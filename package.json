@@ -1,0 +1,25 @@
+{
+  "name": "sharp",
+  "version": "0.0.1",
+  "main": "./build/Release/sharp",
+  "description": "High performance Node.js module to resize JPEG images using the libvips image processing library",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lovell/sharp"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "keywords": [
+    "jpeg",
+    "resize",
+    "thumbnail",
+	"sharpen",
+	"crop",
+	"embed",
+    "libvips",
+	"fast"
+  ],
+  "author": "Lovell Fuller",
+  "license": "Apache 2.0"
+}
