@@ -7,6 +7,12 @@
     "type": "git",
     "url": "git://github.com/lovell/sharp"
   },
+  "devDependencies": {
+    "imagemagick": "*"
+  },
+  "scripts": {
+    "test": "node tests/perf.js"
+  },
   "engines": {
     "node": "*"
   },

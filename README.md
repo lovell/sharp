@@ -1,4 +1,6 @@
-# sharp (_adj_)
+# sharp
+
+_adj_
 
 1. clearly defined; distinct: a sharp photographic image. 
 2. quick, brisk, or spirited. 
@@ -9,7 +11,7 @@ The typical use case for this high performance Node.js module is to convert a la
 
 It is somewhat opinionated in that it only deals with JPEG images, always obeys the requested dimensions by either cropping or embedding and insists on a mild sharpen of the resulting image.
 
-Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by the University of Southampton.
+Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by the University of Southampton. Speed is typically 25-30% faster than the imagemagick equivalent.
 
 ## Prerequisites
 
@@ -36,9 +38,24 @@ Ubuntu 13.04:
 
 ```javascript
 var sharp = require("sharp");
-var cropLandscape = sharp.resize("input.jpg", "output.jpg", 300, 200, "c");
-var embedPortraitWhiteBorder = sharp.resize("input.jpg", "output.jpg", 200, 300, "w");
-var embedPortraitBlackBorder = sharp.resize("input.jpg", "output.jpg", 200, 300, "b");
+sharp.crop("input.jpg", "output.jpg", 300, 200, function(err) {
+  if (err) {
+    throw err;
+  }
+  // output.jpg is cropped input.jpg
+});
+sharp.embedWhite("input.jpg", "output.jpg", 200, 300, function(err) {
+  if (err) {
+    throw err;
+  }
+  // output.jpg contains input.jpg embedded with a white border
+});
+sharp.embedBlack("input.jpg", "output.jpg", 200, 300, function(err) {
+  if (err) {
+    throw err;
+  }
+  // output.jpg contains input.jpg embedded with a black border
+});
 ```
 
 ## Testing [![Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
