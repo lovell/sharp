@@ -38,7 +38,7 @@ Ubuntu 13.04 (64-bit):
 
 ## Usage
 
-  var sharp = require("sharp");
+	var sharp = require("sharp");
 
 ### crop(inputPath, outputPath, width, height, callback)
 
@@ -51,7 +51,7 @@ sharp.crop("input.jpg", "output.jpg", 300, 200, function(err) {
   if (err) {
     throw err;
   }
-  // output.jpg is a 300 pixels wide and 200 pixels high image
+  // output.jpg is a 200 pixels wide and 300 pixels high image
   // containing a scaled and cropped version of input.jpg
 });
 ```
@@ -65,7 +65,7 @@ sharp.embedWhite("input.jpg", "output.jpg", 200, 300, function(err) {
   if (err) {
     throw err;
   }
-  // output.jpg is a 300 pixels wide and 200 pixels high image
+  // output.jpg is a 200 pixels wide and 300 pixels high image
   // containing a scaled version of input.jpg embedded on a white canvas
 });
 ```
@@ -79,7 +79,7 @@ sharp.embedBlack("input.jpg", "output.jpg", 200, 300, function(err) {
   if (err) {
     throw err;
   }
-  // output.jpg is a 300 pixels wide and 200 pixels high image
+  // output.jpg is a 200 pixels wide and 300 pixels high image
   // containing a scaled version of input.jpg embedded on a black canvas
 });
 ```
