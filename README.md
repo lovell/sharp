@@ -51,7 +51,7 @@ sharp.crop("input.jpg", "output.jpg", 300, 200, function(err) {
   if (err) {
     throw err;
   }
-  // output.jpg is a 200 pixels wide and 300 pixels high image
+  // output.jpg is a 300 pixels wide and 200 pixels high image
   // containing a scaled and cropped version of input.jpg
 });
 ```
