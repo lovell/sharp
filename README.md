@@ -1,4 +1,4 @@
-# sharp
+﻿# sharp
 
 _adj_
 
@@ -7,17 +7,17 @@ _adj_
 3. shrewd or astute: a sharp bargainer. 
 4. (Informal.) very stylish: a sharp dresser; a sharp jacket. 
 
-The typical use case for this high performance Node.js module is to convert a large JPEG image to smaller JPEG images of varying dimensions.
+The typical use case for this high speed Node.js module is to convert a large JPEG image to smaller JPEG images of varying dimensions.
 
 It is somewhat opinionated in that it only deals with JPEG images, always obeys the requested dimensions by either cropping or embedding and insists on a mild sharpen of the resulting image.
 
 Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by the University of Southampton.
 
-Speed is typically 4x faster than the imagemagick equivalent.
+Performance is 4x-8x faster than the imagemagick equivalent, based mainly on the number of CPU cores available.
 
 ## Prerequisites
 
-Requires node-gyp and libvips-dev to build.
+Requires Node.js v0.8+, node-gyp and libvips-dev to build.
 
 	sudo npm install -g node-gyp
 	sudo apt-get install libvips-dev
@@ -86,11 +86,32 @@ sharp.embedBlack("input.jpg", "output.jpg", 200, 300, function(err) {
 
 ## Testing [![Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
+	npm install --dev sharp
 	npm test
 
 ## Performance
 
-Using an AMD Athlon quad core CPU with 512KB L2 cache clocked at 3.3GHz with 8GB RAM:
+### AMD Athlon 4x core 3.3GHz 512KB L2
 
-* imagemagick x 5.55 ops/sec �0.68% (31 runs sampled)
-* sharp x 24.49 ops/sec �6.85% (64 runs sampled)
+* imagemagick x 5.55 ops/sec ±0.68% (31 runs sampled)
+* sharp x 24.49 ops/sec ±6.85% (64 runs sampled)
+
+### AWS t1.micro
+
+* imagemagick x 1.36 ops/sec ±0.96% (11 runs sampled)
+* sharp x 12.42 ops/sec ±5.84% (64 runs sampled)
+
+### AWS m1.medium
+
+* imagemagick x 1.38 ops/sec ±0.45% (11 runs sampled)
+* sharp x 12.66 ops/sec ±5.54% (65 runs sampled)
+
+### AWS c1.medium
+
+* imagemagick x 2.10 ops/sec ±0.67% (15 runs sampled)
+* sharp x 18.97 ops/sec ±10.54% (52 runs sampled)
+
+### AWS m3.xlarge
+
+* imagemagick x 4.46 ops/sec ±0.33% (26 runs sampled)
+* sharp x 28.89 ops/sec ±7.75% (74 runs sampled)

@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "index.js",
   "description": "High performance Node.js module to resize JPEG images using the libvips image processing library",
   "repository": {
@@ -15,7 +15,7 @@
     "test": "node tests/perf.js"
   },
   "engines": {
-    "node": "*"
+    "node": ">=0.8"
   },
   "keywords": [
     "jpeg",
