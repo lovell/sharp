@@ -39,7 +39,7 @@ void ResizeAsync(uv_work_t *work) {
   ResizeBaton* baton = static_cast<ResizeBaton*>(work->data);
 
   VipsImage *in = vips_image_new_mode((baton->src).c_str(), "p");
-  im_jpeg2vips((baton->src).c_str(), in);
+  vips_jpegload((baton->src).c_str(), &in, NULL);
   if (in == NULL) {
     (baton->err).append(vips_error_buffer());
     vips_error_clear();
@@ -114,10 +114,10 @@ void ResizeAsync(uv_work_t *work) {
   }
   img = t[3];
 
-  if (im_vips2jpeg(img, baton->dst.c_str())) {
+  if (vips_jpegsave(img, baton->dst.c_str(), "Q", 80, "profile", "none", "optimize_coding", TRUE, NULL)) {
     (baton->err).append(vips_error_buffer());
     vips_error_clear();
-  }  
+  }
 }
 
 void ResizeAsyncAfter(uv_work_t *work, int status) {
