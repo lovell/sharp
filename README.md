@@ -21,12 +21,12 @@ Performance is 4x-8x faster than the imagemagick equivalent, based mainly on the
 * node-gyp
 * libvips-dev 7.28+
 
-	sudo npm install -g node-gyp
-	sudo apt-get install libvips-dev
+```
+sudo npm install -g node-gyp
+sudo apt-get install libvips-dev
+```
 
-`vips-7.28.pc` (or later, installed with libvips-dev) must be symlinked as `/usr/lib/pkgconfig/vips.pc`.
-
-For example, in Ubuntu 13.04 (64-bit):
+Please symlink `vips-7.28.pc` (or later, installed with libvips-dev) as `/usr/lib/pkgconfig/vips.pc`. To do this in Ubuntu 13.04 (64-bit), use:
 
 	sudo ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/vips-7.28.pc /usr/lib/pkgconfig/vips.pc
 

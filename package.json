@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "imagemagick": "*",
+    "gm": "*",
     "benchmark": "*"
   },
   "scripts": {
