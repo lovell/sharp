@@ -17,18 +17,16 @@ Performance is 4x-8x faster than the imagemagick equivalent, based mainly on the
 
 ## Prerequisites
 
-Requires Node.js v0.8+, node-gyp and libvips-dev to build.
+* Node.js v0.8+
+* node-gyp
+* libvips-dev 7.28+
 
 	sudo npm install -g node-gyp
 	sudo apt-get install libvips-dev
 
-Requires vips-7.xx.pc (installed with libvips-dev) to be symlinked as /usr/lib/pkgconfig/vips.pc
+`vips-7.28.pc` (or later, installed with libvips-dev) must be symlinked as `/usr/lib/pkgconfig/vips.pc`.
 
-Ubuntu 12.04 LTS:
-
-	sudo ln -s /usr/lib/pkgconfig/vips-7.26.pc /usr/lib/pkgconfig/vips.pc
-
-Ubuntu 13.04 (64-bit):
+For example, in Ubuntu 13.04 (64-bit):
 
 	sudo ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/vips-7.28.pc /usr/lib/pkgconfig/vips.pc
 
@@ -84,7 +82,7 @@ sharp.embedBlack("input.jpg", "output.jpg", 200, 300, function(err) {
 });
 ```
 
-## Testing [![Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
+## Testing
 
 	npm install --dev sharp
 	npm test
@@ -93,8 +91,8 @@ sharp.embedBlack("input.jpg", "output.jpg", 200, 300, function(err) {
 
 ### AMD Athlon 4x core 3.3GHz 512KB L2
 
-* imagemagick x 5.55 ops/sec ±0.68% (31 runs sampled)
-* sharp x 24.49 ops/sec ±6.85% (64 runs sampled)
+* imagemagick x 5.55 ops/sec ±0.45% (31 runs sampled)
+* sharp x 31.52 ops/sec ±8.74% (80 runs sampled)
 
 ### AWS t1.micro
 
