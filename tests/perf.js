@@ -1,5 +1,6 @@
 var sharp = require("../index");
 var imagemagick = require("imagemagick");
+var gm = require("gm");
 var assert = require("assert");
 var Benchmark = require("benchmark");
 
@@ -19,6 +20,17 @@ suite.add("imagemagick", {
       width: width,
       height: height
     }, function(err) {
+      if (err) {
+        throw err;
+      } else {
+        deferred.resolve();
+      }
+    });
+  }
+}).add("gm", {
+  "defer": true,
+  "fn": function(deferred) {
+    gm(input).crop(width, height).write(output, function (err) {
       if (err) {
         throw err;
       } else {

@@ -13,7 +13,7 @@ It is somewhat opinionated in that it only deals with JPEG images, always obeys 
 
 Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by the University of Southampton.
 
-Performance is 4x-8x faster than the imagemagick equivalent, based mainly on the number of CPU cores available.
+Performance is 4x-8x faster than ImageMagick and 2x-4x faster than GraphicsMagick, based mainly on the number of CPU cores available.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ sudo npm install -g node-gyp
 sudo apt-get install libvips-dev
 ```
 
-Please symlink `vips-7.28.pc` (or later, installed with libvips-dev) as `/usr/lib/pkgconfig/vips.pc`. To do this in Ubuntu 13.04 (64-bit), use:
+When installed as a package, please symlink `vips-7.28.pc` (or later, installed with libvips-dev) as `/usr/lib/pkgconfig/vips.pc`. To do this in Ubuntu 13.04 (64-bit), use:
 
 	sudo ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/vips-7.28.pc /usr/lib/pkgconfig/vips.pc
 
@@ -92,6 +92,7 @@ sharp.embedBlack("input.jpg", "output.jpg", 200, 300, function(err) {
 ### AMD Athlon 4x core 3.3GHz 512KB L2
 
 * imagemagick x 5.55 ops/sec ±0.45% (31 runs sampled)
+* gm x 10.31 ops/sec ±3.57% (53 runs sampled)
 * sharp x 31.52 ops/sec ±8.74% (80 runs sampled)
 
 ### AWS t1.micro
