@@ -1,6 +1,7 @@
 var sharp = require("../index");
 var imagemagick = require("imagemagick");
 var gm = require("gm");
+var epeg = require("epeg");
 var assert = require("assert");
 var Benchmark = require("benchmark");
 
@@ -37,6 +38,13 @@ suite.add("imagemagick", {
         deferred.resolve();
       }
     });
+  }
+}).add("epeg", {
+  "defer": true,
+  "fn": function(deferred) {
+    var image = new epeg.Image({path: input});
+    image.downsize(width, height).saveTo(output);
+    deferred.resolve();
   }
 }).add("sharp", {
   "defer": true,

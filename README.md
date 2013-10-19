@@ -93,6 +93,7 @@ sharp.embedBlack("input.jpg", "output.jpg", 200, 300, function(err) {
 
 * imagemagick x 5.55 ops/sec ±0.45% (31 runs sampled)
 * gm x 10.31 ops/sec ±3.57% (53 runs sampled)
+* epeg x 27.79 ops/sec ±0.12% (69 runs sampled)
 * sharp x 31.52 ops/sec ±8.74% (80 runs sampled)
 
 ### AWS t1.micro
