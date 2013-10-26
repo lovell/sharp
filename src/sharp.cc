@@ -35,11 +35,22 @@ struct ResizeBaton {
   Persistent<Function> callback;
 };
 
+bool EndsWith(std::string const &str, std::string const &end) {
+  return str.length() >= end.length() && 0 == str.compare(str.length() - end.length(), end.length(), end);
+}
+
 void ResizeAsync(uv_work_t *work) {
   ResizeBaton* baton = static_cast<ResizeBaton*>(work->data);
 
   VipsImage *in = vips_image_new_mode((baton->src).c_str(), "p");
-  vips_jpegload((baton->src).c_str(), &in, NULL);
+  if (EndsWith(baton->src, ".jpg") || EndsWith(baton->src, ".jpeg"))  {
+    vips_jpegload((baton->src).c_str(), &in, NULL);
+  } else if (EndsWith(baton->src, ".png")) {
+    vips_pngload((baton->src).c_str(), &in, NULL);
+  } else {
+    (baton->err).append("Unsupported input file type");
+    return;
+  }
   if (in == NULL) {
     (baton->err).append(vips_error_buffer());
     vips_error_clear();
@@ -114,9 +125,18 @@ void ResizeAsync(uv_work_t *work) {
   }
   img = t[3];
 
-  if (vips_jpegsave(img, baton->dst.c_str(), "Q", 80, "profile", "none", "optimize_coding", TRUE, NULL)) {
-    (baton->err).append(vips_error_buffer());
-    vips_error_clear();
+  if (EndsWith(baton->dst, ".jpg") || EndsWith(baton->dst, ".jpeg"))  {
+    if (vips_jpegsave(img, baton->dst.c_str(), "Q", 80, "profile", "none", "optimize_coding", TRUE, NULL)) {
+      (baton->err).append(vips_error_buffer());
+      vips_error_clear();
+    }
+  } else if (EndsWith(baton->dst, ".png")) {
+    if (vips_pngsave(img, baton->dst.c_str(), "compression", 6, "interlace", FALSE, NULL)) {
+      (baton->err).append(vips_error_buffer());
+      vips_error_clear();
+    }
+  } else {
+    (baton->err).append("Unsupported output file type");
   }
 }
 

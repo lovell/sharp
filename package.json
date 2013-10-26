@@ -1,26 +1,19 @@
 {
   "name": "sharp",
-  "version": "0.0.4",
+  "version": "0.0.5",
+  "author": "Lovell Fuller",
+  "description": "High performance module to resize JPEG and PNG images using the libvips image processing library",
+  "scripts": {
+    "test": "node tests/perf.js"
+  },
   "main": "index.js",
-  "description": "High performance Node.js module to resize JPEG images using the libvips image processing library",
   "repository": {
     "type": "git",
     "url": "git://github.com/lovell/sharp"
   },
-  "devDependencies": {
-    "imagemagick": "*",
-    "gm": "*",
-    "epeg": "*",
-    "benchmark": "*"
-  },
-  "scripts": {
-    "test": "node tests/perf.js"
-  },
-  "engines": {
-    "node": ">=0.8"
-  },
   "keywords": [
     "jpeg",
+    "png",
     "resize",
     "thumbnail",
     "sharpen",
@@ -29,6 +22,15 @@
     "libvips",
     "fast"
   ],
-  "author": "Lovell Fuller",
-  "license": "Apache 2.0"
+  "devDependencies": {
+    "imagemagick": "*",
+    "gm": "*",
+    "epeg": "*",
+    "async": "*",
+    "benchmark": "*"
+  },
+  "license": "Apache 2.0",
+  "engines": {
+    "node": ">=0.8"
+  }
 }
