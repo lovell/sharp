@@ -126,12 +126,12 @@ void ResizeAsync(uv_work_t *work) {
   img = t[3];
 
   if (EndsWith(baton->dst, ".jpg") || EndsWith(baton->dst, ".jpeg"))  {
-    if (vips_jpegsave(img, baton->dst.c_str(), "Q", 80, "profile", "none", "optimize_coding", TRUE, NULL)) {
+    if (vips_foreign_save(img, baton->dst.c_str(), "strip", TRUE, "Q", 80, "optimize_coding", TRUE, NULL)) {
       (baton->err).append(vips_error_buffer());
       vips_error_clear();
     }
   } else if (EndsWith(baton->dst, ".png")) {
-    if (vips_pngsave(img, baton->dst.c_str(), "compression", 6, "interlace", FALSE, NULL)) {
+    if (vips_foreign_save(img, baton->dst.c_str(), "strip", TRUE, "compression", 6, "interlace", FALSE, NULL)) {
       (baton->err).append(vips_error_buffer());
       vips_error_clear();
     }

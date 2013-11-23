@@ -115,7 +115,8 @@ async.series({
     }).run();
   }
 }, function(err, results) {
-  results.forEach(function(format, fastest) {
-    assert(fastest === "sharp", "sharp was slower than " + fastest + " for " + format);
+  assert(!err, err);
+  Object.keys(results).forEach(function(format) {
+    assert(results[format] == "sharp", "sharp was slower than " + results[format] + " for " + format);
   });
 });

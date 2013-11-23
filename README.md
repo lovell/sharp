@@ -19,16 +19,11 @@ Performance is 4x-8x faster than ImageMagick and 2x-4x faster than GraphicsMagic
 
 * Node.js v0.8+
 * node-gyp
-* libvips-dev 7.28+ (7.36+ for optimal JPEG Huffman coding)
+* [libvips](https://github.com/jcupitt/libvips) v7.37+
 
-```
-sudo npm install -g node-gyp
-sudo apt-get install libvips-dev
-```
+For the sharpest results, please compile libvips from source.
 
-When installed as a package, please symlink `vips-7.28.pc` (or later, installed with libvips-dev) as `/usr/lib/pkgconfig/vips.pc`. To do this in Ubuntu 13.04 (64-bit), use:
-
-	sudo ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/vips-7.28.pc /usr/lib/pkgconfig/vips.pc
+If you prefer to run a stable, package-managed environment such as Ubuntu 12.04 LTS, [v0.0.3](https://github.com/lovell/sharp/tree/v0.0.3) will work with the libvips-dev package.
 
 ## Install
 
@@ -84,7 +79,6 @@ sharp.embedBlack("input.png", "output.png", 200, 300, function(err) {
 
 ## Testing
 
-	npm install --dev sharp
 	npm test
 
 ## Performance
