@@ -3,8 +3,10 @@
 #include <string>
 #include <vector>
 #include <vips/vips.h>
+#include <node_buffer.h>
 
 using namespace v8;
+using namespace node;
 
 // Free VipsImage children when object goes out of scope
 // Thanks due to https://github.com/dosx/node-vips
@@ -27,12 +29,16 @@ class ImageFreer {
 struct ResizeBaton {
   std::string src;
   std::string dst;
+  void* buffer_out;
+  size_t buffer_out_len;
   int  cols;
   int  rows;
   bool crop;
   int  embed;
   std::string err;
   Persistent<Function> callback;
+
+  ResizeBaton() : buffer_out_len(0) {}
 };
 
 bool EndsWith(std::string const &str, std::string const &end) {
@@ -125,12 +131,28 @@ void ResizeAsync(uv_work_t *work) {
   }
   img = t[3];
 
-  if (EndsWith(baton->dst, ".jpg") || EndsWith(baton->dst, ".jpeg"))  {
+  if (baton->dst == "__jpeg") {
+    // Write JPEG to buffer
+    if (vips_jpegsave_buffer(img, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, "optimize_coding", TRUE, NULL)) {
+      (baton->err).append(vips_error_buffer());
+      vips_error_clear();
+      return;
+    }
+  } else if (baton->dst == "__png") {
+    // Write PNG to buffer
+    if (vips_pngsave_buffer(img, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", 6, "interlace", FALSE, NULL)) {
+      (baton->err).append(vips_error_buffer());
+      vips_error_clear();
+      return;
+    }
+  } else if (EndsWith(baton->dst, ".jpg") || EndsWith(baton->dst, ".jpeg"))  {
+    // Write JPEG to file
     if (vips_foreign_save(img, baton->dst.c_str(), "strip", TRUE, "Q", 80, "optimize_coding", TRUE, NULL)) {
       (baton->err).append(vips_error_buffer());
       vips_error_clear();
     }
   } else if (EndsWith(baton->dst, ".png")) {
+    // Write PNG to file
     if (vips_foreign_save(img, baton->dst.c_str(), "strip", TRUE, "compression", 6, "interlace", FALSE, NULL)) {
       (baton->err).append(vips_error_buffer());
       vips_error_clear();
@@ -145,14 +167,18 @@ void ResizeAsyncAfter(uv_work_t *work, int status) {
 
   ResizeBaton *baton = static_cast<ResizeBaton*>(work->data);
 
-  Local<Value> argv[1];
+  Local<Value> null = Local<Value>::New(Null());
+  Local<Value> argv[2] = {null, null};
   if (!baton->err.empty()) {
+    // Error
     argv[0] = String::New(baton->err.data(), baton->err.size());
-  } else {
-    argv[0] = Local<Value>::New(Null());
+  } else if (baton->buffer_out_len > 0) {
+    // Buffer
+    Buffer *buffer = Buffer::New((const char*)(baton->buffer_out), baton->buffer_out_len);
+    argv[1] = Local<Object>::New(buffer->handle_);
   }
 
-  baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+  baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
   baton->callback.Dispose();
   delete baton;
   delete work;
@@ -168,14 +194,14 @@ Handle<Value> Resize(const Arguments& args) {
   baton->rows = args[3]->Int32Value();
   Local<String> canvas = args[4]->ToString();
   if (canvas->Equals(String::NewSymbol("c"))) {
-	baton->crop = true;
+    baton->crop = true;
   } else if (canvas->Equals(String::NewSymbol("w"))) {
     baton->crop = false;
     baton->embed = 4;
   } else if (canvas->Equals(String::NewSymbol("b"))) {
     baton->crop = false;
     baton->embed = 0;
-  }	
+  }
   baton->callback = Persistent<Function>::New(Local<Function>::Cast(args[5]));
 
   uv_work_t *work = new uv_work_t;
@@ -190,4 +216,4 @@ extern "C" void init(Handle<Object> target) {
   NODE_SET_METHOD(target, "resize", Resize);
 };
 
-NODE_MODULE(sharp, init)
+NODE_MODULE(sharp, init);

@@ -33,11 +33,9 @@ If you prefer to run a stable, package-managed environment such as Ubuntu 12.04 
 
 	var sharp = require("sharp");
 
-### crop(inputPath, outputPath, width, height, callback)
+### crop(input, output, width, height, callback)
 
-Scale and crop `inputPath` to `width` x `height` and write to `outputPath` calling `callback` when complete.
-
-Example:
+Scale and crop to `width` x `height` calling `callback` when complete.
 
 ```javascript
 sharp.crop("input.jpg", "output.jpg", 300, 200, function(err) {
@@ -49,12 +47,30 @@ sharp.crop("input.jpg", "output.jpg", 300, 200, function(err) {
 });
 ```
 
-### embedWhite(inputPath, outputPath, width, height, callback)
-
-Scale and embed `inputPath` to `width` x `height` using a white canvas and write to `outputPath` calling `callback` when complete.
+```javascript
+sharp.crop("input.jpg", sharp.buffer.jpeg, 300, 200, function(err, buffer) {
+  if (err) {
+    throw err;
+  }
+  // buffer contains JPEG image data
+});
+```
 
 ```javascript
-sharp.embedWhite("input.jpg", "output.png", 200, 300, function(err) {
+sharp.crop("input.jpg", sharp.buffer.png, 300, 200, function(err, buffer) {
+  if (err) {
+    throw err;
+  }
+  // buffer contains PNG image data (converted from JPEG)
+});
+```
+
+### embedWhite(input, output, width, height, callback)
+
+Scale and embed to `width` x `height` using a white canvas calling `callback` when complete.
+
+```javascript
+sharp.embedWhite("input.jpg", "output.jpg", 200, 300, function(err) {
   if (err) {
     throw err;
   }
@@ -63,9 +79,18 @@ sharp.embedWhite("input.jpg", "output.png", 200, 300, function(err) {
 });
 ```
 
-### embedBlack(inputPath, outputPath, width, height, callback)
+```javascript
+sharp.embedWhite("input.jpg", sharp.buffer.jpeg, 200, 300, function(err, buffer) {
+  if (err) {
+    throw err;
+  }
+  // buffer contains JPEG image data
+});
+```
 
-Scale and embed `inputPath` to `width` x `height` using a black canvas and write to `outputPath` calling `callback` when complete.
+### embedBlack(input, output, width, height, callback)
+
+Scale and embed to `width` x `height` using a black canvas calling `callback` when complete.
 
 ```javascript
 sharp.embedBlack("input.png", "output.png", 200, 300, function(err) {
@@ -77,6 +102,19 @@ sharp.embedBlack("input.png", "output.png", 200, 300, function(err) {
 });
 ```
 
+### Parameters common to all methods
+
+#### input
+
+String containing the filename to read from.
+
+#### output
+
+One of:
+* String containing the filename to write to.
+* `sharp.buffer.jpeg` to pass a Buffer containing JPEG image data to `callback`.
+* `sharp.buffer.png` to pass a Buffer containing PNG image data to `callback`.
+
 ## Testing
 
 	npm test
@@ -86,8 +124,8 @@ sharp.embedBlack("input.png", "output.png", 200, 300, function(err) {
 Test environment:
 
 * AMD Athlon 4 core 3.3GHz 512KB L2 CPU 1333 DDR3
-* libvips 7.36
-* libjpeg-turbo8 1.2.1
+* libvips 7.37
+* libjpeg-turbo8 1.3.0
 * libpng 1.6.6
 * zlib1g 1.2.7
 
@@ -96,17 +134,19 @@ Test environment:
 * imagemagick x 5.53 ops/sec ±0.55% (31 runs sampled)
 * gm x 10.86 ops/sec ±0.43% (56 runs sampled)
 * epeg x 28.07 ops/sec ±0.07% (70 runs sampled)
-* sharp x 31.60 ops/sec ±8.80% (80 runs sampled)
+* sharp-file x 31.60 ops/sec ±8.80% (80 runs sampled)
+* sharp-buffer x 34.04 ops/sec ±0.36% (82 runs sampled)
 
 #### PNG
 
 * imagemagick x 4.65 ops/sec ±0.37% (27 runs sampled)
 * gm x 21.65 ops/sec ±0.18% (56 runs sampled)
-* sharp x 39.47 ops/sec ±6.78% (68 runs sampled)
+* sharp-file x 39.47 ops/sec ±6.78% (68 runs sampled)
+* sharp-buffer x 42.87 ops/sec ±0.19% (71 runs sampled)
 
 ## Licence
 
-Copyright 2013 Lovell Fuller
+Copyright 2013, 2014 Lovell Fuller
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

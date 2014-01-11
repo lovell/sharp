@@ -1,5 +1,10 @@
 var sharp = require("./build/Release/sharp");
 
+module.exports.buffer = {
+  jpeg: "__jpeg",
+  png: "__png"
+};
+
 module.exports.crop = function(input, output, width, height, callback) {
   sharp.resize(input, output, width, height, "c", callback);
 };
