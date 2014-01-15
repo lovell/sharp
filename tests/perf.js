@@ -12,7 +12,7 @@ var outputJpgLength = 47035;
 
 var inputPng = __dirname + "/50020484-00001.png"; // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
 var outputPng = __dirname + "/output.png";
-var outputPngLength = 60379;
+var outputPngLength = 60380;
 
 var width = 640;
 var height = 480;

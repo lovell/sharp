@@ -160,6 +160,7 @@ void ResizeAsync(uv_work_t *work) {
   } else {
     (baton->err).append("Unsupported output file type");
   }
+  vips_thread_shutdown();
 }
 
 void ResizeAsyncAfter(uv_work_t *work, int status) {
@@ -176,6 +177,7 @@ void ResizeAsyncAfter(uv_work_t *work, int status) {
     // Buffer
     Buffer *buffer = Buffer::New((const char*)(baton->buffer_out), baton->buffer_out_len);
     argv[1] = Local<Object>::New(buffer->handle_);
+    vips_free(baton->buffer_out);
   }
 
   baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
@@ -210,9 +212,15 @@ Handle<Value> Resize(const Arguments& args) {
   return Undefined();
 }
 
+static void at_exit(void* arg) {
+  HandleScope scope;
+  vips_shutdown();
+}
+
 extern "C" void init(Handle<Object> target) {
   HandleScope scope;
   vips_init("");
+  AtExit(at_exit);
   NODE_SET_METHOD(target, "resize", Resize);
 };
 
