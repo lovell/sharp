@@ -8,11 +8,9 @@ var Benchmark = require("benchmark");
 
 var inputJpg = __dirname + "/2569067123_aca715a2ee_o.jpg"; // http://www.flickr.com/photos/grizdave/2569067123/
 var outputJpg = __dirname + "/output.jpg";
-var outputJpgLength = 47035;
 
 var inputPng = __dirname + "/50020484-00001.png"; // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
 var outputPng = __dirname + "/output.png";
-var outputPngLength = 60380;
 
 var width = 640;
 var height = 480;
@@ -73,7 +71,6 @@ async.series({
             throw err;
           } else {
             assert.notStrictEqual(null, buffer);
-            assert.strictEqual(outputJpgLength, buffer.length);
             deferred.resolve();
           }
         });
@@ -131,7 +128,6 @@ async.series({
             throw err;
           } else {
             assert.notStrictEqual(null, buffer);
-            assert.strictEqual(outputPngLength, buffer.length);
             deferred.resolve();
           }
         });

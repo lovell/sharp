@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "author": "Lovell Fuller",
   "description": "High performance module to resize JPEG and PNG images using the libvips image processing library",
   "scripts": {

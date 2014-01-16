@@ -13,7 +13,7 @@ It is somewhat opinionated in that it only deals with JPEG and PNG images, alway
 
 Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by the University of Southampton.
 
-Performance is 4x-8x faster than ImageMagick and 2x-4x faster than GraphicsMagick, based mainly on the number of CPU cores available.
+Performance is 12x-15x faster than ImageMagick and 4x-6x faster than GraphicsMagick, based mainly on the number of CPU cores available.
 
 ## Prerequisites
 
@@ -134,15 +134,15 @@ Test environment:
 * imagemagick x 5.53 ops/sec ±0.55% (31 runs sampled)
 * gm x 10.86 ops/sec ±0.43% (56 runs sampled)
 * epeg x 28.07 ops/sec ±0.07% (70 runs sampled)
-* sharp-file x 31.60 ops/sec ±8.80% (80 runs sampled)
-* sharp-buffer x 34.04 ops/sec ±0.36% (82 runs sampled)
+* sharp-file x 72.01 ops/sec ±7.19% (74 runs sampled)
+* sharp-buffer x 75.73 ops/sec ±0.44% (75 runs sampled)
 
 #### PNG
 
 * imagemagick x 4.65 ops/sec ±0.37% (27 runs sampled)
 * gm x 21.65 ops/sec ±0.18% (56 runs sampled)
-* sharp-file x 39.47 ops/sec ±6.78% (68 runs sampled)
-* sharp-buffer x 42.87 ops/sec ±0.19% (71 runs sampled)
+* sharp-file x 43.80 ops/sec ±6.81% (75 runs sampled)
+* sharp-buffer x 45.67 ops/sec ±0.41% (75 runs sampled)
 
 ## Licence
 

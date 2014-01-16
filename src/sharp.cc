@@ -1,30 +1,11 @@
 #include <node.h>
+#include <node_buffer.h>
 #include <math.h>
 #include <string>
-#include <vector>
 #include <vips/vips.h>
-#include <node_buffer.h>
 
 using namespace v8;
 using namespace node;
-
-// Free VipsImage children when object goes out of scope
-// Thanks due to https://github.com/dosx/node-vips
-class ImageFreer {
-  public:
-    ImageFreer() {}
-    ~ImageFreer() {
-      for (uint16_t i = 0; i < v_.size(); i++) {
-        if (v_[i] != NULL) {
-          g_object_unref(v_[i]);
-        }
-      }
-      v_.clear();
-    }
-    void add(VipsImage* i) { v_.push_back(i); }
-  private:
-    std::vector<VipsImage*> v_;
-};
 
 struct ResizeBaton {
   std::string src;
@@ -45,13 +26,21 @@ bool EndsWith(std::string const &str, std::string const &end) {
   return str.length() >= end.length() && 0 == str.compare(str.length() - end.length(), end.length(), end);
 }
 
+bool IsJpeg(std::string const &str) {
+  return EndsWith(str, ".jpg") || EndsWith(str, ".jpeg");
+}
+
+bool IsPng(std::string const &str) {
+  return EndsWith(str, ".png");
+}
+
 void ResizeAsync(uv_work_t *work) {
   ResizeBaton* baton = static_cast<ResizeBaton*>(work->data);
 
-  VipsImage *in = vips_image_new_mode((baton->src).c_str(), "p");
-  if (EndsWith(baton->src, ".jpg") || EndsWith(baton->src, ".jpeg"))  {
+  VipsImage *in = vips_image_new();
+  if (IsJpeg(baton->src)) {
     vips_jpegload((baton->src).c_str(), &in, NULL);
-  } else if (EndsWith(baton->src, ".png")) {
+  } else if (IsPng(baton->src)) {
     vips_pngload((baton->src).c_str(), &in, NULL);
   } else {
     (baton->err).append("Unsupported input file type");
@@ -62,36 +51,66 @@ void ResizeAsync(uv_work_t *work) {
     vips_error_clear();
     return;
   }
-  ImageFreer freer;
-  freer.add(in);
 
-  VipsImage* img = in;
-  VipsImage* t[4];
-
-  if (im_open_local_array(img, t, 4, "temp", "p")) {
-    (baton->err).append(vips_error_buffer());
-    vips_error_clear();
-    return;
-  }
-
-  double xfactor = static_cast<double>(img->Xsize) / std::max(baton->cols, 1);
-  double yfactor = static_cast<double>(img->Ysize) / std::max(baton->rows, 1);
+  double xfactor = static_cast<double>(in->Xsize) / std::max(baton->cols, 1);
+  double yfactor = static_cast<double>(in->Ysize) / std::max(baton->rows, 1);
   double factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
   factor = std::max(factor, 1.0);
   int shrink = floor(factor);
   double residual = shrink / factor;
 
-  // Use im_shrink with the integral reduction
-  if (im_shrink(img, t[0], shrink, shrink)) {
+  // Try to use libjpeg shrink-on-load
+  int shrink_on_load = 1;
+  if (IsJpeg(baton->src)) {
+    if (shrink >= 8) {
+      residual = residual * shrink / 8;
+      shrink_on_load = 8;
+      shrink = 1;
+    } else if (shrink >= 4) {
+      residual = residual * shrink / 4;
+      shrink_on_load = 4;
+      shrink = 1;
+    } else if (shrink >= 2) {
+      residual = residual * shrink / 2;
+      shrink_on_load = 2;
+      shrink = 1;
+    }
+    if (shrink_on_load > 1) {
+      if (vips_jpegload((baton->src).c_str(), &in, "shrink", shrink_on_load, NULL)) {
+        (baton->err).append(vips_error_buffer());
+        vips_error_clear();
+        g_object_unref(in);
+        return;
+      }
+    }
+  }
+
+  VipsImage* img = in;
+  VipsImage* t[4];
+  if (im_open_local_array(img, t, 4, "temp", "p")) {
     (baton->err).append(vips_error_buffer());
     vips_error_clear();
+    g_object_unref(in);
     return;
   }
 
-  // Use im_affinei with the remaining float part using bilinear interpolation
-  if (im_affinei_all(t[0], t[1], vips_interpolate_bilinear_static(), residual, 0, 0, residual, 0, 0)) {
+  if (shrink > 1) {
+    // Use vips_shrink with the integral reduction
+    if (vips_shrink(img, &t[0], shrink, shrink, NULL)) {
+      (baton->err).append(vips_error_buffer());
+      vips_error_clear();
+      g_object_unref(in);
+      return;
+    }
+  } else {
+    t[0] = img;
+  }
+
+  // Use vips_affine with the remaining float part using bilinear interpolation
+  if (vips_affine(t[0], &t[1], residual, 0, 0, residual, "interpolate", vips_interpolate_bilinear_static(), NULL)) {
     (baton->err).append(vips_error_buffer());
     vips_error_clear();
+    g_object_unref(in);
     return;
   }
   img = t[1];
@@ -104,6 +123,7 @@ void ResizeAsync(uv_work_t *work) {
     if (im_extract_area(img, t[2], left, top, width, height)) {
       (baton->err).append(vips_error_buffer());
       vips_error_clear();
+      g_object_unref(in);
       return;
     }
     img = t[2];
@@ -113,6 +133,7 @@ void ResizeAsync(uv_work_t *work) {
     if (im_embed(img, t[2], baton->embed, left, top, baton->cols, baton->rows)) {
       (baton->err).append(vips_error_buffer());
       vips_error_clear();
+      g_object_unref(in);
       return;
     }
     img = t[2];
@@ -127,6 +148,7 @@ void ResizeAsync(uv_work_t *work) {
   if (im_conv(img, t[3], sharpen)) { 
     (baton->err).append(vips_error_buffer());
     vips_error_clear();
+    g_object_unref(in);
     return;
   }
   img = t[3];
@@ -136,14 +158,12 @@ void ResizeAsync(uv_work_t *work) {
     if (vips_jpegsave_buffer(img, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, "optimize_coding", TRUE, NULL)) {
       (baton->err).append(vips_error_buffer());
       vips_error_clear();
-      return;
     }
   } else if (baton->dst == "__png") {
     // Write PNG to buffer
     if (vips_pngsave_buffer(img, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", 6, "interlace", FALSE, NULL)) {
       (baton->err).append(vips_error_buffer());
       vips_error_clear();
-      return;
     }
   } else if (EndsWith(baton->dst, ".jpg") || EndsWith(baton->dst, ".jpeg"))  {
     // Write JPEG to file
@@ -160,6 +180,7 @@ void ResizeAsync(uv_work_t *work) {
   } else {
     (baton->err).append("Unsupported output file type");
   }
+  g_object_unref(in);
   vips_thread_shutdown();
 }
 
