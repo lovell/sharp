@@ -1,4 +1,4 @@
-﻿# sharp
+# sharp
 
 _adj_
 
@@ -9,21 +9,16 @@ _adj_
 
 The typical use case for this high speed Node.js module is to convert large JPEG and PNG images to smaller JPEG and PNG images of varying dimensions.
 
-It is somewhat opinionated in that it only deals with JPEG and PNG images, always obeys the requested dimensions by either cropping or embedding and insists on a mild sharpen of the resulting image.
+Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by John Cupitt.
 
-Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by the University of Southampton.
-
-Performance is 12x-15x faster than ImageMagick and 4x-6x faster than GraphicsMagick, based mainly on the number of CPU cores available.
+Performance is up to 18x faster than ImageMagick and up to 8x faster than GraphicsMagick, based mainly on the number of CPU cores available.
 
 ## Prerequisites
 
 * Node.js v0.8+
-* node-gyp
-* [libvips](https://github.com/jcupitt/libvips) v7.37+
+* [libvips](https://github.com/jcupitt/libvips) v7.38+
 
 For the sharpest results, please compile libvips from source.
-
-If you prefer to run a stable, package-managed environment such as Ubuntu 12.04 LTS, [v0.0.3](https://github.com/lovell/sharp/tree/v0.0.3) will work with the libvips-dev package.
 
 ## Install
 
@@ -33,12 +28,31 @@ If you prefer to run a stable, package-managed environment such as Ubuntu 12.04 
 
 	var sharp = require("sharp");
 
-### crop(input, output, width, height, callback)
+### resize(input, output, width, height, [options], callback)
 
 Scale and crop to `width` x `height` calling `callback` when complete.
 
+`input` can either be a filename String or a Buffer. When using a filename libvips will `mmap` the file for improved performance. 
+
+`output` can either be a filename String or one of `sharp.buffer.jpeg` or `sharp.buffer.png` to pass a Buffer containing image data to `callback`.
+
+`width` is the Number of pixels wide the resultant image should be.
+
+`height` is the Number of pixels high the resultant image should be.
+
+`options` is optional, and can contain one or more of:
+
+* `canvas` can be one of `sharp.canvas.crop`, `sharp.canvas.embedWhite` or `sharp.canvas.embedBlack`. Defaults to `sharp.canvas.crop`.
+* `sharpen` when set to true will perform a mild sharpen of the resultant image. This typically reduces performance by 30%.
+* `progressive` when set will use progressive (interlace) scan for the output. This typically reduces performance by 30%.
+* `sequentialRead` is an advanced setting that, when set, switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.
+
+`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant image data when a Buffer is requested.
+
+### Examples
+
 ```javascript
-sharp.crop("input.jpg", "output.jpg", 300, 200, function(err) {
+sharp.resize("input.jpg", "output.jpg", 300, 200, function(err) {
   if (err) {
     throw err;
   }
@@ -48,72 +62,42 @@ sharp.crop("input.jpg", "output.jpg", 300, 200, function(err) {
 ```
 
 ```javascript
-sharp.crop("input.jpg", sharp.buffer.jpeg, 300, 200, function(err, buffer) {
+sharp.resize("input.jpg", sharp.buffer.jpeg, 300, 200, {progressive: true}, function(err, buffer) {
   if (err) {
     throw err;
   }
-  // buffer contains JPEG image data
+  // buffer contains progressive JPEG image data
 });
 ```
 
 ```javascript
-sharp.crop("input.jpg", sharp.buffer.png, 300, 200, function(err, buffer) {
+sharp.resize("input.jpg", sharp.buffer.png, 300, 200, {sharpen: true}, function(err, buffer) {
   if (err) {
     throw err;
   }
-  // buffer contains PNG image data (converted from JPEG)
-});
-```
-
-### embedWhite(input, output, width, height, callback)
-
-Scale and embed to `width` x `height` using a white canvas calling `callback` when complete.
-
-```javascript
-sharp.embedWhite("input.jpg", "output.jpg", 200, 300, function(err) {
-  if (err) {
-    throw err;
-  }
-  // output.jpg is a 200 pixels wide and 300 pixels high image
-  // containing a scaled version of input.png embedded on a white canvas
+  // buffer contains sharpened PNG image data (converted from JPEG)
 });
 ```
 
 ```javascript
-sharp.embedWhite("input.jpg", sharp.buffer.jpeg, 200, 300, function(err, buffer) {
+sharp.resize(buffer, "output.jpg", 200, 300, {canvas: sharp.canvas.embedWhite}, function(err) {
   if (err) {
     throw err;
   }
-  // buffer contains JPEG image data
+  // output.jpg is a 200 pixels wide and 300 pixels high image containing a scaled version
+  // of the image data contained in buffer embedded on a white canvas
 });
 ```
 
-### embedBlack(input, output, width, height, callback)
-
-Scale and embed to `width` x `height` using a black canvas calling `callback` when complete.
-
 ```javascript
-sharp.embedBlack("input.png", "output.png", 200, 300, function(err) {
+sharp.resize("input.jpg", sharp.buffer.jpeg, 200, 300, {canvas: sharp.canvas.embedBlack}, function(err, buffer) {
   if (err) {
     throw err;
   }
-  // output.png is a 200 pixels wide and 300 pixels high image
+  // buffer contains JPEG image data of a 200 pixels wide and 300 pixels high image
   // containing a scaled version of input.png embedded on a black canvas
 });
 ```
-
-### Parameters common to all methods
-
-#### input
-
-String containing the filename to read from.
-
-#### output
-
-One of:
-* String containing the filename to write to.
-* `sharp.buffer.jpeg` to pass a Buffer containing JPEG image data to `callback`.
-* `sharp.buffer.png` to pass a Buffer containing PNG image data to `callback`.
 
 ## Testing
 
@@ -129,20 +113,41 @@ Test environment:
 * libpng 1.6.6
 * zlib1g 1.2.7
 
-#### JPEG
+`-file-buffer` indicates read from file and write to buffer, `-buffer-file` indicates read from buffer and write to file etc.
 
-* imagemagick x 5.53 ops/sec ±0.55% (31 runs sampled)
-* gm x 10.86 ops/sec ±0.43% (56 runs sampled)
-* epeg x 28.07 ops/sec ±0.07% (70 runs sampled)
-* sharp-file x 72.01 ops/sec ±7.19% (74 runs sampled)
-* sharp-buffer x 75.73 ops/sec ±0.44% (75 runs sampled)
+`-sharpen`, `-progressive` etc. demonstrate the negative effect of options on performance.
 
-#### PNG
+### JPEG
 
-* imagemagick x 4.65 ops/sec ±0.37% (27 runs sampled)
-* gm x 21.65 ops/sec ±0.18% (56 runs sampled)
-* sharp-file x 43.80 ops/sec ±6.81% (75 runs sampled)
-* sharp-buffer x 45.67 ops/sec ±0.41% (75 runs sampled)
+* imagemagick x 5.50 ops/sec ±0.48% (31 runs sampled)
+* gm-file-file x 11.19 ops/sec ±0.51% (57 runs sampled)
+* gm-file-buffer x 11.11 ops/sec ±0.42% (57 runs sampled)
+* epeg-file-file x 28.59 ops/sec ±0.09% (71 runs sampled)
+* epeg-file-buffer x 28.67 ops/sec ±0.14% (71 runs sampled)
+
+* sharp-buffer-file x 24.72 ops/sec ±0.42% (62 runs sampled)
+* sharp-buffer-buffer x 24.24 ops/sec ±0.36% (61 runs sampled)
+* sharp-file-file x 97.15 ops/sec ±0.44% (80 runs sampled)
+* sharp-file-buffer x __98.51 ops/sec__ ±0.42% (80 runs sampled)
+
+* sharp-file-buffer-sharpen x 56.99 ops/sec ±5.43% (57 runs sampled)
+* sharp-file-buffer-progressive x 64.89 ops/sec ±0.42% (79 runs sampled)
+* sharp-file-buffer-sequentialRead x 64.13 ops/sec ±0.40% (78 runs sampled)
+
+### PNG
+
+* imagemagick x 4.31 ops/sec ±0.27% (26 runs sampled)
+* gm-file-file x 17.89 ops/sec ±0.21% (86 runs sampled)
+* gm-file-buffer x 14.74 ops/sec ±0.15% (73 runs sampled)
+ 
+* sharp-buffer-file x 4.97 ops/sec ±120.47% (26 runs sampled)
+* sharp-buffer-buffer x 13.00 ops/sec ±0.53% (65 runs sampled)
+* sharp-file-file x 53.00 ops/sec ±7.15% (88 runs sampled)
+* sharp-file-buffer x __55.43 ops/sec__ ±0.65% (89 runs sampled)
+ 
+* sharp-file-buffer-sharpen x 45.37 ops/sec ±0.38% (74 runs sampled)
+* sharp-file-buffer-progressive x 55.49 ops/sec ±0.45% (89 runs sampled)
+* sharp-file-buffer-sequentialRead x 32.27 ops/sec ±0.29% (79 runs sampled)
 
 ## Licence
 

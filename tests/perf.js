@@ -1,4 +1,5 @@
 var sharp = require("../index");
+var fs = require("fs");
 var imagemagick = require("imagemagick");
 var gm = require("gm");
 var epeg = require("epeg");
@@ -17,6 +18,7 @@ var height = 480;
 
 async.series({
   jpeg: function(callback) {
+    var inputJpgBuffer = fs.readFileSync(inputJpg);
     (new Benchmark.Suite("jpeg")).add("imagemagick", {
       defer: true,
       fn: function(deferred) {
@@ -34,7 +36,7 @@ async.series({
           }
         });
       }
-    }).add("gm", {
+    }).add("gm-file-file", {
       defer: true,
       fn: function(deferred) {
         gm(inputJpg).crop(width, height).quality(80).write(outputJpg, function (err) {
@@ -45,17 +47,37 @@ async.series({
           }
         });
       }
-    }).add("epeg", {
+    }).add("gm-file-buffer", {
+      defer: true,
+      fn: function(deferred) {
+        gm(inputJpg).crop(width, height).quality(80).toBuffer(function (err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("epeg-file-file", {
       defer: true,
       fn: function(deferred) {
         var image = new epeg.Image({path: inputJpg});
         image.downsize(width, height, 80).saveTo(outputJpg);
         deferred.resolve();
       }
-    }).add("sharp-file", {
+    }).add("epeg-file-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.crop(inputJpg, outputJpg, width, height, function(err) {
+        var image = new epeg.Image({path: inputJpg});
+        var buffer = image.downsize(width, height, 80).process();
+        assert.notStrictEqual(null, buffer);
+        deferred.resolve();
+      }
+    }).add("sharp-buffer-file", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputJpgBuffer, outputJpg, width, height, function(err) {
           if (err) {
             throw err;
           } else {
@@ -63,10 +85,69 @@ async.series({
           }
         });
       }
-    }).add("sharp-buffer", {
+    }).add("sharp-buffer-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.crop(inputJpg, sharp.buffer.jpeg, width, height, function(err, buffer) {
+        sharp.resize(inputJpgBuffer, sharp.buffer.jpeg, width, height, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-file", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputJpg, outputJpg, width, height, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputJpg, sharp.buffer.jpeg, width, height, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-sharpen", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputJpg, sharp.buffer.jpeg, width, height, {sharpen: true}, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-progressive", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputJpg, sharp.buffer.jpeg, width, height, {progressive: true}, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-sequentialRead", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputJpg, sharp.buffer.jpeg, width, height, {sequentialRead: true}, function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -82,6 +163,7 @@ async.series({
     }).run();
   },
   png: function(callback) {
+    var inputPngBuffer = fs.readFileSync(inputPng);
     (new Benchmark.Suite("png")).add("imagemagick", {
       defer: true,
       fn: function(deferred) {
@@ -98,7 +180,7 @@ async.series({
           }
         });
       }
-    }).add("gm", {
+    }).add("gm-file-file", {
       defer: true,
       fn: function(deferred) {
         gm(inputPng).crop(width, height).write(outputPng, function (err) {
@@ -109,10 +191,22 @@ async.series({
           }
         });
       }
-    }).add("sharp-file", {
+    }).add("gm-file-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.crop(inputPng, outputPng, width, height, function(err) {
+        gm(inputPng).crop(width, height).quality(80).toBuffer(function (err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-buffer-file", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputPngBuffer, outputPng, width, height, function(err) {
           if (err) {
             throw err;
           } else {
@@ -120,10 +214,69 @@ async.series({
           }
         });
       }
-    }).add("sharp-buffer", {
+    }).add("sharp-buffer-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.crop(inputPng, sharp.buffer.png, width, height, function(err, buffer) {
+        sharp.resize(inputPngBuffer, sharp.buffer.png, width, height, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-file", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputPng, outputPng, width, height, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputPng, sharp.buffer.png, width, height, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-sharpen", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputPng, sharp.buffer.png, width, height, {sharpen: true}, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-progressive", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputPng, sharp.buffer.png, width, height, {progressive: true}, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-sequentialRead", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputPng, sharp.buffer.png, width, height, {sequentialRead: true}, function(err, buffer) {
           if (err) {
             throw err;
           } else {
