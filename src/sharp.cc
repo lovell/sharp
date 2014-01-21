@@ -18,7 +18,7 @@ struct resize_baton {
   int  width;
   int  height;
   bool crop;
-  int  embed;
+  VipsExtend extend;
   bool sharpen;
   bool progessive;
   VipsAccess access_method;
@@ -98,17 +98,20 @@ void resize_async(uv_work_t *work) {
   int shrink_on_load = 1;
   if (inputImageType == JPEG) {
     if (shrink >= 8) {
-      residual = residual * shrink / 8;
+      factor = residual * shrink / 8;
       shrink_on_load = 8;
-      shrink = 1;
+      shrink = floor(factor);
+      residual = shrink / factor;
     } else if (shrink >= 4) {
-      residual = residual * shrink / 4;
+      factor = residual * shrink / 4;
       shrink_on_load = 4;
-      shrink = 1;
+      shrink = floor(factor);
+      residual = shrink / factor;
     } else if (shrink >= 2) {
-      residual = residual * shrink / 2;
+      factor = residual * shrink / 2;
       shrink_on_load = 2;
-      shrink = 1;
+      shrink = floor(factor);
+      residual = shrink / factor;
     }
     if (shrink_on_load > 1) {
       g_object_unref(in);
@@ -138,26 +141,36 @@ void resize_async(uv_work_t *work) {
 
   // Use vips_affine with the remaining float part using bilinear interpolation
   VipsImage *affined = vips_image_new();
-  if (vips_affine(shrunk, &affined, residual, 0, 0, residual, "interpolate", vips_interpolate_bilinear_static(), NULL)) {
-    return resize_error(baton, shrunk);
+  if (residual > 0) {
+    if (vips_affine(shrunk, &affined, residual, 0, 0, residual, "interpolate", vips_interpolate_bilinear_static(), NULL)) {
+      return resize_error(baton, shrunk);
+    }
+  } else {
+    vips_copy(shrunk, &affined, NULL);
   }
   g_object_unref(shrunk);
 
   VipsImage *canvased = vips_image_new();
-  if (baton->crop) {
-    int width = std::min(affined->Xsize, baton->width);
-    int height = std::min(affined->Ysize, baton->height);
-    int left = (affined->Xsize - width + 1) / 2;
-    int top = (affined->Ysize - height + 1) / 2;
-    if (vips_extract_area(affined, &canvased, left, top, width, height, NULL)) {
-      return resize_error(baton, affined);
+  if (affined->Xsize != baton->width && affined->Ysize != baton->height) {
+    if (baton->crop && affined->Xsize != baton->width && affined->Ysize != baton->height) {
+      // Crop
+      int width = std::min(affined->Xsize, baton->width);
+      int height = std::min(affined->Ysize, baton->height);
+      int left = (affined->Xsize - width + 1) / 2;
+      int top = (affined->Ysize - height + 1) / 2;
+      if (vips_extract_area(affined, &canvased, left, top, width, height, NULL)) {
+        return resize_error(baton, affined);
+      }
+    } else {
+      // Embed
+      int left = (baton->width - affined->Xsize) / 2;
+      int top = (baton->height - affined->Ysize) / 2;
+      if (vips_embed(affined, &canvased, left, top, baton->width, baton->height, "extend", baton->extend, NULL)) {
+        return resize_error(baton, affined);
+      }
     }
   } else {
-    int left = (baton->width - affined->Xsize) / 2;
-    int top = (baton->height - affined->Ysize) / 2;
-    if (vips_embed(affined, &canvased, baton->embed, left, top, baton->width, baton->height, NULL)) {
-      return resize_error(baton, affined);
-    }
+    vips_copy(affined, &canvased, NULL);
   }
   g_object_unref(affined);
 
@@ -248,10 +261,10 @@ Handle<Value> resize(const Arguments& args) {
     baton->crop = true;
   } else if (canvas->Equals(String::NewSymbol("w"))) {
     baton->crop = false;
-    baton->embed = 4;
+    baton->extend = VIPS_EXTEND_WHITE;
   } else if (canvas->Equals(String::NewSymbol("b"))) {
     baton->crop = false;
-    baton->embed = 0;
+    baton->extend = VIPS_EXTEND_BLACK;
   }
   baton->sharpen = args[6]->BooleanValue();
   baton->progessive = args[7]->BooleanValue();

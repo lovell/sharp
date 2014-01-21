@@ -13,7 +13,7 @@ var outputJpg = __dirname + "/output.jpg";
 var inputPng = __dirname + "/50020484-00001.png"; // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
 var outputPng = __dirname + "/output.png";
 
-var width = 640;
+var width = 720;
 var height = 480;
 
 async.series({
@@ -39,7 +39,7 @@ async.series({
     }).add("gm-file-file", {
       defer: true,
       fn: function(deferred) {
-        gm(inputJpg).crop(width, height).quality(80).write(outputJpg, function (err) {
+        gm(inputJpg).resize(width, height).quality(80).write(outputJpg, function (err) {
           if (err) {
             throw err;
           } else {
@@ -50,7 +50,7 @@ async.series({
     }).add("gm-file-buffer", {
       defer: true,
       fn: function(deferred) {
-        gm(inputJpg).crop(width, height).quality(80).toBuffer(function (err, buffer) {
+        gm(inputJpg).resize(width, height).quality(80).toBuffer(function (err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -183,7 +183,7 @@ async.series({
     }).add("gm-file-file", {
       defer: true,
       fn: function(deferred) {
-        gm(inputPng).crop(width, height).write(outputPng, function (err) {
+        gm(inputPng).resize(width, height).write(outputPng, function (err) {
           if (err) {
             throw err;
           } else {
@@ -194,7 +194,7 @@ async.series({
     }).add("gm-file-buffer", {
       defer: true,
       fn: function(deferred) {
-        gm(inputPng).crop(width, height).quality(80).toBuffer(function (err, buffer) {
+        gm(inputPng).resize(width, height).quality(80).toBuffer(function (err, buffer) {
           if (err) {
             throw err;
           } else {

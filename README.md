@@ -9,9 +9,9 @@ _adj_
 
 The typical use case for this high speed Node.js module is to convert large JPEG and PNG images to smaller JPEG and PNG images of varying dimensions.
 
-Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by John Cupitt.
+The performance of JPEG resizing is typically 15x-25x faster than ImageMagick and GraphicsMagick, based mainly on the number of CPU cores available.
 
-Performance is up to 18x faster than ImageMagick and up to 8x faster than GraphicsMagick, based mainly on the number of CPU cores available.
+Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by John Cupitt.
 
 ## Prerequisites
 
@@ -119,35 +119,35 @@ Test environment:
 
 ### JPEG
 
-* imagemagick x 5.50 ops/sec ±0.48% (31 runs sampled)
-* gm-file-file x 11.19 ops/sec ±0.51% (57 runs sampled)
-* gm-file-buffer x 11.11 ops/sec ±0.42% (57 runs sampled)
-* epeg-file-file x 28.59 ops/sec ±0.09% (71 runs sampled)
-* epeg-file-buffer x 28.67 ops/sec ±0.14% (71 runs sampled)
+* imagemagick x 5.53 ops/sec ±0.62% (31 runs sampled)
+* gm-file-file x 4.10 ops/sec ±0.41% (25 runs sampled)
+* gm-file-buffer x 4.10 ops/sec ±0.36% (25 runs sampled)
+* epeg-file-file x 23.82 ops/sec ±0.18% (60 runs sampled)
+* epeg-file-buffer x 23.98 ops/sec ±0.16% (61 runs sampled)
 
-* sharp-buffer-file x 24.72 ops/sec ±0.42% (62 runs sampled)
-* sharp-buffer-buffer x 24.24 ops/sec ±0.36% (61 runs sampled)
-* sharp-file-file x 97.15 ops/sec ±0.44% (80 runs sampled)
-* sharp-file-buffer x __98.51 ops/sec__ ±0.42% (80 runs sampled)
+* sharp-buffer-file x 20.76 ops/sec ±0.55% (54 runs sampled)
+* sharp-buffer-buffer x 20.90 ops/sec ±0.26% (54 runs sampled)
+* sharp-file-file x 91.78 ops/sec ±0.38% (88 runs sampled)
+* sharp-file-buffer x __93.05 ops/sec__ ±0.61% (76 runs sampled)
 
-* sharp-file-buffer-sharpen x 56.99 ops/sec ±5.43% (57 runs sampled)
-* sharp-file-buffer-progressive x 64.89 ops/sec ±0.42% (79 runs sampled)
-* sharp-file-buffer-sequentialRead x 64.13 ops/sec ±0.40% (78 runs sampled)
+* sharp-file-buffer-sharpen x 63.09 ops/sec ±5.58% (63 runs sampled)
+* sharp-file-buffer-progressive x 61.68 ops/sec ±0.53% (76 runs sampled)
+* sharp-file-buffer-sequentialRead x 60.66 ops/sec ±0.38% (75 runs sampled)
 
 ### PNG
 
-* imagemagick x 4.31 ops/sec ±0.27% (26 runs sampled)
-* gm-file-file x 17.89 ops/sec ±0.21% (86 runs sampled)
-* gm-file-buffer x 14.74 ops/sec ±0.15% (73 runs sampled)
+* imagemagick x 4.27 ops/sec ±0.21% (25 runs sampled)
+* gm-file-file x 8.33 ops/sec ±0.19% (44 runs sampled)
+* gm-file-buffer x 7.45 ops/sec ±0.16% (40 runs sampled)
  
-* sharp-buffer-file x 4.97 ops/sec ±120.47% (26 runs sampled)
-* sharp-buffer-buffer x 13.00 ops/sec ±0.53% (65 runs sampled)
-* sharp-file-file x 53.00 ops/sec ±7.15% (88 runs sampled)
-* sharp-file-buffer x __55.43 ops/sec__ ±0.65% (89 runs sampled)
- 
-* sharp-file-buffer-sharpen x 45.37 ops/sec ±0.38% (74 runs sampled)
-* sharp-file-buffer-progressive x 55.49 ops/sec ±0.45% (89 runs sampled)
-* sharp-file-buffer-sequentialRead x 32.27 ops/sec ±0.29% (79 runs sampled)
+* sharp-buffer-file x 4.94 ops/sec ±118.46% (26 runs sampled)
+* sharp-buffer-buffer x 12.59 ops/sec ±0.55% (64 runs sampled)
+* sharp-file-file x 44.06 ops/sec ±6.86% (75 runs sampled)
+* sharp-file-buffer x __46.29 ops/sec__ ±0.38% (76 runs sampled)
+
+* sharp-file-buffer-sharpen x 38.86 ops/sec ±0.22% (65 runs sampled)
+* sharp-file-buffer-progressive x 46.35 ops/sec ±0.20% (76 runs sampled)
+* sharp-file-buffer-sequentialRead x 29.02 ops/sec ±0.62% (72 runs sampled)
 
 ## Licence
 
