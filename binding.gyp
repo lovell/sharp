@@ -7,6 +7,8 @@
       '<!@(PKG_CONFIG_PATH="/usr/lib/pkgconfig" pkg-config --libs vips)'
     ],
     'include_dirs': [
+      '/usr/local/include/glib-2.0',
+      '/usr/local/lib/glib-2.0/include',
       '/usr/include/glib-2.0',
       '/usr/lib/glib-2.0/include',
       '/usr/lib/x86_64-linux-gnu/glib-2.0/include'
