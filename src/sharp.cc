@@ -151,7 +151,7 @@ void resize_async(uv_work_t *work) {
   g_object_unref(shrunk);
 
   VipsImage *canvased = vips_image_new();
-  if (affined->Xsize != baton->width && affined->Ysize != baton->height) {
+  if (affined->Xsize != baton->width || affined->Ysize != baton->height) {
     if (baton->crop && affined->Xsize != baton->width && affined->Ysize != baton->height) {
       // Crop
       int width = std::min(affined->Xsize, baton->width);
