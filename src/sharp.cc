@@ -98,22 +98,21 @@ void resize_async(uv_work_t *work) {
   int shrink_on_load = 1;
   if (inputImageType == JPEG) {
     if (shrink >= 8) {
-      factor = residual * shrink / 8;
+      factor = factor / 8;
       shrink_on_load = 8;
-      shrink = floor(factor);
-      residual = shrink / factor;
     } else if (shrink >= 4) {
-      factor = residual * shrink / 4;
+      factor = factor / 4;
       shrink_on_load = 4;
-      shrink = floor(factor);
-      residual = shrink / factor;
     } else if (shrink >= 2) {
-      factor = residual * shrink / 2;
+      factor = factor / 2;
       shrink_on_load = 2;
-      shrink = floor(factor);
-      residual = shrink / factor;
     }
     if (shrink_on_load > 1) {
+      // Recalculate integral shrink and double residual
+      factor = std::max(factor, 1.0);
+      shrink = floor(factor);
+      residual = shrink / factor;
+      // Reload input using shrink-on-load 
       g_object_unref(in);
       in = vips_image_new();
       if (baton->buffer_in_len > 1) {
@@ -152,7 +151,7 @@ void resize_async(uv_work_t *work) {
 
   VipsImage *canvased = vips_image_new();
   if (affined->Xsize != baton->width || affined->Ysize != baton->height) {
-    if (baton->crop && affined->Xsize != baton->width && affined->Ysize != baton->height) {
+    if (baton->crop) {
       // Crop
       int width = std::min(affined->Xsize, baton->width);
       int height = std::min(affined->Ysize, baton->height);
