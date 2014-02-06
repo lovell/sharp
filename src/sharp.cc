@@ -191,28 +191,28 @@ void resize_async(uv_work_t *work) {
 
   if (baton->file_out == "__jpeg") {
     // Write JPEG to buffer
-    if (vips_jpegsave_buffer(canvased, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
-      return resize_error(baton, canvased);
+    if (vips_jpegsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
+      return resize_error(baton, sharpened);
     }
   } else if (baton->file_out == "__png") {
     // Write PNG to buffer
-    if (vips_pngsave_buffer(canvased, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
-      return resize_error(baton, canvased);
+    if (vips_pngsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
+      return resize_error(baton, sharpened);
     }
   } else if (is_jpeg(baton->file_out))  {
     // Write JPEG to file
-    if (vips_jpegsave(canvased, baton->file_out.c_str(), "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
-      return resize_error(baton, canvased);
+    if (vips_jpegsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
+      return resize_error(baton, sharpened);
     }
   } else if (is_png(baton->file_out)) {
     // Write PNG to file
-    if (vips_pngsave(canvased, baton->file_out.c_str(), "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
-      return resize_error(baton, canvased);
+    if (vips_pngsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
+      return resize_error(baton, sharpened);
     }
   } else {
     (baton->err).append("Unsupported output " + baton->file_out);
   }
-  g_object_unref(canvased);
+  g_object_unref(sharpened);
   vips_thread_shutdown();
 }
 
