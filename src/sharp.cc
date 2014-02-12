@@ -107,36 +107,38 @@ void resize_async(uv_work_t *work) {
       factor = factor / 2;
       shrink_on_load = 2;
     }
-    if (shrink_on_load > 1) {
-      // Recalculate integral shrink and double residual
-      factor = std::max(factor, 1.0);
-      shrink = floor(factor);
-      residual = shrink / factor;
-      // Reload input using shrink-on-load 
-      g_object_unref(in);
-      in = vips_image_new();
-      if (baton->buffer_in_len > 1) {
-        if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "shrink", shrink_on_load, NULL)) {
-          return resize_error(baton, in);
-        }
-      } else {
-        if (vips_jpegload((baton->file_in).c_str(), &in, "shrink", shrink_on_load, NULL)) {
-          return resize_error(baton, in);
-        }
+  }
+  VipsImage *shrunk_on_load = vips_image_new();
+  if (shrink_on_load > 1) {
+    // Recalculate integral shrink and double residual
+    factor = std::max(factor, 1.0);
+    shrink = floor(factor);
+    residual = shrink / factor;
+    // Reload input using shrink-on-load 
+    if (baton->buffer_in_len > 1) {
+      if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
+        return resize_error(baton, in);
+      }
+    } else {
+      if (vips_jpegload((baton->file_in).c_str(), &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
+        return resize_error(baton, in);
       }
     }
+  } else {
+    vips_copy(in, &shrunk_on_load, NULL);
   }
+  g_object_unref(in);
 
   VipsImage *shrunk = vips_image_new();
   if (shrink > 1) {
     // Use vips_shrink with the integral reduction
-    if (vips_shrink(in, &shrunk, shrink, shrink, NULL)) {
-      return resize_error(baton, in);
+    if (vips_shrink(shrunk_on_load, &shrunk, shrink, shrink, NULL)) {
+      return resize_error(baton, shrunk_on_load);
     }
   } else {
-    vips_copy(in, &shrunk, NULL);
+    vips_copy(shrunk_on_load, &shrunk, NULL);
   }
-  g_object_unref(in);
+  g_object_unref(shrunk_on_load);
 
   // Use vips_affine with the remaining float part using bilinear interpolation
   VipsImage *affined = vips_image_new();
@@ -221,10 +223,15 @@ void resize_async_after(uv_work_t *work, int status) {
 
   resize_baton *baton = static_cast<resize_baton*>(work->data);
 
+  // Free temporary copy of input buffer
+  if (baton->buffer_in_len > 0) {
+    g_free(baton->buffer_in);
+  }
+
   Handle<Value> argv[2] = { Null(), Null() };
   if (!baton->err.empty()) {
     // Error
-    argv[0] = String::New(baton->err.data(), baton->err.size());
+    argv[0] = scope.Close(String::New(baton->err.data(), baton->err.size()));
   } else if (baton->buffer_out_len > 0) {
     // Buffer
     Buffer *slowBuffer = Buffer::New(baton->buffer_out_len);
@@ -232,7 +239,7 @@ void resize_async_after(uv_work_t *work, int status) {
     Local<Object> globalObj = Context::GetCurrent()->Global();
     Local<Function> bufferConstructor = Local<Function>::Cast(globalObj->Get(String::New("Buffer")));
     Handle<Value> constructorArgs[3] = { slowBuffer->handle_, v8::Integer::New(baton->buffer_out_len), v8::Integer::New(0) };
-    argv[1] = bufferConstructor->NewInstance(3, constructorArgs);
+    argv[1] = scope.Close(bufferConstructor->NewInstance(3, constructorArgs));
     g_free(baton->buffer_out);
   }
 
@@ -249,8 +256,12 @@ Handle<Value> resize(const Arguments& args) {
   baton->file_in = *String::Utf8Value(args[0]->ToString());
   if (args[1]->IsObject()) {
     Local<Object> buffer = args[1]->ToObject();
-    baton->buffer_in = Buffer::Data(buffer);
-    baton->buffer_in_len = Buffer::Length(buffer);
+    // Take temporary copy of input buffer
+    if (Buffer::Length(buffer) > 0) {
+      baton->buffer_in_len = Buffer::Length(buffer);
+      baton->buffer_in = g_malloc(baton->buffer_in_len);
+      memcpy(baton->buffer_in, Buffer::Data(buffer), baton->buffer_in_len);
+    }
   }
   baton->file_out = *String::Utf8Value(args[2]->ToString());
   baton->width = args[3]->Int32Value();
@@ -286,6 +297,6 @@ extern "C" void init(Handle<Object> target) {
   vips_init("");
   AtExit(at_exit);
   NODE_SET_METHOD(target, "resize", resize);
-};
+}
 
-NODE_MODULE(sharp, init);
+NODE_MODULE(sharp, init)

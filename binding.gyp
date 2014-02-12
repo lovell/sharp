@@ -13,7 +13,7 @@
       '/usr/lib/glib-2.0/include',
       '/usr/lib/x86_64-linux-gnu/glib-2.0/include'
     ],
-    'cflags': ['-fexceptions', '-O3'],
-    'cflags_cc': ['-fexceptions', '-O3']
+    'cflags': ['-fexceptions', '-pedantic', '-Wall', '-O3'],
+    'cflags_cc': ['-fexceptions', '-pedantic', '-Wall', '-O3']
   }]
 }
