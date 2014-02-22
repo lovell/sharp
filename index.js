@@ -2,7 +2,8 @@ var sharp = require("./build/Release/sharp");
 
 module.exports.buffer = {
   jpeg: "__jpeg",
-  png: "__png"
+  png: "__png",
+  webp: "__webp"
 };
 
 module.exports.canvas = {

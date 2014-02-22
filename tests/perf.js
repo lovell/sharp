@@ -13,6 +13,12 @@ var outputJpg = __dirname + "/output.jpg";
 var inputPng = __dirname + "/50020484-00001.png"; // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
 var outputPng = __dirname + "/output.png";
 
+var inputWebp = __dirname + "/4.webp"; // http://www.gstatic.com/webp/gallery/4.webp
+var outputWebp = __dirname + "/output.webp";
+
+var inputTiff = __dirname + "/G31D.TIF"; // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
+var outputTiff = __dirname + "/output.tiff";
+
 var width = 720;
 var height = 480;
 
@@ -290,7 +296,125 @@ async.series({
     }).on("complete", function() {
       callback(null, this.filter("fastest").pluck("name"));
     }).run();
-  }
+  },
+  webp: function(callback) {
+    var inputWebpBuffer = fs.readFileSync(inputWebp);
+    (new Benchmark.Suite("webp")).add("sharp-buffer-file", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputWebpBuffer, outputWebp, width, height, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-buffer-buffer", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputWebpBuffer, sharp.buffer.webp, width, height, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-file", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputWebp, outputWebp, width, height, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputWebp, sharp.buffer.webp, width, height, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-sharpen", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputWebp, sharp.buffer.webp, width, height, {sharpen: true}, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-sequentialRead", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputWebp, sharp.buffer.webp, width, height, {sequentialRead: true}, function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).on("cycle", function(event) {
+      console.log("webp " + String(event.target));
+    }).on("complete", function() {
+      callback(null, this.filter("fastest").pluck("name"));
+    }).run();
+  },
+  tiff: function(callback) {
+    (new Benchmark.Suite("tiff")).add("sharp-file-file", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputTiff, outputTiff, width, height, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-file-sharpen", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputTiff, outputTiff, width, height, {sharpen: true}, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-file-sequentialRead", {
+      defer: true,
+      fn: function(deferred) {
+        sharp.resize(inputTiff, outputTiff, width, height, {sequentialRead: true}, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).on("cycle", function(event) {
+      console.log("tiff " + String(event.target));
+    }).on("complete", function() {
+      callback(null, this.filter("fastest").pluck("name"));
+    }).run();
+  }	
 }, function(err, results) {
   assert(!err, err);
   Object.keys(results).forEach(function(format) {

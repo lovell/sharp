@@ -30,22 +30,33 @@ struct resize_baton {
 
 typedef enum {
   JPEG,
-  PNG
+  PNG,
+  WEBP,
+  TIFF
 } ImageType;
 
 unsigned char MARKER_JPEG[] = {0xff, 0xd8};
 unsigned char MARKER_PNG[] = {0x89, 0x50};
+unsigned char MARKER_WEBP[] = {0x52, 0x49};
 
 bool ends_with(std::string const &str, std::string const &end) {
   return str.length() >= end.length() && 0 == str.compare(str.length() - end.length(), end.length(), end);
 }
 
 bool is_jpeg(std::string const &str) {
-  return ends_with(str, ".jpg") || ends_with(str, ".jpeg");
+  return ends_with(str, ".jpg") || ends_with(str, ".jpeg") || ends_with(str, ".JPG") || ends_with(str, ".JPEG");
 }
 
 bool is_png(std::string const &str) {
-  return ends_with(str, ".png");
+  return ends_with(str, ".png") || ends_with(str, ".PNG");
+}
+
+bool is_webp(std::string const &str) {
+  return ends_with(str, ".webp") || ends_with(str, ".WEBP");
+}
+
+bool is_tiff(std::string const &str) {
+  return ends_with(str, ".tif") || ends_with(str, ".tiff") || ends_with(str, ".TIF") || ends_with(str, ".TIFF");
 }
 
 void resize_error(resize_baton *baton, VipsImage *unref) {
@@ -71,6 +82,15 @@ void resize_async(uv_work_t *work) {
       if (vips_pngload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
         return resize_error(baton, in);
       }
+    } else if(memcmp(MARKER_WEBP, baton->buffer_in, 2) == 0) {
+      inputImageType = WEBP;
+      if (vips_webpload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
+        return resize_error(baton, in);
+      }
+    } else {
+      resize_error(baton, in);
+      (baton->err).append("Unsupported input buffer");
+      return;
     }
   } else if (is_jpeg(baton->file_in)) {
     if (vips_jpegload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
@@ -81,9 +101,19 @@ void resize_async(uv_work_t *work) {
     if (vips_pngload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
       return resize_error(baton, in);
     }
+  } else if (is_webp(baton->file_in)) {
+    inputImageType = WEBP;
+    if (vips_webpload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
+      return resize_error(baton, in);
+    }
+  } else if (is_tiff(baton->file_in)) {
+    inputImageType = TIFF;
+    if (vips_tiffload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
+      return resize_error(baton, in);
+    }
   } else {
     resize_error(baton, in);
-    (baton->err).append("Unsupported input " + baton->file_in);
+    (baton->err).append("Unsupported input file " + baton->file_in);
     return;
   }
 
@@ -201,6 +231,11 @@ void resize_async(uv_work_t *work) {
     if (vips_pngsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
       return resize_error(baton, sharpened);
     }
+  } else if (baton->file_out == "__webp") {
+    // Write WEBP to buffer
+    if (vips_webpsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, NULL)) {
+      return resize_error(baton, sharpened);
+    }
   } else if (is_jpeg(baton->file_out))  {
     // Write JPEG to file
     if (vips_jpegsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
@@ -209,6 +244,16 @@ void resize_async(uv_work_t *work) {
   } else if (is_png(baton->file_out)) {
     // Write PNG to file
     if (vips_pngsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
+      return resize_error(baton, sharpened);
+    }
+  } else if (is_webp(baton->file_out)) {
+    // Write WEBP to file
+    if (vips_webpsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", 80, NULL)) {
+      return resize_error(baton, sharpened);
+    }
+  } else if (is_tiff(baton->file_out)) {
+    // Write TIFF to file
+    if (vips_tiffsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", 80, NULL)) {
       return resize_error(baton, sharpened);
     }
   } else {

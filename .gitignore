@@ -12,7 +12,6 @@ logs
 results
 build
 node_modules
-tests/output.jpg
-tests/output.png
+tests/output.*
 
 npm-debug.log
