@@ -268,11 +268,6 @@ void resize_async_after(uv_work_t *work, int status) {
 
   resize_baton *baton = static_cast<resize_baton*>(work->data);
 
-  // Free temporary copy of input buffer
-  if (baton->buffer_in_len > 0) {
-    g_free(baton->buffer_in);
-  }
-
   Handle<Value> argv[2] = { Null(), Null() };
   if (!baton->err.empty()) {
     // Error
@@ -301,12 +296,8 @@ Handle<Value> resize(const Arguments& args) {
   baton->file_in = *String::Utf8Value(args[0]->ToString());
   if (args[1]->IsObject()) {
     Local<Object> buffer = args[1]->ToObject();
-    // Take temporary copy of input buffer
-    if (Buffer::Length(buffer) > 0) {
-      baton->buffer_in_len = Buffer::Length(buffer);
-      baton->buffer_in = g_malloc(baton->buffer_in_len);
-      memcpy(baton->buffer_in, Buffer::Data(buffer), baton->buffer_in_len);
-    }
+    baton->buffer_in_len = Buffer::Length(buffer);
+    baton->buffer_in = Buffer::Data(buffer);
   }
   baton->file_out = *String::Utf8Value(args[2]->ToString());
   baton->width = args[3]->Int32Value();
