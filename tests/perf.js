@@ -420,4 +420,5 @@ async.series({
   Object.keys(results).forEach(function(format) {
     assert.strictEqual("sharp", results[format].toString().substr(0, 5), "sharp was slower than " + results[format] + " for " + format);
   });
+  console.dir(sharp.cache());
 });

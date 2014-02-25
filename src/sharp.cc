@@ -323,6 +323,22 @@ Handle<Value> resize(const Arguments& args) {
   return scope.Close(Undefined());
 }
 
+Handle<Value> cache(const Arguments& args) {
+  HandleScope scope;
+  
+  // Set cache limit
+  if (args[0]->IsInt32()) {
+    vips_cache_set_max_mem(args[0]->Int32Value() * 1048576);
+  }
+
+  // Get cache statistics
+  Local<Object> cache = Object::New();
+  cache->Set(String::NewSymbol("current"), Number::New(vips_tracked_get_mem() / 1048576));
+  cache->Set(String::NewSymbol("high"), Number::New(vips_tracked_get_mem_highwater() / 1048576));
+  cache->Set(String::NewSymbol("limit"), Number::New(vips_cache_get_max_mem() / 1048576));
+  return scope.Close(cache);
+}
+
 static void at_exit(void* arg) {
   HandleScope scope;
   vips_shutdown();
@@ -333,6 +349,7 @@ extern "C" void init(Handle<Object> target) {
   vips_init("");
   AtExit(at_exit);
   NODE_SET_METHOD(target, "resize", resize);
+  NODE_SET_METHOD(target, "cache", cache);
 }
 
 NODE_MODULE(sharp, init)

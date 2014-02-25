@@ -51,7 +51,7 @@ Scale and crop to `width` x `height` calling `callback` when complete.
 
 `callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant image data when a Buffer is requested.
 
-### Examples
+#### Examples
 
 ```javascript
 sharp.resize("input.jpg", "output.jpg", 300, 200, function(err) {
@@ -99,6 +99,20 @@ sharp.resize("input.jpg", sharp.buffer.webp, 200, 300, {canvas: sharp.canvas.emb
   // buffer contains WebP image data of a 200 pixels wide and 300 pixels high image
   // containing a scaled version of input.png embedded on a black canvas
 });
+```
+
+### cache([limit])
+
+If `limit` is provided, set the `vips` internal cache limit to this value in MB. The default value is 100.
+
+Always returns cache statistics, namely current usage, high water mark and maximum limit.
+
+The high water mark may be higher than the maximum limit.
+
+```javascript
+var stats = sharp.cache(); // { current: 98, high: 115, limit: 100 }
+sharp.cache(200); // { current: 98, high: 115, limit: 200 }
+sharp.cache(50); // { current: 49, high: 115, limit: 50 }
 ```
 
 ## Testing

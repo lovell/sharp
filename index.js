@@ -53,6 +53,13 @@ module.exports.resize = function(input, output, width, height, options, callback
   sharp.resize(options.inFile, options.inBuffer, output, width, height, canvas, sharpen, progessive, sequentialRead, callback);
 };
 
+module.exports.cache = function(limit) {
+  if (Number.isNaN(limit)) {
+    limit = null;
+  }
+  return sharp.cache(limit);
+}
+
 /* Deprecated v0.0.x methods */
 module.exports.crop = function(input, output, width, height, sharpen, callback) {
   sharp.resize(input, output, width, height, {canvas: "c", sharpen: true}, callback);

@@ -26,4 +26,6 @@ async.mapSeries([1, 1, 2, 4, 8, 16, 32, 64, 128], function(parallelism, next) {
       next();
     }
   );
-}, function() {});
+}, function() {
+  console.dir(sharp.cache());
+});
