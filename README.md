@@ -18,9 +18,23 @@ Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupi
 ## Prerequisites
 
 * Node.js v0.8+
-* [libvips](https://github.com/jcupitt/libvips) v7.38+
+* [libvips](https://github.com/jcupitt/libvips) v7.38.5+
 
-For the sharpest results, please compile libvips from source.
+### Install libvips on Mac OS via homebrew
+
+	brew tap homebrew/science
+	brew install vips
+
+### Install libvips on Ubuntu Linux
+
+	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev liborc-0.4-dev libxml2-dev swig
+	git clone https://github.com/jcupitt/libvips.git
+	cd libvips
+	./bootstrap.sh
+	./configure --enable-debug=no --enable-cxx=no --without-magick --without-lcms --without-OpenEXR --without-openslide --without-matio --without-cfitsio --without-pangoft2 --without-zip --without-libexif --without-python
+	make
+	sudo make install
+	sudo ldconfig
 
 ## Install
 
