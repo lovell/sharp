@@ -103,11 +103,11 @@ sharp.resize("input.jpg", sharp.buffer.webp, 200, 300, {canvas: sharp.canvas.emb
 
 ### cache([limit])
 
-If `limit` is provided, set the `vips` internal cache limit to this value in MB. The default value is 100.
+If `limit` is provided, set the (soft) limit of _libvips_ working/cache memory to this value in MB. The default value is 100.
 
-Always returns cache statistics, namely current usage, high water mark and maximum limit.
+This method always returns cache statistics, useful for determining how much working memory is required for a particular task.
 
-The high water mark may be higher than the maximum limit.
+Warnings such as _Application transferred too many scanlines_ are a good indicator you've set this value too low.
 
 ```javascript
 var stats = sharp.cache(); // { current: 98, high: 115, limit: 100 }
