@@ -15,7 +15,7 @@ var max = 960;
 
 var randomDimension = function() {
   return Math.random() * (max - min) + min;
-}
+};
 
 new Benchmark.Suite("random").add("imagemagick", {
 	defer: true,

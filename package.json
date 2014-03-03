@@ -1,10 +1,10 @@
 {
   "name": "sharp",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "Lovell Fuller",
   "description": "High performance module to resize JPEG, PNG, WebP and TIFF images using the libvips image processing library",
   "scripts": {
-    "test": "node tests/perf.js"
+    "test": "node tests/unit && node tests/perf"
   },
   "main": "index.js",
   "repository": {

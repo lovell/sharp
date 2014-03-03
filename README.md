@@ -31,7 +31,7 @@ Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupi
 	git clone https://github.com/jcupitt/libvips.git
 	cd libvips
 	./bootstrap.sh
-	./configure --enable-debug=no --enable-cxx=no --without-magick --without-lcms --without-OpenEXR --without-openslide --without-matio --without-cfitsio --without-pangoft2 --without-zip --without-libexif --without-python
+	./configure --enable-debug=no
 	make
 	sudo make install
 	sudo ldconfig
@@ -52,9 +52,9 @@ Scale and crop to `width` x `height` calling `callback` when complete.
 
 `output` can either be a filename String or one of `sharp.buffer.jpeg`, `sharp.buffer.png` or `sharp.buffer.webp` to pass a Buffer containing JPEG, PNG or WebP image data to `callback`.
 
-`width` is the Number of pixels wide the resultant image should be.
+`width` is the Number of pixels wide the resultant image should be. Use a value of -1 to auto-scale the width to match the height.
 
-`height` is the Number of pixels high the resultant image should be.
+`height` is the Number of pixels high the resultant image should be. Use a value of -1 to auto-scale the height to match the width.
 
 `options` is optional, and can contain one or more of:
 
@@ -78,20 +78,20 @@ sharp.resize("input.jpg", "output.jpg", 300, 200, function(err) {
 ```
 
 ```javascript
-sharp.resize("input.jpg", sharp.buffer.jpeg, 300, 200, {progressive: true}, function(err, buffer) {
+sharp.resize("input.jpg", sharp.buffer.jpeg, -1, 200, {progressive: true}, function(err, buffer) {
   if (err) {
     throw err;
   }
-  // buffer contains progressive JPEG image data
+  // buffer contains progressive JPEG image data, 200 pixels high
 });
 ```
 
 ```javascript
-sharp.resize("input.webp", sharp.buffer.png, 300, 200, {sharpen: true}, function(err, buffer) {
+sharp.resize("input.webp", sharp.buffer.png, 300, -1, {sharpen: true}, function(err, buffer) {
   if (err) {
     throw err;
   }
-  // buffer contains sharpened PNG image data (converted from JPEG)
+  // buffer contains sharpened PNG image data (converted from JPEG), 300 pixels wide
 });
 ```
 

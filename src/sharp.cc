@@ -15,8 +15,8 @@ struct resize_baton {
   std::string file_out;
   void* buffer_out;
   size_t buffer_out_len;
-  int  width;
-  int  height;
+  int width;
+  int height;
   bool crop;
   VipsExtend extend;
   bool sharpen;
@@ -119,7 +119,24 @@ void resize_async(uv_work_t *work) {
 
   double xfactor = static_cast<double>(in->Xsize) / std::max(baton->width, 1);
   double yfactor = static_cast<double>(in->Ysize) / std::max(baton->height, 1);
-  double factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
+  double factor;
+  if (baton->width > 0 && baton->height > 0) {
+    // Fixed width and height
+    factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
+  } else if (baton->width > 0) {
+    // Fixed width, auto height
+    factor = xfactor;
+    baton->height = floor(in->Ysize * factor);
+  } else if (baton->height > 0) {
+    // Fixed height, auto width
+    factor = yfactor;
+    baton->width = floor(in->Xsize * factor);
+  } else {
+    resize_error(baton, in);
+    (baton->err).append("Width and/or height required");
+    return;
+  }
+
   factor = std::max(factor, 1.0);
   int shrink = floor(factor);
   double residual = shrink / factor;

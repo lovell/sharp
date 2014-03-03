@@ -42,6 +42,10 @@ module.exports.resize = function(input, output, width, height, options, callback
     callback("Invalid height " + height);
     return;
   }
+  if (outWidth < 1 && outHeight < 1) {
+    callback("Width and/or height required");
+    return;
+  }
   var canvas = options.canvas || "c";
   if (canvas.length !== 1 || "cwb".indexOf(canvas) === -1) {
     callback("Invalid canvas " + canvas);
@@ -50,15 +54,16 @@ module.exports.resize = function(input, output, width, height, options, callback
   var sharpen = !!options.sharpen;
   var progessive = !!options.progessive;
   var sequentialRead = !!options.sequentialRead;
-  sharp.resize(options.inFile, options.inBuffer, output, width, height, canvas, sharpen, progessive, sequentialRead, callback);
+  sharp.resize(options.inFile, options.inBuffer, output, outWidth, outHeight, canvas, sharpen, progessive, sequentialRead, callback);
 };
 
 module.exports.cache = function(limit) {
+  "use strict";
   if (Number.isNaN(limit)) {
     limit = null;
   }
   return sharp.cache(limit);
-}
+};
 
 /* Deprecated v0.0.x methods */
 module.exports.crop = function(input, output, width, height, sharpen, callback) {
