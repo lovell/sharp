@@ -42,10 +42,6 @@ module.exports.resize = function(input, output, width, height, options, callback
     callback("Invalid height " + height);
     return;
   }
-  if (outWidth < 1 && outHeight < 1) {
-    callback("Width and/or height required");
-    return;
-  }
   var canvas = options.canvas || "c";
   if (canvas.length !== 1 || "cwb".indexOf(canvas) === -1) {
     callback("Invalid canvas " + canvas);

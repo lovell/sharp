@@ -132,9 +132,10 @@ void resize_async(uv_work_t *work) {
     factor = yfactor;
     baton->width = floor(in->Xsize * factor);
   } else {
-    resize_error(baton, in);
-    (baton->err).append("Width and/or height required");
-    return;
+    // Identity transform
+    factor = 1;
+    baton->width = in->Xsize;
+    baton->height = in->Ysize;
   }
 
   factor = std::max(factor, 1.0);
