@@ -57,7 +57,7 @@ new Benchmark.Suite("random").add("imagemagick", {
 }).add("sharp", {
 	defer: true,
 	fn: function(deferred) {
-		sharp.resize(inputJpg, sharp.buffer.jpeg, randomDimension(), randomDimension(), function(err, buffer) {
+		sharp(inputJpg).resize(randomDimension(), randomDimension()).toBuffer(function(err, buffer) {
 			if (err) {
 				throw err;
 			} else {

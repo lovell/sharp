@@ -83,7 +83,7 @@ async.series({
     }).add("sharp-buffer-file", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputJpgBuffer, outputJpg, width, height, function(err) {
+        sharp(inputJpgBuffer).resize(width, height).write(outputJpg, function(err) {
           if (err) {
             throw err;
           } else {
@@ -94,7 +94,7 @@ async.series({
     }).add("sharp-buffer-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputJpgBuffer, sharp.buffer.jpeg, width, height, function(err, buffer) {
+        sharp(inputJpgBuffer).resize(width, height).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -106,7 +106,7 @@ async.series({
     }).add("sharp-file-file", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputJpg, outputJpg, width, height, function(err) {
+        sharp(inputJpg).resize(width, height).write(outputJpg, function(err) {
           if (err) {
             throw err;
           } else {
@@ -117,7 +117,7 @@ async.series({
     }).add("sharp-file-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputJpg, sharp.buffer.jpeg, width, height, function(err, buffer) {
+        sharp(inputJpg).resize(width, height).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -129,7 +129,7 @@ async.series({
     }).add("sharp-file-buffer-sharpen", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputJpg, sharp.buffer.jpeg, width, height, {sharpen: true}, function(err, buffer) {
+        sharp(inputJpg).resize(width, height).sharpen().toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -141,7 +141,7 @@ async.series({
     }).add("sharp-file-buffer-progressive", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputJpg, sharp.buffer.jpeg, width, height, {progressive: true}, function(err, buffer) {
+        sharp(inputJpg).resize(width, height).progressive().toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -153,7 +153,7 @@ async.series({
     }).add("sharp-file-buffer-sequentialRead", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputJpg, sharp.buffer.jpeg, width, height, {sequentialRead: true}, function(err, buffer) {
+        sharp(inputJpg).resize(width, height).sequentialRead().toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -212,7 +212,7 @@ async.series({
     }).add("sharp-buffer-file", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputPngBuffer, outputPng, width, height, function(err) {
+        sharp(inputPngBuffer).resize(width, height).write(outputPng, function(err) {
           if (err) {
             throw err;
           } else {
@@ -223,7 +223,7 @@ async.series({
     }).add("sharp-buffer-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputPngBuffer, sharp.buffer.png, width, height, function(err, buffer) {
+        sharp(inputPngBuffer).resize(width, height).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -235,7 +235,7 @@ async.series({
     }).add("sharp-file-file", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputPng, outputPng, width, height, function(err) {
+        sharp(inputPng).resize(width, height).write(outputPng, function(err) {
           if (err) {
             throw err;
           } else {
@@ -246,7 +246,7 @@ async.series({
     }).add("sharp-file-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputPng, sharp.buffer.png, width, height, function(err, buffer) {
+        sharp(inputPng).resize(width, height).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -258,7 +258,7 @@ async.series({
     }).add("sharp-file-buffer-sharpen", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputPng, sharp.buffer.png, width, height, {sharpen: true}, function(err, buffer) {
+        sharp(inputPng).resize(width, height).sharpen().toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -270,7 +270,7 @@ async.series({
     }).add("sharp-file-buffer-progressive", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputPng, sharp.buffer.png, width, height, {progressive: true}, function(err, buffer) {
+        sharp(inputPng).resize(width, height).progressive().toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -282,7 +282,7 @@ async.series({
     }).add("sharp-file-buffer-sequentialRead", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputPng, sharp.buffer.png, width, height, {sequentialRead: true}, function(err, buffer) {
+        sharp(inputPng).sequentialRead().resize(width, height).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -302,7 +302,7 @@ async.series({
     (new Benchmark.Suite("webp")).add("sharp-buffer-file", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputWebpBuffer, outputWebp, width, height, function(err) {
+        sharp(inputWebpBuffer).resize(width, height).write(outputWebp, function(err) {
           if (err) {
             throw err;
           } else {
@@ -313,7 +313,7 @@ async.series({
     }).add("sharp-buffer-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputWebpBuffer, sharp.buffer.webp, width, height, function(err, buffer) {
+        sharp(inputWebpBuffer).resize(width, height).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -325,7 +325,7 @@ async.series({
     }).add("sharp-file-file", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputWebp, outputWebp, width, height, function(err) {
+        sharp(inputWebp).resize(width, height).write(outputWebp, function(err) {
           if (err) {
             throw err;
           } else {
@@ -336,7 +336,7 @@ async.series({
     }).add("sharp-file-buffer", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputWebp, sharp.buffer.webp, width, height, function(err, buffer) {
+        sharp(inputWebp).resize(width, height).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -348,7 +348,7 @@ async.series({
     }).add("sharp-file-buffer-sharpen", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputWebp, sharp.buffer.webp, width, height, {sharpen: true}, function(err, buffer) {
+        sharp(inputWebp).resize(width, height).sharpen().toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -360,7 +360,7 @@ async.series({
     }).add("sharp-file-buffer-sequentialRead", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputWebp, sharp.buffer.webp, width, height, {sequentialRead: true}, function(err, buffer) {
+        sharp(inputWebp).sequentialRead().resize(width, height).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -379,7 +379,7 @@ async.series({
     (new Benchmark.Suite("tiff")).add("sharp-file-file", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputTiff, outputTiff, width, height, function(err) {
+        sharp(inputTiff).resize(width, height).write(outputTiff, function(err) {
           if (err) {
             throw err;
           } else {
@@ -390,7 +390,7 @@ async.series({
     }).add("sharp-file-file-sharpen", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputTiff, outputTiff, width, height, {sharpen: true}, function(err) {
+        sharp(inputTiff).resize(width, height).sharpen().write(outputTiff, function(err) {
           if (err) {
             throw err;
           } else {
@@ -401,7 +401,7 @@ async.series({
     }).add("sharp-file-file-sequentialRead", {
       defer: true,
       fn: function(deferred) {
-        sharp.resize(inputTiff, outputTiff, width, height, {sequentialRead: true}, function(err) {
+        sharp(inputTiff).sequentialRead().resize(width, height).write(outputTiff, function(err) {
           if (err) {
             throw err;
           } else {

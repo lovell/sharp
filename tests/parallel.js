@@ -11,7 +11,7 @@ async.mapSeries([1, 1, 2, 4, 8, 16, 32, 64, 128], function(parallelism, next) {
   var start = new Date().getTime();
   async.times(parallelism,
     function(id, callback) {
-      sharp.resize(inputJpg, sharp.buffer.jpeg, width, height, function(err, buffer) {
+      sharp(inputJpg).resize(width, height).toBuffer(function(err, buffer) {
         buffer = null;
         callback(err, new Date().getTime() - start);
       });

@@ -7,8 +7,9 @@ var inputJpg = __dirname + "/2569067123_aca715a2ee_o.jpg"; // http://www.flickr.
 var outputJpg = __dirname + "/output.jpg";
 
 async.series([
+  // Resize with exact crop
   function(done) {
-    sharp.resize(inputJpg, outputJpg, 320, 240, function(err) {
+    sharp(inputJpg).resize(320, 240).write(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -18,35 +19,50 @@ async.series([
       });
     });
   },
+  // Resize to fixed width
   function(done) {
-    sharp.resize(inputJpg, outputJpg, 320, -1, function(err) {
+    sharp(inputJpg).resize(320).write(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
         assert.strictEqual(320, features.width);
-        assert.strictEqual(262, features.height);
+        assert.strictEqual(261, features.height);
         done();
       });
     });
   },
+  // Resize to fixed height
   function(done) {
-    sharp.resize(inputJpg, outputJpg, -1, 320, function(err) {
+    sharp(inputJpg).resize(null, 320).write(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
-        assert.strictEqual(392, features.width);
+        assert.strictEqual(391, features.width);
         assert.strictEqual(320, features.height);
         done();
       });
     });
   },
+  // Identity transform
   function(done) {
-    sharp.resize(inputJpg, outputJpg, -1, -1, function(err) {
+    sharp(inputJpg).write(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
         assert.strictEqual(2725, features.width);
         assert.strictEqual(2225, features.height);
+        done();
+      });
+    });
+  },
+  // Upscale
+  function(done) {
+    sharp(inputJpg).resize(3000).write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(3000, features.width);
+        assert.strictEqual(2449, features.height);
         done();
       });
     });

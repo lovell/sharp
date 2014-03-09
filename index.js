@@ -1,73 +1,128 @@
-var sharp = require("./build/Release/sharp");
+/*jslint node: true */
+'use strict';
 
-module.exports.buffer = {
-  jpeg: "__jpeg",
-  png: "__png",
-  webp: "__webp"
-};
+var sharp = require('./build/Release/sharp');
 
-module.exports.canvas = {
-  crop: "c",
-  embedWhite: "w",
-  embedBlack: "b"
-};
-
-module.exports.resize = function(input, output, width, height, options, callback) {
-  "use strict";
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
-  } else {
-    options = options || {};
+var Sharp = function(input) {
+  if (!(this instanceof Sharp)) {
+    return new Sharp(input);
   }
+  this.options = {
+    width: -1,
+    height: -1,
+    canvas: 'c',
+    sharpen: false,
+    progressive: false,
+    sequentialRead: false,
+    output: '__jpeg'
+  };
   if (typeof input === 'string') {
-    options.inFile = input;
+    this.options.inFile = input;
   } else if (typeof input ==='object' && input instanceof Buffer) {
-    options.inBuffer = input;
+    this.options.inBuffer = input;
   } else {
-    callback("Unsupported input " + typeof input);
-    return;
+    throw 'Unsupported input ' + typeof input;
   }
+  return this;
+};
+module.exports = Sharp;
+
+Sharp.prototype.crop = function() {
+  this.options.canvas = 'c';
+  return this;
+};
+
+Sharp.prototype.embedWhite = function() {
+  this.options.canvas = 'w';
+  return this;
+};
+
+Sharp.prototype.embedBlack = function() {
+  this.options.canvas = 'b';
+  return this;
+};
+
+Sharp.prototype.sharpen = function(sharpen) {
+  this.options.sharpen = (typeof sharpen === 'boolean') ? sharpen : true;
+  return this;
+};
+
+Sharp.prototype.progressive = function(progressive) {
+  this.options.progressive = (typeof progressive === 'boolean') ? progressive : true;
+  return this;
+};
+
+Sharp.prototype.sequentialRead = function(sequentialRead) {
+  this.options.sequentialRead = (typeof sequentialRead === 'boolean') ? sequentialRead : true;
+  return this;
+};
+
+Sharp.prototype.resize = function(width, height) {
+  if (!width) {
+    this.options.width = -1;
+  } else {
+    if (!Number.isNaN(width)) {
+      this.options.width = width;
+    } else {
+      throw 'Invalid width ' + width;
+    }
+  }
+  if (!height) {
+    this.options.height = -1;
+  } else {
+    if (!Number.isNaN(height)) {
+      this.options.height = height;
+    } else {
+      throw 'Invalid height ' + height;
+    }
+  }
+  return this;
+};
+
+Sharp.prototype.write = function(output, callback) {
   if (!output || output.length === 0) {
-    callback("Invalid output");
-    return;
+    throw 'Invalid output';
+  } else {
+    this._sharp(output, callback);
   }
-  var outWidth = Number(width);
-  if (Number.isNaN(outWidth)) {
-    callback("Invalid width " + width);
-    return;
-  }
-  var outHeight = Number(height);
-  if (Number.isNaN(outHeight)) {
-    callback("Invalid height " + height);
-    return;
-  }
-  var canvas = options.canvas || "c";
-  if (canvas.length !== 1 || "cwb".indexOf(canvas) === -1) {
-    callback("Invalid canvas " + canvas);
-    return;
-  }
-  var sharpen = !!options.sharpen;
-  var progessive = !!options.progessive;
-  var sequentialRead = !!options.sequentialRead;
-  sharp.resize(options.inFile, options.inBuffer, output, outWidth, outHeight, canvas, sharpen, progessive, sequentialRead, callback);
+  return this;
+};
+
+Sharp.prototype.toBuffer = function(callback) {
+  return this._sharp('__input', callback);
+};
+
+Sharp.prototype.jpeg = function(callback) {
+  return this._sharp('__jpeg', callback);
+};
+
+Sharp.prototype.png = function(callback) {
+  return this._sharp('__png', callback);
+};
+
+Sharp.prototype.webp = function(callback) {
+  return this._sharp('__webp', callback);
+};
+
+Sharp.prototype._sharp = function(output, callback) {
+  sharp.resize(
+    this.options.inFile,
+    this.options.inBuffer,
+    output,
+    this.options.width,
+    this.options.height,
+    this.options.canvas,
+    this.options.sharpen,
+    this.options.progressive,
+    this.options.sequentialRead,
+    callback
+  );
+  return this;
 };
 
 module.exports.cache = function(limit) {
-  "use strict";
   if (Number.isNaN(limit)) {
     limit = null;
   }
   return sharp.cache(limit);
-};
-
-/* Deprecated v0.0.x methods */
-module.exports.crop = function(input, output, width, height, sharpen, callback) {
-  sharp.resize(input, output, width, height, {canvas: "c", sharpen: true}, callback);
-};
-module.exports.embedWhite = function(input, output, width, height, callback) {
-  sharp.resize(input, output, width, height, {canvas: "w", sharpen: true}, callback);
-};
-module.exports.embedBlack = function(input, output, width, height, callback) {
-  sharp.resize(input, output, width, height, {canvas: "b", sharpen: true}, callback);
 };

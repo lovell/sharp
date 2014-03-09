@@ -70,6 +70,7 @@ void resize_error(resize_baton *baton, VipsImage *unref) {
 void resize_async(uv_work_t *work) {
   resize_baton* baton = static_cast<resize_baton*>(work->data);
 
+  // Input
   ImageType inputImageType = JPEG;
   VipsImage *in = vips_image_new();
   if (baton->buffer_in_len > 1) {
@@ -117,30 +118,32 @@ void resize_async(uv_work_t *work) {
     return;
   }
 
-  double xfactor = static_cast<double>(in->Xsize) / std::max(baton->width, 1);
-  double yfactor = static_cast<double>(in->Ysize) / std::max(baton->height, 1);
+  // Scaling calculations
   double factor;
   if (baton->width > 0 && baton->height > 0) {
     // Fixed width and height
+    double xfactor = (double)(in->Xsize) / (double)(baton->width);
+    double yfactor = (double)(in->Ysize) / (double)(baton->height);
     factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
   } else if (baton->width > 0) {
     // Fixed width, auto height
-    factor = xfactor;
-    baton->height = floor(in->Ysize * factor);
+    factor = (double)(in->Xsize) / (double)(baton->width);
+    baton->height = floor((double)(in->Ysize) / factor);
   } else if (baton->height > 0) {
     // Fixed height, auto width
-    factor = yfactor;
-    baton->width = floor(in->Xsize * factor);
+    factor = (double)(in->Ysize) / (double)(baton->height);
+    baton->width = floor((double)(in->Xsize) / factor);
   } else {
     // Identity transform
     factor = 1;
     baton->width = in->Xsize;
     baton->height = in->Ysize;
   }
-
-  factor = std::max(factor, 1.0);
   int shrink = floor(factor);
-  double residual = shrink / factor;
+  if (shrink < 1) {
+    shrink = 1;
+  }
+  double residual = shrink / (double)factor;
 
   // Try to use libjpeg shrink-on-load
   int shrink_on_load = 1;
@@ -190,7 +193,7 @@ void resize_async(uv_work_t *work) {
 
   // Use vips_affine with the remaining float part using bilinear interpolation
   VipsImage *affined = vips_image_new();
-  if (residual > 0) {
+  if (residual != 0) {
     if (vips_affine(shrunk, &affined, residual, 0, 0, residual, "interpolate", vips_interpolate_bilinear_static(), NULL)) {
       return resize_error(baton, shrunk);
     }
@@ -199,6 +202,7 @@ void resize_async(uv_work_t *work) {
   }
   g_object_unref(shrunk);
 
+  // Crop/embed
   VipsImage *canvased = vips_image_new();
   if (affined->Xsize != baton->width || affined->Ysize != baton->height) {
     if (baton->crop) {
@@ -239,17 +243,18 @@ void resize_async(uv_work_t *work) {
   }
   g_object_unref(canvased);
 
-  if (baton->file_out == "__jpeg") {
+  // Output
+  if (baton->file_out == "__jpeg" || (baton->file_out == "__input" && inputImageType == JPEG)) {
     // Write JPEG to buffer
     if (vips_jpegsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
       return resize_error(baton, sharpened);
     }
-  } else if (baton->file_out == "__png") {
+  } else if (baton->file_out == "__png" || (baton->file_out == "__input" && inputImageType == PNG)) {
     // Write PNG to buffer
     if (vips_pngsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
       return resize_error(baton, sharpened);
     }
-  } else if (baton->file_out == "__webp") {
+  } else if (baton->file_out == "__webp" || (baton->file_out == "__input" && inputImageType == WEBP)) {
     // Write WEBP to buffer
     if (vips_webpsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, NULL)) {
       return resize_error(baton, sharpened);

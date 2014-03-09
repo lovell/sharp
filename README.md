@@ -2,10 +2,10 @@
 
 _adj_
 
-1. clearly defined; distinct: a sharp photographic image. 
-2. quick, brisk, or spirited. 
-3. shrewd or astute: a sharp bargainer. 
-4. (Informal.) very stylish: a sharp dresser; a sharp jacket. 
+1. clearly defined; distinct: a sharp photographic image.
+2. quick, brisk, or spirited.
+3. shrewd or astute: a sharp bargainer.
+4. (Informal.) very stylish: a sharp dresser; a sharp jacket.
 
 The typical use case for this high speed Node.js module is to convert large JPEG, PNG, WebP and TIFF images to smaller images of varying dimensions.
 
@@ -13,19 +13,20 @@ The performance of JPEG resizing is typically 15x-25x faster than ImageMagick an
 
 This module supports reading and writing images to and from both the filesystem and Buffer objects (TIFF is limited to filesystem only). Everything remains non-blocking thanks to _libuv_.
 
-Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by John Cupitt.
+Anyone who has used the Node.js bindings for [GraphicsMagick](https://github.com/aheckmann/gm) will find the API similarly expressive.
+
+This module is powered by the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by John Cupitt.
 
 ## Prerequisites
 
 * Node.js v0.8+
 * [libvips](https://github.com/jcupitt/libvips) v7.38.5+
 
-### Install libvips on Mac OS via homebrew
+### Install libvips on Mac OS
 
-	brew tap homebrew/science
-	brew install vips
+	brew install homebrew/science/vips
 
-### Install libvips on Ubuntu Linux
+### Install libvips on Ubuntu/Debian Linux
 
 	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev liborc-0.4-dev libxml2-dev swig
 	git clone https://github.com/jcupitt/libvips.git
@@ -40,35 +41,14 @@ Under the hood you'll find the blazingly fast [libvips](https://github.com/jcupi
 
 	npm install sharp
 
-## Usage
-
-	var sharp = require("sharp");
-
-### resize(input, output, width, height, [options], callback)
-
-Scale and crop to `width` x `height` calling `callback` when complete.
-
-`input` can either be a filename String or a Buffer.
-
-`output` can either be a filename String or one of `sharp.buffer.jpeg`, `sharp.buffer.png` or `sharp.buffer.webp` to pass a Buffer containing JPEG, PNG or WebP image data to `callback`.
-
-`width` is the Number of pixels wide the resultant image should be. Use a value of -1 to auto-scale the width to match the height.
-
-`height` is the Number of pixels high the resultant image should be. Use a value of -1 to auto-scale the height to match the width.
-
-`options` is optional, and can contain one or more of:
-
-* `canvas` can be one of `sharp.canvas.crop`, `sharp.canvas.embedWhite` or `sharp.canvas.embedBlack`. Defaults to `sharp.canvas.crop`.
-* `sharpen` when set to true will perform a mild sharpen of the resultant image. This typically reduces performance by 30%.
-* `progressive` when set will use progressive (interlace) scan for the output. This typically reduces performance by 30%.
-* `sequentialRead` is an advanced setting that, when set, switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.
-
-`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant image data when a Buffer is requested.
-
-#### Examples
+## Usage examples
 
 ```javascript
-sharp.resize("input.jpg", "output.jpg", 300, 200, function(err) {
+	var sharp = require('sharp');
+```
+
+```javascript
+sharp('input.jpg').resize(300, 200).write('output.jpg', function(err) {
   if (err) {
     throw err;
   }
@@ -78,7 +58,7 @@ sharp.resize("input.jpg", "output.jpg", 300, 200, function(err) {
 ```
 
 ```javascript
-sharp.resize("input.jpg", sharp.buffer.jpeg, -1, 200, {progressive: true}, function(err, buffer) {
+sharp('input.jpg').resize(null, 200).progressive().toBuffer(function(err, buffer) {
   if (err) {
     throw err;
   }
@@ -87,35 +67,105 @@ sharp.resize("input.jpg", sharp.buffer.jpeg, -1, 200, {progressive: true}, funct
 ```
 
 ```javascript
-sharp.resize("input.webp", sharp.buffer.png, 300, -1, {sharpen: true}, function(err, buffer) {
+sharp('input.png').resize(300).sharpen().webp(function(err, buffer) {
   if (err) {
     throw err;
   }
-  // buffer contains sharpened PNG image data (converted from JPEG), 300 pixels wide
+  // buffer contains sharpened WebP image data (converted from PNG), 300 pixels wide
 });
 ```
 
 ```javascript
-sharp.resize(buffer, "output.tiff", 200, 300, {canvas: sharp.canvas.embedWhite}, function(err) {
+sharp(buffer).resize(200, 300).embedWhite().write('output.tiff', function(err) {
   if (err) {
     throw err;
   }
-  // output.tiff is a 200 pixels wide and 300 pixels high image containing a scaled version
-  // of the image data contained in buffer embedded on a white canvas
+  // output.tiff is a 200 pixels wide and 300 pixels high image containing a scaled
+  // version, embedded on a white canvas, of the image data in buffer
 });
 ```
 
 ```javascript
-sharp.resize("input.jpg", sharp.buffer.webp, 200, 300, {canvas: sharp.canvas.embedBlack}, function(err, buffer) {
+sharp('input.jpg').resize(200, 300).embedBlack().webp(function(err, buffer) {
   if (err) {
     throw err;
   }
   // buffer contains WebP image data of a 200 pixels wide and 300 pixels high image
-  // containing a scaled version of input.png embedded on a black canvas
+  // containing a scaled version, embedded on a black canvas, of input.png
 });
 ```
 
-### cache([limit])
+## API
+
+### sharp(input)
+
+Constructor to which further methods are chained.
+
+`input` can either be a filename String or a Buffer.
+
+### resize(width, [height])
+
+Scale to `width` x `height`. By default, the resized image is cropped to the exact size specified.
+
+`width` is the Number of pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
+
+`height` is the Number of pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
+
+### crop()
+
+Crop the resized image to the exact size specified, the default behaviour.
+
+### embedWhite()
+
+Embed the resized image on a white background of the exact size specified.
+
+### embedBlack()
+
+Embed the resized image on a black background of the exact size specified.
+
+### sharpen()
+
+Perform a mild sharpen of the resultant image. This typically reduces performance by 30%.
+
+### progressive()
+
+Use progressive (interlace) scan for the output. This typically reduces performance by 30%.
+
+### sequentialRead()
+
+An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.
+
+### write(filename, callback)
+
+`filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP and TIFF supported.
+
+`callback` is called with a single argument `(err)` containing an error message, if any.
+
+### jpeg(callback)
+
+Write JPEG image data to a Buffer.
+
+`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant JPEG image data.
+
+### png(callback)
+
+Write PNG image data to a Buffer.
+
+`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant PNG image data.
+
+### webp(callback)
+
+Write WebP image data to a Buffer.
+
+`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant WebP image data.
+
+### toBuffer(callback)
+
+Write image data to a Buffer, the format of which will match the input image.
+
+`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant image data.
+
+### sharp.cache([limit])
 
 If `limit` is provided, set the (soft) limit of _libvips_ working/cache memory to this value in MB. The default value is 100.
 
