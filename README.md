@@ -44,7 +44,7 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 ## Usage examples
 
 ```javascript
-  var sharp = require('sharp');
+var sharp = require('sharp');
 ```
 
 ```javascript
