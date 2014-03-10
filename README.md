@@ -11,9 +11,11 @@ The typical use case for this high speed Node.js module is to convert large JPEG
 
 The performance of JPEG resizing is typically 15x-25x faster than ImageMagick and GraphicsMagick, based mainly on the number of CPU cores available.
 
+When generating JPEG output all metadata is removed and Huffman tables optimised without having to use separate command line tools like [jpegoptim](https://github.com/tjko/jpegoptim) and [jpegtran](http://jpegclub.org/jpegtran/).
+
 This module supports reading and writing images to and from both the filesystem and Buffer objects (TIFF is limited to filesystem only). Everything remains non-blocking thanks to _libuv_.
 
-Anyone who has used the Node.js bindings for [GraphicsMagick](https://github.com/aheckmann/gm) will find the API similarly expressive.
+Anyone who has used the Node.js bindings for [GraphicsMagick](https://github.com/aheckmann/gm) will find the API similarly fluent.
 
 This module is powered by the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by John Cupitt.
 
@@ -91,7 +93,7 @@ sharp('input.jpg').resize(200, 300).embedBlack().webp(function(err, buffer) {
     throw err;
   }
   // buffer contains WebP image data of a 200 pixels wide and 300 pixels high image
-  // containing a scaled version, embedded on a black canvas, of input.png
+  // containing a scaled version, embedded on a black canvas, of input.jpg
 });
 ```
 
@@ -129,7 +131,7 @@ Perform a mild sharpen of the resultant image. This typically reduces performanc
 
 ### progressive()
 
-Use progressive (interlace) scan for the output. This typically reduces performance by 30%.
+Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.
 
 ### sequentialRead()
 
