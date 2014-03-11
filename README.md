@@ -26,7 +26,7 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 
 ### Install libvips on Mac OS
 
-	brew install homebrew/science/vips
+	brew install homebrew/science/vips --with-webp
 
 ### Install libvips on Ubuntu/Debian Linux
 
@@ -184,6 +184,13 @@ sharp.cache(50); // { current: 49, high: 115, limit: 50 }
 ## Testing
 
 	npm test
+
+Running the tests requires both ImageMagick and GraphicsMagick to be installed.
+
+	brew install imagemagick
+	brew install graphicsmagick
+
+	sudo apt-get install imagemagick graphicsmagick
 
 ## Performance
 
