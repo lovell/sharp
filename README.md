@@ -28,6 +28,10 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 
 	brew install homebrew/science/vips --with-webp
 
+The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp/issues/9) to a `library not found for -lintl` error. If so, please try:
+
+	brew link gettext --force
+
 ### Install libvips on Ubuntu/Debian Linux
 
 	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev liborc-0.4-dev libxml2-dev swig
