@@ -29,12 +29,14 @@
   "devDependencies": {
     "imagemagick": "*",
     "gm": "*",
-    "epeg": "*",
     "async": "*",
     "benchmark": "*"
   },
   "license": "Apache 2.0",
   "engines": {
     "node": ">=0.8"
+  },
+  "dependencies": {
+    "nan": "^0.8.0"
   }
 }
