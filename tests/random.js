@@ -1,13 +1,15 @@
 var sharp = require("../index");
 var fs = require("fs");
+var path = require("path");
 var imagemagick = require("imagemagick");
 var gm = require("gm");
 var async = require("async");
 var assert = require("assert");
 var Benchmark = require("benchmark");
 
-var inputJpg = __dirname + "/2569067123_aca715a2ee_o.jpg"; // http://www.flickr.com/photos/grizdave/2569067123/
-var outputJpg = __dirname + "/output.jpg";
+var fixturesPath = path.join(__dirname, "fixtures");
+var inputJpg = path.join(fixturesPath, "2569067123_aca715a2ee_o.jpg"); // http://www.flickr.com/photos/grizdave/2569067123/
+var outputJpg = path.join(fixturesPath, "output.jpg");
 
 var min = 320;
 var max = 960;

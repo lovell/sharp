@@ -1,22 +1,27 @@
 var sharp = require("../index");
 var fs = require("fs");
+var path = require("path");
 var imagemagick = require("imagemagick");
 var gm = require("gm");
 var async = require("async");
 var assert = require("assert");
 var Benchmark = require("benchmark");
 
-var inputJpg = __dirname + "/2569067123_aca715a2ee_o.jpg"; // http://www.flickr.com/photos/grizdave/2569067123/
-var outputJpg = __dirname + "/output.jpg";
+var fixturesPath = path.join(__dirname, "fixtures");
 
-var inputPng = __dirname + "/50020484-00001.png"; // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
-var outputPng = __dirname + "/output.png";
+var inputJpg = path.join(fixturesPath, "2569067123_aca715a2ee_o.jpg"); // http://www.flickr.com/photos/grizdave/2569067123/
+var outputJpg = path.join(fixturesPath, "output.jpg");
 
-var inputWebp = __dirname + "/4.webp"; // http://www.gstatic.com/webp/gallery/4.webp
-var outputWebp = __dirname + "/output.webp";
+var inputPng = path.join(fixturesPath, "50020484-00001.png"); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
+var outputPng = path.join(fixturesPath, "output.png");
 
-var inputTiff = __dirname + "/G31D.TIF"; // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
-var outputTiff = __dirname + "/output.tiff";
+var inputWebp = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
+var outputWebp = path.join(fixturesPath, "output.webp");
+
+var inputTiff = path.join(fixturesPath, "G31D.TIF"); // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
+var outputTiff = path.join(fixturesPath, "output.tiff");
+
+var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
 
 var width = 720;
 var height = 480;
@@ -395,6 +400,46 @@ async.series({
       }
     }).on("cycle", function(event) {
       console.log("tiff " + String(event.target));
+    }).on("complete", function() {
+      callback(null, this.filter("fastest").pluck("name"));
+    }).run();
+  },
+  gif: function(callback) {
+    (new Benchmark.Suite("gif")).add("sharp-file-file", {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputGif).resize(width, height).write(outputTiff, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-file-sharpen", {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputGif).resize(width, height).sharpen().write(outputTiff, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-file-sequentialRead", {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputGif).sequentialRead().resize(width, height).write(outputTiff, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).on("cycle", function(event) {
+      console.log("gif " + String(event.target));
     }).on("complete", function() {
       callback(null, this.filter("fastest").pluck("name"));
     }).run();

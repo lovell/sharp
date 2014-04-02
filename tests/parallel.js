@@ -1,9 +1,10 @@
 var sharp = require("../index");
 var fs = require("fs");
+var path = require("path");
 var assert = require("assert");
 var async = require("async");
 
-var inputJpg = __dirname + "/2569067123_aca715a2ee_o.jpg"; // http://www.flickr.com/photos/grizdave/2569067123/
+var inputJpg = path.join(__dirname, "fixtures/2569067123_aca715a2ee_o.jpg"); // http://www.flickr.com/photos/grizdave/2569067123/
 var width = 720;
 var height = 480;
 

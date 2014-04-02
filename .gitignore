@@ -12,6 +12,6 @@ logs
 results
 build
 node_modules
-tests/output.*
+tests/fixtures/output.*
 
 npm-debug.log
