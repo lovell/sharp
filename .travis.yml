@@ -1,0 +1,15 @@
+language: "node_js"
+node_js:
+  - '0.10'
+  - '0.11'
+script: npm test
+before_install:
+  - BUILD_DIR=`pwd`
+  - cd /tmp
+  - wget http://www.vips.ecs.soton.ac.uk/supported/current/vips-7.38.5.tar.gz
+  - tar xf vips-7.38.5.tar.gz
+  - cd vips-7.38.5
+  - ./configure
+  - make
+  - sudo make install
+  - cd $BUILD_DIR

@@ -19,6 +19,8 @@ Anyone who has used the Node.js bindings for [GraphicsMagick](https://github.com
 
 This module is powered by the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by John Cupitt.
 
+[![Build Status](https://secure.travis-ci.org/lovell/sharp.png)](http://travis-ci.org/lovell/sharp)
+
 ## Prerequisites
 
 * Node.js v0.10+
