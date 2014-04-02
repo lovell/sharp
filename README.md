@@ -21,7 +21,7 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 
 ## Prerequisites
 
-* Node.js v0.8+
+* Node.js v0.10+
 * [libvips](https://github.com/jcupitt/libvips) v7.38.5+
 
 ### Install libvips on Mac OS
@@ -259,7 +259,7 @@ Test environment:
 
 ## Licence
 
-Copyright 2013, 2014 Lovell Fuller
+Copyright 2013, 2014 Lovell Fuller and Pierre Inglebert
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
