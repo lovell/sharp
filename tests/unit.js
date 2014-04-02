@@ -1,10 +1,13 @@
 var sharp = require("../index");
+var path = require("path");
 var imagemagick = require("imagemagick");
 var assert = require("assert");
 var async = require("async");
 
-var inputJpg = __dirname + "/2569067123_aca715a2ee_o.jpg"; // http://www.flickr.com/photos/grizdave/2569067123/
-var outputJpg = __dirname + "/output.jpg";
+var fixturesPath = path.join(__dirname, "fixtures");
+
+var inputJpg = path.join(fixturesPath, "2569067123_aca715a2ee_o.jpg"); // http://www.flickr.com/photos/grizdave/2569067123/
+var outputJpg = path.join(fixturesPath, "output.jpg");
 
 async.series([
   // Resize with exact crop
