@@ -33,7 +33,8 @@ typedef enum {
   JPEG,
   PNG,
   WEBP,
-  TIFF
+  TIFF,
+  MAGICK
 } ImageType;
 
 unsigned char MARKER_JPEG[] = {0xff, 0xd8};
@@ -115,6 +116,11 @@ class ResizeWorker : public NanAsyncWorker {
     } else if (vips_foreign_is_a("tiffload", baton->file_in.c_str())) {
       inputImageType = TIFF;
       if (vips_tiffload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
+        return resize_error(baton, in);
+      }
+    } else if(vips_foreign_is_a("magickload", (baton->file_in).c_str())) {
+      inputImageType = MAGICK;
+      if (vips_magickload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
         return resize_error(baton, in);
       }
     } else {

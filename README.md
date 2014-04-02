@@ -26,7 +26,7 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 
 ### Install libvips on Mac OS
 
-	brew install homebrew/science/vips --with-webp
+	brew install homebrew/science/vips --with-webp --with-graphicsmagick
 
 The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp/issues/9) to a `library not found for -lintl` error. If so, please try:
 
