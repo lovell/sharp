@@ -2,7 +2,6 @@ var sharp = require("../index");
 var fs = require("fs");
 var imagemagick = require("imagemagick");
 var gm = require("gm");
-var epeg = require("epeg");
 var async = require("async");
 var assert = require("assert");
 var Benchmark = require("benchmark");
@@ -64,21 +63,6 @@ async.series({
             deferred.resolve();
           }
         });
-      }
-    }).add("epeg-file-file", {
-      defer: true,
-      fn: function(deferred) {
-        var image = new epeg.Image({path: inputJpg});
-        image.downsize(width, height, 80).saveTo(outputJpg);
-        deferred.resolve();
-      }
-    }).add("epeg-file-buffer", {
-      defer: true,
-      fn: function(deferred) {
-        var image = new epeg.Image({path: inputJpg});
-        var buffer = image.downsize(width, height, 80).process();
-        assert.notStrictEqual(null, buffer);
-        deferred.resolve();
       }
     }).add("sharp-buffer-file", {
       defer: true,

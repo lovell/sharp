@@ -2,7 +2,6 @@ var sharp = require("../index");
 var fs = require("fs");
 var imagemagick = require("imagemagick");
 var gm = require("gm");
-var epeg = require("epeg");
 var async = require("async");
 var assert = require("assert");
 var Benchmark = require("benchmark");
@@ -45,14 +44,6 @@ new Benchmark.Suite("random").add("imagemagick", {
 				deferred.resolve();
 			}
 		});
-	}
-}).add("epeg", {
-	defer: true,
-	fn: function(deferred) {
-		var image = new epeg.Image({path: inputJpg});
-		var buffer = image.downsize(randomDimension(), randomDimension(), 80).process();
-		assert.notStrictEqual(null, buffer);
-		deferred.resolve();
 	}
 }).add("sharp", {
 	defer: true,

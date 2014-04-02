@@ -5,6 +5,8 @@
 #include <string.h>
 #include <vips/vips.h>
 
+#include "nan.h"
+
 using namespace v8;
 using namespace node;
 
@@ -23,7 +25,6 @@ struct resize_baton {
   bool progessive;
   VipsAccess access_method;
   std::string err;
-  Persistent<Function> callback;
 
   resize_baton(): buffer_in_len(0), buffer_out_len(0) {}
 };
@@ -67,253 +68,251 @@ void resize_error(resize_baton *baton, VipsImage *unref) {
   return;
 }
 
-void resize_async(uv_work_t *work) {
-  resize_baton* baton = static_cast<resize_baton*>(work->data);
+class ResizeWorker : public NanAsyncWorker {
+ public:
+  ResizeWorker(NanCallback *callback, resize_baton *baton)
+    : NanAsyncWorker(callback), baton(baton) {}
+  ~ResizeWorker() {}
 
-  // Input
-  ImageType inputImageType = JPEG;
-  VipsImage *in = vips_image_new();
-  if (baton->buffer_in_len > 1) {
-    if (memcmp(MARKER_JPEG, baton->buffer_in, 2) == 0) {
-      if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
+  void Execute () {
+    // Input
+    ImageType inputImageType = JPEG;
+    VipsImage *in = vips_image_new();
+    if (baton->buffer_in_len > 1) {
+      if (memcmp(MARKER_JPEG, baton->buffer_in, 2) == 0) {
+        if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
+          return resize_error(baton, in);
+        }
+      } else if(memcmp(MARKER_PNG, baton->buffer_in, 2) == 0) {
+        inputImageType = PNG;
+        if (vips_pngload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
+          return resize_error(baton, in);
+        }
+      } else if(memcmp(MARKER_WEBP, baton->buffer_in, 2) == 0) {
+        inputImageType = WEBP;
+        if (vips_webpload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
+          return resize_error(baton, in);
+        }
+      } else {
+        resize_error(baton, in);
+        (baton->err).append("Unsupported input buffer");
+        return;
+      }
+    } else if (is_jpeg(baton->file_in)) {
+      if (vips_jpegload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
         return resize_error(baton, in);
       }
-    } else if(memcmp(MARKER_PNG, baton->buffer_in, 2) == 0) {
+    } else if (is_png(baton->file_in)) {
       inputImageType = PNG;
-      if (vips_pngload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
+      if (vips_pngload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
         return resize_error(baton, in);
       }
-    } else if(memcmp(MARKER_WEBP, baton->buffer_in, 2) == 0) {
+    } else if (is_webp(baton->file_in)) {
       inputImageType = WEBP;
-      if (vips_webpload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
+      if (vips_webpload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
+        return resize_error(baton, in);
+      }
+    } else if (is_tiff(baton->file_in)) {
+      inputImageType = TIFF;
+      if (vips_tiffload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
         return resize_error(baton, in);
       }
     } else {
       resize_error(baton, in);
-      (baton->err).append("Unsupported input buffer");
+      (baton->err).append("Unsupported input file " + baton->file_in);
       return;
     }
-  } else if (is_jpeg(baton->file_in)) {
-    if (vips_jpegload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
-      return resize_error(baton, in);
-    }
-  } else if (is_png(baton->file_in)) {
-    inputImageType = PNG;
-    if (vips_pngload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
-      return resize_error(baton, in);
-    }
-  } else if (is_webp(baton->file_in)) {
-    inputImageType = WEBP;
-    if (vips_webpload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
-      return resize_error(baton, in);
-    }
-  } else if (is_tiff(baton->file_in)) {
-    inputImageType = TIFF;
-    if (vips_tiffload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
-      return resize_error(baton, in);
-    }
-  } else {
-    resize_error(baton, in);
-    (baton->err).append("Unsupported input file " + baton->file_in);
-    return;
-  }
 
-  // Scaling calculations
-  double factor;
-  if (baton->width > 0 && baton->height > 0) {
-    // Fixed width and height
-    double xfactor = (double)(in->Xsize) / (double)(baton->width);
-    double yfactor = (double)(in->Ysize) / (double)(baton->height);
-    factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
-  } else if (baton->width > 0) {
-    // Fixed width, auto height
-    factor = (double)(in->Xsize) / (double)(baton->width);
-    baton->height = floor((double)(in->Ysize) / factor);
-  } else if (baton->height > 0) {
-    // Fixed height, auto width
-    factor = (double)(in->Ysize) / (double)(baton->height);
-    baton->width = floor((double)(in->Xsize) / factor);
-  } else {
-    // Identity transform
-    factor = 1;
-    baton->width = in->Xsize;
-    baton->height = in->Ysize;
-  }
-  int shrink = floor(factor);
-  if (shrink < 1) {
-    shrink = 1;
-  }
-  double residual = shrink / (double)factor;
-
-  // Try to use libjpeg shrink-on-load
-  int shrink_on_load = 1;
-  if (inputImageType == JPEG) {
-    if (shrink >= 8) {
-      factor = factor / 8;
-      shrink_on_load = 8;
-    } else if (shrink >= 4) {
-      factor = factor / 4;
-      shrink_on_load = 4;
-    } else if (shrink >= 2) {
-      factor = factor / 2;
-      shrink_on_load = 2;
+    // Scaling calculations
+    double factor;
+    if (baton->width > 0 && baton->height > 0) {
+      // Fixed width and height
+      double xfactor = (double)(in->Xsize) / (double)(baton->width);
+      double yfactor = (double)(in->Ysize) / (double)(baton->height);
+      factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
+    } else if (baton->width > 0) {
+      // Fixed width, auto height
+      factor = (double)(in->Xsize) / (double)(baton->width);
+      baton->height = floor((double)(in->Ysize) / factor);
+    } else if (baton->height > 0) {
+      // Fixed height, auto width
+      factor = (double)(in->Ysize) / (double)(baton->height);
+      baton->width = floor((double)(in->Xsize) / factor);
+    } else {
+      // Identity transform
+      factor = 1;
+      baton->width = in->Xsize;
+      baton->height = in->Ysize;
     }
-  }
-  VipsImage *shrunk_on_load = vips_image_new();
-  if (shrink_on_load > 1) {
-    // Recalculate integral shrink and double residual
-    factor = std::max(factor, 1.0);
-    shrink = floor(factor);
-    residual = shrink / factor;
-    // Reload input using shrink-on-load 
-    if (baton->buffer_in_len > 1) {
-      if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
-        return resize_error(baton, in);
+    int shrink = floor(factor);
+    if (shrink < 1) {
+      shrink = 1;
+    }
+    double residual = shrink / (double)factor;
+
+    // Try to use libjpeg shrink-on-load
+    int shrink_on_load = 1;
+    if (inputImageType == JPEG) {
+      if (shrink >= 8) {
+        factor = factor / 8;
+        shrink_on_load = 8;
+      } else if (shrink >= 4) {
+        factor = factor / 4;
+        shrink_on_load = 4;
+      } else if (shrink >= 2) {
+        factor = factor / 2;
+        shrink_on_load = 2;
+      }
+    }
+    VipsImage *shrunk_on_load = vips_image_new();
+    if (shrink_on_load > 1) {
+      // Recalculate integral shrink and double residual
+      factor = std::max(factor, 1.0);
+      shrink = floor(factor);
+      residual = shrink / factor;
+      // Reload input using shrink-on-load 
+      if (baton->buffer_in_len > 1) {
+        if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
+          return resize_error(baton, in);
+        }
+      } else {
+        if (vips_jpegload((baton->file_in).c_str(), &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
+          return resize_error(baton, in);
+        }
       }
     } else {
-      if (vips_jpegload((baton->file_in).c_str(), &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
-        return resize_error(baton, in);
-      }
+      vips_copy(in, &shrunk_on_load, NULL);
     }
-  } else {
-    vips_copy(in, &shrunk_on_load, NULL);
-  }
-  g_object_unref(in);
+    g_object_unref(in);
 
-  VipsImage *shrunk = vips_image_new();
-  if (shrink > 1) {
-    // Use vips_shrink with the integral reduction
-    if (vips_shrink(shrunk_on_load, &shrunk, shrink, shrink, NULL)) {
-      return resize_error(baton, shrunk_on_load);
-    }
-  } else {
-    vips_copy(shrunk_on_load, &shrunk, NULL);
-  }
-  g_object_unref(shrunk_on_load);
-
-  // Use vips_affine with the remaining float part using bilinear interpolation
-  VipsImage *affined = vips_image_new();
-  if (residual != 0) {
-    if (vips_affine(shrunk, &affined, residual, 0, 0, residual, "interpolate", vips_interpolate_bilinear_static(), NULL)) {
-      return resize_error(baton, shrunk);
-    }
-  } else {
-    vips_copy(shrunk, &affined, NULL);
-  }
-  g_object_unref(shrunk);
-
-  // Crop/embed
-  VipsImage *canvased = vips_image_new();
-  if (affined->Xsize != baton->width || affined->Ysize != baton->height) {
-    if (baton->crop) {
-      // Crop
-      int width = std::min(affined->Xsize, baton->width);
-      int height = std::min(affined->Ysize, baton->height);
-      int left = (affined->Xsize - width + 1) / 2;
-      int top = (affined->Ysize - height + 1) / 2;
-      if (vips_extract_area(affined, &canvased, left, top, width, height, NULL)) {
-        return resize_error(baton, affined);
+    VipsImage *shrunk = vips_image_new();
+    if (shrink > 1) {
+      // Use vips_shrink with the integral reduction
+      if (vips_shrink(shrunk_on_load, &shrunk, shrink, shrink, NULL)) {
+        return resize_error(baton, shrunk_on_load);
       }
     } else {
-      // Embed
-      int left = (baton->width - affined->Xsize) / 2;
-      int top = (baton->height - affined->Ysize) / 2;
-      if (vips_embed(affined, &canvased, left, top, baton->width, baton->height, "extend", baton->extend, NULL)) {
-        return resize_error(baton, affined);
+      vips_copy(shrunk_on_load, &shrunk, NULL);
+    }
+    g_object_unref(shrunk_on_load);
+
+    // Use vips_affine with the remaining float part using bilinear interpolation
+    VipsImage *affined = vips_image_new();
+    if (residual != 0) {
+      if (vips_affine(shrunk, &affined, residual, 0, 0, residual, "interpolate", vips_interpolate_bilinear_static(), NULL)) {
+        return resize_error(baton, shrunk);
       }
+    } else {
+      vips_copy(shrunk, &affined, NULL);
     }
-  } else {
-    vips_copy(affined, &canvased, NULL);
+    g_object_unref(shrunk);
+
+    // Crop/embed
+    VipsImage *canvased = vips_image_new();
+    if (affined->Xsize != baton->width || affined->Ysize != baton->height) {
+      if (baton->crop) {
+        // Crop
+        int width = std::min(affined->Xsize, baton->width);
+        int height = std::min(affined->Ysize, baton->height);
+        int left = (affined->Xsize - width + 1) / 2;
+        int top = (affined->Ysize - height + 1) / 2;
+        if (vips_extract_area(affined, &canvased, left, top, width, height, NULL)) {
+          return resize_error(baton, affined);
+        }
+      } else {
+        // Embed
+        int left = (baton->width - affined->Xsize) / 2;
+        int top = (baton->height - affined->Ysize) / 2;
+        if (vips_embed(affined, &canvased, left, top, baton->width, baton->height, "extend", baton->extend, NULL)) {
+          return resize_error(baton, affined);
+        }
+      }
+    } else {
+      vips_copy(affined, &canvased, NULL);
+    }
+    g_object_unref(affined);
+
+    // Mild sharpen
+    VipsImage *sharpened = vips_image_new();
+    if (baton->sharpen) {
+      INTMASK* sharpen = im_create_imaskv("sharpen", 3, 3,
+        -1, -1, -1,
+        -1, 32, -1,
+        -1, -1, -1);
+      sharpen->scale = 24;
+      if (im_conv(canvased, sharpened, sharpen)) {
+        return resize_error(baton, canvased);
+      }
+    } else {
+      vips_copy(canvased, &sharpened, NULL);
+    }
+    g_object_unref(canvased);
+
+    // Output
+    if (baton->file_out == "__jpeg" || (baton->file_out == "__input" && inputImageType == JPEG)) {
+      // Write JPEG to buffer
+      if (vips_jpegsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
+        return resize_error(baton, sharpened);
+      }
+    } else if (baton->file_out == "__png" || (baton->file_out == "__input" && inputImageType == PNG)) {
+      // Write PNG to buffer
+      if (vips_pngsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
+        return resize_error(baton, sharpened);
+      }
+    } else if (baton->file_out == "__webp" || (baton->file_out == "__input" && inputImageType == WEBP)) {
+      // Write WEBP to buffer
+      if (vips_webpsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, NULL)) {
+        return resize_error(baton, sharpened);
+      }
+    } else if (is_jpeg(baton->file_out))  {
+      // Write JPEG to file
+      if (vips_jpegsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
+        return resize_error(baton, sharpened);
+      }
+    } else if (is_png(baton->file_out)) {
+      // Write PNG to file
+      if (vips_pngsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
+        return resize_error(baton, sharpened);
+      }
+    } else if (is_webp(baton->file_out)) {
+      // Write WEBP to file
+      if (vips_webpsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", 80, NULL)) {
+        return resize_error(baton, sharpened);
+      }
+    } else if (is_tiff(baton->file_out)) {
+      // Write TIFF to file
+      if (vips_tiffsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", 80, NULL)) {
+        return resize_error(baton, sharpened);
+      }
+    } else {
+      (baton->err).append("Unsupported output " + baton->file_out);
+    }
+    g_object_unref(sharpened);
+    vips_thread_shutdown();
   }
-  g_object_unref(affined);
 
-  // Mild sharpen
-  VipsImage *sharpened = vips_image_new();
-  if (baton->sharpen) {
-    INTMASK* sharpen = im_create_imaskv("sharpen", 3, 3,
-      -1, -1, -1,
-      -1, 32, -1,
-      -1, -1, -1);
-    sharpen->scale = 24;
-    if (im_conv(canvased, sharpened, sharpen)) {
-      return resize_error(baton, canvased);
-    }
-  } else {
-    vips_copy(canvased, &sharpened, NULL);
-  }
-  g_object_unref(canvased);
+  void HandleOKCallback () {
+    NanScope();
 
-  // Output
-  if (baton->file_out == "__jpeg" || (baton->file_out == "__input" && inputImageType == JPEG)) {
-    // Write JPEG to buffer
-    if (vips_jpegsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
-      return resize_error(baton, sharpened);
+    Handle<Value> argv[2] = { Null(), Null() };
+    if (!baton->err.empty()) {
+      // Error
+      argv[0] = String::New(baton->err.data(), baton->err.size());
+    } else if (baton->buffer_out_len > 0) {
+      // Buffer
+      argv[1] = NanNewBufferHandle((char *)baton->buffer_out, baton->buffer_out_len);
+      g_free(baton->buffer_out);
     }
-  } else if (baton->file_out == "__png" || (baton->file_out == "__input" && inputImageType == PNG)) {
-    // Write PNG to buffer
-    if (vips_pngsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
-      return resize_error(baton, sharpened);
-    }
-  } else if (baton->file_out == "__webp" || (baton->file_out == "__input" && inputImageType == WEBP)) {
-    // Write WEBP to buffer
-    if (vips_webpsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", 80, NULL)) {
-      return resize_error(baton, sharpened);
-    }
-  } else if (is_jpeg(baton->file_out))  {
-    // Write JPEG to file
-    if (vips_jpegsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", 80, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
-      return resize_error(baton, sharpened);
-    }
-  } else if (is_png(baton->file_out)) {
-    // Write PNG to file
-    if (vips_pngsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", 6, "interlace", baton->progessive, NULL)) {
-      return resize_error(baton, sharpened);
-    }
-  } else if (is_webp(baton->file_out)) {
-    // Write WEBP to file
-    if (vips_webpsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", 80, NULL)) {
-      return resize_error(baton, sharpened);
-    }
-  } else if (is_tiff(baton->file_out)) {
-    // Write TIFF to file
-    if (vips_tiffsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", 80, NULL)) {
-      return resize_error(baton, sharpened);
-    }
-  } else {
-    (baton->err).append("Unsupported output " + baton->file_out);
-  }
-  g_object_unref(sharpened);
-  vips_thread_shutdown();
-}
-
-void resize_async_after(uv_work_t *work, int status) {
-  HandleScope scope;
-
-  resize_baton *baton = static_cast<resize_baton*>(work->data);
-
-  Handle<Value> argv[2] = { Null(), Null() };
-  if (!baton->err.empty()) {
-    // Error
-    argv[0] = scope.Close(String::New(baton->err.data(), baton->err.size()));
-  } else if (baton->buffer_out_len > 0) {
-    // Buffer
-    Buffer *slowBuffer = Buffer::New(baton->buffer_out_len);
-    memcpy(Buffer::Data(slowBuffer), baton->buffer_out, baton->buffer_out_len);
-    Local<Object> globalObj = Context::GetCurrent()->Global();
-    Local<Function> bufferConstructor = Local<Function>::Cast(globalObj->Get(String::New("Buffer")));
-    Handle<Value> constructorArgs[3] = { slowBuffer->handle_, v8::Integer::New(baton->buffer_out_len), v8::Integer::New(0) };
-    argv[1] = scope.Close(bufferConstructor->NewInstance(3, constructorArgs));
-    g_free(baton->buffer_out);
+    delete baton;
+    callback->Call(2, argv);
   }
 
-  baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
-  baton->callback.Dispose();
-  delete baton;
-  delete work;
-}
+ private:
+  resize_baton* baton;
+};
 
-Handle<Value> resize(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(resize) {
+  NanScope();
   
   resize_baton *baton = new resize_baton;
   baton->file_in = *String::Utf8Value(args[0]->ToString());
@@ -338,16 +337,15 @@ Handle<Value> resize(const Arguments& args) {
   baton->sharpen = args[6]->BooleanValue();
   baton->progessive = args[7]->BooleanValue();
   baton->access_method = args[8]->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
-  baton->callback = Persistent<Function>::New(Local<Function>::Cast(args[9]));
 
-  uv_work_t *work = new uv_work_t;
-  work->data = baton;
-  uv_queue_work(uv_default_loop(), work, resize_async, (uv_after_work_cb)resize_async_after);
-  return scope.Close(Undefined());
+  NanCallback *callback = new NanCallback(args[9].As<v8::Function>());
+
+  NanAsyncQueueWorker(new ResizeWorker(callback, baton));
+  NanReturnUndefined();
 }
 
-Handle<Value> cache(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(cache) {
+  NanScope();
   
   // Set cache limit
   if (args[0]->IsInt32()) {
@@ -359,16 +357,16 @@ Handle<Value> cache(const Arguments& args) {
   cache->Set(String::NewSymbol("current"), Number::New(vips_tracked_get_mem() / 1048576));
   cache->Set(String::NewSymbol("high"), Number::New(vips_tracked_get_mem_highwater() / 1048576));
   cache->Set(String::NewSymbol("limit"), Number::New(vips_cache_get_max_mem() / 1048576));
-  return scope.Close(cache);
+  NanReturnValue(cache);
 }
 
 static void at_exit(void* arg) {
-  HandleScope scope;
+  NanScope();
   vips_shutdown();
 }
 
 extern "C" void init(Handle<Object> target) {
-  HandleScope scope;
+  NanScope();
   vips_init("");
   AtExit(at_exit);
   NODE_SET_METHOD(target, "resize", resize);
