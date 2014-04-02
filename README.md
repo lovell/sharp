@@ -217,8 +217,6 @@ Test environment:
 * imagemagick x 5.53 ops/sec ±0.62% (31 runs sampled)
 * gm-file-file x 4.10 ops/sec ±0.41% (25 runs sampled)
 * gm-file-buffer x 4.10 ops/sec ±0.36% (25 runs sampled)
-* epeg-file-file x 23.82 ops/sec ±0.18% (60 runs sampled)
-* epeg-file-buffer x 23.98 ops/sec ±0.16% (61 runs sampled)
 
 * sharp-buffer-file x 20.76 ops/sec ±0.55% (54 runs sampled)
 * sharp-buffer-buffer x 20.90 ops/sec ±0.26% (54 runs sampled)
