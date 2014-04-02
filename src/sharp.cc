@@ -98,21 +98,21 @@ class ResizeWorker : public NanAsyncWorker {
         (baton->err).append("Unsupported input buffer");
         return;
       }
-    } else if (is_jpeg(baton->file_in)) {
+    } else if (vips_foreign_is_a("jpegload", baton->file_in.c_str())) {
       if (vips_jpegload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
         return resize_error(baton, in);
       }
-    } else if (is_png(baton->file_in)) {
+    } else if (vips_foreign_is_a("pngload", baton->file_in.c_str())) {
       inputImageType = PNG;
       if (vips_pngload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
         return resize_error(baton, in);
       }
-    } else if (is_webp(baton->file_in)) {
+    } else if (vips_foreign_is_a("webpload", baton->file_in.c_str())) {
       inputImageType = WEBP;
       if (vips_webpload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
         return resize_error(baton, in);
       }
-    } else if (is_tiff(baton->file_in)) {
+    } else if (vips_foreign_is_a("tiffload", baton->file_in.c_str())) {
       inputImageType = TIFF;
       if (vips_tiffload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
         return resize_error(baton, in);
