@@ -192,7 +192,7 @@ sharp.cache(200); // { current: 98, high: 115, limit: 200 }
 sharp.cache(50); // { current: 49, high: 115, limit: 50 }
 ```
 
-## Testing
+## Testing [![Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
 	npm test
 
