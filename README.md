@@ -44,7 +44,7 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 	sudo make install
 	sudo ldconfig
 
-Ubuntu 12.04 requires `libtiff4-dev` instead of `libtiff5-dev` and has (a bug in the libwebp package)[https://bugs.launchpad.net/ubuntu/+source/libwebp/+bug/1108731]. Work around these problems by running these command first:
+Ubuntu 12.04 requires `libtiff4-dev` instead of `libtiff5-dev` and has [a bug](https://bugs.launchpad.net/ubuntu/+source/libwebp/+bug/1108731) in the libwebp package. Work around these problems by running these command first:
 
 	sudo add-apt-repository ppa:lyrasis/precise-backports
 	sudo apt-get update
