@@ -37,11 +37,18 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev liborc-0.4-dev libxml2-dev swig
 	git clone https://github.com/jcupitt/libvips.git
 	cd libvips
+	git checkout 7.38
 	./bootstrap.sh
-	./configure --enable-debug=no
+	./configure --enable-debug=no --enable-cxx=no --without-python
 	make
 	sudo make install
 	sudo ldconfig
+
+Ubuntu 12.04 requires `libtiff4-dev` instead of `libtiff5-dev` and has (a bug in the libwebp package)[https://bugs.launchpad.net/ubuntu/+source/libwebp/+bug/1108731]. Work around these problems by running these command first:
+
+	sudo add-apt-repository ppa:lyrasis/precise-backports
+	sudo apt-get update
+	sudo apt-get install libtiff4-dev
 
 ## Install
 
