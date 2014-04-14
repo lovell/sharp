@@ -2,6 +2,7 @@ var sharp = require("../index");
 var fs = require("fs");
 var path = require("path");
 var imagemagick = require("imagemagick");
+var imagemagickNative = require("imagemagick-native");
 var gm = require("gm");
 var async = require("async");
 var assert = require("assert");
@@ -26,10 +27,13 @@ var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikim
 var width = 720;
 var height = 480;
 
+// Disable libvips cache to ensure tests are as fair as they can be
+sharp.cache(0);
+
 async.series({
   jpeg: function(callback) {
     var inputJpgBuffer = fs.readFileSync(inputJpg);
-    (new Benchmark.Suite("jpeg")).add("imagemagick", {
+    (new Benchmark.Suite("jpeg")).add("imagemagick-file-file", {
       defer: true,
       fn: function(deferred) {
         imagemagick.resize({
@@ -45,6 +49,18 @@ async.series({
             deferred.resolve();
           }
         });
+      }
+    }).add("imagemagick-native-buffer-buffer", {
+      defer: true,
+      fn: function(deferred) {
+        imagemagickNative.convert({
+          srcData: inputJpgBuffer,
+          quality: 80,
+          width: width,
+          height: height,
+					format: 'JPEG'
+        });
+				deferred.resolve();
       }
     }).add("gm-file-file", {
       defer: true,
@@ -159,7 +175,7 @@ async.series({
   },
   png: function(callback) {
     var inputPngBuffer = fs.readFileSync(inputPng);
-    (new Benchmark.Suite("png")).add("imagemagick", {
+    (new Benchmark.Suite("png")).add("imagemagick-file-file", {
       defer: true,
       fn: function(deferred) {
         imagemagick.resize({
@@ -174,6 +190,17 @@ async.series({
             deferred.resolve();
           }
         });
+      }
+    }).add("imagemagick-native-buffer-buffer", {
+      defer: true,
+      fn: function(deferred) {
+        imagemagickNative.convert({
+          srcData: inputPngBuffer,
+          width: width,
+          height: height,
+					format: 'PNG'
+        });
+				deferred.resolve();
       }
     }).add("gm-file-file", {
       defer: true,
@@ -447,7 +474,9 @@ async.series({
 }, function(err, results) {
   assert(!err, err);
   Object.keys(results).forEach(function(format) {
-    assert.strictEqual("sharp", results[format].toString().substr(0, 5), "sharp was slower than " + results[format] + " for " + format);
+    if (results[format].toString().substr(0, 5) !== "sharp") {
+      console.log("sharp was slower than " + results[format] + " for " + format);
+    }
   });
   console.dir(sharp.cache());
 });

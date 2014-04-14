@@ -5,7 +5,7 @@
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>"
   ],
-  "description": "High performance module to resize JPEG, PNG, WebP and TIFF images using the libvips image processing library",
+  "description": "High performance Node.js module to resize JPEG, PNG and WebP images using the libvips library",
   "scripts": {
     "test": "node tests/unit && node tests/perf"
   },
@@ -19,6 +19,7 @@
     "png",
     "webp",
     "tiff",
+    "gif",
     "resize",
     "thumbnail",
     "sharpen",
@@ -29,8 +30,12 @@
     "fast",
     "buffer"
   ],
+  "dependencies": {
+    "nan": "^0.8.0"
+  },
   "devDependencies": {
     "imagemagick": "^0.1.3",
+    "imagemagick-native": "^0.2.9",
     "gm": "^1.14.2",
     "async": "^0.6.2",
     "benchmark": "^1.0.0"
@@ -38,8 +43,5 @@
   "license": "Apache 2.0",
   "engines": {
     "node": ">=0.10"
-  },
-  "dependencies": {
-    "nan": "^0.8.0"
   }
 }

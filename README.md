@@ -1,25 +1,29 @@
 # sharp
 
-_adj_
+* [Installation](https://github.com/lovell/sharp#installation)
+* [Usage examples](https://github.com/lovell/sharp#usage-examples)
+* [API](https://github.com/lovell/sharp#api)
+* [Testing](https://github.com/lovell/sharp#testing)
+* [Performance](https://github.com/lovell/sharp#performance)
+* [Licence](https://github.com/lovell/sharp#licence)
 
-1. clearly defined; distinct: a sharp photographic image.
-2. quick, brisk, or spirited.
-3. shrewd or astute: a sharp bargainer.
-4. (Informal.) very stylish: a sharp dresser; a sharp jacket.
+The typical use case for this high speed Node.js module is to convert large images of many formats to smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
-The typical use case for this high speed Node.js module is to convert large JPEG, PNG, WebP and TIFF images to smaller images of varying dimensions.
+The performance of JPEG resizing is typically 8x faster than ImageMagick and GraphicsMagick, based mainly on the number of CPU cores available. Everything remains non-blocking thanks to _libuv_.
 
-The performance of JPEG resizing is typically 15x-25x faster than ImageMagick and GraphicsMagick, based mainly on the number of CPU cores available.
+This module supports reading and writing images of JPEG, PNG and WebP to and from both Buffer objects and the filesystem. It also supports reading images of many other types from the filesystem via libmagick++ or libgraphicsmagick++ if present.
 
 When generating JPEG output all metadata is removed and Huffman tables optimised without having to use separate command line tools like [jpegoptim](https://github.com/tjko/jpegoptim) and [jpegtran](http://jpegclub.org/jpegtran/).
-
-This module supports reading and writing images to and from both the filesystem and Buffer objects (TIFF is limited to filesystem only). Everything remains non-blocking thanks to _libuv_.
 
 Anyone who has used the Node.js bindings for [GraphicsMagick](https://github.com/aheckmann/gm) will find the API similarly fluent.
 
 This module is powered by the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by John Cupitt.
 
-## Prerequisites
+## Installation
+
+	npm install sharp
+
+### Prerequisites
 
 * Node.js v0.10+
 * [libvips](https://github.com/jcupitt/libvips) v7.38.5+
@@ -49,10 +53,6 @@ Ubuntu 12.04 requires `libtiff4-dev` instead of `libtiff5-dev` and has [a bug](h
 	sudo add-apt-repository ppa:lyrasis/precise-backports
 	sudo apt-get update
 	sudo apt-get install libtiff4-dev
-
-## Install
-
-	npm install sharp
 
 ## Usage examples
 
@@ -99,12 +99,12 @@ sharp(buffer).resize(200, 300).embedWhite().write('output.tiff', function(err) {
 ```
 
 ```javascript
-sharp('input.jpg').resize(200, 300).embedBlack().webp(function(err, buffer) {
+sharp('input.gif').resize(200, 300).embedBlack().webp(function(err, buffer) {
   if (err) {
     throw err;
   }
   // buffer contains WebP image data of a 200 pixels wide and 300 pixels high image
-  // containing a scaled version, embedded on a black canvas, of input.jpg
+  // containing a scaled version, embedded on a black canvas, of input.gif
 });
 ```
 
@@ -112,9 +112,10 @@ sharp('input.jpg').resize(200, 300).embedBlack().webp(function(err, buffer) {
 
 ### sharp(input)
 
-Constructor to which further methods are chained.
+Constructor to which further methods are chained. `input` can be one of:
 
-`input` can either be a filename String or a Buffer.
+# Buffer containing JPEG, PNG or WebP image data.
+# String containing the filename of an image. Most major formats are supported.
 
 ### resize(width, [height])
 
@@ -174,7 +175,7 @@ Write WebP image data to a Buffer.
 
 ### toBuffer(callback)
 
-Write image data to a Buffer, the format of which will match the input image.
+Write image data to a Buffer, the format of which will match the input image. JPEG, PNG and WebP are supported.
 
 `callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant image data.
 
@@ -192,16 +193,18 @@ sharp.cache(200); // { current: 98, high: 115, limit: 200 }
 sharp.cache(50); // { current: 49, high: 115, limit: 50 }
 ```
 
-## Testing [![Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
+## Testing
+
+[![Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
 	npm test
 
-Running the tests requires both ImageMagick and GraphicsMagick to be installed.
+Running the tests requires both ImageMagick and GraphicsMagick plus one of either libmagick++-dev or libgraphicsmagick++.
 
 	brew install imagemagick
 	brew install graphicsmagick
 
-	sudo apt-get install imagemagick graphicsmagick
+	sudo apt-get install imagemagick graphicsmagick libmagick++-dev
 
 ## Performance
 
