@@ -114,8 +114,8 @@ sharp('input.gif').resize(200, 300).embedBlack().webp(function(err, buffer) {
 
 Constructor to which further methods are chained. `input` can be one of:
 
-# Buffer containing JPEG, PNG or WebP image data.
-# String containing the filename of an image. Most major formats are supported.
+* Buffer containing JPEG, PNG or WebP image data, or
+* String containing the filename of an image, with most major formats supported.
 
 ### resize(width, [height])
 
@@ -203,6 +203,7 @@ Running the tests requires both ImageMagick and GraphicsMagick plus one of eithe
 
 	brew install imagemagick
 	brew install graphicsmagick
+
 
 	sudo apt-get install imagemagick graphicsmagick libmagick++-dev
 
