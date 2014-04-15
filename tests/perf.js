@@ -62,6 +62,29 @@ async.series({
         });
 				deferred.resolve();
       }
+    }).add("gm-buffer-file", {
+      defer: true,
+      fn: function(deferred) {
+        gm(inputJpgBuffer).resize(width, height).quality(80).write(outputJpg, function (err) {
+          if (err) {
+            throw err;
+          } else {
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("gm-buffer-buffer", {
+      defer: true,
+      fn: function(deferred) {
+        gm(inputJpgBuffer).resize(width, height).quality(80).toBuffer(function (err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
     }).add("gm-file-file", {
       defer: true,
       fn: function(deferred) {
