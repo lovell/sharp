@@ -204,69 +204,42 @@ Running the tests requires both ImageMagick and GraphicsMagick plus one of eithe
 	brew install imagemagick
 	brew install graphicsmagick
 
-
 	sudo apt-get install imagemagick graphicsmagick libmagick++-dev
 
 ## Performance
 
-Test environment:
+### Test environment
 
-* AMD Athlon 4 core 3.3GHz 512KB L2 CPU 1333 DDR3
-* libvips 7.38
-* libjpeg-turbo8 1.3.0
-* libpng 1.6.6
-* zlib1g 1.2.7
-* libwebp 0.3.0
-* libtiff 4.0.2
+* Intel Xeon [L5520](http://ark.intel.com/products/40201/Intel-Xeon-Processor-L5520-8M-Cache-2_26-GHz-5_86-GTs-Intel-QPI) 2.27GHz 8MB cache
+* Ubuntu 13.10
+* libvips 7.38.5
 
-`-file-buffer` indicates read from file and write to buffer, `-buffer-file` indicates read from buffer and write to file etc.
+### The contenders
 
-`-sharpen`, `-progressive` etc. demonstrate the negative effect of options on performance.
+* [imagemagick-native](https://github.com/mash/node-imagemagick-native) - Supports Buffers only and blocks main V8 thread whilst processing.
+* [imagemagick](https://github.com/rsms/node-imagemagick) - Supports filesystem only and "has been unmaintained for a long time".
+* [gm](https://github.com/aheckmann/gm) - Fully featured wrapper around GraphicsMagick.
+* sharp - Caching within libvips disabled to ensure a fair comparison.
 
-### JPEG
+### Results
 
-* imagemagick x 5.53 ops/sec ±0.62% (31 runs sampled)
-* gm-file-file x 4.10 ops/sec ±0.41% (25 runs sampled)
-* gm-file-buffer x 4.10 ops/sec ±0.36% (25 runs sampled)
+| Module                | Input  | Output | Ops/sec | Speed-up |
+| :-------------------- | :----- | :----- | ------: | -------: |
+| imagemagick-native    | buffer | buffer |    0.97 |        1 |
+| imagemagick           | file   | file   |    2.49 |      2.6 |
+| gm                    | buffer | file   |    3.72 |      3.8 |
+| gm                    | buffer | buffer |    3.80 |      3.9 |
+| gm                    | file   | file   |    3.67 |      3.8 |
+| gm                    | file   | buffer |    3.67 |      3.8 |
+| sharp                 | buffer | file   |   13.62 |     14.0 |
+| sharp                 | buffer | buffer |   12.43 |     12.8 |
+| sharp                 | file   | file   |   13.02 |     13.4 |
+| sharp                 | file   | buffer |   11.15 |     11.5 |
+| sharp +sharpen        | file   | buffer |   10.26 |     10.6 |
+| sharp +progressive    | file   | buffer |    9.44 |      9.7 |
+| sharp +sequentialRead | file   | buffer |   11.94 |     12.3 |
 
-* sharp-buffer-file x 20.76 ops/sec ±0.55% (54 runs sampled)
-* sharp-buffer-buffer x 20.90 ops/sec ±0.26% (54 runs sampled)
-* sharp-file-file x 91.78 ops/sec ±0.38% (88 runs sampled)
-* sharp-file-buffer x __93.05 ops/sec__ ±0.61% (76 runs sampled)
-
-* sharp-file-buffer-sharpen x 63.09 ops/sec ±5.58% (63 runs sampled)
-* sharp-file-buffer-progressive x 61.68 ops/sec ±0.53% (76 runs sampled)
-* sharp-file-buffer-sequentialRead x 60.66 ops/sec ±0.38% (75 runs sampled)
-
-### PNG
-
-* imagemagick x 4.27 ops/sec ±0.21% (25 runs sampled)
-* gm-file-file x 8.33 ops/sec ±0.19% (44 runs sampled)
-* gm-file-buffer x 7.45 ops/sec ±0.16% (40 runs sampled)
- 
-* sharp-buffer-file x 4.94 ops/sec ±118.46% (26 runs sampled)
-* sharp-buffer-buffer x 12.59 ops/sec ±0.55% (64 runs sampled)
-* sharp-file-file x 44.06 ops/sec ±6.86% (75 runs sampled)
-* sharp-file-buffer x __46.29 ops/sec__ ±0.38% (76 runs sampled)
-
-* sharp-file-buffer-sharpen x 38.86 ops/sec ±0.22% (65 runs sampled)
-* sharp-file-buffer-progressive x 46.35 ops/sec ±0.20% (76 runs sampled)
-* sharp-file-buffer-sequentialRead x 29.02 ops/sec ±0.62% (72 runs sampled)
-
-### WebP
-
-* sharp-buffer-file x 3.30 ops/sec ±117.14% (19 runs sampled)
-* sharp-buffer-buffer x 7.66 ops/sec ±5.83% (43 runs sampled)
-* sharp-file-file x 9.88 ops/sec ±0.98% (52 runs sampled)
-* sharp-file-buffer x 9.95 ops/sec ±0.25% (52 runs sampled)
-* sharp-file-buffer-sharpen x 9.05 ops/sec ±0.36% (48 runs sampled)
-* sharp-file-buffer-sequentialRead x 9.87 ops/sec ±0.98% (52 runs sampled)
-
-### TIFF
-
-* sharp-file-file x 68.24 ops/sec ±5.93% (85 runs sampled)
-* sharp-file-file-sharpen x 50.76 ops/sec ±0.52% (82 runs sampled)
-* sharp-file-file-sequentialRead x 36.37 ops/sec ±0.90% (87 runs sampled)
+You can expect much greater performance with caching enabled (default) and using 16+ core machines.
 
 ## Licence
 
