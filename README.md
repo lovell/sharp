@@ -221,6 +221,10 @@ Running the tests requires both ImageMagick and GraphicsMagick plus one of eithe
 * [gm](https://github.com/aheckmann/gm) - Fully featured wrapper around GraphicsMagick.
 * sharp - Caching within libvips disabled to ensure a fair comparison.
 
+### The task
+
+Decompress a 2725x2225 JPEG image, resize and crop to 720x480, then compress to JPEG.
+
 ### Results
 
 | Module                | Input  | Output | Ops/sec | Speed-up |
