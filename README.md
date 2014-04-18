@@ -36,7 +36,15 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 	brew link gettext --force
 
-### Install libvips on Ubuntu/Debian Linux
+### Install libvips on Ubuntu Linux
+
+#### Ubuntu 14.x
+
+	sudo apt-get install libvips-dev
+
+#### Ubuntu 13.x
+
+Compiling from source is recommended:
 
 	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev liborc-0.4-dev libxml2-dev swig
 	git clone https://github.com/jcupitt/libvips.git
@@ -48,11 +56,15 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 	sudo make install
 	sudo ldconfig
 
-Ubuntu 12.04 requires `libtiff4-dev` instead of `libtiff5-dev` and has [a bug](https://bugs.launchpad.net/ubuntu/+source/libwebp/+bug/1108731) in the libwebp package. Work around these problems by running these command first:
+#### Ubuntu 12.x
+
+Requires `libtiff4-dev` instead of `libtiff5-dev` and has [a bug](https://bugs.launchpad.net/ubuntu/+source/libwebp/+bug/1108731) in the libwebp package. Work around these problems by running these command first:
 
 	sudo add-apt-repository ppa:lyrasis/precise-backports
 	sudo apt-get update
 	sudo apt-get install libtiff4-dev
+
+Then follow Ubuntu 13.x instructions.
 
 ## Usage examples
 
