@@ -300,10 +300,10 @@ class ResizeWorker : public NanAsyncWorker {
   void HandleOKCallback () {
     NanScope();
 
-    Handle<Value> argv[2] = { Null(), Null() };
+    Handle<Value> argv[2] = { NanNull(), NanNull() };
     if (!baton->err.empty()) {
       // Error
-      argv[0] = String::New(baton->err.data(), baton->err.size());
+      argv[0] = NanNew<String>(baton->err.data(), baton->err.size());
     } else if (baton->buffer_out_len > 0) {
       // Buffer
       argv[1] = NanNewBufferHandle((char *)baton->buffer_out, baton->buffer_out_len);
@@ -331,12 +331,12 @@ NAN_METHOD(resize) {
   baton->width = args[3]->Int32Value();
   baton->height = args[4]->Int32Value();
   Local<String> canvas = args[5]->ToString();
-  if (canvas->Equals(String::NewSymbol("c"))) {
+  if (canvas->Equals(NanSymbol("c"))) {
     baton->crop = true;
-  } else if (canvas->Equals(String::NewSymbol("w"))) {
+  } else if (canvas->Equals(NanSymbol("w"))) {
     baton->crop = false;
     baton->extend = VIPS_EXTEND_WHITE;
-  } else if (canvas->Equals(String::NewSymbol("b"))) {
+  } else if (canvas->Equals(NanSymbol("b"))) {
     baton->crop = false;
     baton->extend = VIPS_EXTEND_BLACK;
   }
@@ -359,10 +359,10 @@ NAN_METHOD(cache) {
   }
 
   // Get cache statistics
-  Local<Object> cache = Object::New();
-  cache->Set(String::NewSymbol("current"), Number::New(vips_tracked_get_mem() / 1048576));
-  cache->Set(String::NewSymbol("high"), Number::New(vips_tracked_get_mem_highwater() / 1048576));
-  cache->Set(String::NewSymbol("limit"), Number::New(vips_cache_get_max_mem() / 1048576));
+  Local<Object> cache = NanNew<Object>();
+  cache->Set(NanSymbol("current"), NanNew<Number>(vips_tracked_get_mem() / 1048576));
+  cache->Set(NanSymbol("high"), NanNew<Number>(vips_tracked_get_mem_highwater() / 1048576));
+  cache->Set(NanSymbol("limit"), NanNew<Number>(vips_cache_get_max_mem() / 1048576));
   NanReturnValue(cache);
 }
 
