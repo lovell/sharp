@@ -13,5 +13,3 @@ results
 build
 node_modules
 tests/fixtures/output.*
-
-npm-debug.log
