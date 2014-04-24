@@ -12,4 +12,7 @@ logs
 results
 build
 node_modules
-tests/fixtures/output.*
+
+.gitignore
+tests
+.travis.yml
