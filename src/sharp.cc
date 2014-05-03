@@ -241,14 +241,16 @@ class ResizeWorker : public NanAsyncWorker {
     // Mild sharpen
     VipsImage *sharpened = vips_image_new();
     if (baton->sharpen) {
-      INTMASK* sharpen = im_create_imaskv("sharpen", 3, 3,
-        -1, -1, -1,
-        -1, 32, -1,
-        -1, -1, -1);
-      sharpen->scale = 24;
-      if (im_conv(canvased, sharpened, sharpen)) {
+      VipsImage *sharpen = vips_image_new_matrixv(3, 3,
+        -1.0, -1.0, -1.0,
+        -1.0, 32.0, -1.0,
+        -1.0, -1.0, -1.0);
+      vips_image_set_double(sharpen, "scale", 24);
+      if (vips_conv(canvased, &sharpened, sharpen, NULL)) {
+        g_object_unref(sharpen);
         return resize_error(baton, canvased);
       }
+      g_object_unref(sharpen);
     } else {
       vips_copy(canvased, &sharpened, NULL);
     }
