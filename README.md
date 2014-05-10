@@ -94,11 +94,11 @@ sharp('input.jpg').resize(null, 200).progressive().toBuffer(function(err, buffer
 ```
 
 ```javascript
-sharp('input.png').resize(300).sharpen().webp(function(err, buffer) {
+sharp('input.png').resize(300).sharpen().quality(90).webp(function(err, buffer) {
   if (err) {
     throw err;
   }
-  // buffer contains sharpened WebP image data (converted from PNG), 300 pixels wide
+  // buffer contains 300 pixels wide, sharpened, 90% quality WebP image data
 });
 ```
 
@@ -158,6 +158,18 @@ Perform a mild sharpen of the resultant image. This typically reduces performanc
 ### progressive()
 
 Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.
+
+### quality(quality)
+
+The output quality to use for lossy JPEG, WebP and TIFF output formats. The default quality is `80`.
+
+`quality` is a Number between 1 and 100.
+
+### compressionLevel(compressionLevel)
+
+An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
+
+`compressionLevel` is a Number between -1 and 9.
 
 ### sequentialRead()
 

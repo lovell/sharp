@@ -14,6 +14,8 @@ var Sharp = function(input) {
     sharpen: false,
     progressive: false,
     sequentialRead: false,
+		quality: 80,
+		compressionLevel: 6,
     output: '__jpeg'
   };
   if (typeof input === 'string') {
@@ -54,6 +56,24 @@ Sharp.prototype.progressive = function(progressive) {
 
 Sharp.prototype.sequentialRead = function(sequentialRead) {
   this.options.sequentialRead = (typeof sequentialRead === 'boolean') ? sequentialRead : true;
+  return this;
+};
+
+Sharp.prototype.quality = function(quality) {
+  if (!Number.isNaN(quality) && quality >= 1 && quality <= 100) {
+    this.options.quality = quality;
+  } else {
+    throw 'Invalid quality (1 to 100) ' + quality;
+  }
+  return this;
+};
+
+Sharp.prototype.compressionLevel = function(compressionLevel) {
+  if (!Number.isNaN(compressionLevel) && compressionLevel >= -1 && compressionLevel <= 9) {
+    this.options.compressionLevel = compressionLevel;
+  } else {
+    throw 'Invalid compressionLevel (-1 to 9) ' + compressionLevel;
+  }
   return this;
 };
 
@@ -115,6 +135,8 @@ Sharp.prototype._sharp = function(output, callback) {
     this.options.sharpen,
     this.options.progressive,
     this.options.sequentialRead,
+    this.options.quality,
+    this.options.compressionLevel,
     callback
   );
   return this;
