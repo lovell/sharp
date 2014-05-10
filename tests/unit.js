@@ -69,5 +69,20 @@ async.series([
         done();
       });
     });
+  },
+  // Quality
+  function(done) {
+    sharp(inputJpg).resize(320, 240).quality(70).jpeg(function(err, buffer70) {
+      if (err) throw err;
+      sharp(inputJpg).resize(320, 240).jpeg(function(err, buffer80) {
+        if (err) throw err;
+        sharp(inputJpg).resize(320, 240).quality(90).jpeg(function(err, buffer90) {
+          assert(buffer70.length < buffer80.length);
+          assert(buffer80.length < buffer90.length);
+          done();
+        });
+      });
+    });
   }
+
 ]);
