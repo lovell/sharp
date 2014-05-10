@@ -28,6 +28,8 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 * Node.js v0.10+
 * [libvips](https://github.com/jcupitt/libvips) v7.38.5+
 
+_libvips_ will take advantage of [liborc](http://code.entropywave.com/orc/) if present, however versions of _liborc_ prior to 0.4.19 suffer memory leaks.
+
 ### Install libvips on Mac OS
 
 	brew install homebrew/science/vips --with-webp --with-graphicsmagick
@@ -46,12 +48,12 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 Compiling from source is recommended:
 
-	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev liborc-0.4-dev libxml2-dev swig
+	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libxml2-dev swig
 	git clone https://github.com/jcupitt/libvips.git
 	cd libvips
 	git checkout 7.38
 	./bootstrap.sh
-	./configure --enable-debug=no --enable-cxx=no --without-python
+	./configure --enable-debug=no --enable-cxx=no --without-python --without-orc
 	make
 	sudo make install
 	sudo ldconfig
