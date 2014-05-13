@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "imagemagick": "^0.1.3",
-    "imagemagick-native": "^0.2.9",
+    "imagemagick-native": "git://github.com/mash/node-imagemagick-native.git#master",
     "gm": "^1.16.0",
     "async": "^0.8.0",
     "benchmark": "^1.0.0"
