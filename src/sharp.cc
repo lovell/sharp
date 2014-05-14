@@ -22,7 +22,7 @@ struct resize_baton {
   bool crop;
   VipsExtend extend;
   bool sharpen;
-  bool progessive;
+  bool progressive;
   VipsAccess access_method;
   int quality;
   int compressionLevel;
@@ -178,7 +178,7 @@ class ResizeWorker : public NanAsyncWorker {
       factor = std::max(factor, 1.0);
       shrink = floor(factor);
       residual = shrink / factor;
-      // Reload input using shrink-on-load 
+      // Reload input using shrink-on-load
       if (baton->buffer_in_len > 1) {
         if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
           return resize_error(baton, in);
@@ -261,12 +261,12 @@ class ResizeWorker : public NanAsyncWorker {
     // Output
     if (baton->file_out == "__jpeg" || (baton->file_out == "__input" && inputImageType == JPEG)) {
       // Write JPEG to buffer
-      if (vips_jpegsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
+      if (vips_jpegsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, sharpened);
       }
     } else if (baton->file_out == "__png" || (baton->file_out == "__input" && inputImageType == PNG)) {
       // Write PNG to buffer
-      if (vips_pngsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progessive, NULL)) {
+      if (vips_pngsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, sharpened);
       }
     } else if (baton->file_out == "__webp" || (baton->file_out == "__input" && inputImageType == WEBP)) {
@@ -276,12 +276,12 @@ class ResizeWorker : public NanAsyncWorker {
       }
     } else if (is_jpeg(baton->file_out))  {
       // Write JPEG to file
-      if (vips_jpegsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progessive, NULL)) {
+      if (vips_jpegsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, sharpened);
       }
     } else if (is_png(baton->file_out)) {
       // Write PNG to file
-      if (vips_pngsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progessive, NULL)) {
+      if (vips_pngsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, sharpened);
       }
     } else if (is_webp(baton->file_out)) {
@@ -323,7 +323,7 @@ class ResizeWorker : public NanAsyncWorker {
 
 NAN_METHOD(resize) {
   NanScope();
-  
+
   resize_baton *baton = new resize_baton;
   baton->file_in = *String::Utf8Value(args[0]->ToString());
   if (args[1]->IsObject()) {
@@ -345,7 +345,7 @@ NAN_METHOD(resize) {
     baton->extend = VIPS_EXTEND_BLACK;
   }
   baton->sharpen = args[6]->BooleanValue();
-  baton->progessive = args[7]->BooleanValue();
+  baton->progressive = args[7]->BooleanValue();
   baton->access_method = args[8]->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   baton->quality = args[9]->Int32Value();
   baton->compressionLevel = args[10]->Int32Value();
@@ -358,7 +358,7 @@ NAN_METHOD(resize) {
 
 NAN_METHOD(cache) {
   NanScope();
-  
+
   // Set cache limit
   if (args[0]->IsInt32()) {
     vips_cache_set_max_mem(args[0]->Int32Value() * 1048576);
