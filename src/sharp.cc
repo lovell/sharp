@@ -135,17 +135,17 @@ class ResizeWorker : public NanAsyncWorker {
     double factor;
     if (baton->width > 0 && baton->height > 0) {
       // Fixed width and height
-      double xfactor = (double)(in->Xsize) / (double)(baton->width);
-      double yfactor = (double)(in->Ysize) / (double)(baton->height);
+      double xfactor = static_cast<double>(in->Xsize) / static_cast<double>(baton->width);
+      double yfactor = static_cast<double>(in->Ysize) / static_cast<double>(baton->height);
       factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
     } else if (baton->width > 0) {
       // Fixed width, auto height
-      factor = (double)(in->Xsize) / (double)(baton->width);
-      baton->height = floor((double)(in->Ysize) / factor);
+      factor = static_cast<double>(in->Xsize) / static_cast<double>(baton->width);
+      baton->height = floor(static_cast<double>(in->Ysize) / factor);
     } else if (baton->height > 0) {
       // Fixed height, auto width
-      factor = (double)(in->Ysize) / (double)(baton->height);
-      baton->width = floor((double)(in->Xsize) / factor);
+      factor = static_cast<double>(in->Ysize) / static_cast<double>(baton->height);
+      baton->width = floor(static_cast<double>(in->Xsize) / factor);
     } else {
       // Identity transform
       factor = 1;
@@ -156,7 +156,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (shrink < 1) {
       shrink = 1;
     }
-    double residual = shrink / (double)factor;
+    double residual = static_cast<double>(shrink) / factor;
 
     // Try to use libjpeg shrink-on-load
     int shrink_on_load = 1;
@@ -198,6 +198,14 @@ class ResizeWorker : public NanAsyncWorker {
       // Use vips_shrink with the integral reduction
       if (vips_shrink(shrunk_on_load, &shrunk, shrink, shrink, NULL)) {
         return resize_error(baton, shrunk_on_load);
+      }
+      // Recalculate residual float based on dimensions of required vs shrunk images
+      double residualx = static_cast<double>(baton->width) / static_cast<double>(shrunk->Xsize);
+      double residualy = static_cast<double>(baton->height) / static_cast<double>(shrunk->Ysize);
+      if (baton->crop) {
+        residual = std::max(residualx, residualy);
+      } else {
+        residual = std::min(residualx, residualy);
       }
     } else {
       vips_copy(shrunk_on_load, &shrunk, NULL);

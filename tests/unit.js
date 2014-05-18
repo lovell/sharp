@@ -9,6 +9,9 @@ var fixturesPath = path.join(__dirname, "fixtures");
 var inputJpg = path.join(fixturesPath, "2569067123_aca715a2ee_o.jpg"); // http://www.flickr.com/photos/grizdave/2569067123/
 var outputJpg = path.join(fixturesPath, "output.jpg");
 
+var inputTiff = path.join(fixturesPath, "G31D.TIF"); // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
+var outputTiff = path.join(fixturesPath, "output.tiff");
+
 async.series([
   // Resize with exact crop
   function(done) {
@@ -81,6 +84,29 @@ async.series([
           assert(buffer80.length < buffer90.length);
           done();
         });
+      });
+    });
+  },
+  // TIFF with dimensions known to cause rounding errors
+  function(done) {
+    sharp(inputTiff).resize(240, 320).embedBlack().write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(240, features.width);
+        assert.strictEqual(320, features.height);
+        done();
+      });
+    });
+  },
+  function(done) {
+    sharp(inputTiff).resize(240, 320).write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(240, features.width);
+        assert.strictEqual(320, features.height);
+        done();
       });
     });
   }
