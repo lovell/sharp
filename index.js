@@ -44,6 +44,12 @@ Sharp.prototype.embedBlack = function() {
   return this;
 };
 
+Sharp.prototype.max = function() {
+  this.options.canvas = 'm';
+  return this;
+};
+
+
 Sharp.prototype.sharpen = function(sharpen) {
   this.options.sharpen = (typeof sharpen === 'boolean') ? sharpen : true;
   return this;
