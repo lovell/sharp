@@ -20,6 +20,7 @@ struct resize_baton {
   int width;
   int height;
   bool crop;
+  bool max;
   VipsExtend extend;
   bool sharpen;
   bool progressive;
@@ -28,7 +29,7 @@ struct resize_baton {
   int compressionLevel;
   std::string err;
 
-  resize_baton(): buffer_in_len(0), buffer_out_len(0) {}
+  resize_baton(): buffer_in_len(0), buffer_out_len(0), crop(false), max(false), sharpen(false), progressive(false) {}
 };
 
 typedef enum {
@@ -138,6 +139,14 @@ class ResizeWorker : public NanAsyncWorker {
       double xfactor = static_cast<double>(in->Xsize) / static_cast<double>(baton->width);
       double yfactor = static_cast<double>(in->Ysize) / static_cast<double>(baton->height);
       factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
+      // if max is set, we need to compute the real size of the thumb image
+      if(baton->max) {
+        if(xfactor > yfactor) {
+          baton->height = round(in->Ysize/factor);
+        } else {
+          baton->width = round(in->Xsize/factor);
+        }
+      }
     } else if (baton->width > 0) {
       // Fixed width, auto height
       factor = static_cast<double>(in->Xsize) / static_cast<double>(baton->width);
@@ -226,7 +235,7 @@ class ResizeWorker : public NanAsyncWorker {
     // Crop/embed
     VipsImage *canvased = vips_image_new();
     if (affined->Xsize != baton->width || affined->Ysize != baton->height) {
-      if (baton->crop) {
+      if (baton->crop || baton->max) {
         // Crop
         int width = std::min(affined->Xsize, baton->width);
         int height = std::min(affined->Ysize, baton->height);
@@ -351,6 +360,9 @@ NAN_METHOD(resize) {
   } else if (canvas->Equals(NanSymbol("b"))) {
     baton->crop = false;
     baton->extend = VIPS_EXTEND_BLACK;
+  } else if (canvas->Equals(NanSymbol("m"))) {
+    baton->crop = false;
+    baton->max = true;
   }
   baton->sharpen = args[6]->BooleanValue();
   baton->progressive = args[7]->BooleanValue();

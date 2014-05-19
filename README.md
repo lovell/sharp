@@ -143,6 +143,10 @@ Scale to `width` x `height`. By default, the resized image is cropped to the exa
 
 Crop the resized image to the exact size specified, the default behaviour.
 
+### max()
+
+Preserving aspect ratio, resize the image to the maximum width or height specified.
+
 ### embedWhite()
 
 Embed the resized image on a white background of the exact size specified.

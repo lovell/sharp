@@ -109,6 +109,29 @@ async.series([
         done();
       });
     });
+  },
+  // Resize to max width or height considering ratio (landscape)
+  function(done) {
+    sharp(inputJpg).resize(320,320).max().write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(261, features.height);
+        done();
+      });
+    });
+  },
+  // Resize to max width or height considering ratio (portrait)
+  function(done) {
+    sharp(inputTiff).resize(320,320).max().write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(243, features.width);
+        assert.strictEqual(320, features.height);
+        done();
+      });
+    });
   }
-
 ]);
