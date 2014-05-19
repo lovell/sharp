@@ -112,7 +112,7 @@ async.series([
   },
   // Resize to max width or height considering ratio (landscape)
   function(done) {
-    sharp(inputJpg).resize(320,320).max().write(outputJpg, function(err) {
+    sharp(inputJpg).resize(320, 320).max().write(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -124,12 +124,24 @@ async.series([
   },
   // Resize to max width or height considering ratio (portrait)
   function(done) {
-    sharp(inputTiff).resize(320,320).max().write(outputJpg, function(err) {
+    sharp(inputTiff).resize(320, 320).max().write(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
         assert.strictEqual(243, features.width);
         assert.strictEqual(320, features.height);
+        done();
+      });
+    });
+  },
+  // Attempt to resize to max but only provide one dimension, so should default to crop
+  function(done) {
+    sharp(inputJpg).resize(320).max().write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(261, features.height);
         done();
       });
     });

@@ -85,25 +85,25 @@ sharp('input.jpg').resize(300, 200).write('output.jpg', function(err) {
 ```
 
 ```javascript
-sharp('input.jpg').resize(null, 200).progressive().toBuffer(function(err, buffer) {
+sharp('input.jpg').resize(null, 200).progressive().toBuffer(function(err, outputBuffer) {
   if (err) {
     throw err;
   }
-  // buffer contains progressive JPEG image data, 200 pixels high
+  // outputBuffer contains progressive JPEG image data, 200 pixels high
 });
 ```
 
 ```javascript
-sharp('input.png').resize(300).sharpen().quality(90).webp(function(err, buffer) {
+sharp('input.png').resize(300).sharpen().quality(90).webp(function(err, outputBuffer) {
   if (err) {
     throw err;
   }
-  // buffer contains 300 pixels wide, sharpened, 90% quality WebP image data
+  // outputBuffer contains 300 pixels wide, sharpened, 90% quality WebP image data
 });
 ```
 
 ```javascript
-sharp(buffer).resize(200, 300).embedWhite().write('output.tiff', function(err) {
+sharp(inputBuffer).resize(200, 300).embedWhite().write('output.tiff', function(err) {
   if (err) {
     throw err;
   }
@@ -113,12 +113,22 @@ sharp(buffer).resize(200, 300).embedWhite().write('output.tiff', function(err) {
 ```
 
 ```javascript
-sharp('input.gif').resize(200, 300).embedBlack().webp(function(err, buffer) {
+sharp('input.gif').resize(200, 300).embedBlack().webp(function(err, outputBuffer) {
   if (err) {
     throw err;
   }
-  // buffer contains WebP image data of a 200 pixels wide and 300 pixels high image
+  // outputBuffer contains WebP image data of a 200 pixels wide and 300 pixels high
   // containing a scaled version, embedded on a black canvas, of input.gif
+});
+```
+
+```javascript
+sharp(inputBuffer).resize(200, 200).max().jpeg(function(err, outputBuffer) {
+  if (err) {
+    throw err;
+  }
+  // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
+  // than 200 pixels regardless of the inputBuffer image dimensions
 });
 ```
 
@@ -146,6 +156,8 @@ Crop the resized image to the exact size specified, the default behaviour.
 ### max()
 
 Preserving aspect ratio, resize the image to the maximum width or height specified.
+
+Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
 ### embedWhite()
 

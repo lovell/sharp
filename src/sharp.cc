@@ -140,11 +140,11 @@ class ResizeWorker : public NanAsyncWorker {
       double yfactor = static_cast<double>(in->Ysize) / static_cast<double>(baton->height);
       factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
       // if max is set, we need to compute the real size of the thumb image
-      if(baton->max) {
-        if(xfactor > yfactor) {
-          baton->height = round(in->Ysize/factor);
+      if (baton->max) {
+        if (xfactor > yfactor) {
+          baton->height = round(static_cast<double>(in->Ysize) / xfactor);
         } else {
-          baton->width = round(in->Xsize/factor);
+          baton->width = round(static_cast<double>(in->Xsize) / yfactor);
         }
       }
     } else if (baton->width > 0) {
@@ -235,8 +235,8 @@ class ResizeWorker : public NanAsyncWorker {
     // Crop/embed
     VipsImage *canvased = vips_image_new();
     if (affined->Xsize != baton->width || affined->Ysize != baton->height) {
-      if (baton->crop || baton->max) {
-        // Crop
+      if (baton->crop) {
+        // Crop/max
         int width = std::min(affined->Xsize, baton->width);
         int height = std::min(affined->Ysize, baton->height);
         int left = (affined->Xsize - width + 1) / 2;
@@ -355,13 +355,11 @@ NAN_METHOD(resize) {
   if (canvas->Equals(NanSymbol("c"))) {
     baton->crop = true;
   } else if (canvas->Equals(NanSymbol("w"))) {
-    baton->crop = false;
     baton->extend = VIPS_EXTEND_WHITE;
   } else if (canvas->Equals(NanSymbol("b"))) {
-    baton->crop = false;
     baton->extend = VIPS_EXTEND_BLACK;
   } else if (canvas->Equals(NanSymbol("m"))) {
-    baton->crop = false;
+    baton->crop = true;
     baton->max = true;
   }
   baton->sharpen = args[6]->BooleanValue();
