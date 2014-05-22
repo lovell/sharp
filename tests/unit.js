@@ -145,5 +145,12 @@ async.series([
         done();
       });
     });
+  },
+  // Attempt to output to input, should fail
+  function(done) {
+    sharp(inputJpg).write(inputJpg, function(err) {
+      assert(!!err);
+      done();
+    });
   }
 ]);

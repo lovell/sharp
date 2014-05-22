@@ -107,9 +107,13 @@ Sharp.prototype.resize = function(width, height) {
 
 Sharp.prototype.write = function(output, callback) {
   if (!output || output.length === 0) {
-    throw 'Invalid output';
+    callback('Invalid output');
   } else {
-    this._sharp(output, callback);
+    if (this.options.inFile === output) {
+      callback('Cannot use same file for input and output');
+    } else {
+      this._sharp(output, callback);
+    }
   }
   return this;
 };
