@@ -211,7 +211,7 @@ class ResizeWorker : public NanAsyncWorker {
       // Recalculate residual float based on dimensions of required vs shrunk images
       double residualx = static_cast<double>(baton->width) / static_cast<double>(shrunk->Xsize);
       double residualy = static_cast<double>(baton->height) / static_cast<double>(shrunk->Ysize);
-      if (baton->crop) {
+      if (baton->crop || baton->max) {
         residual = std::max(residualx, residualy);
       } else {
         residual = std::min(residualx, residualy);
@@ -235,7 +235,7 @@ class ResizeWorker : public NanAsyncWorker {
     // Crop/embed
     VipsImage *canvased = vips_image_new();
     if (affined->Xsize != baton->width || affined->Ysize != baton->height) {
-      if (baton->crop) {
+      if (baton->crop || baton->max) {
         // Crop/max
         int width = std::min(affined->Xsize, baton->width);
         int height = std::min(affined->Ysize, baton->height);
@@ -359,7 +359,6 @@ NAN_METHOD(resize) {
   } else if (canvas->Equals(NanSymbol("b"))) {
     baton->extend = VIPS_EXTEND_BLACK;
   } else if (canvas->Equals(NanSymbol("m"))) {
-    baton->crop = true;
     baton->max = true;
   }
   baton->sharpen = args[6]->BooleanValue();
