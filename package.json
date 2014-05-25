@@ -31,7 +31,7 @@
     "buffer"
   ],
   "dependencies": {
-    "nan": "^1.0.0"
+    "nan": "^1.1.0"
   },
   "devDependencies": {
     "imagemagick": "^0.1.3",
