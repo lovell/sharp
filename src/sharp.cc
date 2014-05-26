@@ -352,13 +352,13 @@ NAN_METHOD(resize) {
   baton->width = args[3]->Int32Value();
   baton->height = args[4]->Int32Value();
   Local<String> canvas = args[5]->ToString();
-  if (canvas->Equals(NanSymbol("c"))) {
+  if (canvas->Equals(NanNew<String>("c"))) {
     baton->crop = true;
-  } else if (canvas->Equals(NanSymbol("w"))) {
+  } else if (canvas->Equals(NanNew<String>("w"))) {
     baton->extend = VIPS_EXTEND_WHITE;
-  } else if (canvas->Equals(NanSymbol("b"))) {
+  } else if (canvas->Equals(NanNew<String>("b"))) {
     baton->extend = VIPS_EXTEND_BLACK;
-  } else if (canvas->Equals(NanSymbol("m"))) {
+  } else if (canvas->Equals(NanNew<String>("m"))) {
     baton->max = true;
   }
   baton->sharpen = args[6]->BooleanValue();
@@ -383,9 +383,9 @@ NAN_METHOD(cache) {
 
   // Get cache statistics
   Local<Object> cache = NanNew<Object>();
-  cache->Set(NanSymbol("current"), NanNew<Number>(vips_tracked_get_mem() / 1048576));
-  cache->Set(NanSymbol("high"), NanNew<Number>(vips_tracked_get_mem_highwater() / 1048576));
-  cache->Set(NanSymbol("limit"), NanNew<Number>(vips_cache_get_max_mem() / 1048576));
+  cache->Set(NanNew<String>("current"), NanNew<Number>(vips_tracked_get_mem() / 1048576));
+  cache->Set(NanNew<String>("high"), NanNew<Number>(vips_tracked_get_mem_highwater() / 1048576));
+  cache->Set(NanNew<String>("limit"), NanNew<Number>(vips_cache_get_max_mem() / 1048576));
   NanReturnValue(cache);
 }
 
