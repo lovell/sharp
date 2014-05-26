@@ -178,6 +178,18 @@ async.series({
           }
         });
       }
+    }).add("sharp-file-buffer-rotate", {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpg).rotate(90).resize(width, height).toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
     }).add("sharp-file-buffer-sequentialRead", {
       defer: true,
       fn: function(deferred) {

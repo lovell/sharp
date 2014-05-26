@@ -5,7 +5,7 @@ node_js:
 before_install:
   - sudo add-apt-repository ppa:lyrasis/precise-backports -y
   - sudo apt-get update -qq
-  - sudo apt-get install -qq automake gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff4-dev libxml2-dev swig graphicsmagick libmagick++-dev
+  - sudo apt-get install -qq automake gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff4-dev libexif-dev libxml2-dev swig graphicsmagick libmagick++-dev
   - git clone https://github.com/jcupitt/libvips.git
   - cd libvips
   - git checkout 7.38

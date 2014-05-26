@@ -48,7 +48,7 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 Compiling from source is recommended:
 
-	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libxml2-dev swig
+	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libxml2-dev swig
 	git clone https://github.com/jcupitt/libvips.git
 	cd libvips
 	git checkout 7.38
@@ -85,20 +85,20 @@ sharp('input.jpg').resize(300, 200).write('output.jpg', function(err) {
 ```
 
 ```javascript
-sharp('input.jpg').resize(null, 200).progressive().toBuffer(function(err, outputBuffer) {
+sharp('input.jpg').rotate().resize(null, 200).progressive().toBuffer(function(err, outputBuffer) {
   if (err) {
     throw err;
   }
-  // outputBuffer contains progressive JPEG image data, 200 pixels high
+  // outputBuffer contains 200px high progressive JPEG image data, auto-rotated using EXIF Orientation tag
 });
 ```
 
 ```javascript
-sharp('input.png').resize(300).sharpen().quality(90).webp(function(err, outputBuffer) {
+sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp(function(err, outputBuffer) {
   if (err) {
     throw err;
   }
-  // outputBuffer contains 300 pixels wide, sharpened, 90% quality WebP image data
+  // outputBuffer contains 300px wide, upside down, sharpened, 90% quality WebP image data
 });
 ```
 
@@ -143,7 +143,7 @@ Constructor to which further methods are chained. `input` can be one of:
 
 ### resize(width, [height])
 
-Scale to `width` x `height`. By default, the resized image is cropped to the exact size specified.
+Scale output to `width` x `height`. By default, the resized image is cropped to the exact size specified.
 
 `width` is the Number of pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
 
@@ -166,6 +166,14 @@ Embed the resized image on a white background of the exact size specified.
 ### embedBlack()
 
 Embed the resized image on a black background of the exact size specified.
+
+### rotate([angle])
+
+Rotate the output image by either an explicit angle or auto-orient based on the EXIF `Orientation` tag. Mirroring is not supported.
+
+`angle`, if present, is a Number with a value of `0`, `90`, `180` or `270`.
+
+Use this method without `angle` to determine the angle from EXIF data.
 
 ### sharpen()
 

@@ -27,6 +27,7 @@ struct resize_baton {
   VipsAccess access_method;
   int quality;
   int compressionLevel;
+  int angle;
   std::string err;
 
   resize_baton(): buffer_in_len(0), buffer_out_len(0), crop(false), max(false), sharpen(false), progressive(false) {}
@@ -40,36 +41,68 @@ typedef enum {
   MAGICK
 } ImageType;
 
-unsigned char MARKER_JPEG[] = {0xff, 0xd8};
-unsigned char MARKER_PNG[] = {0x89, 0x50};
-unsigned char MARKER_WEBP[] = {0x52, 0x49};
+unsigned char const MARKER_JPEG[] = {0xff, 0xd8};
+unsigned char const MARKER_PNG[] = {0x89, 0x50};
+unsigned char const MARKER_WEBP[] = {0x52, 0x49};
 
-bool ends_with(std::string const &str, std::string const &end) {
+static bool ends_with(std::string const &str, std::string const &end) {
   return str.length() >= end.length() && 0 == str.compare(str.length() - end.length(), end.length(), end);
 }
 
-bool is_jpeg(std::string const &str) {
+static bool is_jpeg(std::string const &str) {
   return ends_with(str, ".jpg") || ends_with(str, ".jpeg") || ends_with(str, ".JPG") || ends_with(str, ".JPEG");
 }
 
-bool is_png(std::string const &str) {
+static bool is_png(std::string const &str) {
   return ends_with(str, ".png") || ends_with(str, ".PNG");
 }
 
-bool is_webp(std::string const &str) {
+static bool is_webp(std::string const &str) {
   return ends_with(str, ".webp") || ends_with(str, ".WEBP");
 }
 
-bool is_tiff(std::string const &str) {
+static bool is_tiff(std::string const &str) {
   return ends_with(str, ".tif") || ends_with(str, ".tiff") || ends_with(str, ".TIF") || ends_with(str, ".TIFF");
 }
 
-void resize_error(resize_baton *baton, VipsImage *unref) {
+static void resize_error(resize_baton *baton, VipsImage *unref) {
   (baton->err).append(vips_error_buffer());
   vips_error_clear();
   g_object_unref(unref);
   vips_thread_shutdown();
   return;
+}
+
+/*
+  Calculate the angle of rotation for the output image.
+  In order of priority:
+   1. Use explicitly requested angle (supports 90, 180, 270)
+   2. Use input image EXIF Orientation header (does not support mirroring)
+   3. Otherwise default to zero, i.e. no rotation
+*/
+static VipsAngle calc_rotation(int const angle, VipsImage const *input) {
+  VipsAngle rotate = VIPS_ANGLE_0;
+  if (angle == -1) {
+    const char *exif;
+    if (!vips_image_get_string(input, "exif-ifd0-Orientation", &exif)) {
+      if (exif[0] == 0x36) { // "6"
+        rotate = VIPS_ANGLE_90;
+      } else if (exif[0] == 0x33) { // "3"
+        rotate = VIPS_ANGLE_180;
+      } else if (exif[0] == 0x38) { // "8"
+        rotate = VIPS_ANGLE_270;
+      }
+    }
+  } else {
+    if (angle == 90) {
+      rotate = VIPS_ANGLE_90;
+    } else if (angle == 180) {
+      rotate = VIPS_ANGLE_180;
+    } else if (angle == 270) {
+      rotate = VIPS_ANGLE_270;
+    }
+  }
+  return rotate;
 }
 
 class ResizeWorker : public NanAsyncWorker {
@@ -132,34 +165,47 @@ class ResizeWorker : public NanAsyncWorker {
       return;
     }
 
+    // Get input image width and height
+    int inputWidth = in->Xsize;
+    int inputHeight = in->Ysize;
+
+    // Calculate angle of rotation, to be carried out later
+    VipsAngle rotation = calc_rotation(baton->angle, in);
+    if (rotation == VIPS_ANGLE_90 || rotation == VIPS_ANGLE_270) {
+      // Swap input output width and height when rotating by 90 or 270 degrees
+      int swap = inputWidth;
+      inputWidth = inputHeight;
+      inputHeight = swap;
+    }
+
     // Scaling calculations
     double factor;
     if (baton->width > 0 && baton->height > 0) {
       // Fixed width and height
-      double xfactor = static_cast<double>(in->Xsize) / static_cast<double>(baton->width);
-      double yfactor = static_cast<double>(in->Ysize) / static_cast<double>(baton->height);
+      double xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
+      double yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
       factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
       // if max is set, we need to compute the real size of the thumb image
       if (baton->max) {
         if (xfactor > yfactor) {
-          baton->height = round(static_cast<double>(in->Ysize) / xfactor);
+          baton->height = round(static_cast<double>(inputHeight) / xfactor);
         } else {
-          baton->width = round(static_cast<double>(in->Xsize) / yfactor);
+          baton->width = round(static_cast<double>(inputWidth) / yfactor);
         }
       }
     } else if (baton->width > 0) {
       // Fixed width, auto height
-      factor = static_cast<double>(in->Xsize) / static_cast<double>(baton->width);
-      baton->height = floor(static_cast<double>(in->Ysize) / factor);
+      factor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
+      baton->height = floor(static_cast<double>(inputHeight) / factor);
     } else if (baton->height > 0) {
       // Fixed height, auto width
-      factor = static_cast<double>(in->Ysize) / static_cast<double>(baton->height);
-      baton->width = floor(static_cast<double>(in->Xsize) / factor);
+      factor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
+      baton->width = floor(static_cast<double>(inputWidth) / factor);
     } else {
       // Identity transform
       factor = 1;
-      baton->width = in->Xsize;
-      baton->height = in->Ysize;
+      baton->width = inputWidth;
+      baton->height = inputHeight;
     }
     int shrink = floor(factor);
     if (shrink < 1) {
@@ -186,7 +232,7 @@ class ResizeWorker : public NanAsyncWorker {
       // Recalculate integral shrink and double residual
       factor = std::max(factor, 1.0);
       shrink = floor(factor);
-      residual = shrink / factor;
+      residual = static_cast<double>(shrink) / factor;
       // Reload input using shrink-on-load
       if (baton->buffer_in_len > 1) {
         if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
@@ -209,8 +255,16 @@ class ResizeWorker : public NanAsyncWorker {
         return resize_error(baton, shrunk_on_load);
       }
       // Recalculate residual float based on dimensions of required vs shrunk images
-      double residualx = static_cast<double>(baton->width) / static_cast<double>(shrunk->Xsize);
-      double residualy = static_cast<double>(baton->height) / static_cast<double>(shrunk->Ysize);
+      double shrunkWidth = shrunk->Xsize;
+      double shrunkHeight = shrunk->Ysize;
+      if (rotation == VIPS_ANGLE_90 || rotation == VIPS_ANGLE_270) {
+        // Swap input output width and height when rotating by 90 or 270 degrees
+        int swap = shrunkWidth;
+        shrunkWidth = shrunkHeight;
+        shrunkHeight = swap;
+      }
+      double residualx = static_cast<double>(baton->width) / static_cast<double>(shrunkWidth);
+      double residualy = static_cast<double>(baton->height) / static_cast<double>(shrunkHeight);
       if (baton->crop || baton->max) {
         residual = std::max(residualx, residualy);
       } else {
@@ -232,30 +286,41 @@ class ResizeWorker : public NanAsyncWorker {
     }
     g_object_unref(shrunk);
 
+    // Rotate
+    VipsImage *rotated = vips_image_new();
+    if (rotation != VIPS_ANGLE_0) {
+      if (vips_rot(affined, &rotated, rotation, NULL)) {
+        return resize_error(baton, affined);
+      }
+    } else {
+      vips_copy(affined, &rotated, NULL);
+    }
+    g_object_unref(affined);
+
     // Crop/embed
     VipsImage *canvased = vips_image_new();
-    if (affined->Xsize != baton->width || affined->Ysize != baton->height) {
+    if (rotated->Xsize != baton->width || rotated->Ysize != baton->height) {
       if (baton->crop || baton->max) {
         // Crop/max
-        int width = std::min(affined->Xsize, baton->width);
-        int height = std::min(affined->Ysize, baton->height);
-        int left = (affined->Xsize - width + 1) / 2;
-        int top = (affined->Ysize - height + 1) / 2;
-        if (vips_extract_area(affined, &canvased, left, top, width, height, NULL)) {
-          return resize_error(baton, affined);
+        int width = std::min(rotated->Xsize, baton->width);
+        int height = std::min(rotated->Ysize, baton->height);
+        int left = (rotated->Xsize - width + 1) / 2;
+        int top = (rotated->Ysize - height + 1) / 2;
+        if (vips_extract_area(rotated, &canvased, left, top, width, height, NULL)) {
+          return resize_error(baton, rotated);
         }
       } else {
         // Embed
-        int left = (baton->width - affined->Xsize) / 2;
-        int top = (baton->height - affined->Ysize) / 2;
-        if (vips_embed(affined, &canvased, left, top, baton->width, baton->height, "extend", baton->extend, NULL)) {
-          return resize_error(baton, affined);
+        int left = (baton->width - rotated->Xsize) / 2;
+        int top = (baton->height - rotated->Ysize) / 2;
+        if (vips_embed(rotated, &canvased, left, top, baton->width, baton->height, "extend", baton->extend, NULL)) {
+          return resize_error(baton, rotated);
         }
       }
     } else {
-      vips_copy(affined, &canvased, NULL);
+      vips_copy(rotated, &canvased, NULL);
     }
-    g_object_unref(affined);
+    g_object_unref(rotated);
 
     // Mild sharpen
     VipsImage *sharpened = vips_image_new();
@@ -366,8 +431,9 @@ NAN_METHOD(resize) {
   baton->access_method = args[8]->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   baton->quality = args[9]->Int32Value();
   baton->compressionLevel = args[10]->Int32Value();
+  baton->angle = args[11]->Int32Value();
 
-  NanCallback *callback = new NanCallback(args[11].As<v8::Function>());
+  NanCallback *callback = new NanCallback(args[12].As<v8::Function>());
 
   NanAsyncQueueWorker(new ResizeWorker(callback, baton));
   NanReturnUndefined();

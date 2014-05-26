@@ -12,6 +12,8 @@ var outputJpg = path.join(fixturesPath, "output.jpg");
 var inputTiff = path.join(fixturesPath, "G31D.TIF"); // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
 var outputTiff = path.join(fixturesPath, "output.tiff");
 
+var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_8.jpg
+
 async.series([
   // Resize with exact crop
   function(done) {
@@ -152,5 +154,64 @@ async.series([
       assert(!!err);
       done();
     });
+  },
+  // Rotate by 90 degrees, respecting output input size
+  function(done) {
+    sharp(inputJpg).rotate(90).resize(320, 240).write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(240, features.height);
+        done();
+      });
+    });
+  },
+  // Input image has Orientation EXIF tag but do not rotate output
+  function(done) {
+    sharp(inputJpgWithExif).resize(320).write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(426, features.height);
+        done();
+      });
+    });
+  },
+  // Input image has Orientation EXIF tag value of 8 (270 degrees), auto-rotate
+  function(done) {
+    sharp(inputJpgWithExif).rotate().resize(320).write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(240, features.height);
+        done();
+      });
+    });
+  },
+  // Attempt to auto-rotate using image that has no EXIF
+  function(done) {
+    sharp(inputJpg).rotate().resize(320).write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(261, features.height);
+        done();
+      });
+    });
+  },
+  // Rotate to an invalid angle, should fail
+  function(done) {
+    var isValid = false;
+    try {
+      sharp(inputJpg).rotate(1);
+      isValid = true;
+    } catch (e) {}
+    assert(!isValid);
+    done();
   }
+
 ]);

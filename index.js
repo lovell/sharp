@@ -11,6 +11,7 @@ var Sharp = function(input) {
     width: -1,
     height: -1,
     canvas: 'c',
+    angle: 0,
     sharpen: false,
     progressive: false,
     sequentialRead: false,
@@ -49,6 +50,20 @@ Sharp.prototype.max = function() {
   return this;
 };
 
+/*
+  Rotate output image by 0, 90, 180 or 270 degrees
+  Auto-rotation based on the EXIF Orientation tag is represented by an angle of -1
+*/
+Sharp.prototype.rotate = function(angle) {
+  if (typeof angle === 'undefined') {
+    this.options.angle = -1;
+  } else if (!Number.isNaN(angle) && [0, 90, 180, 270].indexOf(angle) !== -1) {
+    this.options.angle = angle;
+  } else {
+    throw 'Unsupport angle (0, 90, 180, 270) ' + angle;
+  }
+  return this;
+};
 
 Sharp.prototype.sharpen = function(sharpen) {
   this.options.sharpen = (typeof sharpen === 'boolean') ? sharpen : true;
@@ -147,6 +162,7 @@ Sharp.prototype._sharp = function(output, callback) {
     this.options.sequentialRead,
     this.options.quality,
     this.options.compressionLevel,
+    this.options.angle,
     callback
   );
   return this;
