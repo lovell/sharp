@@ -60,7 +60,7 @@ Compiling from source is recommended:
 
 #### Ubuntu 12.x
 
-Requires `libtiff4-dev` instead of `libtiff5-dev` and has [a bug](https://bugs.launchpad.net/ubuntu/+source/libwebp/+bug/1108731) in the libwebp package. Work around these problems by running these command first:
+Requires `libtiff4-dev` instead of `libtiff5-dev` and has [a bug](https://bugs.launchpad.net/ubuntu/+source/libwebp/+bug/1108731) in the libwebp package. Work around these problems by running these commands first:
 
 	sudo add-apt-repository ppa:lyrasis/precise-backports
 	sudo apt-get update
