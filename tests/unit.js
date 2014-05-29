@@ -17,7 +17,7 @@ var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://gi
 async.series([
   // Resize with exact crop
   function(done) {
-    sharp(inputJpg).resize(320, 240).write(outputJpg, function(err) {
+    sharp(inputJpg).resize(320, 240).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -29,7 +29,7 @@ async.series([
   },
   // Resize to fixed width
   function(done) {
-    sharp(inputJpg).resize(320).write(outputJpg, function(err) {
+    sharp(inputJpg).resize(320).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -41,7 +41,7 @@ async.series([
   },
   // Resize to fixed height
   function(done) {
-    sharp(inputJpg).resize(null, 320).write(outputJpg, function(err) {
+    sharp(inputJpg).resize(null, 320).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -53,7 +53,7 @@ async.series([
   },
   // Identity transform
   function(done) {
-    sharp(inputJpg).write(outputJpg, function(err) {
+    sharp(inputJpg).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -65,7 +65,7 @@ async.series([
   },
   // Upscale
   function(done) {
-    sharp(inputJpg).resize(3000).write(outputJpg, function(err) {
+    sharp(inputJpg).resize(3000).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -91,7 +91,7 @@ async.series([
   },
   // TIFF with dimensions known to cause rounding errors
   function(done) {
-    sharp(inputTiff).resize(240, 320).embedBlack().write(outputJpg, function(err) {
+    sharp(inputTiff).resize(240, 320).embedBlack().toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -102,7 +102,7 @@ async.series([
     });
   },
   function(done) {
-    sharp(inputTiff).resize(240, 320).write(outputJpg, function(err) {
+    sharp(inputTiff).resize(240, 320).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -114,7 +114,7 @@ async.series([
   },
   // Resize to max width or height considering ratio (landscape)
   function(done) {
-    sharp(inputJpg).resize(320, 320).max().write(outputJpg, function(err) {
+    sharp(inputJpg).resize(320, 320).max().toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -126,7 +126,7 @@ async.series([
   },
   // Resize to max width or height considering ratio (portrait)
   function(done) {
-    sharp(inputTiff).resize(320, 320).max().write(outputJpg, function(err) {
+    sharp(inputTiff).resize(320, 320).max().toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -138,7 +138,7 @@ async.series([
   },
   // Attempt to resize to max but only provide one dimension, so should default to crop
   function(done) {
-    sharp(inputJpg).resize(320).max().write(outputJpg, function(err) {
+    sharp(inputJpg).resize(320).max().toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -150,14 +150,14 @@ async.series([
   },
   // Attempt to output to input, should fail
   function(done) {
-    sharp(inputJpg).write(inputJpg, function(err) {
+    sharp(inputJpg).toFile(inputJpg, function(err) {
       assert(!!err);
       done();
     });
   },
   // Rotate by 90 degrees, respecting output input size
   function(done) {
-    sharp(inputJpg).rotate(90).resize(320, 240).write(outputJpg, function(err) {
+    sharp(inputJpg).rotate(90).resize(320, 240).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -169,7 +169,7 @@ async.series([
   },
   // Input image has Orientation EXIF tag but do not rotate output
   function(done) {
-    sharp(inputJpgWithExif).resize(320).write(outputJpg, function(err) {
+    sharp(inputJpgWithExif).resize(320).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -181,7 +181,7 @@ async.series([
   },
   // Input image has Orientation EXIF tag value of 8 (270 degrees), auto-rotate
   function(done) {
-    sharp(inputJpgWithExif).rotate().resize(320).write(outputJpg, function(err) {
+    sharp(inputJpgWithExif).rotate().resize(320).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;
@@ -193,7 +193,7 @@ async.series([
   },
   // Attempt to auto-rotate using image that has no EXIF
   function(done) {
-    sharp(inputJpg).rotate().resize(320).write(outputJpg, function(err) {
+    sharp(inputJpg).rotate().resize(320).toFile(outputJpg, function(err) {
       if (err) throw err;
       imagemagick.identify(outputJpg, function(err, features) {
         if (err) throw err;

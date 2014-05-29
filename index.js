@@ -120,7 +120,10 @@ Sharp.prototype.resize = function(width, height) {
   return this;
 };
 
-Sharp.prototype.write = function(output, callback) {
+/*
+  Write output image data to a file
+*/
+Sharp.prototype.toFile = function(output, callback) {
   if (!output || output.length === 0) {
     callback('Invalid output');
   } else {
@@ -132,6 +135,9 @@ Sharp.prototype.write = function(output, callback) {
   }
   return this;
 };
+
+// Deprecated to make way for future stream support - remove in v0.6.0
+Sharp.prototype.write = Sharp.prototype.toFile;
 
 Sharp.prototype.toBuffer = function(callback) {
   return this._sharp('__input', callback);

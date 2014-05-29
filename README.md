@@ -75,7 +75,7 @@ var sharp = require('sharp');
 ```
 
 ```javascript
-sharp('input.jpg').resize(300, 200).write('output.jpg', function(err) {
+sharp('input.jpg').resize(300, 200).toFile('output.jpg', function(err) {
   if (err) {
     throw err;
   }
@@ -103,7 +103,7 @@ sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp(function(e
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 300).embedWhite().write('output.tiff', function(err) {
+sharp(inputBuffer).resize(200, 300).embedWhite().toFile('output.tiff', function(err) {
   if (err) {
     throw err;
   }
@@ -199,7 +199,7 @@ An advanced setting for the _zlib_ compression level of the lossless PNG output 
 
 An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.
 
-### write(filename, callback)
+### toFile(filename, callback)
 
 `filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP and TIFF supported.
 
