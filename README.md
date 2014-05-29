@@ -175,6 +175,12 @@ Rotate the output image by either an explicit angle or auto-orient based on the 
 
 Use this method without `angle` to determine the angle from EXIF data.
 
+### withoutEnlargement()
+
+Do not enlarge the output image if the input image width *or* height are already less than the required dimensions.
+
+This is equivalent to GraphicsMagick's `>` geometry option: "change the dimensions of the image only if its width or height exceeds the geometry specification".
+
 ### sharpen()
 
 Perform a mild sharpen of the resultant image. This typically reduces performance by 30%.

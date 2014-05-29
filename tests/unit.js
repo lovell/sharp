@@ -212,6 +212,30 @@ async.series([
     } catch (e) {}
     assert(!isValid);
     done();
+  },
+  // Do not enlarge the output if the input width is already less than the output width
+  function(done) {
+    sharp(inputJpg).resize(2800).withoutEnlargement().write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(2725, features.width);
+        assert.strictEqual(2225, features.height);
+        done();
+      });
+    });
+  },
+  // Do not enlarge the output if the input height is already less than the output height
+  function(done) {
+    sharp(inputJpg).resize(null, 2300).withoutEnlargement().write(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(2725, features.width);
+        assert.strictEqual(2225, features.height);
+        done();
+      });
+    });
   }
 
 ]);

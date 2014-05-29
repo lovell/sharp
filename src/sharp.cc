@@ -24,13 +24,21 @@ struct resize_baton {
   VipsExtend extend;
   bool sharpen;
   bool progressive;
+  bool without_enlargement;
   VipsAccess access_method;
   int quality;
   int compressionLevel;
   int angle;
   std::string err;
 
-  resize_baton(): buffer_in_len(0), buffer_out_len(0), crop(false), max(false), sharpen(false), progressive(false) {}
+  resize_baton():
+    buffer_in_len(0),
+    buffer_out_len(0),
+    crop(false),
+    max(false),
+    sharpen(false),
+    progressive(false),
+    without_enlargement(false) {}
 };
 
 typedef enum {
@@ -212,6 +220,17 @@ class ResizeWorker : public NanAsyncWorker {
       shrink = 1;
     }
     double residual = static_cast<double>(shrink) / factor;
+
+    // Do not enlarge the output if the input width *or* height are already less than the required dimensions
+    if (baton->without_enlargement) {
+      if (inputWidth < baton->width || inputHeight < baton->height) {
+        factor = 1;
+        shrink = 1;
+        residual = 0;
+        baton->width = inputWidth;
+        baton->height = inputHeight;
+      }
+    }
 
     // Try to use libjpeg shrink-on-load
     int shrink_on_load = 1;
@@ -403,20 +422,29 @@ class ResizeWorker : public NanAsyncWorker {
   resize_baton* baton;
 };
 
+/*
+  resize(options, output, callback)
+*/
 NAN_METHOD(resize) {
   NanScope();
 
+  // V8 objects are converted to non-V8 types held in the baton struct
   resize_baton *baton = new resize_baton;
-  baton->file_in = *String::Utf8Value(args[0]->ToString());
-  if (args[1]->IsObject()) {
-    Local<Object> buffer = args[1]->ToObject();
+  Local<Object> options = args[0]->ToObject();
+
+  // Input filename
+  baton->file_in = *String::Utf8Value(options->Get(NanNew<String>("fileIn"))->ToString());
+  // Input Buffer object
+  if (options->Get(NanNew<String>("bufferIn"))->IsObject()) {
+    Local<Object> buffer = options->Get(NanNew<String>("bufferIn"))->ToObject();
     baton->buffer_in_len = Buffer::Length(buffer);
     baton->buffer_in = Buffer::Data(buffer);
   }
-  baton->file_out = *String::Utf8Value(args[2]->ToString());
-  baton->width = args[3]->Int32Value();
-  baton->height = args[4]->Int32Value();
-  Local<String> canvas = args[5]->ToString();
+  // Output image dimensions
+  baton->width = options->Get(NanNew<String>("width"))->Int32Value();
+  baton->height = options->Get(NanNew<String>("height"))->Int32Value();
+  // Canvas options
+  Local<String> canvas = options->Get(NanNew<String>("canvas"))->ToString();
   if (canvas->Equals(NanNew<String>("c"))) {
     baton->crop = true;
   } else if (canvas->Equals(NanNew<String>("w"))) {
@@ -426,15 +454,19 @@ NAN_METHOD(resize) {
   } else if (canvas->Equals(NanNew<String>("m"))) {
     baton->max = true;
   }
-  baton->sharpen = args[6]->BooleanValue();
-  baton->progressive = args[7]->BooleanValue();
-  baton->access_method = args[8]->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
-  baton->quality = args[9]->Int32Value();
-  baton->compressionLevel = args[10]->Int32Value();
-  baton->angle = args[11]->Int32Value();
+  // Other options
+  baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
+  baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();
+  baton->without_enlargement = options->Get(NanNew<String>("withoutEnlargement"))->BooleanValue();
+  baton->access_method = options->Get(NanNew<String>("sequentialRead"))->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
+  baton->quality = options->Get(NanNew<String>("quality"))->Int32Value();
+  baton->compressionLevel = options->Get(NanNew<String>("compressionLevel"))->Int32Value();
+  baton->angle = options->Get(NanNew<String>("angle"))->Int32Value();
+  // Output filename or __format for Buffer
+  baton->file_out = *String::Utf8Value(args[1]->ToString());
 
-  NanCallback *callback = new NanCallback(args[12].As<v8::Function>());
-
+  // Join queue for worker thread
+  NanCallback *callback = new NanCallback(args[2].As<v8::Function>());
   NanAsyncQueueWorker(new ResizeWorker(callback, baton));
   NanReturnUndefined();
 }

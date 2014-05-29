@@ -12,6 +12,7 @@ var Sharp = function(input) {
     height: -1,
     canvas: 'c',
     angle: 0,
+    withoutEnlargement: false,
     sharpen: false,
     progressive: false,
     sequentialRead: false,
@@ -20,9 +21,9 @@ var Sharp = function(input) {
     output: '__jpeg'
   };
   if (typeof input === 'string') {
-    this.options.inFile = input;
+    this.options.fileIn = input;
   } else if (typeof input ==='object' && input instanceof Buffer) {
-    this.options.inBuffer = input;
+    this.options.bufferIn = input;
   } else {
     throw 'Unsupported input ' + typeof input;
   }
@@ -62,6 +63,16 @@ Sharp.prototype.rotate = function(angle) {
   } else {
     throw 'Unsupport angle (0, 90, 180, 270) ' + angle;
   }
+  return this;
+};
+
+/*
+  Do not enlarge the output if the input width *or* height are already less than the required dimensions
+  This is equivalent to GraphicsMagick's ">" geometry option:
+    "change the dimensions of the image only if its width or height exceeds the geometry specification"
+*/
+Sharp.prototype.withoutEnlargement = function(withoutEnlargement) {
+  this.options.withoutEnlargement = (typeof withoutEnlargement === 'boolean') ? withoutEnlargement : true;
   return this;
 };
 
@@ -127,7 +138,7 @@ Sharp.prototype.toFile = function(output, callback) {
   if (!output || output.length === 0) {
     callback('Invalid output');
   } else {
-    if (this.options.inFile === output) {
+    if (this.options.fileIn === output) {
       callback('Cannot use same file for input and output');
     } else {
       this._sharp(output, callback);
@@ -157,18 +168,8 @@ Sharp.prototype.webp = function(callback) {
 
 Sharp.prototype._sharp = function(output, callback) {
   sharp.resize(
-    this.options.inFile,
-    this.options.inBuffer,
+    this.options,
     output,
-    this.options.width,
-    this.options.height,
-    this.options.canvas,
-    this.options.sharpen,
-    this.options.progressive,
-    this.options.sequentialRead,
-    this.options.quality,
-    this.options.compressionLevel,
-    this.options.angle,
     callback
   );
   return this;
