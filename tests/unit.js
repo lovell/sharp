@@ -1,3 +1,7 @@
+/*jslint node: true */
+/*jslint es5: true */
+'use strict';
+
 var sharp = require("../index");
 var path = require("path");
 var imagemagick = require("imagemagick");
@@ -235,6 +239,18 @@ async.series([
         assert.strictEqual(2225, features.height);
         done();
       });
+    });
+  },
+  // Promises/A+
+  function(done) {
+    sharp(inputJpg).resize(320, 240).toFile(outputJpg).then(function() {
+      imagemagick.identify(outputJpg, function(err, features) {
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(240, features.height);
+        done();
+      });
+    }).catch(function(err) {
+      throw err;
     });
   }
 

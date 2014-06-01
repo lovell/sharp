@@ -1,6 +1,7 @@
 /*jslint node: true */
 'use strict';
 
+var Promise = require('bluebird');
 var sharp = require('./build/Release/sharp');
 
 var Sharp = function(input) {
@@ -141,7 +142,7 @@ Sharp.prototype.toFile = function(output, callback) {
     if (this.options.fileIn === output) {
       callback('Cannot use same file for input and output');
     } else {
-      this._sharp(output, callback);
+      return this._sharp(output, callback);
     }
   }
   return this;
@@ -166,13 +167,28 @@ Sharp.prototype.webp = function(callback) {
   return this._sharp('__webp', callback);
 };
 
+/*
+  Invoke the C++ image processing pipeline
+  Supports callback and promise variants
+*/
 Sharp.prototype._sharp = function(output, callback) {
-  sharp.resize(
-    this.options,
-    output,
-    callback
-  );
-  return this;
+  if (typeof callback === 'function') {
+    // I like callbacks
+    sharp.resize(this.options, output, callback);
+    return this;
+  } else {
+    // I like promises
+    var options = this.options;
+    return new Promise(function(resolve, reject) {
+      sharp.resize(options, output, function(err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  }
 };
 
 module.exports.cache = function(limit) {

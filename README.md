@@ -9,7 +9,7 @@
 
 The typical use case for this high speed Node.js module is to convert large images of many formats to smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
-The performance of JPEG resizing is typically 8x faster than ImageMagick and GraphicsMagick, based mainly on the number of CPU cores available. Everything remains non-blocking thanks to _libuv_.
+The performance of JPEG resizing is typically 8x faster than ImageMagick and GraphicsMagick, based mainly on the number of CPU cores available. Everything remains non-blocking thanks to _libuv_ and Promises/A+ are supported.
 
 This module supports reading and writing images of JPEG, PNG and WebP to and from both Buffer objects and the filesystem. It also supports reading images of many other types from the filesystem via libmagick++ or libgraphicsmagick++ if present.
 
@@ -94,19 +94,13 @@ sharp('input.jpg').rotate().resize(null, 200).progressive().toBuffer(function(er
 ```
 
 ```javascript
-sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp(function(err, outputBuffer) {
-  if (err) {
-    throw err;
-  }
+sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp().then(function(outputBuffer) {
   // outputBuffer contains 300px wide, upside down, sharpened, 90% quality WebP image data
 });
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 300).embedWhite().toFile('output.tiff', function(err) {
-  if (err) {
-    throw err;
-  }
+sharp(inputBuffer).resize(200, 300).embedWhite().toFile('output.tiff').then(function() {
   // output.tiff is a 200 pixels wide and 300 pixels high image containing a scaled
   // version, embedded on a white canvas, of the image data in buffer
 });
@@ -123,10 +117,7 @@ sharp('input.gif').resize(200, 300).embedBlack().webp(function(err, outputBuffer
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 200).max().jpeg(function(err, outputBuffer) {
-  if (err) {
-    throw err;
-  }
+sharp(inputBuffer).resize(200, 200).max().jpeg().then(function(outputBuffer) {
   // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
   // than 200 pixels regardless of the inputBuffer image dimensions
 });
@@ -205,35 +196,45 @@ An advanced setting for the _zlib_ compression level of the lossless PNG output 
 
 An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.
 
-### toFile(filename, callback)
+### toFile(filename, [callback])
 
 `filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP and TIFF supported.
 
-`callback` is called with a single argument `(err)` containing an error message, if any.
+`callback`, if present, is called with a single argument `(err)` containing an error message, if any.
 
-### jpeg(callback)
+A Promises/A+ promise is returned when `callback` is not provided.
+
+### toBuffer([callback])
+
+Write image data to a Buffer, the format of which will match the input image. JPEG, PNG and WebP are supported.
+
+`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant image data.
+
+A Promises/A+ promise is returned when `callback` is not provided.
+
+### jpeg([callback])
 
 Write JPEG image data to a Buffer.
 
-`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant JPEG image data.
+`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant JPEG image data.
+
+A Promises/A+ promise is returned when `callback` is not provided.
 
 ### png(callback)
 
 Write PNG image data to a Buffer.
 
-`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant PNG image data.
+`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant PNG image data.
 
-### webp(callback)
+A Promises/A+ promise is returned when `callback` is not provided.
+
+### webp([callback])
 
 Write WebP image data to a Buffer.
 
-`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant WebP image data.
+`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant WebP image data.
 
-### toBuffer(callback)
-
-Write image data to a Buffer, the format of which will match the input image. JPEG, PNG and WebP are supported.
-
-`callback` gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant image data.
+A Promises/A+ promise is returned when `callback` is not provided.
 
 ### sharp.cache([limit])
 

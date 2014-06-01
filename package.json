@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>"
@@ -31,7 +31,8 @@
     "buffer"
   ],
   "dependencies": {
-    "nan": "^1.1.0"
+    "nan": "^1.1.2",
+    "bluebird": "^1.2.4"
   },
   "devDependencies": {
     "imagemagick": "^0.1.3",
