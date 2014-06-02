@@ -24,7 +24,11 @@ var Sharp = function(input) {
   if (typeof input === 'string') {
     this.options.fileIn = input;
   } else if (typeof input ==='object' && input instanceof Buffer) {
-    this.options.bufferIn = input;
+    if (input.length > 0) {
+      this.options.bufferIn = input;
+    } else {
+      throw 'Buffer is empty';
+    }
   } else {
     throw 'Unsupported input ' + typeof input;
   }

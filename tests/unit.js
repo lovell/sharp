@@ -209,12 +209,12 @@ async.series([
   },
   // Rotate to an invalid angle, should fail
   function(done) {
-    var isValid = false;
+    var fail = false;
     try {
       sharp(inputJpg).rotate(1);
-      isValid = true;
+      fail = true;
     } catch (e) {}
-    assert(!isValid);
+    assert(!fail);
     done();
   },
   // Do not enlarge the output if the input width is already less than the output width
@@ -252,6 +252,15 @@ async.series([
     }).catch(function(err) {
       throw err;
     });
+  },
+  // Empty Buffer, should fail
+  function(done) {
+    var fail = false;
+    try {
+      sharp(new Buffer(0));
+      fail = true;
+    } catch (e) {}
+    assert(!fail);
+    done();
   }
-
 ]);
