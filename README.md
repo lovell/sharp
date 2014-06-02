@@ -28,7 +28,7 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 * Node.js v0.10+
 * [libvips](https://github.com/jcupitt/libvips) v7.38.5+
 
-_libvips_ will take advantage of [liborc](http://code.entropywave.com/orc/) if present, however versions of _liborc_ prior to 0.4.19 suffer memory leaks.
+_libvips_ can take advantage of [liborc](http://code.entropywave.com/orc/) if present. Warning: versions of _liborc_ prior to 0.4.19 suffer [memory leaks](https://github.com/lovell/sharp/issues/21#issuecomment-42367306) and version 0.4.19 suffers [buffer overflows](https://github.com/lovell/sharp/issues/21#issuecomment-44813498).
 
 ### Install libvips on Mac OS
 
