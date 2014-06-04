@@ -32,7 +32,8 @@
   ],
   "dependencies": {
     "nan": "^1.1.2",
-    "bluebird": "^1.2.4"
+    "bluebird": "^1.2.4",
+    "util-deprecate": "^1.0.0"
   },
   "devDependencies": {
     "imagemagick": "^0.1.3",

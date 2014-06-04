@@ -2,6 +2,7 @@
 'use strict';
 
 var Promise = require('bluebird');
+var deprecate = require('util-deprecate');
 var sharp = require('./build/Release/sharp');
 
 var Sharp = function(input) {
@@ -153,7 +154,7 @@ Sharp.prototype.toFile = function(output, callback) {
 };
 
 // Deprecated to make way for future stream support - remove in v0.6.0
-Sharp.prototype.write = Sharp.prototype.toFile;
+Sharp.prototype.write = deprecate(Sharp.prototype.toFile, '.write() is deprecated and will be removed in v0.6.0. Use .toFile() instead.');
 
 Sharp.prototype.toBuffer = function(callback) {
   return this._sharp('__input', callback);
