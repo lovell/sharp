@@ -2,16 +2,14 @@
   'targets': [{
     'target_name': 'sharp',
     'sources': ['src/sharp.cc'],
+    'variables': {
+      'PKG_CONFIG_PATH': '<!(which brew >/dev/null 2>&1 && eval $(brew --env) && echo $PKG_CONFIG_LIBDIR || true):/usr/local/lib/pkgconfig:/usr/lib/pkgconfig'
+    },
     'libraries': [
-      '<!@(PKG_CONFIG_PATH="/usr/local/Library/ENV/pkgconfig/10.8:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig" pkg-config --libs vips)'
+      '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --libs vips)'
     ],
     'include_dirs': [
-      '/usr/local/include/glib-2.0',
-      '/usr/local/lib/glib-2.0/include',
-      '/usr/include/glib-2.0',
-      '/usr/lib/glib-2.0/include',
-      '/usr/lib/x86_64-linux-gnu/glib-2.0/include',
-      '/usr/lib/i386-linux-gnu/glib-2.0/include',
+      '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --cflags vips glib-2.0)',
       '<!(node -e "require(\'nan\')")'
     ],
     'cflags': ['-fexceptions', '-pedantic', '-Wall', '-O3'],
