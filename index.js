@@ -27,10 +27,10 @@ var Sharp = function(input) {
     if (input.length > 0) {
       this.options.bufferIn = input;
     } else {
-      throw 'Buffer is empty';
+      throw new Error('Buffer is empty');
     }
   } else {
-    throw 'Unsupported input ' + typeof input;
+    throw new Error('Unsupported input ' + typeof input);
   }
   return this;
 };
@@ -100,7 +100,7 @@ Sharp.prototype.quality = function(quality) {
   if (!Number.isNaN(quality) && quality >= 1 && quality <= 100) {
     this.options.quality = quality;
   } else {
-    throw 'Invalid quality (1 to 100) ' + quality;
+    throw new Error('Invalid quality (1 to 100) ' + quality);
   }
   return this;
 };
@@ -109,7 +109,7 @@ Sharp.prototype.compressionLevel = function(compressionLevel) {
   if (!Number.isNaN(compressionLevel) && compressionLevel >= -1 && compressionLevel <= 9) {
     this.options.compressionLevel = compressionLevel;
   } else {
-    throw 'Invalid compressionLevel (-1 to 9) ' + compressionLevel;
+    throw new Error('Invalid compressionLevel (-1 to 9) ' + compressionLevel);
   }
   return this;
 };
@@ -121,7 +121,7 @@ Sharp.prototype.resize = function(width, height) {
     if (!Number.isNaN(width)) {
       this.options.width = width;
     } else {
-      throw 'Invalid width ' + width;
+      throw new Error('Invalid width ' + width);
     }
   }
   if (!height) {
@@ -130,7 +130,7 @@ Sharp.prototype.resize = function(width, height) {
     if (!Number.isNaN(height)) {
       this.options.height = height;
     } else {
-      throw 'Invalid height ' + height;
+      throw new Error('Invalid height ' + height);
     }
   }
   return this;
@@ -141,10 +141,20 @@ Sharp.prototype.resize = function(width, height) {
 */
 Sharp.prototype.toFile = function(output, callback) {
   if (!output || output.length === 0) {
-    callback('Invalid output');
+    var err = new Error('Invalid output');
+    if (typeof callback === 'function') {
+      callback(err);
+    } else {
+      return Promise.reject(err);
+    }
   } else {
     if (this.options.fileIn === output) {
-      callback('Cannot use same file for input and output');
+      var err = new Error('Cannot use same file for input and output');
+      if (typeof callback === 'function') {
+        callback(err);
+      } else {
+        return Promise.reject(err);
+      }
     } else {
       return this._sharp(output, callback);
     }
