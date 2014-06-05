@@ -220,7 +220,7 @@ Write JPEG image data to a Buffer.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
-### png(callback)
+### png([callback])
 
 Write PNG image data to a Buffer.
 
