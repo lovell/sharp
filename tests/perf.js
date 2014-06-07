@@ -330,18 +330,6 @@ async.series({
           }
         });
       }
-    }).add("sharp-file-buffer-sequentialRead", {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputPng).sequentialRead().resize(width, height).toBuffer(function(err, buffer) {
-          if (err) {
-            throw err;
-          } else {
-            assert.notStrictEqual(null, buffer);
-            deferred.resolve();
-          }
-        });
-      }
     }).on("cycle", function(event) {
       console.log(" png " + String(event.target));
     }).on("complete", function() {
@@ -408,18 +396,6 @@ async.series({
           }
         });
       }
-    }).add("sharp-file-buffer-sequentialRead", {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputWebp).sequentialRead().resize(width, height).toBuffer(function(err, buffer) {
-          if (err) {
-            throw err;
-          } else {
-            assert.notStrictEqual(null, buffer);
-            deferred.resolve();
-          }
-        });
-      }
     }).on("cycle", function(event) {
       console.log("webp " + String(event.target));
     }).on("complete", function() {
@@ -442,17 +418,6 @@ async.series({
       defer: true,
       fn: function(deferred) {
         sharp(inputTiff).resize(width, height).sharpen().toFile(outputTiff, function(err) {
-          if (err) {
-            throw err;
-          } else {
-            deferred.resolve();
-          }
-        });
-      }
-    }).add("sharp-file-file-sequentialRead", {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputTiff).sequentialRead().resize(width, height).toFile(outputTiff, function(err) {
           if (err) {
             throw err;
           } else {

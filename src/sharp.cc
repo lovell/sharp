@@ -359,46 +359,51 @@ class ResizeWorker : public NanAsyncWorker {
     }
     g_object_unref(canvased);
 
+    // Always convert to sRGB colour space
+    VipsImage *colourspaced = vips_image_new();
+    vips_colourspace(sharpened, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL);
+    g_object_unref(sharpened);
+
     // Output
     if (baton->file_out == "__jpeg" || (baton->file_out == "__input" && inputImageType == JPEG)) {
       // Write JPEG to buffer
-      if (vips_jpegsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
-        return resize_error(baton, sharpened);
+      if (vips_jpegsave_buffer(colourspaced, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
+        return resize_error(baton, colourspaced);
       }
     } else if (baton->file_out == "__png" || (baton->file_out == "__input" && inputImageType == PNG)) {
       // Write PNG to buffer
-      if (vips_pngsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
-        return resize_error(baton, sharpened);
+      if (vips_pngsave_buffer(colourspaced, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
+        return resize_error(baton, colourspaced);
       }
     } else if (baton->file_out == "__webp" || (baton->file_out == "__input" && inputImageType == WEBP)) {
       // Write WEBP to buffer
-      if (vips_webpsave_buffer(sharpened, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", baton->quality, NULL)) {
-        return resize_error(baton, sharpened);
+      if (vips_webpsave_buffer(colourspaced, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", baton->quality, NULL)) {
+        return resize_error(baton, colourspaced);
       }
     } else if (is_jpeg(baton->file_out))  {
       // Write JPEG to file
-      if (vips_jpegsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
-        return resize_error(baton, sharpened);
+      if (vips_jpegsave(colourspaced, baton->file_out.c_str(), "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
+        return resize_error(baton, colourspaced);
       }
     } else if (is_png(baton->file_out)) {
       // Write PNG to file
-      if (vips_pngsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
-        return resize_error(baton, sharpened);
+      if (vips_pngsave(colourspaced, baton->file_out.c_str(), "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
+        return resize_error(baton, colourspaced);
       }
     } else if (is_webp(baton->file_out)) {
       // Write WEBP to file
-      if (vips_webpsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "Q", baton->quality, NULL)) {
-        return resize_error(baton, sharpened);
+      if (vips_webpsave(colourspaced, baton->file_out.c_str(), "strip", TRUE, "Q", baton->quality, NULL)) {
+        return resize_error(baton, colourspaced);
       }
     } else if (is_tiff(baton->file_out)) {
       // Write TIFF to file
-      if (vips_tiffsave(sharpened, baton->file_out.c_str(), "strip", TRUE, "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
-        return resize_error(baton, sharpened);
+      if (vips_tiffsave(colourspaced, baton->file_out.c_str(), "strip", TRUE, "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
+        return resize_error(baton, colourspaced);
       }
     } else {
       (baton->err).append("Unsupported output " + baton->file_out);
     }
-    g_object_unref(sharpened);
+    g_object_unref(colourspaced);
     vips_thread_shutdown();
   }
 
