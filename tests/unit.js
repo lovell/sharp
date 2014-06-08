@@ -268,5 +268,41 @@ async.series([
     sharp(inputTiff).webp().then(function() {
       done();
     });
-  }
+  },
+  // Interpolation: bilinear
+  function(done) {
+    sharp(inputJpg).resize(320, 240).bilinearInterpolation().toFile(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(240, features.height);
+        done();
+      });
+    });
+  },
+  // Interpolation: bicubic
+  function(done) {
+    sharp(inputJpg).resize(320, 240).bicubicInterpolation().toFile(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(240, features.height);
+        done();
+      });
+    });
+  },
+  // Interpolation: nohalo
+  function(done) {
+    sharp(inputJpg).resize(320, 240).nohaloInterpolation().toFile(outputJpg, function(err) {
+      if (err) throw err;
+      imagemagick.identify(outputJpg, function(err, features) {
+        if (err) throw err;
+        assert.strictEqual(320, features.width);
+        assert.strictEqual(240, features.height);
+        done();
+      });
+    });
+  },
 ]);

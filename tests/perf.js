@@ -166,6 +166,30 @@ async.series({
           }
         });
       }
+    }).add("sharp-file-buffer-bicubic", {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpg).resize(width, height).bicubicInterpolation().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-nohalo", {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpg).resize(width, height).nohaloInterpolation().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
     }).add("sharp-file-buffer-progressive", {
       defer: true,
       fn: function(deferred) {

@@ -16,6 +16,7 @@ var Sharp = function(input) {
     angle: 0,
     withoutEnlargement: false,
     sharpen: false,
+    interpolator: 'bilinear',
     progressive: false,
     sequentialRead: false,
 		quality: 80,
@@ -84,6 +85,30 @@ Sharp.prototype.withoutEnlargement = function(withoutEnlargement) {
 
 Sharp.prototype.sharpen = function(sharpen) {
   this.options.sharpen = (typeof sharpen === 'boolean') ? sharpen : true;
+  return this;
+};
+
+/*
+  Use bilinear interpolation for the affine transformation (fastest, default)
+*/
+Sharp.prototype.bilinearInterpolation = function() {
+  this.options.interpolator = 'bilinear';
+  return this;
+};
+
+/*
+  Use bicubic interpolation for the affine transformation
+*/
+Sharp.prototype.bicubicInterpolation = function() {
+  this.options.interpolator = 'bicubic';
+  return this;
+};
+
+/*
+  Use Nohalo interpolation for the affine transformation
+*/
+Sharp.prototype.nohaloInterpolation = function() {
+  this.options.interpolator = 'nohalo';
   return this;
 };
 

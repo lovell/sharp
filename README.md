@@ -53,7 +53,7 @@ Compiling from source is recommended:
 	cd libvips
 	git checkout 7.38
 	./bootstrap.sh
-	./configure --enable-debug=no --enable-cxx=no --without-python --without-orc
+	./configure --enable-debug=no --enable-cxx=yes --without-python --without-orc
 	make
 	sudo make install
 	sudo ldconfig
@@ -100,8 +100,8 @@ sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp().then(fun
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 300).embedWhite().toFile('output.tiff').then(function() {
-  // output.tiff is a 200 pixels wide and 300 pixels high image containing a scaled
+sharp(inputBuffer).resize(200, 300).bicubicInterpolation().embedWhite().toFile('output.tiff').then(function() {
+  // output.tiff is a 200 pixels wide and 300 pixels high image containing a bicubic scaled
   // version, embedded on a white canvas, of the image data in buffer
 });
 ```
@@ -175,6 +175,18 @@ This is equivalent to GraphicsMagick's `>` geometry option: "change the dimensio
 ### sharpen()
 
 Perform a mild sharpen of the resultant image. This typically reduces performance by 30%.
+
+### bilinearInterpolation()
+
+Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation) for image resizing, the default (and fastest) interpolation if none is specified.
+
+### bicubicInterpolation()
+
+Use [bicubic interpolation](http://en.wikipedia.org/wiki/Bicubic_interpolation) for image resizing. This typically reduces performance by 5%.
+
+### nohaloInterpolation()
+
+Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/) for image resizing. This typically reduces performance by a factor of 2.
 
 ### progressive()
 

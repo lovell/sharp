@@ -23,6 +23,7 @@ struct resize_baton {
   bool max;
   VipsExtend extend;
   bool sharpen;
+  std::string interpolator;
   bool progressive;
   bool without_enlargement;
   VipsAccess access_method;
@@ -294,12 +295,17 @@ class ResizeWorker : public NanAsyncWorker {
     }
     g_object_unref(shrunk_on_load);
 
-    // Use vips_affine with the remaining float part using bilinear interpolation
+    // Use vips_affine with the remaining float part
     VipsImage *affined = vips_image_new();
     if (residual != 0) {
-      if (vips_affine(shrunk, &affined, residual, 0, 0, residual, "interpolate", vips_interpolate_bilinear_static(), NULL)) {
+      // Create interpolator - "bilinear" (default), "bicubic" or "nohalo"
+      VipsInterpolate *interpolator = vips_interpolate_new(baton->interpolator.c_str());
+      // Perform affine transformation
+      if (vips_affine(shrunk, &affined, residual, 0, 0, residual, "interpolate", interpolator, NULL)) {
+        g_object_unref(interpolator);
         return resize_error(baton, shrunk);
       }
+      g_object_unref(interpolator);
     } else {
       vips_copy(shrunk, &affined, NULL);
     }
@@ -461,6 +467,7 @@ NAN_METHOD(resize) {
   }
   // Other options
   baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
+  baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();
   baton->without_enlargement = options->Get(NanNew<String>("withoutEnlargement"))->BooleanValue();
   baton->access_method = options->Get(NanNew<String>("sequentialRead"))->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
