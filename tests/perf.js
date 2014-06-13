@@ -154,6 +154,14 @@ async.series({
           }
         });
       }
+    }).add("sharp-file-buffer-promise", {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpg).resize(width, height).toBuffer().then(function(buffer) {
+          assert.notStrictEqual(null, buffer);
+          deferred.resolve();
+        });
+      }
     }).add("sharp-file-buffer-sharpen", {
       defer: true,
       fn: function(deferred) {
