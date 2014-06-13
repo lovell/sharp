@@ -19,8 +19,8 @@ var Sharp = function(input) {
     interpolator: 'bilinear',
     progressive: false,
     sequentialRead: false,
-		quality: 80,
-		compressionLevel: 6,
+    quality: 80,
+    compressionLevel: 6,
     output: '__jpeg'
   };
   if (typeof input === 'string') {
@@ -68,7 +68,7 @@ Sharp.prototype.rotate = function(angle) {
   } else if (!Number.isNaN(angle) && [0, 90, 180, 270].indexOf(angle) !== -1) {
     this.options.angle = angle;
   } else {
-    throw 'Unsupport angle (0, 90, 180, 270) ' + angle;
+    throw new Error('Unsupported angle (0, 90, 180, 270) ' + angle);
   }
   return this;
 };
@@ -167,19 +167,19 @@ Sharp.prototype.resize = function(width, height) {
 */
 Sharp.prototype.toFile = function(output, callback) {
   if (!output || output.length === 0) {
-    var err = new Error('Invalid output');
+    var errOutputInvalid = new Error('Invalid output');
     if (typeof callback === 'function') {
-      callback(err);
+      callback(errOutputInvalid);
     } else {
-      return Promise.reject(err);
+      return Promise.reject(errOutputInvalid);
     }
   } else {
     if (this.options.fileIn === output) {
-      var err = new Error('Cannot use same file for input and output');
+      var errOutputIsInput = new Error('Cannot use same file for input and output');
       if (typeof callback === 'function') {
-        callback(err);
+        callback(errOutputIsInput);
       } else {
-        return Promise.reject(err);
+        return Promise.reject(errOutputIsInput);
       }
     } else {
       return this._sharp(output, callback);
