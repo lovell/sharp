@@ -1,7 +1,7 @@
 /*jslint node: true */
 'use strict';
 
-var Promise = global.Promise || require('bluebird');
+var Promise = require('bluebird');
 var deprecate = require('util-deprecate');
 var sharp = require('./build/Release/sharp');
 
