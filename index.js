@@ -197,9 +197,13 @@ Sharp.prototype.toBuffer = function(callback) {
   return this._sharp(this.options.output, callback);
 };
 
-Sharp.prototype.jpeg = deprecate(function(c){return this.format('jpeg').toBuffer(c)}, '.jpeg() is deprecated. Use .format(\'jpeg\') instead.');
-Sharp.prototype.png = deprecate(function(c){return this.format('png').toBuffer(c)}, '.png() is deprecated. Use .format(\'png\') instead.');
-Sharp.prototype.webp = deprecate(function(c){return this.format('webp').toBuffer(c)}, '.webp() is deprecated. Use .format(\'webp\') instead.');
+function deprecatedFormat(format) {
+  return function(c){ return this.format(format).toBuffer(c) };
+};
+
+Sharp.prototype.jpeg = deprecate(deprecatedFormat('jpeg'), '.jpeg() is deprecated. Use .format(\'jpeg\') instead.');
+Sharp.prototype.png = deprecate(deprecatedFormat('png'), '.png() is deprecated. Use .format(\'png\') instead.');
+Sharp.prototype.webp = deprecate(deprecatedFormat('webp'), '.webp() is deprecated. Use .format(\'webp\') instead.');
 
 /*
   Set format of output image
