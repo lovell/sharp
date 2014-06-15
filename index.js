@@ -5,6 +5,8 @@ var Promise = require('bluebird');
 var deprecate = require('util-deprecate');
 var sharp = require('./build/Release/sharp');
 
+var FORMATS_SUPPORTED = ['input', 'jpeg', 'png', 'webp'];
+
 var Sharp = function(input) {
   if (!(this instanceof Sharp)) {
     return new Sharp(input);
@@ -21,7 +23,7 @@ var Sharp = function(input) {
     sequentialRead: false,
     quality: 80,
     compressionLevel: 6,
-    output: '__jpeg'
+    output: '__input'
   };
   if (typeof input === 'string') {
     this.options.fileIn = input;
@@ -192,19 +194,23 @@ Sharp.prototype.toFile = function(output, callback) {
 Sharp.prototype.write = deprecate(Sharp.prototype.toFile, '.write() is deprecated and will be removed in v0.6.0. Use .toFile() instead.');
 
 Sharp.prototype.toBuffer = function(callback) {
-  return this._sharp('__input', callback);
+  return this._sharp(this.options.output, callback);
 };
 
-Sharp.prototype.jpeg = function(callback) {
-  return this._sharp('__jpeg', callback);
-};
+Sharp.prototype.jpeg = deprecate(function(c){return this.format('jpeg').toBuffer(c)}, '.jpeg() is deprecated. Use .format(\'jpeg\') instead.');
+Sharp.prototype.png = deprecate(function(c){return this.format('png').toBuffer(c)}, '.png() is deprecated. Use .format(\'png\') instead.');
+Sharp.prototype.webp = deprecate(function(c){return this.format('webp').toBuffer(c)}, '.webp() is deprecated. Use .format(\'webp\') instead.');
 
-Sharp.prototype.png = function(callback) {
-  return this._sharp('__png', callback);
-};
-
-Sharp.prototype.webp = function(callback) {
-  return this._sharp('__webp', callback);
+/*
+  Set format of output image
+*/
+Sharp.prototype.format = function(format) {
+  if (~FORMATS_SUPPORTED.indexOf(format)) {
+    this.options.output = '__' + format;  
+  } else {
+    throw new Error('Invalid format: ' + format + '. Valid formats are: ' + FORMATS_SUPPORTED.join(', '));
+  }
+  return this;
 };
 
 /*
