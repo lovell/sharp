@@ -265,7 +265,7 @@ async.series([
   },
   // Check colour space conversion occurs from TIFF to WebP (this used to segfault)
   function(done) {
-    sharp(inputTiff).format('webp').toBuffer.then(function() {
+    sharp(inputTiff).format('webp').toBuffer(function() {
       done();
     });
   },
