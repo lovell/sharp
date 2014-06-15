@@ -318,8 +318,8 @@ async.series([
   // Set supported format!
   function(done) {
     var format = 'png';
-    sharp(inputJpg).format(format);
-    assert(instance.options.output == "__" + format);
+    var inst = sharp(inputJpg).format(format);
+    assert(inst.options.output == "__" + format);
     done();
   }, 
 ]);
