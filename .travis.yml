@@ -10,7 +10,7 @@ before_install:
   - cd libvips
   - git checkout 7.38
   - ./bootstrap.sh
-  - ./configure --enable-debug=no --enable-cxx=no --without-orc --without-python
+  - ./configure --enable-debug=no --enable-cxx=yes --without-orc --without-python
   - make
   - sudo make install
   - sudo ldconfig
