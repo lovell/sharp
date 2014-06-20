@@ -197,13 +197,17 @@ Sharp.prototype.toBuffer = function(callback) {
   return this._sharp(this.options.output, callback);
 };
 
-function deprecatedFormat(format) {
-  return function(c){ return this.format(format).toBuffer(c) };
+Sharp.prototype.jpeg = function(callback) {
+  return this._sharp('__jpeg', callback);
 };
 
-Sharp.prototype.jpeg = deprecate(deprecatedFormat('jpeg'), '.jpeg() is deprecated. Use .format(\'jpeg\') instead.');
-Sharp.prototype.png = deprecate(deprecatedFormat('png'), '.png() is deprecated. Use .format(\'png\') instead.');
-Sharp.prototype.webp = deprecate(deprecatedFormat('webp'), '.webp() is deprecated. Use .format(\'webp\') instead.');
+Sharp.prototype.png = function(callback) {
+  return this._sharp('__png', callback);
+};
+
+Sharp.prototype.webp = function(callback) {
+  return this._sharp('__webp', callback);
+};
 
 /*
   Set format of output image
