@@ -8,7 +8,7 @@
   ],
   "description": "High performance Node.js module to resize JPEG, PNG and WebP images using the libvips library",
   "scripts": {
-    "test": "node tests/unit && node tests/perf"
+    "test": "node tests/unit"
   },
   "main": "index.js",
   "repository": {
