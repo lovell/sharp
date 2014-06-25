@@ -54,6 +54,9 @@ unsigned char const MARKER_JPEG[] = {0xff, 0xd8};
 unsigned char const MARKER_PNG[] = {0x89, 0x50};
 unsigned char const MARKER_WEBP[] = {0x52, 0x49};
 
+// How many tasks are in the queue?
+volatile int queue_length = 0;
+
 static bool ends_with(std::string const &str, std::string const &end) {
   return str.length() >= end.length() && 0 == str.compare(str.length() - end.length(), end.length(), end);
 }
@@ -427,6 +430,8 @@ class ResizeWorker : public NanAsyncWorker {
     }
     delete baton;
     callback->Call(2, argv);
+    // Decrement queue length
+    g_atomic_int_dec_and_test(&queue_length);
   }
 
  private:
@@ -480,6 +485,10 @@ NAN_METHOD(resize) {
   // Join queue for worker thread
   NanCallback *callback = new NanCallback(args[2].As<v8::Function>());
   NanAsyncQueueWorker(new ResizeWorker(callback, baton));
+
+  // Increment queue length
+  g_atomic_int_inc(&queue_length);
+
   NanReturnUndefined();
 }
 
@@ -496,6 +505,7 @@ NAN_METHOD(cache) {
   cache->Set(NanNew<String>("current"), NanNew<Number>(vips_tracked_get_mem() / 1048576));
   cache->Set(NanNew<String>("high"), NanNew<Number>(vips_tracked_get_mem_highwater() / 1048576));
   cache->Set(NanNew<String>("limit"), NanNew<Number>(vips_cache_get_max_mem() / 1048576));
+  cache->Set(NanNew<String>("queue"), NanNew<Number>(queue_length));
   NanReturnValue(cache);
 }
 

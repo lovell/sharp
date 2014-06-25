@@ -257,9 +257,9 @@ This method always returns cache statistics, useful for determining how much wor
 Warnings such as _Application transferred too many scanlines_ are a good indicator you've set this value too low.
 
 ```javascript
-var stats = sharp.cache(); // { current: 98, high: 115, limit: 100 }
-sharp.cache(200); // { current: 98, high: 115, limit: 200 }
-sharp.cache(50); // { current: 49, high: 115, limit: 50 }
+var stats = sharp.cache(); // { current: 98, high: 115, limit: 100, queue: 0 }
+sharp.cache(200); // { current: 98, high: 115, limit: 200, queue: 0 }
+sharp.cache(50); // { current: 49, high: 115, limit: 50, queue: 0 }
 ```
 
 ## Testing
