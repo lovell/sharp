@@ -48,12 +48,12 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 Compiling from source is recommended:
 
-	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libfftw3-dev libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libxml2-dev swig
+	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libxml2-dev swig
 	git clone https://github.com/jcupitt/libvips.git
 	cd libvips
 	git checkout 7.38
 	./bootstrap.sh
-	./configure --enable-debug=no --enable-cxx=yes --without-python --without-orc
+	./configure --enable-debug=no --enable-cxx=yes --without-python --without-orc --without-fftw
 	make
 	sudo make install
 	sudo ldconfig
