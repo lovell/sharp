@@ -68,6 +68,10 @@ Requires `libtiff4-dev` instead of `libtiff5-dev` and has [a bug](https://bugs.l
 
 Then follow Ubuntu 13.x instructions.
 
+### Install libvips on Heroku
+
+[Alessandro Tagliapietra](https://github.com/alex88) maintains an [Heroku buildpack for libvips](https://github.com/alex88/heroku-buildpack-vips) and its dependencies.
+
 ## Usage examples
 
 ```javascript
@@ -160,11 +164,11 @@ Embed the resized image on a black background of the exact size specified.
 
 ### rotate([angle])
 
-Rotate the output image by either an explicit angle or auto-orient based on the EXIF `Orientation` tag. Mirroring is not supported.
+Rotate the output image by either an explicit angle or auto-orient based on the EXIF `Orientation` tag.
 
 `angle`, if present, is a Number with a value of `0`, `90`, `180` or `270`.
 
-Use this method without `angle` to determine the angle from EXIF data.
+Use this method without `angle` to determine the angle from EXIF data. Mirroring is currently unsupported.
 
 ### withoutEnlargement()
 
