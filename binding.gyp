@@ -12,7 +12,10 @@
       '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --cflags vips glib-2.0)',
       '<!(node -e "require(\'nan\')")'
     ],
-    'cflags': ['-fexceptions', '-pedantic', '-Wall', '-O3'],
-    'cflags_cc': ['-fexceptions', '-pedantic', '-Wall', '-O3']
+    'cflags': ['-fexceptions', '-Wall', '-O3'],
+    'cflags_cc': ['-fexceptions', '-Wall', '-O3'],
+    'xcode_settings': {
+      'OTHER_CFLAGS': ['-fexceptions', '-Wall', '-O3']
+    }
   }]
 }
