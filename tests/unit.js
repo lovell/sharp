@@ -81,11 +81,11 @@ async.series([
   },
   // Quality
   function(done) {
-    sharp(inputJpg).resize(320, 240).quality(70).jpeg(function(err, buffer70) {
+    sharp(inputJpg).resize(320, 240).quality(70).format('jpeg').toBuffer(function(err, buffer70) {
       if (err) throw err;
-      sharp(inputJpg).resize(320, 240).jpeg(function(err, buffer80) {
+      sharp(inputJpg).resize(320, 240).format('jpeg').toBuffer(function(err, buffer80) {
         if (err) throw err;
-        sharp(inputJpg).resize(320, 240).quality(90).jpeg(function(err, buffer90) {
+        sharp(inputJpg).resize(320, 240).quality(90).format('jpeg').toBuffer(function(err, buffer90) {
           assert(buffer70.length < buffer80.length);
           assert(buffer80.length < buffer90.length);
           done();
@@ -265,7 +265,7 @@ async.series([
   },
   // Check colour space conversion occurs from TIFF to WebP (this used to segfault)
   function(done) {
-    sharp(inputTiff).webp().then(function() {
+    sharp(inputTiff).format('webp').toBuffer(function() {
       done();
     });
   },
@@ -305,4 +305,21 @@ async.series([
       });
     });
   },
+  // Set unsupported format, fail!
+  function(done) {
+    var fail = false;
+    try {
+      sharp(inputJpg).format('exe');
+      fail = true;
+    } catch (e) {}
+    assert(!fail);
+    done();
+  }, 
+  // Set supported format!
+  function(done) {
+    var format = 'png';
+    var inst = sharp(inputJpg).format(format);
+    assert(inst.options.output == "__" + format);
+    done();
+  }, 
 ]);

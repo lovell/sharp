@@ -4,6 +4,8 @@
 var Promise = require('bluebird');
 var sharp = require('./build/Release/sharp');
 
+var FORMATS_SUPPORTED = ['input', 'jpeg', 'png', 'webp'];
+
 var Sharp = function(input) {
   if (!(this instanceof Sharp)) {
     return new Sharp(input);
@@ -20,7 +22,7 @@ var Sharp = function(input) {
     sequentialRead: false,
     quality: 80,
     compressionLevel: 6,
-    output: '__jpeg'
+    output: '__input'
   };
   if (typeof input === 'string') {
     this.options.fileIn = input;
@@ -194,7 +196,7 @@ Sharp.prototype.write = require('util').deprecate(
 );
 
 Sharp.prototype.toBuffer = function(callback) {
-  return this._sharp('__input', callback);
+  return this._sharp(this.options.output, callback);
 };
 
 Sharp.prototype.jpeg = function(callback) {
@@ -207,6 +209,18 @@ Sharp.prototype.png = function(callback) {
 
 Sharp.prototype.webp = function(callback) {
   return this._sharp('__webp', callback);
+};
+
+/*
+  Set format of output image
+*/
+Sharp.prototype.format = function(format) {
+  if (~FORMATS_SUPPORTED.indexOf(format)) {
+    this.options.output = '__' + format;  
+  } else {
+    throw new Error('Invalid format: ' + format + '. Valid formats are: ' + FORMATS_SUPPORTED.join(', '));
+  }
+  return this;
 };
 
 /*

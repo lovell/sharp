@@ -228,29 +228,9 @@ Write image data to a Buffer, the format of which will match the input image. JP
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
-### jpeg([callback])
+### format(output_format)
 
-Write JPEG image data to a Buffer.
-
-`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant JPEG image data.
-
-A Promises/A+ promise is returned when `callback` is not provided.
-
-### png([callback])
-
-Write PNG image data to a Buffer.
-
-`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant PNG image data.
-
-A Promises/A+ promise is returned when `callback` is not provided.
-
-### webp([callback])
-
-Write WebP image data to a Buffer.
-
-`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant WebP image data.
-
-A Promises/A+ promise is returned when `callback` is not provided.
+Set an output image format. Valid formats are: `input, jpeg, png, webp`. Use with `.toFile()` or `.toBuffer()` methods.
 
 ### sharp.cache([limit])
 
