@@ -222,11 +222,11 @@ Sharp.prototype._sharp = function(output, callback) {
     // I like promises
     var options = this.options;
     return new Promise(function(resolve, reject) {
-      sharp.resize(options, output, function(err, data) {
+      sharp.resize(options, output, function(err, data, info) {
         if (err) {
           reject(err);
         } else {
-          resolve(data);
+          resolve(data, info);
         }
       });
     });

@@ -79,51 +79,62 @@ var sharp = require('sharp');
 ```
 
 ```javascript
-sharp('input.jpg').resize(300, 200).toFile('output.jpg', function(err) {
+sharp('input.jpg').resize(300, 200).toFile('output.jpg', function(err, info) {
   if (err) {
     throw err;
   }
   // output.jpg is a 300 pixels wide and 200 pixels high image
   // containing a scaled and cropped version of input.jpg
+  
+  // info.width and info.height contain the final pixel dimensions of the resized image
+  // in this case they are the same as the input
 });
 ```
 
 ```javascript
-sharp('input.jpg').rotate().resize(null, 200).progressive().toBuffer(function(err, outputBuffer) {
+sharp('input.jpg').rotate().resize(null, 200).progressive().toBuffer(function(err, outputBuffer, info) {
   if (err) {
     throw err;
   }
   // outputBuffer contains 200px high progressive JPEG image data, auto-rotated using EXIF Orientation tag
+  // info.width and info.height contain the final pixel dimensions of the resized image
 });
 ```
 
 ```javascript
-sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp().then(function(outputBuffer) {
+sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp().then(function(outputBuffer, info) {
   // outputBuffer contains 300px wide, upside down, sharpened, 90% quality WebP image data
+  // info.width and info.height contain the final pixel dimensions of the resized image
 });
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 300).bicubicInterpolation().embedWhite().toFile('output.tiff').then(function() {
+sharp(inputBuffer).resize(200, 300).bicubicInterpolation().embedWhite().toFile('output.tiff').then(function(info) {
   // output.tiff is a 200 pixels wide and 300 pixels high image containing a bicubic scaled
   // version, embedded on a white canvas, of the image data in buffer
+  
+  // info.width and info.height contain the final pixel dimensions of the resized image
 });
 ```
 
 ```javascript
-sharp('input.gif').resize(200, 300).embedBlack().webp(function(err, outputBuffer) {
+sharp('input.gif').resize(200, 300).embedBlack().webp(function(err, outputBuffer, info) {
   if (err) {
     throw err;
   }
   // outputBuffer contains WebP image data of a 200 pixels wide and 300 pixels high
   // containing a scaled version, embedded on a black canvas, of input.gif
+  
+  // info.width and info.height contain the final pixel dimensions of the resized image
 });
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 200).max().jpeg().then(function(outputBuffer) {
+sharp(inputBuffer).resize(200, 200).max().jpeg().then(function(outputBuffer, info) {
   // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
   // than 200 pixels regardless of the inputBuffer image dimensions
+  
+  // info.width and info.height contain the final pixel dimensions of the resized image
 });
 ```
 
@@ -216,7 +227,7 @@ An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQU
 
 `filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP and TIFF supported.
 
-`callback`, if present, is called with a single argument `(err)` containing an error message, if any.
+`callback`, if present, is called with two arguments `(err, info)` where `err` contains an error message, if any, and `info` contains the final resized image dimensions in its `width` and `height` properties.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
@@ -224,7 +235,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 Write image data to a Buffer, the format of which will match the input image. JPEG, PNG and WebP are supported.
 
-`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant image data.
+`callback`, if present, gets three arguments `(err, buffer, info)` where `err` is an error message, if any, `buffer` is the resultant image data, and `info` contains the final resized image dimensions in its `width` and `height` properties.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
@@ -232,7 +243,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 Write JPEG image data to a Buffer.
 
-`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant JPEG image data.
+`callback`, if present, gets three arguments `(err, buffer, info)` where `err` is an error message, if any, `buffer` is resultant JPEG image data, and `info` contains the final resized image dimensions in its `width` and `height` properties.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
@@ -240,7 +251,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 Write PNG image data to a Buffer.
 
-`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant PNG image data.
+`callback`, if present, gets three arguments `(err, buffer, info)` where `err` is an error message, if any, `buffer` is resultant PNG image data, and `info` contains the final resized image dimensions in its `width` and `height` properties.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
@@ -248,7 +259,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 Write WebP image data to a Buffer.
 
-`callback`, if present, gets two arguments `(err, buffer)` where `err` is an error message, if any, and `buffer` is the resultant WebP image data.
+`callback`, if present, gets three arguments `(err, buffer, info)` where `err` is an error message, if any, `buffer` is resultant WebP image data, and `info` contains the final resized image dimensions in its `width` and `height` properties.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
