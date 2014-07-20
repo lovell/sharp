@@ -431,17 +431,28 @@ class ResizeWorker : public NanAsyncWorker {
   void HandleOKCallback () {
     NanScope();
 
-    Handle<Value> argv[2] = { NanNull(), NanNull() };
+    Handle<Value> argv[3] = { NanNull(), NanNull(),  NanNull() };
     if (!baton->err.empty()) {
       // Error
       argv[0] = NanNew<String>(baton->err.data(), baton->err.size());
-    } else if (baton->buffer_out_len > 0) {
-      // Buffer
-      argv[1] = NanNewBufferHandle((char *)baton->buffer_out, baton->buffer_out_len);
-      g_free(baton->buffer_out);
+    } else {
+      // Info Object
+      Local<Object> info = NanNew<Object>();
+      info->Set(NanNew<String>("width"), NanNew<Number>(baton->width));
+      info->Set(NanNew<String>("height"), NanNew<Number>(baton->height));
+
+      if (baton->buffer_out_len > 0) {
+        // Buffer
+        argv[1] = NanNewBufferHandle((char *)baton->buffer_out, baton->buffer_out_len);
+        g_free(baton->buffer_out);
+        argv[2] = info;
+      } else {
+        // File
+        argv[1] = info;
+      }
     }
     delete baton;
-    callback->Call(2, argv);
+    callback->Call(3, argv);
     // Decrement queue length
     g_atomic_int_dec_and_test(&queue_length);
   }
