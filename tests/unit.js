@@ -3,8 +3,8 @@
 'use strict';
 
 var sharp = require("../index");
+var fs = require("fs");
 var path = require("path");
-var imagemagick = require("imagemagick");
 var assert = require("assert");
 var async = require("async");
 
@@ -21,79 +21,61 @@ var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://gi
 async.series([
   // Resize with exact crop
   function(done) {
-    sharp(inputJpg).resize(320, 240).toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).resize(320, 240).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(240, features.height);
-        done();
-      });
+      done();
     });
   },
   // Resize to fixed width
   function(done) {
-    sharp(inputJpg).resize(320).toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).resize(320).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
       assert.strictEqual(261, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(261, features.height);
-        done();
-      });
+      done();
     });
   },
   // Resize to fixed height
   function(done) {
-    sharp(inputJpg).resize(null, 320).toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).resize(null, 320).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(391, info.width);
       assert.strictEqual(320, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(391, features.width);
-        assert.strictEqual(320, features.height);
-        done();
-      });
+      done();
     });
   },
   // Identity transform
   function(done) {
-    sharp(inputJpg).toFile(outputJpg, function(err) {
+    sharp(inputJpg).toBuffer(function(err, data, info) {
       if (err) throw err;
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(2725, features.width);
-        assert.strictEqual(2225, features.height);
-        done();
-      });
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual(2725, info.width);
+      assert.strictEqual(2225, info.height);
+      done();
     });
   },
   // Upscale
   function(done) {
-    sharp(inputJpg).resize(3000).toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).resize(3000).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(3000, info.width);
       assert.strictEqual(2449, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(3000, features.width);
-        assert.strictEqual(2449, features.height);
-        done();
-      });
+      done();
     });
   },
   // Quality
   function(done) {
-    sharp(inputJpg).resize(320, 240).quality(70).jpeg(function(err, buffer70) {
+    sharp(inputJpg).resize(320, 240).quality(70).toBuffer(function(err, buffer70) {
       if (err) throw err;
-      sharp(inputJpg).resize(320, 240).jpeg(function(err, buffer80) {
+      sharp(inputJpg).resize(320, 240).toBuffer(function(err, buffer80) {
         if (err) throw err;
-        sharp(inputJpg).resize(320, 240).quality(90).jpeg(function(err, buffer90) {
+        sharp(inputJpg).resize(320, 240).quality(90).toBuffer(function(err, buffer90) {
           assert(buffer70.length < buffer80.length);
           assert(buffer80.length < buffer90.length);
           done();
@@ -103,67 +85,51 @@ async.series([
   },
   // TIFF with dimensions known to cause rounding errors
   function(done) {
-    sharp(inputTiff).resize(240, 320).embedBlack().toFile(outputJpg, function(err) {
+    sharp(inputTiff).resize(240, 320).embedBlack().jpeg().toBuffer(function(err, data, info) {
       if (err) throw err;
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(240, features.width);
-        assert.strictEqual(320, features.height);
-        done();
-      });
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual(240, info.width);
+      assert.strictEqual(320, info.height);
+      done();
     });
   },
   function(done) {
-    sharp(inputTiff).resize(240, 320).toFile(outputJpg, function(err) {
+    sharp(inputTiff).resize(240, 320).jpeg().toBuffer(function(err, data, info) {
       if (err) throw err;
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(240, features.width);
-        assert.strictEqual(320, features.height);
-        done();
-      });
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual(240, info.width);
+      assert.strictEqual(320, info.height);
+      done();
     });
   },
   // Resize to max width or height considering ratio (landscape)
   function(done) {
-    sharp(inputJpg).resize(320, 320).max().toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).resize(320, 320).max().toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
       assert.strictEqual(261, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(261, features.height);
-        done();
-      });
+      done();
     });
   },
   // Resize to max width or height considering ratio (portrait)
   function(done) {
-    sharp(inputTiff).resize(320, 320).max().toFile(outputJpg, function(err, info) {
+    sharp(inputTiff).resize(320, 320).max().jpeg().toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(243, info.width);
       assert.strictEqual(320, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(243, features.width);
-        assert.strictEqual(320, features.height);
-        done();
-      });
+      done();
     });
   },
   // Attempt to resize to max but only provide one dimension, so should default to crop
   function(done) {
-    sharp(inputJpg).resize(320).max().toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).resize(320).max().toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
       assert.strictEqual(261, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(261, features.height);
-        done();
-      });
+      done();
     });
   },
   // Attempt to output to input, should fail
@@ -175,58 +141,42 @@ async.series([
   },
   // Rotate by 90 degrees, respecting output input size
   function(done) {
-    sharp(inputJpg).rotate(90).resize(320, 240).toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).rotate(90).resize(320, 240).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(240, features.height);
-        done();
-      });
+      done();
     });
   },
   // Input image has Orientation EXIF tag but do not rotate output
   function(done) {
-    sharp(inputJpgWithExif).resize(320).toFile(outputJpg, function(err, info) {
+    sharp(inputJpgWithExif).resize(320).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
       assert.strictEqual(426, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(426, features.height);
-        done();
-      });
+      done();
     });
   },
   // Input image has Orientation EXIF tag value of 8 (270 degrees), auto-rotate
   function(done) {
-    sharp(inputJpgWithExif).rotate().resize(320).toFile(outputJpg, function(err, info) {
+    sharp(inputJpgWithExif).rotate().resize(320).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(240, features.height);
-        done();
-      });
+      done();
     });
   },
   // Attempt to auto-rotate using image that has no EXIF
   function(done) {
-    sharp(inputJpg).rotate().resize(320).toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).rotate().resize(320).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
       assert.strictEqual(261, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(261, features.height);
-        done();
-      });
+      done();
     });
   },
   // Rotate to an invalid angle, should fail
@@ -241,40 +191,32 @@ async.series([
   },
   // Do not enlarge the output if the input width is already less than the output width
   function(done) {
-    sharp(inputJpg).resize(2800).withoutEnlargement().toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).resize(2800).withoutEnlargement().toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(2725, info.width);
       assert.strictEqual(2225, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(2725, features.width);
-        assert.strictEqual(2225, features.height);
-        done();
-      });
+      done();
     });
   },
   // Do not enlarge the output if the input height is already less than the output height
   function(done) {
-    sharp(inputJpg).resize(null, 2300).withoutEnlargement().toFile(outputJpg, function(err, info) {
+    sharp(inputJpg).resize(null, 2300).withoutEnlargement().toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual(2725, info.width);
       assert.strictEqual(2225, info.height);
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(2725, features.width);
-        assert.strictEqual(2225, features.height);
-        done();
-      });
+      done();
     });
   },
   // Promises/A+
   function(done) {
-    sharp(inputJpg).resize(320, 240).toFile(outputJpg).then(function(info) {
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(240, info.height);      
-      imagemagick.identify(outputJpg, function(err, features) {
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(240, features.height);
+    sharp(inputJpg).resize(320, 240).toBuffer().then(function(data) {
+      sharp(data).toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
         done();
       });
     }).catch(function(err) {
@@ -293,44 +235,109 @@ async.series([
   },
   // Check colour space conversion occurs from TIFF to WebP (this used to segfault)
   function(done) {
-    sharp(inputTiff).webp().then(function() {
+    sharp(inputTiff).webp().toBuffer().then(function() {
       done();
     });
   },
   // Interpolation: bilinear
   function(done) {
-    sharp(inputJpg).resize(320, 240).bilinearInterpolation().toFile(outputJpg, function(err) {
+    sharp(inputJpg).resize(320, 240).bilinearInterpolation().toBuffer(function(err, data, info) {
       if (err) throw err;
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(240, features.height);
-        done();
-      });
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      done();
     });
   },
   // Interpolation: bicubic
   function(done) {
-    sharp(inputJpg).resize(320, 240).bicubicInterpolation().toFile(outputJpg, function(err) {
+    sharp(inputJpg).resize(320, 240).bicubicInterpolation().toBuffer(function(err, data, info) {
       if (err) throw err;
-      imagemagick.identify(outputJpg, function(err, features) {
-        if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(240, features.height);
-        done();
-      });
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      done();
     });
   },
   // Interpolation: nohalo
   function(done) {
-    sharp(inputJpg).resize(320, 240).nohaloInterpolation().toFile(outputJpg, function(err) {
+    sharp(inputJpg).resize(320, 240).nohaloInterpolation().toBuffer(function(err, data, info) {
       if (err) throw err;
-      imagemagick.identify(outputJpg, function(err, features) {
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      done();
+    });
+  },
+  // File-Stream
+  function(done) {
+    var writable = fs.createWriteStream(outputJpg);
+    writable.on('finish', function() {
+      sharp(outputJpg).toBuffer(function(err, data, info) {
         if (err) throw err;
-        assert.strictEqual(320, features.width);
-        assert.strictEqual(240, features.height);
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fs.unlinkSync(outputJpg);
         done();
       });
     });
+    sharp(inputJpg).resize(320, 240).pipe(writable);
   },
+  // Buffer-Stream
+  function(done) {
+    var inputJpgBuffer = fs.readFileSync(inputJpg);
+    var writable = fs.createWriteStream(outputJpg);
+    writable.on('finish', function() {
+      sharp(outputJpg).toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fs.unlinkSync(outputJpg);
+        done();
+      });
+    });
+    sharp(inputJpgBuffer).resize(320, 240).pipe(writable);
+  },
+  // Stream-File
+  function(done) {
+    var readable = fs.createReadStream(inputJpg);
+    var pipeline = sharp().resize(320, 240).toFile(outputJpg, function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      fs.unlinkSync(outputJpg);
+      done();
+    });
+    readable.pipe(pipeline);
+  },
+  // Stream-Buffer
+  function(done) {
+    var readable = fs.createReadStream(inputJpg);
+    var pipeline = sharp().resize(320, 240).toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      done();
+    });
+    readable.pipe(pipeline);
+  },
+  // Stream-Stream
+  function(done) {
+    var readable = fs.createReadStream(inputJpg);
+    var writable = fs.createWriteStream(outputJpg);
+    writable.on('finish', function() {
+      sharp(outputJpg).toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fs.unlinkSync(outputJpg);
+        done();
+      });
+    });
+    var pipeline = sharp().resize(320, 240);
+    readable.pipe(pipeline).pipe(writable)
+  }
 ]);

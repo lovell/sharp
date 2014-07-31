@@ -14,7 +14,7 @@ struct resize_baton {
   std::string file_in;
   void* buffer_in;
   size_t buffer_in_len;
-  std::string file_out;
+  std::string output;
   void* buffer_out;
   size_t buffer_out_len;
   int width;
@@ -386,43 +386,43 @@ class ResizeWorker : public NanAsyncWorker {
 
     // Output
     VipsImage *output = cached;
-    if (baton->file_out == "__jpeg" || (baton->file_out == "__input" && inputImageType == JPEG)) {
+    if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == JPEG)) {
       // Write JPEG to buffer
       if (vips_jpegsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
-    } else if (baton->file_out == "__png" || (baton->file_out == "__input" && inputImageType == PNG)) {
+    } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == PNG)) {
       // Write PNG to buffer
       if (vips_pngsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
-    } else if (baton->file_out == "__webp" || (baton->file_out == "__input" && inputImageType == WEBP)) {
+    } else if (baton->output == "__webp" || (baton->output == "__input" && inputImageType == WEBP)) {
       // Write WEBP to buffer
       if (vips_webpsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", TRUE, "Q", baton->quality, NULL)) {
         return resize_error(baton, output);
       }
-    } else if (is_jpeg(baton->file_out))  {
+    } else if (is_jpeg(baton->output))  {
       // Write JPEG to file
-      if (vips_jpegsave(output, baton->file_out.c_str(), "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
+      if (vips_jpegsave(output, baton->output.c_str(), "strip", TRUE, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
-    } else if (is_png(baton->file_out)) {
+    } else if (is_png(baton->output)) {
       // Write PNG to file
-      if (vips_pngsave(output, baton->file_out.c_str(), "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
+      if (vips_pngsave(output, baton->output.c_str(), "strip", TRUE, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
-    } else if (is_webp(baton->file_out)) {
+    } else if (is_webp(baton->output)) {
       // Write WEBP to file
-      if (vips_webpsave(output, baton->file_out.c_str(), "strip", TRUE, "Q", baton->quality, NULL)) {
+      if (vips_webpsave(output, baton->output.c_str(), "strip", TRUE, "Q", baton->quality, NULL)) {
         return resize_error(baton, output);
       }
-    } else if (is_tiff(baton->file_out)) {
+    } else if (is_tiff(baton->output)) {
       // Write TIFF to file
-      if (vips_tiffsave(output, baton->file_out.c_str(), "strip", TRUE, "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
+      if (vips_tiffsave(output, baton->output.c_str(), "strip", TRUE, "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
         return resize_error(baton, output);
       }
     } else {
-      (baton->err).append("Unsupported output " + baton->file_out);
+      (baton->err).append("Unsupported output " + baton->output);
     }
     g_object_unref(output);
 
@@ -506,10 +506,10 @@ NAN_METHOD(resize) {
   baton->compressionLevel = options->Get(NanNew<String>("compressionLevel"))->Int32Value();
   baton->angle = options->Get(NanNew<String>("angle"))->Int32Value();
   // Output filename or __format for Buffer
-  baton->file_out = *String::Utf8Value(args[1]->ToString());
+  baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());
 
   // Join queue for worker thread
-  NanCallback *callback = new NanCallback(args[2].As<v8::Function>());
+  NanCallback *callback = new NanCallback(args[1].As<v8::Function>());
   NanAsyncQueueWorker(new ResizeWorker(callback, baton));
 
   // Increment queue length

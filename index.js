@@ -1,6 +1,8 @@
 /*jslint node: true */
 'use strict';
 
+var util = require('util');
+var stream = require('stream');
 var Promise = require('bluebird');
 var sharp = require('./build/Release/sharp');
 
@@ -8,6 +10,7 @@ var Sharp = function(input) {
   if (!(this instanceof Sharp)) {
     return new Sharp(input);
   }
+  stream.Duplex.call(this);
   this.options = {
     width: -1,
     height: -1,
@@ -20,22 +23,54 @@ var Sharp = function(input) {
     sequentialRead: false,
     quality: 80,
     compressionLevel: 6,
-    output: '__jpeg'
+    streamIn: false,
+    streamOut: false,
+    output: '__input'
   };
   if (typeof input === 'string') {
+    // input=file
     this.options.fileIn = input;
-  } else if (typeof input ==='object' && input instanceof Buffer) {
+  } else if (typeof input === 'object' && input instanceof Buffer) {
+    // input=buffer
     if (input.length > 0) {
       this.options.bufferIn = input;
     } else {
       throw new Error('Buffer is empty');
     }
   } else {
-    throw new Error('Unsupported input ' + typeof input);
+    // input=stream
+    this.options.streamIn = true;
   }
   return this;
 };
 module.exports = Sharp;
+util.inherits(Sharp, stream.Duplex);
+
+/*
+  Handle incoming chunk on Writable Stream
+*/
+Sharp.prototype._write = function(chunk, encoding, callback) {
+  if (this.options.streamIn) {
+    if (typeof chunk === 'object' || chunk instanceof Buffer) {
+      if (typeof this.options.bufferIn === 'undefined') {
+        // Create new Buffer
+        this.options.bufferIn = new Buffer(chunk.length);
+        chunk.copy(this.options.bufferIn);
+      } else {
+        // Append to existing Buffer
+        this.options.bufferIn = Buffer.concat(
+          [this.options.bufferIn, chunk],
+          this.options.bufferIn.length + chunk.length
+        );
+      }
+      callback();
+    } else {
+      callback(new Error('Non-Buffer data on Writable Stream'));
+    }
+  } else {
+    callback(new Error('Unexpected data on Writable Stream'));
+  }
+};
 
 Sharp.prototype.crop = function() {
   this.options.canvas = 'c';
@@ -181,55 +216,122 @@ Sharp.prototype.toFile = function(output, callback) {
         return Promise.reject(errOutputIsInput);
       }
     } else {
-      return this._sharp(output, callback);
+      this.options.output = output;
+      return this._sharp(callback);
     }
   }
   return this;
 };
 
-// Deprecated to make way for future stream support - remove in v0.6.0
-Sharp.prototype.write = require('util').deprecate(
-  Sharp.prototype.toFile,
-  '.write() is deprecated and will be removed in v0.6.0. Use .toFile() instead.'
-);
-
 Sharp.prototype.toBuffer = function(callback) {
-  return this._sharp('__input', callback);
+  return this._sharp(callback);
 };
 
-Sharp.prototype.jpeg = function(callback) {
-  return this._sharp('__jpeg', callback);
+Sharp.prototype.jpeg = function() {
+  this.options.output = '__jpeg';
+  if (arguments.length > 0) {
+    console.error('Use of the jpeg() method with a callback is deprecated in 0.6.x and will be removed in 0.7.x');
+    console.error('Please add toFile(), toBuffer() or Stream methods e.g. pipe() for JPEG output');
+    this._sharp(arguments);
+  }
+  return this;
 };
 
-Sharp.prototype.png = function(callback) {
-  return this._sharp('__png', callback);
+Sharp.prototype.png = function() {
+  this.options.output = '__png';
+  if (arguments.length > 0) {
+    console.error('Use of the png() method with a callback is deprecated in 0.6.x and will be removed in 0.7.x');
+    console.error('Please add toFile(), toBuffer() or Stream methods e.g. pipe() for PNG output');
+    this._sharp(arguments);
+  }
+  return this;
 };
 
-Sharp.prototype.webp = function(callback) {
-  return this._sharp('__webp', callback);
+Sharp.prototype.webp = function() {
+  this.options.output = '__webp';
+  if (arguments.length > 0) {
+    console.error('Use of the webp() method with a callback is deprecated in 0.6.x and will be removed in 0.7.x');
+    console.error('Please add toFile(), toBuffer() or Stream methods e.g. pipe() for WebP output');
+    this._sharp(arguments);
+  }
+  return this;
+};
+
+/*
+  Used by a Writable Stream to notify that it is ready for data
+*/
+Sharp.prototype._read = function() {
+  if (!this.options.streamOut) {
+    this.options.streamOut = true;
+    this._sharp();
+  }
 };
 
 /*
   Invoke the C++ image processing pipeline
-  Supports callback and promise variants
+  Supports callback, stream and promise variants
 */
-Sharp.prototype._sharp = function(output, callback) {
+Sharp.prototype._sharp = function(callback) {
+  var that = this;
   if (typeof callback === 'function') {
-    // I like callbacks
-    sharp.resize(this.options, output, callback);
+    // output=file/buffer
+    if (this.options.streamIn) {
+      // output=file/buffer, input=stream
+      this.on('finish', function() {
+        sharp.resize(that.options, callback);
+      });
+    } else {
+      // output=file/buffer, input=file/buffer
+      sharp.resize(this.options, callback);
+    }
+    return this;
+  } else if (this.options.streamOut) {
+    // output=stream
+    if (this.options.streamIn) {
+      // output=stream, input=stream
+      this.on('finish', function() {
+        sharp.resize(that.options, function(err, data) {
+          if (err) throw err;
+          that.push(data);
+          that.push(null);
+        });
+      });
+    } else {
+      // output=stream, input=file/buffer
+      sharp.resize(this.options, function(err, data) {
+        if (err) throw err;
+        that.push(data);
+        that.push(null);
+      });
+    }
     return this;
   } else {
-    // I like promises
-    var options = this.options;
-    return new Promise(function(resolve, reject) {
-      sharp.resize(options, output, function(err, data, info) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data, info);
-        }
+    // output=promise
+    if (this.options.streamIn) {
+      // output=promise, input=stream
+      return new Promise(function(resolve, reject) {
+        that.on('finish', function() {
+          sharp.resize(that.options, function(err, data) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(data);
+            }
+          });
+        });
       });
-    });
+    } else {
+      // output=promise, input=file/buffer
+      return new Promise(function(resolve, reject) {
+        sharp.resize(that.options, function(err, data) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
+      });
+    }
   }
 };
 

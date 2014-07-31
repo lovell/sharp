@@ -142,6 +142,17 @@ async.series({
           }
         });
       }
+    }).add("sharp-stream-stream", {
+      defer: true,
+      fn: function(deferred) {
+        var readable = fs.createReadStream(inputJpg);
+        var writable = fs.createWriteStream(outputJpg);
+        writable.on('finish', function() {
+          deferred.resolve();
+        });
+        var pipeline = sharp().resize(width, height);
+        readable.pipe(pipeline).pipe(writable);
+      }
     }).add("sharp-file-buffer", {
       defer: true,
       fn: function(deferred) {

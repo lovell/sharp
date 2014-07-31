@@ -9,15 +9,17 @@
 
 The typical use case for this high speed Node.js module is to convert large images of many formats to smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
-The performance of JPEG resizing is typically 8x faster than ImageMagick and GraphicsMagick, based mainly on the number of CPU cores available. Everything remains non-blocking thanks to _libuv_ and Promises/A+ are supported.
+The performance of JPEG resizing is typically 8x faster than ImageMagick and GraphicsMagick, based mainly on the number of CPU cores available.
 
-This module supports reading and writing images of JPEG, PNG and WebP to and from both Buffer objects and the filesystem. It also supports reading images of many other types from the filesystem via libmagick++ or libgraphicsmagick++ if present.
+Memory usage is kept to a minimum, no child processes are spawned, everything remains non-blocking thanks to _libuv_ and Promises/A+ are supported.
+
+This module supports reading and writing JPEG, PNG and WebP images to and from Streams, Buffer objects and the filesystem. It also supports reading images of many other types from the filesystem via libmagick++ or libgraphicsmagick++ if present.
 
 When generating JPEG output all metadata is removed and Huffman tables optimised without having to use separate command line tools like [jpegoptim](https://github.com/tjko/jpegoptim) and [jpegtran](http://jpegclub.org/jpegtran/).
 
 Anyone who has used the Node.js bindings for [GraphicsMagick](https://github.com/aheckmann/gm) will find the API similarly fluent.
 
-This module is powered by the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by John Cupitt.
+This module is powered by the blazingly fast [libvips](https://github.com/jcupitt/libvips) image processing library, originally created in 1989 at Birkbeck College and currently maintained by [John Cupitt](https://github.com/jcupitt).
 
 ## Installation
 
@@ -89,13 +91,20 @@ sharp('input.jpg').resize(300, 200).toFile('output.jpg', function(err) {
 ```
 
 ```javascript
-sharp('input.jpg').rotate().resize(null, 200).progressive().toBuffer(function(err, outputBuffer, info) {
+var transformer = sharp().resize(300, 200);
+readableStream.pipe(transformer).pipe(writableStream);
+// Read image data from readableStream, resize and write image data to writableStream
+```
+
+```javascript
+var pipeline = sharp().rotate().resize(null, 200).progressive().toBuffer(function(err, outputBuffer, info) {
   if (err) {
     throw err;
   }
   // outputBuffer contains 200px high progressive JPEG image data, auto-rotated using EXIF Orientation tag
   // info.width and info.height contain the final pixel dimensions of the resized image
 });
+readableStream.pipe(pipeline);
 ```
 
 ```javascript
@@ -103,6 +112,15 @@ sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp().then(fun
   // outputBuffer contains 300px wide, upside down, sharpened, 90% quality WebP image data
   // info.width and info.height contain the final pixel dimensions of the resized image
 });
+```
+
+```javascript
+http.createServer(function(request, response) {
+  response.writeHead(200, {'Content-Type': 'image/webp'});
+  sharp('input.jpg').rotate().resize(200).webp().pipe(response);
+}).listen(8000);
+// Create HTTP server that always returns auto-rotated 'input.jpg',
+// resized to 200 pixels wide, in WebP format
 ```
 
 ```javascript
@@ -132,14 +150,28 @@ sharp(inputBuffer).resize(200, 200).max().jpeg().then(function(outputBuffer, inf
 
 ## API
 
-### sharp(input)
+### Input methods
 
-Constructor to which further methods are chained. `input` can be one of:
+#### sharp([input])
+
+Constructor to which further methods are chained. `input`, if present, can be one of:
 
 * Buffer containing JPEG, PNG or WebP image data, or
 * String containing the filename of an image, with most major formats supported.
 
-### resize(width, [height])
+The object returned implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
+
+JPEG, PNG or WebP format image data can be streamed into the object when `input` is not provided.
+
+JPEG, PNG or WebP format image data can be streamed out from this object.
+
+#### sequentialRead()
+
+An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.
+
+### Image transformation options
+
+#### resize(width, [height])
 
 Scale output to `width` x `height`. By default, the resized image is cropped to the exact size specified.
 
@@ -147,25 +179,25 @@ Scale output to `width` x `height`. By default, the resized image is cropped to 
 
 `height` is the Number of pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
 
-### crop()
+#### crop()
 
 Crop the resized image to the exact size specified, the default behaviour.
 
-### max()
+#### max()
 
 Preserving aspect ratio, resize the image to the maximum width or height specified.
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
-### embedWhite()
+#### embedWhite()
 
 Embed the resized image on a white background of the exact size specified.
 
-### embedBlack()
+#### embedBlack()
 
 Embed the resized image on a black background of the exact size specified.
 
-### rotate([angle])
+#### rotate([angle])
 
 Rotate the output image by either an explicit angle or auto-orient based on the EXIF `Orientation` tag.
 
@@ -173,49 +205,61 @@ Rotate the output image by either an explicit angle or auto-orient based on the 
 
 Use this method without `angle` to determine the angle from EXIF data. Mirroring is currently unsupported.
 
-### withoutEnlargement()
+#### withoutEnlargement()
 
 Do not enlarge the output image if the input image width *or* height are already less than the required dimensions.
 
 This is equivalent to GraphicsMagick's `>` geometry option: "change the dimensions of the image only if its width or height exceeds the geometry specification".
 
-### sharpen()
+#### sharpen()
 
 Perform a mild sharpen of the resultant image. This typically reduces performance by 30%.
 
-### bilinearInterpolation()
+#### bilinearInterpolation()
 
 Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation) for image resizing, the default (and fastest) interpolation if none is specified.
 
-### bicubicInterpolation()
+#### bicubicInterpolation()
 
 Use [bicubic interpolation](http://en.wikipedia.org/wiki/Bicubic_interpolation) for image resizing. This typically reduces performance by 5%.
 
-### nohaloInterpolation()
+#### nohaloInterpolation()
 
 Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/) for image resizing. This typically reduces performance by a factor of 2.
 
-### progressive()
+### Output options
+
+#### progressive()
 
 Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.
 
-### quality(quality)
+#### quality(quality)
 
 The output quality to use for lossy JPEG, WebP and TIFF output formats. The default quality is `80`.
 
 `quality` is a Number between 1 and 100.
 
-### compressionLevel(compressionLevel)
+#### compressionLevel(compressionLevel)
 
 An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
 
 `compressionLevel` is a Number between -1 and 9.
 
-### sequentialRead()
+#### jpeg()
 
-An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.
+Use JPEG format for the output image.
 
-### toFile(filename, [callback])
+#### png()
+
+Use PNG format for the output image.
+
+#### webp()
+
+Use WebP format for the output image.
+
+### Output methods
+
+#### toFile(filename, [callback])
 
 `filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP and TIFF supported.
 
@@ -226,9 +270,9 @@ An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQU
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
-### toBuffer([callback])
+#### toBuffer([callback])
 
-Write image data to a Buffer, the format of which will match the input image. JPEG, PNG and WebP are supported.
+Write image data to a Buffer, the format of which will match the input image by default. JPEG, PNG and WebP are supported.
 
 `callback`, if present, gets three arguments `(err, buffer, info)` where:
 
@@ -238,43 +282,9 @@ Write image data to a Buffer, the format of which will match the input image. JP
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
-### jpeg([callback])
+### Utility methods
 
-Write JPEG image data to a Buffer.
-
-`callback`, if present, gets three arguments `(err, buffer, info)` where:
-
-* `err` is an error message, if any
-* `buffer` is the resultant JPEG image data
-* `info` contains the final resized image dimensions in its `width` and `height` properties
-
-A Promises/A+ promise is returned when `callback` is not provided.
-
-### png([callback])
-
-Write PNG image data to a Buffer.
-
-`callback`, if present, gets three arguments `(err, buffer, info)` where:
-
-* `err` is an error message, if any
-* `buffer` is the resultant PNG image data
-* `info` contains the final resized image dimensions in its `width` and `height` properties
-
-A Promises/A+ promise is returned when `callback` is not provided.
-
-### webp([callback])
-
-Write WebP image data to a Buffer.
-
-`callback`, if present, gets three arguments `(err, buffer, info)` where:
-
-* `err` is an error message, if any
-* `buffer` is the resultant WebP image data
-* `info` contains the final resized image dimensions in its `width` and `height` properties
-
-A Promises/A+ promise is returned when `callback` is not provided.
-
-### sharp.cache([limit])
+#### sharp.cache([limit])
 
 If `limit` is provided, set the (soft) limit of _libvips_ working/cache memory to this value in MB. The default value is 100.
 
