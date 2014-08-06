@@ -425,6 +425,9 @@ class ResizeWorker : public NanAsyncWorker {
       (baton->err).append("Unsupported output " + baton->file_out);
     }
     g_object_unref(output);
+
+    // Clean up libvips' per-request data and threads
+    vips_error_clear();
     vips_thread_shutdown();
   }
 
