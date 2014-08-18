@@ -112,7 +112,7 @@ readableStream.pipe(pipeline);
 ```
 
 ```javascript
-sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp().then(function(outputBuffer, info) {
+sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp().toBuffer().then(function(outputBuffer, info) {
   // outputBuffer contains 300px wide, upside down, sharpened, 90% quality WebP image data
   // info.width and info.height contain the final pixel dimensions of the resized image
 });
@@ -135,7 +135,7 @@ sharp(inputBuffer).resize(200, 300).bicubicInterpolation().embedWhite().toFile('
 ```
 
 ```javascript
-sharp('input.gif').resize(200, 300).embedBlack().webp(function(err, outputBuffer) {
+sharp('input.gif').resize(200, 300).embedBlack().webp().toBuffer(function(err, outputBuffer) {
   if (err) {
     throw err;
   }
@@ -145,7 +145,7 @@ sharp('input.gif').resize(200, 300).embedBlack().webp(function(err, outputBuffer
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 200).max().jpeg().then(function(outputBuffer, info) {
+sharp(inputBuffer).resize(200, 200).max().jpeg().toBuffer().then(function(outputBuffer, info) {
   // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
   // than 200 pixels regardless of the inputBuffer image dimensions
   // info.width and info.height contain the final pixel dimensions of the resized image
