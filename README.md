@@ -36,6 +36,10 @@ _libvips_ can take advantage of [liborc](http://code.entropywave.com/orc/) if pr
 
 	brew install homebrew/science/vips --with-webp --with-graphicsmagick
 
+A missing or incorrectly configured _Xcode Command Line Tools_ installation [can lead](https://github.com/lovell/sharp/issues/80) to a `library not found for -ljpeg` error. If so, please try:
+
+	xcode-select --install
+
 The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp/issues/9) to a `library not found for -lintl` error. If so, please try:
 
 	brew link gettext --force
