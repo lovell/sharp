@@ -18,6 +18,10 @@ var outputTiff = path.join(fixturesPath, "output.tiff");
 
 var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_8.jpg
 
+// Ensure cache limits can be set
+sharp.cache(0); // Disable
+sharp.cache(50, 500); // 50MB, 500 items
+
 async.series([
   // Resize with exact crop
   function(done) {
@@ -339,5 +343,12 @@ async.series([
     });
     var pipeline = sharp().resize(320, 240);
     readable.pipe(pipeline).pipe(writable)
+  },
+  // Verify internal counters
+  function(done) {
+    var counters = sharp.counters();
+    assert.strictEqual(0, counters.queue);
+    assert.strictEqual(0, counters.process);
+    done();
   }
 ]);

@@ -55,7 +55,9 @@ unsigned char const MARKER_PNG[] = {0x89, 0x50};
 unsigned char const MARKER_WEBP[] = {0x52, 0x49};
 
 // How many tasks are in the queue?
-volatile int queue_length = 0;
+volatile int counter_queue = 0;
+// How many tasks are being processed?
+volatile int counter_process = 0;
 
 static bool ends_with(std::string const &str, std::string const &end) {
   return str.length() >= end.length() && 0 == str.compare(str.length() - end.length(), end.length(), end);
@@ -124,6 +126,11 @@ class ResizeWorker : public NanAsyncWorker {
   ~ResizeWorker() {}
 
   void Execute () {
+    // Decrement queued task counter
+    g_atomic_int_dec_and_test(&counter_queue);
+    // Increment processing task counter
+    g_atomic_int_inc(&counter_process);
+
     // Input
     ImageType inputImageType = JPEG;
     VipsImage *in = vips_image_new();
@@ -455,9 +462,12 @@ class ResizeWorker : public NanAsyncWorker {
       }
     }
     delete baton;
+
+    // Decrement processing task counter
+    g_atomic_int_dec_and_test(&counter_process);
+
+    // Return to JavaScript
     callback->Call(3, argv);
-    // Decrement queue length
-    g_atomic_int_dec_and_test(&queue_length);
   }
 
  private:
@@ -512,27 +522,46 @@ NAN_METHOD(resize) {
   NanCallback *callback = new NanCallback(args[1].As<v8::Function>());
   NanAsyncQueueWorker(new ResizeWorker(callback, baton));
 
-  // Increment queue length
-  g_atomic_int_inc(&queue_length);
+  // Increment queued task counter
+  g_atomic_int_inc(&counter_queue);
 
   NanReturnUndefined();
 }
 
+/*
+  Get and set cache memory and item limits
+*/
 NAN_METHOD(cache) {
   NanScope();
 
-  // Set cache limit
+  // Set cache memory limit
   if (args[0]->IsInt32()) {
     vips_cache_set_max_mem(args[0]->Int32Value() * 1048576);
+  }
+
+  // Set cache items limit
+  if (args[1]->IsInt32()) {
+    vips_cache_set_max(args[1]->Int32Value());
   }
 
   // Get cache statistics
   Local<Object> cache = NanNew<Object>();
   cache->Set(NanNew<String>("current"), NanNew<Number>(vips_tracked_get_mem() / 1048576));
   cache->Set(NanNew<String>("high"), NanNew<Number>(vips_tracked_get_mem_highwater() / 1048576));
-  cache->Set(NanNew<String>("limit"), NanNew<Number>(vips_cache_get_max_mem() / 1048576));
-  cache->Set(NanNew<String>("queue"), NanNew<Number>(queue_length));
+  cache->Set(NanNew<String>("memory"), NanNew<Number>(vips_cache_get_max_mem() / 1048576));
+  cache->Set(NanNew<String>("items"), NanNew<Number>(vips_cache_get_max()));
   NanReturnValue(cache);
+}
+
+/*
+  Get internal counters (queued tasks, processing tasks)
+*/
+NAN_METHOD(counters) {
+  NanScope();
+  Local<Object> counters = NanNew<Object>();
+  counters->Set(NanNew<String>("queue"), NanNew<Number>(counter_queue));
+  counters->Set(NanNew<String>("process"), NanNew<Number>(counter_process));
+  NanReturnValue(counters);
 }
 
 static void at_exit(void* arg) {
@@ -544,8 +573,13 @@ extern "C" void init(Handle<Object> target) {
   NanScope();
   vips_init("");
   AtExit(at_exit);
+  // Set libvips operation cache limits
+  vips_cache_set_max_mem(100 * 1048576); // 100 MB
+  vips_cache_set_max(500); // 500 operations
+  // Methods available to JavaScript
   NODE_SET_METHOD(target, "resize", resize);
   NODE_SET_METHOD(target, "cache", cache);
+  NODE_SET_METHOD(target, "counters", counters);
 }
 
 NODE_MODULE(sharp, init)

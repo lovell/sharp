@@ -288,18 +288,30 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 ### Utility methods
 
-#### sharp.cache([limit])
+#### sharp.cache([memory], [items])
 
-If `limit` is provided, set the (soft) limit of _libvips_ working/cache memory to this value in MB. The default value is 100.
+If `memory` or `items` are provided, set the limits of _libvips'_ operation cache.
+
+* `memory` is the maximum memory in MB to use for this cache, with a default value of 100
+* `items` is the maximum number of operations to cache, with a default value of 500
 
 This method always returns cache statistics, useful for determining how much working memory is required for a particular task.
 
-Warnings such as _Application transferred too many scanlines_ are a good indicator you've set this value too low.
+```javascript
+var stats = sharp.cache(); // { current: 75, high: 99, memory: 100, items: 500 }
+sharp.cache(200); // { current: 75, high: 99, memory: 200, items: 500 }
+sharp.cache(50, 200); // { current: 49, high: 99, memory: 50, items: 200}
+```
+
+#### sharp.counters()
+
+Provides access to internal task counters.
+
+* `queue` is the number of tasks queuing for _libuv_ to provide a thread from its pool
+* `process` is the number of tasks being processed
 
 ```javascript
-var stats = sharp.cache(); // { current: 98, high: 115, limit: 100, queue: 0 }
-sharp.cache(200); // { current: 98, high: 115, limit: 200, queue: 0 }
-sharp.cache(50); // { current: 49, high: 115, limit: 50, queue: 0 }
+var counters = sharp.counters(); // { queue: 2, process: 4 }
 ```
 
 ## Testing

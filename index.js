@@ -335,9 +335,22 @@ Sharp.prototype._sharp = function(callback) {
   }
 };
 
-module.exports.cache = function(limit) {
-  if (Number.isNaN(limit)) {
-    limit = null;
+/*
+  Get and set cache memory and item limits
+*/
+module.exports.cache = function(memory, items) {
+  if (Number.isNaN(memory)) {
+    memory = null;
   }
-  return sharp.cache(limit);
+  if (Number.isNaN(items)) {
+    items = null;
+  }
+  return sharp.cache(memory, items);
+};
+
+/*
+  Get internal counters
+*/
+module.exports.counters = function() {
+  return sharp.counters();
 };
