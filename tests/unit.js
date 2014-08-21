@@ -344,6 +344,60 @@ async.series([
     var pipeline = sharp().resize(320, 240);
     readable.pipe(pipeline).pipe(writable)
   },
+  // Crop, gravity=north
+  function(done) {
+    sharp(inputJpg).resize(320, 80).crop(sharp.gravity.north).toFile(path.join(fixturesPath, 'output.gravity-north.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(80, info.height);
+      done();
+    });
+  },
+  // Crop, gravity=east
+  function(done) {
+    sharp(inputJpg).resize(80, 320).crop(sharp.gravity.east).toFile(path.join(fixturesPath, 'output.gravity-east.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(80, info.width);
+      assert.strictEqual(320, info.height);
+      done();
+    });
+  },
+  // Crop, gravity=south
+  function(done) {
+    sharp(inputJpg).resize(320, 80).crop(sharp.gravity.south).toFile(path.join(fixturesPath, 'output.gravity-south.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(80, info.height);
+      done();
+    });
+  },
+  // Crop, gravity=west
+  function(done) {
+    sharp(inputJpg).resize(80, 320).crop(sharp.gravity.west).toFile(path.join(fixturesPath, 'output.gravity-west.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(80, info.width);
+      assert.strictEqual(320, info.height);
+      done();
+    });
+  },
+  // Crop, gravity=center
+  function(done) {
+    sharp(inputJpg).resize(320, 80).crop(sharp.gravity.center).toFile(path.join(fixturesPath, 'output.gravity-center.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(80, info.height);
+      done();
+    });
+  },
+  // Crop, gravity=centre
+  function(done) {
+    sharp(inputJpg).resize(80, 320).crop(sharp.gravity.centre).toFile(path.join(fixturesPath, 'output.gravity-centre.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(80, info.width);
+      assert.strictEqual(320, info.height);
+      done();
+    });
+  },
   // Verify internal counters
   function(done) {
     var counters = sharp.counters();

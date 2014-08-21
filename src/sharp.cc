@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string>
 #include <string.h>
+#include <tuple>
 #include <vips/vips.h>
 
 #include "nan.h"
@@ -20,6 +21,7 @@ struct resize_baton {
   int width;
   int height;
   bool crop;
+  int gravity;
   bool max;
   VipsExtend extend;
   bool sharpen;
@@ -36,6 +38,7 @@ struct resize_baton {
     buffer_in_len(0),
     buffer_out_len(0),
     crop(false),
+    gravity(0),
     max(false),
     sharpen(false),
     progressive(false),
@@ -94,7 +97,8 @@ static void resize_error(resize_baton *baton, VipsImage *unref) {
    2. Use input image EXIF Orientation header (does not support mirroring)
    3. Otherwise default to zero, i.e. no rotation
 */
-static VipsAngle calc_rotation(int const angle, VipsImage const *input) {
+static VipsAngle
+sharp_calc_rotation(int const angle, VipsImage const *input) {
   VipsAngle rotate = VIPS_ANGLE_0;
   if (angle == -1) {
     const char *exif;
@@ -117,6 +121,36 @@ static VipsAngle calc_rotation(int const angle, VipsImage const *input) {
     }
   }
   return rotate;
+}
+
+/*
+  Calculate the (left, top) coordinates of the output image
+  within the input image, applying the given gravity.
+*/
+static std::tuple<int, int>
+sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int const outHeight, int const gravity) {
+  int left = 0;
+  int top = 0;
+  switch (gravity) {
+    case 1: // North
+      left = (inWidth - outWidth + 1) / 2;
+      break;
+    case 2: // East
+      left = inWidth - outWidth;
+      top = (inHeight - outHeight + 1) / 2;
+      break;
+    case 3: // South
+      left = (inWidth - outWidth + 1) / 2;
+      top = inHeight - outHeight;
+      break;
+    case 4: // West
+      top = (inHeight - outHeight + 1) / 2;
+      break;
+    default: // Centre
+      left = (inWidth - outWidth + 1) / 2;
+      top = (inHeight - outHeight + 1) / 2;
+  }
+  return std::make_tuple(left, top);
 }
 
 class ResizeWorker : public NanAsyncWorker {
@@ -189,7 +223,7 @@ class ResizeWorker : public NanAsyncWorker {
     int inputHeight = in->Ysize;
 
     // Calculate angle of rotation, to be carried out later
-    VipsAngle rotation = calc_rotation(baton->angle, in);
+    VipsAngle rotation = sharp_calc_rotation(baton->angle, in);
     if (rotation == VIPS_ANGLE_90 || rotation == VIPS_ANGLE_270) {
       // Swap input output width and height when rotating by 90 or 270 degrees
       int swap = inputWidth;
@@ -337,10 +371,11 @@ class ResizeWorker : public NanAsyncWorker {
     if (rotated->Xsize != baton->width || rotated->Ysize != baton->height) {
       if (baton->crop || baton->max) {
         // Crop/max
+        int left;
+        int top;
+        std::tie(left, top) = sharp_calc_crop(rotated->Xsize, rotated->Ysize, baton->width, baton->height, baton->gravity);
         int width = std::min(rotated->Xsize, baton->width);
         int height = std::min(rotated->Ysize, baton->height);
-        int left = (rotated->Xsize - width + 1) / 2;
-        int top = (rotated->Ysize - height + 1) / 2;
         if (vips_extract_area(rotated, &canvased, left, top, width, height, NULL)) {
           return resize_error(baton, rotated);
         }
@@ -507,6 +542,7 @@ NAN_METHOD(resize) {
     baton->max = true;
   }
   // Other options
+  baton->gravity = options->Get(NanNew<String>("gravity"))->Int32Value();
   baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();

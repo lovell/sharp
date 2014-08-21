@@ -95,7 +95,7 @@ sharp('input.jpg').resize(300, 200).toFile('output.jpg', function(err) {
 ```
 
 ```javascript
-var transformer = sharp().resize(300, 200);
+var transformer = sharp().resize(300, 200).crop(sharp.gravity.north);
 readableStream.pipe(transformer).pipe(writableStream);
 // Read image data from readableStream, resize and write image data to writableStream
 ```
@@ -183,9 +183,13 @@ Scale output to `width` x `height`. By default, the resized image is cropped to 
 
 `height` is the Number of pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
 
-#### crop()
+#### crop([gravity])
 
 Crop the resized image to the exact size specified, the default behaviour.
+
+`gravity`, if present, is an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north`.
+
+Possible values are `north`, `east`, `south`, `west`, `center` and `centre`. The default gravity is `center`/`centre`.
 
 #### max()
 
