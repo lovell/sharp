@@ -110,21 +110,33 @@ image.metadata(function(err, metadata) {
 ```
 
 ```javascript
-var pipeline = sharp().rotate().resize(null, 200).progressive().toBuffer(function(err, outputBuffer, info) {
-  if (err) {
-    throw err;
-  }
-  // outputBuffer contains 200px high progressive JPEG image data, auto-rotated using EXIF Orientation tag
-  // info.width and info.height contain the final pixel dimensions of the resized image
-});
+var pipeline = sharp()
+  .rotate()
+  .resize(null, 200)
+  .progressive()
+  .toBuffer(function(err, outputBuffer, info) {
+    if (err) {
+      throw err;
+    }
+    // outputBuffer contains 200px high progressive JPEG image data,
+    // auto-rotated using EXIF Orientation tag
+    // info.width and info.height contain the dimensions of the resized image
+  });
 readableStream.pipe(pipeline);
 ```
 
 ```javascript
-sharp('input.png').rotate(180).resize(300).sharpen().quality(90).webp().toBuffer().then(function(outputBuffer, info) {
-  // outputBuffer contains 300px wide, upside down, sharpened, 90% quality WebP image data
-  // info.width and info.height contain the final pixel dimensions of the resized image
-});
+sharp('input.png')
+  .rotate(180)
+  .resize(300)
+  .sharpen()
+  .quality(90)
+  .webp()
+  .toBuffer()
+  .then(function(outputBuffer) {
+    // outputBuffer contains 300px wide, upside down, sharpened,
+    // 90% quality WebP image data
+  });
 ```
 
 ```javascript
@@ -137,10 +149,16 @@ http.createServer(function(request, response) {
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 300).bicubicInterpolation().embedWhite().toFile('output.tiff').then(function() {
-  // output.tiff is a 200 pixels wide and 300 pixels high image containing a bicubic scaled
-  // version, embedded on a white canvas, of the image data in buffer
-});
+sharp(inputBuffer)
+  .resize(200, 300)
+  .interpolateWith(sharp.interpolator.nohalo)
+  .embedWhite()
+  .toFile('output.tiff')
+  .then(function() {
+    // output.tiff is a 200 pixels wide and 300 pixels high image
+    // containing a bicubic scaled version, embedded on a white canvas,
+    // of the image data in inputBuffer
+  });
 ```
 
 ```javascript
@@ -247,17 +265,17 @@ This is equivalent to GraphicsMagick's `>` geometry option: "change the dimensio
 
 Perform a mild sharpen of the resultant image. This typically reduces performance by 30%.
 
-#### bilinearInterpolation()
+#### interpolateWith(interpolator)
 
-Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation) for image resizing, the default (and fastest) interpolation if none is specified.
+Use the given interpolator for image resizing, where `interpolator` is an attribute of the `sharp.interpolator` Object e.g. `sharp.interpolator.bicubic`.
 
-#### bicubicInterpolation()
+Possible interpolators, in order of performance, are:
 
-Use [bicubic interpolation](http://en.wikipedia.org/wiki/Bicubic_interpolation) for image resizing. This typically reduces performance by 5%.
-
-#### nohaloInterpolation()
-
-Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/) for image resizing. This typically reduces performance by a factor of 2.
+* `bilinear`: Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation), the default (and fastest) interpolation.
+* `bicubic`: Use [bicubic interpolation](http://en.wikipedia.org/wiki/Bicubic_interpolation), which typically reduces performance by 5%.
+* `vertexSplitQuadraticBasisSpline`: Use [VSQBS interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/vsqbs.cpp#L48), which prevents "staircasing" when enlarging and typically reduces performance by 5%.
+* `locallyBoundedBicubic`: Use [LBB interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/lbb.cpp#L100), which prevents some "[acutance](http://en.wikipedia.org/wiki/Acutance)" and typically reduces performance by a factor of 2.
+* `nohalo`: Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/), which prevents acutance and typically reduces performance by a factor of 3.
 
 ### Output options
 

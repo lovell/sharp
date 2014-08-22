@@ -249,7 +249,7 @@ async.series([
   },
   // Interpolation: bilinear
   function(done) {
-    sharp(inputJpg).resize(320, 240).bilinearInterpolation().toBuffer(function(err, data, info) {
+    sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.bilinear).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
@@ -259,7 +259,7 @@ async.series([
   },
   // Interpolation: bicubic
   function(done) {
-    sharp(inputJpg).resize(320, 240).bicubicInterpolation().toBuffer(function(err, data, info) {
+    sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.bicubic).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
@@ -269,7 +269,27 @@ async.series([
   },
   // Interpolation: nohalo
   function(done) {
-    sharp(inputJpg).resize(320, 240).nohaloInterpolation().toBuffer(function(err, data, info) {
+    sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.nohalo).toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      done();
+    });
+  },
+  // Interpolation: locally bounded bicubic (LBB)
+  function(done) {
+    sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.locallyBoundedBicubic).toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      done();
+    });
+  },
+  // Interpolation: vertex split quadratic basis spline (VSQBS)
+  function(done) {
+    sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.vertexSplitQuadraticBasisSpline).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
       assert.strictEqual(320, info.width);
@@ -346,7 +366,7 @@ async.series([
       });
     });
     var pipeline = sharp().resize(320, 240);
-    readable.pipe(pipeline).pipe(writable)
+    readable.pipe(pipeline).pipe(writable);
   },
   // Crop, gravity=north
   function(done) {
@@ -516,7 +536,7 @@ async.series([
         assert.strictEqual(1362, info.width);
         assert.strictEqual(1112, info.height);
         done();
-      })
+      });
     });
   },
   // Verify internal counters

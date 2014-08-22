@@ -135,28 +135,32 @@ Sharp.prototype.sharpen = function(sharpen) {
 };
 
 /*
-  Use bilinear interpolation for the affine transformation (fastest, default)
+  Set the interpolator to use for the affine transformation
 */
-Sharp.prototype.bilinearInterpolation = function() {
-  this.options.interpolator = 'bilinear';
+module.exports.interpolator = {
+  bilinear: 'bilinear',
+  bicubic: 'bicubic',
+  nohalo: 'nohalo',
+  locallyBoundedBicubic: 'lbb',
+  vertexSplitQuadraticBasisSpline: 'vsqbs'
+};
+Sharp.prototype.interpolateWith = function(interpolator) {
+  this.options.interpolator = interpolator;
   return this;
 };
 
 /*
-  Use bicubic interpolation for the affine transformation
+  Deprecated interpolation methods, to be removed in v0.7.0
 */
-Sharp.prototype.bicubicInterpolation = function() {
-  this.options.interpolator = 'bicubic';
-  return this;
-};
-
-/*
-  Use Nohalo interpolation for the affine transformation
-*/
-Sharp.prototype.nohaloInterpolation = function() {
-  this.options.interpolator = 'nohalo';
-  return this;
-};
+Sharp.prototype.bilinearInterpolation = util.deprecate(function() {
+  return this.interpolateWith(module.exports.interpolator.bilinear);
+}, 'bilinearInterpolation() is deprecated, use interpolateWith(sharp.interpolator.bilinear) instead');
+Sharp.prototype.bicubicInterpolation = util.deprecate(function() {
+  return this.interpolateWith(module.exports.interpolator.bicubic);
+}, 'bicubicInterpolation() is deprecated, use interpolateWith(sharp.interpolator.bicubic) instead');
+Sharp.prototype.nohaloInterpolation = util.deprecate(function() {
+  return this.interpolateWith(module.exports.interpolator.nohalo);
+}, 'nohaloInterpolation() is deprecated, use interpolateWith(sharp.interpolator.nohalo) instead');
 
 Sharp.prototype.progressive = function(progressive) {
   this.options.progressive = (typeof progressive === 'boolean') ? progressive : true;
