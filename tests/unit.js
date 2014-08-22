@@ -471,7 +471,6 @@ async.series([
       assert.strictEqual('magick', metadata.format);
       assert.strictEqual(800, metadata.width);
       assert.strictEqual(533, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
       done();
     });
