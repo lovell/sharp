@@ -130,12 +130,13 @@ sharp('input.png')
   .rotate(180)
   .resize(300)
   .sharpen()
+  .withMetadata()
   .quality(90)
   .webp()
   .toBuffer()
   .then(function(outputBuffer) {
     // outputBuffer contains 300px wide, upside down, sharpened,
-    // 90% quality WebP image data
+    // with metadata, 90% quality WebP image data
   });
 ```
 
@@ -277,6 +278,10 @@ Possible interpolators, in order of performance, are:
 * `nohalo`: Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/), which prevents acutance and typically reduces performance by a factor of 3.
 
 ### Output options
+
+#### withMetadata([boolean])
+
+Specifies if the output image should contains the original metadata or not.
 
 #### progressive()
 

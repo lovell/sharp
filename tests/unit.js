@@ -422,6 +422,28 @@ async.series([
       done();
     });
   },
+  // Keeps Metadata after a resize
+  function(done) {
+      sharp(inputJpgWithExif).resize(320, 240).withMetadata().toBuffer(function(err, buffer) {
+          if (err) throw err;
+          sharp(buffer).metadata(function(err, metadata) {
+              if (err) throw err;
+              assert.strictEqual(8, metadata.orientation);
+              done();
+          });
+      });
+  },
+  // Keeps Metadata after a resize
+  function(done) {
+      sharp(inputJpgWithExif).resize(320, 240).withMetadata(false).toBuffer(function(err, buffer) {
+          if (err) throw err;
+          sharp(buffer).metadata(function(err, metadata) {
+              if (err) throw err;
+              assert.strictEqual('undefined', typeof metadata.orientation);
+              done();
+          });
+      });
+  },
   // Metadata - JPEG
   function(done) {
     sharp(inputJpg).metadata(function(err, metadata) {
