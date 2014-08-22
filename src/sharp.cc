@@ -46,6 +46,7 @@ struct resize_baton {
 };
 
 typedef enum {
+  UNKNOWN,
   JPEG,
   PNG,
   WEBP,
@@ -153,69 +154,223 @@ sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int c
   return std::make_tuple(left, top);
 }
 
-class ResizeWorker : public NanAsyncWorker {
- public:
-  ResizeWorker(NanCallback *callback, resize_baton *baton)
-    : NanAsyncWorker(callback), baton(baton) {}
-  ~ResizeWorker() {}
+/*
+  Initialise a VipsImage from a buffer. Supports JPEG, PNG and WebP.
+  Returns the ImageType detected, if any.
+*/
+static ImageType
+sharp_init_image_from_buffer(VipsImage **image, void *buffer, size_t const length, VipsAccess const access) {
+  ImageType imageType = UNKNOWN;
+  if (memcmp(MARKER_JPEG, buffer, 2) == 0) {
+    if (!vips_jpegload_buffer(buffer, length, image, "access", access, NULL)) {
+      imageType = JPEG;
+    }
+  } else if(memcmp(MARKER_PNG, buffer, 2) == 0) {
+    if (!vips_pngload_buffer(buffer, length, image, "access", access, NULL)) {
+      imageType = PNG;
+    }
+  } else if(memcmp(MARKER_WEBP, buffer, 2) == 0) {
+    if (!vips_webpload_buffer(buffer, length, image, "access", access, NULL)) {
+      imageType = WEBP;
+    }
+  }
+  return imageType;
+}
 
-  void Execute () {
+/*
+  Initialise a VipsImage from a file.
+  Returns the ImageType detected, if any.
+*/
+static ImageType
+sharp_init_image_from_file(VipsImage **image, char const *file, VipsAccess const access) {
+  ImageType imageType = UNKNOWN;
+  if (vips_foreign_is_a("jpegload", file)) {
+    if (!vips_jpegload(file, image, "access", access, NULL)) {
+      imageType = JPEG;
+    }
+  } else if (vips_foreign_is_a("pngload", file)) {
+    if (!vips_pngload(file, image, "access", access, NULL)) {
+      imageType = PNG;
+    }
+  } else if (vips_foreign_is_a("webpload", file)) {
+    if (!vips_webpload(file, image, "access", access, NULL)) {
+      imageType = WEBP;
+    }
+  } else if (vips_foreign_is_a("tiffload", file)) {
+    if (!vips_tiffload(file, image, "access", access, NULL)) {
+      imageType = TIFF;
+    }
+  } else if(vips_foreign_is_a("magickload", file)) {
+    if (!vips_magickload(file, image, "access", access, NULL)) {
+      imageType = MAGICK;
+    }
+  }
+  return imageType;
+}
+
+// Metadata
+
+struct metadata_baton {
+  // Input
+  std::string file_in;
+  void* buffer_in;
+  size_t buffer_in_len;
+  // Output
+  std::string format;
+  int width;
+  int height;
+  std::string space;
+  int channels;
+  int orientation;
+  std::string err;
+
+  metadata_baton():
+    buffer_in_len(0),
+    orientation(0) {}
+};
+
+class MetadataWorker : public NanAsyncWorker {
+
+  public:
+    MetadataWorker(NanCallback *callback, metadata_baton *baton) : NanAsyncWorker(callback), baton(baton) {}
+    ~MetadataWorker() {}
+
+  void Execute() {
+    // Decrement queued task counter
+    g_atomic_int_dec_and_test(&counter_queue);
+
+    ImageType imageType = UNKNOWN;
+    VipsImage *image = vips_image_new();
+    if (baton->buffer_in_len > 1) {
+      // From buffer
+      imageType = sharp_init_image_from_buffer(&image, baton->buffer_in, baton->buffer_in_len, VIPS_ACCESS_RANDOM);
+      if (imageType == UNKNOWN) {
+        (baton->err).append("Input buffer contains unsupported image format");
+      }
+    } else {
+      // From file
+      imageType = sharp_init_image_from_file(&image, baton->file_in.c_str(), VIPS_ACCESS_RANDOM);
+      if (imageType == UNKNOWN) {
+        (baton->err).append("File is of an unsupported image format");
+      }
+    }
+    if (imageType != UNKNOWN) {
+      // Image type
+      switch (imageType) {
+        case JPEG: baton->format = "jpeg"; break;
+        case PNG: baton->format = "png"; break;
+        case WEBP: baton->format = "webp"; break;
+        case TIFF: baton->format = "tiff"; break;
+        case MAGICK: baton->format = "magick"; break;
+        case UNKNOWN: default: baton->format = "";
+      }
+      // VipsImage attributes
+      baton->width = image->Xsize;
+      baton->height = image->Ysize;
+      baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image->Type);
+      baton->channels = image->Bands;
+      // EXIF Orientation
+      const char *exif;
+      if (!vips_image_get_string(image, "exif-ifd0-Orientation", &exif)) {
+        baton->orientation = atoi(&exif[0]);
+      }
+    }
+    // Clean up
+    g_object_unref(image);
+    vips_error_clear();
+    vips_thread_shutdown();
+  }
+
+  void HandleOKCallback () {
+    NanScope();
+
+    Handle<Value> argv[2] = { NanNull(), NanNull() };
+    if (!baton->err.empty()) {
+      // Error
+      argv[0] = NanNew<String>(baton->err.data(), baton->err.size());
+    } else {
+      // Metadata Object
+      Local<Object> info = NanNew<Object>();
+      info->Set(NanNew<String>("format"), NanNew<String>(baton->format));
+      info->Set(NanNew<String>("width"), NanNew<Number>(baton->width));
+      info->Set(NanNew<String>("height"), NanNew<Number>(baton->height));
+      info->Set(NanNew<String>("space"), NanNew<String>(baton->space));
+      info->Set(NanNew<String>("channels"), NanNew<Number>(baton->channels));
+      if (baton->orientation > 0) {
+        info->Set(NanNew<String>("orientation"), NanNew<Number>(baton->orientation));
+      }
+      argv[1] = info;
+    }
+    delete baton;
+
+    // Return to JavaScript
+    callback->Call(2, argv);
+  }
+
+  private:
+    metadata_baton* baton;
+};
+
+/*
+  metadata(options, callback)
+*/
+NAN_METHOD(metadata) {
+  NanScope();
+
+  // V8 objects are converted to non-V8 types held in the baton struct
+  metadata_baton *baton = new metadata_baton;
+  Local<Object> options = args[0]->ToObject();
+
+  // Input filename
+  baton->file_in = *String::Utf8Value(options->Get(NanNew<String>("fileIn"))->ToString());
+  // Input Buffer object
+  if (options->Get(NanNew<String>("bufferIn"))->IsObject()) {
+    Local<Object> buffer = options->Get(NanNew<String>("bufferIn"))->ToObject();
+    baton->buffer_in_len = Buffer::Length(buffer);
+    baton->buffer_in = Buffer::Data(buffer);
+  }
+
+  // Join queue for worker thread
+  NanCallback *callback = new NanCallback(args[1].As<v8::Function>());
+  NanAsyncQueueWorker(new MetadataWorker(callback, baton));
+
+  // Increment queued task counter
+  g_atomic_int_inc(&counter_queue);
+
+  NanReturnUndefined();
+}
+
+// Resize
+
+class ResizeWorker : public NanAsyncWorker {
+  public:
+    ResizeWorker(NanCallback *callback, resize_baton *baton) : NanAsyncWorker(callback), baton(baton) {}
+    ~ResizeWorker() {}
+
+  void Execute() {
     // Decrement queued task counter
     g_atomic_int_dec_and_test(&counter_queue);
     // Increment processing task counter
     g_atomic_int_inc(&counter_process);
 
     // Input
-    ImageType inputImageType = JPEG;
+    ImageType inputImageType = UNKNOWN;
     VipsImage *in = vips_image_new();
     if (baton->buffer_in_len > 1) {
-      if (memcmp(MARKER_JPEG, baton->buffer_in, 2) == 0) {
-        if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
-          return resize_error(baton, in);
-        }
-      } else if(memcmp(MARKER_PNG, baton->buffer_in, 2) == 0) {
-        inputImageType = PNG;
-        if (vips_pngload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
-          return resize_error(baton, in);
-        }
-      } else if(memcmp(MARKER_WEBP, baton->buffer_in, 2) == 0) {
-        inputImageType = WEBP;
-        if (vips_webpload_buffer(baton->buffer_in, baton->buffer_in_len, &in, "access", baton->access_method, NULL)) {
-          return resize_error(baton, in);
-        }
-      } else {
-        resize_error(baton, in);
-        (baton->err).append("Unsupported input buffer");
-        return;
-      }
-    } else if (vips_foreign_is_a("jpegload", baton->file_in.c_str())) {
-      if (vips_jpegload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
-        return resize_error(baton, in);
-      }
-    } else if (vips_foreign_is_a("pngload", baton->file_in.c_str())) {
-      inputImageType = PNG;
-      if (vips_pngload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
-        return resize_error(baton, in);
-      }
-    } else if (vips_foreign_is_a("webpload", baton->file_in.c_str())) {
-      inputImageType = WEBP;
-      if (vips_webpload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
-        return resize_error(baton, in);
-      }
-    } else if (vips_foreign_is_a("tiffload", baton->file_in.c_str())) {
-      inputImageType = TIFF;
-      if (vips_tiffload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
-        return resize_error(baton, in);
-      }
-    } else if(vips_foreign_is_a("magickload", (baton->file_in).c_str())) {
-      inputImageType = MAGICK;
-      if (vips_magickload((baton->file_in).c_str(), &in, "access", baton->access_method, NULL)) {
-        return resize_error(baton, in);
+      // From buffer
+      inputImageType = sharp_init_image_from_buffer(&in, baton->buffer_in, baton->buffer_in_len, baton->access_method);
+      if (inputImageType == UNKNOWN) {
+        (baton->err).append("Input buffer contains unsupported image format");
       }
     } else {
-      resize_error(baton, in);
-      (baton->err).append("Unsupported input file " + baton->file_in);
-      return;
+      // From file
+      inputImageType = sharp_init_image_from_file(&in, baton->file_in.c_str(), baton->access_method);
+      if (inputImageType == UNKNOWN) {
+        (baton->err).append("File is of an unsupported image format");
+      }
+    }
+    if (inputImageType == UNKNOWN) {
+      return resize_error(baton, in);
     }
 
     // Get input image width and height
@@ -613,6 +768,7 @@ extern "C" void init(Handle<Object> target) {
   vips_cache_set_max_mem(100 * 1048576); // 100 MB
   vips_cache_set_max(500); // 500 operations
   // Methods available to JavaScript
+  NODE_SET_METHOD(target, "metadata", metadata);
   NODE_SET_METHOD(target, "resize", resize);
   NODE_SET_METHOD(target, "cache", cache);
   NODE_SET_METHOD(target, "counters", counters);

@@ -169,6 +169,21 @@ JPEG, PNG or WebP format image data can be streamed into the object when `input`
 
 JPEG, PNG or WebP format image data can be streamed out from this object.
 
+#### metadata([callback])
+
+Fast access to image metadata without decoding any compressed image data.
+
+`callback`, if present, gets the arguments `(err, metadata)` where `metadata` has the attributes:
+
+* `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff` and `magick`)
+* `width`: Number of pixels wide
+* `height`: Number of pixels high
+* `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L502)
+* `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
+* `orientation`: Number value of the EXIF Orientation header, if present
+
+A Promises/A+ promise is returned when `callback` is not provided.
+
 #### sequentialRead()
 
 An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.

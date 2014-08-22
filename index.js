@@ -348,6 +348,48 @@ Sharp.prototype._sharp = function(callback) {
 };
 
 /*
+  Reads the image header and returns metadata
+  Supports callback, stream and promise variants
+*/
+Sharp.prototype.metadata = function(callback) {
+  var that = this;
+  if (typeof callback === 'function') {
+    if (this.options.streamIn) {
+      this.on('finish', function() {
+        sharp.metadata(that.options, callback);
+      });
+    } else {
+      sharp.metadata(this.options, callback);
+    }
+    return this;
+  } else {
+    if (this.options.streamIn) {
+      return new Promise(function(resolve, reject) {
+        that.on('finish', function() {
+          sharp.metadata(that.options, function(err, data) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(data);
+            }
+          });
+        });
+      });
+    } else {
+      return new Promise(function(resolve, reject) {
+        sharp.metadata(that.options, function(err, data) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
+      });
+    }
+  }
+};
+
+/*
   Get and set cache memory and item limits
 */
 module.exports.cache = function(memory, items) {

@@ -18,6 +18,10 @@ var outputTiff = path.join(fixturesPath, "output.tiff");
 
 var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_8.jpg
 
+var inputPng = path.join(fixturesPath, "50020484-00001.png"); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
+var inputWebp = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
+var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
+
 // Ensure cache limits can be set
 sharp.cache(0); // Disable
 sharp.cache(50, 500); // 50MB, 500 items
@@ -396,6 +400,124 @@ async.series([
       assert.strictEqual(80, info.width);
       assert.strictEqual(320, info.height);
       done();
+    });
+  },
+  // Metadata - JPEG
+  function(done) {
+    sharp(inputJpg).metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual(2725, metadata.width);
+      assert.strictEqual(2225, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      done();
+    });
+  },
+  // Metadata - JPEG with EXIF
+  function(done) {
+    sharp(inputJpgWithExif).metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual(450, metadata.width);
+      assert.strictEqual(600, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(8, metadata.orientation);
+      done();
+    });
+  },
+  // Metadata - TIFF
+  function(done) {
+    sharp(inputTiff).metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('tiff', metadata.format);
+      assert.strictEqual(2464, metadata.width);
+      assert.strictEqual(3248, metadata.height);
+      assert.strictEqual('b-w', metadata.space);
+      assert.strictEqual(1, metadata.channels);
+      done();
+    });
+  },
+  // Metadata - PNG
+  function(done) {
+    sharp(inputPng).metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('png', metadata.format);
+      assert.strictEqual(2809, metadata.width);
+      assert.strictEqual(2074, metadata.height);
+      assert.strictEqual('b-w', metadata.space);
+      assert.strictEqual(1, metadata.channels);
+      done();
+    });
+  },
+  // Metadata - WebP
+  function(done) {
+    sharp(inputWebp).metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('webp', metadata.format);
+      assert.strictEqual(1024, metadata.width);
+      assert.strictEqual(772, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(3, metadata.channels);
+      done();
+    });
+  },
+  // Metadata - GIF (via libmagick)
+  function(done) {
+    sharp(inputGif).metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('magick', metadata.format);
+      assert.strictEqual(800, metadata.width);
+      assert.strictEqual(533, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(3, metadata.channels);
+      done();
+    });
+  },
+  // Metadata - Promise
+  function(done) {
+    sharp(inputJpg).metadata().then(function(metadata) {
+      assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual(2725, metadata.width);
+      assert.strictEqual(2225, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(3, metadata.channels);
+      done();
+    });
+  },
+  // Metadata - Stream
+  function(done) {
+    var readable = fs.createReadStream(inputJpg);
+    var pipeline = sharp().metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual(2725, metadata.width);
+      assert.strictEqual(2225, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(3, metadata.channels);
+      done();
+    });
+    readable.pipe(pipeline);
+  },
+  // Get metadata then resize to half width
+  function(done) {
+    var image = sharp(inputJpg);
+    image.metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual(2725, metadata.width);
+      assert.strictEqual(2225, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(3, metadata.channels);
+      image.resize(metadata.width / 2).toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(1362, info.width);
+        assert.strictEqual(1112, info.height);
+        done();
+      })
     });
   },
   // Verify internal counters
