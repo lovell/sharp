@@ -172,10 +172,9 @@ sharp('input.gif').resize(200, 300).embedBlack().webp().toBuffer(function(err, o
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 200).max().jpeg().toBuffer().then(function(outputBuffer, info) {
+sharp(inputBuffer).resize(200, 200).max().jpeg().toBuffer().then(function(outputBuffer) {
   // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
   // than 200 pixels regardless of the inputBuffer image dimensions
-  // info.width and info.height contain the final pixel dimensions of the resized image
 });
 ```
 
@@ -353,8 +352,8 @@ sharp.cache(50, 200); // { current: 49, high: 99, memory: 50, items: 200}
 
 Provides access to internal task counters.
 
-* `queue` is the number of tasks queuing for _libuv_ to provide a thread from its pool
-* `process` is the number of tasks being processed
+* `queue` is the number of tasks this module has queued waiting for _libuv_ to provide a worker thread from its pool.
+* `process` is the number of resize tasks currently being processed.
 
 ```javascript
 var counters = sharp.counters(); // { queue: 2, process: 4 }
