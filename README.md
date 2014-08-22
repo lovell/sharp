@@ -101,6 +101,15 @@ readableStream.pipe(transformer).pipe(writableStream);
 ```
 
 ```javascript
+var image = sharp(inputJpg);
+image.metadata(function(err, metadata) {
+  image.resize(metadata.width / 2).webp().toBuffer(function(err, outputBuffer, info) {
+    // outputBuffer contains a WebP image half the width and height of the original JPEG
+  });
+});
+```
+
+```javascript
 var pipeline = sharp().rotate().resize(null, 200).progressive().toBuffer(function(err, outputBuffer, info) {
   if (err) {
     throw err;
