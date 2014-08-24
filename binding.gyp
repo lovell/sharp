@@ -15,7 +15,9 @@
     'cflags': ['-fexceptions', '-Wall', '-O3'],
     'cflags_cc': ['-std=c++0x', '-fexceptions', '-Wall', '-O3'],
     'xcode_settings': {
-      'OTHER_CFLAGS': ['-std=c++11', '-fexceptions', '-Wall', '-O3']
+      'OTHER_CFLAGS': ['-std=c++11', '-stdlib=libc++', '-fexceptions', '-Wall', '-O3'],
+      'OTHER_CPLUSPLUSFLAGS': ['-std=c++11', '-stdlib=libc++', '-fexceptions', '-Wall', '-O3'],
+      'MACOSX_DEPLOYMENT_TARGET': '10.7'
     }
   }]
 }
