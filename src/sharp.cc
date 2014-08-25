@@ -26,6 +26,7 @@ struct resize_baton {
   VipsExtend extend;
   bool sharpen;
   std::string interpolator;
+  double gamma;
   bool progressive;
   bool without_enlargement;
   VipsAccess access_method;
@@ -42,6 +43,7 @@ struct resize_baton {
     gravity(0),
     max(false),
     sharpen(false),
+    gamma(0.0),
     progressive(false),
     without_enlargement(false),
     withMetadata(false) {}
@@ -434,9 +436,9 @@ class ResizeWorker : public NanAsyncWorker {
       }
     }
 
-    // Try to use libjpeg shrink-on-load
+    // Try to use libjpeg shrink-on-load, but not when applying gamma correction
     int shrink_on_load = 1;
-    if (inputImageType == JPEG) {
+    if (inputImageType == JPEG && baton->gamma == 0) {
       if (shrink >= 8) {
         factor = factor / 8;
         shrink_on_load = 8;
@@ -468,6 +470,16 @@ class ResizeWorker : public NanAsyncWorker {
       vips_copy(in, &shrunk_on_load, NULL);
     }
     g_object_unref(in);
+
+    // Gamma encoding (darken)
+    if (baton->gamma >= 1 && baton->gamma <= 3) {
+      VipsImage *gamma_encoded = vips_image_new();
+      if (vips_gamma(shrunk_on_load, &gamma_encoded, "exponent", 1.0 / baton->gamma, NULL)) {
+        return resize_error(baton, shrunk_on_load);
+      }
+      g_object_unref(shrunk_on_load);
+      shrunk_on_load = gamma_encoded;
+    }
 
     VipsImage *shrunk = vips_image_new();
     if (shrink > 1) {
@@ -566,6 +578,16 @@ class ResizeWorker : public NanAsyncWorker {
       vips_copy(canvased, &sharpened, NULL);
     }
     g_object_unref(canvased);
+
+    // Gamma decoding (brighten)
+    if (baton->gamma >= 1 && baton->gamma <= 3) {
+      VipsImage *gamma_decoded = vips_image_new();
+      if (vips_gamma(sharpened, &gamma_decoded, "exponent", baton->gamma, NULL)) {
+        return resize_error(baton, sharpened);
+      }
+      g_object_unref(sharpened);
+      sharpened = gamma_decoded;
+    }
 
     // Always convert to sRGB colour space
     VipsImage *colourspaced = vips_image_new();
@@ -702,6 +724,7 @@ NAN_METHOD(resize) {
   baton->gravity = options->Get(NanNew<String>("gravity"))->Int32Value();
   baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
+  baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();
   baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();
   baton->without_enlargement = options->Get(NanNew<String>("withoutEnlargement"))->BooleanValue();
   baton->access_method = options->Get(NanNew<String>("sequentialRead"))->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;

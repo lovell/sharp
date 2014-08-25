@@ -279,6 +279,16 @@ Possible interpolators, in order of performance, are:
 * `locallyBoundedBicubic`: Use [LBB interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/lbb.cpp#L100), which prevents some "[acutance](http://en.wikipedia.org/wiki/Acutance)" and typically reduces performance by a factor of 2.
 * `nohalo`: Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/), which prevents acutance and typically reduces performance by a factor of 3.
 
+#### gamma([gamma])
+
+Apply a gamma correction by reducing the encoding (darken) pre-resize at a factor of `1/gamma` then increasing the encoding (brighten) post-resize at a factor of `gamma`.
+
+`gamma`, if present, is a Number betweem 1 and 3. The default value is `2.2`, a suitable approximation for sRGB images.
+
+This can improve the perceived brightness of a resized image in non-linear colour spaces.
+
+JPEG input images will not take advantage of the shrink-on-load performance optimisation when applying a gamma correction.
+
 ### Output options
 
 #### jpeg()

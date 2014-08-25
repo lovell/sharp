@@ -18,6 +18,8 @@ var outputTiff = path.join(fixturesPath, "output.tiff");
 
 var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_8.jpg
 
+var inputJpgWithGammaHoliness = path.join(fixturesPath, "gamma_dalai_lama_gray.jpg"); // http://www.4p8.com/eric.brasseur/gamma.html
+
 var inputPng = path.join(fixturesPath, "50020484-00001.png"); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
 var inputWebp = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
 var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
@@ -569,6 +571,25 @@ async.series([
         assert.strictEqual(1112, info.height);
         done();
       });
+    });
+  },
+  // Gamma correction
+  function(done) {
+    sharp(inputJpgWithGammaHoliness).resize(129, 111).toFile(path.join(fixturesPath, 'output.gamma-0.0.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputJpgWithGammaHoliness).resize(129, 111).gamma().toFile(path.join(fixturesPath, 'output.gamma-2.2.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputJpgWithGammaHoliness).resize(129, 111).gamma(3).toFile(path.join(fixturesPath, 'output.gamma-3.0.jpg'), function(err) {
+      if (err) throw err;
+      done();
     });
   },
   // Verify internal counters

@@ -20,6 +20,7 @@ var Sharp = function(input) {
     withoutEnlargement: false,
     sharpen: false,
     interpolator: 'bilinear',
+    gamma: 0,
     progressive: false,
     sequentialRead: false,
     quality: 80,
@@ -163,6 +164,22 @@ Sharp.prototype.bicubicInterpolation = util.deprecate(function() {
 Sharp.prototype.nohaloInterpolation = util.deprecate(function() {
   return this.interpolateWith(module.exports.interpolator.nohalo);
 }, 'nohaloInterpolation() is deprecated, use interpolateWith(sharp.interpolator.nohalo) instead');
+
+/*
+  Darken image pre-resize (1/gamma) and brighten post-resize (gamma).
+  Improves brightness of resized image in non-linear colour spaces.
+*/
+Sharp.prototype.gamma = function(gamma) {
+  if (typeof gamma === 'undefined') {
+    // Default gamma correction of 2.2 (sRGB)
+    this.options.gamma = 2.2;
+  } else if (!Number.isNaN(gamma) && gamma >= 1 && gamma <= 3) {
+    this.options.gamma = gamma;
+  } else {
+    throw new Error('Invalid gamma correction (1.0 to 3.0) ' + gamma);
+  }
+  return this;
+};
 
 Sharp.prototype.progressive = function(progressive) {
   this.options.progressive = (typeof progressive === 'boolean') ? progressive : true;
