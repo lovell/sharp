@@ -272,9 +272,10 @@ Use the given interpolator for image resizing, where `interpolator` is an attrib
 
 Possible interpolators, in order of performance, are:
 
-* `bilinear`: Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation), the default (and fastest) interpolation.
+* `nearest`: Use [nearest neighbour interpolation](http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation), suitable for image enlargement only.
+* `bilinear`: Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation), the default and fastest image reduction interpolation.
 * `bicubic`: Use [bicubic interpolation](http://en.wikipedia.org/wiki/Bicubic_interpolation), which typically reduces performance by 5%.
-* `vertexSplitQuadraticBasisSpline`: Use [VSQBS interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/vsqbs.cpp#L48), which prevents "staircasing" when enlarging and typically reduces performance by 5%.
+* `vertexSplitQuadraticBasisSpline`: Use [VSQBS interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/vsqbs.cpp#L48), which prevents "staircasing" and typically reduces performance by 5%.
 * `locallyBoundedBicubic`: Use [LBB interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/lbb.cpp#L100), which prevents some "[acutance](http://en.wikipedia.org/wiki/Acutance)" and typically reduces performance by a factor of 2.
 * `nohalo`: Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/), which prevents acutance and typically reduces performance by a factor of 3.
 

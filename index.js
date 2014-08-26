@@ -139,6 +139,7 @@ Sharp.prototype.sharpen = function(sharpen) {
   Set the interpolator to use for the affine transformation
 */
 module.exports.interpolator = {
+  nearest: 'nearest',
   bilinear: 'bilinear',
   bicubic: 'bicubic',
   nohalo: 'nohalo',

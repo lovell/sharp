@@ -247,6 +247,16 @@ async.series([
       done();
     });
   },
+  // Interpolation: nearest neighbour
+  function(done) {
+    sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.nearest).toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      done();
+    });
+  },
   // Interpolation: bilinear
   function(done) {
     sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.bilinear).toBuffer(function(err, data, info) {
