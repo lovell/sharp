@@ -645,7 +645,7 @@ class ResizeWorker : public NanAsyncWorker {
 
       if (baton->buffer_out_len > 0) {
         // Buffer
-        argv[1] = NanNewBufferHandle((char *)baton->buffer_out, baton->buffer_out_len);
+        argv[1] = NanNewBufferHandle(static_cast<char*>(baton->buffer_out), baton->buffer_out_len);
         g_free(baton->buffer_out);
         argv[2] = info;
       } else {
@@ -730,7 +730,12 @@ NAN_METHOD(cache) {
 
   // Set cache memory limit
   if (args[0]->IsInt32()) {
-    vips_cache_set_max_mem(args[0]->Int32Value() * 1048576);
+    int newMax = args[0]->Int32Value() * 1048576;
+    int oldMax = vips_cache_get_max_mem();
+    vips_cache_set_max_mem(newMax);
+
+    // Notify the V8 garbage collector of delta in max cache size
+    NanAdjustExternalMemory(newMax - oldMax);
   }
 
   // Set cache items limit
@@ -767,9 +772,14 @@ extern "C" void init(Handle<Object> target) {
   NanScope();
   vips_init("sharp");
   AtExit(at_exit);
+
   // Set libvips operation cache limits
   vips_cache_set_max_mem(100 * 1048576); // 100 MB
   vips_cache_set_max(500); // 500 operations
+
+  // Notify the V8 garbage collector of max cache size
+  NanAdjustExternalMemory(vips_cache_get_max_mem());
+
   // Methods available to JavaScript
   NODE_SET_METHOD(target, "metadata", metadata);
   NODE_SET_METHOD(target, "resize", resize);
