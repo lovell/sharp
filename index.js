@@ -26,6 +26,7 @@ var Sharp = function(input) {
     compressionLevel: 6,
     streamIn: false,
     streamOut: false,
+    withMetadata: false,
     output: '__input'
   };
   if (typeof input === 'string') {
@@ -188,6 +189,11 @@ Sharp.prototype.compressionLevel = function(compressionLevel) {
     throw new Error('Invalid compressionLevel (-1 to 9) ' + compressionLevel);
   }
   return this;
+};
+
+Sharp.prototype.withMetadata = function(withMetadata) {
+    this.options.withMetadata = (typeof withMetadata === 'boolean') ? withMetadata : true;
+    return this;
 };
 
 Sharp.prototype.resize = function(width, height) {
