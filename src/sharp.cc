@@ -765,7 +765,7 @@ static void at_exit(void* arg) {
 
 extern "C" void init(Handle<Object> target) {
   NanScope();
-  vips_init("");
+  vips_init("sharp");
   AtExit(at_exit);
   // Set libvips operation cache limits
   vips_cache_set_max_mem(100 * 1048576); // 100 MB
