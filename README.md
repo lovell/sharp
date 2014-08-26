@@ -5,6 +5,7 @@
 * [API](https://github.com/lovell/sharp#api)
 * [Testing](https://github.com/lovell/sharp#testing)
 * [Performance](https://github.com/lovell/sharp#performance)
+* [Thanks](https://github.com/lovell/sharp#thanks)
 * [Licence](https://github.com/lovell/sharp#licence)
 
 The typical use case for this high speed Node.js module is to convert large images of many formats to smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
@@ -279,26 +280,6 @@ Possible interpolators, in order of performance, are:
 
 ### Output options
 
-#### withMetadata([boolean])
-
-Specifies if the output image should contains the original metadata or not.
-
-#### progressive()
-
-Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.
-
-#### quality(quality)
-
-The output quality to use for lossy JPEG, WebP and TIFF output formats. The default quality is `80`.
-
-`quality` is a Number between 1 and 100.
-
-#### compressionLevel(compressionLevel)
-
-An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
-
-`compressionLevel` is a Number between -1 and 9.
-
 #### jpeg()
 
 Use JPEG format for the output image.
@@ -310,6 +291,26 @@ Use PNG format for the output image.
 #### webp()
 
 Use WebP format for the output image.
+
+#### quality(quality)
+
+The output quality to use for lossy JPEG, WebP and TIFF output formats. The default quality is `80`.
+
+`quality` is a Number between 1 and 100.
+
+#### progressive()
+
+Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.
+
+#### withMetadata([boolean])
+
+Include all metadata (ICC, EXIF, XMP) from the input image in the output image. The default behaviour is to strip all metadata.
+
+#### compressionLevel(compressionLevel)
+
+An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
+
+`compressionLevel` is a Number between -1 and 9.
 
 ### Output methods
 
@@ -372,10 +373,14 @@ var counters = sharp.counters(); // { queue: 2, process: 4 }
 
 Running the tests requires both ImageMagick and GraphicsMagick plus one of either libmagick++-dev or libgraphicsmagick++.
 
+```
 	brew install imagemagick
 	brew install graphicsmagick
+```
 
+```
 	sudo apt-get install imagemagick graphicsmagick libmagick++-dev
+```
 
 ## Performance
 
@@ -416,9 +421,21 @@ Decompress a 2725x2225 JPEG image, resize and crop to 720x480, then compress to 
 
 You can expect much greater performance with caching enabled (default) and using 16+ core machines.
 
+## Thanks
+
+This module would never have been possible without the help and code contributions of the following people:
+
+* [John Cupitt](https://github.com/jcupitt)
+* [Pierre Inglebert](https://github.com/pierreinglebert)
+* [Jonathan Ong](https://github.com/jonathanong)
+* [Chanon Sajjamanochai](https://github.com/chanon)
+* [Juliano Julio](https://github.com/julianojulio)
+
+Thank you!
+
 ## Licence
 
-Copyright 2013, 2014 Lovell Fuller, Pierre Inglebert, Jonathan Ong and Chanon Sajjamanochai
+Copyright 2013, 2014 Lovell Fuller and contributors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
