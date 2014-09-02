@@ -1,0 +1,111 @@
+# libjpeg warnings
+{
+  cond_jpeg_read_scanlines
+  Memcheck:Cond
+  ...
+  fun:jpeg_read_scanlines
+}
+{
+  value_jpeg_read_scanlines
+  Memcheck:Value8
+  ...
+  fun:jpeg_read_scanlines
+}
+{
+  cond_jpeg_write_scanlines
+  Memcheck:Cond
+  ...
+  fun:jpeg_write_scanlines
+}
+{
+  cond_jpeg_finish_compress
+  Memcheck:Cond
+  ...
+  fun:jpeg_finish_compress
+}
+{
+  value_jpeg_finish_compress
+  Memcheck:Value8
+  ...
+  fun:jpeg_finish_compress
+}
+
+# libvips interpolator warnings
+{
+  cond_libvips_interpolate_lbb
+  Memcheck:Cond
+  ...
+  fun:_ZL32vips_interpolate_lbb_interpolateP16_VipsInterpolatePvP11_VipsRegiondd
+  fun:vips_affine_gen
+}
+
+# libuv warnings
+{
+  free_libuv
+  Memcheck:Free
+  ...
+  fun:uv__work_done
+}
+
+# nodejs warnings
+{
+  param_nodejs_write_buffer
+  Memcheck:Param
+  write(buf)
+  ...
+  obj:/usr/bin/nodejs
+}
+{
+  leak_nodejs_ImmutableAsciiSource_CreateFromLiteral
+  Memcheck:Leak
+  match-leak-kinds: definite
+  ...
+  fun:_ZN4node20ImmutableAsciiSource17CreateFromLiteralEPKcm
+}
+{
+  leak_nodejs_Buffer_New
+  Memcheck:Leak
+  match-leak-kinds: definite
+  ...
+  fun:_ZN4node6Buffer3NewERKN2v89ArgumentsE
+}
+{
+  leak_nodejs_Buffer_Replace
+   Memcheck:Leak
+   match-leak-kinds: indirect,possible
+   ...
+   fun:_ZN4node6Buffer7ReplaceEPcmPFvS1_PvES2_
+}
+{
+  leak_nodejs_SignalWrap_New
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node10SignalWrap3NewERKN2v89ArgumentsE
+}
+{
+  leak_nodejs_TTYWrap_New
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node7TTYWrap3NewERKN2v89ArgumentsE
+}
+{
+  leak_nodejs_ares_init_options
+  Memcheck:Leak
+  match-leak-kinds: reachable
+  fun:malloc
+  fun:strdup
+  ...
+  fun:ares_init_options
+}
+
+# vips__init warnings
+{
+  leak_libvips_init
+  Memcheck:Leak
+  match-leak-kinds: reachable
+  fun:malloc
+  ...
+  fun:vips__init
+}
