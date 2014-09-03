@@ -8,8 +8,10 @@ var inputJpg = path.join(__dirname, "fixtures/2569067123_aca715a2ee_o.jpg"); // 
 var width = 720;
 var height = 480;
 
+sharp.concurrency(1);
+
 var timer = setInterval(function() {
-  console.dir(sharp.cache());
+  console.dir(sharp.counters());
 }, 100);
 
 async.mapSeries([1, 1, 2, 4, 8, 16, 32, 64, 128], function(parallelism, next) {
@@ -33,5 +35,5 @@ async.mapSeries([1, 1, 2, 4, 8, 16, 32, 64, 128], function(parallelism, next) {
   );
 }, function() {
   clearInterval(timer);
-  console.dir(sharp.cache());
+  console.dir(sharp.counters());
 });

@@ -431,6 +431,16 @@ module.exports.cache = function(memory, items) {
 };
 
 /*
+  Get and set size of thread pool
+*/
+module.exports.concurrency = function(concurrency) {
+  if (Number.isNaN(concurrency)) {
+    concurrency = null;
+  }
+  return sharp.concurrency(concurrency);
+};
+
+/*
   Get internal counters
 */
 module.exports.counters = function() {

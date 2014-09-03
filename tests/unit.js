@@ -28,6 +28,13 @@ var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikim
 sharp.cache(0); // Disable
 sharp.cache(50, 500); // 50MB, 500 items
 
+// Ensure concurrency can be set
+var defaultConcurrency = sharp.concurrency();
+sharp.concurrency(16);
+assert.strictEqual(16, sharp.concurrency());
+sharp.concurrency(0);
+assert.strictEqual(defaultConcurrency, sharp.concurrency());
+
 async.series([
   // Resize with exact crop
   function(done) {

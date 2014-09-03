@@ -776,6 +776,20 @@ NAN_METHOD(cache) {
 }
 
 /*
+  Get and set size of thread pool
+*/
+NAN_METHOD(concurrency) {
+  NanScope();
+
+  // Set concurrency
+  if (args[0]->IsInt32()) {
+    vips_concurrency_set(args[0]->Int32Value());
+  }
+  // Get concurrency
+  NanReturnValue(NanNew<Number>(vips_concurrency_get()));
+}
+
+/*
   Get internal counters (queued tasks, processing tasks)
 */
 NAN_METHOD(counters) {
@@ -807,6 +821,7 @@ extern "C" void init(Handle<Object> target) {
   NODE_SET_METHOD(target, "metadata", metadata);
   NODE_SET_METHOD(target, "resize", resize);
   NODE_SET_METHOD(target, "cache", cache);
+  NODE_SET_METHOD(target, "concurrency", concurrency);
   NODE_SET_METHOD(target, "counters", counters);
 }
 

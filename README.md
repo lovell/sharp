@@ -365,6 +365,18 @@ sharp.cache(200); // { current: 75, high: 99, memory: 200, items: 500 }
 sharp.cache(50, 200); // { current: 49, high: 99, memory: 50, items: 200}
 ```
 
+#### sharp.concurrency([threads])
+
+`threads`, if provided, is the Number of threads _libvips'_ should create for image processing. The default value is the number of CPU cores. A value of `0` will reset to this default.
+
+This method always returns the current concurrency.
+
+```javascript
+var threads = sharp.concurrency(); // 4
+sharp.concurrency(2); // 2
+sharp.concurrency(0); // 4
+```
+
 #### sharp.counters()
 
 Provides access to internal task counters.
