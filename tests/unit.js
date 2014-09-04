@@ -41,6 +41,7 @@ async.series([
     sharp(inputJpg).resize(320, 240).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -51,6 +52,7 @@ async.series([
     sharp(inputJpg).resize(320).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(261, info.height);
       done();
@@ -61,6 +63,7 @@ async.series([
     sharp(inputJpg).resize(null, 320).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(391, info.width);
       assert.strictEqual(320, info.height);
       done();
@@ -71,6 +74,7 @@ async.series([
     sharp(inputJpg).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(2725, info.width);
       assert.strictEqual(2225, info.height);
       done();
@@ -81,6 +85,7 @@ async.series([
     sharp(inputJpg).resize(3000).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(3000, info.width);
       assert.strictEqual(2449, info.height);
       done();
@@ -105,6 +110,7 @@ async.series([
     sharp(inputTiff).resize(240, 320).embedBlack().jpeg().toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(240, info.width);
       assert.strictEqual(320, info.height);
       done();
@@ -114,6 +120,7 @@ async.series([
     sharp(inputTiff).resize(240, 320).jpeg().toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(240, info.width);
       assert.strictEqual(320, info.height);
       done();
@@ -124,6 +131,7 @@ async.series([
     sharp(inputJpg).resize(320, 320).max().toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(261, info.height);
       done();
@@ -134,6 +142,7 @@ async.series([
     sharp(inputTiff).resize(320, 320).max().jpeg().toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(243, info.width);
       assert.strictEqual(320, info.height);
       done();
@@ -144,6 +153,7 @@ async.series([
     sharp(inputJpg).resize(320).max().toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(261, info.height);
       done();
@@ -161,6 +171,7 @@ async.series([
     sharp(inputJpg).rotate(90).resize(320, 240).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -171,6 +182,7 @@ async.series([
     sharp(inputJpgWithExif).resize(320).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(426, info.height);
       done();
@@ -181,6 +193,7 @@ async.series([
     sharp(inputJpgWithExif).rotate().resize(320).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -191,6 +204,7 @@ async.series([
     sharp(inputJpg).rotate().resize(320).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(261, info.height);
       done();
@@ -211,6 +225,7 @@ async.series([
     sharp(inputJpg).resize(2800).withoutEnlargement().toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(2725, info.width);
       assert.strictEqual(2225, info.height);
       done();
@@ -221,6 +236,7 @@ async.series([
     sharp(inputJpg).resize(null, 2300).withoutEnlargement().toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(2725, info.width);
       assert.strictEqual(2225, info.height);
       done();
@@ -232,6 +248,7 @@ async.series([
       sharp(data).toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
         done();
@@ -252,7 +269,9 @@ async.series([
   },
   // Check colour space conversion occurs from TIFF to WebP (this used to segfault)
   function(done) {
-    sharp(inputTiff).webp().toBuffer().then(function() {
+    sharp(inputTiff).webp().toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual('webp', info.format);
       done();
     });
   },
@@ -261,6 +280,7 @@ async.series([
     sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.nearest).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -271,6 +291,7 @@ async.series([
     sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.bilinear).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -281,6 +302,7 @@ async.series([
     sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.bicubic).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -291,6 +313,7 @@ async.series([
     sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.nohalo).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -301,6 +324,7 @@ async.series([
     sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.locallyBoundedBicubic).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -311,6 +335,7 @@ async.series([
     sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.vertexSplitQuadraticBasisSpline).toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -323,6 +348,7 @@ async.series([
       sharp(outputJpg).toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
         fs.unlinkSync(outputJpg);
@@ -339,6 +365,7 @@ async.series([
       sharp(outputJpg).toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
         fs.unlinkSync(outputJpg);
@@ -352,6 +379,7 @@ async.series([
     var readable = fs.createReadStream(inputJpg);
     var pipeline = sharp().resize(320, 240).toFile(outputJpg, function(err, info) {
       if (err) throw err;
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       fs.unlinkSync(outputJpg);
@@ -364,6 +392,7 @@ async.series([
     var readable = fs.createReadStream(inputJpg);
     var pipeline = sharp().resize(320, 240).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       done();
@@ -378,6 +407,7 @@ async.series([
       sharp(outputJpg).toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
         fs.unlinkSync(outputJpg);

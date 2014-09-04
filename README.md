@@ -331,8 +331,8 @@ An advanced setting for the _zlib_ compression level of the lossless PNG output 
 
 `callback`, if present, is called with two arguments `(err, info)` where:
 
-* `err` contains an error message, if any
-* `info` contains the final resized image dimensions in its `width` and `height` properties
+* `err` contains an error message, if any.
+* `info` contains the output image `format`, `width` and `height`.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
@@ -342,9 +342,9 @@ Write image data to a Buffer, the format of which will match the input image by 
 
 `callback`, if present, gets three arguments `(err, buffer, info)` where:
 
-* `err` is an error message, if any
-* `buffer` is the resultant image data
-* `info` contains the final resized image dimensions in its `width` and `height` properties
+* `err` is an error message, if any.
+* `buffer` is the output image data.
+* `info` contains the output image `format`, `width` and `height`.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 

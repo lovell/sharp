@@ -16,6 +16,7 @@ struct resize_baton {
   void* buffer_in;
   size_t buffer_in_len;
   std::string output;
+  std::string output_format;
   void* buffer_out;
   size_t buffer_out_len;
   int width;
@@ -38,6 +39,7 @@ struct resize_baton {
 
   resize_baton():
     buffer_in_len(0),
+    output_format(""),
     buffer_out_len(0),
     crop(false),
     gravity(0),
@@ -609,39 +611,53 @@ class ResizeWorker : public NanAsyncWorker {
     VipsImage *output = cached;
     if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == JPEG)) {
       // Write JPEG to buffer
-      if (vips_jpegsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->withMetadata, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
+      if (vips_jpegsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->withMetadata,
+        "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
+      baton->output_format = "jpeg";
     } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == PNG)) {
       // Write PNG to buffer
-      if (vips_pngsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->withMetadata, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
+      if (vips_pngsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->withMetadata,
+        "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
+      baton->output_format = "png";
     } else if (baton->output == "__webp" || (baton->output == "__input" && inputImageType == WEBP)) {
       // Write WEBP to buffer
-      if (vips_webpsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->withMetadata, "Q", baton->quality, NULL)) {
+      if (vips_webpsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->withMetadata,
+        "Q", baton->quality, NULL)) {
         return resize_error(baton, output);
       }
+      baton->output_format = "webp";
     } else if (is_jpeg(baton->output))  {
       // Write JPEG to file
-      if (vips_jpegsave(output, baton->output.c_str(), "strip", !baton->withMetadata, "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
+      if (vips_jpegsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+        "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
+      baton->output_format = "jpeg";
     } else if (is_png(baton->output)) {
       // Write PNG to file
-      if (vips_pngsave(output, baton->output.c_str(), "strip", !baton->withMetadata, "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
+      if (vips_pngsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+        "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
+      baton->output_format = "png";
     } else if (is_webp(baton->output)) {
       // Write WEBP to file
-      if (vips_webpsave(output, baton->output.c_str(), "strip", !baton->withMetadata, "Q", baton->quality, NULL)) {
+      if (vips_webpsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+        "Q", baton->quality, NULL)) {
         return resize_error(baton, output);
       }
+      baton->output_format = "webp";
     } else if (is_tiff(baton->output)) {
       // Write TIFF to file
-      if (vips_tiffsave(output, baton->output.c_str(), "strip", !baton->withMetadata, "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
+      if (vips_tiffsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+        "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
         return resize_error(baton, output);
       }
+      baton->output_format = "tiff";
     } else {
       (baton->err).append("Unsupported output " + baton->output);
     }
@@ -662,6 +678,7 @@ class ResizeWorker : public NanAsyncWorker {
     } else {
       // Info Object
       Local<Object> info = NanNew<Object>();
+      info->Set(NanNew<String>("format"), NanNew<String>(baton->output_format));
       info->Set(NanNew<String>("width"), NanNew<Number>(baton->width));
       info->Set(NanNew<String>("height"), NanNew<Number>(baton->height));
 
