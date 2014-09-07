@@ -21,7 +21,7 @@ var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://gi
 var inputJpgWithGammaHoliness = path.join(fixturesPath, "gamma_dalai_lama_gray.jpg"); // http://www.4p8.com/eric.brasseur/gamma.html
 
 var inputPng = path.join(fixturesPath, "50020484-00001.png"); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
-var inputWebp = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
+var inputWebP = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
 var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
 
 // Ensure cache limits can be set
@@ -493,6 +493,48 @@ async.series([
           });
       });
   },
+  // Output filename without extension should mirror input format
+  function(done) {
+    sharp(inputJpg).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual('jpeg', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(80, info.height);
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputPng).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual('png', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(80, info.height);
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputWebP).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual('webp', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(80, info.height);
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputTiff).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual('tiff', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(80, info.height);
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputGif).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+      assert(!!err);
+    });
+  },
   // Metadata - JPEG
   function(done) {
     sharp(inputJpg).metadata(function(err, metadata) {
@@ -545,7 +587,7 @@ async.series([
   },
   // Metadata - WebP
   function(done) {
-    sharp(inputWebp).metadata(function(err, metadata) {
+    sharp(inputWebP).metadata(function(err, metadata) {
       if (err) throw err;
       assert.strictEqual('webp', metadata.format);
       assert.strictEqual(1024, metadata.width);

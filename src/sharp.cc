@@ -630,36 +630,44 @@ class ResizeWorker : public NanAsyncWorker {
         return resize_error(baton, output);
       }
       baton->output_format = "webp";
-    } else if (is_jpeg(baton->output))  {
-      // Write JPEG to file
-      if (vips_jpegsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
-        "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
-        return resize_error(baton, output);
-      }
-      baton->output_format = "jpeg";
-    } else if (is_png(baton->output)) {
-      // Write PNG to file
-      if (vips_pngsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
-        "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
-        return resize_error(baton, output);
-      }
-      baton->output_format = "png";
-    } else if (is_webp(baton->output)) {
-      // Write WEBP to file
-      if (vips_webpsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
-        "Q", baton->quality, NULL)) {
-        return resize_error(baton, output);
-      }
-      baton->output_format = "webp";
-    } else if (is_tiff(baton->output)) {
-      // Write TIFF to file
-      if (vips_tiffsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
-        "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
-        return resize_error(baton, output);
-      }
-      baton->output_format = "tiff";
     } else {
-      (baton->err).append("Unsupported output " + baton->output);
+      bool output_jpeg = is_jpeg(baton->output);
+      bool output_png = is_png(baton->output);
+      bool output_webp = is_webp(baton->output);
+      bool output_tiff = is_tiff(baton->output);
+      bool match_input = !(output_jpeg || output_png || output_webp || output_tiff);
+      if (output_jpeg || (match_input && inputImageType == JPEG)) {
+        // Write JPEG to file
+        if (vips_jpegsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+          "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
+          return resize_error(baton, output);
+        }
+        baton->output_format = "jpeg";
+      } else if (output_png || (match_input && inputImageType == PNG)) {
+        // Write PNG to file
+        if (vips_pngsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+          "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
+          return resize_error(baton, output);
+        }
+        baton->output_format = "png";
+      } else if (output_webp || (match_input && inputImageType == WEBP)) {
+        // Write WEBP to file
+        if (vips_webpsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+          "Q", baton->quality, NULL)) {
+          return resize_error(baton, output);
+        }
+        baton->output_format = "webp";
+      } else if (output_tiff || (match_input && inputImageType == TIFF)) {
+        // Write TIFF to file
+        if (vips_tiffsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+          "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
+          return resize_error(baton, output);
+        }
+        baton->output_format = "tiff";
+      } else {
+        (baton->err).append("Unsupported output " + baton->output);
+        return resize_error(baton, output);
+      }
     }
     g_object_unref(output);
 
