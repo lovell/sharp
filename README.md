@@ -75,6 +75,25 @@ Requires `libtiff4-dev` instead of `libtiff5-dev` and has [a bug](https://bugs.l
 
 Then follow Ubuntu 13.x instructions.
 
+### Install libvips on Redhat/Centos Linux
+
+#### Centos 6
+
+	sudo yum groupinstall -y "Development Tools"
+	sudo yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel ImageMagick-c++-devel
+	sudo yum install -y http://li.nux.ro/download/nux/dextop/el6/x86_64/nux-dextop-release-0-2.el6.nux.noarch.rpm
+	sudo yum install -y --enablerepo=nux-dextop gobject-introspection-devel
+	sudo yum install -y http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+	sudo yum install -y --enablerepo=remi libwebp-devel
+	git clone https://github.com/jcupitt/libvips.git
+	cd libvips
+	git checkout 7.40
+	./bootstrap.sh
+	./configure --prefix=/usr --enable-docs=no --enable-debug=no --enable-cxx=yes --without-orc --without-python --without-fftw
+	make
+	sudo make install
+	sudo ldconfig
+
 ### Install libvips on Heroku
 
 [Alessandro Tagliapietra](https://github.com/alex88) maintains an [Heroku buildpack for libvips](https://github.com/alex88/heroku-buildpack-vips) and its dependencies.
@@ -402,7 +421,12 @@ Running the tests requires both ImageMagick and GraphicsMagick plus one of eithe
 ```
 
 ```
-	sudo apt-get install imagemagick graphicsmagick libmagick++-dev
+	sudo apt-get install -qq imagemagick graphicsmagick libmagick++-dev
+```
+
+```
+	yum install -y http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+	sudo yum install -y --enablerepo=epel GraphicsMagick ImageMagick-c++-devel
 ```
 
 ## Performance
