@@ -409,7 +409,15 @@ var counters = sharp.counters(); // { queue: 2, process: 4 }
 
 ## Testing
 
-[![Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
+### Ubuntu 12.04
+
+[![Ubuntu 12.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
+
+### Centos 6.5
+
+[![Centos 6.5 Build Status](https://snap-ci.com/lovell/sharp/branch/master/build_image)](https://snap-ci.com/lovell/sharp/branch/master)
+
+### It worked on my machine
 
 	npm test
 
