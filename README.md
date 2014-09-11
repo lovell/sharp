@@ -55,7 +55,7 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 Compiling from source is recommended:
 
-	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libxml2-dev swig
+	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libxml2-dev swig libmagickwand-dev
 	git clone https://github.com/jcupitt/libvips.git
 	cd libvips
 	git checkout 7.38
@@ -80,7 +80,7 @@ Then follow Ubuntu 13.x instructions.
 #### Centos 6
 
 	sudo yum groupinstall -y "Development Tools"
-	sudo yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel ImageMagick-c++-devel
+	sudo yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel ImageMagick-devel
 	sudo yum install -y http://li.nux.ro/download/nux/dextop/el6/x86_64/nux-dextop-release-0-2.el6.nux.noarch.rpm
 	sudo yum install -y --enablerepo=nux-dextop gobject-introspection-devel
 	sudo yum install -y http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
@@ -421,7 +421,7 @@ var counters = sharp.counters(); // { queue: 2, process: 4 }
 
 	npm test
 
-Running the tests requires both ImageMagick and GraphicsMagick plus one of either libmagick++-dev or libgraphicsmagick++.
+Running the comparative performance tests requires _ImageMagick_ and _GraphicsMagick_.
 
 ```
 	brew install imagemagick
@@ -429,12 +429,13 @@ Running the tests requires both ImageMagick and GraphicsMagick plus one of eithe
 ```
 
 ```
-	sudo apt-get install -qq imagemagick graphicsmagick libmagick++-dev
+	sudo apt-get install -qq imagemagick graphicsmagick
 ```
 
 ```
-	yum install -y http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-	sudo yum install -y --enablerepo=epel GraphicsMagick ImageMagick-c++-devel
+	sudo yum install ImageMagick
+	sudo yum install -y http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+	sudo yum install -y --enablerepo=epel GraphicsMagick
 ```
 
 ## Performance
