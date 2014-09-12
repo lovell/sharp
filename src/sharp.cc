@@ -157,9 +157,24 @@ sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int c
     case 4: // West
       top = (inHeight - outHeight + 1) / 2;
       break;
-    default: // Centre
+    case 5: // North and East
+      left = inWidth - outWidth;
+      break;
+    case 6: // North and West
+      break;
+    case 7: // South and East
+      left = inWidth - outWidth;
+      top = inHeight - outHeight;
+      break;
+    case 8: // South and West
+      top = inHeight - outHeight;
+      break;
+    case 0: // Centre
       left = (inWidth - outWidth + 1) / 2;
       top = (inHeight - outHeight + 1) / 2;
+    default: // shifting or none
+      left = 0;
+      top = 0;
   }
   left = left + sh_left;
   top = top + sh_top;
