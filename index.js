@@ -12,12 +12,12 @@ var Sharp = function(input) {
   }
   stream.Duplex.call(this);
   this.options = {
-    left: 0,
-    top: 0,
     width: -1,
     height: -1,
     canvas: 'c',
     gravity: 0,
+    left: 0,
+    top: 0,
     angle: 0,
     withoutEnlargement: false,
     sharpen: false,
@@ -77,10 +77,10 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
   }
 };
 
-// Crop this part of the resized image (Center/Centre, North, East, South, West)
-module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4};
+// Crop this part of the resized image (Center/Centre, North, East, South, West, North East, North West, South East, South West, )
+module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4, 'north_west': 5, 'north_east': 6, 'south_west': 7, 'south_west': 8};
 
-Sharp.prototype.crop = function(gravity,left,top) {
+Sharp.prototype.crop = function(gravity, left, top) {
   this.options.canvas = 'c';
   if (typeof gravity !== 'undefined') {
     // Is this a supported gravity?
@@ -89,7 +89,7 @@ Sharp.prototype.crop = function(gravity,left,top) {
       if (typeof left !== 'undefined') {
         this.options.left = left;
       }
-      if (typeof left !== 'undefined') {
+      if (typeof top !== 'undefined') {
         this.options.top = top;
       }
     } else {
