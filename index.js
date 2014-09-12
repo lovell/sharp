@@ -12,6 +12,8 @@ var Sharp = function(input) {
   }
   stream.Duplex.call(this);
   this.options = {
+    left: 0,
+    top: 0,
     width: -1,
     height: -1,
     canvas: 'c',
@@ -78,12 +80,18 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
 // Crop this part of the resized image (Center/Centre, North, East, South, West)
 module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4};
 
-Sharp.prototype.crop = function(gravity) {
+Sharp.prototype.crop = function(gravity,left,top) {
   this.options.canvas = 'c';
   if (typeof gravity !== 'undefined') {
     // Is this a supported gravity?
     if (!Number.isNaN(gravity) && gravity >= 0 && gravity <= 4) {
       this.options.gravity = gravity;
+      if (typeof left !== 'undefined') {
+        this.options.left = left;
+      }
+      if (typeof left !== 'undefined') {
+        this.options.top = top;
+      }
     } else {
       throw new Error('Unsupported crop gravity ' + gravity);
     }
