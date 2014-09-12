@@ -255,7 +255,7 @@ Crop the resized image to the exact size specified, the default behaviour.
 
 `top`, move down the cutting start position.
 
-Possible values are `north`, `east`, `south`, `west`, `center` and `centre`. The default gravity is `center`/`centre`.
+Possible values are `north`, `east`, `south`, `west`,`north_east`, `north_west`, `south_east`, `south_west`, `center` and `centre`. The default gravity is `north_west`.
 
 #### max()
 
