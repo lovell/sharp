@@ -45,6 +45,8 @@ struct resize_baton {
     buffer_out_len(0),
     crop(false),
     gravity(0),
+    left(0),
+    top(0),
     max(false),
     sharpen(false),
     gamma(0.0),
@@ -155,14 +157,12 @@ sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int c
     case 4: // West
       top = (inHeight - outHeight + 1) / 2;
       break;
-    case 5: // Centre
+    default: // Centre
       left = (inWidth - outWidth + 1) / 2;
       top = (inHeight - outHeight + 1) / 2;
-      break;
-    default: // shifting
-      left = sh_left;
-      top = sh_top;
   }
+  left = left + sh_left;
+  top = top + sh_top;
   return std::make_tuple(left, top);
 }
 
@@ -753,6 +753,8 @@ NAN_METHOD(resize) {
   }
   // Other options
   baton->gravity = options->Get(NanNew<String>("gravity"))->Int32Value();
+  baton->left = options->Get(NanNew<String>("left"))->Int32Value();
+  baton->top = options->Get(NanNew<String>("top"))->Int32Value();
   baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();
