@@ -23,6 +23,8 @@ struct resize_baton {
   int height;
   bool crop;
   int gravity;
+  int left;
+  int top;
   bool max;
   VipsExtend extend;
   bool sharpen;
@@ -135,7 +137,7 @@ sharp_calc_rotation(int const angle, VipsImage const *input) {
   within the input image, applying the given gravity.
 */
 static std::tuple<int, int>
-sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int const outHeight, int const gravity) {
+sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int const outHeight, int const gravity, int const sh_left, int const sh_top) {
   int left = 0;
   int top = 0;
   switch (gravity) {
@@ -153,9 +155,13 @@ sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int c
     case 4: // West
       top = (inHeight - outHeight + 1) / 2;
       break;
-    default: // Centre
+    case 5: // Centre
       left = (inWidth - outWidth + 1) / 2;
       top = (inHeight - outHeight + 1) / 2;
+      break;
+    default: // shifting
+      left = sh_left;
+      top = sh_top;
   }
   return std::make_tuple(left, top);
 }
@@ -544,7 +550,7 @@ class ResizeWorker : public NanAsyncWorker {
         // Crop/max
         int left;
         int top;
-        std::tie(left, top) = sharp_calc_crop(rotated->Xsize, rotated->Ysize, baton->width, baton->height, baton->gravity);
+        std::tie(left, top) = sharp_calc_crop(rotated->Xsize, rotated->Ysize, baton->width, baton->height, baton->gravity, baton->left, baton->top);
         int width = std::min(rotated->Xsize, baton->width);
         int height = std::min(rotated->Ysize, baton->height);
         if (vips_extract_area(rotated, &canvased, left, top, width, height, NULL)) {
