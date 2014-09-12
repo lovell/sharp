@@ -419,23 +419,25 @@ var counters = sharp.counters(); // { queue: 2, process: 4 }
 
 ### It worked on my machine
 
-	npm test
+```
+npm test
+```
 
 Running the comparative performance tests requires _ImageMagick_ and _GraphicsMagick_.
 
 ```
-	brew install imagemagick
-	brew install graphicsmagick
+brew install imagemagick
+brew install graphicsmagick
 ```
 
 ```
-	sudo apt-get install -qq imagemagick graphicsmagick
+sudo apt-get install -qq imagemagick graphicsmagick
 ```
 
 ```
-	sudo yum install ImageMagick
-	sudo yum install -y http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-	sudo yum install -y --enablerepo=epel GraphicsMagick
+sudo yum install ImageMagick
+sudo yum install -y http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+sudo yum install -y --enablerepo=epel GraphicsMagick
 ```
 
 ## Performance

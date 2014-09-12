@@ -331,16 +331,22 @@ Sharp.prototype._sharp = function(callback) {
       // output=stream, input=stream
       this.on('finish', function() {
         sharp.resize(that.options, function(err, data) {
-          if (err) throw err;
-          that.push(data);
+          if (err) {
+            that.emit('error', new Error(err));
+          } else {
+            that.push(data);
+          }
           that.push(null);
         });
       });
     } else {
       // output=stream, input=file/buffer
       sharp.resize(this.options, function(err, data) {
-        if (err) throw err;
-        that.push(data);
+        if (err) {
+          that.emit('error', new Error(err));
+        } else {
+          that.push(data);
+        }
         that.push(null);
       });
     }

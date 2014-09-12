@@ -417,6 +417,33 @@ async.series([
     var pipeline = sharp().resize(320, 240);
     readable.pipe(pipeline).pipe(writable);
   },
+  // Stream-Stream error handling
+  function(done) {
+    var pipeline = sharp().resize(320, 240);
+    var anErrorWasEmitted = false;
+    pipeline.on('error', function(err) {
+      anErrorWasEmitted = !!err;
+    }).on('end', function() {
+      assert(anErrorWasEmitted);
+      done();
+    });
+    var readableButNotAnImage = fs.createReadStream(__filename);
+    var writable = fs.createWriteStream(outputJpg);
+    readableButNotAnImage.pipe(pipeline).pipe(writable);
+  },
+  // File-Stream error handling
+  function(done) {
+    var readableButNotAnImage = sharp(__filename).resize(320, 240);
+    var anErrorWasEmitted = false;
+    readableButNotAnImage.on('error', function(err) {
+      anErrorWasEmitted = !!err;
+    }).on('end', function() {
+      assert(anErrorWasEmitted);
+      done();
+    });
+    var writable = fs.createWriteStream(outputJpg);
+    readableButNotAnImage.pipe(writable);
+  },
   // Crop, gravity=north
   function(done) {
     sharp(inputJpg).resize(320, 80).crop(sharp.gravity.north).toFile(path.join(fixturesPath, 'output.gravity-north.jpg'), function(err, info) {
