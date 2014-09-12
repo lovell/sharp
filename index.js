@@ -77,8 +77,8 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
   }
 };
 
-// Crop this part of the resized image (Center/Centre, North, East, South, West, North East, North West, South East, South West, )
-module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4, 'north_west': 5, 'north_east': 6, 'south_west': 7, 'south_west': 8};
+// Crop this part of the resized image (Center/Centre, North, East, South, West, North East, North West, South East, South West)
+module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4, 'north_east': 5, 'north_west': 6, 'south_east': 7, 'south_west': 8};
 
 Sharp.prototype.crop = function(gravity, left, top) {
   this.options.canvas = 'c';
