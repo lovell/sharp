@@ -1,6 +1,7 @@
 /*jslint node: true */
 'use strict';
 
+var Color = require('color');
 var util = require('util');
 var stream = require('stream');
 var Promise = require('bluebird');
@@ -29,7 +30,12 @@ var Sharp = function(input) {
     streamIn: false,
     streamOut: false,
     withMetadata: false,
-    output: '__input'
+    output: '__input',
+    // flatten
+    flatten: false,
+    backgroundRed: 0,
+    backgroundGreen: 0,
+    backgroundBlue: 0
   };
   if (typeof input === 'string') {
     // input=file
@@ -104,6 +110,40 @@ Sharp.prototype.embedBlack = function() {
 
 Sharp.prototype.max = function() {
   this.options.canvas = 'm';
+  return this;
+};
+
+Sharp.prototype.flatten = function() {
+  this.options.flatten = true;
+  return this;
+};
+
+Sharp.prototype.background = function() {
+  if (arguments.length === 0) {
+    throw new Error('`color` or `r, g, b` arguments are required');
+  }
+  if (arguments.length !== 1 && arguments.length !== 3) {
+    throw new Error('Invalid color. Expected `color` or `r, g, b`');
+  }
+
+  if (arguments.length === 1) {
+    var color = Color(arguments[0]);
+    this.options.backgroundRed = color.red();
+    this.options.backgroundGreen = color.green();
+    this.options.backgroundBlue = color.blue();
+  } else if (arguments.length === 3) {
+    var normalize = function (name, color) {
+      if (isNaN(color) || color < 0 || 255 < color) {
+        throw new Error('Invalid ' + name + ' value (0.0 to 255.0) ' + color);
+      }
+      return color;
+    };
+    this.options.backgroundRed = normalize('red', arguments[0]);
+    this.options.backgroundGreen = normalize('green', arguments[1]);
+    this.options.backgroundBlue = normalize('blue', arguments[2]);
+  } else {
+    throw new Error('Unreachable state');
+  }
   return this;
 };
 
