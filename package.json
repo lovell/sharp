@@ -35,8 +35,9 @@
     "stream"
   ],
   "dependencies": {
-    "nan": "^1.3.0",
-    "bluebird": "^2.3.2"
+    "bluebird": "^2.3.2",
+    "color": "^0.7.1",
+    "nan": "^1.3.0"
   },
   "devDependencies": {
     "imagemagick": "^0.1.3",
