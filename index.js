@@ -126,18 +126,19 @@ Sharp.prototype.background = function() {
     throw new Error('Invalid color. Expected `color` or `r, g, b`');
   }
 
+  var normalize = function (name, color) {
+    if (isNaN(color) || color < 0 || 255 < color) {
+      throw new Error('Invalid ' + name + ' value (0.0 to 255.0) ' + color);
+    }
+    return color;
+  };
+
   if (arguments.length === 1) {
     var color = Color(arguments[0]);
-    this.options.backgroundRed = color.red();
-    this.options.backgroundGreen = color.green();
-    this.options.backgroundBlue = color.blue();
+    this.options.backgroundRed = normalize('red', color.red());
+    this.options.backgroundGreen = normalize('green', color.green());
+    this.options.backgroundBlue = normalize('blue', color.blue());
   } else if (arguments.length === 3) {
-    var normalize = function (name, color) {
-      if (isNaN(color) || color < 0 || 255 < color) {
-        throw new Error('Invalid ' + name + ' value (0.0 to 255.0) ' + color);
-      }
-      return color;
-    };
     this.options.backgroundRed = normalize('red', arguments[0]);
     this.options.backgroundGreen = normalize('green', arguments[1]);
     this.options.backgroundBlue = normalize('blue', arguments[2]);
