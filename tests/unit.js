@@ -547,6 +547,15 @@ async.series([
     });
   },
   function(done) {
+    sharp(inputPngWithTransparency).resize(320, 80).toFile(outputZoinks, function(err, info) {
+      if (err) throw err;
+      assert.strictEqual('png', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(80, info.height);
+      done();
+    });
+  },
+  function(done) {
     sharp(inputWebP).resize(320, 80).toFile(outputZoinks, function(err, info) {
       if (err) throw err;
       assert.strictEqual('webp', info.format);
@@ -741,6 +750,42 @@ async.series([
       if (err) throw err;
       done();
     });
+  },
+  // Flattening
+  function(done) {
+    sharp(inputPngWithTransparency).flatten().resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-black.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputPngWithTransparency).flatten().background(255, 102, 0).resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-rgb-orange.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputPngWithTransparency).flatten().background('#ff6600').resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-hex-orange.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputJpg).background('#ff0000').flatten().resize(500, 400).toFile(path.join(fixturesPath, 'output.flatten-input-jpg.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    // Invalid `background` arguments
+    try {
+      sharp(inputPngWithTransparency).background(-1, -1, -1).flatten();
+    } catch (e) {
+      assert.strictEqual(e.message, "Invalid red value (0.0 to 255.0) -1");
+      done();
+      return;
+    }
+    assert.fail();
   },
   // Verify internal counters
   function(done) {
