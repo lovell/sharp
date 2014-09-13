@@ -431,7 +431,7 @@ brew install graphicsmagick
 ```
 
 ```
-sudo apt-get install -qq imagemagick graphicsmagick
+sudo apt-get install -qq imagemagick graphicsmagick libmagick++-dev
 ```
 
 ```
@@ -444,16 +444,17 @@ sudo yum install -y --enablerepo=epel GraphicsMagick
 
 ### Test environment
 
-* Intel Xeon [L5520](http://ark.intel.com/products/40201/Intel-Xeon-Processor-L5520-8M-Cache-2_26-GHz-5_86-GTs-Intel-QPI) 2.27GHz 8MB cache
-* Ubuntu 13.10
-* libvips 7.38.5
+* AWS EC2 [c3.xlarge](http://aws.amazon.com/ec2/instance-types/#Compute_Optimized)
+* Ubuntu 14.04
+* libvips 7.40.8
+* liborc 0.4.22
 
 ### The contenders
 
-* [imagemagick-native](https://github.com/mash/node-imagemagick-native) - Supports Buffers only and blocks main V8 thread whilst processing.
-* [imagemagick](https://github.com/rsms/node-imagemagick) - Supports filesystem only and "has been unmaintained for a long time".
-* [gm](https://github.com/aheckmann/gm) - Fully featured wrapper around GraphicsMagick.
-* sharp - Caching within libvips disabled to ensure a fair comparison.
+* [imagemagick-native](https://github.com/mash/node-imagemagick-native) v1.2.2 - Supports Buffers only and blocks main V8 thread whilst processing.
+* [imagemagick](https://github.com/yourdeveloper/node-imagemagick) v0.1.3 - Supports filesystem only and "has been unmaintained for a long time".
+* [gm](https://github.com/aheckmann/gm) v1.16.0 - Fully featured wrapper around GraphicsMagick.
+* sharp v0.6.2 - Caching within libvips disabled to ensure a fair comparison.
 
 ### The task
 
@@ -463,21 +464,23 @@ Decompress a 2725x2225 JPEG image, resize and crop to 720x480, then compress to 
 
 | Module                | Input  | Output | Ops/sec | Speed-up |
 | :-------------------- | :----- | :----- | ------: | -------: |
-| imagemagick-native    | buffer | buffer |    0.97 |        1 |
-| imagemagick           | file   | file   |    2.49 |      2.6 |
-| gm                    | buffer | file   |    3.72 |      3.8 |
-| gm                    | buffer | buffer |    3.80 |      3.9 |
-| gm                    | file   | file   |    3.67 |      3.8 |
-| gm                    | file   | buffer |    3.67 |      3.8 |
-| sharp                 | buffer | file   |   13.62 |     14.0 |
-| sharp                 | buffer | buffer |   12.43 |     12.8 |
-| sharp                 | file   | file   |   13.02 |     13.4 |
-| sharp                 | file   | buffer |   11.15 |     11.5 |
-| sharp +sharpen        | file   | buffer |   10.26 |     10.6 |
-| sharp +progressive    | file   | buffer |    9.44 |      9.7 |
-| sharp +sequentialRead | file   | buffer |   11.94 |     12.3 |
+| imagemagick-native    | buffer | buffer |    1.58 |        1 |
+| imagemagick           | file   | file   |    6.23 |      3.9 |
+| gm                    | buffer | file   |    5.32 |      3.4 |
+| gm                    | buffer | buffer |    5.32 |      3.4 |
+| gm                    | file   | file   |    5.36 |      3.4 |
+| gm                    | file   | buffer |    5.36 |      3.4 |
+| sharp                 | buffer | file   |   22.05 |     14.0 |
+| sharp                 | buffer | buffer |   22.14 |     14.0 |
+| sharp                 | file   | file   |   21.79 |     13.8 |
+| sharp                 | file   | buffer |   21.90 |     13.9 |
+| sharp                 | stream | stream |   20.87 |     13.2 |
+| sharp +promise        | file   | buffer |   21.89 |     13.9 |
+| sharp +sharpen        | file   | buffer |   19.69 |     12.5 |
+| sharp +progressive    | file   | buffer |   16.93 |     10.7 |
+| sharp +sequentialRead | file   | buffer |   21.60 |     13.7 |
 
-You can expect much greater performance with caching enabled (default) and using 16+ core machines.
+You can expect greater performance with caching enabled (default) and using 8+ core machines.
 
 ## Thanks
 
