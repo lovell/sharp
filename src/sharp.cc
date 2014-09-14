@@ -549,7 +549,7 @@ class ResizeWorker : public NanAsyncWorker {
 
     // Flatten
     VipsImage *flattened = vips_image_new();
-    if (baton->flatten) {
+    if (baton->flatten && affined->Bands == 4) {
       VipsArrayDouble *background = vips_array_double_newv(
         3, // vector size
         baton->background_red,
