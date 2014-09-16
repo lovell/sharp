@@ -283,7 +283,7 @@ This is equivalent to GraphicsMagick's `>` geometry option: "change the dimensio
 
 #### sharpen()
 
-Perform a mild sharpen of the resultant image. This typically reduces performance by 30%.
+Perform a mild sharpen of the output image. This typically reduces performance by 10%.
 
 #### interpolateWith(interpolator)
 
@@ -307,6 +307,14 @@ Apply a gamma correction by reducing the encoding (darken) pre-resize at a facto
 This can improve the perceived brightness of a resized image in non-linear colour spaces.
 
 JPEG input images will not take advantage of the shrink-on-load performance optimisation when applying a gamma correction.
+
+#### grayscale() / greyscale()
+
+Convert to 8-bit greyscale; 256 shades of grey.
+
+This is a linear operation. If the input image is in a non-linear colourspace such as sRGB, use `gamma()` with `greyscale()` for the best results.
+
+The output image will still be web-friendly sRGB and contain three (identical) channels.
 
 ### Output options
 
@@ -332,7 +340,7 @@ The output quality to use for lossy JPEG, WebP and TIFF output formats. The defa
 
 Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.
 
-#### withMetadata([boolean])
+#### withMetadata()
 
 Include all metadata (ICC, EXIF, XMP) from the input image in the output image. The default behaviour is to strip all metadata.
 

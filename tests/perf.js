@@ -257,6 +257,30 @@ async.series({
           }
         });
       }
+    }).add("sharp-file-buffer-greyscale", {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpg).resize(width, height).greyscale().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add("sharp-file-buffer-greyscale-gamma", {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpg).resize(width, height).gamma().greyscale().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
     }).add("sharp-file-buffer-progressive", {
       defer: true,
       fn: function(deferred) {

@@ -21,6 +21,7 @@ var Sharp = function(input) {
     sharpen: false,
     interpolator: 'bilinear',
     gamma: 0,
+    greyscale: false,
     progressive: false,
     sequentialRead: false,
     quality: 80,
@@ -180,6 +181,15 @@ Sharp.prototype.gamma = function(gamma) {
   }
   return this;
 };
+
+/*
+  Convert to greyscale
+*/
+Sharp.prototype.greyscale = function(greyscale) {
+  this.options.greyscale = (typeof greyscale === 'boolean') ? greyscale : true;
+  return this;
+};
+Sharp.prototype.grayscale = Sharp.prototype.greyscale;
 
 Sharp.prototype.progressive = function(progressive) {
   this.options.progressive = (typeof progressive === 'boolean') ? progressive : true;

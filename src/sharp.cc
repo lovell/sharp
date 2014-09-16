@@ -28,6 +28,7 @@ struct resize_baton {
   bool sharpen;
   std::string interpolator;
   double gamma;
+  bool greyscale;
   bool progressive;
   bool without_enlargement;
   VipsAccess access_method;
@@ -483,6 +484,16 @@ class ResizeWorker : public NanAsyncWorker {
       shrunk_on_load = gamma_encoded;
     }
 
+    // Convert to greyscale (linear, therefore after gamma encoding, if any)
+    if (baton->greyscale) {
+      VipsImage *greyscale = vips_image_new();
+      if (vips_colourspace(shrunk_on_load, &greyscale, VIPS_INTERPRETATION_B_W, NULL)) {
+        return resize_error(baton, shrunk_on_load);
+      }
+      g_object_unref(shrunk_on_load);
+      shrunk_on_load = greyscale;
+    }
+
     VipsImage *shrunk = vips_image_new();
     if (shrink > 1) {
       // Use vips_shrink with the integral reduction
@@ -750,6 +761,7 @@ NAN_METHOD(resize) {
   baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();
+  baton->greyscale = options->Get(NanNew<String>("greyscale"))->BooleanValue();
   baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();
   baton->without_enlargement = options->Get(NanNew<String>("withoutEnlargement"))->BooleanValue();
   baton->access_method = options->Get(NanNew<String>("sequentialRead"))->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;

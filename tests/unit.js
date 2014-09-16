@@ -24,6 +24,8 @@ var inputPng = path.join(fixturesPath, "50020484-00001.png"); // http://c.searsp
 var inputWebP = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
 var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
 
+var outputZoinks = path.join(fixturesPath, 'output.zoinks'); // an "unknown" file extension
+
 // Ensure cache limits can be set
 sharp.cache(0); // Disable
 sharp.cache(50, 500); // 50MB, 500 items
@@ -425,6 +427,7 @@ async.series([
       anErrorWasEmitted = !!err;
     }).on('end', function() {
       assert(anErrorWasEmitted);
+      fs.unlinkSync(outputJpg);
       done();
     });
     var readableButNotAnImage = fs.createReadStream(__filename);
@@ -439,6 +442,7 @@ async.series([
       anErrorWasEmitted = !!err;
     }).on('end', function() {
       assert(anErrorWasEmitted);
+      fs.unlinkSync(outputJpg);
       done();
     });
     var writable = fs.createWriteStream(outputJpg);
@@ -522,44 +526,49 @@ async.series([
   },
   // Output filename without extension should mirror input format
   function(done) {
-    sharp(inputJpg).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+    sharp(inputJpg).resize(320, 80).toFile(outputZoinks, function(err, info) {
       if (err) throw err;
       assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(80, info.height);
+      fs.unlinkSync(outputZoinks);
       done();
     });
   },
   function(done) {
-    sharp(inputPng).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+    sharp(inputPng).resize(320, 80).toFile(outputZoinks, function(err, info) {
       if (err) throw err;
       assert.strictEqual('png', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(80, info.height);
+      fs.unlinkSync(outputZoinks);
       done();
     });
   },
   function(done) {
-    sharp(inputWebP).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+    sharp(inputWebP).resize(320, 80).toFile(outputZoinks, function(err, info) {
       if (err) throw err;
       assert.strictEqual('webp', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(80, info.height);
+      fs.unlinkSync(outputZoinks);
       done();
     });
   },
   function(done) {
-    sharp(inputTiff).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+    sharp(inputTiff).resize(320, 80).toFile(outputZoinks, function(err, info) {
       if (err) throw err;
       assert.strictEqual('tiff', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(80, info.height);
+      fs.unlinkSync(outputZoinks);
       done();
     });
   },
   function(done) {
-    sharp(inputGif).resize(320, 80).toFile(path.join(fixturesPath, 'output.zoinks'), function(err, info) {
+    sharp(inputGif).resize(320, 80).toFile(outputZoinks, function(err, info) {
       assert(!!err);
+      done();
     });
   },
   // Metadata - JPEG
@@ -681,7 +690,7 @@ async.series([
   },
   // Gamma correction
   function(done) {
-    sharp(inputJpgWithGammaHoliness).resize(129, 111).toFile(path.join(fixturesPath, 'output.gamma-0.0.jpg'), function(err) {
+    sharp(inputJpgWithGammaHoliness).resize(129, 111).toFile(path.join(fixturesPath, 'output.gamma-0.0.jpg'), function(err, info) {
       if (err) throw err;
       done();
     });
@@ -694,6 +703,19 @@ async.series([
   },
   function(done) {
     sharp(inputJpgWithGammaHoliness).resize(129, 111).gamma(3).toFile(path.join(fixturesPath, 'output.gamma-3.0.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  // Greyscale conversion
+  function(done) {
+    sharp(inputJpg).resize(320, 240).greyscale().toFile(path.join(fixturesPath, 'output.greyscale-gamma-0.0.jpg'), function(err, info) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputJpg).resize(320, 240).gamma().greyscale().toFile(path.join(fixturesPath, 'output.greyscale-gamma-2.2.jpg'), function(err) {
       if (err) throw err;
       done();
     });
