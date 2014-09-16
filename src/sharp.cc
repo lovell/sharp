@@ -484,14 +484,32 @@ class ResizeWorker : public NanAsyncWorker {
     }
     g_object_unref(in);
 
+    // Flatten
+    VipsImage *flattened = vips_image_new();
+    if (baton->flatten && shrunk_on_load->Bands == 4) {
+      VipsArrayDouble *background = vips_array_double_newv(
+        3, // vector size
+        baton->background_red,
+        baton->background_green,
+        baton->background_blue
+      );
+
+      if (vips_flatten(shrunk_on_load, &flattened, "background", background, NULL)) {
+        return resize_error(baton, shrunk_on_load);
+      };
+    } else {
+      vips_copy(shrunk_on_load, &flattened, NULL);
+    }
+    g_object_unref(shrunk_on_load);
+
     // Gamma encoding (darken)
     if (baton->gamma >= 1 && baton->gamma <= 3) {
       VipsImage *gamma_encoded = vips_image_new();
-      if (vips_gamma(shrunk_on_load, &gamma_encoded, "exponent", 1.0 / baton->gamma, NULL)) {
-        return resize_error(baton, shrunk_on_load);
+      if (vips_gamma(flattened, &gamma_encoded, "exponent", 1.0 / baton->gamma, NULL)) {
+        return resize_error(baton, flattened);
       }
-      g_object_unref(shrunk_on_load);
-      shrunk_on_load = gamma_encoded;
+      g_object_unref(flattened);
+      flattened = gamma_encoded;
     }
 
     // Convert to greyscale (linear, therefore after gamma encoding, if any)
@@ -507,8 +525,8 @@ class ResizeWorker : public NanAsyncWorker {
     VipsImage *shrunk = vips_image_new();
     if (shrink > 1) {
       // Use vips_shrink with the integral reduction
-      if (vips_shrink(shrunk_on_load, &shrunk, shrink, shrink, NULL)) {
-        return resize_error(baton, shrunk_on_load);
+      if (vips_shrink(flattened, &shrunk, shrink, shrink, NULL)) {
+        return resize_error(baton, flattened);
       }
       // Recalculate residual float based on dimensions of required vs shrunk images
       double shrunkWidth = shrunk->Xsize;
@@ -527,9 +545,9 @@ class ResizeWorker : public NanAsyncWorker {
         residual = std::min(residualx, residualy);
       }
     } else {
-      vips_copy(shrunk_on_load, &shrunk, NULL);
+      vips_copy(flattened, &shrunk, NULL);
     }
-    g_object_unref(shrunk_on_load);
+    g_object_unref(flattened);
 
     // Use vips_affine with the remaining float part
     VipsImage *affined = vips_image_new();
@@ -547,34 +565,16 @@ class ResizeWorker : public NanAsyncWorker {
     }
     g_object_unref(shrunk);
 
-    // Flatten
-    VipsImage *flattened = vips_image_new();
-    if (baton->flatten && affined->Bands == 4) {
-      VipsArrayDouble *background = vips_array_double_newv(
-        3, // vector size
-        baton->background_red,
-        baton->background_green,
-        baton->background_blue
-      );
-
-      if (vips_flatten(affined, &flattened, "background", background, NULL)) {
-        return resize_error(baton, affined);
-      };
-    } else {
-      vips_copy(affined, &flattened, NULL);
-    }
-    g_object_unref(affined);
-
     // Rotate
     VipsImage *rotated = vips_image_new();
     if (rotation != VIPS_ANGLE_0) {
-      if (vips_rot(flattened, &rotated, rotation, NULL)) {
-        return resize_error(baton, flattened);
+      if (vips_rot(affined, &rotated, rotation, NULL)) {
+        return resize_error(baton, affined);
       }
     } else {
-      vips_copy(flattened, &rotated, NULL);
+      vips_copy(affined, &rotated, NULL);
     }
-    g_object_unref(flattened);
+    g_object_unref(affined);
 
     // Crop/embed
     VipsImage *canvased = vips_image_new();
