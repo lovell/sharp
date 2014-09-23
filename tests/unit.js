@@ -21,7 +21,7 @@ var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://gi
 var inputJpgWithGammaHoliness = path.join(fixturesPath, "gamma_dalai_lama_gray.jpg"); // http://www.4p8.com/eric.brasseur/gamma.html
 
 var inputPng = path.join(fixturesPath, "50020484-00001.png"); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
-var inputPngTransparent = path.join(fixturesPath, "blackbug.png"); // public domain
+var inputPngWithTransparency = path.join(fixturesPath, "blackbug.png"); // public domain
 var inputWebP = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
 var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
 
@@ -547,7 +547,7 @@ async.series([
     });
   },
   function(done) {
-    sharp(inputPngTransparent).resize(320, 80).toFile(outputZoinks, function(err, info) {
+    sharp(inputPngWithTransparency).resize(320, 80).toFile(outputZoinks, function(err, info) {
       if (err) throw err;
       assert.strictEqual('png', info.format);
       assert.strictEqual(320, info.width);
@@ -633,7 +633,7 @@ async.series([
   },
   // Metadata - Transparent PNG
   function(done) {
-    sharp(inputPngTransparent).metadata(function(err, metadata) {
+    sharp(inputPngWithTransparency).metadata(function(err, metadata) {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
       assert.strictEqual(2048, metadata.width);
@@ -744,19 +744,19 @@ async.series([
   },
   // Flattening
   function(done) {
-    sharp(inputPngTransparent).flatten().resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-black.jpg'), function(err) {
+    sharp(inputPngWithTransparency).flatten().resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-black.jpg'), function(err) {
       if (err) throw err;
       done();
     });
   },
   function(done) {
-    sharp(inputPngTransparent).flatten().background(255, 102, 0).resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-rgb-orange.jpg'), function(err) {
+    sharp(inputPngWithTransparency).flatten().background(255, 102, 0).resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-rgb-orange.jpg'), function(err) {
       if (err) throw err;
       done();
     });
   },
   function(done) {
-    sharp(inputPngTransparent).flatten().background('#ff6600').resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-hex-orange.jpg'), function(err) {
+    sharp(inputPngWithTransparency).flatten().background('#ff6600').resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-hex-orange.jpg'), function(err) {
       if (err) throw err;
       done();
     });
@@ -764,7 +764,7 @@ async.series([
   function(done) {
     // Missing `background` arguments
     try {
-      sharp(inputPngTransparent).flatten().background();
+      sharp(inputPngWithTransparency).flatten().background();
     } catch (e) {
       assert.strictEqual(e.message, "`color` or `r, g, b` arguments are required");
       done();
@@ -775,7 +775,7 @@ async.series([
   function(done) {
     // Invalid `background` arguments
     try {
-      sharp(inputPngTransparent).flatten().background(-1, -1, -1);
+      sharp(inputPngWithTransparency).flatten().background(-1, -1, -1);
     } catch (e) {
       assert.strictEqual(e.message, "Invalid red value (0.0 to 255.0) -1");
       done();
