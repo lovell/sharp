@@ -507,6 +507,9 @@ This module would never have been possible without the help and code contributio
 * [Jonathan Ong](https://github.com/jonathanong)
 * [Chanon Sajjamanochai](https://github.com/chanon)
 * [Juliano Julio](https://github.com/julianojulio)
+* [Daniel Gasienica](https://github.com/gasi)
+* [Julian Walker](https://github.com/julianwa)
+* [Amit Pitaru](https://github.com/apitaru)
 
 Thank you!
 
