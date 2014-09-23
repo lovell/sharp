@@ -762,6 +762,12 @@ async.series([
     });
   },
   function(done) {
+    sharp(inputJpg).flatten('#ff0000').resize(500, 400).toFile(path.join(fixturesPath, 'output.flatten-input-jpg.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
     // Invalid `background` arguments
     try {
       sharp(inputPngWithTransparency).flatten(-1, -1, -1);
