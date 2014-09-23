@@ -259,13 +259,9 @@ Preserving aspect ratio, resize the image to the maximum width or height specifi
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
-#### flatten()
+#### flatten(background) or flatten(r, g, b)
 
-Flatten transparent images before processing. Defaults background color to black. Use `background` to set the background color.
-
-#### background(color) or background(r, g, b)
-
-Set the background color when flattening transparent images using `flatten`. Pass any valid CSS color as `color` or numbers in the range of `[0, 255]` for `r`, `g`, and `b`.
+Flatten transparent images onto `background` color before processing. Defaults background color to black. Pass any valid CSS color as `background`, e.g. `#00ff00`, `hsl(120,100%,50%)`, etc., or numbers in the range of `[0, 255]` for `r`, `g`, and `b`.
 
 #### embedWhite()
 

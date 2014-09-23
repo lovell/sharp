@@ -750,32 +750,21 @@ async.series([
     });
   },
   function(done) {
-    sharp(inputPngWithTransparency).flatten().background(255, 102, 0).resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-rgb-orange.jpg'), function(err) {
+    sharp(inputPngWithTransparency).flatten(255, 102, 0).resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-rgb-orange.jpg'), function(err) {
       if (err) throw err;
       done();
     });
   },
   function(done) {
-    sharp(inputPngWithTransparency).flatten().background('#ff6600').resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-hex-orange.jpg'), function(err) {
+    sharp(inputPngWithTransparency).flatten('#ff6600').resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-hex-orange.jpg'), function(err) {
       if (err) throw err;
       done();
     });
-  },
-  function(done) {
-    // Missing `background` arguments
-    try {
-      sharp(inputPngWithTransparency).flatten().background();
-    } catch (e) {
-      assert.strictEqual(e.message, "`color` or `r, g, b` arguments are required");
-      done();
-      return;
-    }
-    assert.fail();
   },
   function(done) {
     // Invalid `background` arguments
     try {
-      sharp(inputPngWithTransparency).flatten().background(-1, -1, -1);
+      sharp(inputPngWithTransparency).flatten(-1, -1, -1);
     } catch (e) {
       assert.strictEqual(e.message, "Invalid red value (0.0 to 255.0) -1");
       done();

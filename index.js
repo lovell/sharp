@@ -113,17 +113,10 @@ Sharp.prototype.max = function() {
   return this;
 };
 
-Sharp.prototype.flatten = function() {
-  this.options.flatten = true;
-  return this;
-};
-
-Sharp.prototype.background = function() {
-  if (arguments.length === 0) {
-    throw new Error('`color` or `r, g, b` arguments are required');
-  }
-  if (arguments.length !== 1 && arguments.length !== 3) {
-    throw new Error('Invalid color. Expected `color` or `r, g, b`');
+Sharp.prototype.flatten = function(background) {
+  if (arguments.length !== 0 && arguments.length !== 1 &&
+      arguments.length !== 3) {
+    throw new Error('Invalid color. Expected `background` or `r, g, b`');
   }
 
   var normalize = function (name, color) {
@@ -133,8 +126,13 @@ Sharp.prototype.background = function() {
     return color;
   };
 
-  if (arguments.length === 1) {
-    var color = Color(arguments[0]);
+  if (arguments.length === 0) {
+    // Default background color to black:
+    this.options.backgroundRed = 0;
+    this.options.backgroundGreen = 0;
+    this.options.backgroundBlue = 0;
+  } else if (arguments.length === 1) {
+    var color = Color(background);
     this.options.backgroundRed = normalize('red', color.red());
     this.options.backgroundGreen = normalize('green', color.green());
     this.options.backgroundBlue = normalize('blue', color.blue());
@@ -145,6 +143,8 @@ Sharp.prototype.background = function() {
   } else {
     throw new Error('Unreachable state');
   }
+
+  this.options.flatten = true;
   return this;
 };
 
