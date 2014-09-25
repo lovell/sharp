@@ -162,6 +162,19 @@ sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int c
 }
 
 /*
+  Does this image have an alpha channel?
+  Uses colourspace interpretation with number of channels to guess this.
+*/
+static bool
+sharp_image_has_alpha(VipsImage *image) {
+  return (
+    (image->Bands == 2 && image->Type == VIPS_INTERPRETATION_B_W) ||
+    (image->Bands == 4 && image->Type != VIPS_INTERPRETATION_CMYK) ||
+    (image->Bands == 5 && image->Type == VIPS_INTERPRETATION_CMYK)
+  );
+}
+
+/*
   Initialise a VipsImage from a buffer. Supports JPEG, PNG and WebP.
   Returns the ImageType detected, if any.
 */
@@ -228,6 +241,7 @@ struct metadata_baton {
   int height;
   std::string space;
   int channels;
+  bool has_alpha;
   int orientation;
   std::string err;
 
@@ -276,6 +290,7 @@ class MetadataWorker : public NanAsyncWorker {
       baton->height = image->Ysize;
       baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image->Type);
       baton->channels = image->Bands;
+      baton->has_alpha = sharp_image_has_alpha(image);
       // EXIF Orientation
       const char *exif;
       if (!vips_image_get_string(image, "exif-ifd0-Orientation", &exif)) {
@@ -303,6 +318,7 @@ class MetadataWorker : public NanAsyncWorker {
       info->Set(NanNew<String>("height"), NanNew<Number>(baton->height));
       info->Set(NanNew<String>("space"), NanNew<String>(baton->space));
       info->Set(NanNew<String>("channels"), NanNew<Number>(baton->channels));
+      info->Set(NanNew<String>("hasAlpha"), NanNew<Boolean>(baton->has_alpha));
       if (baton->orientation > 0) {
         info->Set(NanNew<String>("orientation"), NanNew<Number>(baton->orientation));
       }

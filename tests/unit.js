@@ -21,6 +21,7 @@ var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://gi
 var inputJpgWithGammaHoliness = path.join(fixturesPath, "gamma_dalai_lama_gray.jpg"); // http://www.4p8.com/eric.brasseur/gamma.html
 
 var inputPng = path.join(fixturesPath, "50020484-00001.png"); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
+var inputPngWithTransparency = path.join(fixturesPath, "blackbug.png"); // public domain
 var inputWebP = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
 var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
 
@@ -593,6 +594,7 @@ async.series([
       assert.strictEqual(600, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual(8, metadata.orientation);
       done();
     });
@@ -606,6 +608,7 @@ async.series([
       assert.strictEqual(3248, metadata.height);
       assert.strictEqual('b-w', metadata.space);
       assert.strictEqual(1, metadata.channels);
+      assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
   },
@@ -618,6 +621,20 @@ async.series([
       assert.strictEqual(2074, metadata.height);
       assert.strictEqual('b-w', metadata.space);
       assert.strictEqual(1, metadata.channels);
+      assert.strictEqual(false, metadata.hasAlpha);
+      done();
+    });
+  },
+  // Metadata - Transparent PNG
+  function(done) {
+    sharp(inputPngWithTransparency).metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('png', metadata.format);
+      assert.strictEqual(2048, metadata.width);
+      assert.strictEqual(1536, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(4, metadata.channels);
+      assert.strictEqual(true, metadata.hasAlpha);
       done();
     });
   },
@@ -630,6 +647,7 @@ async.series([
       assert.strictEqual(772, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
   },
@@ -641,6 +659,7 @@ async.series([
       assert.strictEqual(800, metadata.width);
       assert.strictEqual(533, metadata.height);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
   },
@@ -652,6 +671,7 @@ async.series([
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
   },
@@ -665,6 +685,7 @@ async.series([
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
     readable.pipe(pipeline);
@@ -679,6 +700,7 @@ async.series([
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(false, metadata.hasAlpha);
       image.resize(metadata.width / 2).toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
