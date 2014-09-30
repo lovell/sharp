@@ -23,6 +23,8 @@ struct resize_baton {
   int height;
   bool crop;
   int gravity;
+  int left;
+  int top;
   bool max;
   VipsExtend extend;
   bool sharpen;
@@ -44,6 +46,8 @@ struct resize_baton {
     buffer_out_len(0),
     crop(false),
     gravity(0),
+    left(0),
+    top(0),
     max(false),
     sharpen(false),
     gamma(0.0),
@@ -136,7 +140,7 @@ sharp_calc_rotation(int const angle, VipsImage const *input) {
   within the input image, applying the given gravity.
 */
 static std::tuple<int, int>
-sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int const outHeight, int const gravity) {
+sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int const outHeight, int const gravity, int const sh_left, int const sh_top) {
   int left = 0;
   int top = 0;
   switch (gravity) {
@@ -154,10 +158,27 @@ sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int c
     case 4: // West
       top = (inHeight - outHeight + 1) / 2;
       break;
-    default: // Centre
+    case 5: // North and East
+      left = inWidth - outWidth;
+      break;
+    case 6: // North and West
+      break;
+    case 7: // South and East
+      left = inWidth - outWidth;
+      top = inHeight - outHeight;
+      break;
+    case 8: // South and West
+      top = inHeight - outHeight;
+      break;
+    case 0: // Centre
       left = (inWidth - outWidth + 1) / 2;
       top = (inHeight - outHeight + 1) / 2;
+    default: // shifting or none
+      left = 0;
+      top = 0;
   }
+  left = left + sh_left;
+  top = top + sh_top;
   return std::make_tuple(left, top);
 }
 
@@ -555,7 +576,7 @@ class ResizeWorker : public NanAsyncWorker {
         // Crop/max
         int left;
         int top;
-        std::tie(left, top) = sharp_calc_crop(rotated->Xsize, rotated->Ysize, baton->width, baton->height, baton->gravity);
+        std::tie(left, top) = sharp_calc_crop(rotated->Xsize, rotated->Ysize, baton->width, baton->height, baton->gravity, baton->left, baton->top);
         int width = std::min(rotated->Xsize, baton->width);
         int height = std::min(rotated->Ysize, baton->height);
         if (vips_extract_area(rotated, &canvased, left, top, width, height, NULL)) {
@@ -758,6 +779,8 @@ NAN_METHOD(resize) {
   }
   // Other options
   baton->gravity = options->Get(NanNew<String>("gravity"))->Int32Value();
+  baton->left = options->Get(NanNew<String>("left"))->Int32Value();
+  baton->top = options->Get(NanNew<String>("top"))->Int32Value();
   baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();

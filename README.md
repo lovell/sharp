@@ -249,13 +249,17 @@ Scale output to `width` x `height`. By default, the resized image is cropped to 
 
 `height` is the Number of pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
 
-#### crop([gravity])
+#### crop([gravity], [left], [top])
 
 Crop the resized image to the exact size specified, the default behaviour.
 
 `gravity`, if present, is an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north`.
 
-Possible values are `north`, `east`, `south`, `west`, `center` and `centre`. The default gravity is `center`/`centre`.
+`left`, cutting start position shifted to the right, pixel.
+
+`top`, move down the cutting start position.
+
+Possible values are `north`, `east`, `south`, `west`,`north_east`, `north_west`, `south_east`, `south_west`, `center` and `centre`. The default gravity is `north_west`.
 
 #### max()
 
