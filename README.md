@@ -98,6 +98,10 @@ Then follow Ubuntu 13.x instructions.
 
 [Alessandro Tagliapietra](https://github.com/alex88) maintains an [Heroku buildpack for libvips](https://github.com/alex88/heroku-buildpack-vips) and its dependencies.
 
+### Using with gulp.js
+
+[Mohammad Prabowo](https://github.com/rizalp) maintains a [gulp.js plugin](https://github.com/rizalp/gulp-sharp).
+
 ## Usage examples
 
 ```javascript
