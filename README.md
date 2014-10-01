@@ -263,6 +263,10 @@ Preserving aspect ratio, resize the image to the maximum width or height specifi
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
+#### flatten(background) or flatten(r, g, b)
+
+Flatten transparent images onto `background` color before processing. Defaults background color to black. Pass any valid CSS color as `background`, e.g. `#00ff00`, `hsl(120,100%,50%)`, etc., or numbers in the range of `[0, 255]` for `r`, `g`, and `b`.
+
 #### embedWhite()
 
 Embed the resized image on a white background of the exact size specified.
@@ -503,6 +507,9 @@ This module would never have been possible without the help and code contributio
 * [Jonathan Ong](https://github.com/jonathanong)
 * [Chanon Sajjamanochai](https://github.com/chanon)
 * [Juliano Julio](https://github.com/julianojulio)
+* [Daniel Gasienica](https://github.com/gasi)
+* [Julian Walker](https://github.com/julianwa)
+* [Amit Pitaru](https://github.com/apitaru)
 
 Thank you!
 

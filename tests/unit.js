@@ -21,6 +21,7 @@ var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://gi
 var inputJpgWithGammaHoliness = path.join(fixturesPath, "gamma_dalai_lama_gray.jpg"); // http://www.4p8.com/eric.brasseur/gamma.html
 
 var inputPng = path.join(fixturesPath, "50020484-00001.png"); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
+var inputPngWithTransparency = path.join(fixturesPath, "blackbug.png"); // public domain
 var inputWebP = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
 var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
 
@@ -546,6 +547,15 @@ async.series([
     });
   },
   function(done) {
+    sharp(inputPngWithTransparency).resize(320, 80).toFile(outputZoinks, function(err, info) {
+      if (err) throw err;
+      assert.strictEqual('png', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(80, info.height);
+      done();
+    });
+  },
+  function(done) {
     sharp(inputWebP).resize(320, 80).toFile(outputZoinks, function(err, info) {
       if (err) throw err;
       assert.strictEqual('webp', info.format);
@@ -618,6 +628,18 @@ async.series([
       assert.strictEqual(2074, metadata.height);
       assert.strictEqual('b-w', metadata.space);
       assert.strictEqual(1, metadata.channels);
+      done();
+    });
+  },
+  // Metadata - Transparent PNG
+  function(done) {
+    sharp(inputPngWithTransparency).metadata(function(err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('png', metadata.format);
+      assert.strictEqual(2048, metadata.width);
+      assert.strictEqual(1536, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(4, metadata.channels);
       done();
     });
   },
@@ -719,6 +741,42 @@ async.series([
       if (err) throw err;
       done();
     });
+  },
+  // Flattening
+  function(done) {
+    sharp(inputPngWithTransparency).flatten().resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-black.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputPngWithTransparency).flatten(255, 102, 0).resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-rgb-orange.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputPngWithTransparency).flatten('#ff6600').resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-hex-orange.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    sharp(inputJpg).flatten('#ff0000').resize(500, 400).toFile(path.join(fixturesPath, 'output.flatten-input-jpg.jpg'), function(err) {
+      if (err) throw err;
+      done();
+    });
+  },
+  function(done) {
+    // Invalid `background` arguments
+    try {
+      sharp(inputPngWithTransparency).flatten(-1, -1, -1);
+    } catch (e) {
+      assert.strictEqual(e.message, "Invalid red value (0.0 to 255.0) -1");
+      done();
+      return;
+    }
+    assert.fail();
   },
   // Verify internal counters
   function(done) {
