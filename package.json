@@ -6,7 +6,10 @@
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
     "Jonathan Ong <jonathanrichardong@gmail.com>",
     "Chanon Sajjamanochai <chanon.s@gmail.com>",
-    "Juliano Julio <julianojulio@gmail.com>"
+    "Juliano Julio <julianojulio@gmail.com>",
+    "Daniel Gasienica <daniel@gasienica.ch>",
+    "Julian Walker <julian@fiftythree.com>",
+    "Amit Pitaru <pitaru.amit@gmail.com>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG and WebP images using the libvips library",
   "scripts": {
@@ -35,8 +38,9 @@
     "stream"
   ],
   "dependencies": {
-    "nan": "^1.3.0",
-    "bluebird": "^2.3.2"
+    "bluebird": "^2.3.2",
+    "color": "^0.7.1",
+    "nan": "^1.3.0"
   },
   "devDependencies": {
     "imagemagick": "^0.1.3",

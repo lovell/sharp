@@ -153,14 +153,17 @@ readableStream.pipe(pipeline);
 sharp('input.png')
   .rotate(180)
   .resize(300)
+  .flatten()
+  .background('#ff6600')
   .sharpen()
   .withMetadata()
   .quality(90)
   .webp()
   .toBuffer()
   .then(function(outputBuffer) {
-    // outputBuffer contains 300px wide, upside down, sharpened,
-    // with metadata, 90% quality WebP image data
+    // outputBuffer contains upside down, 300px wide, alpha channel flattened
+    // onto orange background, sharpened, with metadata, 90% quality WebP image
+    // data
   });
 ```
 
@@ -241,6 +244,10 @@ An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQU
 
 ### Image transformation options
 
+#### background(color) or background(r, g, b)
+
+Set background color for operations such as `flatten`. Pass any valid CSS color as `color` string, e.g. `'#00ff00'`, `'hsl(120,100%,50%)'`, etc., or as numbers in the range of `[0, 255]` for `r`, `g`, and `b`. Defaults color to black.
+
 #### resize(width, [height])
 
 Scale output to `width` x `height`. By default, the resized image is cropped to the exact size specified.
@@ -270,6 +277,10 @@ Embed the resized image on a white background of the exact size specified.
 #### embedBlack()
 
 Embed the resized image on a black background of the exact size specified.
+
+#### flatten()
+
+Flatten transparent images onto background with a color set using `background`.
 
 #### rotate([angle])
 
@@ -503,6 +514,9 @@ This module would never have been possible without the help and code contributio
 * [Jonathan Ong](https://github.com/jonathanong)
 * [Chanon Sajjamanochai](https://github.com/chanon)
 * [Juliano Julio](https://github.com/julianojulio)
+* [Daniel Gasienica](https://github.com/gasi)
+* [Julian Walker](https://github.com/julianwa)
+* [Amit Pitaru](https://github.com/apitaru)
 
 Thank you!
 

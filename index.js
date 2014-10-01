@@ -1,6 +1,7 @@
 /*jslint node: true */
 'use strict';
 
+var Color = require('color');
 var util = require('util');
 var stream = require('stream');
 var Promise = require('bluebird');
@@ -29,7 +30,13 @@ var Sharp = function(input) {
     streamIn: false,
     streamOut: false,
     withMetadata: false,
-    output: '__input'
+    output: '__input',
+    // background
+    backgroundRed: 0,
+    backgroundGreen: 0,
+    backgroundBlue: 0,
+    // flatten
+    flatten: false
   };
   if (typeof input === 'string') {
     // input=file
@@ -79,6 +86,34 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
 // Crop this part of the resized image (Center/Centre, North, East, South, West)
 module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4};
 
+Sharp.prototype.background = function(color) {
+  if (arguments.length !== 1 && arguments.length !== 3) {
+    throw new Error('Invalid color. Expected `color` or `r, g, b`');
+  }
+
+  var normalize = function (name, color) {
+    if (isNaN(color) || color < 0 || 255 < color) {
+      throw new Error('Invalid ' + name + ' value (0.0 to 255.0) ' + color);
+    }
+    return color;
+  };
+
+  if (arguments.length === 1) {
+    var channels = Color(color);
+    this.options.backgroundRed = normalize('red', channels.red());
+    this.options.backgroundGreen = normalize('green', channels.green());
+    this.options.backgroundBlue = normalize('blue', channels.blue());
+  } else if (arguments.length === 3) {
+    this.options.backgroundRed = normalize('red', arguments[0]);
+    this.options.backgroundGreen = normalize('green', arguments[1]);
+    this.options.backgroundBlue = normalize('blue', arguments[2]);
+  } else {
+    throw new Error('Unreachable state');
+  }
+
+  return this;
+};
+
 Sharp.prototype.crop = function(gravity) {
   this.options.canvas = 'c';
   if (typeof gravity !== 'undefined') {
@@ -99,6 +134,11 @@ Sharp.prototype.embedWhite = function() {
 
 Sharp.prototype.embedBlack = function() {
   this.options.canvas = 'b';
+  return this;
+};
+
+Sharp.prototype.flatten = function(background) {
+  this.options.flatten = true;
   return this;
 };
 
