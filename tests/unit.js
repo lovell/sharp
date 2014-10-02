@@ -94,6 +94,45 @@ async.series([
       done();
     });
   },
+  // Embed - JPEG within PNG, no alpha channel
+  function(done) {
+    sharp(inputJpg)
+      .embed()
+      .resize(320, 240)
+      .png()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        sharp(data).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(3, metadata.channels);
+          done();
+        });
+      });
+  },
+  // Embed - JPEG within WebP, to include alpha channel
+  function(done) {
+    sharp(inputJpg)
+      .resize(320, 240)
+      .background({r: 0, g: 0, b: 0, a: 0})
+      .embed()
+      .webp()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('webp', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        sharp(data).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(4, metadata.channels);
+          done();
+        });
+      });
+  },
   // Quality
   function(done) {
     sharp(inputJpg).resize(320, 240).quality(70).toBuffer(function(err, buffer70) {
@@ -110,7 +149,7 @@ async.series([
   },
   // TIFF with dimensions known to cause rounding errors
   function(done) {
-    sharp(inputTiff).resize(240, 320).embedBlack().jpeg().toBuffer(function(err, data, info) {
+    sharp(inputTiff).resize(240, 320).embed().jpeg().toBuffer(function(err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
       assert.strictEqual('jpeg', info.format);
@@ -776,22 +815,15 @@ async.series([
       done();
     });
   },
-  function(done) {
-    // Invalid `background` arguments
-    try {
-      sharp(inputPngWithTransparency).background(-1, -1, -1).flatten();
-    } catch (e) {
-      assert.strictEqual(e.message, "Invalid red value (0.0 to 255.0) -1");
-      done();
-      return;
-    }
-    assert.fail();
-  },
   // Verify internal counters
   function(done) {
     var counters = sharp.counters();
     assert.strictEqual(0, counters.queue);
     assert.strictEqual(0, counters.process);
+  },
+  // Empty cache
+  function(done) {
+    sharp.cache(0);
     done();
   }
 ]);

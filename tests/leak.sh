@@ -4,4 +4,4 @@ if ! type valgrind >/dev/null; then
 fi
 
 curl -O https://raw.githubusercontent.com/jcupitt/libvips/master/libvips.supp
-G_SLICE=always-malloc G_DEBUG=gc-friendly valgrind --suppressions=libvips.supp --suppressions=sharp.supp --leak-check=full --show-leak-kinds=definite,indirect,possible node unit.js
+G_SLICE=always-malloc G_DEBUG=gc-friendly valgrind --suppressions=libvips.supp --suppressions=sharp.supp --leak-check=full --show-leak-kinds=definite,indirect,possible --num-callers=20 node unit.js

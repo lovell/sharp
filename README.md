@@ -180,7 +180,8 @@ http.createServer(function(request, response) {
 sharp(inputBuffer)
   .resize(200, 300)
   .interpolateWith(sharp.interpolator.nohalo)
-  .embedWhite()
+  .background('white')
+  .embed()
   .toFile('output.tiff')
   .then(function() {
     // output.tiff is a 200 pixels wide and 300 pixels high image
@@ -190,20 +191,29 @@ sharp(inputBuffer)
 ```
 
 ```javascript
-sharp('input.gif').resize(200, 300).embedBlack().webp().toBuffer(function(err, outputBuffer) {
-  if (err) {
-    throw err;
-  }
-  // outputBuffer contains WebP image data of a 200 pixels wide and 300 pixels high
-  // containing a scaled version, embedded on a black canvas, of input.gif
-});
+sharp('input.gif')
+  .resize(200, 300)
+  .background({r: 0, g: 0, b: 0, a: 0})
+  .embed()
+  .webp()
+  .toBuffer(function(err, outputBuffer) {
+    if (err) {
+      throw err;
+    }
+    // outputBuffer contains WebP image data of a 200 pixels wide and 300 pixels high
+    // containing a scaled version, embedded on a transparent canvas, of input.gif
+  });
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 200).max().jpeg().toBuffer().then(function(outputBuffer) {
-  // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
-  // than 200 pixels regardless of the inputBuffer image dimensions
-});
+sharp(inputBuffer)
+  .resize(200, 200)
+  .max()
+  .jpeg()
+  .toBuffer().then(function(outputBuffer) {
+    // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
+    // than 200 pixels regardless of the inputBuffer image dimensions
+  });
 ```
 
 ## API
@@ -234,6 +244,7 @@ Fast access to image metadata without decoding any compressed image data.
 * `height`: Number of pixels high
 * `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L502)
 * `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
+* `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 * `orientation`: Number value of the EXIF Orientation header, if present
 
 A Promises/A+ promise is returned when `callback` is not provided.
@@ -243,10 +254,6 @@ A Promises/A+ promise is returned when `callback` is not provided.
 An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.
 
 ### Image transformation options
-
-#### background(color) or background(r, g, b)
-
-Set background color for operations such as `flatten`. Pass any valid CSS color as `color` string, e.g. `'#00ff00'`, `'hsl(120,100%,50%)'`, etc., or as numbers in the range of `[0, 255]` for `r`, `g`, and `b`. Defaults color to black.
 
 #### resize(width, [height])
 
@@ -266,21 +273,29 @@ Possible values are `north`, `east`, `south`, `west`, `center` and `centre`. The
 
 #### max()
 
-Preserving aspect ratio, resize the image to the maximum width or height specified.
+Preserving aspect ratio, resize the image to the maximum `width` or `height` specified.
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
-#### embedWhite()
+#### background(rgba)
 
-Embed the resized image on a white background of the exact size specified.
+Set the background for the `embed` and `flatten` operations.
 
-#### embedBlack()
+`rgba` is parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
 
-Embed the resized image on a black background of the exact size specified.
+The alpha value is a float between `0` (transparent) and `1` (opaque).
+
+The default background is `{r: 0, g: 0, b: 0, a: 1}`, black without transparency.
+
+#### embed()
+
+Preserving aspect ratio, resize the image to the maximum `width` or `height` specified then embed on a background of the exact `width` and `height` specified.
+
+If the background contains an alpha value then WebP and PNG format output images will contain an alpha channel, even when the input image does not.
 
 #### flatten()
 
-Flatten transparent images onto background with a color set using `background`.
+Merge alpha transparency channel, if any, with `background`.
 
 #### rotate([angle])
 
@@ -327,7 +342,7 @@ JPEG input images will not take advantage of the shrink-on-load performance opti
 
 Convert to 8-bit greyscale; 256 shades of grey.
 
-This is a linear operation. If the input image is in a non-linear colourspace such as sRGB, use `gamma()` with `greyscale()` for the best results.
+This is a linear operation. If the input image is in a non-linear colour space such as sRGB, use `gamma()` with `greyscale()` for the best results.
 
 The output image will still be web-friendly sRGB and contain three (identical) channels.
 

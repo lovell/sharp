@@ -11,6 +11,12 @@
 using namespace v8;
 using namespace node;
 
+typedef enum {
+  CROP,
+  MAX,
+  EMBED
+} Canvas;
+
 struct resize_baton {
   std::string file_in;
   void* buffer_in;
@@ -21,47 +27,37 @@ struct resize_baton {
   size_t buffer_out_len;
   int width;
   int height;
-  bool crop;
+  Canvas canvas;
   int gravity;
-  bool max;
-  VipsExtend extend;
-  bool sharpen;
   std::string interpolator;
+  double background[4];
+  bool flatten;
+  bool sharpen;
   double gamma;
   bool greyscale;
   bool progressive;
   bool without_enlargement;
   VipsAccess access_method;
   int quality;
-  int compressionLevel;
+  int compression_level;
   int angle;
   std::string err;
-  bool withMetadata;
-  // background
-  double background_red;
-  double background_green;
-  double background_blue;
-  // flatten
-  bool flatten;
+  bool with_metadata;
 
   resize_baton():
     buffer_in_len(0),
     output_format(""),
     buffer_out_len(0),
-    crop(false),
+    canvas(CROP),
     gravity(0),
-    max(false),
+    background{0.0, 0.0, 0.0, 255.0},
+    flatten(false),
     sharpen(false),
     gamma(0.0),
+    greyscale(false),
     progressive(false),
     without_enlargement(false),
-    withMetadata(false),
-    // background
-    background_red(0.0),
-    background_green(0.0),
-    background_blue(0.0),
-    // flatten
-    flatten(false) {}
+    with_metadata(false) {}
 };
 
 typedef enum {
@@ -175,7 +171,7 @@ sharp_calc_crop(int const inWidth, int const inHeight, int const outWidth, int c
 
 /*
   Does this image have an alpha channel?
-  Uses colourspace interpretation with number of channels to guess this.
+  Uses colour space interpretation with number of channels to guess this.
 */
 static bool
 sharp_image_has_alpha(VipsImage *image) {
@@ -427,9 +423,9 @@ class ResizeWorker : public NanAsyncWorker {
       // Fixed width and height
       double xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
       double yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
-      factor = baton->crop ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
+      factor = (baton->canvas == CROP) ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
       // if max is set, we need to compute the real size of the thumb image
-      if (baton->max) {
+      if (baton->canvas == MAX) {
         if (xfactor > yfactor) {
           baton->height = round(static_cast<double>(inputHeight) / xfactor);
         } else {
@@ -502,22 +498,21 @@ class ResizeWorker : public NanAsyncWorker {
     }
     g_object_unref(in);
 
-    // Flatten
+    // Flatten image to remove alpha channel
     VipsImage *flattened = vips_image_new();
-    // We skip non-four-band images as we haven’t tested two-channel PNGs with
-    // alpha channel (yet).
-    // See: https://github.com/lovell/sharp/pull/91#issuecomment-56496548
-    if (baton->flatten && sharp_image_has_alpha(shrunk_on_load) && shrunk_on_load->Bands == 4) {
+    if (baton->flatten && sharp_image_has_alpha(shrunk_on_load)) {
+      // Background colour
       VipsArrayDouble *background = vips_array_double_newv(
-        3, // vector size
-        baton->background_red,
-        baton->background_green,
-        baton->background_blue
+        3, // Ignore alpha channel as we're about to remove it
+        baton->background[0],
+        baton->background[1],
+        baton->background[2]
       );
-
       if (vips_flatten(shrunk_on_load, &flattened, "background", background, NULL)) {
+        vips_area_unref(reinterpret_cast<VipsArea*>(background));
         return resize_error(baton, shrunk_on_load);
       };
+      vips_area_unref(reinterpret_cast<VipsArea*>(background));
     } else {
       vips_copy(shrunk_on_load, &flattened, NULL);
     }
@@ -536,11 +531,11 @@ class ResizeWorker : public NanAsyncWorker {
     // Convert to greyscale (linear, therefore after gamma encoding, if any)
     if (baton->greyscale) {
       VipsImage *greyscale = vips_image_new();
-      if (vips_colourspace(shrunk_on_load, &greyscale, VIPS_INTERPRETATION_B_W, NULL)) {
-        return resize_error(baton, shrunk_on_load);
+      if (vips_colourspace(flattened, &greyscale, VIPS_INTERPRETATION_B_W, NULL)) {
+        return resize_error(baton, flattened);
       }
-      g_object_unref(shrunk_on_load);
-      shrunk_on_load = greyscale;
+      g_object_unref(flattened);
+      flattened = greyscale;
     }
 
     VipsImage *shrunk = vips_image_new();
@@ -560,10 +555,10 @@ class ResizeWorker : public NanAsyncWorker {
       }
       double residualx = static_cast<double>(baton->width) / static_cast<double>(shrunkWidth);
       double residualy = static_cast<double>(baton->height) / static_cast<double>(shrunkHeight);
-      if (baton->crop || baton->max) {
-        residual = std::max(residualx, residualy);
-      } else {
+      if (baton->canvas == EMBED) {
         residual = std::min(residualx, residualy);
+      } else {
+        residual = std::max(residualx, residualy);
       }
     } else {
       vips_copy(flattened, &shrunk, NULL);
@@ -600,7 +595,56 @@ class ResizeWorker : public NanAsyncWorker {
     // Crop/embed
     VipsImage *canvased = vips_image_new();
     if (rotated->Xsize != baton->width || rotated->Ysize != baton->height) {
-      if (baton->crop || baton->max) {
+      if (baton->canvas == EMBED) {
+        // Add non-transparent alpha channel, if required
+        if (baton->background[3] < 255.0 && !sharp_image_has_alpha(rotated)) {
+          // Create single-channel transparency
+          VipsImage *black = vips_image_new();
+          if (vips_black(&black, rotated->Xsize, rotated->Ysize, "bands", 1, NULL)) {
+            g_object_unref(black);
+            return resize_error(baton, rotated);
+          }
+          // Invert to become non-transparent
+          VipsImage *alphaChannel = vips_image_new();
+          if (vips_invert(black, &alphaChannel, NULL)) {
+            g_object_unref(black);
+            g_object_unref(alphaChannel);
+            return resize_error(baton, rotated);
+          }
+          g_object_unref(black);
+          // Append alpha channel to existing image
+          VipsImage *joined = vips_image_new();
+          if (vips_bandjoin2(rotated, alphaChannel, &joined, NULL)) {
+            g_object_unref(alphaChannel);
+            g_object_unref(joined);
+            return resize_error(baton, rotated);
+          }
+          g_object_unref(alphaChannel);
+          g_object_unref(rotated);
+          rotated = joined;
+        }
+        // Create background
+        VipsArrayDouble *background;
+        if (baton->background[3] < 255.0) {
+          background = vips_array_double_newv(
+            4, baton->background[0], baton->background[1], baton->background[2], baton->background[3]
+          );
+        } else {
+          background = vips_array_double_newv(
+            3, baton->background[0], baton->background[1], baton->background[2]
+          );
+        }
+        // Embed
+        int left = (baton->width - rotated->Xsize) / 2;
+        int top = (baton->height - rotated->Ysize) / 2;
+        if (vips_embed(rotated, &canvased, left, top, baton->width, baton->height,
+          "extend", VIPS_EXTEND_BACKGROUND, "background", background, NULL
+        )) {
+          vips_area_unref(reinterpret_cast<VipsArea*>(background));
+          return resize_error(baton, rotated);
+        }
+        vips_area_unref(reinterpret_cast<VipsArea*>(background));
+      } else {
         // Crop/max
         int left;
         int top;
@@ -608,13 +652,6 @@ class ResizeWorker : public NanAsyncWorker {
         int width = std::min(rotated->Xsize, baton->width);
         int height = std::min(rotated->Ysize, baton->height);
         if (vips_extract_area(rotated, &canvased, left, top, width, height, NULL)) {
-          return resize_error(baton, rotated);
-        }
-      } else {
-        // Embed
-        int left = (baton->width - rotated->Xsize) / 2;
-        int top = (baton->height - rotated->Ysize) / 2;
-        if (vips_embed(rotated, &canvased, left, top, baton->width, baton->height, "extend", baton->extend, NULL)) {
           return resize_error(baton, rotated);
         }
       }
@@ -671,21 +708,21 @@ class ResizeWorker : public NanAsyncWorker {
     VipsImage *output = cached;
     if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == JPEG)) {
       // Write JPEG to buffer
-      if (vips_jpegsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->withMetadata,
+      if (vips_jpegsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->with_metadata,
         "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
       baton->output_format = "jpeg";
     } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == PNG)) {
       // Write PNG to buffer
-      if (vips_pngsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->withMetadata,
-        "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
+      if (vips_pngsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->with_metadata,
+        "compression", baton->compression_level, "interlace", baton->progressive, NULL)) {
         return resize_error(baton, output);
       }
       baton->output_format = "png";
     } else if (baton->output == "__webp" || (baton->output == "__input" && inputImageType == WEBP)) {
       // Write WEBP to buffer
-      if (vips_webpsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->withMetadata,
+      if (vips_webpsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->with_metadata,
         "Q", baton->quality, NULL)) {
         return resize_error(baton, output);
       }
@@ -698,28 +735,28 @@ class ResizeWorker : public NanAsyncWorker {
       bool match_input = !(output_jpeg || output_png || output_webp || output_tiff);
       if (output_jpeg || (match_input && inputImageType == JPEG)) {
         // Write JPEG to file
-        if (vips_jpegsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+        if (vips_jpegsave(output, baton->output.c_str(), "strip", !baton->with_metadata,
           "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
           return resize_error(baton, output);
         }
         baton->output_format = "jpeg";
       } else if (output_png || (match_input && inputImageType == PNG)) {
         // Write PNG to file
-        if (vips_pngsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
-          "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
+        if (vips_pngsave(output, baton->output.c_str(), "strip", !baton->with_metadata,
+          "compression", baton->compression_level, "interlace", baton->progressive, NULL)) {
           return resize_error(baton, output);
         }
         baton->output_format = "png";
       } else if (output_webp || (match_input && inputImageType == WEBP)) {
         // Write WEBP to file
-        if (vips_webpsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+        if (vips_webpsave(output, baton->output.c_str(), "strip", !baton->with_metadata,
           "Q", baton->quality, NULL)) {
           return resize_error(baton, output);
         }
         baton->output_format = "webp";
       } else if (output_tiff || (match_input && inputImageType == TIFF)) {
         // Write TIFF to file
-        if (vips_tiffsave(output, baton->output.c_str(), "strip", !baton->withMetadata,
+        if (vips_tiffsave(output, baton->output.c_str(), "strip", !baton->with_metadata,
           "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
           return resize_error(baton, output);
         }
@@ -785,6 +822,7 @@ NAN_METHOD(resize) {
 
   // Input filename
   baton->file_in = *String::Utf8Value(options->Get(NanNew<String>("fileIn"))->ToString());
+  baton->access_method = options->Get(NanNew<String>("sequentialRead"))->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   // Input Buffer object
   if (options->Get(NanNew<String>("bufferIn"))->IsObject()) {
     Local<Object> buffer = options->Get(NanNew<String>("bufferIn"))->ToObject();
@@ -794,40 +832,35 @@ NAN_METHOD(resize) {
   // Output image dimensions
   baton->width = options->Get(NanNew<String>("width"))->Int32Value();
   baton->height = options->Get(NanNew<String>("height"))->Int32Value();
-  // Canvas options
+  // Canvas option
   Local<String> canvas = options->Get(NanNew<String>("canvas"))->ToString();
   if (canvas->Equals(NanNew<String>("c"))) {
-    baton->crop = true;
-  } else if (canvas->Equals(NanNew<String>("w"))) {
-    baton->extend = VIPS_EXTEND_WHITE;
-  } else if (canvas->Equals(NanNew<String>("b"))) {
-    baton->extend = VIPS_EXTEND_BLACK;
+    baton->canvas = CROP;
   } else if (canvas->Equals(NanNew<String>("m"))) {
-    baton->max = true;
+    baton->canvas = MAX;
+  } else if (canvas->Equals(NanNew<String>("e"))) {
+    baton->canvas = EMBED;
   }
-
-  // Flatten
-  baton->flatten = options->Get(NanNew<String>("flatten"))->BooleanValue();
-
-  // Background
-  baton->background_red = options->Get(NanNew<String>("backgroundRed"))->NumberValue();
-  baton->background_green = options->Get(NanNew<String>("backgroundGreen"))->NumberValue();
-  baton->background_blue = options->Get(NanNew<String>("backgroundBlue"))->NumberValue();
-
-  // Other options
+  // Background colour
+  Local<Array> background = Local<Array>::Cast(options->Get(NanNew<String>("background")));
+  for (int i = 0; i < 4; i++) {
+    baton->background[i] = background->Get(i)->NumberValue();
+  }
+  // Resize options
+  baton->without_enlargement = options->Get(NanNew<String>("withoutEnlargement"))->BooleanValue();
   baton->gravity = options->Get(NanNew<String>("gravity"))->Int32Value();
-  baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
+  // Operators
+  baton->flatten = options->Get(NanNew<String>("flatten"))->BooleanValue();
+  baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
   baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();
   baton->greyscale = options->Get(NanNew<String>("greyscale"))->BooleanValue();
-  baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();
-  baton->without_enlargement = options->Get(NanNew<String>("withoutEnlargement"))->BooleanValue();
-  baton->access_method = options->Get(NanNew<String>("sequentialRead"))->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
-  baton->quality = options->Get(NanNew<String>("quality"))->Int32Value();
-  baton->compressionLevel = options->Get(NanNew<String>("compressionLevel"))->Int32Value();
   baton->angle = options->Get(NanNew<String>("angle"))->Int32Value();
-  baton->withMetadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
-
+  // Output options
+  baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();
+  baton->quality = options->Get(NanNew<String>("quality"))->Int32Value();
+  baton->compression_level = options->Get(NanNew<String>("compressionLevel"))->Int32Value();
+  baton->with_metadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
   // Output filename or __format for Buffer
   baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());
 
