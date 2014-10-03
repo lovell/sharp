@@ -98,10 +98,10 @@ static bool is_tiff(std::string const &str) {
   return ends_with(str, ".tif") || ends_with(str, ".tiff") || ends_with(str, ".TIF") || ends_with(str, ".TIFF");
 }
 
-static void resize_error(resize_baton *baton, VipsImage *unref) {
+static void resize_error(resize_baton *baton, VipsObject *hook) {
   (baton->err).append(vips_error_buffer());
   vips_error_clear();
-  g_object_unref(unref);
+  g_object_unref(hook);
   vips_thread_shutdown();
   return;
 }
@@ -384,32 +384,37 @@ class ResizeWorker : public NanAsyncWorker {
     // Increment processing task counter
     g_atomic_int_inc(&counter_process);
 
+    // Hang image references from this hook object
+    VipsObject *hook = reinterpret_cast<VipsObject*>(vips_image_new());
+
     // Input
     ImageType inputImageType = UNKNOWN;
-    VipsImage *in = vips_image_new();
+    VipsImage *image = vips_image_new();
+    vips_object_local(hook, image);
+
     if (baton->buffer_in_len > 1) {
       // From buffer
-      inputImageType = sharp_init_image_from_buffer(&in, baton->buffer_in, baton->buffer_in_len, baton->access_method);
+      inputImageType = sharp_init_image_from_buffer(&image, baton->buffer_in, baton->buffer_in_len, baton->access_method);
       if (inputImageType == UNKNOWN) {
         (baton->err).append("Input buffer contains unsupported image format");
       }
     } else {
       // From file
-      inputImageType = sharp_init_image_from_file(&in, baton->file_in.c_str(), baton->access_method);
+      inputImageType = sharp_init_image_from_file(&image, baton->file_in.c_str(), baton->access_method);
       if (inputImageType == UNKNOWN) {
         (baton->err).append("File is of an unsupported image format");
       }
     }
     if (inputImageType == UNKNOWN) {
-      return resize_error(baton, in);
+      return resize_error(baton, hook);
     }
 
     // Get input image width and height
-    int inputWidth = in->Xsize;
-    int inputHeight = in->Ysize;
+    int inputWidth = image->Xsize;
+    int inputHeight = image->Ysize;
 
     // Calculate angle of rotation, to be carried out later
-    VipsAngle rotation = sharp_calc_rotation(baton->angle, in);
+    VipsAngle rotation = sharp_calc_rotation(baton->angle, image);
     if (rotation == VIPS_ANGLE_90 || rotation == VIPS_ANGLE_270) {
       // Swap input output width and height when rotating by 90 or 270 degrees
       int swap = inputWidth;
@@ -477,30 +482,29 @@ class ResizeWorker : public NanAsyncWorker {
         shrink_on_load = 2;
       }
     }
-    VipsImage *shrunk_on_load = vips_image_new();
     if (shrink_on_load > 1) {
       // Recalculate integral shrink and double residual
       factor = std::max(factor, 1.0);
       shrink = floor(factor);
       residual = static_cast<double>(shrink) / factor;
       // Reload input using shrink-on-load
+      VipsImage *shrunk_on_load = vips_image_new();
+      vips_object_local(hook, shrunk_on_load);
       if (baton->buffer_in_len > 1) {
         if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
-          return resize_error(baton, in);
+          return resize_error(baton, hook);
         }
       } else {
         if (vips_jpegload((baton->file_in).c_str(), &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
-          return resize_error(baton, in);
+          return resize_error(baton, hook);
         }
       }
-    } else {
-      vips_copy(in, &shrunk_on_load, NULL);
+      g_object_unref(image);
+      image = shrunk_on_load;
     }
-    g_object_unref(in);
 
     // Flatten image to remove alpha channel
-    VipsImage *flattened = vips_image_new();
-    if (baton->flatten && sharp_image_has_alpha(shrunk_on_load)) {
+    if (baton->flatten && sharp_image_has_alpha(image)) {
       // Background colour
       VipsArrayDouble *background = vips_array_double_newv(
         3, // Ignore alpha channel as we're about to remove it
@@ -508,42 +512,48 @@ class ResizeWorker : public NanAsyncWorker {
         baton->background[1],
         baton->background[2]
       );
-      if (vips_flatten(shrunk_on_load, &flattened, "background", background, NULL)) {
+      VipsImage *flattened = vips_image_new();
+      vips_object_local(hook, flattened);
+      if (vips_flatten(image, &flattened, "background", background, NULL)) {
         vips_area_unref(reinterpret_cast<VipsArea*>(background));
-        return resize_error(baton, shrunk_on_load);
+        return resize_error(baton, hook);
       };
       vips_area_unref(reinterpret_cast<VipsArea*>(background));
-    } else {
-      vips_copy(shrunk_on_load, &flattened, NULL);
+      g_object_unref(image);
+      image = flattened;
     }
-    g_object_unref(shrunk_on_load);
 
     // Gamma encoding (darken)
     if (baton->gamma >= 1 && baton->gamma <= 3) {
       VipsImage *gamma_encoded = vips_image_new();
-      if (vips_gamma(flattened, &gamma_encoded, "exponent", 1.0 / baton->gamma, NULL)) {
-        return resize_error(baton, flattened);
+      vips_object_local(hook, gamma_encoded);
+      if (vips_gamma(image, &gamma_encoded, "exponent", 1.0 / baton->gamma, NULL)) {
+        return resize_error(baton, hook);
       }
-      g_object_unref(flattened);
-      flattened = gamma_encoded;
+      g_object_unref(image);
+      image = gamma_encoded;
     }
 
     // Convert to greyscale (linear, therefore after gamma encoding, if any)
     if (baton->greyscale) {
       VipsImage *greyscale = vips_image_new();
-      if (vips_colourspace(flattened, &greyscale, VIPS_INTERPRETATION_B_W, NULL)) {
-        return resize_error(baton, flattened);
+      vips_object_local(hook, greyscale);
+      if (vips_colourspace(image, &greyscale, VIPS_INTERPRETATION_B_W, NULL)) {
+        return resize_error(baton, hook);
       }
-      g_object_unref(flattened);
-      flattened = greyscale;
+      g_object_unref(image);
+      image = greyscale;
     }
 
-    VipsImage *shrunk = vips_image_new();
     if (shrink > 1) {
+      VipsImage *shrunk = vips_image_new();
+      vips_object_local(hook, shrunk);
       // Use vips_shrink with the integral reduction
-      if (vips_shrink(flattened, &shrunk, shrink, shrink, NULL)) {
-        return resize_error(baton, flattened);
+      if (vips_shrink(image, &shrunk, shrink, shrink, NULL)) {
+        return resize_error(baton, hook);
       }
+      g_object_unref(image);
+      image = shrunk;
       // Recalculate residual float based on dimensions of required vs shrunk images
       double shrunkWidth = shrunk->Xsize;
       double shrunkHeight = shrunk->Ysize;
@@ -560,68 +570,62 @@ class ResizeWorker : public NanAsyncWorker {
       } else {
         residual = std::max(residualx, residualy);
       }
-    } else {
-      vips_copy(flattened, &shrunk, NULL);
     }
-    g_object_unref(flattened);
 
     // Use vips_affine with the remaining float part
-    VipsImage *affined = vips_image_new();
     if (residual != 0) {
+      VipsImage *affined = vips_image_new();
+      vips_object_local(hook, affined);
       // Create interpolator - "bilinear" (default), "bicubic" or "nohalo"
       VipsInterpolate *interpolator = vips_interpolate_new(baton->interpolator.c_str());
       // Perform affine transformation
-      if (vips_affine(shrunk, &affined, residual, 0, 0, residual, "interpolate", interpolator, NULL)) {
+      if (vips_affine(image, &affined, residual, 0, 0, residual, "interpolate", interpolator, NULL)) {
         g_object_unref(interpolator);
-        return resize_error(baton, shrunk);
+        return resize_error(baton, hook);
       }
       g_object_unref(interpolator);
-    } else {
-      vips_copy(shrunk, &affined, NULL);
+      g_object_unref(image);
+      image = affined;
     }
-    g_object_unref(shrunk);
 
     // Rotate
-    VipsImage *rotated = vips_image_new();
     if (rotation != VIPS_ANGLE_0) {
-      if (vips_rot(affined, &rotated, rotation, NULL)) {
-        return resize_error(baton, affined);
+      VipsImage *rotated = vips_image_new();
+      vips_object_local(hook, rotated);
+      if (vips_rot(image, &rotated, rotation, NULL)) {
+        return resize_error(baton, hook);
       }
-    } else {
-      vips_copy(affined, &rotated, NULL);
+      g_object_unref(image);
+      image = rotated;
     }
-    g_object_unref(affined);
 
     // Crop/embed
-    VipsImage *canvased = vips_image_new();
-    if (rotated->Xsize != baton->width || rotated->Ysize != baton->height) {
+    if (image->Xsize != baton->width || image->Ysize != baton->height) {
+      VipsImage *canvased = vips_image_new();
+      vips_object_local(hook, canvased);
       if (baton->canvas == EMBED) {
         // Add non-transparent alpha channel, if required
-        if (baton->background[3] < 255.0 && !sharp_image_has_alpha(rotated)) {
+        if (baton->background[3] < 255.0 && !sharp_image_has_alpha(image)) {
           // Create single-channel transparency
           VipsImage *black = vips_image_new();
-          if (vips_black(&black, rotated->Xsize, rotated->Ysize, "bands", 1, NULL)) {
-            g_object_unref(black);
-            return resize_error(baton, rotated);
+          vips_object_local(hook, black);
+          if (vips_black(&black, image->Xsize, image->Ysize, "bands", 1, NULL)) {
+            return resize_error(baton, hook);
           }
           // Invert to become non-transparent
-          VipsImage *alphaChannel = vips_image_new();
-          if (vips_invert(black, &alphaChannel, NULL)) {
-            g_object_unref(black);
-            g_object_unref(alphaChannel);
-            return resize_error(baton, rotated);
+          VipsImage *alpha = vips_image_new();
+          vips_object_local(hook, alpha);
+          if (vips_invert(black, &alpha, NULL)) {
+            return resize_error(baton, hook);
           }
-          g_object_unref(black);
           // Append alpha channel to existing image
           VipsImage *joined = vips_image_new();
-          if (vips_bandjoin2(rotated, alphaChannel, &joined, NULL)) {
-            g_object_unref(alphaChannel);
-            g_object_unref(joined);
-            return resize_error(baton, rotated);
+          vips_object_local(hook, joined);
+          if (vips_bandjoin2(image, alpha, &joined, NULL)) {
+            return resize_error(baton, hook);
           }
-          g_object_unref(alphaChannel);
-          g_object_unref(rotated);
-          rotated = joined;
+          g_object_unref(image);
+          image = joined;
         }
         // Create background
         VipsArrayDouble *background;
@@ -635,96 +639,98 @@ class ResizeWorker : public NanAsyncWorker {
           );
         }
         // Embed
-        int left = (baton->width - rotated->Xsize) / 2;
-        int top = (baton->height - rotated->Ysize) / 2;
-        if (vips_embed(rotated, &canvased, left, top, baton->width, baton->height,
+        int left = (baton->width - image->Xsize) / 2;
+        int top = (baton->height - image->Ysize) / 2;
+        if (vips_embed(image, &canvased, left, top, baton->width, baton->height,
           "extend", VIPS_EXTEND_BACKGROUND, "background", background, NULL
         )) {
           vips_area_unref(reinterpret_cast<VipsArea*>(background));
-          return resize_error(baton, rotated);
+          return resize_error(baton, hook);
         }
         vips_area_unref(reinterpret_cast<VipsArea*>(background));
       } else {
         // Crop/max
         int left;
         int top;
-        std::tie(left, top) = sharp_calc_crop(rotated->Xsize, rotated->Ysize, baton->width, baton->height, baton->gravity);
-        int width = std::min(rotated->Xsize, baton->width);
-        int height = std::min(rotated->Ysize, baton->height);
-        if (vips_extract_area(rotated, &canvased, left, top, width, height, NULL)) {
-          return resize_error(baton, rotated);
+        std::tie(left, top) = sharp_calc_crop(image->Xsize, image->Ysize, baton->width, baton->height, baton->gravity);
+        int width = std::min(image->Xsize, baton->width);
+        int height = std::min(image->Ysize, baton->height);
+        if (vips_extract_area(image, &canvased, left, top, width, height, NULL)) {
+          return resize_error(baton, hook);
         }
       }
-    } else {
-      vips_copy(rotated, &canvased, NULL);
+      g_object_unref(image);
+      image = canvased;
     }
-    g_object_unref(rotated);
 
     // Mild sharpen
-    VipsImage *sharpened = vips_image_new();
     if (baton->sharpen) {
+      VipsImage *sharpened = vips_image_new();
+      vips_object_local(hook, sharpened);
       VipsImage *sharpen = vips_image_new_matrixv(3, 3,
         -1.0, -1.0, -1.0,
         -1.0, 32.0, -1.0,
         -1.0, -1.0, -1.0);
       vips_image_set_double(sharpen, "scale", 24);
-      if (vips_conv(canvased, &sharpened, sharpen, NULL)) {
-        g_object_unref(sharpen);
-        return resize_error(baton, canvased);
+      vips_object_local(hook, sharpen);
+      if (vips_conv(image, &sharpened, sharpen, NULL)) {
+        return resize_error(baton, hook);
       }
-      g_object_unref(sharpen);
-    } else {
-      vips_copy(canvased, &sharpened, NULL);
+      g_object_unref(image);
+      image = sharpened;
     }
-    g_object_unref(canvased);
 
     // Gamma decoding (brighten)
     if (baton->gamma >= 1 && baton->gamma <= 3) {
       VipsImage *gamma_decoded = vips_image_new();
-      if (vips_gamma(sharpened, &gamma_decoded, "exponent", baton->gamma, NULL)) {
-        return resize_error(baton, sharpened);
+      vips_object_local(hook, gamma_decoded);
+      if (vips_gamma(image, &gamma_decoded, "exponent", baton->gamma, NULL)) {
+        return resize_error(baton, hook);
       }
-      g_object_unref(sharpened);
-      sharpened = gamma_decoded;
+      g_object_unref(image);
+      image = gamma_decoded;
     }
 
     // Always convert to sRGB colour space
     VipsImage *colourspaced = vips_image_new();
-    vips_colourspace(sharpened, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL);
-    g_object_unref(sharpened);
+    vips_object_local(hook, colourspaced);
+    if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
+      return resize_error(baton, hook);
+    }
+    g_object_unref(image);
+    image = colourspaced;
 
     // Generate image tile cache when interlace output is required
-    VipsImage *cached = vips_image_new();
     if (baton->progressive) {
-      if (vips_tilecache(colourspaced, &cached, "threaded", TRUE, "persistent", TRUE, "max_tiles", -1, NULL)) {
-        return resize_error(baton, colourspaced);
+      VipsImage *cached = vips_image_new();
+      vips_object_local(hook, cached);
+      if (vips_tilecache(image, &cached, "threaded", TRUE, "persistent", TRUE, "max_tiles", -1, NULL)) {
+        return resize_error(baton, hook);
       }
-    } else {
-      vips_copy(colourspaced, &cached, NULL);
+      g_object_unref(image);
+      image = cached;
     }
-    g_object_unref(colourspaced);
 
     // Output
-    VipsImage *output = cached;
     if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == JPEG)) {
       // Write JPEG to buffer
-      if (vips_jpegsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->with_metadata,
+      if (vips_jpegsave_buffer(image, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->with_metadata,
         "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
-        return resize_error(baton, output);
+        return resize_error(baton, hook);
       }
       baton->output_format = "jpeg";
     } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == PNG)) {
       // Write PNG to buffer
-      if (vips_pngsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->with_metadata,
+      if (vips_pngsave_buffer(image, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->with_metadata,
         "compression", baton->compression_level, "interlace", baton->progressive, NULL)) {
-        return resize_error(baton, output);
+        return resize_error(baton, hook);
       }
       baton->output_format = "png";
     } else if (baton->output == "__webp" || (baton->output == "__input" && inputImageType == WEBP)) {
       // Write WEBP to buffer
-      if (vips_webpsave_buffer(output, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->with_metadata,
+      if (vips_webpsave_buffer(image, &baton->buffer_out, &baton->buffer_out_len, "strip", !baton->with_metadata,
         "Q", baton->quality, NULL)) {
-        return resize_error(baton, output);
+        return resize_error(baton, hook);
       }
       baton->output_format = "webp";
     } else {
@@ -735,39 +741,40 @@ class ResizeWorker : public NanAsyncWorker {
       bool match_input = !(output_jpeg || output_png || output_webp || output_tiff);
       if (output_jpeg || (match_input && inputImageType == JPEG)) {
         // Write JPEG to file
-        if (vips_jpegsave(output, baton->output.c_str(), "strip", !baton->with_metadata,
+        if (vips_jpegsave(image, baton->output.c_str(), "strip", !baton->with_metadata,
           "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
-          return resize_error(baton, output);
+          return resize_error(baton, hook);
         }
         baton->output_format = "jpeg";
       } else if (output_png || (match_input && inputImageType == PNG)) {
         // Write PNG to file
-        if (vips_pngsave(output, baton->output.c_str(), "strip", !baton->with_metadata,
+        if (vips_pngsave(image, baton->output.c_str(), "strip", !baton->with_metadata,
           "compression", baton->compression_level, "interlace", baton->progressive, NULL)) {
-          return resize_error(baton, output);
+          return resize_error(baton, hook);
         }
         baton->output_format = "png";
       } else if (output_webp || (match_input && inputImageType == WEBP)) {
         // Write WEBP to file
-        if (vips_webpsave(output, baton->output.c_str(), "strip", !baton->with_metadata,
+        if (vips_webpsave(image, baton->output.c_str(), "strip", !baton->with_metadata,
           "Q", baton->quality, NULL)) {
-          return resize_error(baton, output);
+          return resize_error(baton, hook);
         }
         baton->output_format = "webp";
       } else if (output_tiff || (match_input && inputImageType == TIFF)) {
         // Write TIFF to file
-        if (vips_tiffsave(output, baton->output.c_str(), "strip", !baton->with_metadata,
+        if (vips_tiffsave(image, baton->output.c_str(), "strip", !baton->with_metadata,
           "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
-          return resize_error(baton, output);
+          return resize_error(baton, hook);
         }
         baton->output_format = "tiff";
       } else {
         (baton->err).append("Unsupported output " + baton->output);
-        return resize_error(baton, output);
+        return resize_error(baton, hook);
       }
     }
-    g_object_unref(output);
-
+    // Clean up any dangling image references
+    g_object_unref(image);
+    g_object_unref(hook);
     // Clean up libvips' per-request data and threads
     vips_error_clear();
     vips_thread_shutdown();
