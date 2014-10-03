@@ -378,7 +378,7 @@ Include all metadata (ICC, EXIF, XMP) from the input image in the output image. 
 
 An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
 
-`compressionLevel` is a Number between -1 and 9.
+`compressionLevel` is a Number between 0 and 9.
 
 ### Output methods
 

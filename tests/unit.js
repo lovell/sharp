@@ -815,6 +815,26 @@ async.series([
       done();
     });
   },
+  // PNG compression level - valid
+  function(done) {
+    var isValid = false;
+    try {
+      sharp().compressionLevel(0);
+      isValid = true;
+    } catch (e) {}
+    assert(isValid);
+    done();
+  },
+  // PNG compression level - invalid
+  function(done) {
+    var isValid = false;
+    try {
+      sharp().compressionLevel(-1);
+      isValid = true;
+    } catch (e) {}
+    assert(!isValid);
+    done();
+  },
   // Verify internal counters
   function(done) {
     var counters = sharp.counters();

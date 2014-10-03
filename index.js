@@ -63,6 +63,7 @@ util.inherits(Sharp, stream.Duplex);
   Handle incoming chunk on Writable Stream
 */
 Sharp.prototype._write = function(chunk, encoding, callback) {
+  /*jslint unused: false */
   if (this.options.streamIn) {
     if (typeof chunk === 'object' || chunk instanceof Buffer) {
       if (typeof this.options.bufferIn === 'undefined') {
@@ -229,10 +230,10 @@ Sharp.prototype.quality = function(quality) {
 };
 
 Sharp.prototype.compressionLevel = function(compressionLevel) {
-  if (!Number.isNaN(compressionLevel) && compressionLevel >= -1 && compressionLevel <= 9) {
+  if (!Number.isNaN(compressionLevel) && compressionLevel >= 0 && compressionLevel <= 9) {
     this.options.compressionLevel = compressionLevel;
   } else {
-    throw new Error('Invalid compressionLevel (-1 to 9) ' + compressionLevel);
+    throw new Error('Invalid compressionLevel (0 to 9) ' + compressionLevel);
   }
   return this;
 };
