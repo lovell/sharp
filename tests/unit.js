@@ -2,30 +2,27 @@
 /*jslint es5: true */
 'use strict';
 
-var sharp = require("../index");
-var fs = require("fs");
-var path = require("path");
-var assert = require("assert");
-var async = require("async");
+var sharp = require('../index');
+var fs = require('fs');
+var path = require('path');
+var assert = require('assert');
+var async = require('async');
 
-var fixturesPath = path.join(__dirname, "fixtures");
+var fixturesPath = path.join(__dirname, 'fixtures');
 
-var inputJpg = path.join(fixturesPath, "2569067123_aca715a2ee_o.jpg"); // http://www.flickr.com/photos/grizdave/2569067123/
-var outputJpg = path.join(fixturesPath, "output.jpg");
+var inputJpg = path.join(fixturesPath, '2569067123_aca715a2ee_o.jpg'); // http://www.flickr.com/photos/grizdave/2569067123/
+var inputJpgWithExif = path.join(fixturesPath, 'Landscape_8.jpg'); // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_8.jpg
+var inputJpgWithGammaHoliness = path.join(fixturesPath, 'gamma_dalai_lama_gray.jpg'); // http://www.4p8.com/eric.brasseur/gamma.html
 
-var inputTiff = path.join(fixturesPath, "G31D.TIF"); // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
-var outputTiff = path.join(fixturesPath, "output.tiff");
+var inputPng = path.join(fixturesPath, '50020484-00001.png'); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
+var inputPngWithTransparency = path.join(fixturesPath, 'blackbug.png'); // public domain
 
-var inputJpgWithExif = path.join(fixturesPath, "Landscape_8.jpg"); // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_8.jpg
+var inputWebP = path.join(fixturesPath, '4.webp'); // http://www.gstatic.com/webp/gallery/4.webp
+var inputTiff = path.join(fixturesPath, 'G31D.TIF'); // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
+var inputGif = path.join(fixturesPath, 'Crash_test.gif'); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
 
-var inputJpgWithGammaHoliness = path.join(fixturesPath, "gamma_dalai_lama_gray.jpg"); // http://www.4p8.com/eric.brasseur/gamma.html
-
-var inputPng = path.join(fixturesPath, "50020484-00001.png"); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
-var inputPngWithTransparency = path.join(fixturesPath, "blackbug.png"); // public domain
-var inputWebP = path.join(fixturesPath, "4.webp"); // http://www.gstatic.com/webp/gallery/4.webp
-var inputGif = path.join(fixturesPath, "Crash_test.gif"); // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
-
-var outputZoinks = path.join(fixturesPath, 'output.zoinks'); // an "unknown" file extension
+var outputJpg = path.join(fixturesPath, 'output.jpg');
+var outputZoinks = path.join(fixturesPath, 'output.zoinks'); // an 'unknown' file extension
 
 // Ensure cache limits can be set
 sharp.cache(0); // Disable
@@ -140,6 +137,7 @@ async.series([
       sharp(inputJpg).resize(320, 240).toBuffer(function(err, buffer80) {
         if (err) throw err;
         sharp(inputJpg).resize(320, 240).quality(90).toBuffer(function(err, buffer90) {
+          if (err) throw err;
           assert(buffer70.length < buffer80.length);
           assert(buffer80.length < buffer90.length);
           done();
@@ -313,6 +311,7 @@ async.series([
   function(done) {
     sharp(inputTiff).webp().toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual('webp', info.format);
       done();
     });
@@ -434,6 +433,7 @@ async.series([
     var readable = fs.createReadStream(inputJpg);
     var pipeline = sharp().resize(320, 240).toBuffer(function(err, data, info) {
       if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
       assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
@@ -615,7 +615,7 @@ async.series([
     });
   },
   function(done) {
-    sharp(inputGif).resize(320, 80).toFile(outputZoinks, function(err, info) {
+    sharp(inputGif).resize(320, 80).toFile(outputZoinks, function(err) {
       assert(!!err);
       done();
     });
@@ -760,7 +760,7 @@ async.series([
   },
   // Gamma correction
   function(done) {
-    sharp(inputJpgWithGammaHoliness).resize(129, 111).toFile(path.join(fixturesPath, 'output.gamma-0.0.jpg'), function(err, info) {
+    sharp(inputJpgWithGammaHoliness).resize(129, 111).toFile(path.join(fixturesPath, 'output.gamma-0.0.jpg'), function(err) {
       if (err) throw err;
       done();
     });
@@ -779,7 +779,7 @@ async.series([
   },
   // Greyscale conversion
   function(done) {
-    sharp(inputJpg).resize(320, 240).greyscale().toFile(path.join(fixturesPath, 'output.greyscale-gamma-0.0.jpg'), function(err, info) {
+    sharp(inputJpg).resize(320, 240).greyscale().toFile(path.join(fixturesPath, 'output.greyscale-gamma-0.0.jpg'), function(err) {
       if (err) throw err;
       done();
     });
@@ -798,7 +798,7 @@ async.series([
     });
   },
   function(done) {
-    sharp(inputPngWithTransparency).flatten().background(255, 102, 0).resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-rgb-orange.jpg'), function(err) {
+    sharp(inputPngWithTransparency).flatten().background({r: 255, g: 102, b: 0}).resize(400, 300).toFile(path.join(fixturesPath, 'output.flatten-rgb-orange.jpg'), function(err) {
       if (err) throw err;
       done();
     });
@@ -820,6 +820,7 @@ async.series([
     var counters = sharp.counters();
     assert.strictEqual(0, counters.queue);
     assert.strictEqual(0, counters.process);
+    done();
   },
   // Empty cache
   function(done) {
