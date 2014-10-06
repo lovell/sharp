@@ -13,6 +13,7 @@ var fixturesPath = path.join(__dirname, 'fixtures');
 var inputJpg = path.join(fixturesPath, '2569067123_aca715a2ee_o.jpg'); // http://www.flickr.com/photos/grizdave/2569067123/
 var inputJpgWithExif = path.join(fixturesPath, 'Landscape_8.jpg'); // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_8.jpg
 var inputJpgWithGammaHoliness = path.join(fixturesPath, 'gamma_dalai_lama_gray.jpg'); // http://www.4p8.com/eric.brasseur/gamma.html
+var inputJpgWithCmykProfile = path.join(fixturesPath, 'Channel_digital_image_CMYK_color.jpg'); // http://en.wikipedia.org/wiki/File:Channel_digital_image_CMYK_color.jpg
 
 var inputPng = path.join(fixturesPath, '50020484-00001.png'); // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
 var inputPngWithTransparency = path.join(fixturesPath, 'blackbug.png'); // public domain
@@ -313,6 +314,16 @@ async.series([
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
       assert.strictEqual('webp', info.format);
+      done();
+    });
+  },
+  // Check colour space conversion from CMYK to sRGB
+  function(done) {
+    sharp(inputJpgWithCmykProfile).resize(320).toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
+      assert.strictEqual(320, info.width);
       done();
     });
   },

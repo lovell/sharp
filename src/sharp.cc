@@ -511,6 +511,17 @@ class ResizeWorker : public NanAsyncWorker {
       image = shrunk_on_load;
     }
 
+    // Import embedded colour profile, if present
+    if (vips_image_get_typeof(image, VIPS_META_ICC_NAME)) {
+      VipsImage *profile = vips_image_new();
+      vips_object_local(hook, profile);
+      if (vips_icc_import(image, &profile, NULL, "embedded", TRUE, "pcs", VIPS_PCS_XYZ, NULL)) {
+        return resize_error(baton, hook);
+      }
+      g_object_unref(image);
+      image = profile;
+    }
+
     // Flatten image to remove alpha channel
     if (baton->flatten && sharp_image_has_alpha(image)) {
       // Background colour
