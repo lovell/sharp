@@ -106,6 +106,14 @@ static void resize_error(resize_baton *baton, VipsObject *hook) {
   return;
 }
 
+typedef enum {
+	ANGLE_0,
+	ANGLE_90,
+	ANGLE_180,
+	ANGLE_270,
+	ANGLE_LAST
+} Angle;
+
 /*
   Calculate the angle of rotation for the output image.
   In order of priority:
@@ -113,27 +121,27 @@ static void resize_error(resize_baton *baton, VipsObject *hook) {
    2. Use input image EXIF Orientation header (does not support mirroring)
    3. Otherwise default to zero, i.e. no rotation
 */
-static VipsAngle
+static Angle
 sharp_calc_rotation(int const angle, VipsImage const *input) {
-  VipsAngle rotate = VIPS_ANGLE_0;
+  Angle rotate = ANGLE_0;
   if (angle == -1) {
     const char *exif;
     if (!vips_image_get_string(input, "exif-ifd0-Orientation", &exif)) {
       if (exif[0] == 0x36) { // "6"
-        rotate = VIPS_ANGLE_90;
+        rotate = ANGLE_90;
       } else if (exif[0] == 0x33) { // "3"
-        rotate = VIPS_ANGLE_180;
+        rotate = ANGLE_180;
       } else if (exif[0] == 0x38) { // "8"
-        rotate = VIPS_ANGLE_270;
+        rotate = ANGLE_270;
       }
     }
   } else {
     if (angle == 90) {
-      rotate = VIPS_ANGLE_90;
+      rotate = ANGLE_90;
     } else if (angle == 180) {
-      rotate = VIPS_ANGLE_180;
+      rotate = ANGLE_180;
     } else if (angle == 270) {
-      rotate = VIPS_ANGLE_270;
+      rotate = ANGLE_270;
     }
   }
   return rotate;
@@ -414,8 +422,8 @@ class ResizeWorker : public NanAsyncWorker {
     int inputHeight = image->Ysize;
 
     // Calculate angle of rotation, to be carried out later
-    VipsAngle rotation = sharp_calc_rotation(baton->angle, image);
-    if (rotation == VIPS_ANGLE_90 || rotation == VIPS_ANGLE_270) {
+    Angle rotation = sharp_calc_rotation(baton->angle, image);
+    if (rotation == ANGLE_90 || rotation == ANGLE_270) {
       // Swap input output width and height when rotating by 90 or 270 degrees
       int swap = inputWidth;
       inputWidth = inputHeight;
@@ -557,7 +565,7 @@ class ResizeWorker : public NanAsyncWorker {
       // Recalculate residual float based on dimensions of required vs shrunk images
       double shrunkWidth = shrunk->Xsize;
       double shrunkHeight = shrunk->Ysize;
-      if (rotation == VIPS_ANGLE_90 || rotation == VIPS_ANGLE_270) {
+      if (rotation == ANGLE_90 || rotation == ANGLE_270) {
         // Swap input output width and height when rotating by 90 or 270 degrees
         int swap = shrunkWidth;
         shrunkWidth = shrunkHeight;
@@ -589,10 +597,10 @@ class ResizeWorker : public NanAsyncWorker {
     }
 
     // Rotate
-    if (rotation != VIPS_ANGLE_0) {
+    if (rotation != ANGLE_0) {
       VipsImage *rotated = vips_image_new();
       vips_object_local(hook, rotated);
-      if (vips_rot(image, &rotated, rotation, NULL)) {
+      if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), NULL)) {
         return resize_error(baton, hook);
       }
       g_object_unref(image);
