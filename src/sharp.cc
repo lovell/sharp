@@ -511,8 +511,9 @@ class ResizeWorker : public NanAsyncWorker {
       image = shrunk_on_load;
     }
 
-    // Import embedded colour profile, if present
-    if (vips_image_get_typeof(image, VIPS_META_ICC_NAME)) {
+    // Handle colour profile, if any, for non sRGB images
+    if (image->Type != VIPS_INTERPRETATION_sRGB && vips_image_get_typeof(image, VIPS_META_ICC_NAME)) {
+      // Import embedded profile
       VipsImage *profile = vips_image_new();
       vips_object_local(hook, profile);
       if (vips_icc_import(image, &profile, NULL, "embedded", TRUE, "pcs", VIPS_PCS_XYZ, NULL)) {
@@ -520,6 +521,14 @@ class ResizeWorker : public NanAsyncWorker {
       }
       g_object_unref(image);
       image = profile;
+      // Convert to sRGB colour space
+      VipsImage *colourspaced = vips_image_new();
+      vips_object_local(hook, colourspaced);
+      if (vips_colourspace(profile, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
+        return resize_error(baton, hook);
+      }
+      g_object_unref(image);
+      image = colourspaced;
     }
 
     // Flatten image to remove alpha channel
@@ -710,14 +719,16 @@ class ResizeWorker : public NanAsyncWorker {
       image = gamma_decoded;
     }
 
-    // Always convert to sRGB colour space
-    VipsImage *colourspaced = vips_image_new();
-    vips_object_local(hook, colourspaced);
-    if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
-      return resize_error(baton, hook);
+    // Convert to sRGB colour space, if not already
+    if (image->Type != VIPS_INTERPRETATION_sRGB) {
+      VipsImage *colourspaced = vips_image_new();
+      vips_object_local(hook, colourspaced);
+      if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
+        return resize_error(baton, hook);
+      }
+      g_object_unref(image);
+      image = colourspaced;
     }
-    g_object_unref(image);
-    image = colourspaced;
 
     // Generate image tile cache when interlace output is required
     if (baton->progressive) {

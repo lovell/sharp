@@ -327,6 +327,16 @@ async.series([
       done();
     });
   },
+  // Check colour space conversion from CMYK to sRGB works with background colour (yellow=fail)
+  function(done) {
+    sharp(inputJpgWithCmykProfile).resize(320, 240).background('white').embed().toFile(path.join(fixturesPath, 'output.cmyk2srgb.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual('jpeg', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      done();
+    });
+  },
   // Interpolation: nearest neighbour
   function(done) {
     sharp(inputJpg).resize(320, 240).interpolateWith(sharp.interpolator.nearest).toBuffer(function(err, data, info) {
