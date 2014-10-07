@@ -45,37 +45,29 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 	brew link gettext --force
 
-### Install libvips on Ubuntu Linux
+### Install libvips on Linux
 
-#### Ubuntu 14.x
+#### Ubuntu 14.04 LTS
 
 	sudo apt-get install libvips-dev
 
-#### Ubuntu 13.x
+#### Ubuntu 12.04 LTS
 
-Compiling from source is recommended:
-
-	sudo apt-get install automake build-essential git gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libxml2-dev swig libmagickwand-dev
+	sudo add-apt-repository -y ppa:lyrasis/precise-backports
+	sudo apt-get update
+	sudo apt-get install -y automake build-essential git gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff4-dev libexif-dev libxml2-dev swig libmagickwand-dev
 	git clone https://github.com/jcupitt/libvips.git
 	cd libvips
-	git checkout 7.38
+	git checkout 7.40
 	./bootstrap.sh
 	./configure --enable-debug=no --enable-cxx=yes --without-python --without-orc --without-fftw
 	make
 	sudo make install
 	sudo ldconfig
 
-#### Ubuntu 12.x
+#### Debian Jessie
 
-Requires `libtiff4-dev` instead of `libtiff5-dev` and has [a bug](https://bugs.launchpad.net/ubuntu/+source/libwebp/+bug/1108731) in the libwebp package. Work around these problems by running these commands first:
-
-	sudo add-apt-repository ppa:lyrasis/precise-backports
-	sudo apt-get update
-	sudo apt-get install libtiff4-dev
-
-Then follow Ubuntu 13.x instructions.
-
-### Install libvips on Redhat/Centos Linux
+	apt-get install libvips-dev
 
 #### Centos 6
 
@@ -153,14 +145,17 @@ readableStream.pipe(pipeline);
 sharp('input.png')
   .rotate(180)
   .resize(300)
+  .flatten()
+  .background('#ff6600')
   .sharpen()
   .withMetadata()
   .quality(90)
   .webp()
   .toBuffer()
   .then(function(outputBuffer) {
-    // outputBuffer contains 300px wide, upside down, sharpened,
-    // with metadata, 90% quality WebP image data
+    // outputBuffer contains upside down, 300px wide, alpha channel flattened
+    // onto orange background, sharpened, with metadata, 90% quality WebP image
+    // data
   });
 ```
 
@@ -177,7 +172,8 @@ http.createServer(function(request, response) {
 sharp(inputBuffer)
   .resize(200, 300)
   .interpolateWith(sharp.interpolator.nohalo)
-  .embedWhite()
+  .background('white')
+  .embed()
   .toFile('output.tiff')
   .then(function() {
     // output.tiff is a 200 pixels wide and 300 pixels high image
@@ -187,20 +183,29 @@ sharp(inputBuffer)
 ```
 
 ```javascript
-sharp('input.gif').resize(200, 300).embedBlack().webp().toBuffer(function(err, outputBuffer) {
-  if (err) {
-    throw err;
-  }
-  // outputBuffer contains WebP image data of a 200 pixels wide and 300 pixels high
-  // containing a scaled version, embedded on a black canvas, of input.gif
-});
+sharp('input.gif')
+  .resize(200, 300)
+  .background({r: 0, g: 0, b: 0, a: 0})
+  .embed()
+  .webp()
+  .toBuffer(function(err, outputBuffer) {
+    if (err) {
+      throw err;
+    }
+    // outputBuffer contains WebP image data of a 200 pixels wide and 300 pixels high
+    // containing a scaled version, embedded on a transparent canvas, of input.gif
+  });
 ```
 
 ```javascript
-sharp(inputBuffer).resize(200, 200).max().jpeg().toBuffer().then(function(outputBuffer) {
-  // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
-  // than 200 pixels regardless of the inputBuffer image dimensions
-});
+sharp(inputBuffer)
+  .resize(200, 200)
+  .max()
+  .jpeg()
+  .toBuffer().then(function(outputBuffer) {
+    // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
+    // than 200 pixels regardless of the inputBuffer image dimensions
+  });
 ```
 
 ## API
@@ -231,6 +236,7 @@ Fast access to image metadata without decoding any compressed image data.
 * `height`: Number of pixels high
 * `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L502)
 * `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
+* `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 * `orientation`: Number value of the EXIF Orientation header, if present
 
 A Promises/A+ promise is returned when `callback` is not provided.
@@ -259,17 +265,29 @@ Possible values are `north`, `east`, `south`, `west`, `center` and `centre`. The
 
 #### max()
 
-Preserving aspect ratio, resize the image to the maximum width or height specified.
+Preserving aspect ratio, resize the image to the maximum `width` or `height` specified.
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
-#### embedWhite()
+#### background(rgba)
 
-Embed the resized image on a white background of the exact size specified.
+Set the background for the `embed` and `flatten` operations.
 
-#### embedBlack()
+`rgba` is parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
 
-Embed the resized image on a black background of the exact size specified.
+The alpha value is a float between `0` (transparent) and `1` (opaque).
+
+The default background is `{r: 0, g: 0, b: 0, a: 1}`, black without transparency.
+
+#### embed()
+
+Preserving aspect ratio, resize the image to the maximum `width` or `height` specified then embed on a background of the exact `width` and `height` specified.
+
+If the background contains an alpha value then WebP and PNG format output images will contain an alpha channel, even when the input image does not.
+
+#### flatten()
+
+Merge alpha transparency channel, if any, with `background`.
 
 #### rotate([angle])
 
@@ -316,7 +334,7 @@ JPEG input images will not take advantage of the shrink-on-load performance opti
 
 Convert to 8-bit greyscale; 256 shades of grey.
 
-This is a linear operation. If the input image is in a non-linear colourspace such as sRGB, use `gamma()` with `greyscale()` for the best results.
+This is a linear operation. If the input image is in a non-linear colour space such as sRGB, use `gamma()` with `greyscale()` for the best results.
 
 The output image will still be web-friendly sRGB and contain three (identical) channels.
 
@@ -352,7 +370,7 @@ Include all metadata (ICC, EXIF, XMP) from the input image in the output image. 
 
 An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
 
-`compressionLevel` is a Number between -1 and 9.
+`compressionLevel` is a Number between 0 and 9.
 
 ### Output methods
 
@@ -503,6 +521,9 @@ This module would never have been possible without the help and code contributio
 * [Jonathan Ong](https://github.com/jonathanong)
 * [Chanon Sajjamanochai](https://github.com/chanon)
 * [Juliano Julio](https://github.com/julianojulio)
+* [Daniel Gasienica](https://github.com/gasi)
+* [Julian Walker](https://github.com/julianwa)
+* [Amit Pitaru](https://github.com/apitaru)
 
 Thank you!
 

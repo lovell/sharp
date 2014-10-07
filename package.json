@@ -1,12 +1,16 @@
 {
   "name": "sharp",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
     "Jonathan Ong <jonathanrichardong@gmail.com>",
     "Chanon Sajjamanochai <chanon.s@gmail.com>",
-    "Juliano Julio <julianojulio@gmail.com>"
+    "Juliano Julio <julianojulio@gmail.com>",
+    "Daniel Gasienica <daniel@gasienica.ch>",
+    "Julian Walker <julian@fiftythree.com>",
+    "Amit Pitaru <pitaru.amit@gmail.com>",
+    "Brandon Aaron <hello.brandon@aaron.sh>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG and WebP images using the libvips library",
   "scripts": {
@@ -27,6 +31,7 @@
     "thumbnail",
     "sharpen",
     "crop",
+    "extract",
     "embed",
     "libvips",
     "vips",
@@ -35,12 +40,13 @@
     "stream"
   ],
   "dependencies": {
-    "nan": "^1.3.0",
-    "bluebird": "^2.3.2"
+    "bluebird": "^2.3.4",
+    "color": "^0.7.1",
+    "nan": "^1.3.0"
   },
   "devDependencies": {
     "imagemagick": "^0.1.3",
-    "imagemagick-native": "^1.2.2",
+    "imagemagick-native": "^1.3.0",
     "gm": "^1.16.0",
     "async": "^0.9.0",
     "benchmark": "^1.0.0"

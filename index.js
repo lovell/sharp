@@ -3,7 +3,10 @@
 
 var util = require('util');
 var stream = require('stream');
+
+var color = require('color');
 var Promise = require('bluebird');
+
 var sharp = require('./build/Release/sharp');
 
 var Sharp = function(input) {
@@ -12,24 +15,38 @@ var Sharp = function(input) {
   }
   stream.Duplex.call(this);
   this.options = {
+    // input options
+    streamIn: false,
+    sequentialRead: false,
+    // resize options
+    topOffsetPre: -1,
+    leftOffsetPre: -1,
+    widthPre: -1,
+    heightPre: -1,
+    topOffsetPost: -1,
+    leftOffsetPost: -1,
+    widthPost: -1,
+    heightPost: -1,
     width: -1,
     height: -1,
     canvas: 'c',
     gravity: 0,
     angle: 0,
     withoutEnlargement: false,
-    sharpen: false,
     interpolator: 'bilinear',
+    // operations
+    background: [0, 0, 0, 255],
+    flatten: false,
+    sharpen: false,
     gamma: 0,
     greyscale: false,
+    // output options
+    output: '__input',
     progressive: false,
-    sequentialRead: false,
     quality: 80,
     compressionLevel: 6,
-    streamIn: false,
     streamOut: false,
-    withMetadata: false,
-    output: '__input'
+    withMetadata: false
   };
   if (typeof input === 'string') {
     // input=file
@@ -54,6 +71,7 @@ util.inherits(Sharp, stream.Duplex);
   Handle incoming chunk on Writable Stream
 */
 Sharp.prototype._write = function(chunk, encoding, callback) {
+  /*jslint unused: false */
   if (this.options.streamIn) {
     if (typeof chunk === 'object' || chunk instanceof Buffer) {
       if (typeof this.options.bufferIn === 'undefined') {
@@ -92,18 +110,49 @@ Sharp.prototype.crop = function(gravity) {
   return this;
 };
 
-Sharp.prototype.embedWhite = function() {
-  this.options.canvas = 'w';
+Sharp.prototype.extract = function(topOffset, leftOffset, width, height) {
+  var suffix = this.options.width === -1 && this.options.height === -1 ? 'Pre' : 'Post';
+  var values = arguments;
+  ['topOffset', 'leftOffset', 'width', 'height'].forEach(function(name, index) {
+    this.options[name + suffix] = values[index];
+  }.bind(this));
   return this;
 };
 
-Sharp.prototype.embedBlack = function() {
-  this.options.canvas = 'b';
+/*
+  Deprecated embed* methods, to be removed in v0.8.0
+*/
+Sharp.prototype.embedWhite = util.deprecate(function() {
+  return this.background('white').embed();
+}, "embedWhite() is deprecated, use background('white').embed() instead");
+Sharp.prototype.embedBlack = util.deprecate(function() {
+  return this.background('black').embed();
+}, "embedBlack() is deprecated, use background('black').embed() instead");
+
+/*
+  Set the background colour for embed and flatten operations.
+  Delegates to the 'Color' module, which can throw an Error
+  but is liberal in what it accepts, clamping values to sensible min/max.
+*/
+Sharp.prototype.background = function(rgba) {
+  var colour = color(rgba);
+  this.options.background = colour.rgbArray();
+  this.options.background.push(colour.alpha() * 255);
+  return this;
+};
+
+Sharp.prototype.embed = function() {
+  this.options.canvas = 'e';
   return this;
 };
 
 Sharp.prototype.max = function() {
   this.options.canvas = 'm';
+  return this;
+};
+
+Sharp.prototype.flatten = function(flatten) {
+  this.options.flatten = (typeof flatten === 'boolean') ? flatten : true;
   return this;
 };
 
@@ -154,19 +203,6 @@ Sharp.prototype.interpolateWith = function(interpolator) {
 };
 
 /*
-  Deprecated interpolation methods, to be removed in v0.7.0
-*/
-Sharp.prototype.bilinearInterpolation = util.deprecate(function() {
-  return this.interpolateWith(module.exports.interpolator.bilinear);
-}, 'bilinearInterpolation() is deprecated, use interpolateWith(sharp.interpolator.bilinear) instead');
-Sharp.prototype.bicubicInterpolation = util.deprecate(function() {
-  return this.interpolateWith(module.exports.interpolator.bicubic);
-}, 'bicubicInterpolation() is deprecated, use interpolateWith(sharp.interpolator.bicubic) instead');
-Sharp.prototype.nohaloInterpolation = util.deprecate(function() {
-  return this.interpolateWith(module.exports.interpolator.nohalo);
-}, 'nohaloInterpolation() is deprecated, use interpolateWith(sharp.interpolator.nohalo) instead');
-
-/*
   Darken image pre-resize (1/gamma) and brighten post-resize (gamma).
   Improves brightness of resized image in non-linear colour spaces.
 */
@@ -211,17 +247,17 @@ Sharp.prototype.quality = function(quality) {
 };
 
 Sharp.prototype.compressionLevel = function(compressionLevel) {
-  if (!Number.isNaN(compressionLevel) && compressionLevel >= -1 && compressionLevel <= 9) {
+  if (!Number.isNaN(compressionLevel) && compressionLevel >= 0 && compressionLevel <= 9) {
     this.options.compressionLevel = compressionLevel;
   } else {
-    throw new Error('Invalid compressionLevel (-1 to 9) ' + compressionLevel);
+    throw new Error('Invalid compressionLevel (0 to 9) ' + compressionLevel);
   }
   return this;
 };
 
 Sharp.prototype.withMetadata = function(withMetadata) {
-    this.options.withMetadata = (typeof withMetadata === 'boolean') ? withMetadata : true;
-    return this;
+  this.options.withMetadata = (typeof withMetadata === 'boolean') ? withMetadata : true;
+  return this;
 };
 
 Sharp.prototype.resize = function(width, height) {
@@ -279,31 +315,16 @@ Sharp.prototype.toBuffer = function(callback) {
 
 Sharp.prototype.jpeg = function() {
   this.options.output = '__jpeg';
-  if (arguments.length > 0) {
-    console.error('Use of the jpeg() method with a callback is deprecated in 0.6.x and will be removed in 0.7.x');
-    console.error('Please add toFile(), toBuffer() or Stream methods e.g. pipe() for JPEG output');
-    this._sharp(arguments);
-  }
   return this;
 };
 
 Sharp.prototype.png = function() {
   this.options.output = '__png';
-  if (arguments.length > 0) {
-    console.error('Use of the png() method with a callback is deprecated in 0.6.x and will be removed in 0.7.x');
-    console.error('Please add toFile(), toBuffer() or Stream methods e.g. pipe() for PNG output');
-    this._sharp(arguments);
-  }
   return this;
 };
 
 Sharp.prototype.webp = function() {
   this.options.output = '__webp';
-  if (arguments.length > 0) {
-    console.error('Use of the webp() method with a callback is deprecated in 0.6.x and will be removed in 0.7.x');
-    console.error('Please add toFile(), toBuffer() or Stream methods e.g. pipe() for WebP output');
-    this._sharp(arguments);
-  }
   return this;
 };
 

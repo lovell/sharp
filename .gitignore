@@ -14,3 +14,6 @@ build
 node_modules
 tests/fixtures/output.*
 tests/libvips.supp
+
+# Mac OS X
+.DS_Store
