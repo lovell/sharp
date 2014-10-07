@@ -19,6 +19,14 @@ var Sharp = function(input) {
     streamIn: false,
     sequentialRead: false,
     // resize options
+    topOffsetPre: -1,
+    leftOffsetPre: -1,
+    widthPre: -1,
+    heightPre: -1,
+    topOffsetPost: -1,
+    leftOffsetPost: -1,
+    widthPost: -1,
+    heightPost: -1,
     width: -1,
     height: -1,
     canvas: 'c',
@@ -99,6 +107,15 @@ Sharp.prototype.crop = function(gravity) {
       throw new Error('Unsupported crop gravity ' + gravity);
     }
   }
+  return this;
+};
+
+Sharp.prototype.extract = function(topOffset, leftOffset, width, height) {
+  var suffix = this.options.width === -1 && this.options.height === -1 ? 'Pre' : 'Post';
+  var values = arguments;
+  ['topOffset', 'leftOffset', 'width', 'height'].forEach(function(name, index) {
+    this.options[name + suffix] = values[index];
+  }.bind(this));
   return this;
 };
 
@@ -239,8 +256,8 @@ Sharp.prototype.compressionLevel = function(compressionLevel) {
 };
 
 Sharp.prototype.withMetadata = function(withMetadata) {
-    this.options.withMetadata = (typeof withMetadata === 'boolean') ? withMetadata : true;
-    return this;
+  this.options.withMetadata = (typeof withMetadata === 'boolean') ? withMetadata : true;
+  return this;
 };
 
 Sharp.prototype.resize = function(width, height) {

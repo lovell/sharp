@@ -9,7 +9,8 @@
     "Juliano Julio <julianojulio@gmail.com>",
     "Daniel Gasienica <daniel@gasienica.ch>",
     "Julian Walker <julian@fiftythree.com>",
-    "Amit Pitaru <pitaru.amit@gmail.com>"
+    "Amit Pitaru <pitaru.amit@gmail.com>",
+    "Brandon Aaron <hello.brandon@aaron.sh>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG and WebP images using the libvips library",
   "scripts": {
@@ -30,6 +31,7 @@
     "thumbnail",
     "sharpen",
     "crop",
+    "extract",
     "embed",
     "libvips",
     "vips",

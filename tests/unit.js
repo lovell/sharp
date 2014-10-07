@@ -563,6 +563,69 @@ async.series([
       done();
     });
   },
+  // Extract jpg
+  function(done) {
+    sharp(inputJpg).extract(2,2,20,20).toFile(path.join(fixturesPath, 'output.extract.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(20, info.width);
+      assert.strictEqual(20, info.height);
+      done();
+    });
+  },
+  // Extract png
+  function(done) {
+    sharp(inputPng).extract(300,200,400,200).toFile(path.join(fixturesPath, 'output.extract.png'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(400, info.width);
+      assert.strictEqual(200, info.height);
+      done();
+    });
+  },
+  // Extract webp
+  function(done) {
+    sharp(inputWebP).extract(50, 100, 125, 200).toFile(path.join(fixturesPath, 'output.extract.webp'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(125, info.width);
+      assert.strictEqual(200, info.height);
+      done();
+    });
+  },
+  // Extract tiff
+  function(done) {
+    sharp(inputTiff).extract(63, 34, 341, 529).toFile(path.join(fixturesPath, 'output.extract.tiff'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(341, info.width);
+      assert.strictEqual(529, info.height);
+      done();
+    });
+  },
+  // Extract before resize
+  function(done) {
+    sharp(inputJpg).extract(10, 10, 10, 500, 500).resize(100, 100).toFile(path.join(fixturesPath, 'output.extract.resize.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(100, info.width);
+      assert.strictEqual(100, info.height);
+      done();
+    });
+  },
+  // Extract after resize and crop
+  function(done) {
+    sharp(inputJpg).resize(500, 500).crop(sharp.gravity.north).extract(10, 10, 100, 100).toFile(path.join(fixturesPath, 'output.resize.crop.extract.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(100, info.width);
+      assert.strictEqual(100, info.height);
+      done();
+    });
+  },
+  // Extract before and after resize and crop
+  function(done) {
+    sharp(inputJpg).extract(0, 0, 700, 700).resize(500, 500).crop(sharp.gravity.north).extract(10, 10, 100, 100).toFile(path.join(fixturesPath, 'output.extract.resize.crop.extract.jpg'), function(err, info) {
+      if (err) throw err;
+      assert.strictEqual(100, info.width);
+      assert.strictEqual(100, info.height);
+      done();
+    });
+  },
   // Keeps Metadata after a resize
   function(done) {
       sharp(inputJpgWithExif).resize(320, 240).withMetadata().toBuffer(function(err, buffer) {
