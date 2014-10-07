@@ -25,6 +25,14 @@ struct resize_baton {
   std::string output_format;
   void* buffer_out;
   size_t buffer_out_len;
+  int topOffsetPre;
+  int leftOffsetPre;
+  int widthPre;
+  int heightPre;
+  int topOffsetPost;
+  int leftOffsetPost;
+  int widthPost;
+  int heightPost;
   int width;
   int height;
   Canvas canvas;
@@ -48,6 +56,8 @@ struct resize_baton {
     buffer_in_len(0),
     output_format(""),
     buffer_out_len(0),
+    topOffsetPre(-1),
+    topOffsetPost(-1),
     canvas(CROP),
     gravity(0),
     background{0.0, 0.0, 0.0, 255.0},
@@ -417,6 +427,17 @@ class ResizeWorker : public NanAsyncWorker {
       return resize_error(baton, hook);
     }
 
+    // Pre extraction
+    if (baton->topOffsetPre != -1) {
+      VipsImage *extractedPre = vips_image_new();
+      vips_object_local(hook, extractedPre);
+      if (vips_extract_area(image, &extractedPre, baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre, NULL)) {
+        return resize_error(baton, hook);
+      }
+      g_object_unref(image);
+      image = extractedPre;
+    }
+
     // Get input image width and height
     int inputWidth = image->Xsize;
     int inputHeight = image->Ysize;
@@ -691,6 +712,17 @@ class ResizeWorker : public NanAsyncWorker {
       image = canvased;
     }
 
+    // Post extraction
+    if (baton->topOffsetPost != -1) {
+      VipsImage *extractedPost = vips_image_new();
+      vips_object_local(hook, extractedPost);
+      if (vips_extract_area(image, &extractedPost, baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost, NULL)) {
+        return resize_error(baton, hook);
+      }
+      g_object_unref(image);
+      image = extractedPost;
+    }
+
     // Mild sharpen
     if (baton->sharpen) {
       VipsImage *sharpened = vips_image_new();
@@ -818,11 +850,21 @@ class ResizeWorker : public NanAsyncWorker {
       // Error
       argv[0] = NanNew<String>(baton->err.data(), baton->err.size());
     } else {
+      int width = baton->width;
+      int height = baton->height;
+      if (baton->topOffsetPre != -1 && (baton->width == -1 || baton->height == -1)) {
+        width = baton->widthPre;
+        height = baton->heightPre;
+      }
+      if (baton->topOffsetPost != -1) {
+        width = baton->widthPost;
+        height = baton->heightPost;
+      }
       // Info Object
       Local<Object> info = NanNew<Object>();
       info->Set(NanNew<String>("format"), NanNew<String>(baton->output_format));
-      info->Set(NanNew<String>("width"), NanNew<Number>(baton->width));
-      info->Set(NanNew<String>("height"), NanNew<Number>(baton->height));
+      info->Set(NanNew<String>("width"), NanNew<Number>(width));
+      info->Set(NanNew<String>("height"), NanNew<Number>(height));
 
       if (baton->buffer_out_len > 0) {
         // Buffer
@@ -847,6 +889,7 @@ class ResizeWorker : public NanAsyncWorker {
   resize_baton* baton;
 };
 
+
 /*
   resize(options, output, callback)
 */
@@ -866,6 +909,15 @@ NAN_METHOD(resize) {
     baton->buffer_in_len = Buffer::Length(buffer);
     baton->buffer_in = Buffer::Data(buffer);
   }
+  // Extract image options
+  baton->topOffsetPre = options->Get(NanNew<String>("topOffsetPre"))->Int32Value();
+  baton->leftOffsetPre = options->Get(NanNew<String>("leftOffsetPre"))->Int32Value();
+  baton->widthPre = options->Get(NanNew<String>("widthPre"))->Int32Value();
+  baton->heightPre = options->Get(NanNew<String>("heightPre"))->Int32Value();
+  baton->topOffsetPost = options->Get(NanNew<String>("topOffsetPost"))->Int32Value();
+  baton->leftOffsetPost = options->Get(NanNew<String>("leftOffsetPost"))->Int32Value();
+  baton->widthPost = options->Get(NanNew<String>("widthPost"))->Int32Value();
+  baton->heightPost = options->Get(NanNew<String>("heightPost"))->Int32Value();
   // Output image dimensions
   baton->width = options->Get(NanNew<String>("width"))->Int32Value();
   baton->height = options->Get(NanNew<String>("height"))->Int32Value();
