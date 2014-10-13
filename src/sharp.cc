@@ -287,7 +287,7 @@ class MetadataWorker : public NanAsyncWorker {
     g_atomic_int_dec_and_test(&counter_queue);
 
     ImageType imageType = UNKNOWN;
-    VipsImage *image = vips_image_new();
+    VipsImage *image;
     if (baton->buffer_in_len > 1) {
       // From buffer
       imageType = sharp_init_image_from_buffer(&image, baton->buffer_in, baton->buffer_in_len, VIPS_ACCESS_RANDOM);
@@ -497,9 +497,9 @@ class ResizeWorker : public NanAsyncWorker {
       }
     }
 
-    // Try to use libjpeg shrink-on-load, but not when applying gamma correction
+    // Try to use libjpeg shrink-on-load, but not when applying gamma correction or pre-resize extract
     int shrink_on_load = 1;
-    if (inputImageType == JPEG && baton->gamma == 0) {
+    if (inputImageType == JPEG && baton->gamma == 0 && baton->topOffsetPre == -1) {
       if (shrink >= 8) {
         factor = factor / 8;
         shrink_on_load = 8;
@@ -517,19 +517,16 @@ class ResizeWorker : public NanAsyncWorker {
       shrink = floor(factor);
       residual = static_cast<double>(shrink) / factor;
       // Reload input using shrink-on-load
-      VipsImage *shrunk_on_load = vips_image_new();
-      vips_object_local(hook, shrunk_on_load);
+      g_object_unref(image);
       if (baton->buffer_in_len > 1) {
-        if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
+        if (vips_jpegload_buffer(baton->buffer_in, baton->buffer_in_len, &image, "shrink", shrink_on_load, NULL)) {
           return resize_error(baton, hook);
         }
       } else {
-        if (vips_jpegload((baton->file_in).c_str(), &shrunk_on_load, "shrink", shrink_on_load, NULL)) {
+        if (vips_jpegload((baton->file_in).c_str(), &image, "shrink", shrink_on_load, NULL)) {
           return resize_error(baton, hook);
         }
       }
-      g_object_unref(image);
-      image = shrunk_on_load;
     }
 
     // Handle colour profile, if any, for non sRGB images
@@ -650,8 +647,6 @@ class ResizeWorker : public NanAsyncWorker {
 
     // Crop/embed
     if (image->Xsize != baton->width || image->Ysize != baton->height) {
-      VipsImage *canvased = vips_image_new();
-      vips_object_local(hook, canvased);
       if (baton->canvas == EMBED) {
         // Match background colour space, namely sRGB
         if (image->Type != VIPS_INTERPRETATION_sRGB) {
@@ -678,12 +673,14 @@ class ResizeWorker : public NanAsyncWorker {
           if (vips_invert(black, &alpha, NULL)) {
             return resize_error(baton, hook);
           }
+          g_object_unref(black);
           // Append alpha channel to existing image
           VipsImage *joined = vips_image_new();
           vips_object_local(hook, joined);
           if (vips_bandjoin2(image, alpha, &joined, NULL)) {
             return resize_error(baton, hook);
           }
+          g_object_unref(alpha);
           g_object_unref(image);
           image = joined;
         }
@@ -701,13 +698,17 @@ class ResizeWorker : public NanAsyncWorker {
         // Embed
         int left = (baton->width - image->Xsize) / 2;
         int top = (baton->height - image->Ysize) / 2;
-        if (vips_embed(image, &canvased, left, top, baton->width, baton->height,
+        VipsImage *embedded = vips_image_new();
+        vips_object_local(hook, embedded);
+        if (vips_embed(image, &embedded, left, top, baton->width, baton->height,
           "extend", VIPS_EXTEND_BACKGROUND, "background", background, NULL
         )) {
           vips_area_unref(reinterpret_cast<VipsArea*>(background));
           return resize_error(baton, hook);
         }
         vips_area_unref(reinterpret_cast<VipsArea*>(background));
+        g_object_unref(image);
+        image = embedded;
       } else {
         // Crop/max
         int left;
@@ -715,12 +716,14 @@ class ResizeWorker : public NanAsyncWorker {
         std::tie(left, top) = sharp_calc_crop(image->Xsize, image->Ysize, baton->width, baton->height, baton->gravity);
         int width = std::min(image->Xsize, baton->width);
         int height = std::min(image->Ysize, baton->height);
-        if (vips_extract_area(image, &canvased, left, top, width, height, NULL)) {
+        VipsImage *extracted = vips_image_new();
+        vips_object_local(hook, extracted);
+        if (vips_extract_area(image, &extracted, left, top, width, height, NULL)) {
           return resize_error(baton, hook);
         }
+        g_object_unref(image);
+        image = extracted;
       }
-      g_object_unref(image);
-      image = canvased;
     }
 
     // Post extraction
@@ -842,6 +845,7 @@ class ResizeWorker : public NanAsyncWorker {
         baton->output_format = "tiff";
       } else {
         (baton->err).append("Unsupported output " + baton->output);
+        g_object_unref(image);
         return resize_error(baton, hook);
       }
     }
