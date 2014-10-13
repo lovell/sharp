@@ -545,7 +545,7 @@ class ResizeWorker : public NanAsyncWorker {
       // Convert to sRGB colour space
       VipsImage *colourspaced = vips_image_new();
       vips_object_local(hook, colourspaced);
-      if (vips_colourspace(profile, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
+      if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
         return resize_error(baton, hook);
       }
       g_object_unref(image);
@@ -653,6 +653,17 @@ class ResizeWorker : public NanAsyncWorker {
       VipsImage *canvased = vips_image_new();
       vips_object_local(hook, canvased);
       if (baton->canvas == EMBED) {
+        // Match background colour space, namely sRGB
+        if (image->Type != VIPS_INTERPRETATION_sRGB) {
+          // Convert to sRGB colour space
+          VipsImage *colourspaced = vips_image_new();
+          vips_object_local(hook, colourspaced);
+          if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
+            return resize_error(baton, hook);
+          }
+          g_object_unref(image);
+          image = colourspaced;
+        }
         // Add non-transparent alpha channel, if required
         if (baton->background[3] < 255.0 && !sharp_image_has_alpha(image)) {
           // Create single-channel transparency
