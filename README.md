@@ -550,6 +550,7 @@ This module would never have been possible without the help and code contributio
 * [Daniel Gasienica](https://github.com/gasi)
 * [Julian Walker](https://github.com/julianwa)
 * [Amit Pitaru](https://github.com/apitaru)
+* [Brandon Aaron](https://github.com/brandonaaron)
 
 Thank you!
 
