@@ -169,6 +169,22 @@ http.createServer(function(request, response) {
 ```
 
 ```javascript
+sharp(input)
+  .extract(top, left, width, height)
+  .toFile(output);
+  // Extract a region of the input image, saving in the same format.
+```
+
+```javascript
+sharp(input)
+  .extract(topOffsetPre, leftOffsetPre, widthPre, heightPre)
+  .resize(width, height)
+  .extract(topOffsetPost, leftOffsetPost, widthPost, heightPost)
+  .toFile(output);
+  // Extract a region, resize, then extract from the resized image
+```
+
+```javascript
 sharp(inputBuffer)
   .resize(200, 300)
   .interpolateWith(sharp.interpolator.nohalo)
@@ -254,6 +270,16 @@ Scale output to `width` x `height`. By default, the resized image is cropped to 
 `width` is the Number of pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
 
 `height` is the Number of pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
+
+#### extract(top, left, width, height)
+
+Extract a region of the image. Can be used with or without a `resize` operation.
+
+`top` and `left` are the offset, in pixels, from the top-left corner.
+
+`width` and `height` are the dimensions of the extracted image.
+
+Use `extract` before `resize` for pre-resize extraction. Use `extract` after `resize` for post-resize extraction. Use `extract` before and after for both.
 
 #### crop([gravity])
 
