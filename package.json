@@ -40,13 +40,13 @@
     "stream"
   ],
   "dependencies": {
-    "bluebird": "^2.3.4",
+    "bluebird": "^2.3.5",
     "color": "^0.7.1",
     "nan": "^1.3.0"
   },
   "devDependencies": {
     "imagemagick": "^0.1.3",
-    "imagemagick-native": "^1.3.0",
+    "imagemagick-native": "^1.4.0",
     "gm": "^1.16.0",
     "async": "^0.9.0",
     "benchmark": "^1.0.0"
