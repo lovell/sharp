@@ -111,6 +111,7 @@ Sharp.prototype.crop = function(gravity) {
 };
 
 Sharp.prototype.extract = function(topOffset, leftOffset, width, height) {
+  /*jslint unused: false */
   var suffix = this.options.width === -1 && this.options.height === -1 ? 'Pre' : 'Post';
   var values = arguments;
   ['topOffset', 'leftOffset', 'width', 'height'].forEach(function(name, index) {
