@@ -465,21 +465,48 @@ var counters = sharp.counters(); // { queue: 2, process: 4 }
 
 ## Testing
 
-### Ubuntu 12.04
+### Functional tests
+
+#### Ubuntu 12.04
 
 [![Ubuntu 12.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
-### Centos 6.5
+#### Centos 6.5
 
 [![Centos 6.5 Build Status](https://snap-ci.com/lovell/sharp/branch/master/build_image)](https://snap-ci.com/lovell/sharp/branch/master)
 
-### It worked on my machine
+#### It worked on my machine
 
 ```
 npm test
 ```
 
-Running the comparative performance tests requires _ImageMagick_ and _GraphicsMagick_.
+### Memory leak tests
+
+```
+cd sharp/test/leak
+./leak.sh
+```
+
+Requires _valgrind_:
+
+```
+brew install valgrind
+```
+
+```
+sudo apt-get install -qq valgrind
+```
+
+### Benchmark tests
+
+```
+cd sharp/test/bench
+npm install
+npm test
+```
+
+Requires both _ImageMagick_ and _GraphicsMagick_:
 
 ```
 brew install imagemagick
