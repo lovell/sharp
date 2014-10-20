@@ -1,11 +1,10 @@
-/*jslint node: true */
 'use strict';
 
 var util = require('util');
 var stream = require('stream');
 
 var color = require('color');
-var Promise = require('bluebird');
+var BluebirdPromise = require('bluebird');
 
 var sharp = require('./build/Release/sharp');
 
@@ -292,7 +291,7 @@ Sharp.prototype.toFile = function(output, callback) {
     if (typeof callback === 'function') {
       callback(errOutputInvalid);
     } else {
-      return Promise.reject(errOutputInvalid);
+      return BluebirdPromise.reject(errOutputInvalid);
     }
   } else {
     if (this.options.fileIn === output) {
@@ -300,7 +299,7 @@ Sharp.prototype.toFile = function(output, callback) {
       if (typeof callback === 'function') {
         callback(errOutputIsInput);
       } else {
-        return Promise.reject(errOutputIsInput);
+        return BluebirdPromise.reject(errOutputIsInput);
       }
     } else {
       this.options.output = output;
@@ -387,7 +386,7 @@ Sharp.prototype._sharp = function(callback) {
     // output=promise
     if (this.options.streamIn) {
       // output=promise, input=stream
-      return new Promise(function(resolve, reject) {
+      return new BluebirdPromise(function(resolve, reject) {
         that.on('finish', function() {
           sharp.resize(that.options, function(err, data) {
             if (err) {
@@ -400,7 +399,7 @@ Sharp.prototype._sharp = function(callback) {
       });
     } else {
       // output=promise, input=file/buffer
-      return new Promise(function(resolve, reject) {
+      return new BluebirdPromise(function(resolve, reject) {
         sharp.resize(that.options, function(err, data) {
           if (err) {
             reject(err);
@@ -430,7 +429,7 @@ Sharp.prototype.metadata = function(callback) {
     return this;
   } else {
     if (this.options.streamIn) {
-      return new Promise(function(resolve, reject) {
+      return new BluebirdPromise(function(resolve, reject) {
         that.on('finish', function() {
           sharp.metadata(that.options, function(err, data) {
             if (err) {
@@ -442,7 +441,7 @@ Sharp.prototype.metadata = function(callback) {
         });
       });
     } else {
-      return new Promise(function(resolve, reject) {
+      return new BluebirdPromise(function(resolve, reject) {
         sharp.metadata(that.options, function(err, data) {
           if (err) {
             reject(err);

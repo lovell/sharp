@@ -1,19 +1,9 @@
-lib-cov
-*.seed
-*.log
-*.csv
-*.dat
-*.out
-*.pid
-*.gz
-
-pids
-logs
-results
 build
 node_modules
-tests/fixtures/output.*
-tests/libvips.supp
+coverage
+test/bench/node_modules
+test/fixtures/output.*
+test/leak/libvips.supp
 
 # Mac OS X
 .DS_Store
