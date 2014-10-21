@@ -22,9 +22,7 @@
       '-std=c++0x',
       '-fexceptions',
       '-Wall',
-      '-Ofast',
-      '-flto',
-      '-funroll-loops'
+      '-O3'
     ],
     'xcode_settings': {
       'OTHER_CPLUSPLUSFLAGS': [
