@@ -467,6 +467,10 @@ var counters = sharp.counters(); // { queue: 2, process: 4 }
 
 ### Functional tests
 
+#### Coverage
+
+[![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.png?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
+
 #### Ubuntu 12.04
 
 [![Ubuntu 12.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
