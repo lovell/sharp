@@ -15,3 +15,5 @@ before_install:
   - sudo make install
   - sudo ldconfig
   - cd $TRAVIS_BUILD_DIR
+after_success:
+  - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
