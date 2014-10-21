@@ -9,10 +9,20 @@ describe('Utilities', function() {
 
   describe('Cache', function() {
     it('Can be disabled', function() {
-      sharp.cache(0);
+      var cache = sharp.cache(0, 0);
+      assert.strictEqual(0, cache.memory);
+      assert.strictEqual(0, cache.items);
     });
     it('Can be set to a maximum of 50MB and 500 items', function() {
+      var cache = sharp.cache(50, 500);
+      assert.strictEqual(50, cache.memory);
+      assert.strictEqual(500, cache.items);
+    });
+    it('Ignores invalid values', function() {
       sharp.cache(50, 500);
+      var cache = sharp.cache('spoons');
+      assert.strictEqual(50, cache.memory);
+      assert.strictEqual(500, cache.items);
     });
   });
 
@@ -23,6 +33,11 @@ describe('Utilities', function() {
     });
     it('Can be reset to default', function() {
       sharp.concurrency(0);
+      assert.strictEqual(defaultConcurrency, sharp.concurrency());
+    });
+    it('Ignores invalid values', function() {
+      sharp.concurrency(0);
+      sharp.concurrency('spoons');
       assert.strictEqual(defaultConcurrency, sharp.concurrency());
     });
   });

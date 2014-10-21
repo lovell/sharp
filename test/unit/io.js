@@ -67,6 +67,18 @@ describe('Input/output', function() {
     readable.pipe(pipeline);
   });
 
+  it('Read from Stream and write to Buffer via Promise', function(done) {
+    var readable = fs.createReadStream(fixtures.inputJpg);
+    var pipeline = sharp().resize(1, 1);
+    pipeline.toBuffer().then(function(data) {
+      assert.strictEqual(true, data.length > 0);
+      done();
+    }).catch(function(err) {
+      throw err;
+    });
+    readable.pipe(pipeline);
+  });
+
   it('Read from Stream and write to Stream', function(done) {
     var readable = fs.createReadStream(fixtures.inputJpg);
     var writable = fs.createWriteStream(fixtures.outputJpg);
@@ -114,8 +126,63 @@ describe('Input/output', function() {
     readableButNotAnImage.pipe(writable);
   });
 
+  it('Sequential read', function(done) {
+    sharp(fixtures.inputJpg)
+      .sequentialRead()
+      .resize(320, 240)
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
+  it('Not sequential read', function(done) {
+    sharp(fixtures.inputJpg)
+      .sequentialRead(false)
+      .resize(320, 240)
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
   it('Fail when output File is input File', function(done) {
     sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, function(err) {
+      assert(!!err);
+      done();
+    });
+  });
+
+  it('Fail when output File is input File via Promise', function(done) {
+    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg).then(function(data) {
+      assert(false);
+      done();
+    }).catch(function(err) {
+      assert(!!err);
+      done();
+    });
+  });
+
+  it('Fail when output File is empty', function(done) {
+    sharp(fixtures.inputJpg).toFile('', function(err) {
+      assert(!!err);
+      done();
+    });
+  });
+
+  it('Fail when output File is empty via Promise', function(done) {
+    sharp(fixtures.inputJpg).toFile('').then(function(data) {
+      assert(false);
+      done();
+    }).catch(function(err) {
       assert(!!err);
       done();
     });
@@ -159,6 +226,42 @@ describe('Input/output', function() {
         });
       });
     });
+  });
+
+  it('Invalid quality', function(done) {
+    var isValid = true;
+    try {
+      sharp(fixtures.inputJpg).quality(-1);
+    } catch (err) {
+      isValid = false;
+    }
+    assert.strictEqual(false, isValid);
+    done();
+  });
+
+  it('Progressive image', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .png()
+      .progressive(false)
+      .toBuffer(function(err, nonProgressive, info) {
+        if (err) throw err;
+        assert.strictEqual(true, nonProgressive.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        sharp(nonProgressive)
+          .progressive()
+          .toBuffer(function(err, progressive, info) {
+            if (err) throw err;
+            assert.strictEqual(true, progressive.length > 0);
+            assert.strictEqual(true, progressive.length > nonProgressive.length);
+            assert.strictEqual('png', info.format);
+            assert.strictEqual(320, info.width);
+            assert.strictEqual(240, info.height);
+            done();
+          });
+      });
   });
 
   describe('Output filename without extension uses input format', function() {

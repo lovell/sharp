@@ -79,4 +79,15 @@ describe('Crop gravities', function() {
       });
   });
 
+  it('Invalid', function(done) {
+    var isValid = true;
+    try {
+      sharp(fixtures.inputJpg).crop(5);
+    } catch (err) {
+      isValid = false;
+    }
+    assert.strictEqual(false, isValid);
+    done();
+  });
+
 });

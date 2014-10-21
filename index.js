@@ -72,7 +72,7 @@ util.inherits(Sharp, stream.Duplex);
 Sharp.prototype._write = function(chunk, encoding, callback) {
   /*jslint unused: false */
   if (this.options.streamIn) {
-    if (typeof chunk === 'object' || chunk instanceof Buffer) {
+    if (typeof chunk === 'object' && chunk instanceof Buffer) {
       if (typeof this.options.bufferIn === 'undefined') {
         // Create new Buffer
         this.options.bufferIn = new Buffer(chunk.length);
@@ -98,13 +98,10 @@ module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'sout
 
 Sharp.prototype.crop = function(gravity) {
   this.options.canvas = 'c';
-  if (typeof gravity !== 'undefined') {
-    // Is this a supported gravity?
-    if (!Number.isNaN(gravity) && gravity >= 0 && gravity <= 4) {
-      this.options.gravity = gravity;
-    } else {
-      throw new Error('Unsupported crop gravity ' + gravity);
-    }
+  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 4) {
+    this.options.gravity = gravity;
+  } else {
+    throw new Error('Unsupported crop gravity ' + gravity);
   }
   return this;
 };
@@ -264,7 +261,7 @@ Sharp.prototype.resize = function(width, height) {
   if (!width) {
     this.options.width = -1;
   } else {
-    if (!Number.isNaN(width)) {
+    if (typeof width === 'number' && !Number.isNaN(width)) {
       this.options.width = width;
     } else {
       throw new Error('Invalid width ' + width);
@@ -273,7 +270,7 @@ Sharp.prototype.resize = function(width, height) {
   if (!height) {
     this.options.height = -1;
   } else {
-    if (!Number.isNaN(height)) {
+    if (typeof height === 'number' && !Number.isNaN(height)) {
       this.options.height = height;
     } else {
       throw new Error('Invalid height ' + height);
@@ -458,10 +455,10 @@ Sharp.prototype.metadata = function(callback) {
   Get and set cache memory and item limits
 */
 module.exports.cache = function(memory, items) {
-  if (Number.isNaN(memory)) {
+  if (typeof memory !== 'number' || Number.isNaN(memory)) {
     memory = null;
   }
-  if (Number.isNaN(items)) {
+  if (typeof items !== 'number' || Number.isNaN(items)) {
     items = null;
   }
   return sharp.cache(memory, items);
@@ -471,7 +468,7 @@ module.exports.cache = function(memory, items) {
   Get and set size of thread pool
 */
 module.exports.concurrency = function(concurrency) {
-  if (Number.isNaN(concurrency)) {
+  if (typeof concurrency !== 'number' || Number.isNaN(concurrency)) {
     concurrency = null;
   }
   return sharp.concurrency(concurrency);

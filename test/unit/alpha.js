@@ -30,11 +30,24 @@ describe('Alpha transparency', function() {
       .toFile(fixtures.path('output.flatten-hex-orange.jpg'), done);
   });
 
+  it('Do not flatten', function(done) {
+    sharp(fixtures.inputPngWithTransparency)
+      .flatten(false)
+      .toBuffer(function(err, data) {
+        if (err) throw err;
+        sharp(data).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual('png', metadata.format);
+          assert.strictEqual(4, metadata.channels);
+          done();
+        });
+      });
+  });
+
   it('Ignored for JPEG', function(done) {
     sharp(fixtures.inputJpg)
       .background('#ff0000')
       .flatten()
-      .resize(500, 400)
       .toBuffer(function(err, data) {
         if (err) throw err;
         sharp(data).metadata(function(err, metadata) {

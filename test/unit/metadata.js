@@ -99,7 +99,7 @@ describe('Image metadata', function() {
     });
   });
 
-  it('Promise', function(done) {
+  it('File in, Promise out', function(done) {
     sharp(fixtures.inputJpg).metadata().then(function(metadata) {
       assert.strictEqual('jpeg', metadata.format);
       assert.strictEqual(2725, metadata.width);
@@ -109,6 +109,23 @@ describe('Image metadata', function() {
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
+  });
+
+  it('Stream in, Promise out', function(done) {
+    var readable = fs.createReadStream(fixtures.inputJpg);
+    var pipeline = sharp();
+    pipeline.metadata().then(function(metadata) {
+      assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual(2725, metadata.width);
+      assert.strictEqual(2225, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(false, metadata.hasAlpha);
+      done();
+    }).catch(function(err) {
+      throw err;
+    });
+    readable.pipe(pipeline);
   });
 
   it('Stream', function(done) {

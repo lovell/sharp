@@ -22,6 +22,13 @@ describe('Colour space conversion', function() {
       .toFile(fixtures.path('output.greyscale-gamma-2.2.jpg'), done);
   });
 
+  it('Not to greyscale', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .greyscale(false)
+      .toFile(fixtures.path('output.greyscale-not.jpg'), done);
+  });
+
   it('From 1-bit TIFF to sRGB WebP [slow]', function(done) {
     sharp(fixtures.inputTiff)
       .webp()
