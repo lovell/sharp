@@ -321,7 +321,15 @@ Rotate the output image by either an explicit angle or auto-orient based on the 
 
 `angle`, if present, is a Number with a value of `0`, `90`, `180` or `270`.
 
-Use this method without `angle` to determine the angle from EXIF data. Mirroring is currently unsupported.
+Use this method without `angle` to determine the angle from EXIF data. Mirroring is supported and may infer the use of a `flip` operation.
+
+#### flip()
+
+Flip the image about the vertical Y axis. This always occurs after rotation, if any.
+
+#### flop()
+
+Flop the image about the horizontal X axis. This always occurs after rotation, if any.
 
 #### withoutEnlargement()
 

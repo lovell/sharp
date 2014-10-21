@@ -43,12 +43,14 @@ struct resize_baton {
   bool sharpen;
   double gamma;
   bool greyscale;
+  int angle;
+  bool flip;
+  bool flop;
   bool progressive;
   bool without_enlargement;
   VipsAccess access_method;
   int quality;
   int compression_level;
-  int angle;
   std::string err;
   bool with_metadata;
 
@@ -65,6 +67,8 @@ struct resize_baton {
     sharpen(false),
     gamma(0.0),
     greyscale(false),
+    flip(false),
+    flop(false),
     progressive(false),
     without_enlargement(false),
     with_metadata(false) {}
@@ -125,15 +129,16 @@ typedef enum {
 } Angle;
 
 /*
-  Calculate the angle of rotation for the output image.
+  Calculate the angle of rotation and need-to-flip for the output image.
   In order of priority:
    1. Use explicitly requested angle (supports 90, 180, 270)
-   2. Use input image EXIF Orientation header (does not support mirroring)
+   2. Use input image EXIF Orientation header - supports mirroring
    3. Otherwise default to zero, i.e. no rotation
 */
-static Angle
-sharp_calc_rotation(int const angle, VipsImage const *input) {
+static std::tuple<Angle, bool>
+sharp_calc_rotation_and_flip(int const angle, VipsImage const *input) {
   Angle rotate = ANGLE_0;
+  bool flip = FALSE;
   if (angle == -1) {
     const char *exif;
     if (!vips_image_get_string(input, "exif-ifd0-Orientation", &exif)) {
@@ -143,6 +148,17 @@ sharp_calc_rotation(int const angle, VipsImage const *input) {
         rotate = ANGLE_180;
       } else if (exif[0] == 0x38) { // "8"
         rotate = ANGLE_270;
+      } else if (exif[0] == 0x32) { // "2" (flip 1)
+        flip = TRUE;
+      } else if (exif[0] == 0x37) { // "7" (flip 6)
+        rotate = ANGLE_90;
+        flip = TRUE;
+      } else if (exif[0] == 0x34) { // "4" (flip 3)
+        rotate = ANGLE_180;
+        flip = TRUE;
+      } else if (exif[0] == 0x35) { // "5" (flip 8)
+        rotate = ANGLE_270;
+        flip = TRUE;
       }
     }
   } else {
@@ -154,7 +170,7 @@ sharp_calc_rotation(int const angle, VipsImage const *input) {
       rotate = ANGLE_270;
     }
   }
-  return rotate;
+  return std::make_tuple(rotate, flip);
 }
 
 /*
@@ -443,12 +459,18 @@ class ResizeWorker : public NanAsyncWorker {
     int inputHeight = image->Ysize;
 
     // Calculate angle of rotation, to be carried out later
-    Angle rotation = sharp_calc_rotation(baton->angle, image);
+    Angle rotation;
+    bool flip;
+    std::tie(rotation, flip) = sharp_calc_rotation_and_flip(baton->angle, image);
     if (rotation == ANGLE_90 || rotation == ANGLE_270) {
       // Swap input output width and height when rotating by 90 or 270 degrees
       int swap = inputWidth;
       inputWidth = inputHeight;
       inputHeight = swap;
+    }
+    if (flip && !baton->flip) {
+      // Add flip operation due to EXIF mirroring
+      baton->flip = TRUE;
     }
 
     // Scaling calculations
@@ -643,6 +665,28 @@ class ResizeWorker : public NanAsyncWorker {
       }
       g_object_unref(image);
       image = rotated;
+    }
+
+    // Flip (mirror about Y axis)
+    if (baton->flip) {
+      VipsImage *flipped = vips_image_new();
+      vips_object_local(hook, flipped);
+      if (vips_flip(image, &flipped, VIPS_DIRECTION_VERTICAL, NULL)) {
+        return resize_error(baton, hook);
+      }
+      g_object_unref(image);
+      image = flipped;
+    }
+
+    // Flop (mirror about X axis)
+    if (baton->flop) {
+      VipsImage *flopped = vips_image_new();
+      vips_object_local(hook, flopped);
+      if (vips_flip(image, &flopped, VIPS_DIRECTION_HORIZONTAL, NULL)) {
+        return resize_error(baton, hook);
+      }
+      g_object_unref(image);
+      image = flopped;
     }
 
     // Crop/embed
@@ -960,6 +1004,8 @@ NAN_METHOD(resize) {
   baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();
   baton->greyscale = options->Get(NanNew<String>("greyscale"))->BooleanValue();
   baton->angle = options->Get(NanNew<String>("angle"))->Int32Value();
+  baton->flip = options->Get(NanNew<String>("flip"))->BooleanValue();
+  baton->flop = options->Get(NanNew<String>("flop"))->BooleanValue();
   // Output options
   baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();
   baton->quality = options->Get(NanNew<String>("quality"))->Int32Value();

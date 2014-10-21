@@ -31,6 +31,8 @@ var Sharp = function(input) {
     canvas: 'c',
     gravity: 0,
     angle: 0,
+    flip: false,
+    flop: false,
     withoutEnlargement: false,
     interpolator: 'bilinear',
     // operations
@@ -165,6 +167,22 @@ Sharp.prototype.rotate = function(angle) {
   } else {
     throw new Error('Unsupported angle (0, 90, 180, 270) ' + angle);
   }
+  return this;
+};
+
+/*
+  Flip the image vertically, about the Y axis
+*/
+Sharp.prototype.flip = function(flip) {
+  this.options.flip = (typeof flip === 'boolean') ? flip : true;
+  return this;
+};
+
+/*
+  Flop the image horizontally, about the X axis
+*/
+Sharp.prototype.flop = function(flop) {
+  this.options.flop = (typeof flop === 'boolean') ? flop : true;
   return this;
 };
 
