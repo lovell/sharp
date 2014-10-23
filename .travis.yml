@@ -3,17 +3,6 @@ node_js:
   - "0.10"
   - "0.11"
 before_install:
-  - sudo add-apt-repository ppa:lyrasis/precise-backports -y
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq automake gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff4-dev libexif-dev libxml2-dev swig libmagick++-dev
-  - git clone https://github.com/jcupitt/libvips.git
-  - cd libvips
-  - git checkout 7.38
-  - ./bootstrap.sh
-  - ./configure --enable-debug=no --enable-cxx=yes --without-orc --without-python --without-fftw
-  - make
-  - sudo make install
-  - sudo ldconfig
-  - cd $TRAVIS_BUILD_DIR
+  - curl -s https://raw.githubusercontent.com/lovell/sharp/preinstall/preinstall.sh | sudo bash -
 after_success:
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js

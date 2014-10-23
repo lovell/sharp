@@ -31,9 +31,30 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 * Node.js v0.10+
 * [libvips](https://github.com/jcupitt/libvips) v7.38.5+
 
-_libvips_ can take advantage of [liborc](http://code.entropywave.com/orc/) if present. Warning: versions of _liborc_ prior to 0.4.19 suffer [memory leaks](https://github.com/lovell/sharp/issues/21#issuecomment-42367306) and version 0.4.19 suffers [buffer overflows](https://github.com/lovell/sharp/issues/21#issuecomment-44813498).
+To install the latest version of libvips on the following Operating Systems:
 
-### Install libvips on Mac OS
+* Mac OS (homebrew, MacPorts)
+* Debian Linux
+  * Debian 8
+  * Ubuntu 12.04, 14.04, 14.10
+  * Mint 17
+* Red Hat Linux
+  * RHEL/Centos/Scientific 6, 7
+  * Fedora 21, 22
+
+run the following as a user with `sudo` access:
+
+	curl -s https://raw.githubusercontent.com/lovell/sharp/preinstall/preinstall.sh | sudo bash -
+
+or run the following as `root`:
+
+	curl -s https://raw.githubusercontent.com/lovell/sharp/preinstall/preinstall.sh | bash -
+
+The `preinstall.sh` script requires `curl` and `pkg-config`.
+
+### Mac OS tips
+
+Manual install via homebrew:
 
 	brew install homebrew/science/vips --with-webp --with-graphicsmagick
 
@@ -44,47 +65,6 @@ A missing or incorrectly configured _Xcode Command Line Tools_ installation [can
 The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp/issues/9) to a `library not found for -lintl` error. If so, please try:
 
 	brew link gettext --force
-
-### Install libvips on Linux
-
-#### Ubuntu 14.04 LTS
-
-	sudo apt-get install libvips-dev
-
-#### Ubuntu 12.04 LTS
-
-	sudo add-apt-repository -y ppa:lyrasis/precise-backports
-	sudo apt-get update
-	sudo apt-get install -y automake build-essential git gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff4-dev libexif-dev libxml2-dev swig libmagickwand-dev
-	git clone https://github.com/jcupitt/libvips.git
-	cd libvips
-	git checkout 7.40
-	./bootstrap.sh
-	./configure --enable-debug=no --enable-cxx=yes --without-python --without-orc --without-fftw
-	make
-	sudo make install
-	sudo ldconfig
-
-#### Debian Jessie
-
-	apt-get install libvips-dev
-
-#### Centos 6
-
-	sudo yum groupinstall -y "Development Tools"
-	sudo yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel ImageMagick-devel
-	sudo yum install -y http://li.nux.ro/download/nux/dextop/el6/x86_64/nux-dextop-release-0-2.el6.nux.noarch.rpm
-	sudo yum install -y --enablerepo=nux-dextop gobject-introspection-devel
-	sudo yum install -y http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
-	sudo yum install -y --enablerepo=remi libwebp-devel
-	git clone https://github.com/jcupitt/libvips.git
-	cd libvips
-	git checkout 7.40
-	./bootstrap.sh
-	./configure --prefix=/usr --enable-docs=no --enable-debug=no --enable-cxx=yes --without-orc --without-python --without-fftw
-	make
-	sudo make install
-	sudo ldconfig
 
 ### Install libvips on Heroku
 
