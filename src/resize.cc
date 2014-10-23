@@ -586,7 +586,7 @@ class ResizeWorker : public NanAsyncWorker {
     Handle<Value> argv[3] = { NanNull(), NanNull(),  NanNull() };
     if (!baton->err.empty()) {
       // Error
-      argv[0] = NanNew<String>(baton->err.data(), baton->err.size());
+      argv[0] = Exception::Error(NanNew<String>(baton->err.data(), baton->err.size()));
     } else {
       int width = baton->width;
       int height = baton->height;

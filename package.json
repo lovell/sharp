@@ -10,7 +10,8 @@
     "Daniel Gasienica <daniel@gasienica.ch>",
     "Julian Walker <julian@fiftythree.com>",
     "Amit Pitaru <pitaru.amit@gmail.com>",
-    "Brandon Aaron <hello.brandon@aaron.sh>"
+    "Brandon Aaron <hello.brandon@aaron.sh>",
+    "Andreas Lind <andreas@one.com>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG and WebP images using the libvips library",
   "scripts": {
@@ -45,7 +46,7 @@
     "nan": "^1.3.0"
   },
   "devDependencies": {
-    "mocha": "^1.21.5",
+    "mocha": "^2.0.0",
     "mocha-jshint": "^0.0.9",
     "istanbul": "^0.3.2",
     "coveralls": "^2.11.2"

@@ -198,6 +198,15 @@ describe('Input/output', function() {
     done();
   });
 
+  it('Fail when input is invalid Buffer', function(done) {
+    sharp(new Buffer([0x1, 0x2, 0x3, 0x4]))
+      .toBuffer(function (err) {
+        assert.ok(err);
+        assert.ok(err instanceof Error);
+        done();
+      });
+  });
+
   it('Promises/A+', function(done) {
     sharp(fixtures.inputJpg).resize(320, 240).toBuffer().then(function(data) {
       sharp(data).toBuffer(function(err, data, info) {
