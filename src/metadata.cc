@@ -76,7 +76,9 @@ class MetadataWorker : public NanAsyncWorker {
       }
     }
     // Clean up
-    g_object_unref(image);
+    if (imageType != UNKNOWN) {
+      g_object_unref(image);
+    }
     vips_error_clear();
     vips_thread_shutdown();
   }
