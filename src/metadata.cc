@@ -87,7 +87,7 @@ class MetadataWorker : public NanAsyncWorker {
     Handle<Value> argv[2] = { NanNull(), NanNull() };
     if (!baton->err.empty()) {
       // Error
-      argv[0] = NanNew<String>(baton->err.data(), baton->err.size());
+      argv[0] = Exception::Error(NanNew<String>(baton->err.data(), baton->err.size()));
     } else {
       // Metadata Object
       Local<Object> info = NanNew<Object>();
