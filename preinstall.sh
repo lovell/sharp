@@ -85,7 +85,7 @@ case $(uname -s) in
           echo "Installing libvips via apt-get"
           apt-get install -y libvips-dev
           ;;
-        precise)
+        precise|wheezy)
           # Ubuntu 12
           echo "Installing libvips dependencies via apt-get"
           add-apt-repository -y ppa:lyrasis/precise-backports
