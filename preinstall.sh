@@ -4,9 +4,9 @@
 # Currently supports:
 # * Mac OS
 # * Debian Linux
-#   * Debian 8
+#   * Debian 7, 8
 #   * Ubuntu 12.04, 14.04, 14.10
-#   * Mint 17
+#   * Mint 13, 17
 # * Red Hat Linux
 #   * RHEL/Centos/Scientific 6, 7
 #   * Fedora 21, 22
@@ -58,6 +58,12 @@ else
   echo "Could not find libvips using a PKG_CONFIG_PATH of '$pkg_config_path'"
 fi
 
+# Verify root/sudo access
+if [ "$(id -u)" -ne "0" ]; then
+  echo "Sorry, I need root/sudo access to continue"
+  exit 1
+fi
+
 # OS-specific installations of libvips follows
 
 case $(uname -s) in
@@ -85,8 +91,8 @@ case $(uname -s) in
           echo "Installing libvips via apt-get"
           apt-get install -y libvips-dev
           ;;
-        precise|wheezy)
-          # Ubuntu 12
+        precise|wheezy|maya)
+          # Debian 7, Ubuntu 12.04, Mint 13
           echo "Installing libvips dependencies via apt-get"
           add-apt-repository -y ppa:lyrasis/precise-backports
           apt-get update

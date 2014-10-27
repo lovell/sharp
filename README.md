@@ -35,9 +35,9 @@ To install the latest version of libvips on the following Operating Systems:
 
 * Mac OS (homebrew, MacPorts)
 * Debian Linux
-  * Debian 8
+  * Debian 7, 8
   * Ubuntu 12.04, 14.04, 14.10
-  * Mint 17
+  * Mint 13, 17
 * Red Hat Linux
   * RHEL/Centos/Scientific 6, 7
   * Fedora 21, 22
