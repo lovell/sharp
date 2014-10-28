@@ -3,6 +3,6 @@ node_js:
   - "0.10"
   - "0.11"
 before_install:
-  - curl -s https://raw.githubusercontent.com/lovell/sharp/preinstall/preinstall.sh | sudo bash -
+  - curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
 after_success:
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js

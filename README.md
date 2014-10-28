@@ -33,7 +33,9 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 
 To install the latest version of libvips on the following Operating Systems:
 
-* Mac OS (homebrew, MacPorts)
+* Mac OS
+  * Homebrew
+  * MacPorts
 * Debian Linux
   * Debian 7, 8
   * Ubuntu 12.04, 14.04, 14.10
@@ -44,13 +46,13 @@ To install the latest version of libvips on the following Operating Systems:
 
 run the following as a user with `sudo` access:
 
-	curl -s https://raw.githubusercontent.com/lovell/sharp/preinstall/preinstall.sh | sudo bash -
+	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
 
 or run the following as `root`:
 
-	curl -s https://raw.githubusercontent.com/lovell/sharp/preinstall/preinstall.sh | bash -
+	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | bash -
 
-The `preinstall.sh` script requires `curl` and `pkg-config`.
+The [preinstall.sh](https://github.com/lovell/sharp/blob/master/preinstall.sh) script requires `curl` and `pkg-config`.
 
 ### Mac OS tips
 
