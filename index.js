@@ -54,10 +54,15 @@ var Sharp = function(input) {
     this.options.fileIn = input;
   } else if (typeof input === 'object' && input instanceof Buffer) {
     // input=buffer
-    if (input.length > 0) {
+    if (
+      (input.length > 1) &&
+      (input[0] === 0xff && input[1] === 0xd8) || // JPEG
+      (input[0] === 0x89 && input[1] === 0x50) || // PNG
+      (input[0] === 0x52 && input[1] === 0x49) // WebP
+    ) {
       this.options.bufferIn = input;
     } else {
-      throw new Error('Buffer is empty');
+      throw new Error('Buffer contains an unsupported image format. JPEG, PNG and WebP are currently supported.');
     }
   } else {
     // input=stream
