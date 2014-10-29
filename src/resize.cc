@@ -1,5 +1,6 @@
 #include <tuple>
 #include <algorithm>
+#include <cmath>
 #include <node.h>
 #include <node_buffer.h>
 #include <vips/vips.h>
