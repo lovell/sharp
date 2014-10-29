@@ -1,5 +1,5 @@
 #include <tuple>
-#include <math.h>
+#include <algorithm>
 #include <node.h>
 #include <node_buffer.h>
 #include <vips/vips.h>
@@ -70,7 +70,6 @@ struct ResizeBaton {
     topOffsetPost(-1),
     canvas(CROP),
     gravity(0),
-    background{0.0, 0.0, 0.0, 255.0},
     flatten(false),
     sharpen(false),
     gamma(0.0),
@@ -79,7 +78,12 @@ struct ResizeBaton {
     flop(false),
     progressive(false),
     withoutEnlargement(false),
-    withMetadata(false) {}
+    withMetadata(false) {
+      background[0] = 0.0;
+      background[1] = 0.0;
+      background[2] = 0.0;
+      background[3] = 255.0;
+    }
 };
 
 class ResizeWorker : public NanAsyncWorker {
