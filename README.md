@@ -74,7 +74,7 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 ### Using with gulp.js
 
-[Mohammad Prabowo](https://github.com/rizalp) maintains a [gulp.js plugin](https://github.com/rizalp/gulp-sharp).
+[Eugeny Vlasenko](https://github.com/mahnunchik) maintains [gulp-responsive](https://www.npmjs.org/package/gulp-responsive) and [Mohammad Prabowo](https://github.com/rizalp) maintains [gulp-sharp](https://www.npmjs.org/package/gulp-sharp).
 
 ## Usage examples
 
