@@ -1,5 +1,6 @@
 'use strict';
 
+var path = require('path');
 var util = require('util');
 var stream = require('stream');
 
@@ -17,6 +18,8 @@ var Sharp = function(input) {
     // input options
     streamIn: false,
     sequentialRead: false,
+    // ICC profile to use when input CMYK image has no embedded profile
+    iccProfileCmyk: path.join(__dirname, 'icc', 'USWebCoatedSWOP.icc'),
     // resize options
     topOffsetPre: -1,
     leftOffsetPre: -1,

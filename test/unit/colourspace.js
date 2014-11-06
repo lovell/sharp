@@ -66,4 +66,16 @@ describe('Colour space conversion', function() {
       });
   });
 
+  it('From profile-less CMYK to sRGB', function(done) {
+    sharp(fixtures.inputJpgWithCmykNoProfile)
+      .resize(320)
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        done();
+      });
+  });
+
 });

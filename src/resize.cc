@@ -30,6 +30,7 @@ struct ResizeBaton {
   std::string fileIn;
   void* bufferIn;
   size_t bufferInLength;
+  std::string iccProfileCmyk;
   std::string output;
   std::string outputFormat;
   void* bufferOut;
@@ -236,16 +237,28 @@ class ResizeWorker : public NanAsyncWorker {
     }
 
     // Handle colour profile, if any, for non sRGB images
-    if (image->Type != VIPS_INTERPRETATION_sRGB && vips_image_get_typeof(image, VIPS_META_ICC_NAME)) {
-      // Import embedded profile
-      VipsImage *profile = vips_image_new();
-      vips_object_local(hook, profile);
-      if (vips_icc_import(image, &profile, NULL, "embedded", TRUE, "pcs", VIPS_PCS_XYZ, NULL)) {
-        return Error(baton, hook);
+    if (image->Type != VIPS_INTERPRETATION_sRGB) {
+      // Get the input colour profile
+      if (vips_image_get_typeof(image, VIPS_META_ICC_NAME)) {
+        // Use embedded profile
+        VipsImage *profile = vips_image_new();
+        vips_object_local(hook, profile);
+        if (vips_icc_import(image, &profile, "pcs", VIPS_PCS_XYZ, "embedded", TRUE, NULL)) {
+          return Error(baton, hook);
+        }
+        g_object_unref(image);
+        image = profile;
+      } else if (image->Type == VIPS_INTERPRETATION_CMYK) {
+        // CMYK with no embedded profile
+        VipsImage *profile = vips_image_new();
+        vips_object_local(hook, profile);
+        if (vips_icc_import(image, &profile, "pcs", VIPS_PCS_XYZ, "input_profile", (baton->iccProfileCmyk).c_str(), NULL)) {
+          return Error(baton, hook);
+        }
+        g_object_unref(image);
+        image = profile;
       }
-      g_object_unref(image);
-      image = profile;
-      // Convert to sRGB colour space
+      // Attempt to convert to sRGB colour space
       VipsImage *colourspaced = vips_image_new();
       vips_object_local(hook, colourspaced);
       if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
@@ -738,6 +751,8 @@ NAN_METHOD(resize) {
     baton->bufferInLength = node::Buffer::Length(buffer);
     baton->bufferIn = node::Buffer::Data(buffer);
   }
+  // ICC profile to use when input CMYK image has no embedded profile
+  baton->iccProfileCmyk = *String::Utf8Value(options->Get(NanNew<String>("iccProfileCmyk"))->ToString());
   // Extract image options
   baton->topOffsetPre = options->Get(NanNew<String>("topOffsetPre"))->Int32Value();
   baton->leftOffsetPre = options->Get(NanNew<String>("leftOffsetPre"))->Int32Value();
