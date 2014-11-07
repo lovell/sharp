@@ -27,12 +27,25 @@ bool is_tiff(std::string const &str) {
   return ends_with(str, ".tif") || ends_with(str, ".tiff") || ends_with(str, ".TIF") || ends_with(str, ".TIFF");
 }
 
+// Buffer content checkers
+
+#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40)
+static bool buffer_is_tiff(char *buffer, size_t len) {
+  return (
+    len >= 4 && (
+      (buffer[0] == 'M' && buffer[1] == 'M' && buffer[2] == '\0' && (buffer[3] == '*' || buffer[3] == '+')) ||
+      (buffer[0] == 'I' && buffer[1] == 'I' && (buffer[2] == '*' || buffer[2] == '+') && buffer[3] == '\0')
+    )
+  );
+}
+#endif
+
 unsigned char const MARKER_JPEG[] = {0xff, 0xd8};
 unsigned char const MARKER_PNG[] = {0x89, 0x50};
 unsigned char const MARKER_WEBP[] = {0x52, 0x49};
 
 /*
-  Initialise a VipsImage from a buffer. Supports JPEG, PNG and WebP.
+  Initialise a VipsImage from a buffer. Supports JPEG, PNG, WebP and TIFF.
   Returns the ImageType detected, if any.
 */
 ImageType
@@ -42,14 +55,20 @@ sharp_init_image_from_buffer(VipsImage **image, void *buffer, size_t const lengt
     if (!vips_jpegload_buffer(buffer, length, image, "access", access, NULL)) {
       imageType = JPEG;
     }
-  } else if(memcmp(MARKER_PNG, buffer, 2) == 0) {
+  } else if (memcmp(MARKER_PNG, buffer, 2) == 0) {
     if (!vips_pngload_buffer(buffer, length, image, "access", access, NULL)) {
       imageType = PNG;
     }
-  } else if(memcmp(MARKER_WEBP, buffer, 2) == 0) {
+  } else if (memcmp(MARKER_WEBP, buffer, 2) == 0) {
     if (!vips_webpload_buffer(buffer, length, image, "access", access, NULL)) {
       imageType = WEBP;
     }
+#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40)
+  } else if (buffer_is_tiff(static_cast<char*>(buffer), length)) {
+    if (!vips_tiffload_buffer(buffer, length, image, "access", access, NULL)) {
+      imageType = TIFF;
+    }
+#endif
   }
   return imageType;
 }

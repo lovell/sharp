@@ -62,3 +62,13 @@ NAN_METHOD(counters) {
   counters->Set(NanNew<String>("process"), NanNew<Number>(counter_process));
   NanReturnValue(counters);
 }
+
+/*
+  Get libvips version
+*/
+NAN_METHOD(libvipsVersion) {
+  NanScope();
+  char version[9];
+  snprintf(version, 9, "%d.%d.%d", vips_version(0), vips_version(1), vips_version(2));
+  NanReturnValue(NanNew<String>(version));
+}

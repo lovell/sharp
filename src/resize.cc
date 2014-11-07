@@ -61,6 +61,7 @@ struct ResizeBaton {
   VipsAccess accessMethod;
   int quality;
   int compressionLevel;
+  bool withoutAdaptiveFiltering;
   std::string err;
   bool withMetadata;
 
@@ -517,7 +518,8 @@ class ResizeWorker : public NanAsyncWorker {
       image = colourspaced;
     }
 
-    // Generate image tile cache when interlace output is required
+#if !(VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40 && VIPS_MINOR_VERSION >= 5)
+    // Generate image tile cache when interlace output is required - no longer required as of libvips 7.40.5+
     if (baton->progressive) {
       VipsImage *cached = vips_image_new();
       vips_object_local(hook, cached);
@@ -527,6 +529,7 @@ class ResizeWorker : public NanAsyncWorker {
       g_object_unref(image);
       image = cached;
     }
+#endif
 
     // Output
     if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == JPEG)) {
@@ -537,11 +540,21 @@ class ResizeWorker : public NanAsyncWorker {
       }
       baton->outputFormat = "jpeg";
     } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == PNG)) {
+#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 41)
+      // Select PNG row filter
+      int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
+      // Write PNG to buffer
+      if (vips_pngsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
+        "compression", baton->compressionLevel, "interlace", baton->progressive, "filter", filter, NULL)) {
+        return Error(baton, hook);
+      }
+#else
       // Write PNG to buffer
       if (vips_pngsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
         "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
         return Error(baton, hook);
       }
+#endif
       baton->outputFormat = "png";
     } else if (baton->output == "__webp" || (baton->output == "__input" && inputImageType == WEBP)) {
       // Write WEBP to buffer
@@ -564,11 +577,21 @@ class ResizeWorker : public NanAsyncWorker {
         }
         baton->outputFormat = "jpeg";
       } else if (output_png || (match_input && inputImageType == PNG)) {
+#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 41)
+        // Select PNG row filter
+        int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
+        // Write PNG to file
+        if (vips_pngsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
+          "compression", baton->compressionLevel, "interlace", baton->progressive, "filter", filter, NULL)) {
+          return Error(baton, hook);
+        }
+#else
         // Write PNG to file
         if (vips_pngsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
           "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
           return Error(baton, hook);
         }
+#endif
         baton->outputFormat = "png";
       } else if (output_webp || (match_input && inputImageType == WEBP)) {
         // Write WEBP to file
@@ -798,6 +821,7 @@ NAN_METHOD(resize) {
   baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();
   baton->quality = options->Get(NanNew<String>("quality"))->Int32Value();
   baton->compressionLevel = options->Get(NanNew<String>("compressionLevel"))->Int32Value();
+  baton->withoutAdaptiveFiltering = options->Get(NanNew<String>("withoutAdaptiveFiltering"))->BooleanValue();
   baton->withMetadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
   // Output filename or __format for Buffer
   baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());

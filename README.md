@@ -29,7 +29,7 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 ### Prerequisites
 
 * Node.js v0.10+
-* [libvips](https://github.com/jcupitt/libvips) v7.38.5+
+* [libvips](https://github.com/jcupitt/libvips) v7.38.5+ (7.40.9+ recommended)
 
 To install the latest version of libvips on the following Operating Systems:
 
@@ -214,12 +214,12 @@ sharp(inputBuffer)
 
 Constructor to which further methods are chained. `input`, if present, can be one of:
 
-* Buffer containing JPEG, PNG or WebP image data, or
+* Buffer containing JPEG, PNG, WebP or TIFF (libvips 7.40.0+) image data, or
 * String containing the filename of an image, with most major formats supported.
 
 The object returned implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
 
-JPEG, PNG or WebP format image data can be streamed into the object when `input` is not provided.
+JPEG, PNG, WebP or TIFF (libvips 7.40.0+) format image data can be streamed into the object when `input` is not provided.
 
 JPEG, PNG or WebP format image data can be streamed out from this object.
 
@@ -387,6 +387,12 @@ Include all metadata (ICC, EXIF, XMP) from the input image in the output image. 
 An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
 
 `compressionLevel` is a Number between 0 and 9.
+
+#### withoutAdaptiveFiltering()
+
+_Requires libvips 7.41.0+_
+
+An advanced and experimental PNG output setting to disable adaptive row filtering.
 
 ### Output methods
 

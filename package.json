@@ -41,9 +41,10 @@
     "stream"
   ],
   "dependencies": {
-    "bluebird": "^2.3.10",
+    "bluebird": "^2.3.11",
     "color": "^0.7.1",
-    "nan": "^1.4.0"
+    "nan": "^1.4.0",
+    "semver": "^4.1.0"
   },
   "devDependencies": {
     "mocha": "^2.0.1",

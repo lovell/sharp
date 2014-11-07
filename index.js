@@ -4,10 +4,12 @@ var path = require('path');
 var util = require('util');
 var stream = require('stream');
 
+var semver = require('semver');
 var color = require('color');
 var BluebirdPromise = require('bluebird');
 
 var sharp = require('./build/Release/sharp');
+var libvipsVersion = sharp.libvipsVersion();
 
 var Sharp = function(input) {
   if (!(this instanceof Sharp)) {
@@ -49,6 +51,7 @@ var Sharp = function(input) {
     progressive: false,
     quality: 80,
     compressionLevel: 6,
+    withoutAdaptiveFiltering: false,
     streamOut: false,
     withMetadata: false
   };
@@ -58,14 +61,22 @@ var Sharp = function(input) {
   } else if (typeof input === 'object' && input instanceof Buffer) {
     // input=buffer
     if (
-      (input.length > 1) &&
-      (input[0] === 0xff && input[1] === 0xd8) || // JPEG
-      (input[0] === 0x89 && input[1] === 0x50) || // PNG
-      (input[0] === 0x52 && input[1] === 0x49) // WebP
+      (input.length > 3) &&
+      // JPEG
+      (input[0] === 0xFF && input[1] === 0xD8) ||
+      // PNG
+      (input[0] === 0x89 && input[1] === 0x50) ||
+      // WebP
+      (input[0] === 0x52 && input[1] === 0x49) ||
+      // TIFF - requires libvips 7.40.0+
+      (semver.gte(libvipsVersion, '7.40.0') && (
+        (input[0] === 0x4D && input[1] === 0x4D && input[2] === 0x00 && (input[3] === 0x2A || input[3] === 0x2B)) ||
+        (input[0] === 0x49 && input[1] === 0x49 && (input[2] === 0x2A || input[2] === 0x2B) && input[3] === 0x00)
+      ))
     ) {
       this.options.bufferIn = input;
     } else {
-      throw new Error('Buffer contains an unsupported image format. JPEG, PNG and WebP are currently supported.');
+      throw new Error('Buffer contains an unsupported image format. JPEG, PNG, WebP and TIFF are currently supported.');
     }
   } else {
     // input=stream
@@ -269,11 +280,26 @@ Sharp.prototype.quality = function(quality) {
   return this;
 };
 
+/*
+  zlib compression level for PNG output
+*/
 Sharp.prototype.compressionLevel = function(compressionLevel) {
   if (!Number.isNaN(compressionLevel) && compressionLevel >= 0 && compressionLevel <= 9) {
     this.options.compressionLevel = compressionLevel;
   } else {
     throw new Error('Invalid compressionLevel (0 to 9) ' + compressionLevel);
+  }
+  return this;
+};
+
+/*
+  Disable the use of adaptive row filtering for PNG output - requires libvips 7.41.0+
+*/
+Sharp.prototype.withoutAdaptiveFiltering = function(withoutAdaptiveFiltering) {
+  if (semver.gte(libvipsVersion, '7.41.0')) {
+    this.options.withoutAdaptiveFiltering = (typeof withoutAdaptiveFiltering === 'boolean') ? withoutAdaptiveFiltering : true;
+  } else {
+    console.error('withoutAdaptiveFiltering requires libvips 7.41.0+');
   }
   return this;
 };
@@ -505,4 +531,11 @@ module.exports.concurrency = function(concurrency) {
 */
 module.exports.counters = function() {
   return sharp.counters();
+};
+
+/*
+  Get the version of the libvips library
+*/
+module.exports.libvipsVersion = function() {
+  return libvipsVersion;
 };
