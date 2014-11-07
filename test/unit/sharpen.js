@@ -17,7 +17,8 @@ describe('Sharpen', function() {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        sharp(notSharpened)
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
           .sharpen()
           .toBuffer(function(err, sharpened, info) {
             if (err) throw err;

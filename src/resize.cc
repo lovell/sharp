@@ -159,6 +159,9 @@ class ResizeWorker : public NanAsyncWorker {
       baton->flip = TRUE;
     }
 
+    // Get window size of interpolator, used for determining shrink vs affine
+    int interpolatorWindowSize = sharp_interpolator_window_size(baton->interpolator.c_str());
+
     // Scaling calculations
     double factor;
     if (baton->width > 0 && baton->height > 0) {
@@ -188,10 +191,20 @@ class ResizeWorker : public NanAsyncWorker {
       baton->width = inputWidth;
       baton->height = inputHeight;
     }
-    int shrink = floor(factor);
+
+    // Calculate integral box shrink
+    int shrink = 1;
+    if (factor >= 2 && interpolatorWindowSize > 3) {
+      // Shrink less, affine more with interpolators that use at least 4x4 pixel window, e.g. bicubic
+      shrink = floor(factor * 3.0 / interpolatorWindowSize);
+    } else {
+      shrink = floor(factor);
+    }
     if (shrink < 1) {
       shrink = 1;
     }
+
+    // Calculate residual float affine transformation
     double residual = static_cast<double>(shrink) / factor;
 
     // Do not enlarge the output if the input width *or* height are already less than the required dimensions
@@ -207,7 +220,7 @@ class ResizeWorker : public NanAsyncWorker {
 
     // Try to use libjpeg shrink-on-load, but not when applying gamma correction or pre-resize extract
     int shrink_on_load = 1;
-    if (inputImageType == JPEG && baton->gamma == 0 && baton->topOffsetPre == -1) {
+    if (inputImageType == JPEG && shrink >= 2 && baton->gamma == 0 && baton->topOffsetPre == -1) {
       if (shrink >= 8) {
         factor = factor / 8;
         shrink_on_load = 8;
@@ -222,7 +235,11 @@ class ResizeWorker : public NanAsyncWorker {
     if (shrink_on_load > 1) {
       // Recalculate integral shrink and double residual
       factor = std::max(factor, 1.0);
-      shrink = floor(factor);
+      if (factor >= 2 && interpolatorWindowSize > 3) {
+        shrink = floor(factor * 3.0 / interpolatorWindowSize);
+      } else {
+        shrink = floor(factor);
+      }
       residual = static_cast<double>(shrink) / factor;
       // Reload input using shrink-on-load
       g_object_unref(image);
@@ -340,11 +357,21 @@ class ResizeWorker : public NanAsyncWorker {
 
     // Use vips_affine with the remaining float part
     if (residual != 0) {
-      VipsImage *affined = vips_image_new();
-      vips_object_local(hook, affined);
+      // Apply variable blur radius of floor(residual) before large affine reductions
+      if (residual >= 1) {
+        VipsImage *blurred = vips_image_new();
+        vips_object_local(hook, blurred);
+        if (vips_gaussblur(image, &blurred, floor(residual), NULL)) {
+          return Error(baton, hook);
+        }
+        g_object_unref(image);
+        image = blurred;
+      }
       // Create interpolator - "bilinear" (default), "bicubic" or "nohalo"
       VipsInterpolate *interpolator = vips_interpolate_new(baton->interpolator.c_str());
       // Perform affine transformation
+      VipsImage *affined = vips_image_new();
+      vips_object_local(hook, affined);
       if (vips_affine(image, &affined, residual, 0, 0, residual, "interpolate", interpolator, NULL)) {
         g_object_unref(interpolator);
         return Error(baton, hook);

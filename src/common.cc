@@ -116,3 +116,15 @@ sharp_image_has_alpha(VipsImage *image) {
     (image->Bands == 5 && image->Type == VIPS_INTERPRETATION_CMYK)
   );
 }
+
+/*
+  Returns the window size for the named interpolator. For example,
+  a window size of 3 means a 3x3 pixel grid is used for the calculation.
+*/
+int
+sharp_interpolator_window_size(char const *name) {
+  VipsInterpolate *interpolator = vips_interpolate_new(name);
+  int window_size = vips_interpolate_get_window_size(interpolator);
+  g_object_unref(interpolator);
+  return window_size;
+}

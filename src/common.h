@@ -43,4 +43,11 @@ sharp_init_image_from_file(VipsImage **image, char const *file, VipsAccess const
 bool
 sharp_image_has_alpha(VipsImage *image);
 
+/*
+  Returns the window size for the named interpolator. For example,
+  a window size of 3 means a 3x3 pixel grid is used for the calculation.
+*/
+int
+sharp_interpolator_window_size(char const *name);
+
 #endif
