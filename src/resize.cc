@@ -657,7 +657,10 @@ class ResizeWorker : public NanAsyncWorker {
     bool flip = FALSE;
     if (angle == -1) {
       const char *exif;
-      if (!vips_image_get_string(input, "exif-ifd0-Orientation", &exif)) {
+      if (
+        vips_image_get_typeof(input, "exif-ifd0-Orientation") != 0 &&
+        !vips_image_get_string(input, "exif-ifd0-Orientation", &exif)
+      ) {
         if (exif[0] == 0x36) { // "6"
           rotate = ANGLE_90;
         } else if (exif[0] == 0x33) { // "3"

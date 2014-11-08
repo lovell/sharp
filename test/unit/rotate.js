@@ -68,6 +68,21 @@ describe('Rotation', function() {
     });
   });
 
+  it('Attempt to auto-rotate image format without EXIF support', function(done) {
+    sharp(fixtures.inputGif)
+      .rotate()
+      .resize(320)
+      .jpeg()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(213, info.height);
+        done();
+      });
+  });
+
   it('Rotate to an invalid angle, should fail', function(done) {
     var fail = false;
     try {
