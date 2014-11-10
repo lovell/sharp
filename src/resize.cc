@@ -50,6 +50,7 @@ struct ResizeBaton {
   std::string interpolator;
   double background[4];
   bool flatten;
+  int blurRadius;
   int sharpenRadius;
   double sharpenFlat;
   double sharpenJagged;
@@ -76,6 +77,7 @@ struct ResizeBaton {
     canvas(CROP),
     gravity(0),
     flatten(false),
+    blurRadius(0),
     sharpenRadius(0),
     sharpenFlat(1.0),
     sharpenJagged(2.0),
@@ -510,6 +512,31 @@ class ResizeWorker : public NanAsyncWorker {
       image = extractedPost;
     }
 
+    // Blur
+    if (baton->blurRadius != 0) {
+      VipsImage *blurred = vips_image_new();
+      vips_object_local(hook, blurred);
+      if (baton->blurRadius == -1) {
+        // Fast, mild blur
+        VipsImage *blur = vips_image_new_matrixv(3, 3,
+          1.0, 1.0, 1.0,
+          1.0, 1.0, 1.0,
+          1.0, 1.0, 1.0);
+        vips_image_set_double(blur, "scale", 9);
+        vips_object_local(hook, blur);
+        if (vips_conv(image, &blurred, blur, NULL)) {
+          return Error(baton, hook);
+        }
+      } else {
+        // Slower, accurate Gaussian blur
+        if (vips_gaussblur(image, &blurred, baton->blurRadius, NULL)) {
+          return Error(baton, hook);
+        }
+      }
+      g_object_unref(image);
+      image = blurred;
+    }
+
     // Sharpen
     if (baton->sharpenRadius != 0) {
       VipsImage *sharpened = vips_image_new();
@@ -850,6 +877,7 @@ NAN_METHOD(resize) {
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   // Operators
   baton->flatten = options->Get(NanNew<String>("flatten"))->BooleanValue();
+  baton->blurRadius = options->Get(NanNew<String>("blurRadius"))->Int32Value();
   baton->sharpenRadius = options->Get(NanNew<String>("sharpenRadius"))->Int32Value();
   baton->sharpenFlat = options->Get(NanNew<String>("sharpenFlat"))->NumberValue();
   baton->sharpenJagged = options->Get(NanNew<String>("sharpenJagged"))->NumberValue();

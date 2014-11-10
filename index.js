@@ -43,6 +43,7 @@ var Sharp = function(input) {
     // operations
     background: [0, 0, 0, 255],
     flatten: false,
+    blurRadius: 0,
     sharpenRadius: 0,
     sharpenFlat: 1,
     sharpenJagged: 2,
@@ -204,6 +205,27 @@ Sharp.prototype.flop = function(flop) {
 */
 Sharp.prototype.withoutEnlargement = function(withoutEnlargement) {
   this.options.withoutEnlargement = (typeof withoutEnlargement === 'boolean') ? withoutEnlargement : true;
+  return this;
+};
+
+/*
+  Blur the output image.
+  Call without a radius to use a fast, mild blur.
+  Call with a radius to use a slower, more accurate Gaussian blur.
+*/
+Sharp.prototype.blur = function(radius) {
+  if (typeof radius === 'undefined') {
+    // No arguments: default to mild blur
+    this.options.blurRadius = -1;
+  } else if (typeof radius === 'boolean') {
+    // Boolean argument: apply mild blur?
+    this.options.blurRadius = radius ? -1 : 0;
+  } else if (typeof radius === 'number' && !Number.isNaN(radius) && (radius % 1 === 0)) {
+    // Numeric argument: specific radius
+    this.options.blurRadius = radius;
+  } else {
+    throw new Error('Invalid integral blur radius ' + radius);
+  }
   return this;
 };
 

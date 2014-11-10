@@ -187,6 +187,30 @@ async.series({
           }
         });
       }
+    }).add('sharp-blur-mild', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer).resize(width, height).blur().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add('sharp-blur-radius', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer).resize(width, height).blur(3).toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
     }).add('sharp-nearest-neighbour', {
       defer: true,
       fn: function(deferred) {
