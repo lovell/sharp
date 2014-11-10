@@ -163,10 +163,22 @@ async.series({
           deferred.resolve();
         });
       }
-    }).add('sharp-sharpen', {
+    }).add('sharp-sharpen-mild', {
       defer: true,
       fn: function(deferred) {
         sharp(inputJpgBuffer).resize(width, height).sharpen().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add('sharp-sharpen-radius', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer).resize(width, height).sharpen(3, 1, 3).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {

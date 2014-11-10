@@ -43,7 +43,9 @@ var Sharp = function(input) {
     // operations
     background: [0, 0, 0, 255],
     flatten: false,
-    sharpen: false,
+    sharpenRadius: 0,
+    sharpenFlat: 1,
+    sharpenJagged: 2,
     gamma: 0,
     greyscale: false,
     // output options
@@ -138,16 +140,6 @@ Sharp.prototype.extract = function(topOffset, leftOffset, width, height) {
 };
 
 /*
-  Deprecated embed* methods, to be removed in v0.8.0
-*/
-Sharp.prototype.embedWhite = util.deprecate(function() {
-  return this.background('white').embed();
-}, "embedWhite() is deprecated, use background('white').embed() instead");
-Sharp.prototype.embedBlack = util.deprecate(function() {
-  return this.background('black').embed();
-}, "embedBlack() is deprecated, use background('black').embed() instead");
-
-/*
   Set the background colour for embed and flatten operations.
   Delegates to the 'Color' module, which can throw an Error
   but is liberal in what it accepts, clamping values to sensible min/max.
@@ -215,8 +207,35 @@ Sharp.prototype.withoutEnlargement = function(withoutEnlargement) {
   return this;
 };
 
-Sharp.prototype.sharpen = function(sharpen) {
-  this.options.sharpen = (typeof sharpen === 'boolean') ? sharpen : true;
+/*
+  Sharpen the output image.
+  Call without a radius to use a fast, mild sharpen.
+  Call with a radius to use a slow, accurate sharpen using the L of LAB colour space.
+    radius - size of mask in pixels, must be integer
+    flat - level of "flat" area sharpen, default 1
+    jagged - level of "jagged" area sharpen, default 2
+*/
+Sharp.prototype.sharpen = function(radius, flat, jagged) {
+  if (typeof radius === 'undefined') {
+    // No arguments: default to mild sharpen
+    this.options.sharpenRadius = -1;
+  } else if (typeof radius === 'boolean') {
+    // Boolean argument: apply mild sharpen?
+    this.options.sharpenRadius = radius ? -1 : 0;
+  } else if (typeof radius === 'number' && !Number.isNaN(radius) && (radius % 1 === 0)) {
+    // Numeric argument: specific radius
+    this.options.sharpenRadius = radius;
+    if (typeof flat === 'number' && !Number.isNaN(flat)) {
+      // Control over flat areas
+      this.options.sharpenFlat = flat;
+    }
+    if (typeof jagged === 'number' && !Number.isNaN(jagged)) {
+      // Control over jagged areas
+      this.options.sharpenJagged = jagged;
+    }
+  } else {
+    throw new Error('Invalid integral sharpen radius ' + radius);
+  }
   return this;
 };
 

@@ -7,7 +7,57 @@ var fixtures = require('../fixtures');
 
 describe('Sharpen', function() {
 
-  it('sharpen image is larger than non-sharpen', function(done) {
+  it('specific radius and levels 0.5, 2.5', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .sharpen(3, 0.5, 2.5)
+      .toFile(fixtures.path('output.sharpen-3-0.5-2.5.jpg'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
+  it('specific radius 3 and levels 2, 4', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .sharpen(5, 2, 4)
+      .toFile(fixtures.path('output.sharpen-5-2-4.jpg'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
+  it('mild sharpen', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .sharpen()
+      .toFile(fixtures.path('output.sharpen-mild.jpg'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
+  it('invalid radius', function(done) {
+    var isValid = true;
+    try {
+      sharp(fixtures.inputJpg).sharpen(1.5);
+    } catch (err) {
+      isValid = false;
+    }
+    assert.strictEqual(false, isValid);
+    done();
+  });
+
+  it('sharpened image is larger than non-sharpened', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .sharpen(false)
@@ -19,7 +69,7 @@ describe('Sharpen', function() {
         assert.strictEqual(240, info.height);
         sharp(fixtures.inputJpg)
           .resize(320, 240)
-          .sharpen()
+          .sharpen(true)
           .toBuffer(function(err, sharpened, info) {
             if (err) throw err;
             assert.strictEqual(true, sharpened.length > 0);

@@ -319,9 +319,15 @@ Do not enlarge the output image if the input image width *or* height are already
 
 This is equivalent to GraphicsMagick's `>` geometry option: "change the dimensions of the image only if its width or height exceeds the geometry specification".
 
-#### sharpen()
+#### sharpen([radius], [flat], [jagged])
 
-Perform a mild sharpen of the output image. This typically reduces performance by 10%.
+When used without parameters, perform a fast, mild sharpen of the output image. This typically reduces performance by 10%.
+
+When a `radius` is provided, perform a slower, more accurate sharpen of the L channel in the LAB colour space. Separate control over the level of sharpening in "flat" and "jagged" areas is available. This typically reduces performance by 50%.
+
+* `radius`, if present, is an integral Number representing the sharpen mask radius in pixels.
+* `flat`, if present, is a Number representing the level of sharpening to apply to "flat" areas, defaulting to a value of 1.0.
+* `jagged`, if present, is a Number representing the level of sharpening to apply to "jagged" areas, defaulting to a value of 2.0.
 
 #### interpolateWith(interpolator)
 

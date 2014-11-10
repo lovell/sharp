@@ -50,7 +50,9 @@ struct ResizeBaton {
   std::string interpolator;
   double background[4];
   bool flatten;
-  bool sharpen;
+  int sharpenRadius;
+  double sharpenFlat;
+  double sharpenJagged;
   double gamma;
   bool greyscale;
   int angle;
@@ -74,7 +76,9 @@ struct ResizeBaton {
     canvas(CROP),
     gravity(0),
     flatten(false),
-    sharpen(false),
+    sharpenRadius(0),
+    sharpenFlat(1.0),
+    sharpenJagged(2.0),
     gamma(0.0),
     greyscale(false),
     flip(false),
@@ -506,18 +510,26 @@ class ResizeWorker : public NanAsyncWorker {
       image = extractedPost;
     }
 
-    // Mild sharpen
-    if (baton->sharpen) {
+    // Sharpen
+    if (baton->sharpenRadius != 0) {
       VipsImage *sharpened = vips_image_new();
       vips_object_local(hook, sharpened);
-      VipsImage *sharpen = vips_image_new_matrixv(3, 3,
-        -1.0, -1.0, -1.0,
-        -1.0, 32.0, -1.0,
-        -1.0, -1.0, -1.0);
-      vips_image_set_double(sharpen, "scale", 24);
-      vips_object_local(hook, sharpen);
-      if (vips_conv(image, &sharpened, sharpen, NULL)) {
-        return Error(baton, hook);
+      if (baton->sharpenRadius == -1) {
+        // Fast, mild sharpen
+        VipsImage *sharpen = vips_image_new_matrixv(3, 3,
+          -1.0, -1.0, -1.0,
+          -1.0, 32.0, -1.0,
+          -1.0, -1.0, -1.0);
+        vips_image_set_double(sharpen, "scale", 24);
+        vips_object_local(hook, sharpen);
+        if (vips_conv(image, &sharpened, sharpen, NULL)) {
+          return Error(baton, hook);
+        }
+      } else {
+        // Slow, accurate sharpen in LAB colour space, with control over flat vs jagged areas
+        if (vips_sharpen(image, &sharpened, "radius", baton->sharpenRadius, "m1", baton->sharpenFlat, "m2", baton->sharpenJagged, NULL)) {
+          return Error(baton, hook);
+        }
       }
       g_object_unref(image);
       image = sharpened;
@@ -838,7 +850,9 @@ NAN_METHOD(resize) {
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   // Operators
   baton->flatten = options->Get(NanNew<String>("flatten"))->BooleanValue();
-  baton->sharpen = options->Get(NanNew<String>("sharpen"))->BooleanValue();
+  baton->sharpenRadius = options->Get(NanNew<String>("sharpenRadius"))->Int32Value();
+  baton->sharpenFlat = options->Get(NanNew<String>("sharpenFlat"))->NumberValue();
+  baton->sharpenJagged = options->Get(NanNew<String>("sharpenJagged"))->NumberValue();
   baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();
   baton->greyscale = options->Get(NanNew<String>("greyscale"))->BooleanValue();
   baton->angle = options->Get(NanNew<String>("angle"))->Int32Value();
