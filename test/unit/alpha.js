@@ -5,6 +5,8 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.cache(0);
+
 describe('Alpha transparency', function() {
 
   it('Flatten to black', function(done) {

@@ -5,6 +5,8 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.cache(0);
+
 describe('Sharpen', function() {
 
   it('specific radius and levels 0.5, 2.5', function(done) {

@@ -8,6 +8,8 @@ var semver = require('semver');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.cache(0);
+
 describe('Input/output', function() {
 
   it('Read from File and write to Stream', function(done) {

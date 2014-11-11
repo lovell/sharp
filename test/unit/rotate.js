@@ -5,6 +5,8 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.cache(0);
+
 describe('Rotation', function() {
 
   it('Rotate by 90 degrees, respecting output input size', function(done) {

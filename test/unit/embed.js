@@ -5,6 +5,8 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.cache(0);
+
 describe('Embed', function() {
 
   it('JPEG within PNG, no alpha channel', function(done) {

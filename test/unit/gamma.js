@@ -5,6 +5,8 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.cache(0);
+
 describe('Gamma correction', function() {
 
   it('value of 0.0 (disabled)', function(done) {

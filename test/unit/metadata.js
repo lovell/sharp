@@ -6,6 +6,8 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.cache(0);
+
 describe('Image metadata', function() {
 
   it('JPEG', function(done) {
