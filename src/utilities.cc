@@ -7,6 +7,7 @@
 #include "utilities.h"
 
 using namespace v8;
+using namespace sharp;
 
 /*
   Get and set cache memory and item limits
@@ -58,8 +59,8 @@ NAN_METHOD(concurrency) {
 NAN_METHOD(counters) {
   NanScope();
   Local<Object> counters = NanNew<Object>();
-  counters->Set(NanNew<String>("queue"), NanNew<Number>(counter_queue));
-  counters->Set(NanNew<String>("process"), NanNew<Number>(counter_process));
+  counters->Set(NanNew<String>("queue"), NanNew<Number>(counterQueue));
+  counters->Set(NanNew<String>("process"), NanNew<Number>(counterProcess));
   NanReturnValue(counters);
 }
 

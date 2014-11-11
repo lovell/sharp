@@ -7,6 +7,7 @@
 #include "metadata.h"
 
 using namespace v8;
+using namespace sharp;
 
 struct MetadataBaton {
   // Input
@@ -36,49 +37,49 @@ class MetadataWorker : public NanAsyncWorker {
 
   void Execute() {
     // Decrement queued task counter
-    g_atomic_int_dec_and_test(&counter_queue);
+    g_atomic_int_dec_and_test(&counterQueue);
 
-    ImageType imageType = UNKNOWN;
-    VipsImage *image;
+    ImageType imageType = ImageType::UNKNOWN;
+    VipsImage *image = NULL;
     if (baton->bufferInLength > 1) {
       // From buffer
-      imageType = sharp_init_image_from_buffer(&image, baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
-      if (imageType == UNKNOWN) {
+      imageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
+      if (imageType != ImageType::UNKNOWN) {
+        image = InitImage(imageType, baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
+      } else {
         (baton->err).append("Input buffer contains unsupported image format");
       }
     } else {
       // From file
-      imageType = sharp_init_image_from_file(&image, baton->fileIn.c_str(), VIPS_ACCESS_RANDOM);
-      if (imageType == UNKNOWN) {
+      imageType = DetermineImageType(baton->fileIn.c_str());
+      if (imageType != ImageType::UNKNOWN) {
+        image = InitImage(imageType, baton->fileIn.c_str(), VIPS_ACCESS_RANDOM);
+      } else {
         (baton->err).append("File is of an unsupported image format");
       }
     }
-    if (imageType != UNKNOWN) {
+    if (image != NULL && imageType != ImageType::UNKNOWN) {
       // Image type
       switch (imageType) {
-        case JPEG: baton->format = "jpeg"; break;
-        case PNG: baton->format = "png"; break;
-        case WEBP: baton->format = "webp"; break;
-        case TIFF: baton->format = "tiff"; break;
-        case MAGICK: baton->format = "magick"; break;
-        case UNKNOWN: default: baton->format = "";
+        case ImageType::JPEG: baton->format = "jpeg"; break;
+        case ImageType::PNG: baton->format = "png"; break;
+        case ImageType::WEBP: baton->format = "webp"; break;
+        case ImageType::TIFF: baton->format = "tiff"; break;
+        case ImageType::MAGICK: baton->format = "magick"; break;
+        case ImageType::UNKNOWN: break;
       }
       // VipsImage attributes
       baton->width = image->Xsize;
       baton->height = image->Ysize;
       baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image->Type);
       baton->channels = image->Bands;
-      baton->hasAlpha = sharp_image_has_alpha(image);
-      // EXIF Orientation
-      const char *exif;
-      if (!vips_image_get_string(image, "exif-ifd0-Orientation", &exif)) {
-        baton->orientation = atoi(&exif[0]);
-      }
-    }
-    // Clean up
-    if (imageType != UNKNOWN) {
+      // Derived attributes
+      baton->hasAlpha = HasAlpha(image);
+      baton->orientation = ExifOrientation(image);
+      // Drop image reference
       g_object_unref(image);
     }
+    // Clean up
     vips_error_clear();
     vips_thread_shutdown();
   }
@@ -138,7 +139,7 @@ NAN_METHOD(metadata) {
   NanAsyncQueueWorker(new MetadataWorker(callback, baton));
 
   // Increment queued task counter
-  g_atomic_int_inc(&counter_queue);
+  g_atomic_int_inc(&counterQueue);
 
   NanReturnUndefined();
 }
