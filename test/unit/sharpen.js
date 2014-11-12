@@ -9,7 +9,20 @@ sharp.cache(0);
 
 describe('Sharpen', function() {
 
-  it('specific radius and levels 0.5, 2.5', function(done) {
+  it('specific radius 10', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .sharpen(10)
+      .toFile(fixtures.path('output.sharpen-10.jpg'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
+  it('specific radius 3 and levels 0.5, 2.5', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .sharpen(3, 0.5, 2.5)
@@ -22,7 +35,7 @@ describe('Sharpen', function() {
       });
   });
 
-  it('specific radius 3 and levels 2, 4', function(done) {
+  it('specific radius 5 and levels 2, 4', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .sharpen(5, 2, 4)
@@ -52,6 +65,28 @@ describe('Sharpen', function() {
     var isValid = true;
     try {
       sharp(fixtures.inputJpg).sharpen(1.5);
+    } catch (err) {
+      isValid = false;
+    }
+    assert.strictEqual(false, isValid);
+    done();
+  });
+
+  it('invalid flat', function(done) {
+    var isValid = true;
+    try {
+      sharp(fixtures.inputJpg).sharpen(1, -1);
+    } catch (err) {
+      isValid = false;
+    }
+    assert.strictEqual(false, isValid);
+    done();
+  });
+
+  it('invalid jagged', function(done) {
+    var isValid = true;
+    try {
+      sharp(fixtures.inputJpg).sharpen(1, 1, -1);
     } catch (err) {
       isValid = false;
     }

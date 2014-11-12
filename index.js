@@ -220,11 +220,11 @@ Sharp.prototype.blur = function(radius) {
   } else if (typeof radius === 'boolean') {
     // Boolean argument: apply mild blur?
     this.options.blurRadius = radius ? -1 : 0;
-  } else if (typeof radius === 'number' && !Number.isNaN(radius) && (radius % 1 === 0)) {
+  } else if (typeof radius === 'number' && !Number.isNaN(radius) && (radius % 1 === 0) && radius >= 1) {
     // Numeric argument: specific radius
     this.options.blurRadius = radius;
   } else {
-    throw new Error('Invalid integral blur radius ' + radius);
+    throw new Error('Invalid blur radius ' + radius + ' (expected integer >= 1)');
   }
   return this;
 };
@@ -244,19 +244,27 @@ Sharp.prototype.sharpen = function(radius, flat, jagged) {
   } else if (typeof radius === 'boolean') {
     // Boolean argument: apply mild sharpen?
     this.options.sharpenRadius = radius ? -1 : 0;
-  } else if (typeof radius === 'number' && !Number.isNaN(radius) && (radius % 1 === 0)) {
+  } else if (typeof radius === 'number' && !Number.isNaN(radius) && (radius % 1 === 0) && radius >= 1) {
     // Numeric argument: specific radius
     this.options.sharpenRadius = radius;
-    if (typeof flat === 'number' && !Number.isNaN(flat)) {
-      // Control over flat areas
-      this.options.sharpenFlat = flat;
+    // Control over flat areas
+    if (typeof flat !== 'undefined' && flat !== null) {
+      if (typeof flat === 'number' && !Number.isNaN(flat) && flat >= 0) {
+        this.options.sharpenFlat = flat;
+      } else {
+        throw new Error('Invalid sharpen level for flat areas ' + flat + ' (expected >= 0)');
+      }
     }
-    if (typeof jagged === 'number' && !Number.isNaN(jagged)) {
-      // Control over jagged areas
-      this.options.sharpenJagged = jagged;
+    // Control over jagged areas
+    if (typeof jagged !== 'undefined' && jagged !== null) {
+      if (typeof jagged === 'number' && !Number.isNaN(jagged) && jagged >= 0) {
+        this.options.sharpenJagged = jagged;
+      } else {
+        throw new Error('Invalid sharpen level for jagged areas ' + jagged + ' (expected >= 0)');
+      }
     }
   } else {
-    throw new Error('Invalid integral sharpen radius ' + radius);
+    throw new Error('Invalid sharpen radius ' + radius + ' (expected integer >= 1)');
   }
   return this;
 };
