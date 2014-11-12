@@ -86,10 +86,16 @@ case $(uname -s) in
       DISTRO=$(lsb_release -c -s)
       echo "Detected Debian Linux '$DISTRO'"
       case "$DISTRO" in
-        jessie|trusty|utopic|qiana)
-          # Debian 8, Ubuntu 14, Mint 17
+        jessie|vivid)
+          # Debian 8, Ubuntu 15
           echo "Installing libvips via apt-get"
           apt-get install -y libvips-dev
+          ;;
+        trusty|utopic|qiana|rebecca)
+          # Ubuntu 14, Mint 17
+          echo "Installing libvips dependencies via apt-get"
+          apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libxml2-dev swig libmagickwand-dev curl
+          install_libvips_from_source
           ;;
         precise|wheezy|maya)
           # Debian 7, Ubuntu 12.04, Mint 13

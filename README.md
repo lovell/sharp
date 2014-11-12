@@ -29,16 +29,16 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 ### Prerequisites
 
 * Node.js v0.10+
-* [libvips](https://github.com/jcupitt/libvips) v7.38.5+ (7.40.9+ recommended)
+* [libvips](https://github.com/jcupitt/libvips) v7.38.5+ (7.40.12+ recommended)
 
-To install the latest version of libvips on the following Operating Systems:
+To install the most suitable version of libvips on the following Operating Systems:
 
 * Mac OS
   * Homebrew
   * MacPorts
 * Debian Linux
   * Debian 7, 8
-  * Ubuntu 12.04, 14.04, 14.10
+  * Ubuntu 12.04, 14.04, 14.10, 15.04
   * Mint 13, 17
 * Red Hat Linux
   * RHEL/Centos/Scientific 6, 7
