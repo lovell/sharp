@@ -9,11 +9,37 @@ sharp.cache(0);
 
 describe('Blur', function() {
 
-  it('specific radius', function(done) {
+  it('specific radius 1', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .blur(1)
       .toFile(fixtures.path('output.blur-1.jpg'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
+  it('specific radius 10', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .blur(10)
+      .toFile(fixtures.path('output.blur-10.jpg'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
+  it('specific radius 100', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .blur(100)
+      .toFile(fixtures.path('output.blur-100.jpg'), function(err, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
