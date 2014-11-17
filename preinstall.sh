@@ -5,13 +5,13 @@
 # * Mac OS
 # * Debian Linux
 #   * Debian 7, 8
-#   * Ubuntu 12.04, 14.04, 14.10
+#   * Ubuntu 12.04, 14.04, 14.10, 15.04
 #   * Mint 13, 17
 # * Red Hat Linux
 #   * RHEL/Centos/Scientific 6, 7
 #   * Fedora 21, 22
 
-vips_version_minimum=7.38.5
+vips_version_minimum=7.40.0
 vips_version_latest_major=7.40
 vips_version_latest_minor=11
 

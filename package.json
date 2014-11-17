@@ -13,7 +13,7 @@
     "Brandon Aaron <hello.brandon@aaron.sh>",
     "Andreas Lind <andreas@one.com>"
   ],
-  "description": "High performance Node.js module to resize JPEG, PNG and WebP images using the libvips library",
+  "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {
     "test": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=10000 ./test/unit/*.js"
   },
@@ -36,8 +36,6 @@
     "embed",
     "libvips",
     "vips",
-    "fast",
-    "buffer",
     "stream"
   ],
   "dependencies": {

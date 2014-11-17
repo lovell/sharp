@@ -29,7 +29,7 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 ### Prerequisites
 
 * Node.js v0.10+
-* [libvips](https://github.com/jcupitt/libvips) v7.38.5+ (7.40.12+ recommended)
+* [libvips](https://github.com/jcupitt/libvips) v7.40.0+ (7.42.0+ recommended)
 
 To install the most suitable version of libvips on the following Operating Systems:
 
@@ -214,12 +214,12 @@ sharp(inputBuffer)
 
 Constructor to which further methods are chained. `input`, if present, can be one of:
 
-* Buffer containing JPEG, PNG, WebP or TIFF (libvips 7.40.0+) image data, or
+* Buffer containing JPEG, PNG, WebP or TIFF image data, or
 * String containing the filename of an image, with most major formats supported.
 
 The object returned implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
 
-JPEG, PNG, WebP or TIFF (libvips 7.40.0+) format image data can be streamed into the object when `input` is not provided.
+JPEG, PNG, WebP or TIFF format image data can be streamed into the object when `input` is not provided.
 
 JPEG, PNG or WebP format image data can be streamed out from this object.
 
@@ -232,7 +232,7 @@ Fast access to image metadata without decoding any compressed image data.
 * `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff` and `magick`)
 * `width`: Number of pixels wide
 * `height`: Number of pixels high
-* `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L502)
+* `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)
 * `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
 * `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 * `orientation`: Number value of the EXIF Orientation header, if present

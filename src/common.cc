@@ -34,7 +34,6 @@ namespace sharp {
   unsigned char const MARKER_PNG[] = {0x89, 0x50};
   unsigned char const MARKER_WEBP[] = {0x52, 0x49};
 
-#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40)
   static bool buffer_is_tiff(char *buffer, size_t len) {
     return (
       len >= 4 && (
@@ -43,7 +42,6 @@ namespace sharp {
       )
     );
   }
-#endif
 
   /*
     Determine image format of a buffer.
@@ -57,10 +55,8 @@ namespace sharp {
         imageType = ImageType::PNG;
       } else if (memcmp(MARKER_WEBP, buffer, 2) == 0) {
         imageType = ImageType::WEBP;
-#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40)
       } else if (buffer_is_tiff(static_cast<char*>(buffer), length)) {
         imageType = ImageType::TIFF;
-#endif
       }
     }
     return imageType;
@@ -77,10 +73,8 @@ namespace sharp {
       vips_pngload_buffer(buffer, length, &image, "access", access, NULL);
     } else if (imageType == ImageType::WEBP) {
       vips_webpload_buffer(buffer, length, &image, "access", access, NULL);
-#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40)
     } else if (imageType == ImageType::TIFF) {
       vips_tiffload_buffer(buffer, length, &image, "access", access, NULL);
-#endif
     }
     return image;
   }

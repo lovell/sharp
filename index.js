@@ -71,11 +71,9 @@ var Sharp = function(input) {
       (input[0] === 0x89 && input[1] === 0x50) ||
       // WebP
       (input[0] === 0x52 && input[1] === 0x49) ||
-      // TIFF - requires libvips 7.40.0+
-      (semver.gte(libvipsVersion, '7.40.0') && (
-        (input[0] === 0x4D && input[1] === 0x4D && input[2] === 0x00 && (input[3] === 0x2A || input[3] === 0x2B)) ||
-        (input[0] === 0x49 && input[1] === 0x49 && (input[2] === 0x2A || input[2] === 0x2B) && input[3] === 0x00)
-      ))
+      // TIFF
+      (input[0] === 0x4D && input[1] === 0x4D && input[2] === 0x00 && (input[3] === 0x2A || input[3] === 0x2B)) ||
+      (input[0] === 0x49 && input[1] === 0x49 && (input[2] === 0x2A || input[2] === 0x2B) && input[3] === 0x00)
     ) {
       this.options.bufferIn = input;
     } else {
