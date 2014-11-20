@@ -370,7 +370,7 @@ describe('Input/output', function() {
     });
 
     if (semver.gte(sharp.libvipsVersion(), '7.41.0')) {
-      it('withoutAdaptiveFiltering generates smaller file [libvips 7.41.0+]', function(done) {
+      it('withoutAdaptiveFiltering generates smaller file [libvips ' + sharp.libvipsVersion() + '>=7.41.0]', function(done) {
         // First generate with adaptive filtering
         sharp(fixtures.inputPng)
           .resize(320, 240)
@@ -401,7 +401,7 @@ describe('Input/output', function() {
   });
 
   if (semver.gte(sharp.libvipsVersion(), '7.40.0')) {
-    it('Load TIFF from Buffer [libvips 7.40.0+]', function(done) {
+    it('Load TIFF from Buffer [libvips ' + sharp.libvipsVersion() + '>=7.40.0]', function(done) {
       var inputTiffBuffer = fs.readFileSync(fixtures.inputTiff);
       sharp(inputTiffBuffer)
         .resize(320, 240)

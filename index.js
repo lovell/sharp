@@ -43,7 +43,7 @@ var Sharp = function(input) {
     // operations
     background: [0, 0, 0, 255],
     flatten: false,
-    blurRadius: 0,
+    blurSigma: 0,
     sharpenRadius: 0,
     sharpenFlat: 1,
     sharpenJagged: 2,
@@ -208,21 +208,21 @@ Sharp.prototype.withoutEnlargement = function(withoutEnlargement) {
 
 /*
   Blur the output image.
-  Call without a radius to use a fast, mild blur.
-  Call with a radius to use a slower, more accurate Gaussian blur.
+  Call without a sigma to use a fast, mild blur.
+  Call with a sigma to use a slower, more accurate Gaussian blur.
 */
-Sharp.prototype.blur = function(radius) {
-  if (typeof radius === 'undefined') {
+Sharp.prototype.blur = function(sigma) {
+  if (typeof sigma === 'undefined') {
     // No arguments: default to mild blur
-    this.options.blurRadius = -1;
-  } else if (typeof radius === 'boolean') {
+    this.options.blurSigma = -1;
+  } else if (typeof sigma === 'boolean') {
     // Boolean argument: apply mild blur?
-    this.options.blurRadius = radius ? -1 : 0;
-  } else if (typeof radius === 'number' && !Number.isNaN(radius) && (radius % 1 === 0) && radius >= 1) {
-    // Numeric argument: specific radius
-    this.options.blurRadius = radius;
+    this.options.blurSigma = sigma ? -1 : 0;
+  } else if (typeof sigma === 'number' && !Number.isNaN(sigma) && sigma >= 0.3 && sigma <= 1000) {
+    // Numeric argument: specific sigma
+    this.options.blurSigma = sigma;
   } else {
-    throw new Error('Invalid blur radius ' + radius + ' (expected integer >= 1)');
+    throw new Error('Invalid blur sigma (0.3 to 1000.0) ' + sigma);
   }
   return this;
 };

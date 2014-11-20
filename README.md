@@ -319,13 +319,13 @@ Do not enlarge the output image if the input image width *or* height are already
 
 This is equivalent to GraphicsMagick's `>` geometry option: "change the dimensions of the image only if its width or height exceeds the geometry specification".
 
-#### blur([radius])
+#### blur([sigma])
 
 When used without parameters, performs a fast, mild blur of the output image. This typically reduces performance by 10%.
 
-When a `radius` is provided, performs a slower, more accurate Gaussian blur. This typically reduces performance by 30%.
+When a `sigma` is provided, performs a slower, more accurate Gaussian blur. This typically reduces performance by 25%.
 
-* `radius`, if present, is an integral Number representing the approximate blur mask radius in pixels.
+* `sigma`, if present, is a Number between 0.3 and 1000 representing the approximate blur radius in pixels.
 
 #### sharpen([radius], [flat], [jagged])
 

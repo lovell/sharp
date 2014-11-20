@@ -35,11 +35,11 @@ describe('Blur', function() {
       });
   });
 
-  it('specific radius 100', function(done) {
+  it('specific radius 0.3', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
-      .blur(100)
-      .toFile(fixtures.path('output.blur-100.jpg'), function(err, info) {
+      .blur(0.3)
+      .toFile(fixtures.path('output.blur-0.3.jpg'), function(err, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -64,7 +64,7 @@ describe('Blur', function() {
   it('invalid radius', function(done) {
     var isValid = true;
     try {
-      sharp(fixtures.inputJpg).blur(1.5);
+      sharp(fixtures.inputJpg).blur(0.1);
     } catch (err) {
       isValid = false;
     }

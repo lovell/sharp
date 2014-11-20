@@ -51,7 +51,7 @@ struct ResizeBaton {
   std::string interpolator;
   double background[4];
   bool flatten;
-  int blurRadius;
+  double blurSigma;
   int sharpenRadius;
   double sharpenFlat;
   double sharpenJagged;
@@ -78,7 +78,7 @@ struct ResizeBaton {
     canvas(Canvas::CROP),
     gravity(0),
     flatten(false),
-    blurRadius(0),
+    blurSigma(0.0),
     sharpenRadius(0),
     sharpenFlat(1.0),
     sharpenJagged(2.0),
@@ -364,22 +364,33 @@ class ResizeWorker : public NanAsyncWorker {
     }
 
     // Use vips_affine with the remaining float part
-    if (residual != 0) {
-      // Apply variable blur radius of floor(residual) before large affine reductions
-      if (residual >= 1) {
-        VipsImage *blurred;
-        if (vips_gaussblur(image, &blurred, floor(residual), NULL)) {
-          return Error(baton, hook);
+    if (residual != 0.0) {
+      // Apply Gaussian blur before large affine reductions
+      if (residual < 1.0) {
+        // Calculate standard deviation
+        double sigma = ((1.0 / residual) - 0.5) / 1.5;
+        if (sigma >= 0.3) {
+          // Create Gaussian function for standard deviation
+          VipsImage *gaussian;
+          if (vips_gaussmat(&gaussian, sigma, 0.2, "separable", TRUE, "integer", TRUE, NULL)) {
+            return Error(baton, hook);
+          }
+          vips_object_local(hook, gaussian);
+          // Apply Gaussian function
+          VipsImage *blurred;
+          if (vips_convsep(image, &blurred, gaussian, "precision", VIPS_PRECISION_INTEGER, NULL)) {
+            return Error(baton, hook);
+          }
+          vips_object_local(hook, blurred);
+          image = blurred;
         }
-        vips_object_local(hook, blurred);
-        image = blurred;
       }
       // Create interpolator - "bilinear" (default), "bicubic" or "nohalo"
       VipsInterpolate *interpolator = vips_interpolate_new(baton->interpolator.c_str());
       vips_object_local(hook, interpolator);
       // Perform affine transformation
       VipsImage *affined;
-      if (vips_affine(image, &affined, residual, 0, 0, residual, "interpolate", interpolator, NULL)) {
+      if (vips_affine(image, &affined, residual, 0.0, 0.0, residual, "interpolate", interpolator, NULL)) {
         return Error(baton, hook);
       }
       vips_object_local(hook, affined);
@@ -502,10 +513,10 @@ class ResizeWorker : public NanAsyncWorker {
     }
 
     // Blur
-    if (baton->blurRadius != 0) {
+    if (baton->blurSigma != 0.0) {
       VipsImage *blurred;
-      if (baton->blurRadius == -1) {
-        // Fast, mild blur
+      if (baton->blurSigma < 0.0) {
+        // Fast, mild blur - averages neighbouring pixels
         VipsImage *blur = vips_image_new_matrixv(3, 3,
           1.0, 1.0, 1.0,
           1.0, 1.0, 1.0,
@@ -517,7 +528,15 @@ class ResizeWorker : public NanAsyncWorker {
         }
       } else {
         // Slower, accurate Gaussian blur
-        if (vips_gaussblur(image, &blurred, baton->blurRadius, NULL)) {
+        // Create Gaussian function for standard deviation
+        VipsImage *gaussian;
+        if (vips_gaussmat(&gaussian, baton->blurSigma, 0.2, "separable", TRUE, "integer", TRUE, NULL)) {
+          return Error(baton, hook);
+        }
+        vips_object_local(hook, gaussian);
+        // Apply Gaussian function
+        VipsImage *blurred;
+        if (vips_convsep(image, &blurred, gaussian, "precision", VIPS_PRECISION_INTEGER, NULL)) {
           return Error(baton, hook);
         }
       }
@@ -847,7 +866,7 @@ NAN_METHOD(resize) {
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   // Operators
   baton->flatten = options->Get(NanNew<String>("flatten"))->BooleanValue();
-  baton->blurRadius = options->Get(NanNew<String>("blurRadius"))->Int32Value();
+  baton->blurSigma = options->Get(NanNew<String>("blurSigma"))->NumberValue();
   baton->sharpenRadius = options->Get(NanNew<String>("sharpenRadius"))->Int32Value();
   baton->sharpenFlat = options->Get(NanNew<String>("sharpenFlat"))->NumberValue();
   baton->sharpenJagged = options->Get(NanNew<String>("sharpenJagged"))->NumberValue();
