@@ -6,5 +6,6 @@
 NAN_METHOD(cache);
 NAN_METHOD(concurrency);
 NAN_METHOD(counters);
+NAN_METHOD(libvipsVersion);
 
 #endif

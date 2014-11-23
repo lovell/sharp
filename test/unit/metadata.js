@@ -6,6 +6,8 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.cache(0);
+
 describe('Image metadata', function() {
 
   it('JPEG', function(done) {
@@ -185,11 +187,4 @@ describe('Image metadata', function() {
     });
   });
 
-  it('Report an invalid image as an error', function(done) {
-    sharp(new Buffer([0x1, 0x2, 0x3, 0x4])).metadata(function (err, metadata) {
-      assert.ok(err);
-      assert.ok(err instanceof Error);
-      done();
-    });
-  });
 });

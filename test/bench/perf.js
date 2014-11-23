@@ -5,6 +5,7 @@ var fs = require('fs');
 var async = require('async');
 var assert = require('assert');
 var Benchmark = require('benchmark');
+var semver = require('semver');
 
 var imagemagick = require('imagemagick');
 var imagemagickNative = require('imagemagick-native');
@@ -162,10 +163,46 @@ async.series({
           deferred.resolve();
         });
       }
-    }).add('sharp-sharpen', {
+    }).add('sharp-sharpen-mild', {
       defer: true,
       fn: function(deferred) {
         sharp(inputJpgBuffer).resize(width, height).sharpen().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add('sharp-sharpen-radius', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer).resize(width, height).sharpen(3, 1, 3).toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add('sharp-blur-mild', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer).resize(width, height).blur().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
+    }).add('sharp-blur-radius', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer).resize(width, height).blur(3).toBuffer(function(err, buffer) {
           if (err) {
             throw err;
           } else {
@@ -314,7 +351,8 @@ async.series({
   },
   png: function(callback) {
     var inputPngBuffer = fs.readFileSync(fixtures.inputPng);
-    (new Benchmark.Suite('png')).add('imagemagick-file-file', {
+    var pngSuite = new Benchmark.Suite('png');
+    pngSuite.add('imagemagick-file-file', {
       defer: true,
       fn: function(deferred) {
         imagemagick.resize({
@@ -422,7 +460,23 @@ async.series({
           }
         });
       }
-    }).on('cycle', function(event) {
+    });
+    if (semver.gte(sharp.libvipsVersion(), '7.41.0')) {
+      pngSuite.add('sharp-withoutAdaptiveFiltering', {
+        defer: true,
+        fn: function(deferred) {
+          sharp(inputPngBuffer).resize(width, height).withoutAdaptiveFiltering().toBuffer(function(err, buffer) {
+            if (err) {
+              throw err;
+            } else {
+              assert.notStrictEqual(null, buffer);
+              deferred.resolve();
+            }
+          });
+        }
+      });
+    }
+    pngSuite.on('cycle', function(event) {
       console.log(' png ' + String(event.target));
     }).on('complete', function() {
       callback(null, this.filter('fastest').pluck('name'));

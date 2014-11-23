@@ -5,13 +5,13 @@
 # * Mac OS
 # * Debian Linux
 #   * Debian 7, 8
-#   * Ubuntu 12.04, 14.04, 14.10
+#   * Ubuntu 12.04, 14.04, 14.10, 15.04
 #   * Mint 13, 17
 # * Red Hat Linux
 #   * RHEL/Centos/Scientific 6, 7
 #   * Fedora 21, 22
 
-vips_version_minimum=7.38.5
+vips_version_minimum=7.40.0
 vips_version_latest_major=7.40
 vips_version_latest_minor=11
 
@@ -86,10 +86,16 @@ case $(uname -s) in
       DISTRO=$(lsb_release -c -s)
       echo "Detected Debian Linux '$DISTRO'"
       case "$DISTRO" in
-        jessie|trusty|utopic|qiana)
-          # Debian 8, Ubuntu 14, Mint 17
+        jessie|vivid)
+          # Debian 8, Ubuntu 15
           echo "Installing libvips via apt-get"
           apt-get install -y libvips-dev
+          ;;
+        trusty|utopic|qiana|rebecca)
+          # Ubuntu 14, Mint 17
+          echo "Installing libvips dependencies via apt-get"
+          apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libxml2-dev swig libmagickwand-dev curl
+          install_libvips_from_source
           ;;
         precise|wheezy|maya)
           # Debian 7, Ubuntu 12.04, Mint 13

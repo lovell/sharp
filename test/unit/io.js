@@ -3,8 +3,12 @@
 var fs = require('fs');
 var assert = require('assert');
 
+var semver = require('semver');
+
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
+
+sharp.cache(0);
 
 describe('Input/output', function() {
 
@@ -189,22 +193,27 @@ describe('Input/output', function() {
   });
 
   it('Fail when input is empty Buffer', function(done) {
-    var fail = false;
+    var failed = true;
     try {
       sharp(new Buffer(0));
-      fail = true;
-    } catch (e) {}
-    assert(!fail);
+      failed = false;
+    } catch (err) {
+      assert(err instanceof Error);
+    }
+    assert(failed);
     done();
   });
 
   it('Fail when input is invalid Buffer', function(done) {
-    sharp(new Buffer([0x1, 0x2, 0x3, 0x4]))
-      .toBuffer(function (err) {
-        assert.ok(err);
-        assert.ok(err instanceof Error);
-        done();
-      });
+    var failed = true;
+    try {
+      sharp(new Buffer([0x1, 0x2, 0x3, 0x4]));
+      failed = false;
+    } catch (err) {
+      assert(err instanceof Error);
+    }
+    assert(failed);
+    done();
   });
 
   it('Promises/A+', function(done) {
@@ -338,9 +347,9 @@ describe('Input/output', function() {
 
   });
 
-  describe('PNG compression level', function() {
+  describe('PNG output', function() {
 
-    it('valid', function(done) {
+    it('compression level is valid', function(done) {
       var isValid = false;
       try {
         sharp().compressionLevel(0);
@@ -350,7 +359,7 @@ describe('Input/output', function() {
       done();
     });
 
-    it('invalid', function(done) {
+    it('compression level is invalid', function(done) {
       var isValid = false;
       try {
         sharp().compressionLevel(-1);
@@ -360,6 +369,52 @@ describe('Input/output', function() {
       done();
     });
 
+    if (semver.gte(sharp.libvipsVersion(), '7.41.0')) {
+      it('withoutAdaptiveFiltering generates smaller file [libvips ' + sharp.libvipsVersion() + '>=7.41.0]', function(done) {
+        // First generate with adaptive filtering
+        sharp(fixtures.inputPng)
+          .resize(320, 240)
+          .withoutAdaptiveFiltering(false)
+          .toBuffer(function(err, dataAdaptive, info) {
+            if (err) throw err;
+            assert.strictEqual(true, dataAdaptive.length > 0);
+            assert.strictEqual('png', info.format);
+            assert.strictEqual(320, info.width);
+            assert.strictEqual(240, info.height);
+            // Then generate without
+            sharp(fixtures.inputPng)
+              .resize(320, 240)
+              .withoutAdaptiveFiltering()
+              .toBuffer(function(err, dataWithoutAdaptive, info) {
+                if (err) throw err;
+                assert.strictEqual(true, dataWithoutAdaptive.length > 0);
+                assert.strictEqual('png', info.format);
+                assert.strictEqual(320, info.width);
+                assert.strictEqual(240, info.height);
+                assert.strictEqual(true, dataWithoutAdaptive.length < dataAdaptive.length);
+                done();
+              });
+          });
+      });
+    }
+
   });
+
+  if (semver.gte(sharp.libvipsVersion(), '7.40.0')) {
+    it('Load TIFF from Buffer [libvips ' + sharp.libvipsVersion() + '>=7.40.0]', function(done) {
+      var inputTiffBuffer = fs.readFileSync(fixtures.inputTiff);
+      sharp(inputTiffBuffer)
+        .resize(320, 240)
+        .jpeg()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(240, info.height);
+          done();
+        });
+    });
+  }
 
 });

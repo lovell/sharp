@@ -33,6 +33,7 @@ extern "C" void init(Handle<Object> target) {
   NODE_SET_METHOD(target, "cache", cache);
   NODE_SET_METHOD(target, "concurrency", concurrency);
   NODE_SET_METHOD(target, "counters", counters);
+  NODE_SET_METHOD(target, "libvipsVersion", libvipsVersion);
 }
 
 NODE_MODULE(sharp, init)

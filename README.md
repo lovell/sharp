@@ -29,14 +29,16 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 ### Prerequisites
 
 * Node.js v0.10+
-* [libvips](https://github.com/jcupitt/libvips) v7.38.5+
+* [libvips](https://github.com/jcupitt/libvips) v7.40.0+ (7.42.0+ recommended)
 
-To install the latest version of libvips on the following Operating Systems:
+To install the most suitable version of libvips on the following Operating Systems:
 
-* Mac OS (homebrew, MacPorts)
+* Mac OS
+  * Homebrew
+  * MacPorts
 * Debian Linux
   * Debian 7, 8
-  * Ubuntu 12.04, 14.04, 14.10
+  * Ubuntu 12.04, 14.04, 14.10, 15.04
   * Mint 13, 17
 * Red Hat Linux
   * RHEL/Centos/Scientific 6, 7
@@ -44,13 +46,13 @@ To install the latest version of libvips on the following Operating Systems:
 
 run the following as a user with `sudo` access:
 
-	curl -s https://raw.githubusercontent.com/lovell/sharp/preinstall/preinstall.sh | sudo bash -
+	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
 
 or run the following as `root`:
 
-	curl -s https://raw.githubusercontent.com/lovell/sharp/preinstall/preinstall.sh | bash -
+	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | bash -
 
-The `preinstall.sh` script requires `curl` and `pkg-config`.
+The [preinstall.sh](https://github.com/lovell/sharp/blob/master/preinstall.sh) script requires `curl` and `pkg-config`.
 
 ### Mac OS tips
 
@@ -72,7 +74,7 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 ### Using with gulp.js
 
-[Mohammad Prabowo](https://github.com/rizalp) maintains a [gulp.js plugin](https://github.com/rizalp/gulp-sharp).
+[Eugeny Vlasenko](https://github.com/mahnunchik) maintains [gulp-responsive](https://www.npmjs.org/package/gulp-responsive) and [Mohammad Prabowo](https://github.com/rizalp) maintains [gulp-sharp](https://www.npmjs.org/package/gulp-sharp).
 
 ## Usage examples
 
@@ -212,12 +214,12 @@ sharp(inputBuffer)
 
 Constructor to which further methods are chained. `input`, if present, can be one of:
 
-* Buffer containing JPEG, PNG or WebP image data, or
+* Buffer containing JPEG, PNG, WebP or TIFF image data, or
 * String containing the filename of an image, with most major formats supported.
 
 The object returned implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
 
-JPEG, PNG or WebP format image data can be streamed into the object when `input` is not provided.
+JPEG, PNG, WebP or TIFF format image data can be streamed into the object when `input` is not provided.
 
 JPEG, PNG or WebP format image data can be streamed out from this object.
 
@@ -230,7 +232,7 @@ Fast access to image metadata without decoding any compressed image data.
 * `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff` and `magick`)
 * `width`: Number of pixels wide
 * `height`: Number of pixels high
-* `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L502)
+* `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)
 * `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
 * `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 * `orientation`: Number value of the EXIF Orientation header, if present
@@ -317,9 +319,23 @@ Do not enlarge the output image if the input image width *or* height are already
 
 This is equivalent to GraphicsMagick's `>` geometry option: "change the dimensions of the image only if its width or height exceeds the geometry specification".
 
-#### sharpen()
+#### blur([sigma])
 
-Perform a mild sharpen of the output image. This typically reduces performance by 10%.
+When used without parameters, performs a fast, mild blur of the output image. This typically reduces performance by 10%.
+
+When a `sigma` is provided, performs a slower, more accurate Gaussian blur. This typically reduces performance by 25%.
+
+* `sigma`, if present, is a Number between 0.3 and 1000 representing the approximate blur radius in pixels.
+
+#### sharpen([radius], [flat], [jagged])
+
+When used without parameters, performs a fast, mild sharpen of the output image. This typically reduces performance by 10%.
+
+When a `radius` is provided, performs a slower, more accurate sharpen of the L channel in the LAB colour space. Separate control over the level of sharpening in "flat" and "jagged" areas is available. This typically reduces performance by 50%.
+
+* `radius`, if present, is an integral Number representing the sharpen mask radius in pixels.
+* `flat`, if present, is a Number representing the level of sharpening to apply to "flat" areas, defaulting to a value of 1.0.
+* `jagged`, if present, is a Number representing the level of sharpening to apply to "jagged" areas, defaulting to a value of 2.0.
 
 #### interpolateWith(interpolator)
 
@@ -385,6 +401,12 @@ Include all metadata (ICC, EXIF, XMP) from the input image in the output image. 
 An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
 
 `compressionLevel` is a Number between 0 and 9.
+
+#### withoutAdaptiveFiltering()
+
+_Requires libvips 7.41.0+_
+
+An advanced and experimental PNG output setting to disable adaptive row filtering.
 
 ### Output methods
 

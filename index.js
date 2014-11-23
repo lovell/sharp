@@ -1,12 +1,15 @@
 'use strict';
 
+var path = require('path');
 var util = require('util');
 var stream = require('stream');
 
+var semver = require('semver');
 var color = require('color');
 var BluebirdPromise = require('bluebird');
 
 var sharp = require('./build/Release/sharp');
+var libvipsVersion = sharp.libvipsVersion();
 
 var Sharp = function(input) {
   if (!(this instanceof Sharp)) {
@@ -17,6 +20,8 @@ var Sharp = function(input) {
     // input options
     streamIn: false,
     sequentialRead: false,
+    // ICC profile to use when input CMYK image has no embedded profile
+    iccProfileCmyk: path.join(__dirname, 'icc', 'USWebCoatedSWOP.icc'),
     // resize options
     topOffsetPre: -1,
     leftOffsetPre: -1,
@@ -38,7 +43,10 @@ var Sharp = function(input) {
     // operations
     background: [0, 0, 0, 255],
     flatten: false,
-    sharpen: false,
+    blurSigma: 0,
+    sharpenRadius: 0,
+    sharpenFlat: 1,
+    sharpenJagged: 2,
     gamma: 0,
     greyscale: false,
     // output options
@@ -46,6 +54,7 @@ var Sharp = function(input) {
     progressive: false,
     quality: 80,
     compressionLevel: 6,
+    withoutAdaptiveFiltering: false,
     streamOut: false,
     withMetadata: false
   };
@@ -54,10 +63,21 @@ var Sharp = function(input) {
     this.options.fileIn = input;
   } else if (typeof input === 'object' && input instanceof Buffer) {
     // input=buffer
-    if (input.length > 0) {
+    if (
+      (input.length > 3) &&
+      // JPEG
+      (input[0] === 0xFF && input[1] === 0xD8) ||
+      // PNG
+      (input[0] === 0x89 && input[1] === 0x50) ||
+      // WebP
+      (input[0] === 0x52 && input[1] === 0x49) ||
+      // TIFF
+      (input[0] === 0x4D && input[1] === 0x4D && input[2] === 0x00 && (input[3] === 0x2A || input[3] === 0x2B)) ||
+      (input[0] === 0x49 && input[1] === 0x49 && (input[2] === 0x2A || input[2] === 0x2B) && input[3] === 0x00)
+    ) {
       this.options.bufferIn = input;
     } else {
-      throw new Error('Buffer is empty');
+      throw new Error('Buffer contains an unsupported image format. JPEG, PNG, WebP and TIFF are currently supported.');
     }
   } else {
     // input=stream
@@ -117,16 +137,6 @@ Sharp.prototype.extract = function(topOffset, leftOffset, width, height) {
   }.bind(this));
   return this;
 };
-
-/*
-  Deprecated embed* methods, to be removed in v0.8.0
-*/
-Sharp.prototype.embedWhite = util.deprecate(function() {
-  return this.background('white').embed();
-}, "embedWhite() is deprecated, use background('white').embed() instead");
-Sharp.prototype.embedBlack = util.deprecate(function() {
-  return this.background('black').embed();
-}, "embedBlack() is deprecated, use background('black').embed() instead");
 
 /*
   Set the background colour for embed and flatten operations.
@@ -196,8 +206,64 @@ Sharp.prototype.withoutEnlargement = function(withoutEnlargement) {
   return this;
 };
 
-Sharp.prototype.sharpen = function(sharpen) {
-  this.options.sharpen = (typeof sharpen === 'boolean') ? sharpen : true;
+/*
+  Blur the output image.
+  Call without a sigma to use a fast, mild blur.
+  Call with a sigma to use a slower, more accurate Gaussian blur.
+*/
+Sharp.prototype.blur = function(sigma) {
+  if (typeof sigma === 'undefined') {
+    // No arguments: default to mild blur
+    this.options.blurSigma = -1;
+  } else if (typeof sigma === 'boolean') {
+    // Boolean argument: apply mild blur?
+    this.options.blurSigma = sigma ? -1 : 0;
+  } else if (typeof sigma === 'number' && !Number.isNaN(sigma) && sigma >= 0.3 && sigma <= 1000) {
+    // Numeric argument: specific sigma
+    this.options.blurSigma = sigma;
+  } else {
+    throw new Error('Invalid blur sigma (0.3 to 1000.0) ' + sigma);
+  }
+  return this;
+};
+
+/*
+  Sharpen the output image.
+  Call without a radius to use a fast, mild sharpen.
+  Call with a radius to use a slow, accurate sharpen using the L of LAB colour space.
+    radius - size of mask in pixels, must be integer
+    flat - level of "flat" area sharpen, default 1
+    jagged - level of "jagged" area sharpen, default 2
+*/
+Sharp.prototype.sharpen = function(radius, flat, jagged) {
+  if (typeof radius === 'undefined') {
+    // No arguments: default to mild sharpen
+    this.options.sharpenRadius = -1;
+  } else if (typeof radius === 'boolean') {
+    // Boolean argument: apply mild sharpen?
+    this.options.sharpenRadius = radius ? -1 : 0;
+  } else if (typeof radius === 'number' && !Number.isNaN(radius) && (radius % 1 === 0) && radius >= 1) {
+    // Numeric argument: specific radius
+    this.options.sharpenRadius = radius;
+    // Control over flat areas
+    if (typeof flat !== 'undefined' && flat !== null) {
+      if (typeof flat === 'number' && !Number.isNaN(flat) && flat >= 0) {
+        this.options.sharpenFlat = flat;
+      } else {
+        throw new Error('Invalid sharpen level for flat areas ' + flat + ' (expected >= 0)');
+      }
+    }
+    // Control over jagged areas
+    if (typeof jagged !== 'undefined' && jagged !== null) {
+      if (typeof jagged === 'number' && !Number.isNaN(jagged) && jagged >= 0) {
+        this.options.sharpenJagged = jagged;
+      } else {
+        throw new Error('Invalid sharpen level for jagged areas ' + jagged + ' (expected >= 0)');
+      }
+    }
+  } else {
+    throw new Error('Invalid sharpen radius ' + radius + ' (expected integer >= 1)');
+  }
   return this;
 };
 
@@ -261,11 +327,26 @@ Sharp.prototype.quality = function(quality) {
   return this;
 };
 
+/*
+  zlib compression level for PNG output
+*/
 Sharp.prototype.compressionLevel = function(compressionLevel) {
   if (!Number.isNaN(compressionLevel) && compressionLevel >= 0 && compressionLevel <= 9) {
     this.options.compressionLevel = compressionLevel;
   } else {
     throw new Error('Invalid compressionLevel (0 to 9) ' + compressionLevel);
+  }
+  return this;
+};
+
+/*
+  Disable the use of adaptive row filtering for PNG output - requires libvips 7.41.0+
+*/
+Sharp.prototype.withoutAdaptiveFiltering = function(withoutAdaptiveFiltering) {
+  if (semver.gte(libvipsVersion, '7.41.0')) {
+    this.options.withoutAdaptiveFiltering = (typeof withoutAdaptiveFiltering === 'boolean') ? withoutAdaptiveFiltering : true;
+  } else {
+    console.error('withoutAdaptiveFiltering requires libvips 7.41.0+');
   }
   return this;
 };
@@ -497,4 +578,11 @@ module.exports.concurrency = function(concurrency) {
 */
 module.exports.counters = function() {
   return sharp.counters();
+};
+
+/*
+  Get the version of the libvips library
+*/
+module.exports.libvipsVersion = function() {
+  return libvipsVersion;
 };
