@@ -12,15 +12,15 @@
 #   * Fedora 21, 22
 
 vips_version_minimum=7.40.0
-vips_version_latest_major=7.40
-vips_version_latest_minor=11
+vips_version_latest_major=7.42
+vips_version_latest_minor=0
 
 install_libvips_from_source() {
   echo "Compiling libvips $vips_version_latest_major.$vips_version_latest_minor from source"
   curl -O http://www.vips.ecs.soton.ac.uk/supported/$vips_version_latest_major/vips-$vips_version_latest_major.$vips_version_latest_minor.tar.gz
   tar zvxf vips-$vips_version_latest_major.$vips_version_latest_minor.tar.gz
   cd vips-$vips_version_latest_major.$vips_version_latest_minor
-  ./configure --enable-debug=no --enable-docs=no --enable-cxx=yes --without-python --without-orc --without-fftw $1
+  ./configure --enable-debug=no --enable-docs=no --enable-cxx=yes --without-python --without-orc --without-fftw --without-gsf $1
   make
   make install
   cd ..

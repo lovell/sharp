@@ -609,7 +609,7 @@ class ResizeWorker : public NanAsyncWorker {
       }
       baton->outputFormat = "jpeg";
     } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == ImageType::PNG)) {
-#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 41)
+#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42)
       // Select PNG row filter
       int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
       // Write PNG to buffer

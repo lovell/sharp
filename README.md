@@ -404,9 +404,9 @@ An advanced setting for the _zlib_ compression level of the lossless PNG output 
 
 #### withoutAdaptiveFiltering()
 
-_Requires libvips 7.41.0+_
+_Requires libvips 7.42.0+_
 
-An advanced and experimental PNG output setting to disable adaptive row filtering.
+An advanced setting to disable adaptive row filtering for the lossless PNG output format.
 
 ### Output methods
 
