@@ -10,13 +10,13 @@
 
 The typical use case for this high speed Node.js module is to convert large images of many formats to smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
-The performance of JPEG resizing is typically 8x faster than ImageMagick and GraphicsMagick, based mainly on the number of CPU cores available.
-
-Memory usage is kept to a minimum, no child processes are spawned, everything remains non-blocking thanks to _libuv_ and Promises/A+ are supported.
-
 This module supports reading and writing JPEG, PNG and WebP images to and from Streams, Buffer objects and the filesystem. It also supports reading images of many other types from the filesystem via libmagick++ or libgraphicsmagick++ if present.
 
-When generating JPEG output all metadata is removed and Huffman tables optimised without having to use separate command line tools like [jpegoptim](https://github.com/tjko/jpegoptim) and [jpegtran](http://jpegclub.org/jpegtran/).
+Only small regions of uncompressed image data are held in memory and processed at a time, taking full advantage of multiple CPU cores and L1/L2/L3 cache. Resizing an image is typically 4x faster than using the quickest ImageMagick and GraphicsMagick settings.
+
+Huffman tables are optimised when generating JPEG output images without having to use separate command line tools like [jpegoptim](https://github.com/tjko/jpegoptim) and [jpegtran](http://jpegclub.org/jpegtran/). PNG filtering can be disabled, which for diagrams and line art often produces the same result as [pngcrush](http://pmt.sourceforge.net/pngcrush/).
+
+Everything remains non-blocking thanks to _libuv_, no child processes are spawned and Promises/A+ are supported.
 
 Anyone who has used the Node.js bindings for [GraphicsMagick](https://github.com/aheckmann/gm) will find the API similarly fluent.
 
@@ -548,7 +548,7 @@ sudo yum install -y --enablerepo=epel GraphicsMagick
 
 ### The contenders
 
-* [imagemagick-native](https://github.com/mash/node-imagemagick-native) v1.2.2 - Supports Buffers only and blocks main V8 thread whilst processing.
+* [imagemagick-native](https://github.com/mash/node-imagemagick-native) v1.2.2 - Supports Buffers only
 * [imagemagick](https://github.com/yourdeveloper/node-imagemagick) v0.1.3 - Supports filesystem only and "has been unmaintained for a long time".
 * [gm](https://github.com/aheckmann/gm) v1.16.0 - Fully featured wrapper around GraphicsMagick.
 * sharp v0.6.2 - Caching within libvips disabled to ensure a fair comparison.
