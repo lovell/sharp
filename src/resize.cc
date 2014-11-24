@@ -368,7 +368,7 @@ class ResizeWorker : public NanAsyncWorker {
       // Apply Gaussian blur before large affine reductions
       if (residual < 1.0) {
         // Calculate standard deviation
-        double sigma = ((1.0 / residual) - 0.5) / 1.5;
+        double sigma = ((1.0 / residual) - 0.4) / 3.0;
         if (sigma >= 0.3) {
           // Create Gaussian function for standard deviation
           VipsImage *gaussian;
