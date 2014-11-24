@@ -234,6 +234,7 @@ Fast access to image metadata without decoding any compressed image data.
 * `height`: Number of pixels high
 * `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)
 * `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
+* `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 * `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 * `orientation`: Number value of the EXIF Orientation header, if present
 

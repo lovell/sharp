@@ -18,6 +18,8 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(true, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
       done();
     });
@@ -31,6 +33,7 @@ describe('Image metadata', function() {
       assert.strictEqual(600, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual(8, metadata.orientation);
       done();
@@ -45,6 +48,7 @@ describe('Image metadata', function() {
       assert.strictEqual(3248, metadata.height);
       assert.strictEqual('b-w', metadata.space);
       assert.strictEqual(1, metadata.channels);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
@@ -58,6 +62,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2074, metadata.height);
       assert.strictEqual('b-w', metadata.space);
       assert.strictEqual(1, metadata.channels);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
@@ -71,6 +76,7 @@ describe('Image metadata', function() {
       assert.strictEqual(1536, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(4, metadata.channels);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(true, metadata.hasAlpha);
       done();
     });
@@ -84,6 +90,7 @@ describe('Image metadata', function() {
       assert.strictEqual(772, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
@@ -96,6 +103,7 @@ describe('Image metadata', function() {
       assert.strictEqual(800, metadata.width);
       assert.strictEqual(533, metadata.height);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
@@ -108,6 +116,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
@@ -122,6 +131,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     }).catch(function(err) {
@@ -139,6 +149,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
@@ -154,6 +165,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       image.resize(metadata.width / 2).toBuffer(function(err, data, info) {
         if (err) throw err;
@@ -166,25 +178,33 @@ describe('Image metadata', function() {
   });
 
   it('Keep EXIF metadata after a resize', function(done) {
-    sharp(fixtures.inputJpgWithExif).resize(320, 240).withMetadata().toBuffer(function(err, buffer) {
-      if (err) throw err;
-      sharp(buffer).metadata(function(err, metadata) {
+    sharp(fixtures.inputJpgWithExif)
+      .resize(320, 240)
+      .withMetadata()
+      .toBuffer(function(err, buffer) {
         if (err) throw err;
-        assert.strictEqual(8, metadata.orientation);
-        done();
+        sharp(buffer).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(true, metadata.hasProfile);
+          assert.strictEqual(8, metadata.orientation);
+          done();
+        });
       });
-    });
   });
 
   it('Remove EXIF metadata after a resize', function(done) {
-    sharp(fixtures.inputJpgWithExif).resize(320, 240).withMetadata(false).toBuffer(function(err, buffer) {
-      if (err) throw err;
-      sharp(buffer).metadata(function(err, metadata) {
+    sharp(fixtures.inputJpgWithExif)
+      .resize(320, 240)
+      .withMetadata(false)
+      .toBuffer(function(err, buffer) {
         if (err) throw err;
-        assert.strictEqual('undefined', typeof metadata.orientation);
-        done();
+        sharp(buffer).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(false, metadata.hasProfile);
+          assert.strictEqual('undefined', typeof metadata.orientation);
+          done();
+        });
       });
-    });
   });
 
 });
