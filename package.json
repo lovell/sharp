@@ -27,16 +27,11 @@
     "png",
     "webp",
     "tiff",
-    "gif",
     "resize",
     "thumbnail",
-    "sharpen",
     "crop",
-    "extract",
-    "embed",
     "libvips",
-    "vips",
-    "stream"
+    "vips"
   ],
   "dependencies": {
     "bluebird": "^2.3.11",
