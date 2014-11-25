@@ -68,11 +68,17 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 	brew link gettext --force
 
-### Install libvips on Heroku
+### Heroku
 
 [Alessandro Tagliapietra](https://github.com/alex88) maintains an [Heroku buildpack for libvips](https://github.com/alex88/heroku-buildpack-vips) and its dependencies.
 
-### Using with gulp.js
+### Docker
+
+[Marc Bachmann](https://github.com/marcbachmann) maintains a [Dockerfile for libvips](https://github.com/marcbachmann/dockerfile-libvips).
+
+	docker pull marcbachmann/dockerfile-libvips
+
+### gulp.js
 
 [Eugeny Vlasenko](https://github.com/mahnunchik) maintains [gulp-responsive](https://www.npmjs.org/package/gulp-responsive) and [Mohammad Prabowo](https://github.com/rizalp) maintains [gulp-sharp](https://www.npmjs.org/package/gulp-sharp).
 
