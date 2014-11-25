@@ -45,6 +45,11 @@ namespace sharp {
   VipsImage* InitImage(ImageType imageType, char const *file, VipsAccess const access);
 
   /*
+    Does this image have an embedded profile?
+  */
+  bool HasProfile(VipsImage *image);
+
+  /*
     Does this image have an alpha channel?
     Uses colour space interpretation with number of channels to guess this.
   */

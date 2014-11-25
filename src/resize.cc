@@ -269,33 +269,23 @@ class ResizeWorker : public NanAsyncWorker {
       image = shrunkOnLoad;
     }
 
-    // Handle colour profile, if any, for non sRGB images
-    if (image->Type != VIPS_INTERPRETATION_sRGB) {
-      // Get the input colour profile
-      if (vips_image_get_typeof(image, VIPS_META_ICC_NAME)) {
-        VipsImage *profile;
-        // Use embedded profile
-        if (vips_icc_import(image, &profile, "pcs", VIPS_PCS_XYZ, "embedded", TRUE, NULL)) {
-          return Error(baton, hook);
-        }
-        vips_object_local(hook, profile);
-        image = profile;
-      } else if (image->Type == VIPS_INTERPRETATION_CMYK) {
-        VipsImage *profile;
-        // CMYK with no embedded profile
-        if (vips_icc_import(image, &profile, "pcs", VIPS_PCS_XYZ, "input_profile", (baton->iccProfileCmyk).c_str(), NULL)) {
-          return Error(baton, hook);
-        }
-        vips_object_local(hook, profile);
-        image = profile;
-      }
-      // Attempt to convert to sRGB colour space
-      VipsImage *colourspaced;
-      if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
+    // Ensure we're using a device-independent colour space
+    if (HasProfile(image)) {
+      // Convert to CIELAB using embedded profile
+      VipsImage *profile;
+      if (vips_icc_import(image, &profile, "pcs", VIPS_PCS_XYZ, "embedded", TRUE, NULL)) {
         return Error(baton, hook);
       }
-      vips_object_local(hook, colourspaced);
-      image = colourspaced;
+      vips_object_local(hook, profile);
+      image = profile;
+    } else if (image->Type == VIPS_INTERPRETATION_CMYK) {
+      // Convert to CIELAB using default "USWebCoatedSWOP" CMYK profile
+      VipsImage *profile;
+      if (vips_icc_import(image, &profile, "pcs", VIPS_PCS_XYZ, "input_profile", (baton->iccProfileCmyk).c_str(), NULL)) {
+        return Error(baton, hook);
+      }
+      vips_object_local(hook, profile);
+      image = profile;
     }
 
     // Flatten image to remove alpha channel
@@ -578,14 +568,22 @@ class ResizeWorker : public NanAsyncWorker {
       image = gammaDecoded;
     }
 
-    // Convert to sRGB colour space, if not already
+    // Convert colour space to either sRGB or RGB-with-profile, if not already
     if (image->Type != VIPS_INTERPRETATION_sRGB) {
-      VipsImage *colourspaced;
-      if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
-        return Error(baton, hook);
+      VipsImage *rgb;
+      if (baton->withMetadata && HasProfile(image)) {
+        // Convert to device-dependent RGB using embedded profile of input
+        if (vips_icc_export(image, &rgb, NULL)) {
+          return Error(baton, hook);
+        }
+      } else {
+        // Convert to device-independent sRGB
+        if (vips_colourspace(image, &rgb, VIPS_INTERPRETATION_sRGB, NULL)) {
+          return Error(baton, hook);
+        }
       }
-      vips_object_local(hook, colourspaced);
-      image = colourspaced;
+      vips_object_local(hook, rgb);
+      image = rgb;
     }
 
 #if !(VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40 && VIPS_MINOR_VERSION >= 5)

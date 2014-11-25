@@ -118,6 +118,13 @@ namespace sharp {
   }
 
   /*
+    Does this image have an embedded profile?
+  */
+  bool HasProfile(VipsImage *image) {
+    return (vips_image_get_typeof(image, VIPS_META_ICC_NAME) > 0) ? TRUE : FALSE;
+  }
+
+  /*
     Does this image have an alpha channel?
     Uses colour space interpretation with number of channels to guess this.
   */

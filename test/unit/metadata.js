@@ -18,7 +18,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
-      assert.strictEqual(true, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
       done();
@@ -116,7 +116,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
-      assert.strictEqual(true, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
@@ -131,7 +131,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
-      assert.strictEqual(true, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     }).catch(function(err) {
@@ -149,7 +149,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
-      assert.strictEqual(true, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       done();
     });
@@ -165,7 +165,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
-      assert.strictEqual(true, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       image.resize(metadata.width / 2).toBuffer(function(err, data, info) {
         if (err) throw err;

@@ -74,7 +74,7 @@ class MetadataWorker : public NanAsyncWorker {
       baton->height = image->Ysize;
       baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image->Type);
       baton->channels = image->Bands;
-      baton->hasProfile = (vips_image_get_typeof(image, VIPS_META_ICC_NAME) > 0) ? TRUE : FALSE;
+      baton->hasProfile = HasProfile(image);
       // Derived attributes
       baton->hasAlpha = HasAlpha(image);
       baton->orientation = ExifOrientation(image);

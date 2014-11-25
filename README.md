@@ -10,7 +10,9 @@
 
 The typical use case for this high speed Node.js module is to convert large images of many formats to smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
-This module supports reading and writing JPEG, PNG and WebP images to and from Streams, Buffer objects and the filesystem. It also supports reading images of many other types from the filesystem via libmagick++ or libgraphicsmagick++ if present.
+This module supports reading and writing JPEG, PNG and WebP images to and from Streams, Buffer objects and the filesystem.
+It also supports reading images of many other types from the filesystem via libmagick++ or libgraphicsmagick++ if present.
+Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
 
 Only small regions of uncompressed image data are held in memory and processed at a time, taking full advantage of multiple CPU cores and L1/L2/L3 cache. Resizing an image is typically 4x faster than using the quickest ImageMagick and GraphicsMagick settings.
 
@@ -401,7 +403,9 @@ Use progressive (interlace) scan for JPEG and PNG output. This typically reduces
 
 #### withMetadata()
 
-Include all metadata (ICC, EXIF, XMP) from the input image in the output image. The default behaviour is to strip all metadata.
+Include all metadata (ICC, EXIF, XMP) from the input image in the output image.
+
+The default behaviour is to strip all metadata and convert to the device-independent sRGB colour space.
 
 #### compressionLevel(compressionLevel)
 
