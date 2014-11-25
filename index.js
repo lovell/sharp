@@ -20,8 +20,8 @@ var Sharp = function(input) {
     // input options
     streamIn: false,
     sequentialRead: false,
-    // ICC profile to use when input CMYK image has no embedded profile
-    iccProfileCmyk: path.join(__dirname, 'icc', 'USWebCoatedSWOP.icc'),
+    // ICC profiles
+    iccProfilePath: path.join(__dirname, 'icc') + path.sep,
     // resize options
     topOffsetPre: -1,
     leftOffsetPre: -1,

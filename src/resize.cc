@@ -31,7 +31,7 @@ struct ResizeBaton {
   std::string fileIn;
   void* bufferIn;
   size_t bufferInLength;
-  std::string iccProfileCmyk;
+  std::string iccProfilePath;
   std::string output;
   std::string outputFormat;
   void* bufferOut;
@@ -271,21 +271,24 @@ class ResizeWorker : public NanAsyncWorker {
 
     // Ensure we're using a device-independent colour space
     if (HasProfile(image)) {
-      // Convert to CIELAB using embedded profile
-      VipsImage *profile;
-      if (vips_icc_import(image, &profile, "pcs", VIPS_PCS_XYZ, "embedded", TRUE, NULL)) {
+      // Convert to sRGB using embedded profile
+      std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
+      VipsImage *transformed;
+      if (vips_icc_transform(image, &transformed, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
         return Error(baton, hook);
       }
-      vips_object_local(hook, profile);
-      image = profile;
+      vips_object_local(hook, transformed);
+      image = transformed;
     } else if (image->Type == VIPS_INTERPRETATION_CMYK) {
-      // Convert to CIELAB using default "USWebCoatedSWOP" CMYK profile
-      VipsImage *profile;
-      if (vips_icc_import(image, &profile, "pcs", VIPS_PCS_XYZ, "input_profile", (baton->iccProfileCmyk).c_str(), NULL)) {
+      // Convert to sRGB using default "USWebCoatedSWOP" CMYK profile
+      std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
+      std::string cmykProfile = baton->iccProfilePath + "USWebCoatedSWOP.icc";
+      VipsImage *transformed;
+      if (vips_icc_transform(image, &transformed, srgbProfile.c_str(), "input_profile", cmykProfile.c_str(), NULL)) {
         return Error(baton, hook);
       }
-      vips_object_local(hook, profile);
-      image = profile;
+      vips_object_local(hook, transformed);
+      image = transformed;
     }
 
     // Flatten image to remove alpha channel
@@ -831,7 +834,7 @@ NAN_METHOD(resize) {
     baton->bufferIn = node::Buffer::Data(buffer);
   }
   // ICC profile to use when input CMYK image has no embedded profile
-  baton->iccProfileCmyk = *String::Utf8Value(options->Get(NanNew<String>("iccProfileCmyk"))->ToString());
+  baton->iccProfilePath = *String::Utf8Value(options->Get(NanNew<String>("iccProfilePath"))->ToString());
   // Extract image options
   baton->topOffsetPre = options->Get(NanNew<String>("topOffsetPre"))->Int32Value();
   baton->leftOffsetPre = options->Get(NanNew<String>("leftOffsetPre"))->Int32Value();
