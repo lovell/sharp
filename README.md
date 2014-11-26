@@ -78,7 +78,7 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 [Marc Bachmann](https://github.com/marcbachmann) maintains a [Dockerfile for libvips](https://github.com/marcbachmann/dockerfile-libvips).
 
-	docker pull marcbachmann/dockerfile-libvips
+	docker pull marcbachmann/libvips
 
 ### gulp.js
 
