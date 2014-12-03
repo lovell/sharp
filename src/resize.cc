@@ -274,11 +274,11 @@ class ResizeWorker : public NanAsyncWorker {
       // Convert to sRGB using embedded profile
       std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
       VipsImage *transformed;
-      if (vips_icc_transform(image, &transformed, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
-        return Error(baton, hook);
+      if (!vips_icc_transform(image, &transformed, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
+        // Embedded profile can fail, so only update references on success
+        vips_object_local(hook, transformed);
+        image = transformed;
       }
-      vips_object_local(hook, transformed);
-      image = transformed;
     } else if (image->Type == VIPS_INTERPRETATION_CMYK) {
       // Convert to sRGB using default "USWebCoatedSWOP" CMYK profile
       std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
