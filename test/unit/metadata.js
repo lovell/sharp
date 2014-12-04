@@ -122,6 +122,15 @@ describe('Image metadata', function() {
     });
   });
 
+  it('Non-existent file in, Promise out', function(done) {
+    sharp('fail').metadata().then(function(metadata) {
+      throw new Error('Non-existent file');
+    }, function (err) {
+      assert.ok(!!err);
+      done();
+    });
+  });
+
   it('Stream in, Promise out', function(done) {
     var readable = fs.createReadStream(fixtures.inputJpg);
     var pipeline = sharp();
