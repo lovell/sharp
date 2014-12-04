@@ -115,6 +115,9 @@ class ResizeWorker : public NanAsyncWorker {
     // Increment processing task counter
     g_atomic_int_inc(&counterProcess);
 
+    // Latest v2 sRGB ICC profile
+    std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
+
     // Hang image references from this hook object
     VipsObject *hook = reinterpret_cast<VipsObject*>(vips_image_new());
 
@@ -272,7 +275,6 @@ class ResizeWorker : public NanAsyncWorker {
     // Ensure we're using a device-independent colour space
     if (HasProfile(image)) {
       // Convert to sRGB using embedded profile
-      std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
       VipsImage *transformed;
       if (!vips_icc_transform(image, &transformed, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
         // Embedded profile can fail, so only update references on success
@@ -281,7 +283,6 @@ class ResizeWorker : public NanAsyncWorker {
       }
     } else if (image->Type == VIPS_INTERPRETATION_CMYK) {
       // Convert to sRGB using default "USWebCoatedSWOP" CMYK profile
-      std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
       std::string cmykProfile = baton->iccProfilePath + "USWebCoatedSWOP.icc";
       VipsImage *transformed;
       if (vips_icc_transform(image, &transformed, srgbProfile.c_str(), "input_profile", cmykProfile.c_str(), NULL)) {
@@ -576,7 +577,7 @@ class ResizeWorker : public NanAsyncWorker {
       VipsImage *rgb;
       if (baton->withMetadata && HasProfile(image)) {
         // Convert to device-dependent RGB using embedded profile of input
-        if (vips_icc_export(image, &rgb, NULL)) {
+        if (vips_icc_transform(image, &rgb, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
           return Error(baton, hook);
         }
       } else {

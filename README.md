@@ -403,7 +403,7 @@ Use progressive (interlace) scan for JPEG and PNG output. This typically reduces
 
 #### withMetadata()
 
-Include all metadata (ICC, EXIF, XMP) from the input image in the output image.
+Include all metadata (EXIF, XMP, IPTC) from the input image in the output image. This will also convert to and add the latest web-friendly v2 sRGB ICC profile.
 
 The default behaviour is to strip all metadata and convert to the device-independent sRGB colour space.
 
