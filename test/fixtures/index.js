@@ -21,6 +21,8 @@ module.exports = {
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputTiff: getPath('G31D.TIF'), // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
   inputGif: getPath('Crash_test.gif'), // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
+  inputSvg: getPath('Wikimedia-logo.svg'), // http://commons.wikimedia.org/wiki/File:Wikimedia-logo.svg
+  inputPsd: getPath('free-gearhead-pack.psd'), // https://dribbble.com/shots/1624241-Free-Gearhead-Vector-Pack
 
   outputJpg: getPath('output.jpg'),
   outputPng: getPath('output.png'),

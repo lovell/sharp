@@ -400,6 +400,32 @@ describe('Input/output', function() {
 
   });
 
+  it('Convert SVG to PNG', function(done) {
+    sharp(fixtures.inputSvg)
+      .resize(100, 100)
+      .png()
+      .toFile(fixtures.path('output.svg.png'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(100, info.width);
+        assert.strictEqual(100, info.height);
+        done();
+      });
+  });
+
+  it('Convert PSD to PNG', function(done) {
+    sharp(fixtures.inputPsd)
+      .resize(320, 240)
+      .png()
+      .toFile(fixtures.path('output.psd.png'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
   if (semver.gte(sharp.libvipsVersion(), '7.40.0')) {
     it('Load TIFF from Buffer [libvips ' + sharp.libvipsVersion() + '>=7.40.0]', function(done) {
       var inputTiffBuffer = fs.readFileSync(fixtures.inputTiff);
