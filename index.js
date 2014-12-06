@@ -361,7 +361,7 @@ Sharp.prototype.resize = function(width, height) {
   if (!width) {
     this.options.width = -1;
   } else {
-    if (typeof width === 'number' && !Number.isNaN(width)) {
+    if (typeof width === 'number' && !Number.isNaN(width) && width % 1 === 0 && width > 0 && width <= 0x3FFF) {
       this.options.width = width;
     } else {
       throw new Error('Invalid width ' + width);
@@ -370,7 +370,7 @@ Sharp.prototype.resize = function(width, height) {
   if (!height) {
     this.options.height = -1;
   } else {
-    if (typeof height === 'number' && !Number.isNaN(height)) {
+    if (typeof height === 'number' && !Number.isNaN(height) && height % 1 === 0 && height > 0 && height <= 0x3FFF) {
       this.options.height = height;
     } else {
       throw new Error('Invalid height ' + height);

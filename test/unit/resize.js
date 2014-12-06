@@ -64,7 +64,7 @@ describe('Resize dimensions', function() {
     });
   });
 
-  it('Invalid width', function(done) {
+  it('Invalid width - NaN', function(done) {
     var isValid = true;
     try {
       sharp(fixtures.inputJpg).resize('spoons', 240);
@@ -75,10 +75,54 @@ describe('Resize dimensions', function() {
     done();
   });
 
-  it('Invalid height', function(done) {
+  it('Invalid height - NaN', function(done) {
     var isValid = true;
     try {
       sharp(fixtures.inputJpg).resize(320, 'spoons');
+    } catch (err) {
+      isValid = false;
+    }
+    assert.strictEqual(false, isValid);
+    done();
+  });
+
+  it('Invalid width - float', function(done) {
+    var isValid = true;
+    try {
+      sharp(fixtures.inputJpg).resize(1.5, 240);
+    } catch (err) {
+      isValid = false;
+    }
+    assert.strictEqual(false, isValid);
+    done();
+  });
+
+  it('Invalid height - float', function(done) {
+    var isValid = true;
+    try {
+      sharp(fixtures.inputJpg).resize(320, 1.5);
+    } catch (err) {
+      isValid = false;
+    }
+    assert.strictEqual(false, isValid);
+    done();
+  });
+
+  it('Invalid width - too large', function(done) {
+    var isValid = true;
+    try {
+      sharp(fixtures.inputJpg).resize(0x4000, 240);
+    } catch (err) {
+      isValid = false;
+    }
+    assert.strictEqual(false, isValid);
+    done();
+  });
+
+  it('Invalid height - too large', function(done) {
+    var isValid = true;
+    try {
+      sharp(fixtures.inputJpg).resize(320, 0x4000);
     } catch (err) {
       isValid = false;
     }
