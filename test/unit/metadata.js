@@ -176,7 +176,7 @@ describe('Image metadata', function() {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
-      image.resize(metadata.width / 2).toBuffer(function(err, data, info) {
+      image.resize(Math.floor(metadata.width / 2)).toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(1362, info.width);

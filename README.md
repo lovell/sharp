@@ -110,7 +110,7 @@ readableStream.pipe(transformer).pipe(writableStream);
 ```javascript
 var image = sharp(inputJpg);
 image.metadata(function(err, metadata) {
-  image.resize(metadata.width / 2).webp().toBuffer(function(err, outputBuffer, info) {
+  image.resize(Math.floor(metadata.width / 2)).webp().toBuffer(function(err, outputBuffer, info) {
     // outputBuffer contains a WebP image half the width and height of the original JPEG
   });
 });
@@ -259,9 +259,9 @@ An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQU
 
 Scale output to `width` x `height`. By default, the resized image is cropped to the exact size specified.
 
-`width` is the Number of pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
+`width` is the integral Number of pixels wide the resultant image should be, between 1 and 16383 (0x3FFF). Use `null` or `undefined` to auto-scale the width to match the height.
 
-`height` is the Number of pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
+`height` is the integral Number of pixels high the resultant image should be, between 1 and 16383. Use `null` or `undefined` to auto-scale the height to match the width.
 
 #### extract(top, left, width, height)
 
