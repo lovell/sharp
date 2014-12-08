@@ -45,6 +45,7 @@ To install the most suitable version of libvips on the following Operating Syste
 * Red Hat Linux
   * RHEL/Centos/Scientific 6, 7
   * Fedora 21, 22
+  * Amazon Linux 2014.09
 
 run the following as a user with `sudo` access:
 

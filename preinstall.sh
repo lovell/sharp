@@ -10,6 +10,7 @@
 # * Red Hat Linux
 #   * RHEL/Centos/Scientific 6, 7
 #   * Fedora 21, 22
+#   * Amazon Linux 2014.09
 
 vips_version_minimum=7.40.0
 vips_version_latest_major=7.42
@@ -141,6 +142,19 @@ case $(uname -s) in
         *)
           # Unsupported RHEL-based OS
           sorry "$RELEASE"
+          ;;
+      esac
+    elif [ -f /etc/system-release ]; then
+      # Probably Amazon Linux
+      RELEASE=$(cat /etc/system-release)
+      case $RELEASE in
+        "Amazon Linux AMI release 2014.09")
+          # Amazon Linux
+          echo "Detected '$RELEASE'"
+          echo "Installing libvips dependencies via yum"
+          yum groupinstall -y "Development Tools"
+          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+          install_libvips_from_source "--prefix=/usr"
           ;;
       esac
     else
