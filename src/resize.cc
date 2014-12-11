@@ -572,22 +572,24 @@ class ResizeWorker : public NanAsyncWorker {
       image = gammaDecoded;
     }
 
-    // Convert colour space to either sRGB or RGB-with-profile, if not already
+    // Convert image to sRGB, if not already
     if (image->Type != VIPS_INTERPRETATION_sRGB) {
+      // Switch intrepretation to sRGB
       VipsImage *rgb;
-      if (baton->withMetadata && HasProfile(image)) {
-        // Convert to device-dependent RGB using embedded profile of input
-        if (vips_icc_transform(image, &rgb, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
-          return Error(baton, hook);
-        }
-      } else {
-        // Convert to device-independent sRGB
-        if (vips_colourspace(image, &rgb, VIPS_INTERPRETATION_sRGB, NULL)) {
-          return Error(baton, hook);
-        }
+      if (vips_colourspace(image, &rgb, VIPS_INTERPRETATION_sRGB, NULL)) {
+        return Error(baton, hook);
       }
       vips_object_local(hook, rgb);
       image = rgb;
+      // Tranform colours from embedded profile to sRGB profile
+      if (baton->withMetadata && HasProfile(image)) {
+        VipsImage *profiled;
+        if (vips_icc_transform(image, &profiled, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
+          return Error(baton, hook);
+        }
+        vips_object_local(hook, profiled);
+        image = profiled;
+      }
     }
 
 #if !(VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40 && VIPS_MINOR_VERSION >= 5)
