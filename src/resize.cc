@@ -529,7 +529,6 @@ class ResizeWorker : public NanAsyncWorker {
         }
         vips_object_local(hook, gaussian);
         // Apply Gaussian function
-        VipsImage *blurred;
         if (vips_convsep(image, &blurred, gaussian, "precision", VIPS_PRECISION_INTEGER, NULL)) {
           return Error(baton, hook);
         }
