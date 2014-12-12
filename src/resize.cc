@@ -695,6 +695,11 @@ class ResizeWorker : public NanAsyncWorker {
   void HandleOKCallback () {
     NanScope();
 
+    // Free input Buffer
+    if (baton->bufferInLength > 0) {
+      g_free(baton->bufferIn);
+    }
+
     Handle<Value> argv[3] = { NanNull(), NanNull(),  NanNull() };
     if (!baton->err.empty()) {
       // Error
@@ -833,8 +838,10 @@ NAN_METHOD(resize) {
   // Input Buffer object
   if (options->Get(NanNew<String>("bufferIn"))->IsObject()) {
     Local<Object> buffer = options->Get(NanNew<String>("bufferIn"))->ToObject();
+    // Take a copy of the input Buffer to avoid problems with V8 heap compaction
     baton->bufferInLength = node::Buffer::Length(buffer);
-    baton->bufferIn = node::Buffer::Data(buffer);
+    baton->bufferIn = g_malloc(baton->bufferInLength);
+    memcpy(baton->bufferIn, node::Buffer::Data(buffer), baton->bufferInLength);
   }
   // ICC profile to use when input CMYK image has no embedded profile
   baton->iccProfilePath = *String::Utf8Value(options->Get(NanNew<String>("iccProfilePath"))->ToString());
