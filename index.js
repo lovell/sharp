@@ -506,6 +506,8 @@ Sharp.prototype._sharp = function(callback) {
       });
     }
   }
+  // A copy is taken of the Buffer so let V8 garbage collect ours
+  this.options.bufferIn = null;
 };
 
 /*
