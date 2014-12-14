@@ -18,6 +18,7 @@ var Sharp = function(input) {
   stream.Duplex.call(this);
   this.options = {
     // input options
+    bufferIn: null,
     streamIn: false,
     sequentialRead: false,
     // ICC profiles
@@ -95,16 +96,16 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
   /*jslint unused: false */
   if (this.options.streamIn) {
     if (typeof chunk === 'object' && chunk instanceof Buffer) {
-      if (typeof this.options.bufferIn === 'undefined') {
-        // Create new Buffer
-        this.options.bufferIn = new Buffer(chunk.length);
-        chunk.copy(this.options.bufferIn);
-      } else {
+      if (this.options.bufferIn instanceof Buffer) {
         // Append to existing Buffer
         this.options.bufferIn = Buffer.concat(
           [this.options.bufferIn, chunk],
           this.options.bufferIn.length + chunk.length
         );
+      } else {
+        // Create new Buffer
+        this.options.bufferIn = new Buffer(chunk.length);
+        chunk.copy(this.options.bufferIn);
       }
       callback();
     } else {
@@ -506,8 +507,6 @@ Sharp.prototype._sharp = function(callback) {
       });
     }
   }
-  // A copy is taken of the Buffer so let V8 garbage collect ours
-  this.options.bufferIn = null;
 };
 
 /*
