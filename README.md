@@ -429,7 +429,7 @@ An advanced setting to disable adaptive row filtering for the lossless PNG outpu
 `callback`, if present, is called with two arguments `(err, info)` where:
 
 * `err` contains an error message, if any.
-* `info` contains the output image `format`, `width` and `height`.
+* `info` contains the output image `format`, `size` (bytes), `width` and `height`.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
@@ -441,7 +441,7 @@ Write image data to a Buffer, the format of which will match the input image by 
 
 * `err` is an error message, if any.
 * `buffer` is the output image data.
-* `info` contains the output image `format`, `width` and `height`.
+* `info` contains the output image `format`, `size` (bytes), `width` and `height`.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
