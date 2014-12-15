@@ -464,7 +464,7 @@ sharp.cache(50, 200); // { current: 49, high: 99, memory: 50, items: 200}
 
 #### sharp.concurrency([threads])
 
-`threads`, if provided, is the Number of threads _libvips'_ should create for image processing. The default value is the number of CPU cores. A value of `0` will reset to this default.
+`threads`, if provided, is the Number of threads _libvips'_ should create for processing each image. The default value is the number of CPU cores. A value of `0` will reset to this default.
 
 This method always returns the current concurrency.
 
@@ -473,6 +473,8 @@ var threads = sharp.concurrency(); // 4
 sharp.concurrency(2); // 2
 sharp.concurrency(0); // 4
 ```
+
+The maximum number of images that can be processed in parallel is limited by libuv's `UV_THREADPOOL_SIZE` environment variable.
 
 #### sharp.counters()
 
