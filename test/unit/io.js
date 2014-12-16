@@ -519,6 +519,42 @@ describe('Input/output', function() {
     });
   }
 
+  if (sharp.format.dz.output.file) {
+    it('Convert JPEG to DZ', function(done) {
+      sharp(fixtures.inputJpg)
+        .resize(320, 240)
+        .toFormat(sharp.format.dz)
+        .toFile(fixtures.path('output.jpg.dzi'), function(err, info) {
+          if (err) throw err;
+          assert.strictEqual(true, info.size > 0);
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(240, info.height);
+          assert.strictEqual(256, info.tileSize);
+          assert.strictEqual(0, info.tileOverlap);
+          done();
+        });
+    });
+
+    it('Convert JPEG to DZ (test tileSize and tileOverlap)', function(done) {
+      sharp(fixtures.inputJpg)
+        .resize(320, 240)
+        .toFormat(sharp.format.dz)
+        .tileSize(512)
+        .tileOverlap(10)
+        .toFile(fixtures.path('output.tileTest.jpg.dzi'), function(err, info) {
+          if (err) throw err;
+          assert.strictEqual(true, info.size > 0);
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(240, info.height);
+          assert.strictEqual(512, info.tileSize);
+          assert.strictEqual(10, info.tileOverlap);
+          done();
+        });
+    });
+}
+
   if (sharp.format.tiff.input.buffer) {
     it('Load TIFF from Buffer', function(done) {
       var inputTiffBuffer = fs.readFileSync(fixtures.inputTiff);
@@ -668,4 +704,65 @@ describe('Input/output', function() {
 
   });
 
+  if(sharp.format.openslide.input.file) {
+    describe('Openslide output', function() {
+        it('Aperio - convert SVS to PNG', function(done) {
+        sharp(fixtures.inputSvs)
+          .toFile(fixtures.path('output.svs.png'), function(err, info) {
+            if (err) throw err;
+            assert.strictEqual(true, info.size > 0);
+            assert.strictEqual('png', info.format);
+            assert.strictEqual(2220, info.width);
+            assert.strictEqual(2967, info.height);
+            done();
+          });
+        });
+        it('Aperio - convert SVS to JPEG', function(done) {
+        sharp(fixtures.inputSvs)
+          .toFile(fixtures.path('output.svs.jpeg'), function(err, info) {
+            if (err) throw err;
+            assert.strictEqual(true, info.size > 0);
+            assert.strictEqual('jpeg', info.format);
+            assert.strictEqual(2220, info.width);
+            assert.strictEqual(2967, info.height);
+            done();
+          });
+        });
+        it('Aperio - convert SVS to TIFF', function(done) {
+        sharp(fixtures.inputSvs)
+          .toFile(fixtures.path('output.svs.tiff'), function(err, info) {
+            if (err) throw err;
+            assert.strictEqual(true, info.size > 0);
+            assert.strictEqual('tiff', info.format);
+            assert.strictEqual(2220, info.width);
+            assert.strictEqual(2967, info.height);
+            done();
+          });
+        });
+        it('Aperio - convert SVS to WEBP', function(done) {
+        sharp(fixtures.inputSvs)
+          .toFile(fixtures.path('output.svs.webp'), function(err, info) {
+            if (err) throw err;
+            assert.strictEqual(true, info.size > 0);
+            assert.strictEqual('webp', info.format);
+            assert.strictEqual(2220, info.width);
+            assert.strictEqual(2967, info.height);
+            done();
+          });
+        });
+        it('Aperio - convert SVS to DZI', function(done) {
+        sharp(fixtures.inputSvs)
+          .toFile(fixtures.path('output.aperio.svs.dzi'), function(err, info) {
+            if (err) throw err;
+            assert.strictEqual(true, info.size > 0);
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2220, info.width);
+            assert.strictEqual(2967, info.height);
+            assert.strictEqual(256, info.tileSize);
+            assert.strictEqual(0, info.tileOverlap);
+            done();
+          });
+        });
+    });
+  }
 });

@@ -13,7 +13,8 @@
     "Brandon Aaron <hello.brandon@aaron.sh>",
     "Andreas Lind <andreas@one.com>",
     "Maurus Cuelenaere <mcuelenaere@gmail.com>",
-    "Linus Unnebäck <linus@folkdatorn.se>"
+    "Linus Unnebäck <linus@folkdatorn.se>",
+    "Victor Mateevitsi <mvictoras@gmail.com>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {

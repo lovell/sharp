@@ -28,6 +28,9 @@ namespace sharp {
   bool IsTiff(std::string const &str) {
     return EndsWith(str, ".tif") || EndsWith(str, ".tiff") || EndsWith(str, ".TIF") || EndsWith(str, ".TIFF");
   }
+  bool IsDz(std::string const &str) {
+    return EndsWith(str, ".dzi") || EndsWith(str, ".DZI");
+  }
 
   /*
     Determine image format of a buffer.
@@ -103,6 +106,7 @@ namespace sharp {
     } else if(vips_foreign_is_a("magickload", file)) {
       imageType = ImageType::MAGICK;
     }
+
     return imageType;
   }
 

@@ -12,7 +12,7 @@
 The typical use case for this high speed Node.js module is to convert large images of many formats to smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
 This module supports reading and writing JPEG, PNG and WebP images to and from Streams, Buffer objects and the filesystem.
-It also supports reading images of many other types from the filesystem via libmagick or libgraphicsmagick if present.
+It also supports reading images of many other types from the filesystem via libmagick, libgraphicsmagick or [OpenSlide](http://openslide.org/) if present and writing Deep Zoom images.
 Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
 
 Only small regions of uncompressed image data are held in memory and processed at a time, taking full advantage of multiple CPU cores and L1/L2/L3 cache. Resizing an image is typically 4x faster than using the quickest ImageMagick and GraphicsMagick settings.
@@ -34,6 +34,7 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 * Node.js v0.10+ or io.js
 * [libvips](https://github.com/jcupitt/libvips) v7.40.0+ (7.42.0+ recommended)
 * C++11 compatible compiler such as gcc 4.6+ or clang 3.0+
+* [OpenSlide](http://openslide.org/) 3.4.0+ for reading OpenSlide images (optional)
 
 To install the most suitable version of libvips on the following Operating Systems:
 
@@ -48,6 +49,8 @@ To install the most suitable version of libvips on the following Operating Syste
   * RHEL/Centos/Scientific 6, 7
   * Fedora 21, 22
   * Amazon Linux 2014.09
+* OpenSuse Linux
+  * OpenSuse 13.1, 13.2
 
 run the following as a user with `sudo` access:
 
@@ -56,6 +59,14 @@ run the following as a user with `sudo` access:
 or run the following as `root`:
 
 	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | bash -
+
+To enable OpenSlide, add the --with-openslide argument:
+
+> curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -s -- --with-openslide
+
+or run the following as `root`:
+
+	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | bash -s -- --with-openslide
 
 The [preinstall.sh](https://github.com/lovell/sharp/blob/master/preinstall.sh) script requires `curl` and `pkg-config`.
 
@@ -508,11 +519,17 @@ _Requires libvips 7.42.0+_
 
 An advanced setting to disable adaptive row filtering for the lossless PNG output format.
 
+#### tileSize(tileSize)
+Setting the tile_size when DZI output format is selected. Default is 256.
+
+#### tileOverlap(tileOverlap)
+Setting the overlap when DZI output format is selected. Default is 0.
+
 ### Output methods
 
 #### toFile(filename, [callback])
 
-`filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP and TIFF supported.
+`filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
 
 `callback`, if present, is called with two arguments `(err, info)` where:
 

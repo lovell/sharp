@@ -66,7 +66,9 @@ var Sharp = function(input) {
     withoutAdaptiveFiltering: false,
     withoutChromaSubsampling: false,
     streamOut: false,
-    withMetadata: false
+    withMetadata: false,
+    tileSize: 256,
+    tileOverlap: 0
   };
   if (typeof input === 'string') {
     // input=file
@@ -377,6 +379,32 @@ Sharp.prototype.withMetadata = function(withMetadata) {
   return this;
 };
 
+/*
+  dz tile size for DZ output
+  max is 8192 since 7.36.5 (1024 before)
+*/
+Sharp.prototype.tileSize = function(tileSize) {
+  if (!Number.isNaN(tileSize) && tileSize >= 1 && tileSize <= 8192) {
+    this.options.tileSize = tileSize;
+  } else {
+    throw new Error('Invalid tileSize (1 to 8192) ' + tileSize);
+  }
+  return this;
+};
+
+/*
+  dz overlap for DZ output
+*/
+Sharp.prototype.tileOverlap = function(tileOverlap) {
+  if (!Number.isNaN(tileOverlap) && tileOverlap >=0 && tileOverlap <= 8192) {
+    this.options.tileOverlap = tileOverlap;
+  } else {
+    throw new Error('Invalid tileOverlap (0 to 8192) ' + tileOverlap);
+  }
+
+  return this;
+};
+
 Sharp.prototype.resize = function(width, height) {
   if (!width) {
     this.options.width = -1;
@@ -480,6 +508,14 @@ Sharp.prototype.raw = function() {
   } else {
     console.error('Raw output requires libvips 7.42.0+');
   }
+  return this;
+};
+
+/*
+  Force DZI output
+*/
+Sharp.prototype.dz = function() {
+  this.options.output = '__dzi';
   return this;
 };
 
