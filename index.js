@@ -341,10 +341,10 @@ Sharp.prototype.compressionLevel = function(compressionLevel) {
 };
 
 /*
-  Disable the use of adaptive row filtering for PNG output - requires libvips 7.41.0+
+  Disable the use of adaptive row filtering for PNG output - requires libvips 7.42.0+
 */
 Sharp.prototype.withoutAdaptiveFiltering = function(withoutAdaptiveFiltering) {
-  if (semver.gte(libvipsVersion, '7.41.0')) {
+  if (semver.gte(libvipsVersion, '7.42.0')) {
     this.options.withoutAdaptiveFiltering = (typeof withoutAdaptiveFiltering === 'boolean') ? withoutAdaptiveFiltering : true;
   } else {
     console.error('withoutAdaptiveFiltering requires libvips 7.41.0+');
@@ -422,6 +422,15 @@ Sharp.prototype.png = function() {
 
 Sharp.prototype.webp = function() {
   this.options.output = '__webp';
+  return this;
+};
+
+Sharp.prototype.raw = function() {
+  if (semver.gte(libvipsVersion, '7.42.0')) {
+    this.options.output = '__raw';
+  } else {
+    console.error('Raw output requires libvips 7.42.0+');
+  }
   return this;
 };
 

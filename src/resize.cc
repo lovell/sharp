@@ -635,6 +635,35 @@ class ResizeWorker : public NanAsyncWorker {
         return Error(baton, hook);
       }
       baton->outputFormat = "webp";
+#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42)
+    } else if (baton->output == "__raw") {
+      // Write raw, uncompressed image data to buffer
+      if (baton->greyscale) {
+        // Extract first band for greyscale image
+        VipsImage *grey;
+        if (vips_extract_band(image, &grey, 1, NULL)) {
+          return Error(baton, hook);
+        }
+        vips_object_local(hook, grey);
+        image = grey;
+      }
+      if (image->BandFmt != VIPS_FORMAT_UCHAR) {
+        // Cast pixels to uint8 (unsigned char)
+        VipsImage *uchar;
+        if (vips_cast(image, &uchar, VIPS_FORMAT_UCHAR, NULL)) {
+          return Error(baton, hook);
+        }
+        vips_object_local(hook, uchar);
+        image = uchar;
+      }
+      // Get raw image data
+      baton->bufferOut = vips_image_write_to_memory(image, &baton->bufferOutLength);
+      if (baton->bufferOut == NULL) {
+        (baton->err).append("Could not allocate enough memory for raw output");
+        return Error(baton, hook);
+      }
+      baton->outputFormat = "raw";
+#endif
     } else {
       bool outputJpeg = IsJpeg(baton->output);
       bool outputPng = IsPng(baton->output);
@@ -649,7 +678,7 @@ class ResizeWorker : public NanAsyncWorker {
         }
         baton->outputFormat = "jpeg";
       } else if (outputPng || (matchInput && inputImageType == ImageType::PNG)) {
-#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 41)
+#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42)
         // Select PNG row filter
         int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
         // Write PNG to file
