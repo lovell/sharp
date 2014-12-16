@@ -384,8 +384,8 @@ describe('Input/output', function() {
       done();
     });
 
-    if (semver.gte(sharp.libvipsVersion(), '7.41.0')) {
-      it('withoutAdaptiveFiltering generates smaller file [libvips ' + sharp.libvipsVersion() + '>=7.41.0]', function(done) {
+    if (semver.gte(sharp.libvipsVersion(), '7.42.0')) {
+      it('withoutAdaptiveFiltering generates smaller file [libvips ' + sharp.libvipsVersion() + '>=7.42.0]', function(done) {
         // First generate with adaptive filtering
         sharp(fixtures.inputPng)
           .resize(320, 240)
@@ -460,6 +460,51 @@ describe('Input/output', function() {
           assert.strictEqual(240, info.height);
           done();
         });
+    });
+  }
+
+  if (semver.gte(sharp.libvipsVersion(), '7.42.0')) {
+    describe('Ouput raw, uncompressed image data [libvips ' + sharp.libvipsVersion() + '>=7.42.0]', function() {
+      it('1 channel greyscale image', function(done) {
+        sharp(fixtures.inputJpg)
+          .greyscale()
+          .resize(32, 24)
+          .raw()
+          .toBuffer(function(err, data, info) {
+            assert.strictEqual(32 * 24 * 1, info.size);
+            assert.strictEqual(data.length, info.size);
+            assert.strictEqual('raw', info.format);
+            assert.strictEqual(32, info.width);
+            assert.strictEqual(24, info.height);
+            done();
+          });
+      });
+      it('3 channel colour image without transparency', function(done) {
+        sharp(fixtures.inputJpg)
+          .resize(32, 24)
+          .raw()
+          .toBuffer(function(err, data, info) {
+            assert.strictEqual(32 * 24 * 3, info.size);
+            assert.strictEqual(data.length, info.size);
+            assert.strictEqual('raw', info.format);
+            assert.strictEqual(32, info.width);
+            assert.strictEqual(24, info.height);
+            done();
+          });
+      });
+      it('4 channel colour image with transparency', function(done) {
+        sharp(fixtures.inputPngWithTransparency)
+          .resize(32, 24)
+          .raw()
+          .toBuffer(function(err, data, info) {
+            assert.strictEqual(32 * 24 * 4, info.size);
+            assert.strictEqual(data.length, info.size);
+            assert.strictEqual('raw', info.format);
+            assert.strictEqual(32, info.width);
+            assert.strictEqual(24, info.height);
+            done();
+          });
+      });
     });
   }
 

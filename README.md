@@ -392,6 +392,18 @@ Use PNG format for the output image.
 
 Use WebP format for the output image.
 
+#### raw()
+
+_Requires libvips 7.42.0+_
+
+Provide raw, uncompressed uint8 (unsigned char) image data for Buffer and Stream based output.
+
+The number of channels depends on the input image and selected options.
+
+* 1 channel for images converted to `greyscale()`, with each byte representing one pixel.
+* 3 channels for colour images without alpha transparency, with bytes ordered \[red, green, blue, red, green, blue, etc.\]).
+* 4 channels for colour images with alpha transparency, with bytes ordered \[red, green, blue, alpha, red, green, blue, alpha, etc.\].
+
 #### quality(quality)
 
 The output quality to use for lossy JPEG, WebP and TIFF output formats. The default quality is `80`.
