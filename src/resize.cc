@@ -32,6 +32,7 @@ using sharp::IsJpeg;
 using sharp::IsPng;
 using sharp::IsWebp;
 using sharp::IsTiff;
+using sharp::IsDz;
 using sharp::counterProcess;
 using sharp::counterQueue;
 
@@ -94,6 +95,8 @@ struct ResizeBaton {
   bool withoutChromaSubsampling;
   std::string err;
   bool withMetadata;
+  int tileSize;
+  int tileOverlap;
 
   ResizeBaton():
     bufferInLength(0),
@@ -120,7 +123,9 @@ struct ResizeBaton {
     compressionLevel(6),
     withoutAdaptiveFiltering(false),
     withoutChromaSubsampling(false),
-    withMetadata(false) {
+    withMetadata(false),
+    tileSize(256),
+    tileOverlap(0) {
       background[0] = 0.0;
       background[1] = 0.0;
       background[2] = 0.0;
@@ -755,7 +760,8 @@ class ResizeWorker : public NanAsyncWorker {
       bool outputPng = IsPng(baton->output);
       bool outputWebp = IsWebp(baton->output);
       bool outputTiff = IsTiff(baton->output);
-      bool matchInput = !(outputJpeg || outputPng || outputWebp || outputTiff);
+      bool outputDz = IsDz(baton->output);
+      bool matchInput = !(outputJpeg || outputPng || outputWebp || outputTiff || outputDz);
       if (outputJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
         // Write JPEG to file
         if (vips_jpegsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
@@ -795,6 +801,14 @@ class ResizeWorker : public NanAsyncWorker {
           return Error(baton, hook);
         }
         baton->outputFormat = "tiff";
+      } else if (outputDz || matchInput) {
+        // Write DZ to file
+        std::string filename_no_extension = baton->output.substr(0, baton->output.length() - 4);
+        if (vips_dzsave(image, filename_no_extension.c_str(), "strip", !baton->withMetadata,
+            "tile_size", baton->tileSize, "overlap", baton->tileOverlap, NULL)) {
+          return Error(baton, hook);
+        }
+        baton->outputFormat = "dz";
       } else {
         (baton->err).append("Unsupported output " + baton->output);
         return Error(baton, hook);
@@ -828,8 +842,13 @@ class ResizeWorker : public NanAsyncWorker {
       // Info Object
       Local<Object> info = NanNew<Object>();
       info->Set(NanNew<String>("format"), NanNew<String>(baton->outputFormat));
-      info->Set(NanNew<String>("width"), NanNew<Integer>(width));
-      info->Set(NanNew<String>("height"), NanNew<Integer>(height));
+      info->Set(NanNew<String>("width"), NanNew<Uint32>(static_cast<uint32_t>(width)));
+      info->Set(NanNew<String>("height"), NanNew<Uint32>(static_cast<uint32_t>(height)));
+
+      if (baton->outputFormat == "dz" ) {
+        info->Set(NanNew<String>("tileSize"), NanNew<Uint32>(static_cast<uint32_t>(baton->tileSize)));
+        info->Set(NanNew<String>("tileOverlap"), NanNew<Uint32>(static_cast<uint32_t>(baton->tileOverlap)));
+      }
 
       if (baton->bufferOutLength > 0) {
         // Copy data to new Buffer
@@ -1017,6 +1036,8 @@ NAN_METHOD(resize) {
   baton->withMetadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
   // Output filename or __format for Buffer
   baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());
+  baton->tileSize = options->Get(NanNew<String>("tileSize"))->Int32Value();
+  baton->tileOverlap = options->Get(NanNew<String>("tileOverlap"))->Int32Value();
 
   // Join queue for worker thread
   NanCallback *callback = new NanCallback(args[1].As<Function>());

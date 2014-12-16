@@ -90,6 +90,7 @@ class MetadataWorker : public NanAsyncWorker {
         case ImageType::WEBP: baton->format = "webp"; break;
         case ImageType::TIFF: baton->format = "tiff"; break;
         case ImageType::MAGICK: baton->format = "magick"; break;
+        case ImageType::DZ: baton->format = "dzi"; break;
         case ImageType::UNKNOWN: break;
       }
       // VipsImage attributes
