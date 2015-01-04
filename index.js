@@ -37,6 +37,7 @@ var Sharp = function(input) {
     canvas: 'c',
     gravity: 0,
     angle: 0,
+    rotateBeforePreExtract: false,
     flip: false,
     flop: false,
     withoutEnlargement: false,
@@ -136,6 +137,10 @@ Sharp.prototype.extract = function(topOffset, leftOffset, width, height) {
   ['topOffset', 'leftOffset', 'width', 'height'].forEach(function(name, index) {
     this.options[name + suffix] = values[index];
   }.bind(this));
+  // Ensure existing rotation occurs before pre-resize extraction
+  if (suffix === 'Pre' && this.options.angle !== 0) {
+    this.options.rotateBeforePreExtract = true;
+  }
   return this;
 };
 

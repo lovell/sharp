@@ -92,4 +92,28 @@ describe('Partial image extraction', function() {
       });
   });
 
+  it('Extract then rotate', function(done) {
+    sharp(fixtures.inputJpg)
+      .extract(10, 10, 100, 100)
+      .rotate(90)
+      .toFile(fixtures.path('output.extract.extract-then-rotate.jpg'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual(100, info.width);
+        assert.strictEqual(100, info.height);
+        done();
+      });
+  });
+
+  it('Rotate then extract', function(done) {
+    sharp(fixtures.inputJpg)
+      .rotate(90)
+      .extract(10, 10, 100, 100)
+      .toFile(fixtures.path('output.extract.rotate-then-extract.jpg'), function(err, info) {
+        if (err) throw err;
+        assert.strictEqual(100, info.width);
+        assert.strictEqual(100, info.height);
+        done();
+      });
+  });
+
 });

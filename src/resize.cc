@@ -58,6 +58,7 @@ struct ResizeBaton {
   double gamma;
   bool greyscale;
   int angle;
+  bool rotateBeforePreExtract;
   bool flip;
   bool flop;
   bool progressive;
@@ -146,6 +147,25 @@ class ResizeWorker : public NanAsyncWorker {
     }
     vips_object_local(hook, image);
 
+    // Calculate angle of rotation
+    Angle rotation;
+    bool flip;
+    std::tie(rotation, flip) = CalculateRotationAndFlip(baton->angle, image);
+    if (flip && !baton->flip) {
+      // Add flip operation due to EXIF mirroring
+      baton->flip = TRUE;
+    }
+
+    // Rotate pre-extract
+    if (baton->rotateBeforePreExtract && rotation != Angle::D0) {
+      VipsImage *rotated;
+      if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), NULL)) {
+        return Error(baton, hook);
+      }
+      vips_object_local(hook, rotated);
+      image = rotated;
+    }
+
     // Pre extraction
     if (baton->topOffsetPre != -1) {
       VipsImage *extractedPre;
@@ -156,23 +176,14 @@ class ResizeWorker : public NanAsyncWorker {
       image = extractedPre;
     }
 
-    // Get input image width and height
+    // Get pre-resize image width and height
     int inputWidth = image->Xsize;
     int inputHeight = image->Ysize;
-
-    // Calculate angle of rotation, to be carried out later
-    Angle rotation;
-    bool flip;
-    std::tie(rotation, flip) = CalculateRotationAndFlip(baton->angle, image);
     if (rotation == Angle::D90 || rotation == Angle::D270) {
       // Swap input output width and height when rotating by 90 or 270 degrees
       int swap = inputWidth;
       inputWidth = inputHeight;
       inputHeight = swap;
-    }
-    if (flip && !baton->flip) {
-      // Add flip operation due to EXIF mirroring
-      baton->flip = TRUE;
     }
 
     // Get window size of interpolator, used for determining shrink vs affine
@@ -392,7 +403,7 @@ class ResizeWorker : public NanAsyncWorker {
     }
 
     // Rotate
-    if (rotation != Angle::D0) {
+    if (!baton->rotateBeforePreExtract && rotation != Angle::D0) {
       VipsImage *rotated;
       if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), NULL)) {
         return Error(baton, hook);
@@ -918,6 +929,7 @@ NAN_METHOD(resize) {
   baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();
   baton->greyscale = options->Get(NanNew<String>("greyscale"))->BooleanValue();
   baton->angle = options->Get(NanNew<String>("angle"))->Int32Value();
+  baton->rotateBeforePreExtract = options->Get(NanNew<String>("rotateBeforePreExtract"))->BooleanValue();
   baton->flip = options->Get(NanNew<String>("flip"))->BooleanValue();
   baton->flop = options->Get(NanNew<String>("flop"))->BooleanValue();
   // Output options
