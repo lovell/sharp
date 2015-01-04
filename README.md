@@ -315,6 +315,8 @@ Rotate the output image by either an explicit angle or auto-orient based on the 
 
 Use this method without `angle` to determine the angle from EXIF data. Mirroring is supported and may infer the use of a `flip` operation.
 
+Method order is important when both rotating and extracting regions, for example `rotate(x).extract(y)` will produce a different result to `extract(y).rotate(x)`.
+
 #### flip()
 
 Flip the image about the vertical Y axis. This always occurs after rotation, if any.
