@@ -28,7 +28,9 @@ namespace sharp {
   bool IsTiff(std::string const &str) {
     return EndsWith(str, ".tif") || EndsWith(str, ".tiff") || EndsWith(str, ".TIF") || EndsWith(str, ".TIFF");
   }
-
+  bool IsDzi(std::string const &str) {
+    return EndsWith(str, ".dzi") || EndsWith(str, ".DZI");
+  }
   // Buffer content checkers
   unsigned char const MARKER_JPEG[] = {0xff, 0xd8};
   unsigned char const MARKER_PNG[] = {0x89, 0x50};

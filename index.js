@@ -57,7 +57,9 @@ var Sharp = function(input) {
     compressionLevel: 6,
     withoutAdaptiveFiltering: false,
     streamOut: false,
-    withMetadata: false
+    withMetadata: false,
+    tileSize: 256,
+    overlap: 0
   };
   if (typeof input === 'string') {
     // input=file
@@ -357,6 +359,32 @@ Sharp.prototype.withMetadata = function(withMetadata) {
   return this;
 };
 
+/*
+  dzi tile size for DZI output
+  max is 8192 since 7.36.5 (1024 before)
+*/
+Sharp.prototype.tileSize = function(tileSize) {
+  if (!Number.isNaN(tileSize) && tileSize >= 1 && tileSize <= 8192) {
+    this.options.tileSize = tileSize;
+  } else {
+    throw new Error('Invalid tileSize (1 to 8192) ' + tileSize);
+  }
+  return this;
+};
+
+/*
+  dzi overlap for DZI output
+*/
+Sharp.prototype.overlap = function(overlap) {
+  if (!Number.isNaN(overlap) && overlap >=0 && overlap <= 8192) {
+    this.options.overlap = overlap;
+  } else {
+    throw new Error('Invalid overlap (0 to 8192) ' + tileSize);
+  }
+
+  return this;
+};
+
 Sharp.prototype.resize = function(width, height) {
   if (!width) {
     this.options.width = -1;
@@ -424,6 +452,12 @@ Sharp.prototype.webp = function() {
   this.options.output = '__webp';
   return this;
 };
+
+Sharp.prototype.dzi = function() {
+  this.options.output = '__dzi';
+  return this;
+};
+
 
 /*
   Used by a Writable Stream to notify that it is ready for data

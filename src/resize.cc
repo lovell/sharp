@@ -68,6 +68,8 @@ struct ResizeBaton {
   bool withoutAdaptiveFiltering;
   std::string err;
   bool withMetadata;
+  int tileSize;
+  int overlap;
 
   ResizeBaton():
     bufferInLength(0),
@@ -92,7 +94,9 @@ struct ResizeBaton {
     quality(80),
     compressionLevel(6),
     withoutAdaptiveFiltering(false),
-    withMetadata(false) {
+    withMetadata(false),
+    tileSize(256),
+    overlap(0) {
       background[0] = 0.0;
       background[1] = 0.0;
       background[2] = 0.0;
@@ -640,7 +644,8 @@ class ResizeWorker : public NanAsyncWorker {
       bool outputPng = IsPng(baton->output);
       bool outputWebp = IsWebp(baton->output);
       bool outputTiff = IsTiff(baton->output);
-      bool matchInput = !(outputJpeg || outputPng || outputWebp || outputTiff);
+      bool outputDzi = IsDzi(baton->output);
+      bool matchInput = !(outputJpeg || outputPng || outputWebp || outputTiff || outputDzi);
       if (outputJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
         // Write JPEG to file
         if (vips_jpegsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
@@ -679,6 +684,15 @@ class ResizeWorker : public NanAsyncWorker {
           return Error(baton, hook);
         }
         baton->outputFormat = "tiff";
+      } else if (outputDzi || (matchInput && inputImageType == ImageType::DZI)) {
+#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 41)
+        // Write DZI to file
+          std::string filename_no_extension = baton->output.substr(0, baton->output.length() - 4);
+        if (vips_dzsave(image, filename_no_extension.c_str(), "strip", !baton->withMetadata,
+            "tile_size", baton->tileSize, "overlap", baton->overlap, NULL)) {
+          return Error(baton, hook);
+        }
+#endif
       } else {
         (baton->err).append("Unsupported output " + baton->output);
         return Error(baton, hook);
@@ -898,6 +912,8 @@ NAN_METHOD(resize) {
   baton->withoutAdaptiveFiltering = options->Get(NanNew<String>("withoutAdaptiveFiltering"))->BooleanValue();
   baton->withMetadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
   // Output filename or __format for Buffer
+  baton->tileSize = options->Get(NanNew<String>("tileSize"))->Int32Value();
+  baton->overlap = options->Get(NanNew<String>("overlap"))->Int32Value();
   baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());
 
   // Join queue for worker thread
