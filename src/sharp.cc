@@ -8,7 +8,9 @@
 #include "resize.h"
 #include "utilities.h"
 
-using namespace v8;
+using v8::Handle;
+using v8::Object;
+using node::AtExit;
 
 static void at_exit(void* arg) {
   NanScope();
@@ -18,7 +20,7 @@ static void at_exit(void* arg) {
 extern "C" void init(Handle<Object> target) {
   NanScope();
   vips_init("sharp");
-  node::AtExit(at_exit);
+  AtExit(at_exit);
 
   // Set libvips operation cache limits
   vips_cache_set_max_mem(100 * 1048576); // 100 MB

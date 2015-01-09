@@ -6,8 +6,13 @@
 #include "common.h"
 #include "utilities.h"
 
-using namespace v8;
-using namespace sharp;
+using v8::Local;
+using v8::Object;
+using v8::Number;
+using v8::String;
+
+using sharp::counterQueue;
+using sharp::counterProcess;
 
 /*
   Get and set cache memory and item limits

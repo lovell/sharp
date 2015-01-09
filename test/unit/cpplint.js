@@ -22,8 +22,7 @@ describe('cpplint', function() {
           },
           build: {
             include: false,
-            include_order: false,
-            namespaces: false
+            include_order: false
           },
           whitespace: {
             blank_line: false,

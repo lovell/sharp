@@ -6,8 +6,23 @@
 #include "common.h"
 #include "metadata.h"
 
-using namespace v8;
-using namespace sharp;
+using v8::Handle;
+using v8::Local;
+using v8::Value;
+using v8::Object;
+using v8::Number;
+using v8::String;
+using v8::Boolean;
+using v8::Function;
+using v8::Exception;
+
+using sharp::ImageType;
+using sharp::DetermineImageType;
+using sharp::InitImage;
+using sharp::HasProfile;
+using sharp::HasAlpha;
+using sharp::ExifOrientation;
+using sharp::counterQueue;
 
 struct MetadataBaton {
   // Input
