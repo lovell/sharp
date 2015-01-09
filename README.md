@@ -3,6 +3,7 @@
 * [Installation](https://github.com/lovell/sharp#installation)
 * [Usage examples](https://github.com/lovell/sharp#usage-examples)
 * [API](https://github.com/lovell/sharp#api)
+* [Contributing](https://github.com/lovell/sharp#contributing)
 * [Testing](https://github.com/lovell/sharp#testing)
 * [Performance](https://github.com/lovell/sharp#performance)
 * [Thanks](https://github.com/lovell/sharp#thanks)
@@ -501,6 +502,10 @@ Provides access to internal task counters.
 var counters = sharp.counters(); // { queue: 2, process: 4 }
 ```
 
+## Contributing
+
+A [guide for contributors](https://github.com/lovell/sharp/blob/master/CONTRIBUTING.md) covers reporting bugs, requesting features and submitting code changes.
+
 ## Testing
 
 ### Functional tests
@@ -516,29 +521,6 @@ var counters = sharp.counters(); // { queue: 2, process: 4 }
 #### Centos 6.5
 
 [![Centos 6.5 Build Status](https://snap-ci.com/lovell/sharp/branch/master/build_image)](https://snap-ci.com/lovell/sharp/branch/master)
-
-#### It worked on my machine
-
-```
-npm test
-```
-
-### Memory leak tests
-
-```
-cd sharp/test/leak
-./leak.sh
-```
-
-Requires _valgrind_:
-
-```
-brew install valgrind
-```
-
-```
-sudo apt-get install -qq valgrind
-```
 
 ### Benchmark tests
 
@@ -626,7 +608,7 @@ Thank you!
 
 ## Licence
 
-Copyright 2013, 2014 Lovell Fuller and contributors.
+Copyright 2013, 2014, 2015 Lovell Fuller and contributors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
