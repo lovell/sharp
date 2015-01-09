@@ -1,5 +1,5 @@
-#ifndef SHARP_COMMON_H
-#define SHARP_COMMON_H
+#ifndef SRC_COMMON_H_
+#define SRC_COMMON_H_
 
 namespace sharp {
 
@@ -66,6 +66,6 @@ namespace sharp {
   */
   int InterpolatorWindowSize(char const *name);
 
-} // namespace
+}  // namespace sharp
 
-#endif
+#endif  // SRC_COMMON_H_

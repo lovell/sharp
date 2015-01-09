@@ -1,8 +1,8 @@
-#ifndef SHARP_RESIZE_H
-#define SHARP_RESIZE_H
+#ifndef SRC_RESIZE_H_
+#define SRC_RESIZE_H_
 
 #include "nan.h"
 
 NAN_METHOD(resize);
 
-#endif
+#endif  // SRC_RESIZE_H_

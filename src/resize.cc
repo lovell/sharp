@@ -10,8 +10,29 @@
 #include "common.h"
 #include "resize.h"
 
-using namespace v8;
-using namespace sharp;
+using v8::Handle;
+using v8::Local;
+using v8::Value;
+using v8::Object;
+using v8::Integer;
+using v8::String;
+using v8::Array;
+using v8::Function;
+using v8::Exception;
+
+using sharp::ImageType;
+using sharp::DetermineImageType;
+using sharp::InitImage;
+using sharp::InterpolatorWindowSize;
+using sharp::HasProfile;
+using sharp::HasAlpha;
+using sharp::ExifOrientation;
+using sharp::IsJpeg;
+using sharp::IsPng;
+using sharp::IsWebp;
+using sharp::IsTiff;
+using sharp::counterProcess;
+using sharp::counterQueue;
 
 enum class Canvas {
   CROP,
@@ -20,11 +41,11 @@ enum class Canvas {
 };
 
 enum class Angle {
-	D0,
-	D90,
-	D180,
-	D270,
-	DLAST
+  D0,
+  D90,
+  D180,
+  D270,
+  DLAST
 };
 
 struct ResizeBaton {
@@ -111,6 +132,7 @@ class ResizeWorker : public NanAsyncWorker {
     libuv worker
   */
   void Execute() {
+
     // Decrement queued task counter
     g_atomic_int_dec_and_test(&counterQueue);
     // Increment processing task counter
@@ -316,7 +338,7 @@ class ResizeWorker : public NanAsyncWorker {
       if (vips_flatten(image, &flattened, "background", background, NULL)) {
         vips_area_unref(reinterpret_cast<VipsArea*>(background));
         return Error(baton, hook);
-      };
+      }
       vips_area_unref(reinterpret_cast<VipsArea*>(background));
       vips_object_local(hook, flattened);
       image = flattened;
@@ -510,7 +532,9 @@ class ResizeWorker : public NanAsyncWorker {
     // Post extraction
     if (baton->topOffsetPost != -1) {
       VipsImage *extractedPost;
-      if (vips_extract_area(image, &extractedPost, baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost, NULL)) {
+      if (vips_extract_area(image, &extractedPost,
+        baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost, NULL
+      )) {
         return Error(baton, hook);
       }
       vips_object_local(hook, extractedPost);
@@ -942,7 +966,7 @@ NAN_METHOD(resize) {
   baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());
 
   // Join queue for worker thread
-  NanCallback *callback = new NanCallback(args[1].As<v8::Function>());
+  NanCallback *callback = new NanCallback(args[1].As<Function>());
   NanAsyncQueueWorker(new ResizeWorker(callback, baton));
 
   // Increment queued task counter

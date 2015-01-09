@@ -162,4 +162,4 @@ namespace sharp {
     return window_size;
   }
 
-} // namespace
+} // namespace sharp

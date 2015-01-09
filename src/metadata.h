@@ -1,8 +1,8 @@
-#ifndef SHARP_METADATA_H
-#define SHARP_METADATA_H
+#ifndef SRC_METADATA_H_
+#define SRC_METADATA_H_
 
 #include "nan.h"
 
 NAN_METHOD(metadata);
 
-#endif
+#endif  // SRC_METADATA_H_
