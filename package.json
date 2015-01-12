@@ -11,7 +11,8 @@
     "Julian Walker <julian@fiftythree.com>",
     "Amit Pitaru <pitaru.amit@gmail.com>",
     "Brandon Aaron <hello.brandon@aaron.sh>",
-    "Andreas Lind <andreas@one.com>"
+    "Andreas Lind <andreas@one.com>",
+    "Victor Mateevitsi <mvictoras@gmail.com>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {
