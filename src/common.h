@@ -9,7 +9,9 @@ namespace sharp {
     PNG,
     WEBP,
     TIFF,
-    MAGICK
+    MAGICK,
+	OPENSLIDE,
+    DZI
   };
 
   // How many tasks are in the queue?
@@ -23,6 +25,7 @@ namespace sharp {
   bool IsPng(std::string const &str);
   bool IsWebp(std::string const &str);
   bool IsTiff(std::string const &str);
+  bool IsDzi(std::string const &str);
 
   /*
     Determine image format of a buffer.

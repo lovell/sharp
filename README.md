@@ -434,11 +434,17 @@ _Requires libvips 7.42.0+_
 
 An advanced setting to disable adaptive row filtering for the lossless PNG output format.
 
+#### tileSize(tileSize)
+Setting the tile_size when DZI output format is selected. Default is 256.
+
+#### overlap(overlap)
+Setting the overlap when DZI output format is selected. Default is 0.
+
 ### Output methods
 
 #### toFile(filename, [callback])
 
-`filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP and TIFF supported.
+`filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
 
 `callback`, if present, is called with two arguments `(err, info)` where:
 

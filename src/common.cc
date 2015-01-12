@@ -28,7 +28,9 @@ namespace sharp {
   bool IsTiff(std::string const &str) {
     return EndsWith(str, ".tif") || EndsWith(str, ".tiff") || EndsWith(str, ".TIF") || EndsWith(str, ".TIFF");
   }
-
+  bool IsDzi(std::string const &str) {
+    return EndsWith(str, ".dzi") || EndsWith(str, ".DZI");
+  }
   // Buffer content checkers
   unsigned char const MARKER_JPEG[] = {0xff, 0xd8};
   unsigned char const MARKER_PNG[] = {0x89, 0x50};
@@ -90,11 +92,14 @@ namespace sharp {
       imageType = ImageType::PNG;
     } else if (vips_foreign_is_a("webpload", file)) {
       imageType = ImageType::WEBP;
-    } else if (vips_foreign_is_a("tiffload", file)) {
+    } else if (vips_foreign_is_a("openslideload", file)) {
+		imageType = ImageType::OPENSLIDE;
+	} else if (vips_foreign_is_a("tiffload", file)) {
       imageType = ImageType::TIFF;
     } else if(vips_foreign_is_a("magickload", file)) {
       imageType = ImageType::MAGICK;
     }
+
     return imageType;
   }
 
@@ -109,7 +114,9 @@ namespace sharp {
       vips_pngload(file, &image, "access", access, NULL);
     } else if (imageType == ImageType::WEBP) {
       vips_webpload(file, &image, "access", access, NULL);
-    } else if (imageType == ImageType::TIFF) {
+    } else if (imageType == ImageType::OPENSLIDE) {
+		vips_openslideload(file, &image, "access", access, NULL);
+	}else if (imageType == ImageType::TIFF) {
       vips_tiffload(file, &image, "access", access, NULL);
     } else if (imageType == ImageType::MAGICK) {
       vips_magickload(file, &image, "access", access, NULL);
