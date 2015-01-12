@@ -59,7 +59,7 @@ var Sharp = function(input) {
     streamOut: false,
     withMetadata: false,
     tileSize: 256,
-    overlap: 0
+    tileOverlap: 0
   };
   if (typeof input === 'string') {
     // input=file
@@ -375,11 +375,11 @@ Sharp.prototype.tileSize = function(tileSize) {
 /*
   dzi overlap for DZI output
 */
-Sharp.prototype.overlap = function(overlap) {
-  if (!Number.isNaN(overlap) && overlap >=0 && overlap <= 8192) {
-    this.options.overlap = overlap;
+Sharp.prototype.tileOverlap = function(tileOverlap) {
+  if (!Number.isNaN(tileOverlap) && tileOverlap >=0 && tileOverlap <= 8192) {
+    this.options.tileOverlap = tileOverlap;
   } else {
-    throw new Error('Invalid overlap (0 to 8192) ' + tileSize);
+    throw new Error('Invalid tileOverlap (0 to 8192) ' + tileOverlap);
   }
 
   return this;
