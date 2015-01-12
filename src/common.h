@@ -10,6 +10,7 @@ namespace sharp {
     WEBP,
     TIFF,
     MAGICK,
+	OPENSLIDE,
     DZI
   };
 

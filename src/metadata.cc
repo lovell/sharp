@@ -65,7 +65,8 @@ class MetadataWorker : public NanAsyncWorker {
         case ImageType::JPEG: baton->format = "jpeg"; break;
         case ImageType::PNG: baton->format = "png"; break;
         case ImageType::WEBP: baton->format = "webp"; break;
-        case ImageType::TIFF: baton->format = "tiff"; break;
+		case ImageType::OPENSLIDE: baton->format = "openslide"; break;
+		case ImageType::TIFF: baton->format = "tiff"; break;
         case ImageType::MAGICK: baton->format = "magick"; break;
         case ImageType::DZI: baton->format = "dzi"; break;
         case ImageType::UNKNOWN: break;
