@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -34,9 +34,9 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^2.3.11",
+    "bluebird": "^2.6.4",
     "color": "^0.7.3",
-    "nan": "^1.4.1",
+    "nan": "^1.5.1",
     "semver": "^4.1.0"
   },
   "devDependencies": {
