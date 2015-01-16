@@ -12,7 +12,7 @@
     "imagemagick-native": "^1.6.0",
     "gm": "^1.17.0",
     "async": "^0.9.0",
-    "semver": "^4.1.0",
+    "semver": "^4.2.0",
     "benchmark": "^1.0.0"
   },
   "license": "Apache 2.0",
