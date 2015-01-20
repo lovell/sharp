@@ -153,6 +153,10 @@ class ResizeWorker : public NanAsyncWorker {
       inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (inputImageType != ImageType::UNKNOWN) {
         image = InitImage(inputImageType, baton->bufferIn, baton->bufferInLength, baton->accessMethod);
+        if (image == NULL) {
+          (baton->err).append("Input buffer has corrupt header");
+          inputImageType = ImageType::UNKNOWN;
+        }
       } else {
         (baton->err).append("Input buffer contains unsupported image format");
       }
@@ -161,8 +165,12 @@ class ResizeWorker : public NanAsyncWorker {
       inputImageType = DetermineImageType(baton->fileIn.c_str());
       if (inputImageType != ImageType::UNKNOWN) {
         image = InitImage(inputImageType, baton->fileIn.c_str(), baton->accessMethod);
+        if (image == NULL) {
+          (baton->err).append("Input file has corrupt header");
+          inputImageType = ImageType::UNKNOWN;
+        }
       } else {
-        (baton->err).append("File is of an unsupported image format");
+        (baton->err).append("Input file is of an unsupported image format");
       }
     }
     if (inputImageType == ImageType::UNKNOWN) {

@@ -62,6 +62,10 @@ class MetadataWorker : public NanAsyncWorker {
       imageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (imageType != ImageType::UNKNOWN) {
         image = InitImage(imageType, baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
+        if (image == NULL) {
+          (baton->err).append("Input buffer has corrupt header");
+          imageType = ImageType::UNKNOWN;
+        }
       } else {
         (baton->err).append("Input buffer contains unsupported image format");
       }
@@ -70,8 +74,12 @@ class MetadataWorker : public NanAsyncWorker {
       imageType = DetermineImageType(baton->fileIn.c_str());
       if (imageType != ImageType::UNKNOWN) {
         image = InitImage(imageType, baton->fileIn.c_str(), VIPS_ACCESS_RANDOM);
+        if (image == NULL) {
+          (baton->err).append("Input file has corrupt header");
+          imageType = ImageType::UNKNOWN;
+        }
       } else {
-        (baton->err).append("File is of an unsupported image format");
+        (baton->err).append("Input file is of an unsupported image format");
       }
     }
     if (image != NULL && imageType != ImageType::UNKNOWN) {

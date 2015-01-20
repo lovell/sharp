@@ -216,4 +216,20 @@ describe('Image metadata', function() {
       });
   });
 
+  it('File input with corrupt header fails gracefully', function(done) {
+    sharp(fixtures.inputJpgWithCorruptHeader)
+      .metadata(function(err) {
+        assert.strictEqual(true, !!err);
+        done();
+      });
+  });
+
+  it('Buffer input with corrupt header fails gracefully', function(done) {
+    sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
+      .metadata(function(err) {
+        assert.strictEqual(true, !!err);
+        done();
+      });
+  });
+
 });

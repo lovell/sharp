@@ -292,6 +292,22 @@ describe('Input/output', function() {
       });
   });
 
+  it('File input with corrupt header fails gracefully', function(done) {
+    sharp(fixtures.inputJpgWithCorruptHeader)
+      .toBuffer(function(err) {
+        assert.strictEqual(true, !!err);
+        done();
+      });
+  });
+
+  it('Buffer input with corrupt header fails gracefully', function(done) {
+    sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
+      .toBuffer(function(err) {
+        assert.strictEqual(true, !!err);
+        done();
+      });
+  });
+
   describe('Output filename without extension uses input format', function() {
 
     it('JPEG', function(done) {
