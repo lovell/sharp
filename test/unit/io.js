@@ -524,4 +524,72 @@ describe('Input/output', function() {
     });
   }
 
+  describe('Limit pixel count of input image', function() {
+
+    it('Invalid fails - negative', function(done) {
+      var isValid = false;
+      try {
+        sharp().limitInputPixels(-1);
+        isValid = true;
+      } catch (e) {}
+      assert(!isValid);
+      done();
+    });
+
+    it('Invalid fails - float', function(done) {
+      var isValid = false;
+      try {
+        sharp().limitInputPixels(12.3);
+        isValid = true;
+      } catch (e) {}
+      assert(!isValid);
+      done();
+    });
+
+    it('Invalid fails - huge', function(done) {
+      var isValid = false;
+      try {
+        sharp().limitInputPixels(Math.pow(0x3FFF, 2) + 1);
+        isValid = true;
+      } catch (e) {}
+      assert(!isValid);
+      done();
+    });
+
+    it('Invalid fails - string', function(done) {
+      var isValid = false;
+      try {
+        sharp().limitInputPixels('fail');
+        isValid = true;
+      } catch (e) {}
+      assert(!isValid);
+      done();
+    });
+
+    it('Same size as input works', function(done) {
+      sharp(fixtures.inputJpg).metadata(function(err, metadata) {
+        if (err) throw err;
+        sharp(fixtures.inputJpg)
+          .limitInputPixels(metadata.width * metadata.height)
+          .toBuffer(function(err) {
+            assert.strictEqual(true, !err);
+            done();
+          });
+      });
+    });
+
+    it('Smaller than input fails', function(done) {
+      sharp(fixtures.inputJpg).metadata(function(err, metadata) {
+        if (err) throw err;
+        sharp(fixtures.inputJpg)
+          .limitInputPixels(metadata.width * metadata.height - 1)
+          .toBuffer(function(err) {
+            assert.strictEqual(true, !!err);
+            done();
+          });
+      });
+    });
+
+  });
+
 });

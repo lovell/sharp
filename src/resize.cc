@@ -54,6 +54,7 @@ struct ResizeBaton {
   void* bufferIn;
   size_t bufferInLength;
   std::string iccProfilePath;
+  int limitInputPixels;
   std::string output;
   std::string outputFormat;
   void* bufferOut;
@@ -94,6 +95,7 @@ struct ResizeBaton {
 
   ResizeBaton():
     bufferInLength(0),
+    limitInputPixels(0),
     outputFormat(""),
     bufferOutLength(0),
     topOffsetPre(-1),
@@ -177,6 +179,12 @@ class ResizeWorker : public NanAsyncWorker {
       return Error(baton, hook);
     }
     vips_object_local(hook, image);
+
+    // Limit input images to a given number of pixels, where pixels = width * height
+    if (image->Xsize * image->Ysize > baton->limitInputPixels) {
+      (baton->err).append("Input image exceeds pixel limit");
+      return Error(baton, hook);
+    }
 
     // Calculate angle of rotation
     Angle rotation;
@@ -923,6 +931,8 @@ NAN_METHOD(resize) {
   }
   // ICC profile to use when input CMYK image has no embedded profile
   baton->iccProfilePath = *String::Utf8Value(options->Get(NanNew<String>("iccProfilePath"))->ToString());
+  // Limit input images to a given number of pixels, where pixels = width * height
+  baton->limitInputPixels = options->Get(NanNew<String>("limitInputPixels"))->Int32Value();
   // Extract image options
   baton->topOffsetPre = options->Get(NanNew<String>("topOffsetPre"))->Int32Value();
   baton->leftOffsetPre = options->Get(NanNew<String>("leftOffsetPre"))->Int32Value();

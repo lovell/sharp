@@ -254,6 +254,12 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`. This will reduce memory usage and can improve performance on some systems.
 
+#### limitInputPixels(pixels)
+
+Do not process input images where the number of pixels (width * height) exceeds this limit.
+
+`pixels` is the integral Number of pixels, with a value between 1 and the default 268402689 (0x3FFF * 0x3FFF).
+
 ### Image transformation options
 
 #### resize(width, [height])

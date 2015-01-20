@@ -11,6 +11,12 @@ var BluebirdPromise = require('bluebird');
 var sharp = require('./build/Release/sharp');
 var libvipsVersion = sharp.libvipsVersion();
 
+var maximum = {
+  width: 0x3FFF,
+  height: 0x3FFF,
+  pixels: Math.pow(0x3FFF, 2)
+};
+
 var Sharp = function(input) {
   if (!(this instanceof Sharp)) {
     return new Sharp(input);
@@ -21,6 +27,7 @@ var Sharp = function(input) {
     bufferIn: null,
     streamIn: false,
     sequentialRead: false,
+    limitInputPixels: maximum.pixels,
     // ICC profiles
     iccProfilePath: path.join(__dirname, 'icc') + path.sep,
     // resize options
@@ -366,20 +373,33 @@ Sharp.prototype.resize = function(width, height) {
   if (!width) {
     this.options.width = -1;
   } else {
-    if (typeof width === 'number' && !Number.isNaN(width) && width % 1 === 0 && width > 0 && width <= 0x3FFF) {
+    if (typeof width === 'number' && !Number.isNaN(width) && width % 1 === 0 && width > 0 && width <= maximum.width) {
       this.options.width = width;
     } else {
-      throw new Error('Invalid width ' + width);
+      throw new Error('Invalid width (1 to ' + maximum.width + ') ' + width);
     }
   }
   if (!height) {
     this.options.height = -1;
   } else {
-    if (typeof height === 'number' && !Number.isNaN(height) && height % 1 === 0 && height > 0 && height <= 0x3FFF) {
+    if (typeof height === 'number' && !Number.isNaN(height) && height % 1 === 0 && height > 0 && height <= maximum.height) {
       this.options.height = height;
     } else {
-      throw new Error('Invalid height ' + height);
+      throw new Error('Invalid height (1 to ' + maximum.height + ') ' + height);
     }
+  }
+  return this;
+};
+
+/*
+  Limit the total number of pixels for input images
+  Assumes the image dimensions contained in the file header can be trusted
+*/
+Sharp.prototype.limitInputPixels = function(limit) {
+  if (typeof limit === 'number' && !Number.isNaN(limit) && limit % 1 === 0 && limit > 0 && limit <= maximum.pixels) {
+    this.options.limitInputPixels = limit;
+  } else {
+    throw new Error('Invalid pixel limit (1 to ' + maximum.pixels + ') ' + limit);
   }
   return this;
 };
