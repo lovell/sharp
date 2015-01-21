@@ -51,13 +51,13 @@ enum class Angle {
 
 struct ResizeBaton {
   std::string fileIn;
-  char* bufferIn;
+  char *bufferIn;
   size_t bufferInLength;
   std::string iccProfilePath;
   int limitInputPixels;
   std::string output;
   std::string outputFormat;
-  void* bufferOut;
+  void *bufferOut;
   size_t bufferOutLength;
   int topOffsetPre;
   int leftOffsetPre;
@@ -129,14 +129,10 @@ struct ResizeBaton {
   Delete input char[] buffer and notify V8 of memory deallocation
   Used as the callback function for the "postclose" signal
 */
-static void DeleteBuffer(VipsObject *object, std::tuple<char*, size_t> *buffer) {
-  char* data = std::get<0>(*buffer);
-  size_t length = std::get<1>(*buffer);
-  if (data != NULL) {
-    delete[] data;
+static void DeleteBuffer(VipsObject *object, char *buffer) {
+  if (buffer != NULL) {
+    delete[] buffer;
   }
-  NanAdjustExternalMemory(static_cast<int>(-length));
-  delete buffer;
 }
 
 class ResizeWorker : public NanAsyncWorker {
@@ -167,21 +163,20 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->bufferInLength > 1) {
       // From buffer
       inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
-      std::tuple<char*, size_t> *buffer = new std::tuple<char*, size_t>(baton->bufferIn, baton->bufferInLength);
       if (inputImageType != ImageType::UNKNOWN) {
         image = InitImage(inputImageType, baton->bufferIn, baton->bufferInLength, baton->accessMethod);
         if (image != NULL) {
           // Listen for "postclose" signal to delete input buffer
-          g_signal_connect(image, "postclose", G_CALLBACK(DeleteBuffer), buffer);
+          g_signal_connect(image, "postclose", G_CALLBACK(DeleteBuffer), baton->bufferIn);
         } else {
           // Could not read header data
           (baton->err).append("Input buffer has corrupt header");
           inputImageType = ImageType::UNKNOWN;
-          DeleteBuffer(NULL, buffer);
+          DeleteBuffer(NULL, baton->bufferIn);
         }
       } else {
         (baton->err).append("Input buffer contains unsupported image format");
-        DeleteBuffer(NULL, buffer);
+        DeleteBuffer(NULL, baton->bufferIn);
       }
     } else {
       // From file
@@ -820,7 +815,7 @@ class ResizeWorker : public NanAsyncWorker {
       if (baton->bufferOutLength > 0) {
         // Copy data to new Buffer
         argv[1] = NanNewBufferHandle(static_cast<char*>(baton->bufferOut), baton->bufferOutLength);
-        // bufferOut was allocated via malloc
+        // bufferOut was allocated via g_malloc
         g_free(baton->bufferOut);
         // Add buffer size to info
         info->Set(NanNew<String>("size"), NanNew<Uint32>(static_cast<uint32_t>(baton->bufferOutLength)));
@@ -945,8 +940,6 @@ NAN_METHOD(resize) {
     baton->bufferIn = new char[baton->bufferInLength];
     memcpy(baton->bufferIn, node::Buffer::Data(buffer), baton->bufferInLength);
     options->Set(NanNew<String>("bufferIn"), NanNull());
-    // Notify V8 GC of memory allocation
-    NanAdjustExternalMemory(static_cast<int>(baton->bufferInLength));
   }
   // ICC profile to use when input CMYK image has no embedded profile
   baton->iccProfilePath = *String::Utf8Value(options->Get(NanNew<String>("iccProfilePath"))->ToString());

@@ -34,7 +34,7 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^2.6.4",
+    "bluebird": "^2.8.2",
     "color": "^0.7.3",
     "nan": "^1.5.1",
     "semver": "^4.2.0"
