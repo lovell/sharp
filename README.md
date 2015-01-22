@@ -82,9 +82,11 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 	docker pull marcbachmann/libvips
 
-### gulp.js
+### Build tools
 
-[Eugeny Vlasenko](https://github.com/mahnunchik) maintains [gulp-responsive](https://www.npmjs.org/package/gulp-responsive) and [Mohammad Prabowo](https://github.com/rizalp) maintains [gulp-sharp](https://www.npmjs.org/package/gulp-sharp).
+* [gulp-responsive](https://www.npmjs.com/package/gulp-responsive)
+* [gulp-sharp](https://www.npmjs.com/package/gulp-sharp)
+* [grunt-sharp](https://www.npmjs.com/package/grunt-sharp)
 
 ## Usage examples
 
