@@ -12,7 +12,7 @@
 The typical use case for this high speed Node.js module is to convert large images of many formats to smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
 This module supports reading and writing JPEG, PNG and WebP images to and from Streams, Buffer objects and the filesystem.
-It also supports reading images of many other types from the filesystem via libmagick++ or libgraphicsmagick++ if present.
+It also supports reading images of many other types from the filesystem via libmagick or libgraphicsmagick if present.
 Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
 
 Only small regions of uncompressed image data are held in memory and processed at a time, taking full advantage of multiple CPU cores and L1/L2/L3 cache. Resizing an image is typically 4x faster than using the quickest ImageMagick and GraphicsMagick settings.
@@ -546,7 +546,7 @@ brew install graphicsmagick
 ```
 
 ```
-sudo apt-get install -qq imagemagick graphicsmagick libmagick++-dev
+sudo apt-get install -qq imagemagick graphicsmagick libmagickcore-dev
 ```
 
 ```
