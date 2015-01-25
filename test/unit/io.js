@@ -433,16 +433,19 @@ describe('Input/output', function() {
 
   });
 
-  it('Convert SVG to PNG', function(done) {
+  it('Convert SVG, if supported, to PNG', function(done) {
     sharp(fixtures.inputSvg)
       .resize(100, 100)
       .png()
       .toFile(fixtures.path('output.svg.png'), function(err, info) {
-        if (err) throw err;
-        assert.strictEqual(true, info.size > 0);
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(100, info.width);
-        assert.strictEqual(100, info.height);
+        if (err) {
+          assert.strictEqual('Input file is of an unsupported image format', err.message);
+        } else {
+          assert.strictEqual(true, info.size > 0);
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(100, info.width);
+          assert.strictEqual(100, info.height);
+        }
         done();
       });
   });
