@@ -116,4 +116,62 @@ describe('Partial image extraction', function() {
       });
   });
 
+  describe('Invalid parameters', function() {
+
+    it('Undefined', function(done) {
+      var isValid = true;
+      try {
+        sharp(fixtures.inputJpg).extract();
+      } catch (err) {
+        isValid = false;
+      }
+      assert.strictEqual(false, isValid);
+      done();
+    });
+
+    it('String top', function(done) {
+      var isValid = true;
+      try {
+        sharp(fixtures.inputJpg).extract('spoons', 10, 10, 10);
+      } catch (err) {
+        isValid = false;
+      }
+      assert.strictEqual(false, isValid);
+      done();
+    });
+
+    it('Non-integral left', function(done) {
+      var isValid = true;
+      try {
+        sharp(fixtures.inputJpg).extract(10, 10.2, 10, 10);
+      } catch (err) {
+        isValid = false;
+      }
+      assert.strictEqual(false, isValid);
+      done();
+    });
+
+    it('Negative width - negative', function(done) {
+      var isValid = true;
+      try {
+        sharp(fixtures.inputJpg).extract(10, 10, -10, 10);
+      } catch (err) {
+        isValid = false;
+      }
+      assert.strictEqual(false, isValid);
+      done();
+    });
+
+    it('Null height', function(done) {
+      var isValid = true;
+      try {
+        sharp(fixtures.inputJpg).extract(10, 10, 10, null);
+      } catch (err) {
+        isValid = false;
+      }
+      assert.strictEqual(false, isValid);
+      done();
+    });
+
+  });
 });

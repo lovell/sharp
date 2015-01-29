@@ -142,7 +142,11 @@ Sharp.prototype.extract = function(topOffset, leftOffset, width, height) {
   var suffix = this.options.width === -1 && this.options.height === -1 ? 'Pre' : 'Post';
   var values = arguments;
   ['topOffset', 'leftOffset', 'width', 'height'].forEach(function(name, index) {
-    this.options[name + suffix] = values[index];
+    if (typeof values[index] === 'number' && !Number.isNaN(values[index]) && (values[index] % 1 === 0) && values[index] >= 0) {
+      this.options[name + suffix] = values[index];
+    } else {
+      throw new Error('Non-integer value for ' + name + ' of ' + values[index]);
+    }
   }.bind(this));
   // Ensure existing rotation occurs before pre-resize extraction
   if (suffix === 'Pre' && this.options.angle !== 0) {
