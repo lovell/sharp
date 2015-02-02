@@ -11,6 +11,9 @@ var fixtures = require('../fixtures');
 var min = 320;
 var max = 960;
 
+// Nearest equivalent to bilinear
+var magickFilter = 'Triangle';
+
 var randomDimension = function() {
   return Math.ceil(Math.random() * (max - min) + min);
 };
@@ -23,7 +26,9 @@ new Benchmark.Suite('random').add('imagemagick', {
       dstPath: fixtures.outputJpg,
       quality: 0.8,
       width: randomDimension(),
-      height: randomDimension()
+      height: randomDimension(),
+      format: 'jpg',
+      filter: magickFilter
     }, function(err) {
       if (err) {
         throw err;
@@ -35,14 +40,18 @@ new Benchmark.Suite('random').add('imagemagick', {
 }).add('gm', {
   defer: true,
   fn: function(deferred) {
-    gm(fixtures.inputJpg).resize(randomDimension(), randomDimension()).quality(80).toBuffer(function (err, buffer) {
-      if (err) {
-        throw err;
-      } else {
-        assert.notStrictEqual(null, buffer);
-        deferred.resolve();
-      }
-    });
+    gm(fixtures.inputJpg)
+      .resize(randomDimension(), randomDimension())
+      .filter(magickFilter)
+      .quality(80)
+      .toBuffer(function (err, buffer) {
+        if (err) {
+          throw err;
+        } else {
+          assert.notStrictEqual(null, buffer);
+          deferred.resolve();
+        }
+      });
   }
 }).add('sharp', {
   defer: true,
