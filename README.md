@@ -187,7 +187,7 @@ sharp(inputBuffer)
   .toFile('output.tiff')
   .then(function() {
     // output.tiff is a 200 pixels wide and 300 pixels high image
-    // containing a bicubic scaled version, embedded on a white canvas,
+    // containing a nohalo scaled version, embedded on a white canvas,
     // of the image data in inputBuffer
   });
 ```
