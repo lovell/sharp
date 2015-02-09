@@ -14,7 +14,7 @@
 
 vips_version_minimum=7.40.0
 vips_version_latest_major=7.42
-vips_version_latest_minor=1
+vips_version_latest_minor=2
 
 install_libvips_from_source() {
   echo "Compiling libvips $vips_version_latest_major.$vips_version_latest_minor from source"
