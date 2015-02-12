@@ -135,10 +135,11 @@ describe('Input/output', function() {
     readableButNotAnImage.pipe(writable);
   });
 
-  it('Sequential read', function(done) {
+  it('Sequential read, force JPEG', function(done) {
     sharp(fixtures.inputJpg)
       .sequentialRead()
       .resize(320, 240)
+      .toFormat(sharp.format.jpeg)
       .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -150,10 +151,11 @@ describe('Input/output', function() {
       });
   });
 
-  it('Not sequential read', function(done) {
+  it('Not sequential read, force JPEG', function(done) {
     sharp(fixtures.inputJpg)
       .sequentialRead(false)
       .resize(320, 240)
+      .toFormat('jpeg')
       .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -290,6 +292,30 @@ describe('Input/output', function() {
             done();
           });
       });
+  });
+
+  it('WebP output', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .toFormat(sharp.format.webp)
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('webp', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
+  it('Invalid output format', function(done) {
+    var isValid = false;
+    try {
+      sharp().toFormat('zoinks');
+      isValid = true;
+    } catch (e) {}
+    assert(!isValid);
+    done();
   });
 
   it('File input with corrupt header fails gracefully', function(done) {
@@ -436,7 +462,7 @@ describe('Input/output', function() {
   it('Convert SVG, if supported, to PNG', function(done) {
     sharp(fixtures.inputSvg)
       .resize(100, 100)
-      .png()
+      .toFormat('png')
       .toFile(fixtures.path('output.svg.png'), function(err, info) {
         if (err) {
           assert.strictEqual('Input file is of an unsupported image format', err.message);
@@ -453,7 +479,7 @@ describe('Input/output', function() {
   it('Convert PSD to PNG', function(done) {
     sharp(fixtures.inputPsd)
       .resize(320, 240)
-      .png()
+      .toFormat(sharp.format.png)
       .toFile(fixtures.path('output.psd.png'), function(err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
@@ -501,7 +527,7 @@ describe('Input/output', function() {
       it('3 channel colour image without transparency', function(done) {
         sharp(fixtures.inputJpg)
           .resize(32, 24)
-          .raw()
+          .toFormat('raw')
           .toBuffer(function(err, data, info) {
             assert.strictEqual(32 * 24 * 3, info.size);
             assert.strictEqual(data.length, info.size);
@@ -514,7 +540,7 @@ describe('Input/output', function() {
       it('4 channel colour image with transparency', function(done) {
         sharp(fixtures.inputPngWithTransparency)
           .resize(32, 24)
-          .raw()
+          .toFormat(sharp.format.raw)
           .toBuffer(function(err, data, info) {
             assert.strictEqual(32 * 24 * 4, info.size);
             assert.strictEqual(data.length, info.size);

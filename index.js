@@ -435,30 +435,62 @@ Sharp.prototype.toFile = function(output, callback) {
   return this;
 };
 
+/*
+  Write output to a Buffer
+*/
 Sharp.prototype.toBuffer = function(callback) {
   return this._sharp(callback);
 };
 
+/*
+  Force JPEG output
+*/
 Sharp.prototype.jpeg = function() {
   this.options.output = '__jpeg';
   return this;
 };
 
+/*
+  Force PNG output
+*/
 Sharp.prototype.png = function() {
   this.options.output = '__png';
   return this;
 };
 
+/*
+  Force WebP output
+*/
 Sharp.prototype.webp = function() {
   this.options.output = '__webp';
   return this;
 };
 
+/*
+  Force raw, uint8 output
+*/
 Sharp.prototype.raw = function() {
   if (semver.gte(libvipsVersion, '7.42.0')) {
     this.options.output = '__raw';
   } else {
     console.error('Raw output requires libvips 7.42.0+');
+  }
+  return this;
+};
+
+/*
+  Force output to a given format
+*/
+module.exports.format = {'jpeg': 'jpeg', 'png': 'png', 'webp': 'webp', 'raw': 'raw'};
+Sharp.prototype.toFormat = function(format) {
+  if (
+    typeof format === 'string' &&
+    typeof module.exports.format[format] === 'string' &&
+    typeof this[format] === 'function'
+  ) {
+    this[format]();
+  } else {
+    throw new Error('Unsupported format ' + format);
   }
   return this;
 };

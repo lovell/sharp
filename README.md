@@ -197,7 +197,7 @@ sharp('input.gif')
   .resize(200, 300)
   .background({r: 0, g: 0, b: 0, a: 0})
   .embed()
-  .webp()
+  .toFormat(sharp.format.webp)
   .toBuffer(function(err, outputBuffer) {
     if (err) {
       throw err;
@@ -211,7 +211,7 @@ sharp('input.gif')
 sharp(inputBuffer)
   .resize(200, 200)
   .max()
-  .jpeg()
+  .toFormat('jpeg')
   .toBuffer().then(function(outputBuffer) {
     // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
     // than 200 pixels regardless of the inputBuffer image dimensions
@@ -414,6 +414,13 @@ The number of channels depends on the input image and selected options.
 * 1 channel for images converted to `greyscale()`, with each byte representing one pixel.
 * 3 channels for colour images without alpha transparency, with bytes ordered \[red, green, blue, red, green, blue, etc.\]).
 * 4 channels for colour images with alpha transparency, with bytes ordered \[red, green, blue, alpha, red, green, blue, alpha, etc.\].
+
+#### toFormat(format)
+
+Convenience method for the above output format methods, where `format` is either:
+
+* an attribute of the `sharp.format` Object e.g. `sharp.format.jpeg`, or
+* a String containing `jpeg`, `png`, `webp` or `raw`.
 
 #### quality(quality)
 
