@@ -13,11 +13,8 @@ extern "C" void init(v8::Handle<v8::Object> target) {
   vips_init("sharp");
 
   // Set libvips operation cache limits
-  vips_cache_set_max_mem(100 * 1048576); // 100 MB
+  vips_cache_set_max_mem(100 * 1024 * 1024); // 100 MB
   vips_cache_set_max(500); // 500 operations
-
-  // Notify the V8 garbage collector of max cache size
-  NanAdjustExternalMemory(vips_cache_get_max_mem());
 
   // Methods available to JavaScript
   NODE_SET_METHOD(target, "metadata", metadata);
