@@ -34,10 +34,10 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^2.9.8",
+    "bluebird": "^2.9.9",
     "color": "^0.7.3",
     "nan": "^1.6.2",
-    "semver": "^4.2.2"
+    "semver": "^4.3.0"
   },
   "devDependencies": {
     "mocha": "^2.1.0",

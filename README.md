@@ -438,6 +438,15 @@ Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
 
 The default behaviour is to strip all metadata and convert to the device-independent sRGB colour space.
 
+#### withoutChromaSubsampling()
+
+Disable the use of [chroma subsampling](http://en.wikipedia.org/wiki/Chroma_subsampling) with JPEG output (4:4:4).
+
+This can improve colour representation at higher quality settings (90+),
+but usually increases output file size and typically reduces performance by 25%.
+
+The default behaviour is to use chroma subsampling (4:2:0).
+
 #### compressionLevel(compressionLevel)
 
 An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.

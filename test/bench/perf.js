@@ -347,6 +347,18 @@ async.series({
           }
         });
       }
+    }).add('sharp-without-chroma-subsampling', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer).resize(width, height).withoutChromaSubsampling().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
     }).add('sharp-rotate', {
       defer: true,
       fn: function(deferred) {

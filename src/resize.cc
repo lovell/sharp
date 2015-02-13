@@ -90,6 +90,7 @@ struct ResizeBaton {
   int quality;
   int compressionLevel;
   bool withoutAdaptiveFiltering;
+  bool withoutChromaSubsampling;
   std::string err;
   bool withMetadata;
 
@@ -117,6 +118,7 @@ struct ResizeBaton {
     quality(80),
     compressionLevel(6),
     withoutAdaptiveFiltering(false),
+    withoutChromaSubsampling(false),
     withMetadata(false) {
       background[0] = 0.0;
       background[1] = 0.0;
@@ -675,7 +677,8 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == ImageType::JPEG)) {
       // Write JPEG to buffer
       if (vips_jpegsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
-        "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
+        "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
+        "interlace", baton->progressive, NULL)) {
         return Error(baton, hook);
       }
       baton->outputFormat = "jpeg";
@@ -741,7 +744,8 @@ class ResizeWorker : public NanAsyncWorker {
       if (outputJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
         // Write JPEG to file
         if (vips_jpegsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
-          "Q", baton->quality, "optimize_coding", TRUE, "interlace", baton->progressive, NULL)) {
+          "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
+          "interlace", baton->progressive, NULL)) {
           return Error(baton, hook);
         }
         baton->outputFormat = "jpeg";
@@ -992,6 +996,7 @@ NAN_METHOD(resize) {
   baton->quality = options->Get(NanNew<String>("quality"))->Int32Value();
   baton->compressionLevel = options->Get(NanNew<String>("compressionLevel"))->Int32Value();
   baton->withoutAdaptiveFiltering = options->Get(NanNew<String>("withoutAdaptiveFiltering"))->BooleanValue();
+  baton->withoutChromaSubsampling = options->Get(NanNew<String>("withoutChromaSubsampling"))->BooleanValue();
   baton->withMetadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
   // Output filename or __format for Buffer
   baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());

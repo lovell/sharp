@@ -64,6 +64,7 @@ var Sharp = function(input) {
     quality: 80,
     compressionLevel: 6,
     withoutAdaptiveFiltering: false,
+    withoutChromaSubsampling: false,
     streamOut: false,
     withMetadata: false
   };
@@ -365,6 +366,14 @@ Sharp.prototype.withoutAdaptiveFiltering = function(withoutAdaptiveFiltering) {
   } else {
     console.error('withoutAdaptiveFiltering requires libvips 7.41.0+');
   }
+  return this;
+};
+
+/*
+  Disable the use of chroma subsampling for JPEG output
+*/
+Sharp.prototype.withoutChromaSubsampling = function(withoutChromaSubsampling) {
+  this.options.withoutChromaSubsampling = (typeof withoutChromaSubsampling === 'boolean') ? withoutChromaSubsampling : true;
   return this;
 };
 

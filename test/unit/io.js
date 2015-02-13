@@ -459,6 +459,35 @@ describe('Input/output', function() {
 
   });
 
+  it('Without chroma subsampling generates larger file', function(done) {
+    // First generate with chroma subsampling (default)
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .withoutChromaSubsampling(false)
+      .toBuffer(function(err, withChromaSubsamplingData, withChromaSubsamplingInfo) {
+        if (err) throw err;
+        assert.strictEqual(true, withChromaSubsamplingData.length > 0);
+        assert.strictEqual(withChromaSubsamplingData.length, withChromaSubsamplingInfo.size);
+        assert.strictEqual('jpeg', withChromaSubsamplingInfo.format);
+        assert.strictEqual(320, withChromaSubsamplingInfo.width);
+        assert.strictEqual(240, withChromaSubsamplingInfo.height);
+        // Then generate without
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .withoutChromaSubsampling()
+          .toBuffer(function(err, withoutChromaSubsamplingData, withoutChromaSubsamplingInfo) {
+            if (err) throw err;
+            assert.strictEqual(true, withoutChromaSubsamplingData.length > 0);
+            assert.strictEqual(withoutChromaSubsamplingData.length, withoutChromaSubsamplingInfo.size);
+            assert.strictEqual('jpeg', withoutChromaSubsamplingInfo.format);
+            assert.strictEqual(320, withoutChromaSubsamplingInfo.width);
+            assert.strictEqual(240, withoutChromaSubsamplingInfo.height);
+            assert.strictEqual(true, withChromaSubsamplingData.length < withoutChromaSubsamplingData.length);
+            done();
+          });
+      });
+  });
+
   it('Convert SVG, if supported, to PNG', function(done) {
     sharp(fixtures.inputSvg)
       .resize(100, 100)
