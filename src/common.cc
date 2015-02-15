@@ -43,6 +43,15 @@ namespace sharp {
     );
   }
 
+  static bool buffer_is_gif(char *buffer, size_t len) {
+    return (
+      len >= 6 && (
+          (buffer[0] == 'G' && buffer[1] == 'I' && buffer[2] == 'F' &&
+            buffer[3] == '8' && (buffer[4] == '7' || buffer[4] == '9') && buffer[5] == 'a')
+        )
+    );
+  }
+
   /*
     Determine image format of a buffer.
   */
@@ -57,6 +66,8 @@ namespace sharp {
         imageType = ImageType::WEBP;
       } else if (buffer_is_tiff(static_cast<char*>(buffer), length)) {
         imageType = ImageType::TIFF;
+      } else if (buffer_is_gif(static_cast<char*>(buffer), length)) {
+        imageType = ImageType::MAGICK;
       }
     }
     return imageType;
@@ -75,6 +86,10 @@ namespace sharp {
       vips_webpload_buffer(buffer, length, &image, "access", access, NULL);
     } else if (imageType == ImageType::TIFF) {
       vips_tiffload_buffer(buffer, length, &image, "access", access, NULL);
+#if (VIPS_MAJOR_VERSION >= 8 && VIPS_MINOR_VERSION >= 0)
+    } else if (imageType == ImageType::MAGICK) {
+      vips_magickload_buffer(buffer, length, &image, "access", access, NULL);
+#endif
     }
     return image;
   }
