@@ -73,24 +73,7 @@ var Sharp = function(input) {
     this.options.fileIn = input;
   } else if (typeof input === 'object' && input instanceof Buffer) {
     // input=buffer
-    if (
-      (input.length > 3) &&
-      // JPEG
-      (input[0] === 0xFF && input[1] === 0xD8) ||
-      // PNG
-      (input[0] === 0x89 && input[1] === 0x50) ||
-      // WebP
-      (input[0] === 0x52 && input[1] === 0x49) ||
-      // TIFF
-      (input[0] === 0x4D && input[1] === 0x4D && input[2] === 0x00 && (input[3] === 0x2A || input[3] === 0x2B)) ||
-      (input[0] === 0x49 && input[1] === 0x49 && (input[2] === 0x2A || input[2] === 0x2B) && input[3] === 0x00) ||
-      // GIF
-      (input[0] === 0x47 && input[1] === 0x49 && input[2] === 0x46 && input[3] === 0x38 && (input[4] === 0x37 || input[4] === 0x39) && input[5] === 0x61)
-    ) {
-      this.options.bufferIn = input;
-    } else {
-      throw new Error('Buffer contains an unsupported image format. JPEG, PNG, WebP, TIFF and GIF are currently supported.');
-    }
+    this.options.bufferIn = input;
   } else {
     // input=stream
     this.options.streamIn = true;

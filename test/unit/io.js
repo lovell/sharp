@@ -202,27 +202,23 @@ describe('Input/output', function() {
   });
 
   it('Fail when input is empty Buffer', function(done) {
-    var failed = true;
-    try {
-      sharp(new Buffer(0));
-      failed = false;
-    } catch (err) {
+    sharp(new Buffer(0)).toBuffer().then(function () {
+      assert(false);
+      done();
+    }).catch(function (err) {
       assert(err instanceof Error);
-    }
-    assert(failed);
-    done();
+      done();
+    });
   });
 
   it('Fail when input is invalid Buffer', function(done) {
-    var failed = true;
-    try {
-      sharp(new Buffer([0x1, 0x2, 0x3, 0x4]));
-      failed = false;
-    } catch (err) {
+    sharp(new Buffer([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
+      assert(false);
+      done();
+    }).catch(function (err) {
       assert(err instanceof Error);
-    }
-    assert(failed);
-    done();
+      done();
+    });
   });
 
   it('Promises/A+', function(done) {

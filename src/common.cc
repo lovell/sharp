@@ -29,47 +29,40 @@ namespace sharp {
     return EndsWith(str, ".tif") || EndsWith(str, ".tiff") || EndsWith(str, ".TIF") || EndsWith(str, ".TIFF");
   }
 
-  // Buffer content checkers
-  unsigned char const MARKER_JPEG[] = {0xff, 0xd8};
-  unsigned char const MARKER_PNG[] = {0x89, 0x50};
-  unsigned char const MARKER_WEBP[] = {0x52, 0x49};
-
-  static bool buffer_is_tiff(char *buffer, size_t len) {
-    return (
-      len >= 4 && (
-        (buffer[0] == 'M' && buffer[1] == 'M' && buffer[2] == '\0' && (buffer[3] == '*' || buffer[3] == '+')) ||
-        (buffer[0] == 'I' && buffer[1] == 'I' && (buffer[2] == '*' || buffer[2] == '+') && buffer[3] == '\0')
-      )
-    );
-  }
-
-  static bool buffer_is_gif(char *buffer, size_t len) {
-    return (
-      len >= 6 && (
-          (buffer[0] == 'G' && buffer[1] == 'I' && buffer[2] == 'F' &&
-            buffer[3] == '8' && (buffer[4] == '7' || buffer[4] == '9') && buffer[5] == 'a')
-        )
-    );
-  }
-
   /*
     Determine image format of a buffer.
   */
   ImageType DetermineImageType(void *buffer, size_t const length) {
     ImageType imageType = ImageType::UNKNOWN;
-    if (length >= 4) {
-      if (memcmp(MARKER_JPEG, buffer, 2) == 0) {
+#if (VIPS_MAJOR_VERSION >= 8)
+    if (vips_foreign_is_a_buffer("jpegload_buffer", buffer, length)) {
+      imageType = ImageType::JPEG;
+    } else if (vips_foreign_is_a_buffer("pngload_buffer", buffer, length)) {
+      imageType = ImageType::PNG;
+    } else if (vips_foreign_is_a_buffer("webpload_buffer", buffer, length)) {
+      imageType = ImageType::WEBP;
+    } else if (vips_foreign_is_a_buffer("tiffload_buffer", buffer, length)) {
+      imageType = ImageType::TIFF;
+    } else if(vips_foreign_is_a_buffer("magickload_buffer", buffer, length)) {
+      imageType = ImageType::MAGICK;
+    }
+#else
+    const char* loader = vips_foreign_find_load_buffer(buffer, length);
+
+    if (loader != NULL) {
+      if (!strcmp(loader, "VipsForeignLoadJpegBuffer")) {
         imageType = ImageType::JPEG;
-      } else if (memcmp(MARKER_PNG, buffer, 2) == 0) {
+      } else if (!strcmp(loader, "VipsForeignLoadPngBuffer")) {
         imageType = ImageType::PNG;
-      } else if (memcmp(MARKER_WEBP, buffer, 2) == 0) {
+      } else if (!strcmp(loader, "VipsForeignLoadWebpBuffer")) {
         imageType = ImageType::WEBP;
-      } else if (buffer_is_tiff(static_cast<char*>(buffer), length)) {
+      } else if (!strcmp(loader, "VipsForeignLoadTiffBuffer")) {
         imageType = ImageType::TIFF;
-      } else if (buffer_is_gif(static_cast<char*>(buffer), length)) {
+      } else if (!strcmp(loader, "VipsForeignLoadMagickBuffer")) {
         imageType = ImageType::MAGICK;
       }
     }
+#endif
     return imageType;
   }
 
