@@ -661,7 +661,7 @@ class ResizeWorker : public NanAsyncWorker {
       }
     }
 
-#if !(VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40 && VIPS_MINOR_VERSION >= 5)
+#if !(VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40 && VIPS_MINOR_VERSION >= 5))
     // Generate image tile cache when interlace output is required - no longer required as of libvips 7.40.5+
     if (baton->progressive) {
       VipsImage *cached;
@@ -683,7 +683,7 @@ class ResizeWorker : public NanAsyncWorker {
       }
       baton->outputFormat = "jpeg";
     } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == ImageType::PNG)) {
-#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42)
+#if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
       // Select PNG row filter
       int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
       // Write PNG to buffer
@@ -706,7 +706,7 @@ class ResizeWorker : public NanAsyncWorker {
         return Error(baton, hook);
       }
       baton->outputFormat = "webp";
-#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42)
+#if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
     } else if (baton->output == "__raw") {
       // Write raw, uncompressed image data to buffer
       if (baton->greyscale) {
@@ -750,7 +750,7 @@ class ResizeWorker : public NanAsyncWorker {
         }
         baton->outputFormat = "jpeg";
       } else if (outputPng || (matchInput && inputImageType == ImageType::PNG)) {
-#if (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42)
+#if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
         // Select PNG row filter
         int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
         // Write PNG to file
