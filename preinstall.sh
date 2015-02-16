@@ -137,7 +137,7 @@ case $(uname -s) in
         "Fedora release 21 "*|"Fedora release 22 "*)
           # Fedora 21, 22
           echo "Installing libvips via yum"
-          yum install vips-devel
+          yum install -y vips-devel
           ;;
         *)
           # Unsupported RHEL-based OS
