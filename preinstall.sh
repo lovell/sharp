@@ -13,22 +13,22 @@
 #   * Amazon Linux 2014.09
 
 vips_version_minimum=7.40.0
-vips_version_latest_major=7.42
-vips_version_latest_minor=2
+vips_version_latest_major_minor=7.42
+vips_version_latest_patch=3
 
 install_libvips_from_source() {
-  echo "Compiling libvips $vips_version_latest_major.$vips_version_latest_minor from source"
-  curl -O http://www.vips.ecs.soton.ac.uk/supported/$vips_version_latest_major/vips-$vips_version_latest_major.$vips_version_latest_minor.tar.gz
-  tar zvxf vips-$vips_version_latest_major.$vips_version_latest_minor.tar.gz
-  cd vips-$vips_version_latest_major.$vips_version_latest_minor
+  echo "Compiling libvips $vips_version_latest_major_minor.$vips_version_latest_patch from source"
+  curl -O http://www.vips.ecs.soton.ac.uk/supported/$vips_version_latest_major_minor/vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
+  tar zvxf vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
+  cd vips-$vips_version_latest_major_minor.$vips_version_latest_patch
   ./configure --enable-debug=no --enable-docs=no --enable-cxx=yes --without-python --without-orc --without-fftw --without-gsf $1
   make
   make install
   cd ..
-  rm -rf vips-$vips_version_latest_major.$vips_version_latest_minor
-  rm vips-$vips_version_latest_major.$vips_version_latest_minor.tar.gz
+  rm -rf vips-$vips_version_latest_major_minor.$vips_version_latest_patch
+  rm vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   ldconfig
-  echo "Installed libvips $vips_version_latest_major.$vips_version_latest_minor"
+  echo "Installed libvips $vips_version_latest_major_minor.$vips_version_latest_patch"
 }
 
 sorry() {
