@@ -226,14 +226,16 @@ sharp(inputBuffer)
 
 Constructor to which further methods are chained. `input`, if present, can be one of:
 
-* Buffer containing JPEG, PNG, WebP or TIFF image data, or
+* Buffer containing JPEG, PNG, WebP, GIF* or TIFF image data, or
 * String containing the filename of an image, with most major formats supported.
 
 The object returned implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
 
-JPEG, PNG, WebP or TIFF format image data can be streamed into the object when `input` is not provided.
+JPEG, PNG, WebP, GIF* or TIFF format image data can be streamed into the object when `input` is not provided.
 
 JPEG, PNG or WebP format image data can be streamed out from this object.
+
+\* GIF support requires libvips 8.0.0+.
 
 #### metadata([callback])
 
@@ -627,6 +629,7 @@ This module would never have been possible without the help and code contributio
 * [Amit Pitaru](https://github.com/apitaru)
 * [Brandon Aaron](https://github.com/brandonaaron)
 * [Andreas Lind](https://github.com/papandreou)
+* [Maurus Cuelenaere](https://github.com/mcuelenaere)
 
 Thank you!
 
