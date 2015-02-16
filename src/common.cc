@@ -86,7 +86,7 @@ namespace sharp {
       vips_webpload_buffer(buffer, length, &image, "access", access, NULL);
     } else if (imageType == ImageType::TIFF) {
       vips_tiffload_buffer(buffer, length, &image, "access", access, NULL);
-#if (VIPS_MAJOR_VERSION >= 8 && VIPS_MINOR_VERSION >= 0)
+#if (VIPS_MAJOR_VERSION >= 8)
     } else if (imageType == ImageType::MAGICK) {
       vips_magickload_buffer(buffer, length, &image, "access", access, NULL);
 #endif
