@@ -34,6 +34,10 @@ extern "C" void init(Handle<Object> target) {
   NODE_SET_METHOD(target, "concurrency", concurrency);
   NODE_SET_METHOD(target, "counters", counters);
   NODE_SET_METHOD(target, "libvipsVersion", libvipsVersion);
+  NODE_SET_METHOD(target, "hasOpenslide", hasOpenslide);
+#ifdef HAVE_OPENSLIDE_3_4
+  NODE_SET_METHOD(target, "libopenslideVersion", libopenslideVersion);
+#endif
 }
 
 NODE_MODULE(sharp, init)

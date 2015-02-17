@@ -1,5 +1,8 @@
 #include <node.h>
 #include <vips/vips.h>
+#ifdef HAVE_OPENSLIDE_3_4
+#include <openslide.h>
+#endif
 
 #include "nan.h"
 
@@ -73,3 +76,28 @@ NAN_METHOD(libvipsVersion) {
   snprintf(version, 9, "%d.%d.%d", vips_version(0), vips_version(1), vips_version(2));
   NanReturnValue(NanNew<String>(version));
 }
+
+/*
+  Is openslide present?
+*/
+NAN_METHOD(hasOpenslide) {
+  NanScope();
+  bool hasOpenslide = false;
+#ifdef HAVE_OPENSLIDE_3_4
+  hasOpenslide = true;
+#endif
+  NanReturnValue(NanNew<Boolean>(hasOpenslide));
+}
+
+#ifdef HAVE_OPENSLIDE_3_4
+/*
+  Get openslide version
+*/
+NAN_METHOD(libopenslideVersion) {
+  NanScope();
+  char version[9];
+  //version = openslide_get_version();
+  snprintf(version, 9, "%s", openslide_get_version());
+  NanReturnValue(NanNew<String>(version));
+}
+#endif

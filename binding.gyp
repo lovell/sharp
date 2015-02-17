@@ -9,13 +9,19 @@
       'src/sharp.cc'
     ],
     'variables': {
-      'PKG_CONFIG_PATH': '<!(which brew >/dev/null 2>&1 && eval $(brew --env) && echo $PKG_CONFIG_LIBDIR || true):$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig'
+      'PKG_CONFIG_PATH': '<!(which brew >/dev/null 2>&1 && eval $(brew --env) && echo $PKG_CONFIG_LIBDIR || true):$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig',
+      'HAVE_OPENSLIDE': '<!(pkg-config --modversion openslide)'
     },
+    'conditions': [
+       ['HAVE_OPENSLIDE=="3.4.0"', {
+         'defines': [ 'HAVE_OPENSLIDE_3_4' ]
+       }]
+    ],
     'libraries': [
-      '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --libs vips)'
+      '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --libs vips openslide)'
     ],
     'include_dirs': [
-      '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --cflags vips glib-2.0)',
+      '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --cflags vips glib-2.0 openslide)',
       '<!(node -e "require(\'nan\')")'
     ],
     'cflags_cc': [

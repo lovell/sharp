@@ -10,6 +10,10 @@ var BluebirdPromise = require('bluebird');
 
 var sharp = require('./build/Release/sharp');
 var libvipsVersion = sharp.libvipsVersion();
+var hasOpenslide = sharp.hasOpenslide();
+
+if(hasOpenslide)
+    var libopenslideVersion = sharp.libopenslideVersion();
 
 var Sharp = function(input) {
   if (!(this instanceof Sharp)) {
@@ -634,3 +638,19 @@ module.exports.counters = function() {
 module.exports.libvipsVersion = function() {
   return libvipsVersion;
 };
+
+/*
+   Is openslide 3.4.0 installed?
+*/
+module.exports.hasOpenslide = function() {
+    return hasOpenslide;
+};
+
+if(hasOpenslide) {
+    /*
+      Get the version of the openslide library
+    */
+    module.exports.libopenslideVersion = function() {
+      return libopenslideVersion;
+    };
+}
