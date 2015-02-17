@@ -10,8 +10,30 @@
 #include "common.h"
 #include "resize.h"
 
-using namespace v8;
-using namespace sharp;
+using v8::Handle;
+using v8::Local;
+using v8::Value;
+using v8::Object;
+using v8::Integer;
+using v8::Uint32;
+using v8::String;
+using v8::Array;
+using v8::Function;
+using v8::Exception;
+
+using sharp::ImageType;
+using sharp::DetermineImageType;
+using sharp::InitImage;
+using sharp::InterpolatorWindowSize;
+using sharp::HasProfile;
+using sharp::HasAlpha;
+using sharp::ExifOrientation;
+using sharp::IsJpeg;
+using sharp::IsPng;
+using sharp::IsWebp;
+using sharp::IsTiff;
+using sharp::counterProcess;
+using sharp::counterQueue;
 
 enum class Canvas {
   CROP,
@@ -784,21 +806,21 @@ class ResizeWorker : public NanAsyncWorker {
       // Info Object
       Local<Object> info = NanNew<Object>();
       info->Set(NanNew<String>("format"), NanNew<String>(baton->outputFormat));
-      info->Set(NanNew<String>("width"), NanNew<Uint32>(width));
-      info->Set(NanNew<String>("height"), NanNew<Uint32>(height));
+      info->Set(NanNew<String>("width"), NanNew<Uint32>(static_cast<uint32_t>(width)));
+      info->Set(NanNew<String>("height"), NanNew<Uint32>(static_cast<uint32_t>(height)));
 
       if (baton->bufferOutLength > 0) {
         // Copy data to new Buffer
         argv[1] = NanNewBufferHandle(static_cast<char*>(baton->bufferOut), baton->bufferOutLength);
         g_free(baton->bufferOut);
         // Add buffer size to info
-        info->Set(NanNew<String>("size"), NanNew<Uint32>(baton->bufferOutLength));
+        info->Set(NanNew<String>("size"), NanNew<Uint32>(static_cast<uint32_t>(baton->bufferOutLength)));
         argv[2] = info;
       } else {
         // Add file size to info
         struct stat st;
         g_stat(baton->output.c_str(), &st);
-        info->Set(NanNew<String>("size"), NanNew<Uint32>(st.st_size));
+        info->Set(NanNew<String>("size"), NanNew<Uint32>(static_cast<uint32_t>(st.st_size))));
         argv[1] = info;
       }
     }
