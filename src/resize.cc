@@ -784,21 +784,21 @@ class ResizeWorker : public NanAsyncWorker {
       // Info Object
       Local<Object> info = NanNew<Object>();
       info->Set(NanNew<String>("format"), NanNew<String>(baton->outputFormat));
-      info->Set(NanNew<String>("width"), NanNew<Integer>(width));
-      info->Set(NanNew<String>("height"), NanNew<Integer>(height));
+      info->Set(NanNew<String>("width"), NanNew<Uint32>(width));
+      info->Set(NanNew<String>("height"), NanNew<Uint32>(height));
 
       if (baton->bufferOutLength > 0) {
         // Copy data to new Buffer
         argv[1] = NanNewBufferHandle(static_cast<char*>(baton->bufferOut), baton->bufferOutLength);
         g_free(baton->bufferOut);
         // Add buffer size to info
-        info->Set(NanNew<String>("size"), NanNew<Integer>(baton->bufferOutLength));
+        info->Set(NanNew<String>("size"), NanNew<Uint32>(baton->bufferOutLength));
         argv[2] = info;
       } else {
         // Add file size to info
         struct stat st;
         g_stat(baton->output.c_str(), &st);
-        info->Set(NanNew<String>("size"), NanNew<Integer>(st.st_size));
+        info->Set(NanNew<String>("size"), NanNew<Uint32>(st.st_size));
         argv[1] = info;
       }
     }
