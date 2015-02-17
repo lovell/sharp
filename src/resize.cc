@@ -32,6 +32,7 @@ using sharp::IsJpeg;
 using sharp::IsPng;
 using sharp::IsWebp;
 using sharp::IsTiff;
+using sharp::IsDzi;
 using sharp::counterProcess;
 using sharp::counterQueue;
 
