@@ -767,6 +767,7 @@ class ResizeWorker : public NanAsyncWorker {
             "tile_size", baton->tileSize, "overlap", baton->tileOverlap, NULL)) {
           return Error(baton, hook);
         }
+        baton->outputFormat = "dzi";
       }
 #endif
 	  else {
