@@ -12,6 +12,7 @@ The typical use case for this high speed Node.js module is to convert large imag
 
 This module supports reading and writing JPEG, PNG and WebP images to and from Streams, Buffer objects and the filesystem.
 It also supports reading images of many other types from the filesystem via libmagick++ or libgraphicsmagick++ if present.
+Finally, it supports writing [OpenSlide](http://openslide.org/) images with the full list of supported images on their website.
 Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
 
 Only small regions of uncompressed image data are held in memory and processed at a time, taking full advantage of multiple CPU cores and L1/L2/L3 cache. Resizing an image is typically 4x faster than using the quickest ImageMagick and GraphicsMagick settings.
@@ -71,6 +72,9 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 	brew link gettext --force
 
+### Openslide tips
+If you want to enable OpenSlide support, you need to initially install the openslide libraries and then recompile vips, so that openslide support is enabled.
+
 ### Heroku
 
 [Alessandro Tagliapietra](https://github.com/alex88) maintains an [Heroku buildpack for libvips](https://github.com/alex88/heroku-buildpack-vips) and its dependencies.
@@ -84,6 +88,8 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 ### gulp.js
 
 [Eugeny Vlasenko](https://github.com/mahnunchik) maintains [gulp-responsive](https://www.npmjs.org/package/gulp-responsive) and [Mohammad Prabowo](https://github.com/rizalp) maintains [gulp-sharp](https://www.npmjs.org/package/gulp-sharp).
+
+
 
 ## Usage examples
 
