@@ -108,7 +108,6 @@ namespace sharp {
 
     return imageType;
   }
-
   /*
     Initialise and return a VipsImage from a file.
   */
