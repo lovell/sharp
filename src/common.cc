@@ -96,11 +96,11 @@ namespace sharp {
       imageType = ImageType::WEBP;
     }
 #ifdef HAVE_OPENSLIDE_3_4
-	else if (vips_foreign_is_a("openslideload", file)) {
-		imageType = ImageType::OPENSLIDE;
-	}
+    else if (vips_foreign_is_a("openslideload", file)) {
+      imageType = ImageType::OPENSLIDE;
+    }
 #endif
-	else if (vips_foreign_is_a("tiffload", file)) {
+    else if (vips_foreign_is_a("tiffload", file)) {
       imageType = ImageType::TIFF;
     } else if(vips_foreign_is_a("magickload", file)) {
       imageType = ImageType::MAGICK;
