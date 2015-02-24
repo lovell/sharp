@@ -11,7 +11,7 @@ namespace sharp {
     TIFF,
     MAGICK
 #ifdef HAVE_OPENSLIDE_3_4
-	, OPENSLIDE,
+    , OPENSLIDE,
     DZI
 #endif
   };

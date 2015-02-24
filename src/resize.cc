@@ -122,10 +122,10 @@ struct ResizeBaton {
     withoutAdaptiveFiltering(false),
     withMetadata(false)
  #ifdef HAVE_OPENSLIDE_3_4
-	,tileSize(256),
+    ,tileSize(256),
     tileOverlap(0)
 #endif
-	{
+{
       background[0] = 0.0;
       background[1] = 0.0;
       background[2] = 0.0;
