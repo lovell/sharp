@@ -10,21 +10,24 @@
     ],
     'variables': {
       'PKG_CONFIG_PATH': '<!(which brew >/dev/null 2>&1 && eval $(brew --env) && echo $PKG_CONFIG_LIBDIR || true):$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig',
-      'HAS_OPENSLIDE%': '<!(./has_openslide.sh)'
+      'HAS_OPENSLIDE': '<!(./has_openslide.sh)'
     },
     'conditions': [
        ['HAS_OPENSLIDE=="true"', {
-         'defines': [ 'HAS_OPENSLIDE' ],
-         'libraries': [ '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --libs openslide)' ],
-         'include_dirs': [ '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --cflags openslide)' ]
-       }]
-    ],
-    'libraries': [
-      '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --libs vips)'
-    ],
-    'include_dirs': [
-      '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --cflags vips glib-2.0)',
-      '<!(node -e "require(\'nan\')")'
+        'defines': [ 'HAS_OPENSLIDE' ],
+        'libraries': [ '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --libs vips openslide)' ],
+        'include_dirs': [ 
+          '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --cflags vips glib-2.0 openslide)',
+          '<!(node -e "require(\'nan\')")'
+        ]
+       }, { # HASOPENSLIDE != true
+            'libraries': [ '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --libs vips)' ],
+            'include_dirs': [
+              '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --cflags vips glib-2.0)',
+              '<!(node -e "require(\'nan\')")'
+            ]
+          }
+      ],
     ],
     'cflags_cc': [
       '-std=c++0x',

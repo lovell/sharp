@@ -8,7 +8,7 @@ NAN_METHOD(concurrency);
 NAN_METHOD(counters);
 NAN_METHOD(libvipsVersion);
 NAN_METHOD(hasOpenslide);
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
 NAN_METHOD(libopenslideVersion);
 #endif
 

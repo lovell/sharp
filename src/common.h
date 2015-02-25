@@ -10,7 +10,7 @@ namespace sharp {
     WEBP,
     TIFF,
     MAGICK
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
     , OPENSLIDE,
     DZI
 #endif
@@ -27,7 +27,7 @@ namespace sharp {
   bool IsPng(std::string const &str);
   bool IsWebp(std::string const &str);
   bool IsTiff(std::string const &str);
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
   bool IsDzi(std::string const &str);
 #endif
 
