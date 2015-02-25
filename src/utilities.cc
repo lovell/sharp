@@ -1,6 +1,6 @@
 #include <node.h>
 #include <vips/vips.h>
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
 #include <openslide.h>
 #endif
 
@@ -82,14 +82,14 @@ NAN_METHOD(libvipsVersion) {
 */
 NAN_METHOD(hasOpenslide) {
   NanScope();
-  bool hasOpenslide = false;
-#ifdef HAVE_OPENSLIDE_3_4
-  hasOpenslide = true;
+  bool bHasOpenslide = false;
+#ifdef HAS_OPENSLIDE
+  bHasOpenslide = true;
 #endif
-  NanReturnValue(NanNew<Boolean>(hasOpenslide));
+  NanReturnValue(NanNew<Boolean>(bHasOpenslide));
 }
 
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
 /*
   Get openslide version
 */

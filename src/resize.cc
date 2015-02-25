@@ -32,7 +32,9 @@ using sharp::IsJpeg;
 using sharp::IsPng;
 using sharp::IsWebp;
 using sharp::IsTiff;
+#ifdef HAS_OPENSLIDE
 using sharp::IsDzi;
+#endif
 using sharp::counterProcess;
 using sharp::counterQueue;
 
@@ -92,7 +94,7 @@ struct ResizeBaton {
   bool withoutAdaptiveFiltering;
   std::string err;
   bool withMetadata;
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
   int tileSize;
   int tileOverlap;
 #endif
@@ -121,7 +123,7 @@ struct ResizeBaton {
     compressionLevel(6),
     withoutAdaptiveFiltering(false),
     withMetadata(false)
- #ifdef HAVE_OPENSLIDE_3_4
+ #ifdef HAS_OPENSLIDE
     ,tileSize(256),
     tileOverlap(0)
 #endif
@@ -712,11 +714,11 @@ class ResizeWorker : public NanAsyncWorker {
       bool outputPng = IsPng(baton->output);
       bool outputWebp = IsWebp(baton->output);
       bool outputTiff = IsTiff(baton->output);
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
       bool outputDzi = IsDzi(baton->output);
 #endif
       bool matchInput = !(outputJpeg || outputPng || outputWebp || outputTiff
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
 			  || outputDzi
 #endif
 			  );
@@ -759,7 +761,7 @@ class ResizeWorker : public NanAsyncWorker {
         }
         baton->outputFormat = "tiff";
       }
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
       else if (outputDzi || matchInput) {
 		// Write DZI to file
         std::string filename_no_extension = baton->output.substr(0, baton->output.length() - 4);
@@ -990,7 +992,7 @@ NAN_METHOD(resize) {
   baton->withoutAdaptiveFiltering = options->Get(NanNew<String>("withoutAdaptiveFiltering"))->BooleanValue();
   baton->withMetadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
   // Output filename or __format for Buffer
- #ifdef HAVE_OPENSLIDE_3_4
+ #ifdef HAS_OPENSLIDE
   baton->tileSize = options->Get(NanNew<String>("tileSize"))->Int32Value();
   baton->tileOverlap = options->Get(NanNew<String>("tileOverlap"))->Int32Value();
 #endif

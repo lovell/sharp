@@ -508,64 +508,66 @@ describe('Input/output', function() {
     });
   }
 
-  if (semver.gte(sharp.libopenslideVersion(), '3.4.0')) {
-    describe('Openslide output [openslide ' + sharp.libopenslideVersion() + '>=3.4.0]', function() {
-        it('Aperio - convert SVS to PNG', function(done) {
-        sharp(fixtures.inputSvs)
-          .toFile(fixtures.path('output.svs.png'), function(err, info) {
-            if (err) throw err;
-            assert.strictEqual(true, info.size > 0);
-            assert.strictEqual('png', info.format);
-            assert.strictEqual(2220, info.width);
-            assert.strictEqual(2967, info.height);
-            done();
+  if (sharp.hasOpenslide()) {
+    if (semver.gte(sharp.libopenslideVersion(), '3.4.0')) {
+      describe('Openslide output [openslide ' + sharp.libopenslideVersion() + '>=3.4.0]', function() {
+          it('Aperio - convert SVS to PNG', function(done) {
+          sharp(fixtures.inputSvs)
+            .toFile(fixtures.path('output.svs.png'), function(err, info) {
+              if (err) throw err;
+              assert.strictEqual(true, info.size > 0);
+              assert.strictEqual('png', info.format);
+              assert.strictEqual(2220, info.width);
+              assert.strictEqual(2967, info.height);
+              done();
+            });
           });
-        });
-        it('Aperio - convert SVS to JPEG', function(done) {
-        sharp(fixtures.inputSvs)
-          .toFile(fixtures.path('output.svs.jpeg'), function(err, info) {
-            if (err) throw err;
-            assert.strictEqual(true, info.size > 0);
-            assert.strictEqual('jpeg', info.format);
-            assert.strictEqual(2220, info.width);
-            assert.strictEqual(2967, info.height);
-            done();
+          it('Aperio - convert SVS to JPEG', function(done) {
+          sharp(fixtures.inputSvs)
+            .toFile(fixtures.path('output.svs.jpeg'), function(err, info) {
+              if (err) throw err;
+              assert.strictEqual(true, info.size > 0);
+              assert.strictEqual('jpeg', info.format);
+              assert.strictEqual(2220, info.width);
+              assert.strictEqual(2967, info.height);
+              done();
+            });
           });
-        });
-        it('Aperio - convert SVS to TIFF', function(done) {
-        sharp(fixtures.inputSvs)
-          .toFile(fixtures.path('output.svs.tiff'), function(err, info) {
-            if (err) throw err;
-            assert.strictEqual(true, info.size > 0);
-            assert.strictEqual('tiff', info.format);
-            assert.strictEqual(2220, info.width);
-            assert.strictEqual(2967, info.height);
-            done();
+          it('Aperio - convert SVS to TIFF', function(done) {
+          sharp(fixtures.inputSvs)
+            .toFile(fixtures.path('output.svs.tiff'), function(err, info) {
+              if (err) throw err;
+              assert.strictEqual(true, info.size > 0);
+              assert.strictEqual('tiff', info.format);
+              assert.strictEqual(2220, info.width);
+              assert.strictEqual(2967, info.height);
+              done();
+            });
           });
-        });
-        it('Aperio - convert SVS to WEBP', function(done) {
-        sharp(fixtures.inputSvs)
-          .toFile(fixtures.path('output.svs.webp'), function(err, info) {
-            if (err) throw err;
-            assert.strictEqual(true, info.size > 0);
-            assert.strictEqual('webp', info.format);
-            assert.strictEqual(2220, info.width);
-            assert.strictEqual(2967, info.height);
-            done();
+          it('Aperio - convert SVS to WEBP', function(done) {
+          sharp(fixtures.inputSvs)
+            .toFile(fixtures.path('output.svs.webp'), function(err, info) {
+              if (err) throw err;
+              assert.strictEqual(true, info.size > 0);
+              assert.strictEqual('webp', info.format);
+              assert.strictEqual(2220, info.width);
+              assert.strictEqual(2967, info.height);
+              done();
+            });
           });
-        });
-        it('Aperio - convert SVS to DZI', function(done) {
-        sharp(fixtures.inputSvs)
-          .toFile(fixtures.path('output.dzi'), function(err, info) {
-            if (err) throw err;
-            console.log(info);
-            assert.strictEqual(true, info.size > 0);
-            assert.strictEqual('dzi', info.format);
-            assert.strictEqual(2220, info.width);
-            assert.strictEqual(2967, info.height);
-            done();
+          it('Aperio - convert SVS to DZI', function(done) {
+          sharp(fixtures.inputSvs)
+            .toFile(fixtures.path('output.dzi'), function(err, info) {
+              if (err) throw err;
+              console.log(info);
+              assert.strictEqual(true, info.size > 0);
+              assert.strictEqual('dzi', info.format);
+              assert.strictEqual(2220, info.width);
+              assert.strictEqual(2967, info.height);
+              done();
+            });
           });
-        });
-    });
+      });
+    }
   }
 });

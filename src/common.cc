@@ -28,7 +28,7 @@ namespace sharp {
   bool IsTiff(std::string const &str) {
     return EndsWith(str, ".tif") || EndsWith(str, ".tiff") || EndsWith(str, ".TIF") || EndsWith(str, ".TIFF");
   }
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
   bool IsDzi(std::string const &str) {
     return EndsWith(str, ".dzi") || EndsWith(str, ".DZI");
   }
@@ -95,7 +95,7 @@ namespace sharp {
     } else if (vips_foreign_is_a("webpload", file)) {
       imageType = ImageType::WEBP;
     }
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
     else if (vips_foreign_is_a("openslideload", file)) {
       imageType = ImageType::OPENSLIDE;
     }
@@ -121,7 +121,7 @@ namespace sharp {
     } else if (imageType == ImageType::WEBP) {
       vips_webpload(file, &image, "access", access, NULL);
     }
-#ifdef HAVE_OPENSLIDE_3_4
+#ifdef HAS_OPENSLIDE
 	else if (imageType == ImageType::OPENSLIDE) {
 		vips_openslideload(file, &image, "access", access, NULL);
 	}
