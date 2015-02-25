@@ -443,7 +443,7 @@ An advanced setting to disable adaptive row filtering for the lossless PNG outpu
 #### tileSize(tileSize)
 Setting the tile_size when DZI output format is selected. Default is 256.
 
-#### overlap(overlap)
+#### tileOverlap(tileOverlap)
 Setting the overlap when DZI output format is selected. Default is 0.
 
 ### Output methods
