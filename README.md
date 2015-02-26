@@ -233,7 +233,7 @@ An Object containing nested boolean values
 representing the available input and output formats/methods,
 for example:
 
-```json
+```javascript
 { jpeg: { id: 'jpeg',
     input: { file: true, buffer: true, stream: true },
     output: { file: true, buffer: true, stream: true } },
