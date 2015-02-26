@@ -90,7 +90,7 @@ case $(uname -s) in
         jessie|vivid)
           # Debian 8, Ubuntu 15
           echo "Installing libvips via apt-get"
-          apt-get install -y libvips-dev
+          apt-get install -y libvips-dev libgsf-1-dev
           ;;
         trusty|utopic|qiana|rebecca)
           # Ubuntu 14, Mint 17
