@@ -21,7 +21,7 @@ install_libvips_from_source() {
   curl -O http://www.vips.ecs.soton.ac.uk/supported/$vips_version_latest_major_minor/vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   tar zvxf vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   cd vips-$vips_version_latest_major_minor.$vips_version_latest_patch
-  ./configure --enable-debug=no --enable-docs=no --enable-cxx=yes --without-python --without-orc --without-fftw --without-gsf $1
+  ./configure --enable-debug=no --enable-docs=no --enable-cxx=yes --without-python --without-orc --without-fftw $1
   make
   make install
   cd ..
@@ -95,7 +95,7 @@ case $(uname -s) in
         trusty|utopic|qiana|rebecca)
           # Ubuntu 14, Mint 17
           echo "Installing libvips dependencies via apt-get"
-          apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
+          apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
           install_libvips_from_source
           ;;
         precise|wheezy|maya)
@@ -103,7 +103,7 @@ case $(uname -s) in
           echo "Installing libvips dependencies via apt-get"
           add-apt-repository -y ppa:lyrasis/precise-backports
           apt-get update
-          apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff4-dev libexif-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
+          apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff4-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
           install_libvips_from_source
           ;;
         *)
@@ -120,14 +120,14 @@ case $(uname -s) in
           # RHEL/CentOS 7
           echo "Installing libvips dependencies via yum"
           yum groupinstall -y "Development Tools"
-          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
           install_libvips_from_source "--prefix=/usr"
           ;;
         "Red Hat Enterprise Linux release 6."*|"CentOS release 6."*|"Scientific Linux release 6."*)
           # RHEL/CentOS 6
           echo "Installing libvips dependencies via yum"
           yum groupinstall -y "Development Tools"
-          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel curl
+          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel curl
           yum install -y http://li.nux.ro/download/nux/dextop/el6/x86_64/nux-dextop-release-0-2.el6.nux.noarch.rpm
           yum install -y --enablerepo=nux-dextop gobject-introspection-devel
           yum install -y http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
@@ -153,7 +153,7 @@ case $(uname -s) in
           echo "Detected '$RELEASE'"
           echo "Installing libvips dependencies via yum"
           yum groupinstall -y "Development Tools"
-          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
           install_libvips_from_source "--prefix=/usr"
           ;;
       esac
