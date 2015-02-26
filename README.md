@@ -218,7 +218,41 @@ sharp(inputBuffer)
   });
 ```
 
+```javascript
+// Runtime discovery of available formats
+console.dir(sharp.format);
+```
+
 ## API
+
+### Attributes
+
+#### format
+
+An Object containing nested boolean values
+representing the available input and output formats/methods,
+for example:
+
+```json
+{ jpeg: { id: 'jpeg',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: true, buffer: true, stream: true } },
+  png: { id: 'png',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: true, buffer: true, stream: true } },
+  webp: { id: 'webp',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: true, buffer: true, stream: true } },
+  tiff: { id: 'tiff',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: true, buffer: false, stream: false } },
+  magick: { id: 'magick',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: false, buffer: false, stream: false } },
+  raw: { id: 'raw',
+    input: { file: false, buffer: false, stream: false },
+    output: { file: false, buffer: true, stream: true } } }
+```
 
 ### Input methods
 
@@ -235,7 +269,7 @@ JPEG, PNG, WebP, GIF* or TIFF format image data can be streamed into the object 
 
 JPEG, PNG or WebP format image data can be streamed out from this object.
 
-\* GIF support requires libvips 8.0.0+.
+\* libvips 8.0.0+ is required for Buffer/Stream input of GIF and other `magick` formats.
 
 #### metadata([callback])
 

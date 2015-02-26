@@ -101,6 +101,11 @@ module.exports = Sharp;
 util.inherits(Sharp, stream.Duplex);
 
 /*
+  Supported image formats
+*/
+module.exports.format = sharp.format();
+
+/*
   Handle incoming chunk on Writable Stream
 */
 Sharp.prototype._write = function(chunk, encoding, callback) {
@@ -481,7 +486,8 @@ Sharp.prototype.webp = function() {
   Force raw, uint8 output
 */
 Sharp.prototype.raw = function() {
-  if (semver.gte(libvipsVersion, '7.42.0')) {
+  var supportsRawOutput = module.exports.format.raw.output;
+  if (supportsRawOutput.file || supportsRawOutput.buffer || supportsRawOutput.stream) {
     this.options.output = '__raw';
   } else {
     console.error('Raw output requires libvips 7.42.0+');
@@ -491,15 +497,15 @@ Sharp.prototype.raw = function() {
 
 /*
   Force output to a given format
+  @param format is either the id as a String or an Object with an 'id' attribute
 */
-module.exports.format = {'jpeg': 'jpeg', 'png': 'png', 'webp': 'webp', 'raw': 'raw'};
 Sharp.prototype.toFormat = function(format) {
-  if (
-    typeof format === 'string' &&
-    typeof module.exports.format[format] === 'string' &&
-    typeof this[format] === 'function'
-  ) {
-    this[format]();
+  var id = format;
+  if (typeof format === 'object') {
+    id = format.id;
+  }
+  if (typeof id === 'string' && typeof module.exports.format[id] === 'object' && typeof this[id] === 'function') {
+    this[id]();
   } else {
     throw new Error('Unsupported format ' + format);
   }

@@ -10,6 +10,7 @@ using v8::Local;
 using v8::Object;
 using v8::Number;
 using v8::String;
+using v8::Boolean;
 
 using sharp::counterQueue;
 using sharp::counterProcess;
@@ -77,4 +78,67 @@ NAN_METHOD(libvipsVersion) {
   char version[9];
   snprintf(version, sizeof(version), "%d.%d.%d", vips_version(0), vips_version(1), vips_version(2));
   NanReturnValue(NanNew<String>(version));
+}
+
+/*
+  Get available input/output file/buffer/stream formats
+*/
+NAN_METHOD(format) {
+  NanScope();
+
+  // Attribute names
+  Local<String> attrId =  NanNew<String>("id");
+  Local<String> attrInput =  NanNew<String>("input");
+  Local<String> attrOutput =  NanNew<String>("output");
+  Local<String> attrFile =  NanNew<String>("file");
+  Local<String> attrBuffer =  NanNew<String>("buffer");
+  Local<String> attrStream =  NanNew<String>("stream");
+
+  // Which load/save operations are available for each compressed format?
+  Local<Object> format = NanNew<Object>();
+  for (std::string f : {"jpeg", "png", "webp", "tiff", "magick", "openslide", "dz"}) {
+    // Input
+    Local<Object> input = NanNew<Object>();
+    input->Set(attrFile, NanNew<Boolean>(
+      vips_type_find("VipsOperation", (f + "load").c_str())));
+    input->Set(attrBuffer, NanNew<Boolean>(
+      vips_type_find("VipsOperation", (f + "load_buffer").c_str())));
+    input->Set(attrStream, input->Get(attrBuffer));
+    // Output
+    Local<Object> output = NanNew<Object>();
+    output->Set(attrFile, NanNew<Boolean>(
+      vips_type_find("VipsOperation", (f + "save").c_str())));
+    output->Set(attrBuffer, NanNew<Boolean>(
+      vips_type_find("VipsOperation", (f + "save_buffer").c_str())));
+    output->Set(attrStream, output->Get(attrBuffer));
+    // Other attributes
+    Local<Object> container = NanNew<Object>();
+    Local<String> formatId = NanNew<String>(f);
+    container->Set(attrId, formatId);
+    container->Set(attrInput, input);
+    container->Set(attrOutput, output);
+    // Add to set of formats
+    format->Set(formatId, container);
+  }
+
+  // Raw, uncompressed data
+  Local<Object> raw = NanNew<Object>();
+  raw->Set(attrId, NanNew<String>("raw"));
+  format->Set(NanNew<String>("raw"), raw);
+  // No support for raw input yet, so always false
+  Local<Boolean> unsupported = NanNew<Boolean>(false);
+  Local<Object> rawInput = NanNew<Object>();
+  rawInput->Set(attrFile, unsupported);
+  rawInput->Set(attrBuffer, unsupported);
+  rawInput->Set(attrStream, unsupported);
+  raw->Set(attrInput, rawInput);
+  // Raw output via Buffer/Stream is available in libvips >= 7.42.0
+  Local<Boolean> supportsRawOutput = NanNew<Boolean>(vips_version(0) >= 8 || (vips_version(0) == 7 && vips_version(1) >= 42));
+  Local<Object> rawOutput = NanNew<Object>();
+  rawOutput->Set(attrFile, unsupported);
+  rawOutput->Set(attrBuffer, supportsRawOutput);
+  rawOutput->Set(attrStream, supportsRawOutput);
+  raw->Set(attrOutput, rawOutput);
+
+  NanReturnValue(format);
 }

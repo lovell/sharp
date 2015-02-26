@@ -23,6 +23,7 @@ extern "C" void init(v8::Handle<v8::Object> target) {
   NODE_SET_METHOD(target, "concurrency", concurrency);
   NODE_SET_METHOD(target, "counters", counters);
   NODE_SET_METHOD(target, "libvipsVersion", libvipsVersion);
+  NODE_SET_METHOD(target, "format", format);
 }
 
 NODE_MODULE(sharp, init)

@@ -488,39 +488,43 @@ describe('Input/output', function() {
       });
   });
 
-  it('Convert SVG, if supported, to PNG', function(done) {
-    sharp(fixtures.inputSvg)
-      .resize(100, 100)
-      .toFormat('png')
-      .toFile(fixtures.path('output.svg.png'), function(err, info) {
-        if (err) {
-          assert.strictEqual('Input file is of an unsupported image format', err.message);
-        } else {
+  if (sharp.format.magick.input.file) {
+    it('Convert SVG, if supported, to PNG', function(done) {
+      sharp(fixtures.inputSvg)
+        .resize(100, 100)
+        .toFormat('png')
+        .toFile(fixtures.path('output.svg.png'), function(err, info) {
+          if (err) {
+            assert.strictEqual('Input file is of an unsupported image format', err.message);
+          } else {
+            assert.strictEqual(true, info.size > 0);
+            assert.strictEqual('png', info.format);
+            assert.strictEqual(100, info.width);
+            assert.strictEqual(100, info.height);
+          }
+          done();
+        });
+    });
+  }
+
+  if (sharp.format.magick.input.file) {
+    it('Convert PSD to PNG', function(done) {
+      sharp(fixtures.inputPsd)
+        .resize(320, 240)
+        .toFormat(sharp.format.png)
+        .toFile(fixtures.path('output.psd.png'), function(err, info) {
+          if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('png', info.format);
-          assert.strictEqual(100, info.width);
-          assert.strictEqual(100, info.height);
-        }
-        done();
-      });
-  });
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(240, info.height);
+          done();
+        });
+    });
+  }
 
-  it('Convert PSD to PNG', function(done) {
-    sharp(fixtures.inputPsd)
-      .resize(320, 240)
-      .toFormat(sharp.format.png)
-      .toFile(fixtures.path('output.psd.png'), function(err, info) {
-        if (err) throw err;
-        assert.strictEqual(true, info.size > 0);
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
-  });
-
-  if (semver.gte(sharp.libvipsVersion(), '7.40.0')) {
-    it('Load TIFF from Buffer [libvips ' + sharp.libvipsVersion() + '>=7.40.0]', function(done) {
+  if (sharp.format.tiff.input.buffer) {
+    it('Load TIFF from Buffer', function(done) {
       var inputTiffBuffer = fs.readFileSync(fixtures.inputTiff);
       sharp(inputTiffBuffer)
         .resize(320, 240)
@@ -537,8 +541,8 @@ describe('Input/output', function() {
     });
   }
 
-  if (semver.gte(sharp.libvipsVersion(), '8.0.0')) {
-    it('Load GIF from Buffer [libvips ' + sharp.libvipsVersion() + '>=8.0.0]', function(done) {
+  if (sharp.format.magick.input.buffer) {
+    it('Load GIF from Buffer', function(done) {
       var inputGifBuffer = fs.readFileSync(fixtures.inputGif);
       sharp(inputGifBuffer)
         .resize(320, 240)
@@ -555,8 +559,8 @@ describe('Input/output', function() {
     });
   }
 
-  if (semver.gte(sharp.libvipsVersion(), '7.42.0')) {
-    describe('Ouput raw, uncompressed image data [libvips ' + sharp.libvipsVersion() + '>=7.42.0]', function() {
+  if (sharp.format.raw.output.buffer) {
+    describe('Ouput raw, uncompressed image data', function() {
       it('1 channel greyscale image', function(done) {
         sharp(fixtures.inputJpg)
           .greyscale()

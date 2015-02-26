@@ -50,4 +50,25 @@ describe('Utilities', function() {
     });
   });
 
+  describe('Format', function() {
+    it('Contains expected attributes', function() {
+      assert.strictEqual('object', typeof sharp.format);
+      Object.keys(sharp.format).forEach(function(format) {
+        assert.strictEqual(true, 'id' in sharp.format[format]);
+        assert.strictEqual(format, sharp.format[format].id);
+        ['input', 'output'].forEach(function(direction) {
+          assert.strictEqual(true, direction in sharp.format[format]);
+          assert.strictEqual('object', typeof sharp.format[format][direction]);
+          assert.strictEqual(3, Object.keys(sharp.format[format][direction]).length);
+          assert.strictEqual(true, 'file' in sharp.format[format][direction]);
+          assert.strictEqual(true, 'buffer' in sharp.format[format][direction]);
+          assert.strictEqual(true, 'stream' in sharp.format[format][direction]);
+          assert.strictEqual('boolean', typeof sharp.format[format][direction].file);
+          assert.strictEqual('boolean', typeof sharp.format[format][direction].buffer);
+          assert.strictEqual('boolean', typeof sharp.format[format][direction].stream);
+        });
+      });
+    });
+  });
+
 });
