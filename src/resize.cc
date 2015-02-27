@@ -248,7 +248,7 @@ class ResizeWorker : public NanAsyncWorker {
     int interpolatorWindowSize = InterpolatorWindowSize(baton->interpolator.c_str());
 
     // Scaling calculations
-    double factor;
+    double factor = 1.0;
     if (baton->width > 0 && baton->height > 0) {
       // Fixed width and height
       double xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
@@ -287,7 +287,6 @@ class ResizeWorker : public NanAsyncWorker {
       baton->width = floor(static_cast<double>(inputWidth) / factor);
     } else {
       // Identity transform
-      factor = 1;
       baton->width = inputWidth;
       baton->height = inputHeight;
     }

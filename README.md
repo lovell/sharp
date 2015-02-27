@@ -31,8 +31,9 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 
 ### Prerequisites
 
-* Node.js v0.10+
+* Node.js v0.10+ or io.js
 * [libvips](https://github.com/jcupitt/libvips) v7.40.0+ (7.42.0+ recommended)
+* C++11 compatible compiler such as gcc 4.6+ or clang 3.0+
 
 To install the most suitable version of libvips on the following Operating Systems:
 
@@ -328,13 +329,23 @@ Possible values are `north`, `east`, `south`, `west`, `center` and `centre`. The
 
 #### max()
 
-Preserving aspect ratio, resize the image to the maximum `width` or `height` specified.
+Preserving aspect ratio,
+resize the image to be as large as possible
+while ensuring its dimensions are less than or equal to
+the `width` and `height` specified.
+
+This is equivalent to using the `contain` value of the CSS `background-size` property.
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
 #### min()
 
-Preserving aspect ratio, resize the image to the minimum `width` or `height` specified.
+Preserving aspect ratio,
+resize the image to be as small as possible
+while ensuring its dimensions are greater than or equal to
+the `width` and `height` specified.
+
+This is equivalent to using the `cover` value of the CSS `background-size` property.
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
