@@ -37,8 +37,9 @@ using sharp::counterQueue;
 
 enum class Canvas {
   CROP,
+  EMBED,
   MAX,
-  EMBED
+  MIN
 };
 
 enum class Angle {
@@ -252,14 +253,29 @@ class ResizeWorker : public NanAsyncWorker {
       // Fixed width and height
       double xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
       double yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
-      factor = (baton->canvas == Canvas::CROP) ? std::min(xfactor, yfactor) : std::max(xfactor, yfactor);
-      // if max is set, we need to compute the real size of the thumb image
-      if (baton->canvas == Canvas::MAX) {
-        if (xfactor > yfactor) {
-          baton->height = round(static_cast<double>(inputHeight) / xfactor);
-        } else {
-          baton->width = round(static_cast<double>(inputWidth) / yfactor);
-        }
+      switch (baton->canvas) {
+        case Canvas::CROP:
+          factor = std::min(xfactor, yfactor);
+          break;
+        case Canvas::EMBED:
+          factor = std::max(xfactor, yfactor);
+          break;
+        case Canvas::MAX:
+          factor = std::max(xfactor, yfactor);
+          if (xfactor > yfactor) {
+            baton->height = round(static_cast<double>(inputHeight) / xfactor);
+          } else {
+            baton->width = round(static_cast<double>(inputWidth) / yfactor);
+          }
+          break;
+        case Canvas::MIN:
+          factor = std::min(xfactor, yfactor);
+          if (xfactor < yfactor) {
+            baton->height = round(static_cast<double>(inputHeight) / xfactor);
+          } else {
+            baton->width = round(static_cast<double>(inputWidth) / yfactor);
+          }
+          break;
       }
     } else if (baton->width > 0) {
       // Fixed width, auto height
@@ -549,7 +565,7 @@ class ResizeWorker : public NanAsyncWorker {
         vips_object_local(hook, embedded);
         image = embedded;
       } else {
-        // Crop/max
+        // Crop/max/min
         int left;
         int top;
         std::tie(left, top) = CalculateCrop(image->Xsize, image->Ysize, baton->width, baton->height, baton->gravity);
@@ -963,12 +979,14 @@ NAN_METHOD(resize) {
   baton->height = options->Get(NanNew<String>("height"))->Int32Value();
   // Canvas option
   Local<String> canvas = options->Get(NanNew<String>("canvas"))->ToString();
-  if (canvas->Equals(NanNew<String>("c"))) {
+  if (canvas->Equals(NanNew<String>("crop"))) {
     baton->canvas = Canvas::CROP;
-  } else if (canvas->Equals(NanNew<String>("m"))) {
-    baton->canvas = Canvas::MAX;
-  } else if (canvas->Equals(NanNew<String>("e"))) {
+  } else if (canvas->Equals(NanNew<String>("embed"))) {
     baton->canvas = Canvas::EMBED;
+  } else if (canvas->Equals(NanNew<String>("max"))) {
+    baton->canvas = Canvas::MAX;
+  } else if (canvas->Equals(NanNew<String>("min"))) {
+    baton->canvas = Canvas::MIN;
   }
   // Background colour
   Local<Array> background = Local<Array>::Cast(options->Get(NanNew<String>("background")));
