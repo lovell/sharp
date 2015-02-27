@@ -41,7 +41,7 @@ var Sharp = function(input) {
     heightPost: -1,
     width: -1,
     height: -1,
-    canvas: 'c',
+    canvas: 'crop',
     gravity: 0,
     angle: 0,
     rotateBeforePreExtract: false,
@@ -136,7 +136,7 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
 module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4};
 
 Sharp.prototype.crop = function(gravity) {
-  this.options.canvas = 'c';
+  this.options.canvas = 'crop';
   if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 4) {
     this.options.gravity = gravity;
   } else {
@@ -176,12 +176,17 @@ Sharp.prototype.background = function(rgba) {
 };
 
 Sharp.prototype.embed = function() {
-  this.options.canvas = 'e';
+  this.options.canvas = 'embed';
   return this;
 };
 
 Sharp.prototype.max = function() {
-  this.options.canvas = 'm';
+  this.options.canvas = 'max';
+  return this;
+};
+
+Sharp.prototype.min = function() {
+  this.options.canvas = 'min';
   return this;
 };
 

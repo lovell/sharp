@@ -185,6 +185,39 @@ describe('Resize dimensions', function() {
     });
   });
 
+  it('Min width or height considering ratio (landscape)', function(done) {
+    sharp(fixtures.inputJpg).resize(320, 320).min().toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
+      assert.strictEqual(392, info.width);
+      assert.strictEqual(320, info.height);
+      done();
+    });
+  });
+
+  it('Min width or height considering ratio (portrait)', function(done) {
+    sharp(fixtures.inputTiff).resize(320, 320).min().jpeg().toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(422, info.height);
+      done();
+    });
+  });
+
+  it('Provide only one dimension with min, should default to crop', function(done) {
+    sharp(fixtures.inputJpg).resize(320).min().toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(261, info.height);
+      done();
+    });
+  });
+
   it('Do not enlarge when input width is already less than output width', function(done) {
     sharp(fixtures.inputJpg)
       .resize(2800)

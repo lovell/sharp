@@ -332,6 +332,12 @@ Preserving aspect ratio, resize the image to the maximum `width` or `height` spe
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
+#### min()
+
+Preserving aspect ratio, resize the image to the minimum `width` or `height` specified.
+
+Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
+
 #### background(rgba)
 
 Set the background for the `embed` and `flatten` operations.
