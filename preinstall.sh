@@ -51,7 +51,7 @@ install_libopenslide_from_source() {
 }
 
 sorry() {
-  echo "Sorry, I don't yet know how to install libvips on $1"
+  echo "Sorry, I don't yet know how to install lib$1 on $2"
   exit 1
 }
 
@@ -88,7 +88,7 @@ if [ $# -eq 1 ]; then
 fi
 
 if ! type pkg-config >/dev/null; then
-  sorry "a system without pkg-config"
+  sorry "vips" "a system without pkg-config"
 fi
 
 openslide_exists=0
@@ -133,7 +133,7 @@ if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_ex
         echo "Installing libopenslide via MacPorts"
         port install openslide
       else
-        sorry "Mac OS without homebrew or MacPorts"
+        sorry "openslide" "Mac OS without homebrew or MacPorts"
       fi
       ;;
     *)
@@ -161,7 +161,7 @@ if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_ex
             ;;
           *)
             # Unsupported Debian-based OS
-            sorry "Debian-based $DISTRO"
+            sorry "openslide" "Debian-based $DISTRO"
             ;;
         esac
       elif [ -f /etc/redhat-release ]; then
@@ -190,7 +190,7 @@ if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_ex
             ;;
           *)
             # Unsupported RHEL-based OS
-            sorry "$RELEASE"
+            sorry "openslide" "$RELEASE"
             ;;
         esac
       elif [ -f /etc/system-release ]; then
@@ -206,9 +206,29 @@ if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_ex
             install_libopenslide_from_source "--prefix=/usr"
             ;;
         esac
+      elif [ -f /etc/os-release ]; then
+        RELEASE=$(cat /etc/os-release | grep VERSION)
+        echo "Detected OpenSuse Linux '$RELEASE'"
+        case $RELEASE in
+          *"13.2"*)
+          echo "Installing libopenslide via zypper"
+          zypper --gpg-auto-import-keys install -y libopenslide-devel
+          ;;
+        esac
+      elif [ -f /etc/SuSE-brand ]; then
+        RELEASE=$(cat /etc/SuSE-brand | grep VERSION)
+        echo "Detected OpenSuse Linux '$RELEASE'"
+        case $RELEASE in
+          *"13.1")
+          echo "Installing libopenslide dependencies via zypper"
+          zypper --gpg-auto-import-keys install -y --type pattern devel_basis
+          zypper --gpg-auto-import-keys install -y tar curl libpng16-devel libjpeg-turbo libjpeg8-devel libxml2-devel zlib-devel openjpeg-devel libtiff-devel libgdk_pixbuf-2_0-0 sqlite3-devel cairo-devel glib2-devel
+          install_libopenslide_from_source
+          ;;
+        esac
       else
         # Unsupported OS
-        sorry "$(uname -a)"
+        sorry "openslide" "$(uname -a)"
       fi
       ;;
   esac
@@ -232,7 +252,7 @@ case $(uname -s) in
       echo "Installing libvips via MacPorts"
       port install vips
     else
-      sorry "Mac OS without homebrew or MacPorts"
+      sorry "vips" "Mac OS without homebrew or MacPorts"
     fi
     ;;
   *)
@@ -267,7 +287,7 @@ case $(uname -s) in
           ;;
         *)
           # Unsupported Debian-based OS
-          sorry "Debian-based $DISTRO"
+          sorry "vips" "Debian-based $DISTRO"
           ;;
       esac
     elif [ -f /etc/redhat-release ]; then
@@ -308,7 +328,7 @@ case $(uname -s) in
           ;;
         *)
           # Unsupported RHEL-based OS
-          sorry "$RELEASE"
+          sorry "vips" "$RELEASE"
           ;;
       esac
     elif [ -f /etc/system-release ]; then
@@ -324,9 +344,31 @@ case $(uname -s) in
           install_libvips_from_source "--prefix=/usr"
           ;;
       esac
+    elif [ -f /etc/os-release ]; then
+      RELEASE=$(cat /etc/os-release | grep VERSION)
+      echo "Detected OpenSuse Linux '$RELEASE'"
+      case $RELEASE in
+        *"13.2"*)
+        echo "Installing libvips dependencies via zypper"
+        zypper --gpg-auto-import-keys install -y --type pattern devel_basis
+        zypper --gpg-auto-import-keys install -y tar curl gtk-doc libxml2-devel libjpeg-turbo libjpeg8-devel libpng16-devel libtiff-devel libexif-devel liblcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel
+        install_libvips_from_source
+        ;;
+      esac
+    elif [ -f /etc/SuSE-brand ]; then
+      RELEASE=$(cat /etc/SuSE-brand | grep VERSION)
+      echo "Detected OpenSuse Linux '$RELEASE'"
+      case $RELEASE in
+        *"13.1")
+        echo "Installing libvips dependencies via zypper"
+        zypper --gpg-auto-import-keys install -y --type pattern devel_basis
+        zypper --gpg-auto-import-keys install -y tar curl gtk-doc libxml2-devel libjpeg-turbo libjpeg8-devel libpng16-devel libtiff-devel libexif-devel liblcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel
+        install_libvips_from_source
+        ;;
+      esac
     else
       # Unsupported OS
-      sorry "$(uname -a)"
+      sorry "vips" "$(uname -a)"
     fi
     ;;
 esac
