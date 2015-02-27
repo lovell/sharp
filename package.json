@@ -36,15 +36,15 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^2.9.9",
+    "bluebird": "^2.9.12",
     "color": "^0.7.3",
     "nan": "^1.6.2",
-    "semver": "^4.3.0"
+    "semver": "^4.3.1"
   },
   "devDependencies": {
     "mocha": "^2.1.0",
     "mocha-jshint": "^0.0.9",
-    "istanbul": "^0.3.5",
+    "istanbul": "^0.3.6",
     "coveralls": "^2.11.2",
     "node-cpplint": "^0.4.0"
   },
