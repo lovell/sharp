@@ -25,6 +25,8 @@ module.exports = {
   inputSvg: getPath('Wikimedia-logo.svg'), // http://commons.wikimedia.org/wiki/File:Wikimedia-logo.svg
   inputPsd: getPath('free-gearhead-pack.psd'), // https://dribbble.com/shots/1624241-Free-Gearhead-Vector-Pack
 
+  inputSvs: getPath('CMU-1-Small-Region.svs'), // http://openslide.cs.cmu.edu/download/openslide-testdata/Aperio/CMU-1-Small-Region.svs
+
   outputJpg: getPath('output.jpg'),
   outputPng: getPath('output.png'),
   outputWebP: getPath('output.webp'),
