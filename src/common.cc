@@ -80,7 +80,7 @@ namespace sharp {
         imageType = ImageType::OPENSLIDE;
       } else if (EndsWith(loader, "TiffFile")) {
         imageType = ImageType::TIFF;
-      } else if (EndsWith(loader, "MagickFile")) {
+      } else if (EndsWith(loader, "Magick") || EndsWith(loader, "MagickFile")) {
         imageType = ImageType::MAGICK;
       }
     }
