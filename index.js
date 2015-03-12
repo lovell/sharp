@@ -380,28 +380,28 @@ Sharp.prototype.withMetadata = function(withMetadata) {
 };
 
 /*
-  dz tile size for DZ output
-  max is 8192 since 7.36.5 (1024 before)
+  Tile size and overlap for Deep Zoom output
 */
-Sharp.prototype.tileSize = function(tileSize) {
-  if (!Number.isNaN(tileSize) && tileSize >= 1 && tileSize <= 8192) {
-    this.options.tileSize = tileSize;
-  } else {
-    throw new Error('Invalid tileSize (1 to 8192) ' + tileSize);
+Sharp.prototype.tile = function(size, overlap) {
+  // Size of square tiles, in pixels
+  if (typeof size !== 'undefined' && size !== null) {
+    if (!Number.isNaN(size) && size % 1 === 0 && size >= 1 && size <= 8192) {
+      this.options.tileSize = size;
+    } else {
+      throw new Error('Invalid tile size (1 to 8192) ' + size);
+    }
   }
-  return this;
-};
-
-/*
-  dz overlap for DZ output
-*/
-Sharp.prototype.tileOverlap = function(tileOverlap) {
-  if (!Number.isNaN(tileOverlap) && tileOverlap >=0 && tileOverlap <= 8192) {
-    this.options.tileOverlap = tileOverlap;
-  } else {
-    throw new Error('Invalid tileOverlap (0 to 8192) ' + tileOverlap);
+  // Overlap of tiles, in pixels
+  if (typeof overlap !== 'undefined' && overlap !== null) {
+    if (!Number.isNaN(overlap) && overlap % 1 === 0 && overlap >=0 && overlap <= 8192) {
+      if (overlap > this.options.tileSize) {
+        throw new Error('Tile overlap ' + overlap + ' cannot be larger than tile size ' + this.options.tileSize);
+      }
+      this.options.tileOverlap = overlap;
+    } else {
+      throw new Error('Invalid tile overlap (0 to 8192) ' + overlap);
+    }
   }
-
   return this;
 };
 
@@ -508,14 +508,6 @@ Sharp.prototype.raw = function() {
   } else {
     console.error('Raw output requires libvips 7.42.0+');
   }
-  return this;
-};
-
-/*
-  Force DZI output
-*/
-Sharp.prototype.dz = function() {
-  this.options.output = '__dzi';
   return this;
 };
 

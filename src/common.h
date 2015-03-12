@@ -10,7 +10,7 @@ namespace sharp {
     WEBP,
     TIFF,
     MAGICK,
-    DZ
+    OPENSLIDE
   };
 
   // How many tasks are in the queue?
@@ -39,12 +39,12 @@ namespace sharp {
   /*
     Initialise and return a VipsImage from a buffer. Supports JPEG, PNG, WebP and TIFF.
   */
-  VipsImage* InitImage(ImageType imageType, void *buffer, size_t const length, VipsAccess const access);
+  VipsImage* InitImage(void *buffer, size_t const length, VipsAccess const access);
 
   /*
     Initialise and return a VipsImage from a file.
   */
-  VipsImage* InitImage(ImageType imageType, char const *file, VipsAccess const access);
+  VipsImage* InitImage(char const *file, VipsAccess const access);
 
   /*
     Does this image have an embedded profile?

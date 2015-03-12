@@ -2,7 +2,7 @@ build
 node_modules
 coverage
 test/bench/node_modules
-test/fixtures/output.*
+test/fixtures/output*
 test/leak/libvips.supp
 
 # Mac OS X

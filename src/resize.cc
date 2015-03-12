@@ -172,7 +172,7 @@ class ResizeWorker : public NanAsyncWorker {
       // From buffer
       inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (inputImageType != ImageType::UNKNOWN) {
-        image = InitImage(inputImageType, baton->bufferIn, baton->bufferInLength, baton->accessMethod);
+        image = InitImage(baton->bufferIn, baton->bufferInLength, baton->accessMethod);
         if (image != NULL) {
           // Listen for "postclose" signal to delete input buffer
           g_signal_connect(image, "postclose", G_CALLBACK(DeleteBuffer), baton->bufferIn);
@@ -190,7 +190,7 @@ class ResizeWorker : public NanAsyncWorker {
       // From file
       inputImageType = DetermineImageType(baton->fileIn.c_str());
       if (inputImageType != ImageType::UNKNOWN) {
-        image = InitImage(inputImageType, baton->fileIn.c_str(), baton->accessMethod);
+        image = InitImage(baton->fileIn.c_str(), baton->accessMethod);
         if (image == NULL) {
           (baton->err).append("Input file has corrupt header");
           inputImageType = ImageType::UNKNOWN;
@@ -801,7 +801,7 @@ class ResizeWorker : public NanAsyncWorker {
           return Error(baton, hook);
         }
         baton->outputFormat = "tiff";
-      } else if (outputDz || matchInput) {
+      } else if (outputDz) {
         // Write DZ to file
         std::string filename_no_extension = baton->output.substr(0, baton->output.length() - 4);
         if (vips_dzsave(image, filename_no_extension.c_str(), "strip", !baton->withMetadata,
@@ -844,11 +844,6 @@ class ResizeWorker : public NanAsyncWorker {
       info->Set(NanNew<String>("format"), NanNew<String>(baton->outputFormat));
       info->Set(NanNew<String>("width"), NanNew<Uint32>(static_cast<uint32_t>(width)));
       info->Set(NanNew<String>("height"), NanNew<Uint32>(static_cast<uint32_t>(height)));
-
-      if (baton->outputFormat == "dz" ) {
-        info->Set(NanNew<String>("tileSize"), NanNew<Uint32>(static_cast<uint32_t>(baton->tileSize)));
-        info->Set(NanNew<String>("tileOverlap"), NanNew<Uint32>(static_cast<uint32_t>(baton->tileOverlap)));
-      }
 
       if (baton->bufferOutLength > 0) {
         // Copy data to new Buffer

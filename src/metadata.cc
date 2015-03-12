@@ -61,7 +61,7 @@ class MetadataWorker : public NanAsyncWorker {
       // From buffer
       imageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (imageType != ImageType::UNKNOWN) {
-        image = InitImage(imageType, baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
+        image = InitImage(baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
         if (image == NULL) {
           (baton->err).append("Input buffer has corrupt header");
           imageType = ImageType::UNKNOWN;
@@ -73,7 +73,7 @@ class MetadataWorker : public NanAsyncWorker {
       // From file
       imageType = DetermineImageType(baton->fileIn.c_str());
       if (imageType != ImageType::UNKNOWN) {
-        image = InitImage(imageType, baton->fileIn.c_str(), VIPS_ACCESS_RANDOM);
+        image = InitImage(baton->fileIn.c_str(), VIPS_ACCESS_RANDOM);
         if (image == NULL) {
           (baton->err).append("Input file has corrupt header");
           imageType = ImageType::UNKNOWN;
@@ -90,7 +90,7 @@ class MetadataWorker : public NanAsyncWorker {
         case ImageType::WEBP: baton->format = "webp"; break;
         case ImageType::TIFF: baton->format = "tiff"; break;
         case ImageType::MAGICK: baton->format = "magick"; break;
-        case ImageType::DZ: baton->format = "dzi"; break;
+        case ImageType::OPENSLIDE: baton->format = "openslide"; break;
         case ImageType::UNKNOWN: break;
       }
       // VipsImage attributes

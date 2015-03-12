@@ -109,6 +109,22 @@ describe('Image metadata', function() {
     });
   });
 
+  if (sharp.format.openslide.input.file) {
+    it('Aperio SVS via openslide', function(done) {
+      sharp(fixtures.inputSvs).metadata(function(err, metadata) {
+        if (err) throw err;
+        assert.strictEqual('openslide', metadata.format);
+        assert.strictEqual(2220, metadata.width);
+        assert.strictEqual(2967, metadata.height);
+        assert.strictEqual(4, metadata.channels);
+        assert.strictEqual('rgb', metadata.space);
+        assert.strictEqual(false, metadata.hasProfile);
+        assert.strictEqual(true, metadata.hasAlpha);
+        done();
+      });
+    });
+  }
+
   it('File in, Promise out', function(done) {
     sharp(fixtures.inputJpg).metadata().then(function(metadata) {
       assert.strictEqual('jpeg', metadata.format);

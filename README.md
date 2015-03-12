@@ -12,7 +12,11 @@
 The typical use case for this high speed Node.js module is to convert large images of many formats to smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
 This module supports reading and writing JPEG, PNG and WebP images to and from Streams, Buffer objects and the filesystem.
-It also supports reading images of many other types from the filesystem via libmagick, libgraphicsmagick or [OpenSlide](http://openslide.org/) if present and writing Deep Zoom images.
+It also supports reading images of many other formats from the filesystem via libmagick, libgraphicsmagick or [OpenSlide](http://openslide.org/) if present.
+
+Deep Zoom image pyramids can be generated, suitable for use with "slippy map" tile viewers like
+[OpenSeadragon](https://github.com/openseadragon/openseadragon) and [Leaflet](https://github.com/turban/Leaflet.Zoomify).
+
 Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
 
 Only small regions of uncompressed image data are held in memory and processed at a time, taking full advantage of multiple CPU cores and L1/L2/L3 cache. Resizing an image is typically 4x faster than using the quickest ImageMagick and GraphicsMagick settings.
@@ -498,6 +502,13 @@ Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
 
 The default behaviour is to strip all metadata and convert to the device-independent sRGB colour space.
 
+#### tile([size], [overlap])
+
+The size and overlap, in pixels, of square Deep Zoom image pyramid tiles.
+
+* `size` is an integral Number between 1 and 8192. The default value is 256 pixels.
+* `overlap` is an integral Number between 0 and 8192. The default value is 0 pixels.
+
 #### withoutChromaSubsampling()
 
 Disable the use of [chroma subsampling](http://en.wikipedia.org/wiki/Chroma_subsampling) with JPEG output (4:4:4).
@@ -518,12 +529,6 @@ An advanced setting for the _zlib_ compression level of the lossless PNG output 
 _Requires libvips 7.42.0+_
 
 An advanced setting to disable adaptive row filtering for the lossless PNG output format.
-
-#### tileSize(tileSize)
-Setting the tile_size when DZI output format is selected. Default is 256.
-
-#### tileOverlap(tileOverlap)
-Setting the overlap when DZI output format is selected. Default is 0.
 
 ### Output methods
 

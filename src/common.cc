@@ -37,96 +37,61 @@ namespace sharp {
   */
   ImageType DetermineImageType(void *buffer, size_t const length) {
     ImageType imageType = ImageType::UNKNOWN;
-#if (VIPS_MAJOR_VERSION >= 8)
-    if (vips_foreign_is_a_buffer("jpegload_buffer", buffer, length)) {
-      imageType = ImageType::JPEG;
-    } else if (vips_foreign_is_a_buffer("pngload_buffer", buffer, length)) {
-      imageType = ImageType::PNG;
-    } else if (vips_foreign_is_a_buffer("webpload_buffer", buffer, length)) {
-      imageType = ImageType::WEBP;
-    } else if (vips_foreign_is_a_buffer("tiffload_buffer", buffer, length)) {
-      imageType = ImageType::TIFF;
-    } else if(vips_foreign_is_a_buffer("magickload_buffer", buffer, length)) {
-      imageType = ImageType::MAGICK;
-    }
-#else
-    const char* loader = vips_foreign_find_load_buffer(buffer, length);
-
-    if (loader != NULL) {
-      if (!strcmp(loader, "VipsForeignLoadJpegBuffer")) {
+    char const *load = vips_foreign_find_load_buffer(buffer, length);
+    if (load != NULL) {
+      std::string loader = load;
+      if (EndsWith(loader, "JpegBuffer")) {
         imageType = ImageType::JPEG;
-      } else if (!strcmp(loader, "VipsForeignLoadPngBuffer")) {
+      } else if (EndsWith(loader, "PngBuffer")) {
         imageType = ImageType::PNG;
-      } else if (!strcmp(loader, "VipsForeignLoadWebpBuffer")) {
+      } else if (EndsWith(loader, "WebpBuffer")) {
         imageType = ImageType::WEBP;
-      } else if (!strcmp(loader, "VipsForeignLoadTiffBuffer")) {
+      } else if (EndsWith(loader, "TiffBuffer")) {
         imageType = ImageType::TIFF;
-      } else if (!strcmp(loader, "VipsForeignLoadMagickBuffer")) {
+      } else if (EndsWith(loader, "MagickBuffer")) {
         imageType = ImageType::MAGICK;
       }
     }
-#endif
     return imageType;
   }
 
   /*
     Initialise and return a VipsImage from a buffer. Supports JPEG, PNG, WebP and TIFF.
   */
-  VipsImage* InitImage(ImageType imageType, void *buffer, size_t const length, VipsAccess const access) {
-    VipsImage *image = NULL;
-    if (imageType == ImageType::JPEG) {
-      vips_jpegload_buffer(buffer, length, &image, "access", access, NULL);
-    } else if (imageType == ImageType::PNG) {
-      vips_pngload_buffer(buffer, length, &image, "access", access, NULL);
-    } else if (imageType == ImageType::WEBP) {
-      vips_webpload_buffer(buffer, length, &image, "access", access, NULL);
-    } else if (imageType == ImageType::TIFF) {
-      vips_tiffload_buffer(buffer, length, &image, "access", access, NULL);
-#if (VIPS_MAJOR_VERSION >= 8)
-    } else if (imageType == ImageType::MAGICK) {
-      vips_magickload_buffer(buffer, length, &image, "access", access, NULL);
-#endif
-    }
-    return image;
+  VipsImage* InitImage(void *buffer, size_t const length, VipsAccess const access) {
+    return vips_image_new_from_buffer(buffer, length, NULL, "access", access, NULL);
   }
 
   /*
-    Inpect the first 2-4 bytes of a file to determine image format
+    Determine image format, reads the first few bytes of the file
   */
   ImageType DetermineImageType(char const *file) {
     ImageType imageType = ImageType::UNKNOWN;
-    if (vips_foreign_is_a("jpegload", file)) {
-      imageType = ImageType::JPEG;
-    } else if (vips_foreign_is_a("pngload", file)) {
-      imageType = ImageType::PNG;
-    } else if (vips_foreign_is_a("webpload", file)) {
-      imageType = ImageType::WEBP;
-    } else if (vips_foreign_is_a("tiffload", file)) {
-      imageType = ImageType::TIFF;
-    } else if(vips_foreign_is_a("magickload", file)) {
-      imageType = ImageType::MAGICK;
+    char const *load = vips_foreign_find_load(file);
+    if (load != NULL) {
+      std::string loader = load;
+      if (EndsWith(loader, "JpegFile")) {
+        imageType = ImageType::JPEG;
+      } else if (EndsWith(loader, "Png")) {
+        imageType = ImageType::PNG;
+      } else if (EndsWith(loader, "WebpFile")) {
+        imageType = ImageType::WEBP;
+      } else if (EndsWith(loader, "Openslide")) {
+        imageType = ImageType::OPENSLIDE;
+      } else if (EndsWith(loader, "TiffFile")) {
+        imageType = ImageType::TIFF;
+      } else if (EndsWith(loader, "MagickFile")) {
+        imageType = ImageType::MAGICK;
+      }
     }
-
     return imageType;
   }
 
   /*
     Initialise and return a VipsImage from a file.
   */
-  VipsImage* InitImage(ImageType imageType, char const *file, VipsAccess const access) {
-    VipsImage *image = NULL;
-    if (imageType == ImageType::JPEG) {
-      vips_jpegload(file, &image, "access", access, NULL);
-    } else if (imageType == ImageType::PNG) {
-      vips_pngload(file, &image, "access", access, NULL);
-    } else if (imageType == ImageType::WEBP) {
-      vips_webpload(file, &image, "access", access, NULL);
-    } else if (imageType == ImageType::TIFF) {
-      vips_tiffload(file, &image, "access", access, NULL);
-    } else if (imageType == ImageType::MAGICK) {
-      vips_magickload(file, &image, "access", access, NULL);
-    }
-    return image;
+  VipsImage* InitImage(char const *file, VipsAccess const access) {
+    return vips_image_new_from_file(file, "access", access, NULL);
   }
 
   /*

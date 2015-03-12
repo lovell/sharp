@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.9.3",
+  "version": "0.10.0",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -30,6 +30,7 @@
     "png",
     "webp",
     "tiff",
+    "dzi",
     "resize",
     "thumbnail",
     "crop",
@@ -37,17 +38,19 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^2.9.12",
-    "color": "^0.7.3",
+    "bluebird": "^2.9.14",
+    "color": "^0.8.0",
     "nan": "^1.6.2",
     "semver": "^4.3.1"
   },
   "devDependencies": {
     "mocha": "^2.1.0",
-    "mocha-jshint": "^0.0.9",
+    "mocha-jshint": "^1.0.0",
     "istanbul": "^0.3.6",
     "coveralls": "^2.11.2",
-    "node-cpplint": "^0.4.0"
+    "node-cpplint": "^0.4.0",
+    "rimraf": "^2.3.2",
+    "async": "^0.9.0"
   },
   "license": "Apache 2.0",
   "engines": {
