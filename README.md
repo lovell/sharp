@@ -38,7 +38,6 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 * Node.js v0.10+ or io.js
 * [libvips](https://github.com/jcupitt/libvips) v7.40.0+ (7.42.0+ recommended)
 * C++11 compatible compiler such as gcc 4.6+ or clang 3.0+
-* [OpenSlide](http://openslide.org/) 3.4.0+ for reading OpenSlide images (optional)
 
 To install the most suitable version of libvips on the following Operating Systems:
 
@@ -64,15 +63,11 @@ or run the following as `root`:
 
 	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | bash -
 
-To enable OpenSlide, add the --with-openslide argument:
-
-> curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -s -- --with-openslide
-
-or run the following as `root`:
-
-	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | bash -s -- --with-openslide
-
 The [preinstall.sh](https://github.com/lovell/sharp/blob/master/preinstall.sh) script requires `curl` and `pkg-config`.
+
+Add `--with-openslide` to enable OpenSlide support:
+
+	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -s -- --with-openslide
 
 ### Mac OS tips
 
@@ -235,6 +230,13 @@ sharp(inputBuffer)
 ```
 
 ```javascript
+sharp('input.tiff').tile(256).toFile('output.dzi', function(err, info) {
+  // The output.dzi file is the XML format Deep Zoom definition
+  // The output_files directory contains 256x256 pixel tiles grouped by zoom level
+});
+```
+
+```javascript
 // Runtime discovery of available formats
 console.dir(sharp.format);
 ```
@@ -293,7 +295,7 @@ Fast access to image metadata without decoding any compressed image data.
 
 `callback`, if present, gets the arguments `(err, metadata)` where `metadata` has the attributes:
 
-* `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff` and `magick`)
+* `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff`, `magick` and `openslide`)
 * `width`: Number of pixels wide
 * `height`: Number of pixels high
 * `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)
