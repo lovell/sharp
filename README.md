@@ -272,6 +272,19 @@ for example:
     output: { file: false, buffer: true, stream: true } } }
 ```
 
+#### queue
+
+An EventEmitter that emits a `change` event when a task is either:
+
+* queued, waiting for _libuv_ to provide a worker thread
+* complete
+
+```javascript
+sharp.queue.on('change', function(queueLength) {
+  console.log('Queue contains ' + queueLength + ' task(s)');
+});
+```
+
 ### Input methods
 
 #### sharp([input])

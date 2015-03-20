@@ -684,4 +684,22 @@ describe('Input/output', function() {
 
   });
 
+  it('Queue length change events', function(done) {
+    var eventCounter = 0;
+    var queueListener = function(queueLength) {
+      assert.strictEqual('number', typeof queueLength);
+      assert.strictEqual(1 - eventCounter, queueLength);
+      eventCounter++;
+    };
+    sharp.queue.on('change', queueListener);
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .toBuffer(function(err) {
+        if (err) throw err;
+        assert.strictEqual(2, eventCounter);
+        sharp.queue.removeListener('change', queueListener);
+        done();
+      });
+  });
+
 });

@@ -146,7 +146,8 @@ static void DeleteBuffer(VipsObject *object, char *buffer) {
 class ResizeWorker : public NanAsyncWorker {
 
  public:
-  ResizeWorker(NanCallback *callback, ResizeBaton *baton) : NanAsyncWorker(callback), baton(baton) {}
+  ResizeWorker(NanCallback *callback, ResizeBaton *baton, NanCallback *queueListener) :
+    NanAsyncWorker(callback), baton(baton), queueListener(queueListener) {}
   ~ResizeWorker() {}
 
   /*
@@ -162,8 +163,8 @@ class ResizeWorker : public NanAsyncWorker {
     // Latest v2 sRGB ICC profile
     std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
 
-    // Hang image references from this hook object
-    VipsObject *hook = reinterpret_cast<VipsObject*>(vips_image_new());
+    // Create "hook" VipsObject to hang image references from
+    hook = reinterpret_cast<VipsObject*>(vips_image_new());
 
     // Input
     ImageType inputImageType = ImageType::UNKNOWN;
@@ -200,14 +201,14 @@ class ResizeWorker : public NanAsyncWorker {
       }
     }
     if (image == NULL || inputImageType == ImageType::UNKNOWN) {
-      return Error(baton, hook);
+      return Error();
     }
     vips_object_local(hook, image);
 
     // Limit input images to a given number of pixels, where pixels = width * height
     if (image->Xsize * image->Ysize > baton->limitInputPixels) {
       (baton->err).append("Input image exceeds pixel limit");
-      return Error(baton, hook);
+      return Error();
     }
 
     // Calculate angle of rotation
@@ -223,7 +224,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->rotateBeforePreExtract && rotation != Angle::D0) {
       VipsImage *rotated;
       if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, rotated);
       image = rotated;
@@ -233,7 +234,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->topOffsetPre != -1) {
       VipsImage *extractedPre;
       if (vips_extract_area(image, &extractedPre, baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, extractedPre);
       image = extractedPre;
@@ -349,11 +350,11 @@ class ResizeWorker : public NanAsyncWorker {
       VipsImage *shrunkOnLoad;
       if (baton->bufferInLength > 1) {
         if (vips_jpegload_buffer(baton->bufferIn, baton->bufferInLength, &shrunkOnLoad, "shrink", shrink_on_load, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
       } else {
         if (vips_jpegload((baton->fileIn).c_str(), &shrunkOnLoad, "shrink", shrink_on_load, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
       }
       vips_object_local(hook, shrunkOnLoad);
@@ -374,7 +375,7 @@ class ResizeWorker : public NanAsyncWorker {
       std::string cmykProfile = baton->iccProfilePath + "USWebCoatedSWOP.icc";
       VipsImage *transformed;
       if (vips_icc_transform(image, &transformed, srgbProfile.c_str(), "input_profile", cmykProfile.c_str(), NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, transformed);
       image = transformed;
@@ -392,7 +393,7 @@ class ResizeWorker : public NanAsyncWorker {
       VipsImage *flattened;
       if (vips_flatten(image, &flattened, "background", background, NULL)) {
         vips_area_unref(reinterpret_cast<VipsArea*>(background));
-        return Error(baton, hook);
+        return Error();
       }
       vips_area_unref(reinterpret_cast<VipsArea*>(background));
       vips_object_local(hook, flattened);
@@ -403,7 +404,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->gamma >= 1 && baton->gamma <= 3) {
       VipsImage *gammaEncoded;
       if (vips_gamma(image, &gammaEncoded, "exponent", 1.0 / baton->gamma, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, gammaEncoded);
       image = gammaEncoded;
@@ -413,7 +414,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->greyscale) {
       VipsImage *greyscale;
       if (vips_colourspace(image, &greyscale, VIPS_INTERPRETATION_B_W, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, greyscale);
       image = greyscale;
@@ -423,7 +424,7 @@ class ResizeWorker : public NanAsyncWorker {
       VipsImage *shrunk;
       // Use vips_shrink with the integral reduction
       if (vips_shrink(image, &shrunk, shrink, shrink, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, shrunk);
       image = shrunk;
@@ -455,13 +456,13 @@ class ResizeWorker : public NanAsyncWorker {
           // Create Gaussian function for standard deviation
           VipsImage *gaussian;
           if (vips_gaussmat(&gaussian, sigma, 0.2, "separable", TRUE, "integer", TRUE, NULL)) {
-            return Error(baton, hook);
+            return Error();
           }
           vips_object_local(hook, gaussian);
           // Apply Gaussian function
           VipsImage *blurred;
           if (vips_convsep(image, &blurred, gaussian, "precision", VIPS_PRECISION_INTEGER, NULL)) {
-            return Error(baton, hook);
+            return Error();
           }
           vips_object_local(hook, blurred);
           image = blurred;
@@ -473,7 +474,7 @@ class ResizeWorker : public NanAsyncWorker {
       // Perform affine transformation
       VipsImage *affined;
       if (vips_affine(image, &affined, residual, 0.0, 0.0, residual, "interpolate", interpolator, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, affined);
       image = affined;
@@ -483,7 +484,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (!baton->rotateBeforePreExtract && rotation != Angle::D0) {
       VipsImage *rotated;
       if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, rotated);
       image = rotated;
@@ -493,7 +494,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->flip) {
       VipsImage *flipped;
       if (vips_flip(image, &flipped, VIPS_DIRECTION_VERTICAL, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, flipped);
       image = flipped;
@@ -503,7 +504,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->flop) {
       VipsImage *flopped;
       if (vips_flip(image, &flopped, VIPS_DIRECTION_HORIZONTAL, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, flopped);
       image = flopped;
@@ -517,7 +518,7 @@ class ResizeWorker : public NanAsyncWorker {
           // Convert to sRGB colour space
           VipsImage *colourspaced;
           if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
-            return Error(baton, hook);
+            return Error();
           }
           vips_object_local(hook, colourspaced);
           image = colourspaced;
@@ -527,19 +528,19 @@ class ResizeWorker : public NanAsyncWorker {
           // Create single-channel transparency
           VipsImage *black;
           if (vips_black(&black, image->Xsize, image->Ysize, "bands", 1, NULL)) {
-            return Error(baton, hook);
+            return Error();
           }
           vips_object_local(hook, black);
           // Invert to become non-transparent
           VipsImage *alpha;
           if (vips_invert(black, &alpha, NULL)) {
-            return Error(baton, hook);
+            return Error();
           }
           vips_object_local(hook, alpha);
           // Append alpha channel to existing image
           VipsImage *joined;
           if (vips_bandjoin2(image, alpha, &joined, NULL)) {
-            return Error(baton, hook);
+            return Error();
           }
           vips_object_local(hook, joined);
           image = joined;
@@ -563,7 +564,7 @@ class ResizeWorker : public NanAsyncWorker {
           "extend", VIPS_EXTEND_BACKGROUND, "background", background, NULL
         )) {
           vips_area_unref(reinterpret_cast<VipsArea*>(background));
-          return Error(baton, hook);
+          return Error();
         }
         vips_area_unref(reinterpret_cast<VipsArea*>(background));
         vips_object_local(hook, embedded);
@@ -577,7 +578,7 @@ class ResizeWorker : public NanAsyncWorker {
         int height = std::min(image->Ysize, baton->height);
         VipsImage *extracted;
         if (vips_extract_area(image, &extracted, left, top, width, height, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
         vips_object_local(hook, extracted);
         image = extracted;
@@ -590,7 +591,7 @@ class ResizeWorker : public NanAsyncWorker {
       if (vips_extract_area(image, &extractedPost,
         baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost, NULL
       )) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, extractedPost);
       image = extractedPost;
@@ -608,19 +609,19 @@ class ResizeWorker : public NanAsyncWorker {
         vips_image_set_double(blur, "scale", 9);
         vips_object_local(hook, blur);
         if (vips_conv(image, &blurred, blur, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
       } else {
         // Slower, accurate Gaussian blur
         // Create Gaussian function for standard deviation
         VipsImage *gaussian;
         if (vips_gaussmat(&gaussian, baton->blurSigma, 0.2, "separable", TRUE, "integer", TRUE, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
         vips_object_local(hook, gaussian);
         // Apply Gaussian function
         if (vips_convsep(image, &blurred, gaussian, "precision", VIPS_PRECISION_INTEGER, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
       }
       vips_object_local(hook, blurred);
@@ -639,12 +640,12 @@ class ResizeWorker : public NanAsyncWorker {
         vips_image_set_double(sharpen, "scale", 24);
         vips_object_local(hook, sharpen);
         if (vips_conv(image, &sharpened, sharpen, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
       } else {
         // Slow, accurate sharpen in LAB colour space, with control over flat vs jagged areas
         if (vips_sharpen(image, &sharpened, "radius", baton->sharpenRadius, "m1", baton->sharpenFlat, "m2", baton->sharpenJagged, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
       }
       vips_object_local(hook, sharpened);
@@ -655,7 +656,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->gamma >= 1 && baton->gamma <= 3) {
       VipsImage *gammaDecoded;
       if (vips_gamma(image, &gammaDecoded, "exponent", baton->gamma, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, gammaDecoded);
       image = gammaDecoded;
@@ -666,7 +667,7 @@ class ResizeWorker : public NanAsyncWorker {
       // Switch intrepretation to sRGB
       VipsImage *rgb;
       if (vips_colourspace(image, &rgb, VIPS_INTERPRETATION_sRGB, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, rgb);
       image = rgb;
@@ -674,7 +675,7 @@ class ResizeWorker : public NanAsyncWorker {
       if (baton->withMetadata && HasProfile(image)) {
         VipsImage *profiled;
         if (vips_icc_transform(image, &profiled, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
         vips_object_local(hook, profiled);
         image = profiled;
@@ -686,7 +687,7 @@ class ResizeWorker : public NanAsyncWorker {
     if (baton->progressive) {
       VipsImage *cached;
       if (vips_tilecache(image, &cached, "threaded", TRUE, "persistent", TRUE, "max_tiles", -1, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       vips_object_local(hook, cached);
       image = cached;
@@ -699,7 +700,7 @@ class ResizeWorker : public NanAsyncWorker {
       if (vips_jpegsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
         "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
         "interlace", baton->progressive, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       baton->outputFormat = "jpeg";
     } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == ImageType::PNG)) {
@@ -709,13 +710,13 @@ class ResizeWorker : public NanAsyncWorker {
       // Write PNG to buffer
       if (vips_pngsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
         "compression", baton->compressionLevel, "interlace", baton->progressive, "filter", filter, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
 #else
       // Write PNG to buffer
       if (vips_pngsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
         "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
 #endif
       baton->outputFormat = "png";
@@ -723,7 +724,7 @@ class ResizeWorker : public NanAsyncWorker {
       // Write WEBP to buffer
       if (vips_webpsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
         "Q", baton->quality, NULL)) {
-        return Error(baton, hook);
+        return Error();
       }
       baton->outputFormat = "webp";
 #if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
@@ -733,7 +734,7 @@ class ResizeWorker : public NanAsyncWorker {
         // Extract first band for greyscale image
         VipsImage *grey;
         if (vips_extract_band(image, &grey, 1, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
         vips_object_local(hook, grey);
         image = grey;
@@ -742,7 +743,7 @@ class ResizeWorker : public NanAsyncWorker {
         // Cast pixels to uint8 (unsigned char)
         VipsImage *uchar;
         if (vips_cast(image, &uchar, VIPS_FORMAT_UCHAR, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
         vips_object_local(hook, uchar);
         image = uchar;
@@ -751,7 +752,7 @@ class ResizeWorker : public NanAsyncWorker {
       baton->bufferOut = vips_image_write_to_memory(image, &baton->bufferOutLength);
       if (baton->bufferOut == NULL) {
         (baton->err).append("Could not allocate enough memory for raw output");
-        return Error(baton, hook);
+        return Error();
       }
       baton->outputFormat = "raw";
 #endif
@@ -767,7 +768,7 @@ class ResizeWorker : public NanAsyncWorker {
         if (vips_jpegsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
           "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
           "interlace", baton->progressive, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
         baton->outputFormat = "jpeg";
       } else if (outputPng || (matchInput && inputImageType == ImageType::PNG)) {
@@ -777,13 +778,13 @@ class ResizeWorker : public NanAsyncWorker {
         // Write PNG to file
         if (vips_pngsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
           "compression", baton->compressionLevel, "interlace", baton->progressive, "filter", filter, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
 #else
         // Write PNG to file
         if (vips_pngsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
           "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
 #endif
         baton->outputFormat = "png";
@@ -791,14 +792,14 @@ class ResizeWorker : public NanAsyncWorker {
         // Write WEBP to file
         if (vips_webpsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
           "Q", baton->quality, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
         baton->outputFormat = "webp";
       } else if (outputTiff || (matchInput && inputImageType == ImageType::TIFF)) {
         // Write TIFF to file
         if (vips_tiffsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
           "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
         baton->outputFormat = "tiff";
       } else if (outputDz) {
@@ -806,12 +807,12 @@ class ResizeWorker : public NanAsyncWorker {
         std::string filename_no_extension = baton->output.substr(0, baton->output.length() - 4);
         if (vips_dzsave(image, filename_no_extension.c_str(), "strip", !baton->withMetadata,
             "tile_size", baton->tileSize, "overlap", baton->tileOverlap, NULL)) {
-          return Error(baton, hook);
+          return Error();
         }
         baton->outputFormat = "dz";
       } else {
         (baton->err).append("Unsupported output " + baton->output);
-        return Error(baton, hook);
+        return Error();
       }
     }
     // Clean up any dangling image references
@@ -865,13 +866,18 @@ class ResizeWorker : public NanAsyncWorker {
 
     // Decrement processing task counter
     g_atomic_int_dec_and_test(&counterProcess);
+    Handle<Value> queueLength[1] = { NanNew<Uint32>(counterQueue) };
+    queueListener->Call(1, queueLength);
+    delete queueListener;
 
     // Return to JavaScript
     callback->Call(3, argv);
   }
 
  private:
-  ResizeBaton* baton;
+  ResizeBaton *baton;
+  NanCallback *queueListener;
+  VipsObject *hook;
 
   /*
     Calculate the angle of rotation and need-to-flip for the output image.
@@ -941,7 +947,7 @@ class ResizeWorker : public NanAsyncWorker {
     Unref all transitional images on the hook.
     Clear all thread-local data.
   */
-  void Error(ResizeBaton *baton, VipsObject *hook) {
+  void Error() {
     // Get libvips' error message
     (baton->err).append(vips_error_buffer());
     // Clean up any dangling image references
@@ -1033,13 +1039,17 @@ NAN_METHOD(resize) {
   baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());
   baton->tileSize = options->Get(NanNew<String>("tileSize"))->Int32Value();
   baton->tileOverlap = options->Get(NanNew<String>("tileOverlap"))->Int32Value();
+  // Function to notify of queue length changes
+  NanCallback *queueListener = new NanCallback(Handle<Function>::Cast(options->Get(NanNew<String>("queueListener"))));
 
   // Join queue for worker thread
   NanCallback *callback = new NanCallback(args[1].As<Function>());
-  NanAsyncQueueWorker(new ResizeWorker(callback, baton));
+  NanAsyncQueueWorker(new ResizeWorker(callback, baton, queueListener));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);
+  Handle<Value> queueLength[1] = { NanNew<Uint32>(counterQueue) };
+  queueListener->Call(1, queueLength);
 
   NanReturnUndefined();
 }

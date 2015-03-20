@@ -3,6 +3,7 @@
 var path = require('path');
 var util = require('util');
 var stream = require('stream');
+var events = require('events');
 
 var semver = require('semver');
 var color = require('color');
@@ -68,7 +69,11 @@ var Sharp = function(input) {
     streamOut: false,
     withMetadata: false,
     tileSize: 256,
-    tileOverlap: 0
+    tileOverlap: 0,
+    // Function to notify of queue length changes
+    queueListener: function(queueLength) {
+      module.exports.queue.emit('change', queueLength);
+    }
   };
   if (typeof input === 'string') {
     // input=file
@@ -84,6 +89,11 @@ var Sharp = function(input) {
 };
 module.exports = Sharp;
 util.inherits(Sharp, stream.Duplex);
+
+/*
+  EventEmitter singleton emits queue length 'change' events
+*/
+module.exports.queue = new events.EventEmitter();
 
 /*
   Supported image formats
