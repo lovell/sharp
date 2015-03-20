@@ -25,7 +25,7 @@ install_libvips_from_source() {
   curl -O http://www.vips.ecs.soton.ac.uk/supported/$vips_version_latest_major_minor/vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   tar zvxf vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   cd vips-$vips_version_latest_major_minor.$vips_version_latest_patch
-  ./configure --enable-debug=no --enable-docs=no --enable-cxx=yes --without-python --without-orc --without-fftw $1
+  ./configure --disable-debug --disable-docs --disable-static --disable-introspection --enable-cxx=yes --without-python --without-orc --without-fftw $1
   make
   make install
   cd ..
