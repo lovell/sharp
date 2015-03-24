@@ -116,9 +116,14 @@ sharp('input.jpg').resize(300, 200).toFile('output.jpg', function(err) {
 ```
 
 ```javascript
-var transformer = sharp().resize(300, 200).crop(sharp.gravity.north);
-readableStream.pipe(transformer).pipe(writableStream);
+var transformer = sharp()
+  .resize(300, 200)
+  .crop(sharp.gravity.north)
+  .on('error', function(err) {
+    console.log(err);
+  });
 // Read image data from readableStream, resize and write image data to writableStream
+readableStream.pipe(transformer).pipe(writableStream);
 ```
 
 ```javascript
