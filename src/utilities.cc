@@ -76,7 +76,7 @@ NAN_METHOD(counters) {
 NAN_METHOD(libvipsVersion) {
   NanScope();
   char version[9];
-  snprintf(version, sizeof(version), "%d.%d.%d", vips_version(0), vips_version(1), vips_version(2));
+  g_snprintf(version, sizeof(version), "%d.%d.%d", vips_version(0), vips_version(1), vips_version(2));
   NanReturnValue(NanNew<String>(version));
 }
 

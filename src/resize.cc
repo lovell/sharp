@@ -856,7 +856,7 @@ class ResizeWorker : public NanAsyncWorker {
         argv[2] = info;
       } else {
         // Add file size to info
-        struct stat st;
+        GStatBuf st;
         g_stat(baton->output.c_str(), &st);
         info->Set(NanNew<String>("size"), NanNew<Uint32>(static_cast<uint32_t>(st.st_size)));
         argv[1] = info;
