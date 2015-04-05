@@ -83,6 +83,15 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 
 	brew link gettext --force
 
+### Windows
+
+Requires x86 32-bit Node.js or io.js (use `iojs.exe` rather than `node.exe`).
+The WebP format is currently unsupported.
+
+1. [Download](http://www.vips.ecs.soton.ac.uk/supported/current/win32/) and unzip `vips-dev.x.y.z.zip`.
+2. Set the `VIPS_HOME` environment variable to the full path of the `vips-dev-x.y.z` directory.
+3. Add `vips-dev-x.y.z\bin` to `PATH`.
+
 ### Heroku
 
 [Alessandro Tagliapietra](https://github.com/alex88) maintains an [Heroku buildpack for libvips](https://github.com/alex88/heroku-buildpack-vips) and its dependencies.
