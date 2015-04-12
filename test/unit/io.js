@@ -665,16 +665,6 @@ describe('Input/output', function() {
       done();
     });
 
-    it('Invalid fails - huge', function(done) {
-      var isValid = false;
-      try {
-        sharp().limitInputPixels(Math.pow(0x3FFF, 2) + 1);
-        isValid = true;
-      } catch (e) {}
-      assert(!isValid);
-      done();
-    });
-
     it('Invalid fails - string', function(done) {
       var isValid = false;
       try {
