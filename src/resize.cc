@@ -40,7 +40,8 @@ enum class Canvas {
   CROP,
   EMBED,
   MAX,
-  MIN
+  MIN,
+  IGNORE_ASPECT
 };
 
 enum class Angle {
@@ -254,43 +255,63 @@ class ResizeWorker : public NanAsyncWorker {
     int interpolatorWindowSize = InterpolatorWindowSize(baton->interpolator.c_str());
 
     // Scaling calculations
-    double factor = 1.0;
+    double xfactor = 1.0;
+    double yfactor = 1.0;
     if (baton->width > 0 && baton->height > 0) {
       // Fixed width and height
-      double xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
-      double yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
+      xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
+      yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
       switch (baton->canvas) {
         case Canvas::CROP:
-          factor = std::min(xfactor, yfactor);
+          xfactor = std::min(xfactor, yfactor);
+          yfactor = xfactor;
           break;
         case Canvas::EMBED:
-          factor = std::max(xfactor, yfactor);
+          xfactor = std::max(xfactor, yfactor);
+          yfactor = xfactor;
           break;
         case Canvas::MAX:
-          factor = std::max(xfactor, yfactor);
           if (xfactor > yfactor) {
             baton->height = round(static_cast<double>(inputHeight) / xfactor);
+            yfactor = xfactor;
           } else {
             baton->width = round(static_cast<double>(inputWidth) / yfactor);
+            xfactor = yfactor;
           }
           break;
         case Canvas::MIN:
-          factor = std::min(xfactor, yfactor);
           if (xfactor < yfactor) {
             baton->height = round(static_cast<double>(inputHeight) / xfactor);
+            yfactor = xfactor;
           } else {
             baton->width = round(static_cast<double>(inputWidth) / yfactor);
+            xfactor = yfactor;
           }
+          break;
+        case Canvas::IGNORE_ASPECT:
+          // xfactor, yfactor OK!
           break;
       }
     } else if (baton->width > 0) {
-      // Fixed width, auto height
-      factor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
-      baton->height = floor(static_cast<double>(inputHeight) / factor);
+      // Fixed width
+      xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
+      if (baton->canvas == Canvas::IGNORE_ASPECT) {
+        baton->height = inputHeight;
+      } else {
+        // Auto height
+        yfactor = xfactor;
+        baton->height = floor(static_cast<double>(inputHeight) / yfactor);
+      }
     } else if (baton->height > 0) {
-      // Fixed height, auto width
-      factor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
-      baton->width = floor(static_cast<double>(inputWidth) / factor);
+      // Fixed height
+      yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
+      if (baton->canvas == Canvas::IGNORE_ASPECT) {
+        baton->width = inputWidth;
+      } else {
+        // Auto width
+        xfactor = yfactor;
+        baton->width = floor(static_cast<double>(inputWidth) / xfactor);
+      }
     } else {
       // Identity transform
       baton->width = inputWidth;
@@ -298,54 +319,52 @@ class ResizeWorker : public NanAsyncWorker {
     }
 
     // Calculate integral box shrink
-    int shrink = 1;
-    if (factor >= 2 && interpolatorWindowSize > 3) {
-      // Shrink less, affine more with interpolators that use at least 4x4 pixel window, e.g. bicubic
-      shrink = floor(factor * 3.0 / interpolatorWindowSize);
-    } else {
-      shrink = floor(factor);
-    }
-    if (shrink < 1) {
-      shrink = 1;
-    }
+    int xshrink = CalculateShrink(xfactor, interpolatorWindowSize);
+    int yshrink = CalculateShrink(yfactor, interpolatorWindowSize);
 
     // Calculate residual float affine transformation
-    double residual = static_cast<double>(shrink) / factor;
+    double xresidual = CalculateResidual(xshrink, xfactor);
+    double yresidual = CalculateResidual(yshrink, yfactor);
 
     // Do not enlarge the output if the input width *or* height are already less than the required dimensions
     if (baton->withoutEnlargement) {
       if (inputWidth < baton->width || inputHeight < baton->height) {
-        factor = 1;
-        shrink = 1;
-        residual = 0;
+        xfactor = 1;
+        yfactor = 1;
+        xshrink = 1;
+        yshrink = 1;
+        xresidual = 0;
+        yresidual = 0;
         baton->width = inputWidth;
         baton->height = inputHeight;
       }
     }
 
-    // Try to use libjpeg shrink-on-load, but not when applying gamma correction or pre-resize extract
+    // If integral x and y shrink are equal, try to use libjpeg shrink-on-load, but not when applying gamma correction or pre-resize extract
     int shrink_on_load = 1;
-    if (inputImageType == ImageType::JPEG && shrink >= 2 && baton->gamma == 0 && baton->topOffsetPre == -1) {
-      if (shrink >= 8) {
-        factor = factor / 8;
+    if (xshrink == yshrink && inputImageType == ImageType::JPEG && xshrink >= 2 && baton->gamma == 0 && baton->topOffsetPre == -1) {
+      if (xshrink >= 8) {
+        xfactor = xfactor / 8;
+        yfactor = yfactor / 8;
         shrink_on_load = 8;
-      } else if (shrink >= 4) {
-        factor = factor / 4;
+      } else if (xshrink >= 4) {
+        xfactor = xfactor / 4;
+        yfactor = yfactor / 4;
         shrink_on_load = 4;
-      } else if (shrink >= 2) {
-        factor = factor / 2;
+      } else if (xshrink >= 2) {
+        xfactor = xfactor / 2;
+        yfactor = yfactor / 2;
         shrink_on_load = 2;
       }
     }
     if (shrink_on_load > 1) {
       // Recalculate integral shrink and double residual
-      factor = std::max(factor, 1.0);
-      if (factor >= 2 && interpolatorWindowSize > 3) {
-        shrink = floor(factor * 3.0 / interpolatorWindowSize);
-      } else {
-        shrink = floor(factor);
-      }
-      residual = static_cast<double>(shrink) / factor;
+      xfactor = std::max(xfactor, 1.0);
+      yfactor = std::max(yfactor, 1.0);
+      xshrink = CalculateShrink(xfactor, interpolatorWindowSize);
+      yshrink = CalculateShrink(yfactor, interpolatorWindowSize);
+      xresidual = CalculateResidual(xshrink, xfactor);
+      yresidual = CalculateResidual(yshrink, yfactor);
       // Reload input using shrink-on-load
       VipsImage *shrunkOnLoad;
       if (baton->bufferInLength > 1) {
@@ -420,10 +439,10 @@ class ResizeWorker : public NanAsyncWorker {
       image = greyscale;
     }
 
-    if (shrink > 1) {
+    if (xshrink > 1 || yshrink > 1) {
       VipsImage *shrunk;
       // Use vips_shrink with the integral reduction
-      if (vips_shrink(image, &shrunk, shrink, shrink, NULL)) {
+      if (vips_shrink(image, &shrunk, xshrink, yshrink, NULL)) {
         return Error();
       }
       vips_object_local(hook, shrunk);
@@ -437,17 +456,21 @@ class ResizeWorker : public NanAsyncWorker {
         shrunkWidth = shrunkHeight;
         shrunkHeight = swap;
       }
-      double residualx = static_cast<double>(baton->width) / static_cast<double>(shrunkWidth);
-      double residualy = static_cast<double>(baton->height) / static_cast<double>(shrunkHeight);
+      xresidual = static_cast<double>(baton->width) / static_cast<double>(shrunkWidth);
+      yresidual = static_cast<double>(baton->height) / static_cast<double>(shrunkHeight);
       if (baton->canvas == Canvas::EMBED) {
-        residual = std::min(residualx, residualy);
-      } else {
-        residual = std::max(residualx, residualy);
+        xresidual = std::min(xresidual, yresidual);
+        yresidual = xresidual;
+      } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
+        xresidual = std::max(xresidual, yresidual);
+        yresidual = xresidual;
       }
     }
 
     // Use vips_affine with the remaining float part
-    if (residual != 0.0) {
+    if (xresidual != 0.0 || yresidual != 0.0) {
+      // Use average of x and y residuals to compute sigma for Gaussian blur
+      double residual = (xresidual + yresidual) / 2.0;
       // Apply Gaussian blur before large affine reductions
       if (residual < 1.0) {
         // Calculate standard deviation
@@ -482,7 +505,7 @@ class ResizeWorker : public NanAsyncWorker {
       vips_object_local(hook, interpolator);
       // Perform affine transformation
       VipsImage *affined;
-      if (vips_affine(image, &affined, residual, 0.0, 0.0, residual, "interpolate", interpolator, NULL)) {
+      if (vips_affine(image, &affined, xresidual, 0.0, 0.0, yresidual, "interpolate", interpolator, NULL)) {
         return Error();
       }
       vips_object_local(hook, affined);
@@ -578,7 +601,7 @@ class ResizeWorker : public NanAsyncWorker {
         vips_area_unref(reinterpret_cast<VipsArea*>(background));
         vips_object_local(hook, embedded);
         image = embedded;
-      } else {
+      } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
         // Crop/max/min
         int left;
         int top;
@@ -952,6 +975,30 @@ class ResizeWorker : public NanAsyncWorker {
   }
 
   /*
+    Calculate integral shrink given factor and interpolator window size
+  */
+  int CalculateShrink(double factor, int interpolatorWindowSize) {
+    int shrink = 1;
+    if (factor >= 2 && interpolatorWindowSize > 3) {
+      // Shrink less, affine more with interpolators that use at least 4x4 pixel window, e.g. bicubic
+      shrink = floor(factor * 3.0 / interpolatorWindowSize);
+    } else {
+      shrink = floor(factor);
+    }
+    if (shrink < 1) {
+      shrink = 1;
+    }
+    return shrink;
+  }
+
+  /*
+    Calculate residual given shrink and factor
+  */
+  double CalculateResidual(int shrink, double factor) {
+    return static_cast<double>(shrink) / factor;
+  }
+
+  /*
     Copy then clear the error message.
     Unref all transitional images on the hook.
     Clear all thread-local data.
@@ -1015,6 +1062,8 @@ NAN_METHOD(resize) {
     baton->canvas = Canvas::MAX;
   } else if (canvas->Equals(NanNew<String>("min"))) {
     baton->canvas = Canvas::MIN;
+  } else if (canvas->Equals(NanNew<String>("ignore_aspect"))) {
+    baton->canvas = Canvas::IGNORE_ASPECT;
   }
   // Background colour
   Local<Array> background = Local<Array>::Cast(options->Get(NanNew<String>("background")));

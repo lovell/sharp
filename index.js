@@ -185,6 +185,11 @@ Sharp.prototype.min = function() {
   return this;
 };
 
+Sharp.prototype.ignoreAspectRatio = function() {
+  this.options.canvas = 'ignore_aspect';
+  return this;
+};
+
 Sharp.prototype.flatten = function(flatten) {
   this.options.flatten = (typeof flatten === 'boolean') ? flatten : true;
   return this;
