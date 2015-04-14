@@ -37,7 +37,7 @@ This module is powered by the blazingly fast [libvips](https://github.com/jcupit
 
 * Node.js v0.10+ or io.js
 * [libvips](https://github.com/jcupitt/libvips) v7.40.0+ (7.42.0+ recommended)
-* C++11 compatible compiler such as gcc 4.6+ or clang 3.0+
+* C++11 compatible compiler such as gcc 4.6+, clang 3.0+ or MSVC 2013
 
 To install the most suitable version of libvips on the following Operating Systems:
 
@@ -554,6 +554,30 @@ This can improve colour representation at higher quality settings (90+),
 but usually increases output file size and typically reduces performance by 25%.
 
 The default behaviour is to use chroma subsampling (4:2:0).
+
+#### trellisQuantisation() / trellisQuantization()
+
+_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+
+An advanced setting to apply the use of
+[trellis quantisation](http://en.wikipedia.org/wiki/Trellis_quantization) with JPEG output.
+Reduces file size and slightly increases relative quality at the cost of increased compression time.
+
+#### overshootDeringing()
+
+_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+
+An advanced setting to reduce the effects of
+[ringing](http://en.wikipedia.org/wiki/Ringing_%28signal%29) in JPEG output,
+in particular where black text appears on a white background (or vice versa).
+
+#### optimiseScans() / optimizeScans()
+
+_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+
+An advanced setting for progressive (interlace) JPEG output.
+Calculates which spectrum of DCT coefficients uses the fewest bits.
+Usually reduces file size at the cost of increased compression time.
 
 #### compressionLevel(compressionLevel)
 

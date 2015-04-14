@@ -67,6 +67,9 @@ var Sharp = function(input) {
     compressionLevel: 6,
     withoutAdaptiveFiltering: false,
     withoutChromaSubsampling: false,
+    trellisQuantisation: false,
+    overshootDeringing: false,
+    optimiseScans: false,
     streamOut: false,
     withMetadata: false,
     tileSize: 256,
@@ -403,6 +406,50 @@ Sharp.prototype.withoutChromaSubsampling = function(withoutChromaSubsampling) {
   return this;
 };
 
+/*
+  Apply trellis quantisation to JPEG output - requires libvips 8.0.0+ compiled against mozjpeg 3.0+
+*/
+Sharp.prototype.trellisQuantisation = function(trellisQuantisation) {
+  if (semver.gte(libvipsVersion, '8.0.0')) {
+    this.options.trellisQuantisation = (typeof trellisQuantisation === 'boolean') ? trellisQuantisation : true;
+  } else {
+    console.error('trellisQuantisation requires libvips 8.0.0+');
+  }
+  return this;
+};
+Sharp.prototype.trellisQuantization = Sharp.prototype.trellisQuantisation;
+
+/*
+  Apply overshoot deringing to JPEG output - requires libvips 8.0.0+ compiled against mozjpeg 3.0+
+*/
+Sharp.prototype.overshootDeringing = function(overshootDeringing) {
+  if (semver.gte(libvipsVersion, '8.0.0')) {
+    this.options.overshootDeringing = (typeof overshootDeringing === 'boolean') ? overshootDeringing : true;
+  } else {
+    console.error('overshootDeringing requires libvips 8.0.0+');
+  }
+  return this;
+};
+
+/*
+  Optimise scans in progressive JPEG output - requires libvips 8.0.0+ compiled against mozjpeg 3.0+
+*/
+Sharp.prototype.optimiseScans = function(optimiseScans) {
+  if (semver.gte(libvipsVersion, '8.0.0')) {
+    this.options.optimiseScans = (typeof optimiseScans === 'boolean') ? optimiseScans : true;
+    if (this.options.optimiseScans) {
+      this.progressive();
+    }
+  } else {
+    console.error('optimiseScans requires libvips 8.0.0+');
+  }
+  return this;
+};
+Sharp.prototype.optimizeScans = Sharp.prototype.optimiseScans;
+
+/*
+  Include all metadata (EXIF, XMP, IPTC) from the input image in the output image
+*/
 Sharp.prototype.withMetadata = function(withMetadata) {
   this.options.withMetadata = (typeof withMetadata === 'boolean') ? withMetadata : true;
   return this;

@@ -95,6 +95,9 @@ struct ResizeBaton {
   int compressionLevel;
   bool withoutAdaptiveFiltering;
   bool withoutChromaSubsampling;
+  bool trellisQuantisation;
+  bool overshootDeringing;
+  bool optimiseScans;
   std::string err;
   bool withMetadata;
   int tileSize;
@@ -126,6 +129,9 @@ struct ResizeBaton {
     compressionLevel(6),
     withoutAdaptiveFiltering(false),
     withoutChromaSubsampling(false),
+    trellisQuantisation(false),
+    overshootDeringing(false),
+    optimiseScans(false),
     withMetadata(false),
     tileSize(256),
     tileOverlap(0) {
@@ -813,6 +819,11 @@ class ResizeWorker : public NanAsyncWorker {
       // Write JPEG to buffer
       if (vips_jpegsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
         "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
+#if (VIPS_MAJOR_VERSION >= 8)
+        "trellis_quant", baton->trellisQuantisation,
+        "overshoot_deringing", baton->overshootDeringing,
+        "optimize_scans", baton->optimiseScans,
+#endif
         "interlace", baton->progressive, NULL)) {
         return Error();
       }
@@ -881,6 +892,11 @@ class ResizeWorker : public NanAsyncWorker {
         // Write JPEG to file
         if (vips_jpegsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
           "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
+#if (VIPS_MAJOR_VERSION >= 8)
+          "trellis_quant", baton->trellisQuantisation,
+          "overshoot_deringing", baton->overshootDeringing,
+          "optimize_scans", baton->optimiseScans,
+#endif
           "interlace", baton->progressive, NULL)) {
           return Error();
         }
@@ -1175,6 +1191,9 @@ NAN_METHOD(resize) {
   baton->compressionLevel = options->Get(NanNew<String>("compressionLevel"))->Int32Value();
   baton->withoutAdaptiveFiltering = options->Get(NanNew<String>("withoutAdaptiveFiltering"))->BooleanValue();
   baton->withoutChromaSubsampling = options->Get(NanNew<String>("withoutChromaSubsampling"))->BooleanValue();
+  baton->trellisQuantisation = options->Get(NanNew<String>("trellisQuantisation"))->BooleanValue();
+  baton->overshootDeringing = options->Get(NanNew<String>("overshootDeringing"))->BooleanValue();
+  baton->optimiseScans = options->Get(NanNew<String>("optimiseScans"))->BooleanValue();
   baton->withMetadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
   // Output filename or __format for Buffer
   baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());
