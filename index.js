@@ -185,6 +185,10 @@ Sharp.prototype.min = function() {
   return this;
 };
 
+/*
+  Ignoring the aspect ratio of the input, stretch the image to
+  the exact width and/or height provided via the resize method.
+*/
 Sharp.prototype.ignoreAspectRatio = function() {
   this.options.canvas = 'ignore_aspect';
   return this;

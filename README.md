@@ -389,6 +389,10 @@ the `width` and `height` specified.
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
+#### ignoreAspectRatio()
+
+Ignoring the aspect ratio of the input, stretch the image to the exact `width` and/or `height` provided via `resize`.
+
 #### background(rgba)
 
 Set the background for the `embed` and `flatten` operations.
