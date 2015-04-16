@@ -83,6 +83,7 @@ struct ResizeBaton {
   double sharpenJagged;
   double gamma;
   bool greyscale;
+  bool normalize;
   int angle;
   bool rotateBeforePreExtract;
   bool flip;
@@ -115,6 +116,7 @@ struct ResizeBaton {
     sharpenJagged(2.0),
     gamma(0.0),
     greyscale(false),
+    normalize(false),
     angle(0),
     flip(false),
     flop(false),
@@ -694,6 +696,86 @@ class ResizeWorker : public NanAsyncWorker {
       image = gammaDecoded;
     }
 
+    // Apply normalization
+    if (baton->normalize) {
+      VipsInterpretation typeBeforeNormalize = image->Type;
+      if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {
+        typeBeforeNormalize = VIPS_INTERPRETATION_sRGB;
+      }
+
+      // normalize the luminance band in LAB space:
+      VipsImage *lab;
+      if (vips_colourspace(image, &lab, VIPS_INTERPRETATION_LAB, NULL)) {
+        return Error();
+      }
+      vips_object_local(hook, lab);
+
+      VipsImage *luminance;
+      if (vips_extract_band(lab, &luminance, 0, "n", 1, NULL)) {
+        return Error();
+      }
+      vips_object_local(hook, luminance);
+
+      VipsImage *chroma;
+      if (vips_extract_band(lab, &chroma, 1, "n", 2, NULL)) {
+        return Error();
+      }
+      vips_object_local(hook, chroma);
+
+      VipsImage *stats;
+      if (vips_stats(luminance, &stats, NULL)) {
+        return Error();
+      }
+      vips_object_local(hook, stats);
+      double min = *VIPS_MATRIX(stats, 0, 0);
+      double max = *VIPS_MATRIX(stats, 1, 0);
+
+      VipsImage *normalized;
+      if (min == max) {
+        // Range of zero: create black image
+        if (vips_black(&normalized, image->Xsize, image->Ysize, "bands", 1, NULL )) {
+          return Error();
+        }
+        vips_object_local(hook, normalized);
+      } else {
+        double f = 100.0 / (max - min);
+        double a = -(min * f);
+
+        VipsImage *luminance100;
+        if (vips_linear1(luminance, &luminance100, f, a, NULL)) {
+          return Error();
+        }
+        vips_object_local(hook, luminance100);
+
+        VipsImage *normalizedLab;
+        if (vips_bandjoin2(luminance100, chroma, &normalizedLab, NULL)) {
+          return Error();
+        }
+        vips_object_local(hook, normalizedLab);
+        if (vips_colourspace(normalizedLab, &normalized, typeBeforeNormalize, NULL)) {
+          return Error();
+        }
+        vips_object_local(hook, normalized);
+      }
+
+      if (HasAlpha(image)) {
+        VipsImage *alpha;
+        if (vips_extract_band(image, &alpha, image->Bands - 1, "n", 1, NULL)) {
+          return Error();
+        }
+        vips_object_local(hook, alpha);
+
+        VipsImage *normalizedAlpha;
+        if (vips_bandjoin2(normalized, alpha, &normalizedAlpha, NULL)) {
+          return Error();
+        }
+        vips_object_local(hook, normalizedAlpha);
+        image = normalizedAlpha;
+      } else {
+        image = normalized;
+      }
+    }
+
     // Convert image to sRGB, if not already
     if (image->Type != VIPS_INTERPRETATION_sRGB) {
       // Switch intrepretation to sRGB
@@ -762,10 +844,10 @@ class ResizeWorker : public NanAsyncWorker {
 #if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
     } else if (baton->output == "__raw") {
       // Write raw, uncompressed image data to buffer
-      if (baton->greyscale) {
+      if (baton->greyscale || image->Type == VIPS_INTERPRETATION_B_W) {
         // Extract first band for greyscale image
         VipsImage *grey;
-        if (vips_extract_band(image, &grey, 1, NULL)) {
+        if (vips_extract_band(image, &grey, 0, NULL)) {
           return Error();
         }
         vips_object_local(hook, grey);
@@ -1082,6 +1164,7 @@ NAN_METHOD(resize) {
   baton->sharpenJagged = options->Get(NanNew<String>("sharpenJagged"))->NumberValue();
   baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();
   baton->greyscale = options->Get(NanNew<String>("greyscale"))->BooleanValue();
+  baton->normalize = options->Get(NanNew<String>("normalize"))->BooleanValue();
   baton->angle = options->Get(NanNew<String>("angle"))->Int32Value();
   baton->rotateBeforePreExtract = options->Get(NanNew<String>("rotateBeforePreExtract"))->BooleanValue();
   baton->flip = options->Get(NanNew<String>("flip"))->BooleanValue();

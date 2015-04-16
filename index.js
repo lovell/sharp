@@ -59,6 +59,7 @@ var Sharp = function(input) {
     sharpenJagged: 2,
     gamma: 0,
     greyscale: false,
+    normalize: 0,
     // output options
     output: '__input',
     progressive: false,
@@ -332,6 +333,15 @@ Sharp.prototype.gamma = function(gamma) {
   }
   return this;
 };
+
+/*
+  Normalize histogram
+*/
+Sharp.prototype.normalize = function(normalize) {
+  this.options.normalize = (typeof normalize === 'boolean') ? normalize : true;
+  return this;
+};
+Sharp.prototype.normalise = Sharp.prototype.normalize;
 
 /*
   Convert to greyscale
