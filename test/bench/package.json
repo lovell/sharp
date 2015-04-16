@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "imagemagick": "^0.1.3",
-    "imagemagick-native": "^1.7.0",
+    "imagemagick-native": "mash/node-imagemagick-native",
     "gm": "^1.17.0",
     "async": "^0.9.0",
     "semver": "^4.3.0",

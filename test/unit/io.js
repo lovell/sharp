@@ -610,7 +610,7 @@ describe('Input/output', function() {
         .toFormat('png')
         .toFile(fixtures.path('output.svg.png'), function(err, info) {
           if (err) {
-            assert.strictEqual('Input file is of an unsupported image format', err.message);
+            assert.strictEqual(0, err.message.indexOf('Input file is of an unsupported image format'));
           } else {
             assert.strictEqual(true, info.size > 0);
             assert.strictEqual('png', info.format);
