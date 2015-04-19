@@ -261,6 +261,9 @@ class ResizeWorker : public NanAsyncWorker {
 
     // Get window size of interpolator, used for determining shrink vs affine
     int interpolatorWindowSize = InterpolatorWindowSize(baton->interpolator.c_str());
+    if (InterpolatorWindowSize < 0) {
+      return Error();
+    }
 
     // Scaling calculations
     double xfactor = 1.0;
@@ -510,6 +513,9 @@ class ResizeWorker : public NanAsyncWorker {
       }
       // Create interpolator - "bilinear" (default), "bicubic" or "nohalo"
       VipsInterpolate *interpolator = vips_interpolate_new(baton->interpolator.c_str());
+      if (interpolator == NULL) {
+        return Error();
+      }
       vips_object_local(hook, interpolator);
       // Perform affine transformation
       VipsImage *affined;

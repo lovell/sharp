@@ -134,6 +134,9 @@ namespace sharp {
   */
   int InterpolatorWindowSize(char const *name) {
     VipsInterpolate *interpolator = vips_interpolate_new(name);
+    if (interpolator == NULL) {
+      return -1;
+    }
     int window_size = vips_interpolate_get_window_size(interpolator);
     g_object_unref(interpolator);
     return window_size;
