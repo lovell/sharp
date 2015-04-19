@@ -486,6 +486,10 @@ This is a linear operation. If the input image is in a non-linear colour space s
 
 The output image will still be web-friendly sRGB and contain three (identical) channels.
 
+#### normalize() / normalise()
+
+Stretch histogram to cover full dynamic range before output to enhance contrast.
+
 ### Output options
 
 #### jpeg()
