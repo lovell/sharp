@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "mocha": "^2.1.0",
-    "mocha-jshint": "^1.0.0",
+    "mocha-jshint": "^2.1.1",
     "istanbul": "^0.3.6",
     "coveralls": "^2.11.2",
     "node-cpplint": "^0.4.0",

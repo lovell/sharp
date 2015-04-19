@@ -488,7 +488,7 @@ The output image will still be web-friendly sRGB and contain three (identical) c
 
 #### normalize() / normalise()
 
-Stretch histogram to cover full dynamic range before output to enhance contrast.
+Enhance output image contrast by stretching its luminance to cover the full dynamic range. This typically reduces performance by 30%.
 
 ### Output options
 
@@ -760,6 +760,10 @@ This module would never have been possible without the help and code contributio
 * [Brandon Aaron](https://github.com/brandonaaron)
 * [Andreas Lind](https://github.com/papandreou)
 * [Maurus Cuelenaere](https://github.com/mcuelenaere)
+* [Linus Unnebäck](https://github.com/LinusU)
+* [Victor Mateevitsi](https://github.com/mvictoras)
+* [Alaric Holloway](https://github.com/skedastik)
+* [Bernhard K. Weisshuhn](https://github.com/bkw)
 
 Thank you!
 

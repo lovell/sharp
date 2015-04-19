@@ -311,6 +311,18 @@ async.series({
           }
         });
       }
+    }).add('sharp-normalise', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer).resize(width, height).normalise().toBuffer(function(err, buffer) {
+          if (err) {
+            throw err;
+          } else {
+            assert.notStrictEqual(null, buffer);
+            deferred.resolve();
+          }
+        });
+      }
     }).add('sharp-greyscale', {
       defer: true,
       fn: function(deferred) {
