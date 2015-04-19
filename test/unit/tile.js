@@ -177,9 +177,9 @@ describe('Tile', function() {
     describe('Deep Zoom output', function() {
 
       it('Tile size - 256px default', function(done) {
-        var directory = fixtures.path('output256_files');
+        var directory = fixtures.path('output.256_files');
         rimraf(directory, function() {
-          sharp(fixtures.inputJpg).toFile(fixtures.path('output256.dzi'), function(err, info) {
+          sharp(fixtures.inputJpg).toFile(fixtures.path('output.256.dzi'), function(err, info) {
             if (err) throw err;
             assert.strictEqual('dz', info.format);
             assertDeepZoomTiles(directory, 256, 13, done);
@@ -188,9 +188,9 @@ describe('Tile', function() {
       });
 
       it('Tile size/overlap - 512/16px', function(done) {
-        var directory = fixtures.path('output512_files');
+        var directory = fixtures.path('output.512_files');
         rimraf(directory, function() {
-          sharp(fixtures.inputJpg).tile(512, 16).toFile(fixtures.path('output512.dzi'), function(err, info) {
+          sharp(fixtures.inputJpg).tile(512, 16).toFile(fixtures.path('output.512.dzi'), function(err, info) {
             if (err) throw err;
             assert.strictEqual('dz', info.format);
             assertDeepZoomTiles(directory, 512 + 2 * 16, 13, done);
