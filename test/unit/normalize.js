@@ -34,7 +34,7 @@ describe('Normalization', function () {
     sharp(fixtures.inputJpgWithLowContrast)
       .gamma()
       .greyscale()
-      .normalize()
+      .normalize(true)
       .raw()
       .toBuffer(function (err, data, info) {
         if (err) throw err;

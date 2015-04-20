@@ -317,7 +317,18 @@ module.exports.interpolator = {
   vertexSplitQuadraticBasisSpline: 'vsqbs'
 };
 Sharp.prototype.interpolateWith = function(interpolator) {
-  this.options.interpolator = interpolator;
+  var isValid = false;
+  for (var key in module.exports.interpolator) {
+    if (module.exports.interpolator[key] === interpolator) {
+      isValid = true;
+      break;
+    }
+  }
+  if (isValid) {
+    this.options.interpolator = interpolator;
+  } else {
+    throw new Error('Invalid interpolator ' + interpolator);
+  }
   return this;
 };
 
