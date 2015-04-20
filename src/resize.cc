@@ -261,7 +261,7 @@ class ResizeWorker : public NanAsyncWorker {
 
     // Get window size of interpolator, used for determining shrink vs affine
     int interpolatorWindowSize = InterpolatorWindowSize(baton->interpolator.c_str());
-    if (InterpolatorWindowSize < 0) {
+    if (interpolatorWindowSize < 0) {
       return Error();
     }
 
