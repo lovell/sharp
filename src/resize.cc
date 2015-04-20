@@ -459,8 +459,8 @@ class ResizeWorker : public NanAsyncWorker {
       vips_object_local(hook, shrunk);
       image = shrunk;
       // Recalculate residual float based on dimensions of required vs shrunk images
-      double shrunkWidth = shrunk->Xsize;
-      double shrunkHeight = shrunk->Ysize;
+      int shrunkWidth = shrunk->Xsize;
+      int shrunkHeight = shrunk->Ysize;
       if (rotation == Angle::D90 || rotation == Angle::D270) {
         // Swap input output width and height when rotating by 90 or 270 degrees
         int swap = shrunkWidth;

@@ -1,0 +1,17 @@
+os: Visual Studio 2014 CTP4
+environment:
+  VIPS_VERSION_MAJOR_MINOR: 7.42
+  VIPS_VERSION_PATCH: 3
+install:
+  - ps: $env:VIPS_VERSION = "$env:VIPS_VERSION_MAJOR_MINOR.$env:VIPS_VERSION_PATCH"
+  - ps: Write-Output "VIPS_VERSION=$env:VIPS_VERSION"
+  - ps: Write-Output "Fetching http://www.vips.ecs.soton.ac.uk/supported/$env:VIPS_VERSION_MAJOR_MINOR/win32/vips-dev-$env:VIPS_VERSION.zip"
+  - ps: Start-FileDownload http://www.vips.ecs.soton.ac.uk/supported/$env:VIPS_VERSION_MAJOR_MINOR/win32/vips-dev-$env:VIPS_VERSION.zip -FileName c:\vips-dev-$env:VIPS_VERSION.zip
+  - ps: Write-Output "Extracting c:\vips-dev-$env:VIPS_VERSION.zip"
+  - ps: Invoke-Expression "& 7z -y x c:\vips-dev-$env:VIPS_VERSION.zip -oc:\ | FIND /V `"ing  `""
+  - ps: $env:VIPS_HOME = "c:\vips-dev-$env:VIPS_VERSION"
+  - ps: $env:PATH = "$env:VIPS_HOME\bin;$env:PATH"
+  - ps: Install-Product node 0 x86
+  - npm install --msvs_version=2013
+test_script:
+  - npm test
