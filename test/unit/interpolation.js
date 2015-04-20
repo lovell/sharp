@@ -93,4 +93,16 @@ describe('Interpolation', function() {
       });
   });
 
+  it('unknown interpolator throws', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .interpolateWith('nonexistant')
+      .toBuffer()
+      .catch(function (e) {
+        assert(
+          e.toString().match(/VipsInterpolate: class "nonexistant" not found/)
+        );
+      })
+      .finally(done);
+  });
 });
