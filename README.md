@@ -88,9 +88,12 @@ The _gettext_ dependency of _libvips_ [can lead](https://github.com/lovell/sharp
 Requires x86 32-bit Node.js or io.js (use `iojs.exe` rather than `node.exe`).
 The WebP format is currently unsupported.
 
-1. [Download](http://www.vips.ecs.soton.ac.uk/supported/current/win32/) and unzip `vips-dev.x.y.z.zip`.
-2. Set the `VIPS_HOME` environment variable to the full path of the `vips-dev-x.y.z` directory.
-3. Add `vips-dev-x.y.z\bin` to `PATH`.
+1. Ensure the [node-gyp prerequisites](https://github.com/TooTallNate/node-gyp#installation) are met.
+2. [Download](http://www.vips.ecs.soton.ac.uk/supported/current/win32/) and unzip `vips-dev.x.y.z.zip`.
+3. Set the `VIPS_HOME` environment variable to the full path of the `vips-dev-x.y.z` directory.
+4. Add `vips-dev-x.y.z\bin` to `PATH`.
+
+Versions of MSVC more recent than 2013 may require the use of `npm install --arch=ia32 --msvs_version=2013`.
 
 ### Heroku
 
@@ -677,6 +680,10 @@ A [guide for contributors](https://github.com/lovell/sharp/blob/master/CONTRIBUT
 #### Centos 6.5
 
 [![Centos 6.5 Build Status](https://snap-ci.com/lovell/sharp/branch/master/build_image)](https://snap-ci.com/lovell/sharp/branch/master)
+
+#### Windows Server 2012
+
+[![Windows Server 2012 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
 
 ### Benchmark tests
 

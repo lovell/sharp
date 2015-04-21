@@ -31,16 +31,18 @@ describe('Colour space conversion', function() {
       .toFile(fixtures.path('output.greyscale-not.jpg'), done);
   });
 
-  it('From 1-bit TIFF to sRGB WebP [slow]', function(done) {
-    sharp(fixtures.inputTiff)
-      .webp()
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('webp', info.format);
-        done();
-      });
-  });
+  if (sharp.format.webp.output.buffer) {
+    it('From 1-bit TIFF to sRGB WebP [slow]', function(done) {
+      sharp(fixtures.inputTiff)
+        .webp()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('webp', info.format);
+          done();
+        });
+    });
+  }
 
   it('From CMYK to sRGB', function(done) {
     sharp(fixtures.inputJpgWithCmykProfile)

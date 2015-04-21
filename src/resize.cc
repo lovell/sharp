@@ -708,6 +708,7 @@ class ResizeWorker : public NanAsyncWorker {
       image = gammaDecoded;
     }
 
+#ifndef _WIN32
     // Apply normalization
     if (baton->normalize) {
       VipsInterpretation typeBeforeNormalize = image->Type;
@@ -787,6 +788,7 @@ class ResizeWorker : public NanAsyncWorker {
         image = normalized;
       }
     }
+#endif
 
     // Convert image to sRGB, if not already
     if (image->Type != VIPS_INTERPRETATION_sRGB) {

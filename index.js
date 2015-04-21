@@ -349,10 +349,14 @@ Sharp.prototype.gamma = function(gamma) {
 };
 
 /*
-  Normalize histogram
+  Enhance output image contrast by stretching its luminance to cover the full dynamic range
 */
 Sharp.prototype.normalize = function(normalize) {
-  this.options.normalize = (typeof normalize === 'boolean') ? normalize : true;
+  if (process.platform !== 'win32') {
+    this.options.normalize = (typeof normalize === 'boolean') ? normalize : true;
+  } else {
+    console.error('normalize unavailable on win32 platform');
+  }
   return this;
 };
 Sharp.prototype.normalise = Sharp.prototype.normalize;

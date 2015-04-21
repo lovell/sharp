@@ -806,8 +806,10 @@ describe('Input/output', function() {
       .toBuffer(function(err) {
         sharp.queue.removeListener('change', queueListener);
         if (err) throw err;
-        assert.strictEqual(2, eventCounter);
-        done();
+        process.nextTick(function() {
+          assert.strictEqual(2, eventCounter);
+          done();
+        });
       });
   });
 

@@ -31,16 +31,18 @@ describe('Partial image extraction', function() {
       });
   });
 
-  it('WebP', function(done) {
-    sharp(fixtures.inputWebP)
-      .extract(50, 100, 125, 200)
-      .toFile(fixtures.path('output.extract.webp'), function(err, info) {
-        if (err) throw err;
-        assert.strictEqual(125, info.width);
-        assert.strictEqual(200, info.height);
-        done();
-      });
-  });
+  if (sharp.format.webp.output.file) {
+    it('WebP', function(done) {
+      sharp(fixtures.inputWebP)
+        .extract(50, 100, 125, 200)
+        .toFile(fixtures.path('output.extract.webp'), function(err, info) {
+          if (err) throw err;
+          assert.strictEqual(125, info.width);
+          assert.strictEqual(200, info.height);
+          done();
+        });
+    });
+  }
 
   it('TIFF', function(done) {
     sharp(fixtures.inputTiff)

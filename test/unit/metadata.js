@@ -82,19 +82,21 @@ describe('Image metadata', function() {
     });
   });
 
-  it('WebP', function(done) {
-    sharp(fixtures.inputWebP).metadata(function(err, metadata) {
-      if (err) throw err;
-      assert.strictEqual('webp', metadata.format);
-      assert.strictEqual(1024, metadata.width);
-      assert.strictEqual(772, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      done();
+  if (sharp.format.webp.input.file) {
+    it('WebP', function(done) {
+      sharp(fixtures.inputWebP).metadata(function(err, metadata) {
+        if (err) throw err;
+        assert.strictEqual('webp', metadata.format);
+        assert.strictEqual(1024, metadata.width);
+        assert.strictEqual(772, metadata.height);
+        assert.strictEqual('srgb', metadata.space);
+        assert.strictEqual(3, metadata.channels);
+        assert.strictEqual(false, metadata.hasProfile);
+        assert.strictEqual(false, metadata.hasAlpha);
+        done();
+      });
     });
-  });
+  }
 
   it('GIF via libmagick', function(done) {
     sharp(fixtures.inputGif).metadata(function(err, metadata) {
