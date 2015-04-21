@@ -796,8 +796,7 @@ describe('Input/output', function() {
   it('Queue length change events', function(done) {
     var eventCounter = 0;
     var queueListener = function(queueLength) {
-      assert.strictEqual('number', typeof queueLength);
-      assert.strictEqual(1 - eventCounter, queueLength);
+      assert.strictEqual(true, queueLength === 0 || queueLength === 1);
       eventCounter++;
     };
     sharp.queue.on('change', queueListener);
