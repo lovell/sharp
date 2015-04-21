@@ -1,5 +1,6 @@
 os: Visual Studio 2014 CTP4
-platform: x86
+platform: Win32
+configuration: Release
 environment:
   VIPS_VERSION_MAJOR_MINOR: 7.42
   VIPS_VERSION_PATCH: 3
@@ -12,6 +13,6 @@ install:
   - ps: $env:VIPS_HOME = "c:\vips-dev-$env:VIPS_VERSION"
   - ps: $env:PATH = "$env:VIPS_HOME\bin;$env:PATH"
   - ps: Install-Product node 0 x86
-  - npm install --msvs_version=2013
+  - npm install --arch=ia32 --msvs_version=2013
 test_script:
   - npm run-script test-win32-node
