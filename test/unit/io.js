@@ -804,9 +804,9 @@ describe('Input/output', function() {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .toBuffer(function(err) {
-        sharp.queue.removeListener('change', queueListener);
-        if (err) throw err;
         process.nextTick(function() {
+          sharp.queue.removeListener('change', queueListener);
+          if (err) throw err;
           assert.strictEqual(2, eventCounter);
           done();
         });
