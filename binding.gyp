@@ -68,6 +68,11 @@
         '-O3'
       ],
       'MACOSX_DEPLOYMENT_TARGET': '10.7'
+    },
+    'msvs_settings': {
+      'VCCLCompilerTool': {
+        'ExceptionHandling': 1 # /EHsc
+      }
     }
   }]
 }

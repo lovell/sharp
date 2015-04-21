@@ -283,19 +283,19 @@ class ResizeWorker : public NanAsyncWorker {
           break;
         case Canvas::MAX:
           if (xfactor > yfactor) {
-            baton->height = round(static_cast<double>(inputHeight) / xfactor);
+            baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
             yfactor = xfactor;
           } else {
-            baton->width = round(static_cast<double>(inputWidth) / yfactor);
+            baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
             xfactor = yfactor;
           }
           break;
         case Canvas::MIN:
           if (xfactor < yfactor) {
-            baton->height = round(static_cast<double>(inputHeight) / xfactor);
+            baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
             yfactor = xfactor;
           } else {
-            baton->width = round(static_cast<double>(inputWidth) / yfactor);
+            baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
             xfactor = yfactor;
           }
           break;
@@ -311,7 +311,7 @@ class ResizeWorker : public NanAsyncWorker {
       } else {
         // Auto height
         yfactor = xfactor;
-        baton->height = floor(static_cast<double>(inputHeight) / yfactor);
+        baton->height = static_cast<int>(floor(static_cast<double>(inputHeight) / yfactor));
       }
     } else if (baton->height > 0) {
       // Fixed height
@@ -321,7 +321,7 @@ class ResizeWorker : public NanAsyncWorker {
       } else {
         // Auto width
         xfactor = yfactor;
-        baton->width = floor(static_cast<double>(inputWidth) / xfactor);
+        baton->width = static_cast<int>(floor(static_cast<double>(inputWidth) / xfactor));
       }
     } else {
       // Identity transform
@@ -1086,9 +1086,9 @@ class ResizeWorker : public NanAsyncWorker {
     int shrink = 1;
     if (factor >= 2 && interpolatorWindowSize > 3) {
       // Shrink less, affine more with interpolators that use at least 4x4 pixel window, e.g. bicubic
-      shrink = floor(factor * 3.0 / interpolatorWindowSize);
+      shrink = static_cast<int>(floor(factor * 3.0 / interpolatorWindowSize));
     } else {
-      shrink = floor(factor);
+      shrink = static_cast<int>(floor(factor));
     }
     if (shrink < 1) {
       shrink = 1;
