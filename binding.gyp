@@ -3,6 +3,7 @@
     'target_name': 'sharp',
     'sources': [
       'src/common.cc',
+      'src/composite.c',
       'src/utilities.cc',
       'src/metadata.cc',
       'src/resize.cc',
