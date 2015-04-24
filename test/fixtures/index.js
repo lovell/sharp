@@ -11,7 +11,7 @@ var getPath = function(filename) {
 
 // Generates a 64-bit-as-binary-string image fingerprint
 // Based on the dHash gradient method - see http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html
-var fingerprint = function(image, done) {
+var fingerprint = function(image, callback) {
   sharp(image)
     .greyscale()
     .normalise()
@@ -21,7 +21,7 @@ var fingerprint = function(image, done) {
     .raw()
     .toBuffer(function(err, data) {
       if (err) {
-        done(err);
+        callback(err);
       } else {
         var fingerprint = '';
         for (var col = 0; col < 8; col++) {
@@ -32,7 +32,7 @@ var fingerprint = function(image, done) {
             fingerprint = fingerprint + (left < right ? '1' : '0');
           }
         }
-        done(null, fingerprint);
+        callback(null, fingerprint);
       }
     });
 };
@@ -52,6 +52,11 @@ module.exports = {
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),
   inputPngWithOneColor: getPath('2x2_fdcce6.png'),
+  inputPngOverlayLayer0: getPath('alpha-layer-0-background.png'),
+  inputPngOverlayLayer1: getPath('alpha-layer-1-fill.png'),
+  inputPngOverlayLayer2: getPath('alpha-layer-2-ink.png'),
+  inputPngOverlayLayer1LowAlpha: getPath('alpha-layer-1-fill-low-alpha.png'),
+  inputPngOverlayLayer2LowAlpha: getPath('alpha-layer-2-ink-low-alpha.png'),
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputTiff: getPath('G31D.TIF'), // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
@@ -75,19 +80,46 @@ module.exports = {
   },
 
   // Verify similarity of expected vs actual images via fingerprint
-  assertSimilar: function(expectedImage, actualImage, done) {
+  // Specify distance threshold using `options={threshold: 42}`, default
+  // `threshold` is 5;
+  assertSimilar: function(expectedImage, actualImage, options, callback) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+
+    if (typeof options === 'undefined' && options === null) {
+      options = {};
+    }
+
+    if (options.threshold === null || typeof options.threshold === 'undefined') {
+      options.threshold = 5; // ~7% threshold
+    }
+
+    if (typeof options.threshold !== 'number') {
+      throw new TypeError('`options.threshold` must be a number');
+    }
+
+    if (typeof callback !== 'function') {
+      throw new TypeError('`callback` must be a function');
+    }
+
     fingerprint(expectedImage, function(err, expectedFingerprint) {
-      if (err) throw err;
+      if (err) return callback(err);
       fingerprint(actualImage, function(err, actualFingerprint) {
-        if (err) throw err;
+        if (err) return callback(err);
         var distance = 0;
         for (var i = 0; i < 64; i++) {
           if (expectedFingerprint[i] !== actualFingerprint[i]) {
             distance++;
           }
         }
-        assert.strictEqual(true, distance <= 5);  // ~7% threshold
-        done();
+
+        if (distance > options.threshold) {
+          return callback(new Error('Maximum similarity distance: ' + options.threshold + '. Actual: ' + distance));
+        }
+
+        callback();
       });
     });
   }

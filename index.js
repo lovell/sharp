@@ -60,6 +60,8 @@ var Sharp = function(input) {
     gamma: 0,
     greyscale: false,
     normalize: 0,
+    // overlay
+    overlayPath: '',
     // output options
     output: '__input',
     progressive: false,
@@ -200,6 +202,17 @@ Sharp.prototype.ignoreAspectRatio = function() {
 
 Sharp.prototype.flatten = function(flatten) {
   this.options.flatten = (typeof flatten === 'boolean') ? flatten : true;
+  return this;
+};
+
+Sharp.prototype.overlayWith = function(overlayPath) {
+  if (typeof overlayPath !== 'string') {
+    throw new Error('The overlay path must be a string');
+  }
+  if (overlayPath === '') {
+    throw new Error('The overlay path cannot be empty');
+  }
+  this.options.overlayPath = overlayPath;
   return this;
 };
 
