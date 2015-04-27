@@ -250,11 +250,11 @@ case $(uname -s) in
         jessie|vivid)
           # Debian 8, Ubuntu 15
           if [ $enable_openslide -eq 1 ]; then
-            echo "Installing libvips via apt-get"
-            apt-get install -y libvips-dev libgsf-1-dev
-          else
             echo "Recompiling vips with openslide support"
             install_libvips_from_source
+          else
+            echo "Installing libvips via apt-get"
+            apt-get install -y libvips-dev libgsf-1-dev
           fi
           ;;
         trusty|utopic|qiana|rebecca)
