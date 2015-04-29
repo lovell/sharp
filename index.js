@@ -43,7 +43,7 @@ var Sharp = function(input) {
     width: -1,
     height: -1,
     canvas: 'crop',
-    gravity: 0,
+    gravity: { left: 0.5, top: 0.5 },
     angle: 0,
     rotateBeforePreExtract: false,
     flip: false,
@@ -132,11 +132,20 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
 };
 
 // Crop this part of the resized image (Center/Centre, North, East, South, West)
-module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4};
+module.exports.gravity = {
+  'center': { left: 0.5, top: 0.5 },
+  'centre': { left: 0.5, top: 0.5 },
+  'north':  { left: 0.5, top: 0.0 },
+  'east':   { left: 1.0, top: 0.5 },
+  'south':  { left: 0.5, top: 1.0 },
+  'west':   { left: 0.0, top: 0.5 }
+};
 
 Sharp.prototype.crop = function(gravity) {
   this.options.canvas = 'crop';
-  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 4) {
+  if (typeof gravity === 'object' &&
+      typeof gravity.left === 'number' && !Number.isNaN(gravity.left) && gravity.left >= 0 && gravity.left <= 1 &&
+      typeof gravity.top === 'number' && !Number.isNaN(gravity.top) && gravity.top >= 0 && gravity.top <= 1) {
     this.options.gravity = gravity;
   } else {
     throw new Error('Unsupported crop gravity ' + gravity);

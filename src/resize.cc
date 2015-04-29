@@ -73,7 +73,8 @@ struct ResizeBaton {
   int width;
   int height;
   Canvas canvas;
-  int gravity;
+  double gravityLeft;
+  double gravityTop;
   std::string interpolator;
   double background[4];
   bool flatten;
@@ -111,7 +112,8 @@ struct ResizeBaton {
     topOffsetPre(-1),
     topOffsetPost(-1),
     canvas(Canvas::CROP),
-    gravity(0),
+    gravityLeft(0.5),
+    gravityTop(0.5),
     flatten(false),
     blurSigma(0.0),
     sharpenRadius(0),
@@ -619,7 +621,7 @@ class ResizeWorker : public NanAsyncWorker {
         // Crop/max/min
         int left;
         int top;
-        std::tie(left, top) = CalculateCrop(image->Xsize, image->Ysize, baton->width, baton->height, baton->gravity);
+        std::tie(left, top) = CalculateCrop(image->Xsize, image->Ysize, baton->width, baton->height, baton->gravityLeft, baton->gravityTop);
         int width = std::min(image->Xsize, baton->width);
         int height = std::min(image->Ysize, baton->height);
         VipsImage *extracted;
@@ -1054,28 +1056,10 @@ class ResizeWorker : public NanAsyncWorker {
     within the input image, applying the given gravity.
   */
   std::tuple<int, int>
-  CalculateCrop(int const inWidth, int const inHeight, int const outWidth, int const outHeight, int const gravity) {
-    int left = 0;
-    int top = 0;
-    switch (gravity) {
-      case 1: // North
-        left = (inWidth - outWidth + 1) / 2;
-        break;
-      case 2: // East
-        left = inWidth - outWidth;
-        top = (inHeight - outHeight + 1) / 2;
-        break;
-      case 3: // South
-        left = (inWidth - outWidth + 1) / 2;
-        top = inHeight - outHeight;
-        break;
-      case 4: // West
-        top = (inHeight - outHeight + 1) / 2;
-        break;
-      default: // Centre
-        left = (inWidth - outWidth + 1) / 2;
-        top = (inHeight - outHeight + 1) / 2;
-    }
+  CalculateCrop(int const inWidth, int const inHeight, int const outWidth, int const outHeight,
+      double const gravityLeft, double const gravityTop) {
+    int left = (inWidth - outWidth) * gravityLeft;
+    int top = (inHeight - outHeight) * gravityTop;
     return std::make_tuple(left, top);
   }
 
@@ -1177,7 +1161,9 @@ NAN_METHOD(resize) {
   }
   // Resize options
   baton->withoutEnlargement = options->Get(NanNew<String>("withoutEnlargement"))->BooleanValue();
-  baton->gravity = options->Get(NanNew<String>("gravity"))->Int32Value();
+  Local<Object> gravity = options->Get(NanNew<String>("gravity"))->ToObject();
+  baton->gravityLeft = gravity->Get(NanNew<String>("left"))->NumberValue();
+  baton->gravityTop = gravity->Get(NanNew<String>("top"))->NumberValue();
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   // Operators
   baton->flatten = options->Get(NanNew<String>("flatten"))->BooleanValue();
