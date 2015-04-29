@@ -50,4 +50,22 @@ describe('Embed', function() {
     });
   }
 
+  it('PNG with alpha channel', function(done) {
+    sharp(fixtures.inputPngWithTransparency)
+      .resize(50, 50)
+      .embed()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(50, info.width);
+        assert.strictEqual(50, info.height);
+        sharp(data).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(4, metadata.channels);
+          done();
+        });
+      });
+  });
+
 });

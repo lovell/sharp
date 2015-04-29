@@ -593,7 +593,7 @@ class ResizeWorker : public NanAsyncWorker {
         }
         // Create background
         VipsArrayDouble *background;
-        if (baton->background[3] < 255.0) {
+        if (baton->background[3] < 255.0 || HasAlpha(image)) {
           background = vips_array_double_newv(
             4, baton->background[0], baton->background[1], baton->background[2], baton->background[3]
           );
