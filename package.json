@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -20,9 +20,9 @@
   ],
   "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {
-    "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=15000 ./test/unit/*.js",
-    "test-win32-node": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=15000 ./test/unit/*.js",
-    "test-win32-iojs": "iojs ./node_modules/mocha/bin/mocha --slow=5000 --timeout=15000 ./test/unit/*.js"
+    "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=20000 ./test/unit/*.js",
+    "test-win32-node": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=20000 ./test/unit/*.js",
+    "test-win32-iojs": "iojs ./node_modules/mocha/bin/mocha --slow=5000 --timeout=20000 ./test/unit/*.js"
   },
   "main": "index.js",
   "repository": {
@@ -44,17 +44,17 @@
   "dependencies": {
     "bluebird": "^2.9.24",
     "color": "^0.8.0",
-    "nan": "^1.7.0",
+    "nan": "^1.8.4",
     "semver": "^4.3.3"
   },
   "devDependencies": {
-    "mocha": "^2.2.4",
-    "mocha-jshint": "^2.2.0",
-    "istanbul": "^0.3.13",
+    "async": "^0.9.0",
     "coveralls": "^2.11.2",
+    "istanbul": "^0.3.13",
+    "mocha": "^2.2.4",
+    "mocha-jshint": "^2.2.2",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.3.2",
-    "async": "^0.9.0"
+    "rimraf": "^2.3.3"
   },
   "license": "Apache 2.0",
   "engines": {
