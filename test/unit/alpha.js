@@ -13,7 +13,12 @@ describe('Alpha transparency', function() {
     sharp(fixtures.inputPngWithTransparency)
       .flatten()
       .resize(400, 300)
-      .toFile(fixtures.path('output.flatten-black.jpg'), done);
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(400, info.width);
+        assert.strictEqual(300, info.height);
+        fixtures.assertSimilar(fixtures.expected('flatten-black.jpg'), data, done);
+      });
   });
 
   it('Flatten to RGB orange', function(done) {
@@ -21,7 +26,12 @@ describe('Alpha transparency', function() {
       .flatten()
       .background({r: 255, g: 102, b: 0})
       .resize(400, 300)
-      .toFile(fixtures.path('output.flatten-rgb-orange.jpg'), done);
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(400, info.width);
+        assert.strictEqual(300, info.height);
+        fixtures.assertSimilar(fixtures.expected('flatten-orange.jpg'), data, done);
+      });
   });
 
   it('Flatten to CSS/hex orange', function(done) {
@@ -29,7 +39,12 @@ describe('Alpha transparency', function() {
       .flatten()
       .background('#ff6600')
       .resize(400, 300)
-      .toFile(fixtures.path('output.flatten-hex-orange.jpg'), done);
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(400, info.width);
+        assert.strictEqual(300, info.height);
+        fixtures.assertSimilar(fixtures.expected('flatten-orange.jpg'), data, done);
+      });
   });
 
   it('Do not flatten', function(done) {

@@ -669,6 +669,10 @@ A [guide for contributors](https://github.com/lovell/sharp/blob/master/CONTRIBUT
 
 ### Functional tests
 
+Where possible, the functional tests use gradient-based perceptual hashes
+based on [dHash](http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html)
+to compare expected vs actual images.
+
 #### Coverage
 
 [![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.png?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)

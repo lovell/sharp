@@ -1,9 +1,40 @@
 'use strict';
 
 var path = require('path');
+var assert = require('assert');
+
+var sharp = require('../../index');
 
 var getPath = function(filename) {
   return path.join(__dirname, filename);
+};
+
+// Generates a 64-bit-as-binary-string image fingerprint
+// Based on the dHash gradient method - see http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html
+var fingerprint = function(image, done) {
+  sharp(image)
+    .greyscale()
+    .normalise()
+    .resize(9, 8)
+    .ignoreAspectRatio()
+    .interpolateWith(sharp.interpolator.vertexSplitQuadraticBasisSpline)
+    .raw()
+    .toBuffer(function(err, data) {
+      if (err) {
+        done(err);
+      } else {
+        var fingerprint = '';
+        for (var col = 0; col < 8; col++) {
+          var gradient = 0;
+          for (var row = 0; row < 8; row++) {
+            var left = data[row * 8 + col];
+            var right = data[row * 8 + col + 1];
+            fingerprint = fingerprint + (left < right ? '1' : '0');
+          }
+        }
+        done(null, fingerprint);
+      }
+    });
 };
 
 module.exports = {
@@ -35,6 +66,30 @@ module.exports = {
   outputWebP: getPath('output.webp'),
   outputZoinks: getPath('output.zoinks'), // an 'unknown' file extension
 
-  path: getPath // allows tests to write files to fixtures directory (for testing with human eyes)
+  // Path for tests requiring human inspection
+  path: getPath,
+
+  // Path for expected output images
+  expected: function(filename) {
+    return getPath(path.join('expected', filename));
+  },
+
+  // Verify similarity of expected vs actual images via fingerprint
+  assertSimilar: function(expectedImage, actualImage, done) {
+    fingerprint(expectedImage, function(err, expectedFingerprint) {
+      if (err) throw err;
+      fingerprint(actualImage, function(err, actualFingerprint) {
+        if (err) throw err;
+        var distance = 0;
+        for (var i = 0; i < 64; i++) {
+          if (expectedFingerprint[i] !== actualFingerprint[i]) {
+            distance++;
+          }
+        }
+        assert.strictEqual(true, distance <= 5);  // ~7% threshold
+        done();
+      });
+    });
+  }
 
 };
