@@ -37,12 +37,12 @@ describe('Rotation', function() {
     sharp(fixtures.inputJpgWithExif)
       .rotate()
       .resize(320)
-      .toFile(fixtures.path('output.exif.8.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('exif-8.jpg'), data, done);
       });
   });
 
@@ -50,12 +50,12 @@ describe('Rotation', function() {
     sharp(fixtures.inputJpgWithExifMirroring)
       .rotate()
       .resize(320)
-      .toFile(fixtures.path('output.exif.5.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('exif-5.jpg'), data, done);
       });
   });
 
@@ -85,26 +85,22 @@ describe('Rotation', function() {
       });
   });
 
-  it('Rotate to an invalid angle, should fail', function(done) {
-    var fail = false;
-    try {
+  it('Rotate to an invalid angle, should fail', function() {
+    assert.throws(function() {
       sharp(fixtures.inputJpg).rotate(1);
-      fail = true;
-    } catch (e) {}
-    assert(!fail);
-    done();
+    });
   });
 
   it('Flip - vertical', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320)
       .flip()
-      .toFile(fixtures.path('output.flip.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(261, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('flip.jpg'), data, done);
       });
   });
 
@@ -112,12 +108,12 @@ describe('Rotation', function() {
     sharp(fixtures.inputJpg)
       .resize(320)
       .flop()
-      .toFile(fixtures.path('output.flop.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(261, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('flop.jpg'), data, done);
       });
   });
 
@@ -125,12 +121,12 @@ describe('Rotation', function() {
     sharp(fixtures.inputJpg)
       .resize(320)
       .flop()
-      .toFile(fixtures.path('output.flip.flop.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(261, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('flip-and-flop.jpg'), data, done);
       });
   });
 
@@ -139,12 +135,12 @@ describe('Rotation', function() {
       .resize(320)
       .flip(false)
       .flop(false)
-      .toFile(fixtures.path('output.flip.flop.nope.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(261, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.inputJpg, data, done);
       });
   });
 

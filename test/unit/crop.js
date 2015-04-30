@@ -13,11 +13,11 @@ describe('Crop gravities', function() {
     sharp(fixtures.inputJpg)
       .resize(320, 80)
       .crop(sharp.gravity.north)
-      .toFile(fixtures.path('output.gravity-north.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(80, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('gravity-north.jpg'), data, done);
       });
   });
 
@@ -25,11 +25,11 @@ describe('Crop gravities', function() {
     sharp(fixtures.inputJpg)
       .resize(80, 320)
       .crop(sharp.gravity.east)
-      .toFile(fixtures.path('output.gravity-east.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(80, info.width);
         assert.strictEqual(320, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('gravity-east.jpg'), data, done);
       });
   });
 
@@ -37,11 +37,11 @@ describe('Crop gravities', function() {
     sharp(fixtures.inputJpg)
       .resize(320, 80)
       .crop(sharp.gravity.south)
-      .toFile(fixtures.path('output.gravity-south.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(80, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('gravity-south.jpg'), data, done);
       });
   });
 
@@ -49,11 +49,11 @@ describe('Crop gravities', function() {
     sharp(fixtures.inputJpg)
       .resize(80, 320)
       .crop(sharp.gravity.west)
-      .toFile(fixtures.path('output.gravity-west.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(80, info.width);
         assert.strictEqual(320, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('gravity-west.jpg'), data, done);
       });
   });
 
@@ -61,11 +61,11 @@ describe('Crop gravities', function() {
     sharp(fixtures.inputJpg)
       .resize(320, 80)
       .crop(sharp.gravity.center)
-      .toFile(fixtures.path('output.gravity-center.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(80, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('gravity-center.jpg'), data, done);
       });
   });
 
@@ -73,23 +73,18 @@ describe('Crop gravities', function() {
     sharp(fixtures.inputJpg)
       .resize(80, 320)
       .crop(sharp.gravity.centre)
-      .toFile(fixtures.path('output.gravity-centre.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(80, info.width);
         assert.strictEqual(320, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('gravity-centre.jpg'), data, done);
       });
   });
 
-  it('Invalid', function(done) {
-    var isValid = true;
-    try {
+  it('Invalid', function() {
+    assert.throws(function() {
       sharp(fixtures.inputJpg).crop(5);
-    } catch (err) {
-      isValid = false;
-    }
-    assert.strictEqual(false, isValid);
-    done();
+    });
   });
 
 });
