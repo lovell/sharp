@@ -12,22 +12,22 @@ describe('Partial image extraction', function() {
   it('JPEG', function(done) {
     sharp(fixtures.inputJpg)
       .extract(2, 2, 20, 20)
-      .toFile(fixtures.path('output.extract.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(20, info.width);
         assert.strictEqual(20, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('extract.jpg'), data, done);
       });
   });
 
   it('PNG', function(done) {
     sharp(fixtures.inputPng)
       .extract(300, 200, 400, 200)
-      .toFile(fixtures.path('output.extract.png'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(400, info.width);
         assert.strictEqual(200, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('extract.png'), data, done);
       });
   });
 
@@ -35,11 +35,11 @@ describe('Partial image extraction', function() {
     it('WebP', function(done) {
       sharp(fixtures.inputWebP)
         .extract(50, 100, 125, 200)
-        .toFile(fixtures.path('output.extract.webp'), function(err, info) {
+        .toBuffer(function(err, data, info) {
           if (err) throw err;
           assert.strictEqual(125, info.width);
           assert.strictEqual(200, info.height);
-          done();
+          fixtures.assertSimilar(fixtures.expected('extract.webp'), data, done);
         });
     });
   }
@@ -47,11 +47,12 @@ describe('Partial image extraction', function() {
   it('TIFF', function(done) {
     sharp(fixtures.inputTiff)
       .extract(63, 34, 341, 529)
-      .toFile(fixtures.path('output.extract.tiff'), function(err, info) {
+      .jpeg()
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(341, info.width);
         assert.strictEqual(529, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('extract.tiff'), data, done);
       });
   });
 
@@ -59,11 +60,11 @@ describe('Partial image extraction', function() {
     sharp(fixtures.inputJpg)
       .extract(10, 10, 10, 500, 500)
       .resize(100, 100)
-      .toFile(fixtures.path('output.extract.resize.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(100, info.width);
         assert.strictEqual(100, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('extract-resize.jpg'), data, done);
       });
   });
 
@@ -72,11 +73,11 @@ describe('Partial image extraction', function() {
       .resize(500, 500)
       .crop(sharp.gravity.north)
       .extract(10, 10, 100, 100)
-      .toFile(fixtures.path('output.resize.crop.extract.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(100, info.width);
         assert.strictEqual(100, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('resize-crop-extract.jpg'), data, done);
       });
   });
 
@@ -86,11 +87,11 @@ describe('Partial image extraction', function() {
       .resize(500, 500)
       .crop(sharp.gravity.north)
       .extract(10, 10, 100, 100)
-      .toFile(fixtures.path('output.extract.resize.crop.extract.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(100, info.width);
         assert.strictEqual(100, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('extract-resize-crop-extract.jpg'), data, done);
       });
   });
 
@@ -98,11 +99,11 @@ describe('Partial image extraction', function() {
     sharp(fixtures.inputJpg)
       .extract(10, 10, 100, 100)
       .rotate(90)
-      .toFile(fixtures.path('output.extract.extract-then-rotate.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(100, info.width);
         assert.strictEqual(100, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('extract-rotate.jpg'), data, done);
       });
   });
 
@@ -110,69 +111,44 @@ describe('Partial image extraction', function() {
     sharp(fixtures.inputJpg)
       .rotate(90)
       .extract(10, 10, 100, 100)
-      .toFile(fixtures.path('output.extract.rotate-then-extract.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(100, info.width);
         assert.strictEqual(100, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('rotate-extract.jpg'), data, done);
       });
   });
 
   describe('Invalid parameters', function() {
 
-    it('Undefined', function(done) {
-      var isValid = true;
-      try {
+    it('Undefined', function() {
+      assert.throws(function() {
         sharp(fixtures.inputJpg).extract();
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+      });
     });
 
-    it('String top', function(done) {
-      var isValid = true;
-      try {
+    it('String top', function() {
+      assert.throws(function() {
         sharp(fixtures.inputJpg).extract('spoons', 10, 10, 10);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+      });
     });
 
-    it('Non-integral left', function(done) {
-      var isValid = true;
-      try {
+    it('Non-integral left', function() {
+      assert.throws(function() {
         sharp(fixtures.inputJpg).extract(10, 10.2, 10, 10);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+      });
     });
 
-    it('Negative width - negative', function(done) {
-      var isValid = true;
-      try {
+    it('Negative width - negative', function() {
+      assert.throws(function() {
         sharp(fixtures.inputJpg).extract(10, 10, -10, 10);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+      });
     });
 
-    it('Null height', function(done) {
-      var isValid = true;
-      try {
+    it('Null height', function() {
+      assert.throws(function() {
         sharp(fixtures.inputJpg).extract(10, 10, 10, null);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+      });
     });
 
   });
