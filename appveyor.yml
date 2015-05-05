@@ -22,4 +22,4 @@ install:
   - ps: Install-Product node $env:nodejs_version x86
   - npm install --arch=ia32 --msvs_version=2013
 test_script:
-  - npm run-script "test-win32-$env:nodejs_exec"
+  - npm run-script test-win32-%nodejs_exec%
