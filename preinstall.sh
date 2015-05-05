@@ -13,12 +13,12 @@
 #   * Amazon Linux 2014.09
 
 vips_version_minimum=7.40.0
-vips_version_latest_major_minor=7.42
-vips_version_latest_patch=3
+vips_version_latest_major_minor=8.0
+vips_version_latest_patch=1
 
 openslide_version_minimum=3.4.0
 openslide_version_latest_major_minor=3.4
-openslide_version_latest_patch=0
+openslide_version_latest_patch=1
 
 install_libvips_from_source() {
   echo "Compiling libvips $vips_version_latest_major_minor.$vips_version_latest_patch from source"

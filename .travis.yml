@@ -2,7 +2,8 @@ language: node_js
 node_js:
   - "0.10"
   - "0.12"
-  - iojs
+  - "iojs-v1"
+  - "iojs-v2"
 before_install:
   - curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
 after_success:
