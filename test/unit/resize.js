@@ -259,7 +259,7 @@ describe('Resize dimensions', function() {
         done();
       });
   });
-  
+
   it('Downscale width and height, ignoring aspect ratio', function(done) {
     sharp(fixtures.inputJpg).resize(320, 320).ignoreAspectRatio().toBuffer(function(err, data, info) {
       if (err) throw err;
@@ -270,7 +270,27 @@ describe('Resize dimensions', function() {
       done();
     });
   });
-  
+
+  it('Large reduction of transparent image with Gaussian blur', function(done) {
+    sharp(fixtures.inputPngWithFineBrightDetails).resize(1024, 768).interpolateWith('bicubic').toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual('png', info.format);
+      assert.strictEqual(1024, info.width);
+      assert.strictEqual(768, info.height);
+      fixtures.assertSimilar(fixtures.expected('alpha-resizing-bicubic-gaussian-blur-1024x768.png'), data, {threshold: 0}, done);
+    });
+  });
+
+  it('Large reduction of transparent image without Gaussian blur', function(done) {
+    sharp(fixtures.inputPngWithFineBrightDetails).resize(1024, 768).interpolateWith('bicubic').withoutGaussianBlur().toBuffer(function(err, data, info) {
+      if (err) throw err;
+      assert.strictEqual('png', info.format);
+      assert.strictEqual(1024, info.width);
+      assert.strictEqual(768, info.height);
+      fixtures.assertSimilar(fixtures.expected('alpha-resizing-bicubic-no-gaussian-blur-1024x768.png'), data, {threshold: 0}, done);
+    });
+  });
+
   it('Downscale width, ignoring aspect ratio', function(done) {
     sharp(fixtures.inputJpg).resize(320).ignoreAspectRatio().toBuffer(function(err, data, info) {
       if (err) throw err;
@@ -281,7 +301,7 @@ describe('Resize dimensions', function() {
       done();
     });
   });
-  
+
   it('Downscale height, ignoring aspect ratio', function(done) {
     sharp(fixtures.inputJpg).resize(null, 320).ignoreAspectRatio().toBuffer(function(err, data, info) {
       if (err) throw err;
@@ -292,7 +312,7 @@ describe('Resize dimensions', function() {
       done();
     });
   });
-  
+
   it('Upscale width and height, ignoring aspect ratio', function(done) {
     sharp(fixtures.inputJpg).resize(3000, 3000).ignoreAspectRatio().toBuffer(function(err, data, info) {
       if (err) throw err;
@@ -303,7 +323,7 @@ describe('Resize dimensions', function() {
       done();
     });
   });
-  
+
   it('Upscale width, ignoring aspect ratio', function(done) {
     sharp(fixtures.inputJpg).resize(3000).ignoreAspectRatio().toBuffer(function(err, data, info) {
       if (err) throw err;
@@ -314,7 +334,7 @@ describe('Resize dimensions', function() {
       done();
     });
   });
-  
+
   it('Upscale height, ignoring aspect ratio', function(done) {
     sharp(fixtures.inputJpg).resize(null, 3000).ignoreAspectRatio().toBuffer(function(err, data, info) {
       if (err) throw err;
@@ -325,7 +345,7 @@ describe('Resize dimensions', function() {
       done();
     });
   });
-  
+
   it('Downscale width, upscale height, ignoring aspect ratio', function(done) {
     sharp(fixtures.inputJpg).resize(320, 3000).ignoreAspectRatio().toBuffer(function(err, data, info) {
       if (err) throw err;
@@ -336,7 +356,7 @@ describe('Resize dimensions', function() {
       done();
     });
   });
-  
+
   it('Upscale width, downscale height, ignoring aspect ratio', function(done) {
     sharp(fixtures.inputJpg).resize(3000, 320).ignoreAspectRatio().toBuffer(function(err, data, info) {
       if (err) throw err;
@@ -347,7 +367,7 @@ describe('Resize dimensions', function() {
       done();
     });
   });
-  
+
   it('Identity transform, ignoring aspect ratio', function(done) {
     sharp(fixtures.inputJpg).ignoreAspectRatio().toBuffer(function(err, data, info) {
       if (err) throw err;
