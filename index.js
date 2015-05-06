@@ -42,6 +42,7 @@ var Sharp = function(input) {
     heightPost: -1,
     width: -1,
     height: -1,
+    withoutGaussianBlur: false,
     canvas: 'crop',
     gravity: 0,
     angle: 0,
@@ -254,6 +255,15 @@ Sharp.prototype.flop = function(flop) {
 */
 Sharp.prototype.withoutEnlargement = function(withoutEnlargement) {
   this.options.withoutEnlargement = (typeof withoutEnlargement === 'boolean') ? withoutEnlargement : true;
+  return this;
+};
+
+/*
+  Do not apply a Gaussian blur. This is useful to avoid dark ‘fringing’ around bright pixels when doing
+  large reductions on images with transparency.
+*/
+Sharp.prototype.withoutGaussianBlur = function(withoutGaussianBlur) {
+  this.options.withoutGaussianBlur = (typeof withoutGaussianBlur === 'boolean') ? withoutGaussianBlur : true;
   return this;
 };
 

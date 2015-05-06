@@ -92,6 +92,7 @@ struct ResizeBaton {
   bool flop;
   bool progressive;
   bool withoutEnlargement;
+  bool withoutGaussianBlur;
   VipsAccess accessMethod;
   int quality;
   int compressionLevel;
@@ -127,6 +128,7 @@ struct ResizeBaton {
     flop(false),
     progressive(false),
     withoutEnlargement(false),
+    withoutGaussianBlur(false),
     quality(80),
     compressionLevel(6),
     withoutAdaptiveFiltering(false),
@@ -485,7 +487,7 @@ class ResizeWorker : public NanAsyncWorker {
       // Use average of x and y residuals to compute sigma for Gaussian blur
       double residual = (xresidual + yresidual) / 2.0;
       // Apply Gaussian blur before large affine reductions
-      if (residual < 1.0) {
+      if (residual < 1.0 && !baton->withoutGaussianBlur) {
         // Calculate standard deviation
         double sigma = ((1.0 / residual) - 0.4) / 3.0;
         if (sigma >= 0.3) {
@@ -1229,6 +1231,7 @@ NAN_METHOD(resize) {
   baton->overlayPath = *String::Utf8Value(options->Get(NanNew<String>("overlayPath"))->ToString());
   // Resize options
   baton->withoutEnlargement = options->Get(NanNew<String>("withoutEnlargement"))->BooleanValue();
+  baton->withoutGaussianBlur = options->Get(NanNew<String>("withoutGaussianBlur"))->BooleanValue();
   baton->gravity = options->Get(NanNew<String>("gravity"))->Int32Value();
   baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
   // Operators

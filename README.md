@@ -440,6 +440,10 @@ Do not enlarge the output image if the input image width *or* height are already
 
 This is equivalent to GraphicsMagick's `>` geometry option: "change the dimensions of the image only if its width or height exceeds the geometry specification".
 
+#### withoutGaussianBlur()
+
+Do not apply a Gaussian blur for large image reductions. Applying a Gaussian blur on images with alpha channel can introduce dark ‘fringing’ around bright parts.
+
 #### blur([sigma])
 
 When used without parameters, performs a fast, mild blur of the output image. This typically reduces performance by 10%.
