@@ -14,7 +14,7 @@
 
 vips_version_minimum=7.40.0
 vips_version_latest_major_minor=8.0
-vips_version_latest_patch=1
+vips_version_latest_patch=2
 
 openslide_version_minimum=3.4.0
 openslide_version_latest_major_minor=3.4
@@ -321,13 +321,17 @@ case $(uname -s) in
       # Probably Amazon Linux
       RELEASE=$(cat /etc/system-release)
       case $RELEASE in
-        "Amazon Linux AMI release 2014.09")
+        "Amazon Linux AMI release 2014.09"|"Amazon Linux AMI release 2015.03")
           # Amazon Linux
           echo "Detected '$RELEASE'"
           echo "Installing libvips dependencies via yum"
           yum groupinstall -y "Development Tools"
           yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
           install_libvips_from_source "--prefix=/usr"
+          ;;
+        *)
+          # Unsupported Amazon Linux version
+          sorry "vips" "$RELEASE"
           ;;
       esac
     elif [ -f /etc/os-release ]; then
