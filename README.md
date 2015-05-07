@@ -169,6 +169,7 @@ sharp('input.png')
   .resize(300)
   .flatten()
   .background('#ff6600')
+  .overlayWith('overlay.png')
   .sharpen()
   .withMetadata()
   .quality(90)
@@ -176,8 +177,8 @@ sharp('input.png')
   .toBuffer()
   .then(function(outputBuffer) {
     // outputBuffer contains upside down, 300px wide, alpha channel flattened
-    // onto orange background, sharpened, with metadata, 90% quality WebP image
-    // data
+    // onto orange background, composited with `overlay.png`, sharpened,
+    // with metadata, 90% quality WebP image data
   });
 ```
 
@@ -415,6 +416,10 @@ If the background contains an alpha value then WebP and PNG format output images
 #### flatten()
 
 Merge alpha transparency channel, if any, with `background`.
+
+#### Experimental: overlayWith(filename)
+
+**Experimental:** Composite image with transparent overlay. Both input and overlay image must be RGBA and their dimensions must match.
 
 #### rotate([angle])
 
@@ -661,6 +666,17 @@ Provides access to internal task counters.
 var counters = sharp.counters(); // { queue: 2, process: 4 }
 ```
 
+#### Experimental: sharp.compare(filename1, filename2, callback)
+
+`filename1` and `filename2` are strings containing the filenames of the images to compare.
+
+`callback` is called with two arguments `(err, info)` where:
+
+* `err` contains an error message, if any.
+* `info` contains the info about the difference between the two images such as `isEqual` (Boolean), `meanSquaredError` (Number; present iff `status='success'`, otherwise `undefined`), and `status` (String; one of `success`, `mismatchedDimensions`, `mismatchedBands`, `mismatchedType`).
+
+This function can be useful for comparing test output images against reference images.
+
 ## Contributing
 
 A [guide for contributors](https://github.com/lovell/sharp/blob/master/CONTRIBUTING.md) covers reporting bugs, requesting features and submitting code changes.
@@ -771,7 +787,7 @@ This module would never have been possible without the help and code contributio
 * [Brandon Aaron](https://github.com/brandonaaron)
 * [Andreas Lind](https://github.com/papandreou)
 * [Maurus Cuelenaere](https://github.com/mcuelenaere)
-* [Linus Unneb‰ck](https://github.com/LinusU)
+* [Linus Unneb√§ck](https://github.com/LinusU)
 * [Victor Mateevitsi](https://github.com/mvictoras)
 * [Alaric Holloway](https://github.com/skedastik)
 * [Bernhard K. Weisshuhn](https://github.com/bkw)

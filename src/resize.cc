@@ -480,8 +480,29 @@ class ResizeWorker : public NanAsyncWorker {
       }
     }
 
+    // Premultiply image alpha channel before all transformations to avoid
+    // dark fringing around bright pixels
+    // See: http://entropymine.com/imageworsener/resizealpha/
+    bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
+    bool shouldBlur = baton->blurSigma != 0.0;
+    bool shouldSharpen = baton->sharpenRadius != 0;
+    bool shouldTransform = shouldAffineTransform || shouldBlur || shouldSharpen;
+    bool hasOverlay = !baton->overlayPath.empty();
+    bool shouldPremultiplyAlpha = HasAlpha(image) && image->Bands == 4 && (shouldTransform || hasOverlay);
+
+    if (shouldPremultiplyAlpha) {
+      VipsImage *imagePremultiplied;
+      if (Premultiply(hook, image, &imagePremultiplied)) {
+        (baton->err).append("Failed to premultiply alpha channel.");
+        return Error();
+      }
+
+      vips_object_local(hook, imagePremultiplied);
+      image = imagePremultiplied;
+    }
+
     // Use vips_affine with the remaining float part
-    if (xresidual != 0.0 || yresidual != 0.0) {
+    if (shouldAffineTransform) {
       // Use average of x and y residuals to compute sigma for Gaussian blur
       double residual = (xresidual + yresidual) / 2.0;
       // Apply Gaussian blur before large affine reductions
@@ -646,7 +667,7 @@ class ResizeWorker : public NanAsyncWorker {
     }
 
     // Blur
-    if (baton->blurSigma != 0.0) {
+    if (shouldBlur) {
       VipsImage *blurred;
       if (baton->blurSigma < 0.0) {
         // Fast, mild blur - averages neighbouring pixels
@@ -677,7 +698,7 @@ class ResizeWorker : public NanAsyncWorker {
     }
 
     // Sharpen
-    if (baton->sharpenRadius != 0) {
+    if (shouldSharpen) {
       VipsImage *sharpened;
       if (baton->sharpenRadius == -1) {
         // Fast, mild sharpen
@@ -793,7 +814,7 @@ class ResizeWorker : public NanAsyncWorker {
 #endif
 
     // Composite with overlay, if present
-    if (!baton->overlayPath.empty()) {
+    if (hasOverlay) {
       VipsImage *overlayImage = NULL;
       ImageType overlayImageType = ImageType::UNKNOWN;
       overlayImageType = DetermineImageType(baton->overlayPath.c_str());
@@ -802,6 +823,8 @@ class ResizeWorker : public NanAsyncWorker {
         if (overlayImage == NULL) {
           (baton->err).append("Overlay input file has corrupt header");
           overlayImageType = ImageType::UNKNOWN;
+        } else {
+          vips_object_local(hook, overlayImage);
         }
       } else {
         (baton->err).append("Overlay input file is of an unsupported image format");
@@ -831,13 +854,32 @@ class ResizeWorker : public NanAsyncWorker {
         return Error();
       }
 
+      VipsImage *overlayImagePremultiplied;
+      if (Premultiply(hook, overlayImage, &overlayImagePremultiplied)) {
+        (baton->err).append("Failed to premultiply alpha channel of overlay image.");
+        return Error();
+      }
+      vips_object_local(hook, overlayImagePremultiplied);
+
       VipsImage *composited;
-      if (Composite(hook, overlayImage, image, &composited)) {
+      if (Composite(hook, overlayImagePremultiplied, image, &composited)) {
         (baton->err).append("Failed to composite images");
         return Error();
       }
       vips_object_local(hook, composited);
       image = composited;
+    }
+
+    // Reverse premultiplication after all transformations:
+    if (shouldPremultiplyAlpha) {
+      VipsImage *imageUnpremultiplied;
+      if (Unpremultiply(hook, image, &imageUnpremultiplied)) {
+        (baton->err).append("Failed to unpremultiply alpha channel.");
+        return Error();
+      }
+
+      vips_object_local(hook, imageUnpremultiplied);
+      image = imageUnpremultiplied;
     }
 
     // Convert image to sRGB, if not already
