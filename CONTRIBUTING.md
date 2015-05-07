@@ -74,11 +74,10 @@ npm test
 
 ### Memory leak tests
 
-Requires _valgrind_.
+Requires [Valgrind](http://valgrind.org/).
 
 ```sh
-cd sharp/test/leak
-./leak.sh
+npm run test-leak
 ```
 
 ## Finally

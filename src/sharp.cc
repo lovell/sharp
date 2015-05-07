@@ -4,6 +4,7 @@
 #include "nan.h"
 
 #include "common.h"
+#include "compare.h"
 #include "metadata.h"
 #include "resize.h"
 #include "utilities.h"
@@ -19,6 +20,7 @@ extern "C" void init(v8::Handle<v8::Object> target) {
   // Methods available to JavaScript
   NODE_SET_METHOD(target, "metadata", metadata);
   NODE_SET_METHOD(target, "resize", resize);
+  NODE_SET_METHOD(target, "compare", compare);
   NODE_SET_METHOD(target, "cache", cache);
   NODE_SET_METHOD(target, "concurrency", concurrency);
   NODE_SET_METHOD(target, "counters", counters);

@@ -3,11 +3,13 @@
     'target_name': 'sharp',
     'sources': [
       'src/common.cc',
+      'src/compare-internal.c',
+      'src/compare.cc',
       'src/composite.c',
-      'src/utilities.cc',
       'src/metadata.cc',
       'src/resize.cc',
-      'src/sharp.cc'
+      'src/sharp.cc',
+      'src/utilities.cc'
     ],
     'conditions': [
         ['OS=="win"', {

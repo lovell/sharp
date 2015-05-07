@@ -2,9 +2,13 @@
 
 var path = require('path');
 var assert = require('assert');
-
 var sharp = require('../../index');
 
+
+// Constants
+var MAX_ALLOWED_MEAN_SQUARED_ERROR = 0.0005;
+
+// Helpers
 var getPath = function(filename) {
   return path.join(__dirname, filename);
 };
@@ -57,6 +61,8 @@ module.exports = {
   inputPngOverlayLayer2: getPath('alpha-layer-2-ink.png'),
   inputPngOverlayLayer1LowAlpha: getPath('alpha-layer-1-fill-low-alpha.png'),
   inputPngOverlayLayer2LowAlpha: getPath('alpha-layer-2-ink-low-alpha.png'),
+  inputPngAlphaPremultiplicationSmall: getPath('alpha-premultiply-1024x768-paper.png'),
+  inputPngAlphaPremultiplicationLarge: getPath('alpha-premultiply-2048x1536-paper.png'),
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputTiff: getPath('G31D.TIF'), // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
@@ -116,11 +122,36 @@ module.exports = {
         }
 
         if (distance > options.threshold) {
-          return callback(new Error('Maximum similarity distance: ' + options.threshold + '. Actual: ' + distance));
+          return callback(new Error('Expected maximum similarity distance: ' + options.threshold + '. Actual: ' + distance + '.'));
         }
 
         callback();
       });
+    });
+  },
+
+  assertEqual: function(actualImagePath, expectedImagePath, callback) {
+    if (typeof actualImagePath !== 'string') {
+      throw new TypeError('`actualImagePath` must be a string; got ' + actualImagePath);
+    }
+
+    if (typeof expectedImagePath !== 'string') {
+      throw new TypeError('`expectedImagePath` must be a string; got ' + expectedImagePath);
+    }
+
+    if (typeof callback !== 'function') {
+      throw new TypeError('`callback` must be a function');
+    }
+
+    sharp.compare(actualImagePath, expectedImagePath, function (error, info) {
+      if (error) return callback(error);
+
+      var meanSquaredError = info.meanSquaredError;
+      if (typeof meanSquaredError !== 'undefined' && meanSquaredError > MAX_ALLOWED_MEAN_SQUARED_ERROR) {
+        return callback(new Error('Expected images be equal. Mean squared error: ' + meanSquaredError + '.'));
+      }
+
+      return callback(null, info);
     });
   }
 

@@ -759,6 +759,30 @@ Sharp.prototype.metadata = function(callback) {
 };
 
 /*
+  Reads two input images and returns stats about their differences.
+  Supports only callbacks.
+*/
+Sharp.compare = function(input1, input2, callback) {
+  if (typeof input1 !== 'string' || input1 === '') {
+    throw new TypeError('`input1` must be a non-empty string');
+  }
+
+  if (typeof input2 !== 'string' || input2 === '') {
+    throw new TypeError('`input2` must be a non-empty string');
+  }
+
+  if (typeof callback !== 'function') {
+    throw new TypeError('`callback` must be a function');
+  }
+
+  var options = {
+    fileIn1: input1,
+    fileIn2: input2
+  };
+  sharp.compare(options, callback);
+};
+
+/*
   Get and set cache memory and item limits
 */
 module.exports.cache = function(memory, items) {
