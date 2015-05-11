@@ -8,10 +8,6 @@
 #include "resize.h"
 #include "utilities.h"
 
-#ifdef _WIN64
-#error Windows 64-bit currently unsupported - see https://github.com/lovell/sharp#windows
-#endif
-
 extern "C" void init(v8::Handle<v8::Object> target) {
   NanScope();
   vips_init("sharp");

@@ -4,6 +4,20 @@
 
 #include "common.h"
 
+// Verify platform and compiler compatibility
+
+#ifdef _WIN64
+#error Windows 64-bit is currently unsupported - see https://github.com/lovell/sharp#windows
+#endif
+
+#if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
+#error GCC version 4.6+ is required for C++11 features - see https://github.com/lovell/sharp#prerequisites
+#endif
+
+#if (defined(__clang__) && !__has_feature(cxx_range_for))
+#error clang version 3.0+ is required for C++11 features - see https://github.com/lovell/sharp#prerequisites
+#endif
+
 namespace sharp {
 
   // How many tasks are in the queue?
