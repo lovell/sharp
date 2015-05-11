@@ -14,8 +14,10 @@
 #error GCC version 4.6+ is required for C++11 features - see https://github.com/lovell/sharp#prerequisites
 #endif
 
-#if (defined(__clang__) && !__has_feature(cxx_range_for))
+#if (defined(__clang__) && defined(__has_feature))
+#if (!__has_feature(cxx_range_for))
 #error clang version 3.0+ is required for C++11 features - see https://github.com/lovell/sharp#prerequisites
+#endif
 #endif
 
 namespace sharp {
