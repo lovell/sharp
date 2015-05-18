@@ -6,6 +6,10 @@
 
 // Verify platform and compiler compatibility
 
+#if (VIPS_MAJOR_VERSION < 7 || (VIPS_MAJOR_VERSION == 7 && VIPS_MINOR_VERSION < 40))
+#error libvips version 7.40.0+ required - see https://github.com/lovell/sharp#prerequisites
+#endif
+
 #ifdef _WIN64
 #error Windows 64-bit is currently unsupported - see https://github.com/lovell/sharp#windows
 #endif
