@@ -1,52 +1,20 @@
 'use strict';
 
+var assert = require('assert');
 var fixtures = require('../fixtures');
-var fs = require('fs');
 var sharp = require('../../index');
 
 sharp.cache(0);
-
-
-// Constants
-var MAX_ALLOWED_IMAGE_MAGICK_MEAN_SQUARED_ERROR = 0.3;
 
 // Helpers
 var getPaths = function(baseName, extension) {
   if (typeof extension === 'undefined') {
     extension = 'png';
   }
-
-  var actual = fixtures.path('output.' + baseName + '.' + extension);
-  var expected = fixtures.expected(baseName + '.' + extension);
-  var expectedMagick = fixtures.expected(baseName + '-imagemagick.' + extension);
-
   return {
-    actual: actual,
-    expected: expected,
-    expectedMagick: expectedMagick
+    actual: fixtures.path('output.' + baseName + '.' + extension),
+    expected: fixtures.expected(baseName + '.' + extension),
   };
-};
-
-var assertEqual = function (paths, callback) {
-  if (typeof callback !== 'function') {
-    throw new TypeError('`callback` must be a function');
-  }
-
-  fixtures.assertEqual(paths.actual, paths.expected, function (error) {
-    if (error) return callback(error);
-
-    sharp.compare(paths.actual, paths.expectedMagick, function (error, info) {
-      if (error) return callback(error);
-
-      if (info.meanSquaredError > MAX_ALLOWED_IMAGE_MAGICK_MEAN_SQUARED_ERROR) {
-        return callback(new Error('Expected MSE against ImageMagick to be <= ' +
-          MAX_ALLOWED_IMAGE_MAGICK_MEAN_SQUARED_ERROR + '. Actual: ' +
-          info.meanSquaredError));
-      }
-
-      callback();
-    });
-  });
 };
 
 // Test
@@ -58,8 +26,8 @@ describe('Overlays', function() {
       .overlayWith(fixtures.inputPngOverlayLayer1)
       .toFile(paths.actual, function (error) {
         if (error) return done(error);
-
-        assertEqual(paths, done);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+        done();
       });
   });
 
@@ -70,8 +38,8 @@ describe('Overlays', function() {
       .overlayWith(fixtures.inputPngOverlayLayer1LowAlpha)
       .toFile(paths.actual, function (error) {
         if (error) return done(error);
-
-        assertEqual(paths, done);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+        done();
       });
   });
 
@@ -82,13 +50,12 @@ describe('Overlays', function() {
       .overlayWith(fixtures.inputPngOverlayLayer1)
       .toBuffer(function (error, data, info) {
         if (error) return done(error);
-
         sharp(data)
           .overlayWith(fixtures.inputPngOverlayLayer2)
           .toFile(paths.actual, function (error) {
             if (error) return done(error);
-
-            assertEqual(paths, done);
+            fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+            done();
           });
       });
   });
@@ -100,8 +67,8 @@ describe('Overlays', function() {
       .overlayWith(fixtures.inputPngOverlayLayer2)
       .toFile(paths.actual, function (error, data, info) {
         if (error) return done(error);
-
-        assertEqual(paths, done);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+        done();
       });
   });
 
@@ -112,8 +79,8 @@ describe('Overlays', function() {
       .overlayWith(fixtures.inputPngOverlayLayer2LowAlpha)
       .toFile(paths.actual, function (error, data, info) {
         if (error) return done(error);
-
-        assertEqual(paths, done);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected, 2);
+        done();
       });
   });
 
@@ -129,8 +96,8 @@ describe('Overlays', function() {
           .overlayWith(fixtures.inputPngOverlayLayer2LowAlpha)
           .toFile(paths.actual, function (error, data, info) {
             if (error) return done(error);
-
-            assertEqual(paths, done);
+            fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+            done();
           });
       });
   });
@@ -138,11 +105,11 @@ describe('Overlays', function() {
   it('Composite transparent PNG onto JPEG', function(done) {
     sharp(fixtures.inputJpg)
       .overlayWith(fixtures.inputPngOverlayLayer1)
-      .toBuffer(function (error, data, info) {
+      .toBuffer(function (error) {
+        assert.strictEqual(true, error instanceof Error);
         if (error.message !== 'Input image must have an alpha channel') {
           return done(new Error('Unexpected error: ' + error.message));
         }
-
         done();
       });
   });

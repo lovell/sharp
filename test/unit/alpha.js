@@ -83,8 +83,12 @@ describe('Alpha transparency', function() {
       .resize(2048, 1536)
       .interpolateWith('bicubic')
       .toFile(actual, function(err) {
-        if (err) throw err;
-        fixtures.assertEqual(actual, expected, done);
+        if (err) {
+          done(err);
+        } else {
+          fixtures.assertMaxColourDistance(actual, expected, 102);
+          done();
+        }
       });
   });
 
@@ -96,8 +100,12 @@ describe('Alpha transparency', function() {
       .resize(1024, 768)
       .interpolateWith('bicubic')
       .toFile(actual, function(err) {
-        if (err) throw err;
-        fixtures.assertEqual(actual, expected, done);
+        if (err) {
+          done(err);
+        } else {
+          fixtures.assertMaxColourDistance(actual, expected, 102);
+          done();
+        }
       });
   });
 

@@ -3,10 +3,7 @@
 var path = require('path');
 var assert = require('assert');
 var sharp = require('../../index');
-
-
-// Constants
-var MAX_ALLOWED_MEAN_SQUARED_ERROR = 0.0005;
+var maxColourDistance = require('../../build/Release/sharp')._maxColourDistance;
 
 // Helpers
 var getPath = function(filename) {
@@ -130,29 +127,21 @@ module.exports = {
     });
   },
 
-  assertEqual: function(actualImagePath, expectedImagePath, callback) {
+  assertMaxColourDistance: function(actualImagePath, expectedImagePath, acceptedDistance) {
     if (typeof actualImagePath !== 'string') {
       throw new TypeError('`actualImagePath` must be a string; got ' + actualImagePath);
     }
-
     if (typeof expectedImagePath !== 'string') {
       throw new TypeError('`expectedImagePath` must be a string; got ' + expectedImagePath);
     }
-
-    if (typeof callback !== 'function') {
-      throw new TypeError('`callback` must be a function');
+    if (typeof acceptedDistance !== 'number') {
+      // Default threshold
+      acceptedDistance = 1;
     }
-
-    sharp.compare(actualImagePath, expectedImagePath, function (error, info) {
-      if (error) return callback(error);
-
-      var meanSquaredError = info.meanSquaredError;
-      if (typeof meanSquaredError !== 'undefined' && meanSquaredError > MAX_ALLOWED_MEAN_SQUARED_ERROR) {
-        return callback(new Error('Expected images be equal. Mean squared error: ' + meanSquaredError + '.'));
-      }
-
-      return callback(null, info);
-    });
+    var distance = maxColourDistance(actualImagePath, expectedImagePath);
+    if (distance > acceptedDistance) {
+      throw new Error('Expected maximum absolute distance of ' + acceptedDistance + ', actual ' + distance);
+    }
   }
 
 };

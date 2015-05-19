@@ -666,17 +666,6 @@ Provides access to internal task counters.
 var counters = sharp.counters(); // { queue: 2, process: 4 }
 ```
 
-#### Experimental: sharp.compare(filename1, filename2, callback)
-
-`filename1` and `filename2` are strings containing the filenames of the images to compare.
-
-`callback` is called with two arguments `(err, info)` where:
-
-* `err` contains an error message, if any.
-* `info` contains the info about the difference between the two images such as `isEqual` (Boolean), `meanSquaredError` (Number; present iff `status='success'`, otherwise `undefined`), and `status` (String; one of `success`, `mismatchedDimensions`, `mismatchedBands`, `mismatchedType`).
-
-This function can be useful for comparing test output images against reference images.
-
 ## Contributing
 
 A [guide for contributors](https://github.com/lovell/sharp/blob/master/CONTRIBUTING.md) covers reporting bugs, requesting features and submitting code changes.

@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "utilities.h"
+#include "composite.h"
 
 using v8::Local;
 using v8::Object;
@@ -12,6 +13,10 @@ using v8::Number;
 using v8::String;
 using v8::Boolean;
 
+using sharp::DetermineImageType;
+using sharp::ImageType;
+using sharp::InitImage;
+using sharp::HasAlpha;
 using sharp::counterQueue;
 using sharp::counterProcess;
 
@@ -141,4 +146,104 @@ NAN_METHOD(format) {
   raw->Set(attrOutput, rawOutput);
 
   NanReturnValue(format);
+}
+
+/*
+  Synchronous, internal-only method used by some of the functional tests.
+  Calculates the maximum colour distance using the DE2000 algorithm
+  between two images of the same dimensions and number of channels.
+*/
+NAN_METHOD(_maxColourDistance) {
+  NanScope();
+
+  // Create "hook" VipsObject to hang image references from
+  VipsObject *hook = reinterpret_cast<VipsObject*>(vips_image_new());
+
+  // Open input files
+  VipsImage *image1 = NULL;
+  ImageType imageType1 = DetermineImageType(*String::Utf8Value(args[0]));
+  if (imageType1 != ImageType::UNKNOWN) {
+    image1 = InitImage(*String::Utf8Value(args[0]), VIPS_ACCESS_SEQUENTIAL);
+    if (image1 == NULL) {
+      g_object_unref(hook);
+      return NanThrowError("Input file 1 has corrupt header");
+    } else {
+      vips_object_local(hook, image1);
+    }
+  } else {
+    g_object_unref(hook);
+    return NanThrowError("Input file 1 is of an unsupported image format");
+  }
+  VipsImage *image2 = NULL;
+  ImageType imageType2 = DetermineImageType(*String::Utf8Value(args[1]));
+  if (imageType2 != ImageType::UNKNOWN) {
+    image2 = InitImage(*String::Utf8Value(args[1]), VIPS_ACCESS_SEQUENTIAL);
+    if (image2 == NULL) {
+      g_object_unref(hook);
+      return NanThrowError("Input file 2 has corrupt header");
+    } else {
+      vips_object_local(hook, image2);
+    }
+  } else {
+    g_object_unref(hook);
+    return NanThrowError("Input file 2 is of an unsupported image format");
+  }
+
+  // Ensure same number of channels
+  if (image1->Bands != image2->Bands) {
+    g_object_unref(hook);
+    return NanThrowError("mismatchedBands");
+  }
+  // Ensure same dimensions
+  if (image1->Xsize != image2->Xsize || image1->Ysize != image2->Ysize) {
+    g_object_unref(hook);
+    return NanThrowError("mismatchedDimensions");
+  }
+
+  // Premultiply and remove alpha
+  if (HasAlpha(image1)) {
+    VipsImage *imagePremultiplied1;
+    if (Premultiply(hook, image1, &imagePremultiplied1)) {
+      g_object_unref(hook);
+      return NanThrowError(vips_error_buffer());
+    }
+    vips_object_local(hook, imagePremultiplied1);
+    VipsImage *imagePremultipliedNoAlpha1;
+    if (vips_extract_band(image1, &imagePremultipliedNoAlpha1, 1, "n", image1->Bands - 1, NULL)) {
+      g_object_unref(hook);
+      return NanThrowError(vips_error_buffer());
+    }
+    vips_object_local(hook, imagePremultipliedNoAlpha1);
+    image1 = imagePremultipliedNoAlpha1;
+  }
+  if (HasAlpha(image2)) {
+    VipsImage *imagePremultiplied2;
+    if (Premultiply(hook, image2, &imagePremultiplied2)) {
+      g_object_unref(hook);
+      return NanThrowError(vips_error_buffer());
+    }
+    vips_object_local(hook, imagePremultiplied2);
+    VipsImage *imagePremultipliedNoAlpha2;
+    if (vips_extract_band(image2, &imagePremultipliedNoAlpha2, 1, "n", image2->Bands - 1, NULL)) {
+      g_object_unref(hook);
+      return NanThrowError(vips_error_buffer());
+    }
+    vips_object_local(hook, imagePremultipliedNoAlpha2);
+    image2 = imagePremultipliedNoAlpha2;
+  }
+  // Calculate colour distance
+  VipsImage *difference;
+  if (vips_dE00(image1, image2, &difference, NULL)) {
+    g_object_unref(hook);
+    return NanThrowError(vips_error_buffer());
+  }
+  vips_object_local(hook, difference);
+  // Extract maximum distance
+  double maxColourDistance;
+  if (vips_max(difference, &maxColourDistance, NULL)) {
+    g_object_unref(hook);
+    return NanThrowError(vips_error_buffer());
+  }
+  g_object_unref(hook);
+  NanReturnValue(maxColourDistance);
 }

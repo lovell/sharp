@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+var fixtures = require('../fixtures');
 var sharp = require('../../index');
 
 var defaultConcurrency = sharp.concurrency();
