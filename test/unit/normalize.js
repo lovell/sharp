@@ -29,7 +29,7 @@ describe('Normalization', function () {
           }
           assert.strictEqual(0, min);
           assert.strictEqual(255, max);
-          return done();
+          done();
         });
     });
 
@@ -48,7 +48,7 @@ describe('Normalization', function () {
           }
           assert.strictEqual(0, min);
           assert.strictEqual(255, max);
-          return done();
+          done();
         });
     });
 
@@ -64,37 +64,37 @@ describe('Normalization', function () {
           }
           assert.strictEqual(0, min);
           assert.strictEqual(255, max);
-          return done();
+          done();
         });
     });
 
     it('keeps an existing alpha channel', function (done) {
       sharp(fixtures.inputPngWithTransparency)
         .normalize()
-        .toBuffer(function (err, data, info) {
-          sharp(data)
-            .metadata()
-            .then(function (metadata) {
-              assert.strictEqual(4, metadata.channels);
-              assert.strictEqual(true, metadata.hasAlpha);
-              assert.strictEqual('srgb', metadata.space);
-            })
-            .finally(done);
+        .toBuffer(function (err, data) {
+          if (err) return done(err);
+          sharp(data).metadata(function(err, metadata) {
+            if (err) return done(err);
+            assert.strictEqual(4, metadata.channels);
+            assert.strictEqual(true, metadata.hasAlpha);
+            assert.strictEqual('srgb', metadata.space);
+            done();
+          });
         });
     });
 
     it('keeps the alpha channel of greyscale images intact', function (done) {
       sharp(fixtures.inputPngWithGreyAlpha)
         .normalize()
-        .toBuffer(function (err, data, info) {
-          sharp(data)
-            .metadata()
-            .then(function (metadata) {
-              assert.strictEqual(true, metadata.hasAlpha);
-              assert.strictEqual(4, metadata.channels);
-              assert.strictEqual('srgb', metadata.space);
-            })
-            .finally(done);
+        .toBuffer(function (err, data) {
+          if (err) return done(err);
+          sharp(data).metadata(function(err, metadata) {
+            if (err) return done(err);
+            assert.strictEqual(true, metadata.hasAlpha);
+            assert.strictEqual(4, metadata.channels);
+            assert.strictEqual('srgb', metadata.space);
+            done();
+          });
         });
     });
 
