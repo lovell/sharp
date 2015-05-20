@@ -763,17 +763,10 @@ class ResizeWorker : public NanAsyncWorker {
         return Error();
       }
       vips_object_local(hook, stats);
+
       double min = *VIPS_MATRIX(stats, 0, 0);
       double max = *VIPS_MATRIX(stats, 1, 0);
-
-      VipsImage *normalized;
-      if (min == max) {
-        // Range of zero: create black image
-        if (vips_black(&normalized, image->Xsize, image->Ysize, "bands", 1, NULL )) {
-          return Error();
-        }
-        vips_object_local(hook, normalized);
-      } else {
+      if (min != max) {
         double f = 100.0 / (max - min);
         double a = -(min * f);
 
@@ -788,27 +781,29 @@ class ResizeWorker : public NanAsyncWorker {
           return Error();
         }
         vips_object_local(hook, normalizedLab);
+
+        VipsImage *normalized;
         if (vips_colourspace(normalizedLab, &normalized, typeBeforeNormalize, NULL)) {
           return Error();
         }
         vips_object_local(hook, normalized);
-      }
 
-      if (HasAlpha(image)) {
-        VipsImage *alpha;
-        if (vips_extract_band(image, &alpha, image->Bands - 1, "n", 1, NULL)) {
-          return Error();
-        }
-        vips_object_local(hook, alpha);
+        if (HasAlpha(image)) {
+          VipsImage *alpha;
+          if (vips_extract_band(image, &alpha, image->Bands - 1, "n", 1, NULL)) {
+            return Error();
+          }
+          vips_object_local(hook, alpha);
 
-        VipsImage *normalizedAlpha;
-        if (vips_bandjoin2(normalized, alpha, &normalizedAlpha, NULL)) {
-          return Error();
+          VipsImage *normalizedAlpha;
+          if (vips_bandjoin2(normalized, alpha, &normalizedAlpha, NULL)) {
+            return Error();
+          }
+          vips_object_local(hook, normalizedAlpha);
+          image = normalizedAlpha;
+        } else {
+          image = normalized;
         }
-        vips_object_local(hook, normalizedAlpha);
-        image = normalizedAlpha;
-      } else {
-        image = normalized;
       }
     }
 #endif

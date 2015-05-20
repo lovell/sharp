@@ -128,20 +128,12 @@ int Composite(VipsObject *context, VipsImage *srcPremultiplied, VipsImage *dstPr
 int Premultiply(VipsObject *context, VipsImage *image, VipsImage **out) {
   VipsImage *imagePremultiplied;
 
-  // Trivial case: Copy images without alpha channel:
-  if (!HasAlpha(image)) {
-    return vips_image_write(image, *out);
-  }
-
 #if (VIPS_MAJOR_VERSION >= 9 || (VIPS_MAJOR_VERSION >= 8 && VIPS_MINOR_VERSION >= 1))
 
   if (vips_premultiply(image, &imagePremultiplied, NULL))
     return -1;
 
 #else
-
-  if (image->Bands != 4)
-    return -1;
 
   VipsImage *imageRGB;
   if (vips_extract_band(image, &imageRGB, 0, "n", NUM_COLOR_BANDS, NULL))
@@ -181,20 +173,12 @@ int Premultiply(VipsObject *context, VipsImage *image, VipsImage **out) {
 int Unpremultiply(VipsObject *context, VipsImage *image, VipsImage **out) {
   VipsImage *imageUnpremultiplied;
 
-  // Trivial case: Copy images without alpha channel:
-  if (!HasAlpha(image)) {
-    return vips_image_write(image, *out);
-  }
-
 #if (VIPS_MAJOR_VERSION >= 9 || (VIPS_MAJOR_VERSION >= 8 && VIPS_MINOR_VERSION >= 1))
 
   if (vips_unpremultiply(image, &imageUnpremultiplied, NULL))
     return -1;
 
 #else
-
-  if (image->Bands != 4)
-    return -1;
 
   VipsImage *imageRGBPremultipliedTransformed;
   if (vips_extract_band(image, &imageRGBPremultipliedTransformed, 0, "n", NUM_COLOR_BANDS, NULL))
@@ -218,7 +202,6 @@ int Unpremultiply(VipsObject *context, VipsImage *image, VipsImage **out) {
 
   if (vips_bandjoin2(imageRGBUnpremultipliedTransformed, imageAlphaTransformed, &imageUnpremultiplied, NULL))
     return -1;
-
 
 #endif
 

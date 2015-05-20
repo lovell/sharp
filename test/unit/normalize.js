@@ -98,31 +98,15 @@ describe('Normalization', function () {
         });
     });
 
-    it('returns a black image for images with only one color', function (done) {
+    it('does not alter images with only one color', function (done) {
+      var output = fixtures.path('output.unmodified-png-with-one-color.png');
       sharp(fixtures.inputPngWithOneColor)
         .normalize()
-        .toBuffer()
-        .bind({})
-        .then(function (imageData) {
-          this.imageData = imageData;
-          return sharp(imageData)
-            .metadata();
-        })
-        .then(function (metadata) {
-          assert.strictEqual(false, metadata.hasAlpha);
-          assert.strictEqual(3, metadata.channels);
-          assert.strictEqual('srgb', metadata.space);
-        })
-        .then(function () {
-          return sharp(this.imageData)
-            .raw()
-            .toBuffer();
-        })
-        .then(function (rawData) {
-          var blackBuffer = new Buffer([0,0,0, 0,0,0, 0,0,0, 0,0,0]);
-          assert.strictEqual(blackBuffer.toString(), rawData.toString());
-        })
-        .finally(done);
+        .toFile(output, function(err, info) {
+          if (err) done(err);
+          fixtures.assertMaxColourDistance(output, fixtures.inputPngWithOneColor, 0);
+          done();
+        });
     });
 
   }
