@@ -42,21 +42,21 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^2.9.25",
+    "bluebird": "^2.9.27",
     "color": "^0.8.0",
     "nan": "^1.8.4",
-    "semver": "^4.3.4"
+    "semver": "^4.3.5"
   },
   "devDependencies": {
-    "async": "^0.9.0",
+    "async": "^1.0.0",
     "coveralls": "^2.11.2",
-    "istanbul": "^0.3.13",
-    "mocha": "^2.2.4",
-    "mocha-jshint": "^2.2.2",
+    "istanbul": "^0.3.14",
+    "mocha": "^2.2.5",
+    "mocha-jshint": "^2.2.3",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.3.3"
+    "rimraf": "^2.3.4"
   },
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "engines": {
     "node": ">=0.10"
   }
