@@ -567,7 +567,7 @@ Sharp.prototype.toFile = function(output, callback) {
       }
     } else {
       this.options.output = output;
-      return this._sharp(callback);
+      return this._pipeline(callback);
     }
   }
   return this;
@@ -577,7 +577,7 @@ Sharp.prototype.toFile = function(output, callback) {
   Write output to a Buffer
 */
 Sharp.prototype.toBuffer = function(callback) {
-  return this._sharp(callback);
+  return this._pipeline(callback);
 };
 
 /*
@@ -640,7 +640,7 @@ Sharp.prototype.toFormat = function(format) {
 Sharp.prototype._read = function() {
   if (!this.options.streamOut) {
     this.options.streamOut = true;
-    this._sharp();
+    this._pipeline();
   }
 };
 
@@ -648,18 +648,18 @@ Sharp.prototype._read = function() {
   Invoke the C++ image processing pipeline
   Supports callback, stream and promise variants
 */
-Sharp.prototype._sharp = function(callback) {
+Sharp.prototype._pipeline = function(callback) {
   var that = this;
   if (typeof callback === 'function') {
     // output=file/buffer
     if (this.options.streamIn) {
       // output=file/buffer, input=stream
       this.on('finish', function() {
-        sharp.resize(that.options, callback);
+        sharp.pipeline(that.options, callback);
       });
     } else {
       // output=file/buffer, input=file/buffer
-      sharp.resize(this.options, callback);
+      sharp.pipeline(this.options, callback);
     }
     return this;
   } else if (this.options.streamOut) {
@@ -667,9 +667,9 @@ Sharp.prototype._sharp = function(callback) {
     if (this.options.streamIn) {
       // output=stream, input=stream
       this.on('finish', function() {
-        sharp.resize(that.options, function(err, data) {
+        sharp.pipeline(that.options, function(err, data) {
           if (err) {
-            that.emit('error', new Error(err));
+            that.emit('error', err);
           } else {
             that.push(data);
           }
@@ -678,9 +678,9 @@ Sharp.prototype._sharp = function(callback) {
       });
     } else {
       // output=stream, input=file/buffer
-      sharp.resize(this.options, function(err, data) {
+      sharp.pipeline(this.options, function(err, data) {
         if (err) {
-          that.emit('error', new Error(err));
+          that.emit('error', err);
         } else {
           that.push(data);
         }
@@ -694,7 +694,7 @@ Sharp.prototype._sharp = function(callback) {
       // output=promise, input=stream
       return new BluebirdPromise(function(resolve, reject) {
         that.on('finish', function() {
-          sharp.resize(that.options, function(err, data) {
+          sharp.pipeline(that.options, function(err, data) {
             if (err) {
               reject(err);
             } else {
@@ -706,7 +706,7 @@ Sharp.prototype._sharp = function(callback) {
     } else {
       // output=promise, input=file/buffer
       return new BluebirdPromise(function(resolve, reject) {
-        sharp.resize(that.options, function(err, data) {
+        sharp.pipeline(that.options, function(err, data) {
           if (err) {
             reject(err);
           } else {

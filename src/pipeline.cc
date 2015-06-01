@@ -8,8 +8,8 @@
 #include "nan.h"
 
 #include "common.h"
-#include "composite.h"
-#include "resize.h"
+#include "operations.h"
+#include "pipeline.h"
 
 using v8::Handle;
 using v8::Local;
@@ -21,6 +21,10 @@ using v8::String;
 using v8::Array;
 using v8::Function;
 using v8::Exception;
+
+using sharp::Composite;
+using sharp::Premultiply;
+using sharp::Unpremultiply;
 
 using sharp::ImageType;
 using sharp::DetermineImageType;
@@ -53,7 +57,7 @@ enum class Angle {
   DLAST
 };
 
-struct ResizeBaton {
+struct PipelineBaton {
   std::string fileIn;
   char *bufferIn;
   size_t bufferInLength;
@@ -105,7 +109,7 @@ struct ResizeBaton {
   int tileSize;
   int tileOverlap;
 
-  ResizeBaton():
+  PipelineBaton():
     bufferInLength(0),
     limitInputPixels(0),
     outputFormat(""),
@@ -154,12 +158,12 @@ static void DeleteBuffer(VipsObject *object, char *buffer) {
   }
 }
 
-class ResizeWorker : public NanAsyncWorker {
+class PipelineWorker : public NanAsyncWorker {
 
  public:
-  ResizeWorker(NanCallback *callback, ResizeBaton *baton, NanCallback *queueListener) :
+  PipelineWorker(NanCallback *callback, PipelineBaton *baton, NanCallback *queueListener) :
     NanAsyncWorker(callback), baton(baton), queueListener(queueListener) {}
-  ~ResizeWorker() {}
+  ~PipelineWorker() {}
 
   /*
     libuv worker
@@ -1099,7 +1103,7 @@ class ResizeWorker : public NanAsyncWorker {
   }
 
  private:
-  ResizeBaton *baton;
+  PipelineBaton *baton;
   NanCallback *queueListener;
   VipsObject *hook;
 
@@ -1207,13 +1211,13 @@ class ResizeWorker : public NanAsyncWorker {
 };
 
 /*
-  resize(options, output, callback)
+  pipeline(options, output, callback)
 */
-NAN_METHOD(resize) {
+NAN_METHOD(pipeline) {
   NanScope();
 
   // V8 objects are converted to non-V8 types held in the baton struct
-  ResizeBaton *baton = new ResizeBaton;
+  PipelineBaton *baton = new PipelineBaton;
   Local<Object> options = args[0]->ToObject();
 
   // Input filename
@@ -1300,7 +1304,7 @@ NAN_METHOD(resize) {
 
   // Join queue for worker thread
   NanCallback *callback = new NanCallback(args[1].As<Function>());
-  NanAsyncQueueWorker(new ResizeWorker(callback, baton, queueListener));
+  NanAsyncQueueWorker(new PipelineWorker(callback, baton, queueListener));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);

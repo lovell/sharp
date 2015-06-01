@@ -3,9 +3,9 @@
     'target_name': 'sharp',
     'sources': [
       'src/common.cc',
-      'src/composite.c',
       'src/metadata.cc',
-      'src/resize.cc',
+      'src/operations.cc',
+      'src/pipeline.cc',
       'src/sharp.cc',
       'src/utilities.cc'
     ],

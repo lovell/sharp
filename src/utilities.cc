@@ -4,21 +4,14 @@
 #include "nan.h"
 
 #include "common.h"
+#include "operations.h"
 #include "utilities.h"
-#include "composite.h"
 
 using v8::Local;
 using v8::Object;
 using v8::Number;
 using v8::String;
 using v8::Boolean;
-
-using sharp::DetermineImageType;
-using sharp::ImageType;
-using sharp::InitImage;
-using sharp::HasAlpha;
-using sharp::counterQueue;
-using sharp::counterProcess;
 
 /*
   Get and set cache memory and item limits
@@ -68,6 +61,9 @@ NAN_METHOD(concurrency) {
   Get internal counters (queued tasks, processing tasks)
 */
 NAN_METHOD(counters) {
+  using sharp::counterProcess;
+  using sharp::counterQueue;
+
   NanScope();
   Local<Object> counters = NanNew<Object>();
   counters->Set(NanNew<String>("queue"), NanNew<Number>(counterQueue));
@@ -154,6 +150,12 @@ NAN_METHOD(format) {
   between two images of the same dimensions and number of channels.
 */
 NAN_METHOD(_maxColourDistance) {
+  using sharp::Premultiply;
+  using sharp::DetermineImageType;
+  using sharp::ImageType;
+  using sharp::InitImage;
+  using sharp::HasAlpha;
+
   NanScope();
 
   // Create "hook" VipsObject to hang image references from
