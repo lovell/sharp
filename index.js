@@ -87,9 +87,11 @@ var Sharp = function(input) {
   } else if (typeof input === 'object' && input instanceof Buffer) {
     // input=buffer
     this.options.bufferIn = input;
-  } else {
+  } else if (typeof input === 'undefined') {
     // input=stream
     this.options.streamIn = true;
+  } else {
+    throw new Error('Unsupported input ' + typeof input);
   }
   return this;
 };
@@ -394,7 +396,7 @@ Sharp.prototype.sequentialRead = function(sequentialRead) {
 };
 
 Sharp.prototype.quality = function(quality) {
-  if (!Number.isNaN(quality) && quality >= 1 && quality <= 100) {
+  if (!Number.isNaN(quality) && quality >= 1 && quality <= 100 && quality % 1 === 0) {
     this.options.quality = quality;
   } else {
     throw new Error('Invalid quality (1 to 100) ' + quality);

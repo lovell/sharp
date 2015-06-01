@@ -221,6 +221,29 @@ describe('Input/output', function() {
     });
   });
 
+  describe('Fail for unsupported input', function() {
+    it('Numeric', function() {
+      assert.throws(function() {
+        sharp(1);
+      });
+    });
+    it('Boolean', function() {
+      assert.throws(function() {
+        sharp(true);
+      });
+    });
+    it('Empty Object', function() {
+      assert.throws(function() {
+        sharp({});
+      });
+    });
+    it('Error Object', function() {
+      assert.throws(function() {
+        sharp(new Error());
+      });
+    });
+  });
+
   it('Promises/A+', function(done) {
     sharp(fixtures.inputJpg).resize(320, 240).toBuffer().then(function(data) {
       sharp(data).toBuffer(function(err, data, info) {
@@ -252,15 +275,22 @@ describe('Input/output', function() {
     });
   });
 
-  it('Invalid quality', function(done) {
-    var isValid = true;
-    try {
-      sharp(fixtures.inputJpg).quality(-1);
-    } catch (err) {
-      isValid = false;
-    }
-    assert.strictEqual(false, isValid);
-    done();
+  describe('Invalid quality', function() {
+    it('Negative integer', function() {
+      assert.throws(function() {
+        sharp(fixtures.inputJpg).quality(-1);
+      });
+    });
+    it('Non integral', function() {
+      assert.throws(function() {
+        sharp(fixtures.inputJpg).quality(88.2);
+      });
+    });
+    it('String', function() {
+      assert.throws(function() {
+        sharp(fixtures.inputJpg).quality('test');
+      });
+    });
   });
 
   it('Progressive JPEG image', function(done) {
