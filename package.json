@@ -45,10 +45,10 @@
     "bluebird": "^2.9.27",
     "color": "^0.8.0",
     "nan": "^1.8.4",
-    "semver": "^4.3.5"
+    "semver": "^4.3.6"
   },
   "devDependencies": {
-    "async": "^1.0.0",
+    "async": "^1.1.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.14",
     "mocha": "^2.2.5",
