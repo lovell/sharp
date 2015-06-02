@@ -48,7 +48,7 @@ describe('Overlays', function() {
 
     sharp(fixtures.inputPngOverlayLayer0)
       .overlayWith(fixtures.inputPngOverlayLayer1)
-      .toBuffer(function (error, data, info) {
+      .toBuffer(function (error, data) {
         if (error) return done(error);
         sharp(data)
           .overlayWith(fixtures.inputPngOverlayLayer2)
@@ -65,7 +65,7 @@ describe('Overlays', function() {
 
     sharp(fixtures.inputPngOverlayLayer1)
       .overlayWith(fixtures.inputPngOverlayLayer2)
-      .toFile(paths.actual, function (error, data, info) {
+      .toFile(paths.actual, function (error) {
         if (error) return done(error);
         fixtures.assertMaxColourDistance(paths.actual, paths.expected);
         done();
@@ -77,7 +77,7 @@ describe('Overlays', function() {
 
     sharp(fixtures.inputPngOverlayLayer1LowAlpha)
       .overlayWith(fixtures.inputPngOverlayLayer2LowAlpha)
-      .toFile(paths.actual, function (error, data, info) {
+      .toFile(paths.actual, function (error) {
         if (error) return done(error);
         fixtures.assertMaxColourDistance(paths.actual, paths.expected, 2);
         done();
@@ -89,12 +89,12 @@ describe('Overlays', function() {
 
     sharp(fixtures.inputPngOverlayLayer0)
       .overlayWith(fixtures.inputPngOverlayLayer1LowAlpha)
-      .toBuffer(function (error, data, info) {
+      .toBuffer(function (error, data) {
         if (error) return done(error);
 
         sharp(data)
           .overlayWith(fixtures.inputPngOverlayLayer2LowAlpha)
-          .toFile(paths.actual, function (error, data, info) {
+          .toFile(paths.actual, function (error) {
             if (error) return done(error);
             fixtures.assertMaxColourDistance(paths.actual, paths.expected);
             done();
@@ -102,14 +102,63 @@ describe('Overlays', function() {
       });
   });
 
-  it('Composite transparent PNG onto JPEG', function(done) {
+  it('Composite rgb+alpha PNG onto JPEG', function(done) {
+    var paths = getPaths('overlay-jpeg-with-rgb', 'jpg');
+
     sharp(fixtures.inputJpg)
+      .resize(2048, 1536)
       .overlayWith(fixtures.inputPngOverlayLayer1)
-      .toBuffer(function (error) {
+      .toFile(paths.actual, function(error, info) {
+        if (error) return done(error);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected, 102);
+        done();
+      });
+  });
+
+  it('Composite greyscale+alpha PNG onto JPEG', function(done) {
+    var paths = getPaths('overlay-jpeg-with-greyscale', 'jpg');
+
+    sharp(fixtures.inputJpg)
+      .resize(400, 300)
+      .overlayWith(fixtures.inputPngWithGreyAlpha)
+      .toFile(paths.actual, function(error, info) {
+        if (error) return done(error);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected, 102);
+        done();
+      });
+  });
+
+  if (sharp.format.webp.input.file) {
+    it('Composite WebP onto JPEG', function(done) {
+      var paths = getPaths('overlay-jpeg-with-webp', 'jpg');
+
+      sharp(fixtures.inputJpg)
+        .resize(300, 300)
+        .overlayWith(fixtures.inputWebPWithTransparency)
+        .toFile(paths.actual, function(error, info) {
+          if (error) return done(error);
+          fixtures.assertMaxColourDistance(paths.actual, paths.expected, 102);
+          done();
+        });
+    });
+  }
+
+  it('Fail when compositing images with different dimensions', function(done) {
+    sharp(fixtures.inputJpg)
+      .overlayWith(fixtures.inputPngWithGreyAlpha)
+      .toBuffer(function(error) {
+        console.dir(error);
         assert.strictEqual(true, error instanceof Error);
-        if (error.message !== 'Input image must have an alpha channel') {
-          return done(new Error('Unexpected error: ' + error.message));
-        }
+        done();
+      });
+  });
+
+  it('Fail when compositing non-PNG image', function(done) {
+    sharp(fixtures.inputPngOverlayLayer1)
+      .overlayWith(fixtures.inputJpg)
+      .toBuffer(function(error) {
+        console.dir(error);
+        assert.strictEqual(true, error instanceof Error);
         done();
       });
   });

@@ -1,38 +1,55 @@
 #include <vips/vips.h>
 
+#include "common.h"
 #include "operations.h"
 
 namespace sharp {
 
   /*
-    Composite images `src` and `dst` with premultiplied alpha channel and output
-    image with premultiplied alpha.
+    Alpha composite src over dst
+    Assumes alpha channels are already premultiplied and will be unpremultiplied after
    */
-  int Composite(VipsObject *context, VipsImage *srcPremultiplied, VipsImage *dstPremultiplied, VipsImage **outPremultiplied) {
-    if (srcPremultiplied->Bands != 4 || dstPremultiplied->Bands != 4)
-      return -1;
+  int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out) {
+    using sharp::HasAlpha;
 
-    // Extract RGB bands:
-    VipsImage *srcRGBPremultiplied;
-    if (vips_extract_band(srcPremultiplied, &srcRGBPremultiplied, 0, "n", srcPremultiplied->Bands - 1, NULL))
+    // Split src into non-alpha and alpha
+    VipsImage *srcWithoutAlpha;
+    if (vips_extract_band(src, &srcWithoutAlpha, 0, "n", src->Bands - 1, NULL))
       return -1;
-    vips_object_local(context, srcRGBPremultiplied);
-
-    VipsImage *dstRGBPremultiplied;
-    if (vips_extract_band(dstPremultiplied, &dstRGBPremultiplied, 0, "n", dstPremultiplied->Bands - 1, NULL))
-      return -1;
-    vips_object_local(context, dstRGBPremultiplied);
-
-    // Extract alpha bands:
+    vips_object_local(context, srcWithoutAlpha);
     VipsImage *srcAlpha;
-    if (vips_extract_band(srcPremultiplied, &srcAlpha, srcPremultiplied->Bands - 1, "n", 1, NULL))
+    if (vips_extract_band(src, &srcAlpha, src->Bands - 1, "n", 1, NULL))
       return -1;
     vips_object_local(context, srcAlpha);
 
+    // Split dst into non-alpha and alpha channels
+    VipsImage *dstWithoutAlpha;
     VipsImage *dstAlpha;
-    if (vips_extract_band(dstPremultiplied, &dstAlpha, dstPremultiplied->Bands - 1, "n", 1, NULL))
-      return -1;
-    vips_object_local(context, dstAlpha);
+    if (HasAlpha(dst)) {
+      // Non-alpha: extract all-but-last channel
+      if (vips_extract_band(dst, &dstWithoutAlpha, 0, "n", dst->Bands - 1, NULL)) {
+        return -1;
+      }
+      vips_object_local(context, dstWithoutAlpha);
+      // Alpha: Extract last channel
+      if (vips_extract_band(dst, &dstAlpha, dst->Bands - 1, "n", 1, NULL)) {
+        return -1;
+      }
+      vips_object_local(context, dstAlpha);
+    } else {
+      // Non-alpha: Copy reference
+      dstWithoutAlpha = dst;
+      // Alpha: Use blank, opaque (0xFF) image
+      VipsImage *black;
+      if (vips_black(&black, dst->Xsize, dst->Ysize, NULL)) {
+        return -1;
+      }
+      vips_object_local(context, black);
+      if (vips_invert(black, &dstAlpha, NULL)) {
+        return -1;
+      }
+      vips_object_local(context, dstAlpha);
+    }
 
     // Compute normalized input alpha channels:
     VipsImage *srcAlphaNormalized;
@@ -85,12 +102,12 @@ namespace sharp {
     // externally.
     //
     VipsImage *t2;
-    if (vips_multiply(dstRGBPremultiplied, t0, &t2, NULL))
+    if (vips_multiply(dstWithoutAlpha, t0, &t2, NULL))
       return -1;
     vips_object_local(context, t2);
 
     VipsImage *outRGBPremultiplied;
-    if (vips_add(srcRGBPremultiplied, t2, &outRGBPremultiplied, NULL))
+    if (vips_add(srcWithoutAlpha, t2, &outRGBPremultiplied, NULL))
       return -1;
     vips_object_local(context, outRGBPremultiplied);
 
@@ -101,24 +118,15 @@ namespace sharp {
     vips_object_local(context, outAlpha);
 
     // Combine RGB and alpha channel into output image:
-    VipsImage *joined;
-    if (vips_bandjoin2(outRGBPremultiplied, outAlpha, &joined, NULL))
-      return -1;
-
-    // Return a reference to the composited output image
-    *outPremultiplied = joined;
-    return 0;
+    return vips_bandjoin2(outRGBPremultiplied, outAlpha, out, NULL);
   }
 
   /*
    * Premultiply alpha channel of `image`.
    */
   int Premultiply(VipsObject *context, VipsImage *image, VipsImage **out) {
-    VipsImage *imagePremultiplied;
-
 #if (VIPS_MAJOR_VERSION >= 9 || (VIPS_MAJOR_VERSION >= 8 && VIPS_MINOR_VERSION >= 1))
-    if (vips_premultiply(image, &imagePremultiplied, NULL))
-      return -1;
+    return vips_premultiply(image, out, NULL);
 #else
     VipsImage *imageRGB;
     if (vips_extract_band(image, &imageRGB, 0, "n", image->Bands - 1, NULL))
@@ -140,24 +148,16 @@ namespace sharp {
       return -1;
     vips_object_local(context, imageRGBPremultiplied);
 
-    if (vips_bandjoin2(imageRGBPremultiplied, imageAlpha, &imagePremultiplied, NULL))
-      return -1;
+    return vips_bandjoin2(imageRGBPremultiplied, imageAlpha, out, NULL);
 #endif
-
-    // Return a reference to the premultiplied output image
-    *out = imagePremultiplied;
-    return 0;
   }
 
   /*
    * Unpremultiply alpha channel of `image`.
    */
   int Unpremultiply(VipsObject *context, VipsImage *image, VipsImage **out) {
-    VipsImage *imageUnpremultiplied;
-
 #if (VIPS_MAJOR_VERSION >= 9 || (VIPS_MAJOR_VERSION >= 8 && VIPS_MINOR_VERSION >= 1))
-    if (vips_unpremultiply(image, &imageUnpremultiplied, NULL))
-      return -1;
+    return vips_unpremultiply(image, out, NULL);
 #else
     VipsImage *imageRGBPremultipliedTransformed;
     if (vips_extract_band(image, &imageRGBPremultipliedTransformed, 0, "n", image->Bands - 1, NULL))
@@ -179,13 +179,8 @@ namespace sharp {
       return -1;
     vips_object_local(context, imageRGBUnpremultipliedTransformed);
 
-    if (vips_bandjoin2(imageRGBUnpremultipliedTransformed, imageAlphaTransformed, &imageUnpremultiplied, NULL))
-      return -1;
+    return vips_bandjoin2(imageRGBUnpremultipliedTransformed, imageAlphaTransformed, out, NULL);
 #endif
-
-    // Return a reference to the unpremultiplied output image
-    *out = imageUnpremultiplied;
-    return 0;
   }
 
 }  // namespace sharp

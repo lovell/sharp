@@ -417,10 +417,6 @@ If the background contains an alpha value then WebP and PNG format output images
 
 Merge alpha transparency channel, if any, with `background`.
 
-#### Experimental: overlayWith(filename)
-
-**Experimental:** Composite image with transparent overlay. Both input and overlay image must be RGBA and their dimensions must match.
-
 #### rotate([angle])
 
 Rotate the output image by either an explicit angle or auto-orient based on the EXIF `Orientation` tag.
@@ -497,6 +493,14 @@ The output image will still be web-friendly sRGB and contain three (identical) c
 #### normalize() / normalise()
 
 Enhance output image contrast by stretching its luminance to cover the full dynamic range. This typically reduces performance by 30%.
+
+#### overlayWith(filename)
+
+_Experimental_
+
+Alpha composite `filename` over the processed (resized, extracted) image. The dimensions of the two images must match.
+
+* `filename` is a String containing the filename of an image with an alpha channel.
 
 ### Output options
 

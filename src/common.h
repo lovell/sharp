@@ -1,6 +1,8 @@
 #ifndef SRC_COMMON_H_
 #define SRC_COMMON_H_
 
+#include <string>
+
 namespace sharp {
 
   enum class ImageType {

@@ -484,9 +484,6 @@ class PipelineWorker : public NanAsyncWorker {
       }
     }
 
-    // Premultiply image alpha channel before all transformations to avoid
-    // dark fringing around bright pixels
-    // See: http://entropymine.com/imageworsener/resizealpha/
     bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
     bool shouldBlur = baton->blurSigma != 0.0;
     bool shouldSharpen = baton->sharpenRadius != 0;
@@ -494,13 +491,15 @@ class PipelineWorker : public NanAsyncWorker {
     bool hasOverlay = !baton->overlayPath.empty();
     bool shouldPremultiplyAlpha = HasAlpha(image) && image->Bands == 4 && (shouldTransform || hasOverlay);
 
+    // Premultiply image alpha channel before all transformations to avoid
+    // dark fringing around bright pixels
+    // See: http://entropymine.com/imageworsener/resizealpha/
     if (shouldPremultiplyAlpha) {
       VipsImage *imagePremultiplied;
       if (Premultiply(hook, image, &imagePremultiplied)) {
         (baton->err).append("Failed to premultiply alpha channel.");
         return Error();
       }
-
       vips_object_local(hook, imagePremultiplied);
       image = imagePremultiplied;
     }
@@ -820,41 +819,34 @@ class PipelineWorker : public NanAsyncWorker {
       if (overlayImageType != ImageType::UNKNOWN) {
         overlayImage = InitImage(baton->overlayPath.c_str(), baton->accessMethod);
         if (overlayImage == NULL) {
-          (baton->err).append("Overlay input file has corrupt header");
-          overlayImageType = ImageType::UNKNOWN;
+          (baton->err).append("Overlay image has corrupt header");
+          return Error();
         } else {
           vips_object_local(hook, overlayImage);
         }
       } else {
-        (baton->err).append("Overlay input file is of an unsupported image format");
-      }
-
-      if (overlayImage == NULL || overlayImageType == ImageType::UNKNOWN) {
+        (baton->err).append("Overlay image is of an unsupported image format");
         return Error();
       }
-
       if (!HasAlpha(overlayImage)) {
-        (baton->err).append("Overlay input must have an alpha channel");
+        (baton->err).append("Overlay image must have an alpha channel");
+        return Error();
+      }
+      if (overlayImage->Xsize != image->Xsize && overlayImage->Ysize != image->Ysize) {
+        (baton->err).append("Overlay image must have same dimensions as resized image");
         return Error();
       }
 
-      if (!HasAlpha(image)) {
-        (baton->err).append("Input image must have an alpha channel");
+      // Ensure overlay is sRGB
+      VipsImage *overlayImageRGB;
+      if (vips_colourspace(overlayImage, &overlayImageRGB, VIPS_INTERPRETATION_sRGB, NULL)) {
         return Error();
       }
+      vips_object_local(hook, overlayImageRGB);
 
-      if (overlayImage->Bands != 4) {
-        (baton->err).append("Overlay input image must have 4 channels");
-        return Error();
-      }
-
-      if (image->Bands != 4) {
-        (baton->err).append("Input image must have 4 channels");
-        return Error();
-      }
-
+      // Premultiply overlay
       VipsImage *overlayImagePremultiplied;
-      if (Premultiply(hook, overlayImage, &overlayImagePremultiplied)) {
+      if (Premultiply(hook, overlayImageRGB, &overlayImagePremultiplied)) {
         (baton->err).append("Failed to premultiply alpha channel of overlay image.");
         return Error();
       }
@@ -883,14 +875,14 @@ class PipelineWorker : public NanAsyncWorker {
 
     // Convert image to sRGB, if not already
     if (image->Type != VIPS_INTERPRETATION_sRGB) {
-      // Switch intrepretation to sRGB
+      // Switch interpretation to sRGB
       VipsImage *rgb;
       if (vips_colourspace(image, &rgb, VIPS_INTERPRETATION_sRGB, NULL)) {
         return Error();
       }
       vips_object_local(hook, rgb);
       image = rgb;
-      // Tranform colours from embedded profile to sRGB profile
+      // Transform colours from embedded profile to sRGB profile
       if (baton->withMetadata && HasProfile(image)) {
         VipsImage *profiled;
         if (vips_icc_transform(image, &profiled, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
