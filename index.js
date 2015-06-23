@@ -761,6 +761,24 @@ Sharp.prototype.metadata = function(callback) {
 };
 
 /*
+  Clone new instance using existing options.
+  Cloned instances share the same input.
+*/
+Sharp.prototype.clone = function() {
+  // Clone existing options
+  var clone = new Sharp();
+  util._extend(clone.options, this.options);
+  clone.streamIn = false;
+  // Pass 'finish' event to clone for Stream-based input
+  this.on('finish', function() {
+    // Clone inherits input data
+    clone.options.bufferIn = this.options.bufferIn;
+    clone.emit('finish');
+  });
+  return clone;
+};
+
+/*
   Get and set cache memory and item limits
 */
 module.exports.cache = function(memory, items) {

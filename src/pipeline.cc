@@ -1222,7 +1222,6 @@ NAN_METHOD(pipeline) {
     baton->bufferInLength = node::Buffer::Length(buffer);
     baton->bufferIn = new char[baton->bufferInLength];
     memcpy(baton->bufferIn, node::Buffer::Data(buffer), baton->bufferInLength);
-    options->Set(NanNew<String>("bufferIn"), NanNull());
   }
   // ICC profile to use when input CMYK image has no embedded profile
   baton->iccProfilePath = *String::Utf8Value(options->Get(NanNew<String>("iccProfilePath"))->ToString());

@@ -164,6 +164,15 @@ readableStream.pipe(pipeline);
 ```
 
 ```javascript
+var pipeline = sharp().rotate();
+pipeline.clone().resize(800, 600).pipe(firstWritableStream);
+pipeline.clone().extract(20, 20, 100, 100).pipe(secondWritableStream);
+readableStream.pipe(pipeline);
+// firstWritableStream receives auto-rotated, resized readableStream
+// secondWritableStream receives auto-rotated, extracted region of readableStream
+```
+
+```javascript
 sharp('input.png')
   .rotate(180)
   .resize(300)
@@ -346,6 +355,14 @@ An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQU
 Do not process input images where the number of pixels (width * height) exceeds this limit.
 
 `pixels` is the integral Number of pixels, with a value between 1 and the default 268402689 (0x3FFF * 0x3FFF).
+
+#### clone()
+
+Takes a "snapshot" of the instance, returning a new instance.
+Cloned instances inherit the input of their parent instance.
+This allows multiple output Streams
+and therefore multiple processing pipelines
+to share a single input Stream.
 
 ### Image transformation options
 
