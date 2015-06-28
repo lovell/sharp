@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var assert = require('assert');
+var exifReader = require('exif-reader');
 
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
@@ -21,6 +22,7 @@ describe('Image metadata', function() {
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
       done();
     });
   });
@@ -36,6 +38,12 @@ describe('Image metadata', function() {
       assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual(8, metadata.orientation);
+      assert.strictEqual('object', typeof metadata.exif);
+      assert.strictEqual(true, metadata.exif instanceof Buffer);
+      var exif = exifReader(metadata.exif);
+      assert.strictEqual('object', typeof exif);
+      assert.strictEqual('object', typeof exif.image);
+      assert.strictEqual('number', typeof exif.image.XResolution);
       done();
     });
   });

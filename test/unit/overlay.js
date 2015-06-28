@@ -147,7 +147,6 @@ describe('Overlays', function() {
     sharp(fixtures.inputJpg)
       .overlayWith(fixtures.inputPngWithGreyAlpha)
       .toBuffer(function(error) {
-        console.dir(error);
         assert.strictEqual(true, error instanceof Error);
         done();
       });
@@ -157,7 +156,6 @@ describe('Overlays', function() {
     sharp(fixtures.inputPngOverlayLayer1)
       .overlayWith(fixtures.inputJpg)
       .toBuffer(function(error) {
-        console.dir(error);
         assert.strictEqual(true, error instanceof Error);
         done();
       });

@@ -45,19 +45,20 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^2.9.27",
-    "color": "^0.8.0",
+    "bluebird": "^2.9.30",
+    "color": "^0.9.0",
     "nan": "^1.8.4",
     "semver": "^4.3.6"
   },
   "devDependencies": {
-    "async": "^1.1.0",
+    "async": "^1.2.1",
     "coveralls": "^2.11.2",
-    "istanbul": "^0.3.14",
+    "exif-reader": "1.0.0",
+    "istanbul": "^0.3.17",
     "mocha": "^2.2.5",
     "mocha-jshint": "^2.2.3",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.3.4"
+    "rimraf": "^2.4.0"
   },
   "license": "Apache-2.0",
   "engines": {

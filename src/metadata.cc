@@ -27,7 +27,7 @@ using sharp::counterQueue;
 struct MetadataBaton {
   // Input
   std::string fileIn;
-  void* bufferIn;
+  char *bufferIn;
   size_t bufferInLength;
   // Output
   std::string format;
@@ -38,12 +38,25 @@ struct MetadataBaton {
   bool hasProfile;
   bool hasAlpha;
   int orientation;
+  char *exif;
+  size_t exifLength;
   std::string err;
 
   MetadataBaton():
     bufferInLength(0),
-    orientation(0) {}
+    orientation(0),
+    exifLength(0) {}
 };
+
+/*
+  Delete input char[] buffer and notify V8 of memory deallocation
+  Used as the callback function for the "postclose" signal
+*/
+static void DeleteBuffer(VipsObject *object, char *buffer) {
+  if (buffer != NULL) {
+    delete[] buffer;
+  }
+}
 
 class MetadataWorker : public NanAsyncWorker {
 
@@ -57,17 +70,22 @@ class MetadataWorker : public NanAsyncWorker {
 
     ImageType imageType = ImageType::UNKNOWN;
     VipsImage *image = NULL;
-    if (baton->bufferInLength > 1) {
+    if (baton->bufferInLength > 0) {
       // From buffer
       imageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (imageType != ImageType::UNKNOWN) {
         image = InitImage(baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
-        if (image == NULL) {
+        if (image != NULL) {
+          // Listen for "postclose" signal to delete input buffer
+          g_signal_connect(image, "postclose", G_CALLBACK(DeleteBuffer), baton->bufferIn);
+        } else {
           (baton->err).append("Input buffer has corrupt header");
           imageType = ImageType::UNKNOWN;
+          DeleteBuffer(NULL, baton->bufferIn);
         }
       } else {
         (baton->err).append("Input buffer contains unsupported image format");
+        DeleteBuffer(NULL, baton->bufferIn);
       }
     } else {
       // From file
@@ -102,6 +120,16 @@ class MetadataWorker : public NanAsyncWorker {
       // Derived attributes
       baton->hasAlpha = HasAlpha(image);
       baton->orientation = ExifOrientation(image);
+      // EXIF
+      if (vips_image_get_typeof(image, VIPS_META_EXIF_NAME) == VIPS_TYPE_BLOB) {
+        void* exif;
+        size_t exifLength;
+        if (!vips_image_get_blob(image, VIPS_META_EXIF_NAME, &exif, &exifLength)) {
+          baton->exifLength = exifLength;
+          baton->exif = new char[exifLength];
+          memcpy(baton->exif, exif, exifLength);
+        }
+      }
       // Drop image reference
       g_object_unref(image);
     }
@@ -130,6 +158,9 @@ class MetadataWorker : public NanAsyncWorker {
       if (baton->orientation > 0) {
         info->Set(NanNew<String>("orientation"), NanNew<Number>(baton->orientation));
       }
+      if (baton->exifLength > 0) {
+        info->Set(NanNew<String>("exif"), NanBufferUse(baton->exif, baton->exifLength));
+      }
       argv[1] = info;
     }
     delete baton;
@@ -157,8 +188,10 @@ NAN_METHOD(metadata) {
   // Input Buffer object
   if (options->Get(NanNew<String>("bufferIn"))->IsObject()) {
     Local<Object> buffer = options->Get(NanNew<String>("bufferIn"))->ToObject();
+    // Take a copy of the input Buffer to avoid problems with V8 heap compaction
     baton->bufferInLength = node::Buffer::Length(buffer);
-    baton->bufferIn = node::Buffer::Data(buffer);
+    baton->bufferIn = new char[baton->bufferInLength];
+    memcpy(baton->bufferIn, node::Buffer::Data(buffer), baton->bufferInLength);
   }
 
   // Join queue for worker thread

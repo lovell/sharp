@@ -737,22 +737,22 @@ Sharp.prototype.metadata = function(callback) {
     if (this.options.streamIn) {
       return new BluebirdPromise(function(resolve, reject) {
         that.on('finish', function() {
-          sharp.metadata(that.options, function(err, data) {
+          sharp.metadata(that.options, function(err, metadata) {
             if (err) {
               reject(err);
             } else {
-              resolve(data);
+              resolve(metadata);
             }
           });
         });
       });
     } else {
       return new BluebirdPromise(function(resolve, reject) {
-        sharp.metadata(that.options, function(err, data) {
+        sharp.metadata(that.options, function(err, metadata) {
           if (err) {
             reject(err);
           } else {
-            resolve(data);
+            resolve(metadata);
           }
         });
       });

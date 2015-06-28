@@ -184,7 +184,7 @@ class PipelineWorker : public NanAsyncWorker {
     // Input
     ImageType inputImageType = ImageType::UNKNOWN;
     VipsImage *image = NULL;
-    if (baton->bufferInLength > 1) {
+    if (baton->bufferInLength > 0) {
       // From buffer
       inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (inputImageType != ImageType::UNKNOWN) {
