@@ -40,12 +40,15 @@ struct MetadataBaton {
   int orientation;
   char *exif;
   size_t exifLength;
+  char *icc;
+  size_t iccLength;
   std::string err;
 
   MetadataBaton():
     bufferInLength(0),
     orientation(0),
-    exifLength(0) {}
+    exifLength(0),
+    iccLength(0) {}
 };
 
 /*
@@ -130,6 +133,16 @@ class MetadataWorker : public NanAsyncWorker {
           memcpy(baton->exif, exif, exifLength);
         }
       }
+      // ICC profile
+      if (vips_image_get_typeof(image, VIPS_META_ICC_NAME) == VIPS_TYPE_BLOB) {
+        void* icc;
+        size_t iccLength;
+        if (!vips_image_get_blob(image, VIPS_META_ICC_NAME, &icc, &iccLength)) {
+          baton->iccLength = iccLength;
+          baton->icc = new char[iccLength];
+          memcpy(baton->icc, icc, iccLength);
+        }
+      }
       // Drop image reference
       g_object_unref(image);
     }
@@ -160,6 +173,9 @@ class MetadataWorker : public NanAsyncWorker {
       }
       if (baton->exifLength > 0) {
         info->Set(NanNew<String>("exif"), NanBufferUse(baton->exif, baton->exifLength));
+      }
+      if (baton->iccLength > 0) {
+        info->Set(NanNew<String>("icc"), NanBufferUse(baton->icc, baton->iccLength));
       }
       argv[1] = info;
     }

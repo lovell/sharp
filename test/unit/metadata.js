@@ -3,6 +3,7 @@
 var fs = require('fs');
 var assert = require('assert');
 var exifReader = require('exif-reader');
+var icc = require('icc');
 
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
@@ -23,11 +24,12 @@ describe('Image metadata', function() {
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
       assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
       done();
     });
   });
 
-  it('JPEG with EXIF', function(done) {
+  it('JPEG with EXIF/ICC', function(done) {
     sharp(fixtures.inputJpgWithExif).metadata(function(err, metadata) {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
@@ -38,12 +40,19 @@ describe('Image metadata', function() {
       assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual(8, metadata.orientation);
+      // EXIF
       assert.strictEqual('object', typeof metadata.exif);
       assert.strictEqual(true, metadata.exif instanceof Buffer);
       var exif = exifReader(metadata.exif);
       assert.strictEqual('object', typeof exif);
       assert.strictEqual('object', typeof exif.image);
       assert.strictEqual('number', typeof exif.image.XResolution);
+      // ICC
+      assert.strictEqual('object', typeof metadata.icc);
+      assert.strictEqual(true, metadata.icc instanceof Buffer);
+      var profile = icc.parse(metadata.icc);
+      assert.strictEqual('object', typeof profile);
+      assert.strictEqual('Generic RGB Profile', profile.description);
       done();
     });
   });
@@ -58,6 +67,9 @@ describe('Image metadata', function() {
       assert.strictEqual(1, metadata.channels);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
       done();
     });
   });
@@ -72,6 +84,9 @@ describe('Image metadata', function() {
       assert.strictEqual(1, metadata.channels);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
       done();
     });
   });
@@ -86,6 +101,9 @@ describe('Image metadata', function() {
       assert.strictEqual(4, metadata.channels);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(true, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
       done();
     });
   });
@@ -101,6 +119,9 @@ describe('Image metadata', function() {
         assert.strictEqual(3, metadata.channels);
         assert.strictEqual(false, metadata.hasProfile);
         assert.strictEqual(false, metadata.hasAlpha);
+        assert.strictEqual('undefined', typeof metadata.orientation);
+        assert.strictEqual('undefined', typeof metadata.exif);
+        assert.strictEqual('undefined', typeof metadata.icc);
         done();
       });
     });
@@ -115,6 +136,9 @@ describe('Image metadata', function() {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
       done();
     });
   });
@@ -130,6 +154,9 @@ describe('Image metadata', function() {
         assert.strictEqual('rgb', metadata.space);
         assert.strictEqual(false, metadata.hasProfile);
         assert.strictEqual(true, metadata.hasAlpha);
+        assert.strictEqual('undefined', typeof metadata.orientation);
+        assert.strictEqual('undefined', typeof metadata.exif);
+        assert.strictEqual('undefined', typeof metadata.icc);
         done();
       });
     });
@@ -144,6 +171,9 @@ describe('Image metadata', function() {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
       done();
     });
   });
@@ -168,6 +198,9 @@ describe('Image metadata', function() {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
       done();
     }).catch(function(err) {
       throw err;
@@ -186,6 +219,9 @@ describe('Image metadata', function() {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
       done();
     });
     readable.pipe(pipeline);
@@ -202,6 +238,9 @@ describe('Image metadata', function() {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
       image.resize(Math.floor(metadata.width / 2)).toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -212,7 +251,7 @@ describe('Image metadata', function() {
     });
   });
 
-  it('Keep EXIF metadata after a resize', function(done) {
+  it('Keep EXIF metadata and add sRGB profile after a resize', function(done) {
     sharp(fixtures.inputJpgWithExif)
       .resize(320, 240)
       .withMetadata()
@@ -222,6 +261,19 @@ describe('Image metadata', function() {
           if (err) throw err;
           assert.strictEqual(true, metadata.hasProfile);
           assert.strictEqual(8, metadata.orientation);
+          assert.strictEqual('object', typeof metadata.exif);
+          assert.strictEqual(true, metadata.exif instanceof Buffer);
+          // EXIF
+          var exif = exifReader(metadata.exif);
+          assert.strictEqual('object', typeof exif);
+          assert.strictEqual('object', typeof exif.image);
+          assert.strictEqual('number', typeof exif.image.XResolution);
+          // ICC
+          assert.strictEqual('object', typeof metadata.icc);
+          assert.strictEqual(true, metadata.icc instanceof Buffer);
+          var profile = icc.parse(metadata.icc);
+          assert.strictEqual('object', typeof profile);
+          assert.strictEqual('sRGB IEC61966-2-1 black scaled', profile.description);
           done();
         });
       });
@@ -237,6 +289,8 @@ describe('Image metadata', function() {
           if (err) throw err;
           assert.strictEqual(false, metadata.hasProfile);
           assert.strictEqual('undefined', typeof metadata.orientation);
+          assert.strictEqual('undefined', typeof metadata.exif);
+          assert.strictEqual('undefined', typeof metadata.icc);
           done();
         });
       });

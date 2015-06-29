@@ -344,6 +344,7 @@ Fast access to image metadata without decoding any compressed image data.
 * `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 * `orientation`: Number value of the EXIF Orientation header, if present
 * `exif`: Buffer containing raw EXIF data, if present
+* `icc`: Buffer containing raw [ICC](https://www.npmjs.com/package/icc) profile data, if present
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
