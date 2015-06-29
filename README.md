@@ -716,6 +716,10 @@ to compare expected vs actual images.
 
 [![Windows Server 2012 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
 
+#### OS X 10.9.5
+
+[![OS X 10.9.5 Build Status](https://travis-ci.org/lovell/sharp-osx-ci.png?branch=master)](https://travis-ci.org/lovell/sharp-osx-ci)
+
 ### Benchmark tests
 
 ```
