@@ -28,7 +28,7 @@ describe('Rotation', function() {
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
-        assert.strictEqual(426, info.height);
+        assert.strictEqual(427, info.height);
         done();
       });
   });

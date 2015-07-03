@@ -317,7 +317,7 @@ class PipelineWorker : public NanAsyncWorker {
       } else {
         // Auto height
         yfactor = xfactor;
-        baton->height = static_cast<int>(floor(static_cast<double>(inputHeight) / yfactor));
+        baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / yfactor));
       }
     } else if (baton->height > 0) {
       // Fixed height
@@ -327,7 +327,7 @@ class PipelineWorker : public NanAsyncWorker {
       } else {
         // Auto width
         xfactor = yfactor;
-        baton->width = static_cast<int>(floor(static_cast<double>(inputWidth) / xfactor));
+        baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / xfactor));
       }
     } else {
       // Identity transform

@@ -36,7 +36,7 @@ describe('Resize dimensions', function() {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
       assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(391, info.width);
+      assert.strictEqual(392, info.width);
       assert.strictEqual(320, info.height);
       done();
     });
@@ -59,7 +59,7 @@ describe('Resize dimensions', function() {
       assert.strictEqual(true, data.length > 0);
       assert.strictEqual('jpeg', info.format);
       assert.strictEqual(3000, info.width);
-      assert.strictEqual(2449, info.height);
+      assert.strictEqual(2450, info.height);
       done();
     });
   });
