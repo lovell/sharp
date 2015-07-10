@@ -750,41 +750,39 @@ sudo yum install -y --enablerepo=epel GraphicsMagick
 
 ### Test environment
 
-* AWS EC2 [c3.xlarge](http://aws.amazon.com/ec2/instance-types/#Compute_Optimized)
-* Ubuntu 14.04
-* libvips 7.40.8
+* AWS EC2 [c4.xlarge](http://aws.amazon.com/ec2/instance-types/#c4)
+* Ubuntu 15.04
+* Node.js 0.12.7
+* libvips 8.0.2
 * liborc 0.4.22
 
 ### The contenders
 
-* [imagemagick-native](https://github.com/mash/node-imagemagick-native) v1.2.2 - Supports Buffers only
-* [imagemagick](https://github.com/yourdeveloper/node-imagemagick) v0.1.3 - Supports filesystem only and "has been unmaintained for a long time".
-* [gm](https://github.com/aheckmann/gm) v1.16.0 - Fully featured wrapper around GraphicsMagick.
-* sharp v0.6.2 - Caching within libvips disabled to ensure a fair comparison.
+* [lwip](https://www.npmjs.com/package/lwip) 0.0.7 - Wrapper around CImg, compiles dependencies from source
+* [imagemagick-native](https://www.npmjs.com/package/imagemagick-native) git@45d4e2e - Supports Buffers only
+* [imagemagick](https://www.npmjs.com/package/imagemagick) 0.1.3 - Supports filesystem only and "has been unmaintained for a long time".
+* [gm](https://www.npmjs.com/package/gm) 1.18.1 - Fully featured wrapper around GraphicsMagick.
+* sharp 0.11.0 - Caching within libvips disabled to ensure a fair comparison.
 
 ### The task
 
-Decompress a 2725x2225 JPEG image, resize and crop to 720x480, then compress to JPEG.
+Decompress a 2725x2225 JPEG image, resize to 720x480 using bilinear interpolation, then compress to JPEG.
 
 ### Results
 
-| Module                | Input  | Output | Ops/sec | Speed-up |
-| :-------------------- | :----- | :----- | ------: | -------: |
-| imagemagick-native    | buffer | buffer |    1.58 |        1 |
-| imagemagick           | file   | file   |    6.23 |      3.9 |
-| gm                    | buffer | file   |    5.32 |      3.4 |
-| gm                    | buffer | buffer |    5.32 |      3.4 |
-| gm                    | file   | file   |    5.36 |      3.4 |
-| gm                    | file   | buffer |    5.36 |      3.4 |
-| sharp                 | buffer | file   |   22.05 |     14.0 |
-| sharp                 | buffer | buffer |   22.14 |     14.0 |
-| sharp                 | file   | file   |   21.79 |     13.8 |
-| sharp                 | file   | buffer |   21.90 |     13.9 |
-| sharp                 | stream | stream |   20.87 |     13.2 |
-| sharp +promise        | file   | buffer |   21.89 |     13.9 |
-| sharp +sharpen        | file   | buffer |   19.69 |     12.5 |
-| sharp +progressive    | file   | buffer |   16.93 |     10.7 |
-| sharp +sequentialRead | file   | buffer |   21.60 |     13.7 |
+| Module             | Input  | Output | Ops/sec | Speed-up |
+| :----------------- | :----- | :----- | ------: | -------: |
+| lwip               | file   | file   |    1.75 |        1 |
+| lwip               | buffer | buffer |    2.21 |      1.3 |
+| imagemagick-native | buffer | buffer |    7.13 |      4.1 |
+| gm                 | buffer | buffer |    7.27 |      4.2 |
+| gm                 | file   | file   |    7.33 |      4.2 |
+| imagemagick        | file   | file   |   10.04 |      5.7 |
+| sharp              | stream | stream |   23.12 |     13.2 |
+| sharp              | file   | file   |   24.43 |     14.0 |
+| sharp              | file   | buffer |   24.55 |     14.0 |
+| sharp              | buffer | file   |   24.86 |     14.2 |
+| sharp              | buffer | buffer |   24.92 |     14.2 |
 
 You can expect greater performance with caching enabled (default) and using 8+ core machines.
 
