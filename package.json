@@ -45,8 +45,8 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^2.9.30",
-    "color": "^0.9.0",
+    "bluebird": "^2.9.33",
+    "color": "^0.10.1",
     "nan": "^1.8.4",
     "semver": "^4.3.6"
   },
@@ -59,7 +59,7 @@
     "mocha": "^2.2.5",
     "mocha-jshint": "^2.2.3",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.4.0"
+    "rimraf": "^2.4.1"
   },
   "license": "Apache-2.0",
   "engines": {

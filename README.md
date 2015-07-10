@@ -737,7 +737,7 @@ brew install graphicsmagick
 ```
 
 ```
-sudo apt-get install -qq imagemagick graphicsmagick libmagickcore-dev
+sudo apt-get install -qq imagemagick graphicsmagick libmagick++-dev
 ```
 
 ```
