@@ -1,6 +1,7 @@
 os: Visual Studio 2014 CTP4
-platform: Win32
-configuration: Release
+version: "{build}"
+build: off
+platform: x64
 environment:
   VIPS_VERSION_MAJOR_MINOR: 8.0
   VIPS_VERSION_PATCH: 2
@@ -10,7 +11,7 @@ environment:
     nodejs_exec: "node"
   - nodejs_version: "0.12"
     nodejs_exec: "node"
-  - nodejs_version: "1.0"
+  - nodejs_version: "2"
     nodejs_exec: "iojs"
 install:
   - ps: $env:VIPS_VERSION = "$env:VIPS_VERSION_MAJOR_MINOR.$env:VIPS_VERSION_PATCH"
