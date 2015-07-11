@@ -726,6 +726,16 @@ class PipelineWorker : public NanAsyncWorker {
         (baton->err).append("Overlay image is of an unsupported image format");
         return Error();
       }
+      if (image->BandFmt != VIPS_FORMAT_UCHAR && image->BandFmt != VIPS_FORMAT_FLOAT) {
+        (baton->err).append("Expected image band format to be uchar or float: ");
+        (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, image->BandFmt));
+        return Error();
+      }
+      if (overlayImage->BandFmt != VIPS_FORMAT_UCHAR && overlayImage->BandFmt != VIPS_FORMAT_FLOAT) {
+        (baton->err).append("Expected overlay image band format to be uchar or float: ");
+        (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, overlayImage->BandFmt));
+        return Error();
+      }
       if (!HasAlpha(overlayImage)) {
         (baton->err).append("Overlay image must have an alpha channel");
         return Error();
