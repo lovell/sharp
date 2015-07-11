@@ -25,6 +25,9 @@ using v8::Exception;
 using sharp::Composite;
 using sharp::Premultiply;
 using sharp::Unpremultiply;
+using sharp::Normalize;
+using sharp::Blur;
+using sharp::Sharpen;
 
 using sharp::ImageType;
 using sharp::DetermineImageType;
@@ -672,55 +675,18 @@ class PipelineWorker : public NanAsyncWorker {
     // Blur
     if (shouldBlur) {
       VipsImage *blurred;
-      if (baton->blurSigma < 0.0) {
-        // Fast, mild blur - averages neighbouring pixels
-        VipsImage *blur = vips_image_new_matrixv(3, 3,
-          1.0, 1.0, 1.0,
-          1.0, 1.0, 1.0,
-          1.0, 1.0, 1.0);
-        vips_image_set_double(blur, "scale", 9);
-        vips_object_local(hook, blur);
-        if (vips_conv(image, &blurred, blur, NULL)) {
-          return Error();
-        }
-      } else {
-        // Slower, accurate Gaussian blur
-        // Create Gaussian function for standard deviation
-        VipsImage *gaussian;
-        if (vips_gaussmat(&gaussian, baton->blurSigma, 0.2, "separable", TRUE, "integer", TRUE, NULL)) {
-          return Error();
-        }
-        vips_object_local(hook, gaussian);
-        // Apply Gaussian function
-        if (vips_convsep(image, &blurred, gaussian, "precision", VIPS_PRECISION_INTEGER, NULL)) {
-          return Error();
-        }
+      if (Blur(hook, image, &blurred, baton->blurSigma)) {
+        return Error();
       }
-      vips_object_local(hook, blurred);
       image = blurred;
     }
 
     // Sharpen
     if (shouldSharpen) {
       VipsImage *sharpened;
-      if (baton->sharpenRadius == -1) {
-        // Fast, mild sharpen
-        VipsImage *sharpen = vips_image_new_matrixv(3, 3,
-          -1.0, -1.0, -1.0,
-          -1.0, 32.0, -1.0,
-          -1.0, -1.0, -1.0);
-        vips_image_set_double(sharpen, "scale", 24);
-        vips_object_local(hook, sharpen);
-        if (vips_conv(image, &sharpened, sharpen, NULL)) {
-          return Error();
-        }
-      } else {
-        // Slow, accurate sharpen in LAB colour space, with control over flat vs jagged areas
-        if (vips_sharpen(image, &sharpened, "radius", baton->sharpenRadius, "m1", baton->sharpenFlat, "m2", baton->sharpenJagged, NULL)) {
-          return Error();
-        }
+      if (Sharpen(hook, image, &sharpened, baton->sharpenRadius, baton->sharpenFlat, baton->sharpenJagged)) {
+        return Error();
       }
-      vips_object_local(hook, sharpened);
       image = sharpened;
     }
 
@@ -734,82 +700,14 @@ class PipelineWorker : public NanAsyncWorker {
       image = gammaDecoded;
     }
 
-#ifndef _WIN32
-    // Apply normalization
+    // Apply normalization - stretch luminance to cover full dynamic range
     if (baton->normalize) {
-      VipsInterpretation typeBeforeNormalize = image->Type;
-      if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {
-        typeBeforeNormalize = VIPS_INTERPRETATION_sRGB;
-      }
-
-      // normalize the luminance band in LAB space:
-      VipsImage *lab;
-      if (vips_colourspace(image, &lab, VIPS_INTERPRETATION_LAB, NULL)) {
+      VipsImage *normalized;
+      if (Normalize(hook, image, &normalized)) {
         return Error();
       }
-      vips_object_local(hook, lab);
-
-      VipsImage *luminance;
-      if (vips_extract_band(lab, &luminance, 0, "n", 1, NULL)) {
-        return Error();
-      }
-      vips_object_local(hook, luminance);
-
-      VipsImage *chroma;
-      if (vips_extract_band(lab, &chroma, 1, "n", 2, NULL)) {
-        return Error();
-      }
-      vips_object_local(hook, chroma);
-
-      VipsImage *stats;
-      if (vips_stats(luminance, &stats, NULL)) {
-        return Error();
-      }
-      vips_object_local(hook, stats);
-
-      double min = *VIPS_MATRIX(stats, 0, 0);
-      double max = *VIPS_MATRIX(stats, 1, 0);
-      if (min != max) {
-        double f = 100.0 / (max - min);
-        double a = -(min * f);
-
-        VipsImage *luminance100;
-        if (vips_linear1(luminance, &luminance100, f, a, NULL)) {
-          return Error();
-        }
-        vips_object_local(hook, luminance100);
-
-        VipsImage *normalizedLab;
-        if (vips_bandjoin2(luminance100, chroma, &normalizedLab, NULL)) {
-          return Error();
-        }
-        vips_object_local(hook, normalizedLab);
-
-        VipsImage *normalized;
-        if (vips_colourspace(normalizedLab, &normalized, typeBeforeNormalize, NULL)) {
-          return Error();
-        }
-        vips_object_local(hook, normalized);
-
-        if (HasAlpha(image)) {
-          VipsImage *alpha;
-          if (vips_extract_band(image, &alpha, image->Bands - 1, "n", 1, NULL)) {
-            return Error();
-          }
-          vips_object_local(hook, alpha);
-
-          VipsImage *normalizedAlpha;
-          if (vips_bandjoin2(normalized, alpha, &normalizedAlpha, NULL)) {
-            return Error();
-          }
-          vips_object_local(hook, normalizedAlpha);
-          image = normalizedAlpha;
-        } else {
-          image = normalized;
-        }
-      }
+      image = normalized;
     }
-#endif
 
     // Composite with overlay, if present
     if (hasOverlay) {

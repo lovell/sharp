@@ -19,6 +19,21 @@ namespace sharp {
    */
   int Unpremultiply(VipsObject *context, VipsImage *image, VipsImage **out);
 
+  /*
+   * Stretch luminance to cover full dynamic range.
+   */
+  int Normalize(VipsObject *context, VipsImage *image, VipsImage **out);
+
+  /*
+   * Gaussian blur. Use sigma of -1 for fast blur.
+   */
+  int Blur(VipsObject *context, VipsImage *image, VipsImage **out, double sigma);
+
+  /*
+   * Sharpen flat and jagged areas. Use radius of -1 for fast sharpen.
+   */
+  int Sharpen(VipsObject *context, VipsImage *image, VipsImage **out, int radius, double flat, double jagged);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

@@ -183,4 +183,151 @@ namespace sharp {
 #endif
   }
 
+  /*
+   * Stretch luminance to cover full dynamic range.
+   */
+  int Normalize(VipsObject *context, VipsImage *image, VipsImage **out) {
+#ifndef _WIN32
+    // Get original colourspace
+    VipsInterpretation typeBeforeNormalize = image->Type;
+    if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {
+      typeBeforeNormalize = VIPS_INTERPRETATION_sRGB;
+    }
+    // Convert to LAB colourspace
+    VipsImage *lab;
+    if (vips_colourspace(image, &lab, VIPS_INTERPRETATION_LAB, NULL)) {
+      return -1;
+    }
+    vips_object_local(context, lab);
+    // Extract luminance
+    VipsImage *luminance;
+    if (vips_extract_band(lab, &luminance, 0, "n", 1, NULL)) {
+      return -1;
+    }
+    vips_object_local(context, luminance);
+    // Extract chroma
+    VipsImage *chroma;
+    if (vips_extract_band(lab, &chroma, 1, "n", 2, NULL)) {
+      return -1;
+    }
+    vips_object_local(context, chroma);
+    // Find luminance range
+    VipsImage *stats;
+    if (vips_stats(luminance, &stats, NULL)) {
+      return -1;
+    }
+    vips_object_local(context, stats);
+    double min = *VIPS_MATRIX(stats, 0, 0);
+    double max = *VIPS_MATRIX(stats, 1, 0);
+    if (min != max) {
+      double f = 100.0 / (max - min);
+      double a = -(min * f);
+      // Scale luminance
+      VipsImage *luminance100;
+      if (vips_linear1(luminance, &luminance100, f, a, NULL)) {
+        return -1;
+      }
+      vips_object_local(context, luminance100);
+      // Join scaled luminance to chroma
+      VipsImage *normalizedLab;
+      if (vips_bandjoin2(luminance100, chroma, &normalizedLab, NULL)) {
+        return -1;
+      }
+      vips_object_local(context, normalizedLab);
+      // Convert to original colourspace
+      VipsImage *normalized;
+      if (vips_colourspace(normalizedLab, &normalized, typeBeforeNormalize, NULL)) {
+        return -1;
+      }
+      vips_object_local(context, normalized);
+      // Attach original alpha channel, if any
+      if (HasAlpha(image)) {
+        // Extract original alpha channel
+        VipsImage *alpha;
+        if (vips_extract_band(image, &alpha, image->Bands - 1, "n", 1, NULL)) {
+          return -1;
+        }
+        vips_object_local(context, alpha);
+        // Join alpha channel to normalised image
+        VipsImage *normalizedAlpha;
+        if (vips_bandjoin2(normalized, alpha, &normalizedAlpha, NULL)) {
+          return -1;
+        }
+        vips_object_local(context, normalizedAlpha);
+        *out = normalizedAlpha;
+      } else {
+        *out = normalized;
+      }
+    } else {
+      // Cannot normalise zero-range image
+      *out = image;
+    }
+#else
+    // The normalize operation is currently unsupported on Windows
+    // See https://github.com/lovell/sharp/issues/152
+    *out = image;
+#endif
+    return 0;
+  }
+
+  /*
+   * Gaussian blur (use sigma <0 for fast blur)
+   */
+  int Blur(VipsObject *context, VipsImage *image, VipsImage **out, double sigma) {
+    VipsImage *blurred;
+    if (sigma < 0.0) {
+      // Fast, mild blur - averages neighbouring pixels
+      VipsImage *blur = vips_image_new_matrixv(3, 3,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0);
+      vips_image_set_double(blur, "scale", 9);
+      vips_object_local(context, blur);
+      if (vips_conv(image, &blurred, blur, NULL)) {
+        return -1;
+      }
+    } else {
+      // Slower, accurate Gaussian blur
+      // Create Gaussian function for standard deviation
+      VipsImage *gaussian;
+      if (vips_gaussmat(&gaussian, sigma, 0.2, "separable", TRUE, "integer", TRUE, NULL)) {
+        return -1;
+      }
+      vips_object_local(context, gaussian);
+      // Apply Gaussian function
+      if (vips_convsep(image, &blurred, gaussian, "precision", VIPS_PRECISION_INTEGER, NULL)) {
+        return -1;
+      }
+    }
+    vips_object_local(context, blurred);
+    *out = blurred;
+    return 0;
+  }
+
+  /*
+   * Sharpen flat and jagged areas. Use radius of -1 for fast sharpen.
+   */
+  int Sharpen(VipsObject *context, VipsImage *image, VipsImage **out, int radius, double flat, double jagged) {
+    VipsImage *sharpened;
+    if (radius == -1) {
+      // Fast, mild sharpen
+      VipsImage *sharpen = vips_image_new_matrixv(3, 3,
+        -1.0, -1.0, -1.0,
+        -1.0, 32.0, -1.0,
+        -1.0, -1.0, -1.0);
+      vips_image_set_double(sharpen, "scale", 24);
+      vips_object_local(context, sharpen);
+      if (vips_conv(image, &sharpened, sharpen, NULL)) {
+        return -1;
+      }
+    } else {
+      // Slow, accurate sharpen in LAB colour space, with control over flat vs jagged areas
+      if (vips_sharpen(image, &sharpened, "radius", radius, "m1", flat, "m2", jagged, NULL)) {
+        return -1;
+      }
+    }
+    vips_object_local(context, sharpened);
+    *out = sharpened;
+    return 0;
+  }
 }  // namespace sharp
