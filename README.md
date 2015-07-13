@@ -446,13 +446,17 @@ Use this method without `angle` to determine the angle from EXIF data. Mirroring
 
 Method order is important when both rotating and extracting regions, for example `rotate(x).extract(y)` will produce a different result to `extract(y).rotate(x)`.
 
+The use of `rotate` implies the removal of the EXIF `Orientation` tag, if any.
+
 #### flip()
 
 Flip the image about the vertical Y axis. This always occurs after rotation, if any.
+The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 
 #### flop()
 
 Flop the image about the horizontal X axis. This always occurs after rotation, if any.
+The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
 #### withoutEnlargement()
 
