@@ -312,4 +312,21 @@ describe('Image metadata', function() {
       });
   });
 
+  describe('Invalid withMetadata parameters', function() {
+    it('String orientation', function() {
+      assert.throws(function() {
+        sharp().withMetadata({orientation: 'zoinks'});
+      });
+    });
+    it('Negative orientation', function() {
+      assert.throws(function() {
+        sharp().withMetadata({orientation: -1});
+      });
+    });
+    it('Too large orientation', function() {
+      assert.throws(function() {
+        sharp().withMetadata({orientation: 8});
+      });
+    });
+  });
 });

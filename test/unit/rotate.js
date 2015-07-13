@@ -23,13 +23,17 @@ describe('Rotation', function() {
   it('Input image has Orientation EXIF tag but do not rotate output', function(done) {
     sharp(fixtures.inputJpgWithExif)
       .resize(320)
+      .withMetadata()
       .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(427, info.height);
-        done();
+        sharp(data).metadata(function(err, metadata) {
+          assert.strictEqual(8, metadata.orientation);
+          done();
+        });
       });
   });
 
@@ -46,16 +50,37 @@ describe('Rotation', function() {
       });
   });
 
-  it('Input image has Orientation EXIF tag value of 5 (270 degrees + flip), auto-rotate', function(done) {
-    sharp(fixtures.inputJpgWithExifMirroring)
+  it('Override EXIF Orientation tag metadata after auto-rotate', function(done) {
+    sharp(fixtures.inputJpgWithExif)
       .rotate()
       .resize(320)
+      .withMetadata({orientation: 3})
       .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('exif-5.jpg'), data, done);
+        sharp(data).metadata(function(err, metadata) {
+          assert.strictEqual(3, metadata.orientation);
+          fixtures.assertSimilar(fixtures.expected('exif-8.jpg'), data, done);
+        });
+      });
+  });
+
+  it('Input image has Orientation EXIF tag value of 5 (270 degrees + flip), auto-rotate', function(done) {
+    sharp(fixtures.inputJpgWithExifMirroring)
+      .rotate()
+      .resize(320)
+      .withMetadata()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        sharp(data).metadata(function(err, metadata) {
+          assert.strictEqual(false, 'orientation' in metadata);
+          fixtures.assertSimilar(fixtures.expected('exif-5.jpg'), data, done);
+        });
       });
   });
 
@@ -95,12 +120,17 @@ describe('Rotation', function() {
     sharp(fixtures.inputJpg)
       .resize(320)
       .flip()
+      .withMetadata()
       .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(261, info.height);
-        fixtures.assertSimilar(fixtures.expected('flip.jpg'), data, done);
+        sharp(data).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(false, 'orientation' in metadata);
+          fixtures.assertSimilar(fixtures.expected('flip.jpg'), data, done);
+        });
       });
   });
 
@@ -108,12 +138,17 @@ describe('Rotation', function() {
     sharp(fixtures.inputJpg)
       .resize(320)
       .flop()
+      .withMetadata()
       .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(261, info.height);
-        fixtures.assertSimilar(fixtures.expected('flop.jpg'), data, done);
+        sharp(data).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(false, 'orientation' in metadata);
+          fixtures.assertSimilar(fixtures.expected('flop.jpg'), data, done);
+        });
       });
   });
 

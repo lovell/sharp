@@ -65,6 +65,16 @@ namespace sharp {
   int ExifOrientation(VipsImage const *image);
 
   /*
+    Set EXIF Orientation of image.
+  */
+  void SetExifOrientation(VipsImage *image, int const orientation);
+
+  /*
+    Remove EXIF Orientation from image.
+  */
+  void RemoveExifOrientation(VipsImage *image);
+
+  /*
     Returns the window size for the named interpolator. For example,
     a window size of 3 means a 3x3 pixel grid is used for the calculation.
   */

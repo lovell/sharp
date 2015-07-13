@@ -564,11 +564,18 @@ The output quality to use for lossy JPEG, WebP and TIFF output formats. The defa
 
 Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.
 
-#### withMetadata()
+#### withMetadata([metadata])
 
-Include all metadata (EXIF, XMP, IPTC) from the input image in the output image. This will also convert to and add the latest web-friendly v2 sRGB ICC profile.
+Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
+This will also convert to and add the latest web-friendly v2 sRGB ICC profile.
 
-The default behaviour is to strip all metadata and convert to the device-independent sRGB colour space.
+The optional `metadata` parameter, if present, is an Object with the attributes to update.
+New attributes cannot be inserted, only existing attributes updated.
+
+* `orientation` is an integral Number between 0 and 7, used to update the value of the EXIF `Orientation` tag.
+This has no effect if the input image does not have an EXIF `Orientation` tag.
+
+The default behaviour, when `withMetadata` is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
 
 #### tile([size], [overlap])
 

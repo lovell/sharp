@@ -25,6 +25,8 @@
 #endif
 #endif
 
+#define EXIF_IFD0_ORIENTATION "exif-ifd0-Orientation"
+
 namespace sharp {
 
   // How many tasks are in the queue?
@@ -141,12 +143,28 @@ namespace sharp {
     int orientation = 0;
     const char *exif;
     if (
-      vips_image_get_typeof(image, "exif-ifd0-Orientation") != 0 &&
-      !vips_image_get_string(image, "exif-ifd0-Orientation", &exif)
+      vips_image_get_typeof(image, EXIF_IFD0_ORIENTATION) != 0 &&
+      !vips_image_get_string(image, EXIF_IFD0_ORIENTATION, &exif)
     ) {
       orientation = atoi(&exif[0]);
     }
     return orientation;
+  }
+
+  /*
+    Set EXIF Orientation of image.
+  */
+  void SetExifOrientation(VipsImage *image, int const orientation) {
+    char exif[3];
+    g_snprintf(exif, sizeof(exif), "%d", orientation);
+    vips_image_set_string(image, EXIF_IFD0_ORIENTATION, exif);
+  }
+
+  /*
+    Remove EXIF Orientation from image.
+  */
+  void RemoveExifOrientation(VipsImage *image) {
+    vips_image_remove(image, EXIF_IFD0_ORIENTATION);
   }
 
   /*

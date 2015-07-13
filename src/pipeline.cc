@@ -36,6 +36,8 @@ using sharp::InterpolatorWindowSize;
 using sharp::HasProfile;
 using sharp::HasAlpha;
 using sharp::ExifOrientation;
+using sharp::SetExifOrientation;
+using sharp::RemoveExifOrientation;
 using sharp::IsJpeg;
 using sharp::IsPng;
 using sharp::IsWebp;
@@ -109,6 +111,7 @@ struct PipelineBaton {
   bool optimiseScans;
   std::string err;
   bool withMetadata;
+  int withMetadataOrientation;
   int tileSize;
   int tileOverlap;
 
@@ -142,6 +145,7 @@ struct PipelineBaton {
     overshootDeringing(false),
     optimiseScans(false),
     withMetadata(false),
+    withMetadataOrientation(-1),
     tileSize(256),
     tileOverlap(0) {
       background[0] = 0.0;
@@ -246,6 +250,7 @@ class PipelineWorker : public NanAsyncWorker {
       }
       vips_object_local(hook, rotated);
       image = rotated;
+      RemoveExifOrientation(image);
     }
 
     // Pre extraction
@@ -563,6 +568,7 @@ class PipelineWorker : public NanAsyncWorker {
       }
       vips_object_local(hook, rotated);
       image = rotated;
+      RemoveExifOrientation(image);
     }
 
     // Flip (mirror about Y axis)
@@ -573,6 +579,7 @@ class PipelineWorker : public NanAsyncWorker {
       }
       vips_object_local(hook, flipped);
       image = flipped;
+      RemoveExifOrientation(image);
     }
 
     // Flop (mirror about X axis)
@@ -583,6 +590,7 @@ class PipelineWorker : public NanAsyncWorker {
       }
       vips_object_local(hook, flopped);
       image = flopped;
+      RemoveExifOrientation(image);
     }
 
     // Crop/embed
@@ -799,6 +807,11 @@ class PipelineWorker : public NanAsyncWorker {
         vips_object_local(hook, profiled);
         image = profiled;
       }
+    }
+
+    // Override EXIF Orientation tag
+    if (baton->withMetadata && baton->withMetadataOrientation != -1) {
+      SetExifOrientation(image, baton->withMetadataOrientation);
     }
 
 #if !(VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40 && VIPS_MINOR_VERSION >= 5))
@@ -1194,6 +1207,7 @@ NAN_METHOD(pipeline) {
   baton->overshootDeringing = options->Get(NanNew<String>("overshootDeringing"))->BooleanValue();
   baton->optimiseScans = options->Get(NanNew<String>("optimiseScans"))->BooleanValue();
   baton->withMetadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
+  baton->withMetadataOrientation = options->Get(NanNew<String>("withMetadataOrientation"))->Int32Value();
   // Output filename or __format for Buffer
   baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());
   baton->tileSize = options->Get(NanNew<String>("tileSize"))->Int32Value();

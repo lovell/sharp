@@ -74,6 +74,7 @@ var Sharp = function(input) {
     optimiseScans: false,
     streamOut: false,
     withMetadata: false,
+    withMetadataOrientation: -1,
     tileSize: 256,
     tileOverlap: 0,
     // Function to notify of queue length changes
@@ -479,9 +480,26 @@ Sharp.prototype.optimizeScans = Sharp.prototype.optimiseScans;
 
 /*
   Include all metadata (EXIF, XMP, IPTC) from the input image in the output image
+  Optionally provide an Object with attributes to update:
+    orientation: numeric value for EXIF Orientation tag
 */
 Sharp.prototype.withMetadata = function(withMetadata) {
   this.options.withMetadata = (typeof withMetadata === 'boolean') ? withMetadata : true;
+  if (typeof withMetadata === 'object') {
+    if ('orientation' in withMetadata) {
+      if (
+        typeof withMetadata.orientation === 'number' &&
+        !Number.isNaN(withMetadata.orientation) &&
+        withMetadata.orientation % 1 === 0 &&
+        withMetadata.orientation >=0 &&
+        withMetadata.orientation <= 7
+      ) {
+        this.options.withMetadataOrientation = withMetadata.orientation;
+      } else {
+        throw new Error('Invalid orientation (0 to 7) ' + withMetadata.orientation);
+      }
+    }
+  }
   return this;
 };
 
