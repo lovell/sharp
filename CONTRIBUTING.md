@@ -34,7 +34,12 @@ To test C++ changes, you can compile the module using `npm install` and then run
 
 ## Submit a Pull Request with a new feature
 
-Please add JavaScript [unit tests](https://github.com/lovell/sharp/tree/master/test/unit) to cover your new feature. A test coverage report for the JavaScript code is generated in the `coverage/lcov-report` directory.
+Please add JavaScript [unit tests](https://github.com/lovell/sharp/tree/master/test/unit) to cover your new feature.
+A test coverage report for the JavaScript code is generated in the `coverage/lcov-report` directory.
+
+Where possible, the functional tests use gradient-based perceptual hashes
+based on [dHash](http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html)
+to compare expected vs actual images.
 
 You deserve to add your details to the [list of contributors](https://github.com/lovell/sharp/blob/master/package.json#L5).
 

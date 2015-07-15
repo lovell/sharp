@@ -1,0 +1,17 @@
+site_name: sharp
+site_url: http://sharp.dimens.io/
+repo_url: https://github.com/lovell/sharp
+site_description: The fastest Node.js module for resizing JPEG, PNG, WebP and TIFF images. Uses the libvips library.
+copyright: <a href="https://dimens.io/">dimens.io</a>
+google_analytics: ['UA-13034748-12', 'sharp.dimens.io']
+theme: flatly
+dev_addr: 0.0.0.0:10101
+markdown_extensions:
+  - toc:
+      permalink: " ♯"
+pages:
+  - Home: index.md
+  - Installation: install.md
+  - API: api.md
+  - Performance: performance.md
+  - Changelog: changelog.md

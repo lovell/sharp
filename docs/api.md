@@ -1,0 +1,597 @@
+# API
+
+```javascript
+var sharp = require('sharp');
+```
+
+### Input
+
+#### sharp([input])
+
+Constructor to which further methods are chained. `input`, if present, can be one of:
+
+* Buffer containing JPEG, PNG, WebP, GIF* or TIFF image data, or
+* String containing the filename of an image, with most major formats supported.
+
+The object returned implements the
+[stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
+
+JPEG, PNG, WebP, GIF* or TIFF format image data
+can be streamed into the object when `input` is not provided.
+
+JPEG, PNG or WebP format image data can be streamed out from this object.
+
+\* libvips 8.0.0+ is required for Buffer/Stream input of GIF and other `magick` formats.
+
+```javascript
+sharp('input.jpg')
+  .resize(300, 200)
+  .toFile('output.jpg', function(err) {
+    // output.jpg is a 300 pixels wide and 200 pixels high image
+    // containing a scaled and cropped version of input.jpg
+  });
+```
+
+#### metadata([callback])
+
+Fast access to image metadata without decoding any compressed image data.
+
+`callback`, if present, gets the arguments `(err, metadata)` where `metadata` has the attributes:
+
+* `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff`, `magick` and `openslide`)
+* `width`: Number of pixels wide
+* `height`: Number of pixels high
+* `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)
+* `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
+* `hasProfile`: Boolean indicating the presence of an embedded ICC profile
+* `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
+* `orientation`: Number value of the EXIF Orientation header, if present
+* `exif`: Buffer containing raw EXIF data, if present
+* `icc`: Buffer containing raw [ICC](https://www.npmjs.com/package/icc) profile data, if present
+
+A Promises/A+ promise is returned when `callback` is not provided.
+
+```javascript
+var image = sharp(inputJpg);
+image
+  .metadata()
+  .then(function(metadata) {
+    return image
+      .resize(Math.round(metadata.width / 2))
+      .webp()
+      .toBuffer();
+  })
+  .then(function(data) {
+    // data contains a WebP image half the width and height of the original JPEG
+  });
+```
+
+#### clone()
+
+Takes a "snapshot" of the instance, returning a new instance.
+Cloned instances inherit the input of their parent instance.
+
+This allows multiple output Streams
+and therefore multiple processing pipelines
+to share a single input Stream.
+
+```javascript
+var pipeline = sharp().rotate();
+pipeline.clone().resize(800, 600).pipe(firstWritableStream);
+pipeline.clone().extract(20, 20, 100, 100).pipe(secondWritableStream);
+readableStream.pipe(pipeline);
+// firstWritableStream receives auto-rotated, resized readableStream
+// secondWritableStream receives auto-rotated, extracted region of readableStream
+```
+
+#### sequentialRead()
+
+An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`.
+This will reduce memory usage and can improve performance on some systems.
+
+#### limitInputPixels(pixels)
+
+Do not process input images where the number of pixels (width * height) exceeds this limit.
+
+`pixels` is the integral Number of pixels, with a value between 1 and the default 268402689 (0x3FFF * 0x3FFF).
+
+### Resizing
+
+#### resize([width], [height])
+
+Scale output to `width` x `height`. By default, the resized image is cropped to the exact size specified.
+
+`width` is the integral Number of pixels wide the resultant image should be, between 1 and 16383 (0x3FFF). Use `null` or `undefined` to auto-scale the width to match the height.
+
+`height` is the integral Number of pixels high the resultant image should be, between 1 and 16383. Use `null` or `undefined` to auto-scale the height to match the width.
+
+#### crop([gravity])
+
+Crop the resized image to the exact size specified, the default behaviour.
+
+`gravity`, if present, is an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north`.
+
+Possible values are `north`, `east`, `south`, `west`, `center` and `centre`. The default gravity is `center`/`centre`.
+
+```javascript
+var transformer = sharp()
+  .resize(300, 200)
+  .crop(sharp.gravity.north)
+  .on('error', function(err) {
+    console.log(err);
+  });
+// Read image data from readableStream, resize and write image data to writableStream
+readableStream.pipe(transformer).pipe(writableStream);
+```
+
+#### embed()
+
+Preserving aspect ratio, resize the image to the
+maximum `width` or `height` specified
+then embed on a background of the exact
+`width` and `height` specified.
+
+If the background contains an alpha value
+then WebP and PNG format output images will
+contain an alpha channel,
+even when the input image does not.
+
+```javascript
+sharp('input.gif')
+  .resize(200, 300)
+  .background({r: 0, g: 0, b: 0, a: 0})
+  .embed()
+  .toFormat(sharp.format.webp)
+  .toBuffer(function(err, outputBuffer) {
+    if (err) {
+      throw err;
+    }
+    // outputBuffer contains WebP image data of a 200 pixels wide and 300 pixels high
+    // containing a scaled version, embedded on a transparent canvas, of input.gif
+  });
+```
+
+#### max()
+
+Preserving aspect ratio,
+resize the image to be as large as possible
+while ensuring its dimensions are less than or equal to
+the `width` and `height` specified.
+
+Both `width` and `height` must be provided via
+`resize` otherwise the behaviour will default to `crop`.
+
+```javascript
+sharp(inputBuffer)
+  .resize(200, 200)
+  .max()
+  .toFormat('jpeg')
+  .toBuffer()
+  .then(function(outputBuffer) {
+    // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
+    // than 200 pixels regardless of the inputBuffer image dimensions
+  });
+```
+
+#### min()
+
+Preserving aspect ratio,
+resize the image to be as small as possible
+while ensuring its dimensions are greater than or equal to
+the `width` and `height` specified.
+
+Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
+
+#### withoutEnlargement()
+
+Do not enlarge the output image
+if the input image width *or* height
+are already less than the required dimensions.
+
+This is equivalent to GraphicsMagick's `>` geometry option:
+"*change the dimensions of the image only
+if its width or height exceeds the geometry specification*".
+
+#### ignoreAspectRatio()
+
+Ignoring the aspect ratio of the input, stretch the image to the exact `width` and/or `height` provided via `resize`.
+
+#### interpolateWith(interpolator)
+
+Use the given interpolator for image resizing, where `interpolator` is an attribute of the `sharp.interpolator` Object e.g. `sharp.interpolator.bicubic`.
+
+Possible interpolators, in order of performance, are:
+
+* `nearest`: Use [nearest neighbour interpolation](http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation), suitable for image enlargement only.
+* `bilinear`: Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation), the default and fastest image reduction interpolation.
+* `bicubic`: Use [bicubic interpolation](http://en.wikipedia.org/wiki/Bicubic_interpolation), which typically reduces performance by 5%.
+* `vertexSplitQuadraticBasisSpline`: Use [VSQBS interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/vsqbs.cpp#L48), which prevents "staircasing" and typically reduces performance by 5%.
+* `locallyBoundedBicubic`: Use [LBB interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/lbb.cpp#L100), which prevents some "[acutance](http://en.wikipedia.org/wiki/Acutance)" and typically reduces performance by a factor of 2.
+* `nohalo`: Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/), which prevents acutance and typically reduces performance by a factor of 3.
+
+```javascript
+sharp(inputBuffer)
+  .resize(200, 300)
+  .interpolateWith(sharp.interpolator.nohalo)
+  .background('white')
+  .embed()
+  .toFile('output.tiff')
+  .then(function() {
+    // output.tiff is a 200 pixels wide and 300 pixels high image
+    // containing a nohalo scaled version, embedded on a white canvas,
+    // of the image data in inputBuffer
+  });
+```
+
+### Operations
+
+#### extract(top, left, width, height)
+
+Extract a region of the image. Can be used with or without a `resize` operation.
+
+`top` and `left` are the offset, in pixels, from the top-left corner.
+
+`width` and `height` are the dimensions of the extracted image.
+
+Use `extract` before `resize` for pre-resize extraction. Use `extract` after `resize` for post-resize extraction. Use `extract` before and after for both.
+
+```javascript
+sharp(input)
+  .extract(top, left, width, height)
+  .toFile(output, function(err) {
+    // Extract a region of the input image, saving in the same format.
+  });
+```
+
+```javascript
+sharp(input)
+  .extract(topOffsetPre, leftOffsetPre, widthPre, heightPre)
+  .resize(width, height)
+  .extract(topOffsetPost, leftOffsetPost, widthPost, heightPost)
+  .toFile(output, function(err) {
+    // Extract a region, resize, then extract from the resized image
+  });
+```
+
+#### background(rgba)
+
+Set the background for the `embed` and `flatten` operations.
+
+`rgba` is parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
+
+The alpha value is a float between `0` (transparent) and `1` (opaque).
+
+The default background is `{r: 0, g: 0, b: 0, a: 1}`, black without transparency.
+
+#### flatten()
+
+Merge alpha transparency channel, if any, with `background`.
+
+#### rotate([angle])
+
+Rotate the output image by either an explicit angle or auto-orient based on the EXIF `Orientation` tag.
+
+`angle`, if present, is a Number with a value of `0`, `90`, `180` or `270`.
+
+Use this method without `angle` to determine the angle from EXIF data. Mirroring is supported and may infer the use of a `flip` operation.
+
+Method order is important when both rotating and extracting regions, for example `rotate(x).extract(y)` will produce a different result to `extract(y).rotate(x)`.
+
+The use of `rotate` implies the removal of the EXIF `Orientation` tag, if any.
+
+```javascript
+var pipeline = sharp()
+  .rotate()
+  .resize(null, 200)
+  .progressive()
+  .toBuffer(function(err, outputBuffer, info) {
+    if (err) {
+      throw err;
+    }
+    // outputBuffer contains 200px high progressive JPEG image data,
+    // auto-rotated using EXIF Orientation tag
+    // info.width and info.height contain the dimensions of the resized image
+  });
+readableStream.pipe(pipeline);
+```
+
+#### flip()
+
+Flip the image about the vertical Y axis. This always occurs after rotation, if any.
+The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
+
+#### flop()
+
+Flop the image about the horizontal X axis. This always occurs after rotation, if any.
+The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
+
+#### blur([sigma])
+
+When used without parameters, performs a fast, mild blur of the output image. This typically reduces performance by 10%.
+
+When a `sigma` is provided, performs a slower, more accurate Gaussian blur. This typically reduces performance by 25%.
+
+* `sigma`, if present, is a Number between 0.3 and 1000 representing the approximate blur radius in pixels.
+
+#### sharpen([radius], [flat], [jagged])
+
+When used without parameters, performs a fast, mild sharpen of the output image. This typically reduces performance by 10%.
+
+When a `radius` is provided, performs a slower, more accurate sharpen of the L channel in the LAB colour space. Separate control over the level of sharpening in "flat" and "jagged" areas is available. This typically reduces performance by 50%.
+
+* `radius`, if present, is an integral Number representing the sharpen mask radius in pixels.
+* `flat`, if present, is a Number representing the level of sharpening to apply to "flat" areas, defaulting to a value of 1.0.
+* `jagged`, if present, is a Number representing the level of sharpening to apply to "jagged" areas, defaulting to a value of 2.0.
+
+#### gamma([gamma])
+
+Apply a gamma correction by reducing the encoding (darken) pre-resize at a factor of `1/gamma` then increasing the encoding (brighten) post-resize at a factor of `gamma`.
+
+`gamma`, if present, is a Number betweem 1 and 3. The default value is `2.2`, a suitable approximation for sRGB images.
+
+This can improve the perceived brightness of a resized image in non-linear colour spaces.
+
+JPEG input images will not take advantage of the shrink-on-load performance optimisation when applying a gamma correction.
+
+#### grayscale() / greyscale()
+
+Convert to 8-bit greyscale; 256 shades of grey.
+
+This is a linear operation. If the input image is in a non-linear colour space such as sRGB, use `gamma()` with `greyscale()` for the best results.
+
+The output image will still be web-friendly sRGB and contain three (identical) channels.
+
+#### normalize() / normalise()
+
+Enhance output image contrast by stretching its luminance to cover the full dynamic range. This typically reduces performance by 30%.
+
+#### overlayWith(filename)
+
+_Experimental_
+
+Alpha composite `filename` over the processed (resized, extracted) image. The dimensions of the two images must match.
+
+* `filename` is a String containing the filename of an image with an alpha channel.
+
+```javascript
+sharp('input.png')
+  .rotate(180)
+  .resize(300)
+  .flatten()
+  .background('#ff6600')
+  .overlayWith('overlay.png')
+  .sharpen()
+  .withMetadata()
+  .quality(90)
+  .webp()
+  .toBuffer()
+  .then(function(outputBuffer) {
+    // outputBuffer contains upside down, 300px wide, alpha channel flattened
+    // onto orange background, composited with overlay.png, sharpened,
+    // with metadata, 90% quality WebP image data. Phew!
+  });
+```
+
+### Output
+
+#### toFile(filename, [callback])
+
+`filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
+
+`callback`, if present, is called with two arguments `(err, info)` where:
+
+* `err` contains an error message, if any.
+* `info` contains the output image `format`, `size` (bytes), `width` and `height`.
+
+A Promises/A+ promise is returned when `callback` is not provided.
+
+#### toBuffer([callback])
+
+Write image data to a Buffer, the format of which will match the input image by default. JPEG, PNG and WebP are supported.
+
+`callback`, if present, gets three arguments `(err, buffer, info)` where:
+
+* `err` is an error message, if any.
+* `buffer` is the output image data.
+* `info` contains the output image `format`, `size` (bytes), `width` and `height`.
+
+A Promises/A+ promise is returned when `callback` is not provided.
+
+#### jpeg()
+
+Use JPEG format for the output image.
+
+#### png()
+
+Use PNG format for the output image.
+
+#### webp()
+
+Use WebP format for the output image.
+
+#### raw()
+
+_Requires libvips 7.42.0+_
+
+Provide raw, uncompressed uint8 (unsigned char) image data for Buffer and Stream based output.
+
+The number of channels depends on the input image and selected options.
+
+* 1 channel for images converted to `greyscale()`, with each byte representing one pixel.
+* 3 channels for colour images without alpha transparency, with bytes ordered \[red, green, blue, red, green, blue, etc.\]).
+* 4 channels for colour images with alpha transparency, with bytes ordered \[red, green, blue, alpha, red, green, blue, alpha, etc.\].
+
+#### toFormat(format)
+
+Convenience method for the above output format methods, where `format` is either:
+
+* an attribute of the `sharp.format` Object e.g. `sharp.format.jpeg`, or
+* a String containing `jpeg`, `png`, `webp` or `raw`.
+
+#### quality(quality)
+
+The output quality to use for lossy JPEG, WebP and TIFF output formats. The default quality is `80`.
+
+`quality` is a Number between 1 and 100.
+
+#### progressive()
+
+Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.
+
+#### withMetadata([metadata])
+
+Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
+This will also convert to and add the latest web-friendly v2 sRGB ICC profile.
+
+The optional `metadata` parameter, if present, is an Object with the attributes to update.
+New attributes cannot be inserted, only existing attributes updated.
+
+* `orientation` is an integral Number between 0 and 7, used to update the value of the EXIF `Orientation` tag.
+This has no effect if the input image does not have an EXIF `Orientation` tag.
+
+The default behaviour, when `withMetadata` is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
+
+#### tile([size], [overlap])
+
+The size and overlap, in pixels, of square Deep Zoom image pyramid tiles.
+
+* `size` is an integral Number between 1 and 8192. The default value is 256 pixels.
+* `overlap` is an integral Number between 0 and 8192. The default value is 0 pixels.
+
+```javascript
+sharp('input.tiff').tile(256).toFile('output.dzi', function(err, info) {
+  // The output.dzi file is the XML format Deep Zoom definition
+  // The output_files directory contains 256x256 pixel tiles grouped by zoom level
+});
+```
+
+#### withoutChromaSubsampling()
+
+Disable the use of [chroma subsampling](http://en.wikipedia.org/wiki/Chroma_subsampling) with JPEG output (4:4:4).
+
+This can improve colour representation at higher quality settings (90+),
+but usually increases output file size and typically reduces performance by 25%.
+
+The default behaviour is to use chroma subsampling (4:2:0).
+
+#### compressionLevel(compressionLevel)
+
+An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
+
+`compressionLevel` is a Number between 0 and 9.
+
+#### withoutAdaptiveFiltering()
+
+_Requires libvips 7.42.0+_
+
+An advanced setting to disable adaptive row filtering for the lossless PNG output format.
+
+#### trellisQuantisation() / trellisQuantization()
+
+_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+
+An advanced setting to apply the use of
+[trellis quantisation](http://en.wikipedia.org/wiki/Trellis_quantization) with JPEG output.
+Reduces file size and slightly increases relative quality at the cost of increased compression time.
+
+#### overshootDeringing()
+
+_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+
+An advanced setting to reduce the effects of
+[ringing](http://en.wikipedia.org/wiki/Ringing_%28signal%29) in JPEG output,
+in particular where black text appears on a white background (or vice versa).
+
+#### optimiseScans() / optimizeScans()
+
+_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+
+An advanced setting for progressive (interlace) JPEG output.
+Calculates which spectrum of DCT coefficients uses the fewest bits.
+Usually reduces file size at the cost of increased compression time.
+
+### Attributes
+
+#### format
+
+An Object containing nested boolean values
+representing the available input and output formats/methods,
+for example:
+
+```javascript
+> console.dir(sharp.format);
+
+{ jpeg: { id: 'jpeg',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: true, buffer: true, stream: true } },
+  png: { id: 'png',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: true, buffer: true, stream: true } },
+  webp: { id: 'webp',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: true, buffer: true, stream: true } },
+  tiff: { id: 'tiff',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: true, buffer: false, stream: false } },
+  magick: { id: 'magick',
+    input: { file: true, buffer: true, stream: true },
+    output: { file: false, buffer: false, stream: false } },
+  raw: { id: 'raw',
+    input: { file: false, buffer: false, stream: false },
+    output: { file: false, buffer: true, stream: true } } }
+```
+
+#### queue
+
+An EventEmitter that emits a `change` event when a task is either:
+
+* queued, waiting for _libuv_ to provide a worker thread
+* complete
+
+```javascript
+sharp.queue.on('change', function(queueLength) {
+  console.log('Queue contains ' + queueLength + ' task(s)');
+});
+```
+
+### Utilities
+
+#### sharp.cache([memory], [items])
+
+If `memory` or `items` are provided, set the limits of _libvips'_ operation cache.
+
+* `memory` is the maximum memory in MB to use for this cache, with a default value of 100
+* `items` is the maximum number of operations to cache, with a default value of 500
+
+This method always returns cache statistics, useful for determining how much working memory is required for a particular task.
+
+```javascript
+var stats = sharp.cache(); // { current: 75, high: 99, memory: 100, items: 500 }
+sharp.cache(200); // { current: 75, high: 99, memory: 200, items: 500 }
+sharp.cache(50, 200); // { current: 49, high: 99, memory: 50, items: 200}
+```
+
+#### sharp.concurrency([threads])
+
+`threads`, if provided, is the Number of threads _libvips'_ should create for processing each image. The default value is the number of CPU cores. A value of `0` will reset to this default.
+
+This method always returns the current concurrency.
+
+```javascript
+var threads = sharp.concurrency(); // 4
+sharp.concurrency(2); // 2
+sharp.concurrency(0); // 4
+```
+
+The maximum number of images that can be processed in parallel is limited by libuv's `UV_THREADPOOL_SIZE` environment variable.
+
+#### sharp.counters()
+
+Provides access to internal task counters.
+
+* `queue` is the number of tasks this module has queued waiting for _libuv_ to provide a worker thread from its pool.
+* `process` is the number of resize tasks currently being processed.
+
+```javascript
+var counters = sharp.counters(); // { queue: 2, process: 4 }
+```

@@ -7,3 +7,4 @@ coverage
 test
 .travis.yml
 appveyor.yml
+mkdocs.yml
