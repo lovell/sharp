@@ -161,4 +161,15 @@ describe('Overlays', function() {
       });
   });
 
+  it('Fail with empty String parameter', function() {
+    assert.throws(function() {
+      sharp().overlayWith('');
+    });
+  });
+
+  it('Fail with non-String parameter', function() {
+    assert.throws(function() {
+      sharp().overlayWith(1);
+    });
+  });
 });
