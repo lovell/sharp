@@ -109,3 +109,35 @@
   ...
   fun:vips__init
 }
+
+# *magick warnings
+{
+  leak_magick_read
+  Memcheck:Leak
+  match-leak-kinds: definite,indirect,possible
+  ...
+  fun:ReadImage
+  ...
+  fun:vips__magick_read
+}
+{
+  leak_magick_read_header
+  Memcheck:Leak
+  match-leak-kinds: definite,indirect,possible
+  ...
+  fun:ReadImage
+  ...
+  fun:vips__magick_read_header
+}
+
+# glib g_file_read_link
+# https://github.com/GNOME/glib/commit/49a5d0f6f2aed99cd78f25655f137f4448e47d92
+{
+  leak_magick
+  Memcheck:Leak
+  match-leak-kinds: definite,indirect,possible
+  ...
+  fun:g_file_read_link
+  ...
+  fun:vips_gsf_path
+}
