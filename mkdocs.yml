@@ -5,6 +5,9 @@ site_description: The fastest Node.js module for resizing JPEG, PNG, WebP and TI
 copyright: <a href="https://dimens.io/">dimens.io</a>
 google_analytics: ['UA-13034748-12', 'sharp.dimens.io']
 theme: readthedocs
+markdown_extensions:
+  - toc:
+      permalink: True
 dev_addr: 0.0.0.0:10101
 pages:
   - Home: index.md
