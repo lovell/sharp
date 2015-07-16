@@ -2,7 +2,6 @@
 
 # Ensures libvips is installed and attempts to install it if not
 # Currently supports:
-# * Mac OS
 # * Debian Linux
 #   * Debian 7, 8
 #   * Ubuntu 12.04, 14.04, 14.10, 15.04
@@ -10,7 +9,7 @@
 # * Red Hat Linux
 #   * RHEL/Centos/Scientific 6, 7
 #   * Fedora 21, 22
-#   * Amazon Linux 2014.09
+#   * Amazon Linux 2014.09, 2015.03
 
 vips_version_minimum=7.40.0
 vips_version_latest_major_minor=8.0
@@ -55,8 +54,7 @@ sorry() {
   exit 1
 }
 
-pkg_config_path_homebrew=`which brew >/dev/null 2>&1 && eval $(brew --env) && echo $PKG_CONFIG_LIBDIR || true`
-pkg_config_path="$pkg_config_path_homebrew:$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig"
+pkg_config_path="$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig"
 
 check_if_library_exists() {
   PKG_CONFIG_PATH=$pkg_config_path pkg-config --exists $1
@@ -122,243 +120,205 @@ fi
 # OS-specific installations of libopenslide follows
 # Either openslide does not exist, or vips is installed without openslide support
 if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_exists -eq 0 ]; then
-  case $(uname -s) in
-    *[Dd]arwin*)
-      # Mac OS
-      echo "Detected Mac OS"
-      if type "brew" > /dev/null; then
-        echo "Installing libopenslide via homebrew"
-        brew install openslide
-      elif type "port" > /dev/null; then
-        echo "Installing libopenslide via MacPorts"
-        port install openslide
-      else
-        sorry "openslide" "Mac OS without homebrew or MacPorts"
-      fi
+  if [ -f /etc/debian_version ]; then
+    # Debian Linux
+    DISTRO=$(lsb_release -c -s)
+    echo "Detected Debian Linux '$DISTRO'"
+    case "$DISTRO" in
+      jessie|vivid)
+        # Debian 8, Ubuntu 15
+        echo "Installing libopenslide via apt-get"
+        apt-get install -y libopenslide-dev
+        ;;
+      trusty|utopic|qiana|rebecca|rafaela)
+        # Ubuntu 14, Mint 17
+        echo "Installing libopenslide dependencies via apt-get"
+        apt-get install -y automake build-essential curl zlib1g-dev libopenjpeg-dev libpng12-dev libjpeg-dev libtiff5-dev libgdk-pixbuf2.0-dev libxml2-dev libsqlite3-dev libcairo2-dev libglib2.0-dev sqlite3 libsqlite3-dev
+        install_libopenslide_from_source
+        ;;
+      precise|wheezy|maya)
+        # Debian 7, Ubuntu 12.04, Mint 13
+        echo "Installing libopenslide dependencies via apt-get"
+        apt-get install -y automake build-essential curl zlib1g-dev libopenjpeg-dev libpng12-dev libjpeg-dev libtiff5-dev libgdk-pixbuf2.0-dev libxml2-dev libsqlite3-dev libcairo2-dev libglib2.0-dev sqlite3 libsqlite3-dev
+        install_libopenslide_from_source
+        ;;
+      *)
+        # Unsupported Debian-based OS
+        sorry "openslide" "Debian-based $DISTRO"
+        ;;
+    esac
+  elif [ -f /etc/redhat-release ]; then
+    # Red Hat Linux
+    RELEASE=$(cat /etc/redhat-release)
+    echo "Detected Red Hat Linux '$RELEASE'"
+    case $RELEASE in
+      "Red Hat Enterprise Linux release 7."*|"CentOS Linux release 7."*|"Scientific Linux release 7."*)
+        # RHEL/CentOS 7
+        echo "Installing libopenslide dependencies via yum"
+        yum groupinstall -y "Development Tools"
+        yum install -y tar curl libpng-devel libjpeg-devel libxml2-devel zlib-devel openjpeg-devel libtiff-devel gdk-pixbuf2-devel sqlite-devel cairo-devel glib2-devel
+        install_libopenslide_from_source "--prefix=/usr"
+        ;;
+      "Red Hat Enterprise Linux release 6."*|"CentOS release 6."*|"Scientific Linux release 6."*)
+        # RHEL/CentOS 6
+        echo "Installing libopenslide dependencies via yum"
+        yum groupinstall -y "Development Tools"
+        yum install -y tar curl libpng-devel libjpeg-devel libxml2-devel zlib-devel openjpeg-devel libtiff-devel gdk-pixbuf2-devel sqlite-devel cairo-devel glib2-devel
+        install_libopenslide_from_source "--prefix=/usr"
+        ;;
+      "Fedora release 21 "*|"Fedora release 22 "*)
+        # Fedora 21, 22
+        echo "Installing libopenslide via yum"
+        yum install -y openslide-devel
+        ;;
+      *)
+        # Unsupported RHEL-based OS
+        sorry "openslide" "$RELEASE"
+        ;;
+    esac
+  elif [ -f /etc/os-release ]; then
+    RELEASE=$(cat /etc/os-release | grep VERSION)
+    echo "Detected OpenSuse Linux '$RELEASE'"
+    case $RELEASE in
+      *"13.2"*)
+      echo "Installing libopenslide via zypper"
+      zypper --gpg-auto-import-keys install -y libopenslide-devel
       ;;
-    *)
-      if [ -f /etc/debian_version ]; then
-        # Debian Linux
-        DISTRO=$(lsb_release -c -s)
-        echo "Detected Debian Linux '$DISTRO'"
-        case "$DISTRO" in
-          jessie|vivid)
-            # Debian 8, Ubuntu 15
-            echo "Installing libopenslide via apt-get"
-            apt-get install -y libopenslide-dev
-            ;;
-          trusty|utopic|qiana|rebecca)
-            # Ubuntu 14, Mint 17
-            echo "Installing libopenslide dependencies via apt-get"
-            apt-get install -y automake build-essential curl zlib1g-dev libopenjpeg-dev libpng12-dev libjpeg-dev libtiff5-dev libgdk-pixbuf2.0-dev libxml2-dev libsqlite3-dev libcairo2-dev libglib2.0-dev sqlite3 libsqlite3-dev
-            install_libopenslide_from_source
-            ;;
-          precise|wheezy|maya)
-            # Debian 7, Ubuntu 12.04, Mint 13
-            echo "Installing libopenslide dependencies via apt-get"
-            apt-get install -y automake build-essential curl zlib1g-dev libopenjpeg-dev libpng12-dev libjpeg-dev libtiff5-dev libgdk-pixbuf2.0-dev libxml2-dev libsqlite3-dev libcairo2-dev libglib2.0-dev sqlite3 libsqlite3-dev
-            install_libopenslide_from_source
-            ;;
-          *)
-            # Unsupported Debian-based OS
-            sorry "openslide" "Debian-based $DISTRO"
-            ;;
-        esac
-      elif [ -f /etc/redhat-release ]; then
-        # Red Hat Linux
-        RELEASE=$(cat /etc/redhat-release)
-        echo "Detected Red Hat Linux '$RELEASE'"
-        case $RELEASE in
-          "Red Hat Enterprise Linux release 7."*|"CentOS Linux release 7."*|"Scientific Linux release 7."*)
-            # RHEL/CentOS 7
-            echo "Installing libopenslide dependencies via yum"
-            yum groupinstall -y "Development Tools"
-            yum install -y tar curl libpng-devel libjpeg-devel libxml2-devel zlib-devel openjpeg-devel libtiff-devel gdk-pixbuf2-devel sqlite-devel cairo-devel glib2-devel
-            install_libopenslide_from_source "--prefix=/usr"
-            ;;
-          "Red Hat Enterprise Linux release 6."*|"CentOS release 6."*|"Scientific Linux release 6."*)
-            # RHEL/CentOS 6
-            echo "Installing libopenslide dependencies via yum"
-            yum groupinstall -y "Development Tools"
-            yum install -y tar curl libpng-devel libjpeg-devel libxml2-devel zlib-devel openjpeg-devel libtiff-devel gdk-pixbuf2-devel sqlite-devel cairo-devel glib2-devel 
-            install_libopenslide_from_source "--prefix=/usr"
-            ;;
-          "Fedora release 21 "*|"Fedora release 22 "*)
-            # Fedora 21, 22
-            echo "Installing libopenslide via yum"
-            yum install -y openslide-devel
-            ;;
-          *)
-            # Unsupported RHEL-based OS
-            sorry "openslide" "$RELEASE"
-            ;;
-        esac
-      elif [ -f /etc/os-release ]; then
-        RELEASE=$(cat /etc/os-release | grep VERSION)
-        echo "Detected OpenSuse Linux '$RELEASE'"
-        case $RELEASE in
-          *"13.2"*)
-          echo "Installing libopenslide via zypper"
-          zypper --gpg-auto-import-keys install -y libopenslide-devel
-          ;;
-        esac
-      elif [ -f /etc/SuSE-brand ]; then
-        RELEASE=$(cat /etc/SuSE-brand | grep VERSION)
-        echo "Detected OpenSuse Linux '$RELEASE'"
-        case $RELEASE in
-          *"13.1")
-          echo "Installing libopenslide dependencies via zypper"
-          zypper --gpg-auto-import-keys install -y --type pattern devel_basis
-          zypper --gpg-auto-import-keys install -y tar curl libpng16-devel libjpeg-turbo libjpeg8-devel libxml2-devel zlib-devel openjpeg-devel libtiff-devel libgdk_pixbuf-2_0-0 sqlite3-devel cairo-devel glib2-devel
-          install_libopenslide_from_source
-          ;;
-        esac
-      else
-        # Unsupported OS
-        sorry "openslide" "$(uname -a)"
-      fi
+    esac
+  elif [ -f /etc/SuSE-brand ]; then
+    RELEASE=$(cat /etc/SuSE-brand | grep VERSION)
+    echo "Detected OpenSuse Linux '$RELEASE'"
+    case $RELEASE in
+      *"13.1")
+      echo "Installing libopenslide dependencies via zypper"
+      zypper --gpg-auto-import-keys install -y --type pattern devel_basis
+      zypper --gpg-auto-import-keys install -y tar curl libpng16-devel libjpeg-turbo libjpeg8-devel libxml2-devel zlib-devel openjpeg-devel libtiff-devel libgdk_pixbuf-2_0-0 sqlite3-devel cairo-devel glib2-devel
+      install_libopenslide_from_source
       ;;
-  esac
+    esac
+  else
+    # Unsupported OS
+    sorry "openslide" "$(uname -a)"
+  fi
 fi
 
 # OS-specific installations of libvips follows
 
-case $(uname -s) in
-  *[Dd]arwin*)
-    # Mac OS
-    echo "Detected Mac OS"
-    if type "brew" > /dev/null; then
-      echo "Installing libvips via homebrew"
+if [ -f /etc/debian_version ]; then
+  # Debian Linux
+  DISTRO=$(lsb_release -c -s)
+  echo "Detected Debian Linux '$DISTRO'"
+  case "$DISTRO" in
+    jessie|vivid)
+      # Debian 8, Ubuntu 15
       if [ $enable_openslide -eq 1 ]; then
-        brew install homebrew/science/vips --with-webp --with-graphicsmagick --with-openslide
+        echo "Recompiling vips with openslide support"
+        install_libvips_from_source
       else
-        brew install homebrew/science/vips --with-webp --with-graphicsmagick
+        echo "Installing libvips via apt-get"
+        apt-get install -y libvips-dev libgsf-1-dev
       fi
-    elif type "port" > /dev/null; then
-      echo "Installing libvips via MacPorts"
-      port install vips
-    else
-      sorry "vips" "Mac OS without homebrew or MacPorts"
-    fi
+      ;;
+    trusty|utopic|qiana|rebecca|rafaela)
+      # Ubuntu 14, Mint 17
+      echo "Installing libvips dependencies via apt-get"
+      apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
+      install_libvips_from_source
+      ;;
+    precise|wheezy|maya)
+      # Debian 7, Ubuntu 12.04, Mint 13
+      echo "Installing libvips dependencies via apt-get"
+      add-apt-repository -y ppa:lyrasis/precise-backports
+      apt-get update
+      apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-dev libpng12-dev libwebp-dev libtiff4-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
+      install_libvips_from_source
+      ;;
+    *)
+      # Unsupported Debian-based OS
+      sorry "vips" "Debian-based $DISTRO"
+      ;;
+  esac
+elif [ -f /etc/redhat-release ]; then
+  # Red Hat Linux
+  RELEASE=$(cat /etc/redhat-release)
+  echo "Detected Red Hat Linux '$RELEASE'"
+  case $RELEASE in
+    "Red Hat Enterprise Linux release 7."*|"CentOS Linux release 7."*|"Scientific Linux release 7."*)
+      # RHEL/CentOS 7
+      echo "Installing libvips dependencies via yum"
+      yum groupinstall -y "Development Tools"
+      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      install_libvips_from_source "--prefix=/usr"
+      ;;
+    "Red Hat Enterprise Linux release 6."*|"CentOS release 6."*|"Scientific Linux release 6."*)
+      # RHEL/CentOS 6
+      echo "Installing libvips dependencies via yum"
+      yum groupinstall -y "Development Tools"
+      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel curl
+      yum install -y http://li.nux.ro/download/nux/dextop/el6/x86_64/nux-dextop-release-0-2.el6.nux.noarch.rpm
+      yum install -y --enablerepo=nux-dextop gobject-introspection-devel
+      yum install -y http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+      yum install -y --enablerepo=remi libwebp-devel
+      install_libvips_from_source "--prefix=/usr"
+      ;;
+    "Fedora release 21 "*|"Fedora release 22 "*)
+      # Fedora 21, 22
+      if [ $enable_openslide -eq 1 ]; then
+        echo "Installing libvips dependencies via yum"
+        yum groupinstall -y "Development Tools"
+        yum install -y gcc-c++ gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+        echo "Compiling vips with openslide support"
+        install_libvips_from_source "--prefix=/usr"
+      else
+        echo "Installing libvips via yum"
+        yum install -y vips-devel
+      fi
+      ;;
+    *)
+      # Unsupported RHEL-based OS
+      sorry "vips" "$RELEASE"
+      ;;
+  esac
+elif [ -f /etc/system-release ]; then
+  # Probably Amazon Linux
+  RELEASE=$(cat /etc/system-release)
+  case $RELEASE in
+    "Amazon Linux AMI release 2014.09"|"Amazon Linux AMI release 2015.03")
+      # Amazon Linux
+      echo "Detected '$RELEASE'"
+      echo "Installing libvips dependencies via yum"
+      yum groupinstall -y "Development Tools"
+      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      install_libvips_from_source "--prefix=/usr"
+      ;;
+    *)
+      # Unsupported Amazon Linux version
+      sorry "vips" "$RELEASE"
+      ;;
+  esac
+elif [ -f /etc/os-release ]; then
+  RELEASE=$(cat /etc/os-release | grep VERSION)
+  echo "Detected OpenSuse Linux '$RELEASE'"
+  case $RELEASE in
+    *"13.2"*)
+    echo "Installing libvips dependencies via zypper"
+    zypper --gpg-auto-import-keys install -y --type pattern devel_basis
+    zypper --gpg-auto-import-keys install -y tar curl gtk-doc libxml2-devel libjpeg-turbo libjpeg8-devel libpng16-devel libtiff-devel libexif-devel liblcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel
+    install_libvips_from_source
     ;;
-  *)
-    if [ -f /etc/debian_version ]; then
-      # Debian Linux
-      DISTRO=$(lsb_release -c -s)
-      echo "Detected Debian Linux '$DISTRO'"
-      case "$DISTRO" in
-        jessie|vivid)
-          # Debian 8, Ubuntu 15
-          if [ $enable_openslide -eq 1 ]; then
-            echo "Recompiling vips with openslide support"
-            install_libvips_from_source
-          else
-            echo "Installing libvips via apt-get"
-            apt-get install -y libvips-dev libgsf-1-dev
-          fi
-          ;;
-        trusty|utopic|qiana|rebecca)
-          # Ubuntu 14, Mint 17
-          echo "Installing libvips dependencies via apt-get"
-          apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
-          install_libvips_from_source
-          ;;
-        precise|wheezy|maya)
-          # Debian 7, Ubuntu 12.04, Mint 13
-          echo "Installing libvips dependencies via apt-get"
-          add-apt-repository -y ppa:lyrasis/precise-backports
-          apt-get update
-          apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-dev libpng12-dev libwebp-dev libtiff4-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
-          install_libvips_from_source
-          ;;
-        *)
-          # Unsupported Debian-based OS
-          sorry "vips" "Debian-based $DISTRO"
-          ;;
-      esac
-    elif [ -f /etc/redhat-release ]; then
-      # Red Hat Linux
-      RELEASE=$(cat /etc/redhat-release)
-      echo "Detected Red Hat Linux '$RELEASE'"
-      case $RELEASE in
-        "Red Hat Enterprise Linux release 7."*|"CentOS Linux release 7."*|"Scientific Linux release 7."*)
-          # RHEL/CentOS 7
-          echo "Installing libvips dependencies via yum"
-          yum groupinstall -y "Development Tools"
-          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
-          install_libvips_from_source "--prefix=/usr"
-          ;;
-        "Red Hat Enterprise Linux release 6."*|"CentOS release 6."*|"Scientific Linux release 6."*)
-          # RHEL/CentOS 6
-          echo "Installing libvips dependencies via yum"
-          yum groupinstall -y "Development Tools"
-          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel curl
-          yum install -y http://li.nux.ro/download/nux/dextop/el6/x86_64/nux-dextop-release-0-2.el6.nux.noarch.rpm
-          yum install -y --enablerepo=nux-dextop gobject-introspection-devel
-          yum install -y http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
-          yum install -y --enablerepo=remi libwebp-devel
-          install_libvips_from_source "--prefix=/usr"
-          ;;
-        "Fedora release 21 "*|"Fedora release 22 "*)
-          # Fedora 21, 22
-          if [ $enable_openslide -eq 1 ]; then
-            echo "Installing libvips dependencies via yum"
-            yum groupinstall -y "Development Tools"
-            yum install -y gcc-c++ gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
-            echo "Compiling vips with openslide support"
-            install_libvips_from_source "--prefix=/usr"
-          else
-            echo "Installing libvips via yum"
-            yum install -y vips-devel
-          fi
-          ;;
-        *)
-          # Unsupported RHEL-based OS
-          sorry "vips" "$RELEASE"
-          ;;
-      esac
-    elif [ -f /etc/system-release ]; then
-      # Probably Amazon Linux
-      RELEASE=$(cat /etc/system-release)
-      case $RELEASE in
-        "Amazon Linux AMI release 2014.09"|"Amazon Linux AMI release 2015.03")
-          # Amazon Linux
-          echo "Detected '$RELEASE'"
-          echo "Installing libvips dependencies via yum"
-          yum groupinstall -y "Development Tools"
-          yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
-          install_libvips_from_source "--prefix=/usr"
-          ;;
-        *)
-          # Unsupported Amazon Linux version
-          sorry "vips" "$RELEASE"
-          ;;
-      esac
-    elif [ -f /etc/os-release ]; then
-      RELEASE=$(cat /etc/os-release | grep VERSION)
-      echo "Detected OpenSuse Linux '$RELEASE'"
-      case $RELEASE in
-        *"13.2"*)
-        echo "Installing libvips dependencies via zypper"
-        zypper --gpg-auto-import-keys install -y --type pattern devel_basis
-        zypper --gpg-auto-import-keys install -y tar curl gtk-doc libxml2-devel libjpeg-turbo libjpeg8-devel libpng16-devel libtiff-devel libexif-devel liblcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel
-        install_libvips_from_source
-        ;;
-      esac
-    elif [ -f /etc/SuSE-brand ]; then
-      RELEASE=$(cat /etc/SuSE-brand | grep VERSION)
-      echo "Detected OpenSuse Linux '$RELEASE'"
-      case $RELEASE in
-        *"13.1")
-        echo "Installing libvips dependencies via zypper"
-        zypper --gpg-auto-import-keys install -y --type pattern devel_basis
-        zypper --gpg-auto-import-keys install -y tar curl gtk-doc libxml2-devel libjpeg-turbo libjpeg8-devel libpng16-devel libtiff-devel libexif-devel liblcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel
-        install_libvips_from_source
-        ;;
-      esac
-    else
-      # Unsupported OS
-      sorry "vips" "$(uname -a)"
-    fi
+  esac
+elif [ -f /etc/SuSE-brand ]; then
+  RELEASE=$(cat /etc/SuSE-brand | grep VERSION)
+  echo "Detected OpenSuse Linux '$RELEASE'"
+  case $RELEASE in
+    *"13.1")
+    echo "Installing libvips dependencies via zypper"
+    zypper --gpg-auto-import-keys install -y --type pattern devel_basis
+    zypper --gpg-auto-import-keys install -y tar curl gtk-doc libxml2-devel libjpeg-turbo libjpeg8-devel libpng16-devel libtiff-devel libexif-devel liblcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel
+    install_libvips_from_source
     ;;
-esac
+  esac
+else
+  # Unsupported OS
+  sorry "vips" "$(uname -a)"
+fi

@@ -25,7 +25,6 @@ libvips and its dependencies on the following Operating Systems:
 * Fedora 21, 22
 * Amazon Linux 2014.09, 2015.03
 * OpenSuse 13
-* Mac OS
 
 run the following as a user with `sudo` access:
 
@@ -47,11 +46,31 @@ Add `--with-openslide` to enable OpenSlide support:
 curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -s -- --with-openslide
 ```
 
+#### Ubuntu LTS
+
+libvips v7.40.6 is available via a PPA.
+
+##### 12.04
+
+```sh
+sudo add-apt-repository -y ppa:lovell/precise-backport-vips
+sudo apt-get update
+sudo apt-get install -y libvips-dev libgsf-1-dev
+```
+
+##### 14.04
+
+```sh
+sudo add-apt-repository -y ppa:lovell/trusty-backport-vips
+sudo apt-get update
+sudo apt-get install -y libvips-dev libgsf-1-dev
+```
+
 ### Mac OS
 
 [![OS X 10.9.5 Build Status](https://travis-ci.org/lovell/sharp-osx-ci.png?branch=master)](https://travis-ci.org/lovell/sharp-osx-ci)
 
-Manual install via homebrew:
+Install libvips via homebrew:
 
 ```sh
 brew install homebrew/science/vips --with-webp --with-graphicsmagick
