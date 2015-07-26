@@ -74,6 +74,15 @@
       'VCCLCompilerTool': {
         'ExceptionHandling': 1 # /EHsc
       }
-    }
+    },
+    'configurations': {
+      'Release': {
+        'msvs_settings': {
+          'VCCLCompilerTool': {
+            'ExceptionHandling': 1,
+          }
+        }
+      }
+    },
   }]
 }
