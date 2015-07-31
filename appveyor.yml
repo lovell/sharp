@@ -1,4 +1,4 @@
-os: Visual Studio 2014 CTP4
+os: Visual Studio 2015
 version: "{build}"
 build: off
 platform: x64
