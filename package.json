@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -51,7 +51,7 @@
     "semver": "^5.0.1"
   },
   "devDependencies": {
-    "async": "^1.3.0",
+    "async": "^1.4.2",
     "coveralls": "^2.11.2",
     "exif-reader": "1.0.0",
     "icc": "^0.0.2",

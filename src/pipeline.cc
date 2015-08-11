@@ -445,7 +445,7 @@ class PipelineWorker : public NanAsyncWorker {
     }
 
     // Gamma encoding (darken)
-    if (baton->gamma >= 1 && baton->gamma <= 3) {
+    if (baton->gamma >= 1 && baton->gamma <= 3 && !HasAlpha(image)) {
       VipsImage *gammaEncoded;
       if (vips_gamma(image, &gammaEncoded, "exponent", 1.0 / baton->gamma, NULL)) {
         return Error();
@@ -493,11 +493,9 @@ class PipelineWorker : public NanAsyncWorker {
     }
 
     bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
-    bool shouldBlur = baton->blurSigma != 0.0;
-    bool shouldSharpen = baton->sharpenRadius != 0;
-    bool shouldTransform = shouldAffineTransform || shouldBlur || shouldSharpen;
+    bool willConvolve = baton->blurSigma > 0.0 || baton->sharpenRadius > 0;
     bool hasOverlay = !baton->overlayPath.empty();
-    bool shouldPremultiplyAlpha = HasAlpha(image) && image->Bands == 4 && (shouldTransform || hasOverlay);
+    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || willConvolve || hasOverlay);
 
     // Premultiply image alpha channel before all transformations to avoid
     // dark fringing around bright pixels
@@ -681,7 +679,7 @@ class PipelineWorker : public NanAsyncWorker {
     }
 
     // Blur
-    if (shouldBlur) {
+    if (baton->blurSigma != 0.0) {
       VipsImage *blurred;
       if (Blur(hook, image, &blurred, baton->blurSigma)) {
         return Error();
@@ -690,31 +688,12 @@ class PipelineWorker : public NanAsyncWorker {
     }
 
     // Sharpen
-    if (shouldSharpen) {
+    if (baton->sharpenRadius != 0) {
       VipsImage *sharpened;
       if (Sharpen(hook, image, &sharpened, baton->sharpenRadius, baton->sharpenFlat, baton->sharpenJagged)) {
         return Error();
       }
       image = sharpened;
-    }
-
-    // Gamma decoding (brighten)
-    if (baton->gamma >= 1 && baton->gamma <= 3) {
-      VipsImage *gammaDecoded;
-      if (vips_gamma(image, &gammaDecoded, "exponent", baton->gamma, NULL)) {
-        return Error();
-      }
-      vips_object_local(hook, gammaDecoded);
-      image = gammaDecoded;
-    }
-
-    // Apply normalization - stretch luminance to cover full dynamic range
-    if (baton->normalize) {
-      VipsImage *normalized;
-      if (Normalize(hook, image, &normalized)) {
-        return Error();
-      }
-      image = normalized;
     }
 
     // Composite with overlay, if present
@@ -787,6 +766,25 @@ class PipelineWorker : public NanAsyncWorker {
 
       vips_object_local(hook, imageUnpremultiplied);
       image = imageUnpremultiplied;
+    }
+
+    // Gamma decoding (brighten)
+    if (baton->gamma >= 1 && baton->gamma <= 3 && !HasAlpha(image)) {
+      VipsImage *gammaDecoded;
+      if (vips_gamma(image, &gammaDecoded, "exponent", baton->gamma, NULL)) {
+        return Error();
+      }
+      vips_object_local(hook, gammaDecoded);
+      image = gammaDecoded;
+    }
+
+    // Apply normalization - stretch luminance to cover full dynamic range
+    if (baton->normalize) {
+      VipsImage *normalized;
+      if (Normalize(hook, image, &normalized)) {
+        return Error();
+      }
+      image = normalized;
     }
 
     // Convert image to sRGB, if not already
