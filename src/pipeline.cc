@@ -493,9 +493,10 @@ class PipelineWorker : public NanAsyncWorker {
     }
 
     bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
-    bool willConvolve = baton->blurSigma > 0.0 || baton->sharpenRadius > 0;
+    bool shouldBlur = baton->blurSigma != 0.0;
+    bool shouldSharpen = baton->sharpenRadius != 0;
     bool hasOverlay = !baton->overlayPath.empty();
-    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || willConvolve || hasOverlay);
+    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
 
     // Premultiply image alpha channel before all transformations to avoid
     // dark fringing around bright pixels
@@ -679,7 +680,7 @@ class PipelineWorker : public NanAsyncWorker {
     }
 
     // Blur
-    if (baton->blurSigma != 0.0) {
+    if (shouldBlur) {
       VipsImage *blurred;
       if (Blur(hook, image, &blurred, baton->blurSigma)) {
         return Error();
@@ -688,7 +689,7 @@ class PipelineWorker : public NanAsyncWorker {
     }
 
     // Sharpen
-    if (baton->sharpenRadius != 0) {
+    if (shouldSharpen) {
       VipsImage *sharpened;
       if (Sharpen(hook, image, &sharpened, baton->sharpenRadius, baton->sharpenFlat, baton->sharpenJagged)) {
         return Error();
