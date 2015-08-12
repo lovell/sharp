@@ -2,6 +2,16 @@
 
 ### v0.11 - "*knife*"
 
+#### v0.11.1 - 12<sup>th</sup> August 2015
+
+* Silence MSVC warning: "C4530: C++ exception handler used, but unwind semantics are not enabled".
+  [#244](https://github.com/lovell/sharp/pull/244)
+  [@TheThing](https://github.com/TheThing)
+
+* Suppress gamma correction for input image with alpha transparency.
+  [#249](https://github.com/lovell/sharp/issues/249)
+  [@compeak](https://github.com/compeak)
+
 #### v0.11.0 - 15<sup>th</sup> July 2015
 
 * Allow alpha transparency compositing via new `overlayWith` method.
