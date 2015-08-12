@@ -68,4 +68,18 @@ describe('Embed', function() {
       });
   });
 
+  it('Enlarge and embed', function(done) {
+    sharp(fixtures.inputPngWithOneColor)
+      .embed()
+      .resize(320, 240)
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('embed-enlarge.png'), data, done);
+      });
+  });
+
 });
