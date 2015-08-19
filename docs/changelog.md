@@ -2,6 +2,12 @@
 
 ### v0.11 - "*knife*"
 
+#### v0.11.2 - TBD
+
+* Allow crop gravity to be provided as a String.
+  [#255](https://github.com/lovell/sharp/pull/255)
+  [@papandreou](https://github.com/papandreou)
+
 #### v0.11.1 - 12<sup>th</sup> August 2015
 
 * Silence MSVC warning: "C4530: C++ exception handler used, but unwind semantics are not enabled".
