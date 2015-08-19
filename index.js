@@ -143,6 +143,8 @@ Sharp.prototype.crop = function(gravity) {
   this.options.canvas = 'crop';
   if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 4) {
     this.options.gravity = gravity;
+  } else if (typeof gravity === 'string' && typeof module.exports.gravity[gravity] === 'number') {
+    this.options.gravity = module.exports.gravity[gravity];
   } else {
     throw new Error('Unsupported crop gravity ' + gravity);
   }

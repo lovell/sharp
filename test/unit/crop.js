@@ -81,10 +81,27 @@ describe('Crop gravities', function() {
       });
   });
 
-  it('Invalid', function() {
+  it('allows specifying the gravity as a string', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(80, 320)
+      .crop('east')
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(80, info.width);
+        assert.strictEqual(320, info.height);
+        fixtures.assertSimilar(fixtures.expected('gravity-east.jpg'), data, done);
+      });
+  });
+
+  it('Invalid number', function() {
     assert.throws(function() {
       sharp(fixtures.inputJpg).crop(5);
     });
   });
 
+  it('Invalid string', function() {
+    assert.throws(function() {
+      sharp(fixtures.inputJpg).crop('yadda');
+    });
+  });
 });
