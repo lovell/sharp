@@ -8,7 +8,7 @@ npm install sharp
 
 * Node.js v0.10+ or io.js
 * [libvips](https://github.com/jcupitt/libvips) v7.40.0+ (7.42.0+ recommended)
-* C++11 compatible compiler such as gcc 4.6+, clang 3.0+ or MSVC 2013
+* C++11 compatible compiler such as gcc 4.6+, clang 3.0+ or MSVC 2013 (io.js v3+ requires gcc 4.8+)
 
 ### Linux
 

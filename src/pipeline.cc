@@ -22,6 +22,20 @@ using v8::Array;
 using v8::Function;
 using v8::Exception;
 
+using Nan::AsyncQueueWorker;
+using Nan::AsyncWorker;
+using Nan::Callback;
+using Nan::HandleScope;
+using Nan::Utf8String;
+using Nan::Has;
+using Nan::Get;
+using Nan::Set;
+using Nan::To;
+using Nan::New;
+using Nan::CopyBuffer;
+using Nan::Null;
+using Nan::Equals;
+
 using sharp::Composite;
 using sharp::Premultiply;
 using sharp::Unpremultiply;
@@ -165,11 +179,11 @@ static void DeleteBuffer(VipsObject *object, char *buffer) {
   }
 }
 
-class PipelineWorker : public NanAsyncWorker {
+class PipelineWorker : public AsyncWorker {
 
  public:
-  PipelineWorker(NanCallback *callback, PipelineBaton *baton, NanCallback *queueListener) :
-    NanAsyncWorker(callback), baton(baton), queueListener(queueListener) {}
+  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener) :
+    AsyncWorker(callback), baton(baton), queueListener(queueListener) {}
   ~PipelineWorker() {}
 
   /*
@@ -963,12 +977,12 @@ class PipelineWorker : public NanAsyncWorker {
   }
 
   void HandleOKCallback () {
-    NanScope();
+    HandleScope();
 
-    Handle<Value> argv[3] = { NanNull(), NanNull(),  NanNull() };
+    Local<Value> argv[3] = { Null(), Null(),  Null() };
     if (!baton->err.empty()) {
       // Error
-      argv[0] = Exception::Error(NanNew<String>(baton->err.data(), baton->err.size()));
+      argv[0] = Nan::Error(baton->err.c_str());
     } else {
       int width = baton->width;
       int height = baton->height;
@@ -981,32 +995,33 @@ class PipelineWorker : public NanAsyncWorker {
         height = baton->heightPost;
       }
       // Info Object
-      Local<Object> info = NanNew<Object>();
-      info->Set(NanNew<String>("format"), NanNew<String>(baton->outputFormat));
-      info->Set(NanNew<String>("width"), NanNew<Uint32>(static_cast<uint32_t>(width)));
-      info->Set(NanNew<String>("height"), NanNew<Uint32>(static_cast<uint32_t>(height)));
+      Local<Object> info = New<Object>();
+      Set(info, New("format").ToLocalChecked(), New<String>(baton->outputFormat).ToLocalChecked());
+      Set(info, New("width").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(width)));
+      Set(info, New("height").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(height)));
 
       if (baton->bufferOutLength > 0) {
         // Copy data to new Buffer
-        argv[1] = NanNewBufferHandle(static_cast<char*>(baton->bufferOut), baton->bufferOutLength);
+        argv[1] = CopyBuffer(static_cast<char*>(baton->bufferOut), baton->bufferOutLength).ToLocalChecked();
         // bufferOut was allocated via g_malloc
         g_free(baton->bufferOut);
         // Add buffer size to info
-        info->Set(NanNew<String>("size"), NanNew<Uint32>(static_cast<uint32_t>(baton->bufferOutLength)));
+        Set(info, New("size").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(baton->bufferOutLength)));
         argv[2] = info;
       } else {
         // Add file size to info
         GStatBuf st;
         g_stat(baton->output.c_str(), &st);
-        info->Set(NanNew<String>("size"), NanNew<Uint32>(static_cast<uint32_t>(st.st_size)));
+        Set(info, New("size").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(st.st_size)));
         argv[1] = info;
       }
     }
     delete baton;
+    // to here
 
     // Decrement processing task counter
     g_atomic_int_dec_and_test(&counterProcess);
-    Handle<Value> queueLength[1] = { NanNew<Uint32>(counterQueue) };
+    Local<Value> queueLength[1] = { New<Uint32>(counterQueue) };
     queueListener->Call(1, queueLength);
     delete queueListener;
 
@@ -1016,7 +1031,7 @@ class PipelineWorker : public NanAsyncWorker {
 
  private:
   PipelineBaton *baton;
-  NanCallback *queueListener;
+  Callback *queueListener;
   VipsObject *hook;
 
   /*
@@ -1126,102 +1141,102 @@ class PipelineWorker : public NanAsyncWorker {
   pipeline(options, output, callback)
 */
 NAN_METHOD(pipeline) {
-  NanScope();
+  HandleScope();
 
   // V8 objects are converted to non-V8 types held in the baton struct
   PipelineBaton *baton = new PipelineBaton;
-  Local<Object> options = args[0]->ToObject();
+  Local<Object> options = info[0].As<Object>();
 
   // Input filename
-  baton->fileIn = *String::Utf8Value(options->Get(NanNew<String>("fileIn"))->ToString());
-  baton->accessMethod = options->Get(NanNew<String>("sequentialRead"))->BooleanValue() ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
+  baton->fileIn = *Utf8String(Get(options, New("fileIn").ToLocalChecked()).ToLocalChecked());
+  baton->accessMethod =
+    To<bool>(Get(options, New("sequentialRead").ToLocalChecked()).ToLocalChecked()).FromJust() ?
+    VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   // Input Buffer object
-  if (options->Get(NanNew<String>("bufferIn"))->IsObject()) {
-    Local<Object> buffer = options->Get(NanNew<String>("bufferIn"))->ToObject();
+  if (node::Buffer::HasInstance(Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked())) {
+    Local<Object> buffer = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
     // Take a copy of the input Buffer to avoid problems with V8 heap compaction
     baton->bufferInLength = node::Buffer::Length(buffer);
     baton->bufferIn = new char[baton->bufferInLength];
     memcpy(baton->bufferIn, node::Buffer::Data(buffer), baton->bufferInLength);
   }
   // ICC profile to use when input CMYK image has no embedded profile
-  baton->iccProfilePath = *String::Utf8Value(options->Get(NanNew<String>("iccProfilePath"))->ToString());
+  baton->iccProfilePath = *Utf8String(Get(options, New("iccProfilePath").ToLocalChecked()).ToLocalChecked());
   // Limit input images to a given number of pixels, where pixels = width * height
-  baton->limitInputPixels = options->Get(NanNew<String>("limitInputPixels"))->Int32Value();
+  baton->limitInputPixels = To<int32_t>(Get(options, New("limitInputPixels").ToLocalChecked()).ToLocalChecked()).FromJust();
   // Extract image options
-  baton->topOffsetPre = options->Get(NanNew<String>("topOffsetPre"))->Int32Value();
-  baton->leftOffsetPre = options->Get(NanNew<String>("leftOffsetPre"))->Int32Value();
-  baton->widthPre = options->Get(NanNew<String>("widthPre"))->Int32Value();
-  baton->heightPre = options->Get(NanNew<String>("heightPre"))->Int32Value();
-  baton->topOffsetPost = options->Get(NanNew<String>("topOffsetPost"))->Int32Value();
-  baton->leftOffsetPost = options->Get(NanNew<String>("leftOffsetPost"))->Int32Value();
-  baton->widthPost = options->Get(NanNew<String>("widthPost"))->Int32Value();
-  baton->heightPost = options->Get(NanNew<String>("heightPost"))->Int32Value();
+  baton->topOffsetPre = To<int32_t>(Get(options, New("topOffsetPre").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->leftOffsetPre = To<int32_t>(Get(options, New("leftOffsetPre").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->widthPre = To<int32_t>(Get(options, New("widthPre").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->heightPre = To<int32_t>(Get(options, New("heightPre").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->topOffsetPost = To<int32_t>(Get(options, New("topOffsetPost").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->leftOffsetPost = To<int32_t>(Get(options, New("leftOffsetPost").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->widthPost = To<int32_t>(Get(options, New("widthPost").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->heightPost = To<int32_t>(Get(options, New("heightPost").ToLocalChecked()).ToLocalChecked()).FromJust();
   // Output image dimensions
-  baton->width = options->Get(NanNew<String>("width"))->Int32Value();
-  baton->height = options->Get(NanNew<String>("height"))->Int32Value();
+  baton->width = To<int32_t>(Get(options, New("width").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->height = To<int32_t>(Get(options, New("height").ToLocalChecked()).ToLocalChecked()).FromJust();
   // Canvas option
-  Local<String> canvas = options->Get(NanNew<String>("canvas"))->ToString();
-  if (canvas->Equals(NanNew<String>("crop"))) {
+  Local<String> canvas = To<String>(Get(options, New("canvas").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
+  if (Equals(canvas, New("crop").ToLocalChecked()).FromJust()) {
     baton->canvas = Canvas::CROP;
-  } else if (canvas->Equals(NanNew<String>("embed"))) {
+  } else if (Equals(canvas, New("embed").ToLocalChecked()).FromJust()) {
     baton->canvas = Canvas::EMBED;
-  } else if (canvas->Equals(NanNew<String>("max"))) {
+  } else if (Equals(canvas, New("max").ToLocalChecked()).FromJust()) {
     baton->canvas = Canvas::MAX;
-  } else if (canvas->Equals(NanNew<String>("min"))) {
+  } else if (Equals(canvas, New("min").ToLocalChecked()).FromJust()) {
     baton->canvas = Canvas::MIN;
-  } else if (canvas->Equals(NanNew<String>("ignore_aspect"))) {
+  } else if (Equals(canvas, New("ignore_aspect").ToLocalChecked()).FromJust()) {
     baton->canvas = Canvas::IGNORE_ASPECT;
   }
   // Background colour
-  Local<Array> background = Local<Array>::Cast(options->Get(NanNew<String>("background")));
+  Local<Object> background = Get(options, New("background").ToLocalChecked()).ToLocalChecked().As<Object>();
   for (int i = 0; i < 4; i++) {
-    baton->background[i] = background->Get(i)->NumberValue();
+    baton->background[i] = To<int32_t>(Get(background, i).ToLocalChecked()).FromJust();
   }
   // Overlay options
-  baton->overlayPath = *String::Utf8Value(options->Get(NanNew<String>("overlayPath"))->ToString());
+  baton->overlayPath = *Utf8String(Get(options, New("overlayPath").ToLocalChecked()).ToLocalChecked());
   // Resize options
-  baton->withoutEnlargement = options->Get(NanNew<String>("withoutEnlargement"))->BooleanValue();
-  baton->gravity = options->Get(NanNew<String>("gravity"))->Int32Value();
-  baton->interpolator = *String::Utf8Value(options->Get(NanNew<String>("interpolator"))->ToString());
+  baton->withoutEnlargement = To<bool>(Get(options, New("withoutEnlargement").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->gravity = To<int32_t>(Get(options, New("gravity").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->interpolator = *Utf8String(Get(options, New("interpolator").ToLocalChecked()).ToLocalChecked());
   // Operators
-  baton->flatten = options->Get(NanNew<String>("flatten"))->BooleanValue();
-  baton->blurSigma = options->Get(NanNew<String>("blurSigma"))->NumberValue();
-  baton->sharpenRadius = options->Get(NanNew<String>("sharpenRadius"))->Int32Value();
-  baton->sharpenFlat = options->Get(NanNew<String>("sharpenFlat"))->NumberValue();
-  baton->sharpenJagged = options->Get(NanNew<String>("sharpenJagged"))->NumberValue();
-  baton->gamma = options->Get(NanNew<String>("gamma"))->NumberValue();
-  baton->greyscale = options->Get(NanNew<String>("greyscale"))->BooleanValue();
-  baton->normalize = options->Get(NanNew<String>("normalize"))->BooleanValue();
-  baton->angle = options->Get(NanNew<String>("angle"))->Int32Value();
-  baton->rotateBeforePreExtract = options->Get(NanNew<String>("rotateBeforePreExtract"))->BooleanValue();
-  baton->flip = options->Get(NanNew<String>("flip"))->BooleanValue();
-  baton->flop = options->Get(NanNew<String>("flop"))->BooleanValue();
+  baton->flatten = To<bool>(Get(options, New("flatten").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->blurSigma = To<int32_t>(Get(options, New("blurSigma").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->sharpenRadius = To<int32_t>(Get(options, New("sharpenRadius").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->sharpenFlat = To<int32_t>(Get(options, New("sharpenFlat").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->sharpenJagged = To<int32_t>(Get(options, New("sharpenJagged").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->gamma = To<int32_t>(Get(options, New("gamma").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->greyscale = To<bool>(Get(options, New("greyscale").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->normalize = To<bool>(Get(options, New("normalize").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->angle = To<int32_t>(Get(options, New("angle").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->rotateBeforePreExtract = To<bool>(Get(options, New("rotateBeforePreExtract").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->flip = To<bool>(Get(options, New("flip").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->flop = To<bool>(Get(options, New("flop").ToLocalChecked()).ToLocalChecked()).FromJust();
   // Output options
-  baton->progressive = options->Get(NanNew<String>("progressive"))->BooleanValue();
-  baton->quality = options->Get(NanNew<String>("quality"))->Int32Value();
-  baton->compressionLevel = options->Get(NanNew<String>("compressionLevel"))->Int32Value();
-  baton->withoutAdaptiveFiltering = options->Get(NanNew<String>("withoutAdaptiveFiltering"))->BooleanValue();
-  baton->withoutChromaSubsampling = options->Get(NanNew<String>("withoutChromaSubsampling"))->BooleanValue();
-  baton->trellisQuantisation = options->Get(NanNew<String>("trellisQuantisation"))->BooleanValue();
-  baton->overshootDeringing = options->Get(NanNew<String>("overshootDeringing"))->BooleanValue();
-  baton->optimiseScans = options->Get(NanNew<String>("optimiseScans"))->BooleanValue();
-  baton->withMetadata = options->Get(NanNew<String>("withMetadata"))->BooleanValue();
-  baton->withMetadataOrientation = options->Get(NanNew<String>("withMetadataOrientation"))->Int32Value();
+  baton->progressive = To<bool>(Get(options, New("progressive").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->quality = To<int32_t>(Get(options, New("quality").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->compressionLevel = To<int32_t>(Get(options, New("compressionLevel").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->withoutAdaptiveFiltering = To<bool>(Get(options, New("withoutAdaptiveFiltering").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->withoutChromaSubsampling = To<bool>(Get(options, New("withoutChromaSubsampling").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->trellisQuantisation = To<bool>(Get(options, New("trellisQuantisation").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->overshootDeringing = To<bool>(Get(options, New("overshootDeringing").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->optimiseScans = To<bool>(Get(options, New("optimiseScans").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->withMetadata = To<bool>(Get(options, New("withMetadata").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->withMetadataOrientation = To<int32_t>(Get(options, New("withMetadataOrientation").ToLocalChecked()).ToLocalChecked()).FromJust();
   // Output filename or __format for Buffer
-  baton->output = *String::Utf8Value(options->Get(NanNew<String>("output"))->ToString());
-  baton->tileSize = options->Get(NanNew<String>("tileSize"))->Int32Value();
-  baton->tileOverlap = options->Get(NanNew<String>("tileOverlap"))->Int32Value();
+  baton->output = *Utf8String(Get(options, New("output").ToLocalChecked()).ToLocalChecked());
+  baton->tileSize = To<int32_t>(Get(options, New("tileSize").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->tileOverlap = To<int32_t>(Get(options, New("tileOverlap").ToLocalChecked()).ToLocalChecked()).FromJust();
   // Function to notify of queue length changes
-  NanCallback *queueListener = new NanCallback(Handle<Function>::Cast(options->Get(NanNew<String>("queueListener"))));
+  Callback *queueListener = new Callback(Get(options, New("queueListener").ToLocalChecked()).ToLocalChecked().As<Function>());
 
   // Join queue for worker thread
-  NanCallback *callback = new NanCallback(args[1].As<Function>());
-  NanAsyncQueueWorker(new PipelineWorker(callback, baton, queueListener));
+  Callback *callback = new Callback(info[1].As<Function>());
+  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);
-  Handle<Value> queueLength[1] = { NanNew<Uint32>(counterQueue) };
+  Local<Value> queueLength[1] = { New<Uint32>(counterQueue) };
   queueListener->Call(1, queueLength);
-
-  NanReturnUndefined();
 }

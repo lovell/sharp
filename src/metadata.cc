@@ -16,6 +16,19 @@ using v8::Boolean;
 using v8::Function;
 using v8::Exception;
 
+using Nan::AsyncQueueWorker;
+using Nan::AsyncWorker;
+using Nan::Callback;
+using Nan::HandleScope;
+using Nan::Utf8String;
+using Nan::Has;
+using Nan::Get;
+using Nan::Set;
+using Nan::New;
+using Nan::NewBuffer;
+using Nan::Null;
+using Nan::Error;
+
 using sharp::ImageType;
 using sharp::DetermineImageType;
 using sharp::InitImage;
@@ -61,10 +74,10 @@ static void DeleteBuffer(VipsObject *object, char *buffer) {
   }
 }
 
-class MetadataWorker : public NanAsyncWorker {
+class MetadataWorker : public AsyncWorker {
 
  public:
-  MetadataWorker(NanCallback *callback, MetadataBaton *baton) : NanAsyncWorker(callback), baton(baton) {}
+  MetadataWorker(Callback *callback, MetadataBaton *baton) : AsyncWorker(callback), baton(baton) {}
   ~MetadataWorker() {}
 
   void Execute() {
@@ -152,30 +165,30 @@ class MetadataWorker : public NanAsyncWorker {
   }
 
   void HandleOKCallback () {
-    NanScope();
+    HandleScope();
 
-    Handle<Value> argv[2] = { NanNull(), NanNull() };
+    Local<Value> argv[2] = { Null(), Null() };
     if (!baton->err.empty()) {
       // Error
-      argv[0] = Exception::Error(NanNew<String>(baton->err.data(), baton->err.size()));
+      argv[0] = Error(baton->err.c_str());
     } else {
       // Metadata Object
-      Local<Object> info = NanNew<Object>();
-      info->Set(NanNew<String>("format"), NanNew<String>(baton->format));
-      info->Set(NanNew<String>("width"), NanNew<Number>(baton->width));
-      info->Set(NanNew<String>("height"), NanNew<Number>(baton->height));
-      info->Set(NanNew<String>("space"), NanNew<String>(baton->space));
-      info->Set(NanNew<String>("channels"), NanNew<Number>(baton->channels));
-      info->Set(NanNew<String>("hasProfile"), NanNew<Boolean>(baton->hasProfile));
-      info->Set(NanNew<String>("hasAlpha"), NanNew<Boolean>(baton->hasAlpha));
+      Local<Object> info = New<Object>();
+      Set(info, New("format").ToLocalChecked(), New<String>(baton->format).ToLocalChecked());
+      Set(info, New("width").ToLocalChecked(), New<Number>(baton->width));
+      Set(info, New("height").ToLocalChecked(), New<Number>(baton->height));
+      Set(info, New("space").ToLocalChecked(), New<String>(baton->space).ToLocalChecked());
+      Set(info, New("channels").ToLocalChecked(), New<Number>(baton->channels));
+      Set(info, New("hasProfile").ToLocalChecked(), New<Boolean>(baton->hasProfile));
+      Set(info, New("hasAlpha").ToLocalChecked(), New<Boolean>(baton->hasAlpha));
       if (baton->orientation > 0) {
-        info->Set(NanNew<String>("orientation"), NanNew<Number>(baton->orientation));
+        Set(info, New("orientation").ToLocalChecked(), New<Number>(baton->orientation));
       }
       if (baton->exifLength > 0) {
-        info->Set(NanNew<String>("exif"), NanBufferUse(baton->exif, baton->exifLength));
+        Set(info, New("exif").ToLocalChecked(), NewBuffer(baton->exif, baton->exifLength).ToLocalChecked());
       }
       if (baton->iccLength > 0) {
-        info->Set(NanNew<String>("icc"), NanBufferUse(baton->icc, baton->iccLength));
+        Set(info, New("icc").ToLocalChecked(), NewBuffer(baton->icc, baton->iccLength).ToLocalChecked());
       }
       argv[1] = info;
     }
@@ -193,17 +206,17 @@ class MetadataWorker : public NanAsyncWorker {
   metadata(options, callback)
 */
 NAN_METHOD(metadata) {
-  NanScope();
+  HandleScope();
 
   // V8 objects are converted to non-V8 types held in the baton struct
   MetadataBaton *baton = new MetadataBaton;
-  Local<Object> options = args[0]->ToObject();
+  Local<Object> options = info[0].As<Object>();
 
   // Input filename
-  baton->fileIn = *String::Utf8Value(options->Get(NanNew<String>("fileIn"))->ToString());
+  baton->fileIn = *Utf8String(Get(options, New("fileIn").ToLocalChecked()).ToLocalChecked());
   // Input Buffer object
-  if (options->Get(NanNew<String>("bufferIn"))->IsObject()) {
-    Local<Object> buffer = options->Get(NanNew<String>("bufferIn"))->ToObject();
+  if (node::Buffer::HasInstance(Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked())) {
+    Local<Object> buffer = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
     // Take a copy of the input Buffer to avoid problems with V8 heap compaction
     baton->bufferInLength = node::Buffer::Length(buffer);
     baton->bufferIn = new char[baton->bufferInLength];
@@ -211,11 +224,9 @@ NAN_METHOD(metadata) {
   }
 
   // Join queue for worker thread
-  NanCallback *callback = new NanCallback(args[1].As<v8::Function>());
-  NanAsyncQueueWorker(new MetadataWorker(callback, baton));
+  Callback *callback = new Callback(info[1].As<Function>());
+  AsyncQueueWorker(new MetadataWorker(callback, baton));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);
-
-  NanReturnUndefined();
 }
