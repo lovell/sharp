@@ -30,7 +30,61 @@
   fun:jpeg_finish_compress
 }
 
-# libvips interpolator warnings
+# libpng
+{
+  cond_libpng_png_read_row
+  Memcheck:Cond
+  ...
+  fun:png_read_row
+}
+{
+  value_libpng_png_read_row
+  Memcheck:Value8
+  ...
+  fun:png_read_row
+}
+{
+  cond_libpng_png_write_rows
+  Memcheck:Cond
+  ...
+  fun:png_write_row
+  fun:png_write_rows
+}
+{
+  value_libpng_png_write_rows
+  Memcheck:Value8
+  ...
+  fun:png_write_row
+  fun:png_write_rows
+}
+
+# libwebp
+{
+  cond_libwebp_WebPEncodeRGBA
+  Memcheck:Cond
+  ...
+  fun:WebPEncodeRGBA
+}
+{
+  value_libwebp_WebPEncodeRGBA
+  Memcheck:Value8
+  ...
+  fun:WebPEncodeRGBA
+}
+{
+  cond_libwebp_WebPEncodeRGB
+  Memcheck:Cond
+  ...
+  fun:WebPEncodeRGB
+}
+{
+  value_libwebp_WebPEncodeRGB
+  Memcheck:Value8
+  ...
+  fun:WebPEncodeRGB
+}
+
+# libvips
 {
   cond_libvips_interpolate_lbb
   Memcheck:Cond
@@ -38,11 +92,36 @@
   fun:_ZL32vips_interpolate_lbb_interpolateP16_VipsInterpolatePvP11_VipsRegiondd
   fun:vips_affine_gen
 }
+{
+  cond_libvips_conv_gen
+  Memcheck:Cond
+  fun:conv_gen
+  fun:vips_region_generate
+}
+{
+  cond_libvips_col_sRGB2scRGB_8
+  Memcheck:Value8
+  fun:vips_col_sRGB2scRGB_8
+  fun:vips_sRGB2scRGB_gen
+}
 
 # libuv warnings
 {
   free_libuv
   Memcheck:Free
+  ...
+  fun:uv__work_done
+}
+{
+  param_libuv_fs_work
+  Memcheck:Param
+  write(buf)
+  ...
+  fun:uv__fs_work
+}
+{
+  cond_libuv_work_done
+  Memcheck:Cond
   ...
   fun:uv__work_done
 }
@@ -54,6 +133,13 @@
   write(buf)
   ...
   obj:/usr/bin/nodejs
+}
+{
+  param_iojs_write_buffer
+  Memcheck:Param
+  write(buf)
+  ...
+  obj:/usr/bin/iojs
 }
 {
   leak_nodejs_ImmutableAsciiSource_CreateFromLiteral
@@ -98,6 +184,69 @@
   fun:strdup
   ...
   fun:ares_init_options
+}
+{
+  leak_nodejs_CreateEnvironment_Handle
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node17CreateEnvironmentEPN2v87IsolateEP9uv_loop_sNS0_6HandleINS0_7ContextEEEiPKPKciSB_
+}
+{
+  leak_nodejs_CreateEnvironment_Local
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node17CreateEnvironmentEPN2v87IsolateEP9uv_loop_sNS0_5LocalINS0_7ContextEEEiPKPKciSB_
+}
+{
+  leak_nan_FunctionCallbackInfo
+  Memcheck:Leak
+  match-leak-kinds: definite
+  ...
+  fun:_ZN3Nan3impL23FunctionCallbackWrapperERKN2v820FunctionCallbackInfoINS1_5ValueEEE
+}
+{
+  leak_v8_FunctionCallbackInfo
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal25FunctionCallbackArguments4CallEPFvRKNS_20FunctionCallbackInfoINS_5ValueEEEE
+}
+{
+  leak_v8_CallInterfaceDescriptorData
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal27CallInterfaceDescriptorData10InitializeEiPNS0_8RegisterEPNS0_14RepresentationEPNS0_27PlatformInterfaceDescriptorE
+}
+{
+  leak_v8_Isolate_Init
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal7Isolate4InitEPNS0_12DeserializerE
+}
+{
+  leak_v8_StoreDescriptor_Initialize
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal15StoreDescriptor10InitializeEPNS0_27CallInterfaceDescriptorDataE
+}
+{
+  leak_v8_CodeStub_GetCode
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal8CodeStub7GetCodeEv
+}
+{
+  leak_v8_CreateICUCollator
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal12_GLOBAL__N_117CreateICUCollatorEPNS0_7IsolateERKN6icu_556LocaleENS0_6HandleINS0_8JSObjectEEE
 }
 
 # vips__init warnings
