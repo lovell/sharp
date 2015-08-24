@@ -164,7 +164,7 @@ namespace sharp {
     Remove EXIF Orientation from image.
   */
   void RemoveExifOrientation(VipsImage *image) {
-    vips_image_remove(image, EXIF_IFD0_ORIENTATION);
+    SetExifOrientation(image, 0);
   }
 
   /*
