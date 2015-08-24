@@ -7,6 +7,8 @@
 * Allow crop gravity to be provided as a String.
   [#255](https://github.com/lovell/sharp/pull/255)
   [@papandreou](https://github.com/papandreou)
+* Add support for io.js v3 and Node v4.
+  [#246](https://github.com/lovell/sharp/issues/246)
 
 #### v0.11.1 - 12<sup>th</sup> August 2015
 
