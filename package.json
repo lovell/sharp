@@ -59,7 +59,8 @@
     "mocha": "^2.2.5",
     "mocha-jshint": "^2.2.3",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.4.2"
+    "rimraf": "^2.4.2",
+    "bufferutil": "^1.2.1"
   },
   "license": "Apache-2.0",
   "engines": {
