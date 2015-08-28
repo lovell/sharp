@@ -47,7 +47,7 @@
   "dependencies": {
     "bluebird": "^2.9.34",
     "color": "^0.10.1",
-    "nan": "^2.0.5",
+    "nan": "^2.0.8",
     "semver": "^5.0.1"
   },
   "devDependencies": {

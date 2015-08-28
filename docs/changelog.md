@@ -2,7 +2,7 @@
 
 ### v0.11 - "*knife*"
 
-#### v0.11.2 - TBD
+#### v0.11.2 - 28<sup>th</sup> August 2015
 
 * Allow crop gravity to be provided as a String.
   [#255](https://github.com/lovell/sharp/pull/255)
