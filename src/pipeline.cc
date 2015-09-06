@@ -1202,10 +1202,10 @@ NAN_METHOD(pipeline) {
   baton->interpolator = *Utf8String(Get(options, New("interpolator").ToLocalChecked()).ToLocalChecked());
   // Operators
   baton->flatten = To<bool>(Get(options, New("flatten").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->blurSigma = To<int32_t>(Get(options, New("blurSigma").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->blurSigma = To<double>(Get(options, New("blurSigma").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->sharpenRadius = To<int32_t>(Get(options, New("sharpenRadius").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->sharpenFlat = To<int32_t>(Get(options, New("sharpenFlat").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->sharpenJagged = To<int32_t>(Get(options, New("sharpenJagged").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->sharpenFlat = To<double>(Get(options, New("sharpenFlat").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->sharpenJagged = To<double>(Get(options, New("sharpenJagged").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->gamma = To<int32_t>(Get(options, New("gamma").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->greyscale = To<bool>(Get(options, New("greyscale").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->normalize = To<bool>(Get(options, New("normalize").ToLocalChecked()).ToLocalChecked()).FromJust();
