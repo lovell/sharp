@@ -2,6 +2,12 @@
 
 ### v0.11 - "*knife*"
 
+#### v0.11.3 - 8<sup>th</sup> September 2015
+
+* Intrepret blurSigma, sharpenFlat, and sharpenJagged as double precision.
+  [#263](https://github.com/lovell/sharp/pull/263)
+  [@chrisriley](https://github.com/chrisriley)
+
 #### v0.11.2 - 28<sup>th</sup> August 2015
 
 * Allow crop gravity to be provided as a String.

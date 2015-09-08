@@ -16,7 +16,8 @@
     "Linus Unnebäck <linus@folkdatorn.se>",
     "Victor Mateevitsi <mvictoras@gmail.com>",
     "Alaric Holloway <alaric.holloway@gmail.com>",
-    "Bernhard K. Weisshuhn <bkw@codingforce.com>"
+    "Bernhard K. Weisshuhn <bkw@codingforce.com>",
+    "Chris Riley <criley@primedia.com>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {
@@ -55,11 +56,11 @@
     "coveralls": "^2.11.4",
     "exif-reader": "1.0.0",
     "icc": "^0.0.2",
-    "istanbul": "^0.3.18",
-    "mocha": "^2.2.5",
+    "istanbul": "^0.3.19",
+    "mocha": "^2.3.2",
     "mocha-jshint": "^2.2.3",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.4.2",
+    "rimraf": "^2.4.3",
     "bufferutil": "^1.2.1"
   },
   "license": "Apache-2.0",
