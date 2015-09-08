@@ -2,6 +2,7 @@ language: node_js
 node_js:
   - "0.10"
   - "0.12"
+  - "4"
   - "iojs-v2"
   - "iojs-v3"
 addons:
