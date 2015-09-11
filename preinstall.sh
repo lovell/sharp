@@ -130,7 +130,7 @@ if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_ex
         echo "Installing libopenslide via apt-get"
         apt-get install -y libopenslide-dev
         ;;
-      trusty|utopic|qiana|rebecca|rafaela)
+      trusty|utopic|qiana|rebecca|rafaela|freya)
         # Ubuntu 14, Mint 17
         echo "Installing libopenslide dependencies via apt-get"
         apt-get install -y automake build-essential curl zlib1g-dev libopenjpeg-dev libpng12-dev libjpeg-dev libtiff5-dev libgdk-pixbuf2.0-dev libxml2-dev libsqlite3-dev libcairo2-dev libglib2.0-dev sqlite3 libsqlite3-dev
@@ -219,7 +219,7 @@ if [ -f /etc/debian_version ]; then
         apt-get install -y libvips-dev libgsf-1-dev
       fi
       ;;
-    trusty|utopic|qiana|rebecca|rafaela)
+    trusty|utopic|qiana|rebecca|rafaela|freya)
       # Ubuntu 14, Mint 17
       echo "Installing libvips dependencies via apt-get"
       apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
