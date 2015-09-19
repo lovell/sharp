@@ -18,13 +18,13 @@ var getPaths = function(baseName, extension) {
 };
 
 // Test
-describe('Mask', function() {
+describe('Mask with color', function() {
   it('Does not change a opaque image when adding a clear mask', function (done) {
     var paths = getPaths('clear-mask-on-opaque-image');
 
     sharp(fixtures.inputJpg).
       resize(256).
-      maskWith('rgba(0, 0, 0, 0)').
+      maskWithColor('rgba(0, 0, 0, 0)').
       toFile(paths.actual, function (error) {
       if (error) return done(error);
       fixtures.assertMaxColourDistance(paths.actual, paths.expected);
@@ -37,7 +37,7 @@ describe('Mask', function() {
 
     sharp(fixtures.inputPngWithTransparency).
       resize(256).
-      maskWith('rgba(0, 0, 0, 0)').
+      maskWithColor('rgba(0, 0, 0, 0)').
       toFile(paths.actual, function (error) {
       if (error) return done(error);
       fixtures.assertMaxColourDistance(paths.actual, paths.expected);
@@ -50,7 +50,7 @@ describe('Mask', function() {
 
     sharp(fixtures.inputJpg)
       .resize(256)
-      .maskWith('rgba(224, 0, 0, 0.3)')
+      .maskWithColor('rgba(224, 0, 0, 0.3)')
       .toFile(paths.actual, function (error) {
         if (error) return done(error);
         fixtures.assertMaxColourDistance(paths.actual, paths.expected);
@@ -63,7 +63,7 @@ describe('Mask', function() {
 
     sharp(fixtures.inputPngWithTransparency)
       .resize(256)
-      .maskWith('rgba(224, 0, 0, 0.3)')
+      .maskWithColor('rgba(224, 0, 0, 0.3)')
       .toFile(paths.actual, function (error) {
         if (error) return done(error);
         fixtures.assertMaxColourDistance(paths.actual, paths.expected);
@@ -73,7 +73,7 @@ describe('Mask', function() {
 
   it('Fail with non color parameter', function() {
     assert.throws(function() {
-      sharp().maskWith('');
+      sharp().maskWithColor('');
     });
   });
 });

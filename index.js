@@ -222,7 +222,7 @@ Sharp.prototype.overlayWith = function(overlayPath) {
   return this;
 };
 
-Sharp.prototype.maskWith = function(rgba) {
+Sharp.prototype.maskWithColor = function(rgba) {
   var colour = color(rgba);
   this.options.maskColor = colour.rgbArray();
   this.options.maskColor.push(colour.alpha() * 255);
