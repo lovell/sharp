@@ -77,6 +77,7 @@ var Sharp = function(input) {
     withMetadataOrientation: -1,
     tileSize: 256,
     tileOverlap: 0,
+    maskColor: [0, 0, 0, 0],
     // Function to notify of queue length changes
     queueListener: function(queueLength) {
       module.exports.queue.emit('change', queueLength);
@@ -218,6 +219,13 @@ Sharp.prototype.overlayWith = function(overlayPath) {
     throw new Error('The overlay path cannot be empty');
   }
   this.options.overlayPath = overlayPath;
+  return this;
+};
+
+Sharp.prototype.maskWithColor = function(rgba) {
+  var colour = color(rgba);
+  this.options.maskColor = colour.rgbArray();
+  this.options.maskColor.push(colour.alpha() * 255);
   return this;
 };
 
