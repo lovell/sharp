@@ -128,6 +128,7 @@ struct PipelineBaton {
   int withMetadataOrientation;
   int tileSize;
   int tileOverlap;
+  double maskColor[4];
 
   PipelineBaton():
     bufferInLength(0),
@@ -166,6 +167,10 @@ struct PipelineBaton {
       background[1] = 0.0;
       background[2] = 0.0;
       background[3] = 255.0;
+      maskColor[0] = 0.0;
+      maskColor[1] = 0.0;
+      maskColor[2] = 0.0;
+      maskColor[3] = 0.0;
     }
 };
 
@@ -510,7 +515,8 @@ class PipelineWorker : public AsyncWorker {
     bool shouldBlur = baton->blurSigma != 0.0;
     bool shouldSharpen = baton->sharpenRadius != 0;
     bool hasOverlay = !baton->overlayPath.empty();
-    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
+    bool hasMask = baton->maskColor[3] > 0;
+    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay || hasMask);
 
     // Premultiply image alpha channel before all transformations to avoid
     // dark fringing around bright pixels
@@ -764,6 +770,67 @@ class PipelineWorker : public AsyncWorker {
 
       VipsImage *composited;
       if (Composite(hook, overlayImagePremultiplied, image, &composited)) {
+        (baton->err).append("Failed to composite images");
+        return Error();
+      }
+      vips_object_local(hook, composited);
+      image = composited;
+    }
+
+    if (hasMask) {
+      if (image->BandFmt != VIPS_FORMAT_UCHAR && image->BandFmt != VIPS_FORMAT_FLOAT) {
+        (baton->err).append("Expected image band format to be uchar or float: ");
+        (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, image->BandFmt));
+        return Error();
+      }
+
+      VipsImage *black = NULL;
+
+      if (vips_black(&black, 1, 1, "bands", 4, NULL)) {
+        (baton->err).append("Unable to apply mask");
+        return Error();
+      }
+      vips_object_local(hook, black);
+
+      VipsImage *mask = NULL;
+      double ones[4] = {1, 1, 1, 1};
+      if (vips_linear(black, &mask, ones, baton->maskColor, 4, NULL)) {
+        (baton->err).append("Unable to apply mask");
+        return Error();
+      }
+      vips_object_local(hook, mask);
+
+      VipsImage *maskUCHAR = NULL;
+      if (vips_cast(mask, &maskUCHAR, VIPS_FORMAT_UCHAR, NULL)) {
+        (baton->err).append("Unable to apply mask");
+        return Error();
+      }
+      vips_object_local(hook, maskUCHAR);
+
+      VipsImage *maskUCHARsRGB = NULL;
+      if (vips_copy(maskUCHAR, &maskUCHARsRGB, "interpretation", VIPS_INTERPRETATION_sRGB, NULL)) {
+        (baton->err).append("Unable to apply mask");
+        return Error();
+      }
+      vips_object_local(hook, maskUCHARsRGB);
+
+      VipsImage *maskImage = NULL;
+      if (vips_embed(maskUCHARsRGB, &maskImage, 0, 0, image->Xsize, image->Ysize, "extend", VIPS_EXTEND_COPY, NULL)) {
+        (baton->err).append("Unable to apply mask");
+        return Error();
+      }
+      vips_object_local(hook, maskImage);
+
+      // Premultiply mask
+      VipsImage *maskImagePremultiplied;
+      if (Premultiply(hook, maskImage, &maskImagePremultiplied)) {
+        (baton->err).append("Failed to premultiply alpha channel of mask image.");
+        return Error();
+      }
+      vips_object_local(hook, maskImagePremultiplied);
+
+      VipsImage *composited;
+      if (Composite(hook, maskImagePremultiplied, image, &composited)) {
         (baton->err).append("Failed to composite images");
         return Error();
       }
@@ -1228,6 +1295,12 @@ NAN_METHOD(pipeline) {
   baton->output = *Utf8String(Get(options, New("output").ToLocalChecked()).ToLocalChecked());
   baton->tileSize = To<int32_t>(Get(options, New("tileSize").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->tileOverlap = To<int32_t>(Get(options, New("tileOverlap").ToLocalChecked()).ToLocalChecked()).FromJust();
+
+  Local<Object> maskColor = Get(options, New("maskColor").ToLocalChecked()).ToLocalChecked().As<Object>();
+  for (int i = 0; i < 4; i++) {
+    baton->maskColor[i] = To<int32_t>(Get(maskColor, i).ToLocalChecked()).FromJust();
+  }
+
   // Function to notify of queue length changes
   Callback *queueListener = new Callback(Get(options, New("queueListener").ToLocalChecked()).ToLocalChecked().As<Function>());
 
