@@ -213,22 +213,21 @@ Sharp.prototype.flatten = function(flatten) {
 };
 
 Sharp.prototype.overlayWith = function(overlayPath) {
-  if (typeof overlayPath !== 'string') {
-    throw new Error('The overlay path must be a string');
-  }
-
-  if (overlayPath === '') {
-    throw new Error('The overlay path cannot be empty');
-  }
-
   try {
     var colour = color(overlayPath);
     this.options.overlayColor = colour.rgbArray();
     this.options.overlayColor.push(colour.alpha() * 255);
   } catch (e) {
+    if (typeof overlayPath !== 'string') {
+      throw new Error('The overlay path must be a string');
+    }
+
+    if (overlayPath === '') {
+      throw new Error('The overlay path cannot be empty');
+    }
+
     this.options.overlayPath = overlayPath;
   }
-
   return this;
 };
 

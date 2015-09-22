@@ -167,9 +167,15 @@ describe('Overlays', function() {
     });
   });
 
-  it('Fail with non-String parameter', function() {
+  it('Fail with null parameter', function() {
     assert.throws(function() {
-      sharp().overlayWith(1);
+      sharp().overlayWith(null);
+    });
+  });
+
+  it('Succeeds with a color parameter', function() {
+    assert.doesNotThrow(function() {
+      sharp().overlayWith({r: 0, g: 0, b: 0, a: 0});
     });
   });
 
