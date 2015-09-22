@@ -106,6 +106,7 @@ struct PipelineBaton {
   double sharpenFlat;
   double sharpenJagged;
   std::string overlayPath;
+  double overlayColor[4];
   double gamma;
   bool greyscale;
   bool normalize;
@@ -128,7 +129,6 @@ struct PipelineBaton {
   int withMetadataOrientation;
   int tileSize;
   int tileOverlap;
-  double maskColor[4];
 
   PipelineBaton():
     bufferInLength(0),
@@ -167,10 +167,10 @@ struct PipelineBaton {
       background[1] = 0.0;
       background[2] = 0.0;
       background[3] = 255.0;
-      maskColor[0] = 0.0;
-      maskColor[1] = 0.0;
-      maskColor[2] = 0.0;
-      maskColor[3] = 0.0;
+      overlayColor[0] = 0.0;
+      overlayColor[1] = 0.0;
+      overlayColor[2] = 0.0;
+      overlayColor[3] = 0.0;
     }
 };
 
@@ -514,9 +514,10 @@ class PipelineWorker : public AsyncWorker {
     bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
     bool shouldBlur = baton->blurSigma != 0.0;
     bool shouldSharpen = baton->sharpenRadius != 0;
-    bool hasOverlay = !baton->overlayPath.empty();
-    bool hasMask = baton->maskColor[3] > 0;
-    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay || hasMask);
+    bool hasOverlayPath = !baton->overlayPath.empty();
+    bool hasOverlayColor = baton->overlayColor[3] > 0;
+    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen ||
+                                                      hasOverlayPath || hasOverlayColor);
 
     // Premultiply image alpha channel before all transformations to avoid
     // dark fringing around bright pixels
@@ -718,47 +719,86 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Composite with overlay, if present
-    if (hasOverlay) {
-      VipsImage *overlayImage = NULL;
-      ImageType overlayImageType = ImageType::UNKNOWN;
-      overlayImageType = DetermineImageType(baton->overlayPath.c_str());
-      if (overlayImageType != ImageType::UNKNOWN) {
-        overlayImage = InitImage(baton->overlayPath.c_str(), baton->accessMethod);
-        if (overlayImage == NULL) {
-          (baton->err).append("Overlay image has corrupt header");
-          return Error();
-        } else {
-          vips_object_local(hook, overlayImage);
-        }
-      } else {
-        (baton->err).append("Overlay image is of an unsupported image format");
-        return Error();
-      }
+    if (hasOverlayPath || hasOverlayColor) {
       if (image->BandFmt != VIPS_FORMAT_UCHAR && image->BandFmt != VIPS_FORMAT_FLOAT) {
         (baton->err).append("Expected image band format to be uchar or float: ");
         (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, image->BandFmt));
         return Error();
       }
-      if (overlayImage->BandFmt != VIPS_FORMAT_UCHAR && overlayImage->BandFmt != VIPS_FORMAT_FLOAT) {
-        (baton->err).append("Expected overlay image band format to be uchar or float: ");
-        (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, overlayImage->BandFmt));
-        return Error();
-      }
-      if (!HasAlpha(overlayImage)) {
-        (baton->err).append("Overlay image must have an alpha channel");
-        return Error();
-      }
-      if (overlayImage->Xsize != image->Xsize && overlayImage->Ysize != image->Ysize) {
-        (baton->err).append("Overlay image must have same dimensions as resized image");
-        return Error();
-      }
 
-      // Ensure overlay is sRGB
-      VipsImage *overlayImageRGB;
-      if (vips_colourspace(overlayImage, &overlayImageRGB, VIPS_INTERPRETATION_sRGB, NULL)) {
-        return Error();
+      VipsImage *overlayImageRGB = NULL;
+
+      if (hasOverlayPath) {
+        VipsImage *overlayImage = NULL;
+        ImageType overlayImageType = ImageType::UNKNOWN;
+        overlayImageType = DetermineImageType(baton->overlayPath.c_str());
+        if (overlayImageType != ImageType::UNKNOWN) {
+          overlayImage = InitImage(baton->overlayPath.c_str(), baton->accessMethod);
+          if (overlayImage == NULL) {
+            (baton->err).append("Overlay image has corrupt header");
+            return Error();
+          } else {
+            vips_object_local(hook, overlayImage);
+          }
+        } else {
+          (baton->err).append("Overlay image is of an unsupported image format");
+          return Error();
+        }
+        if (overlayImage->BandFmt != VIPS_FORMAT_UCHAR && overlayImage->BandFmt != VIPS_FORMAT_FLOAT) {
+          (baton->err).append("Expected overlay image band format to be uchar or float: ");
+          (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, overlayImage->BandFmt));
+          return Error();
+        }
+        if (!HasAlpha(overlayImage)) {
+          (baton->err).append("Overlay image must have an alpha channel");
+          return Error();
+        }
+        if (overlayImage->Xsize != image->Xsize && overlayImage->Ysize != image->Ysize) {
+          (baton->err).append("Overlay image must have same dimensions as resized image");
+          return Error();
+        }
+
+        if (vips_colourspace(overlayImage, &overlayImageRGB, VIPS_INTERPRETATION_sRGB, NULL)) {
+          return Error();
+        }
+        vips_object_local(hook, overlayImageRGB);
+      } else {
+        VipsImage *black = NULL;
+
+        if (vips_black(&black, 1, 1, "bands", 4, NULL)) {
+          (baton->err).append("Unable to apply overlay with color");
+          return Error();
+        }
+        vips_object_local(hook, black);
+
+        VipsImage *overlayColor = NULL;
+        double ones[4] = {1, 1, 1, 1};
+        if (vips_linear(black, &overlayColor, ones, baton->overlayColor, 4, NULL)) {
+          (baton->err).append("Unable to apply overlay with color");
+          return Error();
+        }
+        vips_object_local(hook, overlayColor);
+
+        VipsImage *overlayColorUCHAR = NULL;
+        if (vips_cast(overlayColor, &overlayColorUCHAR, VIPS_FORMAT_UCHAR, NULL)) {
+          (baton->err).append("Unable to apply overlay with color");
+          return Error();
+        }
+        vips_object_local(hook, overlayColorUCHAR);
+
+        VipsImage *overlayColorUCHARsRGB = NULL;
+        if (vips_copy(overlayColorUCHAR, &overlayColorUCHARsRGB, "interpretation", VIPS_INTERPRETATION_sRGB, NULL)) {
+          (baton->err).append("Unable to apply overlay with color");
+          return Error();
+        }
+        vips_object_local(hook, overlayColorUCHARsRGB);
+
+        if (vips_embed(overlayColorUCHARsRGB, &overlayImageRGB, 0, 0, image->Xsize, image->Ysize, "extend", VIPS_EXTEND_COPY, NULL)) {
+          (baton->err).append("Unable to apply overlay with color");
+          return Error();
+        }
+        vips_object_local(hook, overlayImageRGB);
       }
-      vips_object_local(hook, overlayImageRGB);
 
       // Premultiply overlay
       VipsImage *overlayImagePremultiplied;
@@ -770,67 +810,6 @@ class PipelineWorker : public AsyncWorker {
 
       VipsImage *composited;
       if (Composite(hook, overlayImagePremultiplied, image, &composited)) {
-        (baton->err).append("Failed to composite images");
-        return Error();
-      }
-      vips_object_local(hook, composited);
-      image = composited;
-    }
-
-    if (hasMask) {
-      if (image->BandFmt != VIPS_FORMAT_UCHAR && image->BandFmt != VIPS_FORMAT_FLOAT) {
-        (baton->err).append("Expected image band format to be uchar or float: ");
-        (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, image->BandFmt));
-        return Error();
-      }
-
-      VipsImage *black = NULL;
-
-      if (vips_black(&black, 1, 1, "bands", 4, NULL)) {
-        (baton->err).append("Unable to apply mask");
-        return Error();
-      }
-      vips_object_local(hook, black);
-
-      VipsImage *mask = NULL;
-      double ones[4] = {1, 1, 1, 1};
-      if (vips_linear(black, &mask, ones, baton->maskColor, 4, NULL)) {
-        (baton->err).append("Unable to apply mask");
-        return Error();
-      }
-      vips_object_local(hook, mask);
-
-      VipsImage *maskUCHAR = NULL;
-      if (vips_cast(mask, &maskUCHAR, VIPS_FORMAT_UCHAR, NULL)) {
-        (baton->err).append("Unable to apply mask");
-        return Error();
-      }
-      vips_object_local(hook, maskUCHAR);
-
-      VipsImage *maskUCHARsRGB = NULL;
-      if (vips_copy(maskUCHAR, &maskUCHARsRGB, "interpretation", VIPS_INTERPRETATION_sRGB, NULL)) {
-        (baton->err).append("Unable to apply mask");
-        return Error();
-      }
-      vips_object_local(hook, maskUCHARsRGB);
-
-      VipsImage *maskImage = NULL;
-      if (vips_embed(maskUCHARsRGB, &maskImage, 0, 0, image->Xsize, image->Ysize, "extend", VIPS_EXTEND_COPY, NULL)) {
-        (baton->err).append("Unable to apply mask");
-        return Error();
-      }
-      vips_object_local(hook, maskImage);
-
-      // Premultiply mask
-      VipsImage *maskImagePremultiplied;
-      if (Premultiply(hook, maskImage, &maskImagePremultiplied)) {
-        (baton->err).append("Failed to premultiply alpha channel of mask image.");
-        return Error();
-      }
-      vips_object_local(hook, maskImagePremultiplied);
-
-      VipsImage *composited;
-      if (Composite(hook, maskImagePremultiplied, image, &composited)) {
         (baton->err).append("Failed to composite images");
         return Error();
       }
@@ -1296,9 +1275,9 @@ NAN_METHOD(pipeline) {
   baton->tileSize = To<int32_t>(Get(options, New("tileSize").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->tileOverlap = To<int32_t>(Get(options, New("tileOverlap").ToLocalChecked()).ToLocalChecked()).FromJust();
 
-  Local<Object> maskColor = Get(options, New("maskColor").ToLocalChecked()).ToLocalChecked().As<Object>();
+  Local<Object> overlayColor = Get(options, New("overlayColor").ToLocalChecked()).ToLocalChecked().As<Object>();
   for (int i = 0; i < 4; i++) {
-    baton->maskColor[i] = To<int32_t>(Get(maskColor, i).ToLocalChecked()).FromJust();
+    baton->overlayColor[i] = To<int32_t>(Get(overlayColor, i).ToLocalChecked()).FromJust();
   }
 
   // Function to notify of queue length changes

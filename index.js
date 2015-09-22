@@ -62,6 +62,7 @@ var Sharp = function(input) {
     normalize: 0,
     // overlay
     overlayPath: '',
+    overlayColor: [0, 0, 0, 0],
     // output options
     output: '__input',
     progressive: false,
@@ -215,17 +216,19 @@ Sharp.prototype.overlayWith = function(overlayPath) {
   if (typeof overlayPath !== 'string') {
     throw new Error('The overlay path must be a string');
   }
+
   if (overlayPath === '') {
     throw new Error('The overlay path cannot be empty');
   }
-  this.options.overlayPath = overlayPath;
-  return this;
-};
 
-Sharp.prototype.maskWithColor = function(rgba) {
-  var colour = color(rgba);
-  this.options.maskColor = colour.rgbArray();
-  this.options.maskColor.push(colour.alpha() * 255);
+  try {
+    var colour = color(overlayPath);
+    this.options.overlayColor = colour.rgbArray();
+    this.options.overlayColor.push(colour.alpha() * 255);
+  } catch (e) {
+    this.options.overlayPath = overlayPath;
+  }
+
   return this;
 };
 
