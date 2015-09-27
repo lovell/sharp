@@ -10,6 +10,7 @@ var semver = require('semver');
 // Contenders
 var gm = require('gm');
 var imagemagick = require('imagemagick');
+var jimp = require('jimp');
 var sharp = require('../../index');
 var imagemagickNative;
 try {
@@ -39,6 +40,48 @@ async.series({
   jpeg: function(callback) {
     var inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
     var jpegSuite = new Benchmark.Suite('jpeg');
+    // jimp
+    jpegSuite.add('jimp-buffer-buffer', {
+      defer: true,
+      fn: function(deferred) {
+        new jimp(inputJpgBuffer, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            this
+              .resize(width, height)
+              .quality(80)
+              .getBuffer(jimp.MIME_JPEG, function (err) {
+                if (err) {
+                  throw err;
+                } else {
+                  deferred.resolve();
+                }
+              });
+          }
+        });
+      }
+    }).add('jimp-file-file', {
+      defer: true,
+      fn: function(deferred) {
+        new jimp(fixtures.inputJpg, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            this
+              .resize(width, height)
+              .quality(80)
+              .write(fixtures.outputJpg, function (err) {
+                if (err) {
+                  throw err;
+                } else {
+                  deferred.resolve();
+                }
+              });
+          }
+        });
+      }
+    });
     // lwip
     if (typeof lwip !== 'undefined') {
       jpegSuite.add('lwip-file-file', {
@@ -471,6 +514,46 @@ async.series({
   png: function(callback) {
     var inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     var pngSuite = new Benchmark.Suite('png');
+    // jimp
+    pngSuite.add('jimp-buffer-buffer', {
+      defer: true,
+      fn: function(deferred) {
+        new jimp(inputPngBuffer, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            this
+              .resize(width, height)
+              .getBuffer(jimp.MIME_PNG, function (err) {
+                if (err) {
+                  throw err;
+                } else {
+                  deferred.resolve();
+                }
+              });
+          }
+        });
+      }
+    }).add('jimp-file-file', {
+      defer: true,
+      fn: function(deferred) {
+        new jimp(fixtures.inputPng, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            this
+              .resize(width, height)
+              .write(fixtures.outputPng, function (err) {
+                if (err) {
+                  throw err;
+                } else {
+                  deferred.resolve();
+                }
+              });
+          }
+        });
+      }
+    });
     // lwip
     if (typeof lwip !== 'undefined') {
       pngSuite.add('lwip-buffer-buffer', {
