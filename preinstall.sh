@@ -247,7 +247,7 @@ elif [ -f /etc/redhat-release ]; then
       # RHEL/CentOS 7
       echo "Installing libvips dependencies via yum"
       yum groupinstall -y "Development Tools"
-      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
       install_libvips_from_source "--prefix=/usr"
       ;;
     "Red Hat Enterprise Linux release 6."*|"CentOS release 6."*|"Scientific Linux release 6."*)
