@@ -125,7 +125,7 @@ if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_ex
     DISTRO=$(lsb_release -c -s)
     echo "Detected Debian Linux '$DISTRO'"
     case "$DISTRO" in
-      jessie|vivid)
+      jessie|vivid|wily)
         # Debian 8, Ubuntu 15
         echo "Installing libopenslide via apt-get"
         apt-get install -y libopenslide-dev
@@ -209,7 +209,7 @@ if [ -f /etc/debian_version ]; then
   DISTRO=$(lsb_release -c -s)
   echo "Detected Debian Linux '$DISTRO'"
   case "$DISTRO" in
-    jessie|vivid)
+    jessie|vivid|wily)
       # Debian 8, Ubuntu 15
       if [ $enable_openslide -eq 1 ]; then
         echo "Recompiling vips with openslide support"
