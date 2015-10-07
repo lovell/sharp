@@ -8,3 +8,5 @@ test
 .travis.yml
 appveyor.yml
 mkdocs.yml
+lib
+include

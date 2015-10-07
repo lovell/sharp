@@ -4,16 +4,18 @@
 # Currently supports:
 # * Debian Linux
 #   * Debian 7, 8
-#   * Ubuntu 12.04, 14.04, 14.10, 15.04
+#   * Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
 #   * Mint 13, 17
+#   * Elementary 0.3
 # * Red Hat Linux
 #   * RHEL/Centos/Scientific 6, 7
 #   * Fedora 21, 22
-#   * Amazon Linux 2014.09, 2015.03
+#   * Amazon Linux 2015.03, 2015.09
+# * OpenSuse 13
 
 vips_version_minimum=7.40.0
-vips_version_latest_major_minor=8.0
-vips_version_latest_patch=2
+vips_version_latest_major_minor=8.1
+vips_version_latest_patch=0
 
 openslide_version_minimum=3.4.0
 openslide_version_latest_major_minor=3.4
@@ -24,7 +26,7 @@ install_libvips_from_source() {
   curl -O http://www.vips.ecs.soton.ac.uk/supported/$vips_version_latest_major_minor/vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   tar zvxf vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   cd vips-$vips_version_latest_major_minor.$vips_version_latest_patch
-  ./configure --disable-debug --disable-docs --disable-static --disable-introspection --enable-cxx=yes --without-python --without-orc --without-fftw $1
+  ./configure --disable-debug --disable-docs --disable-static --disable-introspection --disable-dependency-tracking --enable-cxx=yes --without-python --without-orc --without-fftw $1
   make
   make install
   cd ..
@@ -283,12 +285,12 @@ elif [ -f /etc/system-release ]; then
   # Probably Amazon Linux
   RELEASE=$(cat /etc/system-release)
   case $RELEASE in
-    "Amazon Linux AMI release 2014.09"|"Amazon Linux AMI release 2015.03")
+    "Amazon Linux AMI release 2015.03"|"Amazon Linux AMI release 2015.09")
       # Amazon Linux
       echo "Detected '$RELEASE'"
       echo "Installing libvips dependencies via yum"
       yum groupinstall -y "Development Tools"
-      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
       install_libvips_from_source "--prefix=/usr"
       ;;
     *)

@@ -19,11 +19,12 @@ For a system-wide installation of the most suitable version of
 libvips and its dependencies on the following Operating Systems:
 
 * Debian 7, 8
-* Ubuntu 12.04, 14.04, 14.10, 15.04
+* Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
 * Mint 13, 17
+* Elementary 0.3
 * RHEL/Centos/Scientific 6, 7
 * Fedora 21, 22
-* Amazon Linux 2014.09, 2015.03
+* Amazon Linux 2015.03, 2015.09
 * OpenSuse 13
 
 run the following as a user with `sudo` access:
