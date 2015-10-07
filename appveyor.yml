@@ -3,8 +3,8 @@ version: "{build}"
 build: off
 platform: x64
 environment:
-  VIPS_VERSION_MAJOR_MINOR: 8.1
-  VIPS_VERSION_PATCH: 0
+  VIPS_VERSION_MAJOR_MINOR: 8.0
+  VIPS_VERSION_PATCH: 2
   VIPS_WARNING: 0
   matrix:
   - nodejs_version: "0.12"
