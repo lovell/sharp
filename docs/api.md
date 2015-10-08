@@ -327,7 +327,7 @@ When a `radius` is provided, performs a slower, more accurate sharpen of the L c
 
 Apply a gamma correction by reducing the encoding (darken) pre-resize at a factor of `1/gamma` then increasing the encoding (brighten) post-resize at a factor of `gamma`.
 
-`gamma`, if present, is a Number betweem 1 and 3. The default value is `2.2`, a suitable approximation for sRGB images.
+`gamma`, if present, is a Number between 1 and 3. The default value is `2.2`, a suitable approximation for sRGB images.
 
 This can improve the perceived brightness of a resized image in non-linear colour spaces.
 
