@@ -11,7 +11,7 @@ var sharp = require('sharp');
 Constructor to which further methods are chained. `input`, if present, can be one of:
 
 * Buffer containing JPEG, PNG, WebP, GIF* or TIFF image data, or
-* String containing the filename of an image, with most major formats supported.
+* String containing the path to an image file, with most major formats supported.
 
 The object returned implements the
 [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
@@ -345,13 +345,13 @@ The output image will still be web-friendly sRGB and contain three (identical) c
 
 Enhance output image contrast by stretching its luminance to cover the full dynamic range. This typically reduces performance by 30%.
 
-#### overlayWith(filename)
+#### overlayWith(path)
 
 _Experimental_
 
-Alpha composite `filename` over the processed (resized, extracted) image. The dimensions of the two images must match.
+Alpha composite image at `path` over the processed (resized, extracted) image. The dimensions of the two images must match.
 
-* `filename` is a String containing the filename of an image with an alpha channel.
+* `path` is a String containing the path to an image file with an alpha channel.
 
 ```javascript
 sharp('input.png')
@@ -374,9 +374,9 @@ sharp('input.png')
 
 ### Output
 
-#### toFile(filename, [callback])
+#### toFile(path, [callback])
 
-`filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
+`path` is a String containing the path to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
 
 `callback`, if present, is called with two arguments `(err, info)` where:
 
