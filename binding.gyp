@@ -1,6 +1,9 @@
 {
   'targets': [{
     'target_name': 'sharp',
+    'variables': {
+      'runtime_link%':'shared', 
+    },
     'sources': [
       'src/common.cc',
       'src/metadata.cc',
@@ -51,6 +54,11 @@
             'include_dirs': [
                 '<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --cflags vips glib-2.0)',
                 '<!(node -e "require(\'nan\')")'
+            ],
+            'conditions': [
+                ['runtime_link == "static"', {
+                  'libraries': ['<!(PKG_CONFIG_PATH="<(PKG_CONFIG_PATH)" pkg-config --libs vips --static)']
+                }]
             ]
         }]
     ],
