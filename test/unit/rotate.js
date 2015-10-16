@@ -9,6 +9,23 @@ sharp.cache(0);
 
 describe('Rotation', function() {
 
+  ['Landscape', 'Portrait'].forEach(function(orientation) {
+    [1,2,3,4,5,6,7,8].forEach(function(exifTag) {
+      it('Input image has Orientation EXIF tag value of (' + exifTag + '), auto-rotate', function(done) {
+        sharp(fixtures['inputJpgWith'+orientation+'Exif'+exifTag])
+          .rotate()
+          .resize(320)
+          .toBuffer(function(err, data, info) {
+            if (err) throw err;
+            assert.strictEqual('jpeg', info.format);
+            assert.strictEqual(320, info.width);
+            assert.strictEqual(orientation === 'Landscape' ? 240 : 427, info.height);
+            fixtures.assertSimilar(fixtures.expected(orientation + '_' + exifTag + '-out.jpg'), data, done);
+          });
+      });
+    });
+  });
+
   it('Rotate by 90 degrees, respecting output input size', function(done) {
     sharp(fixtures.inputJpg).rotate(90).resize(320, 240).toBuffer(function(err, data, info) {
       if (err) throw err;
