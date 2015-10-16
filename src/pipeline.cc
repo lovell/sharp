@@ -250,10 +250,15 @@ class PipelineWorker : public AsyncWorker {
     // Calculate angle of rotation
     Angle rotation;
     bool flip;
-    std::tie(rotation, flip) = CalculateRotationAndFlip(baton->angle, image);
+    bool flop;
+    std::tie(rotation, flip, flop) = CalculateRotationAndFlip(baton->angle, image);
     if (flip && !baton->flip) {
       // Add flip operation due to EXIF mirroring
       baton->flip = TRUE;
+    }
+    if (flop && !baton->flop) {
+      // Add flip operation due to EXIF mirroring
+      baton->flop = TRUE;
     }
 
     // Rotate pre-extract
@@ -1041,18 +1046,19 @@ class PipelineWorker : public AsyncWorker {
      2. Use input image EXIF Orientation header - supports mirroring
      3. Otherwise default to zero, i.e. no rotation
   */
-  std::tuple<Angle, bool>
+  std::tuple<Angle, bool, bool>
   CalculateRotationAndFlip(int const angle, VipsImage const *input) {
     Angle rotate = Angle::D0;
     bool flip = FALSE;
+    bool flop = FALSE;
     if (angle == -1) {
       switch(ExifOrientation(input)) {
         case 6: rotate = Angle::D90; break;
         case 3: rotate = Angle::D180; break;
         case 8: rotate = Angle::D270; break;
-        case 2: flip = TRUE; break; // flip 1
+        case 2: flop = TRUE; break; // flop 1
         case 7: flip = TRUE; rotate = Angle::D90; break; // flip 6
-        case 4: flip = TRUE; rotate = Angle::D180; break; // flip 3
+        case 4: flop = TRUE; rotate = Angle::D180; break; // flop 3
         case 5: flip = TRUE; rotate = Angle::D270; break; // flip 8
       }
     } else {
@@ -1064,7 +1070,7 @@ class PipelineWorker : public AsyncWorker {
         rotate = Angle::D270;
       }
     }
-    return std::make_tuple(rotate, flip);
+    return std::make_tuple(rotate, flip, flop);
   }
 
   /*
@@ -1240,3 +1246,4 @@ NAN_METHOD(pipeline) {
   Local<Value> queueLength[1] = { New<Uint32>(counterQueue) };
   queueListener->Call(1, queueLength);
 }
+
