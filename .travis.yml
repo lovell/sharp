@@ -2,18 +2,15 @@ language: node_js
 node_js:
   - "0.10"
   - "0.12"
-  - "iojs-v2"
-  - "iojs-v3"
   - "4"
-sudo: 9000
+sudo: false
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
-before_install:
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
-  - curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
+env:
+  CXX=g++-4.8
 after_success:
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js

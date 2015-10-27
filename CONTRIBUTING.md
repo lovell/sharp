@@ -47,7 +47,6 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.11.0 | knife      |
 | v0.12.0 | look       |
 | v0.13.0 | mind       |
 

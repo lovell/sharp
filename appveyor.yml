@@ -3,26 +3,12 @@ version: "{build}"
 build: off
 platform: x64
 environment:
-  VIPS_VERSION_MAJOR_MINOR: 8.1
-  VIPS_VERSION_PATCH: 1
   VIPS_WARNING: 0
   matrix:
   - nodejs_version: "0.12"
-    nodejs_exec: "node"
-  - nodejs_version: "2"
-    nodejs_exec: "iojs"
-  - nodejs_version: "3"
-    nodejs_exec: "iojs"
   - nodejs_version: "4"
-    nodejs_exec: "node"
 install:
-  - ps: $env:VIPS_VERSION = "$env:VIPS_VERSION_MAJOR_MINOR.$env:VIPS_VERSION_PATCH"
-  - ps: Write-Output "Fetching http://www.vips.ecs.soton.ac.uk/supported/$env:VIPS_VERSION_MAJOR_MINOR/win32/vips-dev-$env:VIPS_VERSION.zip"
-  - ps: Start-FileDownload http://www.vips.ecs.soton.ac.uk/supported/$env:VIPS_VERSION_MAJOR_MINOR/win32/vips-dev-$env:VIPS_VERSION.zip -FileName c:\vips-dev-$env:VIPS_VERSION.zip
-  - ps: Invoke-Expression "& 7z -y x c:\vips-dev-$env:VIPS_VERSION.zip -oc:\ | FIND /V `"ing  `""
-  - ps: $env:VIPS_HOME = "c:\vips-dev-$env:VIPS_VERSION"
-  - ps: $env:PATH = "$env:VIPS_HOME\bin;$env:PATH"
   - ps: Install-Product node $env:nodejs_version x86
   - npm install --arch=ia32
 test_script:
-  - npm run-script test-win32-%nodejs_exec%
+  - npm run-script test-win32

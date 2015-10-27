@@ -4,6 +4,8 @@ coverage
 test/bench/node_modules
 test/fixtures/output*
 test/leak/libvips.supp
+bin
 lib
 include
+packaging/libvips*
 .DS_Store

@@ -10,3 +10,4 @@ appveyor.yml
 mkdocs.yml
 lib
 include
+packaging

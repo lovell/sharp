@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.11.4",
+  "version": "0.12.0",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -25,8 +25,7 @@
     "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=20000 ./test/unit/*.js",
     "test-clean": "npm run clean && npm install && npm test",
     "test-leak": "./test/leak/leak.sh",
-    "test-win32-node": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js",
-    "test-win32-iojs": "iojs ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js"
+    "test-win32": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js"
   },
   "main": "index.js",
   "repository": {
@@ -49,7 +48,9 @@
     "bluebird": "^3.0.5",
     "color": "^0.10.1",
     "nan": "^2.1.0",
-    "semver": "^5.0.3"
+    "semver": "^5.0.3",
+    "request": "^2.65.0",
+    "tar": "^2.2.1"
   },
   "devDependencies": {
     "async": "^1.5.0",
@@ -64,6 +65,9 @@
     "bufferutil": "^1.2.1"
   },
   "license": "Apache-2.0",
+  "config": {
+    "libvips": "8.1.1"
+  },
   "engines": {
     "node": ">=0.10"
   }

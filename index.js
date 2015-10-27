@@ -11,6 +11,11 @@ var BluebirdPromise = require('bluebird');
 
 var sharp = require('./build/Release/sharp');
 var libvipsVersion = sharp.libvipsVersion();
+var libvipsVersionMin = require('./package.json').config.libvips;
+
+if (semver.lt(libvipsVersion, libvipsVersionMin)) {
+  throw new Error('Found libvips ' + libvipsVersion + ' but require at least ' + libvipsVersionMin);
+}
 
 var maximum = {
   width: 0x3FFF,
