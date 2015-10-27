@@ -1096,6 +1096,16 @@ class PipelineWorker : public AsyncWorker {
       case 4: // West
         top = (inHeight - outHeight + 1) / 2;
         break;
+      case 5: // Northeast
+        left = inWidth - outWidth;
+        break;
+      case 6: // Southeast
+        left = inWidth - outWidth;
+        top = inHeight - outHeight;
+      case 7: // Southwest
+        top = inHeight - outHeight;
+      case 8: // Northwest
+        break;
       default: // Centre
         left = (inWidth - outWidth + 1) / 2;
         top = (inHeight - outHeight + 1) / 2;
