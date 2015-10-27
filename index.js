@@ -137,11 +137,11 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
 };
 
 // Crop this part of the resized image (Center/Centre, North, East, South, West)
-module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4};
+module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4, 'northeast': 5, 'southeast': 6, 'southwest': 7, 'northwest': 8};
 
 Sharp.prototype.crop = function(gravity) {
   this.options.canvas = 'crop';
-  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 4) {
+  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 8) {
     this.options.gravity = gravity;
   } else if (typeof gravity === 'string' && typeof module.exports.gravity[gravity] === 'number') {
     this.options.gravity = module.exports.gravity[gravity];
