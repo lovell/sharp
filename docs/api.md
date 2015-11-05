@@ -111,7 +111,8 @@ Crop the resized image to the exact size specified, the default behaviour.
 
 `gravity`, if present, is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north`.
 
-Possible values are `north`, `east`, `south`, `west`, `center` and `centre`. The default gravity is `center`/`centre`.
+Possible values are `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` and `centre`.
+The default gravity is `center`/`centre`.
 
 ```javascript
 var transformer = sharp()
