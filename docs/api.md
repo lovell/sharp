@@ -373,6 +373,14 @@ sharp('input.png')
   });
 ```
 
+#### maskWithColor(rgba)
+
+Adds a transparent color mask to the image
+
+rgba is parsed by the color module to extract values for red, green, blue and alpha.
+
+The alpha value is a float between 0 (transparent) and 1 (opaque).
+
 ### Output
 
 #### toFile(path, [callback])

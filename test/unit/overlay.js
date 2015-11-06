@@ -167,9 +167,67 @@ describe('Overlays', function() {
     });
   });
 
-  it('Fail with non-String parameter', function() {
+  it('Fail with null parameter', function() {
     assert.throws(function() {
-      sharp().overlayWith(1);
+      sharp().overlayWith(null);
     });
+  });
+
+  it('Succeeds with a color parameter', function() {
+    assert.doesNotThrow(function() {
+      sharp().overlayWith({r: 0, g: 0, b: 0, a: 0});
+    });
+  });
+
+  it('Does not change a opaque image when adding a clear mask', function (done) {
+    var paths = getPaths('clear-overlay-on-opaque-image');
+
+    sharp(fixtures.inputJpg)
+      .resize(256)
+      .overlayWith('rgba(0, 0, 0, 0)')
+      .toFile(paths.actual, function (error) {
+        if (error) return done(error);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+        done();
+      });
+  });
+
+  it('Does not change a transparent image when adding a clear mask', function (done) {
+    var paths = getPaths('clear-overlay-on-transparent-image');
+
+    sharp(fixtures.inputPngWithTransparency)
+      .resize(256)
+      .overlayWith('rgba(0, 0, 0, 0)')
+      .toFile(paths.actual, function (error) {
+        if (error) return done(error);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+        done();
+      });
+  });
+
+  it('Adds a transparent mask to a opaque image', function(done) {
+    var paths = getPaths('transparent-overlay-on-opaque-image');
+
+    sharp(fixtures.inputJpg)
+      .resize(256)
+      .overlayWith('rgba(224, 0, 0, 0.3)')
+      .toFile(paths.actual, function (error) {
+        if (error) return done(error);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+        done();
+      });
+  });
+
+  it('Adds a transparent mask to a transparent image', function(done) {
+    var paths = getPaths('transparent-overlay-on-transparent-image');
+
+    sharp(fixtures.inputPngWithTransparency)
+      .resize(256)
+      .overlayWith('rgba(224, 0, 0, 0.3)')
+      .toFile(paths.actual, function (error) {
+        if (error) return done(error);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+        done();
+      });
   });
 });

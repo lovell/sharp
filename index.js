@@ -62,6 +62,7 @@ var Sharp = function(input) {
     normalize: 0,
     // overlay
     overlayPath: '',
+    overlayColor: [0, 0, 0, 0],
     // output options
     output: '__input',
     progressive: false,
@@ -77,6 +78,7 @@ var Sharp = function(input) {
     withMetadataOrientation: -1,
     tileSize: 256,
     tileOverlap: 0,
+    maskColor: [0, 0, 0, 0],
     // Function to notify of queue length changes
     queueListener: function(queueLength) {
       module.exports.queue.emit('change', queueLength);
@@ -211,13 +213,21 @@ Sharp.prototype.flatten = function(flatten) {
 };
 
 Sharp.prototype.overlayWith = function(overlayPath) {
-  if (typeof overlayPath !== 'string') {
-    throw new Error('The overlay path must be a string');
+  try {
+    var colour = color(overlayPath);
+    this.options.overlayColor = colour.rgbArray();
+    this.options.overlayColor.push(colour.alpha() * 255);
+  } catch (e) {
+    if (typeof overlayPath !== 'string') {
+      throw new Error('The overlay path must be a string');
+    }
+
+    if (overlayPath === '') {
+      throw new Error('The overlay path cannot be empty');
+    }
+
+    this.options.overlayPath = overlayPath;
   }
-  if (overlayPath === '') {
-    throw new Error('The overlay path cannot be empty');
-  }
-  this.options.overlayPath = overlayPath;
   return this;
 };
 
