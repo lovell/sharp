@@ -11,10 +11,6 @@
 #error libvips version 7.40.0+ required - see http://sharp.dimens.io/page/install
 #endif
 
-#ifdef _WIN64
-#error Windows 64-bit is currently unsupported - see http://sharp.dimens.io/page/install#windows
-#endif
-
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
 #error GCC version 4.6+ is required for C++11 features - see http://sharp.dimens.io/page/install#prerequisites
 #endif

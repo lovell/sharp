@@ -65,8 +65,8 @@
             },
             'libraries': [
               '<(module_root_dir)/lib/libvips.lib',
-              '<(module_root_dir)/lib/glib-2.0.lib',
-              '<(module_root_dir)/lib/gobject-2.0.lib'
+              '<(module_root_dir)/lib/libglib-2.0.lib',
+              '<(module_root_dir)/lib/libgobject-2.0.lib'
             ]
           }],
           ['OS == "linux"', {

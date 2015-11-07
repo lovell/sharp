@@ -25,7 +25,7 @@
     "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=20000 ./test/unit/*.js",
     "test-clean": "npm run clean && npm install && npm test",
     "test-leak": "./test/leak/leak.sh",
-    "test-win32": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js"
+    "test-win": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js"
   },
   "main": "index.js",
   "repository": {

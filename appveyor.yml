@@ -7,8 +7,9 @@ environment:
   matrix:
   - nodejs_version: "0.12"
   - nodejs_version: "4"
+  - nodejs_version: "5"
 install:
-  - ps: Install-Product node $env:nodejs_version x86
-  - npm install --arch=ia32
+  - ps: Install-Product node $env:nodejs_version x64
+  - npm install
 test_script:
-  - npm run-script test-win32
+  - npm run-script test-win
