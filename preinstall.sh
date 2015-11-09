@@ -33,7 +33,7 @@ install_libvips_from_source() {
   rm -rf vips-$vips_version_latest_major_minor.$vips_version_latest_patch
   rm vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   ldconfig
-  echo "Installed libvips $vips_version_latest_major_minor.$vips_version_latest_patch"
+  echo "Installed libvips $(PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --modversion vips)"
 }
 
 install_libopenslide_from_source() {
@@ -249,14 +249,14 @@ elif [ -f /etc/redhat-release ]; then
       # RHEL/CentOS 7
       echo "Installing libvips dependencies via yum"
       yum groupinstall -y "Development Tools"
-      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      yum install -y tar curl gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel
       install_libvips_from_source "--prefix=/usr"
       ;;
     "Red Hat Enterprise Linux release 6."*|"CentOS release 6."*|"Scientific Linux release 6."*)
       # RHEL/CentOS 6
       echo "Installing libvips dependencies via yum"
       yum groupinstall -y "Development Tools"
-      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel curl
+      yum install -y tar curl gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel
       yum install -y http://li.nux.ro/download/nux/dextop/el6/x86_64/nux-dextop-release-0-2.el6.nux.noarch.rpm
       yum install -y --enablerepo=nux-dextop gobject-introspection-devel
       yum install -y http://rpms.famillecollet.com/enterprise/remi-release-6.rpm

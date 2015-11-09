@@ -7,8 +7,8 @@
 
 // Verify platform and compiler compatibility
 
-#if (VIPS_MAJOR_VERSION < 7 || (VIPS_MAJOR_VERSION == 7 && VIPS_MINOR_VERSION < 40))
-#error libvips version 7.40.0+ required - see http://sharp.dimens.io/page/install
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 1 && VIPS_PATCH_VERSION < 1))
+#error libvips version 8.1.1+ required - see http://sharp.dimens.io/page/install
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))

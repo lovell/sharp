@@ -56,14 +56,14 @@ module.exports.download_vips = function() {
   if (!isFile(vipsHeaderPath)) {
     // 32-bit
     if (process.arch === 'ia32') {
-      error('32-bit systems require manual installation - see http://sharp.dimens.io/en/stable/install/');
+      error('32-bit systems require manual installation - please see http://sharp.dimens.io/en/stable/install/');
     }
     // Ensure libc >= 2.15
     var lddVersion = process.env.LDD_VERSION;
     if (lddVersion) {
       var libcVersion = lddVersion ? lddVersion.split(/\n/)[0].split(' ').slice(-1)[0].trim() : '';
       if (libcVersion && semver.lt(libcVersion + '.0', '2.15.0')) {
-        error('Unsupported version of libc:\n' + lddVersion + '\nPlease see http://sharp.dimens.io/en/stable/install/');
+        error('libc version ' + libcVersion + ' requires manual installation - please see http://sharp.dimens.io/en/stable/install/');
       }
     }
     // Platform-specific .tar.gz

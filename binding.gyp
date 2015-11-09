@@ -10,11 +10,11 @@
             }, {
               'pkg_config_path': ''
             }]
-          ]
+          ],
         },
         'conditions': [
           ['OS != "win"', {
-            'global_vips_version': '<!(PKG_CONFIG_PATH="<(pkg_config_path)" which pkg-config >/dev/null 2>&1 && pkg-config --exists vips && pkg-config --modversion vips || true)'
+            'global_vips_version': '<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --modversion vips 2>/dev/null || true)'
           }, {
             'global_vips_version': ''
           }]
@@ -77,6 +77,24 @@
               '<(module_root_dir)/lib/libvips.so',
               '<(module_root_dir)/lib/libglib-2.0.so',
               '<(module_root_dir)/lib/libgobject-2.0.so',
+              # Dependencies of dependencies, included for openSUSE support
+              '<(module_root_dir)/lib/libMagickCore-6.Q16.so',
+              '<(module_root_dir)/lib/libMagickWand-6.Q16.so',
+              '<(module_root_dir)/lib/libexif.so',
+              '<(module_root_dir)/lib/libgio-2.0.so',
+              '<(module_root_dir)/lib/libgmodule-2.0.so',
+              '<(module_root_dir)/lib/libgsf-1.so',
+              '<(module_root_dir)/lib/libjpeg.so',
+              '<(module_root_dir)/lib/libpng.so',
+              '<(module_root_dir)/lib/libtiff.so',
+              '<(module_root_dir)/lib/libwebp.so',
+              '<(module_root_dir)/lib/libz.so',
+              '<(module_root_dir)/lib/libffi.so',
+              '<(module_root_dir)/lib/libgthread-2.0.so',
+              '<(module_root_dir)/lib/liblcms2.so',
+              '<(module_root_dir)/lib/libpng16.so',
+              '<(module_root_dir)/lib/libxml2.so',
+              # Ensure runtime linking is relative to sharp.node
               '-Wl,-rpath=\'$${ORIGIN}/../../lib\''
             ]
           }]
