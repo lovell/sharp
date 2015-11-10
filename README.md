@@ -4,6 +4,12 @@ The typical use case for this high speed Node.js module
 is to convert large images of many formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
+`npm install sharp`
+
+A pre-built version of libvips is provided for Windows and most Linux systems.
+
+Installation of libvips on OS X is as simple as `brew install homebrew/science/vips`.
+
 [![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.png?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
 
 ### Documentation

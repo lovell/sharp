@@ -34,7 +34,6 @@ fi
 
 # Centos 7
 # Fedora 20, 21
-
 for dist in centos7 fedora20 fedora21; do
   echo -n "Testing $dist... "
   if docker run -i -t --rm -v $PWD:/v nodesource/$dist:0.12 sh -c "cd /v && $test" >/dev/null;
@@ -45,14 +44,14 @@ done
 
 # openSUSE 13.2
 echo -n "Testing opensuse... "
-docker run -i -t --rm -v $PWD:/v opensuse:13.2 sh -c "cd /v && ./packaging/test/opensuse.sh && $test" >/dev/null;
+if docker run -i -t --rm -v $PWD:/v opensuse:13.2 sh -c "cd /v && ./packaging/test/opensuse.sh && $test" >/dev/null;
 then echo "OK"
 else echo "fail"
 fi
 
 # Archlinux 2015.06.01
 echo -n "Testing archlinux... "
-docker run -i -t --rm -v $PWD:/v base/archlinux:2015.06.01 sh -c "cd /v && ./packaging/test/archlinux.sh && $test" >/dev/null;
+if docker run -i -t --rm -v $PWD:/v base/archlinux:2015.06.01 sh -c "cd /v && ./packaging/test/archlinux.sh && $test" >/dev/null;
 then echo "OK"
 else echo "fail"
 fi
