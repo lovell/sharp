@@ -25,6 +25,10 @@ Most recent 64-bit Linux-based operating systems should "just work", e.g.:
 * openSUSE 13.2
 * Archlinux 2015.06.01
 
+Preference will be given to an existing globally-installed (via `pkg-config`)
+version of libvips that meets the minimum version requirement.
+This allows the use of newer versions of libvips with older versions of sharp.
+
 For older and 32-bit Linux-based operating systems,
 a system-wide installation of the most suitable version of
 libvips and its dependencies can be achieved by running

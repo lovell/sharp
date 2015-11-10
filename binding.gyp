@@ -1,11 +1,13 @@
 {
   'targets': [{
     'target_name': 'sharp',
+    # Nested variables "pattern" borrowed from http://src.chromium.org/viewvc/chrome/trunk/src/build/common.gypi
     'variables': {
       'variables': {
         'variables': {
           'conditions': [
             ['OS != "win"', {
+              # Build the PKG_CONFIG_PATH environment variable with all possible combinations
               'pkg_config_path': '<!(which brew >/dev/null 2>&1 && eval $(brew --env) && echo $PKG_CONFIG_LIBDIR || true):$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig'
             }, {
               'pkg_config_path': ''
@@ -14,6 +16,7 @@
         },
         'conditions': [
           ['OS != "win"', {
+            # Which version, if any, of libvips is available globally via pkg-config?
             'global_vips_version': '<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --modversion vips 2>/dev/null || true)'
           }, {
             'global_vips_version': ''
@@ -25,6 +28,7 @@
       'runtime_link%': 'shared',
       'conditions': [
         ['OS != "win"', {
+          # Does the globally available version of libvips, if any, meet the minimum version requirement?
           'use_global_vips': '<!(GLOBAL_VIPS_VERSION="<(global_vips_version)" node -e "require(\'./binding\').use_global_vips()")'
         }, {
           'use_global_vips': ''
@@ -44,6 +48,7 @@
     ],
     'conditions': [
       ['use_global_vips == "true"', {
+        # Use pkg-config for include and lib
         'include_dirs': ['<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --cflags vips glib-2.0)'],
         'conditions': [
           ['runtime_link == "static"', {
@@ -53,6 +58,7 @@
           }]
         ]
       }, {
+        # Attempt to download pre-built libvips and install locally within node_modules
         'include_dirs': [
           '<(module_root_dir)/include',
           '<(module_root_dir)/include/glib-2.0',
@@ -108,10 +114,10 @@
       '-O3'
     ],
     'xcode_settings': {
+      'CLANG_CXX_LANGUAGE_STANDARD': 'c++11',
+      'CLANG_CXX_LIBRARY': 'libc++',
       'MACOSX_DEPLOYMENT_TARGET': '10.7',
       'OTHER_CPLUSPLUSFLAGS': [
-        '-std=c++11',
-        '-stdlib=libc++',
         '-fexceptions',
         '-Wall',
         '-O3'
@@ -134,6 +140,7 @@
     ],
     'conditions': [
       ['OS == "win"', {
+        # Windows lacks support for rpath
         'copies': [{
           'destination': '<(module_root_dir)/build/Release',
           'files': [

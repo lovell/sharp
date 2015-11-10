@@ -1,5 +1,12 @@
 # Changelog
 
+### v0.12 - "*look*"
+
+#### v0.12.0 - TBD
+
+* Bundle pre-compiled libvips and its dependencies for 64-bit Linux and Windows.
+  [#42](https://github.com/lovell/sharp/issues/42)
+
 ### v0.11 - "*knife*"
 
 #### v0.11.4 - 5<sup>th</sup> November 2015
