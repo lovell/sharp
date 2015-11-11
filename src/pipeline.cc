@@ -285,7 +285,7 @@ class PipelineWorker : public AsyncWorker {
     // Get pre-resize image width and height
     int inputWidth = image->Xsize;
     int inputHeight = image->Ysize;
-    if (rotation == Angle::D90 || rotation == Angle::D270) {
+    if (!baton->rotateBeforePreExtract && (rotation == Angle::D90 || rotation == Angle::D270)) {
       // Swap input output width and height when rotating by 90 or 270 degrees
       int swap = inputWidth;
       inputWidth = inputHeight;

@@ -96,25 +96,25 @@ describe('Partial image extraction', function() {
   });
 
   it('Extract then rotate', function(done) {
-    sharp(fixtures.inputJpg)
-      .extract(10, 10, 100, 100)
+    sharp(fixtures.inputPngWithGreyAlpha)
+      .extract(10, 20, 380, 280)
       .rotate(90)
       .toBuffer(function(err, data, info) {
         if (err) throw err;
-        assert.strictEqual(100, info.width);
-        assert.strictEqual(100, info.height);
+        assert.strictEqual(280, info.width);
+        assert.strictEqual(380, info.height);
         fixtures.assertSimilar(fixtures.expected('extract-rotate.jpg'), data, done);
       });
   });
 
   it('Rotate then extract', function(done) {
-    sharp(fixtures.inputJpg)
+    sharp(fixtures.inputPngWithGreyAlpha)
       .rotate(90)
-      .extract(10, 10, 100, 100)
+      .extract(10, 20, 280, 380)
       .toBuffer(function(err, data, info) {
         if (err) throw err;
-        assert.strictEqual(100, info.width);
-        assert.strictEqual(100, info.height);
+        assert.strictEqual(280, info.width);
+        assert.strictEqual(380, info.height);
         fixtures.assertSimilar(fixtures.expected('rotate-extract.jpg'), data, done);
       });
   });
