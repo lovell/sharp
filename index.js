@@ -375,11 +375,7 @@ Sharp.prototype.gamma = function(gamma) {
   Enhance output image contrast by stretching its luminance to cover the full dynamic range
 */
 Sharp.prototype.normalize = function(normalize) {
-  if (process.platform !== 'win32') {
-    this.options.normalize = (typeof normalize === 'boolean') ? normalize : true;
-  } else {
-    console.error('normalize unavailable on win32 platform');
-  }
+  this.options.normalize = (typeof normalize === 'boolean') ? normalize : true;
   return this;
 };
 Sharp.prototype.normalise = Sharp.prototype.normalize;
@@ -425,14 +421,10 @@ Sharp.prototype.compressionLevel = function(compressionLevel) {
 };
 
 /*
-  Disable the use of adaptive row filtering for PNG output - requires libvips 7.42.0+
+  Disable the use of adaptive row filtering for PNG output
 */
 Sharp.prototype.withoutAdaptiveFiltering = function(withoutAdaptiveFiltering) {
-  if (semver.gte(libvipsVersion, '7.42.0')) {
-    this.options.withoutAdaptiveFiltering = (typeof withoutAdaptiveFiltering === 'boolean') ? withoutAdaptiveFiltering : true;
-  } else {
-    console.error('withoutAdaptiveFiltering requires libvips 7.41.0+');
-  }
+  this.options.withoutAdaptiveFiltering = (typeof withoutAdaptiveFiltering === 'boolean') ? withoutAdaptiveFiltering : true;
   return this;
 };
 
@@ -445,41 +437,29 @@ Sharp.prototype.withoutChromaSubsampling = function(withoutChromaSubsampling) {
 };
 
 /*
-  Apply trellis quantisation to JPEG output - requires libvips 8.0.0+ compiled against mozjpeg 3.0+
+  Apply trellis quantisation to JPEG output - requires mozjpeg 3.0+
 */
 Sharp.prototype.trellisQuantisation = function(trellisQuantisation) {
-  if (semver.gte(libvipsVersion, '8.0.0')) {
-    this.options.trellisQuantisation = (typeof trellisQuantisation === 'boolean') ? trellisQuantisation : true;
-  } else {
-    console.error('trellisQuantisation requires libvips 8.0.0+');
-  }
+  this.options.trellisQuantisation = (typeof trellisQuantisation === 'boolean') ? trellisQuantisation : true;
   return this;
 };
 Sharp.prototype.trellisQuantization = Sharp.prototype.trellisQuantisation;
 
 /*
-  Apply overshoot deringing to JPEG output - requires libvips 8.0.0+ compiled against mozjpeg 3.0+
+  Apply overshoot deringing to JPEG output - requires mozjpeg 3.0+
 */
 Sharp.prototype.overshootDeringing = function(overshootDeringing) {
-  if (semver.gte(libvipsVersion, '8.0.0')) {
-    this.options.overshootDeringing = (typeof overshootDeringing === 'boolean') ? overshootDeringing : true;
-  } else {
-    console.error('overshootDeringing requires libvips 8.0.0+');
-  }
+  this.options.overshootDeringing = (typeof overshootDeringing === 'boolean') ? overshootDeringing : true;
   return this;
 };
 
 /*
-  Optimise scans in progressive JPEG output - requires libvips 8.0.0+ compiled against mozjpeg 3.0+
+  Optimise scans in progressive JPEG output - requires mozjpeg 3.0+
 */
 Sharp.prototype.optimiseScans = function(optimiseScans) {
-  if (semver.gte(libvipsVersion, '8.0.0')) {
-    this.options.optimiseScans = (typeof optimiseScans === 'boolean') ? optimiseScans : true;
-    if (this.options.optimiseScans) {
-      this.progressive();
-    }
-  } else {
-    console.error('optimiseScans requires libvips 8.0.0+');
+  this.options.optimiseScans = (typeof optimiseScans === 'boolean') ? optimiseScans : true;
+  if (this.options.optimiseScans) {
+    this.progressive();
   }
   return this;
 };

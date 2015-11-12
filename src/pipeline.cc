@@ -37,8 +37,6 @@ using Nan::Null;
 using Nan::Equals;
 
 using sharp::Composite;
-using sharp::Premultiply;
-using sharp::Unpremultiply;
 using sharp::Normalize;
 using sharp::Blur;
 using sharp::Sharpen;
@@ -522,7 +520,7 @@ class PipelineWorker : public AsyncWorker {
     // See: http://entropymine.com/imageworsener/resizealpha/
     if (shouldPremultiplyAlpha) {
       VipsImage *imagePremultiplied;
-      if (Premultiply(hook, image, &imagePremultiplied)) {
+      if (vips_premultiply(image, &imagePremultiplied, NULL)) {
         (baton->err).append("Failed to premultiply alpha channel.");
         return Error();
       }
@@ -761,7 +759,7 @@ class PipelineWorker : public AsyncWorker {
 
       // Premultiply overlay
       VipsImage *overlayImagePremultiplied;
-      if (Premultiply(hook, overlayImageRGB, &overlayImagePremultiplied)) {
+      if (vips_premultiply(overlayImageRGB, &overlayImagePremultiplied, NULL)) {
         (baton->err).append("Failed to premultiply alpha channel of overlay image.");
         return Error();
       }
@@ -779,11 +777,10 @@ class PipelineWorker : public AsyncWorker {
     // Reverse premultiplication after all transformations:
     if (shouldPremultiplyAlpha) {
       VipsImage *imageUnpremultiplied;
-      if (Unpremultiply(hook, image, &imageUnpremultiplied)) {
+      if (vips_unpremultiply(image, &imageUnpremultiplied, NULL)) {
         (baton->err).append("Failed to unpremultiply alpha channel.");
         return Error();
       }
-
       vips_object_local(hook, imageUnpremultiplied);
       image = imageUnpremultiplied;
     }
@@ -832,34 +829,19 @@ class PipelineWorker : public AsyncWorker {
       SetExifOrientation(image, baton->withMetadataOrientation);
     }
 
-#if !(VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40 && VIPS_MINOR_VERSION >= 5))
-    // Generate image tile cache when interlace output is required - no longer required as of libvips 7.40.5+
-    if (baton->progressive) {
-      VipsImage *cached;
-      if (vips_tilecache(image, &cached, "threaded", TRUE, "persistent", TRUE, "max_tiles", -1, NULL)) {
-        return Error();
-      }
-      vips_object_local(hook, cached);
-      image = cached;
-    }
-#endif
-
     // Output
     if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == ImageType::JPEG)) {
       // Write JPEG to buffer
       if (vips_jpegsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
         "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
-#if (VIPS_MAJOR_VERSION >= 8)
         "trellis_quant", baton->trellisQuantisation,
         "overshoot_deringing", baton->overshootDeringing,
         "optimize_scans", baton->optimiseScans,
-#endif
         "interlace", baton->progressive, NULL)) {
         return Error();
       }
       baton->outputFormat = "jpeg";
     } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == ImageType::PNG)) {
-#if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
       // Select PNG row filter
       int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
       // Write PNG to buffer
@@ -867,13 +849,6 @@ class PipelineWorker : public AsyncWorker {
         "compression", baton->compressionLevel, "interlace", baton->progressive, "filter", filter, NULL)) {
         return Error();
       }
-#else
-      // Write PNG to buffer
-      if (vips_pngsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
-        "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
-        return Error();
-      }
-#endif
       baton->outputFormat = "png";
     } else if (baton->output == "__webp" || (baton->output == "__input" && inputImageType == ImageType::WEBP)) {
       // Write WEBP to buffer
@@ -882,7 +857,6 @@ class PipelineWorker : public AsyncWorker {
         return Error();
       }
       baton->outputFormat = "webp";
-#if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
     } else if (baton->output == "__raw") {
       // Write raw, uncompressed image data to buffer
       if (baton->greyscale || image->Type == VIPS_INTERPRETATION_B_W) {
@@ -910,7 +884,6 @@ class PipelineWorker : public AsyncWorker {
         return Error();
       }
       baton->outputFormat = "raw";
-#endif
     } else {
       bool outputJpeg = IsJpeg(baton->output);
       bool outputPng = IsPng(baton->output);
@@ -922,17 +895,14 @@ class PipelineWorker : public AsyncWorker {
         // Write JPEG to file
         if (vips_jpegsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
           "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
-#if (VIPS_MAJOR_VERSION >= 8)
           "trellis_quant", baton->trellisQuantisation,
           "overshoot_deringing", baton->overshootDeringing,
           "optimize_scans", baton->optimiseScans,
-#endif
           "interlace", baton->progressive, NULL)) {
           return Error();
         }
         baton->outputFormat = "jpeg";
       } else if (outputPng || (matchInput && inputImageType == ImageType::PNG)) {
-#if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
         // Select PNG row filter
         int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
         // Write PNG to file
@@ -940,13 +910,6 @@ class PipelineWorker : public AsyncWorker {
           "compression", baton->compressionLevel, "interlace", baton->progressive, "filter", filter, NULL)) {
           return Error();
         }
-#else
-        // Write PNG to file
-        if (vips_pngsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
-          "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
-          return Error();
-        }
-#endif
         baton->outputFormat = "png";
       } else if (outputWebp || (matchInput && inputImageType == ImageType::WEBP)) {
         // Write WEBP to file

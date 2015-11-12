@@ -10,16 +10,6 @@ namespace sharp {
   int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out);
 
   /*
-   * Premultiply alpha channel of `image`.
-   */
-  int Premultiply(VipsObject *context, VipsImage *image, VipsImage **out);
-
-  /*
-   * Unpremultiply alpha channel of `image`.
-   */
-  int Unpremultiply(VipsObject *context, VipsImage *image, VipsImage **out);
-
-  /*
    * Stretch luminance to cover full dynamic range.
    */
   int Normalize(VipsObject *context, VipsImage *image, VipsImage **out);

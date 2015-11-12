@@ -7,6 +7,13 @@
 * Bundle pre-compiled libvips and its dependencies for 64-bit Linux and Windows.
   [#42](https://github.com/lovell/sharp/issues/42)
 
+* Take advantage of libvips v8.1.0+ features.
+  [#152](https://github.com/lovell/sharp/issues/152)
+
+* Pre-extract rotatation should not swap width/height.
+  [#296](https://github.com/lovell/sharp/issues/296)
+  [@asilvas](https://github.com/asilvas)
+
 ### v0.11 - "*knife*"
 
 #### v0.11.4 - 5<sup>th</sup> November 2015

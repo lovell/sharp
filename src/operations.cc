@@ -122,72 +122,9 @@ namespace sharp {
   }
 
   /*
-   * Premultiply alpha channel of `image`.
-   */
-  int Premultiply(VipsObject *context, VipsImage *image, VipsImage **out) {
-#if (VIPS_MAJOR_VERSION >= 9 || (VIPS_MAJOR_VERSION >= 8 && VIPS_MINOR_VERSION >= 1))
-    return vips_premultiply(image, out, NULL);
-#else
-    VipsImage *imageRGB;
-    if (vips_extract_band(image, &imageRGB, 0, "n", image->Bands - 1, NULL))
-      return -1;
-    vips_object_local(context, imageRGB);
-
-    VipsImage *imageAlpha;
-    if (vips_extract_band(image, &imageAlpha, image->Bands - 1, "n", 1, NULL))
-      return -1;
-    vips_object_local(context, imageAlpha);
-
-    VipsImage *imageAlphaNormalized;
-    if (vips_linear1(imageAlpha, &imageAlphaNormalized, 1.0 / 255.0, 0.0, NULL))
-      return -1;
-    vips_object_local(context, imageAlphaNormalized);
-
-    VipsImage *imageRGBPremultiplied;
-    if (vips_multiply(imageRGB, imageAlphaNormalized, &imageRGBPremultiplied, NULL))
-      return -1;
-    vips_object_local(context, imageRGBPremultiplied);
-
-    return vips_bandjoin2(imageRGBPremultiplied, imageAlpha, out, NULL);
-#endif
-  }
-
-  /*
-   * Unpremultiply alpha channel of `image`.
-   */
-  int Unpremultiply(VipsObject *context, VipsImage *image, VipsImage **out) {
-#if (VIPS_MAJOR_VERSION >= 9 || (VIPS_MAJOR_VERSION >= 8 && VIPS_MINOR_VERSION >= 1))
-    return vips_unpremultiply(image, out, NULL);
-#else
-    VipsImage *imageRGBPremultipliedTransformed;
-    if (vips_extract_band(image, &imageRGBPremultipliedTransformed, 0, "n", image->Bands - 1, NULL))
-      return -1;
-    vips_object_local(context, imageRGBPremultipliedTransformed);
-
-    VipsImage *imageAlphaTransformed;
-    if (vips_extract_band(image, &imageAlphaTransformed, image->Bands - 1, "n", 1, NULL))
-      return -1;
-    vips_object_local(context, imageAlphaTransformed);
-
-    VipsImage *imageAlphaNormalizedTransformed;
-    if (vips_linear1(imageAlphaTransformed, &imageAlphaNormalizedTransformed, 1.0 / 255.0, 0.0, NULL))
-      return -1;
-    vips_object_local(context, imageAlphaNormalizedTransformed);
-
-    VipsImage *imageRGBUnpremultipliedTransformed;
-    if (vips_divide(imageRGBPremultipliedTransformed, imageAlphaNormalizedTransformed, &imageRGBUnpremultipliedTransformed, NULL))
-      return -1;
-    vips_object_local(context, imageRGBUnpremultipliedTransformed);
-
-    return vips_bandjoin2(imageRGBUnpremultipliedTransformed, imageAlphaTransformed, out, NULL);
-#endif
-  }
-
-  /*
    * Stretch luminance to cover full dynamic range.
    */
   int Normalize(VipsObject *context, VipsImage *image, VipsImage **out) {
-#ifndef _WIN32
     // Get original colourspace
     VipsInterpretation typeBeforeNormalize = image->Type;
     if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {
@@ -262,11 +199,6 @@ namespace sharp {
       // Cannot normalise zero-range image
       *out = image;
     }
-#else
-    // The normalize operation is currently unsupported on Windows
-    // See https://github.com/lovell/sharp/issues/152
-    *out = image;
-#endif
     return 0;
   }
 

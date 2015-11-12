@@ -157,7 +157,6 @@ NAN_METHOD(format) {
   between two images of the same dimensions and number of channels.
 */
 NAN_METHOD(_maxColourDistance) {
-  using sharp::Premultiply;
   using sharp::DetermineImageType;
   using sharp::ImageType;
   using sharp::InitImage;
@@ -212,7 +211,7 @@ NAN_METHOD(_maxColourDistance) {
   // Premultiply and remove alpha
   if (HasAlpha(image1)) {
     VipsImage *imagePremultiplied1;
-    if (Premultiply(hook, image1, &imagePremultiplied1)) {
+    if (vips_premultiply(image1, &imagePremultiplied1, NULL)) {
       g_object_unref(hook);
       return ThrowError(vips_error_buffer());
     }
@@ -227,7 +226,7 @@ NAN_METHOD(_maxColourDistance) {
   }
   if (HasAlpha(image2)) {
     VipsImage *imagePremultiplied2;
-    if (Premultiply(hook, image2, &imagePremultiplied2)) {
+    if (vips_premultiply(image2, &imagePremultiplied2, NULL)) {
       g_object_unref(hook);
       return ThrowError(vips_error_buffer());
     }
