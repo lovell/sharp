@@ -35,6 +35,7 @@ using sharp::InitImage;
 using sharp::HasProfile;
 using sharp::HasAlpha;
 using sharp::ExifOrientation;
+using sharp::FreeCallback;
 using sharp::counterQueue;
 
 struct MetadataBaton {
@@ -175,10 +176,16 @@ class MetadataWorker : public AsyncWorker {
         Set(info, New("orientation").ToLocalChecked(), New<Number>(baton->orientation));
       }
       if (baton->exifLength > 0) {
-        Set(info, New("exif").ToLocalChecked(), NewBuffer(baton->exif, baton->exifLength).ToLocalChecked());
+        Set(info,
+          New("exif").ToLocalChecked(),
+          NewBuffer(baton->exif, baton->exifLength, FreeCallback, nullptr).ToLocalChecked()
+        );
       }
       if (baton->iccLength > 0) {
-        Set(info, New("icc").ToLocalChecked(), NewBuffer(baton->icc, baton->iccLength).ToLocalChecked());
+        Set(info,
+          New("icc").ToLocalChecked(),
+          NewBuffer(baton->icc, baton->iccLength, FreeCallback, nullptr).ToLocalChecked()
+        );
       }
       argv[1] = info;
     }

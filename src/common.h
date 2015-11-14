@@ -80,6 +80,11 @@ namespace sharp {
   */
   int InterpolatorWindowSize(char const *name);
 
+  /*
+    Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
+  */
+  void FreeCallback(char* data, void* hint);
+
 }  // namespace sharp
 
 #endif  // SRC_COMMON_H_

@@ -55,6 +55,7 @@ using sharp::IsPng;
 using sharp::IsWebp;
 using sharp::IsTiff;
 using sharp::IsDz;
+using sharp::FreeCallback;
 using sharp::counterProcess;
 using sharp::counterQueue;
 
@@ -959,7 +960,9 @@ class PipelineWorker : public AsyncWorker {
 
       if (baton->bufferOutLength > 0) {
         // Pass ownership of output data to Buffer instance
-        argv[1] = NewBuffer(static_cast<char*>(baton->bufferOut), baton->bufferOutLength).ToLocalChecked();
+        argv[1] = NewBuffer(
+          static_cast<char*>(baton->bufferOut), baton->bufferOutLength, FreeCallback, nullptr
+        ).ToLocalChecked();
         // Add buffer size to info
         Set(info, New("size").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(baton->bufferOutLength)));
         argv[2] = info;

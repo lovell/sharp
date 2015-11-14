@@ -285,6 +285,13 @@
   ...
   fun:get_bands
 }
+{
+  value_magick_is_palette_image
+  Memcheck:Value8
+  fun:IsPaletteImage
+  ...
+  fun:get_bands
+}
 
 # glib g_file_read_link
 # https://github.com/GNOME/glib/commit/49a5d0f6f2aed99cd78f25655f137f4448e47d92
