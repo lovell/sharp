@@ -32,7 +32,7 @@ using Nan::Get;
 using Nan::Set;
 using Nan::To;
 using Nan::New;
-using Nan::CopyBuffer;
+using Nan::NewBuffer;
 using Nan::Null;
 using Nan::Equals;
 
@@ -167,21 +167,15 @@ struct PipelineBaton {
     }
 };
 
-/*
-  Delete input char[] buffer and notify V8 of memory deallocation
-  Used as the callback function for the "postclose" signal
-*/
-static void DeleteBuffer(VipsObject *object, char *buffer) {
-  if (buffer != NULL) {
-    delete[] buffer;
-  }
-}
-
 class PipelineWorker : public AsyncWorker {
 
  public:
-  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener) :
-    AsyncWorker(callback), baton(baton), queueListener(queueListener) {}
+  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener, const Local<Object> &bufferIn) :
+    AsyncWorker(callback), baton(baton), queueListener(queueListener) {
+      if (baton->bufferInLength > 0) {
+        SaveToPersistent("bufferIn", bufferIn);
+      }
+    }
   ~PipelineWorker() {}
 
   /*
@@ -208,18 +202,13 @@ class PipelineWorker : public AsyncWorker {
       inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (inputImageType != ImageType::UNKNOWN) {
         image = InitImage(baton->bufferIn, baton->bufferInLength, baton->accessMethod);
-        if (image != NULL) {
-          // Listen for "postclose" signal to delete input buffer
-          g_signal_connect(image, "postclose", G_CALLBACK(DeleteBuffer), baton->bufferIn);
-        } else {
+        if (image == NULL) {
           // Could not read header data
           (baton->err).append("Input buffer has corrupt header");
           inputImageType = ImageType::UNKNOWN;
-          DeleteBuffer(NULL, baton->bufferIn);
         }
       } else {
         (baton->err).append("Input buffer contains unsupported image format");
-        DeleteBuffer(NULL, baton->bufferIn);
       }
     } else {
       // From file
@@ -969,10 +958,8 @@ class PipelineWorker : public AsyncWorker {
       Set(info, New("height").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(height)));
 
       if (baton->bufferOutLength > 0) {
-        // Copy data to new Buffer
-        argv[1] = CopyBuffer(static_cast<char*>(baton->bufferOut), baton->bufferOutLength).ToLocalChecked();
-        // bufferOut was allocated via g_malloc
-        g_free(baton->bufferOut);
+        // Pass ownership of output data to Buffer instance
+        argv[1] = NewBuffer(static_cast<char*>(baton->bufferOut), baton->bufferOutLength).ToLocalChecked();
         // Add buffer size to info
         Set(info, New("size").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(baton->bufferOutLength)));
         argv[2] = info;
@@ -984,8 +971,12 @@ class PipelineWorker : public AsyncWorker {
         argv[1] = info;
       }
     }
+
+    // Dispose of Persistent wrapper around input Buffer so it can be garbage collected
+    if (baton->bufferInLength > 0) {
+      GetFromPersistent("bufferIn");
+    }
     delete baton;
-    // to here
 
     // Decrement processing task counter
     g_atomic_int_dec_and_test(&counterProcess);
@@ -1132,12 +1123,11 @@ NAN_METHOD(pipeline) {
     To<bool>(Get(options, New("sequentialRead").ToLocalChecked()).ToLocalChecked()).FromJust() ?
     VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   // Input Buffer object
+  Local<Object> bufferIn;
   if (node::Buffer::HasInstance(Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked())) {
-    Local<Object> buffer = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
-    // Take a copy of the input Buffer to avoid problems with V8 heap compaction
-    baton->bufferInLength = node::Buffer::Length(buffer);
-    baton->bufferIn = new char[baton->bufferInLength];
-    memcpy(baton->bufferIn, node::Buffer::Data(buffer), baton->bufferInLength);
+    bufferIn = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
+    baton->bufferInLength = node::Buffer::Length(bufferIn);
+    baton->bufferIn = node::Buffer::Data(bufferIn);
   }
   // ICC profile to use when input CMYK image has no embedded profile
   baton->iccProfilePath = *Utf8String(Get(options, New("iccProfilePath").ToLocalChecked()).ToLocalChecked());
@@ -1212,11 +1202,10 @@ NAN_METHOD(pipeline) {
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener));
+  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);
   Local<Value> queueLength[1] = { New<Uint32>(counterQueue) };
   queueListener->Call(1, queueLength);
 }
-

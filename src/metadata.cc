@@ -64,20 +64,15 @@ struct MetadataBaton {
     iccLength(0) {}
 };
 
-/*
-  Delete input char[] buffer and notify V8 of memory deallocation
-  Used as the callback function for the "postclose" signal
-*/
-static void DeleteBuffer(VipsObject *object, char *buffer) {
-  if (buffer != NULL) {
-    delete[] buffer;
-  }
-}
-
 class MetadataWorker : public AsyncWorker {
 
  public:
-  MetadataWorker(Callback *callback, MetadataBaton *baton) : AsyncWorker(callback), baton(baton) {}
+  MetadataWorker(Callback *callback, MetadataBaton *baton, const Local<Object> &bufferIn) :
+    AsyncWorker(callback), baton(baton) {
+      if (baton->bufferInLength > 0) {
+        SaveToPersistent("bufferIn", bufferIn);
+      }
+    }
   ~MetadataWorker() {}
 
   void Execute() {
@@ -91,17 +86,12 @@ class MetadataWorker : public AsyncWorker {
       imageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (imageType != ImageType::UNKNOWN) {
         image = InitImage(baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
-        if (image != NULL) {
-          // Listen for "postclose" signal to delete input buffer
-          g_signal_connect(image, "postclose", G_CALLBACK(DeleteBuffer), baton->bufferIn);
-        } else {
+        if (image == NULL) {
           (baton->err).append("Input buffer has corrupt header");
           imageType = ImageType::UNKNOWN;
-          DeleteBuffer(NULL, baton->bufferIn);
         }
       } else {
         (baton->err).append("Input buffer contains unsupported image format");
-        DeleteBuffer(NULL, baton->bufferIn);
       }
     } else {
       // From file
@@ -192,6 +182,11 @@ class MetadataWorker : public AsyncWorker {
       }
       argv[1] = info;
     }
+
+    // Dispose of Persistent wrapper around input Buffer so it can be garbage collected
+    if (baton->bufferInLength > 0) {
+      GetFromPersistent("bufferIn");
+    }
     delete baton;
 
     // Return to JavaScript
@@ -215,17 +210,16 @@ NAN_METHOD(metadata) {
   // Input filename
   baton->fileIn = *Utf8String(Get(options, New("fileIn").ToLocalChecked()).ToLocalChecked());
   // Input Buffer object
+  Local<Object> bufferIn;
   if (node::Buffer::HasInstance(Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked())) {
-    Local<Object> buffer = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
-    // Take a copy of the input Buffer to avoid problems with V8 heap compaction
-    baton->bufferInLength = node::Buffer::Length(buffer);
-    baton->bufferIn = new char[baton->bufferInLength];
-    memcpy(baton->bufferIn, node::Buffer::Data(buffer), baton->bufferInLength);
+    bufferIn = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
+    baton->bufferInLength = node::Buffer::Length(bufferIn);
+    baton->bufferIn = node::Buffer::Data(bufferIn);
   }
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new MetadataWorker(callback, baton));
+  AsyncQueueWorker(new MetadataWorker(callback, baton, bufferIn));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);

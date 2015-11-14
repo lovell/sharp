@@ -278,11 +278,18 @@
   ...
   fun:vips__magick_read_header
 }
+{
+  cond_magick_is_palette_image
+  Memcheck:Cond
+  fun:IsPaletteImage
+  ...
+  fun:get_bands
+}
 
 # glib g_file_read_link
 # https://github.com/GNOME/glib/commit/49a5d0f6f2aed99cd78f25655f137f4448e47d92
 {
-  leak_magick
+  leak_g_file_read_link
   Memcheck:Leak
   match-leak-kinds: definite,indirect,possible
   ...

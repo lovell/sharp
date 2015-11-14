@@ -47,7 +47,13 @@ libvips must be installed before `npm install` is run.
 This can be achieved via homebrew:
 
 ```sh
-brew install homebrew/science/vips --with-webp --with-graphicsmagick
+brew install homebrew/science/vips
+```
+
+For GIF input and WebP output suppport use:
+
+```sh
+brew install homebrew/science/vips --with-graphicsmagick --with-webp
 ```
 
 A missing or incorrectly configured _Xcode Command Line Tools_ installation
