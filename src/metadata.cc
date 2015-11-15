@@ -81,13 +81,13 @@ class MetadataWorker : public AsyncWorker {
     g_atomic_int_dec_and_test(&counterQueue);
 
     ImageType imageType = ImageType::UNKNOWN;
-    VipsImage *image = NULL;
+    VipsImage *image = nullptr;
     if (baton->bufferInLength > 0) {
       // From buffer
       imageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (imageType != ImageType::UNKNOWN) {
         image = InitImage(baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
-        if (image == NULL) {
+        if (image == nullptr) {
           (baton->err).append("Input buffer has corrupt header");
           imageType = ImageType::UNKNOWN;
         }
@@ -96,10 +96,10 @@ class MetadataWorker : public AsyncWorker {
       }
     } else {
       // From file
-      imageType = DetermineImageType(baton->fileIn.c_str());
+      imageType = DetermineImageType(baton->fileIn.data());
       if (imageType != ImageType::UNKNOWN) {
-        image = InitImage(baton->fileIn.c_str(), VIPS_ACCESS_RANDOM);
-        if (image == NULL) {
+        image = InitImage(baton->fileIn.data(), VIPS_ACCESS_RANDOM);
+        if (image == nullptr) {
           (baton->err).append("Input file has corrupt header");
           imageType = ImageType::UNKNOWN;
         }
@@ -107,7 +107,7 @@ class MetadataWorker : public AsyncWorker {
         (baton->err).append("Input file is of an unsupported image format");
       }
     }
-    if (image != NULL && imageType != ImageType::UNKNOWN) {
+    if (image != nullptr && imageType != ImageType::UNKNOWN) {
       // Image type
       switch (imageType) {
         case ImageType::JPEG: baton->format = "jpeg"; break;
@@ -161,7 +161,7 @@ class MetadataWorker : public AsyncWorker {
     Local<Value> argv[2] = { Null(), Null() };
     if (!baton->err.empty()) {
       // Error
-      argv[0] = Error(baton->err.c_str());
+      argv[0] = Error(baton->err.data());
     } else {
       // Metadata Object
       Local<Object> info = New<Object>();

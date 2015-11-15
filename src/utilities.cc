@@ -168,11 +168,11 @@ NAN_METHOD(_maxColourDistance) {
   VipsObject *hook = reinterpret_cast<VipsObject*>(vips_image_new());
 
   // Open input files
-  VipsImage *image1 = NULL;
+  VipsImage *image1 = nullptr;
   ImageType imageType1 = DetermineImageType(*Utf8String(info[0]));
   if (imageType1 != ImageType::UNKNOWN) {
     image1 = InitImage(*Utf8String(info[0]), VIPS_ACCESS_SEQUENTIAL);
-    if (image1 == NULL) {
+    if (image1 == nullptr) {
       g_object_unref(hook);
       return ThrowError("Input file 1 has corrupt header");
     } else {
@@ -182,11 +182,11 @@ NAN_METHOD(_maxColourDistance) {
     g_object_unref(hook);
     return ThrowError("Input file 1 is of an unsupported image format");
   }
-  VipsImage *image2 = NULL;
+  VipsImage *image2 = nullptr;
   ImageType imageType2 = DetermineImageType(*Utf8String(info[1]));
   if (imageType2 != ImageType::UNKNOWN) {
     image2 = InitImage(*Utf8String(info[1]), VIPS_ACCESS_SEQUENTIAL);
-    if (image2 == NULL) {
+    if (image2 == nullptr) {
       g_object_unref(hook);
       return ThrowError("Input file 2 has corrupt header");
     } else {
@@ -211,13 +211,13 @@ NAN_METHOD(_maxColourDistance) {
   // Premultiply and remove alpha
   if (HasAlpha(image1)) {
     VipsImage *imagePremultiplied1;
-    if (vips_premultiply(image1, &imagePremultiplied1, NULL)) {
+    if (vips_premultiply(image1, &imagePremultiplied1, nullptr)) {
       g_object_unref(hook);
       return ThrowError(vips_error_buffer());
     }
     vips_object_local(hook, imagePremultiplied1);
     VipsImage *imagePremultipliedNoAlpha1;
-    if (vips_extract_band(image1, &imagePremultipliedNoAlpha1, 1, "n", image1->Bands - 1, NULL)) {
+    if (vips_extract_band(image1, &imagePremultipliedNoAlpha1, 1, "n", image1->Bands - 1, nullptr)) {
       g_object_unref(hook);
       return ThrowError(vips_error_buffer());
     }
@@ -226,13 +226,13 @@ NAN_METHOD(_maxColourDistance) {
   }
   if (HasAlpha(image2)) {
     VipsImage *imagePremultiplied2;
-    if (vips_premultiply(image2, &imagePremultiplied2, NULL)) {
+    if (vips_premultiply(image2, &imagePremultiplied2, nullptr)) {
       g_object_unref(hook);
       return ThrowError(vips_error_buffer());
     }
     vips_object_local(hook, imagePremultiplied2);
     VipsImage *imagePremultipliedNoAlpha2;
-    if (vips_extract_band(image2, &imagePremultipliedNoAlpha2, 1, "n", image2->Bands - 1, NULL)) {
+    if (vips_extract_band(image2, &imagePremultipliedNoAlpha2, 1, "n", image2->Bands - 1, nullptr)) {
       g_object_unref(hook);
       return ThrowError(vips_error_buffer());
     }
@@ -241,14 +241,14 @@ NAN_METHOD(_maxColourDistance) {
   }
   // Calculate colour distance
   VipsImage *difference;
-  if (vips_dE00(image1, image2, &difference, NULL)) {
+  if (vips_dE00(image1, image2, &difference, nullptr)) {
     g_object_unref(hook);
     return ThrowError(vips_error_buffer());
   }
   vips_object_local(hook, difference);
   // Extract maximum distance
   double maxColourDistance;
-  if (vips_max(difference, &maxColourDistance, NULL)) {
+  if (vips_max(difference, &maxColourDistance, nullptr)) {
     g_object_unref(hook);
     return ThrowError(vips_error_buffer());
   }

@@ -54,7 +54,7 @@ var Sharp = function(input) {
     flip: false,
     flop: false,
     withoutEnlargement: false,
-    interpolator: 'bilinear',
+    interpolator: 'bicubic',
     // operations
     background: [0, 0, 0, 255],
     flatten: false,

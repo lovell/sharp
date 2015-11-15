@@ -51,7 +51,7 @@ WORKDIR ${DEPS}/jpeg
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --with-jpeg8 --without-turbojpeg && make install-strip
 
 RUN mkdir ${DEPS}/png
-RUN curl -Ls http://kent.dl.sourceforge.net/project/libpng/libpng16/1.6.18/libpng-1.6.18.tar.xz | tar xJC ${DEPS}/png --strip-components=1
+RUN curl -Ls http://kent.dl.sourceforge.net/project/libpng/libpng16/1.6.19/libpng-1.6.19.tar.xz | tar xJC ${DEPS}/png --strip-components=1
 WORKDIR ${DEPS}/png
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
@@ -75,6 +75,11 @@ RUN mkdir ${DEPS}/magick
 RUN curl -Ls http://www.imagemagick.org/download/releases/ImageMagick-6.9.2-5.tar.xz | tar xJC ${DEPS}/magick --strip-components=1
 WORKDIR ${DEPS}/magick
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --without-magick-plus-plus && make install-strip
+
+RUN mkdir ${DEPS}/orc
+RUN curl -Ls http://gstreamer.freedesktop.org/data/src/orc/orc-0.4.24.tar.xz | tar xJC ${DEPS}/orc --strip-components=1
+WORKDIR ${DEPS}/orc
+RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
 RUN mkdir ${DEPS}/vips
 RUN curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.1/vips-8.1.1.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
