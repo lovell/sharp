@@ -530,9 +530,7 @@ class PipelineWorker : public AsyncWorker {
       double residual = (xresidual + yresidual) / 2.0;
       // Apply Gaussian blur before large affine reductions with non-linear interpolators
       if (residual < 1.0 && (
-        baton->interpolator == "bicubic" ||
-        baton->interpolator == "locallyBoundedBicubic" ||
-        baton->interpolator == "nohalo"
+        baton->interpolator == "bicubic" || baton->interpolator == "lbb" || baton->interpolator == "nohalo"
       )) {
         // Calculate standard deviation
         double sigma = ((1.0 / residual) - 0.4) / 3.0;
