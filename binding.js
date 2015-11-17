@@ -62,7 +62,7 @@ module.exports.download_vips = function() {
     var lddVersion = process.env.LDD_VERSION;
     if (lddVersion) {
       var libcVersion = lddVersion ? lddVersion.split(/\n/)[0].split(' ').slice(-1)[0].trim() : '';
-      if (libcVersion && semver.lt(libcVersion + '.0', '2.15.0')) {
+      if (libcVersion && semver.lt(libcVersion + '.0', '2.13.0')) {
         error('libc version ' + libcVersion + ' requires manual installation - please see http://sharp.dimens.io/en/stable/install/');
       }
     }
