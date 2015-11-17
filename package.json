@@ -17,7 +17,8 @@
     "Victor Mateevitsi <mvictoras@gmail.com>",
     "Alaric Holloway <alaric.holloway@gmail.com>",
     "Bernhard K. Weisshuhn <bkw@codingforce.com>",
-    "Chris Riley <criley@primedia.com>"
+    "Chris Riley <criley@primedia.com>",
+    "David Carley <dacarley@gmail.com>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {
