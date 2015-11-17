@@ -72,7 +72,7 @@ RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-de
 RUN rm ${TARGET}/lib/libtiffxx*
 
 RUN mkdir ${DEPS}/magick
-RUN curl -Ls http://www.imagemagick.org/download/releases/ImageMagick-6.9.2-5.tar.xz | tar xJC ${DEPS}/magick --strip-components=1
+RUN curl -Ls http://www.imagemagick.org/download/releases/ImageMagick-6.9.2-6.tar.xz | tar xJC ${DEPS}/magick --strip-components=1
 WORKDIR ${DEPS}/magick
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --without-magick-plus-plus && make install-strip
 
