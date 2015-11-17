@@ -58,6 +58,7 @@ var Sharp = function(input) {
     // operations
     background: [0, 0, 0, 255],
     flatten: false,
+    negate: false,
     blurSigma: 0,
     sharpenRadius: 0,
     sharpenFlat: 1,
@@ -224,6 +225,11 @@ Sharp.prototype.ignoreAspectRatio = function() {
 
 Sharp.prototype.flatten = function(flatten) {
   this.options.flatten = (typeof flatten === 'boolean') ? flatten : true;
+  return this;
+};
+
+Sharp.prototype.negate = function(negate) {
+  this.options.negate = (typeof negate === 'boolean') ? negate : true;
   return this;
 };
 

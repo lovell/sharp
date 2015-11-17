@@ -272,6 +272,10 @@ The default background is `{r: 0, g: 0, b: 0, a: 1}`, black without transparency
 
 Merge alpha transparency channel, if any, with `background`.
 
+#### negate()
+
+Produces the "negative" of the image.  White => Black, Black => White, Blue => Yellow, etc.
+
 #### rotate([angle])
 
 Rotate the output image by either an explicit angle or auto-orient based on the EXIF `Orientation` tag.
