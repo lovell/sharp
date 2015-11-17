@@ -100,6 +100,7 @@ struct PipelineBaton {
   std::string interpolator;
   double background[4];
   bool flatten;
+  bool negate;
   double blurSigma;
   int sharpenRadius;
   double sharpenFlat;
@@ -138,6 +139,7 @@ struct PipelineBaton {
     canvas(Canvas::CROP),
     gravity(0),
     flatten(false),
+    negate(false),
     blurSigma(0.0),
     sharpenRadius(0),
     sharpenFlat(1.0),
@@ -449,6 +451,16 @@ class PipelineWorker : public AsyncWorker {
       vips_area_unref(reinterpret_cast<VipsArea*>(background));
       vips_object_local(hook, flattened);
       image = flattened;
+    }
+
+    // Negate the colors in the image.
+    if (baton->negate) {
+        VipsImage *negated;
+        if (vips_invert(image, &negated, nullptr)) {
+            return Error();
+        }
+        vips_object_local(hook, negated);
+        image = negated;
     }
 
     // Gamma encoding (darken)
@@ -1212,6 +1224,7 @@ NAN_METHOD(pipeline) {
   baton->interpolator = *Utf8String(Get(options, New("interpolator").ToLocalChecked()).ToLocalChecked());
   // Operators
   baton->flatten = To<bool>(Get(options, New("flatten").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->negate = To<bool>(Get(options, New("negate").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->blurSigma = To<double>(Get(options, New("blurSigma").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->sharpenRadius = To<int32_t>(Get(options, New("sharpenRadius").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->sharpenFlat = To<double>(Get(options, New("sharpenFlat").ToLocalChecked()).ToLocalChecked()).FromJust();
