@@ -328,6 +328,12 @@ When a `radius` is provided, performs a slower, more accurate sharpen of the L c
 * `flat`, if present, is a Number representing the level of sharpening to apply to "flat" areas, defaulting to a value of 1.0.
 * `jagged`, if present, is a Number representing the level of sharpening to apply to "jagged" areas, defaulting to a value of 2.0.
 
+#### threshold([threshold])
+
+Converts all pixels in the image to greyscale white or black.  Any pixel greather-than-or-equal-to the threshold (0..255) will be white.  All others will be black.
+
+* `threshold`, if present, is a Number, representing the level above which pixels will be forced to white.
+
 #### gamma([gamma])
 
 Apply a gamma correction by reducing the encoding (darken) pre-resize at a factor of `1/gamma` then increasing the encoding (brighten) post-resize at a factor of `gamma`.

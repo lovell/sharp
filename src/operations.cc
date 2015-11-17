@@ -262,4 +262,23 @@ namespace sharp {
     *out = sharpened;
     return 0;
   }
+
+  int Threshold(VipsObject *context, VipsImage *image, VipsImage **out, int threshold) {
+      using sharp::IsGreyscale;
+
+      VipsImage *greyscale;
+      if (vips_colourspace(image, &greyscale, VIPS_INTERPRETATION_B_W, nullptr)) {
+        return -1;
+      }
+      vips_object_local(context, greyscale);
+      image = greyscale;
+
+      VipsImage *thresholded;
+      if (vips_moreeq_const1(image, &thresholded, threshold, nullptr)) {
+          return -1;
+      }
+      vips_object_local(context, thresholded);
+      *out = thresholded;
+      return 0;
+  }
 }  // namespace sharp
