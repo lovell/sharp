@@ -1,4 +1,4 @@
-FROM ubuntu:precise
+FROM debian:wheezy
 MAINTAINER Lovell Fuller <npm@lovell.info>
 
 RUN apt-get update && apt-get install -y build-essential autoconf libtool nasm gtk-doc-tools texinfo
