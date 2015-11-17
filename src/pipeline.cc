@@ -40,6 +40,7 @@ using sharp::Composite;
 using sharp::Normalize;
 using sharp::Blur;
 using sharp::Sharpen;
+using sharp::Threshold;
 
 using sharp::ImageType;
 using sharp::DetermineImageType;
@@ -104,6 +105,7 @@ struct PipelineBaton {
   int sharpenRadius;
   double sharpenFlat;
   double sharpenJagged;
+  int threshold;
   std::string overlayPath;
   double gamma;
   bool greyscale;
@@ -142,6 +144,7 @@ struct PipelineBaton {
     sharpenRadius(0),
     sharpenFlat(1.0),
     sharpenJagged(2.0),
+    threshold(0),
     gamma(0.0),
     greyscale(false),
     normalize(false),
@@ -502,6 +505,7 @@ class PipelineWorker : public AsyncWorker {
     bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
     bool shouldBlur = baton->blurSigma != 0.0;
     bool shouldSharpen = baton->sharpenRadius != 0;
+    bool shouldThreshold = baton->threshold != 0;
     bool hasOverlay = !baton->overlayPath.empty();
     bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
 
@@ -684,6 +688,15 @@ class PipelineWorker : public AsyncWorker {
       }
       vips_object_local(hook, extractedPost);
       image = extractedPost;
+    }
+
+    // Threshold - must happen before blurring, due to the utility of blurring after thresholding
+    if (shouldThreshold) {
+        VipsImage *thresholded;
+        if (Threshold(hook, image, &thresholded, baton->threshold)) {
+            return Error();
+        }
+        image = thresholded;
     }
 
     // Blur
@@ -1216,6 +1229,7 @@ NAN_METHOD(pipeline) {
   baton->sharpenRadius = To<int32_t>(Get(options, New("sharpenRadius").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->sharpenFlat = To<double>(Get(options, New("sharpenFlat").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->sharpenJagged = To<double>(Get(options, New("sharpenJagged").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->threshold = To<int32_t>(Get(options, New("threshold").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->gamma = To<int32_t>(Get(options, New("gamma").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->greyscale = To<bool>(Get(options, New("greyscale").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->normalize = To<bool>(Get(options, New("normalize").ToLocalChecked()).ToLocalChecked()).FromJust();
