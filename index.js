@@ -62,6 +62,7 @@ var Sharp = function(input) {
     sharpenRadius: 0,
     sharpenFlat: 1,
     sharpenJagged: 2,
+    threshold: 0,
     gamma: 0,
     greyscale: false,
     normalize: 0,
@@ -142,7 +143,18 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
 };
 
 // Crop this part of the resized image (Center/Centre, North, East, South, West)
-module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4, 'northeast': 5, 'southeast': 6, 'southwest': 7, 'northwest': 8};
+module.exports.gravity = {
+  'center': 0,
+  'centre': 0,
+  'north': 1,
+  'east': 2,
+  'south': 3,
+  'west': 4,
+  'northeast': 5,
+  'southeast': 6,
+  'southwest': 7,
+  'northwest': 8
+};
 
 Sharp.prototype.crop = function(gravity) {
   this.options.canvas = 'crop';
@@ -328,6 +340,19 @@ Sharp.prototype.sharpen = function(radius, flat, jagged) {
   return this;
 };
 
+Sharp.prototype.threshold = function(threshold) {
+  if (typeof threshold === 'undefined') {
+    this.options.threshold = 128;
+  } else if (typeof threshold === 'boolean') {
+    this.options.threshold = 128;
+  } else if (typeof threshold === 'number' && !Number.isNaN(threshold) && (threshold % 1 === 0) && threshold >= 0 && threshold <= 255) {
+    this.options.threshold = threshold;
+  } else {
+    throw new Error('Invalid threshold (0 to 255) ' + threshold);
+  }
+  return this;
+};
+
 /*
   Set the interpolator to use for the affine transformation
 */
@@ -478,7 +503,7 @@ Sharp.prototype.withMetadata = function(withMetadata) {
         typeof withMetadata.orientation === 'number' &&
         !Number.isNaN(withMetadata.orientation) &&
         withMetadata.orientation % 1 === 0 &&
-        withMetadata.orientation >=0 &&
+        withMetadata.orientation >= 0 &&
         withMetadata.orientation <= 7
       ) {
         this.options.withMetadataOrientation = withMetadata.orientation;
@@ -504,7 +529,7 @@ Sharp.prototype.tile = function(size, overlap) {
   }
   // Overlap of tiles, in pixels
   if (typeof overlap !== 'undefined' && overlap !== null) {
-    if (!Number.isNaN(overlap) && overlap % 1 === 0 && overlap >=0 && overlap <= 8192) {
+    if (!Number.isNaN(overlap) && overlap % 1 === 0 && overlap >= 0 && overlap <= 8192) {
       if (overlap > this.options.tileSize) {
         throw new Error('Tile overlap ' + overlap + ' cannot be larger than tile size ' + this.options.tileSize);
       }
