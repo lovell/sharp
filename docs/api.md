@@ -78,7 +78,7 @@ to share a single input Stream.
 ```javascript
 var pipeline = sharp().rotate();
 pipeline.clone().resize(800, 600).pipe(firstWritableStream);
-pipeline.clone().extract(20, 20, 100, 100).pipe(secondWritableStream);
+pipeline.clone().extract({ left: 20, top: 20, width: 100, height: 100 }).pipe(secondWritableStream);
 readableStream.pipe(pipeline);
 // firstWritableStream receives auto-rotated, resized readableStream
 // secondWritableStream receives auto-rotated, extracted region of readableStream
@@ -226,11 +226,11 @@ sharp(inputBuffer)
 
 ### Operations
 
-#### extract(top, left, width, height)
+#### extract({ left: left, top: top, width: width, height: height })
 
 Extract a region of the image. Can be used with or without a `resize` operation.
 
-`top` and `left` are the offset, in pixels, from the top-left corner.
+`left` and `top` are the offset, in pixels, from the top-left corner.
 
 `width` and `height` are the dimensions of the extracted image.
 
@@ -238,7 +238,7 @@ Use `extract` before `resize` for pre-resize extraction. Use `extract` after `re
 
 ```javascript
 sharp(input)
-  .extract(top, left, width, height)
+  .extract({ left: left, top: top, width: width, height: height })
   .toFile(output, function(err) {
     // Extract a region of the input image, saving in the same format.
   });
@@ -246,9 +246,9 @@ sharp(input)
 
 ```javascript
 sharp(input)
-  .extract(topOffsetPre, leftOffsetPre, widthPre, heightPre)
+  .extract({ left: leftOffsetPre, top: topOffsetPre, width: widthPre, height: heightPre })
   .resize(width, height)
-  .extract(topOffsetPost, leftOffsetPost, widthPost, heightPost)
+  .extract({ left: leftOffsetPost, top: topOffsetPost, width: widthPost, height: heightPost })
   .toFile(output, function(err) {
     // Extract a region, resize, then extract from the resized image
   });
