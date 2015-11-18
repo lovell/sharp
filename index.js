@@ -151,17 +151,25 @@ Sharp.prototype.crop = function(gravity) {
   return this;
 };
 
-Sharp.prototype.extract = function(topOffset, leftOffset, width, height) {
-  /*jslint unused: false */
+Sharp.prototype.extract = function(options) {
+  if (!options || typeof options !== 'object') {
+    // Legacy extract(top,left,width,height) syntax
+    options = {
+      left: arguments[1],
+      top: arguments[0],
+      width: arguments[2],
+      height: arguments[3]
+    };
+  }
   var suffix = this.options.width === -1 && this.options.height === -1 ? 'Pre' : 'Post';
-  var values = arguments;
-  ['topOffset', 'leftOffset', 'width', 'height'].forEach(function(name, index) {
-    if (typeof values[index] === 'number' && !Number.isNaN(values[index]) && (values[index] % 1 === 0) && values[index] >= 0) {
-      this.options[name + suffix] = values[index];
+  ['left', 'top', 'width', 'height'].forEach(function (name) {
+    var value = options[name];
+    if (typeof value === 'number' && !Number.isNaN(value) && value % 1 === 0 && value >= 0) {
+      this.options[name + (name === 'left' || name === 'top' ? 'Offset' : '') + suffix] = value;
     } else {
-      throw new Error('Non-integer value for ' + name + ' of ' + values[index]);
+      throw new Error('Non-integer value for ' + name + ' of ' + value);
     }
-  }.bind(this));
+  }, this);
   // Ensure existing rotation occurs before pre-resize extraction
   if (suffix === 'Pre' && this.options.angle !== 0) {
     this.options.rotateBeforePreExtract = true;
