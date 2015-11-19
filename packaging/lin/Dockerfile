@@ -12,7 +12,6 @@ ENV PATH ${PATH}:${TARGET}/bin
 
 ENV CPPFLAGS -I${TARGET}/include
 ENV LDFLAGS -L${TARGET}/lib
-ENV MAKEFLAGS -j2
 
 RUN mkdir ${DEPS}/zlib
 RUN curl -Ls http://zlib.net/zlib-1.2.8.tar.xz | tar xJC ${DEPS}/zlib --strip-components=1
@@ -89,16 +88,12 @@ RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-de
   --with-zip-includes=${TARGET}/include --with-zip-libraries=${TARGET}/lib \
   --with-jpeg-includes=${TARGET}/include --with-jpeg-libraries=${TARGET}/lib \
   && make install-strip
-# Remove the C++ bindings
-RUN rm ${TARGET}/lib/*.la
-RUN rm ${TARGET}/lib/libvipsCC*
-RUN rm ${TARGET}/lib/libvips-cpp.*
-RUN rm ${TARGET}/include/vips/vipsc++.h
-RUN rm ${TARGET}/include/vips/vipscpp.h
-RUN rm ${TARGET}/include/vips/V*.h
 
+# Remove the C++ bindings
+WORKDIR ${TARGET}/include
+RUN rm -rf vips/vipsc++.h vips/vipscpp.h vips/V*.h
 WORKDIR ${TARGET}/lib
-RUN rm -rf pkgconfig .libs
+RUN rm -rf pkgconfig .libs *.la libvipsCC* libvips-cpp.*
 
 WORKDIR ${TARGET}
 RUN GZIP=-9 tar czf /libvips-8.1.1-lin.tar.gz include lib

@@ -7,4 +7,5 @@ test/leak/libvips.supp
 lib
 include
 packaging/libvips*
+packaging/*.log
 .DS_Store
