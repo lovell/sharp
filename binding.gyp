@@ -100,6 +100,7 @@
               '<(module_root_dir)/lib/liblcms2.so',
               '<(module_root_dir)/lib/libpng16.so',
               '<(module_root_dir)/lib/libxml2.so',
+              '<(module_root_dir)/lib/liborc-0.4.so',
               # Ensure runtime linking is relative to sharp.node
               '-Wl,-rpath=\'$${ORIGIN}/../../lib\''
             ]

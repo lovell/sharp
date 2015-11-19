@@ -18,7 +18,7 @@ This involves an automated HTTPS download of approximately 6MB.
 
 Most recent 64-bit Linux-based operating systems should "just work", e.g.:
 
-* Debian 8
+* Debian 7, 8
 * Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
 * Centos 7
 * Fedora 20, 21
@@ -53,7 +53,7 @@ brew install homebrew/science/vips
 For GIF input and WebP output suppport use:
 
 ```sh
-brew install homebrew/science/vips --with-graphicsmagick --with-webp
+brew install homebrew/science/vips --with-imagemagick --with-webp
 ```
 
 A missing or incorrectly configured _Xcode Command Line Tools_ installation

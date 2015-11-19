@@ -22,8 +22,8 @@
   ],
   "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {
-    "clean": "rm -rf build/ include/ lib/ coverage/ test/fixtures/output.*",
-    "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=20000 ./test/unit/*.js",
+    "clean": "rm -rf node_modules/ build/ include/ lib/ coverage/ test/fixtures/output.*",
+    "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=30000 ./test/unit/*.js",
     "test-win": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
     "test-packaging": "./packaging/test.sh",
@@ -50,8 +50,8 @@
     "bluebird": "^3.0.5",
     "color": "^0.10.1",
     "nan": "^2.1.0",
-    "semver": "^5.0.3",
-    "request": "^2.65.0",
+    "semver": "^5.1.0",
+    "request": "^2.67.0",
     "tar": "^2.2.1"
   },
   "devDependencies": {
@@ -60,7 +60,7 @@
     "exif-reader": "1.0.0",
     "icc": "^0.0.2",
     "istanbul": "^0.4.0",
-    "mocha": "^2.3.3",
+    "mocha": "^2.3.4",
     "mocha-jshint": "^2.2.5",
     "node-cpplint": "^0.4.0",
     "rimraf": "^2.4.3",
