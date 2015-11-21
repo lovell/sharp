@@ -638,16 +638,17 @@ describe('Input/output', function() {
       sharp(fixtures.inputSvg)
         .resize(100, 100)
         .toFormat('png')
-        .toFile(fixtures.path('output.svg.png'), function(err, info) {
+        .toBuffer(function(err, data, info) {
           if (err) {
             assert.strictEqual(0, err.message.indexOf('Input file is of an unsupported image format'));
+            done();
           } else {
             assert.strictEqual(true, info.size > 0);
             assert.strictEqual('png', info.format);
             assert.strictEqual(100, info.width);
             assert.strictEqual(100, info.height);
+            fixtures.assertSimilar(fixtures.expected('svg.png'), data, done);
           }
-          done();
         });
     });
   }

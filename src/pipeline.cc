@@ -437,17 +437,22 @@ class PipelineWorker : public AsyncWorker {
       image = transformed;
     }
 
+    // Calculate maximum alpha value based on input image pixel depth
+    double maxAlpha = (image->BandFmt == VIPS_FORMAT_USHORT) ? 65535.0 : 255.0;
+
     // Flatten image to remove alpha channel
     if (baton->flatten && HasAlpha(image)) {
+      // Scale up 8-bit values to match 16-bit input image
+      double multiplier = (image->Type == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
       // Background colour
       VipsArrayDouble *background = vips_array_double_newv(
         3, // Ignore alpha channel as we're about to remove it
-        baton->background[0],
-        baton->background[1],
-        baton->background[2]
+        baton->background[0] * multiplier,
+        baton->background[1] * multiplier,
+        baton->background[2] * multiplier
       );
       VipsImage *flattened;
-      if (vips_flatten(image, &flattened, "background", background, nullptr)) {
+      if (vips_flatten(image, &flattened, "background", background, "max_alpha", maxAlpha, nullptr)) {
         vips_area_unref(reinterpret_cast<VipsArea*>(background));
         return Error();
       }
@@ -526,7 +531,7 @@ class PipelineWorker : public AsyncWorker {
     // See: http://entropymine.com/imageworsener/resizealpha/
     if (shouldPremultiplyAlpha) {
       VipsImage *imagePremultiplied;
-      if (vips_premultiply(image, &imagePremultiplied, nullptr)) {
+      if (vips_premultiply(image, &imagePremultiplied, "max_alpha", maxAlpha, nullptr)) {
         (baton->err).append("Failed to premultiply alpha channel.");
         return Error();
       }
@@ -792,7 +797,7 @@ class PipelineWorker : public AsyncWorker {
     // Reverse premultiplication after all transformations:
     if (shouldPremultiplyAlpha) {
       VipsImage *imageUnpremultiplied;
-      if (vips_unpremultiply(image, &imageUnpremultiplied, nullptr)) {
+      if (vips_unpremultiply(image, &imageUnpremultiplied, "max_alpha", maxAlpha, nullptr)) {
         (baton->err).append("Failed to unpremultiply alpha channel");
         return Error();
       }
@@ -820,7 +825,24 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Convert image to sRGB, if not already
-    if (image->Type != VIPS_INTERPRETATION_sRGB) {
+    if (image->Type == VIPS_INTERPRETATION_RGB16) {
+      // Ensure 16-bit integer
+      VipsImage *ushort;
+      if (vips_cast_ushort(image, &ushort, nullptr)) {
+        return Error();
+      }
+      vips_object_local(hook, ushort);
+      image = ushort;
+      // Fast conversion to 8-bit integer by discarding least-significant byte
+      VipsImage *msb;
+      if (vips_msb(image, &msb, nullptr)) {
+        return Error();
+      }
+      vips_object_local(hook, msb);
+      image = msb;
+      // Explicitly set to sRGB
+      image->Type = VIPS_INTERPRETATION_sRGB;
+    } else if (image->Type != VIPS_INTERPRETATION_sRGB) {
       // Switch interpretation to sRGB
       VipsImage *rgb;
       if (vips_colourspace(image, &rgb, VIPS_INTERPRETATION_sRGB, nullptr)) {

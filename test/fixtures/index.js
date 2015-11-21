@@ -71,6 +71,7 @@ module.exports = {
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),
   inputPngWithOneColor: getPath('2x2_fdcce6.png'),
+  inputPngWithTransparency16bit: getPath('tbgn2c16.png'), // http://www.schaik.com/pngsuite/tbgn2c16.png
   inputPngOverlayLayer0: getPath('alpha-layer-0-background.png'),
   inputPngOverlayLayer1: getPath('alpha-layer-1-fill.png'),
   inputPngOverlayLayer2: getPath('alpha-layer-2-ink.png'),

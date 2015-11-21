@@ -46,6 +46,19 @@ describe('Alpha transparency', function() {
       });
   });
 
+  it('Flatten 16-bit PNG with transparency to orange', function(done) {
+    sharp(fixtures.inputPngWithTransparency16bit)
+      .flatten()
+      .background({r: 255, g: 102, b: 0})
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, info.size > 0);
+        assert.strictEqual(32, info.width);
+        assert.strictEqual(32, info.height);
+        fixtures.assertSimilar(fixtures.expected('flatten-rgb16-orange.jpg'), data, done);
+      });
+  });
+
   it('Do not flatten', function(done) {
     sharp(fixtures.inputPngWithTransparency)
       .flatten(false)
