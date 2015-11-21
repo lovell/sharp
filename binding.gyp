@@ -179,7 +179,6 @@
             '<(module_root_dir)/lib/libquadmath-0.dll',
             '<(module_root_dir)/lib/libsqlite3-0.dll',
             '<(module_root_dir)/lib/libssp-0.dll',
-            '<(module_root_dir)/lib/libstdc++-6.dll',
             '<(module_root_dir)/lib/libtiff-5.dll',
             '<(module_root_dir)/lib/libvips-42.dll',
             '<(module_root_dir)/lib/libxml2-2.dll',

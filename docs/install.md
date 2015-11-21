@@ -71,7 +71,7 @@ If so, please try `brew link gettext --force`.
 [![Windows x64 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules\sharp` during `npm install`.
-This involves an automated HTTPS download of approximately 11MB.
+This involves an automated HTTPS download of approximately 9MB.
 
 Only 64-bit (x64) `node.exe` is supported.
 The WebP format is currently unavailable on Windows.

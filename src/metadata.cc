@@ -133,7 +133,7 @@ class MetadataWorker : public AsyncWorker {
         size_t exifLength;
         if (!vips_image_get_blob(image, VIPS_META_EXIF_NAME, &exif, &exifLength)) {
           baton->exifLength = exifLength;
-          baton->exif = static_cast<char*>(malloc(exifLength));
+          baton->exif = static_cast<char*>(g_malloc(exifLength));
           memcpy(baton->exif, exif, exifLength);
         }
       }
@@ -143,7 +143,7 @@ class MetadataWorker : public AsyncWorker {
         size_t iccLength;
         if (!vips_image_get_blob(image, VIPS_META_ICC_NAME, &icc, &iccLength)) {
           baton->iccLength = iccLength;
-          baton->icc = static_cast<char*>(malloc(iccLength));
+          baton->icc = static_cast<char*>(g_malloc(iccLength));
           memcpy(baton->icc, icc, iccLength);
         }
       }
