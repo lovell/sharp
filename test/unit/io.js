@@ -3,8 +3,6 @@
 var fs = require('fs');
 var assert = require('assert');
 
-var semver = require('semver');
-
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
@@ -483,37 +481,34 @@ describe('Input/output', function() {
       done();
     });
 
-    if (semver.gte(sharp.libvipsVersion(), '7.42.0')) {
-      it('withoutAdaptiveFiltering generates smaller file [libvips ' + sharp.libvipsVersion() + '>=7.42.0]', function(done) {
-        // First generate with adaptive filtering
-        sharp(fixtures.inputPng)
-          .resize(320, 240)
-          .withoutAdaptiveFiltering(false)
-          .toBuffer(function(err, adaptiveData, adaptiveInfo) {
-            if (err) throw err;
-            assert.strictEqual(true, adaptiveData.length > 0);
-            assert.strictEqual(adaptiveData.length, adaptiveInfo.size);
-            assert.strictEqual('png', adaptiveInfo.format);
-            assert.strictEqual(320, adaptiveInfo.width);
-            assert.strictEqual(240, adaptiveInfo.height);
-            // Then generate without
-            sharp(fixtures.inputPng)
-              .resize(320, 240)
-              .withoutAdaptiveFiltering()
-              .toBuffer(function(err, withoutAdaptiveData, withoutAdaptiveInfo) {
-                if (err) throw err;
-                assert.strictEqual(true, withoutAdaptiveData.length > 0);
-                assert.strictEqual(withoutAdaptiveData.length, withoutAdaptiveInfo.size);
-                assert.strictEqual('png', withoutAdaptiveInfo.format);
-                assert.strictEqual(320, withoutAdaptiveInfo.width);
-                assert.strictEqual(240, withoutAdaptiveInfo.height);
-                assert.strictEqual(true, withoutAdaptiveData.length < adaptiveData.length);
-                done();
-              });
-          });
-      });
-    }
-
+    it('withoutAdaptiveFiltering generates smaller file', function(done) {
+      // First generate with adaptive filtering
+      sharp(fixtures.inputPng)
+        .resize(320, 240)
+        .withoutAdaptiveFiltering(false)
+        .toBuffer(function(err, adaptiveData, adaptiveInfo) {
+          if (err) throw err;
+          assert.strictEqual(true, adaptiveData.length > 0);
+          assert.strictEqual(adaptiveData.length, adaptiveInfo.size);
+          assert.strictEqual('png', adaptiveInfo.format);
+          assert.strictEqual(320, adaptiveInfo.width);
+          assert.strictEqual(240, adaptiveInfo.height);
+          // Then generate without
+          sharp(fixtures.inputPng)
+            .resize(320, 240)
+            .withoutAdaptiveFiltering()
+            .toBuffer(function(err, withoutAdaptiveData, withoutAdaptiveInfo) {
+              if (err) throw err;
+              assert.strictEqual(true, withoutAdaptiveData.length > 0);
+              assert.strictEqual(withoutAdaptiveData.length, withoutAdaptiveInfo.size);
+              assert.strictEqual('png', withoutAdaptiveInfo.format);
+              assert.strictEqual(320, withoutAdaptiveInfo.width);
+              assert.strictEqual(240, withoutAdaptiveInfo.height);
+              assert.strictEqual(true, withoutAdaptiveData.length < adaptiveData.length);
+              done();
+            });
+        });
+    });
   });
 
   it('Without chroma subsampling generates larger file', function(done) {
@@ -545,93 +540,93 @@ describe('Input/output', function() {
       });
   });
 
-  if (semver.gte(sharp.libvipsVersion(), '8.0.0')) {
-    it('Trellis quantisation [libvips ' + sharp.libvipsVersion() + '>=8.0.0]', function(done) {
-      // First generate without
-      sharp(fixtures.inputJpg)
-        .resize(320, 240)
-        .trellisQuantisation(false)
-        .toBuffer(function(err, withoutData, withoutInfo) {
-          if (err) throw err;
-          assert.strictEqual(true, withoutData.length > 0);
-          assert.strictEqual(withoutData.length, withoutInfo.size);
-          assert.strictEqual('jpeg', withoutInfo.format);
-          assert.strictEqual(320, withoutInfo.width);
-          assert.strictEqual(240, withoutInfo.height);
-          // Then generate with
-          sharp(fixtures.inputJpg)
-            .resize(320, 240)
-            .trellisQuantization()
-            .toBuffer(function(err, withData, withInfo) {
-              if (err) throw err;
-              assert.strictEqual(true, withData.length > 0);
-              assert.strictEqual(withData.length, withInfo.size);
-              assert.strictEqual('jpeg', withInfo.format);
-              assert.strictEqual(320, withInfo.width);
-              assert.strictEqual(240, withInfo.height);
-              // Verify image is same (as mozjpeg may not be present) size or less
-              assert.strictEqual(true, withData.length <= withoutData.length);
-              done();
-            });
-        });
-    });
-    it('Overshoot deringing [libvips ' + sharp.libvipsVersion() + '>=8.0.0]', function(done) {
-      // First generate without
-      sharp(fixtures.inputJpg)
-        .resize(320, 240)
-        .overshootDeringing(false)
-        .toBuffer(function(err, withoutData, withoutInfo) {
-          if (err) throw err;
-          assert.strictEqual(true, withoutData.length > 0);
-          assert.strictEqual(withoutData.length, withoutInfo.size);
-          assert.strictEqual('jpeg', withoutInfo.format);
-          assert.strictEqual(320, withoutInfo.width);
-          assert.strictEqual(240, withoutInfo.height);
-          // Then generate with
-          sharp(fixtures.inputJpg)
-            .resize(320, 240)
-            .overshootDeringing()
-            .toBuffer(function(err, withData, withInfo) {
-              if (err) throw err;
-              assert.strictEqual(true, withData.length > 0);
-              assert.strictEqual(withData.length, withInfo.size);
-              assert.strictEqual('jpeg', withInfo.format);
-              assert.strictEqual(320, withInfo.width);
-              assert.strictEqual(240, withInfo.height);
-              done();
-            });
-        });
-    });
-    it('Optimise scans [libvips ' + sharp.libvipsVersion() + '>=8.0.0]', function(done) {
-      // First generate without
-      sharp(fixtures.inputJpg)
-        .resize(320, 240)
-        .optimiseScans(false)
-        .toBuffer(function(err, withoutData, withoutInfo) {
-          if (err) throw err;
-          assert.strictEqual(true, withoutData.length > 0);
-          assert.strictEqual(withoutData.length, withoutInfo.size);
-          assert.strictEqual('jpeg', withoutInfo.format);
-          assert.strictEqual(320, withoutInfo.width);
-          assert.strictEqual(240, withoutInfo.height);
-          // Then generate with
-          sharp(fixtures.inputJpg)
-            .resize(320, 240)
-            .optimizeScans()
-            .toBuffer(function(err, withData, withInfo) {
-              if (err) throw err;
-              assert.strictEqual(true, withData.length > 0);
-              assert.strictEqual(withData.length, withInfo.size);
-              assert.strictEqual('jpeg', withInfo.format);
-              assert.strictEqual(320, withInfo.width);
-              assert.strictEqual(240, withInfo.height);
-              // Verify image is of a different size (progressive output even without mozjpeg)
-              assert.strictEqual(true, withData.length != withoutData.length);
-              done();
-            });
-        });
-    });
-  }
+  it('Trellis quantisation', function(done) {
+    // First generate without
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .trellisQuantisation(false)
+      .toBuffer(function(err, withoutData, withoutInfo) {
+        if (err) throw err;
+        assert.strictEqual(true, withoutData.length > 0);
+        assert.strictEqual(withoutData.length, withoutInfo.size);
+        assert.strictEqual('jpeg', withoutInfo.format);
+        assert.strictEqual(320, withoutInfo.width);
+        assert.strictEqual(240, withoutInfo.height);
+        // Then generate with
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .trellisQuantization()
+          .toBuffer(function(err, withData, withInfo) {
+            if (err) throw err;
+            assert.strictEqual(true, withData.length > 0);
+            assert.strictEqual(withData.length, withInfo.size);
+            assert.strictEqual('jpeg', withInfo.format);
+            assert.strictEqual(320, withInfo.width);
+            assert.strictEqual(240, withInfo.height);
+            // Verify image is same (as mozjpeg may not be present) size or less
+            assert.strictEqual(true, withData.length <= withoutData.length);
+            done();
+          });
+      });
+  });
+
+  it('Overshoot deringing', function(done) {
+    // First generate without
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .overshootDeringing(false)
+      .toBuffer(function(err, withoutData, withoutInfo) {
+        if (err) throw err;
+        assert.strictEqual(true, withoutData.length > 0);
+        assert.strictEqual(withoutData.length, withoutInfo.size);
+        assert.strictEqual('jpeg', withoutInfo.format);
+        assert.strictEqual(320, withoutInfo.width);
+        assert.strictEqual(240, withoutInfo.height);
+        // Then generate with
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .overshootDeringing()
+          .toBuffer(function(err, withData, withInfo) {
+            if (err) throw err;
+            assert.strictEqual(true, withData.length > 0);
+            assert.strictEqual(withData.length, withInfo.size);
+            assert.strictEqual('jpeg', withInfo.format);
+            assert.strictEqual(320, withInfo.width);
+            assert.strictEqual(240, withInfo.height);
+            done();
+          });
+      });
+  });
+
+  it('Optimise scans', function(done) {
+    // First generate without
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .optimiseScans(false)
+      .toBuffer(function(err, withoutData, withoutInfo) {
+        if (err) throw err;
+        assert.strictEqual(true, withoutData.length > 0);
+        assert.strictEqual(withoutData.length, withoutInfo.size);
+        assert.strictEqual('jpeg', withoutInfo.format);
+        assert.strictEqual(320, withoutInfo.width);
+        assert.strictEqual(240, withoutInfo.height);
+        // Then generate with
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .optimizeScans()
+          .toBuffer(function(err, withData, withInfo) {
+            if (err) throw err;
+            assert.strictEqual(true, withData.length > 0);
+            assert.strictEqual(withData.length, withInfo.size);
+            assert.strictEqual('jpeg', withInfo.format);
+            assert.strictEqual(320, withInfo.width);
+            assert.strictEqual(240, withInfo.height);
+            // Verify image is of a different size (progressive output even without mozjpeg)
+            assert.strictEqual(true, withData.length != withoutData.length);
+            done();
+          });
+      });
+  });
 
   if (sharp.format.magick.input.file) {
     it('Convert SVG, if supported, to PNG', function(done) {

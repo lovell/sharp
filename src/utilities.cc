@@ -7,11 +7,12 @@
 #include "operations.h"
 #include "utilities.h"
 
-using v8::Local;
-using v8::Object;
-using v8::Number;
-using v8::String;
 using v8::Boolean;
+using v8::Integer;
+using v8::Local;
+using v8::Number;
+using v8::Object;
+using v8::String;
 
 using Nan::HandleScope;
 using Nan::New;
@@ -38,10 +39,16 @@ NAN_METHOD(cache) {
 
   // Get cache statistics
   Local<Object> cache = New<Object>();
-  Set(cache, New("current").ToLocalChecked(), New<Number>(vips_tracked_get_mem() / 1048576));
-  Set(cache, New("high").ToLocalChecked(), New<Number>(vips_tracked_get_mem_highwater() / 1048576));
-  Set(cache, New("memory").ToLocalChecked(), New<Number>(vips_cache_get_max_mem() / 1048576));
-  Set(cache, New("items").ToLocalChecked(), New<Number>(vips_cache_get_max()));
+  Set(cache, New("current").ToLocalChecked(),
+    New<Integer>(static_cast<int>(round(vips_tracked_get_mem() / 1048576)))
+  );
+  Set(cache, New("high").ToLocalChecked(),
+    New<Integer>(static_cast<int>(round(vips_tracked_get_mem_highwater() / 1048576)))
+  );
+  Set(cache, New("memory").ToLocalChecked(),
+    New<Integer>(static_cast<int>(round(vips_cache_get_max_mem() / 1048576)))
+  );
+  Set(cache, New("items").ToLocalChecked(), New<Integer>(vips_cache_get_max()));
   info.GetReturnValue().Set(cache);
 }
 
@@ -56,7 +63,7 @@ NAN_METHOD(concurrency) {
     vips_concurrency_set(To<int32_t>(info[0]).FromJust());
   }
   // Get concurrency
-  info.GetReturnValue().Set(New<Number>(vips_concurrency_get()));
+  info.GetReturnValue().Set(New<Integer>(vips_concurrency_get()));
 }
 
 /*
@@ -68,8 +75,8 @@ NAN_METHOD(counters) {
 
   HandleScope();
   Local<Object> counters = New<Object>();
-  Set(counters, New("queue").ToLocalChecked(), New<Number>(counterQueue));
-  Set(counters, New("process").ToLocalChecked(), New<Number>(counterProcess));
+  Set(counters, New("queue").ToLocalChecked(), New<Integer>(counterQueue));
+  Set(counters, New("process").ToLocalChecked(), New<Integer>(counterProcess));
   info.GetReturnValue().Set(counters);
 }
 

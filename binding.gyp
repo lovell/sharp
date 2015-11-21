@@ -165,7 +165,6 @@
             '<(module_root_dir)/lib/libgmodule-2.0-0.dll',
             '<(module_root_dir)/lib/libgobject-2.0-0.dll',
             '<(module_root_dir)/lib/libgsf-1-114.dll',
-            '<(module_root_dir)/lib/libgsf-win32-1-114.dll',
             '<(module_root_dir)/lib/libgthread-2.0-0.dll',
             '<(module_root_dir)/lib/libintl-8.dll',
             '<(module_root_dir)/lib/libjpeg-62.dll',

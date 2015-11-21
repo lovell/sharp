@@ -11,6 +11,6 @@ RUN unzip vips-dev-w64-8.1.1-2.zip
 
 # Clean and zip
 WORKDIR /vips/vips-dev-8.1.1
-RUN rm bin/libvipsCC-42.dll bin/libvips-cpp-42.dll
+RUN rm bin/libvipsCC-42.dll bin/libvips-cpp-42.dll bin/libgsf-win32-1-114.dll
 RUN cp bin/*.dll lib/
 RUN GZIP=-9 tar czf /libvips-8.1.1-win.tar.gz include lib/glib-2.0 lib/libvips.lib lib/libglib-2.0.lib lib/libgobject-2.0.lib lib/*.dll
