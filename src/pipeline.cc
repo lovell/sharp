@@ -549,10 +549,8 @@ class PipelineWorker : public AsyncWorker {
       vips_object_local(hook, interpolator);
       // Use average of x and y residuals to compute sigma for Gaussian blur
       double residual = (xresidual + yresidual) / 2.0;
-      // Apply Gaussian blur before large affine reductions with non-linear interpolators
-      if (residual < 1.0 && (
-        baton->interpolator == "bicubic" || baton->interpolator == "lbb" || baton->interpolator == "nohalo"
-      )) {
+      // Apply Gaussian blur before large affine reductions
+      if (residual < 1.0) {
         // Calculate standard deviation
         double sigma = ((1.0 / residual) - 0.4) / 3.0;
         if (sigma >= 0.3) {

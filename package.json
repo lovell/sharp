@@ -63,7 +63,7 @@
     "mocha": "^2.3.4",
     "mocha-jshint": "^2.2.5",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.4.3",
+    "rimraf": "^2.4.4",
     "bufferutil": "^1.2.1"
   },
   "license": "Apache-2.0",
