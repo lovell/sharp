@@ -6,8 +6,8 @@ RUN apt-get update && apt-get install -y curl zip
 # Fetch and unzip
 RUN mkdir /vips
 WORKDIR /vips
-RUN curl -O http://www.vips.ecs.soton.ac.uk/supported/8.1/win32/vips-dev-w64-8.1.1-2.zip
-RUN unzip vips-dev-w64-8.1.1-2.zip
+RUN curl -O http://www.vips.ecs.soton.ac.uk/supported/8.1/win32/vips-dev-w64-8.1.1-3.zip
+RUN unzip vips-dev-w64-8.1.1-3.zip
 
 # Clean and zip
 WORKDIR /vips/vips-dev-8.1.1

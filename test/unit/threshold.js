@@ -44,6 +44,18 @@ describe('Threshold', function() {
       });
   });
 
+   it('threshold true (=128)', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .threshold(true)
+      .toBuffer(function(err, data, info) {
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data, done);
+      });
+  });
+
   it('threshold default jpeg', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)

@@ -569,6 +569,29 @@ sharp.queue.on('change', function(queueLength) {
 });
 ```
 
+#### versions
+
+An Object containing the version numbers of libvips and, on Linux, its dependencies.
+
+```javascript
+> console.log(sharp.versions);
+
+{ zlib: '1.2.8',
+  ffi: '3.2.1',
+  glib: '2.46.2',
+  xml: '2.9.2',
+  gsf: '1.14.34',
+  exif: '0.6.21',
+  jpeg: '1.4.2',
+  png: '1.6.19',
+  lcms: '2.7',
+  webp: '0.4.4',
+  tiff: '4.0.6',
+  magick: '6.9.2-6',
+  orc: '0.4.24',
+  vips: '8.1.1' }
+```
+
 ### Utilities
 
 #### sharp.cache([memory], [items])

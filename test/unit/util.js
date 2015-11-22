@@ -72,4 +72,11 @@ describe('Utilities', function() {
     });
   });
 
+  describe('Versions', function() {
+    it('Contains expected attributes', function() {
+      assert.strictEqual('object', typeof sharp.versions);
+      assert.strictEqual('string', typeof sharp.versions.vips);
+    });
+  });
+
 });

@@ -10,19 +10,31 @@ var color = require('color');
 var BluebirdPromise = require('bluebird');
 
 var sharp = require('./build/Release/sharp');
-var libvipsVersion = sharp.libvipsVersion();
-var libvipsVersionMin = require('./package.json').config.libvips;
 
-if (semver.lt(libvipsVersion, libvipsVersionMin)) {
-  throw new Error('Found libvips ' + libvipsVersion + ' but require at least ' + libvipsVersionMin);
-}
+// Versioning
+var versions = {
+  vips: sharp.libvipsVersion()
+};
+(function() {
+  // Does libvips meet minimum requirement?
+  var libvipsVersionMin = require('./package.json').config.libvips;
+  if (semver.lt(versions.vips, libvipsVersionMin)) {
+    throw new Error('Found libvips ' + versions.vips + ' but require at least ' + libvipsVersionMin);
+  }
+  // Include versions of dependencies, if present
+  try {
+    versions = require('./lib/versions.json');
+  } catch (err) {}
+})();
 
+// Limits
 var maximum = {
   width: 0x3FFF,
   height: 0x3FFF,
   pixels: Math.pow(0x3FFF, 2)
 };
 
+// Constructor-factory
 var Sharp = function(input) {
   if (!(this instanceof Sharp)) {
     return new Sharp(input);
@@ -115,6 +127,11 @@ module.exports.queue = new events.EventEmitter();
   Supported image formats
 */
 module.exports.format = sharp.format();
+
+/*
+  Version numbers of libvips and its dependencies
+*/
+module.exports.versions = versions;
 
 /*
   Handle incoming chunk on Writable Stream
@@ -652,12 +669,7 @@ Sharp.prototype.webp = function() {
   Force raw, uint8 output
 */
 Sharp.prototype.raw = function() {
-  var supportsRawOutput = module.exports.format.raw.output;
-  if (supportsRawOutput.file || supportsRawOutput.buffer || supportsRawOutput.stream) {
-    this.options.output = '__raw';
-  } else {
-    console.error('Raw output requires libvips 7.42.0+');
-  }
+  this.options.output = '__raw';
   return this;
 };
 
@@ -850,11 +862,4 @@ module.exports.concurrency = function(concurrency) {
 */
 module.exports.counters = function() {
   return sharp.counters();
-};
-
-/*
-  Get the version of the libvips library
-*/
-module.exports.libvipsVersion = function() {
-  return libvipsVersion;
 };
