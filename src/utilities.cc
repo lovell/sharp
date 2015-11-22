@@ -1,3 +1,4 @@
+#include <cmath>
 #include <node.h>
 #include <vips/vips.h>
 
