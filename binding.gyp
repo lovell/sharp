@@ -175,7 +175,7 @@
             '<(module_root_dir)/lib/libpangocairo-1.0-0.dll',
             '<(module_root_dir)/lib/libpangowin32-1.0-0.dll',
             '<(module_root_dir)/lib/libpixman-1-0.dll',
-            '<(module_root_dir)/lib/libpng14-14.dll',
+            '<(module_root_dir)/lib/libpng16-16.dll',
             '<(module_root_dir)/lib/libquadmath-0.dll',
             '<(module_root_dir)/lib/libsqlite3-0.dll',
             '<(module_root_dir)/lib/libssp-0.dll',
