@@ -12,6 +12,7 @@ npm install sharp
 ### Linux
 
 [![Ubuntu 14.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
+[![Linux Build Status](https://circleci.com/gh/lovell/sharp.svg?style=svg&circle-token=6cb6d1d287a51af83722b19ed8885377fbc85e5c)](https://circleci.com/gh/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules/sharp` during `npm install`.
 This involves an automated HTTPS download of approximately 6MB.

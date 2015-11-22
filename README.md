@@ -7,6 +7,12 @@ smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 Resizing an image is typically 4x faster than using the
 quickest ImageMagick and GraphicsMagick settings.
 
+Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
+Bicubic interpolation with Lanczos anti-alias filtering ensures quality is not sacrificed for speed.
+
+As well as image resizing, operations such as
+rotation, extraction, compositing and gamma correction are available.
+
 64-bit Windows and recent Linux systems do not require
 the installation of any external runtime dependencies.
 
@@ -17,9 +23,11 @@ to install the libvips dependency.
 
 ### Documentation
 
-Visit [sharp.dimens.io](http://sharp.dimens.io/) for
-complete installation instructions, API documentation,
-benchmark tests and a changelog.
+Visit [sharp.dimens.io](http://sharp.dimens.io/) for complete
+[installation instructions](http://sharp.dimens.io/page/install),
+[API documentation](http://sharp.dimens.io/page/api),
+[benchmark tests](http://sharp.dimens.io/page/performance) and
+[changelog](http://sharp.dimens.io/page/changelog).
 
 ### Contributing
 
