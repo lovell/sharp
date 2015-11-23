@@ -2,7 +2,7 @@
 
 ### v0.12 - "*look*"
 
-#### v0.12.0 - TBD
+#### v0.12.0 - 23<sup>rd</sup> November 2015
 
 * Bundle pre-compiled libvips and its dependencies for 64-bit Linux and Windows.
   [#42](https://github.com/lovell/sharp/issues/42)
