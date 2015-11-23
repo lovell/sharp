@@ -2,39 +2,40 @@
 
 ### Test environment
 
-* AWS EC2 [c4.xlarge](http://aws.amazon.com/ec2/instance-types/#c4)
-* Amazon Linux AMI 2015.09
-* Node.js v4.1.2
+* AWS EC2 [c4.xlarge](http://aws.amazon.com/ec2/instance-types/#c4) (4x E5-2666 v3 @2.90GHz)
+* Amazon Linux 2015.09.1
+* Node.js v5.1.0
 
 ### The contenders
 
-* [jimp](https://www.npmjs.com/package/jimp) v0.2.8 - Image processing in pure JavaScript.
+* [jimp](https://www.npmjs.com/package/jimp) v0.2.19 - Image processing in pure JavaScript. Bilinear interpolation only.
 * [lwip](https://www.npmjs.com/package/lwip) v0.0.8 - Wrapper around CImg, compiles dependencies from source.
-* ~~[imagemagick-native](https://www.npmjs.com/package/imagemagick-native)~~ - Wrapper around libmagick++, supports Buffers only. Does not currently work with Node.js v4.
+* [imagemagick-native](https://www.npmjs.com/package/imagemagick-native) @5ab570e - Wrapper around libmagick++, supports Buffers only.
 * [imagemagick](https://www.npmjs.com/package/imagemagick) v0.1.3 - Supports filesystem only and "*has been unmaintained for a long time*".
-* [gm](https://www.npmjs.com/package/gm) v1.20.0 - Fully featured wrapper around GraphicsMagick's `convert` command line utility.
-* sharp v0.11.3 / libvips v8.1.0 - Caching within libvips disabled to ensure a fair comparison.
+* [gm](https://www.npmjs.com/package/gm) v1.21.0 - Fully featured wrapper around GraphicsMagick's `gm` command line utility.
+* sharp v0.12.0 / libvips v8.1.1 - Caching within libvips disabled to ensure a fair comparison.
 
 ### The task
 
-Decompress a 2725x2225 JPEG image, resize to 720x480 using bilinear interpolation, then compress to JPEG.
+Decompress a 2725x2225 JPEG image, resize to 720x480 using bicubic interpolation (where available), then compress to JPEG.
 
 ### Results
 
-| Module      | Input  | Output | Ops/sec | Speed-up |
-| :---------- | :----- | :----- | ------: | -------: |
-| jimp        | file   | file   |    0.94 |      1.0 |
-| jimp        | buffer | buffer |    1.12 |      1.2 |
-| lwip        | file   | file   |    1.12 |      1.2 |
-| lwip        | buffer | buffer |    1.13 |      1.2 |
-| gm          | buffer | buffer |    5.50 |      5.9 |
-| gm          | file   | file   |    5.55 |      5.9 |
-| imagemagick | file   | file   |    8.66 |      9.2 |
-| sharp       | stream | stream |   16.33 |     17.4 |
-| sharp       | file   | file   |   16.88 |     18.0 |
-| sharp       | file   | buffer |   16.90 |     18.1 |
-| sharp       | buffer | file   |   16.99 |     18.1 |
-| sharp       | buffer | buffer |   17.06 |     18.1 |
+| Module             | Input  | Output | Ops/sec | Speed-up |
+| :----------------- | :----- | :----- | ------: | -------: |
+| jimp               | file   | file   |    0.99 |      1.0 |
+| jimp               | buffer | buffer |    1.05 |      1.1 |
+| lwip               | file   | file   |    1.13 |      1.1 |
+| lwip               | buffer | buffer |    1.13 |      1.1 |
+| imagemagick-native | buffer | buffer |    1.67 |      1.7 |
+| imagemagick        | file   | file   |    5.19 |      5.2 |
+| gm                 | buffer | buffer |    5.56 |      5.6 |
+| gm                 | file   | file   |    5.59 |      5.6 |
+| sharp              | stream | stream |   21.91 |     22.1 |
+| sharp              | file   | file   |   22.79 |     23.0 |
+| sharp              | file   | buffer |   22.91 |     23.1 |
+| sharp              | buffer | file   |   23.03 |     23.3 |
+| sharp              | buffer | buffer |   23.15 |     23.4 |
 
 Greater performance can be expected with caching enabled (default) and using 8+ core machines.
 
@@ -50,7 +51,11 @@ brew install graphicsmagick
 ```
 
 ```sh
-sudo apt-get install imagemagick graphicsmagick libmagick++-dev
+sudo apt-get install imagemagick libmagick++-dev graphicsmagick
+```
+
+```sh
+sudo yum install ImageMagick-devel ImageMagick-c++-devel GraphicsMagick
 ```
 
 ### Running the benchmark test
