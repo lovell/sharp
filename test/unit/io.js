@@ -805,6 +805,19 @@ describe('Input/output', function() {
       });
     });
 
+    it('Disabling limit works', function(done) {
+      sharp(fixtures.inputJpg).metadata(function(err, metadata) {
+        if (err) throw err;
+        sharp(fixtures.inputJpg)
+          .limitInputPixels(false)
+          .toBuffer(function(err) {
+            assert.strictEqual(true, !err);
+            done();
+          });
+      });
+    });
+
+
     it('Smaller than input fails', function(done) {
       sharp(fixtures.inputJpg).metadata(function(err, metadata) {
         if (err) throw err;

@@ -235,7 +235,8 @@ class PipelineWorker : public AsyncWorker {
     vips_object_local(hook, image);
 
     // Limit input images to a given number of pixels, where pixels = width * height
-    if (image->Xsize * image->Ysize > baton->limitInputPixels) {
+    // Ignore if 0
+    if (baton->limitInputPixels > 0 && image->Xsize * image->Ysize > baton->limitInputPixels) {
       (baton->err).append("Input image exceeds pixel limit");
       return Error();
     }

@@ -596,10 +596,17 @@ Sharp.prototype.resize = function(width, height) {
 
 /*
   Limit the total number of pixels for input images
-  Assumes the image dimensions contained in the file header can be trusted
+  Assumes the image dimensions contained in the file header can be trusted.
+  Alternatively can use boolean to disable or reset to default (maximum pixels)
 */
 Sharp.prototype.limitInputPixels = function(limit) {
-  if (typeof limit === 'number' && !Number.isNaN(limit) && limit % 1 === 0 && limit > 0) {
+  //if we pass in false we represent the integer as 0 to disable
+  if(limit === false) {
+    limit = 0;
+  } else if(limit === true) {
+    limit = maximum.pixels;
+  }
+  if (typeof limit === 'number' && !Number.isNaN(limit) && limit % 1 === 0 && limit >= 0) {
     this.options.limitInputPixels = limit;
   } else {
     throw new Error('Invalid pixel limit (1 to ' + maximum.pixels + ') ' + limit);
