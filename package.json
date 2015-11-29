@@ -19,13 +19,14 @@
     "Bernhard K. Weisshuhn <bkw@codingforce.com>",
     "Chris Riley <criley@primedia.com>",
     "David Carley <dacarley@gmail.com>",
-    "John Tobin <john@limelightmobileinc.com>"
+    "John Tobin <john@limelightmobileinc.com>",
+    "Kenton Gray <kentongray@gmail.com>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {
     "clean": "rm -rf node_modules/ build/ include/ lib/ coverage/ test/fixtures/output.*",
     "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=30000 ./test/unit/*.js",
-    "test-win": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js",
+    "test-win": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
     "test-packaging": "./packaging/test.sh",
     "test-clean": "rm -rf coverage/ test/fixtures/output.* && npm install && npm test"

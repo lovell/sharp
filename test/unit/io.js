@@ -876,6 +876,24 @@ describe('Input/output', function() {
       });
     });
 
+    it('Disabling limit works', function(done) {
+      sharp(fixtures.inputPngLarge)
+        .limitInputPixels(false)
+        .toBuffer(function(err) {
+          assert.strictEqual(true, !err);
+          done();
+        });
+    });
+
+    it('Enabling default limit fails works and fails with a large image', function(done) {
+      sharp(fixtures.inputPngLarge)
+        .limitInputPixels(true)
+        .toBuffer(function(err) {
+          assert.strictEqual(true, !!err);
+          done();
+        });
+    });
+
     it('Smaller than input fails', function(done) {
       sharp(fixtures.inputJpg).metadata(function(err, metadata) {
         if (err) throw err;
