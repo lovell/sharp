@@ -77,7 +77,14 @@ module.exports.download_vips = function() {
       var tmpFile = fs.createWriteStream(tarPath).on('finish', function() {
         unpack(tarPath);
       });
-      request(distBaseUrl + tarFilename).on('response', function(response) {
+      var options = {
+        url: distBaseUrl + tarFilename
+      };
+      if (process.env.npm_config_https_proxy) {
+        // Use the NPM-configured HTTPS proxy
+        options.proxy = process.env.npm_config_https_proxy;
+      }
+      request(options).on('response', function(response) {
         if (response.statusCode !== 200) {
           error(distBaseUrl + tarFilename + ' status code ' + response.statusCode);
         }
