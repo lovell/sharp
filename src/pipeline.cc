@@ -421,7 +421,10 @@ class PipelineWorker : public AsyncWorker {
     if (HasProfile(image)) {
       // Convert to sRGB using embedded profile
       VipsImage *transformed;
-      if (!vips_icc_transform(image, &transformed, srgbProfile.data(), "embedded", TRUE, nullptr)) {
+      if (
+        !vips_icc_transform(image, &transformed, srgbProfile.data(),
+          "embedded", TRUE, "intent", VIPS_INTENT_PERCEPTUAL, nullptr)
+      ) {
         // Embedded profile can fail, so only update references on success
         vips_object_local(hook, transformed);
         image = transformed;
@@ -430,7 +433,10 @@ class PipelineWorker : public AsyncWorker {
       // Convert to sRGB using default "USWebCoatedSWOP" CMYK profile
       std::string cmykProfile = baton->iccProfilePath + "USWebCoatedSWOP.icc";
       VipsImage *transformed;
-      if (vips_icc_transform(image, &transformed, srgbProfile.data(), "input_profile", cmykProfile.data(), nullptr)) {
+      if (
+        vips_icc_transform(image, &transformed, srgbProfile.data(),
+          "input_profile", cmykProfile.data(), "intent", VIPS_INTENT_PERCEPTUAL, nullptr)
+      ) {
         return Error();
       }
       vips_object_local(hook, transformed);
