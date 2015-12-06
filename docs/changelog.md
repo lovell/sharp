@@ -2,6 +2,14 @@
 
 ### v0.12 - "*look*"
 
+#### v0.12.1 - TBD
+
+* Ensure embedded ICC profiles output with perceptual intent.
+  [#321](https://github.com/lovell/sharp/issues/321)
+  [@vlapo](https://github.com/vlapo)
+
+* Use the NPM-configured HTTPS proxy, if any, for binary downloads.
+
 #### v0.12.0 - 23<sup>rd</sup> November 2015
 
 * Bundle pre-compiled libvips and its dependencies for 64-bit Linux and Windows.
