@@ -1,6 +1,7 @@
 #include <cmath>
 #include <node.h>
 #include <vips/vips.h>
+#include <vips/vector.h>
 
 #include "nan.h"
 
@@ -79,6 +80,20 @@ NAN_METHOD(counters) {
   Set(counters, New("queue").ToLocalChecked(), New<Integer>(counterQueue));
   Set(counters, New("process").ToLocalChecked(), New<Integer>(counterProcess));
   info.GetReturnValue().Set(counters);
+}
+
+/*
+  Get and set use of SIMD vector unit instructions
+*/
+NAN_METHOD(simd) {
+  HandleScope();
+
+  // Set state
+  if (info[0]->IsBoolean()) {
+    vips_vector_set_enabled(To<bool>(info[0]).FromJust());
+  }
+  // Get state
+  info.GetReturnValue().Set(New<Boolean>(vips_vector_isenabled()));
 }
 
 /*

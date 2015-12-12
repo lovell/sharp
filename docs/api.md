@@ -426,8 +426,6 @@ Use WebP format for the output image.
 
 #### raw()
 
-_Requires libvips 7.42.0+_
-
 Provide raw, uncompressed uint8 (unsigned char) image data for Buffer and Stream based output.
 
 The number of channels depends on the input image and selected options.
@@ -497,13 +495,11 @@ An advanced setting for the _zlib_ compression level of the lossless PNG output 
 
 #### withoutAdaptiveFiltering()
 
-_Requires libvips 7.42.0+_
-
 An advanced setting to disable adaptive row filtering for the lossless PNG output format.
 
 #### trellisQuantisation() / trellisQuantization()
 
-_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+_Requires libvips to have been compiled with mozjpeg support_
 
 An advanced setting to apply the use of
 [trellis quantisation](http://en.wikipedia.org/wiki/Trellis_quantization) with JPEG output.
@@ -511,7 +507,7 @@ Reduces file size and slightly increases relative quality at the cost of increas
 
 #### overshootDeringing()
 
-_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+_Requires libvips to have been compiled with mozjpeg support_
 
 An advanced setting to reduce the effects of
 [ringing](http://en.wikipedia.org/wiki/Ringing_%28signal%29) in JPEG output,
@@ -519,7 +515,7 @@ in particular where black text appears on a white background (or vice versa).
 
 #### optimiseScans() / optimizeScans()
 
-_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+_Requires libvips to have been compiled with mozjpeg support_
 
 An advanced setting for progressive (interlace) JPEG output.
 Calculates which spectrum of DCT coefficients uses the fewest bits.
@@ -632,4 +628,32 @@ Provides access to internal task counters.
 
 ```javascript
 var counters = sharp.counters(); // { queue: 2, process: 4 }
+```
+
+#### sharp.simd([enable])
+
+_Requires libvips to have been compiled with liborc support_
+
+Improves the performance of `resize`, `blur` and `sharpen` operations
+by taking advantage of the SIMD vector unit of the CPU.
+
+* `enable`, if present, is a boolean where `true` enables and `false` disables the use of SIMD.
+
+This method always returns the current state.
+
+This feature is currently disabled by default
+but future versions may enable it by default.
+
+When enabled, versions of liborc prior to 0.4.24
+and versions of libvips prior to 8.2.0
+have been known to crash under heavy load.
+
+```javascript
+var simd = sharp.simd();
+// simd is `true` is SIMD is currently enabled
+```
+
+```javascript
+var simd = sharp.simd(true);
+// attempts to enable the use of SIMD, returning true if available
 ```

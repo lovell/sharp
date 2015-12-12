@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "async": "^1.5.0",
-    "coveralls": "^2.11.4",
+    "coveralls": "^2.11.6",
     "exif-reader": "^1.0.0",
     "icc": "^0.0.2",
     "istanbul": "^0.4.0",

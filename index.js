@@ -863,3 +863,15 @@ module.exports.concurrency = function(concurrency) {
 module.exports.counters = function() {
   return sharp.counters();
 };
+
+/*
+  Get and set use of SIMD vector unit instructions
+*/
+module.exports.simd = function(simd) {
+  if (typeof simd !== 'boolean') {
+    simd = null;
+  }
+  return sharp.simd(simd);
+};
+// Switch off default
+module.exports.simd(false);

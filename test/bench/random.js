@@ -8,6 +8,8 @@ var Benchmark = require('benchmark');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.simd(true);
+
 var min = 320;
 var max = 960;
 

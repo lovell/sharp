@@ -2,7 +2,12 @@
 
 ### v0.12 - "*look*"
 
-#### v0.12.1 - TBD
+#### v0.12.1 - 12<sup>th</sup> December 2015
+
+* Allow use of SIMD vector instructions (via liborc) to be toggled on/off.
+  [#172](https://github.com/lovell/sharp/issues/172)
+  [@bkw](https://github.com/bkw)
+  [@puzrin](https://github.com/puzrin)
 
 * Ensure embedded ICC profiles output with perceptual intent.
   [#321](https://github.com/lovell/sharp/issues/321)

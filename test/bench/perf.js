@@ -35,6 +35,8 @@ var magickFilterBicubic = 'Lanczos';
 
 // Disable libvips cache to ensure tests are as fair as they can be
 sharp.cache(0);
+// Enable use of SIMD
+sharp.simd(true);
 
 async.series({
   'jpeg-linear': function(callback) {
@@ -488,6 +490,24 @@ async.series({
           .interpolateWith(sharp.interpolator.bilinear)
           .resize(width, height)
           .toBuffer(function(err, buffer) {
+            if (err) {
+              throw err;
+            } else {
+              assert.notStrictEqual(null, buffer);
+              deferred.resolve();
+            }
+          });
+      }
+    }).add('sharp-without-simd', {
+      defer: true,
+      fn: function(deferred) {
+        sharp.simd(false);
+        sharp(inputJpgBuffer)
+          .rotate(90)
+          .interpolateWith(sharp.interpolator.bilinear)
+          .resize(width, height)
+          .toBuffer(function(err, buffer) {
+            sharp.simd(true);
             if (err) {
               throw err;
             } else {
