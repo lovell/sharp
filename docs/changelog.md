@@ -2,6 +2,12 @@
 
 ### v0.12 - "*look*"
 
+#### v0.12.2 - TBD
+
+* Ensure 16-bit input images work with embed option.
+  [#325](https://github.com/lovell/sharp/issues/325)
+  [@janaz](https://github.com/janaz)
+
 #### v0.12.1 - 12<sup>th</sup> December 2015
 
 * Allow use of SIMD vector instructions (via liborc) to be toggled on/off.

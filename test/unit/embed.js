@@ -68,6 +68,20 @@ describe('Embed', function() {
       });
   });
 
+  it('16-bit PNG with alpha channel', function(done) {
+    sharp(fixtures.inputPngWithTransparency16bit)
+      .resize(32, 16)
+      .embed()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(32, info.width);
+        assert.strictEqual(16, info.height);
+        fixtures.assertSimilar(fixtures.expected('embed-16bit.png'), data, done);
+      });
+  });
+
   it('Enlarge and embed', function(done) {
     sharp(fixtures.inputPngWithOneColor)
       .embed()

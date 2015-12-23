@@ -627,16 +627,6 @@ class PipelineWorker : public AsyncWorker {
     // Crop/embed
     if (image->Xsize != baton->width || image->Ysize != baton->height) {
       if (baton->canvas == Canvas::EMBED) {
-        // Match background colour space, namely sRGB
-        if (image->Type != VIPS_INTERPRETATION_sRGB) {
-          // Convert to sRGB colour space
-          VipsImage *colourspaced;
-          if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, nullptr)) {
-            return Error();
-          }
-          vips_object_local(hook, colourspaced);
-          image = colourspaced;
-        }
         // Add non-transparent alpha channel, if required
         if (baton->background[3] < 255.0 && !HasAlpha(image)) {
           // Create single-channel transparency
@@ -661,13 +651,22 @@ class PipelineWorker : public AsyncWorker {
         }
         // Create background
         VipsArrayDouble *background;
+        // Scale up 8-bit values to match 16-bit input image
+        double multiplier = (image->Type == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
         if (baton->background[3] < 255.0 || HasAlpha(image)) {
-          background = vips_array_double_newv(
-            4, baton->background[0], baton->background[1], baton->background[2], baton->background[3]
+          // RGBA
+          background = vips_array_double_newv(4,
+            baton->background[0] * multiplier,
+            baton->background[1] * multiplier,
+            baton->background[2] * multiplier,
+            baton->background[3] * multiplier
           );
         } else {
-          background = vips_array_double_newv(
-            3, baton->background[0], baton->background[1], baton->background[2]
+          // RGB
+          background = vips_array_double_newv(3,
+            baton->background[0] * multiplier,
+            baton->background[1] * multiplier,
+            baton->background[2] * multiplier
           );
         }
         // Embed
