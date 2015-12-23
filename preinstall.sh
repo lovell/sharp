@@ -13,7 +13,7 @@
 #   * Amazon Linux 2015.03, 2015.09
 # * OpenSuse 13
 
-vips_version_minimum=7.40.0
+vips_version_minimum=8.1.1
 vips_version_latest_major_minor=8.1
 vips_version_latest_patch=1
 
@@ -211,18 +211,8 @@ if [ -f /etc/debian_version ]; then
   DISTRO=$(lsb_release -c -s)
   echo "Detected Debian Linux '$DISTRO'"
   case "$DISTRO" in
-    jessie|vivid|wily)
-      # Debian 8, Ubuntu 15
-      if [ $enable_openslide -eq 1 ]; then
-        echo "Recompiling vips with openslide support"
-        install_libvips_from_source
-      else
-        echo "Installing libvips via apt-get"
-        apt-get install -y libvips-dev libgsf-1-dev
-      fi
-      ;;
-    trusty|utopic|qiana|rebecca|rafaela|freya)
-      # Ubuntu 14, Mint 17
+    jessie|trusty|utopic|vivid|wily|xenial|qiana|rebecca|rafaela|freya)
+      # Debian 8, Ubuntu 14.04+, Mint 17
       echo "Installing libvips dependencies via apt-get"
       apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
       install_libvips_from_source
