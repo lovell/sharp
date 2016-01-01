@@ -77,6 +77,15 @@ This involves an automated HTTPS download of approximately 9MB.
 Only 64-bit (x64) `node.exe` is supported.
 The WebP format is currently unavailable on Windows.
 
+### FreeBSD
+
+libvips must be installed before `npm install` is run.
+This can be achieved via [FreshPorts](https://www.freshports.org/graphics/vips/):
+
+```sh
+cd /usr/ports/graphics/vips/ && make install clean
+```
+
 ### Heroku
 
 [Alessandro Tagliapietra](https://github.com/alex88) maintains an
