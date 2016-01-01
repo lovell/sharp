@@ -49,12 +49,12 @@
     'conditions': [
       ['use_global_vips == "true"', {
         # Use pkg-config for include and lib
-        'include_dirs': ['<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --cflags vips glib-2.0)'],
+        'include_dirs': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --cflags-only-I vips glib-2.0 | sed s\/-I//g)'],
         'conditions': [
           ['runtime_link == "static"', {
-            'libraries': ['<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips --static)']
+            'libraries': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs --static vips)']
           }, {
-            'libraries': ['<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips)']
+            'libraries': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips)']
           }]
         ]
       }, {
