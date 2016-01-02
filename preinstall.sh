@@ -9,13 +9,13 @@
 #   * Elementary 0.3
 # * Red Hat Linux
 #   * RHEL/Centos/Scientific 6, 7
-#   * Fedora 21, 22
+#   * Fedora 21, 22, 23
 #   * Amazon Linux 2015.03, 2015.09
 # * OpenSuse 13
 
-vips_version_minimum=8.1.1
-vips_version_latest_major_minor=8.1
-vips_version_latest_patch=1
+vips_version_minimum=8.2.0
+vips_version_latest_major_minor=8.2
+vips_version_latest_patch=0
 
 openslide_version_minimum=3.4.0
 openslide_version_latest_major_minor=3.4
@@ -253,18 +253,12 @@ elif [ -f /etc/redhat-release ]; then
       yum install -y --enablerepo=remi libwebp-devel
       install_libvips_from_source "--prefix=/usr"
       ;;
-    "Fedora release 21 "*|"Fedora release 22 "*)
-      # Fedora 21, 22
-      if [ $enable_openslide -eq 1 ]; then
-        echo "Installing libvips dependencies via yum"
-        yum groupinstall -y "Development Tools"
-        yum install -y gcc-c++ gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
-        echo "Compiling vips with openslide support"
-        install_libvips_from_source "--prefix=/usr"
-      else
-        echo "Installing libvips via yum"
-        yum install -y vips-devel
-      fi
+    "Fedora"*)
+      # Fedora 21, 22, 23
+      echo "Installing libvips dependencies via yum"
+      yum groupinstall -y "Development Tools"
+      yum install -y gcc-c++ gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      install_libvips_from_source "--prefix=/usr"
       ;;
     *)
       # Unsupported RHEL-based OS

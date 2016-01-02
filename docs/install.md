@@ -22,7 +22,7 @@ Most recent 64-bit Linux-based operating systems should "just work", e.g.:
 * Debian 7, 8
 * Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
 * Centos 7
-* Fedora 20, 21
+* Fedora 21, 22, 23
 * openSUSE 13.2
 * Archlinux 2015.06.01
 

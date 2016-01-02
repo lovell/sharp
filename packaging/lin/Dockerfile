@@ -4,32 +4,32 @@ MAINTAINER Lovell Fuller <npm@lovell.info>
 # Build dependencies
 RUN apt-get update && apt-get install -y build-essential autoconf libtool nasm gtk-doc-tools texinfo
 
-# Working directories
-ENV DEPS /deps
-ENV TARGET /target
+# Create working directories
+ENV DEPS=/deps \
+    TARGET=/target
 RUN mkdir ${DEPS} && mkdir ${TARGET}
 
 # Common build paths and flags
-ENV PKG_CONFIG_PATH ${PKG_CONFIG_PATH}:${TARGET}/lib/pkgconfig
-ENV PATH ${PATH}:${TARGET}/bin
-ENV CPPFLAGS -I${TARGET}/include
-ENV LDFLAGS -L${TARGET}/lib
+ENV PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${TARGET}/lib/pkgconfig \
+    PATH=${PATH}:${TARGET}/bin \
+    CPPFLAGS=-I${TARGET}/include \
+    LDFLAGS=-L${TARGET}/lib
 
 # Dependency version numbers
-ENV VERSION_ZLIB 1.2.8
-ENV VERSION_FFI 3.2.1
-ENV VERSION_GLIB 2.46.2
-ENV VERSION_XML2 2.9.2
-ENV VERSION_GSF 1.14.34
-ENV VERSION_EXIF 0.6.21
-ENV VERSION_JPEG 1.4.2
-ENV VERSION_PNG16 1.6.19
-ENV VERSION_LCMS2 2.7
-ENV VERSION_WEBP 0.4.4
-ENV VERSION_TIFF 4.0.6
-ENV VERSION_MAGICK 6.9.2-6
-ENV VERSION_ORC 0.4.24
-ENV VERSION_VIPS 8.1.1
+ENV VERSION_ZLIB=1.2.8 \
+    VERSION_FFI=3.2.1 \
+    VERSION_GLIB=2.46.2 \
+    VERSION_XML2=2.9.3 \
+    VERSION_GSF=1.14.34 \
+    VERSION_EXIF=0.6.21 \
+    VERSION_JPEG=1.4.2 \
+    VERSION_PNG16=1.6.20 \
+    VERSION_LCMS2=2.7 \
+    VERSION_WEBP=0.5.0 \
+    VERSION_TIFF=4.0.6 \
+    VERSION_MAGICK=6.9.2-10 \
+    VERSION_ORC=0.4.24 \
+    VERSION_VIPS=8.2.0
 
 RUN mkdir ${DEPS}/zlib
 RUN curl -Ls http://zlib.net/zlib-${VERSION_ZLIB}.tar.xz | tar xJC ${DEPS}/zlib --strip-components=1
@@ -58,22 +58,22 @@ WORKDIR ${DEPS}/gsf
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
 RUN mkdir ${DEPS}/exif
-RUN curl -Ls http://kent.dl.sourceforge.net/project/libexif/libexif/${VERSION_EXIF}/libexif-${VERSION_EXIF}.tar.bz2 | tar xjC ${DEPS}/exif --strip-components=1
+RUN curl -Ls http://heanet.dl.sourceforge.net/project/libexif/libexif/${VERSION_EXIF}/libexif-${VERSION_EXIF}.tar.bz2 | tar xjC ${DEPS}/exif --strip-components=1
 WORKDIR ${DEPS}/exif
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
 RUN mkdir ${DEPS}/jpeg
-RUN curl -Ls http://kent.dl.sourceforge.net/project/libjpeg-turbo/${VERSION_JPEG}/libjpeg-turbo-${VERSION_JPEG}.tar.gz | tar xzC ${DEPS}/jpeg --strip-components=1
+RUN curl -Ls http://heanet.dl.sourceforge.net/project/libjpeg-turbo/${VERSION_JPEG}/libjpeg-turbo-${VERSION_JPEG}.tar.gz | tar xzC ${DEPS}/jpeg --strip-components=1
 WORKDIR ${DEPS}/jpeg
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --with-jpeg8 --without-turbojpeg && make install-strip
 
 RUN mkdir ${DEPS}/png16
-RUN curl -Ls http://kent.dl.sourceforge.net/project/libpng/libpng16/${VERSION_PNG16}/libpng-${VERSION_PNG16}.tar.xz | tar xJC ${DEPS}/png16 --strip-components=1
+RUN curl -Ls http://heanet.dl.sourceforge.net/project/libpng/libpng16/${VERSION_PNG16}/libpng-${VERSION_PNG16}.tar.xz | tar xJC ${DEPS}/png16 --strip-components=1
 WORKDIR ${DEPS}/png16
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
 RUN mkdir ${DEPS}/lcms2
-RUN curl -Ls http://kent.dl.sourceforge.net/project/lcms/lcms/${VERSION_LCMS2}/lcms2-${VERSION_LCMS2}.tar.gz | tar xzC ${DEPS}/lcms2 --strip-components=1
+RUN curl -Ls http://heanet.dl.sourceforge.net/project/lcms/lcms/${VERSION_LCMS2}/lcms2-${VERSION_LCMS2}.tar.gz | tar xzC ${DEPS}/lcms2 --strip-components=1
 WORKDIR ${DEPS}/lcms2
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
@@ -99,7 +99,7 @@ WORKDIR ${DEPS}/orc
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
 RUN mkdir ${DEPS}/vips
-RUN curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.1/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
+RUN curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.2/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
 WORKDIR ${DEPS}/vips
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
   --disable-debug --disable-introspection --without-python --without-fftw \

@@ -47,7 +47,7 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^3.0.5",
+    "bluebird": "^3.1.1",
     "color": "^0.10.1",
     "nan": "^2.1.0",
     "semver": "^5.1.0",
@@ -59,16 +59,16 @@
     "coveralls": "^2.11.6",
     "exif-reader": "^1.0.0",
     "icc": "^0.0.2",
-    "istanbul": "^0.4.0",
+    "istanbul": "^0.4.1",
     "mocha": "^2.3.4",
     "mocha-jshint": "^2.2.5",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.4.4",
+    "rimraf": "^2.5.0",
     "bufferutil": "^1.2.1"
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.1.1"
+    "libvips": "8.2.0"
   },
   "engines": {
     "node": ">=0.10"
