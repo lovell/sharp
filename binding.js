@@ -54,9 +54,9 @@ var error = function(msg) {
 module.exports.download_vips = function() {
   // Has vips been installed locally?
   if (!isFile(vipsHeaderPath)) {
-    // Ensure 64-bit
-    if (process.arch !== 'x64') {
-      error('ARM and 32-bit systems require manual installation - please see http://sharp.dimens.io/en/stable/install/');
+    // Ensure Intel 64-bit or ARM
+    if (process.arch === 'ia32') {
+      error('Intel Architecture 32-bit systems require manual installation - please see http://sharp.dimens.io/en/stable/install/');
     }
     // Ensure libc >= 2.15
     var lddVersion = process.env.LDD_VERSION;
@@ -66,8 +66,9 @@ module.exports.download_vips = function() {
         error('libc version ' + libcVersion + ' requires manual installation - please see http://sharp.dimens.io/en/stable/install/');
       }
     }
-    // Platform-specific .tar.gz
-    var tarFilename = ['libvips', process.env.npm_package_config_libvips, process.platform.substr(0, 3)].join('-') + '.tar.gz';
+    // Arch/platform-specific .tar.gz
+    var platform = (process.arch === 'arm') ? 'arm' : process.platform.substr(0, 3);
+    var tarFilename = ['libvips', process.env.npm_package_config_libvips, platform].join('-') + '.tar.gz';
     var tarPath = path.join(__dirname, 'packaging', tarFilename);
     if (isFile(tarPath)) {
       unpack(tarPath);

@@ -635,7 +635,7 @@ var counters = sharp.counters(); // { queue: 2, process: 4 }
 _Requires libvips to have been compiled with liborc support_
 
 Improves the performance of `resize`, `blur` and `sharpen` operations
-by taking advantage of the SIMD vector unit of the CPU.
+by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM NEON.
 
 * `enable`, if present, is a boolean where `true` enables and `false` disables the use of SIMD.
 
@@ -650,7 +650,7 @@ have been known to crash under heavy load.
 
 ```javascript
 var simd = sharp.simd();
-// simd is `true` is SIMD is currently enabled
+// simd is `true` if SIMD is currently enabled
 ```
 
 ```javascript

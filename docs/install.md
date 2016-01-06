@@ -17,7 +17,7 @@ npm install sharp
 libvips and its dependencies are fetched and stored within `node_modules/sharp` during `npm install`.
 This involves an automated HTTPS download of approximately 6MB.
 
-Most recent 64-bit Linux-based operating systems should "just work", e.g.:
+Most recent Linux-based operating systems running on x64 and ARMv6+ CPUs should "just work", e.g.:
 
 * Debian 7, 8
 * Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
@@ -25,12 +25,13 @@ Most recent 64-bit Linux-based operating systems should "just work", e.g.:
 * Fedora 21, 22, 23
 * openSUSE 13.2
 * Archlinux 2015.06.01
+* Raspbian Jessie
 
 Preference will be given to an existing globally-installed (via `pkg-config`)
 version of libvips that meets the minimum version requirement.
 This allows the use of newer versions of libvips with older versions of sharp.
 
-For older and 32-bit Linux-based operating systems,
+For older Linux-based operating systems and 32-bit Intel CPUs,
 a system-wide installation of the most suitable version of
 libvips and its dependencies can be achieved by running
 the following command as a user with `sudo` access

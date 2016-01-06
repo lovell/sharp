@@ -4,6 +4,10 @@
 
 #### v0.12.2 - TBD
 
+* Upgrade libvips to v8.2.0 for improved vips_shrink.
+
+* Add pre-compiled libvips for ARMv6+ CPUs.
+
 * Ensure 16-bit input images work with embed option.
   [#325](https://github.com/lovell/sharp/issues/325)
   [@janaz](https://github.com/janaz)
