@@ -16,6 +16,10 @@
   [#326](https://github.com/lovell/sharp/issues/326)
   [@c0decafe](https://github.com/c0decafe)
 
+* Attempt to remove temporary file after installation.
+  [#331](https://github.com/lovell/sharp/issues/331)
+  [@dtoubelis](https://github.com/dtoubelis)
+
 #### v0.12.1 - 12<sup>th</sup> December 2015
 
 * Allow use of SIMD vector instructions (via liborc) to be toggled on/off.

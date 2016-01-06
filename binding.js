@@ -25,7 +25,7 @@ var isFile = function(file) {
   return exists;
 };
 
-var unpack = function(tarPath) {
+var unpack = function(tarPath, done) {
   var extractor = tar.Extract({
     path: __dirname
   });
@@ -33,6 +33,9 @@ var unpack = function(tarPath) {
   extractor.on('end', function() {
     if (!isFile(vipsHeaderPath)) {
       error('Could not unpack ' + tarPath);
+    }
+    if (typeof done === 'function') {
+      done();
     }
   });
   fs.createReadStream(tarPath).on('error', error)
@@ -73,10 +76,15 @@ module.exports.download_vips = function() {
     if (isFile(tarPath)) {
       unpack(tarPath);
     } else {
-      // Download
-      tarPath = path.join(tmp, tarFilename);
+      // Download to per-process temporary file
+      tarPath = path.join(tmp, process.pid + '-' + tarFilename);
       var tmpFile = fs.createWriteStream(tarPath).on('finish', function() {
-        unpack(tarPath);
+        unpack(tarPath, function() {
+          // Attempt to remove temporary file
+          try {
+            fs.unlinkSync(tarPath);
+          } catch (err) {}
+        });
       });
       var options = {
         url: distBaseUrl + tarFilename
