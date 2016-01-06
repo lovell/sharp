@@ -10,8 +10,6 @@ var rimraf = require('rimraf');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
-
 // Verifies all tiles in a given dz output directory are <= size
 var assertDeepZoomTiles = function(directory, expectedSize, expectedLevels, done) {
   // Get levels

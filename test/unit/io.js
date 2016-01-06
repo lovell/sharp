@@ -6,9 +6,14 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
-
 describe('Input/output', function() {
+
+  before(function() {
+    sharp.cache(false);
+  });
+  after(function() {
+    sharp.cache(true);
+  });
 
   it('Read from File and write to Stream', function(done) {
     var writable = fs.createWriteStream(fixtures.outputJpg);

@@ -11,10 +11,6 @@
 NAN_MODULE_INIT(init) {
   vips_init("sharp");
 
-  // Set libvips operation cache limits
-  vips_cache_set_max_mem(100 * 1024 * 1024); // 100 MB
-  vips_cache_set_max(500); // 500 operations
-
   // Methods available to JavaScript
   Nan::Set(target, Nan::New("metadata").ToLocalChecked(),
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(metadata)).ToLocalChecked());

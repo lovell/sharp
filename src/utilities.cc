@@ -24,33 +24,49 @@ using Nan::To;
 using Nan::Utf8String;
 
 /*
-  Get and set cache memory and item limits
+  Get and set cache limits
 */
 NAN_METHOD(cache) {
   HandleScope();
 
-  // Set cache memory limit
+  // Set memory limit
   if (info[0]->IsInt32()) {
     vips_cache_set_max_mem(To<int32_t>(info[0]).FromJust() * 1048576);
   }
-
-  // Set cache items limit
+  // Set file limit
   if (info[1]->IsInt32()) {
-    vips_cache_set_max(To<int32_t>(info[1]).FromJust());
+    vips_cache_set_max_files(To<int32_t>(info[1]).FromJust());
+  }
+  // Set items limit
+  if (info[2]->IsInt32()) {
+    vips_cache_set_max(To<int32_t>(info[2]).FromJust());
   }
 
-  // Get cache statistics
-  Local<Object> cache = New<Object>();
-  Set(cache, New("current").ToLocalChecked(),
+  // Get memory stats
+  Local<Object> memory = New<Object>();
+  Set(memory, New("current").ToLocalChecked(),
     New<Integer>(static_cast<int>(round(vips_tracked_get_mem() / 1048576)))
   );
-  Set(cache, New("high").ToLocalChecked(),
+  Set(memory, New("high").ToLocalChecked(),
     New<Integer>(static_cast<int>(round(vips_tracked_get_mem_highwater() / 1048576)))
   );
-  Set(cache, New("memory").ToLocalChecked(),
+  Set(memory, New("max").ToLocalChecked(),
     New<Integer>(static_cast<int>(round(vips_cache_get_max_mem() / 1048576)))
   );
-  Set(cache, New("items").ToLocalChecked(), New<Integer>(vips_cache_get_max()));
+  // Get file stats
+  Local<Object> files = New<Object>();
+  Set(files, New("current").ToLocalChecked(), New<Integer>(vips_tracked_get_files()));
+  Set(files, New("max").ToLocalChecked(), New<Integer>(vips_cache_get_max_files()));
+
+  // Get item stats
+  Local<Object> items = New<Object>();
+  Set(items, New("current").ToLocalChecked(), New<Integer>(vips_cache_get_size()));
+  Set(items, New("max").ToLocalChecked(), New<Integer>(vips_cache_get_max()));
+
+  Local<Object> cache = New<Object>();
+  Set(cache, New("memory").ToLocalChecked(), memory);
+  Set(cache, New("files").ToLocalChecked(), files);
+  Set(cache, New("items").ToLocalChecked(), items);
   info.GetReturnValue().Set(cache);
 }
 
@@ -262,6 +278,7 @@ NAN_METHOD(_maxColourDistance) {
     vips_object_local(hook, imagePremultipliedNoAlpha2);
     image2 = imagePremultipliedNoAlpha2;
   }
+
   // Calculate colour distance
   VipsImage *difference;
   if (vips_dE00(image1, image2, &difference, nullptr)) {
@@ -276,5 +293,10 @@ NAN_METHOD(_maxColourDistance) {
     return ThrowError(vips_error_buffer());
   }
   g_object_unref(hook);
+
+  // Clean up libvips' per-request data and threads
+  vips_error_clear();
+  vips_thread_shutdown();
+
   info.GetReturnValue().Set(New<Number>(maxColourDistance));
 }

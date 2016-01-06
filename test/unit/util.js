@@ -10,20 +10,48 @@ describe('Utilities', function() {
 
   describe('Cache', function() {
     it('Can be disabled', function() {
-      var cache = sharp.cache(0, 0);
-      assert.strictEqual(0, cache.memory);
-      assert.strictEqual(0, cache.items);
+      sharp.cache(false);
+      var cache = sharp.cache(false);
+      assert.strictEqual(cache.memory.current, 0);
+      assert.strictEqual(cache.memory.max, 0);
+      assert.strictEqual(typeof cache.memory.high, 'number');
+      assert.strictEqual(cache.files.current, 0);
+      assert.strictEqual(cache.files.max, 0);
+      assert.strictEqual(cache.items.current, 0);
+      assert.strictEqual(cache.items.max, 0);
     });
-    it('Can be set to a maximum of 50MB and 500 items', function() {
-      var cache = sharp.cache(50, 500);
-      assert.strictEqual(50, cache.memory);
-      assert.strictEqual(500, cache.items);
+    it('Can be enabled with defaults', function() {
+      var cache = sharp.cache(true);
+      assert.strictEqual(cache.memory.max, 50);
+      assert.strictEqual(cache.files.max, 20);
+      assert.strictEqual(cache.items.max, 100);
+    });
+    it('Can be set to zero', function() {
+      var cache = sharp.cache({
+        memory: 0,
+        files: 0,
+        items: 0
+      });
+      assert.strictEqual(cache.memory.max, 0);
+      assert.strictEqual(cache.files.max, 0);
+      assert.strictEqual(cache.items.max, 0);
+    });
+    it('Can be set to a maximum of 10MB, 100 files and 1000 items', function() {
+      var cache = sharp.cache({
+         memory: 10,
+         files: 100,
+         items: 1000
+      });
+      assert.strictEqual(cache.memory.max, 10);
+      assert.strictEqual(cache.files.max, 100);
+      assert.strictEqual(cache.items.max, 1000);
     });
     it('Ignores invalid values', function() {
-      sharp.cache(50, 500);
+      sharp.cache(true);
       var cache = sharp.cache('spoons');
-      assert.strictEqual(50, cache.memory);
-      assert.strictEqual(500, cache.items);
+      assert.strictEqual(cache.memory.max, 50);
+      assert.strictEqual(cache.files.max, 20);
+      assert.strictEqual(cache.items.max, 100);
     });
   });
 

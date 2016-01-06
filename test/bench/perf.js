@@ -34,7 +34,7 @@ var magickFilterBilinear = 'Triangle';
 var magickFilterBicubic = 'Lanczos';
 
 // Disable libvips cache to ensure tests are as fair as they can be
-sharp.cache(0);
+sharp.cache(false);
 // Enable use of SIMD
 sharp.simd(true);
 

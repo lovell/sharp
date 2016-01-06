@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.13 - "*mind*"
+
+* Control number of open files in libvips' cache; breaks existing `cache` behaviour.
+  [#315](https://github.com/lovell/sharp/issues/315)
+
 ### v0.12 - "*look*"
 
 #### v0.12.2 - 16<sup>th</sup> January 2016

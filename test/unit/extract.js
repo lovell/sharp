@@ -5,8 +5,6 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
-
 describe('Partial image extraction', function() {
   describe('using the legacy extract(top,left,width,height) syntax', function () {
     it('JPEG', function(done) {

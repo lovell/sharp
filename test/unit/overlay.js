@@ -4,8 +4,6 @@ var assert = require('assert');
 var fixtures = require('../fixtures');
 var sharp = require('../../index');
 
-sharp.cache(0);
-
 // Helpers
 var getPaths = function(baseName, extension) {
   if (typeof extension === 'undefined') {

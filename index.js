@@ -834,18 +834,25 @@ Sharp.prototype.clone = function() {
   return clone;
 };
 
-/*
-  Get and set cache memory and item limits
+/**
+  Get and set cache memory, file and item limits
 */
-module.exports.cache = function(memory, items) {
-  if (typeof memory !== 'number' || Number.isNaN(memory)) {
-    memory = null;
+module.exports.cache = function(options) {
+  if (typeof options === 'boolean') {
+    if (options) {
+      // Default cache settings of 50MB, 20 files, 100 items
+      return sharp.cache(50, 20, 100);
+    } else {
+      return sharp.cache(0, 0, 0);
+    }
+  } else if (typeof options === 'object') {
+    return sharp.cache(options.memory, options.files, options.items);
+  } else {
+    return sharp.cache();
   }
-  if (typeof items !== 'number' || Number.isNaN(items)) {
-    items = null;
-  }
-  return sharp.cache(memory, items);
 };
+// Ensure default cache settings are set
+module.exports.cache(true);
 
 /*
   Get and set size of thread pool

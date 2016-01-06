@@ -590,19 +590,26 @@ An Object containing the version numbers of libvips and, on Linux, its dependenc
 
 ### Utilities
 
-#### sharp.cache([memory], [items])
+#### sharp.cache([options])
 
-If `memory` or `items` are provided, set the limits of _libvips'_ operation cache.
+If `options` is provided, sets the limits of _libvips'_ operation cache.
 
-* `memory` is the maximum memory in MB to use for this cache, with a default value of 100
-* `items` is the maximum number of operations to cache, with a default value of 500
+* `options.memory` is the maximum memory in MB to use for this cache, with a default value of 50
+* `options.files` is the maximum number of files to hold open, with a default value of 20
+* `options.items` is the maximum number of operations to cache, with a default value of 100
+
+`options` can also be a boolean, where `true` enables the default cache settings and `false` disables all caching.
 
 This method always returns cache statistics, useful for determining how much working memory is required for a particular task.
 
 ```javascript
-var stats = sharp.cache(); // { current: 75, high: 99, memory: 100, items: 500 }
-sharp.cache(200); // { current: 75, high: 99, memory: 200, items: 500 }
-sharp.cache(50, 200); // { current: 49, high: 99, memory: 50, items: 200}
+var stats = sharp.cache();
+```
+
+```javascript
+sharp.cache( { items: 200 } );
+sharp.cache( { files: 0 } );
+sharp.cache(false);
 ```
 
 #### sharp.concurrency([threads])
