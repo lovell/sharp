@@ -1,5 +1,7 @@
 'use strict';
 
+process.env.UV_THREADPOOL_SIZE = 64;
+
 var assert = require('assert');
 var async = require('async');
 
@@ -10,12 +12,13 @@ var width = 720;
 var height = 480;
 
 sharp.concurrency(1);
+sharp.simd(true);
 
 var timer = setInterval(function() {
   console.dir(sharp.counters());
 }, 100);
 
-async.mapSeries([1, 1, 2, 4, 8, 16, 32, 64, 128], function(parallelism, next) {
+async.mapSeries([1, 1, 2, 4, 8, 16, 32, 64], function(parallelism, next) {
   var start = new Date().getTime();
   async.times(parallelism,
     function(id, callback) {

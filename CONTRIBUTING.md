@@ -6,15 +6,9 @@ Hello, thank you for your interest in helping!
 
 Please create a [new issue](https://github.com/lovell/sharp/issues/new) containing the steps to reproduce the problem.
 
+If you're having installation problems, please include the output of running `npm install --verbose sharp`.
+
 New bugs are assigned a `triage` label whilst under investigation.
-
-If you're having problems with `npm install sharp`, please include the output of the following commands, perhaps as a [gist](https://gist.github.com/):
-
-```sh
-vips -v
-pkg-config --print-provides vips
-npm install --verbose sharp
-```
 
 ## Submit a new feature request
 
@@ -47,7 +41,6 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.11.0 | knife      |
 | v0.12.0 | look       |
 | v0.13.0 | mind       |
 
@@ -83,6 +76,15 @@ Requires [Valgrind](http://valgrind.org/).
 
 ```sh
 npm run test-leak
+```
+
+### Packaging tests
+
+Tests the installation on a number of Linux-based operating systems.
+Requires docker.
+
+```sh
+npm run test-packaging
 ```
 
 ## Finally

@@ -10,16 +10,6 @@ namespace sharp {
   int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out);
 
   /*
-   * Premultiply alpha channel of `image`.
-   */
-  int Premultiply(VipsObject *context, VipsImage *image, VipsImage **out);
-
-  /*
-   * Unpremultiply alpha channel of `image`.
-   */
-  int Unpremultiply(VipsObject *context, VipsImage *image, VipsImage **out);
-
-  /*
    * Stretch luminance to cover full dynamic range.
    */
   int Normalize(VipsObject *context, VipsImage *image, VipsImage **out);
@@ -34,6 +24,11 @@ namespace sharp {
    */
   int Sharpen(VipsObject *context, VipsImage *image, VipsImage **out, int radius, double flat, double jagged);
 
+  /*
+   * Perform thresholding on an image.  If the image is not greyscale, will convert before thresholding.
+   * Pixels with a greyscale value greater-than-or-equal-to `threshold` will be pure white.  All others will be pure black.
+   */
+  int Threshold(VipsObject *context, VipsImage *image, VipsImage **out, int threshold);
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

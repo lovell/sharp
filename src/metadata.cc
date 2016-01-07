@@ -35,6 +35,7 @@ using sharp::InitImage;
 using sharp::HasProfile;
 using sharp::HasAlpha;
 using sharp::ExifOrientation;
+using sharp::FreeCallback;
 using sharp::counterQueue;
 
 struct MetadataBaton {
@@ -64,20 +65,15 @@ struct MetadataBaton {
     iccLength(0) {}
 };
 
-/*
-  Delete input char[] buffer and notify V8 of memory deallocation
-  Used as the callback function for the "postclose" signal
-*/
-static void DeleteBuffer(VipsObject *object, char *buffer) {
-  if (buffer != NULL) {
-    delete[] buffer;
-  }
-}
-
 class MetadataWorker : public AsyncWorker {
 
  public:
-  MetadataWorker(Callback *callback, MetadataBaton *baton) : AsyncWorker(callback), baton(baton) {}
+  MetadataWorker(Callback *callback, MetadataBaton *baton, const Local<Object> &bufferIn) :
+    AsyncWorker(callback), baton(baton) {
+      if (baton->bufferInLength > 0) {
+        SaveToPersistent("bufferIn", bufferIn);
+      }
+    }
   ~MetadataWorker() {}
 
   void Execute() {
@@ -85,30 +81,25 @@ class MetadataWorker : public AsyncWorker {
     g_atomic_int_dec_and_test(&counterQueue);
 
     ImageType imageType = ImageType::UNKNOWN;
-    VipsImage *image = NULL;
+    VipsImage *image = nullptr;
     if (baton->bufferInLength > 0) {
       // From buffer
       imageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (imageType != ImageType::UNKNOWN) {
         image = InitImage(baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
-        if (image != NULL) {
-          // Listen for "postclose" signal to delete input buffer
-          g_signal_connect(image, "postclose", G_CALLBACK(DeleteBuffer), baton->bufferIn);
-        } else {
+        if (image == nullptr) {
           (baton->err).append("Input buffer has corrupt header");
           imageType = ImageType::UNKNOWN;
-          DeleteBuffer(NULL, baton->bufferIn);
         }
       } else {
         (baton->err).append("Input buffer contains unsupported image format");
-        DeleteBuffer(NULL, baton->bufferIn);
       }
     } else {
       // From file
-      imageType = DetermineImageType(baton->fileIn.c_str());
+      imageType = DetermineImageType(baton->fileIn.data());
       if (imageType != ImageType::UNKNOWN) {
-        image = InitImage(baton->fileIn.c_str(), VIPS_ACCESS_RANDOM);
-        if (image == NULL) {
+        image = InitImage(baton->fileIn.data(), VIPS_ACCESS_RANDOM);
+        if (image == nullptr) {
           (baton->err).append("Input file has corrupt header");
           imageType = ImageType::UNKNOWN;
         }
@@ -116,7 +107,7 @@ class MetadataWorker : public AsyncWorker {
         (baton->err).append("Input file is of an unsupported image format");
       }
     }
-    if (image != NULL && imageType != ImageType::UNKNOWN) {
+    if (image != nullptr && imageType != ImageType::UNKNOWN) {
       // Image type
       switch (imageType) {
         case ImageType::JPEG: baton->format = "jpeg"; break;
@@ -142,7 +133,7 @@ class MetadataWorker : public AsyncWorker {
         size_t exifLength;
         if (!vips_image_get_blob(image, VIPS_META_EXIF_NAME, &exif, &exifLength)) {
           baton->exifLength = exifLength;
-          baton->exif = static_cast<char*>(malloc(exifLength));
+          baton->exif = static_cast<char*>(g_malloc(exifLength));
           memcpy(baton->exif, exif, exifLength);
         }
       }
@@ -152,7 +143,7 @@ class MetadataWorker : public AsyncWorker {
         size_t iccLength;
         if (!vips_image_get_blob(image, VIPS_META_ICC_NAME, &icc, &iccLength)) {
           baton->iccLength = iccLength;
-          baton->icc = static_cast<char*>(malloc(iccLength));
+          baton->icc = static_cast<char*>(g_malloc(iccLength));
           memcpy(baton->icc, icc, iccLength);
         }
       }
@@ -170,7 +161,7 @@ class MetadataWorker : public AsyncWorker {
     Local<Value> argv[2] = { Null(), Null() };
     if (!baton->err.empty()) {
       // Error
-      argv[0] = Error(baton->err.c_str());
+      argv[0] = Error(baton->err.data());
     } else {
       // Metadata Object
       Local<Object> info = New<Object>();
@@ -185,12 +176,23 @@ class MetadataWorker : public AsyncWorker {
         Set(info, New("orientation").ToLocalChecked(), New<Number>(baton->orientation));
       }
       if (baton->exifLength > 0) {
-        Set(info, New("exif").ToLocalChecked(), NewBuffer(baton->exif, baton->exifLength).ToLocalChecked());
+        Set(info,
+          New("exif").ToLocalChecked(),
+          NewBuffer(baton->exif, baton->exifLength, FreeCallback, nullptr).ToLocalChecked()
+        );
       }
       if (baton->iccLength > 0) {
-        Set(info, New("icc").ToLocalChecked(), NewBuffer(baton->icc, baton->iccLength).ToLocalChecked());
+        Set(info,
+          New("icc").ToLocalChecked(),
+          NewBuffer(baton->icc, baton->iccLength, FreeCallback, nullptr).ToLocalChecked()
+        );
       }
       argv[1] = info;
+    }
+
+    // Dispose of Persistent wrapper around input Buffer so it can be garbage collected
+    if (baton->bufferInLength > 0) {
+      GetFromPersistent("bufferIn");
     }
     delete baton;
 
@@ -215,17 +217,16 @@ NAN_METHOD(metadata) {
   // Input filename
   baton->fileIn = *Utf8String(Get(options, New("fileIn").ToLocalChecked()).ToLocalChecked());
   // Input Buffer object
+  Local<Object> bufferIn;
   if (node::Buffer::HasInstance(Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked())) {
-    Local<Object> buffer = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
-    // Take a copy of the input Buffer to avoid problems with V8 heap compaction
-    baton->bufferInLength = node::Buffer::Length(buffer);
-    baton->bufferIn = new char[baton->bufferInLength];
-    memcpy(baton->bufferIn, node::Buffer::Data(buffer), baton->bufferInLength);
+    bufferIn = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
+    baton->bufferInLength = node::Buffer::Length(bufferIn);
+    baton->bufferIn = node::Buffer::Data(bufferIn);
   }
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new MetadataWorker(callback, baton));
+  AsyncQueueWorker(new MetadataWorker(callback, baton, bufferIn));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);

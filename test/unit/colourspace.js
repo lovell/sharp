@@ -61,12 +61,12 @@ describe('Colour space conversion', function() {
       .resize(320, 240)
       .background('white')
       .embed()
-      .toFile(fixtures.path('output.cmyk2srgb.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('colourspace.cmyk.jpg'), data, done);
       });
   });
 
@@ -75,10 +75,9 @@ describe('Colour space conversion', function() {
       .resize(320)
       .toBuffer(function(err, data, info) {
         if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
-        done();
+        fixtures.assertSimilar(fixtures.expected('colourspace.cmyk-without-profile.jpg'), data, done);
       });
   });
 

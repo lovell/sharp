@@ -51,6 +51,21 @@ describe('Utilities', function() {
     });
   });
 
+  describe('SIMD', function() {
+    it('Can get current state', function() {
+      var simd = sharp.simd();
+      assert.strictEqual(typeof simd, 'boolean');
+    });
+    it('Can disable', function() {
+      var simd = sharp.simd(false);
+      assert.strictEqual(simd, false);
+    });
+    it('Can attempt to enable', function() {
+      var simd = sharp.simd(true);
+      assert.strictEqual(typeof simd, 'boolean');
+    });
+  });
+
   describe('Format', function() {
     it('Contains expected attributes', function() {
       assert.strictEqual('object', typeof sharp.format);
@@ -69,6 +84,13 @@ describe('Utilities', function() {
           assert.strictEqual('boolean', typeof sharp.format[format][direction].stream);
         });
       });
+    });
+  });
+
+  describe('Versions', function() {
+    it('Contains expected attributes', function() {
+      assert.strictEqual('object', typeof sharp.versions);
+      assert.strictEqual('string', typeof sharp.versions.vips);
     });
   });
 

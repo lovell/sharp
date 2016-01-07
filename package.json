@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.11.2",
+  "version": "0.12.2",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -16,16 +16,18 @@
     "Linus Unnebäck <linus@folkdatorn.se>",
     "Victor Mateevitsi <mvictoras@gmail.com>",
     "Alaric Holloway <alaric.holloway@gmail.com>",
-    "Bernhard K. Weisshuhn <bkw@codingforce.com>"
+    "Bernhard K. Weisshuhn <bkw@codingforce.com>",
+    "Chris Riley <criley@primedia.com>",
+    "David Carley <dacarley@gmail.com>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {
-    "clean": "rm -rf test/fixtures/output.*",
-    "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=20000 ./test/unit/*.js",
-    "test-clean": "npm run clean && npm install && npm test",
+    "clean": "rm -rf node_modules/ build/ include/ lib/ coverage/ test/fixtures/output.*",
+    "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=30000 ./test/unit/*.js",
+    "test-win": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
-    "test-win32-node": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js",
-    "test-win32-iojs": "iojs ./node_modules/mocha/bin/mocha --slow=5000 --timeout=30000 ./test/unit/*.js"
+    "test-packaging": "./packaging/test.sh",
+    "test-clean": "rm -rf coverage/ test/fixtures/output.* && npm install && npm test"
   },
   "main": "index.js",
   "repository": {
@@ -45,24 +47,29 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^2.9.34",
+    "bluebird": "^3.1.1",
     "color": "^0.10.1",
-    "nan": "^2.0.8",
-    "semver": "^5.0.1"
+    "nan": "^2.1.0",
+    "semver": "^5.1.0",
+    "request": "^2.67.0",
+    "tar": "^2.2.1"
   },
   "devDependencies": {
-    "async": "^1.4.2",
-    "coveralls": "^2.11.4",
-    "exif-reader": "1.0.0",
+    "async": "^1.5.0",
+    "coveralls": "^2.11.6",
+    "exif-reader": "^1.0.0",
     "icc": "^0.0.2",
-    "istanbul": "^0.3.18",
-    "mocha": "^2.2.5",
-    "mocha-jshint": "^2.2.3",
+    "istanbul": "^0.4.1",
+    "mocha": "^2.3.4",
+    "mocha-jshint": "^2.2.5",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.4.2",
+    "rimraf": "^2.5.0",
     "bufferutil": "^1.2.1"
   },
   "license": "Apache-2.0",
+  "config": {
+    "libvips": "8.2.0"
+  },
   "engines": {
     "node": ">=0.10"
   }

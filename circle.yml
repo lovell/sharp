@@ -1,0 +1,6 @@
+machine:
+  services:
+    - docker
+test:
+  override:
+    - ./packaging/test.sh

@@ -40,6 +40,24 @@ var fingerprint = function(image, callback) {
 
 module.exports = {
 
+  inputJpgWithLandscapeExif1: getPath('Landscape_1.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithLandscapeExif2: getPath('Landscape_2.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithLandscapeExif3: getPath('Landscape_3.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithLandscapeExif4: getPath('Landscape_4.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithLandscapeExif5: getPath('Landscape_5.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithLandscapeExif6: getPath('Landscape_6.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithLandscapeExif7: getPath('Landscape_7.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithLandscapeExif8: getPath('Landscape_8.jpg'), // https://github.com/recurser/exif-orientation-examples
+
+  inputJpgWithPortraitExif1: getPath('Portrait_1.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithPortraitExif2: getPath('Portrait_2.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithPortraitExif3: getPath('Portrait_3.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithPortraitExif4: getPath('Portrait_4.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithPortraitExif5: getPath('Portrait_5.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithPortraitExif6: getPath('Portrait_6.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithPortraitExif7: getPath('Portrait_7.jpg'), // https://github.com/recurser/exif-orientation-examples
+  inputJpgWithPortraitExif8: getPath('Portrait_8.jpg'), // https://github.com/recurser/exif-orientation-examples
+
   inputJpg: getPath('2569067123_aca715a2ee_o.jpg'), // http://www.flickr.com/photos/grizdave/2569067123/
   inputJpgWithExif: getPath('Landscape_8.jpg'), // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_8.jpg
   inputJpgWithExifMirroring: getPath('Landscape_5.jpg'), // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_5.jpg
@@ -53,6 +71,7 @@ module.exports = {
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),
   inputPngWithOneColor: getPath('2x2_fdcce6.png'),
+  inputPngWithTransparency16bit: getPath('tbgn2c16.png'), // http://www.schaik.com/pngsuite/tbgn2c16.png
   inputPngOverlayLayer0: getPath('alpha-layer-0-background.png'),
   inputPngOverlayLayer1: getPath('alpha-layer-1-fill.png'),
   inputPngOverlayLayer2: getPath('alpha-layer-2-ink.png'),

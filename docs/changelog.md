@@ -1,6 +1,95 @@
 # Changelog
 
+### v0.12 - "*look*"
+
+#### v0.12.2 - TBD
+
+* Upgrade libvips to v8.2.0 for improved vips_shrink.
+
+* Add pre-compiled libvips for ARMv6+ CPUs.
+
+* Ensure 16-bit input images work with embed option.
+  [#325](https://github.com/lovell/sharp/issues/325)
+  [@janaz](https://github.com/janaz)
+
+* Allow compilation with gmake to provide FreeBSD support.
+  [#326](https://github.com/lovell/sharp/issues/326)
+  [@c0decafe](https://github.com/c0decafe)
+
+* Attempt to remove temporary file after installation.
+  [#331](https://github.com/lovell/sharp/issues/331)
+  [@dtoubelis](https://github.com/dtoubelis)
+
+#### v0.12.1 - 12<sup>th</sup> December 2015
+
+* Allow use of SIMD vector instructions (via liborc) to be toggled on/off.
+  [#172](https://github.com/lovell/sharp/issues/172)
+  [@bkw](https://github.com/bkw)
+  [@puzrin](https://github.com/puzrin)
+
+* Ensure embedded ICC profiles output with perceptual intent.
+  [#321](https://github.com/lovell/sharp/issues/321)
+  [@vlapo](https://github.com/vlapo)
+
+* Use the NPM-configured HTTPS proxy, if any, for binary downloads.
+
+#### v0.12.0 - 23<sup>rd</sup> November 2015
+
+* Bundle pre-compiled libvips and its dependencies for 64-bit Linux and Windows.
+  [#42](https://github.com/lovell/sharp/issues/42)
+
+* Take advantage of libvips v8.1.0+ features.
+  [#152](https://github.com/lovell/sharp/issues/152)
+
+* Add support for 64-bit Windows. Drop support for 32-bit Windows.
+  [#224](https://github.com/lovell/sharp/issues/224)
+  [@sabrehagen](https://github.com/sabrehagen)
+
+* Switch default interpolator to bicubic.
+  [#289](https://github.com/lovell/sharp/issues/289)
+  [@mahnunchik](https://github.com/mahnunchik)
+
+* Pre-extract rotatation should not swap width/height.
+  [#296](https://github.com/lovell/sharp/issues/296)
+  [@asilvas](https://github.com/asilvas)
+
+* Ensure 16-bit+alpha input images are (un)premultiplied correctly.
+  [#301](https://github.com/lovell/sharp/issues/301)
+  [@izaakschroeder](https://github.com/izaakschroeder)
+
+* Add `threshold` operation.
+  [#303](https://github.com/lovell/sharp/pull/303)
+  [@dacarley](https://github.com/dacarley)
+
+* Add `negate` operation.
+  [#306](https://github.com/lovell/sharp/pull/306)
+  [@dacarley](https://github.com/dacarley)
+
+* Support `options` Object with existing `extract` operation.
+  [#309](https://github.com/lovell/sharp/pull/309)
+  [@papandreou](https://github.com/papandreou)
+
 ### v0.11 - "*knife*"
+
+#### v0.11.4 - 5<sup>th</sup> November 2015
+
+* Add corners, e.g. `northeast`, to existing `gravity` option.
+  [#291](https://github.com/lovell/sharp/pull/291)
+  [@brandonaaron](https://github.com/brandonaaron)
+
+* Ensure correct auto-rotation for EXIF Orientation values 2 and 4.
+  [#288](https://github.com/lovell/sharp/pull/288)
+  [@brandonaaron](https://github.com/brandonaaron)
+
+* Make static linking possible via `--runtime_link` install option.
+  [#287](https://github.com/lovell/sharp/pull/287)
+  [@vlapo](https://github.com/vlapo)
+
+#### v0.11.3 - 8<sup>th</sup> September 2015
+
+* Intrepret blurSigma, sharpenFlat, and sharpenJagged as double precision.
+  [#263](https://github.com/lovell/sharp/pull/263)
+  [@chrisriley](https://github.com/chrisriley)
 
 #### v0.11.2 - 28<sup>th</sup> August 2015
 

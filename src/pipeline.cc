@@ -32,16 +32,15 @@ using Nan::Get;
 using Nan::Set;
 using Nan::To;
 using Nan::New;
-using Nan::CopyBuffer;
+using Nan::NewBuffer;
 using Nan::Null;
 using Nan::Equals;
 
 using sharp::Composite;
-using sharp::Premultiply;
-using sharp::Unpremultiply;
 using sharp::Normalize;
 using sharp::Blur;
 using sharp::Sharpen;
+using sharp::Threshold;
 
 using sharp::ImageType;
 using sharp::DetermineImageType;
@@ -57,6 +56,7 @@ using sharp::IsPng;
 using sharp::IsWebp;
 using sharp::IsTiff;
 using sharp::IsDz;
+using sharp::FreeCallback;
 using sharp::counterProcess;
 using sharp::counterQueue;
 
@@ -101,10 +101,12 @@ struct PipelineBaton {
   std::string interpolator;
   double background[4];
   bool flatten;
+  bool negate;
   double blurSigma;
   int sharpenRadius;
   double sharpenFlat;
   double sharpenJagged;
+  int threshold;
   std::string overlayPath;
   double gamma;
   bool greyscale;
@@ -139,10 +141,12 @@ struct PipelineBaton {
     canvas(Canvas::CROP),
     gravity(0),
     flatten(false),
+    negate(false),
     blurSigma(0.0),
     sharpenRadius(0),
     sharpenFlat(1.0),
     sharpenJagged(2.0),
+    threshold(0),
     gamma(0.0),
     greyscale(false),
     normalize(false),
@@ -169,21 +173,15 @@ struct PipelineBaton {
     }
 };
 
-/*
-  Delete input char[] buffer and notify V8 of memory deallocation
-  Used as the callback function for the "postclose" signal
-*/
-static void DeleteBuffer(VipsObject *object, char *buffer) {
-  if (buffer != NULL) {
-    delete[] buffer;
-  }
-}
-
 class PipelineWorker : public AsyncWorker {
 
  public:
-  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener) :
-    AsyncWorker(callback), baton(baton), queueListener(queueListener) {}
+  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener, const Local<Object> &bufferIn) :
+    AsyncWorker(callback), baton(baton), queueListener(queueListener) {
+      if (baton->bufferInLength > 0) {
+        SaveToPersistent("bufferIn", bufferIn);
+      }
+    }
   ~PipelineWorker() {}
 
   /*
@@ -204,31 +202,26 @@ class PipelineWorker : public AsyncWorker {
 
     // Input
     ImageType inputImageType = ImageType::UNKNOWN;
-    VipsImage *image = NULL;
+    VipsImage *image = nullptr;
     if (baton->bufferInLength > 0) {
       // From buffer
       inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (inputImageType != ImageType::UNKNOWN) {
         image = InitImage(baton->bufferIn, baton->bufferInLength, baton->accessMethod);
-        if (image != NULL) {
-          // Listen for "postclose" signal to delete input buffer
-          g_signal_connect(image, "postclose", G_CALLBACK(DeleteBuffer), baton->bufferIn);
-        } else {
+        if (image == nullptr) {
           // Could not read header data
           (baton->err).append("Input buffer has corrupt header");
           inputImageType = ImageType::UNKNOWN;
-          DeleteBuffer(NULL, baton->bufferIn);
         }
       } else {
         (baton->err).append("Input buffer contains unsupported image format");
-        DeleteBuffer(NULL, baton->bufferIn);
       }
     } else {
       // From file
-      inputImageType = DetermineImageType(baton->fileIn.c_str());
+      inputImageType = DetermineImageType(baton->fileIn.data());
       if (inputImageType != ImageType::UNKNOWN) {
-        image = InitImage(baton->fileIn.c_str(), baton->accessMethod);
-        if (image == NULL) {
+        image = InitImage(baton->fileIn.data(), baton->accessMethod);
+        if (image == nullptr) {
           (baton->err).append("Input file has corrupt header");
           inputImageType = ImageType::UNKNOWN;
         }
@@ -236,7 +229,7 @@ class PipelineWorker : public AsyncWorker {
         (baton->err).append("Input file is of an unsupported image format");
       }
     }
-    if (image == NULL || inputImageType == ImageType::UNKNOWN) {
+    if (image == nullptr || inputImageType == ImageType::UNKNOWN) {
       return Error();
     }
     vips_object_local(hook, image);
@@ -250,16 +243,21 @@ class PipelineWorker : public AsyncWorker {
     // Calculate angle of rotation
     Angle rotation;
     bool flip;
-    std::tie(rotation, flip) = CalculateRotationAndFlip(baton->angle, image);
+    bool flop;
+    std::tie(rotation, flip, flop) = CalculateRotationAndFlip(baton->angle, image);
     if (flip && !baton->flip) {
       // Add flip operation due to EXIF mirroring
       baton->flip = TRUE;
+    }
+    if (flop && !baton->flop) {
+      // Add flip operation due to EXIF mirroring
+      baton->flop = TRUE;
     }
 
     // Rotate pre-extract
     if (baton->rotateBeforePreExtract && rotation != Angle::D0) {
       VipsImage *rotated;
-      if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), NULL)) {
+      if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), nullptr)) {
         return Error();
       }
       vips_object_local(hook, rotated);
@@ -270,7 +268,7 @@ class PipelineWorker : public AsyncWorker {
     // Pre extraction
     if (baton->topOffsetPre != -1) {
       VipsImage *extractedPre;
-      if (vips_extract_area(image, &extractedPre, baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre, NULL)) {
+      if (vips_extract_area(image, &extractedPre, baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre, nullptr)) {
         return Error();
       }
       vips_object_local(hook, extractedPre);
@@ -280,7 +278,7 @@ class PipelineWorker : public AsyncWorker {
     // Get pre-resize image width and height
     int inputWidth = image->Xsize;
     int inputHeight = image->Ysize;
-    if (rotation == Angle::D90 || rotation == Angle::D270) {
+    if (!baton->rotateBeforePreExtract && (rotation == Angle::D90 || rotation == Angle::D270)) {
       // Swap input output width and height when rotating by 90 or 270 degrees
       int swap = inputWidth;
       inputWidth = inputHeight;
@@ -288,7 +286,7 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Get window size of interpolator, used for determining shrink vs affine
-    int interpolatorWindowSize = InterpolatorWindowSize(baton->interpolator.c_str());
+    int interpolatorWindowSize = InterpolatorWindowSize(baton->interpolator.data());
     if (interpolatorWindowSize < 0) {
       return Error();
     }
@@ -407,11 +405,11 @@ class PipelineWorker : public AsyncWorker {
       // Reload input using shrink-on-load
       VipsImage *shrunkOnLoad;
       if (baton->bufferInLength > 1) {
-        if (vips_jpegload_buffer(baton->bufferIn, baton->bufferInLength, &shrunkOnLoad, "shrink", shrink_on_load, NULL)) {
+        if (vips_jpegload_buffer(baton->bufferIn, baton->bufferInLength, &shrunkOnLoad, "shrink", shrink_on_load, nullptr)) {
           return Error();
         }
       } else {
-        if (vips_jpegload((baton->fileIn).c_str(), &shrunkOnLoad, "shrink", shrink_on_load, NULL)) {
+        if (vips_jpegload((baton->fileIn).data(), &shrunkOnLoad, "shrink", shrink_on_load, nullptr)) {
           return Error();
         }
       }
@@ -423,7 +421,10 @@ class PipelineWorker : public AsyncWorker {
     if (HasProfile(image)) {
       // Convert to sRGB using embedded profile
       VipsImage *transformed;
-      if (!vips_icc_transform(image, &transformed, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
+      if (
+        !vips_icc_transform(image, &transformed, srgbProfile.data(),
+          "embedded", TRUE, "intent", VIPS_INTENT_PERCEPTUAL, nullptr)
+      ) {
         // Embedded profile can fail, so only update references on success
         vips_object_local(hook, transformed);
         image = transformed;
@@ -432,24 +433,32 @@ class PipelineWorker : public AsyncWorker {
       // Convert to sRGB using default "USWebCoatedSWOP" CMYK profile
       std::string cmykProfile = baton->iccProfilePath + "USWebCoatedSWOP.icc";
       VipsImage *transformed;
-      if (vips_icc_transform(image, &transformed, srgbProfile.c_str(), "input_profile", cmykProfile.c_str(), NULL)) {
+      if (
+        vips_icc_transform(image, &transformed, srgbProfile.data(),
+          "input_profile", cmykProfile.data(), "intent", VIPS_INTENT_PERCEPTUAL, nullptr)
+      ) {
         return Error();
       }
       vips_object_local(hook, transformed);
       image = transformed;
     }
 
+    // Calculate maximum alpha value based on input image pixel depth
+    double maxAlpha = (image->BandFmt == VIPS_FORMAT_USHORT) ? 65535.0 : 255.0;
+
     // Flatten image to remove alpha channel
     if (baton->flatten && HasAlpha(image)) {
+      // Scale up 8-bit values to match 16-bit input image
+      double multiplier = (image->Type == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
       // Background colour
       VipsArrayDouble *background = vips_array_double_newv(
         3, // Ignore alpha channel as we're about to remove it
-        baton->background[0],
-        baton->background[1],
-        baton->background[2]
+        baton->background[0] * multiplier,
+        baton->background[1] * multiplier,
+        baton->background[2] * multiplier
       );
       VipsImage *flattened;
-      if (vips_flatten(image, &flattened, "background", background, NULL)) {
+      if (vips_flatten(image, &flattened, "background", background, "max_alpha", maxAlpha, nullptr)) {
         vips_area_unref(reinterpret_cast<VipsArea*>(background));
         return Error();
       }
@@ -458,10 +467,20 @@ class PipelineWorker : public AsyncWorker {
       image = flattened;
     }
 
+    // Negate the colors in the image.
+    if (baton->negate) {
+        VipsImage *negated;
+        if (vips_invert(image, &negated, nullptr)) {
+            return Error();
+        }
+        vips_object_local(hook, negated);
+        image = negated;
+    }
+
     // Gamma encoding (darken)
     if (baton->gamma >= 1 && baton->gamma <= 3 && !HasAlpha(image)) {
       VipsImage *gammaEncoded;
-      if (vips_gamma(image, &gammaEncoded, "exponent", 1.0 / baton->gamma, NULL)) {
+      if (vips_gamma(image, &gammaEncoded, "exponent", 1.0 / baton->gamma, nullptr)) {
         return Error();
       }
       vips_object_local(hook, gammaEncoded);
@@ -471,7 +490,7 @@ class PipelineWorker : public AsyncWorker {
     // Convert to greyscale (linear, therefore after gamma encoding, if any)
     if (baton->greyscale) {
       VipsImage *greyscale;
-      if (vips_colourspace(image, &greyscale, VIPS_INTERPRETATION_B_W, NULL)) {
+      if (vips_colourspace(image, &greyscale, VIPS_INTERPRETATION_B_W, nullptr)) {
         return Error();
       }
       vips_object_local(hook, greyscale);
@@ -481,7 +500,7 @@ class PipelineWorker : public AsyncWorker {
     if (xshrink > 1 || yshrink > 1) {
       VipsImage *shrunk;
       // Use vips_shrink with the integral reduction
-      if (vips_shrink(image, &shrunk, xshrink, yshrink, NULL)) {
+      if (vips_shrink(image, &shrunk, xshrink, yshrink, nullptr)) {
         return Error();
       }
       vips_object_local(hook, shrunk);
@@ -509,6 +528,7 @@ class PipelineWorker : public AsyncWorker {
     bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
     bool shouldBlur = baton->blurSigma != 0.0;
     bool shouldSharpen = baton->sharpenRadius != 0;
+    bool shouldThreshold = baton->threshold != 0;
     bool hasOverlay = !baton->overlayPath.empty();
     bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
 
@@ -517,7 +537,7 @@ class PipelineWorker : public AsyncWorker {
     // See: http://entropymine.com/imageworsener/resizealpha/
     if (shouldPremultiplyAlpha) {
       VipsImage *imagePremultiplied;
-      if (Premultiply(hook, image, &imagePremultiplied)) {
+      if (vips_premultiply(image, &imagePremultiplied, "max_alpha", maxAlpha, nullptr)) {
         (baton->err).append("Failed to premultiply alpha channel.");
         return Error();
       }
@@ -527,6 +547,12 @@ class PipelineWorker : public AsyncWorker {
 
     // Use vips_affine with the remaining float part
     if (shouldAffineTransform) {
+      // Create interpolator
+      VipsInterpolate *interpolator = vips_interpolate_new(baton->interpolator.data());
+      if (interpolator == nullptr) {
+        return Error();
+      }
+      vips_object_local(hook, interpolator);
       // Use average of x and y residuals to compute sigma for Gaussian blur
       double residual = (xresidual + yresidual) / 2.0;
       // Apply Gaussian blur before large affine reductions
@@ -534,39 +560,31 @@ class PipelineWorker : public AsyncWorker {
         // Calculate standard deviation
         double sigma = ((1.0 / residual) - 0.4) / 3.0;
         if (sigma >= 0.3) {
-          // Create Gaussian function for standard deviation
-          VipsImage *gaussian;
-          if (vips_gaussmat(&gaussian, sigma, 0.2, "separable", TRUE, "integer", TRUE, NULL)) {
-            return Error();
-          }
-          vips_object_local(hook, gaussian);
           // Sequential input requires a small linecache before use of convolution
           if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL) {
             VipsImage *lineCached;
-            if (vips_linecache(image, &lineCached, "access", VIPS_ACCESS_SEQUENTIAL, "tile_height", 1, "threaded", TRUE, NULL)) {
+            if (vips_linecache(image, &lineCached, "access", VIPS_ACCESS_SEQUENTIAL,
+              "tile_height", 1, "threaded", TRUE, nullptr)
+            ) {
               return Error();
             }
             vips_object_local(hook, lineCached);
             image = lineCached;
           }
-          // Apply Gaussian function
+          // Apply Gaussian blur
           VipsImage *blurred;
-          if (vips_convsep(image, &blurred, gaussian, "precision", VIPS_PRECISION_INTEGER, NULL)) {
+          if (vips_gaussblur(image, &blurred, sigma, nullptr)) {
             return Error();
           }
           vips_object_local(hook, blurred);
           image = blurred;
         }
       }
-      // Create interpolator - "bilinear" (default), "bicubic" or "nohalo"
-      VipsInterpolate *interpolator = vips_interpolate_new(baton->interpolator.c_str());
-      if (interpolator == NULL) {
-        return Error();
-      }
-      vips_object_local(hook, interpolator);
       // Perform affine transformation
       VipsImage *affined;
-      if (vips_affine(image, &affined, xresidual, 0.0, 0.0, yresidual, "interpolate", interpolator, NULL)) {
+      if (vips_affine(image, &affined, xresidual, 0.0, 0.0, yresidual,
+        "interpolate", interpolator, nullptr)
+      ) {
         return Error();
       }
       vips_object_local(hook, affined);
@@ -576,7 +594,7 @@ class PipelineWorker : public AsyncWorker {
     // Rotate
     if (!baton->rotateBeforePreExtract && rotation != Angle::D0) {
       VipsImage *rotated;
-      if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), NULL)) {
+      if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), nullptr)) {
         return Error();
       }
       vips_object_local(hook, rotated);
@@ -587,7 +605,7 @@ class PipelineWorker : public AsyncWorker {
     // Flip (mirror about Y axis)
     if (baton->flip) {
       VipsImage *flipped;
-      if (vips_flip(image, &flipped, VIPS_DIRECTION_VERTICAL, NULL)) {
+      if (vips_flip(image, &flipped, VIPS_DIRECTION_VERTICAL, nullptr)) {
         return Error();
       }
       vips_object_local(hook, flipped);
@@ -598,7 +616,7 @@ class PipelineWorker : public AsyncWorker {
     // Flop (mirror about X axis)
     if (baton->flop) {
       VipsImage *flopped;
-      if (vips_flip(image, &flopped, VIPS_DIRECTION_HORIZONTAL, NULL)) {
+      if (vips_flip(image, &flopped, VIPS_DIRECTION_HORIZONTAL, nullptr)) {
         return Error();
       }
       vips_object_local(hook, flopped);
@@ -609,33 +627,23 @@ class PipelineWorker : public AsyncWorker {
     // Crop/embed
     if (image->Xsize != baton->width || image->Ysize != baton->height) {
       if (baton->canvas == Canvas::EMBED) {
-        // Match background colour space, namely sRGB
-        if (image->Type != VIPS_INTERPRETATION_sRGB) {
-          // Convert to sRGB colour space
-          VipsImage *colourspaced;
-          if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, NULL)) {
-            return Error();
-          }
-          vips_object_local(hook, colourspaced);
-          image = colourspaced;
-        }
         // Add non-transparent alpha channel, if required
         if (baton->background[3] < 255.0 && !HasAlpha(image)) {
           // Create single-channel transparency
           VipsImage *black;
-          if (vips_black(&black, image->Xsize, image->Ysize, "bands", 1, NULL)) {
+          if (vips_black(&black, image->Xsize, image->Ysize, "bands", 1, nullptr)) {
             return Error();
           }
           vips_object_local(hook, black);
           // Invert to become non-transparent
           VipsImage *alpha;
-          if (vips_invert(black, &alpha, NULL)) {
+          if (vips_invert(black, &alpha, nullptr)) {
             return Error();
           }
           vips_object_local(hook, alpha);
           // Append alpha channel to existing image
           VipsImage *joined;
-          if (vips_bandjoin2(image, alpha, &joined, NULL)) {
+          if (vips_bandjoin2(image, alpha, &joined, nullptr)) {
             return Error();
           }
           vips_object_local(hook, joined);
@@ -643,13 +651,22 @@ class PipelineWorker : public AsyncWorker {
         }
         // Create background
         VipsArrayDouble *background;
+        // Scale up 8-bit values to match 16-bit input image
+        double multiplier = (image->Type == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
         if (baton->background[3] < 255.0 || HasAlpha(image)) {
-          background = vips_array_double_newv(
-            4, baton->background[0], baton->background[1], baton->background[2], baton->background[3]
+          // RGBA
+          background = vips_array_double_newv(4,
+            baton->background[0] * multiplier,
+            baton->background[1] * multiplier,
+            baton->background[2] * multiplier,
+            baton->background[3] * multiplier
           );
         } else {
-          background = vips_array_double_newv(
-            3, baton->background[0], baton->background[1], baton->background[2]
+          // RGB
+          background = vips_array_double_newv(3,
+            baton->background[0] * multiplier,
+            baton->background[1] * multiplier,
+            baton->background[2] * multiplier
           );
         }
         // Embed
@@ -657,7 +674,7 @@ class PipelineWorker : public AsyncWorker {
         int top = (baton->height - image->Ysize) / 2;
         VipsImage *embedded;
         if (vips_embed(image, &embedded, left, top, baton->width, baton->height,
-          "extend", VIPS_EXTEND_BACKGROUND, "background", background, NULL
+          "extend", VIPS_EXTEND_BACKGROUND, "background", background, nullptr
         )) {
           vips_area_unref(reinterpret_cast<VipsArea*>(background));
           return Error();
@@ -673,7 +690,7 @@ class PipelineWorker : public AsyncWorker {
         int width = std::min(image->Xsize, baton->width);
         int height = std::min(image->Ysize, baton->height);
         VipsImage *extracted;
-        if (vips_extract_area(image, &extracted, left, top, width, height, NULL)) {
+        if (vips_extract_area(image, &extracted, left, top, width, height, nullptr)) {
           return Error();
         }
         vips_object_local(hook, extracted);
@@ -685,12 +702,21 @@ class PipelineWorker : public AsyncWorker {
     if (baton->topOffsetPost != -1) {
       VipsImage *extractedPost;
       if (vips_extract_area(image, &extractedPost,
-        baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost, NULL
+        baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost, nullptr
       )) {
         return Error();
       }
       vips_object_local(hook, extractedPost);
       image = extractedPost;
+    }
+
+    // Threshold - must happen before blurring, due to the utility of blurring after thresholding
+    if (shouldThreshold) {
+        VipsImage *thresholded;
+        if (Threshold(hook, image, &thresholded, baton->threshold)) {
+            return Error();
+        }
+        image = thresholded;
     }
 
     // Blur
@@ -713,12 +739,12 @@ class PipelineWorker : public AsyncWorker {
 
     // Composite with overlay, if present
     if (hasOverlay) {
-      VipsImage *overlayImage = NULL;
+      VipsImage *overlayImage = nullptr;
       ImageType overlayImageType = ImageType::UNKNOWN;
-      overlayImageType = DetermineImageType(baton->overlayPath.c_str());
+      overlayImageType = DetermineImageType(baton->overlayPath.data());
       if (overlayImageType != ImageType::UNKNOWN) {
-        overlayImage = InitImage(baton->overlayPath.c_str(), baton->accessMethod);
-        if (overlayImage == NULL) {
+        overlayImage = InitImage(baton->overlayPath.data(), baton->accessMethod);
+        if (overlayImage == nullptr) {
           (baton->err).append("Overlay image has corrupt header");
           return Error();
         } else {
@@ -749,15 +775,15 @@ class PipelineWorker : public AsyncWorker {
 
       // Ensure overlay is sRGB
       VipsImage *overlayImageRGB;
-      if (vips_colourspace(overlayImage, &overlayImageRGB, VIPS_INTERPRETATION_sRGB, NULL)) {
+      if (vips_colourspace(overlayImage, &overlayImageRGB, VIPS_INTERPRETATION_sRGB, nullptr)) {
         return Error();
       }
       vips_object_local(hook, overlayImageRGB);
 
       // Premultiply overlay
       VipsImage *overlayImagePremultiplied;
-      if (Premultiply(hook, overlayImageRGB, &overlayImagePremultiplied)) {
-        (baton->err).append("Failed to premultiply alpha channel of overlay image.");
+      if (vips_premultiply(overlayImageRGB, &overlayImagePremultiplied, nullptr)) {
+        (baton->err).append("Failed to premultiply alpha channel of overlay image");
         return Error();
       }
       vips_object_local(hook, overlayImagePremultiplied);
@@ -774,11 +800,10 @@ class PipelineWorker : public AsyncWorker {
     // Reverse premultiplication after all transformations:
     if (shouldPremultiplyAlpha) {
       VipsImage *imageUnpremultiplied;
-      if (Unpremultiply(hook, image, &imageUnpremultiplied)) {
-        (baton->err).append("Failed to unpremultiply alpha channel.");
+      if (vips_unpremultiply(image, &imageUnpremultiplied, "max_alpha", maxAlpha, nullptr)) {
+        (baton->err).append("Failed to unpremultiply alpha channel");
         return Error();
       }
-
       vips_object_local(hook, imageUnpremultiplied);
       image = imageUnpremultiplied;
     }
@@ -786,7 +811,7 @@ class PipelineWorker : public AsyncWorker {
     // Gamma decoding (brighten)
     if (baton->gamma >= 1 && baton->gamma <= 3 && !HasAlpha(image)) {
       VipsImage *gammaDecoded;
-      if (vips_gamma(image, &gammaDecoded, "exponent", baton->gamma, NULL)) {
+      if (vips_gamma(image, &gammaDecoded, "exponent", baton->gamma, nullptr)) {
         return Error();
       }
       vips_object_local(hook, gammaDecoded);
@@ -803,10 +828,27 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Convert image to sRGB, if not already
-    if (image->Type != VIPS_INTERPRETATION_sRGB) {
+    if (image->Type == VIPS_INTERPRETATION_RGB16) {
+      // Ensure 16-bit integer
+      VipsImage *ushort;
+      if (vips_cast_ushort(image, &ushort, nullptr)) {
+        return Error();
+      }
+      vips_object_local(hook, ushort);
+      image = ushort;
+      // Fast conversion to 8-bit integer by discarding least-significant byte
+      VipsImage *msb;
+      if (vips_msb(image, &msb, nullptr)) {
+        return Error();
+      }
+      vips_object_local(hook, msb);
+      image = msb;
+      // Explicitly set to sRGB
+      image->Type = VIPS_INTERPRETATION_sRGB;
+    } else if (image->Type != VIPS_INTERPRETATION_sRGB) {
       // Switch interpretation to sRGB
       VipsImage *rgb;
-      if (vips_colourspace(image, &rgb, VIPS_INTERPRETATION_sRGB, NULL)) {
+      if (vips_colourspace(image, &rgb, VIPS_INTERPRETATION_sRGB, nullptr)) {
         return Error();
       }
       vips_object_local(hook, rgb);
@@ -814,7 +856,7 @@ class PipelineWorker : public AsyncWorker {
       // Transform colours from embedded profile to sRGB profile
       if (baton->withMetadata && HasProfile(image)) {
         VipsImage *profiled;
-        if (vips_icc_transform(image, &profiled, srgbProfile.c_str(), "embedded", TRUE, NULL)) {
+        if (vips_icc_transform(image, &profiled, srgbProfile.data(), "embedded", TRUE, nullptr)) {
           return Error();
         }
         vips_object_local(hook, profiled);
@@ -827,63 +869,54 @@ class PipelineWorker : public AsyncWorker {
       SetExifOrientation(image, baton->withMetadataOrientation);
     }
 
-#if !(VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 40 && VIPS_MINOR_VERSION >= 5))
-    // Generate image tile cache when interlace output is required - no longer required as of libvips 7.40.5+
-    if (baton->progressive) {
-      VipsImage *cached;
-      if (vips_tilecache(image, &cached, "threaded", TRUE, "persistent", TRUE, "max_tiles", -1, NULL)) {
-        return Error();
-      }
-      vips_object_local(hook, cached);
-      image = cached;
-    }
-#endif
-
     // Output
     if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == ImageType::JPEG)) {
       // Write JPEG to buffer
-      if (vips_jpegsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
-        "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
-#if (VIPS_MAJOR_VERSION >= 8)
+      if (vips_jpegsave_buffer(
+        image, &baton->bufferOut, &baton->bufferOutLength,
+        "strip", !baton->withMetadata,
+        "Q", baton->quality,
+        "optimize_coding", TRUE,
+        "no_subsample", baton->withoutChromaSubsampling,
         "trellis_quant", baton->trellisQuantisation,
         "overshoot_deringing", baton->overshootDeringing,
         "optimize_scans", baton->optimiseScans,
-#endif
-        "interlace", baton->progressive, NULL)) {
+        "interlace", baton->progressive,
+        nullptr
+      )) {
         return Error();
       }
       baton->outputFormat = "jpeg";
     } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == ImageType::PNG)) {
-#if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
-      // Select PNG row filter
-      int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
       // Write PNG to buffer
-      if (vips_pngsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
-        "compression", baton->compressionLevel, "interlace", baton->progressive, "filter", filter, NULL)) {
+      if (vips_pngsave_buffer(
+        image, &baton->bufferOut, &baton->bufferOutLength,
+        "strip", !baton->withMetadata,
+        "compression", baton->compressionLevel,
+        "interlace", baton->progressive,
+        "filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL,
+        nullptr
+      )) {
         return Error();
       }
-#else
-      // Write PNG to buffer
-      if (vips_pngsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
-        "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
-        return Error();
-      }
-#endif
       baton->outputFormat = "png";
     } else if (baton->output == "__webp" || (baton->output == "__input" && inputImageType == ImageType::WEBP)) {
       // Write WEBP to buffer
-      if (vips_webpsave_buffer(image, &baton->bufferOut, &baton->bufferOutLength, "strip", !baton->withMetadata,
-        "Q", baton->quality, NULL)) {
+      if (vips_webpsave_buffer(
+        image, &baton->bufferOut, &baton->bufferOutLength,
+        "strip", !baton->withMetadata,
+        "Q", baton->quality,
+        nullptr
+      )) {
         return Error();
       }
       baton->outputFormat = "webp";
-#if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
     } else if (baton->output == "__raw") {
       // Write raw, uncompressed image data to buffer
       if (baton->greyscale || image->Type == VIPS_INTERPRETATION_B_W) {
         // Extract first band for greyscale image
         VipsImage *grey;
-        if (vips_extract_band(image, &grey, 0, NULL)) {
+        if (vips_extract_band(image, &grey, 0, nullptr)) {
           return Error();
         }
         vips_object_local(hook, grey);
@@ -892,7 +925,7 @@ class PipelineWorker : public AsyncWorker {
       if (image->BandFmt != VIPS_FORMAT_UCHAR) {
         // Cast pixels to uint8 (unsigned char)
         VipsImage *uchar;
-        if (vips_cast(image, &uchar, VIPS_FORMAT_UCHAR, NULL)) {
+        if (vips_cast(image, &uchar, VIPS_FORMAT_UCHAR, nullptr)) {
           return Error();
         }
         vips_object_local(hook, uchar);
@@ -900,12 +933,11 @@ class PipelineWorker : public AsyncWorker {
       }
       // Get raw image data
       baton->bufferOut = vips_image_write_to_memory(image, &baton->bufferOutLength);
-      if (baton->bufferOut == NULL) {
+      if (baton->bufferOut == nullptr) {
         (baton->err).append("Could not allocate enough memory for raw output");
         return Error();
       }
       baton->outputFormat = "raw";
-#endif
     } else {
       bool outputJpeg = IsJpeg(baton->output);
       bool outputPng = IsPng(baton->output);
@@ -915,52 +947,66 @@ class PipelineWorker : public AsyncWorker {
       bool matchInput = !(outputJpeg || outputPng || outputWebp || outputTiff || outputDz);
       if (outputJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
         // Write JPEG to file
-        if (vips_jpegsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
-          "Q", baton->quality, "optimize_coding", TRUE, "no_subsample", baton->withoutChromaSubsampling,
-#if (VIPS_MAJOR_VERSION >= 8)
+        if (vips_jpegsave(
+          image, baton->output.data(),
+          "strip", !baton->withMetadata,
+          "Q", baton->quality,
+          "optimize_coding", TRUE,
+          "no_subsample", baton->withoutChromaSubsampling,
           "trellis_quant", baton->trellisQuantisation,
           "overshoot_deringing", baton->overshootDeringing,
           "optimize_scans", baton->optimiseScans,
-#endif
-          "interlace", baton->progressive, NULL)) {
+          "interlace", baton->progressive,
+          nullptr
+        )) {
           return Error();
         }
         baton->outputFormat = "jpeg";
       } else if (outputPng || (matchInput && inputImageType == ImageType::PNG)) {
-#if (VIPS_MAJOR_VERSION >= 8 || (VIPS_MAJOR_VERSION >= 7 && VIPS_MINOR_VERSION >= 42))
-        // Select PNG row filter
-        int filter = baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL;
         // Write PNG to file
-        if (vips_pngsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
-          "compression", baton->compressionLevel, "interlace", baton->progressive, "filter", filter, NULL)) {
+        if (vips_pngsave(
+          image, baton->output.data(),
+          "strip", !baton->withMetadata,
+          "compression", baton->compressionLevel,
+          "interlace", baton->progressive,
+          "filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL,
+          nullptr
+        )) {
           return Error();
         }
-#else
-        // Write PNG to file
-        if (vips_pngsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
-          "compression", baton->compressionLevel, "interlace", baton->progressive, NULL)) {
-          return Error();
-        }
-#endif
         baton->outputFormat = "png";
       } else if (outputWebp || (matchInput && inputImageType == ImageType::WEBP)) {
         // Write WEBP to file
-        if (vips_webpsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
-          "Q", baton->quality, NULL)) {
+        if (vips_webpsave(
+          image, baton->output.data(),
+          "strip", !baton->withMetadata,
+          "Q", baton->quality,
+          nullptr
+        )) {
           return Error();
         }
         baton->outputFormat = "webp";
       } else if (outputTiff || (matchInput && inputImageType == ImageType::TIFF)) {
         // Write TIFF to file
-        if (vips_tiffsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
-          "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG, "Q", baton->quality, NULL)) {
+        if (vips_tiffsave(
+          image, baton->output.data(),
+          "strip", !baton->withMetadata,
+          "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG,
+          "Q", baton->quality,
+          nullptr
+        )) {
           return Error();
         }
         baton->outputFormat = "tiff";
       } else if (outputDz) {
         // Write DZ to file
-        if (vips_dzsave(image, baton->output.c_str(), "strip", !baton->withMetadata,
-            "tile_size", baton->tileSize, "overlap", baton->tileOverlap, NULL)) {
+        if (vips_dzsave(
+          image, baton->output.data(),
+          "strip", !baton->withMetadata,
+          "tile_size", baton->tileSize,
+          "overlap", baton->tileOverlap,
+          nullptr
+        )) {
           return Error();
         }
         baton->outputFormat = "dz";
@@ -979,10 +1025,10 @@ class PipelineWorker : public AsyncWorker {
   void HandleOKCallback () {
     HandleScope();
 
-    Local<Value> argv[3] = { Null(), Null(),  Null() };
+    Local<Value> argv[3] = { Null(), Null(), Null() };
     if (!baton->err.empty()) {
       // Error
-      argv[0] = Nan::Error(baton->err.c_str());
+      argv[0] = Nan::Error(baton->err.data());
     } else {
       int width = baton->width;
       int height = baton->height;
@@ -1001,23 +1047,27 @@ class PipelineWorker : public AsyncWorker {
       Set(info, New("height").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(height)));
 
       if (baton->bufferOutLength > 0) {
-        // Copy data to new Buffer
-        argv[1] = CopyBuffer(static_cast<char*>(baton->bufferOut), baton->bufferOutLength).ToLocalChecked();
-        // bufferOut was allocated via g_malloc
-        g_free(baton->bufferOut);
+        // Pass ownership of output data to Buffer instance
+        argv[1] = NewBuffer(
+          static_cast<char*>(baton->bufferOut), baton->bufferOutLength, FreeCallback, nullptr
+        ).ToLocalChecked();
         // Add buffer size to info
         Set(info, New("size").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(baton->bufferOutLength)));
         argv[2] = info;
       } else {
         // Add file size to info
         GStatBuf st;
-        g_stat(baton->output.c_str(), &st);
+        g_stat(baton->output.data(), &st);
         Set(info, New("size").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(st.st_size)));
         argv[1] = info;
       }
     }
+
+    // Dispose of Persistent wrapper around input Buffer so it can be garbage collected
+    if (baton->bufferInLength > 0) {
+      GetFromPersistent("bufferIn");
+    }
     delete baton;
-    // to here
 
     // Decrement processing task counter
     g_atomic_int_dec_and_test(&counterProcess);
@@ -1041,18 +1091,19 @@ class PipelineWorker : public AsyncWorker {
      2. Use input image EXIF Orientation header - supports mirroring
      3. Otherwise default to zero, i.e. no rotation
   */
-  std::tuple<Angle, bool>
+  std::tuple<Angle, bool, bool>
   CalculateRotationAndFlip(int const angle, VipsImage const *input) {
     Angle rotate = Angle::D0;
     bool flip = FALSE;
+    bool flop = FALSE;
     if (angle == -1) {
       switch(ExifOrientation(input)) {
         case 6: rotate = Angle::D90; break;
         case 3: rotate = Angle::D180; break;
         case 8: rotate = Angle::D270; break;
-        case 2: flip = TRUE; break; // flip 1
+        case 2: flop = TRUE; break; // flop 1
         case 7: flip = TRUE; rotate = Angle::D90; break; // flip 6
-        case 4: flip = TRUE; rotate = Angle::D180; break; // flip 3
+        case 4: flop = TRUE; rotate = Angle::D180; break; // flop 3
         case 5: flip = TRUE; rotate = Angle::D270; break; // flip 8
       }
     } else {
@@ -1064,7 +1115,7 @@ class PipelineWorker : public AsyncWorker {
         rotate = Angle::D270;
       }
     }
-    return std::make_tuple(rotate, flip);
+    return std::make_tuple(rotate, flip, flop);
   }
 
   /*
@@ -1089,6 +1140,16 @@ class PipelineWorker : public AsyncWorker {
         break;
       case 4: // West
         top = (inHeight - outHeight + 1) / 2;
+        break;
+      case 5: // Northeast
+        left = inWidth - outWidth;
+        break;
+      case 6: // Southeast
+        left = inWidth - outWidth;
+        top = inHeight - outHeight;
+      case 7: // Southwest
+        top = inHeight - outHeight;
+      case 8: // Northwest
         break;
       default: // Centre
         left = (inWidth - outWidth + 1) / 2;
@@ -1153,12 +1214,11 @@ NAN_METHOD(pipeline) {
     To<bool>(Get(options, New("sequentialRead").ToLocalChecked()).ToLocalChecked()).FromJust() ?
     VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   // Input Buffer object
+  Local<Object> bufferIn;
   if (node::Buffer::HasInstance(Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked())) {
-    Local<Object> buffer = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
-    // Take a copy of the input Buffer to avoid problems with V8 heap compaction
-    baton->bufferInLength = node::Buffer::Length(buffer);
-    baton->bufferIn = new char[baton->bufferInLength];
-    memcpy(baton->bufferIn, node::Buffer::Data(buffer), baton->bufferInLength);
+    bufferIn = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
+    baton->bufferInLength = node::Buffer::Length(bufferIn);
+    baton->bufferIn = node::Buffer::Data(bufferIn);
   }
   // ICC profile to use when input CMYK image has no embedded profile
   baton->iccProfilePath = *Utf8String(Get(options, New("iccProfilePath").ToLocalChecked()).ToLocalChecked());
@@ -1202,10 +1262,12 @@ NAN_METHOD(pipeline) {
   baton->interpolator = *Utf8String(Get(options, New("interpolator").ToLocalChecked()).ToLocalChecked());
   // Operators
   baton->flatten = To<bool>(Get(options, New("flatten").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->negate = To<bool>(Get(options, New("negate").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->blurSigma = To<double>(Get(options, New("blurSigma").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->sharpenRadius = To<int32_t>(Get(options, New("sharpenRadius").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->sharpenFlat = To<double>(Get(options, New("sharpenFlat").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->sharpenJagged = To<double>(Get(options, New("sharpenJagged").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->threshold = To<int32_t>(Get(options, New("threshold").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->gamma = To<int32_t>(Get(options, New("gamma").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->greyscale = To<bool>(Get(options, New("greyscale").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->normalize = To<bool>(Get(options, New("normalize").ToLocalChecked()).ToLocalChecked()).FromJust();
@@ -1233,7 +1295,7 @@ NAN_METHOD(pipeline) {
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener));
+  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);

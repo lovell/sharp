@@ -7,12 +7,8 @@
 
 // Verify platform and compiler compatibility
 
-#if (VIPS_MAJOR_VERSION < 7 || (VIPS_MAJOR_VERSION == 7 && VIPS_MINOR_VERSION < 40))
-#error libvips version 7.40.0+ required - see http://sharp.dimens.io/page/install
-#endif
-
-#ifdef _WIN64
-#error Windows 64-bit is currently unsupported - see http://sharp.dimens.io/page/install#windows
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 1 && VIPS_PATCH_VERSION < 1))
+#error libvips version 8.1.1+ required - see http://sharp.dimens.io/page/install
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
@@ -82,7 +78,7 @@ namespace sharp {
     Initialise and return a VipsImage from a buffer. Supports JPEG, PNG, WebP and TIFF.
   */
   VipsImage* InitImage(void *buffer, size_t const length, VipsAccess const access) {
-    return vips_image_new_from_buffer(buffer, length, NULL, "access", access, NULL);
+    return vips_image_new_from_buffer(buffer, length, nullptr, "access", access, nullptr);
   }
 
   /*
@@ -91,7 +87,7 @@ namespace sharp {
   ImageType DetermineImageType(char const *file) {
     ImageType imageType = ImageType::UNKNOWN;
     char const *load = vips_foreign_find_load(file);
-    if (load != NULL) {
+    if (load != nullptr) {
       std::string loader = load;
       if (EndsWith(loader, "JpegFile")) {
         imageType = ImageType::JPEG;
@@ -114,7 +110,7 @@ namespace sharp {
     Initialise and return a VipsImage from a file.
   */
   VipsImage* InitImage(char const *file, VipsAccess const access) {
-    return vips_image_new_from_file(file, "access", access, NULL);
+    return vips_image_new_from_file(file, "access", access, nullptr);
   }
 
   /*
@@ -173,12 +169,21 @@ namespace sharp {
   */
   int InterpolatorWindowSize(char const *name) {
     VipsInterpolate *interpolator = vips_interpolate_new(name);
-    if (interpolator == NULL) {
+    if (interpolator == nullptr) {
       return -1;
     }
     int window_size = vips_interpolate_get_window_size(interpolator);
     g_object_unref(interpolator);
     return window_size;
+  }
+
+  /*
+    Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
+  */
+  void FreeCallback(char* data, void* hint) {
+    if (data != nullptr) {
+      g_free(data);
+    }
   }
 
 } // namespace sharp

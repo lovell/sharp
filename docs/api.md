@@ -11,7 +11,7 @@ var sharp = require('sharp');
 Constructor to which further methods are chained. `input`, if present, can be one of:
 
 * Buffer containing JPEG, PNG, WebP, GIF* or TIFF image data, or
-* String containing the filename of an image, with most major formats supported.
+* String containing the path to an image file, with most major formats supported.
 
 The object returned implements the
 [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
@@ -78,7 +78,7 @@ to share a single input Stream.
 ```javascript
 var pipeline = sharp().rotate();
 pipeline.clone().resize(800, 600).pipe(firstWritableStream);
-pipeline.clone().extract(20, 20, 100, 100).pipe(secondWritableStream);
+pipeline.clone().extract({ left: 20, top: 20, width: 100, height: 100 }).pipe(secondWritableStream);
 readableStream.pipe(pipeline);
 // firstWritableStream receives auto-rotated, resized readableStream
 // secondWritableStream receives auto-rotated, extracted region of readableStream
@@ -111,7 +111,8 @@ Crop the resized image to the exact size specified, the default behaviour.
 
 `gravity`, if present, is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north`.
 
-Possible values are `north`, `east`, `south`, `west`, `center` and `centre`. The default gravity is `center`/`centre`.
+Possible values are `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` and `centre`.
+The default gravity is `center`/`centre`.
 
 ```javascript
 var transformer = sharp()
@@ -200,14 +201,18 @@ Ignoring the aspect ratio of the input, stretch the image to the exact `width` a
 
 Use the given interpolator for image resizing, where `interpolator` is an attribute of the `sharp.interpolator` Object e.g. `sharp.interpolator.bicubic`.
 
+The default interpolator is `bicubic`, providing a general-purpose interpolator that is both fast and of good quality.
+
 Possible interpolators, in order of performance, are:
 
 * `nearest`: Use [nearest neighbour interpolation](http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation), suitable for image enlargement only.
-* `bilinear`: Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation), the default and fastest image reduction interpolation.
-* `bicubic`: Use [bicubic interpolation](http://en.wikipedia.org/wiki/Bicubic_interpolation), which typically reduces performance by 5%.
-* `vertexSplitQuadraticBasisSpline`: Use [VSQBS interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/vsqbs.cpp#L48), which prevents "staircasing" and typically reduces performance by 5%.
-* `locallyBoundedBicubic`: Use [LBB interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/lbb.cpp#L100), which prevents some "[acutance](http://en.wikipedia.org/wiki/Acutance)" and typically reduces performance by a factor of 2.
-* `nohalo`: Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/), which prevents acutance and typically reduces performance by a factor of 3.
+* `bilinear`: Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation), faster than bicubic but with less smooth results.
+* `vertexSplitQuadraticBasisSpline`: Use the smoother [VSQBS interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/vsqbs.cpp#L48) to prevent "staircasing" when enlarging.
+* `bicubic`: Use [bicubic interpolation](http://en.wikipedia.org/wiki/Bicubic_interpolation) (the default).
+* `locallyBoundedBicubic`: Use [LBB interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/lbb.cpp#L100), which prevents some "[acutance](http://en.wikipedia.org/wiki/Acutance)" but typically reduces performance by a factor of 2.
+* `nohalo`: Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/), which prevents acutance but typically reduces performance by a factor of 3.
+
+[Compare the output of these interpolators](https://github.com/lovell/sharp/tree/master/test/interpolators)
 
 ```javascript
 sharp(inputBuffer)
@@ -225,11 +230,11 @@ sharp(inputBuffer)
 
 ### Operations
 
-#### extract(top, left, width, height)
+#### extract({ left: left, top: top, width: width, height: height })
 
 Extract a region of the image. Can be used with or without a `resize` operation.
 
-`top` and `left` are the offset, in pixels, from the top-left corner.
+`left` and `top` are the offset, in pixels, from the top-left corner.
 
 `width` and `height` are the dimensions of the extracted image.
 
@@ -237,7 +242,7 @@ Use `extract` before `resize` for pre-resize extraction. Use `extract` after `re
 
 ```javascript
 sharp(input)
-  .extract(top, left, width, height)
+  .extract({ left: left, top: top, width: width, height: height })
   .toFile(output, function(err) {
     // Extract a region of the input image, saving in the same format.
   });
@@ -245,9 +250,9 @@ sharp(input)
 
 ```javascript
 sharp(input)
-  .extract(topOffsetPre, leftOffsetPre, widthPre, heightPre)
+  .extract({ left: leftOffsetPre, top: topOffsetPre, width: widthPre, height: heightPre })
   .resize(width, height)
-  .extract(topOffsetPost, leftOffsetPost, widthPost, heightPost)
+  .extract({ left: leftOffsetPost, top: topOffsetPost, width: widthPost, height: heightPost })
   .toFile(output, function(err) {
     // Extract a region, resize, then extract from the resized image
   });
@@ -266,6 +271,10 @@ The default background is `{r: 0, g: 0, b: 0, a: 1}`, black without transparency
 #### flatten()
 
 Merge alpha transparency channel, if any, with `background`.
+
+#### negate()
+
+Produces the "negative" of the image.  White => Black, Black => White, Blue => Yellow, etc.
 
 #### rotate([angle])
 
@@ -323,11 +332,17 @@ When a `radius` is provided, performs a slower, more accurate sharpen of the L c
 * `flat`, if present, is a Number representing the level of sharpening to apply to "flat" areas, defaulting to a value of 1.0.
 * `jagged`, if present, is a Number representing the level of sharpening to apply to "jagged" areas, defaulting to a value of 2.0.
 
+#### threshold([threshold])
+
+Converts all pixels in the image to greyscale white or black.  Any pixel greather-than-or-equal-to the threshold (0..255) will be white.  All others will be black.
+
+* `threshold`, if present, is a Number, representing the level above which pixels will be forced to white.
+
 #### gamma([gamma])
 
 Apply a gamma correction by reducing the encoding (darken) pre-resize at a factor of `1/gamma` then increasing the encoding (brighten) post-resize at a factor of `gamma`.
 
-`gamma`, if present, is a Number betweem 1 and 3. The default value is `2.2`, a suitable approximation for sRGB images.
+`gamma`, if present, is a Number between 1 and 3. The default value is `2.2`, a suitable approximation for sRGB images.
 
 This can improve the perceived brightness of a resized image in non-linear colour spaces.
 
@@ -345,13 +360,13 @@ The output image will still be web-friendly sRGB and contain three (identical) c
 
 Enhance output image contrast by stretching its luminance to cover the full dynamic range. This typically reduces performance by 30%.
 
-#### overlayWith(filename)
+#### overlayWith(path)
 
 _Experimental_
 
-Alpha composite `filename` over the processed (resized, extracted) image. The dimensions of the two images must match.
+Alpha composite image at `path` over the processed (resized, extracted) image. The dimensions of the two images must match.
 
-* `filename` is a String containing the filename of an image with an alpha channel.
+* `path` is a String containing the path to an image file with an alpha channel.
 
 ```javascript
 sharp('input.png')
@@ -374,9 +389,9 @@ sharp('input.png')
 
 ### Output
 
-#### toFile(filename, [callback])
+#### toFile(path, [callback])
 
-`filename` is a String containing the filename to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
+`path` is a String containing the path to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
 
 `callback`, if present, is called with two arguments `(err, info)` where:
 
@@ -410,8 +425,6 @@ Use PNG format for the output image.
 Use WebP format for the output image.
 
 #### raw()
-
-_Requires libvips 7.42.0+_
 
 Provide raw, uncompressed uint8 (unsigned char) image data for Buffer and Stream based output.
 
@@ -482,13 +495,11 @@ An advanced setting for the _zlib_ compression level of the lossless PNG output 
 
 #### withoutAdaptiveFiltering()
 
-_Requires libvips 7.42.0+_
-
 An advanced setting to disable adaptive row filtering for the lossless PNG output format.
 
 #### trellisQuantisation() / trellisQuantization()
 
-_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+_Requires libvips to have been compiled with mozjpeg support_
 
 An advanced setting to apply the use of
 [trellis quantisation](http://en.wikipedia.org/wiki/Trellis_quantization) with JPEG output.
@@ -496,7 +507,7 @@ Reduces file size and slightly increases relative quality at the cost of increas
 
 #### overshootDeringing()
 
-_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+_Requires libvips to have been compiled with mozjpeg support_
 
 An advanced setting to reduce the effects of
 [ringing](http://en.wikipedia.org/wiki/Ringing_%28signal%29) in JPEG output,
@@ -504,7 +515,7 @@ in particular where black text appears on a white background (or vice versa).
 
 #### optimiseScans() / optimizeScans()
 
-_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+_Requires libvips to have been compiled with mozjpeg support_
 
 An advanced setting for progressive (interlace) JPEG output.
 Calculates which spectrum of DCT coefficients uses the fewest bits.
@@ -554,6 +565,29 @@ sharp.queue.on('change', function(queueLength) {
 });
 ```
 
+#### versions
+
+An Object containing the version numbers of libvips and, on Linux, its dependencies.
+
+```javascript
+> console.log(sharp.versions);
+
+{ zlib: '1.2.8',
+  ffi: '3.2.1',
+  glib: '2.46.2',
+  xml: '2.9.2',
+  gsf: '1.14.34',
+  exif: '0.6.21',
+  jpeg: '1.4.2',
+  png: '1.6.19',
+  lcms: '2.7',
+  webp: '0.4.4',
+  tiff: '4.0.6',
+  magick: '6.9.2-6',
+  orc: '0.4.24',
+  vips: '8.1.1' }
+```
+
 ### Utilities
 
 #### sharp.cache([memory], [items])
@@ -594,4 +628,32 @@ Provides access to internal task counters.
 
 ```javascript
 var counters = sharp.counters(); // { queue: 2, process: 4 }
+```
+
+#### sharp.simd([enable])
+
+_Requires libvips to have been compiled with liborc support_
+
+Improves the performance of `resize`, `blur` and `sharpen` operations
+by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM NEON.
+
+* `enable`, if present, is a boolean where `true` enables and `false` disables the use of SIMD.
+
+This method always returns the current state.
+
+This feature is currently disabled by default
+but future versions may enable it by default.
+
+When enabled, versions of liborc prior to 0.4.24
+and versions of libvips prior to 8.2.0
+have been known to crash under heavy load.
+
+```javascript
+var simd = sharp.simd();
+// simd is `true` if SIMD is currently enabled
+```
+
+```javascript
+var simd = sharp.simd(true);
+// attempts to enable the use of SIMD, returning true if available
 ```

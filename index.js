@@ -10,14 +10,31 @@ var color = require('color');
 var BluebirdPromise = require('bluebird');
 
 var sharp = require('./build/Release/sharp');
-var libvipsVersion = sharp.libvipsVersion();
 
+// Versioning
+var versions = {
+  vips: sharp.libvipsVersion()
+};
+(function() {
+  // Does libvips meet minimum requirement?
+  var libvipsVersionMin = require('./package.json').config.libvips;
+  if (semver.lt(versions.vips, libvipsVersionMin)) {
+    throw new Error('Found libvips ' + versions.vips + ' but require at least ' + libvipsVersionMin);
+  }
+  // Include versions of dependencies, if present
+  try {
+    versions = require('./lib/versions.json');
+  } catch (err) {}
+})();
+
+// Limits
 var maximum = {
   width: 0x3FFF,
   height: 0x3FFF,
   pixels: Math.pow(0x3FFF, 2)
 };
 
+// Constructor-factory
 var Sharp = function(input) {
   if (!(this instanceof Sharp)) {
     return new Sharp(input);
@@ -49,14 +66,16 @@ var Sharp = function(input) {
     flip: false,
     flop: false,
     withoutEnlargement: false,
-    interpolator: 'bilinear',
+    interpolator: 'bicubic',
     // operations
     background: [0, 0, 0, 255],
     flatten: false,
+    negate: false,
     blurSigma: 0,
     sharpenRadius: 0,
     sharpenFlat: 1,
     sharpenJagged: 2,
+    threshold: 0,
     gamma: 0,
     greyscale: false,
     normalize: 0,
@@ -110,6 +129,11 @@ module.exports.queue = new events.EventEmitter();
 module.exports.format = sharp.format();
 
 /*
+  Version numbers of libvips and its dependencies
+*/
+module.exports.versions = versions;
+
+/*
   Handle incoming chunk on Writable Stream
 */
 Sharp.prototype._write = function(chunk, encoding, callback) {
@@ -137,11 +161,22 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
 };
 
 // Crop this part of the resized image (Center/Centre, North, East, South, West)
-module.exports.gravity = {'center': 0, 'centre': 0, 'north': 1, 'east': 2, 'south': 3, 'west': 4};
+module.exports.gravity = {
+  'center': 0,
+  'centre': 0,
+  'north': 1,
+  'east': 2,
+  'south': 3,
+  'west': 4,
+  'northeast': 5,
+  'southeast': 6,
+  'southwest': 7,
+  'northwest': 8
+};
 
 Sharp.prototype.crop = function(gravity) {
   this.options.canvas = 'crop';
-  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 4) {
+  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 8) {
     this.options.gravity = gravity;
   } else if (typeof gravity === 'string' && typeof module.exports.gravity[gravity] === 'number') {
     this.options.gravity = module.exports.gravity[gravity];
@@ -151,17 +186,25 @@ Sharp.prototype.crop = function(gravity) {
   return this;
 };
 
-Sharp.prototype.extract = function(topOffset, leftOffset, width, height) {
-  /*jslint unused: false */
+Sharp.prototype.extract = function(options) {
+  if (!options || typeof options !== 'object') {
+    // Legacy extract(top,left,width,height) syntax
+    options = {
+      left: arguments[1],
+      top: arguments[0],
+      width: arguments[2],
+      height: arguments[3]
+    };
+  }
   var suffix = this.options.width === -1 && this.options.height === -1 ? 'Pre' : 'Post';
-  var values = arguments;
-  ['topOffset', 'leftOffset', 'width', 'height'].forEach(function(name, index) {
-    if (typeof values[index] === 'number' && !Number.isNaN(values[index]) && (values[index] % 1 === 0) && values[index] >= 0) {
-      this.options[name + suffix] = values[index];
+  ['left', 'top', 'width', 'height'].forEach(function (name) {
+    var value = options[name];
+    if (typeof value === 'number' && !Number.isNaN(value) && value % 1 === 0 && value >= 0) {
+      this.options[name + (name === 'left' || name === 'top' ? 'Offset' : '') + suffix] = value;
     } else {
-      throw new Error('Non-integer value for ' + name + ' of ' + values[index]);
+      throw new Error('Non-integer value for ' + name + ' of ' + value);
     }
-  }.bind(this));
+  }, this);
   // Ensure existing rotation occurs before pre-resize extraction
   if (suffix === 'Pre' && this.options.angle !== 0) {
     this.options.rotateBeforePreExtract = true;
@@ -207,6 +250,11 @@ Sharp.prototype.ignoreAspectRatio = function() {
 
 Sharp.prototype.flatten = function(flatten) {
   this.options.flatten = (typeof flatten === 'boolean') ? flatten : true;
+  return this;
+};
+
+Sharp.prototype.negate = function(negate) {
+  this.options.negate = (typeof negate === 'boolean') ? negate : true;
   return this;
 };
 
@@ -323,6 +371,19 @@ Sharp.prototype.sharpen = function(radius, flat, jagged) {
   return this;
 };
 
+Sharp.prototype.threshold = function(threshold) {
+  if (typeof threshold === 'undefined') {
+    this.options.threshold = 128;
+  } else if (typeof threshold === 'boolean') {
+    this.options.threshold = threshold ? 128 : 0;
+  } else if (typeof threshold === 'number' && !Number.isNaN(threshold) && (threshold % 1 === 0) && threshold >= 0 && threshold <= 255) {
+    this.options.threshold = threshold;
+  } else {
+    throw new Error('Invalid threshold (0 to 255) ' + threshold);
+  }
+  return this;
+};
+
 /*
   Set the interpolator to use for the affine transformation
 */
@@ -370,11 +431,7 @@ Sharp.prototype.gamma = function(gamma) {
   Enhance output image contrast by stretching its luminance to cover the full dynamic range
 */
 Sharp.prototype.normalize = function(normalize) {
-  if (process.platform !== 'win32') {
-    this.options.normalize = (typeof normalize === 'boolean') ? normalize : true;
-  } else {
-    console.error('normalize unavailable on win32 platform');
-  }
+  this.options.normalize = (typeof normalize === 'boolean') ? normalize : true;
   return this;
 };
 Sharp.prototype.normalise = Sharp.prototype.normalize;
@@ -420,14 +477,10 @@ Sharp.prototype.compressionLevel = function(compressionLevel) {
 };
 
 /*
-  Disable the use of adaptive row filtering for PNG output - requires libvips 7.42.0+
+  Disable the use of adaptive row filtering for PNG output
 */
 Sharp.prototype.withoutAdaptiveFiltering = function(withoutAdaptiveFiltering) {
-  if (semver.gte(libvipsVersion, '7.42.0')) {
-    this.options.withoutAdaptiveFiltering = (typeof withoutAdaptiveFiltering === 'boolean') ? withoutAdaptiveFiltering : true;
-  } else {
-    console.error('withoutAdaptiveFiltering requires libvips 7.41.0+');
-  }
+  this.options.withoutAdaptiveFiltering = (typeof withoutAdaptiveFiltering === 'boolean') ? withoutAdaptiveFiltering : true;
   return this;
 };
 
@@ -440,41 +493,29 @@ Sharp.prototype.withoutChromaSubsampling = function(withoutChromaSubsampling) {
 };
 
 /*
-  Apply trellis quantisation to JPEG output - requires libvips 8.0.0+ compiled against mozjpeg 3.0+
+  Apply trellis quantisation to JPEG output - requires mozjpeg 3.0+
 */
 Sharp.prototype.trellisQuantisation = function(trellisQuantisation) {
-  if (semver.gte(libvipsVersion, '8.0.0')) {
-    this.options.trellisQuantisation = (typeof trellisQuantisation === 'boolean') ? trellisQuantisation : true;
-  } else {
-    console.error('trellisQuantisation requires libvips 8.0.0+');
-  }
+  this.options.trellisQuantisation = (typeof trellisQuantisation === 'boolean') ? trellisQuantisation : true;
   return this;
 };
 Sharp.prototype.trellisQuantization = Sharp.prototype.trellisQuantisation;
 
 /*
-  Apply overshoot deringing to JPEG output - requires libvips 8.0.0+ compiled against mozjpeg 3.0+
+  Apply overshoot deringing to JPEG output - requires mozjpeg 3.0+
 */
 Sharp.prototype.overshootDeringing = function(overshootDeringing) {
-  if (semver.gte(libvipsVersion, '8.0.0')) {
-    this.options.overshootDeringing = (typeof overshootDeringing === 'boolean') ? overshootDeringing : true;
-  } else {
-    console.error('overshootDeringing requires libvips 8.0.0+');
-  }
+  this.options.overshootDeringing = (typeof overshootDeringing === 'boolean') ? overshootDeringing : true;
   return this;
 };
 
 /*
-  Optimise scans in progressive JPEG output - requires libvips 8.0.0+ compiled against mozjpeg 3.0+
+  Optimise scans in progressive JPEG output - requires mozjpeg 3.0+
 */
 Sharp.prototype.optimiseScans = function(optimiseScans) {
-  if (semver.gte(libvipsVersion, '8.0.0')) {
-    this.options.optimiseScans = (typeof optimiseScans === 'boolean') ? optimiseScans : true;
-    if (this.options.optimiseScans) {
-      this.progressive();
-    }
-  } else {
-    console.error('optimiseScans requires libvips 8.0.0+');
+  this.options.optimiseScans = (typeof optimiseScans === 'boolean') ? optimiseScans : true;
+  if (this.options.optimiseScans) {
+    this.progressive();
   }
   return this;
 };
@@ -493,7 +534,7 @@ Sharp.prototype.withMetadata = function(withMetadata) {
         typeof withMetadata.orientation === 'number' &&
         !Number.isNaN(withMetadata.orientation) &&
         withMetadata.orientation % 1 === 0 &&
-        withMetadata.orientation >=0 &&
+        withMetadata.orientation >= 0 &&
         withMetadata.orientation <= 7
       ) {
         this.options.withMetadataOrientation = withMetadata.orientation;
@@ -519,7 +560,7 @@ Sharp.prototype.tile = function(size, overlap) {
   }
   // Overlap of tiles, in pixels
   if (typeof overlap !== 'undefined' && overlap !== null) {
-    if (!Number.isNaN(overlap) && overlap % 1 === 0 && overlap >=0 && overlap <= 8192) {
+    if (!Number.isNaN(overlap) && overlap % 1 === 0 && overlap >= 0 && overlap <= 8192) {
       if (overlap > this.options.tileSize) {
         throw new Error('Tile overlap ' + overlap + ' cannot be larger than tile size ' + this.options.tileSize);
       }
@@ -628,12 +669,7 @@ Sharp.prototype.webp = function() {
   Force raw, uint8 output
 */
 Sharp.prototype.raw = function() {
-  var supportsRawOutput = module.exports.format.raw.output;
-  if (supportsRawOutput.file || supportsRawOutput.buffer || supportsRawOutput.stream) {
-    this.options.output = '__raw';
-  } else {
-    console.error('Raw output requires libvips 7.42.0+');
-  }
+  this.options.output = '__raw';
   return this;
 };
 
@@ -829,8 +865,13 @@ module.exports.counters = function() {
 };
 
 /*
-  Get the version of the libvips library
+  Get and set use of SIMD vector unit instructions
 */
-module.exports.libvipsVersion = function() {
-  return libvipsVersion;
+module.exports.simd = function(simd) {
+  if (typeof simd !== 'boolean') {
+    simd = null;
+  }
+  return sharp.simd(simd);
 };
+// Switch off default
+module.exports.simd(false);

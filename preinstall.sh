@@ -4,16 +4,18 @@
 # Currently supports:
 # * Debian Linux
 #   * Debian 7, 8
-#   * Ubuntu 12.04, 14.04, 14.10, 15.04
+#   * Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
 #   * Mint 13, 17
+#   * Elementary 0.3
 # * Red Hat Linux
 #   * RHEL/Centos/Scientific 6, 7
-#   * Fedora 21, 22
-#   * Amazon Linux 2014.09, 2015.03
+#   * Fedora 21, 22, 23
+#   * Amazon Linux 2015.03, 2015.09
+# * OpenSuse 13
 
-vips_version_minimum=7.40.0
-vips_version_latest_major_minor=8.0
-vips_version_latest_patch=2
+vips_version_minimum=8.2.0
+vips_version_latest_major_minor=8.2
+vips_version_latest_patch=0
 
 openslide_version_minimum=3.4.0
 openslide_version_latest_major_minor=3.4
@@ -24,14 +26,14 @@ install_libvips_from_source() {
   curl -O http://www.vips.ecs.soton.ac.uk/supported/$vips_version_latest_major_minor/vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   tar zvxf vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   cd vips-$vips_version_latest_major_minor.$vips_version_latest_patch
-  ./configure --disable-debug --disable-docs --disable-static --disable-introspection --enable-cxx=yes --without-python --without-orc --without-fftw $1
+  ./configure --disable-debug --disable-docs --disable-static --disable-introspection --disable-dependency-tracking --enable-cxx=yes --without-python --without-orc --without-fftw $1
   make
   make install
   cd ..
   rm -rf vips-$vips_version_latest_major_minor.$vips_version_latest_patch
   rm vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   ldconfig
-  echo "Installed libvips $vips_version_latest_major_minor.$vips_version_latest_patch"
+  echo "Installed libvips $(PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --modversion vips)"
 }
 
 install_libopenslide_from_source() {
@@ -125,12 +127,12 @@ if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_ex
     DISTRO=$(lsb_release -c -s)
     echo "Detected Debian Linux '$DISTRO'"
     case "$DISTRO" in
-      jessie|vivid)
+      jessie|vivid|wily)
         # Debian 8, Ubuntu 15
         echo "Installing libopenslide via apt-get"
         apt-get install -y libopenslide-dev
         ;;
-      trusty|utopic|qiana|rebecca|rafaela)
+      trusty|utopic|qiana|rebecca|rafaela|freya)
         # Ubuntu 14, Mint 17
         echo "Installing libopenslide dependencies via apt-get"
         apt-get install -y automake build-essential curl zlib1g-dev libopenjpeg-dev libpng12-dev libjpeg-dev libtiff5-dev libgdk-pixbuf2.0-dev libxml2-dev libsqlite3-dev libcairo2-dev libglib2.0-dev sqlite3 libsqlite3-dev
@@ -209,18 +211,8 @@ if [ -f /etc/debian_version ]; then
   DISTRO=$(lsb_release -c -s)
   echo "Detected Debian Linux '$DISTRO'"
   case "$DISTRO" in
-    jessie|vivid)
-      # Debian 8, Ubuntu 15
-      if [ $enable_openslide -eq 1 ]; then
-        echo "Recompiling vips with openslide support"
-        install_libvips_from_source
-      else
-        echo "Installing libvips via apt-get"
-        apt-get install -y libvips-dev libgsf-1-dev
-      fi
-      ;;
-    trusty|utopic|qiana|rebecca|rafaela)
-      # Ubuntu 14, Mint 17
+    jessie|trusty|utopic|vivid|wily|xenial|qiana|rebecca|rafaela|freya)
+      # Debian 8, Ubuntu 14.04+, Mint 17
       echo "Installing libvips dependencies via apt-get"
       apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
       install_libvips_from_source
@@ -247,32 +239,26 @@ elif [ -f /etc/redhat-release ]; then
       # RHEL/CentOS 7
       echo "Installing libvips dependencies via yum"
       yum groupinstall -y "Development Tools"
-      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      yum install -y tar curl gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel
       install_libvips_from_source "--prefix=/usr"
       ;;
     "Red Hat Enterprise Linux release 6."*|"CentOS release 6."*|"Scientific Linux release 6."*)
       # RHEL/CentOS 6
       echo "Installing libvips dependencies via yum"
       yum groupinstall -y "Development Tools"
-      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel curl
+      yum install -y tar curl gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel
       yum install -y http://li.nux.ro/download/nux/dextop/el6/x86_64/nux-dextop-release-0-2.el6.nux.noarch.rpm
       yum install -y --enablerepo=nux-dextop gobject-introspection-devel
       yum install -y http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
       yum install -y --enablerepo=remi libwebp-devel
       install_libvips_from_source "--prefix=/usr"
       ;;
-    "Fedora release 21 "*|"Fedora release 22 "*)
-      # Fedora 21, 22
-      if [ $enable_openslide -eq 1 ]; then
-        echo "Installing libvips dependencies via yum"
-        yum groupinstall -y "Development Tools"
-        yum install -y gcc-c++ gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
-        echo "Compiling vips with openslide support"
-        install_libvips_from_source "--prefix=/usr"
-      else
-        echo "Installing libvips via yum"
-        yum install -y vips-devel
-      fi
+    "Fedora"*)
+      # Fedora 21, 22, 23
+      echo "Installing libvips dependencies via yum"
+      yum groupinstall -y "Development Tools"
+      yum install -y gcc-c++ gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      install_libvips_from_source "--prefix=/usr"
       ;;
     *)
       # Unsupported RHEL-based OS
@@ -283,12 +269,12 @@ elif [ -f /etc/system-release ]; then
   # Probably Amazon Linux
   RELEASE=$(cat /etc/system-release)
   case $RELEASE in
-    "Amazon Linux AMI release 2014.09"|"Amazon Linux AMI release 2015.03")
+    "Amazon Linux AMI release 2015.03"|"Amazon Linux AMI release 2015.09")
       # Amazon Linux
       echo "Detected '$RELEASE'"
       echo "Installing libvips dependencies via yum"
       yum groupinstall -y "Development Tools"
-      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      yum install -y gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel libgsf-devel lcms2-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
       install_libvips_from_source "--prefix=/usr"
       ;;
     *)

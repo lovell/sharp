@@ -7,6 +7,18 @@ smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 Resizing an image is typically 4x faster than using
 the quickest ImageMagick and GraphicsMagick settings.
 
+Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
+Bicubic interpolation with Lanczos anti-alias filtering ensures quality is not sacrificed for speed.
+
+As well as image resizing, operations such as
+rotation, extraction, compositing and gamma correction are available.
+
+64-bit Windows and recent Linux systems do not require
+the installation of any external runtime dependencies.
+
+Use with OS X is as simple as running `brew install homebrew/science/vips`
+to install the libvips dependency.
+
 [![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.png?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
 
 ### Formats
@@ -24,14 +36,6 @@ Deep Zoom image pyramids can be generated,
 suitable for use with "slippy map" tile viewers like
 [OpenSeadragon](https://github.com/openseadragon/openseadragon)
 and [Leaflet](https://github.com/turban/Leaflet.Zoomify).
-
-### Features
-
-As well as image resizing, operations such as
-rotation, extraction, compositing and gamma correction are available.
-
-Colour spaces, embedded ICC profiles and alpha transparency channels
-are all handled correctly.
 
 ### Fast
 
@@ -84,6 +88,7 @@ the help and code contributions of the following people:
 * [Victor Mateevitsi](https://github.com/mvictoras)
 * [Alaric Holloway](https://github.com/skedastik)
 * [Bernhard K. Weisshuhn](https://github.com/bkw)
+* [David A. Carley](https://github.com/dacarley)
 
 Thank you!
 

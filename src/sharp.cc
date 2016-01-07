@@ -26,6 +26,8 @@ NAN_MODULE_INIT(init) {
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(concurrency)).ToLocalChecked());
   Nan::Set(target, Nan::New("counters").ToLocalChecked(),
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(counters)).ToLocalChecked());
+  Nan::Set(target, Nan::New("simd").ToLocalChecked(),
+    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(simd)).ToLocalChecked());
   Nan::Set(target, Nan::New("libvipsVersion").ToLocalChecked(),
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(libvipsVersion)).ToLocalChecked());
   Nan::Set(target, Nan::New("format").ToLocalChecked(),
