@@ -82,6 +82,9 @@ var Sharp = function(input) {
     // overlay
     bufferOverlay: null,
     hasOverlay: false,
+    overlayGravity: 0,
+    overlayRatio: 1.0,
+    overlayInterpolator: 'bicubic',
     // output options
     output: '__input',
     progressive: false,
@@ -270,6 +273,42 @@ Sharp.prototype.overlayWith = function(input) {
     this.options.hasOverlay = true;
   } else {
     throw new Error('Unsupported overlay ' + typeof input);
+  }
+  return this;
+};
+
+Sharp.prototype.overlayGravity = function(gravity) {
+  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 8) {
+    this.options.overlayGravity = gravity;
+  } else if (typeof gravity === 'string' && typeof module.exports.gravity[gravity] === 'number') {
+    this.options.overlayGravity = module.exports.gravity[gravity];
+  } else {
+    throw new Error('Unsupported overlay gravity ' + gravity);
+  }
+  return this;
+};
+
+Sharp.prototype.overlayRatio = function(ratio) {
+  if (typeof ratio === 'number' && !Number.isNaN(ratio) && parseFloat(ratio) <= 1) {
+    this.options.overlayRatio = parseFloat(ratio);
+  } else {
+    throw new Error('Unsupported overlay ratio ' + ratio);
+  }
+  return this;
+};
+
+Sharp.prototype.interpolateOverlayWith = function(interpolator) {
+  var isValid = false;
+  for (var key in module.exports.interpolator) {
+    if (module.exports.interpolator[key] === interpolator) {
+      isValid = true;
+      break;
+    }
+  }
+  if (isValid) {
+    this.options.overlayInterpolator = interpolator;
+  } else {
+    throw new Error('Invalid overlay interpolator ' + interpolator);
   }
   return this;
 };

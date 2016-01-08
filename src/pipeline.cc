@@ -84,6 +84,9 @@ struct PipelineBaton {
   char *bufferOverlay;
   size_t bufferOverlayLength;
   bool hasOverlay;
+  int overlayGravity;
+  double overlayRatio;
+  std::string overlayInterpolator;
   std::string iccProfilePath;
   int limitInputPixels;
   std::string output;
@@ -138,6 +141,8 @@ struct PipelineBaton {
     bufferInLength(0),
     bufferOverlayLength(0),
     hasOverlay(false),
+    overlayGravity(0),
+    overlayRatio(1.0),
     limitInputPixels(0),
     outputFormat(""),
     bufferOutLength(0),
@@ -774,9 +779,9 @@ class PipelineWorker : public AsyncWorker {
         }
       } else {
         // From file
-        overlayImageType = DetermineImageType(baton->fileOverlay.c_str());
+        overlayImageType = DetermineImageType(baton->fileOverlay.data());
         if (overlayImageType != ImageType::UNKNOWN) {
-          overlayImage = InitImage(baton->fileOverlay.c_str(), baton->accessMethod);
+          overlayImage = InitImage(baton->fileOverlay.data(), baton->accessMethod);
           if (overlayImage == nullptr) {
             (baton->err).append("Overlay file has corrupt header");
             overlayImageType = ImageType::UNKNOWN;
@@ -827,7 +832,7 @@ class PipelineWorker : public AsyncWorker {
       vips_object_local(hook, overlayImagePremultiplied);
 
       VipsImage *composited;
-      if (Composite(hook, overlayImagePremultiplied, image, &composited)) {
+      if (Composite(hook, overlayImagePremultiplied, image, &composited, baton->overlayGravity, baton->overlayRatio, baton->overlayInterpolator)) {
         (baton->err).append("Failed to composite images");
         return Error();
       }
@@ -1306,6 +1311,9 @@ NAN_METHOD(pipeline) {
     baton->bufferOverlayLength = node::Buffer::Length(bufferOverlay);
     baton->bufferOverlay = node::Buffer::Data(bufferOverlay);
   }
+  baton->overlayGravity = To<int32_t>(Get(options, New("overlayGravity").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->overlayRatio = To<double>(Get(options, New("overlayRatio").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->overlayInterpolator = *Utf8String(Get(options, New("overlayInterpolator").ToLocalChecked()).ToLocalChecked());
   // Resize options
   baton->withoutEnlargement = To<bool>(Get(options, New("withoutEnlargement").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->gravity = To<int32_t>(Get(options, New("gravity").ToLocalChecked()).ToLocalChecked()).FromJust();

@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "operations.h"
+#include <algorithm>
 
 namespace sharp {
 
@@ -9,8 +10,77 @@ namespace sharp {
     Alpha composite src over dst
     Assumes alpha channels are already premultiplied and will be unpremultiplied after
    */
-  int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out) {
+  int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out, int const gravity, double const ratio, std::string const interp) {
     using sharp::HasAlpha;
+
+    int imageWidth    = dst->Xsize;
+    int imageHeight   = dst->Ysize;
+    int overlayWidth  = src->Xsize;
+    int overlayHeight = src->Ysize;
+
+    double wmarkWidth  = (double)imageWidth * ratio;
+    double wmarkHeight = (double)imageHeight * ratio;
+
+    double scale;
+
+    if (imageWidth > imageHeight) {
+      scale = wmarkWidth / (double)overlayWidth;
+    } else {
+      scale = wmarkHeight / (double)overlayHeight;
+    }
+
+    VipsInterpolate *interpolator = vips_interpolate_new(interp.data());
+    if (interpolator == nullptr) {
+      return -1;
+    }
+    vips_object_local(context, interpolator);
+
+    VipsImage *scaledOverlay;
+    if (vips_resize(src, &scaledOverlay, scale, "interpolate", interpolator, nullptr)) {
+      return -1;
+    }
+    vips_object_local(context, scaledOverlay);
+
+    src = scaledOverlay;
+    overlayWidth  = src->Xsize;
+    overlayHeight = src->Ysize;
+
+    int left = 0;
+    int top = 0;
+    switch (gravity) {
+      case 1: // North
+        left = (imageWidth - overlayWidth + 1) / 2;
+        break;
+      case 2: // East
+        left = imageWidth - overlayWidth;
+        top = (imageHeight - overlayHeight + 1) / 2;
+        break;
+      case 3: // South
+        left = (imageWidth - overlayWidth + 1) / 2;
+        top = imageHeight - overlayHeight;
+        break;
+      case 4: // West
+        top = (imageHeight - overlayHeight + 1) / 2;
+        break;
+      case 5: // Northeast
+        left = imageWidth - overlayWidth;
+        break;
+      case 6: // Southeast
+        left = imageWidth - overlayWidth;
+        top = imageHeight - overlayHeight;
+      case 7: // Southwest
+        top = imageHeight - overlayHeight;
+      case 8: // Northwest
+        break;
+      default: // Centre
+        left = (imageWidth - overlayWidth + 1) / 2;
+        top = (imageHeight - overlayHeight + 1) / 2;
+    }
+
+    VipsImage *bg;
+    if (vips_extract_area(dst, &bg, left, top, overlayWidth, overlayHeight, nullptr))
+      return -1;
+    vips_object_local(context, bg);
 
     // Split src into non-alpha and alpha
     VipsImage *srcWithoutAlpha;
@@ -25,23 +95,24 @@ namespace sharp {
     // Split dst into non-alpha and alpha channels
     VipsImage *dstWithoutAlpha;
     VipsImage *dstAlpha;
-    if (HasAlpha(dst)) {
+
+    if (HasAlpha(bg)) {
       // Non-alpha: extract all-but-last channel
-      if (vips_extract_band(dst, &dstWithoutAlpha, 0, "n", dst->Bands - 1, nullptr)) {
+      if (vips_extract_band(bg, &dstWithoutAlpha, 0, "n", bg->Bands - 1, nullptr)) {
         return -1;
       }
       vips_object_local(context, dstWithoutAlpha);
       // Alpha: Extract last channel
-      if (vips_extract_band(dst, &dstAlpha, dst->Bands - 1, "n", 1, nullptr)) {
+      if (vips_extract_band(bg, &dstAlpha, bg->Bands - 1, "n", 1, nullptr)) {
         return -1;
       }
       vips_object_local(context, dstAlpha);
     } else {
       // Non-alpha: Copy reference
-      dstWithoutAlpha = dst;
+      dstWithoutAlpha = bg;
       // Alpha: Use blank, opaque (0xFF) image
       VipsImage *black;
-      if (vips_black(&black, dst->Xsize, dst->Ysize, nullptr)) {
+      if (vips_black(&black, bg->Xsize, bg->Ysize, nullptr)) {
         return -1;
       }
       vips_object_local(context, black);
@@ -117,8 +188,8 @@ namespace sharp {
       return -1;
     vips_object_local(context, outAlpha);
 
-    // Combine RGB and alpha channel into output image:
-    return vips_bandjoin2(outRGBPremultiplied, outAlpha, out, nullptr);
+    // Insert the composited image on top of the original and output the image
+    return vips_insert(dst, outRGBPremultiplied, out, left, top, "expand", FALSE, nullptr);
   }
 
   /*
