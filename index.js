@@ -80,7 +80,8 @@ var Sharp = function(input) {
     greyscale: false,
     normalize: 0,
     // overlay
-    overlayPath: '',
+    bufferOverlay: null,
+    hasOverlay: false,
     // output options
     output: '__input',
     progressive: false,
@@ -258,14 +259,18 @@ Sharp.prototype.negate = function(negate) {
   return this;
 };
 
-Sharp.prototype.overlayWith = function(overlayPath) {
-  if (typeof overlayPath !== 'string') {
-    throw new Error('The overlay path must be a string');
+Sharp.prototype.overlayWith = function(input) {
+  if (typeof input === 'string') {
+    // input=file
+    this.options.fileOverlay = input;
+    this.options.hasOverlay = true;
+  } else if (typeof input === 'object' && input instanceof Buffer) {
+    // input=buffer
+    this.options.bufferOverlay = input;
+    this.options.hasOverlay = true;
+  } else {
+    throw new Error('Unsupported overlay ' + typeof input);
   }
-  if (overlayPath === '') {
-    throw new Error('The overlay path cannot be empty');
-  }
-  this.options.overlayPath = overlayPath;
   return this;
 };
 
