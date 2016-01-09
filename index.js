@@ -85,6 +85,9 @@ var Sharp = function(input) {
     overlayGravity: 0,
     overlayRatio: 1.0,
     overlayInterpolator: 'bicubic',
+    overlayWidth: -1,
+    overlayHeight: -1,
+    padOverlay: false,
     // output options
     output: '__input',
     progressive: false,
@@ -264,10 +267,16 @@ Sharp.prototype.negate = function(negate) {
 
 Sharp.prototype.overlayWith = function(input) {
   if (typeof input === 'string') {
+    if (input === '') {
+      throw new Error('The overlay path cannot be empty');
+    }
     // input=file
     this.options.fileOverlay = input;
     this.options.hasOverlay = true;
   } else if (typeof input === 'object' && input instanceof Buffer) {
+    if (input.length === 0) {
+      throw new Error('The overlay buffer cannot be empty');
+    }
     // input=buffer
     this.options.bufferOverlay = input;
     this.options.hasOverlay = true;
@@ -297,6 +306,28 @@ Sharp.prototype.overlayRatio = function(ratio) {
   return this;
 };
 
+Sharp.prototype.overlaySize = function(width, height) {
+  if (!width) {
+    this.options.overlayWidth = -1;
+  } else {
+    if (typeof width === 'number' && !Number.isNaN(width) && width % 1 === 0 && width > 0 && width <= maximum.width) {
+      this.options.overlayWidth = width;
+    } else {
+      throw new Error('Invalid width (1 to ' + maximum.width + ') ' + width);
+    }
+  }
+  if (!height) {
+    this.options.overlayHeight = -1;
+  } else {
+    if (typeof height === 'number' && !Number.isNaN(height) && height % 1 === 0 && height > 0 && height <= maximum.height) {
+      this.options.overlayHeight = height;
+    } else {
+      throw new Error('Invalid height (1 to ' + maximum.height + ') ' + height);
+    }
+  }
+  return this;
+};
+
 Sharp.prototype.interpolateOverlayWith = function(interpolator) {
   var isValid = false;
   for (var key in module.exports.interpolator) {
@@ -310,6 +341,11 @@ Sharp.prototype.interpolateOverlayWith = function(interpolator) {
   } else {
     throw new Error('Invalid overlay interpolator ' + interpolator);
   }
+  return this;
+};
+
+Sharp.prototype.padOverlay = function(padOverlay) {
+  this.options.padOverlay = (typeof padOverlay === 'boolean') ? padOverlay : true;
   return this;
 };
 

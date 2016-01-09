@@ -10,24 +10,12 @@ namespace sharp {
     Alpha composite src over dst
     Assumes alpha channels are already premultiplied and will be unpremultiplied after
    */
-  int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out, int const gravity, double const ratio, std::string const interp) {
+  int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out, double ratio,
+    int overlayWidth, int overlayHeight, int gravity, std::string interp, bool padOverlay) {
     using sharp::HasAlpha;
 
-    int imageWidth    = dst->Xsize;
-    int imageHeight   = dst->Ysize;
-    int overlayWidth  = src->Xsize;
-    int overlayHeight = src->Ysize;
-
-    double wmarkWidth  = (double)imageWidth * ratio;
-    double wmarkHeight = (double)imageHeight * ratio;
-
-    double scale;
-
-    if (imageWidth > imageHeight) {
-      scale = wmarkWidth / (double)overlayWidth;
-    } else {
-      scale = wmarkHeight / (double)overlayHeight;
-    }
+    int imageWidth  = dst->Xsize;
+    int imageHeight = dst->Ysize;
 
     VipsInterpolate *interpolator = vips_interpolate_new(interp.data());
     if (interpolator == nullptr) {
@@ -35,46 +23,91 @@ namespace sharp {
     }
     vips_object_local(context, interpolator);
 
+    double scale = 0.0;
     VipsImage *scaledOverlay;
-    if (vips_resize(src, &scaledOverlay, scale, "interpolate", interpolator, nullptr)) {
-      return -1;
+
+    // overlaySize() trumps overlayRatio()
+    if (overlayHeight > 0 || overlayWidth > 0) {
+      if (overlayHeight > 0 && overlayWidth > 0) {
+        double hScale = static_cast<double>(overlayWidth) / static_cast<double>(src->Xsize);
+        double vScale = static_cast<double>(overlayHeight) / static_cast<double>(src->Ysize);
+        if (vips_resize(src, &scaledOverlay, hScale, "vscale", vScale, "interpolate", interpolator, nullptr)) {
+          return -1;
+        }
+      } else {
+        if (overlayHeight < 0) {
+          scale = static_cast<double>(overlayWidth) / static_cast<double>(src->Xsize);
+        }
+        if (overlayWidth < 0) {
+          scale = static_cast<double>(overlayHeight) / static_cast<double>(src->Ysize);
+        }
+        if (vips_resize(src, &scaledOverlay, scale, "interpolate", interpolator, nullptr)) {
+          return -1;
+        }
+        overlayWidth  = scaledOverlay->Xsize;
+        overlayHeight = scaledOverlay->Ysize;
+      }
+    } else {
+      scale = (static_cast<double>(imageWidth) * ratio) / src->Xsize;
+      if (vips_resize(src, &scaledOverlay, scale, "interpolate", interpolator, nullptr)) {
+        return -1;
+      }
+      overlayWidth  = scaledOverlay->Xsize;
+      overlayHeight = scaledOverlay->Ysize;
     }
+
     vips_object_local(context, scaledOverlay);
 
     src = scaledOverlay;
-    overlayWidth  = src->Xsize;
-    overlayHeight = src->Ysize;
 
     int left = 0;
-    int top = 0;
+    int top  = 0;
+    int pad  = 0;
+
+    if (padOverlay) {
+      double xPad = static_cast<double>(imageWidth) * 0.0100;
+      double yPad = static_cast<double>(imageHeight) * 0.0100;
+
+      if (xPad < yPad) {
+        pad = static_cast<int>(round(xPad));
+      } else {
+        pad = static_cast<int>(round(yPad));
+      }
+    }
+
     switch (gravity) {
       case 1: // North
         left = (imageWidth - overlayWidth + 1) / 2;
+        top  = pad;
         break;
       case 2: // East
-        left = imageWidth - overlayWidth;
-        top = (imageHeight - overlayHeight + 1) / 2;
+        left = imageWidth - overlayWidth - pad;
+        top  = (imageHeight - overlayHeight + 1) / 2;
         break;
       case 3: // South
         left = (imageWidth - overlayWidth + 1) / 2;
-        top = imageHeight - overlayHeight;
+        top  = imageHeight - overlayHeight - pad;
         break;
       case 4: // West
-        top = (imageHeight - overlayHeight + 1) / 2;
+        top  = (imageHeight - overlayHeight + 1) / 2;
+        left = pad;
         break;
       case 5: // Northeast
-        left = imageWidth - overlayWidth;
+        left = imageWidth - overlayWidth - pad;
+        top  = pad;
         break;
       case 6: // Southeast
-        left = imageWidth - overlayWidth;
-        top = imageHeight - overlayHeight;
+        left = imageWidth - overlayWidth - pad;
+        top  = imageHeight - overlayHeight - pad;
+        break;
       case 7: // Southwest
-        top = imageHeight - overlayHeight;
+        top  = imageHeight - overlayHeight - pad;
+        left = pad;
       case 8: // Northwest
         break;
       default: // Centre
         left = (imageWidth - overlayWidth + 1) / 2;
-        top = (imageHeight - overlayHeight + 1) / 2;
+        top  = (imageHeight - overlayHeight + 1) / 2;
     }
 
     VipsImage *bg;
@@ -188,8 +221,16 @@ namespace sharp {
       return -1;
     vips_object_local(context, outAlpha);
 
+    VipsImage *outFinal;
+    if (dst->Bands > outRGBPremultiplied->Bands) {
+      if (vips_bandjoin2(outRGBPremultiplied, outAlpha, &outFinal, nullptr))
+        return -1;
+    } else {
+      outFinal = outRGBPremultiplied;
+    }
+
     // Insert the composited image on top of the original and output the image
-    return vips_insert(dst, outRGBPremultiplied, out, left, top, "expand", FALSE, nullptr);
+    return vips_insert(dst, outFinal, out, left, top, "expand", FALSE, nullptr);
   }
 
   /*

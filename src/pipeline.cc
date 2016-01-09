@@ -86,7 +86,10 @@ struct PipelineBaton {
   bool hasOverlay;
   int overlayGravity;
   double overlayRatio;
+  int overlayWidth;
+  int overlayHeight;
   std::string overlayInterpolator;
+  bool padOverlay;
   std::string iccProfilePath;
   int limitInputPixels;
   std::string output;
@@ -143,6 +146,7 @@ struct PipelineBaton {
     hasOverlay(false),
     overlayGravity(0),
     overlayRatio(1.0),
+    padOverlay(false),
     limitInputPixels(0),
     outputFormat(""),
     bufferOutLength(0),
@@ -196,7 +200,8 @@ struct PipelineBaton {
 class PipelineWorker : public AsyncWorker {
 
  public:
-  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener, const Local<Object> &bufferIn, const Local<Object> &bufferOverlay) :
+  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
+    const Local<Object> &bufferIn, const Local<Object> &bufferOverlay) :
     AsyncWorker(callback), baton(baton), queueListener(queueListener) {
       if (baton->bufferInLength > 0) {
         SaveToPersistent("bufferIn", bufferIn);
@@ -761,7 +766,7 @@ class PipelineWorker : public AsyncWorker {
 
     // Composite with overlay, if present
     if (baton->hasOverlay) {
-      ImageType overlayImageType = ImageType::UNKNOWN;      
+      ImageType overlayImageType = ImageType::UNKNOWN;
       VipsImage *overlayImage = nullptr;
 
       if (baton->bufferOverlayLength > 0) {
@@ -832,7 +837,8 @@ class PipelineWorker : public AsyncWorker {
       vips_object_local(hook, overlayImagePremultiplied);
 
       VipsImage *composited;
-      if (Composite(hook, overlayImagePremultiplied, image, &composited, baton->overlayGravity, baton->overlayRatio, baton->overlayInterpolator)) {
+      if (Composite(hook, overlayImagePremultiplied, image, &composited, baton->overlayRatio, baton->overlayWidth,
+        baton->overlayHeight, baton->overlayGravity, baton->overlayInterpolator, baton->padOverlay)) {
         (baton->err).append("Failed to composite images");
         return Error();
       }
@@ -1314,6 +1320,9 @@ NAN_METHOD(pipeline) {
   baton->overlayGravity = To<int32_t>(Get(options, New("overlayGravity").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->overlayRatio = To<double>(Get(options, New("overlayRatio").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->overlayInterpolator = *Utf8String(Get(options, New("overlayInterpolator").ToLocalChecked()).ToLocalChecked());
+  baton->overlayWidth = To<int32_t>(Get(options, New("overlayWidth").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->overlayHeight = To<int32_t>(Get(options, New("overlayHeight").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->padOverlay = To<bool>(Get(options, New("padOverlay").ToLocalChecked()).ToLocalChecked()).FromJust();
   // Resize options
   baton->withoutEnlargement = To<bool>(Get(options, New("withoutEnlargement").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->gravity = To<int32_t>(Get(options, New("gravity").ToLocalChecked()).ToLocalChecked()).FromJust();
