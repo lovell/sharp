@@ -23,9 +23,22 @@ namespace sharp {
     }
     vips_object_local(context, interpolator);
 
+    // Preserve the aspect ratio of the overlay image
+    double wAspect = static_cast<double>(src->Ysize) / static_cast<double>(src->Xsize);
+    double hAspect = static_cast<double>(src->Xsize) / static_cast<double>(src->Ysize);
+    int calcWidth  = round(overlayHeight * static_cast<double>(hAspect));
+    int calcHeight = round(overlayWidth * static_cast<double>(wAspect));
+
+    if (calcWidth < overlayWidth) {
+      overlayWidth = calcWidth;
+    }
+
+    if (calcHeight < overlayHeight) {
+      overlayHeight = calcHeight;
+    }
+
     double scale = 0.0;
     VipsImage *scaledOverlay;
-
     // overlaySize() trumps overlayRatio()
     if (overlayHeight > 0 || overlayWidth > 0) {
       if (overlayHeight > 0 && overlayWidth > 0) {
