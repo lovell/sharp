@@ -187,16 +187,6 @@ struct PipelineBaton {
     }
 };
 
-/*
-  Delete input char[] buffer and notify V8 of memory deallocation
-  Used as the callback function for the "postclose" signal
-*/
-// static void DeleteBuffer(VipsObject *object, char *buffer) {
-//   if (buffer != NULL) {
-//     delete[] buffer;
-//   }
-// }
-
 class PipelineWorker : public AsyncWorker {
 
  public:
