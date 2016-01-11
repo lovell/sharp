@@ -62,8 +62,12 @@ namespace sharp {
       }
     } else {
       scale = (static_cast<double>(imageWidth) * ratio) / src->Xsize;
-      if (vips_resize(src, &scaledOverlay, scale, "interpolate", interpolator, nullptr)) {
-        return -1;
+      if (scale < 1.0) {
+        if (vips_resize(src, &scaledOverlay, scale, "interpolate", interpolator, nullptr)) {
+          return -1;
+        }
+      } else {
+        vips_copy(src, &scaledOverlay, nullptr);
       }
       overlayWidth  = scaledOverlay->Xsize;
       overlayHeight = scaledOverlay->Ysize;
