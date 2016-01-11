@@ -386,6 +386,19 @@ namespace sharp {
       if (vips_sharpen(image, &sharpened, "radius", radius, "m1", flat, "m2", jagged, nullptr)) {
         return -1;
       }
+
+      // Get original colourspace
+      VipsInterpretation typeBeforeSharpen = image->Type;
+      if (typeBeforeSharpen == VIPS_INTERPRETATION_RGB) {
+        typeBeforeSharpen = VIPS_INTERPRETATION_sRGB;
+      }
+
+      VipsImage *sharpen;
+      // Convert to original colourspace
+      if (vips_colourspace(sharpened, &sharpen, typeBeforeSharpen, NULL)) {
+        return -1;
+      }
+      sharpened = sharpen;
     }
     vips_object_local(context, sharpened);
     *out = sharpened;
