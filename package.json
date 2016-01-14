@@ -48,20 +48,20 @@
   ],
   "dependencies": {
     "bluebird": "^3.1.1",
-    "color": "^0.10.1",
-    "nan": "^2.1.0",
+    "color": "^0.11.1",
+    "nan": "^2.2.0",
     "semver": "^5.1.0",
     "request": "^2.67.0",
     "tar": "^2.2.1"
   },
   "devDependencies": {
-    "async": "^1.5.0",
+    "async": "^1.5.2",
     "coveralls": "^2.11.6",
     "exif-reader": "^1.0.0",
     "icc": "^0.0.2",
-    "istanbul": "^0.4.1",
+    "istanbul": "^0.4.2",
     "mocha": "^2.3.4",
-    "mocha-jshint": "^2.2.5",
+    "mocha-jshint": "^2.2.6",
     "node-cpplint": "^0.4.0",
     "rimraf": "^2.5.0",
     "bufferutil": "^1.2.1"
