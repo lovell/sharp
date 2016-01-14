@@ -92,7 +92,6 @@ describe('Alpha transparency', function() {
     var expected = fixtures.expected(BASE_NAME);
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .resize(2048, 1536)
-      .interpolateWith('bicubic')
       .toFile(actual, function(err) {
         if (err) {
           done(err);
@@ -109,7 +108,6 @@ describe('Alpha transparency', function() {
     var expected = fixtures.expected(BASE_NAME);
     sharp(fixtures.inputPngAlphaPremultiplicationLarge)
       .resize(1024, 768)
-      .interpolateWith('bicubic')
       .toFile(actual, function(err) {
         if (err) {
           done(err);

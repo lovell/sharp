@@ -640,7 +640,7 @@ describe('Input/output', function() {
         .toFormat('png')
         .toBuffer(function(err, data, info) {
           if (err) {
-            assert.strictEqual(0, err.message.indexOf('Input file is of an unsupported image format'));
+            assert.strictEqual(0, err.message.indexOf('Input file is missing or of an unsupported image format'));
             done();
           } else {
             assert.strictEqual(true, info.size > 0);

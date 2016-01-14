@@ -2,6 +2,9 @@
 #define SRC_COMMON_H_
 
 #include <string>
+#include <vips/vips8>
+
+using vips::VImage;
 
 namespace sharp {
 
@@ -39,46 +42,30 @@ namespace sharp {
   ImageType DetermineImageType(char const *file);
 
   /*
-    Initialise and return a VipsImage from a buffer. Supports JPEG, PNG, WebP and TIFF.
-  */
-  VipsImage* InitImage(void *buffer, size_t const length, VipsAccess const access);
-
-  /*
-    Initialise and return a VipsImage from a file.
-  */
-  VipsImage* InitImage(char const *file, VipsAccess const access);
-
-  /*
     Does this image have an embedded profile?
   */
-  bool HasProfile(VipsImage *image);
+  bool HasProfile(VImage image);
 
   /*
     Does this image have an alpha channel?
     Uses colour space interpretation with number of channels to guess this.
   */
-  bool HasAlpha(VipsImage *image);
+  bool HasAlpha(VImage image);
 
   /*
     Get EXIF Orientation of image, if any.
   */
-  int ExifOrientation(VipsImage const *image);
+  int ExifOrientation(VImage image);
 
   /*
     Set EXIF Orientation of image.
   */
-  void SetExifOrientation(VipsImage *image, int const orientation);
+  void SetExifOrientation(VImage image, int const orientation);
 
   /*
     Remove EXIF Orientation from image.
   */
-  void RemoveExifOrientation(VipsImage *image);
-
-  /*
-    Returns the window size for the named interpolator. For example,
-    a window size of 3 means a 3x3 pixel grid is used for the calculation.
-  */
-  int InterpolatorWindowSize(char const *name);
+  void RemoveExifOrientation(VImage image);
 
   /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows

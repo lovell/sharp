@@ -11,7 +11,9 @@ describe('cpplint', function() {
   // Ignore cpplint failures, possibly newline-related, on Windows
   if (process.platform !== 'win32') {
     // List C++ source files
-    fs.readdirSync(path.join(__dirname, '..', '..', 'src')).forEach(function (source) {
+    fs.readdirSync(path.join(__dirname, '..', '..', 'src')).filter(function(source) {
+      return source !== 'libvips';
+    }).forEach(function(source) {
       var file = path.join('src', source);
       it(file, function(done) {
         // Lint each source file

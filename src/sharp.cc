@@ -1,5 +1,5 @@
 #include <node.h>
-#include <vips/vips.h>
+#include <vips/vips8>
 
 #include "nan.h"
 

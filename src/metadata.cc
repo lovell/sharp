@@ -1,5 +1,5 @@
 #include <node.h>
-#include <vips/vips.h>
+#include <vips/vips8>
 
 #include "nan.h"
 
@@ -29,9 +29,11 @@ using Nan::NewBuffer;
 using Nan::Null;
 using Nan::Error;
 
+using vips::VImage;
+using vips::VError;
+
 using sharp::ImageType;
 using sharp::DetermineImageType;
-using sharp::InitImage;
 using sharp::HasProfile;
 using sharp::HasAlpha;
 using sharp::ExifOrientation;
@@ -81,13 +83,14 @@ class MetadataWorker : public AsyncWorker {
     g_atomic_int_dec_and_test(&counterQueue);
 
     ImageType imageType = ImageType::UNKNOWN;
-    VipsImage *image = nullptr;
+    VImage image;
     if (baton->bufferInLength > 0) {
       // From buffer
       imageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
       if (imageType != ImageType::UNKNOWN) {
-        image = InitImage(baton->bufferIn, baton->bufferInLength, VIPS_ACCESS_RANDOM);
-        if (image == nullptr) {
+        try {
+          image = VImage::new_from_buffer(baton->bufferIn, baton->bufferInLength, nullptr);
+        } catch (...) {
           (baton->err).append("Input buffer has corrupt header");
           imageType = ImageType::UNKNOWN;
         }
@@ -98,16 +101,17 @@ class MetadataWorker : public AsyncWorker {
       // From file
       imageType = DetermineImageType(baton->fileIn.data());
       if (imageType != ImageType::UNKNOWN) {
-        image = InitImage(baton->fileIn.data(), VIPS_ACCESS_RANDOM);
-        if (image == nullptr) {
+        try {
+          image = VImage::new_from_file(baton->fileIn.data());
+        } catch (...) {
           (baton->err).append("Input file has corrupt header");
           imageType = ImageType::UNKNOWN;
         }
       } else {
-        (baton->err).append("Input file is of an unsupported image format");
+        (baton->err).append("Input file is missing or of an unsupported image format");
       }
     }
-    if (image != nullptr && imageType != ImageType::UNKNOWN) {
+    if (imageType != ImageType::UNKNOWN) {
       // Image type
       switch (imageType) {
         case ImageType::JPEG: baton->format = "jpeg"; break;
@@ -119,36 +123,30 @@ class MetadataWorker : public AsyncWorker {
         case ImageType::UNKNOWN: break;
       }
       // VipsImage attributes
-      baton->width = image->Xsize;
-      baton->height = image->Ysize;
-      baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image->Type);
-      baton->channels = image->Bands;
+      baton->width = image.width();
+      baton->height = image.height();
+      baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image.interpretation());
+      baton->channels = image.bands();
       baton->hasProfile = HasProfile(image);
       // Derived attributes
       baton->hasAlpha = HasAlpha(image);
       baton->orientation = ExifOrientation(image);
       // EXIF
-      if (vips_image_get_typeof(image, VIPS_META_EXIF_NAME) == VIPS_TYPE_BLOB) {
-        void* exif;
+      if (image.get_typeof(VIPS_META_EXIF_NAME) == VIPS_TYPE_BLOB) {
         size_t exifLength;
-        if (!vips_image_get_blob(image, VIPS_META_EXIF_NAME, &exif, &exifLength)) {
-          baton->exifLength = exifLength;
-          baton->exif = static_cast<char*>(g_malloc(exifLength));
-          memcpy(baton->exif, exif, exifLength);
-        }
+        void const *exif = image.get_blob(VIPS_META_EXIF_NAME, &exifLength);
+        baton->exif = static_cast<char*>(g_malloc(exifLength));
+        memcpy(baton->exif, exif, exifLength);
+        baton->exifLength = exifLength;
       }
       // ICC profile
-      if (vips_image_get_typeof(image, VIPS_META_ICC_NAME) == VIPS_TYPE_BLOB) {
-        void* icc;
+      if (image.get_typeof(VIPS_META_ICC_NAME) == VIPS_TYPE_BLOB) {
         size_t iccLength;
-        if (!vips_image_get_blob(image, VIPS_META_ICC_NAME, &icc, &iccLength)) {
-          baton->iccLength = iccLength;
-          baton->icc = static_cast<char*>(g_malloc(iccLength));
-          memcpy(baton->icc, icc, iccLength);
-        }
+        void const *icc = image.get_blob(VIPS_META_ICC_NAME, &iccLength);
+        baton->icc = static_cast<char*>(g_malloc(iccLength));
+        memcpy(baton->icc, icc, iccLength);
+        baton->iccLength = iccLength;
       }
-      // Drop image reference
-      g_object_unref(image);
     }
     // Clean up
     vips_error_clear();

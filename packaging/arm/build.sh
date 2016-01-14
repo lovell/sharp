@@ -28,7 +28,7 @@ VERSION_WEBP=0.5.0
 VERSION_TIFF=4.0.6
 VERSION_MAGICK=6.9.2-10
 VERSION_ORC=0.4.24
-VERSION_VIPS=8.2.0
+VERSION_VIPS=8.2.1
 
 mkdir ${DEPS}/zlib
 curl -Ls http://zlib.net/zlib-${VERSION_ZLIB}.tar.xz | tar xJC ${DEPS}/zlib --strip-components=1
@@ -106,11 +106,11 @@ cd ${DEPS}/vips
   --with-jpeg-includes=${TARGET}/include --with-jpeg-libraries=${TARGET}/lib \
   && make install-strip
 
-# Remove the C++ bindings
+# Remove the old C++ bindings
 cd ${TARGET}/include
-rm -rf vips/vipsc++.h vips/vipscpp.h vips/V*.h
+rm -rf vips/vipsc++.h vips/vipscpp.h
 cd ${TARGET}/lib
-rm -rf pkgconfig .libs *.la libvipsCC* libvips-cpp.*
+rm -rf pkgconfig .libs *.la libvipsCC*
 
 # Create JSON file of version numbers
 cd ${TARGET}
