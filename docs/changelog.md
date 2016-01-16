@@ -2,7 +2,7 @@
 
 ### v0.12 - "*look*"
 
-#### v0.12.2 - TBD
+#### v0.12.2 - 16<sup>th</sup> January 2016
 
 * Upgrade libvips to v8.2.0 for improved vips_shrink.
 
