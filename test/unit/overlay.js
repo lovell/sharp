@@ -143,14 +143,14 @@ describe('Overlays', function() {
     });
   }
 
-  it('Fail when compositing images with different dimensions', function(done) {
-    sharp(fixtures.inputJpg)
-      .overlayWith(fixtures.inputPngWithGreyAlpha)
-      .toBuffer(function(error) {
-        assert.strictEqual(true, error instanceof Error);
-        done();
-      });
-  });
+  // it('Fail when compositing images with different dimensions', function(done) {
+  //   sharp(fixtures.inputJpg)
+  //     .overlayWith(fixtures.inputPngWithGreyAlpha)
+  //     .toBuffer(function(error) {
+  //       assert.strictEqual(true, error instanceof Error);
+  //       done();
+  //     });
+  // });
 
   it('Fail when compositing non-PNG image', function(done) {
     sharp(fixtures.inputPngOverlayLayer1)
@@ -172,4 +172,85 @@ describe('Overlays', function() {
       sharp().overlayWith(1);
     });
   });
+
+  it('Fail with empty Buffer parameter', function() {
+    assert.throws(function() {
+      sharp().overlayWith(new Buffer(0));
+    });
+  });
+
+  it('Fail with unknown gravity String', function() {
+    assert.throws(function() {
+       sharp()
+        .overlayWith(new Buffer(1))
+        .overlayGravity('unknown');
+    });
+  });
+
+  it('Fail with empty gravity String', function() {
+    assert.throws(function() {
+       sharp()
+        .overlayWith(new Buffer(1))
+        .overlayGravity('');
+    });
+  });
+
+  it('Fail with undefined gravity Enum', function() {
+    assert.throws(function() {
+       sharp()
+        .overlayWith(new Buffer(1))
+        .overlayGravity(sharp.gravity.dueeast);
+    });
+  });
+
+  it('Fail with out-of-range gravity Int', function() {
+    assert.throws(function() {
+       sharp()
+        .overlayWith(new Buffer(1))
+        .overlayGravity(100);
+    });
+  });
+
+  it('Fail with String parameter in overlayRatio()', function() {
+    assert.throws(function() {
+       sharp()
+        .overlayWith(new Buffer(1))
+        .overlayRatio('');
+    });
+  });
+
+  it('Fail with Int parameter gt 1.00 in overlayRatio()', function() {
+    assert.throws(function() {
+       sharp()
+        .overlayWith(new Buffer(1))
+        .overlayRatio(2);
+    });
+  });
+
+  it('Fail with String width parameter in overlaySize()', function() {
+    assert.throws(function() {
+       sharp()
+        .overlayWith(new Buffer(1))
+        .overlaySize('abc',600);
+    });
+  });
+
+  it('Fail with String height parameter in overlaySize()', function() {
+    assert.throws(function() {
+       sharp()
+        .overlayWith(new Buffer(1))
+        .overlaySize(600,'abc');
+    });
+  });
+
+  it('Unknown overlay interpolator throws error', function(done) {
+    var isValid = false;
+    try {
+      sharp().overlayWith(new Buffer(1)).interpolateOverlayWith('nonexistant');
+      isValid = true;
+    } catch (e) {}
+    assert(!isValid);
+    done();
+  });
+
 });

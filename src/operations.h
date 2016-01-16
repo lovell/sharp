@@ -7,7 +7,8 @@ namespace sharp {
     Composite images `src` and `dst` with premultiplied alpha channel and output
     image with premultiplied alpha.
    */
-  int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out);
+  int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out, double ratio,
+    int overlayWidth, int overlayHeight, int gravity, std::string interp, bool padOverlay);
 
   /*
    * Stretch luminance to cover full dynamic range.

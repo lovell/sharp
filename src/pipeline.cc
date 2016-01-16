@@ -80,6 +80,16 @@ struct PipelineBaton {
   std::string fileIn;
   char *bufferIn;
   size_t bufferInLength;
+  std::string fileOverlay;
+  char *bufferOverlay;
+  size_t bufferOverlayLength;
+  bool hasOverlay;
+  int overlayGravity;
+  double overlayRatio;
+  int overlayWidth;
+  int overlayHeight;
+  std::string overlayInterpolator;
+  bool padOverlay;
   std::string iccProfilePath;
   int limitInputPixels;
   std::string output;
@@ -107,7 +117,6 @@ struct PipelineBaton {
   double sharpenFlat;
   double sharpenJagged;
   int threshold;
-  std::string overlayPath;
   double gamma;
   bool greyscale;
   bool normalize;
@@ -133,6 +142,11 @@ struct PipelineBaton {
 
   PipelineBaton():
     bufferInLength(0),
+    bufferOverlayLength(0),
+    hasOverlay(false),
+    overlayGravity(0),
+    overlayRatio(1.0),
+    padOverlay(false),
     limitInputPixels(0),
     outputFormat(""),
     bufferOutLength(0),
@@ -176,10 +190,14 @@ struct PipelineBaton {
 class PipelineWorker : public AsyncWorker {
 
  public:
-  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener, const Local<Object> &bufferIn) :
+  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
+    const Local<Object> &bufferIn, const Local<Object> &bufferOverlay) :
     AsyncWorker(callback), baton(baton), queueListener(queueListener) {
       if (baton->bufferInLength > 0) {
         SaveToPersistent("bufferIn", bufferIn);
+      }
+      if (baton->bufferOverlayLength > 0) {
+        SaveToPersistent("bufferOverlay", bufferOverlay);
       }
     }
   ~PipelineWorker() {}
@@ -529,8 +547,7 @@ class PipelineWorker : public AsyncWorker {
     bool shouldBlur = baton->blurSigma != 0.0;
     bool shouldSharpen = baton->sharpenRadius != 0;
     bool shouldThreshold = baton->threshold != 0;
-    bool hasOverlay = !baton->overlayPath.empty();
-    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
+    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen || baton->hasOverlay);
 
     // Premultiply image alpha channel before all transformations to avoid
     // dark fringing around bright pixels
@@ -738,22 +755,47 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Composite with overlay, if present
-    if (hasOverlay) {
-      VipsImage *overlayImage = nullptr;
+    if (baton->hasOverlay) {
       ImageType overlayImageType = ImageType::UNKNOWN;
-      overlayImageType = DetermineImageType(baton->overlayPath.data());
-      if (overlayImageType != ImageType::UNKNOWN) {
-        overlayImage = InitImage(baton->overlayPath.data(), baton->accessMethod);
-        if (overlayImage == nullptr) {
-          (baton->err).append("Overlay image has corrupt header");
-          return Error();
+      VipsImage *overlayImage = nullptr;
+
+      if (baton->bufferOverlayLength > 0) {
+        // From buffer
+        overlayImageType = DetermineImageType(baton->bufferOverlay, baton->bufferOverlayLength);
+        if (overlayImageType != ImageType::UNKNOWN) {
+          overlayImage = InitImage(baton->bufferOverlay, baton->bufferOverlayLength, baton->accessMethod);
+          if (image == nullptr) {
+            // Could not read header data
+            (baton->err).append("Overlay buffer has corrupt header");
+            overlayImageType = ImageType::UNKNOWN;
+          }
         } else {
-          vips_object_local(hook, overlayImage);
+          (baton->err).append("Overlay buffer contains unsupported image format");
         }
       } else {
-        (baton->err).append("Overlay image is of an unsupported image format");
+        // From file
+        overlayImageType = DetermineImageType(baton->fileOverlay.data());
+        if (overlayImageType != ImageType::UNKNOWN) {
+          overlayImage = InitImage(baton->fileOverlay.data(), baton->accessMethod);
+          if (overlayImage == nullptr) {
+            (baton->err).append("Overlay file has corrupt header");
+            overlayImageType = ImageType::UNKNOWN;
+          }
+        } else {
+          (baton->err).append("Overlay file is of an unsupported image format");
+        }
+      }
+      if (overlayImage == nullptr || overlayImageType == ImageType::UNKNOWN) {
         return Error();
       }
+      vips_object_local(hook, overlayImage);
+
+      // Limit overlay images to a given number of pixels, where pixels = width * height
+      if (overlayImage->Xsize * overlayImage->Ysize > baton->limitInputPixels) {
+        (baton->err).append("Overlay image exceeds pixel limit");
+        return Error();
+      }
+
       if (image->BandFmt != VIPS_FORMAT_UCHAR && image->BandFmt != VIPS_FORMAT_FLOAT) {
         (baton->err).append("Expected image band format to be uchar or float: ");
         (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, image->BandFmt));
@@ -766,10 +808,6 @@ class PipelineWorker : public AsyncWorker {
       }
       if (!HasAlpha(overlayImage)) {
         (baton->err).append("Overlay image must have an alpha channel");
-        return Error();
-      }
-      if (overlayImage->Xsize != image->Xsize && overlayImage->Ysize != image->Ysize) {
-        (baton->err).append("Overlay image must have same dimensions as resized image");
         return Error();
       }
 
@@ -789,7 +827,8 @@ class PipelineWorker : public AsyncWorker {
       vips_object_local(hook, overlayImagePremultiplied);
 
       VipsImage *composited;
-      if (Composite(hook, overlayImagePremultiplied, image, &composited)) {
+      if (Composite(hook, overlayImagePremultiplied, image, &composited, baton->overlayRatio, baton->overlayWidth,
+        baton->overlayHeight, baton->overlayGravity, baton->overlayInterpolator, baton->padOverlay)) {
         (baton->err).append("Failed to composite images");
         return Error();
       }
@@ -1067,6 +1106,9 @@ class PipelineWorker : public AsyncWorker {
     if (baton->bufferInLength > 0) {
       GetFromPersistent("bufferIn");
     }
+    if (baton->bufferOverlayLength > 0) {
+      GetFromPersistent("bufferOverlay");
+    }
     delete baton;
 
     // Decrement processing task counter
@@ -1255,7 +1297,22 @@ NAN_METHOD(pipeline) {
     baton->background[i] = To<int32_t>(Get(background, i).ToLocalChecked()).FromJust();
   }
   // Overlay options
-  baton->overlayPath = *Utf8String(Get(options, New("overlayPath").ToLocalChecked()).ToLocalChecked());
+  baton->hasOverlay = To<bool>(Get(options, New("hasOverlay").ToLocalChecked()).ToLocalChecked()).FromJust();
+  // Overlay filename
+  baton->fileOverlay = *Utf8String(Get(options, New("fileOverlay").ToLocalChecked()).ToLocalChecked());
+  // Overlay Buffer object
+  Local<Object> bufferOverlay;
+  if (node::Buffer::HasInstance(Get(options, New("bufferOverlay").ToLocalChecked()).ToLocalChecked())) {
+    bufferOverlay = Get(options, New("bufferOverlay").ToLocalChecked()).ToLocalChecked().As<Object>();
+    baton->bufferOverlayLength = node::Buffer::Length(bufferOverlay);
+    baton->bufferOverlay = node::Buffer::Data(bufferOverlay);
+  }
+  baton->overlayGravity = To<int32_t>(Get(options, New("overlayGravity").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->overlayRatio = To<double>(Get(options, New("overlayRatio").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->overlayInterpolator = *Utf8String(Get(options, New("overlayInterpolator").ToLocalChecked()).ToLocalChecked());
+  baton->overlayWidth = To<int32_t>(Get(options, New("overlayWidth").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->overlayHeight = To<int32_t>(Get(options, New("overlayHeight").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->padOverlay = To<bool>(Get(options, New("padOverlay").ToLocalChecked()).ToLocalChecked()).FromJust();
   // Resize options
   baton->withoutEnlargement = To<bool>(Get(options, New("withoutEnlargement").ToLocalChecked()).ToLocalChecked()).FromJust();
   baton->gravity = To<int32_t>(Get(options, New("gravity").ToLocalChecked()).ToLocalChecked()).FromJust();
@@ -1295,7 +1352,7 @@ NAN_METHOD(pipeline) {
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn));
+  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn, bufferOverlay));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);

@@ -80,7 +80,14 @@ var Sharp = function(input) {
     greyscale: false,
     normalize: 0,
     // overlay
-    overlayPath: '',
+    bufferOverlay: null,
+    hasOverlay: false,
+    overlayGravity: 0,
+    overlayRatio: 1.0,
+    overlayInterpolator: 'bicubic',
+    overlayWidth: -1,
+    overlayHeight: -1,
+    padOverlay: false,
     // output options
     output: '__input',
     progressive: false,
@@ -258,14 +265,87 @@ Sharp.prototype.negate = function(negate) {
   return this;
 };
 
-Sharp.prototype.overlayWith = function(overlayPath) {
-  if (typeof overlayPath !== 'string') {
-    throw new Error('The overlay path must be a string');
+Sharp.prototype.overlayWith = function(input) {
+  if (typeof input === 'string') {
+    if (input === '') {
+      throw new Error('The overlay path cannot be empty');
+    }
+    // input=file
+    this.options.fileOverlay = input;
+    this.options.hasOverlay = true;
+  } else if (typeof input === 'object' && input instanceof Buffer) {
+    if (input.length === 0) {
+      throw new Error('The overlay buffer cannot be empty');
+    }
+    // input=buffer
+    this.options.bufferOverlay = input;
+    this.options.hasOverlay = true;
+  } else {
+    throw new Error('Unsupported overlay ' + typeof input);
   }
-  if (overlayPath === '') {
-    throw new Error('The overlay path cannot be empty');
+  return this;
+};
+
+Sharp.prototype.overlayGravity = function(gravity) {
+  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 8) {
+    this.options.overlayGravity = gravity;
+  } else if (typeof gravity === 'string' && typeof module.exports.gravity[gravity] === 'number') {
+    this.options.overlayGravity = module.exports.gravity[gravity];
+  } else {
+    throw new Error('Unsupported overlay gravity ' + gravity);
   }
-  this.options.overlayPath = overlayPath;
+  return this;
+};
+
+Sharp.prototype.overlayRatio = function(ratio) {
+  if (typeof ratio === 'number' && !Number.isNaN(ratio) && parseFloat(ratio) <= 1) {
+    this.options.overlayRatio = parseFloat(ratio);
+  } else {
+    throw new Error('Unsupported overlay ratio ' + ratio);
+  }
+  return this;
+};
+
+Sharp.prototype.overlaySize = function(width, height) {
+  if (!width) {
+    this.options.overlayWidth = -1;
+  } else {
+    if (typeof width === 'number' && !Number.isNaN(width) && width % 1 === 0 && width > 0 && width <= maximum.width) {
+      this.options.overlayWidth = width;
+    } else {
+      throw new Error('Invalid width (1 to ' + maximum.width + ') ' + width);
+    }
+  }
+  if (!height) {
+    this.options.overlayHeight = -1;
+  } else {
+    if (typeof height === 'number' && !Number.isNaN(height) && height % 1 === 0 && height > 0 && height <= maximum.height) {
+      this.options.overlayHeight = height;
+    } else {
+      throw new Error('Invalid height (1 to ' + maximum.height + ') ' + height);
+    }
+  }
+  return this;
+};
+
+Sharp.prototype.interpolateOverlayWith = function(interpolator) {
+  var isValid = false;
+  for (var key in module.exports.interpolator) {
+    if (module.exports.interpolator[key] === interpolator) {
+      isValid = true;
+      break;
+    }
+  }
+  if (isValid) {
+    this.options.overlayInterpolator = interpolator;
+  } else {
+    throw new Error('Invalid overlay interpolator ' + interpolator);
+  }
+  return this;
+};
+
+Sharp.prototype.padOverlay = function(padOverlay) {
+  this.options.padOverlay = (typeof padOverlay === 'boolean') ? padOverlay : true;
   return this;
 };
 
