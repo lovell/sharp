@@ -925,7 +925,7 @@ class PipelineWorker : public AsyncWorker {
   */
   int CalculateShrink(double factor, int interpolatorWindowSize) {
     int shrink = 1;
-    if (factor >= 2 && interpolatorWindowSize > 3) {
+    if (factor >= 2.0 && trunc(factor) != factor && interpolatorWindowSize > 3) {
       // Shrink less, affine more with interpolators that use at least 4x4 pixel window, e.g. bicubic
       shrink = static_cast<int>(floor(factor * 3.0 / interpolatorWindowSize));
     } else {
