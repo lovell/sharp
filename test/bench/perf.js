@@ -535,7 +535,7 @@ async.series({
     }).on('cycle', function(event) {
       console.log('jpeg-linear ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   },
 
@@ -782,7 +782,7 @@ async.series({
     }).on('cycle', function(event) {
       console.log('jpeg-cubic ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   },
 
@@ -882,7 +882,7 @@ async.series({
     }).on('cycle', function(event) {
       console.log('interpolators ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   },
 
@@ -1115,7 +1115,7 @@ async.series({
     pngSuite.on('cycle', function(event) {
       console.log(' png ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   },
 
@@ -1182,7 +1182,7 @@ async.series({
     }).on('cycle', function(event) {
       console.log('webp ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   }
 }, function(err, results) {

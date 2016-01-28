@@ -8,8 +8,8 @@
     "test": "node perf && node random && node parallel"
   },
   "devDependencies": {
-    "async": "^1.5.0",
-    "benchmark": "^1.0.0",
+    "async": "^1.5.2",
+    "benchmark": "^2.0.0",
     "gm": "^1.21.0",
     "imagemagick": "^0.1.3",
     "imagemagick-native": "elad/node-imagemagick-native",
