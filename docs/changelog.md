@@ -2,8 +2,19 @@
 
 ### v0.13 - "*mind*"
 
+* Switch from libvips' C to C++ bindings, requires upgrade to v8.2.2.
+  [#299](https://github.com/lovell/sharp/issues/299)
+
 * Control number of open files in libvips' cache; breaks existing `cache` behaviour.
   [#315](https://github.com/lovell/sharp/issues/315)
+
+* Ensure 16-bit input images can be embedded onto a transparent background.
+  [#340](https://github.com/lovell/sharp/issues/340)
+  [@janaz](https://github.com/janaz)
+
+* Small optimisation when reducing by an integral factor to favour shrink over affine.
+
+* Add support for gamma correction of images with an alpha channel.
 
 ### v0.12 - "*look*"
 

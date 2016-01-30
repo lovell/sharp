@@ -43,6 +43,7 @@ using vips::VError;
 
 using sharp::Composite;
 using sharp::Normalize;
+using sharp::Gamma;
 using sharp::Blur;
 using sharp::Sharpen;
 
@@ -425,7 +426,8 @@ class PipelineWorker : public AsyncWorker {
       }
 
       // Calculate maximum alpha value based on input image pixel depth
-      double maxAlpha = (image.format() == VIPS_FORMAT_USHORT) ? 65535.0 : 255.0;
+      bool is16Bit = (image.format() == VIPS_FORMAT_USHORT);
+      double maxAlpha = is16Bit ? 65535.0 : 255.0;
 
       // Flatten image to remove alpha channel
       if (baton->flatten && HasAlpha(image)) {
@@ -449,8 +451,8 @@ class PipelineWorker : public AsyncWorker {
       }
 
       // Gamma encoding (darken)
-      if (baton->gamma >= 1 && baton->gamma <= 3 && !HasAlpha(image)) {
-        image = image.gamma(VImage::option()->set("exponent", 1.0 / baton->gamma));
+      if (baton->gamma >= 1 && baton->gamma <= 3) {
+        image = Gamma(image, 1.0 / baton->gamma);
       }
 
       // Convert to greyscale (linear, therefore after gamma encoding, if any)
@@ -541,10 +543,6 @@ class PipelineWorker : public AsyncWorker {
       // Crop/embed
       if (image.width() != baton->width || image.height() != baton->height) {
         if (baton->canvas == Canvas::EMBED) {
-          // Add non-transparent alpha channel, if required
-          if (baton->background[3] < 255.0 && !HasAlpha(image)) {
-            image = image.bandjoin(VImage::black(image.width(), image.height()).invert());
-          }
           // Scale up 8-bit values to match 16-bit input image
           double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
           // Create background colour
@@ -556,6 +554,12 @@ class PipelineWorker : public AsyncWorker {
           // Add alpha channel to background colour
           if (baton->background[3] < 255.0 || HasAlpha(image)) {
             background.push_back(baton->background[3] * multiplier);
+          }
+          // Add non-transparent alpha channel, if required
+          if (baton->background[3] < 255.0 && !HasAlpha(image)) {
+            VImage alpha = VImage::new_matrix(image.width(), image.height())
+              .new_from_image(baton->background[3] * multiplier);
+            image = image.bandjoin(alpha);
           }
           // Embed
           int left = static_cast<int>(round((baton->width - image.width()) / 2));
@@ -639,11 +643,17 @@ class PipelineWorker : public AsyncWorker {
       // Reverse premultiplication after all transformations:
       if (shouldPremultiplyAlpha) {
         image = image.unpremultiply(VImage::option()->set("max_alpha", maxAlpha));
+        // Cast pixel values to integer
+        if (is16Bit) {
+          image = image.cast(VIPS_FORMAT_USHORT);
+        } else {
+          image = image.cast(VIPS_FORMAT_UCHAR);
+        }
       }
 
       // Gamma decoding (brighten)
-      if (baton->gamma >= 1 && baton->gamma <= 3 && !HasAlpha(image)) {
-        image = image.gamma(VImage::option()->set("exponent", baton->gamma));
+      if (baton->gamma >= 1 && baton->gamma <= 3) {
+        image = Gamma(image, baton->gamma);
       }
 
       // Apply normalization - stretch luminance to cover full dynamic range

@@ -103,10 +103,24 @@ namespace sharp {
   }
 
   /*
+   * Gamma encoding/decoding
+   */
+  VImage Gamma(VImage image, double const exponent) {
+    if (HasAlpha(image)) {
+      // Separate alpha channel
+      VImage imageWithoutAlpha = image.extract_band(0,
+        VImage::option()->set("n", image.bands() - 1));
+      VImage alpha = image[image.bands() - 1];
+      return imageWithoutAlpha.gamma(VImage::option()->set("exponent", exponent)).bandjoin(alpha);
+    } else {
+      return image.gamma(VImage::option()->set("exponent", exponent));
+    }
+  }
+
+  /*
    * Gaussian blur (use sigma <0 for fast blur)
    */
   VImage Blur(VImage image, double const sigma) {
-    VImage blurred;
     if (sigma < 0.0) {
       // Fast, mild blur - averages neighbouring pixels
       VImage blur = VImage::new_matrixv(3, 3,

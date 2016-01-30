@@ -19,6 +19,11 @@ namespace sharp {
   VImage Normalize(VImage image);
 
   /*
+   * Gamma encoding/decoding
+   */
+  VImage Gamma(VImage image, double const exponent);
+
+  /*
    * Gaussian blur. Use sigma of -1 for fast blur.
    */
   VImage Blur(VImage image, double const sigma);
