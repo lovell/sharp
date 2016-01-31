@@ -94,6 +94,10 @@ namespace sharp {
         imageType = ImageType::OPENSLIDE;
       } else if (EndsWith(loader, "TiffFile")) {
         imageType = ImageType::TIFF;
+      } else if (EndsWith(loader, "Ppm")) {
+        imageType = ImageType::PPM;
+      } else if (EndsWith(loader, "Fits")) {
+        imageType = ImageType::FITS;
       } else if (EndsWith(loader, "Magick") || EndsWith(loader, "MagickFile")) {
         imageType = ImageType::MAGICK;
       }

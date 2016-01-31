@@ -24,7 +24,7 @@ to install the libvips dependency.
 ### Formats
 
 This module supports reading JPEG, PNG, WebP, TIFF, OpenSlide,
-GIF and other libmagick-supported formats.
+GIF and most other libmagick-supported formats.
 
 Output images can be in JPEG, PNG and WebP formats as well as uncompressed raw pixel data.
 

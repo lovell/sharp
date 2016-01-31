@@ -38,7 +38,7 @@ Fast access to image metadata without decoding any compressed image data.
 
 `callback`, if present, gets the arguments `(err, metadata)` where `metadata` has the attributes:
 
-* `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff`, `magick` and `openslide`)
+* `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff`, `magick`, `openslide`, `ppm`, `fits`)
 * `width`: Number of pixels wide
 * `height`: Number of pixels high
 * `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)

@@ -120,6 +120,8 @@ class MetadataWorker : public AsyncWorker {
         case ImageType::TIFF: baton->format = "tiff"; break;
         case ImageType::MAGICK: baton->format = "magick"; break;
         case ImageType::OPENSLIDE: baton->format = "openslide"; break;
+        case ImageType::PPM: baton->format = "ppm"; break;
+        case ImageType::FITS: baton->format = "fits"; break;
         case ImageType::UNKNOWN: break;
       }
       // VipsImage attributes

@@ -15,7 +15,9 @@ namespace sharp {
     WEBP,
     TIFF,
     MAGICK,
-    OPENSLIDE
+    OPENSLIDE,
+    PPM,
+    FITS
   };
 
   // How many tasks are in the queue?

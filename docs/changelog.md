@@ -12,6 +12,10 @@
   [#340](https://github.com/lovell/sharp/issues/340)
   [@janaz](https://github.com/janaz)
 
+* Add support for libvips' PBM, PGM, PPM and FITS image format loaders.
+  [#347](https://github.com/lovell/sharp/issues/347)
+  [@oaleynik](https://github.com/oaleynik)
+
 * Small optimisation when reducing by an integral factor to favour shrink over affine.
 
 * Add support for gamma correction of images with an alpha channel.
