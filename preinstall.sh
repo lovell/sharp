@@ -13,9 +13,9 @@
 #   * Amazon Linux 2015.03, 2015.09
 # * OpenSuse 13
 
-vips_version_minimum=8.2.0
+vips_version_minimum=8.2.2
 vips_version_latest_major_minor=8.2
-vips_version_latest_patch=1
+vips_version_latest_patch=2
 
 openslide_version_minimum=3.4.0
 openslide_version_latest_major_minor=3.4
