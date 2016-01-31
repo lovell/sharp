@@ -13,7 +13,9 @@ RUN mkdir ${DEPS} && mkdir ${TARGET}
 ENV PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${TARGET}/lib/pkgconfig \
     PATH=${PATH}:${TARGET}/bin \
     CPPFLAGS=-I${TARGET}/include \
-    LDFLAGS=-L${TARGET}/lib
+    LDFLAGS=-L${TARGET}/lib \
+    CFLAGS="-O3" \
+    CXXFLAGS="-O3"
 
 # Dependency version numbers
 ENV VERSION_ZLIB=1.2.8 \
@@ -23,13 +25,13 @@ ENV VERSION_ZLIB=1.2.8 \
     VERSION_GSF=1.14.34 \
     VERSION_EXIF=0.6.21 \
     VERSION_JPEG=1.4.2 \
-    VERSION_PNG16=1.6.20 \
+    VERSION_PNG16=1.6.21 \
     VERSION_LCMS2=2.7 \
     VERSION_WEBP=0.5.0 \
     VERSION_TIFF=4.0.6 \
-    VERSION_MAGICK=6.9.2-10 \
+    VERSION_MAGICK=6.9.3-2 \
     VERSION_ORC=0.4.24 \
-    VERSION_VIPS=8.2.1
+    VERSION_VIPS=8.2.2
 
 RUN mkdir ${DEPS}/zlib
 RUN curl -Ls http://zlib.net/zlib-${VERSION_ZLIB}.tar.xz | tar xJC ${DEPS}/zlib --strip-components=1
