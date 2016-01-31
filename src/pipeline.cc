@@ -964,6 +964,14 @@ class PipelineWorker : public AsyncWorker {
   }
 };
 
+// Convenience methods to access the attributes of a V8::Object
+template<typename T> T attrAs(Handle<Object> obj, std::string attr) {
+  return To<T>(Get(obj, New(attr).ToLocalChecked()).ToLocalChecked()).FromJust();
+}
+static std::string attrAsStr(Handle<Object> obj, std::string attr) {
+  return *Utf8String(Get(obj, New(attr).ToLocalChecked()).ToLocalChecked());
+}
+
 /*
   pipeline(options, output, callback)
 */
@@ -975,9 +983,8 @@ NAN_METHOD(pipeline) {
   Local<Object> options = info[0].As<Object>();
 
   // Input filename
-  baton->fileIn = *Utf8String(Get(options, New("fileIn").ToLocalChecked()).ToLocalChecked());
-  baton->accessMethod =
-    To<bool>(Get(options, New("sequentialRead").ToLocalChecked()).ToLocalChecked()).FromJust() ?
+  baton->fileIn = attrAsStr(options, "fileIn");
+  baton->accessMethod = attrAs<bool>(options, "sequentialRead") ?
     VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   // Input Buffer object
   Local<Object> bufferIn;
@@ -987,32 +994,32 @@ NAN_METHOD(pipeline) {
     baton->bufferIn = node::Buffer::Data(bufferIn);
   }
   // ICC profile to use when input CMYK image has no embedded profile
-  baton->iccProfilePath = *Utf8String(Get(options, New("iccProfilePath").ToLocalChecked()).ToLocalChecked());
+  baton->iccProfilePath = attrAsStr(options, "iccProfilePath");
   // Limit input images to a given number of pixels, where pixels = width * height
-  baton->limitInputPixels = To<int32_t>(Get(options, New("limitInputPixels").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->limitInputPixels = attrAs<int32_t>(options, "limitInputPixels");
   // Extract image options
-  baton->topOffsetPre = To<int32_t>(Get(options, New("topOffsetPre").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->leftOffsetPre = To<int32_t>(Get(options, New("leftOffsetPre").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->widthPre = To<int32_t>(Get(options, New("widthPre").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->heightPre = To<int32_t>(Get(options, New("heightPre").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->topOffsetPost = To<int32_t>(Get(options, New("topOffsetPost").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->leftOffsetPost = To<int32_t>(Get(options, New("leftOffsetPost").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->widthPost = To<int32_t>(Get(options, New("widthPost").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->heightPost = To<int32_t>(Get(options, New("heightPost").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->topOffsetPre = attrAs<int32_t>(options, "topOffsetPre");
+  baton->leftOffsetPre = attrAs<int32_t>(options, "leftOffsetPre");
+  baton->widthPre = attrAs<int32_t>(options, "widthPre");
+  baton->heightPre = attrAs<int32_t>(options, "heightPre");
+  baton->topOffsetPost = attrAs<int32_t>(options, "topOffsetPost");
+  baton->leftOffsetPost = attrAs<int32_t>(options, "leftOffsetPost");
+  baton->widthPost = attrAs<int32_t>(options, "widthPost");
+  baton->heightPost = attrAs<int32_t>(options, "heightPost");
   // Output image dimensions
-  baton->width = To<int32_t>(Get(options, New("width").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->height = To<int32_t>(Get(options, New("height").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->width = attrAs<int32_t>(options, "width");
+  baton->height = attrAs<int32_t>(options, "height");
   // Canvas option
-  Local<String> canvas = To<String>(Get(options, New("canvas").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
-  if (Equals(canvas, New("crop").ToLocalChecked()).FromJust()) {
+  std::string canvas = attrAsStr(options, "canvas");
+  if (canvas == "crop") {
     baton->canvas = Canvas::CROP;
-  } else if (Equals(canvas, New("embed").ToLocalChecked()).FromJust()) {
+  } else if (canvas == "embed") {
     baton->canvas = Canvas::EMBED;
-  } else if (Equals(canvas, New("max").ToLocalChecked()).FromJust()) {
+  } else if (canvas == "max") {
     baton->canvas = Canvas::MAX;
-  } else if (Equals(canvas, New("min").ToLocalChecked()).FromJust()) {
+  } else if (canvas == "min") {
     baton->canvas = Canvas::MIN;
-  } else if (Equals(canvas, New("ignore_aspect").ToLocalChecked()).FromJust()) {
+  } else if (canvas == "ignore_aspect") {
     baton->canvas = Canvas::IGNORE_ASPECT;
   }
   // Background colour
@@ -1021,43 +1028,45 @@ NAN_METHOD(pipeline) {
     baton->background[i] = To<int32_t>(Get(background, i).ToLocalChecked()).FromJust();
   }
   // Overlay options
-  baton->overlayPath = *Utf8String(Get(options, New("overlayPath").ToLocalChecked()).ToLocalChecked());
+  baton->overlayPath = attrAsStr(options, "overlayPath");
   // Resize options
-  baton->withoutEnlargement = To<bool>(Get(options, New("withoutEnlargement").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->gravity = To<int32_t>(Get(options, New("gravity").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->interpolator = *Utf8String(Get(options, New("interpolator").ToLocalChecked()).ToLocalChecked());
+  baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
+  baton->gravity = attrAs<int32_t>(options, "gravity");
+  baton->interpolator = attrAsStr(options, "interpolator");
   // Operators
-  baton->flatten = To<bool>(Get(options, New("flatten").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->negate = To<bool>(Get(options, New("negate").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->blurSigma = To<double>(Get(options, New("blurSigma").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->sharpenRadius = To<int32_t>(Get(options, New("sharpenRadius").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->sharpenFlat = To<double>(Get(options, New("sharpenFlat").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->sharpenJagged = To<double>(Get(options, New("sharpenJagged").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->threshold = To<int32_t>(Get(options, New("threshold").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->gamma = To<int32_t>(Get(options, New("gamma").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->greyscale = To<bool>(Get(options, New("greyscale").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->normalize = To<bool>(Get(options, New("normalize").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->angle = To<int32_t>(Get(options, New("angle").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->rotateBeforePreExtract = To<bool>(Get(options, New("rotateBeforePreExtract").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->flip = To<bool>(Get(options, New("flip").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->flop = To<bool>(Get(options, New("flop").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->flatten = attrAs<bool>(options, "flatten");
+  baton->negate = attrAs<bool>(options, "negate");
+  baton->blurSigma = attrAs<double>(options, "blurSigma");
+  baton->sharpenRadius = attrAs<int32_t>(options, "sharpenRadius");
+  baton->sharpenFlat = attrAs<double>(options, "sharpenFlat");
+  baton->sharpenJagged = attrAs<double>(options, "sharpenJagged");
+  baton->threshold = attrAs<int32_t>(options, "threshold");
+  baton->gamma = attrAs<double>(options, "gamma");
+  baton->greyscale = attrAs<bool>(options, "greyscale");
+  baton->normalize = attrAs<bool>(options, "normalize");
+  baton->angle = attrAs<int32_t>(options, "angle");
+  baton->rotateBeforePreExtract = attrAs<bool>(options, "rotateBeforePreExtract");
+  baton->flip = attrAs<bool>(options, "flip");
+  baton->flop = attrAs<bool>(options, "flop");
   // Output options
-  baton->progressive = To<bool>(Get(options, New("progressive").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->quality = To<int32_t>(Get(options, New("quality").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->compressionLevel = To<int32_t>(Get(options, New("compressionLevel").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->withoutAdaptiveFiltering = To<bool>(Get(options, New("withoutAdaptiveFiltering").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->withoutChromaSubsampling = To<bool>(Get(options, New("withoutChromaSubsampling").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->trellisQuantisation = To<bool>(Get(options, New("trellisQuantisation").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->overshootDeringing = To<bool>(Get(options, New("overshootDeringing").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->optimiseScans = To<bool>(Get(options, New("optimiseScans").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->withMetadata = To<bool>(Get(options, New("withMetadata").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->withMetadataOrientation = To<int32_t>(Get(options, New("withMetadataOrientation").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->progressive = attrAs<bool>(options, "progressive");
+  baton->quality = attrAs<int32_t>(options, "quality");
+  baton->compressionLevel = attrAs<int32_t>(options, "compressionLevel");
+  baton->withoutAdaptiveFiltering = attrAs<bool>(options, "withoutAdaptiveFiltering");
+  baton->withoutChromaSubsampling = attrAs<bool>(options, "withoutChromaSubsampling");
+  baton->trellisQuantisation = attrAs<bool>(options, "trellisQuantisation");
+  baton->overshootDeringing = attrAs<bool>(options, "overshootDeringing");
+  baton->optimiseScans = attrAs<bool>(options, "optimiseScans");
+  baton->withMetadata = attrAs<bool>(options, "withMetadata");
+  baton->withMetadataOrientation = attrAs<int32_t>(options, "withMetadataOrientation");
   // Output filename or __format for Buffer
-  baton->output = *Utf8String(Get(options, New("output").ToLocalChecked()).ToLocalChecked());
-  baton->tileSize = To<int32_t>(Get(options, New("tileSize").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->tileOverlap = To<int32_t>(Get(options, New("tileOverlap").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->output = attrAsStr(options, "output");
+  baton->tileSize = attrAs<int32_t>(options, "tileSize");
+  baton->tileOverlap = attrAs<int32_t>(options, "tileOverlap");
   // Function to notify of queue length changes
-  Callback *queueListener = new Callback(Get(options, New("queueListener").ToLocalChecked()).ToLocalChecked().As<Function>());
+  Callback *queueListener = new Callback(
+    Get(options, New("queueListener").ToLocalChecked()).ToLocalChecked().As<Function>()
+  );
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
