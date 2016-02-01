@@ -77,6 +77,7 @@ struct PipelineBaton {
   size_t bufferInLength;
   std::string iccProfilePath;
   int limitInputPixels;
+  std::string density;
   std::string output;
   std::string outputFormat;
   void *bufferOut;
@@ -129,6 +130,7 @@ struct PipelineBaton {
   PipelineBaton():
     bufferInLength(0),
     limitInputPixels(0),
+    density(""),
     outputFormat(""),
     bufferOutLength(0),
     topOffsetPre(-1),
@@ -201,8 +203,9 @@ class PipelineWorker : public AsyncWorker {
       if (inputImageType != ImageType::UNKNOWN) {
         try {
           image = VImage::new_from_buffer(
-            baton->bufferIn, baton->bufferInLength, nullptr,
-            VImage::option()->set("access", baton->accessMethod)
+            baton->bufferIn, baton->bufferInLength, nullptr, VImage::option()
+            ->set("access", baton->accessMethod)
+            ->set("density", baton->density.data())
           );
         } catch (...) {
           (baton->err).append("Input buffer has corrupt header");
@@ -217,8 +220,9 @@ class PipelineWorker : public AsyncWorker {
       if (inputImageType != ImageType::UNKNOWN) {
         try {
           image = VImage::new_from_file(
-            baton->fileIn.data(),
-            VImage::option()->set("access", baton->accessMethod)
+            baton->fileIn.data(), VImage::option()
+            ->set("access", baton->accessMethod)
+            ->set("density", baton->density.data())
           );
         } catch (...) {
           (baton->err).append("Input file has corrupt header");
@@ -997,6 +1001,8 @@ NAN_METHOD(pipeline) {
   baton->iccProfilePath = attrAsStr(options, "iccProfilePath");
   // Limit input images to a given number of pixels, where pixels = width * height
   baton->limitInputPixels = attrAs<int32_t>(options, "limitInputPixels");
+  // Density/DPI at which to load vector images via libmagick
+  baton->density = attrAsStr(options, "density");
   // Extract image options
   baton->topOffsetPre = attrAs<int32_t>(options, "topOffsetPre");
   baton->leftOffsetPre = attrAs<int32_t>(options, "leftOffsetPre");

@@ -35,9 +35,9 @@ var maximum = {
 };
 
 // Constructor-factory
-var Sharp = function(input) {
+var Sharp = function(input, options) {
   if (!(this instanceof Sharp)) {
-    return new Sharp(input);
+    return new Sharp(input, options);
   }
   stream.Duplex.call(this);
   this.options = {
@@ -46,6 +46,7 @@ var Sharp = function(input) {
     streamIn: false,
     sequentialRead: false,
     limitInputPixels: maximum.pixels,
+    density: '72',
     // ICC profiles
     iccProfilePath: path.join(__dirname, 'icc') + path.sep,
     // resize options
@@ -107,12 +108,13 @@ var Sharp = function(input) {
   } else if (typeof input === 'object' && input instanceof Buffer) {
     // input=buffer
     this.options.bufferIn = input;
-  } else if (typeof input === 'undefined') {
+  } else if (typeof input === 'undefined' || input === null) {
     // input=stream
     this.options.streamIn = true;
   } else {
     throw new Error('Unsupported input ' + typeof input);
   }
+  this._inputOptions(options);
   return this;
 };
 module.exports = Sharp;
@@ -132,6 +134,27 @@ module.exports.format = sharp.format();
   Version numbers of libvips and its dependencies
 */
 module.exports.versions = versions;
+
+/*
+  Set input-related options
+    density: DPI at which to load vector images via libmagick
+*/
+Sharp.prototype._inputOptions = function(options) {
+  if (typeof options === 'object') {
+    if (typeof options.density !== 'undefined') {
+      if (
+        typeof options.density === 'number' && !Number.isNaN(options.density) &&
+        options.density % 1 === 0 && options.density > 0 && options.density <= 2400
+      ) {
+        this.options.density = options.density.toString();
+      } else {
+        throw new Error('Invalid density (1 to 2400)' + options.density);
+      }
+    }
+  } else if (typeof options !== 'undefined' && options !== null) {
+    throw new Error('Invalid input options ' + options);
+  }
+};
 
 /*
   Handle incoming chunk on Writable Stream

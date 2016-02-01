@@ -132,8 +132,8 @@
               '<(module_root_dir)/lib/libglib-2.0.so',
               '<(module_root_dir)/lib/libgobject-2.0.so',
               # Dependencies of dependencies, included for openSUSE support
-              '<(module_root_dir)/lib/libMagickCore-6.Q16.so',
-              '<(module_root_dir)/lib/libMagickWand-6.Q16.so',
+              '<(module_root_dir)/lib/libGraphicsMagick.so',
+              '<(module_root_dir)/lib/libGraphicsMagickWand.so',
               '<(module_root_dir)/lib/libexif.so',
               '<(module_root_dir)/lib/libgio-2.0.so',
               '<(module_root_dir)/lib/libgmodule-2.0.so',

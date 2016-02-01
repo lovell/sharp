@@ -6,22 +6,26 @@ var sharp = require('sharp');
 
 ### Input
 
-#### sharp([input])
+#### sharp([input], [options])
 
-Constructor to which further methods are chained. `input`, if present, can be one of:
+Constructor to which further methods are chained.
 
-* Buffer containing JPEG, PNG, WebP, GIF* or TIFF image data, or
+`input`, if present, can be one of:
+
+* Buffer containing JPEG, PNG, WebP, GIF, SVG or TIFF image data, or
 * String containing the path to an image file, with most major formats supported.
 
-The object returned implements the
+JPEG, PNG, WebP, GIF, SVG or TIFF format image data
+can be streamed into the object when `input` is `null` or `undefined`.
+
+`options`, if present, is an Object with the following optional attributes:
+
+* `density` an integral number representing the DPI for vector images, defaulting to 72.
+
+The object returned by the constructor implements the
 [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
 
-JPEG, PNG, WebP, GIF* or TIFF format image data
-can be streamed into the object when `input` is not provided.
-
 JPEG, PNG or WebP format image data can be streamed out from this object.
-
-\* libvips 8.0.0+ is required for Buffer/Stream input of GIF and other `magick` formats.
 
 ```javascript
 sharp('input.jpg')

@@ -634,20 +634,37 @@ describe('Input/output', function() {
   });
 
   if (sharp.format.magick.input.file) {
-    it('Convert SVG, if supported, to PNG', function(done) {
+    it('Convert SVG to PNG at default 72DPI', function(done) {
       sharp(fixtures.inputSvg)
-        .resize(100, 100)
+        .resize(1024)
+        .extract({left: 290, top: 760, width: 40, height: 40})
         .toFormat('png')
         .toBuffer(function(err, data, info) {
           if (err) {
             assert.strictEqual(0, err.message.indexOf('Input file is missing or of an unsupported image format'));
             done();
           } else {
-            assert.strictEqual(true, info.size > 0);
             assert.strictEqual('png', info.format);
-            assert.strictEqual(100, info.width);
-            assert.strictEqual(100, info.height);
-            fixtures.assertSimilar(fixtures.expected('svg.png'), data, done);
+            assert.strictEqual(40, info.width);
+            assert.strictEqual(40, info.height);
+            fixtures.assertSimilar(fixtures.expected('svg72.png'), data, done);
+          }
+        });
+    });
+    it('Convert SVG to PNG at 300DPI', function(done) {
+      sharp(fixtures.inputSvg, { density: 1200 })
+        .resize(1024)
+        .extract({left: 290, top: 760, width: 40, height: 40})
+        .toFormat('png')
+        .toBuffer(function(err, data, info) {
+          if (err) {
+            assert.strictEqual(0, err.message.indexOf('Input file is missing or of an unsupported image format'));
+            done();
+          } else {
+            assert.strictEqual('png', info.format);
+            assert.strictEqual(40, info.width);
+            assert.strictEqual(40, info.height);
+            fixtures.assertSimilar(fixtures.expected('svg1200.png'), data, done);
           }
         });
     });
@@ -822,6 +839,27 @@ describe('Input/output', function() {
       });
     });
 
+  });
+
+  describe('Input options', function() {
+    it('Non-Object options fails', function() {
+      assert.throws(function() {
+        sharp(null, 'zoinks');
+      });
+    });
+    it('Invalid density: string', function() {
+      assert.throws(function() {
+        sharp(null, { density: 'zoinks' } );
+      });
+    });
+    it('Invalid density: float', function() {
+      assert.throws(function() {
+        sharp(null, { density: 0.5 } );
+      });
+    });
+    it('Ignore unknown attribute', function() {
+      sharp(null, { unknown: true } );
+    });
   });
 
   it('Queue length change events', function(done) {

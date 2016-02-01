@@ -2,11 +2,19 @@
 
 ### v0.13 - "*mind*"
 
+#### v0.13.0 - TBD
+
+* Improve vector image support by allowing control of density/DPI.
+  Switch pre-built libs from Imagemagick to Graphicsmagick.
+  [#110](https://github.com/lovell/sharp/issues/110)
+  [@bradisbell](https://github.com/bradisbell)
+
 * Switch from libvips' C to C++ bindings, requires upgrade to v8.2.2.
   [#299](https://github.com/lovell/sharp/issues/299)
 
 * Control number of open files in libvips' cache; breaks existing `cache` behaviour.
   [#315](https://github.com/lovell/sharp/issues/315)
+  [@impomezia](https://github.com/impomezia)
 
 * Ensure 16-bit input images can be embedded onto a transparent background.
   [#340](https://github.com/lovell/sharp/issues/340)
