@@ -20,7 +20,8 @@
   [#315](https://github.com/lovell/sharp/issues/315)
   [@impomezia](https://github.com/impomezia)
 
-* Ensure 16-bit input images can be embedded onto a transparent background.
+* Ensure 16-bit input images can be normalised and embedded onto transparent backgrounds.
+  [#339](https://github.com/lovell/sharp/issues/339)
   [#340](https://github.com/lovell/sharp/issues/340)
   [@janaz](https://github.com/janaz)
 
