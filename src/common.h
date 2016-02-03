@@ -17,7 +17,8 @@ namespace sharp {
     MAGICK,
     OPENSLIDE,
     PPM,
-    FITS
+    FITS,
+    RAW
   };
 
   // How many tasks are in the queue?

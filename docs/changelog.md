@@ -9,6 +9,10 @@
   [#110](https://github.com/lovell/sharp/issues/110)
   [@bradisbell](https://github.com/bradisbell)
 
+* Add support for raw, uncompressed pixel Buffer/Stream input.
+  [#220](https://github.com/lovell/sharp/issues/220)
+  [@mikemorris](https://github.com/mikemorris)
+
 * Switch from libvips' C to C++ bindings, requires upgrade to v8.2.2.
   [#299](https://github.com/lovell/sharp/issues/299)
 

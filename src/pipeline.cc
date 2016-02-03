@@ -78,6 +78,9 @@ struct PipelineBaton {
   std::string iccProfilePath;
   int limitInputPixels;
   std::string density;
+  int rawWidth;
+  int rawHeight;
+  int rawChannels;
   std::string output;
   std::string outputFormat;
   void *bufferOut;
@@ -92,6 +95,7 @@ struct PipelineBaton {
   int heightPost;
   int width;
   int height;
+  int channels;
   Canvas canvas;
   int gravity;
   std::string interpolator;
@@ -131,10 +135,14 @@ struct PipelineBaton {
     bufferInLength(0),
     limitInputPixels(0),
     density(""),
+    rawWidth(0),
+    rawHeight(0),
+    rawChannels(0),
     outputFormat(""),
     bufferOutLength(0),
     topOffsetPre(-1),
     topOffsetPost(-1),
+    channels(0),
     canvas(Canvas::CROP),
     gravity(0),
     flatten(false),
@@ -199,20 +207,33 @@ class PipelineWorker : public AsyncWorker {
     VImage image;
     if (baton->bufferInLength > 0) {
       // From buffer
-      inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
-      if (inputImageType != ImageType::UNKNOWN) {
-        try {
-          image = VImage::new_from_buffer(
-            baton->bufferIn, baton->bufferInLength, nullptr, VImage::option()
-            ->set("access", baton->accessMethod)
-            ->set("density", baton->density.data())
-          );
-        } catch (...) {
-          (baton->err).append("Input buffer has corrupt header");
-          inputImageType = ImageType::UNKNOWN;
+      if (baton->rawWidth > 0 && baton->rawHeight > 0 && baton->rawChannels > 0) {
+        // Raw, uncompressed pixel data
+        image = VImage::new_from_memory(baton->bufferIn, baton->bufferInLength,
+          baton->rawWidth, baton->rawHeight, baton->rawChannels, VIPS_FORMAT_UCHAR);
+        if (baton->rawChannels < 3) {
+          image.get_image()->Type = VIPS_INTERPRETATION_B_W;
+        } else {
+          image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
         }
+        inputImageType = ImageType::RAW;
       } else {
-        (baton->err).append("Input buffer contains unsupported image format");
+        // Compressed data
+        inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
+        if (inputImageType != ImageType::UNKNOWN) {
+          try {
+            image = VImage::new_from_buffer(
+              baton->bufferIn, baton->bufferInLength, nullptr, VImage::option()
+              ->set("access", baton->accessMethod)
+              ->set("density", baton->density.data())
+            );
+          } catch (...) {
+            (baton->err).append("Input buffer has corrupt header");
+            inputImageType = ImageType::UNKNOWN;
+          }
+        } else {
+          (baton->err).append("Input buffer contains unsupported image format");
+        }
       }
     } else {
       // From file
@@ -667,12 +688,9 @@ class PipelineWorker : public AsyncWorker {
 
       // Convert image to sRGB, if not already
       if (image.interpretation() == VIPS_INTERPRETATION_RGB16) {
-        // Cast to integer and fast 8-bit conversion by discarding LSB
-        image = image.cast(VIPS_FORMAT_USHORT).msb();
-        // Explicitly set interpretation to sRGB
-        image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
-      } else if (image.interpretation() != VIPS_INTERPRETATION_sRGB) {
-        // Switch interpretation to sRGB
+        image = image.cast(VIPS_FORMAT_USHORT);
+      }
+      if (image.interpretation() != VIPS_INTERPRETATION_sRGB) {
         image = image.colourspace(VIPS_INTERPRETATION_sRGB);
         // Transform colours from embedded profile to sRGB profile
         if (baton->withMetadata && HasProfile(image)) {
@@ -791,6 +809,8 @@ class PipelineWorker : public AsyncWorker {
           return Error();
         }
       }
+      // Number of channels used in output image
+      baton->channels = image.bands();
     } catch (VError const &err) {
       (baton->err).append(err.what());
     }
@@ -822,6 +842,7 @@ class PipelineWorker : public AsyncWorker {
       Set(info, New("format").ToLocalChecked(), New<String>(baton->outputFormat).ToLocalChecked());
       Set(info, New("width").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(width)));
       Set(info, New("height").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(height)));
+      Set(info, New("channels").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(baton->channels)));
 
       if (baton->bufferOutLength > 0) {
         // Pass ownership of output data to Buffer instance
@@ -1003,6 +1024,10 @@ NAN_METHOD(pipeline) {
   baton->limitInputPixels = attrAs<int32_t>(options, "limitInputPixels");
   // Density/DPI at which to load vector images via libmagick
   baton->density = attrAsStr(options, "density");
+  // Raw pixel input
+  baton->rawWidth = attrAs<int32_t>(options, "rawWidth");
+  baton->rawHeight = attrAs<int32_t>(options, "rawHeight");
+  baton->rawChannels = attrAs<int32_t>(options, "rawChannels");
   // Extract image options
   baton->topOffsetPre = attrAs<int32_t>(options, "topOffsetPre");
   baton->leftOffsetPre = attrAs<int32_t>(options, "leftOffsetPre");

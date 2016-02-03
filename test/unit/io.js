@@ -862,6 +862,88 @@ describe('Input/output', function() {
     });
   });
 
+  describe('Raw pixel input', function() {
+    it('Missing options', function() {
+      assert.throws(function() {
+        sharp(null, { raw: {} } );
+      });
+    });
+    it('Incomplete options', function() {
+      assert.throws(function() {
+        sharp(null, { raw: { width: 1, height: 1} } );
+      });
+    });
+    it('Invalid channels', function() {
+      assert.throws(function() {
+        sharp(null, { raw: { width: 1, height: 1, channels: 5} } );
+      });
+    });
+    it('Invalid height', function() {
+      assert.throws(function() {
+        sharp(null, { raw: { width: 1, height: 0, channels: 4} } );
+      });
+    });
+    it('Invalid width', function() {
+      assert.throws(function() {
+        sharp(null, { raw: { width: 'zoinks', height: 1, channels: 4} } );
+      });
+    });
+    it('RGB', function(done) {
+      // Convert to raw pixel data
+      sharp(fixtures.inputJpg)
+        .resize(256)
+        .raw()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(256, info.width);
+          assert.strictEqual(209, info.height);
+          assert.strictEqual(3, info.channels);
+          // Convert back to JPEG
+          sharp(data, {
+            raw: {
+              width: info.width,
+              height: info.height,
+              channels: info.channels
+            }})
+            .jpeg()
+            .toBuffer(function(err, data, info) {
+              if (err) throw err;
+              assert.strictEqual(256, info.width);
+              assert.strictEqual(209, info.height);
+              assert.strictEqual(3, info.channels);
+              fixtures.assertSimilar(fixtures.inputJpg, data, done);
+            });
+        });
+    });
+    it('RGBA', function(done) {
+      // Convert to raw pixel data
+      sharp(fixtures.inputPngOverlayLayer1)
+        .resize(256)
+        .raw()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(256, info.width);
+          assert.strictEqual(192, info.height);
+          assert.strictEqual(4, info.channels);
+          // Convert back to PNG
+          sharp(data, {
+            raw: {
+              width: info.width,
+              height: info.height,
+              channels: info.channels
+            }})
+            .png()
+            .toBuffer(function(err, data, info) {
+              if (err) throw err;
+              assert.strictEqual(256, info.width);
+              assert.strictEqual(192, info.height);
+              assert.strictEqual(4, info.channels);
+              fixtures.assertSimilar(fixtures.inputPngOverlayLayer1, data, done);
+            });
+        });
+    });
+  });
+
   it('Queue length change events', function(done) {
     var eventCounter = 0;
     var queueListener = function(queueLength) {

@@ -12,15 +12,16 @@ Constructor to which further methods are chained.
 
 `input`, if present, can be one of:
 
-* Buffer containing JPEG, PNG, WebP, GIF, SVG or TIFF image data, or
+* Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
 * String containing the path to an image file, with most major formats supported.
 
-JPEG, PNG, WebP, GIF, SVG or TIFF format image data
+JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data
 can be streamed into the object when `input` is `null` or `undefined`.
 
 `options`, if present, is an Object with the following optional attributes:
 
 * `density` an integral number representing the DPI for vector images, defaulting to 72.
+* `raw` an Object containing `width`, `height` and `channels` when providing uncompressed data. See `raw()` for pixel ordering.
 
 The object returned by the constructor implements the
 [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
@@ -400,7 +401,7 @@ sharp('input.png')
 `callback`, if present, is called with two arguments `(err, info)` where:
 
 * `err` contains an error message, if any.
-* `info` contains the output image `format`, `size` (bytes), `width` and `height`.
+* `info` contains the output image `format`, `size` (bytes), `width`, `height` and `channels`.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
@@ -412,7 +413,7 @@ Write image data to a Buffer, the format of which will match the input image by 
 
 * `err` is an error message, if any.
 * `buffer` is the output image data.
-* `info` contains the output image `format`, `size` (bytes), `width` and `height`.
+* `info` contains the output image `format`, `size` (bytes), `width`, `height` and `channels`.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 

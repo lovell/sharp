@@ -47,6 +47,9 @@ var Sharp = function(input, options) {
     sequentialRead: false,
     limitInputPixels: maximum.pixels,
     density: '72',
+    rawWidth: 0,
+    rawHeight: 0,
+    rawChannels: 0,
     // ICC profiles
     iccProfilePath: path.join(__dirname, 'icc') + path.sep,
     // resize options
@@ -136,22 +139,51 @@ module.exports.format = sharp.format();
 module.exports.versions = versions;
 
 /*
+  Validation helpers
+*/
+var isDefined = function(val) {
+  return typeof val !== 'undefined' && val !== null;
+};
+var isObject = function(val) {
+  return typeof val === 'object';
+};
+var isInteger = function(val) {
+  return typeof val === 'number' && !Number.isNaN(val) && val % 1 === 0;
+};
+var inRange = function(val, min, max) {
+  return val >= min && val <= max;
+};
+
+/*
   Set input-related options
     density: DPI at which to load vector images via libmagick
 */
 Sharp.prototype._inputOptions = function(options) {
-  if (typeof options === 'object') {
-    if (typeof options.density !== 'undefined') {
-      if (
-        typeof options.density === 'number' && !Number.isNaN(options.density) &&
-        options.density % 1 === 0 && options.density > 0 && options.density <= 2400
-      ) {
+  if (isObject(options)) {
+    // Density
+    if (isDefined(options.density)) {
+      if (isInteger(options.density) && inRange(options.density, 1, 2400)) {
         this.options.density = options.density.toString();
       } else {
-        throw new Error('Invalid density (1 to 2400)' + options.density);
+        throw new Error('Invalid density (1 to 2400) ' + options.density);
       }
     }
-  } else if (typeof options !== 'undefined' && options !== null) {
+    // Raw pixel input
+    if (isDefined(options.raw)) {
+      if (
+        isObject(options.raw) &&
+        isInteger(options.raw.width) && inRange(options.raw.width, 1, maximum.width) &&
+        isInteger(options.raw.height) && inRange(options.raw.height, 1, maximum.height) &&
+        isInteger(options.raw.channels) && inRange(options.raw.channels, 1, 4)
+      ) {
+        this.options.rawWidth = options.raw.width;
+        this.options.rawHeight = options.raw.height;
+        this.options.rawChannels = options.raw.channels;
+      } else {
+        throw new Error('Expected width, height and channels for raw pixel input');
+      }
+    }
+  } else if (isDefined(options)) {
     throw new Error('Invalid input options ' + options);
   }
 };
