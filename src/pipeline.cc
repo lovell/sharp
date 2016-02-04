@@ -39,6 +39,7 @@ using Nan::Equals;
 
 using vips::VImage;
 using vips::VInterpolate;
+using vips::VOption;
 using vips::VError;
 
 using sharp::Composite;
@@ -222,11 +223,11 @@ class PipelineWorker : public AsyncWorker {
         inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
         if (inputImageType != ImageType::UNKNOWN) {
           try {
-            image = VImage::new_from_buffer(
-              baton->bufferIn, baton->bufferInLength, nullptr, VImage::option()
-              ->set("access", baton->accessMethod)
-              ->set("density", baton->density.data())
-            );
+            VOption *option = VImage::option()->set("access", baton->accessMethod);
+            if (inputImageType == ImageType::MAGICK) {
+              option->set("density", baton->density.data());
+            }
+            image = VImage::new_from_buffer(baton->bufferIn, baton->bufferInLength, nullptr, option);
           } catch (...) {
             (baton->err).append("Input buffer has corrupt header");
             inputImageType = ImageType::UNKNOWN;
@@ -240,11 +241,11 @@ class PipelineWorker : public AsyncWorker {
       inputImageType = DetermineImageType(baton->fileIn.data());
       if (inputImageType != ImageType::UNKNOWN) {
         try {
-          image = VImage::new_from_file(
-            baton->fileIn.data(), VImage::option()
-            ->set("access", baton->accessMethod)
-            ->set("density", baton->density.data())
-          );
+          VOption *option = VImage::option()->set("access", baton->accessMethod);
+          if (inputImageType == ImageType::MAGICK) {
+            option->set("density", baton->density.data());
+          }
+          image = VImage::new_from_file(baton->fileIn.data(), option);
         } catch (...) {
           (baton->err).append("Input file has corrupt header");
           inputImageType = ImageType::UNKNOWN;

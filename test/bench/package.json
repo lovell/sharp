@@ -5,7 +5,7 @@
   "author": "Lovell Fuller <npm@lovell.info>",
   "description": "Benchmark and performance tests for sharp",
   "scripts": {
-    "test": "node perf && node random && node parallel"
+    "test": "VIPS_WARNING=0 node perf && node random && node parallel"
   },
   "devDependencies": {
     "async": "^1.5.2",

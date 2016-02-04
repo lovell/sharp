@@ -29,6 +29,10 @@
   [#347](https://github.com/lovell/sharp/issues/347)
   [@oaleynik](https://github.com/oaleynik)
 
+* Ensure default crop gravity is center/centre.
+  [#351](https://github.com/lovell/sharp/pull/351)
+  [@joelmukuthu](https://github.com/joelmukuthu)
+
 * Small optimisation when reducing by an integral factor to favour shrink over affine.
 
 * Add support for gamma correction of images with an alpha channel.
