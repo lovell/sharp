@@ -231,7 +231,9 @@ module.exports.gravity = {
 
 Sharp.prototype.crop = function(gravity) {
   this.options.canvas = 'crop';
-  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 8) {
+  if (typeof gravity === 'undefined') {
+    this.options.gravity = module.exports.gravity.center;
+  } else if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 8) {
     this.options.gravity = gravity;
   } else if (typeof gravity === 'string' && typeof module.exports.gravity[gravity] === 'number') {
     this.options.gravity = module.exports.gravity[gravity];

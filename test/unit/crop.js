@@ -145,4 +145,25 @@ describe('Crop gravities', function() {
       sharp(fixtures.inputJpg).crop('yadda');
     });
   });
+
+  it('does not throw if crop gravity is undefined', function() {
+    assert.doesNotThrow(function() {
+      sharp(fixtures.inputJpg).crop();
+    });
+  });
+
+  it('defaults crop gravity to sharp.gravity.center', function(done) {
+    var centerGravitySettings = testSettings.filter(function (settings) {
+      return settings.name === 'Center';
+    })[0];
+    sharp(fixtures.inputJpg)
+      .resize(centerGravitySettings.width, centerGravitySettings.height)
+      .crop()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(centerGravitySettings.width, info.width);
+        assert.strictEqual(centerGravitySettings.height, info.height);
+        fixtures.assertSimilar(fixtures.expected(centerGravitySettings.fixture), data, done);
+      });
+  });
 });
