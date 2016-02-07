@@ -86,7 +86,8 @@ var Sharp = function(input, options) {
     // overlay
     overlayPath: '',
     // output options
-    output: '__input',
+    formatOut: 'input',
+    fileOut: '',
     progressive: false,
     quality: 80,
     compressionLevel: 6,
@@ -667,8 +668,8 @@ Sharp.prototype.limitInputPixels = function(limit) {
 /*
   Write output image data to a file
 */
-Sharp.prototype.toFile = function(output, callback) {
-  if (!output || output.length === 0) {
+Sharp.prototype.toFile = function(fileOut, callback) {
+  if (!fileOut || fileOut.length === 0) {
     var errOutputInvalid = new Error('Invalid output');
     if (typeof callback === 'function') {
       callback(errOutputInvalid);
@@ -676,7 +677,7 @@ Sharp.prototype.toFile = function(output, callback) {
       return BluebirdPromise.reject(errOutputInvalid);
     }
   } else {
-    if (this.options.fileIn === output) {
+    if (this.options.fileIn === fileOut) {
       var errOutputIsInput = new Error('Cannot use same file for input and output');
       if (typeof callback === 'function') {
         callback(errOutputIsInput);
@@ -684,7 +685,7 @@ Sharp.prototype.toFile = function(output, callback) {
         return BluebirdPromise.reject(errOutputIsInput);
       }
     } else {
-      this.options.output = output;
+      this.options.fileOut = fileOut;
       return this._pipeline(callback);
     }
   }
@@ -702,7 +703,7 @@ Sharp.prototype.toBuffer = function(callback) {
   Force JPEG output
 */
 Sharp.prototype.jpeg = function() {
-  this.options.output = '__jpeg';
+  this.options.formatOut = 'jpeg';
   return this;
 };
 
@@ -710,7 +711,7 @@ Sharp.prototype.jpeg = function() {
   Force PNG output
 */
 Sharp.prototype.png = function() {
-  this.options.output = '__png';
+  this.options.formatOut = 'png';
   return this;
 };
 
@@ -718,7 +719,7 @@ Sharp.prototype.png = function() {
   Force WebP output
 */
 Sharp.prototype.webp = function() {
-  this.options.output = '__webp';
+  this.options.formatOut = 'webp';
   return this;
 };
 
@@ -726,7 +727,7 @@ Sharp.prototype.webp = function() {
   Force raw, uint8 output
 */
 Sharp.prototype.raw = function() {
-  this.options.output = '__raw';
+  this.options.formatOut = 'raw';
   return this;
 };
 
@@ -734,15 +735,17 @@ Sharp.prototype.raw = function() {
   Force output to a given format
   @param format is either the id as a String or an Object with an 'id' attribute
 */
-Sharp.prototype.toFormat = function(format) {
-  var id = format;
-  if (typeof format === 'object') {
-    id = format.id;
+Sharp.prototype.toFormat = function(formatOut) {
+  if (isObject(formatOut) && isDefined(formatOut.id)) {
+    formatOut = formatOut.id;
   }
-  if (typeof id === 'string' && typeof module.exports.format[id] === 'object' && typeof this[id] === 'function') {
-    this[id]();
+  if (
+    isDefined(formatOut) &&
+    ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'].indexOf(formatOut) !== -1
+  ) {
+    this.options.formatOut = formatOut;
   } else {
-    throw new Error('Unsupported format ' + format);
+    throw new Error('Unsupported output format ' + formatOut);
   }
   return this;
 };

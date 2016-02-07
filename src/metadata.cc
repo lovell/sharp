@@ -33,6 +33,7 @@ using vips::VImage;
 using vips::VError;
 
 using sharp::ImageType;
+using sharp::ImageTypeId;
 using sharp::DetermineImageType;
 using sharp::HasProfile;
 using sharp::HasAlpha;
@@ -113,18 +114,7 @@ class MetadataWorker : public AsyncWorker {
     }
     if (imageType != ImageType::UNKNOWN) {
       // Image type
-      switch (imageType) {
-        case ImageType::JPEG: baton->format = "jpeg"; break;
-        case ImageType::PNG: baton->format = "png"; break;
-        case ImageType::WEBP: baton->format = "webp"; break;
-        case ImageType::TIFF: baton->format = "tiff"; break;
-        case ImageType::MAGICK: baton->format = "magick"; break;
-        case ImageType::OPENSLIDE: baton->format = "openslide"; break;
-        case ImageType::PPM: baton->format = "ppm"; break;
-        case ImageType::FITS: baton->format = "fits"; break;
-        case ImageType::RAW: baton->format = "raw"; break;
-        case ImageType::UNKNOWN: break;
-      }
+      baton->format = ImageTypeId(imageType);
       // VipsImage attributes
       baton->width = image.width();
       baton->height = image.height();

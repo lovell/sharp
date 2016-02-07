@@ -54,6 +54,26 @@ namespace sharp {
   }
 
   /*
+    Provide a string identifier for the given image type.
+  */
+  std::string ImageTypeId(ImageType const imageType) {
+    std::string id;
+    switch (imageType) {
+      case ImageType::JPEG: id = "jpeg"; break;
+      case ImageType::PNG: id = "png"; break;
+      case ImageType::WEBP: id = "webp"; break;
+      case ImageType::TIFF: id = "tiff"; break;
+      case ImageType::MAGICK: id = "magick"; break;
+      case ImageType::OPENSLIDE: id = "openslide"; break;
+      case ImageType::PPM: id = "ppm"; break;
+      case ImageType::FITS: id = "fits"; break;
+      case ImageType::RAW: id = "raw"; break;
+      case ImageType::UNKNOWN: id = "unknown"; break;
+    }
+    return id;
+  }
+
+  /*
     Determine image format of a buffer.
   */
   ImageType DetermineImageType(void *buffer, size_t const length) {

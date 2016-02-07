@@ -396,7 +396,9 @@ sharp('input.png')
 
 #### toFile(path, [callback])
 
-`path` is a String containing the path to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
+`path` is a String containing the path to write the image data to.
+
+If an explicit output format is not selected, it will be inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
 
 `callback`, if present, is called with two arguments `(err, info)` where:
 

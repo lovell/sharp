@@ -35,6 +35,11 @@ namespace sharp {
   bool IsDz(std::string const &str);
 
   /*
+    Provide a string identifier for the given image type.
+  */
+  std::string ImageTypeId(ImageType const imageType);
+
+  /*
     Determine image format of a buffer.
   */
   ImageType DetermineImageType(void *buffer, size_t const length);

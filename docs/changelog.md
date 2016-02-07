@@ -25,6 +25,10 @@
   [#340](https://github.com/lovell/sharp/issues/340)
   [@janaz](https://github.com/janaz)
 
+* Ensure selected format takes precedence over any unknown output filename extension.
+  [#344](https://github.com/lovell/sharp/issues/344)
+  [@ubaltaci](https://github.com/ubaltaci)
+
 * Add support for libvips' PBM, PGM, PPM and FITS image format loaders.
   [#347](https://github.com/lovell/sharp/issues/347)
   [@oaleynik](https://github.com/oaleynik)

@@ -49,6 +49,7 @@ using sharp::Blur;
 using sharp::Sharpen;
 
 using sharp::ImageType;
+using sharp::ImageTypeId;
 using sharp::DetermineImageType;
 using sharp::HasProfile;
 using sharp::HasAlpha;
@@ -82,8 +83,8 @@ struct PipelineBaton {
   int rawWidth;
   int rawHeight;
   int rawChannels;
-  std::string output;
-  std::string outputFormat;
+  std::string formatOut;
+  std::string fileOut;
   void *bufferOut;
   size_t bufferOutLength;
   int topOffsetPre;
@@ -139,7 +140,8 @@ struct PipelineBaton {
     rawWidth(0),
     rawHeight(0),
     rawChannels(0),
-    outputFormat(""),
+    formatOut(""),
+    fileOut(""),
     bufferOutLength(0),
     topOffsetPre(-1),
     topOffsetPost(-1),
@@ -707,62 +709,75 @@ class PipelineWorker : public AsyncWorker {
       }
 
       // Output
-      if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == ImageType::JPEG)) {
-        // Write JPEG to buffer
-        baton->bufferOut = static_cast<char*>(const_cast<void*>(vips_blob_get(image.jpegsave_buffer(VImage::option()
-          ->set("strip", !baton->withMetadata)
-          ->set("Q", baton->quality)
-          ->set("optimize_coding", TRUE)
-          ->set("no_subsample", baton->withoutChromaSubsampling)
-          ->set("trellis_quant", baton->trellisQuantisation)
-          ->set("overshoot_deringing", baton->overshootDeringing)
-          ->set("optimize_scans", baton->optimiseScans)
-          ->set("interlace", baton->progressive)
-        ), &baton->bufferOutLength)));
-        baton->outputFormat = "jpeg";
-      } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == ImageType::PNG)) {
-        // Write PNG to buffer
-        baton->bufferOut = static_cast<char*>(const_cast<void*>(vips_blob_get(image.pngsave_buffer(VImage::option()
-          ->set("strip", !baton->withMetadata)
-          ->set("compression", baton->compressionLevel)
-          ->set("interlace", baton->progressive)
-          ->set("filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
-        ), &baton->bufferOutLength)));
-        baton->outputFormat = "png";
-      } else if (baton->output == "__webp" || (baton->output == "__input" && inputImageType == ImageType::WEBP)) {
-        // Write WEBP to buffer
-        baton->bufferOut = static_cast<char*>(const_cast<void*>(vips_blob_get(image.webpsave_buffer(VImage::option()
-          ->set("strip", !baton->withMetadata)
-          ->set("Q", baton->quality)
-        ), &baton->bufferOutLength)));
-        baton->outputFormat = "webp";
-      } else if (baton->output == "__raw") {
-        // Write raw, uncompressed image data to buffer
-        if (baton->greyscale || image.interpretation() == VIPS_INTERPRETATION_B_W) {
-          // Extract first band for greyscale image
-          image = image[0];
-        }
-        if (image.format() != VIPS_FORMAT_UCHAR) {
-          // Cast pixels to uint8 (unsigned char)
-          image = image.cast(VIPS_FORMAT_UCHAR);
-        }
-        // Get raw image data
-        baton->bufferOut = static_cast<char*>(image.write_to_memory(&baton->bufferOutLength));
-        if (baton->bufferOut == nullptr) {
-          (baton->err).append("Could not allocate enough memory for raw output");
+      if (baton->fileOut == "") {
+        // Buffer output
+        if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == ImageType::JPEG)) {
+          // Write JPEG to buffer
+          baton->bufferOut = static_cast<char*>(const_cast<void*>(vips_blob_get(image.jpegsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->quality)
+            ->set("optimize_coding", TRUE)
+            ->set("no_subsample", baton->withoutChromaSubsampling)
+            ->set("trellis_quant", baton->trellisQuantisation)
+            ->set("overshoot_deringing", baton->overshootDeringing)
+            ->set("optimize_scans", baton->optimiseScans)
+            ->set("interlace", baton->progressive)
+          ), &baton->bufferOutLength)));
+          baton->formatOut = "jpeg";
+        } else if (baton->formatOut == "png" || (baton->formatOut == "input" && inputImageType == ImageType::PNG)) {
+          // Write PNG to buffer
+          baton->bufferOut = static_cast<char*>(const_cast<void*>(vips_blob_get(image.pngsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("compression", baton->compressionLevel)
+            ->set("interlace", baton->progressive)
+            ->set("filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
+          ), &baton->bufferOutLength)));
+          baton->formatOut = "png";
+        } else if (baton->formatOut == "webp" || (baton->formatOut == "input" && inputImageType == ImageType::WEBP)) {
+          // Write WEBP to buffer
+          baton->bufferOut = static_cast<char*>(const_cast<void*>(vips_blob_get(image.webpsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->quality)
+          ), &baton->bufferOutLength)));
+          baton->formatOut = "webp";
+        } else if (baton->formatOut == "raw") {
+          // Write raw, uncompressed image data to buffer
+          if (baton->greyscale || image.interpretation() == VIPS_INTERPRETATION_B_W) {
+            // Extract first band for greyscale image
+            image = image[0];
+          }
+          if (image.format() != VIPS_FORMAT_UCHAR) {
+            // Cast pixels to uint8 (unsigned char)
+            image = image.cast(VIPS_FORMAT_UCHAR);
+          }
+          // Get raw image data
+          baton->bufferOut = static_cast<char*>(image.write_to_memory(&baton->bufferOutLength));
+          if (baton->bufferOut == nullptr) {
+            (baton->err).append("Could not allocate enough memory for raw output");
+            return Error();
+          }
+          baton->formatOut = "raw";
+        } else {
+          // Unsupported output format
+          (baton->err).append("Unsupported output format ");
+          if (baton->formatOut == "input") {
+            (baton->err).append(ImageTypeId(inputImageType));
+          } else {
+            (baton->err).append(baton->formatOut);
+          }
           return Error();
         }
-        baton->outputFormat = "raw";
       } else {
-        bool outputJpeg = IsJpeg(baton->output);
-        bool outputPng = IsPng(baton->output);
-        bool outputWebp = IsWebp(baton->output);
-        bool outputTiff = IsTiff(baton->output);
-        bool outputDz = IsDz(baton->output);
-        bool matchInput = !(outputJpeg || outputPng || outputWebp || outputTiff || outputDz);
-        if (outputJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
+        // File output
+        bool isJpeg = IsJpeg(baton->fileOut);
+        bool isPng = IsPng(baton->fileOut);
+        bool isWebp = IsWebp(baton->fileOut);
+        bool isTiff = IsTiff(baton->fileOut);
+        bool isDz = IsDz(baton->fileOut);
+        bool matchInput = baton->formatOut == "input" && !(isJpeg || isPng || isWebp || isTiff || isDz);
+        if (baton->formatOut == "jpeg" || isJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
           // Write JPEG to file
-          image.jpegsave(const_cast<char*>(baton->output.data()), VImage::option()
+          image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->quality)
             ->set("optimize_coding", TRUE)
@@ -772,41 +787,42 @@ class PipelineWorker : public AsyncWorker {
             ->set("optimize_scans", baton->optimiseScans)
             ->set("interlace", baton->progressive)
           );
-          baton->outputFormat = "jpeg";
-        } else if (outputPng || (matchInput && inputImageType == ImageType::PNG)) {
+          baton->formatOut = "jpeg";
+        } else if (baton->formatOut == "png" || isPng || (matchInput && inputImageType == ImageType::PNG)) {
           // Write PNG to file
-          image.pngsave(const_cast<char*>(baton->output.data()), VImage::option()
+          image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("compression", baton->compressionLevel)
             ->set("interlace", baton->progressive)
             ->set("filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
           );
-          baton->outputFormat = "png";
-        } else if (outputWebp || (matchInput && inputImageType == ImageType::WEBP)) {
+          baton->formatOut = "png";
+        } else if (baton->formatOut == "webp" || isWebp || (matchInput && inputImageType == ImageType::WEBP)) {
           // Write WEBP to file
-          image.webpsave(const_cast<char*>(baton->output.data()), VImage::option()
+          image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->quality)
           );
-          baton->outputFormat = "webp";
-        } else if (outputTiff || (matchInput && inputImageType == ImageType::TIFF)) {
+          baton->formatOut = "webp";
+        } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
           // Write TIFF to file
-          image.tiffsave(const_cast<char*>(baton->output.data()), VImage::option()
+          image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->quality)
             ->set("compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG)
           );
-          baton->outputFormat = "tiff";
-        } else if (outputDz) {
+          baton->formatOut = "tiff";
+        } else if (baton->formatOut == "dz" || IsDz(baton->fileOut)) {
           // Write DZ to file
-          image.dzsave(const_cast<char*>(baton->output.data()), VImage::option()
+          image.dzsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("tile_size", baton->tileSize)
             ->set("overlap", baton->tileOverlap)
           );
-          baton->outputFormat = "dz";
+          baton->formatOut = "dz";
         } else {
-          (baton->err).append("Unsupported output " + baton->output);
+          // Unsupported output format
+          (baton->err).append("Unsupported output format " + baton->fileOut);
           return Error();
         }
       }
@@ -840,7 +856,7 @@ class PipelineWorker : public AsyncWorker {
       }
       // Info Object
       Local<Object> info = New<Object>();
-      Set(info, New("format").ToLocalChecked(), New<String>(baton->outputFormat).ToLocalChecked());
+      Set(info, New("format").ToLocalChecked(), New<String>(baton->formatOut).ToLocalChecked());
       Set(info, New("width").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(width)));
       Set(info, New("height").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(height)));
       Set(info, New("channels").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(baton->channels)));
@@ -856,7 +872,7 @@ class PipelineWorker : public AsyncWorker {
       } else {
         // Add file size to info
         GStatBuf st;
-        g_stat(baton->output.data(), &st);
+        g_stat(baton->fileOut.data(), &st);
         Set(info, New("size").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(st.st_size)));
         argv[1] = info;
       }
@@ -1091,8 +1107,9 @@ NAN_METHOD(pipeline) {
   baton->optimiseScans = attrAs<bool>(options, "optimiseScans");
   baton->withMetadata = attrAs<bool>(options, "withMetadata");
   baton->withMetadataOrientation = attrAs<int32_t>(options, "withMetadataOrientation");
-  // Output filename or __format for Buffer
-  baton->output = attrAsStr(options, "output");
+  // Output
+  baton->formatOut = attrAsStr(options, "formatOut");
+  baton->fileOut = attrAsStr(options, "fileOut");
   baton->tileSize = attrAs<int32_t>(options, "tileSize");
   baton->tileOverlap = attrAs<int32_t>(options, "tileOverlap");
   // Function to notify of queue length changes

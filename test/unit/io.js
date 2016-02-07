@@ -392,76 +392,89 @@ describe('Input/output', function() {
       });
   });
 
-  describe('Output filename without extension uses input format', function() {
+  describe('Output filename with unknown extension', function() {
 
-    it('JPEG', function(done) {
-      sharp(fixtures.inputJpg).resize(320, 80).toFile(fixtures.outputZoinks, function(err, info) {
-        if (err) throw err;
-        assert.strictEqual(true, info.size > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(80, info.height);
-        fs.unlinkSync(fixtures.outputZoinks);
-        done();
-      });
-    });
-
-    it('PNG', function(done) {
-      sharp(fixtures.inputPng).resize(320, 80).toFile(fixtures.outputZoinks, function(err, info) {
-        if (err) throw err;
-        assert.strictEqual(true, info.size > 0);
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(80, info.height);
-        fs.unlinkSync(fixtures.outputZoinks);
-        done();
-      });
-    });
-
-    it('Transparent PNG', function(done) {
-      sharp(fixtures.inputPngWithTransparency).resize(320, 80).toFile(fixtures.outputZoinks, function(err, info) {
-        if (err) throw err;
-        assert.strictEqual(true, info.size > 0);
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(80, info.height);
-        done();
-      });
-    });
-
-    if (sharp.format.webp.input.file) {
-      it('WebP', function(done) {
-        sharp(fixtures.inputWebP).resize(320, 80).toFile(fixtures.outputZoinks, function(err, info) {
+    it('Match JPEG input', function(done) {
+      sharp(fixtures.inputJpg)
+        .resize(320, 80)
+        .toFile(fixtures.outputZoinks, function(err, info) {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
-          assert.strictEqual('webp', info.format);
+          assert.strictEqual('jpeg', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
           fs.unlinkSync(fixtures.outputZoinks);
           done();
         });
+    });
+
+    it('Match PNG input', function(done) {
+      sharp(fixtures.inputPng)
+        .resize(320, 80)
+        .toFile(fixtures.outputZoinks, function(err, info) {
+          if (err) throw err;
+          assert.strictEqual(true, info.size > 0);
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80, info.height);
+          fs.unlinkSync(fixtures.outputZoinks);
+          done();
+        });
+    });
+
+    if (sharp.format.webp.input.file) {
+      it('Match WebP input', function(done) {
+        sharp(fixtures.inputWebP)
+          .resize(320, 80)
+          .toFile(fixtures.outputZoinks, function(err, info) {
+            if (err) throw err;
+            assert.strictEqual(true, info.size > 0);
+            assert.strictEqual('webp', info.format);
+            assert.strictEqual(320, info.width);
+            assert.strictEqual(80, info.height);
+            fs.unlinkSync(fixtures.outputZoinks);
+            done();
+          });
       });
     }
 
-    it('TIFF', function(done) {
-      sharp(fixtures.inputTiff).resize(320, 80).toFile(fixtures.outputZoinks, function(err, info) {
-        if (err) throw err;
-        assert.strictEqual(true, info.size > 0);
-        assert.strictEqual('tiff', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(80, info.height);
-        fs.unlinkSync(fixtures.outputZoinks);
-        done();
-      });
+    it('Match TIFF input', function(done) {
+      sharp(fixtures.inputTiff)
+        .resize(320, 80)
+        .toFile(fixtures.outputZoinks, function(err, info) {
+          if (err) throw err;
+          assert.strictEqual(true, info.size > 0);
+          assert.strictEqual('tiff', info.format);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80, info.height);
+          fs.unlinkSync(fixtures.outputZoinks);
+          done();
+        });
     });
 
-    it('Fail with GIF', function(done) {
-      sharp(fixtures.inputGif).resize(320, 80).toFile(fixtures.outputZoinks, function(err) {
-        assert(!!err);
-        done();
-      });
+    it('Match GIF input, therefore fail', function(done) {
+      sharp(fixtures.inputGif)
+        .resize(320, 80)
+        .toFile(fixtures.outputZoinks, function(err) {
+          assert(!!err);
+          done();
+        });
     });
 
+    it('Force JPEG format for PNG input', function(done) {
+      sharp(fixtures.inputPng)
+        .resize(320, 80)
+        .jpeg()
+        .toFile(fixtures.outputZoinks, function(err, info) {
+          if (err) throw err;
+          assert.strictEqual(true, info.size > 0);
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80, info.height);
+          fs.unlinkSync(fixtures.outputZoinks);
+          done();
+        });
+    });
   });
 
   describe('PNG output', function() {
