@@ -112,5 +112,4 @@ docker pull wjordan/libvips
 ### Build tools
 
 * [gulp-responsive](https://www.npmjs.com/package/gulp-responsive)
-* [gulp-sharp](https://www.npmjs.com/package/gulp-sharp)
 * [grunt-sharp](https://www.npmjs.com/package/grunt-sharp)
