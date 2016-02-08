@@ -61,12 +61,16 @@ module.exports.download_vips = function() {
     if (process.arch === 'ia32') {
       error('Intel Architecture 32-bit systems require manual installation - please see http://sharp.dimens.io/en/stable/install/');
     }
-    // Ensure libc >= 2.15
+    // Ensure glibc >= 2.15
     var lddVersion = process.env.LDD_VERSION;
     if (lddVersion) {
-      var libcVersion = lddVersion ? lddVersion.split(/\n/)[0].split(' ').slice(-1)[0].trim() : '';
-      if (libcVersion && semver.lt(libcVersion + '.0', '2.13.0')) {
-        error('libc version ' + libcVersion + ' requires manual installation - please see http://sharp.dimens.io/en/stable/install/');
+      if (/glibc/i.test(lddVersion)) {
+        var glibcVersion = lddVersion ? lddVersion.split(/\n/)[0].split(' ').slice(-1)[0].trim() : '';
+        if (glibcVersion && semver.lt(glibcVersion + '.0', '2.13.0')) {
+          error('glibc version ' + glibcVersion + ' requires manual installation - please see http://sharp.dimens.io/en/stable/install/');
+        }
+      } else {
+        error(lddVersion.split(/\n/)[0] + ' requires manual installation - please see http://sharp.dimens.io/en/stable/install/');
       }
     }
     // Arch/platform-specific .tar.gz

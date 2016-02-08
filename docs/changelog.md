@@ -37,6 +37,10 @@
   [#351](https://github.com/lovell/sharp/pull/351)
   [@joelmukuthu](https://github.com/joelmukuthu)
 
+* Check for glibc before downloading pre-compiled binaries.
+  [#354](https://github.com/lovell/sharp/issues/354)
+  [@download13](https://github.com/download13)
+
 * Small optimisation when reducing by an integral factor to favour shrink over affine.
 
 * Add support for gamma correction of images with an alpha channel.
