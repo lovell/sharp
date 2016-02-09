@@ -713,7 +713,7 @@ class PipelineWorker : public AsyncWorker {
         // Buffer output
         if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == ImageType::JPEG)) {
           // Write JPEG to buffer
-          baton->bufferOut = static_cast<char*>(const_cast<void*>(vips_blob_get(image.jpegsave_buffer(VImage::option()
+          VipsArea *area = VIPS_AREA(image.jpegsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->quality)
             ->set("optimize_coding", TRUE)
@@ -722,23 +722,35 @@ class PipelineWorker : public AsyncWorker {
             ->set("overshoot_deringing", baton->overshootDeringing)
             ->set("optimize_scans", baton->optimiseScans)
             ->set("interlace", baton->progressive)
-          ), &baton->bufferOutLength)));
+          ));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
           baton->formatOut = "jpeg";
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" && inputImageType == ImageType::PNG)) {
           // Write PNG to buffer
-          baton->bufferOut = static_cast<char*>(const_cast<void*>(vips_blob_get(image.pngsave_buffer(VImage::option()
+          VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("compression", baton->compressionLevel)
             ->set("interlace", baton->progressive)
             ->set("filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
-          ), &baton->bufferOutLength)));
+          ));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
           baton->formatOut = "png";
         } else if (baton->formatOut == "webp" || (baton->formatOut == "input" && inputImageType == ImageType::WEBP)) {
           // Write WEBP to buffer
-          baton->bufferOut = static_cast<char*>(const_cast<void*>(vips_blob_get(image.webpsave_buffer(VImage::option()
+          VipsArea *area = VIPS_AREA(image.webpsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->quality)
-          ), &baton->bufferOutLength)));
+          ));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
           baton->formatOut = "webp";
         } else if (baton->formatOut == "raw") {
           // Write raw, uncompressed image data to buffer
