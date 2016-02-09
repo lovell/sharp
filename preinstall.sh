@@ -1,7 +1,14 @@
 #!/bin/sh
 
-# Ensures libvips is installed and attempts to install it if not
-# Currently supports:
+# This script is no longer required on most
+# 64-bit Linux systems when using sharp v0.12.0+
+
+# See http://sharp.dimens.io/page/install#linux
+
+# If you really need this script, it will attempt to
+# globally install libvips if not already available.
+
+# Supports:
 # * Debian Linux
 #   * Debian 7, 8
 #   * Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
@@ -117,6 +124,11 @@ fi
 if [ "$(id -u)" -ne "0" ]; then
   echo "Sorry, I need root/sudo access to continue"
   exit 1
+fi
+
+# Deprecation warning
+if [ "$(arch)" == "x86_64" ]; then
+  echo "This script is no longer required on most 64-bit Linux systems when using sharp v0.12.0+"
 fi
 
 # OS-specific installations of libopenslide follows
