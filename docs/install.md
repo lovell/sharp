@@ -41,6 +41,10 @@ the following command as a user with `sudo` access
 curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
 ```
 
+For Linux-based operating systems such as Alpine that use musl libc,
+the smaller stack size means libvips' cache should be disabled
+via `sharp.cache(false)` to avoid a stack overflow.
+
 ### Mac OS
 
 [![OS X 10.9.5 Build Status](https://travis-ci.org/lovell/sharp-osx-ci.png?branch=master)](https://travis-ci.org/lovell/sharp-osx-ci)

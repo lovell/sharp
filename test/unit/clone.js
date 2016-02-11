@@ -8,10 +8,10 @@ var fixtures = require('../fixtures');
 
 describe('Clone', function() {
 
-  before(function() {
+  beforeEach(function() {
     sharp.cache(false);
   });
-  after(function() {
+  afterEach(function() {
     sharp.cache(true);
   });
 

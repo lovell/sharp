@@ -4,9 +4,8 @@
   "maxparams": 4,
   "maxcomplexity": 13,
   "globals": {
-    "before": true,
     "beforeEach": true,
-    "after": true,
+    "afterEach": true,
     "describe": true,
     "it": true
   }

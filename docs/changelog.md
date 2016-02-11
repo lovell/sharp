@@ -37,7 +37,7 @@
   [#351](https://github.com/lovell/sharp/pull/351)
   [@joelmukuthu](https://github.com/joelmukuthu)
 
-* Check for glibc before downloading pre-compiled binaries.
+* Improve support for musl libc systems e.g. Alpine Linux.
   [#354](https://github.com/lovell/sharp/issues/354)
   [@download13](https://github.com/download13)
 
