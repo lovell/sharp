@@ -65,17 +65,19 @@ describe('Partial image extraction', function() {
     });
   }
 
-  it('TIFF', function(done) {
-    sharp(fixtures.inputTiff)
-      .extract({ left: 34, top: 63, width: 341, height: 529 })
-      .jpeg()
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(341, info.width);
-        assert.strictEqual(529, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract.tiff'), data, done);
-      });
-  });
+  if (sharp.format.tiff.output.file) {
+    it('TIFF', function(done) {
+      sharp(fixtures.inputTiff)
+        .extract({ left: 34, top: 63, width: 341, height: 529 })
+        .jpeg()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(341, info.width);
+          assert.strictEqual(529, info.height);
+          fixtures.assertSimilar(fixtures.expected('extract.tiff'), data, done);
+        });
+    });
+  }
 
   it('Before resize', function(done) {
     sharp(fixtures.inputJpg)

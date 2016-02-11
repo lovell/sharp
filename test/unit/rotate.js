@@ -111,7 +111,7 @@ describe('Rotation', function() {
   });
 
   it('Attempt to auto-rotate image format without EXIF support', function(done) {
-    sharp(fixtures.inputGif)
+    sharp(fixtures.inputPng)
       .rotate()
       .resize(320)
       .jpeg()
@@ -120,7 +120,7 @@ describe('Rotation', function() {
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
-        assert.strictEqual(213, info.height);
+        assert.strictEqual(236, info.height);
         done();
       });
   });

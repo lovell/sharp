@@ -438,19 +438,21 @@ describe('Input/output', function() {
       });
     }
 
-    it('Match TIFF input', function(done) {
-      sharp(fixtures.inputTiff)
-        .resize(320, 80)
-        .toFile(fixtures.outputZoinks, function(err, info) {
-          if (err) throw err;
-          assert.strictEqual(true, info.size > 0);
-          assert.strictEqual('tiff', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          fs.unlinkSync(fixtures.outputZoinks);
-          done();
-        });
-    });
+    if (sharp.format.tiff.input.file) {
+      it('Match TIFF input', function(done) {
+        sharp(fixtures.inputTiff)
+          .resize(320, 80)
+          .toFile(fixtures.outputZoinks, function(err, info) {
+            if (err) throw err;
+            assert.strictEqual(true, info.size > 0);
+            assert.strictEqual('tiff', info.format);
+            assert.strictEqual(320, info.width);
+            assert.strictEqual(80, info.height);
+            fs.unlinkSync(fixtures.outputZoinks);
+            done();
+          });
+      });
+    }
 
     it('Match GIF input, therefore fail', function(done) {
       sharp(fixtures.inputGif)

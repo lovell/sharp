@@ -5,6 +5,7 @@
   "maxcomplexity": 13,
   "globals": {
     "before": true,
+    "beforeEach": true,
     "after": true,
     "describe": true,
     "it": true

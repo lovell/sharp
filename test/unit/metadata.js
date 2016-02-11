@@ -55,22 +55,24 @@ describe('Image metadata', function() {
     });
   });
 
-  it('TIFF', function(done) {
-    sharp(fixtures.inputTiff).metadata(function(err, metadata) {
-      if (err) throw err;
-      assert.strictEqual('tiff', metadata.format);
-      assert.strictEqual(2464, metadata.width);
-      assert.strictEqual(3248, metadata.height);
-      assert.strictEqual('b-w', metadata.space);
-      assert.strictEqual(1, metadata.channels);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+  if (sharp.format.tiff.input.file) {
+    it('TIFF', function(done) {
+      sharp(fixtures.inputTiff).metadata(function(err, metadata) {
+        if (err) throw err;
+        assert.strictEqual('tiff', metadata.format);
+        assert.strictEqual(2464, metadata.width);
+        assert.strictEqual(3248, metadata.height);
+        assert.strictEqual('b-w', metadata.space);
+        assert.strictEqual(1, metadata.channels);
+        assert.strictEqual(false, metadata.hasProfile);
+        assert.strictEqual(false, metadata.hasAlpha);
+        assert.strictEqual('undefined', typeof metadata.orientation);
+        assert.strictEqual('undefined', typeof metadata.exif);
+        assert.strictEqual('undefined', typeof metadata.icc);
+        done();
+      });
     });
-  });
+  }
 
   it('PNG', function(done) {
     sharp(fixtures.inputPng).metadata(function(err, metadata) {
@@ -125,21 +127,23 @@ describe('Image metadata', function() {
     });
   }
 
-  it('GIF via libmagick', function(done) {
-    sharp(fixtures.inputGif).metadata(function(err, metadata) {
-      if (err) throw err;
-      assert.strictEqual('magick', metadata.format);
-      assert.strictEqual(800, metadata.width);
-      assert.strictEqual(533, metadata.height);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+  if (sharp.format.magick.input.file) {
+    it('GIF via libmagick', function(done) {
+      sharp(fixtures.inputGif).metadata(function(err, metadata) {
+        if (err) throw err;
+        assert.strictEqual('magick', metadata.format);
+        assert.strictEqual(800, metadata.width);
+        assert.strictEqual(533, metadata.height);
+        assert.strictEqual(3, metadata.channels);
+        assert.strictEqual(false, metadata.hasProfile);
+        assert.strictEqual(false, metadata.hasAlpha);
+        assert.strictEqual('undefined', typeof metadata.orientation);
+        assert.strictEqual('undefined', typeof metadata.exif);
+        assert.strictEqual('undefined', typeof metadata.icc);
+        done();
+      });
     });
-  });
+  }
 
   if (sharp.format.openslide.input.file) {
     it('Aperio SVS via openslide', function(done) {

@@ -29,7 +29,7 @@ describe('Colour space conversion', function() {
       .toFile(fixtures.path('output.greyscale-not.jpg'), done);
   });
 
-  if (sharp.format.webp.output.buffer) {
+  if (sharp.format.tiff.input.file && sharp.format.webp.output.buffer) {
     it('From 1-bit TIFF to sRGB WebP [slow]', function(done) {
       sharp(fixtures.inputTiff)
         .webp()

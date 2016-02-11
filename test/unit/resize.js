@@ -128,27 +128,58 @@ describe('Resize dimensions', function() {
     done();
   });
 
-  it('TIFF embed known to cause rounding errors', function(done) {
-    sharp(fixtures.inputTiff).resize(240, 320).embed().jpeg().toBuffer(function(err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(240, info.width);
-      assert.strictEqual(320, info.height);
-      done();
+  if (sharp.format.tiff.input.file) {
+    it('TIFF embed known to cause rounding errors', function(done) {
+      sharp(fixtures.inputTiff)
+        .resize(240, 320)
+        .embed()
+        .jpeg()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(240, info.width);
+          assert.strictEqual(320, info.height);
+          done();
+        });
     });
-  });
 
-  it('TIFF known to cause rounding errors', function(done) {
-    sharp(fixtures.inputTiff).resize(240, 320).jpeg().toBuffer(function(err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(240, info.width);
-      assert.strictEqual(320, info.height);
-      done();
+    it('TIFF known to cause rounding errors', function(done) {
+      sharp(fixtures.inputTiff)
+        .resize(240, 320)
+        .jpeg()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(240, info.width);
+          assert.strictEqual(320, info.height);
+          done();
+        });
     });
-  });
+
+    it('Max width or height considering ratio (portrait)', function(done) {
+      sharp(fixtures.inputTiff).resize(320, 320).max().jpeg().toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(243, info.width);
+        assert.strictEqual(320, info.height);
+        done();
+      });
+    });
+
+    it('Min width or height considering ratio (portrait)', function(done) {
+      sharp(fixtures.inputTiff).resize(320, 320).min().jpeg().toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(422, info.height);
+        done();
+      });
+    });
+  }
 
   it('Max width or height considering ratio (landscape)', function(done) {
     sharp(fixtures.inputJpg).resize(320, 320).max().toBuffer(function(err, data, info) {
@@ -157,17 +188,6 @@ describe('Resize dimensions', function() {
       assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(261, info.height);
-      done();
-    });
-  });
-
-  it('Max width or height considering ratio (portrait)', function(done) {
-    sharp(fixtures.inputTiff).resize(320, 320).max().jpeg().toBuffer(function(err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(243, info.width);
-      assert.strictEqual(320, info.height);
       done();
     });
   });
@@ -190,17 +210,6 @@ describe('Resize dimensions', function() {
       assert.strictEqual('jpeg', info.format);
       assert.strictEqual(392, info.width);
       assert.strictEqual(320, info.height);
-      done();
-    });
-  });
-
-  it('Min width or height considering ratio (portrait)', function(done) {
-    sharp(fixtures.inputTiff).resize(320, 320).min().jpeg().toBuffer(function(err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(422, info.height);
       done();
     });
   });
