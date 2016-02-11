@@ -172,19 +172,17 @@ NAN_METHOD(format) {
   Local<String> rawId = New("raw").ToLocalChecked();
   Set(raw, attrId, rawId);
   Set(format, rawId, raw);
-  // No support for raw input yet, so always false
+  Local<Boolean> supported = New<Boolean>(true);
   Local<Boolean> unsupported = New<Boolean>(false);
   Local<Object> rawInput = New<Object>();
   Set(rawInput, attrFile, unsupported);
-  Set(rawInput, attrBuffer, unsupported);
-  Set(rawInput, attrStream, unsupported);
+  Set(rawInput, attrBuffer, supported);
+  Set(rawInput, attrStream, supported);
   Set(raw, attrInput, rawInput);
-  // Raw output via Buffer/Stream is available in libvips >= 7.42.0
-  Local<Boolean> hasOutputBufferRaw = New<Boolean>(vips_version(0) >= 8 || (vips_version(0) == 7 && vips_version(1) >= 42));
   Local<Object> rawOutput = New<Object>();
   Set(rawOutput, attrFile, unsupported);
-  Set(rawOutput, attrBuffer, hasOutputBufferRaw);
-  Set(rawOutput, attrStream, hasOutputBufferRaw);
+  Set(rawOutput, attrBuffer, supported);
+  Set(rawOutput, attrStream, supported);
   Set(raw, attrOutput, rawOutput);
 
   info.GetReturnValue().Set(format);

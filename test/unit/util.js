@@ -113,6 +113,13 @@ describe('Utilities', function() {
         });
       });
     });
+    it('Raw file=false, buffer=true, stream=true', function() {
+      ['input', 'output'].forEach(function(direction) {
+        assert.strictEqual(false, sharp.format.raw[direction].file);
+        assert.strictEqual(true, sharp.format.raw[direction].buffer);
+        assert.strictEqual(true, sharp.format.raw[direction].stream);
+      });
+    });
   });
 
   describe('Versions', function() {
