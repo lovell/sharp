@@ -51,7 +51,7 @@ fi
 
 # Alpine
 echo "Testing alpine..."
-if docker run -i -t --rm -v $PWD:/v -e "SHARP_TEST_WITHOUT_CACHE=0" alpine:3.3 >packaging/alpine.log 2>&1 sh -c "cd /v; ./packaging/test/alpine.sh; $test";
+if docker run -i -t --rm -v $PWD:/v -e "SHARP_TEST_WITHOUT_CACHE=0" alpine:edge >packaging/alpine.log 2>&1 sh -c "cd /v; ./packaging/test/alpine.sh; $test";
 then echo "alpine OK"
 else echo "alpine fail" && cat packaging/alpine.log
 fi
