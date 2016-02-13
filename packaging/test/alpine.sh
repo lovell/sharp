@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Install Node.js
+# Install build dependencies
 apk add --update make gcc g++ python nodejs
 
-# Install libvips dependencies
-apk add --update glib-dev libpng libwebp libexif libxml2 orc fftw lcms2
+# Install libvips with build headers and dependencies
+apk add libvips-dev --update --repository https://s3.amazonaws.com/wjordan-apk --allow-untrusted
