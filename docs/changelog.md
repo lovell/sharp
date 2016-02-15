@@ -2,7 +2,7 @@
 
 ### v0.13 - "*mind*"
 
-#### v0.13.0 - TBD
+#### v0.13.0 - 15<sup>th</sup> February 2016
 
 * Improve vector image support by allowing control of density/DPI.
   Switch pre-built libs from Imagemagick to Graphicsmagick.
@@ -39,7 +39,9 @@
 
 * Improve support for musl libc systems e.g. Alpine Linux.
   [#354](https://github.com/lovell/sharp/issues/354)
+  [#359](https://github.com/lovell/sharp/pull/359)
   [@download13](https://github.com/download13)
+  [@wjordan](https://github.com/wjordan)
 
 * Small optimisation when reducing by an integral factor to favour shrink over affine.
 
