@@ -884,7 +884,6 @@ Sharp.prototype.clone = function() {
   // Clone existing options
   var clone = new Sharp();
   util._extend(clone.options, this.options);
-  clone.streamIn = false;
   // Pass 'finish' event to clone for Stream-based input
   this.on('finish', function() {
     // Clone inherits input data
