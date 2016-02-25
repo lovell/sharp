@@ -2,6 +2,12 @@
 
 ### v0.13 - "*mind*"
 
+#### v0.13.1 - TBD
+
+* Fix embedding onto transparent backgrounds; regression introduced in v0.13.0.
+  [#366](https://github.com/lovell/sharp/issues/366)
+  [@diegocsandrim](https://github.com/diegocsandrim)
+
 #### v0.13.0 - 15<sup>th</sup> February 2016
 
 * Improve vector image support by allowing control of density/DPI.

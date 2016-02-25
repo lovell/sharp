@@ -18,11 +18,8 @@ describe('Embed', function() {
         assert.strictEqual('png', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        sharp(data).metadata(function(err, metadata) {
-          if (err) throw err;
-          assert.strictEqual(3, metadata.channels);
-          done();
-        });
+        assert.strictEqual(3, info.channels);
+        fixtures.assertSimilar(fixtures.expected('embed-3-into-3.png'), data, done);
       });
   });
 
@@ -39,11 +36,8 @@ describe('Embed', function() {
           assert.strictEqual('webp', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(240, info.height);
-          sharp(data).metadata(function(err, metadata) {
-            if (err) throw err;
-            assert.strictEqual(4, metadata.channels);
-            done();
-          });
+          assert.strictEqual(4, info.channels);
+          fixtures.assertSimilar(fixtures.expected('embed-3-into-4.webp'), data, done);
         });
     });
   }
@@ -58,11 +52,8 @@ describe('Embed', function() {
         assert.strictEqual('png', info.format);
         assert.strictEqual(50, info.width);
         assert.strictEqual(50, info.height);
-        sharp(data).metadata(function(err, metadata) {
-          if (err) throw err;
-          assert.strictEqual(4, metadata.channels);
-          done();
-        });
+        assert.strictEqual(4, info.channels);
+        fixtures.assertSimilar(fixtures.expected('embed-4-into-4.png'), data, done);
       });
   });
 
@@ -76,6 +67,7 @@ describe('Embed', function() {
         assert.strictEqual('png', info.format);
         assert.strictEqual(32, info.width);
         assert.strictEqual(16, info.height);
+        assert.strictEqual(4, info.channels);
         fixtures.assertSimilar(fixtures.expected('embed-16bit.png'), data, done);
       });
   });
@@ -91,6 +83,7 @@ describe('Embed', function() {
         assert.strictEqual('png', info.format);
         assert.strictEqual(32, info.width);
         assert.strictEqual(16, info.height);
+        assert.strictEqual(4, info.channels);
         fixtures.assertSimilar(fixtures.expected('embed-16bit-rgba.png'), data, done);
       });
   });
@@ -105,6 +98,7 @@ describe('Embed', function() {
         assert.strictEqual('png', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
+        assert.strictEqual(3, info.channels);
         fixtures.assertSimilar(fixtures.expected('embed-enlarge.png'), data, done);
       });
   });

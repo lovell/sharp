@@ -585,9 +585,9 @@ class PipelineWorker : public AsyncWorker {
           }
           // Add non-transparent alpha channel, if required
           if (baton->background[3] < 255.0 && !HasAlpha(image)) {
-            VImage alpha = VImage::new_matrix(image.width(), image.height())
-              .new_from_image(baton->background[3] * multiplier);
-            image = image.bandjoin(alpha);
+            image = image.bandjoin(
+              VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
+            );
           }
           // Embed
           int left = static_cast<int>(round((baton->width - image.width()) / 2));
