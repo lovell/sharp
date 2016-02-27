@@ -2,7 +2,7 @@
 
 ### v0.13 - "*mind*"
 
-#### v0.13.1 - TBD
+#### v0.13.1 - 27<sup>th</sup> February 2016
 
 * Fix embedding onto transparent backgrounds; regression introduced in v0.13.0.
   [#366](https://github.com/lovell/sharp/issues/366)
