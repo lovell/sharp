@@ -14,7 +14,7 @@ npm install sharp
 [![Ubuntu 14.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 [![Linux Build Status](https://circleci.com/gh/lovell/sharp.svg?style=svg&circle-token=6cb6d1d287a51af83722b19ed8885377fbc85e5c)](https://circleci.com/gh/lovell/sharp)
 
-libvips and its dependencies are fetched and stored within `node_modules/sharp` during `npm install`.
+libvips and its dependencies are fetched and stored within `node_modules/sharp/lib` during `npm install`.
 This involves an automated HTTPS download of approximately 6MB.
 
 Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ CPUs should "just work", e.g.:
@@ -26,9 +26,16 @@ Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ C
 * openSUSE 13.2
 * Archlinux 2015.06.01
 * Raspbian Jessie
+* Amazon Linux 2015.03, 2015.09
 
-Preference will be given to an existing globally-installed (via `pkg-config`)
-version of libvips that meets the minimum version requirement.
+To use your own version of libvips instead of the provided binaries, make sure it is
+at least the version listed under `config.libvips` in the `package.json` file that it
+can be located using `pkg-config`. If you are using non-stadard paths (anything other
+than `/usr` or `/usr/local`), you might need to set `PKG_CONFIG_PATH` during `npm install`
+and `LD_LIBRARY_PATH` at runtime.
+
+You can print the detected vips version using: `pkg-config --modversion vips-cpp`
+
 This allows the use of newer versions of libvips with older versions of sharp.
 
 For older Linux-based operating systems and 32-bit Intel CPUs,
@@ -112,6 +119,34 @@ docker pull marcbachmann/libvips
 ```sh
 docker pull wjordan/libvips
 ```
+
+### AWS Lambda
+
+In order to use sharp on AWS Lambda, you need to [create a deployment package](http://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html). Because sharp
+downloads and links libraries for the current platform during `npm install` you have to
+do this on a system similar to the [Lambda Execution Environment](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html). The easiest ways to do this, is to setup a
+small t2.micro instance using the AMI ID listed in the previous link, ssh into it as ec2-user
+and follow the instructions below.
+
+Install depencies:
+
+```sh
+sudo yum-config-manager --enable epel
+sudo yum install -y nodejs gcc-c++
+curl -s https://www.npmjs.com/install.sh | sudo sh
+```
+
+Copy your code and package.json to the instance using `scp` and create a deployment package:
+
+```sh
+cd sharp-lambda-example
+npm install
+zip -ur9 ../sharp-lambda-example.zip index.js node_modules
+```
+
+You can now download your deployment ZIP using `scp` and upload it to Lambda.
+
+**Performance Tip:** To get the best performance on Lambda choose the largest memory available because this also gives you the most cpu time (a 1536 MB function is 12x faster than a 128 MB function).
 
 ### Build tools
 
