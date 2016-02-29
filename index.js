@@ -84,7 +84,9 @@ var Sharp = function(input, options) {
     greyscale: false,
     normalize: 0,
     // overlay
-    overlayPath: '',
+    overlayFileIn: '',
+    overlayBufferIn: null,
+    overlayGravity: 0,
     // output options
     formatOut: 'input',
     fileOut: '',
@@ -106,13 +108,13 @@ var Sharp = function(input, options) {
       module.exports.queue.emit('change', queueLength);
     }
   };
-  if (typeof input === 'string') {
+  if (isString(input)) {
     // input=file
     this.options.fileIn = input;
-  } else if (typeof input === 'object' && input instanceof Buffer) {
+  } else if (isBuffer(input)) {
     // input=buffer
     this.options.bufferIn = input;
-  } else if (typeof input === 'undefined' || input === null) {
+  } else if (!isDefined(input)) {
     // input=stream
     this.options.streamIn = true;
   } else {
@@ -147,6 +149,12 @@ var isDefined = function(val) {
 };
 var isObject = function(val) {
   return typeof val === 'object';
+};
+var isBuffer = function(val) {
+  return typeof val === 'object' && val instanceof Buffer;
+};
+var isString = function(val) {
+  return typeof val === 'string' && val.length > 0;
 };
 var isInteger = function(val) {
   return typeof val === 'number' && !Number.isNaN(val) && val % 1 === 0;
@@ -232,11 +240,11 @@ module.exports.gravity = {
 
 Sharp.prototype.crop = function(gravity) {
   this.options.canvas = 'crop';
-  if (typeof gravity === 'undefined') {
+  if (!isDefined(gravity)) {
     this.options.gravity = module.exports.gravity.center;
-  } else if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 8) {
+  } else if (isInteger(gravity) && inRange(gravity, 0, 8)) {
     this.options.gravity = gravity;
-  } else if (typeof gravity === 'string' && typeof module.exports.gravity[gravity] === 'number') {
+  } else if (isString(gravity) && isInteger(module.exports.gravity[gravity])) {
     this.options.gravity = module.exports.gravity[gravity];
   } else {
     throw new Error('Unsupported crop gravity ' + gravity);
@@ -316,14 +324,26 @@ Sharp.prototype.negate = function(negate) {
   return this;
 };
 
-Sharp.prototype.overlayWith = function(overlayPath) {
-  if (typeof overlayPath !== 'string') {
-    throw new Error('The overlay path must be a string');
+/*
+  Overlay with another image, using an optional gravity
+*/
+Sharp.prototype.overlayWith = function(overlay, options) {
+  if (isString(overlay)) {
+    this.options.overlayFileIn = overlay;
+  } else if (isBuffer(overlay)) {
+    this.options.overlayBufferIn = overlay;
+  } else {
+    throw new Error('Unsupported overlay ' + typeof overlay);
   }
-  if (overlayPath === '') {
-    throw new Error('The overlay path cannot be empty');
+  if (isObject(options)) {
+    if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
+      this.options.overlayGravity = options.gravity;
+    } else if (isString(options.gravity) && isInteger(module.exports.gravity[options.gravity])) {
+      this.options.overlayGravity = module.exports.gravity[options.gravity];
+    } else if (isDefined(options.gravity)) {
+      throw new Error('Unsupported overlay gravity ' + options.gravity);
+    }
   }
-  this.options.overlayPath = overlayPath;
   return this;
 };
 

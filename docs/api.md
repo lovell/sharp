@@ -365,13 +365,18 @@ The output image will still be web-friendly sRGB and contain three (identical) c
 
 Enhance output image contrast by stretching its luminance to cover the full dynamic range. This typically reduces performance by 30%.
 
-#### overlayWith(path)
+#### overlayWith(image, [options])
 
-_Experimental_
+Overlay (composite) a image containing an alpha channel over the processed (resized, extracted etc.) image.
 
-Alpha composite image at `path` over the processed (resized, extracted) image. The dimensions of the two images must match.
+`image` is one of the following, and must be the same size or smaller than the processed image:
 
-* `path` is a String containing the path to an image file with an alpha channel.
+* Buffer containing PNG, WebP, GIF or SVG image data, or
+* String containing the path to an image file, with most major transparency formats supported.
+
+`options`, if present, is an Object with the following optional attributes:
+
+* `gravity` is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north` at which to place the overlay, defaulting to `center`/`centre`.
 
 ```javascript
 sharp('input.png')
@@ -379,7 +384,7 @@ sharp('input.png')
   .resize(300)
   .flatten()
   .background('#ff6600')
-  .overlayWith('overlay.png')
+  .overlayWith('overlay.png', { gravity: sharp.gravity.southeast } )
   .sharpen()
   .withMetadata()
   .quality(90)
@@ -387,8 +392,8 @@ sharp('input.png')
   .toBuffer()
   .then(function(outputBuffer) {
     // outputBuffer contains upside down, 300px wide, alpha channel flattened
-    // onto orange background, composited with overlay.png, sharpened,
-    // with metadata, 90% quality WebP image data. Phew!
+    // onto orange background, composited with overlay.png with SE gravity,
+    // sharpened, with metadata, 90% quality WebP image data. Phew!
   });
 ```
 

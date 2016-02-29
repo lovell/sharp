@@ -1,5 +1,11 @@
 # Changelog
 
+### v0.14 - "*needle*"
+
+* Improvements to overlayWith: differing sizes/formats, gravity, buffer input.
+  [#239](https://github.com/lovell/sharp/issues/239)
+  [@chrisriley](https://github.com/chrisriley)
+
 ### v0.13 - "*mind*"
 
 #### v0.13.1 - 27<sup>th</sup> February 2016

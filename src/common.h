@@ -2,6 +2,8 @@
 #define SRC_COMMON_H_
 
 #include <string>
+#include <tuple>
+
 #include <vips/vips8>
 
 using vips::VImage;
@@ -79,6 +81,13 @@ namespace sharp {
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
   void FreeCallback(char* data, void* hint);
+
+  /*
+    Calculate the (left, top) coordinates of the output image
+    within the input image, applying the given gravity.
+  */
+  std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,
+    int const outWidth, int const outHeight, int const gravity);
 
 }  // namespace sharp
 

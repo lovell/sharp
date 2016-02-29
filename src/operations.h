@@ -8,10 +8,10 @@ using vips::VImage;
 namespace sharp {
 
   /*
-    Composite images `src` and `dst` with premultiplied alpha channel and output
-    image with premultiplied alpha.
+    Alpha composite src over dst with given gravity.
+    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
    */
-  VImage Composite(VImage src, VImage dst);
+  VImage Composite(VImage src, VImage dst, const int gravity);
 
   /*
    * Stretch luminance to cover full dynamic range.

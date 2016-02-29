@@ -185,4 +185,45 @@ namespace sharp {
     }
   }
 
+  /*
+    Calculate the (left, top) coordinates of the output image
+    within the input image, applying the given gravity.
+  */
+  std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,
+    int const outWidth, int const outHeight, int const gravity) {
+
+    int left = 0;
+    int top = 0;
+    switch (gravity) {
+      case 1: // North
+        left = (inWidth - outWidth + 1) / 2;
+        break;
+      case 2: // East
+        left = inWidth - outWidth;
+        top = (inHeight - outHeight + 1) / 2;
+        break;
+      case 3: // South
+        left = (inWidth - outWidth + 1) / 2;
+        top = inHeight - outHeight;
+        break;
+      case 4: // West
+        top = (inHeight - outHeight + 1) / 2;
+        break;
+      case 5: // Northeast
+        left = inWidth - outWidth;
+        break;
+      case 6: // Southeast
+        left = inWidth - outWidth;
+        top = inHeight - outHeight;
+      case 7: // Southwest
+        top = inHeight - outHeight;
+      case 8: // Northwest
+        break;
+      default: // Centre
+        left = (inWidth - outWidth + 1) / 2;
+        top = (inHeight - outHeight + 1) / 2;
+    }
+    return std::make_tuple(left, top);
+  }
+
 } // namespace sharp
