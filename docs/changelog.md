@@ -10,6 +10,10 @@
   [#338](https://github.com/lovell/sharp/issues/338)
   [@lookfirst](https://github.com/lookfirst)
 
+* Emit post-processing 'info' event for Stream output.
+  [#367](https://github.com/lovell/sharp/issues/367)
+  [@salzhrani](https://github.com/salzhrani)
+
 ### v0.13 - "*mind*"
 
 #### v0.13.1 - 27<sup>th</sup> February 2016

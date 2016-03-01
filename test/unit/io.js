@@ -109,6 +109,26 @@ describe('Input/output', function() {
     readable.pipe(pipeline).pipe(writable);
   });
 
+  it('Stream should emit info event', function(done) {
+    var readable = fs.createReadStream(fixtures.inputJpg);
+    var writable = fs.createWriteStream(fixtures.outputJpg);
+    var pipeline = sharp().resize(320, 240);
+    var infoEventEmitted = false;
+    pipeline.on('info', function(info) {
+      assert.strictEqual('jpeg', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      assert.strictEqual(3, info.channels);
+      infoEventEmitted = true;
+    });
+    writable.on('finish', function() {
+      assert.strictEqual(true, infoEventEmitted);
+      fs.unlinkSync(fixtures.outputJpg);
+      done();
+    });
+    readable.pipe(pipeline).pipe(writable);
+  });
+
   it('Handle Stream to Stream error ', function(done) {
     var pipeline = sharp().resize(320, 240);
     var anErrorWasEmitted = false;

@@ -27,6 +27,7 @@ The object returned by the constructor implements the
 [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
 
 JPEG, PNG or WebP format image data can be streamed out from this object.
+When using Stream based output, derived attributes are available from the `info` event.
 
 ```javascript
 sharp('input.jpg')
@@ -35,6 +36,19 @@ sharp('input.jpg')
     // output.jpg is a 300 pixels wide and 200 pixels high image
     // containing a scaled and cropped version of input.jpg
   });
+```
+
+```javascript
+// Read image data from readableStream,
+// resize to 300 pixels wide,
+// emit an 'info' event with calculated dimensions
+// and finally write image data to writableStream
+var transformer = sharp()
+  .resize(300)
+  .on('info', function(info) {
+    console.log('Image height is ' + info.height);
+  });
+readableStream.pipe(transformer).pipe(writableStream);
 ```
 
 #### metadata([callback])

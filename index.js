@@ -803,10 +803,11 @@ Sharp.prototype._pipeline = function(callback) {
     if (this.options.streamIn) {
       // output=stream, input=stream
       this.on('finish', function() {
-        sharp.pipeline(that.options, function(err, data) {
+        sharp.pipeline(that.options, function(err, data, info) {
           if (err) {
             that.emit('error', err);
           } else {
+            that.emit('info', info);
             that.push(data);
           }
           that.push(null);
@@ -814,10 +815,11 @@ Sharp.prototype._pipeline = function(callback) {
       });
     } else {
       // output=stream, input=file/buffer
-      sharp.pipeline(this.options, function(err, data) {
+      sharp.pipeline(this.options, function(err, data, info) {
         if (err) {
           that.emit('error', err);
         } else {
+          that.emit('info', info);
           that.push(data);
         }
         that.push(null);
