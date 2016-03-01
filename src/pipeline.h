@@ -19,7 +19,7 @@ struct PipelineBaton {
   size_t bufferInLength;
   std::string iccProfilePath;
   int limitInputPixels;
-  std::string density;
+  int density;
   int rawWidth;
   int rawHeight;
   int rawChannels;
@@ -79,7 +79,7 @@ struct PipelineBaton {
   PipelineBaton():
     bufferInLength(0),
     limitInputPixels(0),
-    density(""),
+    density(72),
     rawWidth(0),
     rawHeight(0),
     rawChannels(0),

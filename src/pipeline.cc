@@ -58,6 +58,7 @@ using sharp::HasAlpha;
 using sharp::ExifOrientation;
 using sharp::SetExifOrientation;
 using sharp::RemoveExifOrientation;
+using sharp::SetDensity;
 using sharp::IsJpeg;
 using sharp::IsPng;
 using sharp::IsWebp;
@@ -118,9 +119,12 @@ class PipelineWorker : public AsyncWorker {
           try {
             VOption *option = VImage::option()->set("access", baton->accessMethod);
             if (inputImageType == ImageType::MAGICK) {
-              option->set("density", baton->density.data());
+              option->set("density", std::to_string(baton->density).data());
             }
             image = VImage::new_from_buffer(baton->bufferIn, baton->bufferInLength, nullptr, option);
+            if (inputImageType == ImageType::MAGICK) {
+              SetDensity(image, baton->density);
+            }
           } catch (...) {
             (baton->err).append("Input buffer has corrupt header");
             inputImageType = ImageType::UNKNOWN;
@@ -136,9 +140,12 @@ class PipelineWorker : public AsyncWorker {
         try {
           VOption *option = VImage::option()->set("access", baton->accessMethod);
           if (inputImageType == ImageType::MAGICK) {
-            option->set("density", baton->density.data());
+            option->set("density", std::to_string(baton->density).data());
           }
           image = VImage::new_from_file(baton->fileIn.data(), option);
+          if (inputImageType == ImageType::MAGICK) {
+            SetDensity(image, baton->density);
+          }
         } catch (...) {
           (baton->err).append("Input file has corrupt header");
           inputImageType = ImageType::UNKNOWN;
@@ -921,7 +928,7 @@ NAN_METHOD(pipeline) {
   // Limit input images to a given number of pixels, where pixels = width * height
   baton->limitInputPixels = attrAs<int32_t>(options, "limitInputPixels");
   // Density/DPI at which to load vector images via libmagick
-  baton->density = attrAsStr(options, "density");
+  baton->density = attrAs<int32_t>(options, "density");
   // Raw pixel input
   baton->rawWidth = attrAs<int32_t>(options, "rawWidth");
   baton->rawHeight = attrAs<int32_t>(options, "rawHeight");

@@ -177,6 +177,30 @@ namespace sharp {
   }
 
   /*
+    Does this image have a non-default density?
+  */
+  bool HasDensity(VImage image) {
+    return image.xres() > 1.0;
+  }
+
+  /*
+    Get pixels/mm resolution as pixels/inch density.
+  */
+  int GetDensity(VImage image) {
+    return static_cast<int>(round(image.xres() * 25.4));
+  }
+
+  /*
+    Set pixels/mm resolution based on a pixels/inch density.
+  */
+  void SetDensity(VImage image, const int density) {
+    const double pixelsPerMm = static_cast<double>(density) / 25.4;
+    image.set("Xres", pixelsPerMm);
+    image.set("Yres", pixelsPerMm);
+    image.set(VIPS_META_RESOLUTION_UNIT, "in");
+  }
+
+  /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
   void FreeCallback(char* data, void* hint) {

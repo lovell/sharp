@@ -662,7 +662,14 @@ describe('Input/output', function() {
             assert.strictEqual('png', info.format);
             assert.strictEqual(40, info.width);
             assert.strictEqual(40, info.height);
-            fixtures.assertSimilar(fixtures.expected('svg72.png'), data, done);
+            fixtures.assertSimilar(fixtures.expected('svg72.png'), data, function(err) {
+              if (err) throw err;
+              sharp(data).metadata(function(err, info) {
+                if (err) throw err;
+                assert.strictEqual(72, info.density);
+                done();
+              });
+            });
           }
         });
     });
@@ -679,7 +686,14 @@ describe('Input/output', function() {
             assert.strictEqual('png', info.format);
             assert.strictEqual(40, info.width);
             assert.strictEqual(40, info.height);
-            fixtures.assertSimilar(fixtures.expected('svg1200.png'), data, done);
+            fixtures.assertSimilar(fixtures.expected('svg1200.png'), data, function(err) {
+              if (err) throw err;
+              sharp(data).metadata(function(err, info) {
+                if (err) throw err;
+                assert.strictEqual(1200, info.density);
+                done();
+              });
+            });
           }
         });
     });

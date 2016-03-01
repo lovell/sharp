@@ -46,7 +46,7 @@ var Sharp = function(input, options) {
     streamIn: false,
     sequentialRead: false,
     limitInputPixels: maximum.pixels,
-    density: '72',
+    density: 72,
     rawWidth: 0,
     rawHeight: 0,
     rawChannels: 0,
@@ -172,7 +172,7 @@ Sharp.prototype._inputOptions = function(options) {
     // Density
     if (isDefined(options.density)) {
       if (isInteger(options.density) && inRange(options.density, 1, 2400)) {
-        this.options.density = options.density.toString();
+        this.options.density = options.density;
       } else {
         throw new Error('Invalid density (1 to 2400) ' + options.density);
       }

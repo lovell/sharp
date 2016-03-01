@@ -6,6 +6,10 @@
   [#239](https://github.com/lovell/sharp/issues/239)
   [@chrisriley](https://github.com/chrisriley)
 
+* Expose density metadata; set density of images from vector input.
+  [#338](https://github.com/lovell/sharp/issues/338)
+  [@lookfirst](https://github.com/lookfirst)
+
 ### v0.13 - "*mind*"
 
 #### v0.13.1 - 27<sup>th</sup> February 2016

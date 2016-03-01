@@ -169,4 +169,5 @@ namespace sharp {
       );
     }
   }
+
 }  // namespace sharp

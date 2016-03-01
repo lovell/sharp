@@ -32,6 +32,7 @@ namespace sharp {
    * Sharpen flat and jagged areas. Use radius of -1 for fast sharpen.
    */
   VImage Sharpen(VImage image, int const radius, double const flat, double const jagged);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

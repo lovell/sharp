@@ -78,6 +78,21 @@ namespace sharp {
   void RemoveExifOrientation(VImage image);
 
   /*
+    Does this image have a non-default density?
+  */
+  bool HasDensity(VImage image);
+
+  /*
+    Get pixels/mm resolution as pixels/inch density.
+  */
+  int GetDensity(VImage image);
+
+  /*
+    Set pixels/mm resolution based on a pixels/inch density.
+  */
+  void SetDensity(VImage image, const int density);
+
+  /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
   void FreeCallback(char* data, void* hint);
