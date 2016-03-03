@@ -1,6 +1,8 @@
 #ifndef SRC_PIPELINE_H_
 #define SRC_PIPELINE_H_
 
+#include <vips/vips8>
+
 #include "nan.h"
 
 NAN_METHOD(pipeline);
@@ -79,6 +81,7 @@ struct PipelineBaton {
   int withMetadataOrientation;
   int tileSize;
   int tileOverlap;
+  VipsForeignDzLayout tileLayout;
 
   PipelineBaton():
     bufferInLength(0),
@@ -126,7 +129,8 @@ struct PipelineBaton {
     withMetadata(false),
     withMetadataOrientation(-1),
     tileSize(256),
-    tileOverlap(0) {
+    tileOverlap(0),
+    tileLayout(VIPS_FOREIGN_DZ_LAYOUT_DZ) {
       background[0] = 0.0;
       background[1] = 0.0;
       background[2] = 0.0;

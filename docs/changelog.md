@@ -6,6 +6,10 @@
   [#128](https://github.com/lovell/sharp/issues/128)
   [@blowsie](https://github.com/blowsie)
 
+* Add support for Zoomify and Google tile layouts. Breaks existing tile API.
+  [#223](https://github.com/lovell/sharp/issues/223)
+  [@bdunnette](https://github.com/bdunnette)
+
 * Improvements to overlayWith: differing sizes/formats, gravity, buffer input.
   [#239](https://github.com/lovell/sharp/issues/239)
   [@chrisriley](https://github.com/chrisriley)

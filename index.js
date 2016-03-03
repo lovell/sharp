@@ -166,6 +166,9 @@ var isInteger = function(val) {
 var inRange = function(val, min, max) {
   return val >= min && val <= max;
 };
+var contains = function(val, list) {
+  return list.indexOf(val) !== -1;
+};
 
 /*
   Set input-related options
@@ -629,26 +632,36 @@ Sharp.prototype.withMetadata = function(withMetadata) {
 };
 
 /*
-  Tile size and overlap for Deep Zoom output
+  Tile-based deep zoom output options: size, overlap, layout
 */
-Sharp.prototype.tile = function(size, overlap) {
-  // Size of square tiles, in pixels
-  if (typeof size !== 'undefined' && size !== null) {
-    if (!Number.isNaN(size) && size % 1 === 0 && size >= 1 && size <= 8192) {
-      this.options.tileSize = size;
-    } else {
-      throw new Error('Invalid tile size (1 to 8192) ' + size);
-    }
-  }
-  // Overlap of tiles, in pixels
-  if (typeof overlap !== 'undefined' && overlap !== null) {
-    if (!Number.isNaN(overlap) && overlap % 1 === 0 && overlap >= 0 && overlap <= 8192) {
-      if (overlap > this.options.tileSize) {
-        throw new Error('Tile overlap ' + overlap + ' cannot be larger than tile size ' + this.options.tileSize);
+Sharp.prototype.tile = function(tile) {
+  if (isObject(tile)) {
+    // Size of square tiles, in pixels
+    if (isDefined(tile.size)) {
+      if (isInteger(tile.size) && inRange(tile.size, 1, 8192)) {
+        this.options.tileSize = tile.size;
+      } else {
+        throw new Error('Invalid tile size (1 to 8192) ' + tile.size);
       }
-      this.options.tileOverlap = overlap;
-    } else {
-      throw new Error('Invalid tile overlap (0 to 8192) ' + overlap);
+    }
+    // Overlap of tiles, in pixels
+    if (isDefined(tile.overlap)) {
+      if (isInteger(tile.overlap) && inRange(tile.overlap, 0, 8192)) {
+        if (tile.overlap > this.options.tileSize) {
+          throw new Error('Tile overlap ' + tile.overlap + ' cannot be larger than tile size ' + this.options.tileSize);
+        }
+        this.options.tileOverlap = tile.overlap;
+      } else {
+        throw new Error('Invalid tile overlap (0 to 8192) ' + tile.overlap);
+      }
+    }
+    // Layout
+    if (isDefined(tile.layout)) {
+      if (isString(tile.layout) && contains(tile.layout, ['dz', 'google', 'zoomify'])) {
+        this.options.tileLayout = tile.layout;
+      } else {
+        throw new Error('Invalid tile layout ' + tile.layout);
+      }
     }
   }
   return this;

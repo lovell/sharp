@@ -510,18 +510,25 @@ This has no effect if the input image does not have an EXIF `Orientation` tag.
 
 The default behaviour, when `withMetadata` is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
 
-#### tile([size], [overlap])
+#### tile(options)
 
-The size and overlap, in pixels, of square Deep Zoom image pyramid tiles.
+The size, overlap and directory layout to use when generating square Deep Zoom image pyramid tiles.
+
+`options` is an Object with one or more of the following attributes:
 
 * `size` is an integral Number between 1 and 8192. The default value is 256 pixels.
 * `overlap` is an integral Number between 0 and 8192. The default value is 0 pixels.
+* `layout` is a String, with value `dz`, `zoomify` or `google`. The default value is `dz`.
 
 ```javascript
-sharp('input.tiff').tile(256).toFile('output.dzi', function(err, info) {
-  // The output.dzi file is the XML format Deep Zoom definition
-  // The output_files directory contains 256x256 pixel tiles grouped by zoom level
-});
+sharp('input.tiff')
+  .tile({
+    size: 512
+  })
+  .toFile('output.dzi', function(err, info) {
+    // output.dzi is the Deep Zoom XML definition
+    // output_files contains 512x512 tiles grouped by zoom level
+  });
 ```
 
 #### withoutChromaSubsampling()

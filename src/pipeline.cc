@@ -766,6 +766,7 @@ class PipelineWorker : public AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("tile_size", baton->tileSize)
             ->set("overlap", baton->tileOverlap)
+            ->set("layout", baton->tileLayout)
           );
           baton->formatOut = "dz";
         } else {
@@ -1030,8 +1031,18 @@ NAN_METHOD(pipeline) {
   // Output
   baton->formatOut = attrAsStr(options, "formatOut");
   baton->fileOut = attrAsStr(options, "fileOut");
+  // Tile output
   baton->tileSize = attrAs<int32_t>(options, "tileSize");
   baton->tileOverlap = attrAs<int32_t>(options, "tileOverlap");
+  std::string tileLayout = attrAsStr(options, "tileLayout");
+  if (tileLayout == "google") {
+    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_GOOGLE;
+  } else if (tileLayout == "zoomify") {
+    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY;
+  } else {
+    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
+  }
+
   // Function to notify of queue length changes
   Callback *queueListener = new Callback(
     Get(options, New("queueListener").ToLocalChecked()).ToLocalChecked().As<Function>()
