@@ -2,6 +2,10 @@
 
 ### v0.14 - "*needle*"
 
+* Add ability to extend (pad) the edges of an image.
+  [#128](https://github.com/lovell/sharp/issues/128)
+  [@blowsie](https://github.com/blowsie)
+
 * Improvements to overlayWith: differing sizes/formats, gravity, buffer input.
   [#239](https://github.com/lovell/sharp/issues/239)
   [@chrisriley](https://github.com/chrisriley)

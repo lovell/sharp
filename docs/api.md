@@ -280,7 +280,7 @@ sharp(input)
 
 #### background(rgba)
 
-Set the background for the `embed` and `flatten` operations.
+Set the background for the `embed`, `flatten` and `extend` operations.
 
 `rgba` is parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
 
@@ -291,6 +291,25 @@ The default background is `{r: 0, g: 0, b: 0, a: 1}`, black without transparency
 #### flatten()
 
 Merge alpha transparency channel, if any, with `background`.
+
+#### extend(extension)
+
+Extends/pads the edges of the image with `background`, where `extension` is one of:
+
+* a Number representing the pixel count to add to each edge, or
+* an Object containing `top`, `left`, `bottom` and `right` attributes, each a Number of pixels to add to that edge.
+
+This operation will always occur after resizing and extraction, if any.
+
+```javascript
+// Resize to 140 pixels wide, then add 10 transparent pixels
+// to the top, left and right edges and 20 to the bottom edge
+sharp(input)
+  .resize(140)
+  .background({r: 0, g: 0, b: 0, a: 0})
+  .extend({top: 10, bottom: 20, left: 10, right: 10})
+  ...
+```
 
 #### negate()
 

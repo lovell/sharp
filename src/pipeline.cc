@@ -522,6 +522,27 @@ class PipelineWorker : public AsyncWorker {
         );
       }
 
+      // Extend edges
+      if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
+        // Scale up 8-bit values to match 16-bit input image
+        const double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+        // Create background colour
+        std::vector<double> background {
+          baton->background[0] * multiplier,
+          baton->background[1] * multiplier,
+          baton->background[2] * multiplier
+        };
+        // Add alpha channel to background colour
+        if (HasAlpha(image)) {
+          background.push_back(baton->background[3] * multiplier);
+        }
+        // Embed
+        baton->width = image.width() + baton->extendLeft + baton->extendRight;
+        baton->height = image.height() + baton->extendTop + baton->extendBottom;
+        image = image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
+          VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
+      }
+
       // Threshold - must happen before blurring, due to the utility of blurring after thresholding
       if (shouldThreshold) {
         image = image.colourspace(VIPS_INTERPRETATION_B_W) >= baton->threshold;
@@ -991,6 +1012,10 @@ NAN_METHOD(pipeline) {
   baton->rotateBeforePreExtract = attrAs<bool>(options, "rotateBeforePreExtract");
   baton->flip = attrAs<bool>(options, "flip");
   baton->flop = attrAs<bool>(options, "flop");
+  baton->extendTop = attrAs<int32_t>(options, "extendTop");
+  baton->extendBottom = attrAs<int32_t>(options, "extendBottom");
+  baton->extendLeft = attrAs<int32_t>(options, "extendLeft");
+  baton->extendRight = attrAs<int32_t>(options, "extendRight");
   // Output options
   baton->progressive = attrAs<bool>(options, "progressive");
   baton->quality = attrAs<int32_t>(options, "quality");

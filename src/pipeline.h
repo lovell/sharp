@@ -60,6 +60,10 @@ struct PipelineBaton {
   bool rotateBeforePreExtract;
   bool flip;
   bool flop;
+  int extendTop;
+  int extendBottom;
+  int extendLeft;
+  int extendRight;
   bool progressive;
   bool withoutEnlargement;
   VipsAccess accessMethod;
@@ -106,6 +110,10 @@ struct PipelineBaton {
     angle(0),
     flip(false),
     flop(false),
+    extendTop(0),
+    extendBottom(0),
+    extendLeft(0),
+    extendRight(0),
     progressive(false),
     withoutEnlargement(false),
     quality(80),

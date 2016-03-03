@@ -69,6 +69,10 @@ var Sharp = function(input, options) {
     rotateBeforePreExtract: false,
     flip: false,
     flop: false,
+    extendTop: 0,
+    extendBottom: 0,
+    extendLeft: 0,
+    extendRight: 0,
     withoutEnlargement: false,
     interpolator: 'bicubic',
     // operations
@@ -646,6 +650,32 @@ Sharp.prototype.tile = function(size, overlap) {
     } else {
       throw new Error('Invalid tile overlap (0 to 8192) ' + overlap);
     }
+  }
+  return this;
+};
+
+/*
+  Extend edges
+*/
+Sharp.prototype.extend = function(extend) {
+  if (isInteger(extend) && extend > 0) {
+    this.options.extendTop = extend;
+    this.options.extendBottom = extend;
+    this.options.extendLeft = extend;
+    this.options.extendRight = extend;
+  } else if (
+    isObject(extend) &&
+    isInteger(extend.top) && extend.top >= 0 &&
+    isInteger(extend.bottom) && extend.bottom >= 0 &&
+    isInteger(extend.left) && extend.left >= 0 &&
+    isInteger(extend.right) && extend.right >= 0
+  ) {
+    this.options.extendTop = extend.top;
+    this.options.extendBottom = extend.bottom;
+    this.options.extendLeft = extend.left;
+    this.options.extendRight = extend.right;
+  } else {
+    throw new Error('Invalid edge extension ' + extend);
   }
   return this;
 };
