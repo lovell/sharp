@@ -14,6 +14,10 @@
   [#239](https://github.com/lovell/sharp/issues/239)
   [@chrisriley](https://github.com/chrisriley)
 
+* Add entropy-based strategy to determine crop region.
+  [#295](https://github.com/lovell/sharp/issues/295)
+  [@rightaway](https://github.com/rightaway)
+
 * Expose density metadata; set density of images from vector input.
   [#338](https://github.com/lovell/sharp/issues/338)
   [@lookfirst](https://github.com/lookfirst)

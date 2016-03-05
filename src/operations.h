@@ -33,6 +33,16 @@ namespace sharp {
    */
   VImage Sharpen(VImage image, int const radius, double const flat, double const jagged);
 
+  /*
+    Calculate crop area based on image entropy
+  */
+  std::tuple<int, int> EntropyCrop(VImage image, int const outWidth, int const outHeight);
+
+  /*
+    Calculate the Shannon entropy for an image
+  */
+  double Entropy(VImage image);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

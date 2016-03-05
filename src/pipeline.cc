@@ -49,6 +49,7 @@ using sharp::Normalize;
 using sharp::Gamma;
 using sharp::Blur;
 using sharp::Sharpen;
+using sharp::EntropyCrop;
 
 using sharp::ImageType;
 using sharp::ImageTypeId;
@@ -506,9 +507,15 @@ class PipelineWorker : public AsyncWorker {
           // Crop/max/min
           int left;
           int top;
-          std::tie(left, top) = CalculateCrop(
-            image.width(), image.height(), baton->width, baton->height, baton->gravity
-          );
+          if (baton->crop < 9) {
+            // Gravity-based crop
+            std::tie(left, top) = CalculateCrop(
+              image.width(), image.height(), baton->width, baton->height, baton->crop
+            );
+          } else {
+            // Entropy-based crop
+            std::tie(left, top) = EntropyCrop(image, baton->width, baton->height);
+          }
           int width = std::min(image.width(), baton->width);
           int height = std::min(image.height(), baton->height);
           image = image.extract_area(left, top, width, height);
@@ -996,7 +1003,7 @@ NAN_METHOD(pipeline) {
   baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
-  baton->gravity = attrAs<int32_t>(options, "gravity");
+  baton->crop = attrAs<int32_t>(options, "crop");
   baton->interpolator = attrAsStr(options, "interpolator");
   // Operators
   baton->flatten = attrAs<bool>(options, "flatten");

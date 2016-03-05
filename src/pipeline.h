@@ -45,7 +45,7 @@ struct PipelineBaton {
   int height;
   int channels;
   Canvas canvas;
-  int gravity;
+  int crop;
   std::string interpolator;
   double background[4];
   bool flatten;
@@ -99,7 +99,7 @@ struct PipelineBaton {
     topOffsetPost(-1),
     channels(0),
     canvas(Canvas::CROP),
-    gravity(0),
+    crop(0),
     flatten(false),
     negate(false),
     blurSigma(0.0),

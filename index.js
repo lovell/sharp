@@ -64,7 +64,7 @@ var Sharp = function(input, options) {
     width: -1,
     height: -1,
     canvas: 'crop',
-    gravity: 0,
+    crop: 0,
     angle: 0,
     rotateBeforePreExtract: false,
     flip: false,
@@ -231,48 +231,53 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
   }
 };
 
-// Crop this part of the resized image (Center/Centre, North, East, South, West)
+// Weighting to apply to image crop
 module.exports.gravity = {
-  'center': 0,
-  'centre': 0,
-  'north': 1,
-  'east': 2,
-  'south': 3,
-  'west': 4,
-  'northeast': 5,
-  'southeast': 6,
-  'southwest': 7,
-  'northwest': 8
+  center: 0,
+  centre: 0,
+  north: 1,
+  east: 2,
+  south: 3,
+  west: 4,
+  northeast: 5,
+  southeast: 6,
+  southwest: 7,
+  northwest: 8
 };
 
-Sharp.prototype.crop = function(gravity) {
+// Strategies for automagic behaviour
+module.exports.strategy = {
+  entropy: 16
+};
+
+/*
+  What part of the image should be retained when cropping?
+*/
+Sharp.prototype.crop = function(crop) {
   this.options.canvas = 'crop';
-  if (!isDefined(gravity)) {
-    this.options.gravity = module.exports.gravity.center;
-  } else if (isInteger(gravity) && inRange(gravity, 0, 8)) {
-    this.options.gravity = gravity;
-  } else if (isString(gravity) && isInteger(module.exports.gravity[gravity])) {
-    this.options.gravity = module.exports.gravity[gravity];
+  if (!isDefined(crop)) {
+    // Default
+    this.options.crop = module.exports.gravity.center;
+  } else if (isInteger(crop) && inRange(crop, 0, 8)) {
+    // Gravity (numeric)
+    this.options.crop = crop;
+  } else if (isString(crop) && isInteger(module.exports.gravity[crop])) {
+    // Gravity (string)
+    this.options.crop = module.exports.gravity[crop];
+  } else if (isInteger(crop) && crop === module.exports.strategy.entropy) {
+    // Strategy
+    this.options.crop = crop;
   } else {
-    throw new Error('Unsupported crop gravity ' + gravity);
+    throw new Error('Unsupported crop ' + crop);
   }
   return this;
 };
 
 Sharp.prototype.extract = function(options) {
-  if (!options || typeof options !== 'object') {
-    // Legacy extract(top,left,width,height) syntax
-    options = {
-      left: arguments[1],
-      top: arguments[0],
-      width: arguments[2],
-      height: arguments[3]
-    };
-  }
   var suffix = this.options.width === -1 && this.options.height === -1 ? 'Pre' : 'Post';
   ['left', 'top', 'width', 'height'].forEach(function (name) {
     var value = options[name];
-    if (typeof value === 'number' && !Number.isNaN(value) && value % 1 === 0 && value >= 0) {
+    if (isInteger(value) && value >= 0) {
       this.options[name + (name === 'left' || name === 'top' ? 'Offset' : '') + suffix] = value;
     } else {
       throw new Error('Non-integer value for ' + name + ' of ' + value);

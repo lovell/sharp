@@ -125,23 +125,34 @@ Scale output to `width` x `height`. By default, the resized image is cropped to 
 
 `height` is the integral Number of pixels high the resultant image should be, between 1 and 16383. Use `null` or `undefined` to auto-scale the height to match the width.
 
-#### crop([gravity])
+#### crop([option])
 
 Crop the resized image to the exact size specified, the default behaviour.
 
-`gravity`, if present, is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north`.
+`option`, if present, is an attribute of:
 
-Possible values are `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` and `centre`.
-The default gravity is `center`/`centre`.
+* `sharp.gravity` e.g. `sharp.gravity.north`, to crop to an edge or corner, or
+* `sharp.strategy` e.g. `sharp.strategy.entropy`, to crop dynamically.
+
+Possible attributes of `sharp.gravity` are
+`north`, `northeast`, `east`, `southeast`, `south`,
+`southwest`, `west`, `northwest`, `center` and `centre`.
+
+`sharp.strategy` currently contains only the experimental `entropy`,
+which will retain the part of the image with the highest
+[Shannon entropy](https://en.wikipedia.org/wiki/Entropy_%28information_theory%29) value.
+
+The default option is a `center`/`centre` gravity.
 
 ```javascript
 var transformer = sharp()
-  .resize(300, 200)
-  .crop(sharp.gravity.north)
+  .resize(200, 200)
+  .crop(sharp.strategy.entropy)
   .on('error', function(err) {
     console.log(err);
   });
-// Read image data from readableStream, resize and write image data to writableStream
+// Read image data from readableStream
+// Write 200px square auto-cropped image data to writableStream
 readableStream.pipe(transformer).pipe(writableStream);
 ```
 

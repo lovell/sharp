@@ -170,4 +170,82 @@ namespace sharp {
     }
   }
 
+  /*
+    Calculate crop area based on image entropy
+  */
+  std::tuple<int, int> EntropyCrop(VImage image, int const outWidth, int const outHeight) {
+    int left = 0;
+    int top = 0;
+    int const inWidth = image.width();
+    int const inHeight = image.height();
+    if (inWidth > outWidth) {
+      // Reduce width by repeated removing slices from edge with lowest entropy
+      int width = inWidth;
+      double leftEntropy = 0.0;
+      double rightEntropy = 0.0;
+      // Max width of each slice
+      int const maxSliceWidth = static_cast<int>(ceil((inWidth - outWidth) / 8.0));
+      while (width > outWidth) {
+        // Width of current slice
+        int const slice = std::min(width - outWidth, maxSliceWidth);
+        if (leftEntropy == 0.0) {
+          // Update entropy of left slice
+          leftEntropy = Entropy(image.extract_area(left, 0, slice, inHeight));
+        }
+        if (rightEntropy == 0.0) {
+          // Update entropy of right slice
+          rightEntropy = Entropy(image.extract_area(width - slice - 1, 0, slice, inHeight));
+        }
+        // Keep slice with highest entropy
+        if (leftEntropy >= rightEntropy) {
+          // Discard right slice
+          rightEntropy = 0.0;
+        } else {
+          // Discard left slice
+          leftEntropy = 0.0;
+          left = left + slice;
+        }
+        width = width - slice;
+      }
+    }
+    if (inHeight > outHeight) {
+      // Reduce height by repeated removing slices from edge with lowest entropy
+      int height = inHeight;
+      double topEntropy = 0.0;
+      double bottomEntropy = 0.0;
+      // Max height of each slice
+      int const maxSliceHeight = static_cast<int>(ceil((inHeight - outHeight) / 8.0));
+      while (height > outHeight) {
+        // Height of current slice
+        int const slice = std::min(height - outHeight, maxSliceHeight);
+        if (topEntropy == 0.0) {
+          // Update entropy of top slice
+          topEntropy = Entropy(image.extract_area(0, top, inWidth, slice));
+        }
+        if (bottomEntropy == 0.0) {
+          // Update entropy of bottom slice
+          bottomEntropy = Entropy(image.extract_area(0, height - slice - 1, inWidth, slice));
+        }
+        // Keep slice with highest entropy
+        if (topEntropy >= bottomEntropy) {
+          // Discard bottom slice
+          bottomEntropy = 0.0;
+        } else {
+          // Discard top slice
+          topEntropy = 0.0;
+          top = top + slice;
+        }
+        height = height - slice;
+      }
+    }
+    return std::make_tuple(left, top);
+  }
+
+  /*
+    Calculate the Shannon entropy for an image
+  */
+  double Entropy(VImage image) {
+    return image.hist_find().hist_entropy();
+  }
+
 }  // namespace sharp

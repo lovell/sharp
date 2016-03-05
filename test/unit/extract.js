@@ -6,29 +6,6 @@ var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
 describe('Partial image extraction', function() {
-  describe('using the legacy extract(top,left,width,height) syntax', function () {
-    it('JPEG', function(done) {
-      sharp(fixtures.inputJpg)
-        .extract(2, 2, 20, 20)
-        .toBuffer(function(err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(20, info.width);
-          assert.strictEqual(20, info.height);
-          fixtures.assertSimilar(fixtures.expected('extract.jpg'), data, done);
-        });
-    });
-
-    it('PNG', function(done) {
-      sharp(fixtures.inputPng)
-        .extract(300, 200, 400, 200)
-        .toBuffer(function(err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(400, info.width);
-          assert.strictEqual(200, info.height);
-          fixtures.assertSimilar(fixtures.expected('extract.png'), data, done);
-      });
-    });
-  });
 
   it('JPEG', function(done) {
     sharp(fixtures.inputJpg)
