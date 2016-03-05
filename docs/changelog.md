@@ -14,7 +14,7 @@
   [#239](https://github.com/lovell/sharp/issues/239)
   [@chrisriley](https://github.com/chrisriley)
 
-* Add entropy-based strategy to determine crop region.
+* Add entropy-based crop strategy to remove least interesting edges.
   [#295](https://github.com/lovell/sharp/issues/295)
   [@rightaway](https://github.com/rightaway)
 

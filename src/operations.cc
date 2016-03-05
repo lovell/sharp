@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <tuple>
 #include <vips/vips8>
 
 #include "common.h"

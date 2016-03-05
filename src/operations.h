@@ -1,6 +1,7 @@
 #ifndef SRC_OPERATIONS_H_
 #define SRC_OPERATIONS_H_
 
+#include <tuple>
 #include <vips/vips8>
 
 using vips::VImage;

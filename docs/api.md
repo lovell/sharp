@@ -138,11 +138,14 @@ Possible attributes of `sharp.gravity` are
 `north`, `northeast`, `east`, `southeast`, `south`,
 `southwest`, `west`, `northwest`, `center` and `centre`.
 
-`sharp.strategy` currently contains only the experimental `entropy`,
-which will retain the part of the image with the highest
-[Shannon entropy](https://en.wikipedia.org/wiki/Entropy_%28information_theory%29) value.
+Possible attributes of the experimental `sharp.strategy` are:
 
-The default option is a `center`/`centre` gravity.
+* `entropy`: resize so one dimension is at its target size
+then repeatedly remove pixels from the edge with the lowest
+[Shannon entropy](https://en.wikipedia.org/wiki/Entropy_%28information_theory%29)
+until it too reaches the target size.
+
+The default crop option is a `center`/`centre` gravity.
 
 ```javascript
 var transformer = sharp()
