@@ -147,7 +147,7 @@ if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_ex
       trusty|utopic|qiana|rebecca|rafaela|freya)
         # Ubuntu 14, Mint 17
         echo "Installing libopenslide dependencies via apt-get"
-        apt-get install -y automake build-essential curl zlib1g-dev libopenjpeg-dev libpng12-dev libjpeg-dev libtiff5-dev libgdk-pixbuf2.0-dev libxml2-dev libsqlite3-dev libcairo2-dev libglib2.0-dev sqlite3 libsqlite3-dev
+        apt-get install -y automake build-essential curl zlib1g-dev libopenjpeg-dev libpng12-dev libjpeg-dev libtiff5-dev libgdk-pixbuf2.0-dev libxml2-dev libsqlite3-dev libcairo2-dev libglib2.0-dev sqlite3 libsqlite3-dev libpango1.0-dev
         install_libopenslide_from_source
         ;;
       precise|wheezy|maya)
