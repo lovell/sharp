@@ -221,7 +221,7 @@
             '<(module_root_dir)/lib/libintl-8.dll',
             '<(module_root_dir)/lib/libjpeg-62.dll',
             '<(module_root_dir)/lib/liblcms2-2.dll',
-            '<(module_root_dir)/lib/libopenjpeg-1.dll',
+            '<(module_root_dir)/lib/libopenjp2.dll',
             '<(module_root_dir)/lib/libopenslide-0.dll',
             '<(module_root_dir)/lib/libpango-1.0-0.dll',
             '<(module_root_dir)/lib/libpangocairo-1.0-0.dll',
