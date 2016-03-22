@@ -47,156 +47,149 @@ var assertDeepZoomTiles = function(directory, expectedSize, expectedLevels, done
 
 describe('Tile', function() {
 
-  describe('Invalid tile values', function() {
-    it('size - NaN', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile('zoinks');
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+  it('Valid size values pass', function() {
+    [1, 8192].forEach(function(size) {
+      assert.doesNotThrow(function() {
+        sharp().tile({
+          size: size
+        });
+      });
     });
+  });
 
-    it('size - float', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(1.1);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+  it('Invalid size values fail', function() {
+    ['zoinks', 1.1, -1, 0, 8193].forEach(function(size) {
+      assert.throws(function() {
+        sharp().tile({
+          size: size
+        });
+      });
     });
+  });
 
-    it('size - negative', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(-1);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+  it('Valid overlap values pass', function() {
+    [0, 8192].forEach(function(overlap) {
+      assert.doesNotThrow(function() {
+        sharp().tile({
+          size: 8192,
+          overlap: overlap
+        });
+      });
     });
+  });
 
-    it('size - zero', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(0);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+  it('Invalid overlap values fail', function() {
+    ['zoinks', 1.1, -1, 8193].forEach(function(overlap) {
+      assert.throws(function() {
+        sharp().tile({
+          overlap: overlap
+        });
+      });
     });
+  });
 
-    it('size - too large', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(8193);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+  it('Valid layout values pass', function() {
+    ['dz', 'google', 'zoomify'].forEach(function(layout) {
+      assert.doesNotThrow(function() {
+        sharp().tile({
+          layout: layout
+        });
+      });
     });
+  });
 
-    it('overlap - NaN', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(null, 'zoinks');
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+  it('Invalid layout values fail', function() {
+    ['zoinks', 1].forEach(function(layout) {
+      assert.throws(function() {
+        sharp().tile({
+          layout: layout
+        });
+      });
     });
+  });
 
-    it('overlap - float', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(null, 1.1);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+  it('Prevent larger overlap than default size', function() {
+    assert.throws(function() {
+      sharp().tile({overlap: 257});
     });
+  });
 
-    it('overlap - negative', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(null, -1);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
+  it('Prevent larger overlap than provided size', function() {
+    assert.throws(function() {
+      sharp().tile({size: 512, overlap: 513});
     });
-
-    it('overlap - too large', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(null, 8193);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
-    });
-
-    it('overlap - larger than default size', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(null, 257);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
-    });
-
-    it('overlap - larger than provided size', function(done) {
-      var isValid = true;
-      try {
-        sharp().tile(512, 513);
-      } catch (err) {
-        isValid = false;
-      }
-      assert.strictEqual(false, isValid);
-      done();
-    });
-
   });
 
   if (sharp.format.dz.output.file) {
-    describe('Deep Zoom output', function() {
 
-      it('Tile size - 256px default', function(done) {
-        var directory = fixtures.path('output.256_files');
-        rimraf(directory, function() {
-          sharp(fixtures.inputJpg).toFile(fixtures.path('output.256.dzi'), function(err, info) {
+    it('Deep Zoom layout', function(done) {
+      var directory = fixtures.path('output.dz_files');
+      rimraf(directory, function() {
+        sharp(fixtures.inputJpg)
+          .toFile(fixtures.path('output.dz.dzi'), function(err, info) {
             if (err) throw err;
             assert.strictEqual('dz', info.format);
             assertDeepZoomTiles(directory, 256, 13, done);
           });
-        });
       });
+    });
 
-      it('Tile size/overlap - 512/16px', function(done) {
-        var directory = fixtures.path('output.512_files');
-        rimraf(directory, function() {
-          sharp(fixtures.inputJpg).tile(512, 16).toFile(fixtures.path('output.512.dzi'), function(err, info) {
+    it('Deep Zoom layout with custom size+overlap', function(done) {
+      var directory = fixtures.path('output.dz.512_files');
+      rimraf(directory, function() {
+        sharp(fixtures.inputJpg)
+          .tile({
+            size: 512,
+            overlap: 16
+          })
+          .toFile(fixtures.path('output.dz.512.dzi'), function(err, info) {
             if (err) throw err;
             assert.strictEqual('dz', info.format);
             assertDeepZoomTiles(directory, 512 + 2 * 16, 13, done);
           });
-        });
       });
-
     });
+
+    it('Zoomify layout', function(done) {
+      var directory = fixtures.path('output.zoomify');
+      rimraf(directory, function() {
+        sharp(fixtures.inputJpg)
+          .tile({
+            layout: 'zoomify'
+          })
+          .toFile(fixtures.path('output.zoomify.dzi'), function(err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            fs.stat(path.join(directory, 'ImageProperties.xml'), function(err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
+              done();
+            });
+          });
+      });
+    });
+
+    it('Google layout', function(done) {
+      var directory = fixtures.path('output.google');
+      rimraf(directory, function() {
+        sharp(fixtures.inputJpg)
+          .tile({
+            layout: 'google'
+          })
+          .toFile(fixtures.path('output.google.dzi'), function(err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            fs.stat(path.join(directory, '0', '0', '0.jpg'), function(err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
+              done();
+            });
+          });
+      });
+    });
+
   }
 
 });

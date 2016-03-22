@@ -1,6 +1,7 @@
 #ifndef SRC_OPERATIONS_H_
 #define SRC_OPERATIONS_H_
 
+#include <tuple>
 #include <vips/vips8>
 
 using vips::VImage;
@@ -8,10 +9,10 @@ using vips::VImage;
 namespace sharp {
 
   /*
-    Composite images `src` and `dst` with premultiplied alpha channel and output
-    image with premultiplied alpha.
+    Alpha composite src over dst with given gravity.
+    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
    */
-  VImage Composite(VImage src, VImage dst);
+  VImage Composite(VImage src, VImage dst, const int gravity);
 
   /*
    * Stretch luminance to cover full dynamic range.
@@ -32,6 +33,17 @@ namespace sharp {
    * Sharpen flat and jagged areas. Use radius of -1 for fast sharpen.
    */
   VImage Sharpen(VImage image, int const radius, double const flat, double const jagged);
+
+  /*
+    Calculate crop area based on image entropy
+  */
+  std::tuple<int, int> EntropyCrop(VImage image, int const outWidth, int const outHeight);
+
+  /*
+    Calculate the Shannon entropy for an image
+  */
+  double Entropy(VImage image);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

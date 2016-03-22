@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -47,7 +47,7 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^3.3.3",
+    "bluebird": "^3.3.4",
     "color": "^0.11.1",
     "nan": "^2.2.0",
     "semver": "^5.1.0",
@@ -68,7 +68,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.2.2"
+    "libvips": "8.2.3"
   },
   "engines": {
     "node": ">=0.10"

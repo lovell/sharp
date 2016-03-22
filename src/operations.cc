@@ -1,37 +1,54 @@
+#include <algorithm>
+#include <tuple>
 #include <vips/vips8>
 
 #include "common.h"
 #include "operations.h"
 
 using vips::VImage;
+using vips::VError;
 
 namespace sharp {
 
   /*
-    Alpha composite src over dst
-    Assumes alpha channels are already premultiplied and will be unpremultiplied after
+    Alpha composite src over dst with given gravity.
+    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
    */
-  VImage Composite(VImage src, VImage dst) {
+  VImage Composite(VImage src, VImage dst, const int gravity) {
+    using sharp::CalculateCrop;
     using sharp::HasAlpha;
 
-    // Split src into non-alpha and alpha
+    if (!HasAlpha(src)) {
+      throw VError("Overlay image must have an alpha channel");
+    }
+    if (!HasAlpha(dst)) {
+      throw VError("Image to be overlaid must have an alpha channel");
+    }
+    if (src.width() > dst.width() || src.height() > dst.height()) {
+      throw VError("Overlay image must have same dimensions or smaller");
+    }
+
+    // Enlarge overlay src, if required
+    if (src.width() < dst.width() || src.height() < dst.height()) {
+      // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
+      int left;
+      int top;
+      std::tie(left, top) = CalculateCrop(dst.width(), dst.height(), src.width(), src.height(), gravity);
+      // Embed onto transparent background
+      std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
+      src = src.embed(left, top, dst.width(), dst.height(), VImage::option()
+        ->set("extend", VIPS_EXTEND_BACKGROUND)
+        ->set("background", background)
+      );
+    }
+
+    // Split src into non-alpha and alpha channels
     VImage srcWithoutAlpha = src.extract_band(0, VImage::option()->set("n", src.bands() - 1));
     VImage srcAlpha = src[src.bands() - 1] * (1.0 / 255.0);
 
     // Split dst into non-alpha and alpha channels
-    VImage dstWithoutAlpha;
-    VImage dstAlpha;
-    if (HasAlpha(dst)) {
-      // Non-alpha: extract all-but-last channel
-      dstWithoutAlpha = dst.extract_band(0, VImage::option()->set("n", dst.bands() - 1));
-      // Alpha: Extract last channel
-      dstAlpha = dst[dst.bands() - 1] * (1.0 / 255.0);
-    } else {
-      // Non-alpha: Copy reference
-      dstWithoutAlpha = dst;
-      // Alpha: Use blank, opaque (0xFF) image
-      dstAlpha = VImage::black(dst.width(), dst.height()).invert();
-    }
+    VImage dstWithoutAlpha = dst.extract_band(0, VImage::option()->set("n", dst.bands() - 1));
+    VImage dstAlpha = dst[dst.bands() - 1] * (1.0 / 255.0);
 
     //
     // Compute normalized output alpha channel:
@@ -154,4 +171,83 @@ namespace sharp {
       );
     }
   }
+
+  /*
+    Calculate crop area based on image entropy
+  */
+  std::tuple<int, int> EntropyCrop(VImage image, int const outWidth, int const outHeight) {
+    int left = 0;
+    int top = 0;
+    int const inWidth = image.width();
+    int const inHeight = image.height();
+    if (inWidth > outWidth) {
+      // Reduce width by repeated removing slices from edge with lowest entropy
+      int width = inWidth;
+      double leftEntropy = 0.0;
+      double rightEntropy = 0.0;
+      // Max width of each slice
+      int const maxSliceWidth = static_cast<int>(ceil((inWidth - outWidth) / 8.0));
+      while (width > outWidth) {
+        // Width of current slice
+        int const slice = std::min(width - outWidth, maxSliceWidth);
+        if (leftEntropy == 0.0) {
+          // Update entropy of left slice
+          leftEntropy = Entropy(image.extract_area(left, 0, slice, inHeight));
+        }
+        if (rightEntropy == 0.0) {
+          // Update entropy of right slice
+          rightEntropy = Entropy(image.extract_area(width - slice - 1, 0, slice, inHeight));
+        }
+        // Keep slice with highest entropy
+        if (leftEntropy >= rightEntropy) {
+          // Discard right slice
+          rightEntropy = 0.0;
+        } else {
+          // Discard left slice
+          leftEntropy = 0.0;
+          left = left + slice;
+        }
+        width = width - slice;
+      }
+    }
+    if (inHeight > outHeight) {
+      // Reduce height by repeated removing slices from edge with lowest entropy
+      int height = inHeight;
+      double topEntropy = 0.0;
+      double bottomEntropy = 0.0;
+      // Max height of each slice
+      int const maxSliceHeight = static_cast<int>(ceil((inHeight - outHeight) / 8.0));
+      while (height > outHeight) {
+        // Height of current slice
+        int const slice = std::min(height - outHeight, maxSliceHeight);
+        if (topEntropy == 0.0) {
+          // Update entropy of top slice
+          topEntropy = Entropy(image.extract_area(0, top, inWidth, slice));
+        }
+        if (bottomEntropy == 0.0) {
+          // Update entropy of bottom slice
+          bottomEntropy = Entropy(image.extract_area(0, height - slice - 1, inWidth, slice));
+        }
+        // Keep slice with highest entropy
+        if (topEntropy >= bottomEntropy) {
+          // Discard bottom slice
+          bottomEntropy = 0.0;
+        } else {
+          // Discard top slice
+          topEntropy = 0.0;
+          top = top + slice;
+        }
+        height = height - slice;
+      }
+    }
+    return std::make_tuple(left, top);
+  }
+
+  /*
+    Calculate the Shannon entropy for an image
+  */
+  double Entropy(VImage image) {
+    return image.hist_find().hist_entropy();
+  }
+
 }  // namespace sharp

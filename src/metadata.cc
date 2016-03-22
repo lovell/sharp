@@ -38,6 +38,8 @@ using sharp::DetermineImageType;
 using sharp::HasProfile;
 using sharp::HasAlpha;
 using sharp::ExifOrientation;
+using sharp::HasDensity;
+using sharp::GetDensity;
 using sharp::FreeCallback;
 using sharp::counterQueue;
 
@@ -52,6 +54,7 @@ struct MetadataBaton {
   int height;
   std::string space;
   int channels;
+  int density;
   bool hasProfile;
   bool hasAlpha;
   int orientation;
@@ -63,6 +66,7 @@ struct MetadataBaton {
 
   MetadataBaton():
     bufferInLength(0),
+    density(0),
     orientation(0),
     exifLength(0),
     iccLength(0) {}
@@ -120,6 +124,9 @@ class MetadataWorker : public AsyncWorker {
       baton->height = image.height();
       baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image.interpretation());
       baton->channels = image.bands();
+      if (HasDensity(image)) {
+        baton->density = GetDensity(image);
+      }
       baton->hasProfile = HasProfile(image);
       // Derived attributes
       baton->hasAlpha = HasAlpha(image);
@@ -161,6 +168,9 @@ class MetadataWorker : public AsyncWorker {
       Set(info, New("height").ToLocalChecked(), New<Number>(baton->height));
       Set(info, New("space").ToLocalChecked(), New<String>(baton->space).ToLocalChecked());
       Set(info, New("channels").ToLocalChecked(), New<Number>(baton->channels));
+      if (baton->density > 0) {
+        Set(info, New("density").ToLocalChecked(), New<Number>(baton->density));
+      }
       Set(info, New("hasProfile").ToLocalChecked(), New<Boolean>(baton->hasProfile));
       Set(info, New("hasAlpha").ToLocalChecked(), New<Boolean>(baton->hasAlpha));
       if (baton->orientation > 0) {

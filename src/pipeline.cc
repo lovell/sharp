@@ -1,10 +1,12 @@
-#include <tuple>
 #include <algorithm>
-#include <utility>
 #include <cmath>
+#include <tuple>
+#include <utility>
+
+#include <vips/vips8>
+
 #include <node.h>
 #include <node_buffer.h>
-#include <vips/vips8>
 
 #include "nan.h"
 
@@ -47,6 +49,7 @@ using sharp::Normalize;
 using sharp::Gamma;
 using sharp::Blur;
 using sharp::Sharpen;
+using sharp::EntropyCrop;
 
 using sharp::ImageType;
 using sharp::ImageTypeId;
@@ -56,138 +59,28 @@ using sharp::HasAlpha;
 using sharp::ExifOrientation;
 using sharp::SetExifOrientation;
 using sharp::RemoveExifOrientation;
+using sharp::SetDensity;
 using sharp::IsJpeg;
 using sharp::IsPng;
 using sharp::IsWebp;
 using sharp::IsTiff;
 using sharp::IsDz;
 using sharp::FreeCallback;
+using sharp::CalculateCrop;
 using sharp::counterProcess;
 using sharp::counterQueue;
-
-enum class Canvas {
-  CROP,
-  EMBED,
-  MAX,
-  MIN,
-  IGNORE_ASPECT
-};
-
-struct PipelineBaton {
-  std::string fileIn;
-  char *bufferIn;
-  size_t bufferInLength;
-  std::string iccProfilePath;
-  int limitInputPixels;
-  std::string density;
-  int rawWidth;
-  int rawHeight;
-  int rawChannels;
-  std::string formatOut;
-  std::string fileOut;
-  void *bufferOut;
-  size_t bufferOutLength;
-  int topOffsetPre;
-  int leftOffsetPre;
-  int widthPre;
-  int heightPre;
-  int topOffsetPost;
-  int leftOffsetPost;
-  int widthPost;
-  int heightPost;
-  int width;
-  int height;
-  int channels;
-  Canvas canvas;
-  int gravity;
-  std::string interpolator;
-  double background[4];
-  bool flatten;
-  bool negate;
-  double blurSigma;
-  int sharpenRadius;
-  double sharpenFlat;
-  double sharpenJagged;
-  int threshold;
-  std::string overlayPath;
-  double gamma;
-  bool greyscale;
-  bool normalize;
-  int angle;
-  bool rotateBeforePreExtract;
-  bool flip;
-  bool flop;
-  bool progressive;
-  bool withoutEnlargement;
-  VipsAccess accessMethod;
-  int quality;
-  int compressionLevel;
-  bool withoutAdaptiveFiltering;
-  bool withoutChromaSubsampling;
-  bool trellisQuantisation;
-  bool overshootDeringing;
-  bool optimiseScans;
-  std::string err;
-  bool withMetadata;
-  int withMetadataOrientation;
-  int tileSize;
-  int tileOverlap;
-
-  PipelineBaton():
-    bufferInLength(0),
-    limitInputPixels(0),
-    density(""),
-    rawWidth(0),
-    rawHeight(0),
-    rawChannels(0),
-    formatOut(""),
-    fileOut(""),
-    bufferOutLength(0),
-    topOffsetPre(-1),
-    topOffsetPost(-1),
-    channels(0),
-    canvas(Canvas::CROP),
-    gravity(0),
-    flatten(false),
-    negate(false),
-    blurSigma(0.0),
-    sharpenRadius(0),
-    sharpenFlat(1.0),
-    sharpenJagged(2.0),
-    threshold(0),
-    gamma(0.0),
-    greyscale(false),
-    normalize(false),
-    angle(0),
-    flip(false),
-    flop(false),
-    progressive(false),
-    withoutEnlargement(false),
-    quality(80),
-    compressionLevel(6),
-    withoutAdaptiveFiltering(false),
-    withoutChromaSubsampling(false),
-    trellisQuantisation(false),
-    overshootDeringing(false),
-    optimiseScans(false),
-    withMetadata(false),
-    withMetadataOrientation(-1),
-    tileSize(256),
-    tileOverlap(0) {
-      background[0] = 0.0;
-      background[1] = 0.0;
-      background[2] = 0.0;
-      background[3] = 255.0;
-    }
-};
 
 class PipelineWorker : public AsyncWorker {
 
  public:
-  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener, const Local<Object> &bufferIn) :
+  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
+    const Local<Object> &bufferIn, const Local<Object> &overlayBufferIn) :
     AsyncWorker(callback), baton(baton), queueListener(queueListener) {
       if (baton->bufferInLength > 0) {
         SaveToPersistent("bufferIn", bufferIn);
+      }
+      if (baton->overlayBufferInLength > 0) {
+        SaveToPersistent("overlayBufferIn", overlayBufferIn);
       }
     }
   ~PipelineWorker() {}
@@ -227,9 +120,12 @@ class PipelineWorker : public AsyncWorker {
           try {
             VOption *option = VImage::option()->set("access", baton->accessMethod);
             if (inputImageType == ImageType::MAGICK) {
-              option->set("density", baton->density.data());
+              option->set("density", std::to_string(baton->density).data());
             }
             image = VImage::new_from_buffer(baton->bufferIn, baton->bufferInLength, nullptr, option);
+            if (inputImageType == ImageType::MAGICK) {
+              SetDensity(image, baton->density);
+            }
           } catch (...) {
             (baton->err).append("Input buffer has corrupt header");
             inputImageType = ImageType::UNKNOWN;
@@ -245,9 +141,12 @@ class PipelineWorker : public AsyncWorker {
         try {
           VOption *option = VImage::option()->set("access", baton->accessMethod);
           if (inputImageType == ImageType::MAGICK) {
-            option->set("density", baton->density.data());
+            option->set("density", std::to_string(baton->density).data());
           }
           image = VImage::new_from_file(baton->fileIn.data(), option);
+          if (inputImageType == ImageType::MAGICK) {
+            SetDensity(image, baton->density);
+          }
         } catch (...) {
           (baton->err).append("Input file has corrupt header");
           inputImageType = ImageType::UNKNOWN;
@@ -508,11 +407,19 @@ class PipelineWorker : public AsyncWorker {
         }
       }
 
+      // Ensure image has an alpha channel when there is an overlay
+      bool hasOverlay = baton->overlayBufferInLength > 0 || !baton->overlayFileIn.empty();
+      if (hasOverlay && !HasAlpha(image)) {
+        double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+        image = image.bandjoin(
+          VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
+        );
+      }
+
       bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
       bool shouldBlur = baton->blurSigma != 0.0;
       bool shouldSharpen = baton->sharpenRadius != 0;
       bool shouldThreshold = baton->threshold != 0;
-      bool hasOverlay = !baton->overlayPath.empty();
       bool shouldPremultiplyAlpha = HasAlpha(image) &&
         (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
 
@@ -600,9 +507,15 @@ class PipelineWorker : public AsyncWorker {
           // Crop/max/min
           int left;
           int top;
-          std::tie(left, top) = CalculateCrop(
-            image.width(), image.height(), baton->width, baton->height, baton->gravity
-          );
+          if (baton->crop < 9) {
+            // Gravity-based crop
+            std::tie(left, top) = CalculateCrop(
+              image.width(), image.height(), baton->width, baton->height, baton->crop
+            );
+          } else {
+            // Entropy-based crop
+            std::tie(left, top) = EntropyCrop(image, baton->width, baton->height);
+          }
           int width = std::min(image.width(), baton->width);
           int height = std::min(image.height(), baton->height);
           image = image.extract_area(left, top, width, height);
@@ -614,6 +527,27 @@ class PipelineWorker : public AsyncWorker {
         image = image.extract_area(
           baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost
         );
+      }
+
+      // Extend edges
+      if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
+        // Scale up 8-bit values to match 16-bit input image
+        const double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+        // Create background colour
+        std::vector<double> background {
+          baton->background[0] * multiplier,
+          baton->background[1] * multiplier,
+          baton->background[2] * multiplier
+        };
+        // Add alpha channel to background colour
+        if (HasAlpha(image)) {
+          background.push_back(baton->background[3] * multiplier);
+        }
+        // Embed
+        baton->width = image.width() + baton->extendLeft + baton->extendRight;
+        baton->height = image.height() + baton->extendTop + baton->extendBottom;
+        image = image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
+          VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
       }
 
       // Threshold - must happen before blurring, due to the utility of blurring after thresholding
@@ -634,38 +568,41 @@ class PipelineWorker : public AsyncWorker {
       // Composite with overlay, if present
       if (hasOverlay) {
         VImage overlayImage;
-        ImageType overlayImageType = DetermineImageType(baton->overlayPath.data());
-        if (overlayImageType != ImageType::UNKNOWN) {
-          overlayImage = VImage::new_from_file(
-            baton->overlayPath.data(),
-            VImage::option()->set("access", baton->accessMethod)
-          );
+        ImageType overlayImageType = ImageType::UNKNOWN;
+        if (baton->overlayBufferInLength > 0) {
+          // Overlay with image from buffer
+          overlayImageType = DetermineImageType(baton->overlayBufferIn, baton->overlayBufferInLength);
+          if (overlayImageType != ImageType::UNKNOWN) {
+            try {
+              overlayImage = VImage::new_from_buffer(baton->overlayBufferIn, baton->overlayBufferInLength,
+                nullptr, VImage::option()->set("access", baton->accessMethod));
+            } catch (...) {
+              (baton->err).append("Overlay buffer has corrupt header");
+              overlayImageType = ImageType::UNKNOWN;
+            }
+          } else {
+            (baton->err).append("Overlay buffer contains unsupported image format");
+          }
         } else {
-          (baton->err).append("Overlay image is of an unsupported image format");
+          // Overlay with image from file
+          overlayImageType = DetermineImageType(baton->overlayFileIn.data());
+          if (overlayImageType != ImageType::UNKNOWN) {
+            try {
+              overlayImage = VImage::new_from_file(baton->overlayFileIn.data(),
+                VImage::option()->set("access", baton->accessMethod));
+            } catch (...) {
+              (baton->err).append("Overlay file has corrupt header");
+              overlayImageType = ImageType::UNKNOWN;
+            }
+          }
+        }
+        if (overlayImageType == ImageType::UNKNOWN) {
           return Error();
         }
-        if (image.format() != VIPS_FORMAT_UCHAR && image.format() != VIPS_FORMAT_FLOAT) {
-          (baton->err).append("Expected image band format to be uchar or float: ");
-          (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, image.format()));
-          return Error();
-        }
-        if (overlayImage.format() != VIPS_FORMAT_UCHAR && overlayImage.format() != VIPS_FORMAT_FLOAT) {
-          (baton->err).append("Expected overlay image band format to be uchar or float: ");
-          (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, overlayImage.format()));
-          return Error();
-        }
-        if (!HasAlpha(overlayImage)) {
-          (baton->err).append("Overlay image must have an alpha channel");
-          return Error();
-        }
-        if (overlayImage.width() != image.width() && overlayImage.height() != image.height()) {
-          (baton->err).append("Overlay image must have same dimensions as resized image");
-          return Error();
-        }
-        // Ensure overlay is sRGB and premutiplied
+        // Ensure overlay is premultiplied sRGB
         overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
-
-        image = Composite(overlayImage, image);
+        // Composite images with given gravity
+        image = Composite(overlayImage, image, baton->overlayGravity);
       }
 
       // Reverse premultiplication after all transformations:
@@ -708,6 +645,9 @@ class PipelineWorker : public AsyncWorker {
         SetExifOrientation(image, baton->withMetadataOrientation);
       }
 
+      // Number of channels used in output image
+      baton->channels = image.bands();
+
       // Output
       if (baton->fileOut == "") {
         // Buffer output
@@ -728,6 +668,7 @@ class PipelineWorker : public AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "jpeg";
+          baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" && inputImageType == ImageType::PNG)) {
           // Write PNG to buffer
           VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
@@ -800,6 +741,7 @@ class PipelineWorker : public AsyncWorker {
             ->set("interlace", baton->progressive)
           );
           baton->formatOut = "jpeg";
+          baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || isPng || (matchInput && inputImageType == ImageType::PNG)) {
           // Write PNG to file
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -824,12 +766,14 @@ class PipelineWorker : public AsyncWorker {
             ->set("compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG)
           );
           baton->formatOut = "tiff";
+          baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "dz" || IsDz(baton->fileOut)) {
           // Write DZ to file
           image.dzsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("tile_size", baton->tileSize)
             ->set("overlap", baton->tileOverlap)
+            ->set("layout", baton->tileLayout)
           );
           baton->formatOut = "dz";
         } else {
@@ -838,8 +782,6 @@ class PipelineWorker : public AsyncWorker {
           return Error();
         }
       }
-      // Number of channels used in output image
-      baton->channels = image.bands();
     } catch (VError const &err) {
       (baton->err).append(err.what());
     }
@@ -890,9 +832,12 @@ class PipelineWorker : public AsyncWorker {
       }
     }
 
-    // Dispose of Persistent wrapper around input Buffer so it can be garbage collected
+    // Dispose of Persistent wrapper around input Buffers so they can be garbage collected
     if (baton->bufferInLength > 0) {
       GetFromPersistent("bufferIn");
+    }
+    if (baton->overlayBufferInLength > 0) {
+      GetFromPersistent("overlayBufferIn");
     }
     delete baton;
 
@@ -942,46 +887,6 @@ class PipelineWorker : public AsyncWorker {
       }
     }
     return std::make_tuple(rotate, flip, flop);
-  }
-
-  /*
-    Calculate the (left, top) coordinates of the output image
-    within the input image, applying the given gravity.
-  */
-  std::tuple<int, int>
-  CalculateCrop(int const inWidth, int const inHeight, int const outWidth, int const outHeight, int const gravity) {
-    int left = 0;
-    int top = 0;
-    switch (gravity) {
-      case 1: // North
-        left = (inWidth - outWidth + 1) / 2;
-        break;
-      case 2: // East
-        left = inWidth - outWidth;
-        top = (inHeight - outHeight + 1) / 2;
-        break;
-      case 3: // South
-        left = (inWidth - outWidth + 1) / 2;
-        top = inHeight - outHeight;
-        break;
-      case 4: // West
-        top = (inHeight - outHeight + 1) / 2;
-        break;
-      case 5: // Northeast
-        left = inWidth - outWidth;
-        break;
-      case 6: // Southeast
-        left = inWidth - outWidth;
-        top = inHeight - outHeight;
-      case 7: // Southwest
-        top = inHeight - outHeight;
-      case 8: // Northwest
-        break;
-      default: // Centre
-        left = (inWidth - outWidth + 1) / 2;
-        top = (inHeight - outHeight + 1) / 2;
-    }
-    return std::make_tuple(left, top);
   }
 
   /*
@@ -1052,7 +957,7 @@ NAN_METHOD(pipeline) {
   // Limit input images to a given number of pixels, where pixels = width * height
   baton->limitInputPixels = attrAs<int32_t>(options, "limitInputPixels");
   // Density/DPI at which to load vector images via libmagick
-  baton->density = attrAsStr(options, "density");
+  baton->density = attrAs<int32_t>(options, "density");
   // Raw pixel input
   baton->rawWidth = attrAs<int32_t>(options, "rawWidth");
   baton->rawHeight = attrAs<int32_t>(options, "rawHeight");
@@ -1088,10 +993,17 @@ NAN_METHOD(pipeline) {
     baton->background[i] = To<int32_t>(Get(background, i).ToLocalChecked()).FromJust();
   }
   // Overlay options
-  baton->overlayPath = attrAsStr(options, "overlayPath");
+  baton->overlayFileIn = attrAsStr(options, "overlayFileIn");
+  Local<Object> overlayBufferIn;
+  if (node::Buffer::HasInstance(Get(options, New("overlayBufferIn").ToLocalChecked()).ToLocalChecked())) {
+    overlayBufferIn = Get(options, New("overlayBufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
+    baton->overlayBufferInLength = node::Buffer::Length(overlayBufferIn);
+    baton->overlayBufferIn = node::Buffer::Data(overlayBufferIn);
+  }
+  baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
-  baton->gravity = attrAs<int32_t>(options, "gravity");
+  baton->crop = attrAs<int32_t>(options, "crop");
   baton->interpolator = attrAsStr(options, "interpolator");
   // Operators
   baton->flatten = attrAs<bool>(options, "flatten");
@@ -1108,6 +1020,10 @@ NAN_METHOD(pipeline) {
   baton->rotateBeforePreExtract = attrAs<bool>(options, "rotateBeforePreExtract");
   baton->flip = attrAs<bool>(options, "flip");
   baton->flop = attrAs<bool>(options, "flop");
+  baton->extendTop = attrAs<int32_t>(options, "extendTop");
+  baton->extendBottom = attrAs<int32_t>(options, "extendBottom");
+  baton->extendLeft = attrAs<int32_t>(options, "extendLeft");
+  baton->extendRight = attrAs<int32_t>(options, "extendRight");
   // Output options
   baton->progressive = attrAs<bool>(options, "progressive");
   baton->quality = attrAs<int32_t>(options, "quality");
@@ -1122,8 +1038,18 @@ NAN_METHOD(pipeline) {
   // Output
   baton->formatOut = attrAsStr(options, "formatOut");
   baton->fileOut = attrAsStr(options, "fileOut");
+  // Tile output
   baton->tileSize = attrAs<int32_t>(options, "tileSize");
   baton->tileOverlap = attrAs<int32_t>(options, "tileOverlap");
+  std::string tileLayout = attrAsStr(options, "tileLayout");
+  if (tileLayout == "google") {
+    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_GOOGLE;
+  } else if (tileLayout == "zoomify") {
+    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY;
+  } else {
+    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
+  }
+
   // Function to notify of queue length changes
   Callback *queueListener = new Callback(
     Get(options, New("queueListener").ToLocalChecked()).ToLocalChecked().As<Function>()
@@ -1131,7 +1057,7 @@ NAN_METHOD(pipeline) {
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn));
+  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn, overlayBufferIn));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);

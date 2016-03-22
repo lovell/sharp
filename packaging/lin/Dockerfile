@@ -20,7 +20,7 @@ ENV PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${TARGET}/lib/pkgconfig \
 # Dependency version numbers
 ENV VERSION_ZLIB=1.2.8 \
     VERSION_FFI=3.2.1 \
-    VERSION_GLIB=2.47.5 \
+    VERSION_GLIB=2.47.6 \
     VERSION_XML2=2.9.3 \
     VERSION_GSF=1.14.34 \
     VERSION_EXIF=0.6.21 \
@@ -30,8 +30,8 @@ ENV VERSION_ZLIB=1.2.8 \
     VERSION_PNG16=1.6.21 \
     VERSION_WEBP=0.5.0 \
     VERSION_TIFF=4.0.6 \
-    VERSION_ORC=0.4.24 \
-    VERSION_VIPS=8.2.2
+    VERSION_ORC=0.4.25 \
+    VERSION_VIPS=8.2.3
 
 RUN mkdir ${DEPS}/zlib
 RUN curl -Ls http://zlib.net/zlib-${VERSION_ZLIB}.tar.xz | tar xJC ${DEPS}/zlib --strip-components=1

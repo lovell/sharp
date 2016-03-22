@@ -109,6 +109,26 @@ describe('Input/output', function() {
     readable.pipe(pipeline).pipe(writable);
   });
 
+  it('Stream should emit info event', function(done) {
+    var readable = fs.createReadStream(fixtures.inputJpg);
+    var writable = fs.createWriteStream(fixtures.outputJpg);
+    var pipeline = sharp().resize(320, 240);
+    var infoEventEmitted = false;
+    pipeline.on('info', function(info) {
+      assert.strictEqual('jpeg', info.format);
+      assert.strictEqual(320, info.width);
+      assert.strictEqual(240, info.height);
+      assert.strictEqual(3, info.channels);
+      infoEventEmitted = true;
+    });
+    writable.on('finish', function() {
+      assert.strictEqual(true, infoEventEmitted);
+      fs.unlinkSync(fixtures.outputJpg);
+      done();
+    });
+    readable.pipe(pipeline).pipe(writable);
+  });
+
   it('Handle Stream to Stream error ', function(done) {
     var pipeline = sharp().resize(320, 240);
     var anErrorWasEmitted = false;
@@ -662,7 +682,14 @@ describe('Input/output', function() {
             assert.strictEqual('png', info.format);
             assert.strictEqual(40, info.width);
             assert.strictEqual(40, info.height);
-            fixtures.assertSimilar(fixtures.expected('svg72.png'), data, done);
+            fixtures.assertSimilar(fixtures.expected('svg72.png'), data, function(err) {
+              if (err) throw err;
+              sharp(data).metadata(function(err, info) {
+                if (err) throw err;
+                assert.strictEqual(72, info.density);
+                done();
+              });
+            });
           }
         });
     });
@@ -679,7 +706,14 @@ describe('Input/output', function() {
             assert.strictEqual('png', info.format);
             assert.strictEqual(40, info.width);
             assert.strictEqual(40, info.height);
-            fixtures.assertSimilar(fixtures.expected('svg1200.png'), data, done);
+            fixtures.assertSimilar(fixtures.expected('svg1200.png'), data, function(err) {
+              if (err) throw err;
+              sharp(data).metadata(function(err, info) {
+                if (err) throw err;
+                assert.strictEqual(1200, info.density);
+                done();
+              });
+            });
           }
         });
     });

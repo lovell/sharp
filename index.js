@@ -46,7 +46,7 @@ var Sharp = function(input, options) {
     streamIn: false,
     sequentialRead: false,
     limitInputPixels: maximum.pixels,
-    density: '72',
+    density: 72,
     rawWidth: 0,
     rawHeight: 0,
     rawChannels: 0,
@@ -64,11 +64,15 @@ var Sharp = function(input, options) {
     width: -1,
     height: -1,
     canvas: 'crop',
-    gravity: 0,
+    crop: 0,
     angle: 0,
     rotateBeforePreExtract: false,
     flip: false,
     flop: false,
+    extendTop: 0,
+    extendBottom: 0,
+    extendLeft: 0,
+    extendRight: 0,
     withoutEnlargement: false,
     interpolator: 'bicubic',
     // operations
@@ -84,7 +88,9 @@ var Sharp = function(input, options) {
     greyscale: false,
     normalize: 0,
     // overlay
-    overlayPath: '',
+    overlayFileIn: '',
+    overlayBufferIn: null,
+    overlayGravity: 0,
     // output options
     formatOut: 'input',
     fileOut: '',
@@ -106,13 +112,13 @@ var Sharp = function(input, options) {
       module.exports.queue.emit('change', queueLength);
     }
   };
-  if (typeof input === 'string') {
+  if (isString(input)) {
     // input=file
     this.options.fileIn = input;
-  } else if (typeof input === 'object' && input instanceof Buffer) {
+  } else if (isBuffer(input)) {
     // input=buffer
     this.options.bufferIn = input;
-  } else if (typeof input === 'undefined' || input === null) {
+  } else if (!isDefined(input)) {
     // input=stream
     this.options.streamIn = true;
   } else {
@@ -148,11 +154,20 @@ var isDefined = function(val) {
 var isObject = function(val) {
   return typeof val === 'object';
 };
+var isBuffer = function(val) {
+  return typeof val === 'object' && val instanceof Buffer;
+};
+var isString = function(val) {
+  return typeof val === 'string' && val.length > 0;
+};
 var isInteger = function(val) {
   return typeof val === 'number' && !Number.isNaN(val) && val % 1 === 0;
 };
 var inRange = function(val, min, max) {
   return val >= min && val <= max;
+};
+var contains = function(val, list) {
+  return list.indexOf(val) !== -1;
 };
 
 /*
@@ -164,7 +179,7 @@ Sharp.prototype._inputOptions = function(options) {
     // Density
     if (isDefined(options.density)) {
       if (isInteger(options.density) && inRange(options.density, 1, 2400)) {
-        this.options.density = options.density.toString();
+        this.options.density = options.density;
       } else {
         throw new Error('Invalid density (1 to 2400) ' + options.density);
       }
@@ -216,48 +231,53 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
   }
 };
 
-// Crop this part of the resized image (Center/Centre, North, East, South, West)
+// Weighting to apply to image crop
 module.exports.gravity = {
-  'center': 0,
-  'centre': 0,
-  'north': 1,
-  'east': 2,
-  'south': 3,
-  'west': 4,
-  'northeast': 5,
-  'southeast': 6,
-  'southwest': 7,
-  'northwest': 8
+  center: 0,
+  centre: 0,
+  north: 1,
+  east: 2,
+  south: 3,
+  west: 4,
+  northeast: 5,
+  southeast: 6,
+  southwest: 7,
+  northwest: 8
 };
 
-Sharp.prototype.crop = function(gravity) {
+// Strategies for automagic behaviour
+module.exports.strategy = {
+  entropy: 16
+};
+
+/*
+  What part of the image should be retained when cropping?
+*/
+Sharp.prototype.crop = function(crop) {
   this.options.canvas = 'crop';
-  if (typeof gravity === 'undefined') {
-    this.options.gravity = module.exports.gravity.center;
-  } else if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 8) {
-    this.options.gravity = gravity;
-  } else if (typeof gravity === 'string' && typeof module.exports.gravity[gravity] === 'number') {
-    this.options.gravity = module.exports.gravity[gravity];
+  if (!isDefined(crop)) {
+    // Default
+    this.options.crop = module.exports.gravity.center;
+  } else if (isInteger(crop) && inRange(crop, 0, 8)) {
+    // Gravity (numeric)
+    this.options.crop = crop;
+  } else if (isString(crop) && isInteger(module.exports.gravity[crop])) {
+    // Gravity (string)
+    this.options.crop = module.exports.gravity[crop];
+  } else if (isInteger(crop) && crop === module.exports.strategy.entropy) {
+    // Strategy
+    this.options.crop = crop;
   } else {
-    throw new Error('Unsupported crop gravity ' + gravity);
+    throw new Error('Unsupported crop ' + crop);
   }
   return this;
 };
 
 Sharp.prototype.extract = function(options) {
-  if (!options || typeof options !== 'object') {
-    // Legacy extract(top,left,width,height) syntax
-    options = {
-      left: arguments[1],
-      top: arguments[0],
-      width: arguments[2],
-      height: arguments[3]
-    };
-  }
   var suffix = this.options.width === -1 && this.options.height === -1 ? 'Pre' : 'Post';
   ['left', 'top', 'width', 'height'].forEach(function (name) {
     var value = options[name];
-    if (typeof value === 'number' && !Number.isNaN(value) && value % 1 === 0 && value >= 0) {
+    if (isInteger(value) && value >= 0) {
       this.options[name + (name === 'left' || name === 'top' ? 'Offset' : '') + suffix] = value;
     } else {
       throw new Error('Non-integer value for ' + name + ' of ' + value);
@@ -316,14 +336,26 @@ Sharp.prototype.negate = function(negate) {
   return this;
 };
 
-Sharp.prototype.overlayWith = function(overlayPath) {
-  if (typeof overlayPath !== 'string') {
-    throw new Error('The overlay path must be a string');
+/*
+  Overlay with another image, using an optional gravity
+*/
+Sharp.prototype.overlayWith = function(overlay, options) {
+  if (isString(overlay)) {
+    this.options.overlayFileIn = overlay;
+  } else if (isBuffer(overlay)) {
+    this.options.overlayBufferIn = overlay;
+  } else {
+    throw new Error('Unsupported overlay ' + typeof overlay);
   }
-  if (overlayPath === '') {
-    throw new Error('The overlay path cannot be empty');
+  if (isObject(options)) {
+    if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
+      this.options.overlayGravity = options.gravity;
+    } else if (isString(options.gravity) && isInteger(module.exports.gravity[options.gravity])) {
+      this.options.overlayGravity = module.exports.gravity[options.gravity];
+    } else if (isDefined(options.gravity)) {
+      throw new Error('Unsupported overlay gravity ' + options.gravity);
+    }
   }
-  this.options.overlayPath = overlayPath;
   return this;
 };
 
@@ -605,27 +637,63 @@ Sharp.prototype.withMetadata = function(withMetadata) {
 };
 
 /*
-  Tile size and overlap for Deep Zoom output
+  Tile-based deep zoom output options: size, overlap, layout
 */
-Sharp.prototype.tile = function(size, overlap) {
-  // Size of square tiles, in pixels
-  if (typeof size !== 'undefined' && size !== null) {
-    if (!Number.isNaN(size) && size % 1 === 0 && size >= 1 && size <= 8192) {
-      this.options.tileSize = size;
-    } else {
-      throw new Error('Invalid tile size (1 to 8192) ' + size);
+Sharp.prototype.tile = function(tile) {
+  if (isObject(tile)) {
+    // Size of square tiles, in pixels
+    if (isDefined(tile.size)) {
+      if (isInteger(tile.size) && inRange(tile.size, 1, 8192)) {
+        this.options.tileSize = tile.size;
+      } else {
+        throw new Error('Invalid tile size (1 to 8192) ' + tile.size);
+      }
+    }
+    // Overlap of tiles, in pixels
+    if (isDefined(tile.overlap)) {
+      if (isInteger(tile.overlap) && inRange(tile.overlap, 0, 8192)) {
+        if (tile.overlap > this.options.tileSize) {
+          throw new Error('Tile overlap ' + tile.overlap + ' cannot be larger than tile size ' + this.options.tileSize);
+        }
+        this.options.tileOverlap = tile.overlap;
+      } else {
+        throw new Error('Invalid tile overlap (0 to 8192) ' + tile.overlap);
+      }
+    }
+    // Layout
+    if (isDefined(tile.layout)) {
+      if (isString(tile.layout) && contains(tile.layout, ['dz', 'google', 'zoomify'])) {
+        this.options.tileLayout = tile.layout;
+      } else {
+        throw new Error('Invalid tile layout ' + tile.layout);
+      }
     }
   }
-  // Overlap of tiles, in pixels
-  if (typeof overlap !== 'undefined' && overlap !== null) {
-    if (!Number.isNaN(overlap) && overlap % 1 === 0 && overlap >= 0 && overlap <= 8192) {
-      if (overlap > this.options.tileSize) {
-        throw new Error('Tile overlap ' + overlap + ' cannot be larger than tile size ' + this.options.tileSize);
-      }
-      this.options.tileOverlap = overlap;
-    } else {
-      throw new Error('Invalid tile overlap (0 to 8192) ' + overlap);
-    }
+  return this;
+};
+
+/*
+  Extend edges
+*/
+Sharp.prototype.extend = function(extend) {
+  if (isInteger(extend) && extend > 0) {
+    this.options.extendTop = extend;
+    this.options.extendBottom = extend;
+    this.options.extendLeft = extend;
+    this.options.extendRight = extend;
+  } else if (
+    isObject(extend) &&
+    isInteger(extend.top) && extend.top >= 0 &&
+    isInteger(extend.bottom) && extend.bottom >= 0 &&
+    isInteger(extend.left) && extend.left >= 0 &&
+    isInteger(extend.right) && extend.right >= 0
+  ) {
+    this.options.extendTop = extend.top;
+    this.options.extendBottom = extend.bottom;
+    this.options.extendLeft = extend.left;
+    this.options.extendRight = extend.right;
+  } else {
+    throw new Error('Invalid edge extension ' + extend);
   }
   return this;
 };
@@ -783,10 +851,11 @@ Sharp.prototype._pipeline = function(callback) {
     if (this.options.streamIn) {
       // output=stream, input=stream
       this.on('finish', function() {
-        sharp.pipeline(that.options, function(err, data) {
+        sharp.pipeline(that.options, function(err, data, info) {
           if (err) {
             that.emit('error', err);
           } else {
+            that.emit('info', info);
             that.push(data);
           }
           that.push(null);
@@ -794,10 +863,11 @@ Sharp.prototype._pipeline = function(callback) {
       });
     } else {
       // output=stream, input=file/buffer
-      sharp.pipeline(this.options, function(err, data) {
+      sharp.pipeline(this.options, function(err, data, info) {
         if (err) {
           that.emit('error', err);
         } else {
+          that.emit('info', info);
           that.push(data);
         }
         that.push(null);

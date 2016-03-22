@@ -27,6 +27,7 @@ The object returned by the constructor implements the
 [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
 
 JPEG, PNG or WebP format image data can be streamed out from this object.
+When using Stream based output, derived attributes are available from the `info` event.
 
 ```javascript
 sharp('input.jpg')
@@ -35,6 +36,19 @@ sharp('input.jpg')
     // output.jpg is a 300 pixels wide and 200 pixels high image
     // containing a scaled and cropped version of input.jpg
   });
+```
+
+```javascript
+// Read image data from readableStream,
+// resize to 300 pixels wide,
+// emit an 'info' event with calculated dimensions
+// and finally write image data to writableStream
+var transformer = sharp()
+  .resize(300)
+  .on('info', function(info) {
+    console.log('Image height is ' + info.height);
+  });
+readableStream.pipe(transformer).pipe(writableStream);
 ```
 
 #### metadata([callback])
@@ -48,6 +62,7 @@ Fast access to image metadata without decoding any compressed image data.
 * `height`: Number of pixels high
 * `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)
 * `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
+* `density`: Number of pixels per inch (DPI), if present
 * `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 * `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 * `orientation`: Number value of the EXIF Orientation header, if present
@@ -110,23 +125,37 @@ Scale output to `width` x `height`. By default, the resized image is cropped to 
 
 `height` is the integral Number of pixels high the resultant image should be, between 1 and 16383. Use `null` or `undefined` to auto-scale the height to match the width.
 
-#### crop([gravity])
+#### crop([option])
 
 Crop the resized image to the exact size specified, the default behaviour.
 
-`gravity`, if present, is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north`.
+`option`, if present, is an attribute of:
 
-Possible values are `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` and `centre`.
-The default gravity is `center`/`centre`.
+* `sharp.gravity` e.g. `sharp.gravity.north`, to crop to an edge or corner, or
+* `sharp.strategy` e.g. `sharp.strategy.entropy`, to crop dynamically.
+
+Possible attributes of `sharp.gravity` are
+`north`, `northeast`, `east`, `southeast`, `south`,
+`southwest`, `west`, `northwest`, `center` and `centre`.
+
+Possible attributes of the experimental `sharp.strategy` are:
+
+* `entropy`: resize so one dimension is at its target size
+then repeatedly remove pixels from the edge with the lowest
+[Shannon entropy](https://en.wikipedia.org/wiki/Entropy_%28information_theory%29)
+until it too reaches the target size.
+
+The default crop option is a `center`/`centre` gravity.
 
 ```javascript
 var transformer = sharp()
-  .resize(300, 200)
-  .crop(sharp.gravity.north)
+  .resize(200, 200)
+  .crop(sharp.strategy.entropy)
   .on('error', function(err) {
     console.log(err);
   });
-// Read image data from readableStream, resize and write image data to writableStream
+// Read image data from readableStream
+// Write 200px square auto-cropped image data to writableStream
 readableStream.pipe(transformer).pipe(writableStream);
 ```
 
@@ -265,7 +294,7 @@ sharp(input)
 
 #### background(rgba)
 
-Set the background for the `embed` and `flatten` operations.
+Set the background for the `embed`, `flatten` and `extend` operations.
 
 `rgba` is parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
 
@@ -276,6 +305,25 @@ The default background is `{r: 0, g: 0, b: 0, a: 1}`, black without transparency
 #### flatten()
 
 Merge alpha transparency channel, if any, with `background`.
+
+#### extend(extension)
+
+Extends/pads the edges of the image with `background`, where `extension` is one of:
+
+* a Number representing the pixel count to add to each edge, or
+* an Object containing `top`, `left`, `bottom` and `right` attributes, each a Number of pixels to add to that edge.
+
+This operation will always occur after resizing and extraction, if any.
+
+```javascript
+// Resize to 140 pixels wide, then add 10 transparent pixels
+// to the top, left and right edges and 20 to the bottom edge
+sharp(input)
+  .resize(140)
+  .background({r: 0, g: 0, b: 0, a: 0})
+  .extend({top: 10, bottom: 20, left: 10, right: 10})
+  ...
+```
 
 #### negate()
 
@@ -365,13 +413,18 @@ The output image will still be web-friendly sRGB and contain three (identical) c
 
 Enhance output image contrast by stretching its luminance to cover the full dynamic range. This typically reduces performance by 30%.
 
-#### overlayWith(path)
+#### overlayWith(image, [options])
 
-_Experimental_
+Overlay (composite) a image containing an alpha channel over the processed (resized, extracted etc.) image.
 
-Alpha composite image at `path` over the processed (resized, extracted) image. The dimensions of the two images must match.
+`image` is one of the following, and must be the same size or smaller than the processed image:
 
-* `path` is a String containing the path to an image file with an alpha channel.
+* Buffer containing PNG, WebP, GIF or SVG image data, or
+* String containing the path to an image file, with most major transparency formats supported.
+
+`options`, if present, is an Object with the following optional attributes:
+
+* `gravity` is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north` at which to place the overlay, defaulting to `center`/`centre`.
 
 ```javascript
 sharp('input.png')
@@ -379,7 +432,7 @@ sharp('input.png')
   .resize(300)
   .flatten()
   .background('#ff6600')
-  .overlayWith('overlay.png')
+  .overlayWith('overlay.png', { gravity: sharp.gravity.southeast } )
   .sharpen()
   .withMetadata()
   .quality(90)
@@ -387,8 +440,8 @@ sharp('input.png')
   .toBuffer()
   .then(function(outputBuffer) {
     // outputBuffer contains upside down, 300px wide, alpha channel flattened
-    // onto orange background, composited with overlay.png, sharpened,
-    // with metadata, 90% quality WebP image data. Phew!
+    // onto orange background, composited with overlay.png with SE gravity,
+    // sharpened, with metadata, 90% quality WebP image data. Phew!
   });
 ```
 
@@ -471,18 +524,25 @@ This has no effect if the input image does not have an EXIF `Orientation` tag.
 
 The default behaviour, when `withMetadata` is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
 
-#### tile([size], [overlap])
+#### tile(options)
 
-The size and overlap, in pixels, of square Deep Zoom image pyramid tiles.
+The size, overlap and directory layout to use when generating square Deep Zoom image pyramid tiles.
+
+`options` is an Object with one or more of the following attributes:
 
 * `size` is an integral Number between 1 and 8192. The default value is 256 pixels.
 * `overlap` is an integral Number between 0 and 8192. The default value is 0 pixels.
+* `layout` is a String, with value `dz`, `zoomify` or `google`. The default value is `dz`.
 
 ```javascript
-sharp('input.tiff').tile(256).toFile('output.dzi', function(err, info) {
-  // The output.dzi file is the XML format Deep Zoom definition
-  // The output_files directory contains 256x256 pixel tiles grouped by zoom level
-});
+sharp('input.tiff')
+  .tile({
+    size: 512
+  })
+  .toFile('output.dzi', function(err, info) {
+    // output.dzi is the Deep Zoom XML definition
+    // output_files contains 512x512 tiles grouped by zoom level
+  });
 ```
 
 #### withoutChromaSubsampling()

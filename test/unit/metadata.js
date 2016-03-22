@@ -18,6 +18,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -35,6 +36,7 @@ describe('Image metadata', function() {
       assert.strictEqual(600, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual(72, metadata.density);
       assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual(8, metadata.orientation);
@@ -64,6 +66,7 @@ describe('Image metadata', function() {
         assert.strictEqual(3248, metadata.height);
         assert.strictEqual('b-w', metadata.space);
         assert.strictEqual(1, metadata.channels);
+        assert.strictEqual(300, metadata.density);
         assert.strictEqual(false, metadata.hasProfile);
         assert.strictEqual(false, metadata.hasAlpha);
         assert.strictEqual('undefined', typeof metadata.orientation);
@@ -82,6 +85,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2074, metadata.height);
       assert.strictEqual('b-w', metadata.space);
       assert.strictEqual(1, metadata.channels);
+      assert.strictEqual(300, metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -99,6 +103,7 @@ describe('Image metadata', function() {
       assert.strictEqual(1536, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(4, metadata.channels);
+      assert.strictEqual(72, metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(true, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -117,6 +122,7 @@ describe('Image metadata', function() {
         assert.strictEqual(772, metadata.height);
         assert.strictEqual('srgb', metadata.space);
         assert.strictEqual(3, metadata.channels);
+        assert.strictEqual('undefined', typeof metadata.density);
         assert.strictEqual(false, metadata.hasProfile);
         assert.strictEqual(false, metadata.hasAlpha);
         assert.strictEqual('undefined', typeof metadata.orientation);
@@ -135,6 +141,7 @@ describe('Image metadata', function() {
         assert.strictEqual(800, metadata.width);
         assert.strictEqual(533, metadata.height);
         assert.strictEqual(3, metadata.channels);
+        assert.strictEqual('undefined', typeof metadata.density);
         assert.strictEqual(false, metadata.hasProfile);
         assert.strictEqual(false, metadata.hasAlpha);
         assert.strictEqual('undefined', typeof metadata.orientation);
@@ -153,6 +160,7 @@ describe('Image metadata', function() {
         assert.strictEqual(2220, metadata.width);
         assert.strictEqual(2967, metadata.height);
         assert.strictEqual(4, metadata.channels);
+        assert.strictEqual('undefined', typeof metadata.density);
         assert.strictEqual('rgb', metadata.space);
         assert.strictEqual(false, metadata.hasProfile);
         assert.strictEqual(true, metadata.hasAlpha);
@@ -171,6 +179,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -198,6 +207,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -219,6 +229,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -238,6 +249,7 @@ describe('Image metadata', function() {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);

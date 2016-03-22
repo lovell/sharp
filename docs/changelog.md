@@ -1,5 +1,31 @@
 # Changelog
 
+### v0.14 - "*needle*"
+
+* Add ability to extend (pad) the edges of an image.
+  [#128](https://github.com/lovell/sharp/issues/128)
+  [@blowsie](https://github.com/blowsie)
+
+* Add support for Zoomify and Google tile layouts. Breaks existing tile API.
+  [#223](https://github.com/lovell/sharp/issues/223)
+  [@bdunnette](https://github.com/bdunnette)
+
+* Improvements to overlayWith: differing sizes/formats, gravity, buffer input.
+  [#239](https://github.com/lovell/sharp/issues/239)
+  [@chrisriley](https://github.com/chrisriley)
+
+* Add entropy-based crop strategy to remove least interesting edges.
+  [#295](https://github.com/lovell/sharp/issues/295)
+  [@rightaway](https://github.com/rightaway)
+
+* Expose density metadata; set density of images from vector input.
+  [#338](https://github.com/lovell/sharp/issues/338)
+  [@lookfirst](https://github.com/lookfirst)
+
+* Emit post-processing 'info' event for Stream output.
+  [#367](https://github.com/lovell/sharp/issues/367)
+  [@salzhrani](https://github.com/salzhrani)
+
 ### v0.13 - "*mind*"
 
 #### v0.13.1 - 27<sup>th</sup> February 2016
