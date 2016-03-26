@@ -49,7 +49,6 @@
   "dependencies": {
     "bluebird": "^3.3.4",
     "color": "^0.11.1",
-    "mocha": "^2.4.5",
     "nan": "^2.2.0",
     "request": "^2.69.0",
     "semver": "^5.1.0",
@@ -57,15 +56,14 @@
   },
   "devDependencies": {
     "async": "^1.5.2",
+    "bufferutil": "^1.2.1",
     "coveralls": "^2.11.8",
     "exif-reader": "^1.0.0",
     "icc": "^0.0.2",
     "istanbul": "^0.4.2",
-    "mocha": "^2.4.5",
     "mocha-jshint": "^2.3.1",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.5.2",
-    "bufferutil": "^1.2.1"
+    "rimraf": "^2.5.2"
   },
   "license": "Apache-2.0",
   "config": {

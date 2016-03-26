@@ -519,7 +519,7 @@ This will also convert to and add the latest web-friendly v2 sRGB ICC profile.
 The optional `metadata` parameter, if present, is an Object with the attributes to update.
 New attributes cannot be inserted, only existing attributes updated.
 
-* `orientation` is an integral Number between 0 and 7, used to update the value of the EXIF `Orientation` tag.
+* `orientation` is an integral Number between 1 and 8, used to update the value of the EXIF `Orientation` tag.
 This has no effect if the input image does not have an EXIF `Orientation` tag.
 
 The default behaviour, when `withMetadata` is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
