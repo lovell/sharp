@@ -337,9 +337,14 @@ describe('Image metadata', function() {
         sharp().withMetadata({orientation: -1});
       });
     });
+    it('Zero orientation', function () {
+      assert.throws(function () {
+        sharp().withMetadata({ orientation: 0 });
+      });
+    });
     it('Too large orientation', function() {
       assert.throws(function() {
-        sharp().withMetadata({orientation: 8});
+        sharp().withMetadata({orientation: 9});
       });
     });
   });

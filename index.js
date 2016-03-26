@@ -624,12 +624,12 @@ Sharp.prototype.withMetadata = function(withMetadata) {
         typeof withMetadata.orientation === 'number' &&
         !Number.isNaN(withMetadata.orientation) &&
         withMetadata.orientation % 1 === 0 &&
-        withMetadata.orientation >= 0 &&
-        withMetadata.orientation <= 7
+        withMetadata.orientation >= 1 &&
+        withMetadata.orientation <= 8
       ) {
         this.options.withMetadataOrientation = withMetadata.orientation;
       } else {
-        throw new Error('Invalid orientation (0 to 7) ' + withMetadata.orientation);
+        throw new Error('Invalid orientation (1 to 8) ' + withMetadata.orientation);
       }
     }
   }
