@@ -56,14 +56,15 @@
   },
   "devDependencies": {
     "async": "^1.5.2",
-    "bufferutil": "^1.2.1",
     "coveralls": "^2.11.8",
     "exif-reader": "^1.0.0",
     "icc": "^0.0.2",
     "istanbul": "^0.4.2",
+    "mocha": "^2.4.5",
     "mocha-jshint": "^2.3.1",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.5.2"
+    "rimraf": "^2.5.2",
+    "bufferutil": "^1.2.1"
   },
   "license": "Apache-2.0",
   "config": {
