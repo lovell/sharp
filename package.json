@@ -50,8 +50,8 @@
     "bluebird": "^3.3.4",
     "color": "^0.11.1",
     "nan": "^2.2.0",
-    "request": "^2.69.0",
     "semver": "^5.1.0",
+    "request": "^2.69.0",
     "tar": "^2.2.1"
   },
   "devDependencies": {
