@@ -194,7 +194,8 @@ class PipelineWorker : public AsyncWorker {
       // Get pre-resize image width and height
       int inputWidth = image.width();
       int inputHeight = image.height();
-      if (!baton->rotateBeforePreExtract && (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
+      if (baton->canvas != Canvas::IGNORE_ASPECT && !baton->rotateBeforePreExtract &&
+        (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
         // Swap input output width and height when rotating by 90 or 270 degrees
         std::swap(inputWidth, inputHeight);
       }
@@ -392,7 +393,8 @@ class PipelineWorker : public AsyncWorker {
         // Recalculate residual float based on dimensions of required vs shrunk images
         int shrunkWidth = image.width();
         int shrunkHeight = image.height();
-        if (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270) {
+        if (baton->canvas != Canvas::IGNORE_ASPECT && !baton->rotateBeforePreExtract &&
+          (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
           // Swap input output width and height when rotating by 90 or 270 degrees
           std::swap(shrunkWidth, shrunkHeight);
         }

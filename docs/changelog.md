@@ -26,6 +26,10 @@
   [#367](https://github.com/lovell/sharp/issues/367)
   [@salzhrani](https://github.com/salzhrani)
 
+* Ensure ratios are not swapped when rotating 90/270 and ignoring aspect.
+  [#387](https://github.com/lovell/sharp/issues/387)
+  [@kleisauke](https://github.com/kleisauke)
+
 ### v0.13 - "*mind*"
 
 #### v0.13.1 - 27<sup>th</sup> February 2016
