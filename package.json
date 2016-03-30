@@ -49,14 +49,14 @@
   "dependencies": {
     "bluebird": "^3.3.4",
     "color": "^0.11.1",
-    "nan": "^2.2.0",
+    "nan": "^2.2.1",
     "semver": "^5.1.0",
     "request": "^2.69.0",
     "tar": "^2.2.1"
   },
   "devDependencies": {
     "async": "^1.5.2",
-    "coveralls": "^2.11.8",
+    "coveralls": "^2.11.9",
     "exif-reader": "^1.0.0",
     "icc": "^0.0.2",
     "istanbul": "^0.4.2",

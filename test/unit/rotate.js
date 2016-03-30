@@ -49,7 +49,24 @@ describe('Rotation', function() {
           assert.strictEqual(240, metadata.height);
           done();
         });
-    });
+      });
+  });
+
+  it('Rotate by 270 degrees, rectangular output ignoring aspect ratio', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .ignoreAspectRatio()
+      .rotate(270)
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        sharp(data).metadata(function(err, metadata) {
+          assert.strictEqual(320, metadata.width);
+          assert.strictEqual(240, metadata.height);
+          done();
+        });
+      });
   });
 
   it('Input image has Orientation EXIF tag but do not rotate output', function(done) {

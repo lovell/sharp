@@ -194,7 +194,7 @@ class PipelineWorker : public AsyncWorker {
       // Get pre-resize image width and height
       int inputWidth = image.width();
       int inputHeight = image.height();
-      if (baton->canvas != Canvas::IGNORE_ASPECT && !baton->rotateBeforePreExtract &&
+      if (!baton->rotateBeforePreExtract &&
         (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
         // Swap input output width and height when rotating by 90 or 270 degrees
         std::swap(inputWidth, inputHeight);
@@ -239,7 +239,10 @@ class PipelineWorker : public AsyncWorker {
             }
             break;
           case Canvas::IGNORE_ASPECT:
-            // xfactor, yfactor OK!
+            if (!baton->rotateBeforePreExtract &&
+              (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
+              std::swap(xfactor, yfactor);
+            }
             break;
         }
       } else if (baton->width > 0) {
@@ -393,7 +396,7 @@ class PipelineWorker : public AsyncWorker {
         // Recalculate residual float based on dimensions of required vs shrunk images
         int shrunkWidth = image.width();
         int shrunkHeight = image.height();
-        if (baton->canvas != Canvas::IGNORE_ASPECT && !baton->rotateBeforePreExtract &&
+        if (!baton->rotateBeforePreExtract &&
           (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
           // Swap input output width and height when rotating by 90 or 270 degrees
           std::swap(shrunkWidth, shrunkHeight);
@@ -403,7 +406,12 @@ class PipelineWorker : public AsyncWorker {
         if (baton->canvas == Canvas::EMBED) {
           xresidual = std::min(xresidual, yresidual);
           yresidual = xresidual;
-        } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
+        } else if (baton->canvas == Canvas::IGNORE_ASPECT) {
+          if (!baton->rotateBeforePreExtract &&
+            (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
+            std::swap(xresidual, yresidual);
+          }
+        } else {
           xresidual = std::max(xresidual, yresidual);
           yresidual = xresidual;
         }
