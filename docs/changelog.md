@@ -4,6 +4,7 @@
 
 * Take advantage of libvips 8.3 features.
   Use shrink-on-load for WebP input.
+  Break existing sharpen API to accept sigma and improve precision.
   [#369](https://github.com/lovell/sharp/issues/369)
 
 ### v0.14 - "*needle*"

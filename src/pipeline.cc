@@ -444,7 +444,7 @@ class PipelineWorker : public AsyncWorker {
 
       bool shouldAffineTransform = xresidual != 1.0 || yresidual != 1.0;
       bool shouldBlur = baton->blurSigma != 0.0;
-      bool shouldSharpen = baton->sharpenRadius != 0;
+      bool shouldSharpen = baton->sharpenSigma != 0.0;
       bool shouldThreshold = baton->threshold != 0;
       bool shouldPremultiplyAlpha = HasAlpha(image) &&
         (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
@@ -598,7 +598,7 @@ class PipelineWorker : public AsyncWorker {
 
       // Sharpen
       if (shouldSharpen) {
-        image = Sharpen(image, baton->sharpenRadius, baton->sharpenFlat, baton->sharpenJagged);
+        image = Sharpen(image, baton->sharpenSigma, baton->sharpenFlat, baton->sharpenJagged);
       }
 
       // Composite with overlay, if present
@@ -1053,7 +1053,7 @@ NAN_METHOD(pipeline) {
   baton->flatten = attrAs<bool>(options, "flatten");
   baton->negate = attrAs<bool>(options, "negate");
   baton->blurSigma = attrAs<double>(options, "blurSigma");
-  baton->sharpenRadius = attrAs<int32_t>(options, "sharpenRadius");
+  baton->sharpenSigma = attrAs<double>(options, "sharpenSigma");
   baton->sharpenFlat = attrAs<double>(options, "sharpenFlat");
   baton->sharpenJagged = attrAs<double>(options, "sharpenJagged");
   baton->threshold = attrAs<int32_t>(options, "threshold");

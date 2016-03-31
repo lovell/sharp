@@ -25,14 +25,14 @@ namespace sharp {
   VImage Gamma(VImage image, double const exponent);
 
   /*
-   * Gaussian blur. Use sigma of -1 for fast blur.
+   * Gaussian blur. Use sigma of -1.0 for fast blur.
    */
   VImage Blur(VImage image, double const sigma);
 
   /*
-   * Sharpen flat and jagged areas. Use radius of -1 for fast sharpen.
+   * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
    */
-  VImage Sharpen(VImage image, int const radius, double const flat, double const jagged);
+  VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged);
 
   /*
     Calculate crop area based on image entropy

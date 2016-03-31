@@ -80,7 +80,7 @@ var Sharp = function(input, options) {
     flatten: false,
     negate: false,
     blurSigma: 0,
-    sharpenRadius: 0,
+    sharpenSigma: 0,
     sharpenFlat: 1,
     sharpenJagged: 2,
     threshold: 0,
@@ -154,14 +154,20 @@ var isDefined = function(val) {
 var isObject = function(val) {
   return typeof val === 'object';
 };
+var isBoolean = function(val) {
+  return typeof val === 'boolean';
+};
 var isBuffer = function(val) {
   return typeof val === 'object' && val instanceof Buffer;
 };
 var isString = function(val) {
   return typeof val === 'string' && val.length > 0;
 };
+var isNumber = function(val) {
+  return typeof val === 'number' && !Number.isNaN(val);
+};
 var isInteger = function(val) {
-  return typeof val === 'number' && !Number.isNaN(val) && val % 1 === 0;
+  return isNumber(val) && val % 1 === 0;
 };
 var inRange = function(val, min, max) {
   return val >= min && val <= max;
@@ -406,17 +412,17 @@ Sharp.prototype.withoutEnlargement = function(withoutEnlargement) {
   Call with a sigma to use a slower, more accurate Gaussian blur.
 */
 Sharp.prototype.blur = function(sigma) {
-  if (typeof sigma === 'undefined') {
+  if (!isDefined(sigma)) {
     // No arguments: default to mild blur
     this.options.blurSigma = -1;
-  } else if (typeof sigma === 'boolean') {
+  } else if (isBoolean(sigma)) {
     // Boolean argument: apply mild blur?
     this.options.blurSigma = sigma ? -1 : 0;
-  } else if (typeof sigma === 'number' && !Number.isNaN(sigma) && sigma >= 0.3 && sigma <= 1000) {
+  } else if (isNumber(sigma) && inRange(sigma, 0.3, 1000)) {
     // Numeric argument: specific sigma
     this.options.blurSigma = sigma;
   } else {
-    throw new Error('Invalid blur sigma (0.3 to 1000.0) ' + sigma);
+    throw new Error('Invalid blur sigma (0.3 - 1000.0) ' + sigma);
   }
   return this;
 };
@@ -425,38 +431,38 @@ Sharp.prototype.blur = function(sigma) {
   Sharpen the output image.
   Call without a radius to use a fast, mild sharpen.
   Call with a radius to use a slow, accurate sharpen using the L of LAB colour space.
-    radius - size of mask in pixels, must be integer
+    sigma - sigma of mask
     flat - level of "flat" area sharpen, default 1
     jagged - level of "jagged" area sharpen, default 2
 */
-Sharp.prototype.sharpen = function(radius, flat, jagged) {
-  if (typeof radius === 'undefined') {
+Sharp.prototype.sharpen = function(sigma, flat, jagged) {
+  if (!isDefined(sigma)) {
     // No arguments: default to mild sharpen
-    this.options.sharpenRadius = -1;
-  } else if (typeof radius === 'boolean') {
+    this.options.sharpenSigma = -1;
+  } else if (isBoolean(sigma)) {
     // Boolean argument: apply mild sharpen?
-    this.options.sharpenRadius = radius ? -1 : 0;
-  } else if (typeof radius === 'number' && !Number.isNaN(radius) && (radius % 1 === 0) && radius >= 1) {
-    // Numeric argument: specific radius
-    this.options.sharpenRadius = radius;
+    this.options.sharpenSigma = sigma ? -1 : 0;
+  } else if (isNumber(sigma) && inRange(sigma, 0.01, 10000)) {
+    // Numeric argument: specific sigma
+    this.options.sharpenSigma = sigma;
     // Control over flat areas
-    if (typeof flat !== 'undefined' && flat !== null) {
-      if (typeof flat === 'number' && !Number.isNaN(flat) && flat >= 0) {
+    if (isDefined(flat)) {
+      if (isNumber(flat) && inRange(flat, 0, 10000)) {
         this.options.sharpenFlat = flat;
       } else {
-        throw new Error('Invalid sharpen level for flat areas ' + flat + ' (expected >= 0)');
+        throw new Error('Invalid sharpen level for flat areas (0 - 10000) ' + flat);
       }
     }
     // Control over jagged areas
-    if (typeof jagged !== 'undefined' && jagged !== null) {
-      if (typeof jagged === 'number' && !Number.isNaN(jagged) && jagged >= 0) {
+    if (isDefined(jagged)) {
+      if (isNumber(jagged) && inRange(jagged, 0, 10000)) {
         this.options.sharpenJagged = jagged;
       } else {
-        throw new Error('Invalid sharpen level for jagged areas ' + jagged + ' (expected >= 0)');
+        throw new Error('Invalid sharpen level for jagged areas (0 - 10000) ' + jagged);
       }
     }
   } else {
-    throw new Error('Invalid sharpen radius ' + radius + ' (expected integer >= 1)');
+    throw new Error('Invalid sharpen sigma (0.01 - 10000) ' + sigma);
   }
   return this;
 };

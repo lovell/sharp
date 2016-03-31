@@ -7,10 +7,10 @@ var fixtures = require('../fixtures');
 
 describe('Sharpen', function() {
 
-  it('specific radius 10', function(done) {
+  it('specific radius 10 (sigma 6)', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
-      .sharpen(10)
+      .sharpen(6)
       .toBuffer(function(err, data, info) {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -19,10 +19,10 @@ describe('Sharpen', function() {
       });
   });
 
-  it('specific radius 3 and levels 0.5, 2.5', function(done) {
+  it('specific radius 3 (sigma 1.5) and levels 0.5, 2.5', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
-      .sharpen(3, 0.5, 2.5)
+      .sharpen(1.5, 0.5, 2.5)
       .toBuffer(function(err, data, info) {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -31,10 +31,10 @@ describe('Sharpen', function() {
       });
   });
 
-  it('specific radius 5 and levels 2, 4', function(done) {
+  it('specific radius 5 (sigma 3.5) and levels 2, 4', function(done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
-      .sharpen(5, 2, 4)
+      .sharpen(3.5, 2, 4)
       .toBuffer(function(err, data, info) {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -55,9 +55,9 @@ describe('Sharpen', function() {
       });
   });
 
-  it('invalid radius', function() {
+  it('invalid sigma', function() {
     assert.throws(function() {
-      sharp(fixtures.inputJpg).sharpen(1.5);
+      sharp(fixtures.inputJpg).sharpen(-1.5);
     });
   });
 

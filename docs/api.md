@@ -374,15 +374,15 @@ When used without parameters, performs a fast, mild blur of the output image. Th
 
 When a `sigma` is provided, performs a slower, more accurate Gaussian blur. This typically reduces performance by 25%.
 
-* `sigma`, if present, is a Number between 0.3 and 1000 representing the approximate blur radius in pixels.
+* `sigma`, if present, is a Number between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
 
-#### sharpen([radius], [flat], [jagged])
+#### sharpen([sigma], [flat], [jagged])
 
 When used without parameters, performs a fast, mild sharpen of the output image. This typically reduces performance by 10%.
 
-When a `radius` is provided, performs a slower, more accurate sharpen of the L channel in the LAB colour space. Separate control over the level of sharpening in "flat" and "jagged" areas is available. This typically reduces performance by 50%.
+When a `sigma` is provided, performs a slower, more accurate sharpen of the L channel in the LAB colour space. Separate control over the level of sharpening in "flat" and "jagged" areas is available. This typically reduces performance by 50%.
 
-* `radius`, if present, is an integral Number representing the sharpen mask radius in pixels.
+* `sigma`, if present, is a Number representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
 * `flat`, if present, is a Number representing the level of sharpening to apply to "flat" areas, defaulting to a value of 1.0.
 * `jagged`, if present, is a Number representing the level of sharpening to apply to "jagged" areas, defaulting to a value of 2.0.
 

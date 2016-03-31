@@ -135,10 +135,10 @@ namespace sharp {
   }
 
   /*
-   * Gaussian blur (use sigma <0 for fast blur)
+   * Gaussian blur. Use sigma of -1.0 for fast blur.
    */
   VImage Blur(VImage image, double const sigma) {
-    if (sigma < 0.0) {
+    if (sigma == -1.0) {
       // Fast, mild blur - averages neighbouring pixels
       VImage blur = VImage::new_matrixv(3, 3,
         1.0, 1.0, 1.0,
@@ -153,10 +153,10 @@ namespace sharp {
   }
 
   /*
-   * Sharpen flat and jagged areas. Use radius of -1 for fast sharpen.
+   * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
    */
-  VImage Sharpen(VImage image, int const radius, double const flat, double const jagged) {
-    if (radius == -1) {
+  VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged) {
+    if (sigma == -1.0) {
       // Fast, mild sharpen
       VImage sharpen = VImage::new_matrixv(3, 3,
         -1.0, -1.0, -1.0,
@@ -167,7 +167,7 @@ namespace sharp {
     } else {
       // Slow, accurate sharpen in LAB colour space, with control over flat vs jagged areas
       return image.sharpen(
-        VImage::option()->set("radius", radius)->set("m1", flat)->set("m2", jagged)
+        VImage::option()->set("sigma", sigma)->set("m1", flat)->set("m2", jagged)
       );
     }
   }
