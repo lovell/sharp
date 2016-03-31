@@ -8,16 +8,16 @@
 // Verify platform and compiler compatibility
 
 #if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 2))
-#error libvips version 8.2.0+ required - see http://sharp.dimens.io/page/install
+#error libvips version 8.2.0+ required - see sharp.dimens.io/page/install
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
-#error GCC version 4.6+ is required for C++11 features - see http://sharp.dimens.io/page/install#prerequisites
+#error GCC version 4.6+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
 #endif
 
 #if (defined(__clang__) && defined(__has_feature))
 #if (!__has_feature(cxx_range_for))
-#error clang version 3.0+ is required for C++11 features - see http://sharp.dimens.io/page/install#prerequisites
+#error clang version 3.0+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
 #endif
 #endif
 
@@ -219,35 +219,44 @@ namespace sharp {
     int left = 0;
     int top = 0;
     switch (gravity) {
-      case 1: // North
+      case 1:
+        // North
         left = (inWidth - outWidth + 1) / 2;
         break;
-      case 2: // East
+      case 2:
+        // East
         left = inWidth - outWidth;
         top = (inHeight - outHeight + 1) / 2;
         break;
-      case 3: // South
+      case 3:
+        // South
         left = (inWidth - outWidth + 1) / 2;
         top = inHeight - outHeight;
         break;
-      case 4: // West
+      case 4:
+        // West
         top = (inHeight - outHeight + 1) / 2;
         break;
-      case 5: // Northeast
+      case 5:
+        // Northeast
         left = inWidth - outWidth;
         break;
-      case 6: // Southeast
+      case 6:
+        // Southeast
         left = inWidth - outWidth;
         top = inHeight - outHeight;
-      case 7: // Southwest
+      case 7:
+        // Southwest
         top = inHeight - outHeight;
-      case 8: // Northwest
+      case 8:
+        // Northwest
         break;
-      default: // Centre
+      default:
+        // Centre
         left = (inWidth - outWidth + 1) / 2;
         top = (inHeight - outHeight + 1) / 2;
     }
     return std::make_tuple(left, top);
   }
 
-} // namespace sharp
+}  // namespace sharp

@@ -307,25 +307,14 @@
   fun:vips__magick_read_header
 }
 {
-  cond_magick_is_palette_image_get_bands
-  Memcheck:Cond
-  fun:IsPaletteImage
-  ...
-  fun:get_bands
-}
-{
   value_magick_is_palette_image
   Memcheck:Value8
   fun:IsPaletteImage
-  ...
-  fun:get_bands
 }
 {
-  cond_magick_is_palette_image_parse_header
+  cond_magick_is_palette_image
   Memcheck:Cond
   fun:IsPaletteImage
-  ...
-  fun:parse_header
 }
 
 # glib g_file_read_link

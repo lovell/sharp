@@ -73,7 +73,6 @@ struct MetadataBaton {
 };
 
 class MetadataWorker : public AsyncWorker {
-
  public:
   MetadataWorker(Callback *callback, MetadataBaton *baton, const Local<Object> &bufferIn) :
     AsyncWorker(callback), baton(baton) {

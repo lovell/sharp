@@ -71,7 +71,6 @@ using sharp::counterProcess;
 using sharp::counterQueue;
 
 class PipelineWorker : public AsyncWorker {
-
  public:
   PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
     const Local<Object> &bufferIn, const Local<Object> &overlayBufferIn) :
@@ -89,7 +88,6 @@ class PipelineWorker : public AsyncWorker {
     libuv worker
   */
   void Execute() {
-
     // Decrement queued task counter
     g_atomic_int_dec_and_test(&counterQueue);
     // Increment processing task counter
@@ -685,7 +683,8 @@ class PipelineWorker : public AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("compression", baton->compressionLevel)
             ->set("interlace", baton->progressive)
-            ->set("filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
+            ->set("filter", baton->withoutAdaptiveFiltering ?
+              VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
           ));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -758,7 +757,8 @@ class PipelineWorker : public AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("compression", baton->compressionLevel)
             ->set("interlace", baton->progressive)
-            ->set("filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
+            ->set("filter", baton->withoutAdaptiveFiltering ?
+              VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
           );
           baton->formatOut = "png";
         } else if (baton->formatOut == "webp" || isWebp || (matchInput && inputImageType == ImageType::WEBP)) {
@@ -882,10 +882,10 @@ class PipelineWorker : public AsyncWorker {
         case 6: rotate = VIPS_ANGLE_D90; break;
         case 3: rotate = VIPS_ANGLE_D180; break;
         case 8: rotate = VIPS_ANGLE_D270; break;
-        case 2: flop = TRUE; break; // flop 1
-        case 7: flip = TRUE; rotate = VIPS_ANGLE_D90; break; // flip 6
-        case 4: flop = TRUE; rotate = VIPS_ANGLE_D180; break; // flop 3
-        case 5: flip = TRUE; rotate = VIPS_ANGLE_D270; break; // flip 8
+        case 2: flop = TRUE; break;  // flop 1
+        case 7: flip = TRUE; rotate = VIPS_ANGLE_D90; break;  // flip 6
+        case 4: flop = TRUE; rotate = VIPS_ANGLE_D180; break;  // flop 3
+        case 5: flip = TRUE; rotate = VIPS_ANGLE_D270; break;  // flip 8
       }
     } else {
       if (angle == 90) {

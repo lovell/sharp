@@ -19,18 +19,15 @@ describe('cpplint', function() {
         // Lint each source file
         cpplint({
           files: [file],
-          linelength: 140,
+          linelength: 120,
           filters: {
             legal: {
               copyright: false
             },
             build: {
-              include: false,
-              include_order: false
+              include: false
             },
             whitespace: {
-              blank_line: false,
-              comments: false,
               parens: false
             }
           }
