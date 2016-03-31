@@ -1,5 +1,11 @@
 # Changelog
 
+### v0.15 - "*outfit*"
+
+* Take advantage of libvips 8.3 features.
+  Use shrink-on-load for WebP input.
+  [#369](https://github.com/lovell/sharp/issues/369)
+
 ### v0.14 - "*needle*"
 
 Requires libvips v8.2.3

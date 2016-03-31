@@ -303,7 +303,8 @@ class PipelineWorker : public AsyncWorker {
       // but not when applying gamma correction or pre-resize extract
       int shrink_on_load = 1;
       if (
-        xshrink == yshrink && inputImageType == ImageType::JPEG && xshrink >= 2 &&
+        xshrink == yshrink && xshrink >= 2 &&
+        (inputImageType == ImageType::JPEG || inputImageType == ImageType::WEBP) &&
         baton->gamma == 0 && baton->topOffsetPre == -1
       ) {
         if (xshrink >= 8) {
@@ -329,15 +330,25 @@ class PipelineWorker : public AsyncWorker {
         xresidual = CalculateResidual(xshrink, xfactor);
         yresidual = CalculateResidual(yshrink, yfactor);
         // Reload input using shrink-on-load
+        VOption *option = VImage::option()->set("shrink", shrink_on_load);
         if (baton->bufferInLength > 1) {
           VipsBlob *blob = vips_blob_new(nullptr, baton->bufferIn, baton->bufferInLength);
-          image = VImage::jpegload_buffer(blob, VImage::option()->set("shrink", shrink_on_load));
+          if (inputImageType == ImageType::JPEG) {
+            // Reload JPEG buffer
+            image = VImage::jpegload_buffer(blob, option);
+          } else {
+            // Reload WebP buffer
+            image = VImage::webpload_buffer(blob, option);
+          }
           vips_area_unref(reinterpret_cast<VipsArea*>(blob));
         } else {
-          image = VImage::jpegload(
-            const_cast<char*>((baton->fileIn).data()),
-            VImage::option()->set("shrink", shrink_on_load)
-          );
+          if (inputImageType == ImageType::JPEG) {
+            // Reload JPEG file
+            image = VImage::jpegload(const_cast<char*>((baton->fileIn).data()), option);
+          } else {
+            // Reload WebP file
+            image = VImage::webpload(const_cast<char*>((baton->fileIn).data()), option);
+          }
         }
       }
 
