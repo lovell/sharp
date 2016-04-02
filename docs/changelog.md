@@ -2,6 +2,8 @@
 
 ### v0.14 - "*needle*"
 
+Requires libvips v8.2.3
+
 #### v0.14.0 - 2<sup>nd</sup> April 2016
 
 * Add ability to extend (pad) the edges of an image.
@@ -37,6 +39,8 @@
   [@kleisauke](https://github.com/kleisauke)
 
 ### v0.13 - "*mind*"
+
+Requires libvips v8.2.2
 
 #### v0.13.1 - 27<sup>th</sup> February 2016
 
@@ -90,6 +94,8 @@
 * Add support for gamma correction of images with an alpha channel.
 
 ### v0.12 - "*look*"
+
+Requires libvips v8.2.0
 
 #### v0.12.2 - 16<sup>th</sup> January 2016
 
