@@ -2,6 +2,8 @@
 
 ### v0.14 - "*needle*"
 
+#### v0.14.0 - 2<sup>nd</sup> April 2016
+
 * Add ability to extend (pad) the edges of an image.
   [#128](https://github.com/lovell/sharp/issues/128)
   [@blowsie](https://github.com/blowsie)
@@ -25,6 +27,10 @@
 * Emit post-processing 'info' event for Stream output.
   [#367](https://github.com/lovell/sharp/issues/367)
   [@salzhrani](https://github.com/salzhrani)
+
+* Ensure output image EXIF Orientation values are within 1-8 range.
+  [#385](https://github.com/lovell/sharp/pull/385)
+  [@jtobinisaniceguy](https://github.com/jtobinisaniceguy)
 
 * Ensure ratios are not swapped when rotating 90/270 and ignoring aspect.
   [#387](https://github.com/lovell/sharp/issues/387)
