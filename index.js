@@ -35,9 +35,9 @@ var maximum = {
 };
 
 // Constructor-factory
-var Sharp = function(input) {
+var Sharp = function(input, options) {
   if (!(this instanceof Sharp)) {
-    return new Sharp(input);
+    return new Sharp(input, options);
   }
   stream.Duplex.call(this);
   this.options = {
@@ -46,6 +46,10 @@ var Sharp = function(input) {
     streamIn: false,
     sequentialRead: false,
     limitInputPixels: maximum.pixels,
+    density: 72,
+    rawWidth: 0,
+    rawHeight: 0,
+    rawChannels: 0,
     // ICC profiles
     iccProfilePath: path.join(__dirname, 'icc') + path.sep,
     // resize options
@@ -60,11 +64,15 @@ var Sharp = function(input) {
     width: -1,
     height: -1,
     canvas: 'crop',
-    gravity: 0,
+    crop: 0,
     angle: 0,
     rotateBeforePreExtract: false,
     flip: false,
     flop: false,
+    extendTop: 0,
+    extendBottom: 0,
+    extendLeft: 0,
+    extendRight: 0,
     withoutEnlargement: false,
     interpolator: 'bicubic',
     // operations
@@ -80,9 +88,12 @@ var Sharp = function(input) {
     greyscale: false,
     normalize: 0,
     // overlay
-    overlayPath: '',
+    overlayFileIn: '',
+    overlayBufferIn: null,
+    overlayGravity: 0,
     // output options
-    output: '__input',
+    formatOut: 'input',
+    fileOut: '',
     progressive: false,
     quality: 80,
     compressionLevel: 6,
@@ -101,18 +112,19 @@ var Sharp = function(input) {
       module.exports.queue.emit('change', queueLength);
     }
   };
-  if (typeof input === 'string') {
+  if (isString(input)) {
     // input=file
     this.options.fileIn = input;
-  } else if (typeof input === 'object' && input instanceof Buffer) {
+  } else if (isBuffer(input)) {
     // input=buffer
     this.options.bufferIn = input;
-  } else if (typeof input === 'undefined') {
+  } else if (!isDefined(input)) {
     // input=stream
     this.options.streamIn = true;
   } else {
     throw new Error('Unsupported input ' + typeof input);
   }
+  this._inputOptions(options);
   return this;
 };
 module.exports = Sharp;
@@ -132,6 +144,65 @@ module.exports.format = sharp.format();
   Version numbers of libvips and its dependencies
 */
 module.exports.versions = versions;
+
+/*
+  Validation helpers
+*/
+var isDefined = function(val) {
+  return typeof val !== 'undefined' && val !== null;
+};
+var isObject = function(val) {
+  return typeof val === 'object';
+};
+var isBuffer = function(val) {
+  return typeof val === 'object' && val instanceof Buffer;
+};
+var isString = function(val) {
+  return typeof val === 'string' && val.length > 0;
+};
+var isInteger = function(val) {
+  return typeof val === 'number' && !Number.isNaN(val) && val % 1 === 0;
+};
+var inRange = function(val, min, max) {
+  return val >= min && val <= max;
+};
+var contains = function(val, list) {
+  return list.indexOf(val) !== -1;
+};
+
+/*
+  Set input-related options
+    density: DPI at which to load vector images via libmagick
+*/
+Sharp.prototype._inputOptions = function(options) {
+  if (isObject(options)) {
+    // Density
+    if (isDefined(options.density)) {
+      if (isInteger(options.density) && inRange(options.density, 1, 2400)) {
+        this.options.density = options.density;
+      } else {
+        throw new Error('Invalid density (1 to 2400) ' + options.density);
+      }
+    }
+    // Raw pixel input
+    if (isDefined(options.raw)) {
+      if (
+        isObject(options.raw) &&
+        isInteger(options.raw.width) && inRange(options.raw.width, 1, maximum.width) &&
+        isInteger(options.raw.height) && inRange(options.raw.height, 1, maximum.height) &&
+        isInteger(options.raw.channels) && inRange(options.raw.channels, 1, 4)
+      ) {
+        this.options.rawWidth = options.raw.width;
+        this.options.rawHeight = options.raw.height;
+        this.options.rawChannels = options.raw.channels;
+      } else {
+        throw new Error('Expected width, height and channels for raw pixel input');
+      }
+    }
+  } else if (isDefined(options)) {
+    throw new Error('Invalid input options ' + options);
+  }
+};
 
 /*
   Handle incoming chunk on Writable Stream
@@ -160,46 +231,53 @@ Sharp.prototype._write = function(chunk, encoding, callback) {
   }
 };
 
-// Crop this part of the resized image (Center/Centre, North, East, South, West)
+// Weighting to apply to image crop
 module.exports.gravity = {
-  'center': 0,
-  'centre': 0,
-  'north': 1,
-  'east': 2,
-  'south': 3,
-  'west': 4,
-  'northeast': 5,
-  'southeast': 6,
-  'southwest': 7,
-  'northwest': 8
+  center: 0,
+  centre: 0,
+  north: 1,
+  east: 2,
+  south: 3,
+  west: 4,
+  northeast: 5,
+  southeast: 6,
+  southwest: 7,
+  northwest: 8
 };
 
-Sharp.prototype.crop = function(gravity) {
+// Strategies for automagic behaviour
+module.exports.strategy = {
+  entropy: 16
+};
+
+/*
+  What part of the image should be retained when cropping?
+*/
+Sharp.prototype.crop = function(crop) {
   this.options.canvas = 'crop';
-  if (typeof gravity === 'number' && !Number.isNaN(gravity) && gravity >= 0 && gravity <= 8) {
-    this.options.gravity = gravity;
-  } else if (typeof gravity === 'string' && typeof module.exports.gravity[gravity] === 'number') {
-    this.options.gravity = module.exports.gravity[gravity];
+  if (!isDefined(crop)) {
+    // Default
+    this.options.crop = module.exports.gravity.center;
+  } else if (isInteger(crop) && inRange(crop, 0, 8)) {
+    // Gravity (numeric)
+    this.options.crop = crop;
+  } else if (isString(crop) && isInteger(module.exports.gravity[crop])) {
+    // Gravity (string)
+    this.options.crop = module.exports.gravity[crop];
+  } else if (isInteger(crop) && crop === module.exports.strategy.entropy) {
+    // Strategy
+    this.options.crop = crop;
   } else {
-    throw new Error('Unsupported crop gravity ' + gravity);
+    throw new Error('Unsupported crop ' + crop);
   }
   return this;
 };
 
 Sharp.prototype.extract = function(options) {
-  if (!options || typeof options !== 'object') {
-    // Legacy extract(top,left,width,height) syntax
-    options = {
-      left: arguments[1],
-      top: arguments[0],
-      width: arguments[2],
-      height: arguments[3]
-    };
-  }
   var suffix = this.options.width === -1 && this.options.height === -1 ? 'Pre' : 'Post';
   ['left', 'top', 'width', 'height'].forEach(function (name) {
     var value = options[name];
-    if (typeof value === 'number' && !Number.isNaN(value) && value % 1 === 0 && value >= 0) {
+    if (isInteger(value) && value >= 0) {
       this.options[name + (name === 'left' || name === 'top' ? 'Offset' : '') + suffix] = value;
     } else {
       throw new Error('Non-integer value for ' + name + ' of ' + value);
@@ -258,14 +336,26 @@ Sharp.prototype.negate = function(negate) {
   return this;
 };
 
-Sharp.prototype.overlayWith = function(overlayPath) {
-  if (typeof overlayPath !== 'string') {
-    throw new Error('The overlay path must be a string');
+/*
+  Overlay with another image, using an optional gravity
+*/
+Sharp.prototype.overlayWith = function(overlay, options) {
+  if (isString(overlay)) {
+    this.options.overlayFileIn = overlay;
+  } else if (isBuffer(overlay)) {
+    this.options.overlayBufferIn = overlay;
+  } else {
+    throw new Error('Unsupported overlay ' + typeof overlay);
   }
-  if (overlayPath === '') {
-    throw new Error('The overlay path cannot be empty');
+  if (isObject(options)) {
+    if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
+      this.options.overlayGravity = options.gravity;
+    } else if (isString(options.gravity) && isInteger(module.exports.gravity[options.gravity])) {
+      this.options.overlayGravity = module.exports.gravity[options.gravity];
+    } else if (isDefined(options.gravity)) {
+      throw new Error('Unsupported overlay gravity ' + options.gravity);
+    }
   }
-  this.options.overlayPath = overlayPath;
   return this;
 };
 
@@ -534,12 +624,12 @@ Sharp.prototype.withMetadata = function(withMetadata) {
         typeof withMetadata.orientation === 'number' &&
         !Number.isNaN(withMetadata.orientation) &&
         withMetadata.orientation % 1 === 0 &&
-        withMetadata.orientation >= 0 &&
-        withMetadata.orientation <= 7
+        withMetadata.orientation >= 1 &&
+        withMetadata.orientation <= 8
       ) {
         this.options.withMetadataOrientation = withMetadata.orientation;
       } else {
-        throw new Error('Invalid orientation (0 to 7) ' + withMetadata.orientation);
+        throw new Error('Invalid orientation (1 to 8) ' + withMetadata.orientation);
       }
     }
   }
@@ -547,27 +637,63 @@ Sharp.prototype.withMetadata = function(withMetadata) {
 };
 
 /*
-  Tile size and overlap for Deep Zoom output
+  Tile-based deep zoom output options: size, overlap, layout
 */
-Sharp.prototype.tile = function(size, overlap) {
-  // Size of square tiles, in pixels
-  if (typeof size !== 'undefined' && size !== null) {
-    if (!Number.isNaN(size) && size % 1 === 0 && size >= 1 && size <= 8192) {
-      this.options.tileSize = size;
-    } else {
-      throw new Error('Invalid tile size (1 to 8192) ' + size);
+Sharp.prototype.tile = function(tile) {
+  if (isObject(tile)) {
+    // Size of square tiles, in pixels
+    if (isDefined(tile.size)) {
+      if (isInteger(tile.size) && inRange(tile.size, 1, 8192)) {
+        this.options.tileSize = tile.size;
+      } else {
+        throw new Error('Invalid tile size (1 to 8192) ' + tile.size);
+      }
+    }
+    // Overlap of tiles, in pixels
+    if (isDefined(tile.overlap)) {
+      if (isInteger(tile.overlap) && inRange(tile.overlap, 0, 8192)) {
+        if (tile.overlap > this.options.tileSize) {
+          throw new Error('Tile overlap ' + tile.overlap + ' cannot be larger than tile size ' + this.options.tileSize);
+        }
+        this.options.tileOverlap = tile.overlap;
+      } else {
+        throw new Error('Invalid tile overlap (0 to 8192) ' + tile.overlap);
+      }
+    }
+    // Layout
+    if (isDefined(tile.layout)) {
+      if (isString(tile.layout) && contains(tile.layout, ['dz', 'google', 'zoomify'])) {
+        this.options.tileLayout = tile.layout;
+      } else {
+        throw new Error('Invalid tile layout ' + tile.layout);
+      }
     }
   }
-  // Overlap of tiles, in pixels
-  if (typeof overlap !== 'undefined' && overlap !== null) {
-    if (!Number.isNaN(overlap) && overlap % 1 === 0 && overlap >= 0 && overlap <= 8192) {
-      if (overlap > this.options.tileSize) {
-        throw new Error('Tile overlap ' + overlap + ' cannot be larger than tile size ' + this.options.tileSize);
-      }
-      this.options.tileOverlap = overlap;
-    } else {
-      throw new Error('Invalid tile overlap (0 to 8192) ' + overlap);
-    }
+  return this;
+};
+
+/*
+  Extend edges
+*/
+Sharp.prototype.extend = function(extend) {
+  if (isInteger(extend) && extend > 0) {
+    this.options.extendTop = extend;
+    this.options.extendBottom = extend;
+    this.options.extendLeft = extend;
+    this.options.extendRight = extend;
+  } else if (
+    isObject(extend) &&
+    isInteger(extend.top) && extend.top >= 0 &&
+    isInteger(extend.bottom) && extend.bottom >= 0 &&
+    isInteger(extend.left) && extend.left >= 0 &&
+    isInteger(extend.right) && extend.right >= 0
+  ) {
+    this.options.extendTop = extend.top;
+    this.options.extendBottom = extend.bottom;
+    this.options.extendLeft = extend.left;
+    this.options.extendRight = extend.right;
+  } else {
+    throw new Error('Invalid edge extension ' + extend);
   }
   return this;
 };
@@ -617,8 +743,8 @@ Sharp.prototype.limitInputPixels = function(limit) {
 /*
   Write output image data to a file
 */
-Sharp.prototype.toFile = function(output, callback) {
-  if (!output || output.length === 0) {
+Sharp.prototype.toFile = function(fileOut, callback) {
+  if (!fileOut || fileOut.length === 0) {
     var errOutputInvalid = new Error('Invalid output');
     if (typeof callback === 'function') {
       callback(errOutputInvalid);
@@ -626,7 +752,7 @@ Sharp.prototype.toFile = function(output, callback) {
       return BluebirdPromise.reject(errOutputInvalid);
     }
   } else {
-    if (this.options.fileIn === output) {
+    if (this.options.fileIn === fileOut) {
       var errOutputIsInput = new Error('Cannot use same file for input and output');
       if (typeof callback === 'function') {
         callback(errOutputIsInput);
@@ -634,7 +760,7 @@ Sharp.prototype.toFile = function(output, callback) {
         return BluebirdPromise.reject(errOutputIsInput);
       }
     } else {
-      this.options.output = output;
+      this.options.fileOut = fileOut;
       return this._pipeline(callback);
     }
   }
@@ -652,7 +778,7 @@ Sharp.prototype.toBuffer = function(callback) {
   Force JPEG output
 */
 Sharp.prototype.jpeg = function() {
-  this.options.output = '__jpeg';
+  this.options.formatOut = 'jpeg';
   return this;
 };
 
@@ -660,7 +786,7 @@ Sharp.prototype.jpeg = function() {
   Force PNG output
 */
 Sharp.prototype.png = function() {
-  this.options.output = '__png';
+  this.options.formatOut = 'png';
   return this;
 };
 
@@ -668,7 +794,7 @@ Sharp.prototype.png = function() {
   Force WebP output
 */
 Sharp.prototype.webp = function() {
-  this.options.output = '__webp';
+  this.options.formatOut = 'webp';
   return this;
 };
 
@@ -676,7 +802,7 @@ Sharp.prototype.webp = function() {
   Force raw, uint8 output
 */
 Sharp.prototype.raw = function() {
-  this.options.output = '__raw';
+  this.options.formatOut = 'raw';
   return this;
 };
 
@@ -684,15 +810,17 @@ Sharp.prototype.raw = function() {
   Force output to a given format
   @param format is either the id as a String or an Object with an 'id' attribute
 */
-Sharp.prototype.toFormat = function(format) {
-  var id = format;
-  if (typeof format === 'object') {
-    id = format.id;
+Sharp.prototype.toFormat = function(formatOut) {
+  if (isObject(formatOut) && isDefined(formatOut.id)) {
+    formatOut = formatOut.id;
   }
-  if (typeof id === 'string' && typeof module.exports.format[id] === 'object' && typeof this[id] === 'function') {
-    this[id]();
+  if (
+    isDefined(formatOut) &&
+    ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'].indexOf(formatOut) !== -1
+  ) {
+    this.options.formatOut = formatOut;
   } else {
-    throw new Error('Unsupported format ' + format);
+    throw new Error('Unsupported output format ' + formatOut);
   }
   return this;
 };
@@ -730,10 +858,11 @@ Sharp.prototype._pipeline = function(callback) {
     if (this.options.streamIn) {
       // output=stream, input=stream
       this.on('finish', function() {
-        sharp.pipeline(that.options, function(err, data) {
+        sharp.pipeline(that.options, function(err, data, info) {
           if (err) {
             that.emit('error', err);
           } else {
+            that.emit('info', info);
             that.push(data);
           }
           that.push(null);
@@ -741,10 +870,11 @@ Sharp.prototype._pipeline = function(callback) {
       });
     } else {
       // output=stream, input=file/buffer
-      sharp.pipeline(this.options, function(err, data) {
+      sharp.pipeline(this.options, function(err, data, info) {
         if (err) {
           that.emit('error', err);
         } else {
+          that.emit('info', info);
           that.push(data);
         }
         that.push(null);
@@ -831,7 +961,6 @@ Sharp.prototype.clone = function() {
   // Clone existing options
   var clone = new Sharp();
   util._extend(clone.options, this.options);
-  clone.streamIn = false;
   // Pass 'finish' event to clone for Stream-based input
   this.on('finish', function() {
     // Clone inherits input data
@@ -841,18 +970,25 @@ Sharp.prototype.clone = function() {
   return clone;
 };
 
-/*
-  Get and set cache memory and item limits
+/**
+  Get and set cache memory, file and item limits
 */
-module.exports.cache = function(memory, items) {
-  if (typeof memory !== 'number' || Number.isNaN(memory)) {
-    memory = null;
+module.exports.cache = function(options) {
+  if (typeof options === 'boolean') {
+    if (options) {
+      // Default cache settings of 50MB, 20 files, 100 items
+      return sharp.cache(50, 20, 100);
+    } else {
+      return sharp.cache(0, 0, 0);
+    }
+  } else if (typeof options === 'object') {
+    return sharp.cache(options.memory, options.files, options.items);
+  } else {
+    return sharp.cache();
   }
-  if (typeof items !== 'number' || Number.isNaN(items)) {
-    items = null;
-  }
-  return sharp.cache(memory, items);
 };
+// Ensure default cache settings are set
+module.exports.cache(true);
 
 /*
   Get and set size of thread pool
@@ -870,3 +1006,15 @@ module.exports.concurrency = function(concurrency) {
 module.exports.counters = function() {
   return sharp.counters();
 };
+
+/*
+  Get and set use of SIMD vector unit instructions
+*/
+module.exports.simd = function(simd) {
+  if (typeof simd !== 'boolean') {
+    simd = null;
+  }
+  return sharp.simd(simd);
+};
+// Switch off default
+module.exports.simd(false);

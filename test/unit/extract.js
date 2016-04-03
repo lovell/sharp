@@ -5,32 +5,7 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
-
 describe('Partial image extraction', function() {
-  describe('using the legacy extract(top,left,width,height) syntax', function () {
-    it('JPEG', function(done) {
-      sharp(fixtures.inputJpg)
-        .extract(2, 2, 20, 20)
-        .toBuffer(function(err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(20, info.width);
-          assert.strictEqual(20, info.height);
-          fixtures.assertSimilar(fixtures.expected('extract.jpg'), data, done);
-        });
-    });
-
-    it('PNG', function(done) {
-      sharp(fixtures.inputPng)
-        .extract(300, 200, 400, 200)
-        .toBuffer(function(err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(400, info.width);
-          assert.strictEqual(200, info.height);
-          fixtures.assertSimilar(fixtures.expected('extract.png'), data, done);
-      });
-    });
-  });
 
   it('JPEG', function(done) {
     sharp(fixtures.inputJpg)
@@ -67,17 +42,19 @@ describe('Partial image extraction', function() {
     });
   }
 
-  it('TIFF', function(done) {
-    sharp(fixtures.inputTiff)
-      .extract({ left: 34, top: 63, width: 341, height: 529 })
-      .jpeg()
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(341, info.width);
-        assert.strictEqual(529, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract.tiff'), data, done);
-      });
-  });
+  if (sharp.format.tiff.output.file) {
+    it('TIFF', function(done) {
+      sharp(fixtures.inputTiff)
+        .extract({ left: 34, top: 63, width: 341, height: 529 })
+        .jpeg()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(341, info.width);
+          assert.strictEqual(529, info.height);
+          fixtures.assertSimilar(fixtures.expected('extract.tiff'), data, done);
+        });
+    });
+  }
 
   it('Before resize', function(done) {
     sharp(fixtures.inputJpg)

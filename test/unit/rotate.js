@@ -5,8 +5,6 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
-
 describe('Rotation', function() {
 
   ['Landscape', 'Portrait'].forEach(function(orientation) {
@@ -35,6 +33,40 @@ describe('Rotation', function() {
       assert.strictEqual(240, info.height);
       done();
     });
+  });
+
+  it('Rotate by 270 degrees, square output ignoring aspect ratio', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(240, 240)
+      .ignoreAspectRatio()
+      .rotate(270)
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(240, info.width);
+        assert.strictEqual(240, info.height);
+        sharp(data).metadata(function(err, metadata) {
+          assert.strictEqual(240, metadata.width);
+          assert.strictEqual(240, metadata.height);
+          done();
+        });
+      });
+  });
+
+  it('Rotate by 270 degrees, rectangular output ignoring aspect ratio', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .ignoreAspectRatio()
+      .rotate(270)
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        sharp(data).metadata(function(err, metadata) {
+          assert.strictEqual(320, metadata.width);
+          assert.strictEqual(240, metadata.height);
+          done();
+        });
+      });
   });
 
   it('Input image has Orientation EXIF tag but do not rotate output', function(done) {
@@ -113,7 +145,7 @@ describe('Rotation', function() {
   });
 
   it('Attempt to auto-rotate image format without EXIF support', function(done) {
-    sharp(fixtures.inputGif)
+    sharp(fixtures.inputPng)
       .rotate()
       .resize(320)
       .jpeg()
@@ -122,7 +154,7 @@ describe('Rotation', function() {
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
-        assert.strictEqual(213, info.height);
+        assert.strictEqual(236, info.height);
         done();
       });
   });

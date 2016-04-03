@@ -13,7 +13,7 @@ Bicubic interpolation with Lanczos anti-alias filtering ensures quality is not s
 As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
-64-bit Windows and recent Linux systems do not require
+Most Windows (x64), Linux and ARMv6+ systems do not require
 the installation of any external runtime dependencies.
 
 Use with OS X is as simple as running `brew install homebrew/science/vips`
@@ -36,7 +36,7 @@ covers reporting bugs, requesting features and submitting code changes.
 
 ### Licence
 
-Copyright 2013, 2014, 2015 Lovell Fuller and contributors.
+Copyright 2013, 2014, 2015, 2016 Lovell Fuller and contributors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

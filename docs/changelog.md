@@ -1,6 +1,132 @@
 # Changelog
 
+### v0.14 - "*needle*"
+
+Requires libvips v8.2.3
+
+#### v0.14.0 - 2<sup>nd</sup> April 2016
+
+* Add ability to extend (pad) the edges of an image.
+  [#128](https://github.com/lovell/sharp/issues/128)
+  [@blowsie](https://github.com/blowsie)
+
+* Add support for Zoomify and Google tile layouts. Breaks existing tile API.
+  [#223](https://github.com/lovell/sharp/issues/223)
+  [@bdunnette](https://github.com/bdunnette)
+
+* Improvements to overlayWith: differing sizes/formats, gravity, buffer input.
+  [#239](https://github.com/lovell/sharp/issues/239)
+  [@chrisriley](https://github.com/chrisriley)
+
+* Add entropy-based crop strategy to remove least interesting edges.
+  [#295](https://github.com/lovell/sharp/issues/295)
+  [@rightaway](https://github.com/rightaway)
+
+* Expose density metadata; set density of images from vector input.
+  [#338](https://github.com/lovell/sharp/issues/338)
+  [@lookfirst](https://github.com/lookfirst)
+
+* Emit post-processing 'info' event for Stream output.
+  [#367](https://github.com/lovell/sharp/issues/367)
+  [@salzhrani](https://github.com/salzhrani)
+
+* Ensure output image EXIF Orientation values are within 1-8 range.
+  [#385](https://github.com/lovell/sharp/pull/385)
+  [@jtobinisaniceguy](https://github.com/jtobinisaniceguy)
+
+* Ensure ratios are not swapped when rotating 90/270 and ignoring aspect.
+  [#387](https://github.com/lovell/sharp/issues/387)
+  [@kleisauke](https://github.com/kleisauke)
+
+### v0.13 - "*mind*"
+
+Requires libvips v8.2.2
+
+#### v0.13.1 - 27<sup>th</sup> February 2016
+
+* Fix embedding onto transparent backgrounds; regression introduced in v0.13.0.
+  [#366](https://github.com/lovell/sharp/issues/366)
+  [@diegocsandrim](https://github.com/diegocsandrim)
+
+#### v0.13.0 - 15<sup>th</sup> February 2016
+
+* Improve vector image support by allowing control of density/DPI.
+  Switch pre-built libs from Imagemagick to Graphicsmagick.
+  [#110](https://github.com/lovell/sharp/issues/110)
+  [@bradisbell](https://github.com/bradisbell)
+
+* Add support for raw, uncompressed pixel Buffer/Stream input.
+  [#220](https://github.com/lovell/sharp/issues/220)
+  [@mikemorris](https://github.com/mikemorris)
+
+* Switch from libvips' C to C++ bindings, requires upgrade to v8.2.2.
+  [#299](https://github.com/lovell/sharp/issues/299)
+
+* Control number of open files in libvips' cache; breaks existing `cache` behaviour.
+  [#315](https://github.com/lovell/sharp/issues/315)
+  [@impomezia](https://github.com/impomezia)
+
+* Ensure 16-bit input images can be normalised and embedded onto transparent backgrounds.
+  [#339](https://github.com/lovell/sharp/issues/339)
+  [#340](https://github.com/lovell/sharp/issues/340)
+  [@janaz](https://github.com/janaz)
+
+* Ensure selected format takes precedence over any unknown output filename extension.
+  [#344](https://github.com/lovell/sharp/issues/344)
+  [@ubaltaci](https://github.com/ubaltaci)
+
+* Add support for libvips' PBM, PGM, PPM and FITS image format loaders.
+  [#347](https://github.com/lovell/sharp/issues/347)
+  [@oaleynik](https://github.com/oaleynik)
+
+* Ensure default crop gravity is center/centre.
+  [#351](https://github.com/lovell/sharp/pull/351)
+  [@joelmukuthu](https://github.com/joelmukuthu)
+
+* Improve support for musl libc systems e.g. Alpine Linux.
+  [#354](https://github.com/lovell/sharp/issues/354)
+  [#359](https://github.com/lovell/sharp/pull/359)
+  [@download13](https://github.com/download13)
+  [@wjordan](https://github.com/wjordan)
+
+* Small optimisation when reducing by an integral factor to favour shrink over affine.
+
+* Add support for gamma correction of images with an alpha channel.
+
 ### v0.12 - "*look*"
+
+Requires libvips v8.2.0
+
+#### v0.12.2 - 16<sup>th</sup> January 2016
+
+* Upgrade libvips to v8.2.0 for improved vips_shrink.
+
+* Add pre-compiled libvips for ARMv6+ CPUs.
+
+* Ensure 16-bit input images work with embed option.
+  [#325](https://github.com/lovell/sharp/issues/325)
+  [@janaz](https://github.com/janaz)
+
+* Allow compilation with gmake to provide FreeBSD support.
+  [#326](https://github.com/lovell/sharp/issues/326)
+  [@c0decafe](https://github.com/c0decafe)
+
+* Attempt to remove temporary file after installation.
+  [#331](https://github.com/lovell/sharp/issues/331)
+  [@dtoubelis](https://github.com/dtoubelis)
+
+#### v0.12.1 - 12<sup>th</sup> December 2015
+
+* Allow use of SIMD vector instructions (via liborc) to be toggled on/off.
+  [#172](https://github.com/lovell/sharp/issues/172)
+  [@bkw](https://github.com/bkw)
+  [@puzrin](https://github.com/puzrin)
+
+* Ensure embedded ICC profiles output with perceptual intent.
+  [#321](https://github.com/lovell/sharp/issues/321)
+  [@vlapo](https://github.com/vlapo)
+
+* Use the NPM-configured HTTPS proxy, if any, for binary downloads.
 
 #### v0.12.0 - 23<sup>rd</sup> November 2015
 

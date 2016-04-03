@@ -6,22 +6,28 @@ var sharp = require('sharp');
 
 ### Input
 
-#### sharp([input])
+#### sharp([input], [options])
 
-Constructor to which further methods are chained. `input`, if present, can be one of:
+Constructor to which further methods are chained.
 
-* Buffer containing JPEG, PNG, WebP, GIF* or TIFF image data, or
+`input`, if present, can be one of:
+
+* Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
 * String containing the path to an image file, with most major formats supported.
 
-The object returned implements the
+JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data
+can be streamed into the object when `input` is `null` or `undefined`.
+
+`options`, if present, is an Object with the following optional attributes:
+
+* `density` an integral number representing the DPI for vector images, defaulting to 72.
+* `raw` an Object containing `width`, `height` and `channels` when providing uncompressed data. See `raw()` for pixel ordering.
+
+The object returned by the constructor implements the
 [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
 
-JPEG, PNG, WebP, GIF* or TIFF format image data
-can be streamed into the object when `input` is not provided.
-
 JPEG, PNG or WebP format image data can be streamed out from this object.
-
-\* libvips 8.0.0+ is required for Buffer/Stream input of GIF and other `magick` formats.
+When using Stream based output, derived attributes are available from the `info` event.
 
 ```javascript
 sharp('input.jpg')
@@ -32,17 +38,31 @@ sharp('input.jpg')
   });
 ```
 
+```javascript
+// Read image data from readableStream,
+// resize to 300 pixels wide,
+// emit an 'info' event with calculated dimensions
+// and finally write image data to writableStream
+var transformer = sharp()
+  .resize(300)
+  .on('info', function(info) {
+    console.log('Image height is ' + info.height);
+  });
+readableStream.pipe(transformer).pipe(writableStream);
+```
+
 #### metadata([callback])
 
 Fast access to image metadata without decoding any compressed image data.
 
 `callback`, if present, gets the arguments `(err, metadata)` where `metadata` has the attributes:
 
-* `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff`, `magick` and `openslide`)
+* `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff`, `magick`, `openslide`, `ppm`, `fits`)
 * `width`: Number of pixels wide
 * `height`: Number of pixels high
 * `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)
 * `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
+* `density`: Number of pixels per inch (DPI), if present
 * `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 * `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 * `orientation`: Number value of the EXIF Orientation header, if present
@@ -105,23 +125,37 @@ Scale output to `width` x `height`. By default, the resized image is cropped to 
 
 `height` is the integral Number of pixels high the resultant image should be, between 1 and 16383. Use `null` or `undefined` to auto-scale the height to match the width.
 
-#### crop([gravity])
+#### crop([option])
 
 Crop the resized image to the exact size specified, the default behaviour.
 
-`gravity`, if present, is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north`.
+`option`, if present, is an attribute of:
 
-Possible values are `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` and `centre`.
-The default gravity is `center`/`centre`.
+* `sharp.gravity` e.g. `sharp.gravity.north`, to crop to an edge or corner, or
+* `sharp.strategy` e.g. `sharp.strategy.entropy`, to crop dynamically.
+
+Possible attributes of `sharp.gravity` are
+`north`, `northeast`, `east`, `southeast`, `south`,
+`southwest`, `west`, `northwest`, `center` and `centre`.
+
+Possible attributes of the experimental `sharp.strategy` are:
+
+* `entropy`: resize so one dimension is at its target size
+then repeatedly remove pixels from the edge with the lowest
+[Shannon entropy](https://en.wikipedia.org/wiki/Entropy_%28information_theory%29)
+until it too reaches the target size.
+
+The default crop option is a `center`/`centre` gravity.
 
 ```javascript
 var transformer = sharp()
-  .resize(300, 200)
-  .crop(sharp.gravity.north)
+  .resize(200, 200)
+  .crop(sharp.strategy.entropy)
   .on('error', function(err) {
     console.log(err);
   });
-// Read image data from readableStream, resize and write image data to writableStream
+// Read image data from readableStream
+// Write 200px square auto-cropped image data to writableStream
 readableStream.pipe(transformer).pipe(writableStream);
 ```
 
@@ -260,7 +294,7 @@ sharp(input)
 
 #### background(rgba)
 
-Set the background for the `embed` and `flatten` operations.
+Set the background for the `embed`, `flatten` and `extend` operations.
 
 `rgba` is parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
 
@@ -271,6 +305,25 @@ The default background is `{r: 0, g: 0, b: 0, a: 1}`, black without transparency
 #### flatten()
 
 Merge alpha transparency channel, if any, with `background`.
+
+#### extend(extension)
+
+Extends/pads the edges of the image with `background`, where `extension` is one of:
+
+* a Number representing the pixel count to add to each edge, or
+* an Object containing `top`, `left`, `bottom` and `right` attributes, each a Number of pixels to add to that edge.
+
+This operation will always occur after resizing and extraction, if any.
+
+```javascript
+// Resize to 140 pixels wide, then add 10 transparent pixels
+// to the top, left and right edges and 20 to the bottom edge
+sharp(input)
+  .resize(140)
+  .background({r: 0, g: 0, b: 0, a: 0})
+  .extend({top: 10, bottom: 20, left: 10, right: 10})
+  ...
+```
 
 #### negate()
 
@@ -360,13 +413,18 @@ The output image will still be web-friendly sRGB and contain three (identical) c
 
 Enhance output image contrast by stretching its luminance to cover the full dynamic range. This typically reduces performance by 30%.
 
-#### overlayWith(path)
+#### overlayWith(image, [options])
 
-_Experimental_
+Overlay (composite) a image containing an alpha channel over the processed (resized, extracted etc.) image.
 
-Alpha composite image at `path` over the processed (resized, extracted) image. The dimensions of the two images must match.
+`image` is one of the following, and must be the same size or smaller than the processed image:
 
-* `path` is a String containing the path to an image file with an alpha channel.
+* Buffer containing PNG, WebP, GIF or SVG image data, or
+* String containing the path to an image file, with most major transparency formats supported.
+
+`options`, if present, is an Object with the following optional attributes:
+
+* `gravity` is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north` at which to place the overlay, defaulting to `center`/`centre`.
 
 ```javascript
 sharp('input.png')
@@ -374,7 +432,7 @@ sharp('input.png')
   .resize(300)
   .flatten()
   .background('#ff6600')
-  .overlayWith('overlay.png')
+  .overlayWith('overlay.png', { gravity: sharp.gravity.southeast } )
   .sharpen()
   .withMetadata()
   .quality(90)
@@ -382,8 +440,8 @@ sharp('input.png')
   .toBuffer()
   .then(function(outputBuffer) {
     // outputBuffer contains upside down, 300px wide, alpha channel flattened
-    // onto orange background, composited with overlay.png, sharpened,
-    // with metadata, 90% quality WebP image data. Phew!
+    // onto orange background, composited with overlay.png with SE gravity,
+    // sharpened, with metadata, 90% quality WebP image data. Phew!
   });
 ```
 
@@ -391,12 +449,14 @@ sharp('input.png')
 
 #### toFile(path, [callback])
 
-`path` is a String containing the path to write the image data to. The format is inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
+`path` is a String containing the path to write the image data to.
+
+If an explicit output format is not selected, it will be inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
 
 `callback`, if present, is called with two arguments `(err, info)` where:
 
 * `err` contains an error message, if any.
-* `info` contains the output image `format`, `size` (bytes), `width` and `height`.
+* `info` contains the output image `format`, `size` (bytes), `width`, `height` and `channels`.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
@@ -408,7 +468,7 @@ Write image data to a Buffer, the format of which will match the input image by 
 
 * `err` is an error message, if any.
 * `buffer` is the output image data.
-* `info` contains the output image `format`, `size` (bytes), `width` and `height`.
+* `info` contains the output image `format`, `size` (bytes), `width`, `height` and `channels`.
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
@@ -425,8 +485,6 @@ Use PNG format for the output image.
 Use WebP format for the output image.
 
 #### raw()
-
-_Requires libvips 7.42.0+_
 
 Provide raw, uncompressed uint8 (unsigned char) image data for Buffer and Stream based output.
 
@@ -461,23 +519,30 @@ This will also convert to and add the latest web-friendly v2 sRGB ICC profile.
 The optional `metadata` parameter, if present, is an Object with the attributes to update.
 New attributes cannot be inserted, only existing attributes updated.
 
-* `orientation` is an integral Number between 0 and 7, used to update the value of the EXIF `Orientation` tag.
+* `orientation` is an integral Number between 1 and 8, used to update the value of the EXIF `Orientation` tag.
 This has no effect if the input image does not have an EXIF `Orientation` tag.
 
 The default behaviour, when `withMetadata` is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
 
-#### tile([size], [overlap])
+#### tile(options)
 
-The size and overlap, in pixels, of square Deep Zoom image pyramid tiles.
+The size, overlap and directory layout to use when generating square Deep Zoom image pyramid tiles.
+
+`options` is an Object with one or more of the following attributes:
 
 * `size` is an integral Number between 1 and 8192. The default value is 256 pixels.
 * `overlap` is an integral Number between 0 and 8192. The default value is 0 pixels.
+* `layout` is a String, with value `dz`, `zoomify` or `google`. The default value is `dz`.
 
 ```javascript
-sharp('input.tiff').tile(256).toFile('output.dzi', function(err, info) {
-  // The output.dzi file is the XML format Deep Zoom definition
-  // The output_files directory contains 256x256 pixel tiles grouped by zoom level
-});
+sharp('input.tiff')
+  .tile({
+    size: 512
+  })
+  .toFile('output.dzi', function(err, info) {
+    // output.dzi is the Deep Zoom XML definition
+    // output_files contains 512x512 tiles grouped by zoom level
+  });
 ```
 
 #### withoutChromaSubsampling()
@@ -497,13 +562,11 @@ An advanced setting for the _zlib_ compression level of the lossless PNG output 
 
 #### withoutAdaptiveFiltering()
 
-_Requires libvips 7.42.0+_
-
 An advanced setting to disable adaptive row filtering for the lossless PNG output format.
 
 #### trellisQuantisation() / trellisQuantization()
 
-_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+_Requires libvips to have been compiled with mozjpeg support_
 
 An advanced setting to apply the use of
 [trellis quantisation](http://en.wikipedia.org/wiki/Trellis_quantization) with JPEG output.
@@ -511,7 +574,7 @@ Reduces file size and slightly increases relative quality at the cost of increas
 
 #### overshootDeringing()
 
-_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+_Requires libvips to have been compiled with mozjpeg support_
 
 An advanced setting to reduce the effects of
 [ringing](http://en.wikipedia.org/wiki/Ringing_%28signal%29) in JPEG output,
@@ -519,7 +582,7 @@ in particular where black text appears on a white background (or vice versa).
 
 #### optimiseScans() / optimizeScans()
 
-_Requires libvips 8.0.0+ compiled against mozjpeg 3.0+_
+_Requires libvips to have been compiled with mozjpeg support_
 
 An advanced setting for progressive (interlace) JPEG output.
 Calculates which spectrum of DCT coefficients uses the fewest bits.
@@ -594,19 +657,26 @@ An Object containing the version numbers of libvips and, on Linux, its dependenc
 
 ### Utilities
 
-#### sharp.cache([memory], [items])
+#### sharp.cache([options])
 
-If `memory` or `items` are provided, set the limits of _libvips'_ operation cache.
+If `options` is provided, sets the limits of _libvips'_ operation cache.
 
-* `memory` is the maximum memory in MB to use for this cache, with a default value of 100
-* `items` is the maximum number of operations to cache, with a default value of 500
+* `options.memory` is the maximum memory in MB to use for this cache, with a default value of 50
+* `options.files` is the maximum number of files to hold open, with a default value of 20
+* `options.items` is the maximum number of operations to cache, with a default value of 100
+
+`options` can also be a boolean, where `true` enables the default cache settings and `false` disables all caching.
 
 This method always returns cache statistics, useful for determining how much working memory is required for a particular task.
 
 ```javascript
-var stats = sharp.cache(); // { current: 75, high: 99, memory: 100, items: 500 }
-sharp.cache(200); // { current: 75, high: 99, memory: 200, items: 500 }
-sharp.cache(50, 200); // { current: 49, high: 99, memory: 50, items: 200}
+var stats = sharp.cache();
+```
+
+```javascript
+sharp.cache( { items: 200 } );
+sharp.cache( { files: 0 } );
+sharp.cache(false);
 ```
 
 #### sharp.concurrency([threads])
@@ -632,4 +702,32 @@ Provides access to internal task counters.
 
 ```javascript
 var counters = sharp.counters(); // { queue: 2, process: 4 }
+```
+
+#### sharp.simd([enable])
+
+_Requires libvips to have been compiled with liborc support_
+
+Improves the performance of `resize`, `blur` and `sharpen` operations
+by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM NEON.
+
+* `enable`, if present, is a boolean where `true` enables and `false` disables the use of SIMD.
+
+This method always returns the current state.
+
+This feature is currently disabled by default
+but future versions may enable it by default.
+
+When enabled, versions of liborc prior to 0.4.24
+and versions of libvips prior to 8.2.0
+have been known to crash under heavy load.
+
+```javascript
+var simd = sharp.simd();
+// simd is `true` if SIMD is currently enabled
+```
+
+```javascript
+var simd = sharp.simd(true);
+// attempts to enable the use of SIMD, returning true if available
 ```

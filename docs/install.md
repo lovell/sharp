@@ -14,23 +14,31 @@ npm install sharp
 [![Ubuntu 14.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 [![Linux Build Status](https://circleci.com/gh/lovell/sharp.svg?style=svg&circle-token=6cb6d1d287a51af83722b19ed8885377fbc85e5c)](https://circleci.com/gh/lovell/sharp)
 
-libvips and its dependencies are fetched and stored within `node_modules/sharp` during `npm install`.
+libvips and its dependencies are fetched and stored within `node_modules/sharp/lib` during `npm install`.
 This involves an automated HTTPS download of approximately 6MB.
 
-Most recent 64-bit Linux-based operating systems should "just work", e.g.:
+Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ CPUs should "just work", e.g.:
 
 * Debian 7, 8
 * Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
 * Centos 7
-* Fedora 20, 21
+* Fedora 21, 22, 23
 * openSUSE 13.2
 * Archlinux 2015.06.01
+* Raspbian Jessie
+* Amazon Linux 2015.03, 2015.09
 
-Preference will be given to an existing globally-installed (via `pkg-config`)
-version of libvips that meets the minimum version requirement.
+To use your own version of libvips instead of the provided binaries, make sure it is
+at least the version listed under `config.libvips` in the `package.json` file that it
+can be located using `pkg-config`. If you are using non-stadard paths (anything other
+than `/usr` or `/usr/local`), you might need to set `PKG_CONFIG_PATH` during `npm install`
+and `LD_LIBRARY_PATH` at runtime.
+
+You can print the detected vips version using: `pkg-config --modversion vips-cpp`
+
 This allows the use of newer versions of libvips with older versions of sharp.
 
-For older and 32-bit Linux-based operating systems,
+For older Linux-based operating systems and 32-bit Intel CPUs,
 a system-wide installation of the most suitable version of
 libvips and its dependencies can be achieved by running
 the following command as a user with `sudo` access
@@ -39,6 +47,10 @@ the following command as a user with `sudo` access
 ```sh
 curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
 ```
+
+For Linux-based operating systems such as Alpine that use musl libc,
+the smaller stack size means libvips' cache should be disabled
+via `sharp.cache(false)` to avoid a stack overflow.
 
 ### Mac OS
 
@@ -77,6 +89,15 @@ This involves an automated HTTPS download of approximately 9MB.
 Only 64-bit (x64) `node.exe` is supported.
 The WebP format is currently unavailable on Windows.
 
+### FreeBSD
+
+libvips must be installed before `npm install` is run.
+This can be achieved via [FreshPorts](https://www.freshports.org/graphics/vips/):
+
+```sh
+cd /usr/ports/graphics/vips/ && make install clean
+```
+
 ### Heroku
 
 [Alessandro Tagliapietra](https://github.com/alex88) maintains an
@@ -99,8 +120,35 @@ docker pull marcbachmann/libvips
 docker pull wjordan/libvips
 ```
 
+### AWS Lambda
+
+In order to use sharp on AWS Lambda, you need to [create a deployment package](http://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html). Because sharp
+downloads and links libraries for the current platform during `npm install` you have to
+do this on a system similar to the [Lambda Execution Environment](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html). The easiest ways to do this, is to setup a
+small t2.micro instance using the AMI ID listed in the previous link, ssh into it as ec2-user
+and follow the instructions below.
+
+Install depencies:
+
+```sh
+sudo yum-config-manager --enable epel
+sudo yum install -y nodejs gcc-c++
+curl -s https://www.npmjs.com/install.sh | sudo sh
+```
+
+Copy your code and package.json to the instance using `scp` and create a deployment package:
+
+```sh
+cd sharp-lambda-example
+npm install
+zip -ur9 ../sharp-lambda-example.zip index.js node_modules
+```
+
+You can now download your deployment ZIP using `scp` and upload it to Lambda.
+
+**Performance Tip:** To get the best performance on Lambda choose the largest memory available because this also gives you the most cpu time (a 1536 MB function is 12x faster than a 128 MB function).
+
 ### Build tools
 
 * [gulp-responsive](https://www.npmjs.com/package/gulp-responsive)
-* [gulp-sharp](https://www.npmjs.com/package/gulp-sharp)
 * [grunt-sharp](https://www.npmjs.com/package/grunt-sharp)

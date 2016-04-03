@@ -1,5 +1,5 @@
 #include <node.h>
-#include <vips/vips.h>
+#include <vips/vips8>
 
 #include "nan.h"
 
@@ -10,10 +10,6 @@
 
 NAN_MODULE_INIT(init) {
   vips_init("sharp");
-
-  // Set libvips operation cache limits
-  vips_cache_set_max_mem(100 * 1024 * 1024); // 100 MB
-  vips_cache_set_max(500); // 500 operations
 
   // Methods available to JavaScript
   Nan::Set(target, Nan::New("metadata").ToLocalChecked(),
@@ -26,6 +22,8 @@ NAN_MODULE_INIT(init) {
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(concurrency)).ToLocalChecked());
   Nan::Set(target, Nan::New("counters").ToLocalChecked(),
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(counters)).ToLocalChecked());
+  Nan::Set(target, Nan::New("simd").ToLocalChecked(),
+    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(simd)).ToLocalChecked());
   Nan::Set(target, Nan::New("libvipsVersion").ToLocalChecked(),
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(libvipsVersion)).ToLocalChecked());
   Nan::Set(target, Nan::New("format").ToLocalChecked(),

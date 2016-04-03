@@ -12,6 +12,7 @@ var width = 720;
 var height = 480;
 
 sharp.concurrency(1);
+sharp.simd(true);
 
 var timer = setInterval(function() {
   console.dir(sharp.counters());

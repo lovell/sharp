@@ -1,10 +1,9 @@
 'use strict';
 
+var fs = require('fs');
 var assert = require('assert');
 var fixtures = require('../fixtures');
 var sharp = require('../../index');
-
-sharp.cache(0);
 
 // Helpers
 var getPaths = function(baseName, extension) {
@@ -19,11 +18,23 @@ var getPaths = function(baseName, extension) {
 
 // Test
 describe('Overlays', function() {
-  it('Overlay transparent PNG on solid background', function(done) {
+  it('Overlay transparent PNG file on solid background', function(done) {
     var paths = getPaths('alpha-layer-01');
 
     sharp(fixtures.inputPngOverlayLayer0)
       .overlayWith(fixtures.inputPngOverlayLayer1)
+      .toFile(paths.actual, function (error) {
+        if (error) return done(error);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+        done();
+      });
+  });
+
+  it('Overlay transparent PNG Buffer on solid background', function(done) {
+    var paths = getPaths('alpha-layer-01');
+
+    sharp(fixtures.inputPngOverlayLayer0)
+      .overlayWith(fs.readFileSync(fixtures.inputPngOverlayLayer1))
       .toFile(paths.actual, function (error) {
         if (error) return done(error);
         fixtures.assertMaxColourDistance(paths.actual, paths.expected);
@@ -143,18 +154,19 @@ describe('Overlays', function() {
     });
   }
 
-  it('Fail when compositing images with different dimensions', function(done) {
-    sharp(fixtures.inputJpg)
-      .overlayWith(fixtures.inputPngWithGreyAlpha)
+  it('Fail when overlay does not contain alpha channel', function(done) {
+    sharp(fixtures.inputPngOverlayLayer1)
+      .overlayWith(fixtures.inputJpg)
       .toBuffer(function(error) {
         assert.strictEqual(true, error instanceof Error);
         done();
       });
   });
 
-  it('Fail when compositing non-PNG image', function(done) {
-    sharp(fixtures.inputPngOverlayLayer1)
-      .overlayWith(fixtures.inputJpg)
+  it('Fail when overlay is larger', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320)
+      .overlayWith(fixtures.inputPngOverlayLayer1)
       .toBuffer(function(error) {
         assert.strictEqual(true, error instanceof Error);
         done();
@@ -172,4 +184,62 @@ describe('Overlays', function() {
       sharp().overlayWith(1);
     });
   });
+
+  it('Fail with unsupported gravity', function() {
+    assert.throws(function() {
+      sharp()
+        .overlayWith(fixtures.inputPngOverlayLayer1, {
+          gravity: 9
+        });
+    });
+  });
+
+  it('Empty options', function() {
+    assert.doesNotThrow(function() {
+      sharp().overlayWith(fixtures.inputPngOverlayLayer1, {});
+    });
+  });
+
+  describe('Overlay with numeric gravity', function() {
+    Object.keys(sharp.gravity).forEach(function(gravity) {
+      it(gravity, function(done) {
+        var expected = fixtures.expected('overlay-gravity-' + gravity + '.jpg');
+        sharp(fixtures.inputJpg)
+          .resize(80)
+          .overlayWith(fixtures.inputPngWithTransparency16bit, {
+            gravity: gravity
+          })
+          .toBuffer(function(err, data, info) {
+            if (err) throw err;
+            assert.strictEqual('jpeg', info.format);
+            assert.strictEqual(80, info.width);
+            assert.strictEqual(65, info.height);
+            assert.strictEqual(3, info.channels);
+            fixtures.assertSimilar(expected, data, done);
+          });
+      });
+    });
+  });
+
+  describe('Overlay with string-based gravity', function() {
+    Object.keys(sharp.gravity).forEach(function(gravity) {
+      it(gravity, function(done) {
+        var expected = fixtures.expected('overlay-gravity-' + gravity + '.jpg');
+        sharp(fixtures.inputJpg)
+          .resize(80)
+          .overlayWith(fixtures.inputPngWithTransparency16bit, {
+            gravity: sharp.gravity[gravity]
+          })
+          .toBuffer(function(err, data, info) {
+            if (err) throw err;
+            assert.strictEqual('jpeg', info.format);
+            assert.strictEqual(80, info.width);
+            assert.strictEqual(65, info.height);
+            assert.strictEqual(3, info.channels);
+            fixtures.assertSimilar(expected, data, done);
+          });
+      });
+    });
+  });
+
 });

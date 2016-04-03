@@ -6,6 +6,7 @@
 NAN_METHOD(cache);
 NAN_METHOD(concurrency);
 NAN_METHOD(counters);
+NAN_METHOD(simd);
 NAN_METHOD(libvipsVersion);
 NAN_METHOD(format);
 NAN_METHOD(_maxColourDistance);

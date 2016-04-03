@@ -5,8 +5,6 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
-
 describe('Colour space conversion', function() {
 
   it('To greyscale', function(done) {
@@ -31,7 +29,7 @@ describe('Colour space conversion', function() {
       .toFile(fixtures.path('output.greyscale-not.jpg'), done);
   });
 
-  if (sharp.format.webp.output.buffer) {
+  if (sharp.format.tiff.input.file && sharp.format.webp.output.buffer) {
     it('From 1-bit TIFF to sRGB WebP [slow]', function(done) {
       sharp(fixtures.inputTiff)
         .webp()
@@ -61,12 +59,12 @@ describe('Colour space conversion', function() {
       .resize(320, 240)
       .background('white')
       .embed()
-      .toFile(fixtures.path('output.cmyk2srgb.jpg'), function(err, info) {
+      .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        done();
+        fixtures.assertSimilar(fixtures.expected('colourspace.cmyk.jpg'), data, done);
       });
   });
 
@@ -75,10 +73,9 @@ describe('Colour space conversion', function() {
       .resize(320)
       .toBuffer(function(err, data, info) {
         if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
-        done();
+        fixtures.assertSimilar(fixtures.expected('colourspace.cmyk-without-profile.jpg'), data, done);
       });
   });
 

@@ -41,8 +41,9 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.12.0 | look       |
-| v0.13.0 | mind       |
+| v0.15.0 | outfit     |
+| v0.16.0 | pencil     |
+| v0.17.0 | quill      |
 
 Please squash your changes into a single commit using a command like `git rebase -i upstream/<wip-branch>`.
 

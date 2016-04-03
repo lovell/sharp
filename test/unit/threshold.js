@@ -5,8 +5,6 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
-
 describe('Threshold', function() {
   it('threshold 1 jpeg', function(done) {
     sharp(fixtures.inputJpg)

@@ -1,27 +1,29 @@
 #include <cstdlib>
 #include <string>
 #include <string.h>
-#include <vips/vips.h>
+#include <vips/vips8>
 
 #include "common.h"
 
 // Verify platform and compiler compatibility
 
-#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 1 && VIPS_PATCH_VERSION < 1))
-#error libvips version 8.1.1+ required - see http://sharp.dimens.io/page/install
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 2))
+#error libvips version 8.2.0+ required - see sharp.dimens.io/page/install
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
-#error GCC version 4.6+ is required for C++11 features - see http://sharp.dimens.io/page/install#prerequisites
+#error GCC version 4.6+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
 #endif
 
 #if (defined(__clang__) && defined(__has_feature))
 #if (!__has_feature(cxx_range_for))
-#error clang version 3.0+ is required for C++11 features - see http://sharp.dimens.io/page/install#prerequisites
+#error clang version 3.0+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
 #endif
 #endif
 
 #define EXIF_IFD0_ORIENTATION "exif-ifd0-Orientation"
+
+using vips::VImage;
 
 namespace sharp {
 
@@ -52,13 +54,33 @@ namespace sharp {
   }
 
   /*
+    Provide a string identifier for the given image type.
+  */
+  std::string ImageTypeId(ImageType const imageType) {
+    std::string id;
+    switch (imageType) {
+      case ImageType::JPEG: id = "jpeg"; break;
+      case ImageType::PNG: id = "png"; break;
+      case ImageType::WEBP: id = "webp"; break;
+      case ImageType::TIFF: id = "tiff"; break;
+      case ImageType::MAGICK: id = "magick"; break;
+      case ImageType::OPENSLIDE: id = "openslide"; break;
+      case ImageType::PPM: id = "ppm"; break;
+      case ImageType::FITS: id = "fits"; break;
+      case ImageType::RAW: id = "raw"; break;
+      case ImageType::UNKNOWN: id = "unknown"; break;
+    }
+    return id;
+  }
+
+  /*
     Determine image format of a buffer.
   */
   ImageType DetermineImageType(void *buffer, size_t const length) {
     ImageType imageType = ImageType::UNKNOWN;
     char const *load = vips_foreign_find_load_buffer(buffer, length);
     if (load != NULL) {
-      std::string loader = load;
+      std::string const loader = load;
       if (EndsWith(loader, "JpegBuffer")) {
         imageType = ImageType::JPEG;
       } else if (EndsWith(loader, "PngBuffer")) {
@@ -75,20 +97,13 @@ namespace sharp {
   }
 
   /*
-    Initialise and return a VipsImage from a buffer. Supports JPEG, PNG, WebP and TIFF.
-  */
-  VipsImage* InitImage(void *buffer, size_t const length, VipsAccess const access) {
-    return vips_image_new_from_buffer(buffer, length, nullptr, "access", access, nullptr);
-  }
-
-  /*
     Determine image format, reads the first few bytes of the file
   */
   ImageType DetermineImageType(char const *file) {
     ImageType imageType = ImageType::UNKNOWN;
     char const *load = vips_foreign_find_load(file);
     if (load != nullptr) {
-      std::string loader = load;
+      std::string const loader = load;
       if (EndsWith(loader, "JpegFile")) {
         imageType = ImageType::JPEG;
       } else if (EndsWith(loader, "Png")) {
@@ -99,6 +114,10 @@ namespace sharp {
         imageType = ImageType::OPENSLIDE;
       } else if (EndsWith(loader, "TiffFile")) {
         imageType = ImageType::TIFF;
+      } else if (EndsWith(loader, "Ppm")) {
+        imageType = ImageType::PPM;
+      } else if (EndsWith(loader, "Fits")) {
+        imageType = ImageType::FITS;
       } else if (EndsWith(loader, "Magick") || EndsWith(loader, "MagickFile")) {
         imageType = ImageType::MAGICK;
       }
@@ -107,42 +126,36 @@ namespace sharp {
   }
 
   /*
-    Initialise and return a VipsImage from a file.
-  */
-  VipsImage* InitImage(char const *file, VipsAccess const access) {
-    return vips_image_new_from_file(file, "access", access, nullptr);
-  }
-
-  /*
     Does this image have an embedded profile?
   */
-  bool HasProfile(VipsImage *image) {
-    return (vips_image_get_typeof(image, VIPS_META_ICC_NAME) > 0) ? TRUE : FALSE;
+  bool HasProfile(VImage image) {
+    return (image.get_typeof(VIPS_META_ICC_NAME) != 0) ? TRUE : FALSE;
   }
 
   /*
     Does this image have an alpha channel?
     Uses colour space interpretation with number of channels to guess this.
   */
-  bool HasAlpha(VipsImage *image) {
+  bool HasAlpha(VImage image) {
+    int const bands = image.bands();
+    VipsInterpretation const interpretation = image.interpretation();
     return (
-      (image->Bands == 2 && image->Type == VIPS_INTERPRETATION_B_W) ||
-      (image->Bands == 4 && image->Type != VIPS_INTERPRETATION_CMYK) ||
-      (image->Bands == 5 && image->Type == VIPS_INTERPRETATION_CMYK)
+      (bands == 2 && interpretation == VIPS_INTERPRETATION_B_W) ||
+      (bands == 4 && interpretation != VIPS_INTERPRETATION_CMYK) ||
+      (bands == 5 && interpretation == VIPS_INTERPRETATION_CMYK)
     );
   }
 
   /*
     Get EXIF Orientation of image, if any.
   */
-  int ExifOrientation(VipsImage const *image) {
+  int ExifOrientation(VImage image) {
     int orientation = 0;
-    const char *exif;
-    if (
-      vips_image_get_typeof(image, EXIF_IFD0_ORIENTATION) != 0 &&
-      !vips_image_get_string(image, EXIF_IFD0_ORIENTATION, &exif)
-    ) {
-      orientation = atoi(&exif[0]);
+    if (image.get_typeof(EXIF_IFD0_ORIENTATION) != 0) {
+      char const *exif = image.get_string(EXIF_IFD0_ORIENTATION);
+      if (exif != nullptr) {
+        orientation = atoi(&exif[0]);
+      }
     }
     return orientation;
   }
@@ -150,31 +163,41 @@ namespace sharp {
   /*
     Set EXIF Orientation of image.
   */
-  void SetExifOrientation(VipsImage *image, int const orientation) {
+  void SetExifOrientation(VImage image, int const orientation) {
     char exif[3];
     g_snprintf(exif, sizeof(exif), "%d", orientation);
-    vips_image_set_string(image, EXIF_IFD0_ORIENTATION, exif);
+    image.set(EXIF_IFD0_ORIENTATION, exif);
   }
 
   /*
     Remove EXIF Orientation from image.
   */
-  void RemoveExifOrientation(VipsImage *image) {
+  void RemoveExifOrientation(VImage image) {
     SetExifOrientation(image, 0);
   }
 
   /*
-    Returns the window size for the named interpolator. For example,
-    a window size of 3 means a 3x3 pixel grid is used for the calculation.
+    Does this image have a non-default density?
   */
-  int InterpolatorWindowSize(char const *name) {
-    VipsInterpolate *interpolator = vips_interpolate_new(name);
-    if (interpolator == nullptr) {
-      return -1;
-    }
-    int window_size = vips_interpolate_get_window_size(interpolator);
-    g_object_unref(interpolator);
-    return window_size;
+  bool HasDensity(VImage image) {
+    return image.xres() > 1.0;
+  }
+
+  /*
+    Get pixels/mm resolution as pixels/inch density.
+  */
+  int GetDensity(VImage image) {
+    return static_cast<int>(round(image.xres() * 25.4));
+  }
+
+  /*
+    Set pixels/mm resolution based on a pixels/inch density.
+  */
+  void SetDensity(VImage image, const int density) {
+    const double pixelsPerMm = static_cast<double>(density) / 25.4;
+    image.set("Xres", pixelsPerMm);
+    image.set("Yres", pixelsPerMm);
+    image.set(VIPS_META_RESOLUTION_UNIT, "in");
   }
 
   /*
@@ -186,4 +209,54 @@ namespace sharp {
     }
   }
 
-} // namespace sharp
+  /*
+    Calculate the (left, top) coordinates of the output image
+    within the input image, applying the given gravity.
+  */
+  std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,
+    int const outWidth, int const outHeight, int const gravity) {
+
+    int left = 0;
+    int top = 0;
+    switch (gravity) {
+      case 1:
+        // North
+        left = (inWidth - outWidth + 1) / 2;
+        break;
+      case 2:
+        // East
+        left = inWidth - outWidth;
+        top = (inHeight - outHeight + 1) / 2;
+        break;
+      case 3:
+        // South
+        left = (inWidth - outWidth + 1) / 2;
+        top = inHeight - outHeight;
+        break;
+      case 4:
+        // West
+        top = (inHeight - outHeight + 1) / 2;
+        break;
+      case 5:
+        // Northeast
+        left = inWidth - outWidth;
+        break;
+      case 6:
+        // Southeast
+        left = inWidth - outWidth;
+        top = inHeight - outHeight;
+      case 7:
+        // Southwest
+        top = inHeight - outHeight;
+      case 8:
+        // Northwest
+        break;
+      default:
+        // Centre
+        left = (inWidth - outWidth + 1) / 2;
+        top = (inHeight - outHeight + 1) / 2;
+    }
+    return std::make_tuple(left, top);
+  }
+
+}  // namespace sharp

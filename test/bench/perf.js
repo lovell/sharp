@@ -34,7 +34,9 @@ var magickFilterBilinear = 'Triangle';
 var magickFilterBicubic = 'Lanczos';
 
 // Disable libvips cache to ensure tests are as fair as they can be
-sharp.cache(0);
+sharp.cache(false);
+// Enable use of SIMD
+sharp.simd(true);
 
 async.series({
   'jpeg-linear': function(callback) {
@@ -496,6 +498,24 @@ async.series({
             }
           });
       }
+    }).add('sharp-without-simd', {
+      defer: true,
+      fn: function(deferred) {
+        sharp.simd(false);
+        sharp(inputJpgBuffer)
+          .rotate(90)
+          .interpolateWith(sharp.interpolator.bilinear)
+          .resize(width, height)
+          .toBuffer(function(err, buffer) {
+            sharp.simd(true);
+            if (err) {
+              throw err;
+            } else {
+              assert.notStrictEqual(null, buffer);
+              deferred.resolve();
+            }
+          });
+      }
     }).add('sharp-sequentialRead', {
       defer: true,
       fn: function(deferred) {
@@ -515,7 +535,7 @@ async.series({
     }).on('cycle', function(event) {
       console.log('jpeg-linear ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   },
 
@@ -762,7 +782,7 @@ async.series({
     }).on('cycle', function(event) {
       console.log('jpeg-cubic ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   },
 
@@ -862,7 +882,7 @@ async.series({
     }).on('cycle', function(event) {
       console.log('interpolators ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   },
 
@@ -1095,7 +1115,7 @@ async.series({
     pngSuite.on('cycle', function(event) {
       console.log(' png ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   },
 
@@ -1162,7 +1182,7 @@ async.series({
     }).on('cycle', function(event) {
       console.log('webp ' + String(event.target));
     }).on('complete', function() {
-      callback(null, this.filter('fastest').pluck('name'));
+      callback(null, this.filter('fastest').map('name'));
     }).run();
   }
 }, function(err, results) {

@@ -5,11 +5,9 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
+describe('Crop', function() {
 
-describe('Crop gravities', function() {
-
-  var testSettings = [
+  [
     {
       name: 'North',
       width: 320,
@@ -50,6 +48,13 @@ describe('Crop gravities', function() {
       width: 80,
       height: 320,
       gravity: sharp.gravity.centre,
+      fixture: 'gravity-centre.jpg'
+    },
+    {
+      name: 'Default (centre)',
+      width: 80,
+      height: 320,
+      gravity: undefined,
       fixture: 'gravity-centre.jpg'
     },
     {
@@ -108,10 +113,8 @@ describe('Crop gravities', function() {
       gravity: sharp.gravity.northwest,
       fixture: 'gravity-west.jpg'
     }
-  ];
-
-  testSettings.forEach(function(settings) {
-    it(settings.name, function(done) {
+  ].forEach(function(settings) {
+    it(settings.name + ' gravity', function(done) {
       sharp(fixtures.inputJpg)
         .resize(settings.width, settings.height)
         .crop(settings.gravity)
@@ -124,7 +127,7 @@ describe('Crop gravities', function() {
     });
   });
 
-  it('allows specifying the gravity as a string', function(done) {
+  it('Allows specifying the gravity as a string', function(done) {
     sharp(fixtures.inputJpg)
       .resize(80, 320)
       .crop('east')
@@ -136,15 +139,57 @@ describe('Crop gravities', function() {
       });
   });
 
-  it('Invalid number', function() {
+  it('Invalid values fail', function() {
     assert.throws(function() {
-      sharp(fixtures.inputJpg).crop(9);
+      sharp().crop(9);
+    });
+    assert.throws(function() {
+      sharp().crop(1.1);
+    });
+    assert.throws(function() {
+      sharp().crop(-1);
+    });
+    assert.throws(function() {
+      sharp().crop('zoinks');
     });
   });
 
-  it('Invalid string', function() {
-    assert.throws(function() {
-      sharp(fixtures.inputJpg).crop('yadda');
+  it('Uses default value when none specified', function() {
+    assert.doesNotThrow(function() {
+      sharp().crop();
     });
   });
+
+  describe('Entropy-based strategy', function() {
+
+    it('JPEG', function(done) {
+      sharp(fixtures.inputJpgWithCmykProfile)
+        .resize(80, 320)
+        .crop(sharp.strategy.entropy)
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual(80, info.width);
+          assert.strictEqual(320, info.height);
+          fixtures.assertSimilar(fixtures.expected('crop-entropy.jpg'), data, done);
+        });
+    });
+
+    it('PNG', function(done) {
+      sharp(fixtures.inputPngWithTransparency)
+        .resize(320, 80)
+        .crop(sharp.strategy.entropy)
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(4, info.channels);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80, info.height);
+          fixtures.assertSimilar(fixtures.expected('crop-entropy.png'), data, done);
+        });
+    });
+
+  });
+
 });

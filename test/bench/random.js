@@ -8,6 +8,8 @@ var Benchmark = require('benchmark');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
+sharp.simd(true);
+
 var min = 320;
 var max = 960;
 
@@ -68,7 +70,7 @@ new Benchmark.Suite('random').add('imagemagick', {
 }).on('cycle', function(event) {
   console.log(String(event.target));
 }).on('complete', function() {
-  var winner = this.filter('fastest').pluck('name');
+  var winner = this.filter('fastest').map('name');
   assert.strictEqual('sharp', String(winner), 'sharp was slower than ' + winner);
   console.dir(sharp.cache());
 }).run();

@@ -248,6 +248,34 @@
   ...
   fun:_ZN2v88internal12_GLOBAL__N_117CreateICUCollatorEPNS0_7IsolateERKN6icu_556LocaleENS0_6HandleINS0_8JSObjectEEE
 }
+{
+  leak_v8_CallInterfaceDescriptorData
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal27CallInterfaceDescriptorData26InitializePlatformSpecificEiPNS0_8RegisterEPNS0_27PlatformInterfaceDescriptorE
+}
+{
+  leak_v8_InitializePlatformSpecific14
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal14LoadDescriptor26InitializePlatformSpecificEPNS0_27CallInterfaceDescriptorDataE
+}
+{
+  leak_v8_InitializePlatformSpecific15
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal15StoreDescriptor26InitializePlatformSpecificEPNS0_27CallInterfaceDescriptorDataE
+}
+{
+  leak_v8_Malloced
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN2v88internal8Malloced3NewEm
+}
 
 # vips__init warnings
 {
@@ -279,18 +307,14 @@
   fun:vips__magick_read_header
 }
 {
-  cond_magick_is_palette_image
-  Memcheck:Cond
-  fun:IsPaletteImage
-  ...
-  fun:get_bands
-}
-{
   value_magick_is_palette_image
   Memcheck:Value8
   fun:IsPaletteImage
-  ...
-  fun:get_bands
+}
+{
+  cond_magick_is_palette_image
+  Memcheck:Cond
+  fun:IsPaletteImage
 }
 
 # glib g_file_read_link

@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.12.0",
+  "version": "0.14.0",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -18,7 +18,8 @@
     "Alaric Holloway <alaric.holloway@gmail.com>",
     "Bernhard K. Weisshuhn <bkw@codingforce.com>",
     "Chris Riley <criley@primedia.com>",
-    "David Carley <dacarley@gmail.com>"
+    "David Carley <dacarley@gmail.com>",
+    "John Tobin <john@limelightmobileinc.com>"
   ],
   "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
   "scripts": {
@@ -47,28 +48,28 @@
     "vips"
   ],
   "dependencies": {
-    "bluebird": "^3.0.5",
-    "color": "^0.10.1",
-    "nan": "^2.1.0",
+    "bluebird": "^3.3.4",
+    "color": "^0.11.1",
+    "nan": "^2.2.1",
     "semver": "^5.1.0",
-    "request": "^2.67.0",
+    "request": "^2.69.0",
     "tar": "^2.2.1"
   },
   "devDependencies": {
-    "async": "^1.5.0",
-    "coveralls": "^2.11.4",
+    "async": "^1.5.2",
+    "coveralls": "^2.11.9",
     "exif-reader": "^1.0.0",
     "icc": "^0.0.2",
-    "istanbul": "^0.4.0",
-    "mocha": "^2.3.4",
-    "mocha-jshint": "^2.2.5",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.5",
+    "mocha-jshint": "^2.3.1",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.4.4",
+    "rimraf": "^2.5.2",
     "bufferutil": "^1.2.1"
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.1.1"
+    "libvips": "8.2.3"
   },
   "engines": {
     "node": ">=0.10"

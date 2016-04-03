@@ -1,6 +1,7 @@
 #include <cmath>
 #include <node.h>
-#include <vips/vips.h>
+#include <vips/vips8>
+#include <vips/vector.h>
 
 #include "nan.h"
 
@@ -23,33 +24,49 @@ using Nan::To;
 using Nan::Utf8String;
 
 /*
-  Get and set cache memory and item limits
+  Get and set cache limits
 */
 NAN_METHOD(cache) {
   HandleScope();
 
-  // Set cache memory limit
+  // Set memory limit
   if (info[0]->IsInt32()) {
     vips_cache_set_max_mem(To<int32_t>(info[0]).FromJust() * 1048576);
   }
-
-  // Set cache items limit
+  // Set file limit
   if (info[1]->IsInt32()) {
-    vips_cache_set_max(To<int32_t>(info[1]).FromJust());
+    vips_cache_set_max_files(To<int32_t>(info[1]).FromJust());
+  }
+  // Set items limit
+  if (info[2]->IsInt32()) {
+    vips_cache_set_max(To<int32_t>(info[2]).FromJust());
   }
 
-  // Get cache statistics
-  Local<Object> cache = New<Object>();
-  Set(cache, New("current").ToLocalChecked(),
+  // Get memory stats
+  Local<Object> memory = New<Object>();
+  Set(memory, New("current").ToLocalChecked(),
     New<Integer>(static_cast<int>(round(vips_tracked_get_mem() / 1048576)))
   );
-  Set(cache, New("high").ToLocalChecked(),
+  Set(memory, New("high").ToLocalChecked(),
     New<Integer>(static_cast<int>(round(vips_tracked_get_mem_highwater() / 1048576)))
   );
-  Set(cache, New("memory").ToLocalChecked(),
+  Set(memory, New("max").ToLocalChecked(),
     New<Integer>(static_cast<int>(round(vips_cache_get_max_mem() / 1048576)))
   );
-  Set(cache, New("items").ToLocalChecked(), New<Integer>(vips_cache_get_max()));
+  // Get file stats
+  Local<Object> files = New<Object>();
+  Set(files, New("current").ToLocalChecked(), New<Integer>(vips_tracked_get_files()));
+  Set(files, New("max").ToLocalChecked(), New<Integer>(vips_cache_get_max_files()));
+
+  // Get item stats
+  Local<Object> items = New<Object>();
+  Set(items, New("current").ToLocalChecked(), New<Integer>(vips_cache_get_size()));
+  Set(items, New("max").ToLocalChecked(), New<Integer>(vips_cache_get_max()));
+
+  Local<Object> cache = New<Object>();
+  Set(cache, New("memory").ToLocalChecked(), memory);
+  Set(cache, New("files").ToLocalChecked(), files);
+  Set(cache, New("items").ToLocalChecked(), items);
   info.GetReturnValue().Set(cache);
 }
 
@@ -79,6 +96,20 @@ NAN_METHOD(counters) {
   Set(counters, New("queue").ToLocalChecked(), New<Integer>(counterQueue));
   Set(counters, New("process").ToLocalChecked(), New<Integer>(counterProcess));
   info.GetReturnValue().Set(counters);
+}
+
+/*
+  Get and set use of SIMD vector unit instructions
+*/
+NAN_METHOD(simd) {
+  HandleScope();
+
+  // Set state
+  if (info[0]->IsBoolean()) {
+    vips_vector_set_enabled(To<bool>(info[0]).FromJust());
+  }
+  // Get state
+  info.GetReturnValue().Set(New<Boolean>(vips_vector_isenabled()));
 }
 
 /*
@@ -141,19 +172,17 @@ NAN_METHOD(format) {
   Local<String> rawId = New("raw").ToLocalChecked();
   Set(raw, attrId, rawId);
   Set(format, rawId, raw);
-  // No support for raw input yet, so always false
+  Local<Boolean> supported = New<Boolean>(true);
   Local<Boolean> unsupported = New<Boolean>(false);
   Local<Object> rawInput = New<Object>();
   Set(rawInput, attrFile, unsupported);
-  Set(rawInput, attrBuffer, unsupported);
-  Set(rawInput, attrStream, unsupported);
+  Set(rawInput, attrBuffer, supported);
+  Set(rawInput, attrStream, supported);
   Set(raw, attrInput, rawInput);
-  // Raw output via Buffer/Stream is available in libvips >= 7.42.0
-  Local<Boolean> hasOutputBufferRaw = New<Boolean>(vips_version(0) >= 8 || (vips_version(0) == 7 && vips_version(1) >= 42));
   Local<Object> rawOutput = New<Object>();
   Set(rawOutput, attrFile, unsupported);
-  Set(rawOutput, attrBuffer, hasOutputBufferRaw);
-  Set(rawOutput, attrStream, hasOutputBufferRaw);
+  Set(rawOutput, attrBuffer, supported);
+  Set(rawOutput, attrStream, supported);
   Set(raw, attrOutput, rawOutput);
 
   info.GetReturnValue().Set(format);
@@ -165,101 +194,64 @@ NAN_METHOD(format) {
   between two images of the same dimensions and number of channels.
 */
 NAN_METHOD(_maxColourDistance) {
+  using vips::VImage;
+  using vips::VError;
   using sharp::DetermineImageType;
   using sharp::ImageType;
-  using sharp::InitImage;
   using sharp::HasAlpha;
 
   HandleScope();
 
-  // Create "hook" VipsObject to hang image references from
-  VipsObject *hook = reinterpret_cast<VipsObject*>(vips_image_new());
-
   // Open input files
-  VipsImage *image1 = nullptr;
+  VImage image1;
   ImageType imageType1 = DetermineImageType(*Utf8String(info[0]));
   if (imageType1 != ImageType::UNKNOWN) {
-    image1 = InitImage(*Utf8String(info[0]), VIPS_ACCESS_SEQUENTIAL);
-    if (image1 == nullptr) {
-      g_object_unref(hook);
+    try {
+      image1 = VImage::new_from_file(*Utf8String(info[0]));
+    } catch (...) {
       return ThrowError("Input file 1 has corrupt header");
-    } else {
-      vips_object_local(hook, image1);
     }
   } else {
-    g_object_unref(hook);
     return ThrowError("Input file 1 is of an unsupported image format");
   }
-  VipsImage *image2 = nullptr;
+  VImage image2;
   ImageType imageType2 = DetermineImageType(*Utf8String(info[1]));
   if (imageType2 != ImageType::UNKNOWN) {
-    image2 = InitImage(*Utf8String(info[1]), VIPS_ACCESS_SEQUENTIAL);
-    if (image2 == nullptr) {
-      g_object_unref(hook);
+    try {
+      image2 = VImage::new_from_file(*Utf8String(info[1]));
+    } catch (...) {
       return ThrowError("Input file 2 has corrupt header");
-    } else {
-      vips_object_local(hook, image2);
     }
   } else {
-    g_object_unref(hook);
     return ThrowError("Input file 2 is of an unsupported image format");
   }
-
   // Ensure same number of channels
-  if (image1->Bands != image2->Bands) {
-    g_object_unref(hook);
+  if (image1.bands() != image2.bands()) {
     return ThrowError("mismatchedBands");
   }
   // Ensure same dimensions
-  if (image1->Xsize != image2->Xsize || image1->Ysize != image2->Ysize) {
-    g_object_unref(hook);
+  if (image1.width() != image2.width() || image1.height() != image2.height()) {
     return ThrowError("mismatchedDimensions");
   }
 
-  // Premultiply and remove alpha
-  if (HasAlpha(image1)) {
-    VipsImage *imagePremultiplied1;
-    if (vips_premultiply(image1, &imagePremultiplied1, nullptr)) {
-      g_object_unref(hook);
-      return ThrowError(vips_error_buffer());
-    }
-    vips_object_local(hook, imagePremultiplied1);
-    VipsImage *imagePremultipliedNoAlpha1;
-    if (vips_extract_band(image1, &imagePremultipliedNoAlpha1, 1, "n", image1->Bands - 1, nullptr)) {
-      g_object_unref(hook);
-      return ThrowError(vips_error_buffer());
-    }
-    vips_object_local(hook, imagePremultipliedNoAlpha1);
-    image1 = imagePremultipliedNoAlpha1;
-  }
-  if (HasAlpha(image2)) {
-    VipsImage *imagePremultiplied2;
-    if (vips_premultiply(image2, &imagePremultiplied2, nullptr)) {
-      g_object_unref(hook);
-      return ThrowError(vips_error_buffer());
-    }
-    vips_object_local(hook, imagePremultiplied2);
-    VipsImage *imagePremultipliedNoAlpha2;
-    if (vips_extract_band(image2, &imagePremultipliedNoAlpha2, 1, "n", image2->Bands - 1, nullptr)) {
-      g_object_unref(hook);
-      return ThrowError(vips_error_buffer());
-    }
-    vips_object_local(hook, imagePremultipliedNoAlpha2);
-    image2 = imagePremultipliedNoAlpha2;
-  }
-  // Calculate colour distance
-  VipsImage *difference;
-  if (vips_dE00(image1, image2, &difference, nullptr)) {
-    g_object_unref(hook);
-    return ThrowError(vips_error_buffer());
-  }
-  vips_object_local(hook, difference);
-  // Extract maximum distance
   double maxColourDistance;
-  if (vips_max(difference, &maxColourDistance, nullptr)) {
-    g_object_unref(hook);
-    return ThrowError(vips_error_buffer());
+  try {
+    // Premultiply and remove alpha
+    if (HasAlpha(image1)) {
+      image1 = image1.premultiply().extract_band(1, VImage::option()->set("n", image1.bands() - 1));
+    }
+    if (HasAlpha(image2)) {
+      image2 = image2.premultiply().extract_band(1, VImage::option()->set("n", image2.bands() - 1));
+    }
+    // Calculate colour distance
+    maxColourDistance = image1.dE00(image2).max();
+  } catch (VError err) {
+    return ThrowError(err.what());
   }
-  g_object_unref(hook);
+
+  // Clean up libvips' per-request data and threads
+  vips_error_clear();
+  vips_thread_shutdown();
+
   info.GetReturnValue().Set(New<Number>(maxColourDistance));
 }

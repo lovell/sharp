@@ -4,8 +4,8 @@ The typical use case for this high speed Node.js module
 is to convert large images of many formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
-Resizing an image is typically 4x faster than using
-the quickest ImageMagick and GraphicsMagick settings.
+Resizing an image is typically 4x faster than using the
+quickest ImageMagick and GraphicsMagick settings.
 
 Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
 Bicubic interpolation with Lanczos anti-alias filtering ensures quality is not sacrificed for speed.
@@ -13,7 +13,7 @@ Bicubic interpolation with Lanczos anti-alias filtering ensures quality is not s
 As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
-64-bit Windows and recent Linux systems do not require
+Most Windows (x64), Linux and ARMv6+ systems do not require
 the installation of any external runtime dependencies.
 
 Use with OS X is as simple as running `brew install homebrew/science/vips`
@@ -24,7 +24,7 @@ to install the libvips dependency.
 ### Formats
 
 This module supports reading JPEG, PNG, WebP, TIFF, OpenSlide,
-GIF and other libmagick-supported formats.
+GIF and most other libmagick-supported formats.
 
 Output images can be in JPEG, PNG and WebP formats as well as uncompressed raw pixel data.
 

@@ -5,8 +5,6 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
-
 describe('Gamma correction', function() {
 
   it('value of 0.0 (disabled)', function(done) {
@@ -16,7 +14,7 @@ describe('Gamma correction', function() {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(129, info.width);
         assert.strictEqual(111, info.height);
-        fixtures.assertSimilar(fixtures.expected('gamma-0.0.jpg'), data, done);
+        fixtures.assertSimilar(fixtures.expected('gamma-0.0.jpg'), data, { threshold: 9 }, done);
       });
   });
 

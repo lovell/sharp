@@ -1,6 +1,53 @@
 {
   'targets': [{
+    'target_name': 'libvips-cpp',
+    'conditions': [
+      ['OS == "win"', {
+        # Build libvips C++ binding for Windows due to MSVC std library ABI changes
+        'type': 'shared_library',
+        'variables': {
+          'download_vips': '<!(node -e "require(\'./binding\').download_vips()")'
+        },
+        'defines': [
+          'VIPS_CPLUSPLUS_EXPORTS'
+        ],
+        'sources': [
+          'src/libvips/cplusplus/VError.cpp',
+          'src/libvips/cplusplus/VInterpolate.cpp',
+          'src/libvips/cplusplus/VImage.cpp'
+        ],
+        'include_dirs': [
+          '<(module_root_dir)/include',
+          '<(module_root_dir)/include/glib-2.0',
+          '<(module_root_dir)/lib/glib-2.0/include'
+        ],
+        'libraries': [
+          '<(module_root_dir)/lib/libvips.lib',
+          '<(module_root_dir)/lib/libglib-2.0.lib',
+          '<(module_root_dir)/lib/libgobject-2.0.lib'
+        ],
+        'configurations': {
+          'Release': {
+            'msvs_settings': {
+              'VCCLCompilerTool': {
+                'ExceptionHandling': 1
+              }
+            },
+            'msvs_disabled_warnings': [
+              4275
+            ]
+          }
+        }
+      }, {
+        # Ignore this target for non-Windows
+        'type': 'none'
+      }]
+    ]
+  }, {
     'target_name': 'sharp',
+    'dependencies': [
+      'libvips-cpp'
+    ],
     # Nested variables "pattern" borrowed from http://src.chromium.org/viewvc/chrome/trunk/src/build/common.gypi
     'variables': {
       'variables': {
@@ -17,7 +64,7 @@
         'conditions': [
           ['OS != "win"', {
             # Which version, if any, of libvips is available globally via pkg-config?
-            'global_vips_version': '<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --modversion vips 2>/dev/null || true)'
+            'global_vips_version': '<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --modversion vips-cpp 2>/dev/null || true)'
           }, {
             'global_vips_version': ''
           }]
@@ -43,18 +90,21 @@
       'src/sharp.cc',
       'src/utilities.cc'
     ],
+    'defines': [
+      '_GLIBCXX_USE_CXX11_ABI=0'
+    ],
     'include_dirs': [
       '<!(node -e "require(\'nan\')")'
     ],
     'conditions': [
       ['use_global_vips == "true"', {
         # Use pkg-config for include and lib
-        'include_dirs': ['<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --cflags vips glib-2.0)'],
+        'include_dirs': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --cflags-only-I vips-cpp vips glib-2.0 | sed s\/-I//g)'],
         'conditions': [
           ['runtime_link == "static"', {
-            'libraries': ['<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips --static)']
+            'libraries': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs --static vips-cpp)']
           }, {
-            'libraries': ['<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips)']
+            'libraries': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips-cpp)']
           }]
         ]
       }, {
@@ -66,9 +116,6 @@
         ],
         'conditions': [
           ['OS == "win"', {
-            'variables': {
-              'download_vips': '<!(node -e "require(\'./binding\').download_vips()")'
-            },
             'libraries': [
               '<(module_root_dir)/lib/libvips.lib',
               '<(module_root_dir)/lib/libglib-2.0.lib',
@@ -80,12 +127,13 @@
               'download_vips': '<!(LDD_VERSION="<!(ldd --version 2>&1 || true)" node -e "require(\'./binding\').download_vips()")'
             },
             'libraries': [
+              '<(module_root_dir)/lib/libvips-cpp.so',
               '<(module_root_dir)/lib/libvips.so',
               '<(module_root_dir)/lib/libglib-2.0.so',
               '<(module_root_dir)/lib/libgobject-2.0.so',
               # Dependencies of dependencies, included for openSUSE support
-              '<(module_root_dir)/lib/libMagickCore-6.Q16.so',
-              '<(module_root_dir)/lib/libMagickWand-6.Q16.so',
+              '<(module_root_dir)/lib/libGraphicsMagick.so',
+              '<(module_root_dir)/lib/libGraphicsMagickWand.so',
               '<(module_root_dir)/lib/libexif.so',
               '<(module_root_dir)/lib/libgio-2.0.so',
               '<(module_root_dir)/lib/libgmodule-2.0.so',
@@ -118,6 +166,7 @@
       'CLANG_CXX_LANGUAGE_STANDARD': 'c++11',
       'CLANG_CXX_LIBRARY': 'libc++',
       'MACOSX_DEPLOYMENT_TARGET': '10.7',
+      'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
       'OTHER_CPLUSPLUSFLAGS': [
         '-fexceptions',
         '-Wall',
@@ -130,7 +179,10 @@
           'VCCLCompilerTool': {
             'ExceptionHandling': 1
           }
-        }
+        },
+        'msvs_disabled_warnings': [
+          4275
+        ]
       }
     },
   }, {
@@ -169,7 +221,7 @@
             '<(module_root_dir)/lib/libintl-8.dll',
             '<(module_root_dir)/lib/libjpeg-62.dll',
             '<(module_root_dir)/lib/liblcms2-2.dll',
-            '<(module_root_dir)/lib/libopenjpeg-1.dll',
+            '<(module_root_dir)/lib/libopenjp2.dll',
             '<(module_root_dir)/lib/libopenslide-0.dll',
             '<(module_root_dir)/lib/libpango-1.0-0.dll',
             '<(module_root_dir)/lib/libpangocairo-1.0-0.dll',

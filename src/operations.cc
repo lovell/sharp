@@ -1,66 +1,54 @@
-#include <vips/vips.h>
+#include <algorithm>
+#include <tuple>
+#include <vips/vips8>
 
 #include "common.h"
 #include "operations.h"
 
+using vips::VImage;
+using vips::VError;
+
 namespace sharp {
 
   /*
-    Alpha composite src over dst
-    Assumes alpha channels are already premultiplied and will be unpremultiplied after
+    Alpha composite src over dst with given gravity.
+    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
    */
-  int Composite(VipsObject *context, VipsImage *src, VipsImage *dst, VipsImage **out) {
+  VImage Composite(VImage src, VImage dst, const int gravity) {
+    using sharp::CalculateCrop;
     using sharp::HasAlpha;
 
-    // Split src into non-alpha and alpha
-    VipsImage *srcWithoutAlpha;
-    if (vips_extract_band(src, &srcWithoutAlpha, 0, "n", src->Bands - 1, nullptr))
-      return -1;
-    vips_object_local(context, srcWithoutAlpha);
-    VipsImage *srcAlpha;
-    if (vips_extract_band(src, &srcAlpha, src->Bands - 1, "n", 1, nullptr))
-      return -1;
-    vips_object_local(context, srcAlpha);
-
-    // Split dst into non-alpha and alpha channels
-    VipsImage *dstWithoutAlpha;
-    VipsImage *dstAlpha;
-    if (HasAlpha(dst)) {
-      // Non-alpha: extract all-but-last channel
-      if (vips_extract_band(dst, &dstWithoutAlpha, 0, "n", dst->Bands - 1, nullptr)) {
-        return -1;
-      }
-      vips_object_local(context, dstWithoutAlpha);
-      // Alpha: Extract last channel
-      if (vips_extract_band(dst, &dstAlpha, dst->Bands - 1, "n", 1, nullptr)) {
-        return -1;
-      }
-      vips_object_local(context, dstAlpha);
-    } else {
-      // Non-alpha: Copy reference
-      dstWithoutAlpha = dst;
-      // Alpha: Use blank, opaque (0xFF) image
-      VipsImage *black;
-      if (vips_black(&black, dst->Xsize, dst->Ysize, nullptr)) {
-        return -1;
-      }
-      vips_object_local(context, black);
-      if (vips_invert(black, &dstAlpha, nullptr)) {
-        return -1;
-      }
-      vips_object_local(context, dstAlpha);
+    if (!HasAlpha(src)) {
+      throw VError("Overlay image must have an alpha channel");
+    }
+    if (!HasAlpha(dst)) {
+      throw VError("Image to be overlaid must have an alpha channel");
+    }
+    if (src.width() > dst.width() || src.height() > dst.height()) {
+      throw VError("Overlay image must have same dimensions or smaller");
     }
 
-    // Compute normalized input alpha channels:
-    VipsImage *srcAlphaNormalized;
-    if (vips_linear1(srcAlpha, &srcAlphaNormalized, 1.0 / 255.0, 0.0, nullptr))
-      return -1;
-    vips_object_local(context, srcAlphaNormalized);
+    // Enlarge overlay src, if required
+    if (src.width() < dst.width() || src.height() < dst.height()) {
+      // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
+      int left;
+      int top;
+      std::tie(left, top) = CalculateCrop(dst.width(), dst.height(), src.width(), src.height(), gravity);
+      // Embed onto transparent background
+      std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
+      src = src.embed(left, top, dst.width(), dst.height(), VImage::option()
+        ->set("extend", VIPS_EXTEND_BACKGROUND)
+        ->set("background", background)
+      );
+    }
 
-    VipsImage *dstAlphaNormalized;
-    if (vips_linear1(dstAlpha, &dstAlphaNormalized, 1.0 / 255.0, 0.0, nullptr))
-      return -1;
-    vips_object_local(context, dstAlphaNormalized);
+    // Split src into non-alpha and alpha channels
+    VImage srcWithoutAlpha = src.extract_band(0, VImage::option()->set("n", src.bands() - 1));
+    VImage srcAlpha = src[src.bands() - 1] * (1.0 / 255.0);
+
+    // Split dst into non-alpha and alpha channels
+    VImage dstWithoutAlpha = dst.extract_band(0, VImage::option()->set("n", dst.bands() - 1));
+    VImage dstAlpha = dst[dst.bands() - 1] * (1.0 / 255.0);
 
     //
     // Compute normalized output alpha channel:
@@ -72,22 +60,8 @@ namespace sharp {
     // out_a = src_a + dst_a * (1 - src_a)
     //                         ^^^^^^^^^^^
     //                            t0
-    //                 ^^^^^^^^^^^^^^^^^^^
-    //                         t1
-    VipsImage *t0;
-    if (vips_linear1(srcAlphaNormalized, &t0, -1.0, 1.0, nullptr))
-      return -1;
-    vips_object_local(context, t0);
-
-    VipsImage *t1;
-    if (vips_multiply(dstAlphaNormalized, t0, &t1, nullptr))
-      return -1;
-    vips_object_local(context, t1);
-
-    VipsImage *outAlphaNormalized;
-    if (vips_add(srcAlphaNormalized, t1, &outAlphaNormalized, nullptr))
-      return -1;
-    vips_object_local(context, outAlphaNormalized);
+    VImage t0 = srcAlpha.linear(-1.0, 1.0);
+    VImage outAlphaNormalized = srcAlpha + dstAlpha * t0;
 
     //
     // Compute output RGB channels:
@@ -101,182 +75,179 @@ namespace sharp {
     // premultiplied RGBA image as reversal of premultiplication is handled
     // externally.
     //
-    VipsImage *t2;
-    if (vips_multiply(dstWithoutAlpha, t0, &t2, nullptr))
-      return -1;
-    vips_object_local(context, t2);
-
-    VipsImage *outRGBPremultiplied;
-    if (vips_add(srcWithoutAlpha, t2, &outRGBPremultiplied, nullptr))
-      return -1;
-    vips_object_local(context, outRGBPremultiplied);
-
-    // Denormalize output alpha channel:
-    VipsImage *outAlpha;
-    if (vips_linear1(outAlphaNormalized, &outAlpha, 255.0, 0.0, nullptr))
-      return -1;
-    vips_object_local(context, outAlpha);
+    VImage outRGBPremultiplied = srcWithoutAlpha + dstWithoutAlpha * t0;
 
     // Combine RGB and alpha channel into output image:
-    return vips_bandjoin2(outRGBPremultiplied, outAlpha, out, nullptr);
+    return outRGBPremultiplied.bandjoin(outAlphaNormalized * 255.0);
   }
 
   /*
    * Stretch luminance to cover full dynamic range.
    */
-  int Normalize(VipsObject *context, VipsImage *image, VipsImage **out) {
+  VImage Normalize(VImage image) {
     // Get original colourspace
-    VipsInterpretation typeBeforeNormalize = image->Type;
+    VipsInterpretation typeBeforeNormalize = image.interpretation();
     if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {
       typeBeforeNormalize = VIPS_INTERPRETATION_sRGB;
     }
     // Convert to LAB colourspace
-    VipsImage *lab;
-    if (vips_colourspace(image, &lab, VIPS_INTERPRETATION_LAB, nullptr)) {
-      return -1;
-    }
-    vips_object_local(context, lab);
+    VImage lab = image.colourspace(VIPS_INTERPRETATION_LAB);
     // Extract luminance
-    VipsImage *luminance;
-    if (vips_extract_band(lab, &luminance, 0, "n", 1, nullptr)) {
-      return -1;
-    }
-    vips_object_local(context, luminance);
-    // Extract chroma
-    VipsImage *chroma;
-    if (vips_extract_band(lab, &chroma, 1, "n", 2, nullptr)) {
-      return -1;
-    }
-    vips_object_local(context, chroma);
+    VImage luminance = lab[0];
     // Find luminance range
-    VipsImage *stats;
-    if (vips_stats(luminance, &stats, nullptr)) {
-      return -1;
-    }
-    vips_object_local(context, stats);
-    double min = *VIPS_MATRIX(stats, 0, 0);
-    double max = *VIPS_MATRIX(stats, 1, 0);
+    VImage stats = luminance.stats();
+    double min = stats(0, 0)[0];
+    double max = stats(1, 0)[0];
     if (min != max) {
+      // Extract chroma
+      VImage chroma = lab.extract_band(1, VImage::option()->set("n", 2));
+      // Calculate multiplication factor and addition
       double f = 100.0 / (max - min);
       double a = -(min * f);
-      // Scale luminance
-      VipsImage *luminance100;
-      if (vips_linear1(luminance, &luminance100, f, a, nullptr)) {
-        return -1;
-      }
-      vips_object_local(context, luminance100);
-      // Join scaled luminance to chroma
-      VipsImage *normalizedLab;
-      if (vips_bandjoin2(luminance100, chroma, &normalizedLab, nullptr)) {
-        return -1;
-      }
-      vips_object_local(context, normalizedLab);
-      // Convert to original colourspace
-      VipsImage *normalized;
-      if (vips_colourspace(normalizedLab, &normalized, typeBeforeNormalize, nullptr)) {
-        return -1;
-      }
-      vips_object_local(context, normalized);
+      // Scale luminance, join to chroma, convert back to original colourspace
+      VImage normalized = luminance.linear(f, a).bandjoin(chroma).colourspace(typeBeforeNormalize);
       // Attach original alpha channel, if any
       if (HasAlpha(image)) {
         // Extract original alpha channel
-        VipsImage *alpha;
-        if (vips_extract_band(image, &alpha, image->Bands - 1, "n", 1, nullptr)) {
-          return -1;
-        }
-        vips_object_local(context, alpha);
+        VImage alpha = image[image.bands() - 1];
         // Join alpha channel to normalised image
-        VipsImage *normalizedAlpha;
-        if (vips_bandjoin2(normalized, alpha, &normalizedAlpha, nullptr)) {
-          return -1;
-        }
-        vips_object_local(context, normalizedAlpha);
-        *out = normalizedAlpha;
+        return normalized.bandjoin(alpha);
       } else {
-        *out = normalized;
+        return normalized;
       }
-    } else {
-      // Cannot normalise zero-range image
-      *out = image;
     }
-    return 0;
+    return image;
+  }
+
+  /*
+   * Gamma encoding/decoding
+   */
+  VImage Gamma(VImage image, double const exponent) {
+    if (HasAlpha(image)) {
+      // Separate alpha channel
+      VImage imageWithoutAlpha = image.extract_band(0,
+        VImage::option()->set("n", image.bands() - 1));
+      VImage alpha = image[image.bands() - 1];
+      return imageWithoutAlpha.gamma(VImage::option()->set("exponent", exponent)).bandjoin(alpha);
+    } else {
+      return image.gamma(VImage::option()->set("exponent", exponent));
+    }
   }
 
   /*
    * Gaussian blur (use sigma <0 for fast blur)
    */
-  int Blur(VipsObject *context, VipsImage *image, VipsImage **out, double sigma) {
-    VipsImage *blurred;
+  VImage Blur(VImage image, double const sigma) {
     if (sigma < 0.0) {
       // Fast, mild blur - averages neighbouring pixels
-      VipsImage *blur = vips_image_new_matrixv(3, 3,
+      VImage blur = VImage::new_matrixv(3, 3,
         1.0, 1.0, 1.0,
         1.0, 1.0, 1.0,
         1.0, 1.0, 1.0);
-      vips_image_set_double(blur, "scale", 9);
-      vips_object_local(context, blur);
-      if (vips_conv(image, &blurred, blur, nullptr)) {
-        return -1;
-      }
+      blur.set("scale", 9.0);
+      return image.conv(blur);
     } else {
       // Slower, accurate Gaussian blur
-      // Create Gaussian function for standard deviation
-      VipsImage *gaussian;
-      if (vips_gaussmat(&gaussian, sigma, 0.2, "separable", TRUE, "integer", TRUE, nullptr)) {
-        return -1;
-      }
-      vips_object_local(context, gaussian);
-      // Apply Gaussian function
-      if (vips_convsep(image, &blurred, gaussian, "precision", VIPS_PRECISION_INTEGER, nullptr)) {
-        return -1;
-      }
+      return image.gaussblur(sigma);
     }
-    vips_object_local(context, blurred);
-    *out = blurred;
-    return 0;
   }
 
   /*
    * Sharpen flat and jagged areas. Use radius of -1 for fast sharpen.
    */
-  int Sharpen(VipsObject *context, VipsImage *image, VipsImage **out, int radius, double flat, double jagged) {
-    VipsImage *sharpened;
+  VImage Sharpen(VImage image, int const radius, double const flat, double const jagged) {
     if (radius == -1) {
       // Fast, mild sharpen
-      VipsImage *sharpen = vips_image_new_matrixv(3, 3,
+      VImage sharpen = VImage::new_matrixv(3, 3,
         -1.0, -1.0, -1.0,
         -1.0, 32.0, -1.0,
         -1.0, -1.0, -1.0);
-      vips_image_set_double(sharpen, "scale", 24);
-      vips_object_local(context, sharpen);
-      if (vips_conv(image, &sharpened, sharpen, nullptr)) {
-        return -1;
-      }
+      sharpen.set("scale", 24.0);
+      return image.conv(sharpen);
     } else {
       // Slow, accurate sharpen in LAB colour space, with control over flat vs jagged areas
-      if (vips_sharpen(image, &sharpened, "radius", radius, "m1", flat, "m2", jagged, nullptr)) {
-        return -1;
+      return image.sharpen(
+        VImage::option()->set("radius", radius)->set("m1", flat)->set("m2", jagged)
+      );
+    }
+  }
+
+  /*
+    Calculate crop area based on image entropy
+  */
+  std::tuple<int, int> EntropyCrop(VImage image, int const outWidth, int const outHeight) {
+    int left = 0;
+    int top = 0;
+    int const inWidth = image.width();
+    int const inHeight = image.height();
+    if (inWidth > outWidth) {
+      // Reduce width by repeated removing slices from edge with lowest entropy
+      int width = inWidth;
+      double leftEntropy = 0.0;
+      double rightEntropy = 0.0;
+      // Max width of each slice
+      int const maxSliceWidth = static_cast<int>(ceil((inWidth - outWidth) / 8.0));
+      while (width > outWidth) {
+        // Width of current slice
+        int const slice = std::min(width - outWidth, maxSliceWidth);
+        if (leftEntropy == 0.0) {
+          // Update entropy of left slice
+          leftEntropy = Entropy(image.extract_area(left, 0, slice, inHeight));
+        }
+        if (rightEntropy == 0.0) {
+          // Update entropy of right slice
+          rightEntropy = Entropy(image.extract_area(width - slice - 1, 0, slice, inHeight));
+        }
+        // Keep slice with highest entropy
+        if (leftEntropy >= rightEntropy) {
+          // Discard right slice
+          rightEntropy = 0.0;
+        } else {
+          // Discard left slice
+          leftEntropy = 0.0;
+          left = left + slice;
+        }
+        width = width - slice;
       }
     }
-    vips_object_local(context, sharpened);
-    *out = sharpened;
-    return 0;
+    if (inHeight > outHeight) {
+      // Reduce height by repeated removing slices from edge with lowest entropy
+      int height = inHeight;
+      double topEntropy = 0.0;
+      double bottomEntropy = 0.0;
+      // Max height of each slice
+      int const maxSliceHeight = static_cast<int>(ceil((inHeight - outHeight) / 8.0));
+      while (height > outHeight) {
+        // Height of current slice
+        int const slice = std::min(height - outHeight, maxSliceHeight);
+        if (topEntropy == 0.0) {
+          // Update entropy of top slice
+          topEntropy = Entropy(image.extract_area(0, top, inWidth, slice));
+        }
+        if (bottomEntropy == 0.0) {
+          // Update entropy of bottom slice
+          bottomEntropy = Entropy(image.extract_area(0, height - slice - 1, inWidth, slice));
+        }
+        // Keep slice with highest entropy
+        if (topEntropy >= bottomEntropy) {
+          // Discard bottom slice
+          bottomEntropy = 0.0;
+        } else {
+          // Discard top slice
+          topEntropy = 0.0;
+          top = top + slice;
+        }
+        height = height - slice;
+      }
+    }
+    return std::make_tuple(left, top);
   }
 
-  int Threshold(VipsObject *context, VipsImage *image, VipsImage **out, int threshold) {
-      VipsImage *greyscale;
-      if (vips_colourspace(image, &greyscale, VIPS_INTERPRETATION_B_W, nullptr)) {
-        return -1;
-      }
-      vips_object_local(context, greyscale);
-      image = greyscale;
-
-      VipsImage *thresholded;
-      if (vips_moreeq_const1(image, &thresholded, threshold, nullptr)) {
-          return -1;
-      }
-      vips_object_local(context, thresholded);
-      *out = thresholded;
-      return 0;
+  /*
+    Calculate the Shannon entropy for an image
+  */
+  double Entropy(VImage image) {
+    return image.hist_find().hist_entropy();
   }
+
 }  // namespace sharp

@@ -6,9 +6,15 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-sharp.cache(0);
-
 describe('Clone', function() {
+
+  beforeEach(function() {
+    sharp.cache(false);
+  });
+  afterEach(function() {
+    sharp.cache(true);
+  });
+
   it('Read from Stream and write to multiple Streams', function(done) {
     var finishEventsExpected = 2;
     // Output stream 1
@@ -55,4 +61,5 @@ describe('Clone', function() {
     // Go
     fs.createReadStream(fixtures.inputJpg).pipe(rotator);
   });
+
 });

@@ -1,7 +1,14 @@
 #!/bin/sh
 
-# Ensures libvips is installed and attempts to install it if not
-# Currently supports:
+# This script is no longer required on most
+# 64-bit Linux systems when using sharp v0.12.0+
+
+# See http://sharp.dimens.io/page/install#linux
+
+# If you really need this script, it will attempt to
+# globally install libvips if not already available.
+
+# Supports:
 # * Debian Linux
 #   * Debian 7, 8
 #   * Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
@@ -9,13 +16,13 @@
 #   * Elementary 0.3
 # * Red Hat Linux
 #   * RHEL/Centos/Scientific 6, 7
-#   * Fedora 21, 22
+#   * Fedora 21, 22, 23
 #   * Amazon Linux 2015.03, 2015.09
 # * OpenSuse 13
 
-vips_version_minimum=7.40.0
-vips_version_latest_major_minor=8.1
-vips_version_latest_patch=1
+vips_version_minimum=8.2.3
+vips_version_latest_major_minor=8.2
+vips_version_latest_patch=3
 
 openslide_version_minimum=3.4.0
 openslide_version_latest_major_minor=3.4
@@ -119,6 +126,11 @@ if [ "$(id -u)" -ne "0" ]; then
   exit 1
 fi
 
+# Deprecation warning
+if [ "$(arch)" == "x86_64" ]; then
+  echo "This script is no longer required on most 64-bit Linux systems when using sharp v0.12.0+"
+fi
+
 # OS-specific installations of libopenslide follows
 # Either openslide does not exist, or vips is installed without openslide support
 if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_exists -eq 0 ]; then
@@ -211,18 +223,8 @@ if [ -f /etc/debian_version ]; then
   DISTRO=$(lsb_release -c -s)
   echo "Detected Debian Linux '$DISTRO'"
   case "$DISTRO" in
-    jessie|vivid|wily)
-      # Debian 8, Ubuntu 15
-      if [ $enable_openslide -eq 1 ]; then
-        echo "Recompiling vips with openslide support"
-        install_libvips_from_source
-      else
-        echo "Installing libvips via apt-get"
-        apt-get install -y libvips-dev libgsf-1-dev
-      fi
-      ;;
-    trusty|utopic|qiana|rebecca|rafaela|freya)
-      # Ubuntu 14, Mint 17
+    jessie|trusty|utopic|vivid|wily|xenial|qiana|rebecca|rafaela|freya)
+      # Debian 8, Ubuntu 14.04+, Mint 17
       echo "Installing libvips dependencies via apt-get"
       apt-get install -y automake build-essential gobject-introspection gtk-doc-tools libglib2.0-dev libjpeg-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libgsf-1-dev liblcms2-dev libxml2-dev swig libmagickcore-dev curl
       install_libvips_from_source
@@ -263,18 +265,12 @@ elif [ -f /etc/redhat-release ]; then
       yum install -y --enablerepo=remi libwebp-devel
       install_libvips_from_source "--prefix=/usr"
       ;;
-    "Fedora release 21 "*|"Fedora release 22 "*)
-      # Fedora 21, 22
-      if [ $enable_openslide -eq 1 ]; then
-        echo "Installing libvips dependencies via yum"
-        yum groupinstall -y "Development Tools"
-        yum install -y gcc-c++ gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
-        echo "Compiling vips with openslide support"
-        install_libvips_from_source "--prefix=/usr"
-      else
-        echo "Installing libvips via yum"
-        yum install -y vips-devel
-      fi
+    "Fedora"*)
+      # Fedora 21, 22, 23
+      echo "Installing libvips dependencies via yum"
+      yum groupinstall -y "Development Tools"
+      yum install -y gcc-c++ gtk-doc libxml2-devel libjpeg-turbo-devel libpng-devel libtiff-devel libexif-devel lcms-devel ImageMagick-devel gobject-introspection-devel libwebp-devel curl
+      install_libvips_from_source "--prefix=/usr"
       ;;
     *)
       # Unsupported RHEL-based OS

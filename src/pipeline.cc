@@ -1,9 +1,12 @@
-#include <tuple>
 #include <algorithm>
 #include <cmath>
+#include <tuple>
+#include <utility>
+
+#include <vips/vips8>
+
 #include <node.h>
 #include <node_buffer.h>
-#include <vips/vips.h>
 
 #include "nan.h"
 
@@ -36,150 +39,47 @@ using Nan::NewBuffer;
 using Nan::Null;
 using Nan::Equals;
 
+using vips::VImage;
+using vips::VInterpolate;
+using vips::VOption;
+using vips::VError;
+
 using sharp::Composite;
 using sharp::Normalize;
+using sharp::Gamma;
 using sharp::Blur;
 using sharp::Sharpen;
-using sharp::Threshold;
+using sharp::EntropyCrop;
 
 using sharp::ImageType;
+using sharp::ImageTypeId;
 using sharp::DetermineImageType;
-using sharp::InitImage;
-using sharp::InterpolatorWindowSize;
 using sharp::HasProfile;
 using sharp::HasAlpha;
 using sharp::ExifOrientation;
 using sharp::SetExifOrientation;
 using sharp::RemoveExifOrientation;
+using sharp::SetDensity;
 using sharp::IsJpeg;
 using sharp::IsPng;
 using sharp::IsWebp;
 using sharp::IsTiff;
 using sharp::IsDz;
 using sharp::FreeCallback;
+using sharp::CalculateCrop;
 using sharp::counterProcess;
 using sharp::counterQueue;
 
-enum class Canvas {
-  CROP,
-  EMBED,
-  MAX,
-  MIN,
-  IGNORE_ASPECT
-};
-
-enum class Angle {
-  D0,
-  D90,
-  D180,
-  D270,
-  DLAST
-};
-
-struct PipelineBaton {
-  std::string fileIn;
-  char *bufferIn;
-  size_t bufferInLength;
-  std::string iccProfilePath;
-  int limitInputPixels;
-  std::string output;
-  std::string outputFormat;
-  void *bufferOut;
-  size_t bufferOutLength;
-  int topOffsetPre;
-  int leftOffsetPre;
-  int widthPre;
-  int heightPre;
-  int topOffsetPost;
-  int leftOffsetPost;
-  int widthPost;
-  int heightPost;
-  int width;
-  int height;
-  Canvas canvas;
-  int gravity;
-  std::string interpolator;
-  double background[4];
-  bool flatten;
-  bool negate;
-  double blurSigma;
-  int sharpenRadius;
-  double sharpenFlat;
-  double sharpenJagged;
-  int threshold;
-  std::string overlayPath;
-  double gamma;
-  bool greyscale;
-  bool normalize;
-  int angle;
-  bool rotateBeforePreExtract;
-  bool flip;
-  bool flop;
-  bool progressive;
-  bool withoutEnlargement;
-  VipsAccess accessMethod;
-  int quality;
-  int compressionLevel;
-  bool withoutAdaptiveFiltering;
-  bool withoutChromaSubsampling;
-  bool trellisQuantisation;
-  bool overshootDeringing;
-  bool optimiseScans;
-  std::string err;
-  bool withMetadata;
-  int withMetadataOrientation;
-  int tileSize;
-  int tileOverlap;
-
-  PipelineBaton():
-    bufferInLength(0),
-    limitInputPixels(0),
-    outputFormat(""),
-    bufferOutLength(0),
-    topOffsetPre(-1),
-    topOffsetPost(-1),
-    canvas(Canvas::CROP),
-    gravity(0),
-    flatten(false),
-    negate(false),
-    blurSigma(0.0),
-    sharpenRadius(0),
-    sharpenFlat(1.0),
-    sharpenJagged(2.0),
-    threshold(0),
-    gamma(0.0),
-    greyscale(false),
-    normalize(false),
-    angle(0),
-    flip(false),
-    flop(false),
-    progressive(false),
-    withoutEnlargement(false),
-    quality(80),
-    compressionLevel(6),
-    withoutAdaptiveFiltering(false),
-    withoutChromaSubsampling(false),
-    trellisQuantisation(false),
-    overshootDeringing(false),
-    optimiseScans(false),
-    withMetadata(false),
-    withMetadataOrientation(-1),
-    tileSize(256),
-    tileOverlap(0) {
-      background[0] = 0.0;
-      background[1] = 0.0;
-      background[2] = 0.0;
-      background[3] = 255.0;
-    }
-};
-
 class PipelineWorker : public AsyncWorker {
-
  public:
-  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener, const Local<Object> &bufferIn) :
+  PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
+    const Local<Object> &bufferIn, const Local<Object> &overlayBufferIn) :
     AsyncWorker(callback), baton(baton), queueListener(queueListener) {
       if (baton->bufferInLength > 0) {
         SaveToPersistent("bufferIn", bufferIn);
+      }
+      if (baton->overlayBufferInLength > 0) {
+        SaveToPersistent("overlayBufferIn", overlayBufferIn);
       }
     }
   ~PipelineWorker() {}
@@ -188,7 +88,6 @@ class PipelineWorker : public AsyncWorker {
     libuv worker
   */
   void Execute() {
-
     // Decrement queued task counter
     g_atomic_int_dec_and_test(&counterQueue);
     // Increment processing task counter
@@ -197,822 +96,706 @@ class PipelineWorker : public AsyncWorker {
     // Latest v2 sRGB ICC profile
     std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
 
-    // Create "hook" VipsObject to hang image references from
-    hook = reinterpret_cast<VipsObject*>(vips_image_new());
-
     // Input
     ImageType inputImageType = ImageType::UNKNOWN;
-    VipsImage *image = nullptr;
+    VImage image;
     if (baton->bufferInLength > 0) {
       // From buffer
-      inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
-      if (inputImageType != ImageType::UNKNOWN) {
-        image = InitImage(baton->bufferIn, baton->bufferInLength, baton->accessMethod);
-        if (image == nullptr) {
-          // Could not read header data
-          (baton->err).append("Input buffer has corrupt header");
-          inputImageType = ImageType::UNKNOWN;
+      if (baton->rawWidth > 0 && baton->rawHeight > 0 && baton->rawChannels > 0) {
+        // Raw, uncompressed pixel data
+        image = VImage::new_from_memory(baton->bufferIn, baton->bufferInLength,
+          baton->rawWidth, baton->rawHeight, baton->rawChannels, VIPS_FORMAT_UCHAR);
+        if (baton->rawChannels < 3) {
+          image.get_image()->Type = VIPS_INTERPRETATION_B_W;
+        } else {
+          image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
         }
+        inputImageType = ImageType::RAW;
       } else {
-        (baton->err).append("Input buffer contains unsupported image format");
+        // Compressed data
+        inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
+        if (inputImageType != ImageType::UNKNOWN) {
+          try {
+            VOption *option = VImage::option()->set("access", baton->accessMethod);
+            if (inputImageType == ImageType::MAGICK) {
+              option->set("density", std::to_string(baton->density).data());
+            }
+            image = VImage::new_from_buffer(baton->bufferIn, baton->bufferInLength, nullptr, option);
+            if (inputImageType == ImageType::MAGICK) {
+              SetDensity(image, baton->density);
+            }
+          } catch (...) {
+            (baton->err).append("Input buffer has corrupt header");
+            inputImageType = ImageType::UNKNOWN;
+          }
+        } else {
+          (baton->err).append("Input buffer contains unsupported image format");
+        }
       }
     } else {
       // From file
       inputImageType = DetermineImageType(baton->fileIn.data());
       if (inputImageType != ImageType::UNKNOWN) {
-        image = InitImage(baton->fileIn.data(), baton->accessMethod);
-        if (image == nullptr) {
+        try {
+          VOption *option = VImage::option()->set("access", baton->accessMethod);
+          if (inputImageType == ImageType::MAGICK) {
+            option->set("density", std::to_string(baton->density).data());
+          }
+          image = VImage::new_from_file(baton->fileIn.data(), option);
+          if (inputImageType == ImageType::MAGICK) {
+            SetDensity(image, baton->density);
+          }
+        } catch (...) {
           (baton->err).append("Input file has corrupt header");
           inputImageType = ImageType::UNKNOWN;
         }
       } else {
-        (baton->err).append("Input file is of an unsupported image format");
+        (baton->err).append("Input file is missing or of an unsupported image format");
       }
     }
-    if (image == nullptr || inputImageType == ImageType::UNKNOWN) {
+    if (inputImageType == ImageType::UNKNOWN) {
       return Error();
     }
-    vips_object_local(hook, image);
 
     // Limit input images to a given number of pixels, where pixels = width * height
     // Ignore if 0
-    if (baton->limitInputPixels > 0 && image->Xsize * image->Ysize > baton->limitInputPixels) {
+    if (baton->limitInputPixels > 0 && image.width() * image.height() > baton->limitInputPixels) {
       (baton->err).append("Input image exceeds pixel limit");
       return Error();
     }
 
-    // Calculate angle of rotation
-    Angle rotation;
-    bool flip;
-    bool flop;
-    std::tie(rotation, flip, flop) = CalculateRotationAndFlip(baton->angle, image);
-    if (flip && !baton->flip) {
-      // Add flip operation due to EXIF mirroring
-      baton->flip = TRUE;
-    }
-    if (flop && !baton->flop) {
-      // Add flip operation due to EXIF mirroring
-      baton->flop = TRUE;
-    }
-
-    // Rotate pre-extract
-    if (baton->rotateBeforePreExtract && rotation != Angle::D0) {
-      VipsImage *rotated;
-      if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), nullptr)) {
-        return Error();
+    try {
+      // Calculate angle of rotation
+      VipsAngle rotation;
+      bool flip;
+      bool flop;
+      std::tie(rotation, flip, flop) = CalculateRotationAndFlip(baton->angle, image);
+      if (flip && !baton->flip) {
+        // Add flip operation due to EXIF mirroring
+        baton->flip = TRUE;
       }
-      vips_object_local(hook, rotated);
-      image = rotated;
-      RemoveExifOrientation(image);
-    }
-
-    // Pre extraction
-    if (baton->topOffsetPre != -1) {
-      VipsImage *extractedPre;
-      if (vips_extract_area(image, &extractedPre, baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre, nullptr)) {
-        return Error();
+      if (flop && !baton->flop) {
+        // Add flip operation due to EXIF mirroring
+        baton->flop = TRUE;
       }
-      vips_object_local(hook, extractedPre);
-      image = extractedPre;
-    }
 
-    // Get pre-resize image width and height
-    int inputWidth = image->Xsize;
-    int inputHeight = image->Ysize;
-    if (!baton->rotateBeforePreExtract && (rotation == Angle::D90 || rotation == Angle::D270)) {
-      // Swap input output width and height when rotating by 90 or 270 degrees
-      int swap = inputWidth;
-      inputWidth = inputHeight;
-      inputHeight = swap;
-    }
-
-    // Get window size of interpolator, used for determining shrink vs affine
-    int interpolatorWindowSize = InterpolatorWindowSize(baton->interpolator.data());
-    if (interpolatorWindowSize < 0) {
-      return Error();
-    }
-
-    // Scaling calculations
-    double xfactor = 1.0;
-    double yfactor = 1.0;
-    if (baton->width > 0 && baton->height > 0) {
-      // Fixed width and height
-      xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
-      yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
-      switch (baton->canvas) {
-        case Canvas::CROP:
-          xfactor = std::min(xfactor, yfactor);
-          yfactor = xfactor;
-          break;
-        case Canvas::EMBED:
-          xfactor = std::max(xfactor, yfactor);
-          yfactor = xfactor;
-          break;
-        case Canvas::MAX:
-          if (xfactor > yfactor) {
-            baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
-            yfactor = xfactor;
-          } else {
-            baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
-            xfactor = yfactor;
-          }
-          break;
-        case Canvas::MIN:
-          if (xfactor < yfactor) {
-            baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
-            yfactor = xfactor;
-          } else {
-            baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
-            xfactor = yfactor;
-          }
-          break;
-        case Canvas::IGNORE_ASPECT:
-          // xfactor, yfactor OK!
-          break;
+      // Rotate pre-extract
+      if (baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
+        image = image.rot(rotation);
+        RemoveExifOrientation(image);
       }
-    } else if (baton->width > 0) {
-      // Fixed width
-      xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
-      if (baton->canvas == Canvas::IGNORE_ASPECT) {
-        baton->height = inputHeight;
-      } else {
-        // Auto height
-        yfactor = xfactor;
-        baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / yfactor));
-      }
-    } else if (baton->height > 0) {
-      // Fixed height
-      yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
-      if (baton->canvas == Canvas::IGNORE_ASPECT) {
-        baton->width = inputWidth;
-      } else {
-        // Auto width
-        xfactor = yfactor;
-        baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / xfactor));
-      }
-    } else {
-      // Identity transform
-      baton->width = inputWidth;
-      baton->height = inputHeight;
-    }
 
-    // Calculate integral box shrink
-    int xshrink = CalculateShrink(xfactor, interpolatorWindowSize);
-    int yshrink = CalculateShrink(yfactor, interpolatorWindowSize);
-
-    // Calculate residual float affine transformation
-    double xresidual = CalculateResidual(xshrink, xfactor);
-    double yresidual = CalculateResidual(yshrink, yfactor);
-
-    // Do not enlarge the output if the input width *or* height are already less than the required dimensions
-    if (baton->withoutEnlargement) {
-      if (inputWidth < baton->width || inputHeight < baton->height) {
-        xfactor = 1;
-        yfactor = 1;
-        xshrink = 1;
-        yshrink = 1;
-        xresidual = 0;
-        yresidual = 0;
-        baton->width = inputWidth;
-        baton->height = inputHeight;
+      // Pre extraction
+      if (baton->topOffsetPre != -1) {
+        image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
       }
-    }
 
-    // If integral x and y shrink are equal, try to use libjpeg shrink-on-load, but not when applying gamma correction or pre-resize extract
-    int shrink_on_load = 1;
-    if (xshrink == yshrink && inputImageType == ImageType::JPEG && xshrink >= 2 && baton->gamma == 0 && baton->topOffsetPre == -1) {
-      if (xshrink >= 8) {
-        xfactor = xfactor / 8;
-        yfactor = yfactor / 8;
-        shrink_on_load = 8;
-      } else if (xshrink >= 4) {
-        xfactor = xfactor / 4;
-        yfactor = yfactor / 4;
-        shrink_on_load = 4;
-      } else if (xshrink >= 2) {
-        xfactor = xfactor / 2;
-        yfactor = yfactor / 2;
-        shrink_on_load = 2;
-      }
-    }
-    if (shrink_on_load > 1) {
-      // Recalculate integral shrink and double residual
-      xfactor = std::max(xfactor, 1.0);
-      yfactor = std::max(yfactor, 1.0);
-      xshrink = CalculateShrink(xfactor, interpolatorWindowSize);
-      yshrink = CalculateShrink(yfactor, interpolatorWindowSize);
-      xresidual = CalculateResidual(xshrink, xfactor);
-      yresidual = CalculateResidual(yshrink, yfactor);
-      // Reload input using shrink-on-load
-      VipsImage *shrunkOnLoad;
-      if (baton->bufferInLength > 1) {
-        if (vips_jpegload_buffer(baton->bufferIn, baton->bufferInLength, &shrunkOnLoad, "shrink", shrink_on_load, nullptr)) {
-          return Error();
-        }
-      } else {
-        if (vips_jpegload((baton->fileIn).data(), &shrunkOnLoad, "shrink", shrink_on_load, nullptr)) {
-          return Error();
-        }
-      }
-      vips_object_local(hook, shrunkOnLoad);
-      image = shrunkOnLoad;
-    }
-
-    // Ensure we're using a device-independent colour space
-    if (HasProfile(image)) {
-      // Convert to sRGB using embedded profile
-      VipsImage *transformed;
-      if (!vips_icc_transform(image, &transformed, srgbProfile.data(), "embedded", TRUE, nullptr)) {
-        // Embedded profile can fail, so only update references on success
-        vips_object_local(hook, transformed);
-        image = transformed;
-      }
-    } else if (image->Type == VIPS_INTERPRETATION_CMYK) {
-      // Convert to sRGB using default "USWebCoatedSWOP" CMYK profile
-      std::string cmykProfile = baton->iccProfilePath + "USWebCoatedSWOP.icc";
-      VipsImage *transformed;
-      if (vips_icc_transform(image, &transformed, srgbProfile.data(), "input_profile", cmykProfile.data(), nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, transformed);
-      image = transformed;
-    }
-
-    // Calculate maximum alpha value based on input image pixel depth
-    double maxAlpha = (image->BandFmt == VIPS_FORMAT_USHORT) ? 65535.0 : 255.0;
-
-    // Flatten image to remove alpha channel
-    if (baton->flatten && HasAlpha(image)) {
-      // Scale up 8-bit values to match 16-bit input image
-      double multiplier = (image->Type == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
-      // Background colour
-      VipsArrayDouble *background = vips_array_double_newv(
-        3, // Ignore alpha channel as we're about to remove it
-        baton->background[0] * multiplier,
-        baton->background[1] * multiplier,
-        baton->background[2] * multiplier
-      );
-      VipsImage *flattened;
-      if (vips_flatten(image, &flattened, "background", background, "max_alpha", maxAlpha, nullptr)) {
-        vips_area_unref(reinterpret_cast<VipsArea*>(background));
-        return Error();
-      }
-      vips_area_unref(reinterpret_cast<VipsArea*>(background));
-      vips_object_local(hook, flattened);
-      image = flattened;
-    }
-
-    // Negate the colors in the image.
-    if (baton->negate) {
-        VipsImage *negated;
-        if (vips_invert(image, &negated, nullptr)) {
-            return Error();
-        }
-        vips_object_local(hook, negated);
-        image = negated;
-    }
-
-    // Gamma encoding (darken)
-    if (baton->gamma >= 1 && baton->gamma <= 3 && !HasAlpha(image)) {
-      VipsImage *gammaEncoded;
-      if (vips_gamma(image, &gammaEncoded, "exponent", 1.0 / baton->gamma, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, gammaEncoded);
-      image = gammaEncoded;
-    }
-
-    // Convert to greyscale (linear, therefore after gamma encoding, if any)
-    if (baton->greyscale) {
-      VipsImage *greyscale;
-      if (vips_colourspace(image, &greyscale, VIPS_INTERPRETATION_B_W, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, greyscale);
-      image = greyscale;
-    }
-
-    if (xshrink > 1 || yshrink > 1) {
-      VipsImage *shrunk;
-      // Use vips_shrink with the integral reduction
-      if (vips_shrink(image, &shrunk, xshrink, yshrink, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, shrunk);
-      image = shrunk;
-      // Recalculate residual float based on dimensions of required vs shrunk images
-      int shrunkWidth = shrunk->Xsize;
-      int shrunkHeight = shrunk->Ysize;
-      if (rotation == Angle::D90 || rotation == Angle::D270) {
+      // Get pre-resize image width and height
+      int inputWidth = image.width();
+      int inputHeight = image.height();
+      if (!baton->rotateBeforePreExtract &&
+        (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
         // Swap input output width and height when rotating by 90 or 270 degrees
-        int swap = shrunkWidth;
-        shrunkWidth = shrunkHeight;
-        shrunkHeight = swap;
+        std::swap(inputWidth, inputHeight);
       }
-      xresidual = static_cast<double>(baton->width) / static_cast<double>(shrunkWidth);
-      yresidual = static_cast<double>(baton->height) / static_cast<double>(shrunkHeight);
-      if (baton->canvas == Canvas::EMBED) {
-        xresidual = std::min(xresidual, yresidual);
-        yresidual = xresidual;
-      } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
-        xresidual = std::max(xresidual, yresidual);
-        yresidual = xresidual;
-      }
-    }
 
-    bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
-    bool shouldBlur = baton->blurSigma != 0.0;
-    bool shouldSharpen = baton->sharpenRadius != 0;
-    bool shouldThreshold = baton->threshold != 0;
-    bool hasOverlay = !baton->overlayPath.empty();
-    bool shouldPremultiplyAlpha = HasAlpha(image) && (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
+      // Get window size of interpolator, used for determining shrink vs affine
+      VInterpolate interpolator = VInterpolate::new_from_name(baton->interpolator.data());
+      int interpolatorWindowSize = vips_interpolate_get_window_size(interpolator.get_interpolate());
 
-    // Premultiply image alpha channel before all transformations to avoid
-    // dark fringing around bright pixels
-    // See: http://entropymine.com/imageworsener/resizealpha/
-    if (shouldPremultiplyAlpha) {
-      VipsImage *imagePremultiplied;
-      if (vips_premultiply(image, &imagePremultiplied, "max_alpha", maxAlpha, nullptr)) {
-        (baton->err).append("Failed to premultiply alpha channel.");
-        return Error();
-      }
-      vips_object_local(hook, imagePremultiplied);
-      image = imagePremultiplied;
-    }
-
-    // Use vips_affine with the remaining float part
-    if (shouldAffineTransform) {
-      // Create interpolator
-      VipsInterpolate *interpolator = vips_interpolate_new(baton->interpolator.data());
-      if (interpolator == nullptr) {
-        return Error();
-      }
-      vips_object_local(hook, interpolator);
-      // Use average of x and y residuals to compute sigma for Gaussian blur
-      double residual = (xresidual + yresidual) / 2.0;
-      // Apply Gaussian blur before large affine reductions
-      if (residual < 1.0) {
-        // Calculate standard deviation
-        double sigma = ((1.0 / residual) - 0.4) / 3.0;
-        if (sigma >= 0.3) {
-          // Sequential input requires a small linecache before use of convolution
-          if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL) {
-            VipsImage *lineCached;
-            if (vips_linecache(image, &lineCached, "access", VIPS_ACCESS_SEQUENTIAL,
-              "tile_height", 1, "threaded", TRUE, nullptr)
-            ) {
-              return Error();
+      // Scaling calculations
+      double xfactor = 1.0;
+      double yfactor = 1.0;
+      if (baton->width > 0 && baton->height > 0) {
+        // Fixed width and height
+        xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
+        yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
+        switch (baton->canvas) {
+          case Canvas::CROP:
+            xfactor = std::min(xfactor, yfactor);
+            yfactor = xfactor;
+            break;
+          case Canvas::EMBED:
+            xfactor = std::max(xfactor, yfactor);
+            yfactor = xfactor;
+            break;
+          case Canvas::MAX:
+            if (xfactor > yfactor) {
+              baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
+              yfactor = xfactor;
+            } else {
+              baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
+              xfactor = yfactor;
             }
-            vips_object_local(hook, lineCached);
-            image = lineCached;
-          }
-          // Apply Gaussian blur
-          VipsImage *blurred;
-          if (vips_gaussblur(image, &blurred, sigma, nullptr)) {
-            return Error();
-          }
-          vips_object_local(hook, blurred);
-          image = blurred;
+            break;
+          case Canvas::MIN:
+            if (xfactor < yfactor) {
+              baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
+              yfactor = xfactor;
+            } else {
+              baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
+              xfactor = yfactor;
+            }
+            break;
+          case Canvas::IGNORE_ASPECT:
+            if (!baton->rotateBeforePreExtract &&
+              (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
+              std::swap(xfactor, yfactor);
+            }
+            break;
         }
-      }
-      // Perform affine transformation
-      VipsImage *affined;
-      if (vips_affine(image, &affined, xresidual, 0.0, 0.0, yresidual,
-        "interpolate", interpolator, nullptr)
-      ) {
-        return Error();
-      }
-      vips_object_local(hook, affined);
-      image = affined;
-    }
-
-    // Rotate
-    if (!baton->rotateBeforePreExtract && rotation != Angle::D0) {
-      VipsImage *rotated;
-      if (vips_rot(image, &rotated, static_cast<VipsAngle>(rotation), nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, rotated);
-      image = rotated;
-      RemoveExifOrientation(image);
-    }
-
-    // Flip (mirror about Y axis)
-    if (baton->flip) {
-      VipsImage *flipped;
-      if (vips_flip(image, &flipped, VIPS_DIRECTION_VERTICAL, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, flipped);
-      image = flipped;
-      RemoveExifOrientation(image);
-    }
-
-    // Flop (mirror about X axis)
-    if (baton->flop) {
-      VipsImage *flopped;
-      if (vips_flip(image, &flopped, VIPS_DIRECTION_HORIZONTAL, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, flopped);
-      image = flopped;
-      RemoveExifOrientation(image);
-    }
-
-    // Crop/embed
-    if (image->Xsize != baton->width || image->Ysize != baton->height) {
-      if (baton->canvas == Canvas::EMBED) {
-        // Match background colour space, namely sRGB
-        if (image->Type != VIPS_INTERPRETATION_sRGB) {
-          // Convert to sRGB colour space
-          VipsImage *colourspaced;
-          if (vips_colourspace(image, &colourspaced, VIPS_INTERPRETATION_sRGB, nullptr)) {
-            return Error();
-          }
-          vips_object_local(hook, colourspaced);
-          image = colourspaced;
-        }
-        // Add non-transparent alpha channel, if required
-        if (baton->background[3] < 255.0 && !HasAlpha(image)) {
-          // Create single-channel transparency
-          VipsImage *black;
-          if (vips_black(&black, image->Xsize, image->Ysize, "bands", 1, nullptr)) {
-            return Error();
-          }
-          vips_object_local(hook, black);
-          // Invert to become non-transparent
-          VipsImage *alpha;
-          if (vips_invert(black, &alpha, nullptr)) {
-            return Error();
-          }
-          vips_object_local(hook, alpha);
-          // Append alpha channel to existing image
-          VipsImage *joined;
-          if (vips_bandjoin2(image, alpha, &joined, nullptr)) {
-            return Error();
-          }
-          vips_object_local(hook, joined);
-          image = joined;
-        }
-        // Create background
-        VipsArrayDouble *background;
-        if (baton->background[3] < 255.0 || HasAlpha(image)) {
-          background = vips_array_double_newv(
-            4, baton->background[0], baton->background[1], baton->background[2], baton->background[3]
-          );
+      } else if (baton->width > 0) {
+        // Fixed width
+        xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
+        if (baton->canvas == Canvas::IGNORE_ASPECT) {
+          baton->height = inputHeight;
         } else {
-          background = vips_array_double_newv(
-            3, baton->background[0], baton->background[1], baton->background[2]
+          // Auto height
+          yfactor = xfactor;
+          baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / yfactor));
+        }
+      } else if (baton->height > 0) {
+        // Fixed height
+        yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
+        if (baton->canvas == Canvas::IGNORE_ASPECT) {
+          baton->width = inputWidth;
+        } else {
+          // Auto width
+          xfactor = yfactor;
+          baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / xfactor));
+        }
+      } else {
+        // Identity transform
+        baton->width = inputWidth;
+        baton->height = inputHeight;
+      }
+
+      // Calculate integral box shrink
+      int xshrink = CalculateShrink(xfactor, interpolatorWindowSize);
+      int yshrink = CalculateShrink(yfactor, interpolatorWindowSize);
+
+      // Calculate residual float affine transformation
+      double xresidual = CalculateResidual(xshrink, xfactor);
+      double yresidual = CalculateResidual(yshrink, yfactor);
+
+      // Do not enlarge the output if the input width *or* height
+      // are already less than the required dimensions
+      if (baton->withoutEnlargement) {
+        if (inputWidth < baton->width || inputHeight < baton->height) {
+          xfactor = 1;
+          yfactor = 1;
+          xshrink = 1;
+          yshrink = 1;
+          xresidual = 0;
+          yresidual = 0;
+          baton->width = inputWidth;
+          baton->height = inputHeight;
+        }
+      }
+
+      // If integral x and y shrink are equal, try to use libjpeg shrink-on-load,
+      // but not when applying gamma correction or pre-resize extract
+      int shrink_on_load = 1;
+      if (
+        xshrink == yshrink && inputImageType == ImageType::JPEG && xshrink >= 2 &&
+        baton->gamma == 0 && baton->topOffsetPre == -1
+      ) {
+        if (xshrink >= 8) {
+          xfactor = xfactor / 8;
+          yfactor = yfactor / 8;
+          shrink_on_load = 8;
+        } else if (xshrink >= 4) {
+          xfactor = xfactor / 4;
+          yfactor = yfactor / 4;
+          shrink_on_load = 4;
+        } else if (xshrink >= 2) {
+          xfactor = xfactor / 2;
+          yfactor = yfactor / 2;
+          shrink_on_load = 2;
+        }
+      }
+      if (shrink_on_load > 1) {
+        // Recalculate integral shrink and double residual
+        xfactor = std::max(xfactor, 1.0);
+        yfactor = std::max(yfactor, 1.0);
+        xshrink = CalculateShrink(xfactor, interpolatorWindowSize);
+        yshrink = CalculateShrink(yfactor, interpolatorWindowSize);
+        xresidual = CalculateResidual(xshrink, xfactor);
+        yresidual = CalculateResidual(yshrink, yfactor);
+        // Reload input using shrink-on-load
+        if (baton->bufferInLength > 1) {
+          VipsBlob *blob = vips_blob_new(nullptr, baton->bufferIn, baton->bufferInLength);
+          image = VImage::jpegload_buffer(blob, VImage::option()->set("shrink", shrink_on_load));
+          vips_area_unref(reinterpret_cast<VipsArea*>(blob));
+        } else {
+          image = VImage::jpegload(
+            const_cast<char*>((baton->fileIn).data()),
+            VImage::option()->set("shrink", shrink_on_load)
           );
+        }
+      }
+
+      // Ensure we're using a device-independent colour space
+      if (HasProfile(image)) {
+        // Convert to sRGB using embedded profile
+        try {
+          image = image.icc_transform(const_cast<char*>(srgbProfile.data()), VImage::option()
+            ->set("embedded", TRUE)
+            ->set("intent", VIPS_INTENT_PERCEPTUAL)
+          );
+        } catch(...) {
+          // Ignore failure of embedded profile
+        }
+      } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
+        // Convert to sRGB using default "USWebCoatedSWOP" CMYK profile
+        std::string cmykProfile = baton->iccProfilePath + "USWebCoatedSWOP.icc";
+        image = image.icc_transform(const_cast<char*>(srgbProfile.data()), VImage::option()
+          ->set("input_profile", cmykProfile.data())
+          ->set("intent", VIPS_INTENT_PERCEPTUAL)
+        );
+      }
+
+      // Calculate maximum alpha value based on input image pixel depth
+      bool is16Bit = (image.format() == VIPS_FORMAT_USHORT);
+      double maxAlpha = is16Bit ? 65535.0 : 255.0;
+
+      // Flatten image to remove alpha channel
+      if (baton->flatten && HasAlpha(image)) {
+        // Scale up 8-bit values to match 16-bit input image
+        double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+        // Background colour
+        std::vector<double> background {
+          baton->background[0] * multiplier,
+          baton->background[1] * multiplier,
+          baton->background[2] * multiplier
+        };
+        image = image.flatten(VImage::option()
+          ->set("background", background)
+          ->set("max_alpha", maxAlpha)
+        );
+      }
+
+      // Negate the colours in the image
+      if (baton->negate) {
+        image = image.invert();
+      }
+
+      // Gamma encoding (darken)
+      if (baton->gamma >= 1 && baton->gamma <= 3) {
+        image = Gamma(image, 1.0 / baton->gamma);
+      }
+
+      // Convert to greyscale (linear, therefore after gamma encoding, if any)
+      if (baton->greyscale) {
+        image = image.colourspace(VIPS_INTERPRETATION_B_W);
+      }
+
+      if (xshrink > 1 || yshrink > 1) {
+        image = image.shrink(xshrink, yshrink);
+        // Recalculate residual float based on dimensions of required vs shrunk images
+        int shrunkWidth = image.width();
+        int shrunkHeight = image.height();
+        if (!baton->rotateBeforePreExtract &&
+          (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
+          // Swap input output width and height when rotating by 90 or 270 degrees
+          std::swap(shrunkWidth, shrunkHeight);
+        }
+        xresidual = static_cast<double>(baton->width) / static_cast<double>(shrunkWidth);
+        yresidual = static_cast<double>(baton->height) / static_cast<double>(shrunkHeight);
+        if (baton->canvas == Canvas::EMBED) {
+          xresidual = std::min(xresidual, yresidual);
+          yresidual = xresidual;
+        } else if (baton->canvas == Canvas::IGNORE_ASPECT) {
+          if (!baton->rotateBeforePreExtract &&
+            (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
+            std::swap(xresidual, yresidual);
+          }
+        } else {
+          xresidual = std::max(xresidual, yresidual);
+          yresidual = xresidual;
+        }
+      }
+
+      // Ensure image has an alpha channel when there is an overlay
+      bool hasOverlay = baton->overlayBufferInLength > 0 || !baton->overlayFileIn.empty();
+      if (hasOverlay && !HasAlpha(image)) {
+        double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+        image = image.bandjoin(
+          VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
+        );
+      }
+
+      bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
+      bool shouldBlur = baton->blurSigma != 0.0;
+      bool shouldSharpen = baton->sharpenRadius != 0;
+      bool shouldThreshold = baton->threshold != 0;
+      bool shouldPremultiplyAlpha = HasAlpha(image) &&
+        (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
+
+      // Premultiply image alpha channel before all transformations to avoid
+      // dark fringing around bright pixels
+      // See: http://entropymine.com/imageworsener/resizealpha/
+      if (shouldPremultiplyAlpha) {
+        image = image.premultiply(VImage::option()->set("max_alpha", maxAlpha));
+      }
+
+      // Use affine transformation with the remaining float part
+      if (shouldAffineTransform) {
+        // Use average of x and y residuals to compute sigma for Gaussian blur
+        double residual = (xresidual + yresidual) / 2.0;
+        // Apply Gaussian blur before large affine reductions
+        if (residual < 1.0) {
+          // Calculate standard deviation
+          double sigma = ((1.0 / residual) - 0.4) / 3.0;
+          if (sigma >= 0.3) {
+            // Sequential input requires a small linecache before use of convolution
+            if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL) {
+              image = image.linecache(VImage::option()
+                ->set("access", VIPS_ACCESS_SEQUENTIAL)
+                ->set("tile_height", 1)
+                ->set("threaded", TRUE)
+              );
+            }
+            // Apply Gaussian blur
+            image = image.gaussblur(sigma);
+          }
+        }
+        // Perform affine transformation
+        image = image.affine({xresidual, 0.0, 0.0, yresidual}, VImage::option()
+          ->set("interpolate", interpolator)
+        );
+      }
+
+      // Rotate
+      if (!baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
+        image = image.rot(rotation);
+        RemoveExifOrientation(image);
+      }
+
+      // Flip (mirror about Y axis)
+      if (baton->flip) {
+        image = image.flip(VIPS_DIRECTION_VERTICAL);
+        RemoveExifOrientation(image);
+      }
+
+      // Flop (mirror about X axis)
+      if (baton->flop) {
+        image = image.flip(VIPS_DIRECTION_HORIZONTAL);
+        RemoveExifOrientation(image);
+      }
+
+      // Crop/embed
+      if (image.width() != baton->width || image.height() != baton->height) {
+        if (baton->canvas == Canvas::EMBED) {
+          // Scale up 8-bit values to match 16-bit input image
+          double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+          // Create background colour
+          std::vector<double> background {
+            baton->background[0] * multiplier,
+            baton->background[1] * multiplier,
+            baton->background[2] * multiplier
+          };
+          // Add alpha channel to background colour
+          if (baton->background[3] < 255.0 || HasAlpha(image)) {
+            background.push_back(baton->background[3] * multiplier);
+          }
+          // Add non-transparent alpha channel, if required
+          if (baton->background[3] < 255.0 && !HasAlpha(image)) {
+            image = image.bandjoin(
+              VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
+            );
+          }
+          // Embed
+          int left = static_cast<int>(round((baton->width - image.width()) / 2));
+          int top = static_cast<int>(round((baton->height - image.height()) / 2));
+          image = image.embed(left, top, baton->width, baton->height, VImage::option()
+            ->set("extend", VIPS_EXTEND_BACKGROUND)
+            ->set("background", background)
+          );
+        } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
+          // Crop/max/min
+          int left;
+          int top;
+          if (baton->crop < 9) {
+            // Gravity-based crop
+            std::tie(left, top) = CalculateCrop(
+              image.width(), image.height(), baton->width, baton->height, baton->crop
+            );
+          } else {
+            // Entropy-based crop
+            std::tie(left, top) = EntropyCrop(image, baton->width, baton->height);
+          }
+          int width = std::min(image.width(), baton->width);
+          int height = std::min(image.height(), baton->height);
+          image = image.extract_area(left, top, width, height);
+        }
+      }
+
+      // Post extraction
+      if (baton->topOffsetPost != -1) {
+        image = image.extract_area(
+          baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost
+        );
+      }
+
+      // Extend edges
+      if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
+        // Scale up 8-bit values to match 16-bit input image
+        const double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+        // Create background colour
+        std::vector<double> background {
+          baton->background[0] * multiplier,
+          baton->background[1] * multiplier,
+          baton->background[2] * multiplier
+        };
+        // Add alpha channel to background colour
+        if (HasAlpha(image)) {
+          background.push_back(baton->background[3] * multiplier);
         }
         // Embed
-        int left = (baton->width - image->Xsize) / 2;
-        int top = (baton->height - image->Ysize) / 2;
-        VipsImage *embedded;
-        if (vips_embed(image, &embedded, left, top, baton->width, baton->height,
-          "extend", VIPS_EXTEND_BACKGROUND, "background", background, nullptr
-        )) {
-          vips_area_unref(reinterpret_cast<VipsArea*>(background));
-          return Error();
-        }
-        vips_area_unref(reinterpret_cast<VipsArea*>(background));
-        vips_object_local(hook, embedded);
-        image = embedded;
-      } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
-        // Crop/max/min
-        int left;
-        int top;
-        std::tie(left, top) = CalculateCrop(image->Xsize, image->Ysize, baton->width, baton->height, baton->gravity);
-        int width = std::min(image->Xsize, baton->width);
-        int height = std::min(image->Ysize, baton->height);
-        VipsImage *extracted;
-        if (vips_extract_area(image, &extracted, left, top, width, height, nullptr)) {
-          return Error();
-        }
-        vips_object_local(hook, extracted);
-        image = extracted;
+        baton->width = image.width() + baton->extendLeft + baton->extendRight;
+        baton->height = image.height() + baton->extendTop + baton->extendBottom;
+        image = image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
+          VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
       }
-    }
 
-    // Post extraction
-    if (baton->topOffsetPost != -1) {
-      VipsImage *extractedPost;
-      if (vips_extract_area(image, &extractedPost,
-        baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost, nullptr
-      )) {
-        return Error();
+      // Threshold - must happen before blurring, due to the utility of blurring after thresholding
+      if (shouldThreshold) {
+        image = image.colourspace(VIPS_INTERPRETATION_B_W) >= baton->threshold;
       }
-      vips_object_local(hook, extractedPost);
-      image = extractedPost;
-    }
 
-    // Threshold - must happen before blurring, due to the utility of blurring after thresholding
-    if (shouldThreshold) {
-        VipsImage *thresholded;
-        if (Threshold(hook, image, &thresholded, baton->threshold)) {
-            return Error();
-        }
-        image = thresholded;
-    }
-
-    // Blur
-    if (shouldBlur) {
-      VipsImage *blurred;
-      if (Blur(hook, image, &blurred, baton->blurSigma)) {
-        return Error();
+      // Blur
+      if (shouldBlur) {
+        image = Blur(image, baton->blurSigma);
       }
-      image = blurred;
-    }
 
-    // Sharpen
-    if (shouldSharpen) {
-      VipsImage *sharpened;
-      if (Sharpen(hook, image, &sharpened, baton->sharpenRadius, baton->sharpenFlat, baton->sharpenJagged)) {
-        return Error();
+      // Sharpen
+      if (shouldSharpen) {
+        image = Sharpen(image, baton->sharpenRadius, baton->sharpenFlat, baton->sharpenJagged);
       }
-      image = sharpened;
-    }
 
-    // Composite with overlay, if present
-    if (hasOverlay) {
-      VipsImage *overlayImage = nullptr;
-      ImageType overlayImageType = ImageType::UNKNOWN;
-      overlayImageType = DetermineImageType(baton->overlayPath.data());
-      if (overlayImageType != ImageType::UNKNOWN) {
-        overlayImage = InitImage(baton->overlayPath.data(), baton->accessMethod);
-        if (overlayImage == nullptr) {
-          (baton->err).append("Overlay image has corrupt header");
-          return Error();
+      // Composite with overlay, if present
+      if (hasOverlay) {
+        VImage overlayImage;
+        ImageType overlayImageType = ImageType::UNKNOWN;
+        if (baton->overlayBufferInLength > 0) {
+          // Overlay with image from buffer
+          overlayImageType = DetermineImageType(baton->overlayBufferIn, baton->overlayBufferInLength);
+          if (overlayImageType != ImageType::UNKNOWN) {
+            try {
+              overlayImage = VImage::new_from_buffer(baton->overlayBufferIn, baton->overlayBufferInLength,
+                nullptr, VImage::option()->set("access", baton->accessMethod));
+            } catch (...) {
+              (baton->err).append("Overlay buffer has corrupt header");
+              overlayImageType = ImageType::UNKNOWN;
+            }
+          } else {
+            (baton->err).append("Overlay buffer contains unsupported image format");
+          }
         } else {
-          vips_object_local(hook, overlayImage);
+          // Overlay with image from file
+          overlayImageType = DetermineImageType(baton->overlayFileIn.data());
+          if (overlayImageType != ImageType::UNKNOWN) {
+            try {
+              overlayImage = VImage::new_from_file(baton->overlayFileIn.data(),
+                VImage::option()->set("access", baton->accessMethod));
+            } catch (...) {
+              (baton->err).append("Overlay file has corrupt header");
+              overlayImageType = ImageType::UNKNOWN;
+            }
+          }
+        }
+        if (overlayImageType == ImageType::UNKNOWN) {
+          return Error();
+        }
+        // Ensure overlay is premultiplied sRGB
+        overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
+        // Composite images with given gravity
+        image = Composite(overlayImage, image, baton->overlayGravity);
+      }
+
+      // Reverse premultiplication after all transformations:
+      if (shouldPremultiplyAlpha) {
+        image = image.unpremultiply(VImage::option()->set("max_alpha", maxAlpha));
+        // Cast pixel values to integer
+        if (is16Bit) {
+          image = image.cast(VIPS_FORMAT_USHORT);
+        } else {
+          image = image.cast(VIPS_FORMAT_UCHAR);
+        }
+      }
+
+      // Gamma decoding (brighten)
+      if (baton->gamma >= 1 && baton->gamma <= 3) {
+        image = Gamma(image, baton->gamma);
+      }
+
+      // Apply normalization - stretch luminance to cover full dynamic range
+      if (baton->normalize) {
+        image = Normalize(image);
+      }
+
+      // Convert image to sRGB, if not already
+      if (image.interpretation() == VIPS_INTERPRETATION_RGB16) {
+        image = image.cast(VIPS_FORMAT_USHORT);
+      }
+      if (image.interpretation() != VIPS_INTERPRETATION_sRGB) {
+        image = image.colourspace(VIPS_INTERPRETATION_sRGB);
+        // Transform colours from embedded profile to sRGB profile
+        if (baton->withMetadata && HasProfile(image)) {
+          image = image.icc_transform(const_cast<char*>(srgbProfile.data()), VImage::option()
+            ->set("embedded", TRUE)
+          );
+        }
+      }
+
+      // Override EXIF Orientation tag
+      if (baton->withMetadata && baton->withMetadataOrientation != -1) {
+        SetExifOrientation(image, baton->withMetadataOrientation);
+      }
+
+      // Number of channels used in output image
+      baton->channels = image.bands();
+
+      // Output
+      if (baton->fileOut == "") {
+        // Buffer output
+        if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == ImageType::JPEG)) {
+          // Write JPEG to buffer
+          VipsArea *area = VIPS_AREA(image.jpegsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->quality)
+            ->set("optimize_coding", TRUE)
+            ->set("no_subsample", baton->withoutChromaSubsampling)
+            ->set("trellis_quant", baton->trellisQuantisation)
+            ->set("overshoot_deringing", baton->overshootDeringing)
+            ->set("optimize_scans", baton->optimiseScans)
+            ->set("interlace", baton->progressive)
+          ));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "jpeg";
+          baton->channels = std::min(baton->channels, 3);
+        } else if (baton->formatOut == "png" || (baton->formatOut == "input" && inputImageType == ImageType::PNG)) {
+          // Write PNG to buffer
+          VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("compression", baton->compressionLevel)
+            ->set("interlace", baton->progressive)
+            ->set("filter", baton->withoutAdaptiveFiltering ?
+              VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
+          ));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "png";
+        } else if (baton->formatOut == "webp" || (baton->formatOut == "input" && inputImageType == ImageType::WEBP)) {
+          // Write WEBP to buffer
+          VipsArea *area = VIPS_AREA(image.webpsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->quality)
+          ));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "webp";
+        } else if (baton->formatOut == "raw" || (baton->formatOut == "input" && inputImageType == ImageType::RAW)) {
+          // Write raw, uncompressed image data to buffer
+          if (baton->greyscale || image.interpretation() == VIPS_INTERPRETATION_B_W) {
+            // Extract first band for greyscale image
+            image = image[0];
+          }
+          if (image.format() != VIPS_FORMAT_UCHAR) {
+            // Cast pixels to uint8 (unsigned char)
+            image = image.cast(VIPS_FORMAT_UCHAR);
+          }
+          // Get raw image data
+          baton->bufferOut = static_cast<char*>(image.write_to_memory(&baton->bufferOutLength));
+          if (baton->bufferOut == nullptr) {
+            (baton->err).append("Could not allocate enough memory for raw output");
+            return Error();
+          }
+          baton->formatOut = "raw";
+        } else {
+          // Unsupported output format
+          (baton->err).append("Unsupported output format ");
+          if (baton->formatOut == "input") {
+            (baton->err).append(ImageTypeId(inputImageType));
+          } else {
+            (baton->err).append(baton->formatOut);
+          }
+          return Error();
         }
       } else {
-        (baton->err).append("Overlay image is of an unsupported image format");
-        return Error();
+        // File output
+        bool isJpeg = IsJpeg(baton->fileOut);
+        bool isPng = IsPng(baton->fileOut);
+        bool isWebp = IsWebp(baton->fileOut);
+        bool isTiff = IsTiff(baton->fileOut);
+        bool isDz = IsDz(baton->fileOut);
+        bool matchInput = baton->formatOut == "input" && !(isJpeg || isPng || isWebp || isTiff || isDz);
+        if (baton->formatOut == "jpeg" || isJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
+          // Write JPEG to file
+          image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->quality)
+            ->set("optimize_coding", TRUE)
+            ->set("no_subsample", baton->withoutChromaSubsampling)
+            ->set("trellis_quant", baton->trellisQuantisation)
+            ->set("overshoot_deringing", baton->overshootDeringing)
+            ->set("optimize_scans", baton->optimiseScans)
+            ->set("interlace", baton->progressive)
+          );
+          baton->formatOut = "jpeg";
+          baton->channels = std::min(baton->channels, 3);
+        } else if (baton->formatOut == "png" || isPng || (matchInput && inputImageType == ImageType::PNG)) {
+          // Write PNG to file
+          image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("compression", baton->compressionLevel)
+            ->set("interlace", baton->progressive)
+            ->set("filter", baton->withoutAdaptiveFiltering ?
+              VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
+          );
+          baton->formatOut = "png";
+        } else if (baton->formatOut == "webp" || isWebp || (matchInput && inputImageType == ImageType::WEBP)) {
+          // Write WEBP to file
+          image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->quality)
+          );
+          baton->formatOut = "webp";
+        } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
+          // Write TIFF to file
+          image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->quality)
+            ->set("compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG)
+          );
+          baton->formatOut = "tiff";
+          baton->channels = std::min(baton->channels, 3);
+        } else if (baton->formatOut == "dz" || IsDz(baton->fileOut)) {
+          // Write DZ to file
+          image.dzsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("tile_size", baton->tileSize)
+            ->set("overlap", baton->tileOverlap)
+            ->set("layout", baton->tileLayout)
+          );
+          baton->formatOut = "dz";
+        } else {
+          // Unsupported output format
+          (baton->err).append("Unsupported output format " + baton->fileOut);
+          return Error();
+        }
       }
-      if (image->BandFmt != VIPS_FORMAT_UCHAR && image->BandFmt != VIPS_FORMAT_FLOAT) {
-        (baton->err).append("Expected image band format to be uchar or float: ");
-        (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, image->BandFmt));
-        return Error();
-      }
-      if (overlayImage->BandFmt != VIPS_FORMAT_UCHAR && overlayImage->BandFmt != VIPS_FORMAT_FLOAT) {
-        (baton->err).append("Expected overlay image band format to be uchar or float: ");
-        (baton->err).append(vips_enum_nick(VIPS_TYPE_BAND_FORMAT, overlayImage->BandFmt));
-        return Error();
-      }
-      if (!HasAlpha(overlayImage)) {
-        (baton->err).append("Overlay image must have an alpha channel");
-        return Error();
-      }
-      if (overlayImage->Xsize != image->Xsize && overlayImage->Ysize != image->Ysize) {
-        (baton->err).append("Overlay image must have same dimensions as resized image");
-        return Error();
-      }
-
-      // Ensure overlay is sRGB
-      VipsImage *overlayImageRGB;
-      if (vips_colourspace(overlayImage, &overlayImageRGB, VIPS_INTERPRETATION_sRGB, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, overlayImageRGB);
-
-      // Premultiply overlay
-      VipsImage *overlayImagePremultiplied;
-      if (vips_premultiply(overlayImageRGB, &overlayImagePremultiplied, nullptr)) {
-        (baton->err).append("Failed to premultiply alpha channel of overlay image");
-        return Error();
-      }
-      vips_object_local(hook, overlayImagePremultiplied);
-
-      VipsImage *composited;
-      if (Composite(hook, overlayImagePremultiplied, image, &composited)) {
-        (baton->err).append("Failed to composite images");
-        return Error();
-      }
-      vips_object_local(hook, composited);
-      image = composited;
+    } catch (VError const &err) {
+      (baton->err).append(err.what());
     }
-
-    // Reverse premultiplication after all transformations:
-    if (shouldPremultiplyAlpha) {
-      VipsImage *imageUnpremultiplied;
-      if (vips_unpremultiply(image, &imageUnpremultiplied, "max_alpha", maxAlpha, nullptr)) {
-        (baton->err).append("Failed to unpremultiply alpha channel");
-        return Error();
-      }
-      vips_object_local(hook, imageUnpremultiplied);
-      image = imageUnpremultiplied;
-    }
-
-    // Gamma decoding (brighten)
-    if (baton->gamma >= 1 && baton->gamma <= 3 && !HasAlpha(image)) {
-      VipsImage *gammaDecoded;
-      if (vips_gamma(image, &gammaDecoded, "exponent", baton->gamma, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, gammaDecoded);
-      image = gammaDecoded;
-    }
-
-    // Apply normalization - stretch luminance to cover full dynamic range
-    if (baton->normalize) {
-      VipsImage *normalized;
-      if (Normalize(hook, image, &normalized)) {
-        return Error();
-      }
-      image = normalized;
-    }
-
-    // Convert image to sRGB, if not already
-    if (image->Type == VIPS_INTERPRETATION_RGB16) {
-      // Ensure 16-bit integer
-      VipsImage *ushort;
-      if (vips_cast_ushort(image, &ushort, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, ushort);
-      image = ushort;
-      // Fast conversion to 8-bit integer by discarding least-significant byte
-      VipsImage *msb;
-      if (vips_msb(image, &msb, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, msb);
-      image = msb;
-      // Explicitly set to sRGB
-      image->Type = VIPS_INTERPRETATION_sRGB;
-    } else if (image->Type != VIPS_INTERPRETATION_sRGB) {
-      // Switch interpretation to sRGB
-      VipsImage *rgb;
-      if (vips_colourspace(image, &rgb, VIPS_INTERPRETATION_sRGB, nullptr)) {
-        return Error();
-      }
-      vips_object_local(hook, rgb);
-      image = rgb;
-      // Transform colours from embedded profile to sRGB profile
-      if (baton->withMetadata && HasProfile(image)) {
-        VipsImage *profiled;
-        if (vips_icc_transform(image, &profiled, srgbProfile.data(), "embedded", TRUE, nullptr)) {
-          return Error();
-        }
-        vips_object_local(hook, profiled);
-        image = profiled;
-      }
-    }
-
-    // Override EXIF Orientation tag
-    if (baton->withMetadata && baton->withMetadataOrientation != -1) {
-      SetExifOrientation(image, baton->withMetadataOrientation);
-    }
-
-    // Output
-    if (baton->output == "__jpeg" || (baton->output == "__input" && inputImageType == ImageType::JPEG)) {
-      // Write JPEG to buffer
-      if (vips_jpegsave_buffer(
-        image, &baton->bufferOut, &baton->bufferOutLength,
-        "strip", !baton->withMetadata,
-        "Q", baton->quality,
-        "optimize_coding", TRUE,
-        "no_subsample", baton->withoutChromaSubsampling,
-        "trellis_quant", baton->trellisQuantisation,
-        "overshoot_deringing", baton->overshootDeringing,
-        "optimize_scans", baton->optimiseScans,
-        "interlace", baton->progressive,
-        nullptr
-      )) {
-        return Error();
-      }
-      baton->outputFormat = "jpeg";
-    } else if (baton->output == "__png" || (baton->output == "__input" && inputImageType == ImageType::PNG)) {
-      // Write PNG to buffer
-      if (vips_pngsave_buffer(
-        image, &baton->bufferOut, &baton->bufferOutLength,
-        "strip", !baton->withMetadata,
-        "compression", baton->compressionLevel,
-        "interlace", baton->progressive,
-        "filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL,
-        nullptr
-      )) {
-        return Error();
-      }
-      baton->outputFormat = "png";
-    } else if (baton->output == "__webp" || (baton->output == "__input" && inputImageType == ImageType::WEBP)) {
-      // Write WEBP to buffer
-      if (vips_webpsave_buffer(
-        image, &baton->bufferOut, &baton->bufferOutLength,
-        "strip", !baton->withMetadata,
-        "Q", baton->quality,
-        nullptr
-      )) {
-        return Error();
-      }
-      baton->outputFormat = "webp";
-    } else if (baton->output == "__raw") {
-      // Write raw, uncompressed image data to buffer
-      if (baton->greyscale || image->Type == VIPS_INTERPRETATION_B_W) {
-        // Extract first band for greyscale image
-        VipsImage *grey;
-        if (vips_extract_band(image, &grey, 0, nullptr)) {
-          return Error();
-        }
-        vips_object_local(hook, grey);
-        image = grey;
-      }
-      if (image->BandFmt != VIPS_FORMAT_UCHAR) {
-        // Cast pixels to uint8 (unsigned char)
-        VipsImage *uchar;
-        if (vips_cast(image, &uchar, VIPS_FORMAT_UCHAR, nullptr)) {
-          return Error();
-        }
-        vips_object_local(hook, uchar);
-        image = uchar;
-      }
-      // Get raw image data
-      baton->bufferOut = vips_image_write_to_memory(image, &baton->bufferOutLength);
-      if (baton->bufferOut == nullptr) {
-        (baton->err).append("Could not allocate enough memory for raw output");
-        return Error();
-      }
-      baton->outputFormat = "raw";
-    } else {
-      bool outputJpeg = IsJpeg(baton->output);
-      bool outputPng = IsPng(baton->output);
-      bool outputWebp = IsWebp(baton->output);
-      bool outputTiff = IsTiff(baton->output);
-      bool outputDz = IsDz(baton->output);
-      bool matchInput = !(outputJpeg || outputPng || outputWebp || outputTiff || outputDz);
-      if (outputJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
-        // Write JPEG to file
-        if (vips_jpegsave(
-          image, baton->output.data(),
-          "strip", !baton->withMetadata,
-          "Q", baton->quality,
-          "optimize_coding", TRUE,
-          "no_subsample", baton->withoutChromaSubsampling,
-          "trellis_quant", baton->trellisQuantisation,
-          "overshoot_deringing", baton->overshootDeringing,
-          "optimize_scans", baton->optimiseScans,
-          "interlace", baton->progressive,
-          nullptr
-        )) {
-          return Error();
-        }
-        baton->outputFormat = "jpeg";
-      } else if (outputPng || (matchInput && inputImageType == ImageType::PNG)) {
-        // Write PNG to file
-        if (vips_pngsave(
-          image, baton->output.data(),
-          "strip", !baton->withMetadata,
-          "compression", baton->compressionLevel,
-          "interlace", baton->progressive,
-          "filter", baton->withoutAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL,
-          nullptr
-        )) {
-          return Error();
-        }
-        baton->outputFormat = "png";
-      } else if (outputWebp || (matchInput && inputImageType == ImageType::WEBP)) {
-        // Write WEBP to file
-        if (vips_webpsave(
-          image, baton->output.data(),
-          "strip", !baton->withMetadata,
-          "Q", baton->quality,
-          nullptr
-        )) {
-          return Error();
-        }
-        baton->outputFormat = "webp";
-      } else if (outputTiff || (matchInput && inputImageType == ImageType::TIFF)) {
-        // Write TIFF to file
-        if (vips_tiffsave(
-          image, baton->output.data(),
-          "strip", !baton->withMetadata,
-          "compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG,
-          "Q", baton->quality,
-          nullptr
-        )) {
-          return Error();
-        }
-        baton->outputFormat = "tiff";
-      } else if (outputDz) {
-        // Write DZ to file
-        if (vips_dzsave(
-          image, baton->output.data(),
-          "strip", !baton->withMetadata,
-          "tile_size", baton->tileSize,
-          "overlap", baton->tileOverlap,
-          nullptr
-        )) {
-          return Error();
-        }
-        baton->outputFormat = "dz";
-      } else {
-        (baton->err).append("Unsupported output " + baton->output);
-        return Error();
-      }
-    }
-    // Clean up any dangling image references
-    g_object_unref(hook);
     // Clean up libvips' per-request data and threads
     vips_error_clear();
     vips_thread_shutdown();
@@ -1038,9 +821,10 @@ class PipelineWorker : public AsyncWorker {
       }
       // Info Object
       Local<Object> info = New<Object>();
-      Set(info, New("format").ToLocalChecked(), New<String>(baton->outputFormat).ToLocalChecked());
+      Set(info, New("format").ToLocalChecked(), New<String>(baton->formatOut).ToLocalChecked());
       Set(info, New("width").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(width)));
       Set(info, New("height").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(height)));
+      Set(info, New("channels").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(baton->channels)));
 
       if (baton->bufferOutLength > 0) {
         // Pass ownership of output data to Buffer instance
@@ -1053,15 +837,18 @@ class PipelineWorker : public AsyncWorker {
       } else {
         // Add file size to info
         GStatBuf st;
-        g_stat(baton->output.data(), &st);
+        g_stat(baton->fileOut.data(), &st);
         Set(info, New("size").ToLocalChecked(), New<Uint32>(static_cast<uint32_t>(st.st_size)));
         argv[1] = info;
       }
     }
 
-    // Dispose of Persistent wrapper around input Buffer so it can be garbage collected
+    // Dispose of Persistent wrapper around input Buffers so they can be garbage collected
     if (baton->bufferInLength > 0) {
       GetFromPersistent("bufferIn");
+    }
+    if (baton->overlayBufferInLength > 0) {
+      GetFromPersistent("overlayBufferIn");
     }
     delete baton;
 
@@ -1078,7 +865,6 @@ class PipelineWorker : public AsyncWorker {
  private:
   PipelineBaton *baton;
   Callback *queueListener;
-  VipsObject *hook;
 
   /*
     Calculate the angle of rotation and need-to-flip for the output image.
@@ -1087,71 +873,31 @@ class PipelineWorker : public AsyncWorker {
      2. Use input image EXIF Orientation header - supports mirroring
      3. Otherwise default to zero, i.e. no rotation
   */
-  std::tuple<Angle, bool, bool>
-  CalculateRotationAndFlip(int const angle, VipsImage const *input) {
-    Angle rotate = Angle::D0;
+  std::tuple<VipsAngle, bool, bool>
+  CalculateRotationAndFlip(int const angle, VImage image) {
+    VipsAngle rotate = VIPS_ANGLE_D0;
     bool flip = FALSE;
     bool flop = FALSE;
     if (angle == -1) {
-      switch(ExifOrientation(input)) {
-        case 6: rotate = Angle::D90; break;
-        case 3: rotate = Angle::D180; break;
-        case 8: rotate = Angle::D270; break;
-        case 2: flop = TRUE; break; // flop 1
-        case 7: flip = TRUE; rotate = Angle::D90; break; // flip 6
-        case 4: flop = TRUE; rotate = Angle::D180; break; // flop 3
-        case 5: flip = TRUE; rotate = Angle::D270; break; // flip 8
+      switch(ExifOrientation(image)) {
+        case 6: rotate = VIPS_ANGLE_D90; break;
+        case 3: rotate = VIPS_ANGLE_D180; break;
+        case 8: rotate = VIPS_ANGLE_D270; break;
+        case 2: flop = TRUE; break;  // flop 1
+        case 7: flip = TRUE; rotate = VIPS_ANGLE_D90; break;  // flip 6
+        case 4: flop = TRUE; rotate = VIPS_ANGLE_D180; break;  // flop 3
+        case 5: flip = TRUE; rotate = VIPS_ANGLE_D270; break;  // flip 8
       }
     } else {
       if (angle == 90) {
-        rotate = Angle::D90;
+        rotate = VIPS_ANGLE_D90;
       } else if (angle == 180) {
-        rotate = Angle::D180;
+        rotate = VIPS_ANGLE_D180;
       } else if (angle == 270) {
-        rotate = Angle::D270;
+        rotate = VIPS_ANGLE_D270;
       }
     }
     return std::make_tuple(rotate, flip, flop);
-  }
-
-  /*
-    Calculate the (left, top) coordinates of the output image
-    within the input image, applying the given gravity.
-  */
-  std::tuple<int, int>
-  CalculateCrop(int const inWidth, int const inHeight, int const outWidth, int const outHeight, int const gravity) {
-    int left = 0;
-    int top = 0;
-    switch (gravity) {
-      case 1: // North
-        left = (inWidth - outWidth + 1) / 2;
-        break;
-      case 2: // East
-        left = inWidth - outWidth;
-        top = (inHeight - outHeight + 1) / 2;
-        break;
-      case 3: // South
-        left = (inWidth - outWidth + 1) / 2;
-        top = inHeight - outHeight;
-        break;
-      case 4: // West
-        top = (inHeight - outHeight + 1) / 2;
-        break;
-      case 5: // Northeast
-        left = inWidth - outWidth;
-        break;
-      case 6: // Southeast
-        left = inWidth - outWidth;
-        top = inHeight - outHeight;
-      case 7: // Southwest
-        top = inHeight - outHeight;
-      case 8: // Northwest
-        break;
-      default: // Centre
-        left = (inWidth - outWidth + 1) / 2;
-        top = (inHeight - outHeight + 1) / 2;
-    }
-    return std::make_tuple(left, top);
   }
 
   /*
@@ -1159,7 +905,7 @@ class PipelineWorker : public AsyncWorker {
   */
   int CalculateShrink(double factor, int interpolatorWindowSize) {
     int shrink = 1;
-    if (factor >= 2 && interpolatorWindowSize > 3) {
+    if (factor >= 2.0 && trunc(factor) != factor && interpolatorWindowSize > 3) {
       // Shrink less, affine more with interpolators that use at least 4x4 pixel window, e.g. bicubic
       shrink = static_cast<int>(floor(factor * 3.0 / interpolatorWindowSize));
     } else {
@@ -1179,20 +925,22 @@ class PipelineWorker : public AsyncWorker {
   }
 
   /*
-    Copy then clear the error message.
-    Unref all transitional images on the hook.
     Clear all thread-local data.
   */
   void Error() {
-    // Get libvips' error message
-    (baton->err).append(vips_error_buffer());
-    // Clean up any dangling image references
-    g_object_unref(hook);
     // Clean up libvips' per-request data and threads
     vips_error_clear();
     vips_thread_shutdown();
   }
 };
+
+// Convenience methods to access the attributes of a V8::Object
+template<typename T> T attrAs(Handle<Object> obj, std::string attr) {
+  return To<T>(Get(obj, New(attr).ToLocalChecked()).ToLocalChecked()).FromJust();
+}
+static std::string attrAsStr(Handle<Object> obj, std::string attr) {
+  return *Utf8String(Get(obj, New(attr).ToLocalChecked()).ToLocalChecked());
+}
 
 /*
   pipeline(options, output, callback)
@@ -1205,9 +953,8 @@ NAN_METHOD(pipeline) {
   Local<Object> options = info[0].As<Object>();
 
   // Input filename
-  baton->fileIn = *Utf8String(Get(options, New("fileIn").ToLocalChecked()).ToLocalChecked());
-  baton->accessMethod =
-    To<bool>(Get(options, New("sequentialRead").ToLocalChecked()).ToLocalChecked()).FromJust() ?
+  baton->fileIn = attrAsStr(options, "fileIn");
+  baton->accessMethod = attrAs<bool>(options, "sequentialRead") ?
     VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   // Input Buffer object
   Local<Object> bufferIn;
@@ -1217,32 +964,38 @@ NAN_METHOD(pipeline) {
     baton->bufferIn = node::Buffer::Data(bufferIn);
   }
   // ICC profile to use when input CMYK image has no embedded profile
-  baton->iccProfilePath = *Utf8String(Get(options, New("iccProfilePath").ToLocalChecked()).ToLocalChecked());
+  baton->iccProfilePath = attrAsStr(options, "iccProfilePath");
   // Limit input images to a given number of pixels, where pixels = width * height
-  baton->limitInputPixels = To<int32_t>(Get(options, New("limitInputPixels").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->limitInputPixels = attrAs<int32_t>(options, "limitInputPixels");
+  // Density/DPI at which to load vector images via libmagick
+  baton->density = attrAs<int32_t>(options, "density");
+  // Raw pixel input
+  baton->rawWidth = attrAs<int32_t>(options, "rawWidth");
+  baton->rawHeight = attrAs<int32_t>(options, "rawHeight");
+  baton->rawChannels = attrAs<int32_t>(options, "rawChannels");
   // Extract image options
-  baton->topOffsetPre = To<int32_t>(Get(options, New("topOffsetPre").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->leftOffsetPre = To<int32_t>(Get(options, New("leftOffsetPre").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->widthPre = To<int32_t>(Get(options, New("widthPre").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->heightPre = To<int32_t>(Get(options, New("heightPre").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->topOffsetPost = To<int32_t>(Get(options, New("topOffsetPost").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->leftOffsetPost = To<int32_t>(Get(options, New("leftOffsetPost").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->widthPost = To<int32_t>(Get(options, New("widthPost").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->heightPost = To<int32_t>(Get(options, New("heightPost").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->topOffsetPre = attrAs<int32_t>(options, "topOffsetPre");
+  baton->leftOffsetPre = attrAs<int32_t>(options, "leftOffsetPre");
+  baton->widthPre = attrAs<int32_t>(options, "widthPre");
+  baton->heightPre = attrAs<int32_t>(options, "heightPre");
+  baton->topOffsetPost = attrAs<int32_t>(options, "topOffsetPost");
+  baton->leftOffsetPost = attrAs<int32_t>(options, "leftOffsetPost");
+  baton->widthPost = attrAs<int32_t>(options, "widthPost");
+  baton->heightPost = attrAs<int32_t>(options, "heightPost");
   // Output image dimensions
-  baton->width = To<int32_t>(Get(options, New("width").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->height = To<int32_t>(Get(options, New("height").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->width = attrAs<int32_t>(options, "width");
+  baton->height = attrAs<int32_t>(options, "height");
   // Canvas option
-  Local<String> canvas = To<String>(Get(options, New("canvas").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
-  if (Equals(canvas, New("crop").ToLocalChecked()).FromJust()) {
+  std::string canvas = attrAsStr(options, "canvas");
+  if (canvas == "crop") {
     baton->canvas = Canvas::CROP;
-  } else if (Equals(canvas, New("embed").ToLocalChecked()).FromJust()) {
+  } else if (canvas == "embed") {
     baton->canvas = Canvas::EMBED;
-  } else if (Equals(canvas, New("max").ToLocalChecked()).FromJust()) {
+  } else if (canvas == "max") {
     baton->canvas = Canvas::MAX;
-  } else if (Equals(canvas, New("min").ToLocalChecked()).FromJust()) {
+  } else if (canvas == "min") {
     baton->canvas = Canvas::MIN;
-  } else if (Equals(canvas, New("ignore_aspect").ToLocalChecked()).FromJust()) {
+  } else if (canvas == "ignore_aspect") {
     baton->canvas = Canvas::IGNORE_ASPECT;
   }
   // Background colour
@@ -1251,47 +1004,71 @@ NAN_METHOD(pipeline) {
     baton->background[i] = To<int32_t>(Get(background, i).ToLocalChecked()).FromJust();
   }
   // Overlay options
-  baton->overlayPath = *Utf8String(Get(options, New("overlayPath").ToLocalChecked()).ToLocalChecked());
+  baton->overlayFileIn = attrAsStr(options, "overlayFileIn");
+  Local<Object> overlayBufferIn;
+  if (node::Buffer::HasInstance(Get(options, New("overlayBufferIn").ToLocalChecked()).ToLocalChecked())) {
+    overlayBufferIn = Get(options, New("overlayBufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
+    baton->overlayBufferInLength = node::Buffer::Length(overlayBufferIn);
+    baton->overlayBufferIn = node::Buffer::Data(overlayBufferIn);
+  }
+  baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
   // Resize options
-  baton->withoutEnlargement = To<bool>(Get(options, New("withoutEnlargement").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->gravity = To<int32_t>(Get(options, New("gravity").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->interpolator = *Utf8String(Get(options, New("interpolator").ToLocalChecked()).ToLocalChecked());
+  baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
+  baton->crop = attrAs<int32_t>(options, "crop");
+  baton->interpolator = attrAsStr(options, "interpolator");
   // Operators
-  baton->flatten = To<bool>(Get(options, New("flatten").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->negate = To<bool>(Get(options, New("negate").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->blurSigma = To<double>(Get(options, New("blurSigma").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->sharpenRadius = To<int32_t>(Get(options, New("sharpenRadius").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->sharpenFlat = To<double>(Get(options, New("sharpenFlat").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->sharpenJagged = To<double>(Get(options, New("sharpenJagged").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->threshold = To<int32_t>(Get(options, New("threshold").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->gamma = To<int32_t>(Get(options, New("gamma").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->greyscale = To<bool>(Get(options, New("greyscale").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->normalize = To<bool>(Get(options, New("normalize").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->angle = To<int32_t>(Get(options, New("angle").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->rotateBeforePreExtract = To<bool>(Get(options, New("rotateBeforePreExtract").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->flip = To<bool>(Get(options, New("flip").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->flop = To<bool>(Get(options, New("flop").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->flatten = attrAs<bool>(options, "flatten");
+  baton->negate = attrAs<bool>(options, "negate");
+  baton->blurSigma = attrAs<double>(options, "blurSigma");
+  baton->sharpenRadius = attrAs<int32_t>(options, "sharpenRadius");
+  baton->sharpenFlat = attrAs<double>(options, "sharpenFlat");
+  baton->sharpenJagged = attrAs<double>(options, "sharpenJagged");
+  baton->threshold = attrAs<int32_t>(options, "threshold");
+  baton->gamma = attrAs<double>(options, "gamma");
+  baton->greyscale = attrAs<bool>(options, "greyscale");
+  baton->normalize = attrAs<bool>(options, "normalize");
+  baton->angle = attrAs<int32_t>(options, "angle");
+  baton->rotateBeforePreExtract = attrAs<bool>(options, "rotateBeforePreExtract");
+  baton->flip = attrAs<bool>(options, "flip");
+  baton->flop = attrAs<bool>(options, "flop");
+  baton->extendTop = attrAs<int32_t>(options, "extendTop");
+  baton->extendBottom = attrAs<int32_t>(options, "extendBottom");
+  baton->extendLeft = attrAs<int32_t>(options, "extendLeft");
+  baton->extendRight = attrAs<int32_t>(options, "extendRight");
   // Output options
-  baton->progressive = To<bool>(Get(options, New("progressive").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->quality = To<int32_t>(Get(options, New("quality").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->compressionLevel = To<int32_t>(Get(options, New("compressionLevel").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->withoutAdaptiveFiltering = To<bool>(Get(options, New("withoutAdaptiveFiltering").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->withoutChromaSubsampling = To<bool>(Get(options, New("withoutChromaSubsampling").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->trellisQuantisation = To<bool>(Get(options, New("trellisQuantisation").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->overshootDeringing = To<bool>(Get(options, New("overshootDeringing").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->optimiseScans = To<bool>(Get(options, New("optimiseScans").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->withMetadata = To<bool>(Get(options, New("withMetadata").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->withMetadataOrientation = To<int32_t>(Get(options, New("withMetadataOrientation").ToLocalChecked()).ToLocalChecked()).FromJust();
-  // Output filename or __format for Buffer
-  baton->output = *Utf8String(Get(options, New("output").ToLocalChecked()).ToLocalChecked());
-  baton->tileSize = To<int32_t>(Get(options, New("tileSize").ToLocalChecked()).ToLocalChecked()).FromJust();
-  baton->tileOverlap = To<int32_t>(Get(options, New("tileOverlap").ToLocalChecked()).ToLocalChecked()).FromJust();
+  baton->progressive = attrAs<bool>(options, "progressive");
+  baton->quality = attrAs<int32_t>(options, "quality");
+  baton->compressionLevel = attrAs<int32_t>(options, "compressionLevel");
+  baton->withoutAdaptiveFiltering = attrAs<bool>(options, "withoutAdaptiveFiltering");
+  baton->withoutChromaSubsampling = attrAs<bool>(options, "withoutChromaSubsampling");
+  baton->trellisQuantisation = attrAs<bool>(options, "trellisQuantisation");
+  baton->overshootDeringing = attrAs<bool>(options, "overshootDeringing");
+  baton->optimiseScans = attrAs<bool>(options, "optimiseScans");
+  baton->withMetadata = attrAs<bool>(options, "withMetadata");
+  baton->withMetadataOrientation = attrAs<int32_t>(options, "withMetadataOrientation");
+  // Output
+  baton->formatOut = attrAsStr(options, "formatOut");
+  baton->fileOut = attrAsStr(options, "fileOut");
+  // Tile output
+  baton->tileSize = attrAs<int32_t>(options, "tileSize");
+  baton->tileOverlap = attrAs<int32_t>(options, "tileOverlap");
+  std::string tileLayout = attrAsStr(options, "tileLayout");
+  if (tileLayout == "google") {
+    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_GOOGLE;
+  } else if (tileLayout == "zoomify") {
+    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY;
+  } else {
+    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
+  }
+
   // Function to notify of queue length changes
-  Callback *queueListener = new Callback(Get(options, New("queueListener").ToLocalChecked()).ToLocalChecked().As<Function>());
+  Callback *queueListener = new Callback(
+    Get(options, New("queueListener").ToLocalChecked()).ToLocalChecked().As<Function>()
+  );
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn));
+  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn, overlayBufferIn));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);
