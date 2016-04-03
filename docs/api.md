@@ -113,7 +113,8 @@ This will reduce memory usage and can improve performance on some systems.
 
 Do not process input images where the number of pixels (width * height) exceeds this limit.
 
-`pixels` is the integral Number of pixels, with a value between 1 and the default 268402689 (0x3FFF * 0x3FFF).
+`pixels` is either an integral Number of pixels, with a value between 1 and the default 268402689 (0x3FFF * 0x3FFF) or
+ a boolean. `false` will disable checking while `true` will revert to the default limit.
 
 ### Resizing
 
