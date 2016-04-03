@@ -158,7 +158,8 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Limit input images to a given number of pixels, where pixels = width * height
-    if (image.width() * image.height() > baton->limitInputPixels) {
+    // Ignore if 0
+    if (baton->limitInputPixels > 0 && image.width() * image.height() > baton->limitInputPixels) {
       (baton->err).append("Input image exceeds pixel limit");
       return Error();
     }
