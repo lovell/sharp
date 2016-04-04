@@ -879,6 +879,7 @@ describe('Input/output', function() {
     it('Disabling limit works', function(done) {
       sharp(fixtures.inputPngLarge)
         .limitInputPixels(false)
+        .resize(2)
         .toBuffer(function(err) {
           assert.strictEqual(true, !err);
           done();

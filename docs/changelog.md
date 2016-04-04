@@ -4,6 +4,14 @@
 
 Requires libvips v8.2.3
 
+#### v0.14.1 - TBC
+
+* Allow removal of limitation on input pixel count via limitInputPixels. Use with care.
+  [#250](https://github.com/lovell/sharp/issues/250)
+  [#316](https://github.com/lovell/sharp/pull/316)
+  [@anandthakker](https://github.com/anandthakker)
+  [@kentongray](https://github.com/kentongray)
+
 #### v0.14.0 - 2<sup>nd</sup> April 2016
 
 * Add ability to extend (pad) the edges of an image.
