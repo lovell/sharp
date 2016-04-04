@@ -13,3 +13,4 @@ mkdocs.yml
 lib
 include
 packaging
+preinstall.sh
