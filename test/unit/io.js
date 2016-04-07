@@ -1044,7 +1044,7 @@ describe('Input/output', function() {
     var badPipeline = sharp(null, {raw: {width: 840, height: 473, channels: 3}})
       .toFormat('jpeg')
       .toBuffer(function(err, data, info) {
-        assert.strictEqual(err.message.indexOf('VipsImage: memory area too small --- should be 1191960 bytes, you passed 1189440'), 0);
+        assert.strictEqual(err.message.indexOf('memory area too small') > 0, true);
         readable = fs.createReadStream(fixtures.inputJPGBig);
         var goodPipeline = sharp(null, {raw: {width: 840, height: 472, channels: 3}})
           .toFormat('jpeg')
