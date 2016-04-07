@@ -1031,4 +1031,32 @@ describe('Input/output', function() {
       });
   });
 
+  it('Info event data', function(done) {
+    var readable = fs.createReadStream(fixtures.inputJPGBig);
+    var inPipeline = sharp()
+      .resize(840)
+      .raw()
+      .on('info', function(info) {
+        assert.strictEqual(840, info.width);
+        assert.strictEqual(472, info.height);
+        assert.strictEqual(3, info.channels);
+      });
+    var badPipeline = sharp(null, {raw: {width: 840, height: 473, channels: 3}})
+      .toFormat('jpeg')
+      .toBuffer(function(err, data, info) {
+        assert.strictEqual(err.message.indexOf('VipsImage: memory area too small --- should be 1191960 bytes, you passed 1189440'), 0);
+        readable = fs.createReadStream(fixtures.inputJPGBig);
+        var goodPipeline = sharp(null, {raw: {width: 840, height: 472, channels: 3}})
+          .toFormat('jpeg')
+          .toBuffer(function(err, data, info) {
+            if (err) throw err;
+            done();
+          });
+          inPipeline = sharp()
+            .resize(840)
+            .raw();
+          readable.pipe(inPipeline).pipe(goodPipeline);
+      });
+    readable.pipe(inPipeline).pipe(badPipeline);
+  });
 });
