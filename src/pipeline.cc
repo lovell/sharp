@@ -65,6 +65,7 @@ using sharp::IsPng;
 using sharp::IsWebp;
 using sharp::IsTiff;
 using sharp::IsDz;
+using sharp::IsDzZip;
 using sharp::FreeCallback;
 using sharp::CalculateCrop;
 using sharp::counterProcess;
@@ -737,7 +738,8 @@ class PipelineWorker : public AsyncWorker {
         bool isWebp = IsWebp(baton->fileOut);
         bool isTiff = IsTiff(baton->fileOut);
         bool isDz = IsDz(baton->fileOut);
-        bool matchInput = baton->formatOut == "input" && !(isJpeg || isPng || isWebp || isTiff || isDz);
+        bool isDzZip = IsDzZip(baton->fileOut);
+        bool matchInput = baton->formatOut == "input" && !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip);
         if (baton->formatOut == "jpeg" || isJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
           // Write JPEG to file
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -778,12 +780,16 @@ class PipelineWorker : public AsyncWorker {
           );
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
-        } else if (baton->formatOut == "dz" || IsDz(baton->fileOut)) {
+        } else if (baton->formatOut == "dz" || isDz || isDzZip) {
+          if (isDzZip) {
+            baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
+          }
           // Write DZ to file
           image.dzsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("tile_size", baton->tileSize)
             ->set("overlap", baton->tileOverlap)
+            ->set("container", baton->tileContainer)
             ->set("layout", baton->tileLayout)
           );
           baton->formatOut = "dz";
@@ -1052,6 +1058,12 @@ NAN_METHOD(pipeline) {
   // Tile output
   baton->tileSize = attrAs<int32_t>(options, "tileSize");
   baton->tileOverlap = attrAs<int32_t>(options, "tileOverlap");
+  std::string tileContainer = attrAsStr(options, "tileContainer");
+  if (tileContainer == "zip") {
+    baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
+  } else {
+    baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_FS;
+  }
   std::string tileLayout = attrAsStr(options, "tileLayout");
   if (tileLayout == "google") {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_GOOGLE;

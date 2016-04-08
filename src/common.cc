@@ -52,6 +52,9 @@ namespace sharp {
   bool IsDz(std::string const &str) {
     return EndsWith(str, ".dzi") || EndsWith(str, ".DZI");
   }
+  bool IsDzZip(std::string const &str) {
+    return EndsWith(str, ".zip") || EndsWith(str, ".ZIP") || EndsWith(str, ".szi") || EndsWith(str, ".SZI");
+  }
 
   /*
     Provide a string identifier for the given image type.
