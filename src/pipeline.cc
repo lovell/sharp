@@ -103,14 +103,19 @@ class PipelineWorker : public AsyncWorker {
       // From buffer
       if (baton->rawWidth > 0 && baton->rawHeight > 0 && baton->rawChannels > 0) {
         // Raw, uncompressed pixel data
-        image = VImage::new_from_memory(baton->bufferIn, baton->bufferInLength,
-          baton->rawWidth, baton->rawHeight, baton->rawChannels, VIPS_FORMAT_UCHAR);
-        if (baton->rawChannels < 3) {
-          image.get_image()->Type = VIPS_INTERPRETATION_B_W;
-        } else {
-          image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+        try {
+          image = VImage::new_from_memory(baton->bufferIn, baton->bufferInLength,
+            baton->rawWidth, baton->rawHeight, baton->rawChannels, VIPS_FORMAT_UCHAR);
+          if (baton->rawChannels < 3) {
+            image.get_image()->Type = VIPS_INTERPRETATION_B_W;
+          } else {
+            image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+          }
+          inputImageType = ImageType::RAW;
+        } catch(VError const &err) {
+          (baton->err).append(err.what());
+          inputImageType = ImageType::UNKNOWN;
         }
-        inputImageType = ImageType::RAW;
       } else {
         // Compressed data
         inputImageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
@@ -656,7 +661,8 @@ class PipelineWorker : public AsyncWorker {
 
       // Number of channels used in output image
       baton->channels = image.bands();
-
+      baton->width = image.width();
+      baton->height = image.height();
       // Output
       if (baton->fileOut == "") {
         // Buffer output
