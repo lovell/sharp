@@ -81,6 +81,7 @@ struct PipelineBaton {
   int withMetadataOrientation;
   int tileSize;
   int tileOverlap;
+  VipsForeignDzContainer tileContainer;
   VipsForeignDzLayout tileLayout;
 
   PipelineBaton():
@@ -130,6 +131,7 @@ struct PipelineBaton {
     withMetadataOrientation(-1),
     tileSize(256),
     tileOverlap(0),
+    tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),
     tileLayout(VIPS_FOREIGN_DZ_LAYOUT_DZ) {
       background[0] = 0.0;
       background[1] = 0.0;

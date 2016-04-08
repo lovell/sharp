@@ -527,13 +527,16 @@ The default behaviour, when `withMetadata` is not used, is to strip all metadata
 
 #### tile(options)
 
-The size, overlap and directory layout to use when generating square Deep Zoom image pyramid tiles.
+The size, overlap, container and directory layout to use when generating square Deep Zoom image pyramid tiles.
 
 `options` is an Object with one or more of the following attributes:
 
 * `size` is an integral Number between 1 and 8192. The default value is 256 pixels.
 * `overlap` is an integral Number between 0 and 8192. The default value is 0 pixels.
+* `container` is a String, with value `fs` or `zip`. The default value is `fs`.
 * `layout` is a String, with value `dz`, `zoomify` or `google`. The default value is `dz`.
+
+You can also use the file extension .zip or .szi to write to a ZIP container instead of the filesystem.
 
 ```javascript
 sharp('input.tiff')

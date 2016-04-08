@@ -6,6 +6,7 @@ var assert = require('assert');
 
 var async = require('async');
 var rimraf = require('rimraf');
+var unzip = require('unzip');
 
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
@@ -83,6 +84,26 @@ describe('Tile', function() {
       assert.throws(function() {
         sharp().tile({
           overlap: overlap
+        });
+      });
+    });
+  });
+
+  it('Valid container values pass', function() {
+    ['fs', 'zip'].forEach(function(container) {
+      assert.doesNotThrow(function() {
+        sharp().tile({
+          container: container
+        });
+      });
+    });
+  });
+
+  it('Invalid container values fail', function() {
+    ['zoinks', 1].forEach(function(container) {
+      assert.throws(function() {
+        sharp().tile({
+          container: container
         });
       });
     });
@@ -185,6 +206,58 @@ describe('Tile', function() {
               assert.strictEqual(true, stat.isFile());
               assert.strictEqual(true, stat.size > 0);
               done();
+            });
+          });
+      });
+    });
+
+    it('Write to ZIP container using file extension', function(done) {
+      var container = fixtures.path('output.dz.container.zip');
+      var extractTo = fixtures.path('output.dz.container');
+      var directory = path.join(extractTo, 'output.dz.container_files');
+      rimraf(directory, function() {
+        sharp(fixtures.inputJpg)
+          .toFile(container, function(err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            fs.stat(container, function(err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
+              fs.createReadStream(container)
+                .pipe(unzip.Extract({path: path.dirname(extractTo)}))
+                .on('error', function(err) { throw err; })
+                .on('close', function() {
+                  assertDeepZoomTiles(directory, 256, 13, done);
+                });
+            });
+          });
+      });
+    });
+
+    it('Write to ZIP container using container tile option', function(done) {
+      var container = fixtures.path('output.dz.containeropt.zip');
+      var extractTo = fixtures.path('output.dz.containeropt');
+      var directory = path.join(extractTo, 'output.dz.containeropt_files');
+      rimraf(directory, function() {
+        sharp(fixtures.inputJpg)
+          .tile({
+            container: 'zip'
+          })
+          .toFile(fixtures.path('output.dz.containeropt.dzi'), function(err, info) {
+            // Vips overrides .dzi extension to .zip used by container var below
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            fs.stat(container, function(err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
+              fs.createReadStream(container)
+                .pipe(unzip.Extract({path: path.dirname(extractTo)}))
+                .on('error', function(err) { throw err; })
+                .on('close', function() {
+                  assertDeepZoomTiles(directory, 256, 13, done);
+                });
             });
           });
       });

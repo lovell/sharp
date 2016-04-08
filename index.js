@@ -660,6 +660,14 @@ Sharp.prototype.tile = function(tile) {
         throw new Error('Invalid tile overlap (0 to 8192) ' + tile.overlap);
       }
     }
+    // Container
+    if (isDefined(tile.container)) {
+      if (isString(tile.container) && contains(tile.container, ['fs', 'zip'])) {
+        this.options.tileContainer = tile.container;
+      } else {
+        throw new Error('Invalid tile container ' + tile.container);
+      }
+    }
     // Layout
     if (isDefined(tile.layout)) {
       if (isString(tile.layout) && contains(tile.layout, ['dz', 'google', 'zoomify'])) {
