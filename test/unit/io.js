@@ -877,7 +877,7 @@ describe('Input/output', function() {
     });
 
     it('Disabling limit works', function(done) {
-      sharp(fixtures.inputPngLarge)
+      sharp(fixtures.inputJpgLarge)
         .limitInputPixels(false)
         .resize(2)
         .toBuffer(function(err) {
@@ -886,8 +886,8 @@ describe('Input/output', function() {
         });
     });
 
-    it('Enabling default limit fails works and fails with a large image', function(done) {
-      sharp(fixtures.inputPngLarge)
+    it('Enabling default limit works and fails with a large image', function(done) {
+      sharp(fixtures.inputJpgLarge)
         .limitInputPixels(true)
         .toBuffer(function(err) {
           assert.strictEqual(true, !!err);
