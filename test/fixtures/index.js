@@ -66,6 +66,7 @@ module.exports = {
   inputJpgWithCmykNoProfile: getPath('Channel_digital_image_CMYK_color_no_profile.jpg'),
   inputJpgWithCorruptHeader: getPath('corrupt-header.jpg'),
   inputJpgWithLowContrast: getPath('low-contrast.jpg'), // http://www.flickr.com/photos/grizdave/2569067123/
+  inputJpgLarge: getPath('giant-image.jpg'),
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
@@ -79,7 +80,6 @@ module.exports = {
   inputPngOverlayLayer2LowAlpha: getPath('alpha-layer-2-ink-low-alpha.png'),
   inputPngAlphaPremultiplicationSmall: getPath('alpha-premultiply-1024x768-paper.png'),
   inputPngAlphaPremultiplicationLarge: getPath('alpha-premultiply-2048x1536-paper.png'),
-  inputPngLarge: getPath('giant-image.png'),
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp
