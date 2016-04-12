@@ -734,6 +734,7 @@ class PipelineWorker : public AsyncWorker {
           // Write WEBP to buffer
           VipsArea *area = VIPS_AREA(image.webpsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
+            ->set("lossless", baton->lossless)
             ->set("Q", baton->quality)
           ));
           baton->bufferOut = static_cast<char*>(area->data);
@@ -805,6 +806,7 @@ class PipelineWorker : public AsyncWorker {
           // Write WEBP to file
           image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
+            ->set("lossless", baton->lossless)
             ->set("Q", baton->quality)
           );
           baton->formatOut = "webp";
@@ -1080,6 +1082,7 @@ NAN_METHOD(pipeline) {
   baton->extendRight = attrAs<int32_t>(options, "extendRight");
   // Output options
   baton->progressive = attrAs<bool>(options, "progressive");
+  baton->lossless = attrAs<bool>(options, "lossless");
   baton->quality = attrAs<int32_t>(options, "quality");
   baton->compressionLevel = attrAs<int32_t>(options, "compressionLevel");
   baton->withoutAdaptiveFiltering = attrAs<bool>(options, "withoutAdaptiveFiltering");
