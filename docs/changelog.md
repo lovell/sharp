@@ -12,6 +12,14 @@ Requires libvips v8.2.3
   [@anandthakker](https://github.com/anandthakker)
   [@kentongray](https://github.com/kentongray)
 
+* Use final output image for metadata passed to callback.
+  [#399](https://github.com/lovell/sharp/pull/399)
+  [@salzhrani](https://github.com/salzhrani)
+
+* Add support for writing tiled images to a zip container.
+  [#402](https://github.com/lovell/sharp/pull/402)
+  [@felixbuenemann](https://github.com/felixbuenemann)
+
 * Allow use of embed with 1 and 2 channel images.
   [#411](https://github.com/lovell/sharp/issues/411)
   [@janaz](https://github.com/janaz)

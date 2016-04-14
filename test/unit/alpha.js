@@ -53,7 +53,7 @@ describe('Alpha transparency', function() {
         assert.strictEqual(true, info.size > 0);
         assert.strictEqual(32, info.width);
         assert.strictEqual(32, info.height);
-        fixtures.assertSimilar(fixtures.expected('flatten-rgb16-orange.jpg'), data, done);
+        fixtures.assertSimilar(fixtures.expected('flatten-rgb16-orange.jpg'), data, { threshold: 6 }, done);
       });
   });
 
