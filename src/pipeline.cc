@@ -496,11 +496,21 @@ class PipelineWorker : public AsyncWorker {
           // Scale up 8-bit values to match 16-bit input image
           double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
           // Create background colour
-          std::vector<double> background {
-            baton->background[0] * multiplier,
-            baton->background[1] * multiplier,
-            baton->background[2] * multiplier
-          };
+          std::vector<double> background;
+          if (image.bands() > 2) {
+            background = {
+              multiplier * baton->background[0],
+              multiplier * baton->background[1],
+              multiplier * baton->background[2]
+            };
+          } else {
+            // Convert sRGB to greyscale
+            background = { multiplier * (
+              0.2126 * baton->background[0] +
+              0.7152 * baton->background[1] +
+              0.0722 * baton->background[2]
+            )};
+          }
           // Add alpha channel to background colour
           if (baton->background[3] < 255.0 || HasAlpha(image)) {
             background.push_back(baton->background[3] * multiplier);

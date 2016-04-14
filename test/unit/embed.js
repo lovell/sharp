@@ -88,6 +88,22 @@ describe('Embed', function() {
       });
   });
 
+  it('PNG with 2 channels', function(done) {
+    sharp(fixtures.inputPngWithGreyAlpha)
+      .resize(32, 16)
+      .embed()
+      .background({r: 0, g: 0, b: 0, a: 0})
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(32, info.width);
+        assert.strictEqual(16, info.height);
+        assert.strictEqual(4, info.channels);
+        fixtures.assertSimilar(fixtures.expected('embed-2channel.png'), data, done);
+      });
+  });
+
   it('Enlarge and embed', function(done) {
     sharp(fixtures.inputPngWithOneColor)
       .embed()

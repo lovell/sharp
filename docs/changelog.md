@@ -12,6 +12,10 @@ Requires libvips v8.2.3
   [@anandthakker](https://github.com/anandthakker)
   [@kentongray](https://github.com/kentongray)
 
+* Allow use of embed with 1 and 2 channel images.
+  [#411](https://github.com/lovell/sharp/issues/411)
+  [@janaz](https://github.com/janaz)
+
 #### v0.14.0 - 2<sup>nd</sup> April 2016
 
 * Add ability to extend (pad) the edges of an image.

@@ -38,7 +38,7 @@ describe('Gamma correction', function() {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(129, info.width);
         assert.strictEqual(111, info.height);
-        fixtures.assertSimilar(fixtures.expected('gamma-3.0.jpg'), data, done);
+        fixtures.assertSimilar(fixtures.expected('gamma-3.0.jpg'), data, { threshold: 6 }, done);
       });
   });
 
@@ -49,7 +49,7 @@ describe('Gamma correction', function() {
       .toBuffer(function(err, data, info) {
         assert.strictEqual('png', info.format);
         assert.strictEqual(320, info.width);
-        fixtures.assertSimilar(fixtures.expected('gamma-alpha.jpg'), data, done);
+        fixtures.assertSimilar(fixtures.expected('gamma-alpha.jpg'), data, { threshold: 11 }, done);
       });
   });
 
