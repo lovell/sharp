@@ -12,6 +12,9 @@ var tmp = require('os').tmpdir();
 
 var distBaseUrl = 'https://dl.bintray.com/lovell/sharp/';
 
+// Use NPM-provided environment variable where available, falling back to require-based method for Electron
+var minimumLibvipsVersion = process.env.npm_package_config_libvips || require('./package.json').config.libvips;
+
 var vipsHeaderPath = path.join(__dirname, 'include', 'vips', 'vips.h');
 
 // -- Helpers
@@ -75,7 +78,7 @@ module.exports.download_vips = function() {
     }
     // Arch/platform-specific .tar.gz
     var platform = (process.arch === 'arm') ? 'arm' : process.platform.substr(0, 3);
-    var tarFilename = ['libvips', process.env.npm_package_config_libvips, platform].join('-') + '.tar.gz';
+    var tarFilename = ['libvips', minimumLibvipsVersion, platform].join('-') + '.tar.gz';
     var tarPath = path.join(__dirname, 'packaging', tarFilename);
     if (isFile(tarPath)) {
       unpack(tarPath);
@@ -114,13 +117,13 @@ module.exports.use_global_vips = function() {
   if (globalVipsVersion) {
     useGlobalVips = semver.gte(
       globalVipsVersion,
-      process.env.npm_package_config_libvips
+      minimumLibvipsVersion
     );
   }
   if (process.platform === 'darwin' && !useGlobalVips) {
     if (globalVipsVersion) {
       error(
-        'Found libvips ' + globalVipsVersion + ' but require ' + process.env.npm_package_config_libvips +
+        'Found libvips ' + globalVipsVersion + ' but require ' + minimumLibvipsVersion +
         '\nPlease upgrade libvips by running: brew update && brew upgrade'
       );
     } else {
