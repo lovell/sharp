@@ -52,9 +52,15 @@ For Linux-based operating systems such as Alpine that use musl libc,
 the smaller stack size means libvips' cache should be disabled
 via `sharp.cache(false)` to avoid a stack overflow.
 
+Beware of Linux OS upgrades that introduce v5.1+ of the `g++` compiler due to
+[changes](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html)
+in the C++11 ABI.
+This module assumes the previous behaviour, which can be enforced by setting the
+`_GLIBCXX_USE_CXX11_ABI=0` environment variable at libvips' compile time.
+
 ### Mac OS
 
-[![OS X 10.9.5 Build Status](https://travis-ci.org/lovell/sharp-osx-ci.png?branch=master)](https://travis-ci.org/lovell/sharp-osx-ci)
+[![OS X 10.9.5 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
 libvips must be installed before `npm install` is run.
 This can be achieved via homebrew:

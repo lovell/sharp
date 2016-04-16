@@ -4,7 +4,7 @@
 
 Requires libvips v8.2.3
 
-#### v0.14.1 - TBC
+#### v0.14.1 - 16<sup>th</sup> April 2016
 
 * Allow removal of limitation on input pixel count via limitInputPixels. Use with care.
   [#250](https://github.com/lovell/sharp/issues/250)
@@ -23,6 +23,10 @@ Requires libvips v8.2.3
 * Allow use of embed with 1 and 2 channel images.
   [#411](https://github.com/lovell/sharp/issues/411)
   [@janaz](https://github.com/janaz)
+
+* Improve Electron compatibility by allowing node-gyp rebuilds without npm.
+  [#412](https://github.com/lovell/sharp/issues/412)
+  [@nouh](https://github.com/nouh)
 
 #### v0.14.0 - 2<sup>nd</sup> April 2016
 
