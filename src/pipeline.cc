@@ -288,12 +288,12 @@ class PipelineWorker : public AsyncWorker {
       // are already less than the required dimensions
       if (baton->withoutEnlargement) {
         if (inputWidth < baton->width || inputHeight < baton->height) {
-          xfactor = 1;
-          yfactor = 1;
+          xfactor = 1.0;
+          yfactor = 1.0;
           xshrink = 1;
           yshrink = 1;
-          xresidual = 0;
-          yresidual = 0;
+          xresidual = 1.0;
+          yresidual = 1.0;
           baton->width = inputWidth;
           baton->height = inputHeight;
         }
@@ -431,7 +431,7 @@ class PipelineWorker : public AsyncWorker {
         );
       }
 
-      bool shouldAffineTransform = xresidual != 0.0 || yresidual != 0.0;
+      bool shouldAffineTransform = xresidual != 1.0 || yresidual != 1.0;
       bool shouldBlur = baton->blurSigma != 0.0;
       bool shouldSharpen = baton->sharpenRadius != 0;
       bool shouldThreshold = baton->threshold != 0;

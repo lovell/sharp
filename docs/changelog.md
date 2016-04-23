@@ -4,6 +4,12 @@
 
 Requires libvips v8.2.3
 
+#### v0.14.2 - TBD
+
+* Remove unnecessary (un)premultiply operations when not resizing/compositing.
+  [#413](https://github.com/lovell/sharp/issues/413)
+  [@jardakotesovec](https://github.com/jardakotesovec)
+
 #### v0.14.1 - 16<sup>th</sup> April 2016
 
 * Allow removal of limitation on input pixel count via limitInputPixels. Use with care.
