@@ -96,7 +96,7 @@ describe('Threshold', function() {
         .threshold()
         .toBuffer(function(err, data, info) {
           assert.strictEqual('webp', info.format);
-          fixtures.assertSimilar(fixtures.expected('threshold-128-transparency.webp'), data, done);
+          fixtures.assertSimilar(fixtures.expected('threshold-128-transparency.webp'), data, { threshold: 14 }, done);
         });
     });
   }
