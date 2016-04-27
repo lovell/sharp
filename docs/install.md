@@ -134,12 +134,11 @@ do this on a system similar to the [Lambda Execution Environment](http://docs.aw
 small t2.micro instance using the AMI ID listed in the previous link, ssh into it as ec2-user
 and follow the instructions below.
 
-Install depencies:
+Install dependencies:
 
 ```sh
-sudo yum-config-manager --enable epel
-sudo yum install -y nodejs gcc-c++
-curl -s https://www.npmjs.com/install.sh | sudo sh
+curl -s https://rpm.nodesource.com/setup_4.x | sudo bash -
+sudo yum install -y gcc-c++ nodejs
 ```
 
 Copy your code and package.json to the instance using `scp` and create a deployment package:
@@ -150,7 +149,7 @@ npm install
 zip -ur9 ../sharp-lambda-example.zip index.js node_modules
 ```
 
-You can now download your deployment ZIP using `scp` and upload it to Lambda.
+You can now download your deployment ZIP using `scp` and upload it to Lambda. Be sure to set your Lambda runtime to Node.js 4.3.
 
 **Performance Tip:** To get the best performance on Lambda choose the largest memory available because this also gives you the most cpu time (a 1536 MB function is 12x faster than a 128 MB function).
 
