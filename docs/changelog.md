@@ -3,6 +3,8 @@
 ### v0.15 - "*outfit*"
 
 * Take advantage of libvips 8.3 features.
+  Add support for libvips' new native loaders, including GIF and SVG.
+  Pre-built binaries now include giflib and librsvg, exclude *magick.
   Use shrink-on-load for WebP input.
   Break existing sharpen API to accept sigma and improve precision.
   [#369](https://github.com/lovell/sharp/issues/369)

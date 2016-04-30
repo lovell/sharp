@@ -1,5 +1,5 @@
 // bodies for vips operations
-// Sat Jan  9 15:05:58 GMT 2016
+// Fri Feb 12 20:03:53 GMT 2016
 // this file is generated automatically, do not edit!
 
 void VImage::system( char * cmd_format , VOption *options )
@@ -1408,6 +1408,78 @@ VImage VImage::vipsload( char * filename , VOption *options )
     return( out );
 }
 
+VImage VImage::pdfload( char * filename , VOption *options )
+{
+    VImage out;
+
+    call( "pdfload" ,
+        (options ? options : VImage::option()) ->
+            set( "filename", filename ) ->
+            set( "out", &out ) );
+
+    return( out );
+}
+
+VImage VImage::pdfload_buffer( VipsBlob * buffer , VOption *options )
+{
+    VImage out;
+
+    call( "pdfload_buffer" ,
+        (options ? options : VImage::option()) ->
+            set( "buffer", buffer ) ->
+            set( "out", &out ) );
+
+    return( out );
+}
+
+VImage VImage::svgload( char * filename , VOption *options )
+{
+    VImage out;
+
+    call( "svgload" ,
+        (options ? options : VImage::option()) ->
+            set( "filename", filename ) ->
+            set( "out", &out ) );
+
+    return( out );
+}
+
+VImage VImage::svgload_buffer( VipsBlob * buffer , VOption *options )
+{
+    VImage out;
+
+    call( "svgload_buffer" ,
+        (options ? options : VImage::option()) ->
+            set( "buffer", buffer ) ->
+            set( "out", &out ) );
+
+    return( out );
+}
+
+VImage VImage::gifload( char * filename , VOption *options )
+{
+    VImage out;
+
+    call( "gifload" ,
+        (options ? options : VImage::option()) ->
+            set( "filename", filename ) ->
+            set( "out", &out ) );
+
+    return( out );
+}
+
+VImage VImage::gifload_buffer( VipsBlob * buffer , VOption *options )
+{
+    VImage out;
+
+    call( "gifload_buffer" ,
+        (options ? options : VImage::option()) ->
+            set( "buffer", buffer ) ->
+            set( "out", &out ) );
+
+    return( out );
+}
+
 VImage VImage::pngload( char * filename , VOption *options )
 {
     VImage out;
@@ -1783,11 +1855,37 @@ VImage VImage::shrinkv( int yshrink , VOption *options )
     return( out );
 }
 
-VImage VImage::shrink2( double xshrink , double yshrink , VOption *options )
+VImage VImage::reduceh( double xshrink , VOption *options )
 {
     VImage out;
 
-    call( "shrink2" ,
+    call( "reduceh" ,
+        (options ? options : VImage::option()) ->
+            set( "in", *this ) ->
+            set( "out", &out ) ->
+            set( "xshrink", xshrink ) );
+
+    return( out );
+}
+
+VImage VImage::reducev( double yshrink , VOption *options )
+{
+    VImage out;
+
+    call( "reducev" ,
+        (options ? options : VImage::option()) ->
+            set( "in", *this ) ->
+            set( "out", &out ) ->
+            set( "yshrink", yshrink ) );
+
+    return( out );
+}
+
+VImage VImage::reduce( double xshrink , double yshrink , VOption *options )
+{
+    VImage out;
+
+    call( "reduce" ,
         (options ? options : VImage::option()) ->
             set( "in", *this ) ->
             set( "out", &out ) ->

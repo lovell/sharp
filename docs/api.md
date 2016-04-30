@@ -13,7 +13,7 @@ Constructor to which further methods are chained.
 `input`, if present, can be one of:
 
 * Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
-* String containing the path to an image file, with most major formats supported.
+* String containing the path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
 
 JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data
 can be streamed into the object when `input` is `null` or `undefined`.
@@ -57,7 +57,7 @@ Fast access to image metadata without decoding any compressed image data.
 
 `callback`, if present, gets the arguments `(err, metadata)` where `metadata` has the attributes:
 
-* `format`: Name of decoder to be used to decompress image data e.g. `jpeg`, `png`, `webp` (for file-based input additionally `tiff`, `magick`, `openslide`, `ppm`, `fits`)
+* `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
 * `width`: Number of pixels wide
 * `height`: Number of pixels high
 * `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)
@@ -615,9 +615,6 @@ for example:
   tiff: { id: 'tiff',
     input: { file: true, buffer: true, stream: true },
     output: { file: true, buffer: false, stream: false } },
-  magick: { id: 'magick',
-    input: { file: true, buffer: true, stream: true },
-    output: { file: false, buffer: false, stream: false } },
   raw: { id: 'raw',
     input: { file: false, buffer: false, stream: false },
     output: { file: false, buffer: true, stream: true } } }
@@ -641,22 +638,7 @@ sharp.queue.on('change', function(queueLength) {
 An Object containing the version numbers of libvips and, on Linux, its dependencies.
 
 ```javascript
-> console.log(sharp.versions);
-
-{ zlib: '1.2.8',
-  ffi: '3.2.1',
-  glib: '2.46.2',
-  xml: '2.9.2',
-  gsf: '1.14.34',
-  exif: '0.6.21',
-  jpeg: '1.4.2',
-  png: '1.6.19',
-  lcms: '2.7',
-  webp: '0.4.4',
-  tiff: '4.0.6',
-  magick: '6.9.2-6',
-  orc: '0.4.24',
-  vips: '8.1.1' }
+console.log(sharp.versions);
 ```
 
 ### Utilities

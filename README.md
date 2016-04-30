@@ -1,7 +1,7 @@
 # sharp
 
 The typical use case for this high speed Node.js module
-is to convert large images of many formats to
+is to convert large images in common formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
 Resizing an image is typically 4x faster than using the

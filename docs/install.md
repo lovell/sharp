@@ -6,7 +6,7 @@ npm install sharp
 
 ### Prerequisites
 
-* C++11 compatible compiler such as gcc 4.6+ (Node v4+ requires gcc 4.8+), clang 3.0+ or MSVC 2013
+* C++11 compatible compiler such as gcc 4.8+, clang 3.0+ or MSVC 2013+
 * [node-gyp](https://github.com/TooTallNate/node-gyp#installation)
 
 ### Linux
@@ -15,12 +15,12 @@ npm install sharp
 [![Linux Build Status](https://circleci.com/gh/lovell/sharp.svg?style=svg&circle-token=6cb6d1d287a51af83722b19ed8885377fbc85e5c)](https://circleci.com/gh/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules/sharp/lib` during `npm install`.
-This involves an automated HTTPS download of approximately 6MB.
+This involves an automated HTTPS download of approximately 7MB.
 
 Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ CPUs should "just work", e.g.:
 
 * Debian 7, 8
-* Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
+* Ubuntu 12.04, 14.04, 15.04, 15.10, 16.04
 * Centos 7
 * Fedora 21, 22, 23
 * openSUSE 13.2
@@ -69,10 +69,10 @@ This can be achieved via homebrew:
 brew install homebrew/science/vips
 ```
 
-For GIF input and WebP output suppport use:
+For WebP suppport use:
 
 ```sh
-brew install homebrew/science/vips --with-imagemagick --with-webp
+brew install homebrew/science/vips --with-webp
 ```
 
 A missing or incorrectly configured _Xcode Command Line Tools_ installation
@@ -93,7 +93,6 @@ libvips and its dependencies are fetched and stored within `node_modules\sharp` 
 This involves an automated HTTPS download of approximately 9MB.
 
 Only 64-bit (x64) `node.exe` is supported.
-The WebP format is currently unavailable on Windows.
 
 ### FreeBSD
 

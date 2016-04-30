@@ -138,7 +138,9 @@ NAN_METHOD(format) {
 
   // Which load/save operations are available for each compressed format?
   Local<Object> format = New<Object>();
-  for (std::string f : {"jpeg", "png", "webp", "tiff", "magick", "openslide", "dz"}) {
+  for (std::string f : {
+    "jpeg", "png", "webp", "tiff", "magick", "openslide", "dz", "ppm", "fits", "gif", "svg", "pdf"
+  }) {
     // Input
     Local<Boolean> hasInputFile =
       New<Boolean>(vips_type_find("VipsOperation", (f + "load").c_str()));

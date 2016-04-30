@@ -668,29 +668,25 @@ describe('Input/output', function() {
       });
   });
 
-  if (sharp.format.magick.input.file) {
+  if (sharp.format.svg.input.file) {
     it('Convert SVG to PNG at default 72DPI', function(done) {
       sharp(fixtures.inputSvg)
         .resize(1024)
         .extract({left: 290, top: 760, width: 40, height: 40})
         .toFormat('png')
         .toBuffer(function(err, data, info) {
-          if (err) {
-            assert.strictEqual(0, err.message.indexOf('Input file is missing or of an unsupported image format'));
-            done();
-          } else {
-            assert.strictEqual('png', info.format);
-            assert.strictEqual(40, info.width);
-            assert.strictEqual(40, info.height);
-            fixtures.assertSimilar(fixtures.expected('svg72.png'), data, function(err) {
+          if (err) throw err;
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(40, info.width);
+          assert.strictEqual(40, info.height);
+          fixtures.assertSimilar(fixtures.expected('svg72.png'), data, function(err) {
+            if (err) throw err;
+            sharp(data).metadata(function(err, info) {
               if (err) throw err;
-              sharp(data).metadata(function(err, info) {
-                if (err) throw err;
-                assert.strictEqual(72, info.density);
-                done();
-              });
+              assert.strictEqual(72, info.density);
+              done();
             });
-          }
+          });
         });
     });
     it('Convert SVG to PNG at 300DPI', function(done) {
@@ -699,38 +695,18 @@ describe('Input/output', function() {
         .extract({left: 290, top: 760, width: 40, height: 40})
         .toFormat('png')
         .toBuffer(function(err, data, info) {
-          if (err) {
-            assert.strictEqual(0, err.message.indexOf('Input file is missing or of an unsupported image format'));
-            done();
-          } else {
-            assert.strictEqual('png', info.format);
-            assert.strictEqual(40, info.width);
-            assert.strictEqual(40, info.height);
-            fixtures.assertSimilar(fixtures.expected('svg1200.png'), data, function(err) {
-              if (err) throw err;
-              sharp(data).metadata(function(err, info) {
-                if (err) throw err;
-                assert.strictEqual(1200, info.density);
-                done();
-              });
-            });
-          }
-        });
-    });
-  }
-
-  if (sharp.format.magick.input.file) {
-    it('Convert PSD to PNG', function(done) {
-      sharp(fixtures.inputPsd)
-        .resize(320, 240)
-        .toFormat(sharp.format.png)
-        .toFile(fixtures.path('output.psd.png'), function(err, info) {
           if (err) throw err;
-          assert.strictEqual(true, info.size > 0);
           assert.strictEqual('png', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(240, info.height);
-          done();
+          assert.strictEqual(40, info.width);
+          assert.strictEqual(40, info.height);
+          fixtures.assertSimilar(fixtures.expected('svg1200.png'), data, function(err) {
+            if (err) throw err;
+            sharp(data).metadata(function(err, info) {
+              if (err) throw err;
+              assert.strictEqual(1200, info.density);
+              done();
+            });
+          });
         });
     });
   }
@@ -753,7 +729,7 @@ describe('Input/output', function() {
     });
   }
 
-  if (sharp.format.magick.input.buffer) {
+  if (sharp.format.gif.input.buffer) {
     it('Load GIF from Buffer', function(done) {
       var inputGifBuffer = fs.readFileSync(fixtures.inputGif);
       sharp(inputGifBuffer)

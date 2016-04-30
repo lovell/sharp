@@ -66,6 +66,9 @@ namespace sharp {
       case ImageType::PNG: id = "png"; break;
       case ImageType::WEBP: id = "webp"; break;
       case ImageType::TIFF: id = "tiff"; break;
+      case ImageType::GIF: id = "gif"; break;
+      case ImageType::SVG: id = "svg"; break;
+      case ImageType::PDF: id = "pdf"; break;
       case ImageType::MAGICK: id = "magick"; break;
       case ImageType::OPENSLIDE: id = "openslide"; break;
       case ImageType::PPM: id = "ppm"; break;
@@ -92,6 +95,12 @@ namespace sharp {
         imageType = ImageType::WEBP;
       } else if (EndsWith(loader, "TiffBuffer")) {
         imageType = ImageType::TIFF;
+      } else if (EndsWith(loader, "GifBuffer")) {
+        imageType = ImageType::GIF;
+      } else if (EndsWith(loader, "SvgBuffer")) {
+        imageType = ImageType::SVG;
+      } else if (EndsWith(loader, "PdfBuffer")) {
+        imageType = ImageType::PDF;
       } else if (EndsWith(loader, "MagickBuffer")) {
         imageType = ImageType::MAGICK;
       }
@@ -117,6 +126,12 @@ namespace sharp {
         imageType = ImageType::OPENSLIDE;
       } else if (EndsWith(loader, "TiffFile")) {
         imageType = ImageType::TIFF;
+      } else if (EndsWith(loader, "GifFile")) {
+        imageType = ImageType::GIF;
+      } else if (EndsWith(loader, "SvgFile")) {
+        imageType = ImageType::SVG;
+      } else if (EndsWith(loader, "PdfFile")) {
+        imageType = ImageType::PDF;
       } else if (EndsWith(loader, "Ppm")) {
         imageType = ImageType::PPM;
       } else if (EndsWith(loader, "Fits")) {

@@ -123,11 +123,16 @@ class PipelineWorker : public AsyncWorker {
         if (inputImageType != ImageType::UNKNOWN) {
           try {
             VOption *option = VImage::option()->set("access", baton->accessMethod);
+            if (inputImageType == ImageType::SVG || inputImageType == ImageType::PDF) {
+              option->set("dpi", static_cast<double>(baton->density));
+            }
             if (inputImageType == ImageType::MAGICK) {
               option->set("density", std::to_string(baton->density).data());
             }
             image = VImage::new_from_buffer(baton->bufferIn, baton->bufferInLength, nullptr, option);
-            if (inputImageType == ImageType::MAGICK) {
+            if (inputImageType == ImageType::SVG ||
+              inputImageType == ImageType::PDF ||
+              inputImageType == ImageType::MAGICK) {
               SetDensity(image, baton->density);
             }
           } catch (...) {
@@ -144,11 +149,16 @@ class PipelineWorker : public AsyncWorker {
       if (inputImageType != ImageType::UNKNOWN) {
         try {
           VOption *option = VImage::option()->set("access", baton->accessMethod);
+          if (inputImageType == ImageType::SVG || inputImageType == ImageType::PDF) {
+            option->set("dpi", static_cast<double>(baton->density));
+          }
           if (inputImageType == ImageType::MAGICK) {
             option->set("density", std::to_string(baton->density).data());
           }
           image = VImage::new_from_file(baton->fileIn.data(), option);
-          if (inputImageType == ImageType::MAGICK) {
+          if (inputImageType == ImageType::SVG ||
+            inputImageType == ImageType::PDF ||
+            inputImageType == ImageType::MAGICK) {
             SetDensity(image, baton->density);
           }
         } catch (...) {

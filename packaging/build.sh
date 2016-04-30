@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION_VIPS=8.2.3
+VERSION_VIPS=8.3.0
 
 # Is docker available?
 
@@ -9,7 +9,7 @@ if ! type docker >/dev/null; then
   exit 1
 fi
 
-# TODO: docker v1.9.0 will allow build-time args - https://github.com/docker/docker/pull/15182
+# TODO: docker v1.9.0 allows build-time args - https://github.com/docker/docker/pull/15182
 
 # Windows
 

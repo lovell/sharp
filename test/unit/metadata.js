@@ -133,7 +133,24 @@ describe('Image metadata', function() {
     });
   }
 
-  if (sharp.format.magick.input.file) {
+  if (sharp.format.gif.input.file) {
+    it('GIF via giflib', function(done) {
+      sharp(fixtures.inputGif).metadata(function(err, metadata) {
+        if (err) throw err;
+        assert.strictEqual('gif', metadata.format);
+        assert.strictEqual(800, metadata.width);
+        assert.strictEqual(533, metadata.height);
+        assert.strictEqual(4, metadata.channels);
+        assert.strictEqual('undefined', typeof metadata.density);
+        assert.strictEqual(false, metadata.hasProfile);
+        assert.strictEqual(true, metadata.hasAlpha);
+        assert.strictEqual('undefined', typeof metadata.orientation);
+        assert.strictEqual('undefined', typeof metadata.exif);
+        assert.strictEqual('undefined', typeof metadata.icc);
+        done();
+      });
+    });
+  } else if (sharp.format.magick.input.file) {
     it('GIF via libmagick', function(done) {
       sharp(fixtures.inputGif).metadata(function(err, metadata) {
         if (err) throw err;

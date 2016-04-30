@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.14.1",
+  "version": "0.15.0",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -73,7 +73,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.2.3"
+    "libvips": "8.3.0"
   },
   "engines": {
     "node": ">=0.10"

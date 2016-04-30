@@ -1,7 +1,7 @@
 # sharp
 
 The typical use case for this high speed Node.js module
-is to convert large images of many formats to
+is to convert large images in common formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
 Resizing an image is typically 4x faster than using the
@@ -23,8 +23,7 @@ to install the libvips dependency.
 
 ### Formats
 
-This module supports reading JPEG, PNG, WebP, TIFF, OpenSlide,
-GIF and most other libmagick-supported formats.
+This module supports reading JPEG, PNG, WebP, TIFF, GIF and SVG images.
 
 Output images can be in JPEG, PNG and WebP formats as well as uncompressed raw pixel data.
 

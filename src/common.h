@@ -11,16 +11,19 @@ using vips::VImage;
 namespace sharp {
 
   enum class ImageType {
-    UNKNOWN,
     JPEG,
     PNG,
     WEBP,
     TIFF,
+    GIF,
+    SVG,
+    PDF,
     MAGICK,
     OPENSLIDE,
     PPM,
     FITS,
-    RAW
+    RAW,
+    UNKNOWN
   };
 
   // How many tasks are in the queue?
