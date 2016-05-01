@@ -747,6 +747,24 @@ describe('Input/output', function() {
     });
   }
 
+  if (sharp.format.gif.input.file) {
+    it('Load GIF grey+alpha from file', function(done) {
+      sharp(fixtures.inputGifGreyPlusAlpha)
+        .resize(8, 4)
+        .png()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual(data.length, info.size);
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(8, info.width);
+          assert.strictEqual(4, info.height);
+          assert.strictEqual(4, info.channels);
+          done();
+        });
+    });
+  }
+
   if (sharp.format.openslide.input.file) {
     it('Load Aperio SVS file via Openslide', function(done) {
       sharp(fixtures.inputSvs)
