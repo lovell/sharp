@@ -157,3 +157,38 @@ You can now download your deployment ZIP using `scp` and upload it to Lambda. Be
 
 * [gulp-responsive](https://www.npmjs.com/package/gulp-responsive)
 * [grunt-sharp](https://www.npmjs.com/package/grunt-sharp)
+
+### Security
+
+Many users of this module process untrusted, user-supplied images,
+but there are aspects of security to consider when doing so.
+
+It is possible to compile libvips with support for various third-party image loaders.
+Each of these libraries has undergone differing levels of security testing.
+
+Whilst tools such as [American Fuzzy Lop](http://lcamtuf.coredump.cx/afl/)
+and [Valgrind](http://valgrind.org/) have been used to test
+the most popular web-based formats, as well as libvips itself,
+you are advised to perform your own testing and sandboxing.
+
+ImageMagick in particular has a relatively large attack surface,
+which can be partially mitigated with a
+[policy.xml](http://www.imagemagick.org/script/resources.php)
+configuration file to prevent the use of coders known to be vulnerable.
+
+```xml
+<policymap>
+  <policy domain="coder" rights="none" pattern="EPHEMERAL" />
+  <policy domain="coder" rights="none" pattern="URL" />
+  <policy domain="coder" rights="none" pattern="HTTPS" />
+  <policy domain="coder" rights="none" pattern="MVG" />
+  <policy domain="coder" rights="none" pattern="MSL" />
+  <policy domain="coder" rights="none" pattern="TEXT" />
+  <policy domain="coder" rights="none" pattern="SHOW" />
+  <policy domain="coder" rights="none" pattern="WIN" />
+  <policy domain="coder" rights="none" pattern="PLT" />
+</policymap>
+```
+
+Set the `MAGICK_CONFIGURE_PATH` environment variable
+to the directory containing the `policy.xml` file.
