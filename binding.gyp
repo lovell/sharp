@@ -9,7 +9,8 @@
           'download_vips': '<!(node -e "require(\'./binding\').download_vips()")'
         },
         'defines': [
-          'VIPS_CPLUSPLUS_EXPORTS'
+          'VIPS_CPLUSPLUS_EXPORTS',
+          '_ALLOW_KEYWORD_MACROS'
         ],
         'sources': [
           'src/libvips/cplusplus/VError.cpp',
@@ -91,7 +92,8 @@
       'src/utilities.cc'
     ],
     'defines': [
-      '_GLIBCXX_USE_CXX11_ABI=0'
+      '_GLIBCXX_USE_CXX11_ABI=0',
+      '_ALLOW_KEYWORD_MACROS'
     ],
     'include_dirs': [
       '<!(node -e "require(\'nan\')")'
