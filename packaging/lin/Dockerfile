@@ -40,7 +40,7 @@ ENV VERSION_ZLIB=1.2.8 \
     VERSION_CROCO=0.6.11 \
     VERSION_SVG=2.40.15 \
     VERSION_GIF=5.1.4 \
-    VERSION_VIPS=8.3.0
+    VERSION_VIPS=8.3.1
 
 # Least out-of-sync Sourceforge mirror
 ENV SOURCEFORGE_MIRROR=netix

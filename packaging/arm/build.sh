@@ -19,18 +19,27 @@ export CXXFLAGS="-O3"
 # Dependency version numbers
 VERSION_ZLIB=1.2.8
 VERSION_FFI=3.2.1
-VERSION_GLIB=2.47.6
+VERSION_GLIB=2.48.0
 VERSION_XML2=2.9.3
-VERSION_GSF=1.14.34
+VERSION_GSF=1.14.36
 VERSION_EXIF=0.6.21
 VERSION_LCMS2=2.7
-VERSION_GM=1.3.23
-VERSION_JPEG=1.4.2
+VERSION_JPEG=1.4.90
 VERSION_PNG16=1.6.21
 VERSION_WEBP=0.5.0
 VERSION_TIFF=4.0.6
 VERSION_ORC=0.4.25
-VERSION_VIPS=8.2.3
+VERSION_GDKPIXBUF=2.34.0
+VERSION_FREETYPE=2.6.3
+VERSION_FONTCONFIG=2.11.95
+VERSION_HARFBUZZ=1.2.6
+VERSION_PIXMAN=0.34.0
+VERSION_CAIRO=1.14.6
+VERSION_PANGO=1.40.1
+VERSION_CROCO=0.6.11
+VERSION_SVG=2.40.15
+VERSION_GIF=5.1.4
+VERSION_VIPS=8.3.1
 
 mkdir ${DEPS}/zlib
 curl -Ls http://zlib.net/zlib-${VERSION_ZLIB}.tar.xz | tar xJC ${DEPS}/zlib --strip-components=1
@@ -44,7 +53,7 @@ cd ${DEPS}/ffi
 ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --disable-builddir && make install-strip
 
 mkdir ${DEPS}/glib
-curl -Ls https://download.gnome.org/sources/glib/2.47/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
+curl -Ls https://download.gnome.org/sources/glib/2.48/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
 cd ${DEPS}/glib
 ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --with-pcre=internal && make install-strip
 
@@ -67,11 +76,6 @@ mkdir ${DEPS}/lcms2
 curl -Ls http://heanet.dl.sourceforge.net/project/lcms/lcms/${VERSION_LCMS2}/lcms2-${VERSION_LCMS2}.tar.gz | tar xzC ${DEPS}/lcms2 --strip-components=1
 cd ${DEPS}/lcms2
 ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
-
-mkdir ${DEPS}/gm
-curl -Ls http://heanet.dl.sourceforge.net/project/graphicsmagick/graphicsmagick/${VERSION_GM}/GraphicsMagick-${VERSION_GM}.tar.xz | tar xJC ${DEPS}/gm --strip-components=1
-cd ${DEPS}/gm
-./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --without-magick-plus-plus && make install-strip
 
 mkdir ${DEPS}/jpeg
 curl -Ls http://heanet.dl.sourceforge.net/project/libjpeg-turbo/${VERSION_JPEG}/libjpeg-turbo-${VERSION_JPEG}.tar.gz | tar xzC ${DEPS}/jpeg --strip-components=1
@@ -99,11 +103,24 @@ curl -Ls http://gstreamer.freedesktop.org/data/src/orc/orc-${VERSION_ORC}.tar.xz
 cd ${DEPS}/orc
 ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
+# TODO:
+# VERSION_GDKPIXBUF=2.34.0
+# VERSION_FREETYPE=2.6.3
+# VERSION_FONTCONFIG=2.11.95
+# VERSION_HARFBUZZ=1.2.6
+# VERSION_PIXMAN=0.34.0
+# VERSION_CAIRO=1.14.6
+# VERSION_PANGO=1.40.1
+# VERSION_CROCO=0.6.11
+# VERSION_SVG=2.40.15
+# VERSION_GIF=5.1.4
+
 mkdir ${DEPS}/vips
-curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.2/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
+curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.3/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
 cd ${DEPS}/vips
 ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
-  --disable-debug --disable-introspection --without-python --without-fftw --with-magickpackage=GraphicsMagick \
+  --disable-debug --disable-introspection --without-python --without-fftw \
+  --without-magick --without-pangoft2 --without-ppm --without-analyze --without-radiance \
   --with-zip-includes=${TARGET}/include --with-zip-libraries=${TARGET}/lib \
   --with-jpeg-includes=${TARGET}/include --with-jpeg-libraries=${TARGET}/lib \
   && make install-strip
@@ -117,20 +134,29 @@ rm -rf pkgconfig .libs *.la libvipsCC*
 # Create JSON file of version numbers
 cd ${TARGET}
 echo "{\n\
+  \"cairo\": \"${VERSION_CAIRO}\",\n\
+  \"croco\": \"${VERSION_CROCO}\",\n\
   \"exif\": \"${VERSION_EXIF}\",\n\
   \"ffi\": \"${VERSION_FFI}\",\n\
+  \"fontconfig\": \"${VERSION_FONTCONFIG}\",\n\
+  \"freetype\": \"${VERSION_FREETYPE}\",\n\
+  \"gdkpixbuf\": \"${VERSION_GDKPIXBUF}\",\n\
+  \"gif\": \"${VERSION_GIF}\",\n\
   \"glib\": \"${VERSION_GLIB}\",\n\
   \"gsf\": \"${VERSION_GSF}\",\n\
+  \"harfbuzz\": \"${VERSION_HARFBUZZ}\",\n\
   \"jpeg\": \"${VERSION_JPEG}\",\n\
   \"lcms\": \"${VERSION_LCMS2}\",\n\
-  \"gm\": \"${VERSION_GM}\",\n\
   \"orc\": \"${VERSION_ORC}\",\n\
+  \"pango\": \"${VERSION_PANGO}\",\n\
+  \"pixman\": \"${VERSION_PIXMAN}\",\n\
   \"png\": \"${VERSION_PNG16}\",\n\
+  \"svg\": \"${VERSION_SVG}\",\n\
   \"tiff\": \"${VERSION_TIFF}\",\n\
-  \"vips\": \"${VERSION_VIPS}\"\n\
+  \"vips\": \"${VERSION_VIPS}\",\n\
   \"webp\": \"${VERSION_WEBP}\",\n\
   \"xml\": \"${VERSION_XML2}\",\n\
-  \"zlib\": \"${VERSION_ZLIB}\",\n\
+  \"zlib\": \"${VERSION_ZLIB}\"\n\
 }" >lib/versions.json
 
 # Create .tar.gz

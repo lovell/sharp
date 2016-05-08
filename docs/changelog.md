@@ -2,22 +2,24 @@
 
 ### v0.15 - "*outfit*"
 
-* Take advantage of libvips 8.3 features.
-  Add support for libvips' new native loaders, including GIF and SVG.
+Requires libvips v8.3.1
+
+#### v0.15.0 - TBD
+
+* Take advantage of libvips v8.3 features.
+  Add support for libvips' new GIF and SVG loaders.
   Pre-built binaries now include giflib and librsvg, exclude *magick.
   Use shrink-on-load for WebP input.
   Break existing sharpen API to accept sigma and improve precision.
   [#369](https://github.com/lovell/sharp/issues/369)
 
-### v0.14 - "*needle*"
-
-Requires libvips v8.2.3
-
-#### v0.14.2 - TBD
-
 * Remove unnecessary (un)premultiply operations when not resizing/compositing.
   [#413](https://github.com/lovell/sharp/issues/413)
   [@jardakotesovec](https://github.com/jardakotesovec)
+
+### v0.14 - "*needle*"
+
+Requires libvips v8.2.3
 
 #### v0.14.1 - 16<sup>th</sup> April 2016
 

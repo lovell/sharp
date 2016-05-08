@@ -15,14 +15,14 @@ npm install sharp
 [![Linux Build Status](https://circleci.com/gh/lovell/sharp.svg?style=svg&circle-token=6cb6d1d287a51af83722b19ed8885377fbc85e5c)](https://circleci.com/gh/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules/sharp/lib` during `npm install`.
-This involves an automated HTTPS download of approximately 7MB.
+This involves an automated HTTPS download of approximately 6.7MB.
 
 Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ CPUs should "just work", e.g.:
 
 * Debian 7, 8
-* Ubuntu 12.04, 14.04, 15.04, 15.10, 16.04
+* Ubuntu 12.04, 14.04, 15.10, 16.04
 * Centos 7
-* Fedora 21, 22, 23
+* Fedora 22, 23
 * openSUSE 13.2
 * Archlinux 2015.06.01
 * Raspbian Jessie

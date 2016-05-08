@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION_VIPS=8.3.0
+VERSION_VIPS=8.3.1
 
 # Is docker available?
 

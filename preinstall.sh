@@ -11,7 +11,7 @@
 # Supports:
 # * Debian Linux
 #   * Debian 7, 8
-#   * Ubuntu 12.04, 14.04, 14.10, 15.04, 15.10
+#   * Ubuntu 12.04, 14.04, 15.10, 16.04
 #   * Mint 13, 17
 #   * Elementary 0.3
 # * Red Hat Linux
@@ -20,9 +20,9 @@
 #   * Amazon Linux 2015.03, 2015.09
 # * OpenSuse 13
 
-vips_version_minimum=8.2.3
-vips_version_latest_major_minor=8.2
-vips_version_latest_patch=3
+vips_version_minimum=8.3.1
+vips_version_latest_major_minor=8.3
+vips_version_latest_patch=1
 
 openslide_version_minimum=3.4.0
 openslide_version_latest_major_minor=3.4
@@ -139,7 +139,7 @@ if [ $enable_openslide -eq 1 ] && [ -z $vips_with_openslide ] && [ $openslide_ex
     DISTRO=$(lsb_release -c -s)
     echo "Detected Debian Linux '$DISTRO'"
     case "$DISTRO" in
-      jessie|vivid|wily)
+      jessie|vivid|wily|xenial)
         # Debian 8, Ubuntu 15
         echo "Installing libopenslide via apt-get"
         apt-get install -y libopenslide-dev

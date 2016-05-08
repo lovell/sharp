@@ -6,34 +6,33 @@ if ! type docker >/dev/null; then
   exit 1
 fi
 
+version_node=4.4.2
+
 test="npm run clean; npm install --unsafe-perm; npm test"
 
 # Debian 7, 8
-# Ubuntu 12.04, 14.04
-for dist in wheezy jessie precise trusty; do
+# Ubuntu 14.04
+for dist in wheezy jessie trusty; do
   echo "Testing $dist..."
-  if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/$dist:0.12 >packaging/$dist.log 2>&1 sh -c "cd /v; ./packaging/test/debian.sh; $test";
+  if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/$dist:$version_node >packaging/$dist.log 2>&1 sh -c "cd /v; ./packaging/test/debian.sh; $test";
   then echo "$dist OK"
   else echo "$dist fail" && cat packaging/$dist.log
   fi
 done
-
-# Centos 6
-echo "Testing centos6..."
-if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/centos6:0.12 >packaging/centos6.log 2>&1 sh -c "cd /v; source ./packaging/test/centos6.sh; ./preinstall.sh; $test";
-then echo "centos6 OK"
-else echo "centos6 fail" && cat packaging/centos6.log
-fi
 
 # Centos 7
-# Fedora 20, 21
-for dist in centos7 fedora20 fedora21; do
-  echo "Testing $dist..."
-  if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/$dist:0.12 >packaging/$dist.log 2>&1 sh -c "cd /v; $test";
-  then echo "$dist OK"
-  else echo "$dist fail" && cat packaging/$dist.log
-  fi
-done
+echo "Testing centos7..."
+if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/centos7:$version_node >packaging/$dist.log 2>&1 sh -c "cd /v; $test";
+then echo "$dist OK"
+else echo "$dist fail" && cat packaging/$dist.log
+fi
+
+# Fedora 22
+echo "Testing fedora22..."
+if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/fedora22:$version_node >packaging/$dist.log 2>&1 sh -c "cd /v; $test";
+then echo "$dist OK"
+else echo "$dist fail" && cat packaging/$dist.log
+fi
 
 # openSUSE 13.2
 echo "Testing opensuse..."

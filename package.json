@@ -43,7 +43,10 @@
     "png",
     "webp",
     "tiff",
+    "gif",
+    "svg",
     "dzi",
+    "image",
     "resize",
     "thumbnail",
     "crop",
@@ -73,7 +76,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.3.0"
+    "libvips": "8.3.1"
   },
   "engines": {
     "node": ">=0.10"
