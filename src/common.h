@@ -20,6 +20,7 @@ namespace sharp {
     OPENSLIDE,
     PPM,
     FITS,
+    GIF,
     RAW
   };
 
