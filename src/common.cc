@@ -70,6 +70,7 @@ namespace sharp {
       case ImageType::OPENSLIDE: id = "openslide"; break;
       case ImageType::PPM: id = "ppm"; break;
       case ImageType::FITS: id = "fits"; break;
+      case ImageType::GIF: id = "gif"; break;
       case ImageType::RAW: id = "raw"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
     }
@@ -121,6 +122,8 @@ namespace sharp {
         imageType = ImageType::PPM;
       } else if (EndsWith(loader, "Fits")) {
         imageType = ImageType::FITS;
+      } else if (EndsWith(loader, "GifFile")) {
+        imageType = ImageType::GIF;
       } else if (EndsWith(loader, "Magick") || EndsWith(loader, "MagickFile")) {
         imageType = ImageType::MAGICK;
       }
