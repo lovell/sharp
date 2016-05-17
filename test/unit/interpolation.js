@@ -5,100 +5,67 @@ var assert = require('assert');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
 
-describe('Interpolation', function() {
+describe('Interpolators and kernels', function() {
 
-  it('nearest neighbour', function(done) {
-    sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .interpolateWith(sharp.interpolator.nearest)
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
+  describe('Reducers', function() {
+    [
+      sharp.kernel.cubic,
+      sharp.kernel.lanczos2,
+      sharp.kernel.lanczos3
+    ].forEach(function(kernel) {
+      it(kernel, function(done) {
+        sharp(fixtures.inputJpg)
+          .resize(320, null, { kernel: kernel })
+          .toBuffer(function(err, data, info) {
+            if (err) throw err;
+            assert.strictEqual('jpeg', info.format);
+            assert.strictEqual(320, info.width);
+            fixtures.assertSimilar(fixtures.inputJpg, data, done);
+          });
       });
+    });
   });
 
-  it('bilinear', function(done) {
-    sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .interpolateWith(sharp.interpolator.bilinear)
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
+  describe('Enlargers', function() {
+    [
+      sharp.interpolator.nearest,
+      sharp.interpolator.bilinear,
+      sharp.interpolator.bicubic,
+      sharp.interpolator.nohalo,
+      sharp.interpolator.locallyBoundedBicubic,
+      sharp.interpolator.vertexSplitQuadraticBasisSpline
+    ].forEach(function(interpolator) {
+      it(interpolator, function(done) {
+        sharp(fixtures.inputJpg)
+          .resize(320, null, { interpolator: interpolator })
+          .toBuffer(function(err, data, info) {
+            if (err) throw err;
+            assert.strictEqual('jpeg', info.format);
+            assert.strictEqual(320, info.width);
+            fixtures.assertSimilar(fixtures.inputJpg, data, done);
+          });
       });
+    });
   });
 
-  it('bicubic', function(done) {
-    sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .interpolateWith(sharp.interpolator.bicubic)
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
+  it('unknown kernel throws', function() {
+    assert.throws(function() {
+      sharp().resize(null, null, { kernel: 'unknown' });
+    });
   });
 
-  it('nohalo', function(done) {
-    sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .interpolateWith(sharp.interpolator.nohalo)
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
+  it('unknown interpolator throws', function() {
+    assert.throws(function() {
+      sharp().resize(null, null, { interpolator: 'unknown' });
+    });
   });
 
-  it('locally bounded bicubic (LBB)', function(done) {
-    sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .interpolateWith(sharp.interpolator.locallyBoundedBicubic)
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
+  describe('deprecated interpolateWith method still works', function() {
+    it('resize then interpolateWith', function() {
+      sharp().resize(1, 1).interpolateWith('bicubic');
+    });
+    it('interpolateWith then resize', function() {
+      sharp().interpolateWith('bicubic').resize(1, 1);
+    });
   });
-
-  it('vertex split quadratic basis spline (VSQBS)', function(done) {
-    sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .interpolateWith(sharp.interpolator.vertexSplitQuadraticBasisSpline)
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
-  });
-
-  it('unknown interpolator throws', function(done) {
-    var isValid = false;
-    try {
-      sharp().interpolateWith('nonexistant');
-      isValid = true;
-    } catch (e) {}
-    assert(!isValid);
-    done();
-  });
-
 });

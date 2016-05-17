@@ -250,4 +250,22 @@ namespace sharp {
     return image.hist_find().hist_entropy();
   }
 
+  /*
+    Insert a tile cache to prevent over-computation of any previous operations in the pipeline
+  */
+  VImage TileCache(VImage image, double const factor) {
+    int tile_width;
+    int tile_height;
+    int scanline_count;
+    vips_get_tile_size(image.get_image(), &tile_width, &tile_height, &scanline_count);
+    double const need_lines = 1.2 * scanline_count / factor;
+    return image.tilecache(VImage::option()
+      ->set("tile_width", image.width())
+      ->set("tile_height", 10)
+      ->set("max_tiles", static_cast<int>(round(1.0 + need_lines / 10.0)))
+      ->set("access", VIPS_ACCESS_SEQUENTIAL)
+      ->set("threaded", TRUE)
+    );
+  }
+
 }  // namespace sharp

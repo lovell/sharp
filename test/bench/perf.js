@@ -30,18 +30,15 @@ var fixtures = require('../fixtures');
 var width = 720;
 var height = 480;
 
-var magickFilterBilinear = 'Triangle';
-var magickFilterBicubic = 'Lanczos';
-
 // Disable libvips cache to ensure tests are as fair as they can be
 sharp.cache(false);
 // Enable use of SIMD
 sharp.simd(true);
 
 async.series({
-  'jpeg-linear': function(callback) {
+  'jpeg': function(callback) {
     var inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
-    var jpegSuite = new Benchmark.Suite('jpeg-linear');
+    var jpegSuite = new Benchmark.Suite('jpeg');
     // jimp
     jpegSuite.add('jimp-buffer-buffer', {
       defer: true,
@@ -93,7 +90,7 @@ async.series({
             if (err) {
               throw err;
             }
-            image.resize(width, height, 'linear', function (err, image) {
+            image.resize(width, height, 'lanczos', function (err, image) {
               if (err) {
                 throw err;
               }
@@ -113,7 +110,7 @@ async.series({
             if (err) {
               throw err;
             }
-            image.resize(width, height, 'linear', function (err, image) {
+            image.resize(width, height, 'lanczos', function (err, image) {
               if (err) {
                 throw err;
               }
@@ -140,7 +137,7 @@ async.series({
           width: width,
           height: height,
           format: 'jpg',
-          filter: magickFilterBilinear
+          filter: 'Lanczos'
         }, function(err) {
           if (err) {
             throw err;
@@ -161,7 +158,7 @@ async.series({
             width: width,
             height: height,
             format: 'JPEG',
-            filter: magickFilterBilinear
+            filter: 'Lanczos'
           }, function (err, buffer) {
             if (err) {
               throw err;
@@ -179,7 +176,7 @@ async.series({
       fn: function(deferred) {
         gm(inputJpgBuffer)
           .resize(width, height)
-          .filter(magickFilterBilinear)
+          .filter('Lanczos')
           .quality(80)
           .write(fixtures.outputJpg, function (err) {
             if (err) {
@@ -194,7 +191,7 @@ async.series({
       fn: function(deferred) {
         gm(inputJpgBuffer)
           .resize(width, height)
-          .filter(magickFilterBilinear)
+          .filter('Lanczos')
           .quality(80)
           .toBuffer(function (err, buffer) {
             if (err) {
@@ -210,7 +207,7 @@ async.series({
       fn: function(deferred) {
         gm(fixtures.inputJpg)
           .resize(width, height)
-          .filter(magickFilterBilinear)
+          .filter('Lanczos')
           .quality(80)
           .write(fixtures.outputJpg, function (err) {
             if (err) {
@@ -225,7 +222,7 @@ async.series({
       fn: function(deferred) {
         gm(fixtures.inputJpg)
           .resize(width, height)
-          .filter(magickFilterBilinear)
+          .filter('Lanczos')
           .quality(80)
           .toBuffer(function (err, buffer) {
             if (err) {
@@ -243,7 +240,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toFile(fixtures.outputJpg, function(err) {
             if (err) {
               throw err;
@@ -257,7 +253,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;
@@ -272,7 +267,6 @@ async.series({
       fn: function(deferred) {
         sharp(fixtures.inputJpg)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toFile(fixtures.outputJpg, function(err) {
             if (err) {
               throw err;
@@ -290,8 +284,7 @@ async.series({
           deferred.resolve();
         });
         var pipeline = sharp()
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear);
+          .resize(width, height);
         readable.pipe(pipeline).pipe(writable);
       }
     }).add('sharp-file-buffer', {
@@ -299,7 +292,6 @@ async.series({
       fn: function(deferred) {
         sharp(fixtures.inputJpg)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;
@@ -314,19 +306,27 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toBuffer()
           .then(function(buffer) {
             assert.notStrictEqual(null, buffer);
             deferred.resolve();
           });
       }
-    }).add('sharp-sharpen-mild', {
+    }).on('cycle', function(event) {
+      console.log('jpeg ' + String(event.target));
+    }).on('complete', function() {
+      callback(null, this.filter('fastest').map('name'));
+    }).run();
+  },
+  // Effect of applying operations
+  operations: function(callback) {
+    var inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
+    var operationsSuite = new Benchmark.Suite('operations');
+    operationsSuite.add('sharp-sharpen-mild', {
       defer: true,
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .sharpen()
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -342,7 +342,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .sharpen(3, 1, 3)
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -358,7 +357,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .blur()
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -374,7 +372,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .blur(3)
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -390,7 +387,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .gamma()
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -406,7 +402,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .normalise()
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -422,7 +417,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .greyscale()
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -438,7 +432,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .gamma()
           .greyscale()
           .toBuffer(function(err, buffer) {
@@ -455,7 +448,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .progressive()
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -471,7 +463,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .withoutChromaSubsampling()
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -487,7 +478,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputJpgBuffer)
           .rotate(90)
-          .interpolateWith(sharp.interpolator.bilinear)
           .resize(width, height)
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -503,8 +493,6 @@ async.series({
       fn: function(deferred) {
         sharp.simd(false);
         sharp(inputJpgBuffer)
-          .rotate(90)
-          .interpolateWith(sharp.interpolator.bilinear)
           .resize(width, height)
           .toBuffer(function(err, buffer) {
             sharp.simd(true);
@@ -520,9 +508,8 @@ async.series({
       defer: true,
       fn: function(deferred) {
         sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .sequentialRead()
+          .resize(width, height)
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;
@@ -533,189 +520,19 @@ async.series({
           });
       }
     }).on('cycle', function(event) {
-      console.log('jpeg-linear ' + String(event.target));
+      console.log('operations ' + String(event.target));
     }).on('complete', function() {
       callback(null, this.filter('fastest').map('name'));
     }).run();
   },
-
-  'jpeg-cubic': function(callback) {
+  // Comparitive speed of kernels
+  kernels: function(callback) {
     var inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
-    var jpegSuite = new Benchmark.Suite('jpeg-cubic');
-    // lwip
-    if (typeof lwip !== 'undefined') {
-      jpegSuite.add('lwip-file-file', {
-        defer: true,
-        fn: function(deferred) {
-          lwip.open(fixtures.inputJpg, function (err, image) {
-            if (err) {
-              throw err;
-            }
-            image.resize(width, height, 'lanczos', function (err, image) {
-              if (err) {
-                throw err;
-              }
-              image.writeFile(fixtures.outputJpg, {quality: 80}, function (err) {
-                if (err) {
-                  throw err;
-                }
-                deferred.resolve();
-              });
-            });
-          });
-        }
-      }).add('lwip-buffer-buffer', {
-        defer: true,
-        fn: function(deferred) {
-          lwip.open(inputJpgBuffer, 'jpg', function (err, image) {
-            if (err) {
-              throw err;
-            }
-            image.resize(width, height, 'lanczos', function (err, image) {
-              if (err) {
-                throw err;
-              }
-              image.toBuffer('jpg', {quality: 80}, function (err, buffer) {
-                if (err) {
-                  throw err;
-                }
-                assert.notStrictEqual(null, buffer);
-                deferred.resolve();
-              });
-            });
-          });
-        }
-      });
-    }
-    // imagemagick
-    jpegSuite.add('imagemagick-file-file', {
-      defer: true,
-      fn: function(deferred) {
-        imagemagick.resize({
-          srcPath: fixtures.inputJpg,
-          dstPath: fixtures.outputJpg,
-          quality: 0.8,
-          width: width,
-          height: height,
-          format: 'jpg',
-          filter: magickFilterBicubic
-        }, function(err) {
-          if (err) {
-            throw err;
-          } else {
-            deferred.resolve();
-          }
-        });
-      }
-    });
-    // imagemagick-native
-    if (typeof imagemagickNative !== 'undefined') {
-      jpegSuite.add('imagemagick-native-buffer-buffer', {
-        defer: true,
-        fn: function(deferred) {
-          imagemagickNative.convert({
-            srcData: inputJpgBuffer,
-            quality: 80,
-            width: width,
-            height: height,
-            format: 'JPEG',
-            filter: magickFilterBicubic
-          }, function (err, buffer) {
-            if (err) {
-              throw err;
-            } else {
-              assert.notStrictEqual(null, buffer);
-              deferred.resolve();
-            }
-          });
-        }
-      });
-    }
-    // gm
-    jpegSuite.add('gm-buffer-file', {
-      defer: true,
-      fn: function(deferred) {
-        gm(inputJpgBuffer)
-          .resize(width, height)
-          .filter(magickFilterBicubic)
-          .quality(80)
-          .write(fixtures.outputJpg, function (err) {
-            if (err) {
-              throw err;
-            } else {
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('gm-buffer-buffer', {
-      defer: true,
-      fn: function(deferred) {
-        gm(inputJpgBuffer)
-          .resize(width, height)
-          .filter(magickFilterBicubic)
-          .quality(80)
-          .toBuffer(function (err, buffer) {
-            if (err) {
-              throw err;
-            } else {
-              assert.notStrictEqual(null, buffer);
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('gm-file-file', {
-      defer: true,
-      fn: function(deferred) {
-        gm(fixtures.inputJpg)
-          .resize(width, height)
-          .filter(magickFilterBicubic)
-          .quality(80)
-          .write(fixtures.outputJpg, function (err) {
-            if (err) {
-              throw err;
-            } else {
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('gm-file-buffer', {
-      defer: true,
-      fn: function(deferred) {
-        gm(fixtures.inputJpg)
-          .resize(width, height)
-          .filter(magickFilterBicubic)
-          .quality(80)
-          .toBuffer(function (err, buffer) {
-            if (err) {
-              throw err;
-            } else {
-              assert.notStrictEqual(null, buffer);
-              deferred.resolve();
-            }
-          });
-      }
-    });
-    // sharp
-    jpegSuite.add('sharp-buffer-file', {
+    (new Benchmark.Suite('kernels')).add('sharp-cubic', {
       defer: true,
       fn: function(deferred) {
         sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bicubic)
-          .toFile(fixtures.outputJpg, function(err) {
-            if (err) {
-              throw err;
-            } else {
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('sharp-buffer-buffer', {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bicubic)
+          .resize(width, height, { kernel: 'cubic' })
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;
@@ -725,39 +542,11 @@ async.series({
             }
           });
       }
-    }).add('sharp-file-file', {
+    }).add('sharp-lanczos2', {
       defer: true,
       fn: function(deferred) {
-        sharp(fixtures.inputJpg)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bicubic)
-          .toFile(fixtures.outputJpg, function(err) {
-            if (err) {
-              throw err;
-            } else {
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('sharp-stream-stream', {
-      defer: true,
-      fn: function(deferred) {
-        var readable = fs.createReadStream(fixtures.inputJpg);
-        var writable = fs.createWriteStream(fixtures.outputJpg);
-        writable.on('finish', function() {
-          deferred.resolve();
-        });
-        var pipeline = sharp()
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bicubic);
-        readable.pipe(pipeline).pipe(writable);
-      }
-    }).add('sharp-file-buffer', {
-      defer: true,
-      fn: function(deferred) {
-        sharp(fixtures.inputJpg)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bicubic)
+        sharp(inputJpgBuffer)
+          .resize(width, height, { kernel: 'lanczos2' })
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;
@@ -767,109 +556,11 @@ async.series({
             }
           });
       }
-    }).add('sharp-promise', {
+    }).add('sharp-lanczos3', {
       defer: true,
       fn: function(deferred) {
         sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bicubic)
-          .toBuffer()
-          .then(function(buffer) {
-            assert.notStrictEqual(null, buffer);
-            deferred.resolve();
-          });
-      }
-    }).on('cycle', function(event) {
-      console.log('jpeg-cubic ' + String(event.target));
-    }).on('complete', function() {
-      callback(null, this.filter('fastest').map('name'));
-    }).run();
-  },
-
-  // Comparitive speed of pixel interpolators
-  interpolators: function(callback) {
-    var inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
-    (new Benchmark.Suite('interpolators')).add('sharp-nearest-neighbour', {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.nearest)
-          .toBuffer(function(err, buffer) {
-            if (err) {
-              throw err;
-            } else {
-              assert.notStrictEqual(null, buffer);
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('sharp-bilinear', {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
-          .toBuffer(function(err, buffer) {
-            if (err) {
-              throw err;
-            } else {
-              assert.notStrictEqual(null, buffer);
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('sharp-vertexSplitQuadraticBasisSpline', {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.vertexSplitQuadraticBasisSpline)
-          .toBuffer(function(err, buffer) {
-            if (err) {
-              throw err;
-            } else {
-              assert.notStrictEqual(null, buffer);
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('sharp-bicubic', {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.bicubic)
-          .toBuffer(function(err, buffer) {
-            if (err) {
-              throw err;
-            } else {
-              assert.notStrictEqual(null, buffer);
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('sharp-locallyBoundedBicubic', {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.locallyBoundedBicubic)
-          .toBuffer(function(err, buffer) {
-            if (err) {
-              throw err;
-            } else {
-              assert.notStrictEqual(null, buffer);
-              deferred.resolve();
-            }
-          });
-      }
-    }).add('sharp-nohalo', {
-      defer: true,
-      fn: function(deferred) {
-        sharp(inputJpgBuffer)
-          .resize(width, height)
-          .interpolateWith(sharp.interpolator.nohalo)
+          .resize(width, height, { kernel: 'lanczos3' })
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;
@@ -880,12 +571,12 @@ async.series({
           });
       }
     }).on('cycle', function(event) {
-      console.log('interpolators ' + String(event.target));
+      console.log('kernels ' + String(event.target));
     }).on('complete', function() {
       callback(null, this.filter('fastest').map('name'));
     }).run();
   },
-
+  // PNG
   png: function(callback) {
     var inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     var pngSuite = new Benchmark.Suite('png');
@@ -938,7 +629,7 @@ async.series({
             if (err) {
               throw err;
             }
-            image.resize(width, height, 'linear', function (err, image) {
+            image.resize(width, height, 'lanczos', function (err, image) {
               if (err) {
                 throw err;
               }
@@ -963,7 +654,7 @@ async.series({
           dstPath: fixtures.outputPng,
           width: width,
           height: height,
-          filter: magickFilterBilinear
+          filter: 'Lanczos'
         }, function(err) {
           if (err) {
             throw err;
@@ -983,7 +674,7 @@ async.series({
             width: width,
             height: height,
             format: 'PNG',
-            filter: magickFilterBilinear
+            filter: 'Lanczos'
           });
           deferred.resolve();
         }
@@ -995,7 +686,7 @@ async.series({
       fn: function(deferred) {
         gm(fixtures.inputPng)
           .resize(width, height)
-          .filter(magickFilterBilinear)
+          .filter('Lanczos')
           .write(fixtures.outputPng, function (err) {
             if (err) {
               throw err;
@@ -1009,7 +700,7 @@ async.series({
       fn: function(deferred) {
         gm(fixtures.inputPng)
           .resize(width, height)
-          .filter(magickFilterBilinear)
+          .filter('Lanczos')
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -1026,7 +717,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toFile(fixtures.outputPng, function(err) {
             if (err) {
               throw err;
@@ -1040,7 +730,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;
@@ -1055,7 +744,6 @@ async.series({
       fn: function(deferred) {
         sharp(fixtures.inputPng)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toFile(fixtures.outputPng, function(err) {
             if (err) {
               throw err;
@@ -1069,7 +757,6 @@ async.series({
       fn: function(deferred) {
         sharp(fixtures.inputPng)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;
@@ -1084,7 +771,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .progressive()
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -1100,7 +786,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .withoutAdaptiveFiltering()
           .toBuffer(function(err, buffer) {
             if (err) {
@@ -1118,7 +803,7 @@ async.series({
       callback(null, this.filter('fastest').map('name'));
     }).run();
   },
-
+  // WebP
   webp: function(callback) {
     var inputWebPBuffer = fs.readFileSync(fixtures.inputWebP);
     (new Benchmark.Suite('webp')).add('sharp-buffer-file', {
@@ -1126,7 +811,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputWebPBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toFile(fixtures.outputWebP, function(err) {
             if (err) {
               throw err;
@@ -1140,7 +824,6 @@ async.series({
       fn: function(deferred) {
         sharp(inputWebPBuffer)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;
@@ -1155,7 +838,6 @@ async.series({
       fn: function(deferred) {
         sharp(fixtures.inputWebP)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toFile(fixtures.outputWebP, function(err) {
             if (err) {
               throw err;
@@ -1169,7 +851,6 @@ async.series({
       fn: function(deferred) {
         sharp(fixtures.inputWebp)
           .resize(width, height)
-          .interpolateWith(sharp.interpolator.bilinear)
           .toBuffer(function(err, buffer) {
             if (err) {
               throw err;

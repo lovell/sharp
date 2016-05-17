@@ -74,6 +74,7 @@ var Sharp = function(input, options) {
     extendLeft: 0,
     extendRight: 0,
     withoutEnlargement: false,
+    kernel: 'lanczos3',
     interpolator: 'bicubic',
     // operations
     background: [0, 0, 0, 255],
@@ -481,33 +482,6 @@ Sharp.prototype.threshold = function(threshold) {
 };
 
 /*
-  Set the interpolator to use for the affine transformation
-*/
-module.exports.interpolator = {
-  nearest: 'nearest',
-  bilinear: 'bilinear',
-  bicubic: 'bicubic',
-  nohalo: 'nohalo',
-  locallyBoundedBicubic: 'lbb',
-  vertexSplitQuadraticBasisSpline: 'vsqbs'
-};
-Sharp.prototype.interpolateWith = function(interpolator) {
-  var isValid = false;
-  for (var key in module.exports.interpolator) {
-    if (module.exports.interpolator[key] === interpolator) {
-      isValid = true;
-      break;
-    }
-  }
-  if (isValid) {
-    this.options.interpolator = interpolator;
-  } else {
-    throw new Error('Invalid interpolator ' + interpolator);
-  }
-  return this;
-};
-
-/*
   Darken image pre-resize (1/gamma) and brighten post-resize (gamma).
   Improves brightness of resized image in non-linear colour spaces.
 */
@@ -712,27 +686,75 @@ Sharp.prototype.extend = function(extend) {
   return this;
 };
 
-Sharp.prototype.resize = function(width, height) {
-  if (!width) {
-    this.options.width = -1;
-  } else {
-    if (typeof width === 'number' && !Number.isNaN(width) && width % 1 === 0 && width > 0 && width <= maximum.width) {
+// Kernels for reduction
+module.exports.kernel = {
+  cubic: 'cubic',
+  lanczos2: 'lanczos2',
+  lanczos3: 'lanczos3'
+};
+// Interpolators for enlargement
+module.exports.interpolator = {
+  nearest: 'nearest',
+  bilinear: 'bilinear',
+  bicubic: 'bicubic',
+  nohalo: 'nohalo',
+  lbb: 'lbb',
+  locallyBoundedBicubic: 'lbb',
+  vsqbs: 'vsqbs',
+  vertexSplitQuadraticBasisSpline: 'vsqbs'
+};
+
+/*
+  Resize image to width x height pixels
+  options.kernel is the kernel to use for reductions, default 'lanczos3'
+  options.interpolator is the interpolator to use for enlargements, default 'bicubic'
+*/
+Sharp.prototype.resize = function(width, height, options) {
+  if (isDefined(width)) {
+    if (isInteger(width) && inRange(width, 1, maximum.width)) {
       this.options.width = width;
     } else {
       throw new Error('Invalid width (1 to ' + maximum.width + ') ' + width);
     }
-  }
-  if (!height) {
-    this.options.height = -1;
   } else {
-    if (typeof height === 'number' && !Number.isNaN(height) && height % 1 === 0 && height > 0 && height <= maximum.height) {
+    this.options.width = -1;
+  }
+  if (isDefined(height)) {
+    if (isInteger(height) && inRange(height, 1, maximum.height)) {
       this.options.height = height;
     } else {
       throw new Error('Invalid height (1 to ' + maximum.height + ') ' + height);
     }
+  } else {
+    this.options.height = -1;
+  }
+  if (isObject(options)) {
+    // Kernel
+    if (isDefined(options.kernel)) {
+      if (isString(module.exports.kernel[options.kernel])) {
+        this.options.kernel = module.exports.kernel[options.kernel];
+      } else {
+        throw new Error('Invalid kernel ' + options.kernel);
+      }
+    }
+    // Interpolator
+    if (isDefined(options.interpolator)) {
+      if (isString(module.exports.interpolator[options.interpolator])) {
+        this.options.interpolator = module.exports.interpolator[options.interpolator];
+      } else {
+        throw new Error('Invalid interpolator ' + options.interpolator);
+      }
+    }
   }
   return this;
 };
+Sharp.prototype.interpolateWith = util.deprecate(function(interpolator) {
+  return this.resize(
+    this.options.width > 0 ? this.options.width : null,
+    this.options.height > 0 ? this.options.height : null,
+    { interpolator: interpolator }
+  );
+}, 'interpolateWith: Please use resize(w, h, { interpolator: ... }) instead');
 
 /*
   Limit the total number of pixels for input images

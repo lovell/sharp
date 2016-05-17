@@ -1028,14 +1028,14 @@ describe('Input/output', function() {
   it('Info event data', function(done) {
     var readable = fs.createReadStream(fixtures.inputJPGBig);
     var inPipeline = sharp()
-      .resize(840)
+      .resize(840, 472)
       .raw()
       .on('info', function(info) {
         assert.strictEqual(840, info.width);
         assert.strictEqual(472, info.height);
         assert.strictEqual(3, info.channels);
       });
-    var badPipeline = sharp(null, {raw: {width: 840, height: 473, channels: 3}})
+    var badPipeline = sharp(null, {raw: {width: 840, height: 500, channels: 3}})
       .toFormat('jpeg')
       .toBuffer(function(err, data, info) {
         assert.strictEqual(err.message.indexOf('memory area too small') > 0, true);
@@ -1047,7 +1047,7 @@ describe('Input/output', function() {
             done();
           });
           inPipeline = sharp()
-            .resize(840)
+            .resize(840, 472)
             .raw();
           readable.pipe(inPipeline).pipe(goodPipeline);
       });

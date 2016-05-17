@@ -57,7 +57,7 @@ describe('Clone', function() {
     var rotator = sharp().rotate(90);
     // Cloned instances with differing dimensions
     rotator.clone().resize(320, 240).pipe(writable1);
-    rotator.clone().resize(100).pipe(writable2);
+    rotator.clone().resize(100, 122).pipe(writable2);
     // Go
     fs.createReadStream(fixtures.inputJpg).pipe(rotator);
   });

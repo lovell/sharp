@@ -18,7 +18,6 @@ var fingerprint = function(image, callback) {
     .normalise()
     .resize(9, 8)
     .ignoreAspectRatio()
-    .interpolateWith(sharp.interpolator.vertexSplitQuadraticBasisSpline)
     .raw()
     .toBuffer(function(err, data) {
       if (err) {

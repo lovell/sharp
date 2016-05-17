@@ -45,15 +45,17 @@ describe('Alpha transparency', function() {
   });
 
   it('Flatten 16-bit PNG with transparency to orange', function(done) {
+    var output = fixtures.path('output.flatten-rgb16-orange.jpg');
     sharp(fixtures.inputPngWithTransparency16bit)
       .flatten()
       .background({r: 255, g: 102, b: 0})
-      .toBuffer(function(err, data, info) {
+      .toFile(output, function(err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
         assert.strictEqual(32, info.width);
         assert.strictEqual(32, info.height);
-        fixtures.assertSimilar(fixtures.expected('flatten-rgb16-orange.jpg'), data, { threshold: 6 }, done);
+        fixtures.assertMaxColourDistance(output, fixtures.expected('flatten-rgb16-orange.jpg'), 25);
+        done();
       });
   });
 

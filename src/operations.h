@@ -44,6 +44,11 @@ namespace sharp {
   */
   double Entropy(VImage image);
 
+  /*
+    Insert a tile cache to prevent over-computation of any previous operations in the pipeline
+  */
+  VImage TileCache(VImage image, double const factor);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

@@ -6,6 +6,11 @@ Requires libvips v8.3.1
 
 #### v0.15.0 - TBD
 
+* Use libvips' new Lanczos 3 kernel as default for image reduction.
+  Deprecate interpolateWith method, now provided as a resize option.
+  [#310](https://github.com/lovell/sharp/issues/310)
+  [@jcupitt](https://github.com/jcupitt)
+
 * Take advantage of libvips v8.3 features.
   Add support for libvips' new GIF and SVG loaders.
   Pre-built binaries now include giflib and librsvg, exclude *magick.

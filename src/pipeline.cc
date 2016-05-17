@@ -50,6 +50,7 @@ using sharp::Gamma;
 using sharp::Blur;
 using sharp::Sharpen;
 using sharp::EntropyCrop;
+using sharp::TileCache;
 
 using sharp::ImageType;
 using sharp::ImageTypeId;
@@ -215,17 +216,13 @@ class PipelineWorker : public AsyncWorker {
         std::swap(inputWidth, inputHeight);
       }
 
-      // Get window size of interpolator, used for determining shrink vs affine
-      VInterpolate interpolator = VInterpolate::new_from_name(baton->interpolator.data());
-      int interpolatorWindowSize = vips_interpolate_get_window_size(interpolator.get_interpolate());
-
       // Scaling calculations
       double xfactor = 1.0;
       double yfactor = 1.0;
       if (baton->width > 0 && baton->height > 0) {
         // Fixed width and height
-        xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
-        yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
+        xfactor = static_cast<double>(inputWidth) / (static_cast<double>(baton->width) + 0.1);
+        yfactor = static_cast<double>(inputHeight) / (static_cast<double>(baton->height) + 0.1);
         switch (baton->canvas) {
           case Canvas::CROP:
             xfactor = std::min(xfactor, yfactor);
@@ -262,7 +259,7 @@ class PipelineWorker : public AsyncWorker {
         }
       } else if (baton->width > 0) {
         // Fixed width
-        xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
+        xfactor = static_cast<double>(inputWidth) / (static_cast<double>(baton->width) + 0.1);
         if (baton->canvas == Canvas::IGNORE_ASPECT) {
           baton->height = inputHeight;
         } else {
@@ -272,7 +269,7 @@ class PipelineWorker : public AsyncWorker {
         }
       } else if (baton->height > 0) {
         // Fixed height
-        yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
+        yfactor = static_cast<double>(inputHeight) / (static_cast<double>(baton->height) + 0.1);
         if (baton->canvas == Canvas::IGNORE_ASPECT) {
           baton->width = inputWidth;
         } else {
@@ -287,12 +284,12 @@ class PipelineWorker : public AsyncWorker {
       }
 
       // Calculate integral box shrink
-      int xshrink = CalculateShrink(xfactor, interpolatorWindowSize);
-      int yshrink = CalculateShrink(yfactor, interpolatorWindowSize);
+      int xshrink = std::max(1, static_cast<int>(floor(xfactor)));
+      int yshrink = std::max(1, static_cast<int>(floor(yfactor)));
 
       // Calculate residual float affine transformation
-      double xresidual = CalculateResidual(xshrink, xfactor);
-      double yresidual = CalculateResidual(yshrink, yfactor);
+      double xresidual = static_cast<double>(xshrink) / xfactor;
+      double yresidual = static_cast<double>(yshrink) / yfactor;
 
       // Do not enlarge the output if the input width *or* height
       // are already less than the required dimensions
@@ -335,10 +332,10 @@ class PipelineWorker : public AsyncWorker {
         // Recalculate integral shrink and double residual
         xfactor = std::max(xfactor, 1.0);
         yfactor = std::max(yfactor, 1.0);
-        xshrink = CalculateShrink(xfactor, interpolatorWindowSize);
-        yshrink = CalculateShrink(yfactor, interpolatorWindowSize);
-        xresidual = CalculateResidual(xshrink, xfactor);
-        yresidual = CalculateResidual(yshrink, yfactor);
+        xshrink = std::max(1, static_cast<int>(floor(xfactor)));
+        yshrink = std::max(1, static_cast<int>(floor(yfactor)));
+        xresidual = static_cast<double>(xshrink) / xfactor;
+        yresidual = static_cast<double>(yshrink) / yfactor;
         // Reload input using shrink-on-load
         VOption *option = VImage::option()->set("shrink", shrink_on_load);
         if (baton->bufferInLength > 1) {
@@ -418,7 +415,12 @@ class PipelineWorker : public AsyncWorker {
       }
 
       if (xshrink > 1 || yshrink > 1) {
-        image = image.shrink(xshrink, yshrink);
+        if (yshrink > 1) {
+          image = image.shrinkv(yshrink);
+        }
+        if (xshrink > 1) {
+          image = image.shrinkh(xshrink);
+        }
         // Recalculate residual float based on dimensions of required vs shrunk images
         int shrunkWidth = image.width();
         int shrunkHeight = image.height();
@@ -466,31 +468,41 @@ class PipelineWorker : public AsyncWorker {
         image = image.premultiply(VImage::option()->set("max_alpha", maxAlpha));
       }
 
-      // Use affine transformation with the remaining float part
+      // Use affine increase or kernel reduce with the remaining float part
       if (shouldAffineTransform) {
-        // Use average of x and y residuals to compute sigma for Gaussian blur
-        double residual = (xresidual + yresidual) / 2.0;
-        // Apply Gaussian blur before large affine reductions
-        if (residual < 1.0) {
-          // Calculate standard deviation
-          double sigma = ((1.0 / residual) - 0.4) / 3.0;
-          if (sigma >= 0.3) {
-            // Sequential input requires a small linecache before use of convolution
-            if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL) {
-              image = image.linecache(VImage::option()
-                ->set("access", VIPS_ACCESS_SEQUENTIAL)
-                ->set("tile_height", 1)
-                ->set("threaded", TRUE)
-              );
-            }
-            // Apply Gaussian blur
-            image = image.gaussblur(sigma);
+        // Insert tile cache to prevent over-computation of previous operations
+        if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL) {
+          image = TileCache(image, yresidual);
+        }
+        // Perform kernel-based reduction
+        if (yresidual < 1.0 || xresidual < 1.0) {
+          VipsKernel kernel = static_cast<VipsKernel>(
+            vips_enum_from_nick(nullptr, VIPS_TYPE_KERNEL, baton->kernel.data())
+          );
+          if (kernel != VIPS_KERNEL_CUBIC && kernel != VIPS_KERNEL_LANCZOS2 && kernel != VIPS_KERNEL_LANCZOS3) {
+            throw VError("Unknown kernel");
+          }
+          if (yresidual < 1.0) {
+            image = image.reducev(1.0 / yresidual, VImage::option()->set("kernel", kernel));
+          }
+          if (xresidual < 1.0) {
+            image = image.reduceh(1.0 / xresidual, VImage::option()->set("kernel", kernel));
           }
         }
-        // Perform affine transformation
-        image = image.affine({xresidual, 0.0, 0.0, yresidual}, VImage::option()
-          ->set("interpolate", interpolator)
-        );
+        // Perform affine enlargement
+        if (yresidual > 1.0 || xresidual > 1.0) {
+          VInterpolate interpolator = VInterpolate::new_from_name(baton->interpolator.data());
+          if (yresidual > 1.0) {
+            image = image.affine({1.0, 0.0, 0.0, yresidual}, VImage::option()
+              ->set("interpolate", interpolator)
+            );
+          }
+          if (xresidual > 1.0) {
+            image = image.affine({xresidual, 0.0, 0.0, 1.0}, VImage::option()
+              ->set("interpolate", interpolator)
+            );
+          }
+        }
       }
 
       // Rotate
@@ -944,30 +956,6 @@ class PipelineWorker : public AsyncWorker {
   }
 
   /*
-    Calculate integral shrink given factor and interpolator window size
-  */
-  int CalculateShrink(double factor, int interpolatorWindowSize) {
-    int shrink = 1;
-    if (factor >= 2.0 && trunc(factor) != factor && interpolatorWindowSize > 3) {
-      // Shrink less, affine more with interpolators that use at least 4x4 pixel window, e.g. bicubic
-      shrink = static_cast<int>(floor(factor * 3.0 / interpolatorWindowSize));
-    } else {
-      shrink = static_cast<int>(floor(factor));
-    }
-    if (shrink < 1) {
-      shrink = 1;
-    }
-    return shrink;
-  }
-
-  /*
-    Calculate residual given shrink and factor
-  */
-  double CalculateResidual(int shrink, double factor) {
-    return static_cast<double>(shrink) / factor;
-  }
-
-  /*
     Clear all thread-local data.
   */
   void Error() {
@@ -1058,6 +1046,7 @@ NAN_METHOD(pipeline) {
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
   baton->crop = attrAs<int32_t>(options, "crop");
+  baton->kernel = attrAsStr(options, "kernel");
   baton->interpolator = attrAsStr(options, "interpolator");
   // Operators
   baton->flatten = attrAs<bool>(options, "flatten");
