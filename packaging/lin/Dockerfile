@@ -170,11 +170,11 @@ WORKDIR ${DEPS}/gif
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
 RUN mkdir ${DEPS}/vips
-#RUN curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.3/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
-RUN apt-get install -y swig gobject-introspection gettext glib2.0-dev
-RUN curl -Ls https://github.com/jcupitt/libvips/archive/master.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
+RUN curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.3/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
+#RUN apt-get install -y swig gobject-introspection gettext glib2.0-dev
+#RUN curl -Ls https://github.com/jcupitt/libvips/archive/master.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
 WORKDIR ${DEPS}/vips
-RUN ./bootstrap.sh
+#RUN ./bootstrap.sh
 RUN ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
   --disable-debug --disable-introspection --without-python --without-fftw \
   --without-magick --without-pangoft2 --without-ppm --without-analyze --without-radiance \
