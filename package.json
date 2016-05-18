@@ -24,7 +24,7 @@
     "Felix Bünemann <Felix.Buenemann@gmail.com>",
     "Samy Al Zahrani <samyalzahrany@gmail.com>"
   ],
-  "description": "High performance Node.js module to resize JPEG, PNG, WebP and TIFF images using the libvips library",
+  "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
   "scripts": {
     "clean": "rm -rf node_modules/ build/ include/ lib/ coverage/ test/fixtures/output.*",
     "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=30000 ./test/unit/*.js",

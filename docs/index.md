@@ -8,7 +8,7 @@ Resizing an image is typically 4x faster than using the
 quickest ImageMagick and GraphicsMagick settings.
 
 Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
-Bicubic interpolation with Lanczos anti-alias filtering ensures quality is not sacrificed for speed.
+Lanczos resampling ensures quality is not sacrificed for speed.
 
 As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
@@ -88,12 +88,16 @@ the help and code contributions of the following people:
 * [Alaric Holloway](https://github.com/skedastik)
 * [Bernhard K. Weisshuhn](https://github.com/bkw)
 * [David A. Carley](https://github.com/dacarley)
+* [John Tobin](https://github.com/jtobinisaniceguy)
+* [Kenton Gray](https://github.com/kentongray)
+* [Felix Bünemann](https://github.com/felixbuenemann)
+* [Samy Al Zahrani](https://github.com/salzhrani)
 
 Thank you!
 
 ### Licence
 
-Copyright 2013, 2014, 2015 Lovell Fuller and contributors.
+Copyright 2013, 2014, 2015, 2016 Lovell Fuller and contributors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
