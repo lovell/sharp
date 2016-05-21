@@ -4,7 +4,7 @@
 
 Requires libvips v8.3.1
 
-#### v0.15.0 - TBD
+#### v0.15.0 - 21<sup>st</sup> May 2016
 
 * Use libvips' new Lanczos 3 kernel as default for image reduction.
   Deprecate interpolateWith method, now provided as a resize option.
