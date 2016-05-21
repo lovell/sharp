@@ -83,6 +83,54 @@
   ...
   fun:WebPEncodeRGB
 }
+{
+  value_libwebp_WebPEncode
+  Memcheck:Value8
+  ...
+  fun:WebPEncode
+}
+{
+  cond_libwebp_WebPEncode
+  Memcheck:Cond
+  ...
+  fun:WebPEncode
+}
+{
+  value_libwebp_WebPPictureImportRGBA
+  Memcheck:Value8
+  ...
+  fun:WebPPictureImportRGBA
+}
+{
+  cond_libwebp_WebPPictureImportRGBA
+  Memcheck:Cond
+  ...
+  fun:WebPPictureImportRGBA
+}
+{
+  value_libwebp_WebPPictureImportRGB
+  Memcheck:Value8
+  ...
+  fun:WebPPictureImportRGB
+}
+{
+  cond_libwebp_WebPPictureImportRGB
+  Memcheck:Cond
+  ...
+  fun:WebPPictureImportRGB
+}
+{
+  value_libwebp_WebPDecode
+  Memcheck:Value8
+  ...
+  fun:WebPDecode
+}
+{
+  cond_libwebp_WebPDecode
+  Memcheck:Cond
+  ...
+  fun:WebPDecode
+}
 
 # libvips
 {
@@ -102,7 +150,21 @@
   cond_libvips_col_sRGB2scRGB_8
   Memcheck:Value8
   fun:vips_col_sRGB2scRGB_8
-  fun:vips_sRGB2scRGB_gen
+}
+{
+  cond_libvips_vips_region_fill
+  Memcheck:Cond
+  ...
+  fun:vips_region_fill
+  fun:vips_region_prepare
+}
+{
+  leak_libvips_init
+  Memcheck:Leak
+  match-leak-kinds: reachable
+  fun:malloc
+  ...
+  fun:vips__init
 }
 
 # libuv warnings
@@ -200,6 +262,13 @@
   fun:_ZN4node17CreateEnvironmentEPN2v87IsolateEP9uv_loop_sNS0_5LocalINS0_7ContextEEEiPKPKciSB_
 }
 {
+  leak_nodejs_icu_getAvailableLocales
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN6icu_568Collator19getAvailableLocalesERi
+}
+{
   leak_nan_FunctionCallbackInfo
   Memcheck:Leak
   match-leak-kinds: definite
@@ -275,56 +344,4 @@
   match-leak-kinds: possible
   ...
   fun:_ZN2v88internal8Malloced3NewEm
-}
-
-# vips__init warnings
-{
-  leak_libvips_init
-  Memcheck:Leak
-  match-leak-kinds: reachable
-  fun:malloc
-  ...
-  fun:vips__init
-}
-
-# *magick warnings
-{
-  leak_magick_read
-  Memcheck:Leak
-  match-leak-kinds: definite,indirect,possible
-  ...
-  fun:ReadImage
-  ...
-  fun:vips__magick_read
-}
-{
-  leak_magick_read_header
-  Memcheck:Leak
-  match-leak-kinds: definite,indirect,possible
-  ...
-  fun:ReadImage
-  ...
-  fun:vips__magick_read_header
-}
-{
-  value_magick_is_palette_image
-  Memcheck:Value8
-  fun:IsPaletteImage
-}
-{
-  cond_magick_is_palette_image
-  Memcheck:Cond
-  fun:IsPaletteImage
-}
-
-# glib g_file_read_link
-# https://github.com/GNOME/glib/commit/49a5d0f6f2aed99cd78f25655f137f4448e47d92
-{
-  leak_g_file_read_link
-  Memcheck:Leak
-  match-leak-kinds: definite,indirect,possible
-  ...
-  fun:g_file_read_link
-  ...
-  fun:vips_gsf_path
 }

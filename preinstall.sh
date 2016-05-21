@@ -1,24 +1,15 @@
 #!/bin/sh
 
-# This script is no longer required on most
-# 64-bit Linux systems when using sharp v0.12.0+
+# Use of this script is deprecated
 
-# See http://sharp.dimens.io/page/install#linux
-
-# If you really need this script, it will attempt to
-# globally install libvips if not already available.
-
-# Supports:
-# * Debian Linux
-#   * Debian 7, 8
-#   * Ubuntu 12.04, 14.04, 15.10, 16.04
-#   * Mint 13, 17
-#   * Elementary 0.3
-# * Red Hat Linux
-#   * RHEL/Centos/Scientific 6, 7
-#   * Fedora 21, 22, 23
-#   * Amazon Linux 2015.03, 2015.09
-# * OpenSuse 13
+echo
+echo "WARNING: This script is no longer required on most 64-bit Linux systems when using sharp v0.12.0+"
+echo
+echo "See http://sharp.dimens.io/page/install#linux"
+echo
+echo "If you really, really need this script, it will attempt"
+echo "to globally install libvips if not already available."
+echo
 
 vips_version_minimum=8.3.1
 vips_version_latest_major_minor=8.3
@@ -33,7 +24,7 @@ install_libvips_from_source() {
   curl -O http://www.vips.ecs.soton.ac.uk/supported/$vips_version_latest_major_minor/vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   tar zvxf vips-$vips_version_latest_major_minor.$vips_version_latest_patch.tar.gz
   cd vips-$vips_version_latest_major_minor.$vips_version_latest_patch
-  ./configure --disable-debug --disable-docs --disable-static --disable-introspection --disable-dependency-tracking --enable-cxx=yes --without-python --without-orc --without-fftw $1
+  CXXFLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" ./configure --disable-debug --disable-docs --disable-static --disable-introspection --disable-dependency-tracking --enable-cxx=yes --without-python --without-orc --without-fftw $1
   make
   make install
   cd ..

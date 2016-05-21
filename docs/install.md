@@ -29,22 +29,24 @@ Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ C
 * Amazon Linux 2015.03, 2015.09
 
 To use your own version of libvips instead of the provided binaries, make sure it is
-at least the version listed under `config.libvips` in the `package.json` file that it
-can be located using `pkg-config`. If you are using non-stadard paths (anything other
-than `/usr` or `/usr/local`), you might need to set `PKG_CONFIG_PATH` during `npm install`
-and `LD_LIBRARY_PATH` at runtime.
+at least the version listed under `config.libvips` in the `package.json` file,
+that it can be located using `pkg-config --modversion vips-cpp`
+and that it has been compiled with `_GLIBCXX_USE_CXX11_ABI=0`.
 
-You can print the detected vips version using: `pkg-config --modversion vips-cpp`
+If you are using non-stadard paths (anything other than `/usr` or `/usr/local`),
+you might need to set `PKG_CONFIG_PATH` during `npm install`
+and `LD_LIBRARY_PATH` at runtime.
 
 This allows the use of newer versions of libvips with older versions of sharp.
 
-For older Linux-based operating systems and 32-bit Intel CPUs,
+For 32-bit Intel CPUs and older Linux-based operating systems such as Centos 6,
 a system-wide installation of the most suitable version of
 libvips and its dependencies can be achieved by running
 the following command as a user with `sudo` access
 (requires `curl` and `pkg-config`):
 
 ```sh
+# WARNING: This script is deprecated. You probably don't need to run it. Please read above.
 curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
 ```
 
