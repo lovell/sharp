@@ -4,6 +4,12 @@
 
 Requires libvips v8.3.1
 
+#### v0.15.1 - TBD
+
+* Concat Stream-based input in single operation for ~+3% perf and less GC.
+  [#429](https://github.com/lovell/sharp/issues/429)
+  [@papandreou](https://github.com/papandreou)
+
 #### v0.15.0 - 21<sup>st</sup> May 2016
 
 * Use libvips' new Lanczos 3 kernel as default for image reduction.

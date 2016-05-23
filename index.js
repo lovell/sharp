@@ -42,7 +42,7 @@ var Sharp = function(input, options) {
   stream.Duplex.call(this);
   this.options = {
     // input options
-    bufferIn: null,
+    bufferIn: [],
     streamIn: false,
     sequentialRead: false,
     limitInputPixels: maximum.pixels,
@@ -217,24 +217,23 @@ Sharp.prototype._inputOptions = function(options) {
 Sharp.prototype._write = function(chunk, encoding, callback) {
   /*jslint unused: false */
   if (this.options.streamIn) {
-    if (typeof chunk === 'object' && chunk instanceof Buffer) {
-      if (this.options.bufferIn instanceof Buffer) {
-        // Append to existing Buffer
-        this.options.bufferIn = Buffer.concat(
-          [this.options.bufferIn, chunk],
-          this.options.bufferIn.length + chunk.length
-        );
-      } else {
-        // Create new Buffer
-        this.options.bufferIn = new Buffer(chunk.length);
-        chunk.copy(this.options.bufferIn);
-      }
+    if (isBuffer(chunk)) {
+      this.options.bufferIn.push(chunk);
       callback();
     } else {
       callback(new Error('Non-Buffer data on Writable Stream'));
     }
   } else {
     callback(new Error('Unexpected data on Writable Stream'));
+  }
+};
+
+/*
+  Flattens the array of chunks in bufferIn
+*/
+Sharp.prototype._flattenBufferIn = function() {
+  if (Array.isArray(this.options.bufferIn)) {
+    this.options.bufferIn = Buffer.concat(this.options.bufferIn);
   }
 };
 
@@ -882,6 +881,7 @@ Sharp.prototype._pipeline = function(callback) {
     if (this.options.streamIn) {
       // output=file/buffer, input=stream
       this.on('finish', function() {
+        that._flattenBufferIn();
         sharp.pipeline(that.options, callback);
       });
     } else {
@@ -894,6 +894,7 @@ Sharp.prototype._pipeline = function(callback) {
     if (this.options.streamIn) {
       // output=stream, input=stream
       this.on('finish', function() {
+        that._flattenBufferIn();
         sharp.pipeline(that.options, function(err, data, info) {
           if (err) {
             that.emit('error', err);
@@ -923,6 +924,7 @@ Sharp.prototype._pipeline = function(callback) {
       // output=promise, input=stream
       return new BluebirdPromise(function(resolve, reject) {
         that.on('finish', function() {
+          that._flattenBufferIn();
           sharp.pipeline(that.options, function(err, data) {
             if (err) {
               reject(err);
@@ -956,6 +958,7 @@ Sharp.prototype.metadata = function(callback) {
   if (typeof callback === 'function') {
     if (this.options.streamIn) {
       this.on('finish', function() {
+        that._flattenBufferIn();
         sharp.metadata(that.options, callback);
       });
     } else {
@@ -966,6 +969,7 @@ Sharp.prototype.metadata = function(callback) {
     if (this.options.streamIn) {
       return new BluebirdPromise(function(resolve, reject) {
         that.on('finish', function() {
+          that._flattenBufferIn();
           sharp.metadata(that.options, function(err, metadata) {
             if (err) {
               reject(err);
@@ -994,13 +998,15 @@ Sharp.prototype.metadata = function(callback) {
   Cloned instances share the same input.
 */
 Sharp.prototype.clone = function() {
+  var that = this;
   // Clone existing options
   var clone = new Sharp();
   util._extend(clone.options, this.options);
   // Pass 'finish' event to clone for Stream-based input
   this.on('finish', function() {
     // Clone inherits input data
-    clone.options.bufferIn = this.options.bufferIn;
+    that._flattenBufferIn();
+    clone.options.bufferIn = that.options.bufferIn;
     clone.emit('finish');
   });
   return clone;
