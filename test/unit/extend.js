@@ -49,4 +49,16 @@ describe('Extend', function () {
     });
   });
 
+  it('should add alpha channel before extending with a transparent Background', function( done ){
+    sharp(fixtures.inputJpgWithLandscapeExif1)
+      .background({r: 0, g: 0, b: 0, a: 0})
+      .toFormat( sharp.format.png )
+      .extend({top: 0, bottom: 10, left: 0, right: 10})
+      .toBuffer( function(err, data, info){
+        assert.strictEqual(610, info.width);
+        assert.strictEqual(460, info.height);
+        fixtures.assertSimilar(fixtures.expected('addAlphaChanelBeforeExtend.png'), data, done);
+      });
+  });
+
 });
