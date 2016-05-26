@@ -664,6 +664,21 @@ class PipelineWorker : public AsyncWorker {
         if (overlayImageType == ImageType::UNKNOWN) {
           return Error();
         }
+        // Check if overlay is tiled
+        if (baton->overlayTile) {
+          int overlayImageWidth = overlayImage.width();
+          int overlayImageHeight = overlayImage.height();
+          int across = 0;
+          int down = 0;
+
+          if(overlayImageWidth <= baton->width){
+            across = static_cast<int>(floor(static_cast<double>(baton->width) / overlayImageWidth));
+          }
+          if(overlayImageHeight <= baton->height){
+            down = static_cast<int>(floor(static_cast<double>(baton->height) / overlayImageHeight));
+          }
+          overlayImage = overlayImage.replicate(across, down);
+        }
         // Ensure overlay is premultiplied sRGB
         overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
         // Composite images with given gravity
@@ -1050,6 +1065,7 @@ NAN_METHOD(pipeline) {
     baton->overlayBufferIn = node::Buffer::Data(overlayBufferIn);
   }
   baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
+  baton->overlayTile = attrAs<bool>(options, "overlayTile");
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
   baton->crop = attrAs<int32_t>(options, "crop");
