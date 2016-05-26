@@ -657,6 +657,35 @@ class PipelineWorker : public AsyncWorker {
         if (overlayImageType == ImageType::UNKNOWN) {
           return Error();
         }
+        // Check if overlay is tiled
+        if (baton->overlayTile) {
+          int overlayImageWidth = overlayImage.width();
+          int overlayImageHeight = overlayImage.height();
+          int across = 0;
+          int down = 0;
+
+          // use gravity in ovelay
+          if(overlayImageWidth <= baton->width) {
+            across = static_cast<int>(ceil(static_cast<double>(baton->width) / overlayImageWidth));
+          }
+          if(overlayImageHeight <= baton->height) {
+            down = static_cast<int>(ceil(static_cast<double>(baton->height) / overlayImageHeight));
+          }
+          if(across != 0 || down != 0) {
+            int left;
+            int top;
+            overlayImage = overlayImage.replicate(across, down);
+            // the overlayGravity will now be used to CalculateCrop for extract_area
+            std::tie(left, top) = CalculateCrop(
+              overlayImage.width(), overlayImage.height(), baton->width, baton->height, baton->overlayGravity
+            );
+            overlayImage = overlayImage.extract_area(
+              left, top, baton->width, baton->height
+            );
+          }
+          // the overlayGravity was used for extract_area, therefore set it back to its default value of 0
+          baton->overlayGravity = 0;
+        }
         // Ensure overlay is premultiplied sRGB
         overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
         // Composite images with given gravity
@@ -1043,6 +1072,7 @@ NAN_METHOD(pipeline) {
     baton->overlayBufferIn = node::Buffer::Data(overlayBufferIn);
   }
   baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
+  baton->overlayTile = attrAs<bool>(options, "overlayTile");
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
   baton->crop = attrAs<int32_t>(options, "crop");

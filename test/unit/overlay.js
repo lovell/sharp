@@ -242,4 +242,58 @@ describe('Overlays', function() {
     });
   });
 
+  describe('Overlay with tile enabled and gravity', function() {
+    Object.keys(sharp.gravity).forEach(function(gravity) {
+      it(gravity, function(done) {
+        var expected = fixtures.expected('overlay-tile-gravity-' + gravity + '.jpg');
+        sharp(fixtures.inputJpg)
+          .resize(80)
+          .overlayWith(fixtures.inputPngWithTransparency16bit, {
+            tile: true,
+            gravity: gravity
+          })
+          .toBuffer(function(err, data, info) {
+            if (err) throw err;
+            assert.strictEqual('jpeg', info.format);
+            assert.strictEqual(80, info.width);
+            assert.strictEqual(65, info.height);
+            assert.strictEqual(3, info.channels);
+            fixtures.assertSimilar(expected, data, done);
+          });
+      });
+    });
+  });
+
+  describe('Overlay with tile enabled and image rotated 90 degrees', function(done) {
+    var expected = fixtures.expected('overlay-tile-rotated90.jpg');
+    sharp(fixtures.inputJpg)
+      .resize(80)
+      .overlayWith(fixtures.inputPngWithTransparency16bit, {
+        tile: true
+      })
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(80, info.width);
+        assert.strictEqual(3, info.channels);
+        fixtures.assertSimilar(expected, data, done);
+      });
+  });
+
+  describe('Overlay with tile enabled and image rotated 90 degrees and gravity northwest', function(done) {
+    var expected = fixtures.expected('overlay-tile-rotated90-gravity-northwest.jpg');
+    sharp(fixtures.inputJpg)
+      .resize(80)
+      .overlayWith(fixtures.inputPngWithTransparency16bit, {
+        tile: true,
+        gravity: 'northwest'
+      })
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(80, info.width);
+        fixtures.assertSimilar(expected, data, done);
+      });
+  });
+
 });
