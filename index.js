@@ -92,6 +92,7 @@ var Sharp = function(input, options) {
     overlayFileIn: '',
     overlayBufferIn: null,
     overlayGravity: 0,
+    overlayTile: false,
     // output options
     formatOut: 'input',
     fileOut: '',
@@ -354,6 +355,15 @@ Sharp.prototype.overlayWith = function(overlay, options) {
     throw new Error('Unsupported overlay ' + typeof overlay);
   }
   if (isObject(options)) {
+    if (typeof options.tile === 'undefined') {
+      this.options.overlayTile = false;
+    }
+    else if (isBoolean(options.tile)) {
+      this.options.overlayTile = options.tile;
+    } else {
+      throw new Error(' Invalid Value for tile ' + options.tile + 'Only Boolean Values allowed for overlay.tile.');
+    }
+    
     if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
       this.options.overlayGravity = options.gravity;
     } else if (isString(options.gravity) && isInteger(module.exports.gravity[options.gravity])) {
