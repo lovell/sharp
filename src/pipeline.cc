@@ -598,12 +598,19 @@ class PipelineWorker : public AsyncWorker {
           baton->background[2] * multiplier
         };
         // Add alpha channel to background colour
-        if (HasAlpha(image)) {
+        if (baton->background[3] < 255.0 || HasAlpha(image)) {
           background.push_back(baton->background[3] * multiplier);
+        }
+        // Add non-transparent alpha channel, if required
+        if (baton->background[3] < 255.0 && !HasAlpha(image)) {
+          image = image.bandjoin(
+            VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
+          );
         }
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
         baton->height = image.height() + baton->extendTop + baton->extendBottom;
+
         image = image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
           VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
       }
