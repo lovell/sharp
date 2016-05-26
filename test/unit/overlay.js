@@ -264,16 +264,11 @@ describe('Overlays', function() {
     });
   });
 
-<<<<<<< HEAD
-  describe('Overlay with tile enabled and image rotated 90 degrees', function(done) {
-    var expected = fixtures.expected('overlay-tile-rotated90.jpg');
-    sharp(fixtures.inputJpg)
-=======
+
   it('With tile enabled and image rotated 90 degrees', function(done) {
     var expected = fixtures.expected('overlay-tile-rotated90.jpg');
     sharp(fixtures.inputJpg)
       .rotate(90)
->>>>>>> 98b3847... Adds the option of tiling/replicatng the overlay image across the image.
       .resize(80)
       .overlayWith(fixtures.inputPngWithTransparency16bit, {
         tile: true
@@ -282,25 +277,17 @@ describe('Overlays', function() {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(80, info.width);
-<<<<<<< HEAD
-=======
         assert.strictEqual(98, info.height);
->>>>>>> 98b3847... Adds the option of tiling/replicatng the overlay image across the image.
         assert.strictEqual(3, info.channels);
         fixtures.assertSimilar(expected, data, done);
       });
   });
 
-<<<<<<< HEAD
-  describe('Overlay with tile enabled and image rotated 90 degrees and gravity northwest', function(done) {
-    var expected = fixtures.expected('overlay-tile-rotated90-gravity-northwest.jpg');
-    sharp(fixtures.inputJpg)
-=======
+
   it('With tile enabled and image rotated 90 degrees and gravity northwest', function(done) {
     var expected = fixtures.expected('overlay-tile-rotated90-gravity-northwest.jpg');
     sharp(fixtures.inputJpg)
       .rotate(90)
->>>>>>> 98b3847... Adds the option of tiling/replicatng the overlay image across the image.
       .resize(80)
       .overlayWith(fixtures.inputPngWithTransparency16bit, {
         tile: true,
@@ -310,11 +297,8 @@ describe('Overlays', function() {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(80, info.width);
-<<<<<<< HEAD
-=======
         assert.strictEqual(98, info.height);
         assert.strictEqual(3, info.channels);
->>>>>>> 98b3847... Adds the option of tiling/replicatng the overlay image across the image.
         fixtures.assertSimilar(expected, data, done);
       });
   });
