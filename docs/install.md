@@ -193,3 +193,47 @@ configuration file to prevent the use of coders known to be vulnerable.
 
 Set the `MAGICK_CONFIGURE_PATH` environment variable
 to the directory containing the `policy.xml` file.
+
+### Licences
+
+If a global installation of libvips that meets the
+minimum version requirement cannot be found,
+this module will download a pre-compiled bundle of libvips
+and its dependencies on Linux and Windows machines.
+
+Should you need to manually download and inspect these files,
+you can do so via https://dl.bintray.com/lovell/sharp/
+
+This module is licensed under the terms of the
+[Apache 2.0 Licence](https://github.com/lovell/sharp/blob/master/LICENSE).
+
+The libraries downloaded and used by this module
+are done so under the terms of the following licences,
+all of which are compatible with the Apache 2.0 Licence.
+
+Use of libraries under the terms of the LGPLv3 is via the
+"any later version" clause of the LGPLv2 or LGPLv2.1.
+
+| Library       | Used under the terms of                                                                                  |
+|---------------|----------------------------------------------------------------------------------------------------------|
+| cairo         | Mozilla Public License 2.0                                                                               |
+| fontconfig    | [fontconfig Licence](https://cgit.freedesktop.org/fontconfig/tree/COPYING) (BSD-like)                    |
+| freetype      | [freetype Licence](http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT) (BSD-like) |
+| giflib        | MIT Licence                                                                                              |
+| glib          | LGPLv3                                                                                                   |
+| harfbuzz      | MIT Licence                                                                                              |
+| lcms          | MIT Licence                                                                                              |
+| libcroco      | LGPLv3                                                                                                   |
+| libexif       | LGPLv3                                                                                                   |
+| libffi        | MIT Licence                                                                                              |
+| libgsf        | LGPLv3                                                                                                   |
+| libjpeg-turbo | [zlib License, IJG License](https://github.com/libjpeg-turbo/libjpeg-turbo/blob/master/LICENSE.md)       |
+| libpng        | [libpng License](http://www.libpng.org/pub/png/src/libpng-LICENSE.txt)                                   |
+| librsvg       | LGPLv3                                                                                                   |
+| libtiff       | [libtiff License](http://www.libtiff.org/misc.html) (BSD-like)                                           |
+| libvips       | LGPLv3                                                                                                   |
+| libwebp       | New BSD License                                                                                          |
+| libxml2       | MIT Licence                                                                                              |
+| pango         | LGPLv3                                                                                                   |
+| pixman        | MIT Licence                                                                                              |
+| zlib          | [zlib Licence](https://github.com/madler/zlib/blob/master/zlib.h)                                        |
