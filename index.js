@@ -93,6 +93,7 @@ var Sharp = function(input, options) {
     overlayBufferIn: null,
     overlayGravity: 0,
     overlayTile: false,
+    overlayCutout: false,
     // output options
     formatOut: 'input',
     fileOut: '',
@@ -361,9 +362,18 @@ Sharp.prototype.overlayWith = function(overlay, options) {
     else if (isBoolean(options.tile)) {
       this.options.overlayTile = options.tile;
     } else {
-      throw new Error(' Invalid Value for tile ' + options.tile + 'Only Boolean Values allowed for overlay.tile.');
+      throw new Error('Invalid Value for tile ' + options.tile + ' Only Boolean Values allowed for overlay.tile.');
     }
-    
+
+    if (typeof options.cutout === 'undefined') {
+      this.options.overlayCutout = false;
+    }
+    else if (isBoolean(options.cutout)) {
+      this.options.overlayCutout = options.cutout;
+    } else {
+      throw new Error('Invalid Value for cutout ' + options.cutout + ' Only Boolean Values allowed for overlay.cutout.');
+    }
+
     if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
       this.options.overlayGravity = options.gravity;
     } else if (isString(options.gravity) && isInteger(module.exports.gravity[options.gravity])) {
