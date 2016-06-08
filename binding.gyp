@@ -51,6 +51,7 @@
     ],
     # Nested variables "pattern" borrowed from http://src.chromium.org/viewvc/chrome/trunk/src/build/common.gypi
     'variables': {
+    	'sharp-cxx11%': '0',
       'variables': {
         'variables': {
           'conditions': [
@@ -92,7 +93,7 @@
       'src/utilities.cc'
     ],
     'defines': [
-      '_GLIBCXX_USE_CXX11_ABI=0',
+      '_GLIBCXX_USE_CXX11_ABI=<(sharp-cxx11)',
       '_ALLOW_KEYWORD_MACROS'
     ],
     'include_dirs': [
