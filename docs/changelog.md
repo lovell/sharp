@@ -18,6 +18,10 @@ Requires libvips v8.3.1
   [#443](https://github.com/lovell/sharp/pull/443)
   [@lemnisk8](https://github.com/lemnisk8)
 
+* Add --sharp-cxx11 flag to compile with gcc's new C++11 ABI.
+  [#456](https://github.com/lovell/sharp/pull/456)
+  [@kapouer](https://github.com/kapouer)
+
 #### v0.15.0 - 21<sup>st</sup> May 2016
 
 * Use libvips' new Lanczos 3 kernel as default for image reduction.

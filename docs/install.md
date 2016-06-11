@@ -30,8 +30,16 @@ Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ C
 
 To use your own version of libvips instead of the provided binaries, make sure it is
 at least the version listed under `config.libvips` in the `package.json` file,
-that it can be located using `pkg-config --modversion vips-cpp`
-and that it has been compiled with `_GLIBCXX_USE_CXX11_ABI=0`.
+that it can be located using `pkg-config --modversion vips-cpp`.
+
+There are [changes in the C++11 ABI](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html)
+when using v5.1+ of the `g++` compiler.
+If you have installed `libvips-dev` via package manager on an OS such as Debian testing/unstable,
+you can pass the required value of the `_GLIBCXX_USE_CXX11_ABI` macro using the `--sharp-cxx11` flag.
+
+```sh
+npm install --sharp-cxx11=1
+```
 
 If you are using non-stadard paths (anything other than `/usr` or `/usr/local`),
 you might need to set `PKG_CONFIG_PATH` during `npm install`
@@ -53,12 +61,6 @@ curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | su
 For Linux-based operating systems such as Alpine that use musl libc,
 the smaller stack size means libvips' cache should be disabled
 via `sharp.cache(false)` to avoid a stack overflow.
-
-Beware of Linux OS upgrades that introduce v5.1+ of the `g++` compiler due to
-[changes](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html)
-in the C++11 ABI.
-This module assumes the previous behaviour, which can be enforced by setting the
-`_GLIBCXX_USE_CXX11_ABI=0` environment variable at libvips' compile time.
 
 ### Mac OS
 
