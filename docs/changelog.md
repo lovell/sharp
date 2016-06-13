@@ -18,6 +18,10 @@ Requires libvips v8.3.1
   [#443](https://github.com/lovell/sharp/pull/443)
   [@lemnisk8](https://github.com/lemnisk8)
 
+* Ensure scaling factors are calculated independently to prevent rounding errors.
+  [#452](https://github.com/lovell/sharp/issues/452)
+  [@puzrin](https://github.com/puzrin)
+
 * Add --sharp-cxx11 flag to compile with gcc's new C++11 ABI.
   [#456](https://github.com/lovell/sharp/pull/456)
   [@kapouer](https://github.com/kapouer)
