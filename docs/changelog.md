@@ -106,6 +106,10 @@ Requires libvips v8.2.3
   [#387](https://github.com/lovell/sharp/issues/387)
   [@kleisauke](https://github.com/kleisauke)
 
+* Remove deprecated style of calling extract API. Breaks calls using positional arguments.
+  [#276](https://github.com/lovell/sharp/issues/276)
+  [@papandreou](https://github.com/papandreou)
+
 ### v0.13 - "*mind*"
 
 Requires libvips v8.2.2
