@@ -125,6 +125,19 @@
               '<(module_root_dir)/lib/libgobject-2.0.lib'
             ]
           }],
+          ['OS == "mac"', {
+            'variables': {
+              'download_vips': '<!(node -e "require(\'./binding\').download_vips()")'
+            },
+            'libraries': [
+              '<(module_root_dir)/lib/libvips-cpp.42.dylib',
+              '<(module_root_dir)/lib/libvips.42.dylib',
+              '<(module_root_dir)/lib/libglib-2.0.0.dylib',
+              '<(module_root_dir)/lib/libgobject-2.0.0.dylib',
+              # Ensure runtime linking is relative to sharp.node
+              '-rpath \'@loader_path/../../lib\''
+            ]
+          }],
           ['OS == "linux"', {
             'variables': {
               'download_vips': '<!(LDD_VERSION="<!(ldd --version 2>&1 || true)" node -e "require(\'./binding\').download_vips()")'

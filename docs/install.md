@@ -29,7 +29,7 @@ Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ C
 * Amazon Linux 2015.03, 2015.09
 
 To use your own version of libvips instead of the provided binaries, make sure it is
-at least the version listed under `config.libvips` in the `package.json` file,
+at least the version listed under `config.libvips` in the `package.json` file and
 that it can be located using `pkg-config --modversion vips-cpp`.
 
 There are [changes in the C++11 ABI](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html)
@@ -66,28 +66,12 @@ via `sharp.cache(false)` to avoid a stack overflow.
 
 [![OS X 10.9.5 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
-libvips must be installed before `npm install` is run.
-This can be achieved via homebrew:
+libvips and its dependencies are fetched and stored within `node_modules/sharp/lib` during `npm install`.
+This involves an automated HTTPS download of approximately 6.5MB.
 
-```sh
-brew install homebrew/science/vips
-```
-
-For WebP suppport use:
-
-```sh
-brew install homebrew/science/vips --with-webp
-```
-
-A missing or incorrectly configured _Xcode Command Line Tools_ installation
-[can lead](https://github.com/lovell/sharp/issues/80) to a
-`library not found for -ljpeg` error.
-If so, please try: `xcode-select --install`.
-
-The _gettext_ dependency of _libvips_
-[can lead](https://github.com/lovell/sharp/issues/9)
-to a `library not found for -lintl` error.
-If so, please try `brew link gettext --force`.
+To use your own version of libvips instead of the provided binaries, make sure it is
+at least the version listed under `config.libvips` in the `package.json` file and
+that it can be located using `pkg-config --modversion vips-cpp`.
 
 ### Windows
 

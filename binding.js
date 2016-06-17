@@ -120,15 +120,5 @@ module.exports.use_global_vips = function() {
       minimumLibvipsVersion
     );
   }
-  if (process.platform === 'darwin' && !useGlobalVips) {
-    if (globalVipsVersion) {
-      error(
-        'Found libvips ' + globalVipsVersion + ' but require ' + minimumLibvipsVersion +
-        '\nPlease upgrade libvips by running: brew update && brew upgrade'
-      );
-    } else {
-      error('Please install libvips by running: brew install homebrew/science/vips --with-webp --with-graphicsmagick');
-    }
-  }
   process.stdout.write(useGlobalVips ? 'true' : 'false');
 };
