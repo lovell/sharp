@@ -365,7 +365,7 @@ Sharp.prototype.overlayWith = function(overlay, options) {
       throw new Error(' Invalid Value for tile ' + options.tile + 'Only Boolean Values allowed for overlay.tile.');
     }
     
-    if(isInteger(options.left) && options.left > 0 && isInteger(options.top) && options.top > 0) {
+    if(isInteger(options.left) && options.left >= 0 && isInteger(options.top) && options.top >= 0) {
       this.options.overlayXOffset = options.left;
       this.options.overlayYOffset = options.top;
     } else if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {

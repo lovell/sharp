@@ -689,8 +689,7 @@ class PipelineWorker : public AsyncWorker {
             int top;
             overlayImage = overlayImage.replicate(across, down);
 
-            if((baton->overlayXOffset && baton->overlayXOffset >= 0)
-              && (baton->overlayYOffset && baton->overlayYOffset >= 0)) {
+            if(baton->overlayXOffset >= 0 && baton->overlayYOffset >= 0) {
               // the overlayX/YOffsets will now be used to CalculateCrop for extract_area
               std::tie(left, top) = CalculateCrop(
                 overlayImage.width(), overlayImage.height(), image.width(), image.height(),
@@ -711,8 +710,7 @@ class PipelineWorker : public AsyncWorker {
         }
         // Ensure overlay is premultiplied sRGB
         overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
-        if((baton->overlayXOffset && baton->overlayXOffset >= 0)
-          && (baton->overlayYOffset && baton->overlayYOffset >= 0)) {
+        if(baton->overlayXOffset >= 0 && baton->overlayYOffset >= 0) {
           // Composite images with given offsets
           image = Composite(overlayImage, image, baton->overlayXOffset, baton->overlayYOffset);
         } else {
