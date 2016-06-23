@@ -30,8 +30,16 @@ Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ C
 
 To use your own version of libvips instead of the provided binaries, make sure it is
 at least the version listed under `config.libvips` in the `package.json` file,
-that it can be located using `pkg-config --modversion vips-cpp`
-and that it has been compiled with `_GLIBCXX_USE_CXX11_ABI=0`.
+that it can be located using `pkg-config --modversion vips-cpp`.
+
+There are [changes in the C++11 ABI](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html)
+when using v5.1+ of the `g++` compiler.
+If you have installed `libvips-dev` via package manager on an OS such as Debian testing/unstable,
+you can pass the required value of the `_GLIBCXX_USE_CXX11_ABI` macro using the `--sharp-cxx11` flag.
+
+```sh
+npm install --sharp-cxx11=1
+```
 
 If you are using non-stadard paths (anything other than `/usr` or `/usr/local`),
 you might need to set `PKG_CONFIG_PATH` during `npm install`
@@ -53,12 +61,6 @@ curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | su
 For Linux-based operating systems such as Alpine that use musl libc,
 the smaller stack size means libvips' cache should be disabled
 via `sharp.cache(false)` to avoid a stack overflow.
-
-Beware of Linux OS upgrades that introduce v5.1+ of the `g++` compiler due to
-[changes](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html)
-in the C++11 ABI.
-This module assumes the previous behaviour, which can be enforced by setting the
-`_GLIBCXX_USE_CXX11_ABI=0` environment variable at libvips' compile time.
 
 ### Mac OS
 
@@ -193,3 +195,47 @@ configuration file to prevent the use of coders known to be vulnerable.
 
 Set the `MAGICK_CONFIGURE_PATH` environment variable
 to the directory containing the `policy.xml` file.
+
+### Licences
+
+If a global installation of libvips that meets the
+minimum version requirement cannot be found,
+this module will download a pre-compiled bundle of libvips
+and its dependencies on Linux and Windows machines.
+
+Should you need to manually download and inspect these files,
+you can do so via https://dl.bintray.com/lovell/sharp/
+
+This module is licensed under the terms of the
+[Apache 2.0 Licence](https://github.com/lovell/sharp/blob/master/LICENSE).
+
+The libraries downloaded and used by this module
+are done so under the terms of the following licences,
+all of which are compatible with the Apache 2.0 Licence.
+
+Use of libraries under the terms of the LGPLv3 is via the
+"any later version" clause of the LGPLv2 or LGPLv2.1.
+
+| Library       | Used under the terms of                                                                                  |
+|---------------|----------------------------------------------------------------------------------------------------------|
+| cairo         | Mozilla Public License 2.0                                                                               |
+| fontconfig    | [fontconfig Licence](https://cgit.freedesktop.org/fontconfig/tree/COPYING) (BSD-like)                    |
+| freetype      | [freetype Licence](http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT) (BSD-like) |
+| giflib        | MIT Licence                                                                                              |
+| glib          | LGPLv3                                                                                                   |
+| harfbuzz      | MIT Licence                                                                                              |
+| lcms          | MIT Licence                                                                                              |
+| libcroco      | LGPLv3                                                                                                   |
+| libexif       | LGPLv3                                                                                                   |
+| libffi        | MIT Licence                                                                                              |
+| libgsf        | LGPLv3                                                                                                   |
+| libjpeg-turbo | [zlib License, IJG License](https://github.com/libjpeg-turbo/libjpeg-turbo/blob/master/LICENSE.md)       |
+| libpng        | [libpng License](http://www.libpng.org/pub/png/src/libpng-LICENSE.txt)                                   |
+| librsvg       | LGPLv3                                                                                                   |
+| libtiff       | [libtiff License](http://www.libtiff.org/misc.html) (BSD-like)                                           |
+| libvips       | LGPLv3                                                                                                   |
+| libwebp       | New BSD License                                                                                          |
+| libxml2       | MIT Licence                                                                                              |
+| pango         | LGPLv3                                                                                                   |
+| pixman        | MIT Licence                                                                                              |
+| zlib          | [zlib Licence](https://github.com/madler/zlib/blob/master/zlib.h)                                        |

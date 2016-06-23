@@ -4,6 +4,28 @@
 
 Requires libvips v8.3.1
 
+#### v0.15.1 - TBD
+
+* Concat Stream-based input in single operation for ~+3% perf and less GC.
+  [#429](https://github.com/lovell/sharp/issues/429)
+  [@papandreou](https://github.com/papandreou)
+
+* Add alpha channel, if required, before extend operation.
+  [#439](https://github.com/lovell/sharp/pull/439)
+  [@frulo](https://github.com/frulo)
+
+* Allow overlay image to be repeated across entire image via tile option.
+  [#443](https://github.com/lovell/sharp/pull/443)
+  [@lemnisk8](https://github.com/lemnisk8)
+
+* Ensure scaling factors are calculated independently to prevent rounding errors.
+  [#452](https://github.com/lovell/sharp/issues/452)
+  [@puzrin](https://github.com/puzrin)
+
+* Add --sharp-cxx11 flag to compile with gcc's new C++11 ABI.
+  [#456](https://github.com/lovell/sharp/pull/456)
+  [@kapouer](https://github.com/kapouer)
+
 #### v0.15.0 - 21<sup>st</sup> May 2016
 
 * Use libvips' new Lanczos 3 kernel as default for image reduction.
@@ -83,6 +105,9 @@ Requires libvips v8.2.3
 * Ensure ratios are not swapped when rotating 90/270 and ignoring aspect.
   [#387](https://github.com/lovell/sharp/issues/387)
   [@kleisauke](https://github.com/kleisauke)
+
+* Remove deprecated style of calling extract API. Breaks calls using positional arguments.
+  [#276](https://github.com/lovell/sharp/issues/276)
 
 ### v0.13 - "*mind*"
 

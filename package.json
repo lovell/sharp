@@ -1,6 +1,6 @@
 {
   "name": "sharp",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "author": "Lovell Fuller <npm@lovell.info>",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
@@ -22,7 +22,9 @@
     "John Tobin <john@limelightmobileinc.com>",
     "Kenton Gray <kentongray@gmail.com>",
     "Felix Bünemann <Felix.Buenemann@gmail.com>",
-    "Samy Al Zahrani <samyalzahrany@gmail.com>"
+    "Samy Al Zahrani <samyalzahrany@gmail.com>",
+    "Chintan Thakkar <lemnisk8@gmail.com>",
+    "F. Orlando Galashan <frulo@gmx.de>"
   ],
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
   "scripts": {
@@ -68,7 +70,7 @@
     "exif-reader": "^1.0.0",
     "icc": "^0.0.2",
     "istanbul": "^0.4.3",
-    "mocha": "^2.4.5",
+    "mocha": "^2.5.3",
     "mocha-jshint": "^2.3.1",
     "node-cpplint": "^0.4.0",
     "rimraf": "^2.5.2",

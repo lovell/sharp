@@ -431,6 +431,7 @@ Overlay (composite) a image containing an alpha channel over the processed (resi
 `options`, if present, is an Object with the following optional attributes:
 
 * `gravity` is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north` at which to place the overlay, defaulting to `center`/`centre`.
+* `tile` is a Boolean, defaulting to `false`. When set to `true` repeats the overlay image across the entire image with the given `gravity`.
 
 ```javascript
 sharp('input.png')

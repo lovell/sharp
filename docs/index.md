@@ -92,6 +92,8 @@ the help and code contributions of the following people:
 * [Kenton Gray](https://github.com/kentongray)
 * [Felix Bünemann](https://github.com/felixbuenemann)
 * [Samy Al Zahrani](https://github.com/salzhrani)
+* [Chintan Thakkar](https://github.com/lemnisk8)
+* [F. Orlando Galashan](https://github.com/frulo)
 
 Thank you!
 

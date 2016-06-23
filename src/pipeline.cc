@@ -219,34 +219,46 @@ class PipelineWorker : public AsyncWorker {
       // Scaling calculations
       double xfactor = 1.0;
       double yfactor = 1.0;
+      int targetResizeWidth = baton->width;
+      int targetResizeHeight = baton->height;
       if (baton->width > 0 && baton->height > 0) {
         // Fixed width and height
-        xfactor = static_cast<double>(inputWidth) / (static_cast<double>(baton->width) + 0.1);
-        yfactor = static_cast<double>(inputHeight) / (static_cast<double>(baton->height) + 0.1);
+        xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
+        yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
         switch (baton->canvas) {
           case Canvas::CROP:
-            xfactor = std::min(xfactor, yfactor);
-            yfactor = xfactor;
+            if (xfactor < yfactor) {
+              targetResizeHeight = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
+              yfactor = xfactor;
+            } else {
+              targetResizeWidth = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
+              xfactor = yfactor;
+            }
             break;
           case Canvas::EMBED:
-            xfactor = std::max(xfactor, yfactor);
-            yfactor = xfactor;
+            if (xfactor > yfactor) {
+              targetResizeHeight = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
+              yfactor = xfactor;
+            } else {
+              targetResizeWidth = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
+              xfactor = yfactor;
+            }
             break;
           case Canvas::MAX:
             if (xfactor > yfactor) {
-              baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
+              targetResizeHeight = baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
               yfactor = xfactor;
             } else {
-              baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
+              targetResizeWidth = baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
               xfactor = yfactor;
             }
             break;
           case Canvas::MIN:
             if (xfactor < yfactor) {
-              baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
+              targetResizeHeight = baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
               yfactor = xfactor;
             } else {
-              baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
+              targetResizeWidth = baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
               xfactor = yfactor;
             }
             break;
@@ -259,23 +271,23 @@ class PipelineWorker : public AsyncWorker {
         }
       } else if (baton->width > 0) {
         // Fixed width
-        xfactor = static_cast<double>(inputWidth) / (static_cast<double>(baton->width) + 0.1);
+        xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
         if (baton->canvas == Canvas::IGNORE_ASPECT) {
-          baton->height = inputHeight;
+          targetResizeHeight = baton->height = inputHeight;
         } else {
           // Auto height
           yfactor = xfactor;
-          baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / yfactor));
+          targetResizeHeight = baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / yfactor));
         }
       } else if (baton->height > 0) {
         // Fixed height
-        yfactor = static_cast<double>(inputHeight) / (static_cast<double>(baton->height) + 0.1);
+        yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
         if (baton->canvas == Canvas::IGNORE_ASPECT) {
-          baton->width = inputWidth;
+          targetResizeWidth = baton->width = inputWidth;
         } else {
           // Auto width
           xfactor = yfactor;
-          baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / xfactor));
+          targetResizeWidth = baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / xfactor));
         }
       } else {
         // Identity transform
@@ -429,19 +441,13 @@ class PipelineWorker : public AsyncWorker {
           // Swap input output width and height when rotating by 90 or 270 degrees
           std::swap(shrunkWidth, shrunkHeight);
         }
-        xresidual = static_cast<double>(baton->width) / static_cast<double>(shrunkWidth);
-        yresidual = static_cast<double>(baton->height) / static_cast<double>(shrunkHeight);
-        if (baton->canvas == Canvas::EMBED) {
-          xresidual = std::min(xresidual, yresidual);
-          yresidual = xresidual;
-        } else if (baton->canvas == Canvas::IGNORE_ASPECT) {
-          if (!baton->rotateBeforePreExtract &&
-            (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
-            std::swap(xresidual, yresidual);
-          }
-        } else {
-          xresidual = std::max(xresidual, yresidual);
-          yresidual = xresidual;
+        xresidual = static_cast<double>(targetResizeWidth) / static_cast<double>(shrunkWidth);
+        yresidual = static_cast<double>(targetResizeHeight) / static_cast<double>(shrunkHeight);
+        if (
+          !baton->rotateBeforePreExtract &&
+          (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)
+        ) {
+          std::swap(xresidual, yresidual);
         }
       }
 
@@ -598,12 +604,19 @@ class PipelineWorker : public AsyncWorker {
           baton->background[2] * multiplier
         };
         // Add alpha channel to background colour
-        if (HasAlpha(image)) {
+        if (baton->background[3] < 255.0 || HasAlpha(image)) {
           background.push_back(baton->background[3] * multiplier);
+        }
+        // Add non-transparent alpha channel, if required
+        if (baton->background[3] < 255.0 && !HasAlpha(image)) {
+          image = image.bandjoin(
+            VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
+          );
         }
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
         baton->height = image.height() + baton->extendTop + baton->extendBottom;
+
         image = image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
           VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
       }
@@ -656,6 +669,35 @@ class PipelineWorker : public AsyncWorker {
         }
         if (overlayImageType == ImageType::UNKNOWN) {
           return Error();
+        }
+        // Check if overlay is tiled
+        if (baton->overlayTile) {
+          int overlayImageWidth = overlayImage.width();
+          int overlayImageHeight = overlayImage.height();
+          int across = 0;
+          int down = 0;
+
+          // use gravity in ovelay
+          if(overlayImageWidth <= baton->width) {
+            across = static_cast<int>(ceil(static_cast<double>(image.width()) / overlayImageWidth));
+          }
+          if(overlayImageHeight <= baton->height) {
+            down = static_cast<int>(ceil(static_cast<double>(image.height()) / overlayImageHeight));
+          }
+          if(across != 0 || down != 0) {
+            int left;
+            int top;
+            overlayImage = overlayImage.replicate(across, down);
+            // the overlayGravity will now be used to CalculateCrop for extract_area
+            std::tie(left, top) = CalculateCrop(
+              overlayImage.width(), overlayImage.height(), image.width(), image.height(), baton->overlayGravity
+            );
+            overlayImage = overlayImage.extract_area(
+              left, top, image.width(), image.height()
+            );
+          }
+          // the overlayGravity was used for extract_area, therefore set it back to its default value of 0
+          baton->overlayGravity = 0;
         }
         // Ensure overlay is premultiplied sRGB
         overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
@@ -1043,6 +1085,7 @@ NAN_METHOD(pipeline) {
     baton->overlayBufferIn = node::Buffer::Data(overlayBufferIn);
   }
   baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
+  baton->overlayTile = attrAs<bool>(options, "overlayTile");
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
   baton->crop = attrAs<int32_t>(options, "crop");
