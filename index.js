@@ -8,7 +8,6 @@ var events = require('events');
 var semver = require('semver');
 var color = require('color');
 var BluebirdPromise = require('bluebird');
-
 var sharp = require('./build/Release/sharp');
 
 // Versioning
@@ -92,6 +91,8 @@ var Sharp = function(input, options) {
     overlayFileIn: '',
     overlayBufferIn: null,
     overlayGravity: 0,
+    overlayXOffset : -1,
+    overlayYOffset : -1,
     overlayTile: false,
     // output options
     formatOut: 'input',
@@ -364,7 +365,10 @@ Sharp.prototype.overlayWith = function(overlay, options) {
       throw new Error(' Invalid Value for tile ' + options.tile + 'Only Boolean Values allowed for overlay.tile.');
     }
     
-    if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
+    if(isInteger(options.left) && options.left > 0 && isInteger(options.top) && options.top > 0) {
+      this.options.overlayXOffset = options.left;
+      this.options.overlayYOffset = options.top;
+    } else if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
       this.options.overlayGravity = options.gravity;
     } else if (isString(options.gravity) && isInteger(module.exports.gravity[options.gravity])) {
       this.options.overlayGravity = module.exports.gravity[options.gravity];

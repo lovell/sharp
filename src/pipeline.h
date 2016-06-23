@@ -33,6 +33,8 @@ struct PipelineBaton {
   char *overlayBufferIn;
   size_t overlayBufferInLength;
   int overlayGravity;
+  int overlayXOffset;
+  int overlayYOffset;
   bool overlayTile;
   int topOffsetPre;
   int leftOffsetPre;
@@ -98,6 +100,8 @@ struct PipelineBaton {
     bufferOutLength(0),
     overlayBufferInLength(0),
     overlayGravity(0),
+    overlayXOffset(-1),
+    overlayYOffset(-1),
     overlayTile(false),
     topOffsetPre(-1),
     topOffsetPost(-1),

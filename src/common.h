@@ -108,6 +108,13 @@ namespace sharp {
   std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,
     int const outWidth, int const outHeight, int const gravity);
 
+  /*
+    Calculate the (left, top) coordinates of the output image
+    within the input image, applying the given x and y offsets of the output image.
+  */
+  std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,
+    int const outWidth, int const outHeight, int const x, int const y);
+
 }  // namespace sharp
 
 #endif  // SRC_COMMON_H_
