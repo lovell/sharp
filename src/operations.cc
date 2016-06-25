@@ -82,6 +82,65 @@ namespace sharp {
   }
 
   /*
+    Cutout src over dst with given gravity.
+   */
+  VImage Cutout(VImage mask, VImage dst, const int gravity) {
+    using sharp::CalculateCrop;
+    using sharp::HasAlpha;
+    using sharp::MaximumImageAlpha;
+
+    bool maskHasAlpha = HasAlpha(mask);
+
+    if (!maskHasAlpha && mask.bands() > 1) {
+      throw VError("Overlay image must have an alpha channel or one band");
+    }
+    if (!HasAlpha(dst)) {
+      throw VError("Image to be overlaid must have an alpha channel");
+    }
+    if (mask.width() > dst.width() || mask.height() > dst.height()) {
+      throw VError("Overlay image must have same dimensions or smaller");
+    }
+
+    // Enlarge overlay mask, if required
+    if (mask.width() < dst.width() || mask.height() < dst.height()) {
+      // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
+      int left;
+      int top;
+      std::tie(left, top) = CalculateCrop(dst.width(), dst.height(), mask.width(), mask.height(), gravity);
+      // Embed onto transparent background
+      std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
+      mask = mask.embed(left, top, dst.width(), dst.height(), VImage::option()
+              ->set("extend", VIPS_EXTEND_BACKGROUND)
+              ->set("background", background)
+      );
+    }
+
+    // we use the mask alpha if it has alpha
+    if(maskHasAlpha) {
+      mask = mask.extract_band(mask.bands() - 1, VImage::option()->set("n", 1));;
+    }
+
+    // Split dst into an optional alpha
+    VImage dstAlpha = dst.extract_band(dst.bands() - 1, VImage::option()->set("n", 1));
+
+    // we use the dst non-alpha
+    dst = dst.extract_band(0, VImage::option()->set("n", dst.bands() - 1));
+
+    // the range of the mask and the image need to match .. one could be
+    // 16-bit, one 8-bit
+    int dstMax = MaximumImageAlpha(dst.interpretation());
+    int maskMax = MaximumImageAlpha(mask.interpretation());
+
+    // combine the new mask and the existing alpha ... there are
+    // many ways of doing this, mult is the simplest
+    mask = dstMax * ((mask / maskMax) * (dstAlpha / dstMax));
+
+    // append the mask to the image data ... the mask might be float now,
+    // we must cast the format down to match the image data
+    return dst.bandjoin(mask.cast(dst.format()));
+  }
+
+  /*
    * Stretch luminance to cover full dynamic range.
    */
   VImage Normalize(VImage image) {
