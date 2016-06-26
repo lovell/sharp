@@ -543,7 +543,7 @@ The size, overlap, container and directory layout to use when generating square 
 * `container` is a String, with value `fs` or `zip`. The default value is `fs`.
 * `layout` is a String, with value `dz`, `zoomify` or `google`. The default value is `dz`.
 
-You can also use the file extension .zip or .szi to write to a ZIP container instead of the filesystem.
+You can also use the file extension `.zip` or `.szi` to write to a compressed archive file format.
 
 ```javascript
 sharp('input.tiff')
