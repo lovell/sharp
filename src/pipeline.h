@@ -58,6 +58,7 @@ struct PipelineBaton {
   double sharpenFlat;
   double sharpenJagged;
   int threshold;
+  bool thresholdColor;
   double gamma;
   bool greyscale;
   bool normalize;
@@ -113,6 +114,7 @@ struct PipelineBaton {
     sharpenFlat(1.0),
     sharpenJagged(2.0),
     threshold(0),
+    thresholdColor(false),
     gamma(0.0),
     greyscale(false),
     normalize(false),
@@ -145,4 +147,4 @@ struct PipelineBaton {
     }
 };
 
-#endif  // SRC_PIPELINE_H_
+#endif  // SRC_PIPELINE_H
