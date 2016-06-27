@@ -478,7 +478,8 @@ Sharp.prototype.conv = function(kernel) {
     kernel.kernel.forEach(function(row) {
       row.forEach(function(e) {
         sum += e;
-      })});
+      });
+    });
     kernel.scale = sum;
   }
   if(!isDefined(kernel.offset)) {
@@ -487,7 +488,7 @@ Sharp.prototype.conv = function(kernel) {
   this.options.convKernel = kernel;
   this.options.convKernelValid = true;
   return this;
-}
+};
 
 /*
   Sharpen the output image.
