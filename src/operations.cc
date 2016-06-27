@@ -212,6 +212,13 @@ namespace sharp {
   }
 
   /*
+   * Convolution with a kernel.
+   */
+  VImage Conv(VImage image, VImage const kernel) {
+    return image.conv(kernel);
+  }
+
+  /*
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
    */
   VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged) {

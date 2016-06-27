@@ -49,6 +49,7 @@ using sharp::Cutout;
 using sharp::Normalize;
 using sharp::Gamma;
 using sharp::Blur;
+using sharp::Conv;
 using sharp::Sharpen;
 using sharp::EntropyCrop;
 using sharp::TileCache;
@@ -463,11 +464,12 @@ class PipelineWorker : public AsyncWorker {
 
       bool shouldAffineTransform = xresidual != 1.0 || yresidual != 1.0;
       bool shouldBlur = baton->blurSigma != 0.0;
+      bool shouldConv = baton->convKernelValid;
       bool shouldSharpen = baton->sharpenSigma != 0.0;
       bool shouldThreshold = baton->threshold != 0;
       bool shouldCutout = baton->overlayCutout;
       bool shouldPremultiplyAlpha = HasAlpha(image) &&
-        (shouldAffineTransform || shouldBlur || shouldSharpen || (hasOverlay && !shouldCutout));
+        (shouldAffineTransform || shouldBlur || shouldConv || shouldSharpen || (hasOverlay && !shouldCutout));
 
       // Premultiply image alpha channel before all transformations to avoid
       // dark fringing around bright pixels
@@ -631,6 +633,11 @@ class PipelineWorker : public AsyncWorker {
       // Blur
       if (shouldBlur) {
         image = Blur(image, baton->blurSigma);
+      }
+
+      // Convolve
+      if (shouldConv) {
+        image = Conv(image, baton->convKernel);
       }
 
       // Sharpen
@@ -1148,6 +1155,26 @@ NAN_METHOD(pipeline) {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY;
   } else {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
+  }
+  // Convolution Kernel
+  baton->convKernelValid = attrAs<bool>(options,"convKernelValid");
+  if(baton->convKernelValid) {
+    Local<Object> kernel = Get(options, New("convKernel").ToLocalChecked()).ToLocalChecked().As<Object>();
+    int32_t width = attrAs<int32_t>(kernel,"width");
+    int32_t height = attrAs<int32_t>(kernel,"height");
+    double scale = attrAs<double>(kernel,"scale");
+    double offset = attrAs<double>(kernel,"offset");
+    baton->convKernel = VImage::new_matrix(width, height);
+    baton->convKernel.set("scale",scale);
+    baton->convKernel.set("offset",offset);
+    VipsImage *vips_matrix = baton->convKernel.get_image();
+    Local<Array> kdata = Get(kernel, New("kernel").ToLocalChecked()).ToLocalChecked().As<Array>();
+    for(int i=0; i<width; i++) {
+      Local<Array> row = Get(kdata, i).ToLocalChecked().As<Array>();
+      for(int j=0; j<height; j++) {
+        *VIPS_MATRIX( vips_matrix, i, j ) = To<double>(Get(row, j).ToLocalChecked()).FromJust();
+      }
+    }
   }
 
   // Function to notify of queue length changes

@@ -81,6 +81,8 @@ var Sharp = function(input, options) {
     flatten: false,
     negate: false,
     blurSigma: 0,
+    convKernel: 0,
+    convKernelValid: false,
     sharpenSigma: 0,
     sharpenFlat: 1,
     sharpenJagged: 2,
@@ -446,6 +448,46 @@ Sharp.prototype.blur = function(sigma) {
   }
   return this;
 };
+
+/*
+  Convolve the image with a kernel.
+  Call with an object of the following form:
+  { 'width': N
+  , 'height': M
+  , 'scale': Z
+  , 'offset': Y
+  , 'kernel':
+             [[ 1, 2, 3],
+              [ 4, 5, 6],
+              [ 7, 8, 9]]
+  }
+*/
+
+Sharp.prototype.conv = function(kernel) {
+  if (!isDefined(kernel) || !isDefined(kernel.kernel) ||
+      !isDefined(kernel.width) || !isDefined(kernel.height) ||
+      !inRange(kernel.width,3,1001) || !inRange(kernel.height,3,1001) ||
+      kernel.height != kernel.kernel.length ||
+      kernel.width != kernel.kernel[0].length
+     ) {
+    // must pass in a kernel
+    throw new Error('Invalid convolution kernel');
+  }
+  if(!isDefined(kernel.scale)) {
+    var sum = 0;
+    kernel.kernel.forEach(function(row) {
+      row.forEach(function(e) {
+        sum += e;
+      })});
+    kernel.scale = sum;
+  }
+  if(!isDefined(kernel.offset)) {
+    kernel.offset = 0;
+  }
+  this.options.convKernel = kernel;
+  this.options.convKernelValid = true;
+  return this;
+}
 
 /*
   Sharpen the output image.

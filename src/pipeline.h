@@ -82,6 +82,8 @@ struct PipelineBaton {
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
+  VImage convKernel;
+  bool convKernelValid;
   int tileSize;
   int tileOverlap;
   VipsForeignDzContainer tileContainer;
@@ -134,6 +136,8 @@ struct PipelineBaton {
     optimiseScans(false),
     withMetadata(false),
     withMetadataOrientation(-1),
+    convKernel(0),
+    convKernelValid(false),
     tileSize(256),
     tileOverlap(0),
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),
