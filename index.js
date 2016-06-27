@@ -499,7 +499,7 @@ Sharp.prototype.threshold = function(threshold, thresholdColor) {
     throw new Error('Invalid threshold (0 to 255) ' + threshold);
   }
   
-  if(typeof thresholdColor === 'undefined' || thresholdColor == false) {
+  if(typeof thresholdColor === 'undefined' || thresholdColor === false) {
     this.options.thresholdColor = false;
   } else {
     this.options.thresholdColor = true;
