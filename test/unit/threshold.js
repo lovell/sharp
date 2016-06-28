@@ -101,6 +101,18 @@ describe('Threshold', function() {
     });
   }
 
+  it('color threshold', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .threshold(127,{'grayscale':false})
+      .toBuffer(function(err, data, info) {
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('threshold-color-128.jpg'), data, done);
+      });    
+  });
+
   it('invalid threshold -1', function() {
     assert.throws(function() {
       sharp(fixtures.inputJpg).threshold(-1);
