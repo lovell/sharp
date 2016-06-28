@@ -397,7 +397,7 @@ Converts all pixels in the image to greyscale white or black.  Any pixel greathe
 
 * `threshold`, if present, is a Number, representing the level above which pixels will be forced to white.
 
-* `options`, an options object that may contain a boolean `grayscale` or `greyscale`. When `grayscale` is `true`, `threshold` returns a black and white image, and when `false` a color image with each channel thresholded independently. The default is `grayscale: false` when omitted.
+* `options`, an options object that may contain a boolean `grayscale` or `greyscale`. When `grayscale` is `true`, `threshold` returns a black and white image, and when `false` a color image with each channel thresholded independently. The default is `grayscale: true` when omitted.
 
 #### gamma([gamma])
 
