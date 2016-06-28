@@ -472,10 +472,8 @@ Sharp.prototype.convolve = function(kernel) {
   }
   if(!isDefined(kernel.scale)) {
     var sum = 0;
-    kernel.kernel.forEach(function(row) {
-      row.forEach(function(e) {
-        sum += e;
-      });
+    kernel.kernel.forEach(function(e) {
+      sum += e;
     });
     kernel.scale = sum;
   }
