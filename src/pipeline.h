@@ -147,4 +147,4 @@ struct PipelineBaton {
     }
 };
 
-#endif  // SRC_PIPELINE_H
+#endif  // SRC_PIPELINE_H_
