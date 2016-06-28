@@ -214,7 +214,19 @@ namespace sharp {
   /*
    * Convolution with a kernel.
    */
-  VImage Conv(VImage image, VImage const kernel) {
+  VImage Convolve(VImage image, int width, int height, double scale, double offset, std::vector<double> kernel_v) {
+    VImage kernel = VImage::new_matrix(width, height);
+    kernel.set("scale", scale);
+    kernel.set("offset", offset);
+
+    VipsImage *vips_matrix = kernel.get_image();
+
+    int i = 0;
+    for(int k : kernel_v) {
+      *VIPS_MATRIX( vips_matrix, i % width, i / width ) = k;
+      i++;
+    }
+
     return image.conv(kernel);
   }
 

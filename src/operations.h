@@ -37,7 +37,7 @@ namespace sharp {
   /*
    * Convolution with a kernel.
    */
-  VImage Conv(VImage image, VImage const kernel);
+  VImage Convolve(VImage image, int width, int height, double scale, double offset, std::vector<double> kernel_v);
 
   /*
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.

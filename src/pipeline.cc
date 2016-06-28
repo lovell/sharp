@@ -49,7 +49,7 @@ using sharp::Cutout;
 using sharp::Normalize;
 using sharp::Gamma;
 using sharp::Blur;
-using sharp::Conv;
+using sharp::Convolve;
 using sharp::Sharpen;
 using sharp::EntropyCrop;
 using sharp::TileCache;
@@ -464,7 +464,7 @@ class PipelineWorker : public AsyncWorker {
 
       bool shouldAffineTransform = xresidual != 1.0 || yresidual != 1.0;
       bool shouldBlur = baton->blurSigma != 0.0;
-      bool shouldConv = baton->convKernelValid;
+      bool shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool shouldSharpen = baton->sharpenSigma != 0.0;
       bool shouldThreshold = baton->threshold != 0;
       bool shouldCutout = baton->overlayCutout;
@@ -637,7 +637,10 @@ class PipelineWorker : public AsyncWorker {
 
       // Convolve
       if (shouldConv) {
-        image = Conv(image, baton->convKernel);
+        image = Convolve(image,
+                            baton->convKernelWidth, baton->convKernelHeight,
+                            baton->convKernelScale, baton->convKernelOffset,
+                            baton->convKernel);
       }
 
       // Sharpen
@@ -1157,23 +1160,18 @@ NAN_METHOD(pipeline) {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
   }
   // Convolution Kernel
-  baton->convKernelValid = attrAs<bool>(options, "convKernelValid");
-  if(baton->convKernelValid) {
+  if(Has(options, New("convKernel").ToLocalChecked()).FromJust()) {
     Local<Object> kernel = Get(options, New("convKernel").ToLocalChecked()).ToLocalChecked().As<Object>();
-    int32_t width = attrAs<int32_t>(kernel, "width");
-    int32_t height = attrAs<int32_t>(kernel, "height");
-    double scale = attrAs<double>(kernel, "scale");
-    double offset = attrAs<double>(kernel, "offset");
-    baton->convKernel = VImage::new_matrix(width, height);
-    baton->convKernel.set("scale", scale);
-    baton->convKernel.set("offset", offset);
-    VipsImage *vips_matrix = baton->convKernel.get_image();
+    baton->convKernelWidth = attrAs<int32_t>(kernel, "width");
+    baton->convKernelHeight = attrAs<int32_t>(kernel, "height");
+    baton->convKernelScale = attrAs<double>(kernel, "scale");
+    baton->convKernelOffset = attrAs<double>(kernel, "offset");
+
+    // Store the kernel in a std::vector in the pipeline baton for thread safety --
+    //   this will work for small kernels, but for large kernels it will be inefficient.
     Local<Array> kdata = Get(kernel, New("kernel").ToLocalChecked()).ToLocalChecked().As<Array>();
-    for(int i = 0; i < width; i++) {
-      Local<Array> row = Get(kdata, i).ToLocalChecked().As<Array>();
-      for(int j = 0; j < height; j++) {
-        *VIPS_MATRIX( vips_matrix, i, j ) = To<double>(Get(row, j).ToLocalChecked()).FromJust();
-      }
+    for(int i = 0; i < baton->convKernelWidth * baton->convKernelHeight; i++) {
+      baton->convKernel.push_back(To<double>(Get(kdata, i).ToLocalChecked()).FromJust());
     }
   }
 
