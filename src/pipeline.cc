@@ -626,7 +626,7 @@ class PipelineWorker : public AsyncWorker {
 
       // Threshold - must happen before blurring, due to the utility of blurring after thresholding
       if (shouldThreshold) {
-        image = Threshold(image, baton->threshold, baton->thresholdColor);
+        image = Threshold(image, baton->threshold, baton->thresholdGrayscale);
       }
 
       // Blur
@@ -1108,7 +1108,7 @@ NAN_METHOD(pipeline) {
   baton->sharpenFlat = attrAs<double>(options, "sharpenFlat");
   baton->sharpenJagged = attrAs<double>(options, "sharpenJagged");
   baton->threshold = attrAs<int32_t>(options, "threshold");
-  baton->thresholdColor = attrAs<bool>(options, "thresholdColor");
+  baton->thresholdGrayscale = attrAs<bool>(options, "thresholdGrayscale");
   baton->gamma = attrAs<double>(options, "gamma");
   baton->greyscale = attrAs<bool>(options, "greyscale");
   baton->normalize = attrAs<bool>(options, "normalize");

@@ -85,7 +85,7 @@ var Sharp = function(input, options) {
     sharpenFlat: 1,
     sharpenJagged: 2,
     threshold: 0,
-    thresholdColor: false,
+    thresholdGrayscale: false,
     gamma: 0,
     greyscale: false,
     normalize: 0,
@@ -501,9 +501,9 @@ Sharp.prototype.threshold = function(threshold, options) {
   
   if(typeof options === 'undefined' ||
      options.greyscale === true || options.grayscale === true) {
-    this.options.thresholdColor = false;
+    this.options.thresholdGrayscale = true;
   } else {
-    this.options.thresholdColor = true;
+    this.options.thresholdGrayscale = false;
   }
     
   return this;

@@ -327,8 +327,8 @@ namespace sharp {
     );
   }
 
-  VImage Threshold(VImage image, double const threshold, bool const thresholdColor) {
-    if(thresholdColor) {
+  VImage Threshold(VImage image, double const threshold, bool const thresholdGrayscale) {
+    if(!thresholdGrayscale) {
       return image >= threshold;
     }
     return image.colourspace(VIPS_INTERPRETATION_B_W) >= threshold;
