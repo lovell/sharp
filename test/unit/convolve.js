@@ -21,10 +21,10 @@ describe('Convolve', function() {
                       10, 20, 10 ]
         })
       .toBuffer(function(err, data, info) {
-        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual('png', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('conv-1.jpg'), data, done);
+        fixtures.assertSimilar(fixtures.expected('conv-1.png'), data, done);
       });
   });
 
@@ -40,10 +40,10 @@ describe('Convolve', function() {
                       1, 0, 1 ]
         })
       .toBuffer(function(err, data, info) {
-        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual('png', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('conv-2.jpg'), data, done);
+        fixtures.assertSimilar(fixtures.expected('conv-2.png'), data, done);
       });
   });
 
