@@ -85,7 +85,7 @@ var Sharp = function(input, options) {
     sharpenFlat: 1,
     sharpenJagged: 2,
     threshold: 0,
-    thresholdGrayscale: false,
+    thresholdGrayscale: true,
     gamma: 0,
     greyscale: false,
     normalize: 0,
