@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <tuple>
+#include <memory>
 #include <vips/vips8>
 
 #include "common.h"
@@ -214,18 +215,17 @@ namespace sharp {
   /*
    * Convolution with a kernel.
    */
-  VImage Convolve(VImage image, int width, int height, double scale, double offset, std::vector<double> kernel_v) {
-    VImage kernel = VImage::new_matrix(width, height);
+  VImage Convolve(VImage image, int width, int height, double scale, double offset,
+                  const std::unique_ptr<double[]> &kernel_v) {
+    VImage kernel = VImage::new_from_memory(
+      kernel_v.get(),
+      width * height * sizeof(double),
+      width,
+      height,
+      1,
+      VIPS_FORMAT_DOUBLE);
     kernel.set("scale", scale);
     kernel.set("offset", offset);
-
-    VipsImage *vips_matrix = kernel.get_image();
-
-    int i = 0;
-    for(int k : kernel_v) {
-      *VIPS_MATRIX( vips_matrix, i % width, i / width ) = k;
-      i++;
-    }
 
     return image.conv(kernel);
   }

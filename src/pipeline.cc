@@ -2,6 +2,7 @@
 #include <cmath>
 #include <tuple>
 #include <utility>
+#include <memory>
 
 #include <vips/vips8>
 
@@ -1167,11 +1168,12 @@ NAN_METHOD(pipeline) {
     baton->convKernelScale = attrAs<double>(kernel, "scale");
     baton->convKernelOffset = attrAs<double>(kernel, "offset");
 
-    // Store the kernel in a std::vector in the pipeline baton for thread safety --
-    //   this will work for small kernels, but for large kernels it will be inefficient.
+    size_t kernelSize = baton->convKernelWidth * baton->convKernelHeight;
+
+    baton->convKernel = std::unique_ptr<double[]>(new double[kernelSize]);
     Local<Array> kdata = Get(kernel, New("kernel").ToLocalChecked()).ToLocalChecked().As<Array>();
-    for(int i = 0; i < baton->convKernelWidth * baton->convKernelHeight; i++) {
-      baton->convKernel.push_back(To<double>(Get(kdata, i).ToLocalChecked()).FromJust());
+    for(unsigned int i = 0; i < kernelSize; i++) {
+      baton->convKernel[i] = To<double>(Get(kdata, i).ToLocalChecked()).FromJust();
     }
   }
 

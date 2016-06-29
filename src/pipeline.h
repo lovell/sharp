@@ -1,6 +1,8 @@
 #ifndef SRC_PIPELINE_H_
 #define SRC_PIPELINE_H_
 
+#include <memory>
+
 #include <vips/vips8>
 
 #include "nan.h"
@@ -82,7 +84,7 @@ struct PipelineBaton {
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
-  std::vector<double> convKernel;
+  std::unique_ptr<double[]> convKernel;
   int convKernelWidth;
   int convKernelHeight;
   double convKernelScale;

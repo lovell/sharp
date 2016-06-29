@@ -2,6 +2,7 @@
 #define SRC_OPERATIONS_H_
 
 #include <tuple>
+#include <memory>
 #include <vips/vips8>
 
 using vips::VImage;
@@ -37,7 +38,8 @@ namespace sharp {
   /*
    * Convolution with a kernel.
    */
-  VImage Convolve(VImage image, int width, int height, double scale, double offset, std::vector<double> kernel_v);
+  VImage Convolve(VImage image, int width, int height, double scale, double offset,
+                  const std::unique_ptr<double[]> &kernel_v);
 
   /*
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
