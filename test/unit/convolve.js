@@ -8,17 +8,17 @@ var fixtures = require('../fixtures');
 describe('Convolve', function() {
 
   it('specific convolution kernel 1', function(done) {
-    sharp(fixtures.inputJpg)
+    sharp(fixtures.inputPngStripesV)
       .resize(320, 240)
       .convolve(
         {
           'width': 3,
           'height': 3,
-          'scale': 36,
+          'scale': 50,
           'offset': 0,
-          'kernel': [ 2, 2, 1,
-                      2, 20, 2,
-                      1, 2, 4 ]
+          'kernel': [ 10, 20, 10,
+                      0,   0,  0,
+                      10, 20, 10 ]
         })
       .toBuffer(function(err, data, info) {
         assert.strictEqual('jpeg', info.format);
@@ -29,15 +29,15 @@ describe('Convolve', function() {
   });
 
   it('specific convolution kernel 2', function(done) {
-    sharp(fixtures.inputJpg)
+    sharp(fixtures.inputPngStripesH)
       .resize(320, 240)
       .convolve(
         {
           'width': 3,
           'height': 3,
-          'kernel': [ -1,  2, 1,
-                      -2, 20, 2,
-                      -2,  4, 2 ]
+          'kernel': [ 1, 0, 1,
+                      2, 0, 2,
+                      1, 0, 1 ]
         })
       .toBuffer(function(err, data, info) {
         assert.strictEqual('jpeg', info.format);

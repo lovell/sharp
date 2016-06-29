@@ -91,6 +91,9 @@ module.exports = {
 
   inputJPGBig: getPath('flowers.jpeg'),
 
+  inputPngStripesV: getPath('stripesV.png'),
+  inputPngStripesH: getPath('stripesH.png'),
+
   outputJpg: getPath('output.jpg'),
   outputPng: getPath('output.png'),
   outputWebP: getPath('output.webp'),
