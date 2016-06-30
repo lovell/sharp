@@ -299,53 +299,35 @@ describe('Overlays', function() {
       
     });
 
-    it('Overlay with only top offset', function(done) {
-      var expected = fixtures.expected('overlay-only-top-offset.jpg');
-      sharp(fixtures.inputJpg)
-        .resize(400)
-        .overlayWith(fixtures.inputPngWithTransparency16bit, {
-          top: 1000
-        })
-        .toBuffer(function(err, data, info) {
-          if (err) throw err;
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(3, info.channels);
-          fixtures.assertSimilar(expected, data, done);
-        });
-      
+    it('Overlay with only top offset', function() {
+      assert.throws(function() {
+        sharp(fixtures.inputJpg)
+          .resize(400)
+          .overlayWith(fixtures.inputPngWithTransparency16bit, {
+            top: 1000
+          });
+      });
     });
 
-    it('Overlay with only left offset', function(done) {
-      var expected = fixtures.expected('overlay-only-left-offset.jpg');
-      sharp(fixtures.inputJpg)
-        .resize(400)
-        .overlayWith(fixtures.inputPngWithTransparency16bit, {
-          left: 1000
-        })
-        .toBuffer(function(err, data, info) {
-          if (err) throw err;
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(3, info.channels);
-          fixtures.assertSimilar(expected, data, done);
+    it('Overlay with only left offset', function() {
+      assert.throws(function() {
+        sharp(fixtures.inputJpg)
+          .resize(400)
+          .overlayWith(fixtures.inputPngWithTransparency16bit, {
+            left: 1000
+          });
         });
-      
     });
 
-    it('Overlay with negative offsets', function(done) {
-      var expected = fixtures.expected('overlay-negative-offset.jpg');
-      sharp(fixtures.inputJpg)
-        .resize(400)
-        .overlayWith(fixtures.inputPngWithTransparency16bit, {
-          top: -1000,
-          left: -1000
-        })
-        .toBuffer(function(err, data, info) {
-          if (err) throw err;
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(3, info.channels);
-          fixtures.assertSimilar(expected, data, done);
-        });
-      
+    it('Overlay with negative offsets', function() {
+      assert.throws(function() {
+        sharp(fixtures.inputJpg)
+          .resize(400)
+          .overlayWith(fixtures.inputPngWithTransparency16bit, {
+            top: -1000,
+            left: -1000
+          });
+        });     
     });
 
     it('Overlay with 0 offset', function(done) {
@@ -393,6 +375,42 @@ describe('Overlays', function() {
           top: 10,
           gravity : 4,
           tile: true
+        })
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(3, info.channels);
+          fixtures.assertSimilar(expected, data, done);
+        });
+      
+    });
+
+    it('Overlay with offset and tile', function(done) {
+      var expected = fixtures.expected('overlay-offset-with-tile.jpg');
+      sharp(fixtures.inputJpg)
+        .resize(400)
+        .overlayWith(fixtures.inputPngWithTransparency16bit, {
+          left: 10,
+          top: 10,
+          tile: true
+        })
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(3, info.channels);
+          fixtures.assertSimilar(expected, data, done);
+        });
+      
+    });
+
+
+    it('Overlay with very large offset', function(done) {
+      var expected = fixtures.expected('overlay-very-large-offset.jpg');
+      sharp(fixtures.inputJpg)
+        .resize(400)
+        .overlayWith(fixtures.inputPngWithTransparency16bit, {
+          left: 1000000,
+          top: 100000
         })
         .toBuffer(function(err, data, info) {
           if (err) throw err;

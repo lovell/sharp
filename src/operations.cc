@@ -15,7 +15,7 @@ namespace sharp {
     Assumes alpha channels are already premultiplied and will be unpremultiplied after.
    */
   VImage Composite(VImage src, VImage dst, const int gravity) {
-    if(isInputValidForComposition(src, dst)) {
+    if(IsInputValidForComposition(src, dst)) {
       // Enlarge overlay src, if required
       if (src.width() < dst.width() || src.height() < dst.height()) {
         // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
@@ -29,7 +29,7 @@ namespace sharp {
           ->set("background", background)
         );
       }
-      return compositeImage(src, dst);
+      return CompositeImage(src, dst);
     }
     // If the input was not valid for composition the return the input image itself
     return dst;
@@ -37,7 +37,7 @@ namespace sharp {
 
 
   VImage Composite(VImage src, VImage dst, const int x, const int y) {
-    if(isInputValidForComposition(src, dst)) {
+    if(IsInputValidForComposition(src, dst)) {
       // Enlarge overlay src, if required
       if (src.width() < dst.width() || src.height() < dst.height()) {
         // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
@@ -51,13 +51,13 @@ namespace sharp {
           ->set("background", background)
         );
       }
-      return compositeImage(src, dst);
+      return CompositeImage(src, dst);
     }
     // If the input was not valid for composition the return the input image itself
     return dst;
   }
 
-  bool isInputValidForComposition(VImage src, VImage dst) {
+  bool IsInputValidForComposition(VImage src, VImage dst) {
     using sharp::CalculateCrop;
     using sharp::HasAlpha;
 
@@ -74,7 +74,7 @@ namespace sharp {
     return true;
   }
 
-  VImage compositeImage(VImage src, VImage dst) {
+  VImage CompositeImage(VImage src, VImage dst) {
     // Split src into non-alpha and alpha channels
     VImage srcWithoutAlpha = src.extract_band(0, VImage::option()->set("n", src.bands() - 1));
     VImage srcAlpha = src[src.bands() - 1] * (1.0 / 255.0);

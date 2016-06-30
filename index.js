@@ -8,6 +8,7 @@ var events = require('events');
 var semver = require('semver');
 var color = require('color');
 var BluebirdPromise = require('bluebird');
+
 var sharp = require('./build/Release/sharp');
 
 // Versioning
@@ -368,6 +369,8 @@ Sharp.prototype.overlayWith = function(overlay, options) {
     if(isInteger(options.left) && options.left >= 0 && isInteger(options.top) && options.top >= 0) {
       this.options.overlayXOffset = options.left;
       this.options.overlayYOffset = options.top;
+    } else if(isDefined(options.left) || isDefined(options.top)) {
+      throw new Error('Unsupported top and/or left offset values');
     } else if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
       this.options.overlayGravity = options.gravity;
     } else if (isString(options.gravity) && isInteger(module.exports.gravity[options.gravity])) {

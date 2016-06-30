@@ -23,12 +23,12 @@ namespace sharp {
   /*
     Check if the src and dst Images for composition operation are valid
   */
-  bool isInputValidForComposition(VImage src, VImage dst);
+  bool IsInputValidForComposition(VImage src, VImage dst);
 
   /*
     Given a valid src and dst, returns the composite of the two images
   */
-  VImage compositeImage(VImage src, VImage dst);
+  VImage CompositeImage(VImage src, VImage dst);
 
   /*
    * Stretch luminance to cover full dynamic range.
