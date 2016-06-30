@@ -18,6 +18,10 @@ Requires libvips v8.3.1
   [#443](https://github.com/lovell/sharp/pull/443)
   [@lemnisk8](https://github.com/lemnisk8)
 
+* Add cutout option to overlayWith feature, applies only the alpha channel of the overlay image.
+  [#448](https://github.com/lovell/sharp/pull/448)
+  [@kleisauke](https://github.com/kleisauke)
+
 * Ensure scaling factors are calculated independently to prevent rounding errors.
   [#452](https://github.com/lovell/sharp/issues/452)
   [@puzrin](https://github.com/puzrin)

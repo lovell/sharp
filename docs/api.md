@@ -432,6 +432,7 @@ Overlay (composite) a image containing an alpha channel over the processed (resi
 
 * `gravity` is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north` at which to place the overlay, defaulting to `center`/`centre`.
 * `tile` is a Boolean, defaulting to `false`. When set to `true` repeats the overlay image across the entire image with the given `gravity`.
+* `cutout` is a Boolean, defaulting to `false`. When set to `true` applies only the alpha channel of the overlay image to the image to be overlaid, giving the appearance of one image being cut out of another.
 
 ```javascript
 sharp('input.png')
@@ -542,7 +543,7 @@ The size, overlap, container and directory layout to use when generating square 
 * `container` is a String, with value `fs` or `zip`. The default value is `fs`.
 * `layout` is a String, with value `dz`, `zoomify` or `google`. The default value is `dz`.
 
-You can also use the file extension .zip or .szi to write to a ZIP container instead of the filesystem.
+You can also use the file extension `.zip` or `.szi` to write to a compressed archive file format.
 
 ```javascript
 sharp('input.tiff')
