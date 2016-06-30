@@ -277,7 +277,6 @@ namespace sharp {
     return std::make_tuple(left, top);
   }
 
-
   /*
     Calculate the (left, top) coordinates of the output image
     within the input image, applying the given x and y offsets.
@@ -311,6 +310,18 @@ namespace sharp {
     }
 
     return std::make_tuple(left, top);
+  }
+  /*
+    Return the image alpha maximum. Useful for combining alpha bands. scRGB
+    images are 0 - 1 for image data, but the alpha is 0 - 255.
+  */
+  int MaximumImageAlpha(VipsInterpretation interpretation) {
+    if(interpretation == VIPS_INTERPRETATION_RGB16 ||
+        interpretation == VIPS_INTERPRETATION_GREY16) {
+      return (65535);
+    } else {
+      return (255);
+    }
   }
 
 }  // namespace sharp

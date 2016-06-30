@@ -115,6 +115,9 @@ namespace sharp {
   std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,
     int const outWidth, int const outHeight, int const x, int const y);
 
+  int MaximumImageAlpha(VipsInterpretation interpretation);
+
+
 }  // namespace sharp
 
 #endif  // SRC_COMMON_H_

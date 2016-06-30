@@ -31,6 +31,11 @@ namespace sharp {
   VImage CompositeImage(VImage src, VImage dst);
 
   /*
+    Cutout src over dst with given gravity.
+  */
+  VImage Cutout(VImage src, VImage dst, const int gravity);
+
+  /*
    * Stretch luminance to cover full dynamic range.
    */
   VImage Normalize(VImage image);

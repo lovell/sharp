@@ -36,6 +36,7 @@ struct PipelineBaton {
   int overlayXOffset;
   int overlayYOffset;
   bool overlayTile;
+  bool overlayCutout;
   int topOffsetPre;
   int leftOffsetPre;
   int widthPre;
@@ -103,6 +104,7 @@ struct PipelineBaton {
     overlayXOffset(-1),
     overlayYOffset(-1),
     overlayTile(false),
+    overlayCutout(false),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),

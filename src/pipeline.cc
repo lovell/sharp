@@ -45,6 +45,7 @@ using vips::VOption;
 using vips::VError;
 
 using sharp::Composite;
+using sharp::Cutout;
 using sharp::Normalize;
 using sharp::Gamma;
 using sharp::Blur;
@@ -464,8 +465,9 @@ class PipelineWorker : public AsyncWorker {
       bool shouldBlur = baton->blurSigma != 0.0;
       bool shouldSharpen = baton->sharpenSigma != 0.0;
       bool shouldThreshold = baton->threshold != 0;
+      bool shouldCutout = baton->overlayCutout;
       bool shouldPremultiplyAlpha = HasAlpha(image) &&
-        (shouldAffineTransform || shouldBlur || shouldSharpen || hasOverlay);
+        (shouldAffineTransform || shouldBlur || shouldSharpen || (hasOverlay && !shouldCutout));
 
       // Premultiply image alpha channel before all transformations to avoid
       // dark fringing around bright pixels
@@ -708,14 +710,19 @@ class PipelineWorker : public AsyncWorker {
           // the overlayGravity was used for extract_area, therefore set it back to its default value of 0
           baton->overlayGravity = 0;
         }
-        // Ensure overlay is premultiplied sRGB
-        overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
-        if(baton->overlayXOffset >= 0 && baton->overlayYOffset >= 0) {
-          // Composite images with given offsets
-          image = Composite(overlayImage, image, baton->overlayXOffset, baton->overlayYOffset);
+        if(shouldCutout) {
+          // 'cut out' the image, premultiplication is not required
+          image = Cutout(overlayImage, image, baton->overlayGravity);
         } else {
-          // Composite images with given gravity
-          image = Composite(overlayImage, image, baton->overlayGravity);
+          // Ensure overlay is premultiplied sRGB
+          overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
+          if(baton->overlayXOffset >= 0 && baton->overlayYOffset >= 0) {
+            // Composite images with given offsets
+            image = Composite(overlayImage, image, baton->overlayXOffset, baton->overlayYOffset);
+          } else {
+            // Composite images with given gravity
+            image = Composite(overlayImage, image, baton->overlayGravity);
+          }
         }
       }
 
@@ -1102,6 +1109,7 @@ NAN_METHOD(pipeline) {
   baton->overlayXOffset = attrAs<int32_t>(options, "overlayXOffset");
   baton->overlayYOffset = attrAs<int32_t>(options, "overlayYOffset");
   baton->overlayTile = attrAs<bool>(options, "overlayTile");
+  baton->overlayCutout = attrAs<bool>(options, "overlayCutout");
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
   baton->crop = attrAs<int32_t>(options, "crop");
