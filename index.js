@@ -358,10 +358,18 @@ Sharp.prototype.overlayWith = function(overlay, options) {
     throw new Error('Unsupported overlay ' + typeof overlay);
   }
   if (isObject(options)) {
-    setTileOption(options.tile, this.options);
-    setCutoutOption(options.cutout, this.options);
-    setOffsetOption(options.top, options.left, this.options);
-    setGravityOption(options.gravity, this.options);
+    if(isDefined(options.tile)) {
+      setTileOption(options.tile, this.options);
+    }
+    if(isDefined(options.cutout)) {
+      setCutoutOption(options.cutout, this.options);  
+    }
+    if(isDefined(options.left) || isDefined(options.top)) {
+      setOffsetOption(options.top, options.left, this.options);  
+    }
+    if (isDefined(options.gravity)) {
+      setGravityOption(options.gravity, this.options);  
+    }
   }
   return this;
 };
@@ -372,7 +380,7 @@ Sharp.prototype.overlayWith = function(overlay, options) {
 function setTileOption(tile, options) {
   if(isBoolean(tile)) {
     options.overlayTile = tile;
-  } else if(isDefined(tile)) {
+  } else {
     throw new Error('Invalid Value for tile ' + tile + ' Only Boolean Values allowed for overlay.tile.');
   } 
 }
@@ -380,7 +388,7 @@ function setTileOption(tile, options) {
 function setCutoutOption(cutout, options) {
   if(isBoolean(cutout)) {
     options.overlayCutout = cutout;
-  } else if(isDefined(cutout)) {
+  } else {
     throw new Error('Invalid Value for cutout ' + cutout + ' Only Boolean Values allowed for overlay.cutout.');
   }
 }
@@ -389,7 +397,7 @@ function setOffsetOption(top, left, options) {
   if(isInteger(left) && left >= 0 && isInteger(top) && top >= 0) {
     options.overlayXOffset = left;
     options.overlayYOffset = top;
-  } else if(isDefined(left) || isDefined(top)) {
+  } else {
     throw new Error('Unsupported top and/or left offset values');
   }
 }
@@ -399,7 +407,7 @@ function setGravityOption(gravity, options) {
     options.overlayGravity = gravity;
   } else if (isString(gravity) && isInteger(module.exports.gravity[gravity])) {
     options.overlayGravity = module.exports.gravity[gravity];
-  } else if (isDefined(gravity)) {
+  } else {
     throw new Error('Unsupported overlay gravity ' + gravity);
   }
 }
