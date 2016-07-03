@@ -391,11 +391,13 @@ When a `sigma` is provided, performs a slower, more accurate sharpen of the L ch
 * `flat`, if present, is a Number representing the level of sharpening to apply to "flat" areas, defaulting to a value of 1.0.
 * `jagged`, if present, is a Number representing the level of sharpening to apply to "jagged" areas, defaulting to a value of 2.0.
 
-#### threshold([threshold])
+#### threshold([threshold], [options])
 
 Converts all pixels in the image to greyscale white or black.  Any pixel greather-than-or-equal-to the threshold (0..255) will be white.  All others will be black.
 
 * `threshold`, if present, is a Number, representing the level above which pixels will be forced to white.
+
+* `options`, an options object that may contain a boolean `grayscale` or `greyscale`. When `grayscale` is `true`, `threshold` returns a black and white image, and when `false` a color image with each channel thresholded independently. The default is `grayscale: true` when omitted.
 
 #### gamma([gamma])
 

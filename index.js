@@ -85,6 +85,7 @@ var Sharp = function(input, options) {
     sharpenFlat: 1,
     sharpenJagged: 2,
     threshold: 0,
+    thresholdGrayscale: true,
     gamma: 0,
     greyscale: false,
     normalize: 0,
@@ -487,7 +488,7 @@ Sharp.prototype.sharpen = function(sigma, flat, jagged) {
   return this;
 };
 
-Sharp.prototype.threshold = function(threshold) {
+Sharp.prototype.threshold = function(threshold, options) {
   if (typeof threshold === 'undefined') {
     this.options.threshold = 128;
   } else if (typeof threshold === 'boolean') {
@@ -497,6 +498,14 @@ Sharp.prototype.threshold = function(threshold) {
   } else {
     throw new Error('Invalid threshold (0 to 255) ' + threshold);
   }
+  
+  if(typeof options === 'undefined' ||
+     options.greyscale === true || options.grayscale === true) {
+    this.options.thresholdGrayscale = true;
+  } else {
+    this.options.thresholdGrayscale = false;
+  }
+    
   return this;
 };
 

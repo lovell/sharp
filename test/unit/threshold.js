@@ -52,7 +52,20 @@ describe('Threshold', function() {
         assert.strictEqual(240, info.height);
         fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data, done);
       });
+   });
+  
+  it('threshold grayscale: true (=128)', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .threshold(128,{'grayscale':true})
+      .toBuffer(function(err, data, info) {
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data, done);
+      });    
   });
+
 
   it('threshold default jpeg', function(done) {
     sharp(fixtures.inputJpg)
@@ -100,6 +113,18 @@ describe('Threshold', function() {
         });
     });
   }
+
+  it('color threshold', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .threshold(128,{'grayscale':false})
+      .toBuffer(function(err, data, info) {
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('threshold-color-128.jpg'), data, done);
+      });    
+  });
 
   it('invalid threshold -1', function() {
     assert.throws(function() {

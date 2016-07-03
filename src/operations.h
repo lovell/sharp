@@ -54,6 +54,11 @@ namespace sharp {
   */
   VImage TileCache(VImage image, double const factor);
 
+  /*
+    Threshold an image
+  */
+  VImage Threshold(VImage image, double const threshold, bool const thresholdColor);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_
