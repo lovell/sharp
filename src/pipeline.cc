@@ -640,9 +640,10 @@ class PipelineWorker : public AsyncWorker {
       // Convolve
       if (shouldConv) {
         image = Convolve(image,
-                            baton->convKernelWidth, baton->convKernelHeight,
-                            baton->convKernelScale, baton->convKernelOffset,
-                            baton->convKernel);
+          baton->convKernelWidth, baton->convKernelHeight,
+          baton->convKernelScale, baton->convKernelOffset,
+          baton->convKernel
+        );
       }
 
       // Sharpen
@@ -1165,13 +1166,12 @@ NAN_METHOD(pipeline) {
   // Convolution Kernel
   if(Has(options, New("convKernel").ToLocalChecked()).FromJust()) {
     Local<Object> kernel = Get(options, New("convKernel").ToLocalChecked()).ToLocalChecked().As<Object>();
-    baton->convKernelWidth = attrAs<int32_t>(kernel, "width");
-    baton->convKernelHeight = attrAs<int32_t>(kernel, "height");
+    baton->convKernelWidth = attrAs<uint32_t>(kernel, "width");
+    baton->convKernelHeight = attrAs<uint32_t>(kernel, "height");
     baton->convKernelScale = attrAs<double>(kernel, "scale");
     baton->convKernelOffset = attrAs<double>(kernel, "offset");
 
-    size_t kernelSize = baton->convKernelWidth * baton->convKernelHeight;
-
+    size_t const kernelSize = static_cast<size_t>(baton->convKernelWidth * baton->convKernelHeight);
     baton->convKernel = std::unique_ptr<double[]>(new double[kernelSize]);
     Local<Array> kdata = Get(kernel, New("kernel").ToLocalChecked()).ToLocalChecked().As<Array>();
     for(unsigned int i = 0; i < kernelSize; i++) {

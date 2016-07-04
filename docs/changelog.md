@@ -30,6 +30,10 @@ Requires libvips v8.3.1
   [#456](https://github.com/lovell/sharp/pull/456)
   [@kapouer](https://github.com/kapouer)
 
+* Add convolve operation for kernel-based convolution.
+  [#479](https://github.com/lovell/sharp/pull/479)
+  [@mhirsch](https://github.com/mhirsch)
+
 * Add greyscale option to threshold operation for colourspace conversion control.
   [#480](https://github.com/lovell/sharp/pull/480)
   [@mhirsch](https://github.com/mhirsch)

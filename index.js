@@ -450,18 +450,7 @@ Sharp.prototype.blur = function(sigma) {
 
 /*
   Convolve the image with a kernel.
-  Call with an object of the following form:
-  { 'width': N
-  , 'height': M
-  , 'scale': Z
-  , 'offset': Y
-  , 'kernel':
-             [ 1, 2, 3,
-               4, 5, 6,
-               7, 8, 9 ]
-  }
 */
-
 Sharp.prototype.convolve = function(kernel) {
   if (!isDefined(kernel) || !isDefined(kernel.kernel) ||
       !isDefined(kernel.width) || !isDefined(kernel.height) ||

@@ -383,18 +383,27 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur. This
 
 #### convolve(kernel)
 
-Convolve the image with the specified `kernel`. The kernel specification takes the following form:
+Convolve the image with the specified `kernel`, an Object with the following attributes:
 
-* `kernel = `
-  `{ 'width': N`
-  `, 'height': M`
-  `, 'scale': Z`
-  `, 'offset': Y`
-  `, 'kernel':`
-  `   [ 1, 2, 3,`
-  `     4, 5, 6,`
-  `     7, 8, 9 ]`
-  `}`
+* `width` is an integral Number representing the width of the kernel in pixels.
+* `height` is an integral Number representing the width of the kernel in pixels.
+* `kernel` is an Array of length `width*height` containing the kernel values.
+* `scale`, if present, is a Number representing the scale of the kernel in pixels, defaulting to the sum of the kernel's values.
+* `offset`, if present, is a Number representing the offset of the kernel in pixels, defaulting to 0.
+
+```javascript
+sharp(input)
+  .convolve({
+    width: 3,
+    height: 3,
+    kernel: [-1, 0, 1, -2, 0, 2, -1, 0, 1]
+  })
+  .raw()
+  .toBuffer(function(err, data, info) {
+    // data contains the raw pixel data representing the input image
+    // convolved with the horizontal Sobel operator
+  });
+```
 
 #### sharpen([sigma], [flat], [jagged])
 
