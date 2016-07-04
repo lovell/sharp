@@ -97,8 +97,8 @@ class PipelineWorker : public AsyncWorker {
     // Increment processing task counter
     g_atomic_int_inc(&counterProcess);
 
-    // Latest v2 sRGB ICC profile
-    std::string srgbProfile = baton->iccProfilePath + "sRGB_IEC61966-2-1_black_scaled.icc";
+    // Default sRGB ICC profile from https://packages.debian.org/sid/all/icc-profiles-free/filelist
+    std::string srgbProfile = baton->iccProfilePath + "sRGB.icc";
 
     // Input
     ImageType inputImageType = ImageType::UNKNOWN;
@@ -385,8 +385,8 @@ class PipelineWorker : public AsyncWorker {
           // Ignore failure of embedded profile
         }
       } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
-        // Convert to sRGB using default "USWebCoatedSWOP" CMYK profile
-        std::string cmykProfile = baton->iccProfilePath + "USWebCoatedSWOP.icc";
+        // Convert to sRGB using default CMYK profile from http://www.argyllcms.com/cmyk.icm
+        std::string cmykProfile = baton->iccProfilePath + "cmyk.icm";
         image = image.icc_transform(const_cast<char*>(srgbProfile.data()), VImage::option()
           ->set("input_profile", cmykProfile.data())
           ->set("intent", VIPS_INTENT_PERCEPTUAL)

@@ -30,6 +30,10 @@ Requires libvips v8.3.1
   [#456](https://github.com/lovell/sharp/pull/456)
   [@kapouer](https://github.com/kapouer)
 
+* Ensure ICC profiles are licenced for distribution.
+  [#486](https://github.com/lovell/sharp/issues/486)
+  [@kapouer](https://github.com/kapouer)
+
 #### v0.15.0 - 21<sup>st</sup> May 2016
 
 * Use libvips' new Lanczos 3 kernel as default for image reduction.

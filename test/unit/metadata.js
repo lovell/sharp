@@ -303,7 +303,9 @@ describe('Image metadata', function() {
           assert.strictEqual(true, metadata.icc instanceof Buffer);
           var profile = icc.parse(metadata.icc);
           assert.strictEqual('object', typeof profile);
-          assert.strictEqual('sRGB IEC61966-2-1 black scaled', profile.description);
+          assert.strictEqual('RGB', profile.colorSpace);
+          assert.strictEqual('Perceptual', profile.intent);
+          assert.strictEqual('Monitor', profile.deviceClass);
           done();
         });
       });
