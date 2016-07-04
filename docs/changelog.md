@@ -30,6 +30,10 @@ Requires libvips v8.3.1
   [#456](https://github.com/lovell/sharp/pull/456)
   [@kapouer](https://github.com/kapouer)
 
+* Add greyscale option to threshold operation for colourspace conversion control.
+  [#480](https://github.com/lovell/sharp/pull/480)
+  [@mhirsch](https://github.com/mhirsch)
+
 * Ensure ICC profiles are licenced for distribution.
   [#486](https://github.com/lovell/sharp/issues/486)
   [@kapouer](https://github.com/kapouer)

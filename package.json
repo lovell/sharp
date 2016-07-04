@@ -25,7 +25,8 @@
     "Samy Al Zahrani <samyalzahrany@gmail.com>",
     "Chintan Thakkar <lemnisk8@gmail.com>",
     "F. Orlando Galashan <frulo@gmx.de>",
-    "Kleis Auke Wolthuizen <info@kleisauke.nl>"
+    "Kleis Auke Wolthuizen <info@kleisauke.nl>",
+    "Matt Hirsch <mhirsch@media.mit.edu>"
   ],
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
   "scripts": {

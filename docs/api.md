@@ -393,11 +393,11 @@ When a `sigma` is provided, performs a slower, more accurate sharpen of the L ch
 
 #### threshold([threshold], [options])
 
-Converts all pixels in the image to greyscale white or black.  Any pixel greather-than-or-equal-to the threshold (0..255) will be white.  All others will be black.
+Any pixel value greather than or equal to the threshold value will be set to 255, otherwise it will be set to 0.
+By default, the image will be converted to single channel greyscale before thresholding.
 
-* `threshold`, if present, is a Number, representing the level above which pixels will be forced to white.
-
-* `options`, an options object that may contain a boolean `grayscale` or `greyscale`. When `grayscale` is `true`, `threshold` returns a black and white image, and when `false` a color image with each channel thresholded independently. The default is `grayscale: true` when omitted.
+* `threshold`, if present, is a Number between 0 and 255, representing the level at which the threshold will be applied. The default threshold is 128.
+* `options`, if present, is an Object containing a Boolean `greyscale` (or `grayscale`). When `false` each channel will have the threshold applied independently.
 
 #### gamma([gamma])
 

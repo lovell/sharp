@@ -94,6 +94,8 @@ the help and code contributions of the following people:
 * [Samy Al Zahrani](https://github.com/salzhrani)
 * [Chintan Thakkar](https://github.com/lemnisk8)
 * [F. Orlando Galashan](https://github.com/frulo)
+* [Kleis Auke Wolthuizen](https://github.com/kleisauke)
+* [Matt Hirsch](https://github.com/mhirsch)
 
 Thank you!
 
