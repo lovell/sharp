@@ -381,6 +381,21 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur. This
 
 * `sigma`, if present, is a Number between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
 
+#### convolve(kernel)
+
+Convolve the image with the specified `kernel`. The kernel specification takes the following form:
+
+* `kernel = `
+  `{ 'width': N`
+  `, 'height': M`
+  `, 'scale': Z`
+  `, 'offset': Y`
+  `, 'kernel':`
+  `   [ 1, 2, 3,`
+  `     4, 5, 6,`
+  `     7, 8, 9 ]`
+  `}`
+
 #### sharpen([sigma], [flat], [jagged])
 
 When used without parameters, performs a fast, mild sharpen of the output image. This typically reduces performance by 10%.

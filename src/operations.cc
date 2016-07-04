@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <tuple>
+#include <memory>
 #include <vips/vips8>
 
 #include "common.h"
@@ -209,6 +210,24 @@ namespace sharp {
       // Slower, accurate Gaussian blur
       return image.gaussblur(sigma);
     }
+  }
+
+  /*
+   * Convolution with a kernel.
+   */
+  VImage Convolve(VImage image, int width, int height, double scale, double offset,
+                  const std::unique_ptr<double[]> &kernel_v) {
+    VImage kernel = VImage::new_from_memory(
+      kernel_v.get(),
+      width * height * sizeof(double),
+      width,
+      height,
+      1,
+      VIPS_FORMAT_DOUBLE);
+    kernel.set("scale", scale);
+    kernel.set("offset", offset);
+
+    return image.conv(kernel);
   }
 
   /*

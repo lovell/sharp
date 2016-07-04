@@ -449,6 +449,43 @@ Sharp.prototype.blur = function(sigma) {
 };
 
 /*
+  Convolve the image with a kernel.
+  Call with an object of the following form:
+  { 'width': N
+  , 'height': M
+  , 'scale': Z
+  , 'offset': Y
+  , 'kernel':
+             [ 1, 2, 3,
+               4, 5, 6,
+               7, 8, 9 ]
+  }
+*/
+
+Sharp.prototype.convolve = function(kernel) {
+  if (!isDefined(kernel) || !isDefined(kernel.kernel) ||
+      !isDefined(kernel.width) || !isDefined(kernel.height) ||
+      !inRange(kernel.width,3,1001) || !inRange(kernel.height,3,1001) ||
+      kernel.height * kernel.width != kernel.kernel.length
+     ) {
+    // must pass in a kernel
+    throw new Error('Invalid convolution kernel');
+  }
+  if(!isDefined(kernel.scale)) {
+    var sum = 0;
+    kernel.kernel.forEach(function(e) {
+      sum += e;
+    });
+    kernel.scale = sum;
+  }
+  if(!isDefined(kernel.offset)) {
+    kernel.offset = 0;
+  }
+  this.options.convKernel = kernel;
+  return this;
+};
+
+/*
   Sharpen the output image.
   Call without a radius to use a fast, mild sharpen.
   Call with a radius to use a slow, accurate sharpen using the L of LAB colour space.

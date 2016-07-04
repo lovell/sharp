@@ -2,6 +2,7 @@
 #include <cmath>
 #include <tuple>
 #include <utility>
+#include <memory>
 
 #include <vips/vips8>
 
@@ -49,6 +50,7 @@ using sharp::Cutout;
 using sharp::Normalize;
 using sharp::Gamma;
 using sharp::Blur;
+using sharp::Convolve;
 using sharp::Sharpen;
 using sharp::EntropyCrop;
 using sharp::TileCache;
@@ -464,11 +466,12 @@ class PipelineWorker : public AsyncWorker {
 
       bool shouldAffineTransform = xresidual != 1.0 || yresidual != 1.0;
       bool shouldBlur = baton->blurSigma != 0.0;
+      bool shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool shouldSharpen = baton->sharpenSigma != 0.0;
       bool shouldThreshold = baton->threshold != 0;
       bool shouldCutout = baton->overlayCutout;
       bool shouldPremultiplyAlpha = HasAlpha(image) &&
-        (shouldAffineTransform || shouldBlur || shouldSharpen || (hasOverlay && !shouldCutout));
+        (shouldAffineTransform || shouldBlur || shouldConv || shouldSharpen || (hasOverlay && !shouldCutout));
 
       // Premultiply image alpha channel before all transformations to avoid
       // dark fringing around bright pixels
@@ -632,6 +635,14 @@ class PipelineWorker : public AsyncWorker {
       // Blur
       if (shouldBlur) {
         image = Blur(image, baton->blurSigma);
+      }
+
+      // Convolve
+      if (shouldConv) {
+        image = Convolve(image,
+                            baton->convKernelWidth, baton->convKernelHeight,
+                            baton->convKernelScale, baton->convKernelOffset,
+                            baton->convKernel);
       }
 
       // Sharpen
@@ -1150,6 +1161,22 @@ NAN_METHOD(pipeline) {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY;
   } else {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
+  }
+  // Convolution Kernel
+  if(Has(options, New("convKernel").ToLocalChecked()).FromJust()) {
+    Local<Object> kernel = Get(options, New("convKernel").ToLocalChecked()).ToLocalChecked().As<Object>();
+    baton->convKernelWidth = attrAs<int32_t>(kernel, "width");
+    baton->convKernelHeight = attrAs<int32_t>(kernel, "height");
+    baton->convKernelScale = attrAs<double>(kernel, "scale");
+    baton->convKernelOffset = attrAs<double>(kernel, "offset");
+
+    size_t kernelSize = baton->convKernelWidth * baton->convKernelHeight;
+
+    baton->convKernel = std::unique_ptr<double[]>(new double[kernelSize]);
+    Local<Array> kdata = Get(kernel, New("kernel").ToLocalChecked()).ToLocalChecked().As<Array>();
+    for(unsigned int i = 0; i < kernelSize; i++) {
+      baton->convKernel[i] = To<double>(Get(kdata, i).ToLocalChecked()).FromJust();
+    }
   }
 
   // Function to notify of queue length changes

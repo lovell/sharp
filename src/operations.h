@@ -2,6 +2,7 @@
 #define SRC_OPERATIONS_H_
 
 #include <tuple>
+#include <memory>
 #include <vips/vips8>
 
 using vips::VImage;
@@ -33,6 +34,12 @@ namespace sharp {
    * Gaussian blur. Use sigma of -1.0 for fast blur.
    */
   VImage Blur(VImage image, double const sigma);
+
+  /*
+   * Convolution with a kernel.
+   */
+  VImage Convolve(VImage image, int width, int height, double scale, double offset,
+                  const std::unique_ptr<double[]> &kernel_v);
 
   /*
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
