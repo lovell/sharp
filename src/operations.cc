@@ -244,9 +244,13 @@ namespace sharp {
       return image.conv(sharpen);
     } else {
       // Slow, accurate sharpen in LAB colour space, with control over flat vs jagged areas
+      VipsInterpretation colourspaceBeforeSharpen = image.interpretation();
+      if (colourspaceBeforeSharpen == VIPS_INTERPRETATION_RGB) {
+        colourspaceBeforeSharpen = VIPS_INTERPRETATION_sRGB;
+      }
       return image.sharpen(
         VImage::option()->set("sigma", sigma)->set("m1", flat)->set("m2", jagged)
-      );
+      ).colourspace(colourspaceBeforeSharpen);
     }
   }
 

@@ -38,6 +38,10 @@ Requires libvips v8.3.1
   [#486](https://github.com/lovell/sharp/issues/486)
   [@kapouer](https://github.com/kapouer)
 
+* Allow images with an alpha channel to work with LAB-colourspace based sharpen.
+  [#490](https://github.com/lovell/sharp/issues/490)
+  [@jwagner](https://github.com/jwagner)
+
 #### v0.15.0 - 21<sup>st</sup> May 2016
 
 * Use libvips' new Lanczos 3 kernel as default for image reduction.

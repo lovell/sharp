@@ -12,6 +12,7 @@ describe('Sharpen', function() {
       .resize(320, 240)
       .sharpen(6)
       .toBuffer(function(err, data, info) {
+        if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -24,6 +25,7 @@ describe('Sharpen', function() {
       .resize(320, 240)
       .sharpen(1.5, 0.5, 2.5)
       .toBuffer(function(err, data, info) {
+        if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -36,10 +38,25 @@ describe('Sharpen', function() {
       .resize(320, 240)
       .sharpen(3.5, 2, 4)
       .toBuffer(function(err, data, info) {
+        if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
         fixtures.assertSimilar(fixtures.expected('sharpen-5-2-4.jpg'), data, done);
+      });
+  });
+
+  it('specific radius/levels with alpha channel', function(done) {
+    sharp(fixtures.inputPngWithTransparency)
+      .resize(320, 240)
+      .sharpen(5, 4, 8)
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(4, info.channels);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('sharpen-rgba.png'), data, done);
       });
   });
 
@@ -48,6 +65,7 @@ describe('Sharpen', function() {
       .resize(320, 240)
       .sharpen()
       .toBuffer(function(err, data, info) {
+        if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -78,6 +96,7 @@ describe('Sharpen', function() {
       .resize(320, 240)
       .sharpen(false)
       .toBuffer(function(err, notSharpened, info) {
+        if (err) throw err;
         assert.strictEqual(true, notSharpened.length > 0);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -86,6 +105,7 @@ describe('Sharpen', function() {
           .resize(320, 240)
           .sharpen(true)
           .toBuffer(function(err, sharpened, info) {
+            if (err) throw err;
             assert.strictEqual(true, sharpened.length > 0);
             assert.strictEqual(true, sharpened.length > notSharpened.length);
             assert.strictEqual('jpeg', info.format);
