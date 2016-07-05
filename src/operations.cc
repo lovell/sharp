@@ -392,4 +392,11 @@ namespace sharp {
     return image.colourspace(VIPS_INTERPRETATION_B_W) >= threshold;
   }
 
+  /*
+    Perform boolean/bitwise operation on image color channels - results in one channel image
+  */
+  VImage Bandbool(VImage image, VipsOperationBoolean const boolean) {
+    return image.bandbool(boolean);
+  }
+
 }  // namespace sharp

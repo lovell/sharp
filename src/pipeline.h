@@ -92,6 +92,7 @@ struct PipelineBaton {
   int convKernelHeight;
   double convKernelScale;
   double convKernelOffset;
+  VipsOperationBoolean bandBoolOp;
   int tileSize;
   int tileOverlap;
   VipsForeignDzContainer tileContainer;
@@ -151,6 +152,7 @@ struct PipelineBaton {
     convKernelHeight(0),
     convKernelScale(0.0),
     convKernelOffset(0.0),
+    bandBoolOp(VIPS_OPERATION_BOOLEAN_LAST),
     tileSize(256),
     tileOverlap(0),
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),
