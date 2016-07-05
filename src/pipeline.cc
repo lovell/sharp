@@ -1206,17 +1206,13 @@ NAN_METHOD(pipeline) {
   std::string opStr = attrAsStr(options, "bandBoolOp");
   if(opStr == "and" ) {
     baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_AND;
-  }
-  else if(opStr == "or") {
+  } else if(opStr == "or") {
     baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_OR;
-  }
-  else if(opStr == "eor") {
+  } else if(opStr == "eor") {
     baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_EOR;
-  }
-  else if(opStr == "lshift") {
+  } else if(opStr == "lshift") {
     baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_LSHIFT;
-  }
-  else if(opStr == "rshift") {
+  } else if(opStr == "rshift") {
     baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_RSHIFT;
   }
 

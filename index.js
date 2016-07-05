@@ -603,7 +603,7 @@ Sharp.prototype.bandbool = function(boolOp) {
   }
   this.options.bandBoolOp = boolOp;
   return this;
-}
+};
 
 /*
   Convert to greyscale
