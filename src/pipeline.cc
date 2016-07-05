@@ -56,6 +56,7 @@ using sharp::EntropyCrop;
 using sharp::TileCache;
 using sharp::Threshold;
 using sharp::Bandbool;
+using sharp::Trim;
 
 using sharp::ImageType;
 using sharp::ImageTypeId;
@@ -205,6 +206,11 @@ class PipelineWorker : public AsyncWorker {
       if (baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
         image = image.rot(rotation);
         RemoveExifOrientation(image);
+      }
+
+      // Trim
+      if(baton->trimTolerance != 0) {
+        image = Trim(image, baton->trimTolerance);
       }
 
       // Pre extraction
@@ -1145,6 +1151,10 @@ NAN_METHOD(pipeline) {
   baton->sharpenJagged = attrAs<double>(options, "sharpenJagged");
   baton->threshold = attrAs<int32_t>(options, "threshold");
   baton->thresholdGrayscale = attrAs<bool>(options, "thresholdGrayscale");
+  baton->trimTolerance = attrAs<int32_t>(options, "trimTolerance");
+  if(baton->accessMethod == VIPS_ACCESS_SEQUENTIAL && baton->trimTolerance != 0) {
+    baton->accessMethod = VIPS_ACCESS_RANDOM;
+  }
   baton->gamma = attrAs<double>(options, "gamma");
   baton->greyscale = attrAs<bool>(options, "greyscale");
   baton->normalize = attrAs<bool>(options, "normalize");
