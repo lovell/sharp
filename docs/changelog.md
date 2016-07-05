@@ -30,6 +30,10 @@ Requires libvips v8.3.1
   [#456](https://github.com/lovell/sharp/pull/456)
   [@kapouer](https://github.com/kapouer)
 
+* Add top/left offset support to overlayWith operation.
+  [#473](https://github.com/lovell/sharp/pull/473)
+  [@rnanwani](https://github.com/rnanwani)
+
 * Add convolve operation for kernel-based convolution.
   [#479](https://github.com/lovell/sharp/pull/479)
   [@mhirsch](https://github.com/mhirsch)

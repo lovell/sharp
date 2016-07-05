@@ -96,6 +96,7 @@ the help and code contributions of the following people:
 * [F. Orlando Galashan](https://github.com/frulo)
 * [Kleis Auke Wolthuizen](https://github.com/kleisauke)
 * [Matt Hirsch](https://github.com/mhirsch)
+* [Rahul Nanwani](https://github.com/rnanwani)
 
 Thank you!
 

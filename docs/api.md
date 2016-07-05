@@ -400,8 +400,8 @@ sharp(input)
   })
   .raw()
   .toBuffer(function(err, data, info) {
-    // data contains the raw pixel data representing the input image
-    // convolved with the horizontal Sobel operator
+    // data contains the raw pixel data representing the convolution
+    // of the input image with the horizontal Sobel operator
   });
 ```
 
@@ -457,8 +457,12 @@ Overlay (composite) a image containing an alpha channel over the processed (resi
 `options`, if present, is an Object with the following optional attributes:
 
 * `gravity` is a String or an attribute of the `sharp.gravity` Object e.g. `sharp.gravity.north` at which to place the overlay, defaulting to `center`/`centre`.
+* `top` is an integral Number representing the pixel offset from the top edge.
+* `left` is an integral Number representing the pixel offset from the left edge.
 * `tile` is a Boolean, defaulting to `false`. When set to `true` repeats the overlay image across the entire image with the given `gravity`.
 * `cutout` is a Boolean, defaulting to `false`. When set to `true` applies only the alpha channel of the overlay image to the image to be overlaid, giving the appearance of one image being cut out of another.
+
+If both `top` and `left` are provided, they take precedence over `gravity`.
 
 ```javascript
 sharp('input.png')
