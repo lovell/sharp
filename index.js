@@ -93,6 +93,8 @@ var Sharp = function(input, options) {
     overlayFileIn: '',
     overlayBufferIn: null,
     overlayGravity: 0,
+    overlayXOffset : -1,
+    overlayYOffset : -1,
     overlayTile: false,
     overlayCutout: false,
     // output options
@@ -357,34 +359,60 @@ Sharp.prototype.overlayWith = function(overlay, options) {
     throw new Error('Unsupported overlay ' + typeof overlay);
   }
   if (isObject(options)) {
-    if (typeof options.tile === 'undefined') {
-      this.options.overlayTile = false;
+    if(isDefined(options.tile)) {
+      setTileOption(options.tile, this.options);
     }
-    else if (isBoolean(options.tile)) {
-      this.options.overlayTile = options.tile;
-    } else {
-      throw new Error('Invalid Value for tile ' + options.tile + ' Only Boolean Values allowed for overlay.tile.');
+    if(isDefined(options.cutout)) {
+      setCutoutOption(options.cutout, this.options);  
     }
-
-    if (typeof options.cutout === 'undefined') {
-      this.options.overlayCutout = false;
+    if(isDefined(options.left) || isDefined(options.top)) {
+      setOffsetOption(options.top, options.left, this.options);  
     }
-    else if (isBoolean(options.cutout)) {
-      this.options.overlayCutout = options.cutout;
-    } else {
-      throw new Error('Invalid Value for cutout ' + options.cutout + ' Only Boolean Values allowed for overlay.cutout.');
-    }
-
-    if (isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
-      this.options.overlayGravity = options.gravity;
-    } else if (isString(options.gravity) && isInteger(module.exports.gravity[options.gravity])) {
-      this.options.overlayGravity = module.exports.gravity[options.gravity];
-    } else if (isDefined(options.gravity)) {
-      throw new Error('Unsupported overlay gravity ' + options.gravity);
+    if (isDefined(options.gravity)) {
+      setGravityOption(options.gravity, this.options);  
     }
   }
   return this;
 };
+
+/*
+  Supporting functions for overlayWith
+*/
+function setTileOption(tile, options) {
+  if(isBoolean(tile)) {
+    options.overlayTile = tile;
+  } else {
+    throw new Error('Invalid Value for tile ' + tile + ' Only Boolean Values allowed for overlay.tile.');
+  } 
+}
+
+function setCutoutOption(cutout, options) {
+  if(isBoolean(cutout)) {
+    options.overlayCutout = cutout;
+  } else {
+    throw new Error('Invalid Value for cutout ' + cutout + ' Only Boolean Values allowed for overlay.cutout.');
+  }
+}
+
+function setOffsetOption(top, left, options) {
+  if(isInteger(left) && left >= 0 && isInteger(top) && top >= 0) {
+    options.overlayXOffset = left;
+    options.overlayYOffset = top;
+  } else {
+    throw new Error('Unsupported top and/or left offset values');
+  }
+}
+
+function setGravityOption(gravity, options) {
+  if(isInteger(gravity) && inRange(gravity, 0, 8)) {
+    options.overlayGravity = gravity;
+  } else if (isString(gravity) && isInteger(module.exports.gravity[gravity])) {
+    options.overlayGravity = module.exports.gravity[gravity];
+  } else {
+    throw new Error('Unsupported overlay gravity ' + gravity);
+  }
+}
+
 
 /*
   Rotate output image by 0, 90, 180 or 270 degrees

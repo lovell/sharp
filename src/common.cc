@@ -278,6 +278,40 @@ namespace sharp {
   }
 
   /*
+    Calculate the (left, top) coordinates of the output image
+    within the input image, applying the given x and y offsets.
+  */
+  std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,
+    int const outWidth, int const outHeight, int const x, int const y) {
+
+    // default values
+    int left = 0;
+    int top = 0;
+
+    // assign only if valid
+    if(x >= 0 && x < (inWidth - outWidth)) {
+      left = x;
+    } else if(x >= (inWidth - outWidth)) {
+      left = inWidth - outWidth;
+    }
+
+    if(y >= 0 && y < (inHeight - outHeight)) {
+      top = y;
+    } else if(x >= (inHeight - outHeight)) {
+      top = inHeight - outHeight;
+    }
+
+    // the resulting left and top could have been outside the image after calculation from bottom/right edges
+    if(left < 0) {
+      left = 0;
+    }
+    if(top < 0) {
+      top = 0;
+    }
+
+    return std::make_tuple(left, top);
+  }
+  /*
     Return the image alpha maximum. Useful for combining alpha bands. scRGB
     images are 0 - 1 for image data, but the alpha is 0 - 255.
   */

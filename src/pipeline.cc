@@ -703,10 +703,19 @@ class PipelineWorker : public AsyncWorker {
             int left;
             int top;
             overlayImage = overlayImage.replicate(across, down);
-            // the overlayGravity will now be used to CalculateCrop for extract_area
-            std::tie(left, top) = CalculateCrop(
-              overlayImage.width(), overlayImage.height(), image.width(), image.height(), baton->overlayGravity
-            );
+
+            if(baton->overlayXOffset >= 0 && baton->overlayYOffset >= 0) {
+              // the overlayX/YOffsets will now be used to CalculateCrop for extract_area
+              std::tie(left, top) = CalculateCrop(
+                overlayImage.width(), overlayImage.height(), image.width(), image.height(),
+                baton->overlayXOffset, baton->overlayYOffset
+              );
+            } else {
+              // the overlayGravity will now be used to CalculateCrop for extract_area
+              std::tie(left, top) = CalculateCrop(
+                overlayImage.width(), overlayImage.height(), image.width(), image.height(), baton->overlayGravity
+              );
+            }
             overlayImage = overlayImage.extract_area(
               left, top, image.width(), image.height()
             );
@@ -720,8 +729,13 @@ class PipelineWorker : public AsyncWorker {
         } else {
           // Ensure overlay is premultiplied sRGB
           overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
-          // Composite images with given gravity
-          image = Composite(overlayImage, image, baton->overlayGravity);
+          if(baton->overlayXOffset >= 0 && baton->overlayYOffset >= 0) {
+            // Composite images with given offsets
+            image = Composite(overlayImage, image, baton->overlayXOffset, baton->overlayYOffset);
+          } else {
+            // Composite images with given gravity
+            image = Composite(overlayImage, image, baton->overlayGravity);
+          }
         }
       }
 
@@ -1105,6 +1119,8 @@ NAN_METHOD(pipeline) {
     baton->overlayBufferIn = node::Buffer::Data(overlayBufferIn);
   }
   baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
+  baton->overlayXOffset = attrAs<int32_t>(options, "overlayXOffset");
+  baton->overlayYOffset = attrAs<int32_t>(options, "overlayYOffset");
   baton->overlayTile = attrAs<bool>(options, "overlayTile");
   baton->overlayCutout = attrAs<bool>(options, "overlayCutout");
   // Resize options
