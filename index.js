@@ -597,7 +597,7 @@ Sharp.prototype.bandbool = function(boolOp) {
     throw new Error('Invalid bandbool operation');
   }
   boolOp = boolOp.toLowerCase();
-  var ops = ['and', 'or', 'eor', 'lshift', 'rshift'];
+  var ops = ['and', 'or', 'eor'];
   if(ops.indexOf(boolOp) == -1) {
     throw new Error('Invalid bandbool operation');
   }

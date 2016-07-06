@@ -1210,10 +1210,6 @@ NAN_METHOD(pipeline) {
     baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_OR;
   } else if(opStr == "eor") {
     baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_EOR;
-  } else if(opStr == "lshift") {
-    baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_LSHIFT;
-  } else if(opStr == "rshift") {
-    baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_RSHIFT;
   }
 
   // Function to notify of queue length changes

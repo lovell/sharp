@@ -492,8 +492,6 @@ Perform a boolean or bitwise operation on image color channels. The result is a 
  * `and` performs a bitwise and operation, like the c-operator `&`
  * `or` performs a bitwise or operation, like the c-operator `|`
  * `eor` performs a bitwise exclusive or operation, like the c-operator `^`
- * `lshift` performs a bitwise left shift operation, like the c-operator `<<`
- * `rshift` performs a bitwise right shift operation, like the c-operator `>>`
 
 A `bandbool` example:
 
