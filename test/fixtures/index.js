@@ -79,6 +79,7 @@ module.exports = {
   inputPngOverlayLayer2LowAlpha: getPath('alpha-layer-2-ink-low-alpha.png'),
   inputPngAlphaPremultiplicationSmall: getPath('alpha-premultiply-1024x768-paper.png'),
   inputPngAlphaPremultiplicationLarge: getPath('alpha-premultiply-2048x1536-paper.png'),
+  inputPngBooleanNoAlpha: getPath('bandbool.png'),
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp
