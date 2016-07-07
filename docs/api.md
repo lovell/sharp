@@ -489,7 +489,7 @@ sharp('input.png')
 
 `path` is a String containing the path to write the image data to.
 
-If an explicit output format is not selected, it will be inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
+If an explicit output format is not selected, it will be inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported. Note that RAW format is only supported for buffer output.
 
 `callback`, if present, is called with two arguments `(err, info)` where:
 
@@ -500,7 +500,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 #### toBuffer([callback])
 
-Write image data to a Buffer, the format of which will match the input image by default. JPEG, PNG and WebP are supported.
+Write image data to a Buffer, the format of which will match the input image by default. JPEG, PNG WebP, and RAW are supported.
 
 `callback`, if present, gets three arguments `(err, buffer, info)` where:
 
