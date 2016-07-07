@@ -483,6 +483,24 @@ sharp('input.png')
   });
 ```
 
+#### bandbool(operation)
+
+Perform a bitwise boolean operation on image color channels (bands in vips terminology). The result is a single channel grayscale image. Bandbool is performed at the end of the image processing pipeline, after gamma correction, colorspace conversion, normalization, and other operations. This makes it possible to create an image that contains the unaltered result of the boolean operation. Note that the alpha channel of the image is included in `bandbool` operations. All channels are cast to an integer type before the operation. `bandbool` takes no effect on single channel images.
+
+`operation` is a string containing the name of the bitwise operator to be appled to image color channels, which can be one of:
+
+ * `and` performs a bitwise and operation, like the c-operator `&`
+ * `or` performs a bitwise or operation, like the c-operator `|`
+ * `eor` performs a bitwise exclusive or operation, like the c-operator `^`
+
+```javascript
+sharp('input.png')
+  .bandbool(sharp.bool.and)
+  .toFile('output.png')
+```
+
+In the above example if `input.png` is a 3 channel RGB image, `output.png` will be a 1 channel grayscale image where each pixel `P = R & G & B`. For example, if `I(1,1) = [247, 170, 14] = [0b11110111, 0b10101010, 0b00001111]` then `O(1,1) = 0b11110111 & 0b10101010 & 0b00001111 = 0b00000010 = 2`.
+  
 ### Output
 
 #### toFile(path, [callback])

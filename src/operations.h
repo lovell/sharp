@@ -82,6 +82,11 @@ namespace sharp {
   */
   VImage Threshold(VImage image, double const threshold, bool const thresholdColor);
 
+  /*
+    Perform boolean/bitwise operation on image color channels - results in one channel image
+  */
+  VImage Bandbool(VImage image, VipsOperationBoolean const boolean);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_
