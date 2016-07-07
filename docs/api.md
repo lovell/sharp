@@ -500,7 +500,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 #### toBuffer([callback])
 
-Write image data to a Buffer, the format of which will match the input image by default. JPEG, PNG WebP, and RAW are supported.
+Write image data to a Buffer, the format of which will match the input image by default. JPEG, PNG, WebP, and RAW are supported.
 
 `callback`, if present, gets three arguments `(err, buffer, info)` where:
 
