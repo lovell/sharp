@@ -784,14 +784,30 @@ describe('Input/output', function() {
   if (sharp.format.vips.input.file) {
     it("Load Vips V file", function(done) {
       sharp(fixtures.inputV)
-        .resize(320,240)
         .jpeg()
         .toBuffer(function(err, data, info) {
           if (err) throw err;
           assert.strictEqual(true, data.length > 0);
           assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(240, info.height);
+          assert.strictEqual(70, info.width);
+          assert.strictEqual(60, info.height);
+          fixtures.assertSimilar(fixtures.expected('vfile.jpg'), data, done);
+        });
+    });
+  }
+
+  if (sharp.format.vips.output.file) {
+    it("Save Vips V file", function(done) {
+      sharp(fixtures.inputJpg)
+        .extract({left: 910, top: 1105, width: 70, height: 60})
+        .v()
+        .toFile(fixtures.outputV, function(err, info) {
+          if(err) throw err;
+          assert.strictEqual(true, info.size > 0);
+          assert.strictEqual('v', info.format);
+          assert.strictEqual(70, info.width);
+          assert.strictEqual(60, info.height);
+          fs.unlinkSync(fixtures.outputV);
           done();
         });
     });

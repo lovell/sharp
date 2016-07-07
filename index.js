@@ -944,6 +944,7 @@ Sharp.prototype.webp = function() {
 */
 Sharp.prototype.v = function() {
   this.options.formatOut = 'v';
+  return this;
 };
 Sharp.prototype.vips = Sharp.prototype.v;
 
