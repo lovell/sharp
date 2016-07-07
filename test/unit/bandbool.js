@@ -13,6 +13,7 @@ describe('Bandbool per-channel boolean operations', function() {
         if (err) throw err;
         assert.strictEqual(200, info.width);
         assert.strictEqual(200, info.height);
+        assert.strictEqual(1, info.channels);
         fixtures.assertSimilar(fixtures.expected('bandbool_and_result.png'), data, done);
       });
   });
@@ -24,6 +25,7 @@ describe('Bandbool per-channel boolean operations', function() {
         if (err) throw err;
         assert.strictEqual(200, info.width);
         assert.strictEqual(200, info.height);
+        assert.strictEqual(1, info.channels);
         fixtures.assertSimilar(fixtures.expected('bandbool_or_result.png'), data, done);
       });
   });
@@ -35,6 +37,7 @@ describe('Bandbool per-channel boolean operations', function() {
         if (err) throw err;
         assert.strictEqual(200, info.width);
         assert.strictEqual(200, info.height);
+        assert.strictEqual(1, info.channels);
         fixtures.assertSimilar(fixtures.expected('bandbool_eor_result.png'), data, done);
       });
   });
