@@ -89,6 +89,7 @@ var Sharp = function(input, options) {
     gamma: 0,
     greyscale: false,
     normalize: 0,
+    bandBoolOp: null,
     // overlay
     overlayFileIn: '',
     overlayBufferIn: null,
@@ -589,6 +590,22 @@ Sharp.prototype.normalize = function(normalize) {
 Sharp.prototype.normalise = Sharp.prototype.normalize;
 
 /*
+  Perform boolean/bitwise operation on image color channels - results in one channel image
+*/
+Sharp.prototype.bandbool = function(boolOp) {
+  if(typeof boolOp !== 'string') {
+    throw new Error('Invalid bandbool operation');
+  }
+  boolOp = boolOp.toLowerCase();
+  var ops = ['and', 'or', 'eor'];
+  if(ops.indexOf(boolOp) == -1) {
+    throw new Error('Invalid bandbool operation');
+  }
+  this.options.bandBoolOp = boolOp;
+  return this;
+};
+
+/*
   Convert to greyscale
 */
 Sharp.prototype.greyscale = function(greyscale) {
@@ -784,6 +801,12 @@ module.exports.interpolator = {
   locallyBoundedBicubic: 'lbb',
   vsqbs: 'vsqbs',
   vertexSplitQuadraticBasisSpline: 'vsqbs'
+};
+// Boolean operations for bandbool
+module.exports.bool = {
+  and: 'and',
+  or: 'or',
+  eor: 'eor'
 };
 
 /*

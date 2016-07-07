@@ -55,6 +55,7 @@ using sharp::Sharpen;
 using sharp::EntropyCrop;
 using sharp::TileCache;
 using sharp::Threshold;
+using sharp::Bandbool;
 
 using sharp::ImageType;
 using sharp::ImageTypeId;
@@ -471,6 +472,8 @@ class PipelineWorker : public AsyncWorker {
       bool shouldSharpen = baton->sharpenSigma != 0.0;
       bool shouldThreshold = baton->threshold != 0;
       bool shouldCutout = baton->overlayCutout;
+      bool shouldBandbool = baton->bandBoolOp < VIPS_OPERATION_BOOLEAN_LAST &&
+                            baton->bandBoolOp >= VIPS_OPERATION_BOOLEAN_AND;
       bool shouldPremultiplyAlpha = HasAlpha(image) &&
         (shouldAffineTransform || shouldBlur || shouldConv || shouldSharpen || (hasOverlay && !shouldCutout));
 
@@ -773,6 +776,11 @@ class PipelineWorker : public AsyncWorker {
             ->set("embedded", TRUE)
           );
         }
+      }
+
+      // Apply per-channel Bandbool bitwise operations after all other operations
+      if (shouldBandbool) {
+        image = Bandbool(image, baton->bandBoolOp);
       }
 
       // Override EXIF Orientation tag
@@ -1202,6 +1210,15 @@ NAN_METHOD(pipeline) {
     for(unsigned int i = 0; i < kernelSize; i++) {
       baton->convKernel[i] = To<double>(Get(kdata, i).ToLocalChecked()).FromJust();
     }
+  }
+  // Bandbool operation
+  std::string opStr = attrAsStr(options, "bandBoolOp");
+  if(opStr == "and" ) {
+    baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_AND;
+  } else if(opStr == "or") {
+    baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_OR;
+  } else if(opStr == "eor") {
+    baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_EOR;
   }
 
   // Function to notify of queue length changes
