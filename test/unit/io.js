@@ -781,6 +781,22 @@ describe('Input/output', function() {
     });
   }
 
+  if (sharp.format.vips.input.file) {
+    it("Load Vips V file", function(done) {
+      sharp(fixtures.inputV)
+        .resize(320,240)
+        .jpeg()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(240, info.height);
+          done();
+        });
+    });
+  }
+      
   if (sharp.format.raw.output.buffer) {
     describe('Ouput raw, uncompressed image data', function() {
       it('1 channel greyscale image', function(done) {
