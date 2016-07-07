@@ -495,7 +495,7 @@ Perform a bitwise boolean operation on image color channels (bands in vips termi
 
 ```javascript
 sharp('input.png')
-  .bandbool('and')
+  .bandbool(sharp.bool.and)
   .toFile('output.png')
 ```
 

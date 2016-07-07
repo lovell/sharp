@@ -20,7 +20,7 @@ describe('Bandbool per-channel boolean operations', function() {
 
   it('\'or\' Operation', function(done) {
     sharp(fixtures.inputPngBooleanNoAlpha)
-      .bandbool('or')
+      .bandbool(sharp.bool.or)
       .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(200, info.width);

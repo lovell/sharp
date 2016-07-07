@@ -802,6 +802,12 @@ module.exports.interpolator = {
   vsqbs: 'vsqbs',
   vertexSplitQuadraticBasisSpline: 'vsqbs'
 };
+// Boolean operations for bandbool
+module.exports.bool = {
+  and: 'and',
+  or: 'or',
+  eor: 'eor'
+};
 
 /*
   Resize image to width x height pixels
