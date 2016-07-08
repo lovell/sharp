@@ -800,7 +800,6 @@ describe('Input/output', function() {
     it("Save Vips V file", function(done) {
       sharp(fixtures.inputJpg)
         .extract({left: 910, top: 1105, width: 70, height: 60})
-        .v()
         .toFile(fixtures.outputV, function(err, info) {
           if(err) throw err;
           assert.strictEqual(true, info.size > 0);

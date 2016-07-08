@@ -940,15 +940,6 @@ Sharp.prototype.webp = function() {
 };
 
 /*
-  Force VIPS file output
-*/
-Sharp.prototype.v = function() {
-  this.options.formatOut = 'v';
-  return this;
-};
-Sharp.prototype.vips = Sharp.prototype.v;
-
-/*
   Force raw, uint8 output
 */
 Sharp.prototype.raw = function() {
@@ -966,7 +957,7 @@ Sharp.prototype.toFormat = function(formatOut) {
   }
   if (
     isDefined(formatOut) &&
-      ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'v', 'input'].indexOf(formatOut) !== -1
+      ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'].indexOf(formatOut) !== -1
   ) {
     this.options.formatOut = formatOut;
   } else {
