@@ -8,7 +8,7 @@ var sharp = require('../../index');
 describe('Boolean operation between two images', function() {
 
   it('\'and\' Operation, file', function(done) {
-    sharp('/home/mhirsch/sharp/test/fixtures/2569067123_aca715a2ee_o.jpg') //fixtures.inputJpg
+    sharp(fixtures.inputJpg) //fixtures.inputJpg
       .resize(320,240)
       .boolean(fixtures.inputJpgBooleanTest, sharp.bool.and)
       .toBuffer(function(err, data, info) {
@@ -27,7 +27,7 @@ describe('Boolean operation between two images', function() {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        //fixtures.assertSimilar(fixtures.expected('boolean_or_result.jpg'), data, done);
+        fixtures.assertSimilar(fixtures.expected('boolean_or_result.jpg'), data, done);
         done();
       });
   });
