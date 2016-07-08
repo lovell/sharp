@@ -18,8 +18,6 @@
 #include "operations.h"
 #include "pipeline.h"
 
-#include <iostream>
-
 using v8::Handle;
 using v8::Local;
 using v8::Value;
@@ -84,13 +82,18 @@ using sharp::counterProcess;
 using sharp::counterQueue;
 using sharp::GetBooleanOperation;
 
+typedef struct BufferContainer_t {
+  std::string name;
+  Local<Object> nodeBuf;
+} BufferContainer;
+
 class PipelineWorker : public AsyncWorker {
  public:
   PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
-                 const std::vector<Local<Object>> saveBuffers) :
+                 const std::vector<BufferContainer> saveBuffers) :
     AsyncWorker(callback), baton(baton), queueListener(queueListener), saveBuffers(saveBuffers) {
-    for (unsigned int i = 0; i < saveBuffers.size(); i++) {
-      SaveToPersistent(UniqueName(saveBuffers[i]).c_str(), saveBuffers[i]);
+    for (const BufferContainer buf : saveBuffers) {
+      SaveToPersistent(buf.name.c_str(), buf.nodeBuf);
     }
   }
   ~PipelineWorker() {}
@@ -1025,8 +1028,8 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Dispose of Persistent wrapper around input Buffers so they can be garbage collected
-    for (unsigned int i = 0; i < saveBuffers.size(); i++) {
-      GetFromPersistent(UniqueName(saveBuffers[i]).c_str());
+    for (const BufferContainer buf : saveBuffers) {
+      GetFromPersistent(buf.name.c_str());
     }
     delete baton;
 
@@ -1043,7 +1046,7 @@ class PipelineWorker : public AsyncWorker {
  private:
   PipelineBaton *baton;
   Callback *queueListener;
-  std::vector<Local<Object>> saveBuffers;
+  std::vector<BufferContainer> saveBuffers;
 
   /*
     Calculate the angle of rotation and need-to-flip for the output image.
@@ -1086,16 +1089,6 @@ class PipelineWorker : public AsyncWorker {
     // Clean up libvips' per-request data and threads
     vips_error_clear();
     vips_thread_shutdown();
-  }
-
-  /*
-    Create a unique buffer name for node from the memory address of the buffer
-  */
-  const std::string UniqueName(const Local<Object> &nodeBuf) {
-    std::stringstream ss;
-    ss << std::hex << static_cast<const void*>(&nodeBuf);
-    std::cout << ss.str() << std::endl;
-    return ss.str();
   }
 };
 
@@ -1274,13 +1267,13 @@ NAN_METHOD(pipeline) {
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
 
-  std::vector<Local<Object>> saveBuffers;
+  std::vector<BufferContainer> saveBuffers;
   if (baton->bufferInLength)
-    saveBuffers.push_back(bufferIn);
+    saveBuffers.push_back({"bufferIn", bufferIn});
   if (baton->overlayBufferInLength)
-    saveBuffers.push_back(overlayBufferIn);
+    saveBuffers.push_back({"overlayBufferIn", overlayBufferIn});
   if (baton->booleanBufferInLength)
-    saveBuffers.push_back(booleanBufferIn);
+    saveBuffers.push_back({"booleanBufferIn", booleanBufferIn});
   AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, saveBuffers));
 
   // Increment queued task counter
