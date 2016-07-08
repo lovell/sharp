@@ -176,10 +176,13 @@ describe('Partial image extraction', function() {
       });
     });
 
-    it('Bad image area', function() {
-      assert.throws(function() {
-        sharp(fixtures.inputJpg).extract({ left: 3000, top: 10, width: 10, height: 10 });
-      });
+    it('Bad image area', function(done) {
+      sharp(fixtures.inputJpg)
+        .extract({ left: 3000, top: 10, width: 10, height: 10 })
+        .toBuffer(function(err) {
+          assert(err instanceof Error);
+          done();
+        });
     });
   });
 });
