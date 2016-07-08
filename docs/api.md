@@ -510,7 +510,7 @@ Perform a bitwise boolean operation with `image`.
 * Buffer contianing PNG, WebP, GIF or SVG image data, or
 * String containing the path to an image file
 
-This operation creates an output image where each pixel is the result of the selected bitwise boolean `operation`, which can be one of the following:
+This operation creates an output image where each pixel is the result of the selected bitwise boolean `operation`, between the corresponding pixels of the input images. The boolean operation can be one of the following:
 
  * `and` performs a bitwise and operation, like the c-operator `&`
  * `or` performs a bitwise or operation, like the c-operator `|`
