@@ -15,7 +15,7 @@ describe('Image channel extraction', function() {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-red.jpg'), data, { threshold: 8 }, done);
+        fixtures.assertSimilar(fixtures.expected('extract-red.jpg'), data, done);
       });
   });
 
@@ -27,7 +27,7 @@ describe('Image channel extraction', function() {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-green.jpg'), data, { threshold: 8 }, done);
+        fixtures.assertSimilar(fixtures.expected('extract-green.jpg'), data, done);
       });
   });
 
@@ -39,7 +39,7 @@ describe('Image channel extraction', function() {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-blue.jpg'), data, { threshold: 8 }, done);
+        fixtures.assertSimilar(fixtures.expected('extract-blue.jpg'), data, done);
       });
   });
 
@@ -51,7 +51,7 @@ describe('Image channel extraction', function() {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-blue.jpg'), data, { threshold: 8 }, done);
+        fixtures.assertSimilar(fixtures.expected('extract-blue.jpg'), data, done);
       });
   });
 
