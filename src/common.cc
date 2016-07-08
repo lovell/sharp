@@ -328,14 +328,9 @@ namespace sharp {
     Get VIPS Boolean operatoin type from string
   */
   VipsOperationBoolean GetBooleanOperation(std::string opStr) {
-    if(opStr == "and" ) {
-      return VIPS_OPERATION_BOOLEAN_AND;
-    } else if(opStr == "or") {
-      return VIPS_OPERATION_BOOLEAN_OR;
-    } else if(opStr == "eor") {
-      return VIPS_OPERATION_BOOLEAN_EOR;
-    }
-    return VIPS_OPERATION_BOOLEAN_LAST;
+    return static_cast<VipsOperationBoolean>(
+      vips_enum_from_nick(nullptr, VIPS_TYPE_OPERATION_BOOLEAN, opStr.data())
+    );
   }
 
 }  // namespace sharp
