@@ -483,13 +483,31 @@ sharp('input.png')
   });
 ```
 
+#### bandbool(operation)
+
+Perform a bitwise boolean operation on image color channels (bands in vips terminology). The result is a single channel grayscale image. Bandbool is performed at the end of the image processing pipeline, after gamma correction, colorspace conversion, normalization, and other operations. This makes it possible to create an image that contains the unaltered result of the boolean operation. Note that the alpha channel of the image is included in `bandbool` operations. All channels are cast to an integer type before the operation. `bandbool` takes no effect on single channel images.
+
+`operation` is a string containing the name of the bitwise operator to be appled to image color channels, which can be one of:
+
+ * `and` performs a bitwise and operation, like the c-operator `&`
+ * `or` performs a bitwise or operation, like the c-operator `|`
+ * `eor` performs a bitwise exclusive or operation, like the c-operator `^`
+
+```javascript
+sharp('input.png')
+  .bandbool(sharp.bool.and)
+  .toFile('output.png')
+```
+
+In the above example if `input.png` is a 3 channel RGB image, `output.png` will be a 1 channel grayscale image where each pixel `P = R & G & B`. For example, if `I(1,1) = [247, 170, 14] = [0b11110111, 0b10101010, 0b00001111]` then `O(1,1) = 0b11110111 & 0b10101010 & 0b00001111 = 0b00000010 = 2`.
+  
 ### Output
 
 #### toFile(path, [callback])
 
 `path` is a String containing the path to write the image data to.
 
-If an explicit output format is not selected, it will be inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported.
+If an explicit output format is not selected, it will be inferred from the extension, with JPEG, PNG, WebP, TIFF and DZI supported. Note that RAW format is only supported for buffer output.
 
 `callback`, if present, is called with two arguments `(err, info)` where:
 
@@ -500,7 +518,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 #### toBuffer([callback])
 
-Write image data to a Buffer, the format of which will match the input image by default. JPEG, PNG and WebP are supported.
+Write image data to a Buffer, the format of which will match the input image by default. JPEG, PNG, WebP, and RAW are supported.
 
 `callback`, if present, gets three arguments `(err, buffer, info)` where:
 
