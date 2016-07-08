@@ -781,7 +781,7 @@ describe('Input/output', function() {
     });
   }
 
-  if (sharp.format.vips.input.file) {
+  if (sharp.format.v.input.file) {
     it("Load Vips V file", function(done) {
       sharp(fixtures.inputV)
         .jpeg()
@@ -796,7 +796,7 @@ describe('Input/output', function() {
     });
   }
 
-  if (sharp.format.vips.output.file) {
+  if (sharp.format.v.output.file) {
     it("Save Vips V file", function(done) {
       sharp(fixtures.inputJpg)
         .extract({left: 910, top: 1105, width: 70, height: 60})
