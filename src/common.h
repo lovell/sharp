@@ -115,6 +115,10 @@ namespace sharp {
   std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,
     int const outWidth, int const outHeight, int const x, int const y);
 
+  /*
+    Return the image alpha maximum. Useful for combining alpha bands. scRGB
+    images are 0 - 1 for image data, but the alpha is 0 - 255.
+  */
   int MaximumImageAlpha(VipsInterpretation interpretation);
 
 
