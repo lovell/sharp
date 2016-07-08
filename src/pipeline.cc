@@ -79,22 +79,23 @@ using sharp::counterProcess;
 using sharp::counterQueue;
 using sharp::GetBooleanOperation;
 
+typedef struct BufferContainer_t {
+  std::string name;
+  Local<Object> nodeBuf;
+  size_t length;
+} BufferContainer;
+
 class PipelineWorker : public AsyncWorker {
  public:
   PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
-    const Local<Object> &bufferIn, const Local<Object> &overlayBufferIn,
-    const Local<Object> &booleanBufferIn) :
+                 const std::vector<BufferContainer> saveBuffers) :
     AsyncWorker(callback), baton(baton), queueListener(queueListener) {
-      if (baton->bufferInLength > 0) {
-        SaveToPersistent("bufferIn", bufferIn);
-      }
-      if (baton->overlayBufferInLength > 0) {
-        SaveToPersistent("overlayBufferIn", overlayBufferIn);
-      }
-      if (baton->booleanBufferInLength > 0) {
-        SaveToPersistent("booleanBufferIn", booleanBufferIn);
+    for (const BufferContainer b : saveBuffers) {
+      if (b.length > 0) {
+        SaveToPersistent(b.name.c_str(), b.nodeBuf);
       }
     }
+  }
   ~PipelineWorker() {}
 
   /*
@@ -1270,7 +1271,12 @@ NAN_METHOD(pipeline) {
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn, overlayBufferIn, booleanBufferIn));
+
+  std::vector<BufferContainer> saveBuffers;
+  saveBuffers.push_back({"bufferIn", bufferIn, baton->bufferInLength});
+  saveBuffers.push_back({"overlayBufferIn", overlayBufferIn, baton->overlayBufferInLength});
+  saveBuffers.push_back({"booleanBufferIn", booleanBufferIn, baton->booleanBufferInLength});
+  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, saveBuffers));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);
