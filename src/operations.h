@@ -87,6 +87,11 @@ namespace sharp {
   */
   VImage Bandbool(VImage image, VipsOperationBoolean const boolean);
 
+  /*
+    Perform bitwise boolean operation between images
+  */
+  VImage Boolean(VImage image, VImage imageR, VipsOperationBoolean const boolean);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

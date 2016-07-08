@@ -90,6 +90,9 @@ var Sharp = function(input, options) {
     greyscale: false,
     normalize: 0,
     bandBoolOp: null,
+    booleanOp: null,
+    booleanBufferIn: null,
+    booleanFileIn: '',
     // overlay
     overlayFileIn: '',
     overlayBufferIn: null,
@@ -345,6 +348,30 @@ Sharp.prototype.flatten = function(flatten) {
 
 Sharp.prototype.negate = function(negate) {
   this.options.negate = (typeof negate === 'boolean') ? negate : true;
+  return this;
+};
+
+/*
+  Bitwise boolean operations between images
+*/
+Sharp.prototype.boolean = function(operand, operator) {
+  if (isString(operand)) {
+    this.options.booleanFileIn = operand;
+  } else if (isBuffer(operand)) {
+    this.options.booleanBufferIn = operand;
+  } else {
+    throw new Error('Unsupported boolean operand ' + typeof operand);
+  }
+  if (!isString(operator)) {
+    throw new Error('Invalid boolean operation ' + operator);
+  }
+  operator = operator.toLowerCase();
+  var ops = ['and', 'or', 'eor'];
+  if(ops.indexOf(operator) == -1) {
+    throw new Error('Invalid boolean operation ' + operator);
+  }
+  this.options.booleanOp = operator;
+
   return this;
 };
 

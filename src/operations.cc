@@ -399,4 +399,11 @@ namespace sharp {
     return image.bandbool(boolean);
   }
 
+  /*
+    Perform bitwise boolean operation between images
+  */
+  VImage Boolean(VImage image, VImage imageR, VipsOperationBoolean const boolean) {
+    return image.boolean(imageR, boolean);
+  }
+
 }  // namespace sharp

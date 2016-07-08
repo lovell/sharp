@@ -95,6 +95,8 @@ module.exports = {
   inputPngStripesV: getPath('stripesV.png'),
   inputPngStripesH: getPath('stripesH.png'),
 
+  inputJpgBooleanTest: getPath('booleanTest.jpg'),
+
   outputJpg: getPath('output.jpg'),
   outputPng: getPath('output.png'),
   outputWebP: getPath('output.webp'),

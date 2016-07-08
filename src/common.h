@@ -117,6 +117,11 @@ namespace sharp {
 
   int MaximumImageAlpha(VipsInterpretation interpretation);
 
+  /*
+    Get VIPS Boolean operatoin type from string
+  */
+  VipsOperationBoolean GetBooleanOperation(std::string opStr);
+
 
 }  // namespace sharp
 

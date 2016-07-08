@@ -500,6 +500,21 @@ sharp('input.png')
 ```
 
 In the above example if `input.png` is a 3 channel RGB image, `output.png` will be a 1 channel grayscale image where each pixel `P = R & G & B`. For example, if `I(1,1) = [247, 170, 14] = [0b11110111, 0b10101010, 0b00001111]` then `O(1,1) = 0b11110111 & 0b10101010 & 0b00001111 = 0b00000010 = 2`.
+
+#### boolean(image, operation)
+
+Perform a bitwise boolean operation with `image`.
+
+`image` is one of the following.
+
+* Buffer contianing PNG, WebP, GIF or SVG image data, or
+* String containing the path to an image file
+
+This operation creates an output image where each pixel is the result of the selected bitwise boolean `operation`, which can be one of the following:
+
+ * `and` performs a bitwise and operation, like the c-operator `&`
+ * `or` performs a bitwise or operation, like the c-operator `|`
+ * `eor` performs a bitwise exclusive or operation, like the c-operator `^`
   
 ### Output
 
