@@ -175,5 +175,14 @@ describe('Partial image extraction', function() {
         sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: 10, height: null });
       });
     });
+
+    it('Bad image area', function(done) {
+      sharp(fixtures.inputJpg)
+        .extract({ left: 3000, top: 10, width: 10, height: 10 })
+        .toBuffer(function(err) {
+          assert(err instanceof Error);
+          done();
+        });
+    });
   });
 });
