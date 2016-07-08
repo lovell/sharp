@@ -9,6 +9,9 @@
 #include <node.h>
 #include <node_buffer.h>
 
+#include <sstream>
+#include <iomanip>
+
 #include "nan.h"
 
 #include "common.h"
@@ -79,21 +82,13 @@ using sharp::counterProcess;
 using sharp::counterQueue;
 using sharp::GetBooleanOperation;
 
-typedef struct BufferContainer_t {
-  std::string name;
-  Local<Object> nodeBuf;
-  size_t length;
-} BufferContainer;
-
 class PipelineWorker : public AsyncWorker {
  public:
   PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
-                 const std::vector<BufferContainer> saveBuffers) :
-    AsyncWorker(callback), baton(baton), queueListener(queueListener) {
-    for (const BufferContainer b : saveBuffers) {
-      if (b.length > 0) {
-        SaveToPersistent(b.name.c_str(), b.nodeBuf);
-      }
+                 const std::vector<Local<Object>> saveBuffers) :
+    AsyncWorker(callback), baton(baton), queueListener(queueListener), saveBuffers(saveBuffers) {
+    for (const Local<Object> buf : saveBuffers) {
+      SaveToPersistent(UniqueName(buf).c_str(), buf);
     }
   }
   ~PipelineWorker() {}
@@ -1028,14 +1023,8 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Dispose of Persistent wrapper around input Buffers so they can be garbage collected
-    if (baton->bufferInLength > 0) {
-      GetFromPersistent("bufferIn");
-    }
-    if (baton->overlayBufferInLength > 0) {
-      GetFromPersistent("overlayBufferIn");
-    }
-    if (baton->booleanBufferInLength > 0) {
-      GetFromPersistent("booleanBufferIn");
+    for (const Local<Object> buf : saveBuffers) {
+      GetFromPersistent(UniqueName(buf).c_str());
     }
     delete baton;
 
@@ -1052,6 +1041,7 @@ class PipelineWorker : public AsyncWorker {
  private:
   PipelineBaton *baton;
   Callback *queueListener;
+  std::vector<Local<Object>> saveBuffers;
 
   /*
     Calculate the angle of rotation and need-to-flip for the output image.
@@ -1094,6 +1084,15 @@ class PipelineWorker : public AsyncWorker {
     // Clean up libvips' per-request data and threads
     vips_error_clear();
     vips_thread_shutdown();
+  }
+
+  /*
+    Create a unique buffer name for node from the memory address of the buffer
+  */
+  const std::string UniqueName(const Local<Object> nodeBuf) {
+    std::stringstream ss;
+    ss << std::hex << static_cast<const void*>(&nodeBuf);
+    return ss.str();
   }
 };
 
@@ -1272,10 +1271,13 @@ NAN_METHOD(pipeline) {
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
 
-  std::vector<BufferContainer> saveBuffers;
-  saveBuffers.push_back({"bufferIn", bufferIn, baton->bufferInLength});
-  saveBuffers.push_back({"overlayBufferIn", overlayBufferIn, baton->overlayBufferInLength});
-  saveBuffers.push_back({"booleanBufferIn", booleanBufferIn, baton->booleanBufferInLength});
+  std::vector<Local<Object>> saveBuffers;
+  if (baton->bufferInLength)
+    saveBuffers.push_back(bufferIn);
+  if (baton->overlayBufferInLength)
+    saveBuffers.push_back(overlayBufferIn);
+  if (baton->booleanBufferInLength)
+    saveBuffers.push_back(booleanBufferIn);
   AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, saveBuffers));
 
   // Increment queued task counter
