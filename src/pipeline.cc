@@ -18,6 +18,8 @@
 #include "operations.h"
 #include "pipeline.h"
 
+#include <iostream>
+
 using v8::Handle;
 using v8::Local;
 using v8::Value;
@@ -87,8 +89,8 @@ class PipelineWorker : public AsyncWorker {
   PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
                  const std::vector<Local<Object>> saveBuffers) :
     AsyncWorker(callback), baton(baton), queueListener(queueListener), saveBuffers(saveBuffers) {
-    for (const Local<Object> buf : saveBuffers) {
-      SaveToPersistent(UniqueName(buf).c_str(), buf);
+    for (unsigned int i = 0; i < saveBuffers.size(); i++) {
+      SaveToPersistent(UniqueName(saveBuffers[i]).c_str(), saveBuffers[i]);
     }
   }
   ~PipelineWorker() {}
@@ -1023,8 +1025,8 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Dispose of Persistent wrapper around input Buffers so they can be garbage collected
-    for (const Local<Object> buf : saveBuffers) {
-      GetFromPersistent(UniqueName(buf).c_str());
+    for (unsigned int i = 0; i < saveBuffers.size(); i++) {
+      GetFromPersistent(UniqueName(saveBuffers[i]).c_str());
     }
     delete baton;
 
@@ -1089,9 +1091,10 @@ class PipelineWorker : public AsyncWorker {
   /*
     Create a unique buffer name for node from the memory address of the buffer
   */
-  const std::string UniqueName(const Local<Object> nodeBuf) {
+  const std::string UniqueName(const Local<Object> &nodeBuf) {
     std::stringstream ss;
     ss << std::hex << static_cast<const void*>(&nodeBuf);
+    std::cout << ss.str() << std::endl;
     return ss.str();
   }
 };
