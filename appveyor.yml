@@ -1,4 +1,4 @@
-os: Visual Studio 2015
+os: Previous Visual Studio 2015
 version: "{build}"
 build: off
 platform: x64
