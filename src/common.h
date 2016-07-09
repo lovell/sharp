@@ -22,6 +22,7 @@ namespace sharp {
     OPENSLIDE,
     PPM,
     FITS,
+    VIPS,
     RAW,
     UNKNOWN
   };
@@ -39,6 +40,7 @@ namespace sharp {
   bool IsTiff(std::string const &str);
   bool IsDz(std::string const &str);
   bool IsDzZip(std::string const &str);
+  bool IsV(std::string const &str);
 
   /*
     Provide a string identifier for the given image type.

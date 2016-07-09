@@ -975,7 +975,7 @@ Sharp.prototype.toFormat = function(formatOut) {
   }
   if (
     isDefined(formatOut) &&
-    ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'].indexOf(formatOut) !== -1
+      ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'].indexOf(formatOut) !== -1
   ) {
     this.options.formatOut = formatOut;
   } else {

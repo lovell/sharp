@@ -73,6 +73,7 @@ using sharp::IsWebp;
 using sharp::IsTiff;
 using sharp::IsDz;
 using sharp::IsDzZip;
+using sharp::IsV;
 using sharp::FreeCallback;
 using sharp::CalculateCrop;
 using sharp::counterProcess;
@@ -878,7 +879,9 @@ class PipelineWorker : public AsyncWorker {
         bool isTiff = IsTiff(baton->fileOut);
         bool isDz = IsDz(baton->fileOut);
         bool isDzZip = IsDzZip(baton->fileOut);
-        bool matchInput = baton->formatOut == "input" && !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip);
+        bool isV = IsV(baton->fileOut);
+        bool matchInput = baton->formatOut == "input" &&
+          !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip || isV);
         if (baton->formatOut == "jpeg" || isJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
           // Write JPEG to file
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -932,6 +935,12 @@ class PipelineWorker : public AsyncWorker {
             ->set("layout", baton->tileLayout)
           );
           baton->formatOut = "dz";
+        } else if (baton->formatOut == "v" || isV || (matchInput && inputImageType == ImageType::VIPS)) {
+          // Write V to file
+          image.vipssave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+          );
+          baton->formatOut = "v";
         } else {
           // Unsupported output format
           (baton->err).append("Unsupported output format " + baton->fileOut);
