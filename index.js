@@ -115,6 +115,7 @@ var Sharp = function(input, options) {
     withMetadataOrientation: -1,
     tileSize: 256,
     tileOverlap: 0,
+    extractChannel: -1,
     // Function to notify of queue length changes
     queueListener: function(queueLength) {
       module.exports.queue.emit('change', queueLength);
@@ -299,6 +300,21 @@ Sharp.prototype.extract = function(options) {
   // Ensure existing rotation occurs before pre-resize extraction
   if (suffix === 'Pre' && this.options.angle !== 0) {
     this.options.rotateBeforePreExtract = true;
+  }
+  return this;
+};
+
+Sharp.prototype.extractChannel = function(channel) {
+  if (channel === 'red')
+    channel = 0;
+  else if (channel === 'green')
+    channel = 1;
+  else if (channel === 'blue')
+    channel = 2;
+  if(isInteger(channel) && inRange(channel,0,4)) {
+    this.options.extractChannel = channel;
+  } else {
+    throw new Error('Cannot extract invalid channel ' + channel);
   }
   return this;
 };

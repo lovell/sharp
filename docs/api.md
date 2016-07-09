@@ -298,6 +298,25 @@ sharp(input)
   });
 ```
 
+#### extractChannel(channel)
+
+Extract a channel from the image. The following channel names are equivalent:
+
+ * Red: `0, 'red'`
+ * Green: `1, 'green'`
+ * Blue: `2, 'blue'`
+
+The result will be a single-channel grayscale image.
+
+```javascript
+sharp(input)
+  .extractChannel('green')
+  .toFile('input_green.jpg',function(err, info) {
+    // info.channels === 1
+    // input_green.jpg contains the green channel of the input image
+   });
+```
+
 #### background(rgba)
 
 Set the background for the `embed`, `flatten` and `extend` operations.

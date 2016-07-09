@@ -789,6 +789,15 @@ class PipelineWorker : public AsyncWorker {
         image = Bandbool(image, baton->bandBoolOp);
       }
 
+      // Extract an image channel (aka vips band)
+      if(baton->extractChannel > -1) {
+        if(baton->extractChannel >= image.bands()) {
+          (baton->err).append("Cannot extract channel from image. Too few channels in image.");
+          return Error();
+        }
+        image = image.extract_band(baton->extractChannel);
+      }
+
       // Override EXIF Orientation tag
       if (baton->withMetadata && baton->withMetadataOrientation != -1) {
         SetExifOrientation(image, baton->withMetadataOrientation);
@@ -1175,6 +1184,7 @@ NAN_METHOD(pipeline) {
   baton->extendBottom = attrAs<int32_t>(options, "extendBottom");
   baton->extendLeft = attrAs<int32_t>(options, "extendLeft");
   baton->extendRight = attrAs<int32_t>(options, "extendRight");
+  baton->extractChannel = attrAs<int32_t>(options, "extractChannel");
   // Output options
   baton->progressive = attrAs<bool>(options, "progressive");
   baton->quality = attrAs<int32_t>(options, "quality");
