@@ -97,9 +97,12 @@ module.exports = {
 
   inputJpgBooleanTest: getPath('booleanTest.jpg'),
 
+  inputV: getPath('vfile.v'),
+
   outputJpg: getPath('output.jpg'),
   outputPng: getPath('output.png'),
   outputWebP: getPath('output.webp'),
+  outputV: getPath('output.v'),
   outputZoinks: getPath('output.zoinks'), // an 'unknown' file extension
 
   // Path for tests requiring human inspection

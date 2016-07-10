@@ -66,6 +66,7 @@ struct PipelineBaton {
   double sharpenJagged;
   int threshold;
   bool thresholdGrayscale;
+  int trimTolerance;
   double gamma;
   bool greyscale;
   bool normalize;
@@ -97,6 +98,7 @@ struct PipelineBaton {
   double convKernelOffset;
   VipsOperationBoolean bandBoolOp;
   VipsOperationBoolean booleanOp;
+  int extractChannel;
   int tileSize;
   int tileOverlap;
   VipsForeignDzContainer tileContainer;
@@ -132,6 +134,7 @@ struct PipelineBaton {
     sharpenJagged(2.0),
     threshold(0),
     thresholdGrayscale(true),
+    trimTolerance(0),
     gamma(0.0),
     greyscale(false),
     normalize(false),
@@ -159,6 +162,7 @@ struct PipelineBaton {
     convKernelOffset(0.0),
     bandBoolOp(VIPS_OPERATION_BOOLEAN_LAST),
     booleanOp(VIPS_OPERATION_BOOLEAN_LAST),
+    extractChannel(-1),
     tileSize(256),
     tileOverlap(0),
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),

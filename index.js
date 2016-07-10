@@ -86,6 +86,7 @@ var Sharp = function(input, options) {
     sharpenJagged: 2,
     threshold: 0,
     thresholdGrayscale: true,
+    trimTolerance: 0,
     gamma: 0,
     greyscale: false,
     normalize: 0,
@@ -117,6 +118,7 @@ var Sharp = function(input, options) {
     withMetadataOrientation: -1,
     tileSize: 256,
     tileOverlap: 0,
+    extractChannel: -1,
     // Function to notify of queue length changes
     queueListener: function(queueLength) {
       module.exports.queue.emit('change', queueLength);
@@ -305,6 +307,21 @@ Sharp.prototype.extract = function(options) {
   return this;
 };
 
+Sharp.prototype.extractChannel = function(channel) {
+  if (channel === 'red')
+    channel = 0;
+  else if (channel === 'green')
+    channel = 1;
+  else if (channel === 'blue')
+    channel = 2;
+  if(isInteger(channel) && inRange(channel,0,4)) {
+    this.options.extractChannel = channel;
+  } else {
+    throw new Error('Cannot extract invalid channel ' + channel);
+  }
+  return this;
+};
+
 /*
   Set the background colour for embed and flatten operations.
   Delegates to the 'Color' module, which can throw an Error
@@ -391,13 +408,13 @@ Sharp.prototype.overlayWith = function(overlay, options) {
       setTileOption(options.tile, this.options);
     }
     if(isDefined(options.cutout)) {
-      setCutoutOption(options.cutout, this.options);  
+      setCutoutOption(options.cutout, this.options);
     }
     if(isDefined(options.left) || isDefined(options.top)) {
-      setOffsetOption(options.top, options.left, this.options);  
+      setOffsetOption(options.top, options.left, this.options);
     }
     if (isDefined(options.gravity)) {
-      setGravityOption(options.gravity, this.options);  
+      setGravityOption(options.gravity, this.options);
     }
   }
   return this;
@@ -411,7 +428,7 @@ function setTileOption(tile, options) {
     options.overlayTile = tile;
   } else {
     throw new Error('Invalid Value for tile ' + tile + ' Only Boolean Values allowed for overlay.tile.');
-  } 
+  }
 }
 
 function setCutoutOption(cutout, options) {
@@ -580,14 +597,31 @@ Sharp.prototype.threshold = function(threshold, options) {
   } else {
     throw new Error('Invalid threshold (0 to 255) ' + threshold);
   }
-  
+
   if(typeof options === 'undefined' ||
      options.greyscale === true || options.grayscale === true) {
     this.options.thresholdGrayscale = true;
   } else {
     this.options.thresholdGrayscale = false;
   }
-    
+
+  return this;
+};
+
+/*
+  Automatically remove "boring" image edges.
+    tolerance - if present, is a percentaged tolerance level between 0 and 100 to trim away similar color values
+      Defaulting to 10 when no tolerance is given.
+ */
+Sharp.prototype.trim = function(tolerance) {
+  if (typeof tolerance === 'undefined') {
+    this.options.trimTolerance = 10;
+  } else if (isInteger(tolerance) && inRange(tolerance, 1, 99)) {
+    this.options.trimTolerance = tolerance;
+  } else {
+    throw new Error('Invalid trim tolerance (1 to 99) ' + tolerance);
+  }
+
   return this;
 };
 
@@ -984,7 +1018,7 @@ Sharp.prototype.toFormat = function(formatOut) {
   }
   if (
     isDefined(formatOut) &&
-    ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'].indexOf(formatOut) !== -1
+      ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'].indexOf(formatOut) !== -1
   ) {
     this.options.formatOut = formatOut;
   } else {

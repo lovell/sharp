@@ -55,6 +55,9 @@ namespace sharp {
   bool IsDzZip(std::string const &str) {
     return EndsWith(str, ".zip") || EndsWith(str, ".ZIP") || EndsWith(str, ".szi") || EndsWith(str, ".SZI");
   }
+  bool IsV(std::string const &str) {
+    return EndsWith(str, ".v") || EndsWith(str, ".V") || EndsWith(str, ".vips") || EndsWith(str, ".VIPS");
+  }
 
   /*
     Provide a string identifier for the given image type.
@@ -73,6 +76,7 @@ namespace sharp {
       case ImageType::OPENSLIDE: id = "openslide"; break;
       case ImageType::PPM: id = "ppm"; break;
       case ImageType::FITS: id = "fits"; break;
+      case ImageType::VIPS: id = "v"; break;
       case ImageType::RAW: id = "raw"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
     }
@@ -136,6 +140,8 @@ namespace sharp {
         imageType = ImageType::PPM;
       } else if (EndsWith(loader, "Fits")) {
         imageType = ImageType::FITS;
+      } else if (EndsWith(loader, "Vips")) {
+        imageType = ImageType::VIPS;
       } else if (EndsWith(loader, "Magick") || EndsWith(loader, "MagickFile")) {
         imageType = ImageType::MAGICK;
       }

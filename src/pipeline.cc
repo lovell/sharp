@@ -60,6 +60,7 @@ using sharp::TileCache;
 using sharp::Threshold;
 using sharp::Bandbool;
 using sharp::Boolean;
+using sharp::Trim;
 
 using sharp::ImageType;
 using sharp::ImageTypeId;
@@ -76,6 +77,7 @@ using sharp::IsWebp;
 using sharp::IsTiff;
 using sharp::IsDz;
 using sharp::IsDzZip;
+using sharp::IsV;
 using sharp::FreeCallback;
 using sharp::CalculateCrop;
 using sharp::counterProcess;
@@ -212,6 +214,11 @@ class PipelineWorker : public AsyncWorker {
       if (baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
         image = image.rot(rotation);
         RemoveExifOrientation(image);
+      }
+
+      // Trim
+      if(baton->trimTolerance != 0) {
+        image = Trim(image, baton->trimTolerance);
       }
 
       // Pre extraction
@@ -827,6 +834,15 @@ class PipelineWorker : public AsyncWorker {
         image = Bandbool(image, baton->bandBoolOp);
       }
 
+      // Extract an image channel (aka vips band)
+      if(baton->extractChannel > -1) {
+        if(baton->extractChannel >= image.bands()) {
+          (baton->err).append("Cannot extract channel from image. Too few channels in image.");
+          return Error();
+        }
+        image = image.extract_band(baton->extractChannel);
+      }
+
       // Override EXIF Orientation tag
       if (baton->withMetadata && baton->withMetadataOrientation != -1) {
         SetExifOrientation(image, baton->withMetadataOrientation);
@@ -917,7 +933,9 @@ class PipelineWorker : public AsyncWorker {
         bool isTiff = IsTiff(baton->fileOut);
         bool isDz = IsDz(baton->fileOut);
         bool isDzZip = IsDzZip(baton->fileOut);
-        bool matchInput = baton->formatOut == "input" && !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip);
+        bool isV = IsV(baton->fileOut);
+        bool matchInput = baton->formatOut == "input" &&
+          !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip || isV);
         if (baton->formatOut == "jpeg" || isJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
           // Write JPEG to file
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -971,6 +989,12 @@ class PipelineWorker : public AsyncWorker {
             ->set("layout", baton->tileLayout)
           );
           baton->formatOut = "dz";
+        } else if (baton->formatOut == "v" || isV || (matchInput && inputImageType == ImageType::VIPS)) {
+          // Write V to file
+          image.vipssave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+          );
+          baton->formatOut = "v";
         } else {
           // Unsupported output format
           (baton->err).append("Unsupported output format " + baton->fileOut);
@@ -1196,6 +1220,10 @@ NAN_METHOD(pipeline) {
   baton->sharpenJagged = attrAs<double>(options, "sharpenJagged");
   baton->threshold = attrAs<int32_t>(options, "threshold");
   baton->thresholdGrayscale = attrAs<bool>(options, "thresholdGrayscale");
+  baton->trimTolerance = attrAs<int32_t>(options, "trimTolerance");
+  if(baton->accessMethod == VIPS_ACCESS_SEQUENTIAL && baton->trimTolerance != 0) {
+    baton->accessMethod = VIPS_ACCESS_RANDOM;
+  }
   baton->gamma = attrAs<double>(options, "gamma");
   baton->greyscale = attrAs<bool>(options, "greyscale");
   baton->normalize = attrAs<bool>(options, "normalize");
@@ -1207,6 +1235,7 @@ NAN_METHOD(pipeline) {
   baton->extendBottom = attrAs<int32_t>(options, "extendBottom");
   baton->extendLeft = attrAs<int32_t>(options, "extendLeft");
   baton->extendRight = attrAs<int32_t>(options, "extendRight");
+  baton->extractChannel = attrAs<int32_t>(options, "extractChannel");
   // Output options
   baton->progressive = attrAs<bool>(options, "progressive");
   baton->quality = attrAs<int32_t>(options, "quality");

@@ -781,6 +781,37 @@ describe('Input/output', function() {
     });
   }
 
+  if (sharp.format.v.input.file) {
+    it("Load Vips V file", function(done) {
+      sharp(fixtures.inputV)
+        .jpeg()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(70, info.width);
+          assert.strictEqual(60, info.height);
+          fixtures.assertSimilar(fixtures.expected('vfile.jpg'), data, done);
+        });
+    });
+  }
+
+  if (sharp.format.v.output.file) {
+    it("Save Vips V file", function(done) {
+      sharp(fixtures.inputJpg)
+        .extract({left: 910, top: 1105, width: 70, height: 60})
+        .toFile(fixtures.outputV, function(err, info) {
+          if(err) throw err;
+          assert.strictEqual(true, info.size > 0);
+          assert.strictEqual('v', info.format);
+          assert.strictEqual(70, info.width);
+          assert.strictEqual(60, info.height);
+          fs.unlinkSync(fixtures.outputV);
+          done();
+        });
+    });
+  }
+      
   if (sharp.format.raw.output.buffer) {
     describe('Ouput raw, uncompressed image data', function() {
       it('1 channel greyscale image', function(done) {

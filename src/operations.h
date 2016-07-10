@@ -92,6 +92,11 @@ namespace sharp {
   */
   VImage Boolean(VImage image, VImage imageR, VipsOperationBoolean const boolean);
 
+  /*
+    Trim an image
+  */
+  VImage Trim(VImage image, int const tolerance);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

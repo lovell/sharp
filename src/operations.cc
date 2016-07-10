@@ -406,4 +406,56 @@ namespace sharp {
     return image.boolean(imageR, boolean);
   }
 
+  VImage Trim(VImage image, int const tolerance) {
+    using sharp::MaximumImageAlpha;
+    // An equivalent of ImageMagick's -trim in C++ ... automatically remove
+    // "boring" image edges.
+
+    // We use .project to sum the rows and columns of a 0/255 mask image, the first
+    // non-zero row or column is the object edge. We make the mask image with an
+    // amount-different-from-background image plus a threshold.
+
+    // find the value of the pixel at (0, 0) ... we will search for all pixels
+    // significantly different from this
+    std::vector<double> background = image(0, 0);
+
+    int max = MaximumImageAlpha(image.interpretation());
+
+    // we need to smooth the image, subtract the background from every pixel, take
+    // the absolute value of the difference, then threshold
+    VImage mask = (image.median(3) - background).abs() > (max * tolerance / 100);
+
+    // sum mask rows and columns, then search for the first non-zero sum in each
+    // direction
+    VImage rows;
+    VImage columns = mask.project(&rows);
+
+    VImage profileLeftV;
+    VImage profileLeftH = columns.profile(&profileLeftV);
+
+    VImage profileRightV;
+    VImage profileRightH = columns.fliphor().profile(&profileRightV);
+
+    VImage profileTopV;
+    VImage profileTopH = rows.profile(&profileTopV);
+
+    VImage profileBottomV;
+    VImage profileBottomH = rows.flipver().profile(&profileBottomV);
+
+    int left = static_cast<int>(floor(profileLeftV.min()));
+    int right = columns.width() - static_cast<int>(floor(profileRightV.min()));
+    int top = static_cast<int>(floor(profileTopH.min()));
+    int bottom = rows.height() - static_cast<int>(floor(profileBottomH.min()));
+
+    int width = right - left;
+    int height = bottom - top;
+
+    if(width <= 0 || height <= 0) {
+      throw VError("Unexpected error while trimming. Try to lower the tolerance");
+    }
+
+    // and now crop the original image
+    return image.extract_area(left, top, width, height);
+  }
+
 }  // namespace sharp
