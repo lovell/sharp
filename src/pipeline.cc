@@ -1193,6 +1193,11 @@ NAN_METHOD(pipeline) {
     baton->overlayBufferInLength = node::Buffer::Length(overlayBufferIn);
     baton->overlayBufferIn = node::Buffer::Data(overlayBufferIn);
   }
+  baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
+  baton->overlayXOffset = attrAs<int32_t>(options, "overlayXOffset");
+  baton->overlayYOffset = attrAs<int32_t>(options, "overlayYOffset");
+  baton->overlayTile = attrAs<bool>(options, "overlayTile");
+  baton->overlayCutout = attrAs<bool>(options, "overlayCutout");
   // Boolean options
   baton->booleanFileIn = attrAsStr(options, "booleanFileIn");
   Local<Object> booleanBufferIn;
@@ -1201,11 +1206,6 @@ NAN_METHOD(pipeline) {
     baton->booleanBufferInLength = node::Buffer::Length(booleanBufferIn);
     baton->booleanBufferIn = node::Buffer::Data(booleanBufferIn);
   }
-  baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
-  baton->overlayXOffset = attrAs<int32_t>(options, "overlayXOffset");
-  baton->overlayYOffset = attrAs<int32_t>(options, "overlayYOffset");
-  baton->overlayTile = attrAs<bool>(options, "overlayTile");
-  baton->overlayCutout = attrAs<bool>(options, "overlayCutout");
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
   baton->crop = attrAs<int32_t>(options, "crop");
