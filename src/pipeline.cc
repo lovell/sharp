@@ -3,6 +3,7 @@
 #include <tuple>
 #include <utility>
 #include <memory>
+#include <numeric>
 
 #include <vips/vips8>
 
