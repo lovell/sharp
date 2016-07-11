@@ -9,6 +9,9 @@
 #include <node.h>
 #include <node_buffer.h>
 
+#include <sstream>
+#include <iomanip>
+
 #include "nan.h"
 
 #include "common.h"
@@ -56,6 +59,7 @@ using sharp::EntropyCrop;
 using sharp::TileCache;
 using sharp::Threshold;
 using sharp::Bandbool;
+using sharp::Boolean;
 using sharp::Trim;
 
 using sharp::ImageType;
@@ -78,19 +82,22 @@ using sharp::FreeCallback;
 using sharp::CalculateCrop;
 using sharp::counterProcess;
 using sharp::counterQueue;
+using sharp::GetBooleanOperation;
+
+typedef struct BufferContainer_t {
+  std::string name;
+  Local<Object> nodeBuf;
+} BufferContainer;
 
 class PipelineWorker : public AsyncWorker {
  public:
   PipelineWorker(Callback *callback, PipelineBaton *baton, Callback *queueListener,
-    const Local<Object> &bufferIn, const Local<Object> &overlayBufferIn) :
-    AsyncWorker(callback), baton(baton), queueListener(queueListener) {
-      if (baton->bufferInLength > 0) {
-        SaveToPersistent("bufferIn", bufferIn);
-      }
-      if (baton->overlayBufferInLength > 0) {
-        SaveToPersistent("overlayBufferIn", overlayBufferIn);
-      }
+                 const std::vector<BufferContainer> saveBuffers) :
+    AsyncWorker(callback), baton(baton), queueListener(queueListener), saveBuffers(saveBuffers) {
+    for (const BufferContainer buf : saveBuffers) {
+      SaveToPersistent(buf.name.c_str(), buf.nodeBuf);
     }
+  }
   ~PipelineWorker() {}
 
   /*
@@ -784,6 +791,44 @@ class PipelineWorker : public AsyncWorker {
         }
       }
 
+      // Apply bitwise boolean operation between images
+      if (baton->booleanOp != VIPS_OPERATION_BOOLEAN_LAST &&
+          (baton->booleanBufferInLength > 0 || !baton->booleanFileIn.empty())) {
+        VImage booleanImage;
+        ImageType booleanImageType = ImageType::UNKNOWN;
+        if (baton->booleanBufferInLength > 0) {
+          // Buffer input for boolean operation
+          booleanImageType = DetermineImageType(baton->booleanBufferIn, baton->booleanBufferInLength);
+          if (booleanImageType != ImageType::UNKNOWN) {
+            try {
+              booleanImage = VImage::new_from_buffer(baton->booleanBufferIn, baton->booleanBufferInLength,
+                nullptr, VImage::option()->set("access", baton->accessMethod));
+            } catch (...) {
+              (baton->err).append("Boolean operation buffer has corrupt header");
+              booleanImageType = ImageType::UNKNOWN;
+            }
+          } else {
+            (baton->err).append("Boolean operation buffer contains unsupported image format");
+          }
+        } else if (!baton->booleanFileIn.empty()) {
+          // File input for boolean operation
+          booleanImageType = DetermineImageType(baton->booleanFileIn.data());
+          if (booleanImageType != ImageType::UNKNOWN) {
+            try {
+              booleanImage = VImage::new_from_file(baton->booleanFileIn.data(),
+                VImage::option()->set("access", baton->accessMethod));
+            } catch (...) {
+              (baton->err).append("Boolean operation file has corrupt header");
+            }
+          }
+        }
+        if (booleanImageType == ImageType::UNKNOWN) {
+          return Error();
+        }
+        // Apply the boolean operation
+        image = Boolean(image, booleanImage, baton->booleanOp);
+      }
+
       // Apply per-channel Bandbool bitwise operations after all other operations
       if (shouldBandbool) {
         image = Bandbool(image, baton->bandBoolOp);
@@ -1007,11 +1052,8 @@ class PipelineWorker : public AsyncWorker {
     }
 
     // Dispose of Persistent wrapper around input Buffers so they can be garbage collected
-    if (baton->bufferInLength > 0) {
-      GetFromPersistent("bufferIn");
-    }
-    if (baton->overlayBufferInLength > 0) {
-      GetFromPersistent("overlayBufferIn");
+    for (const BufferContainer buf : saveBuffers) {
+      GetFromPersistent(buf.name.c_str());
     }
     delete baton;
 
@@ -1028,6 +1070,7 @@ class PipelineWorker : public AsyncWorker {
  private:
   PipelineBaton *baton;
   Callback *queueListener;
+  std::vector<BufferContainer> saveBuffers;
 
   /*
     Calculate the angle of rotation and need-to-flip for the output image.
@@ -1155,6 +1198,14 @@ NAN_METHOD(pipeline) {
   baton->overlayYOffset = attrAs<int32_t>(options, "overlayYOffset");
   baton->overlayTile = attrAs<bool>(options, "overlayTile");
   baton->overlayCutout = attrAs<bool>(options, "overlayCutout");
+  // Boolean options
+  baton->booleanFileIn = attrAsStr(options, "booleanFileIn");
+  Local<Object> booleanBufferIn;
+  if (node::Buffer::HasInstance(Get(options, New("booleanBufferIn").ToLocalChecked()).ToLocalChecked())) {
+    booleanBufferIn = Get(options, New("booleanBufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
+    baton->booleanBufferInLength = node::Buffer::Length(booleanBufferIn);
+    baton->booleanBufferIn = node::Buffer::Data(booleanBufferIn);
+  }
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");
   baton->crop = attrAs<int32_t>(options, "crop");
@@ -1232,14 +1283,10 @@ NAN_METHOD(pipeline) {
     }
   }
   // Bandbool operation
-  std::string opStr = attrAsStr(options, "bandBoolOp");
-  if(opStr == "and" ) {
-    baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_AND;
-  } else if(opStr == "or") {
-    baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_OR;
-  } else if(opStr == "eor") {
-    baton->bandBoolOp = VIPS_OPERATION_BOOLEAN_EOR;
-  }
+  baton->bandBoolOp = GetBooleanOperation(attrAsStr(options, "bandBoolOp"));
+
+  // Boolean operation
+  baton->booleanOp = GetBooleanOperation(attrAsStr(options, "booleanOp"));
 
   // Function to notify of queue length changes
   Callback *queueListener = new Callback(
@@ -1248,7 +1295,15 @@ NAN_METHOD(pipeline) {
 
   // Join queue for worker thread
   Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, bufferIn, overlayBufferIn));
+
+  std::vector<BufferContainer> saveBuffers;
+  if (baton->bufferInLength)
+    saveBuffers.push_back({"bufferIn", bufferIn});
+  if (baton->overlayBufferInLength)
+    saveBuffers.push_back({"overlayBufferIn", overlayBufferIn});
+  if (baton->booleanBufferInLength)
+    saveBuffers.push_back({"booleanBufferIn", booleanBufferIn});
+  AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, saveBuffers));
 
   // Increment queued task counter
   g_atomic_int_inc(&counterQueue);

@@ -330,4 +330,13 @@ namespace sharp {
     }
   }
 
+  /*
+    Get VIPS Boolean operatoin type from string
+  */
+  VipsOperationBoolean GetBooleanOperation(std::string opStr) {
+    return static_cast<VipsOperationBoolean>(
+      vips_enum_from_nick(nullptr, VIPS_TYPE_OPERATION_BOOLEAN, opStr.data())
+    );
+  }
+
 }  // namespace sharp

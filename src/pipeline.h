@@ -39,6 +39,9 @@ struct PipelineBaton {
   int overlayYOffset;
   bool overlayTile;
   bool overlayCutout;
+  std::string booleanFileIn;
+  char *booleanBufferIn;
+  size_t booleanBufferInLength;
   int topOffsetPre;
   int leftOffsetPre;
   int widthPre;
@@ -94,6 +97,7 @@ struct PipelineBaton {
   double convKernelScale;
   double convKernelOffset;
   VipsOperationBoolean bandBoolOp;
+  VipsOperationBoolean booleanOp;
   int extractChannel;
   int tileSize;
   int tileOverlap;
@@ -116,6 +120,7 @@ struct PipelineBaton {
     overlayYOffset(-1),
     overlayTile(false),
     overlayCutout(false),
+    booleanBufferInLength(0),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),
@@ -156,6 +161,7 @@ struct PipelineBaton {
     convKernelScale(0.0),
     convKernelOffset(0.0),
     bandBoolOp(VIPS_OPERATION_BOOLEAN_LAST),
+    booleanOp(VIPS_OPERATION_BOOLEAN_LAST),
     extractChannel(-1),
     tileSize(256),
     tileOverlap(0),

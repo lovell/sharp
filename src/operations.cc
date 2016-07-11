@@ -399,6 +399,13 @@ namespace sharp {
     return image.bandbool(boolean);
   }
 
+  /*
+    Perform bitwise boolean operation between images
+  */
+  VImage Boolean(VImage image, VImage imageR, VipsOperationBoolean const boolean) {
+    return image.boolean(imageR, boolean);
+  }
+
   VImage Trim(VImage image, int const tolerance) {
     using sharp::MaximumImageAlpha;
     // An equivalent of ImageMagick's -trim in C++ ... automatically remove
