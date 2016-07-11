@@ -317,23 +317,26 @@ namespace sharp {
 
     return std::make_tuple(left, top);
   }
+
+  /*
+    Are pixel values in this image 16-bit integer?
+  */
+  bool Is16Bit(VipsInterpretation const interpretation) {
+    return interpretation == VIPS_INTERPRETATION_RGB16 || interpretation == VIPS_INTERPRETATION_GREY16;
+  }
+
   /*
     Return the image alpha maximum. Useful for combining alpha bands. scRGB
     images are 0 - 1 for image data, but the alpha is 0 - 255.
   */
-  int MaximumImageAlpha(VipsInterpretation interpretation) {
-    if(interpretation == VIPS_INTERPRETATION_RGB16 ||
-        interpretation == VIPS_INTERPRETATION_GREY16) {
-      return (65535);
-    } else {
-      return (255);
-    }
+  double MaximumImageAlpha(VipsInterpretation const interpretation) {
+    return Is16Bit(interpretation) ? 65535.0 : 255.0;
   }
 
   /*
-    Get VIPS Boolean operatoin type from string
+    Get boolean operation type from string
   */
-  VipsOperationBoolean GetBooleanOperation(std::string opStr) {
+  VipsOperationBoolean GetBooleanOperation(std::string const opStr) {
     return static_cast<VipsOperationBoolean>(
       vips_enum_from_nick(nullptr, VIPS_TYPE_OPERATION_BOOLEAN, opStr.data())
     );

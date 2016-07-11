@@ -118,16 +118,20 @@ namespace sharp {
     int const outWidth, int const outHeight, int const x, int const y);
 
   /*
+    Are pixel values in this image 16-bit integer?
+  */
+  bool Is16Bit(VipsInterpretation const interpretation);
+
+  /*
     Return the image alpha maximum. Useful for combining alpha bands. scRGB
     images are 0 - 1 for image data, but the alpha is 0 - 255.
   */
-  int MaximumImageAlpha(VipsInterpretation interpretation);
+  double MaximumImageAlpha(VipsInterpretation const interpretation);
 
   /*
-    Get VIPS Boolean operatoin type from string
+    Get boolean operation type from string
   */
-  VipsOperationBoolean GetBooleanOperation(std::string opStr);
-
+  VipsOperationBoolean GetBooleanOperation(std::string const opStr);
 
 }  // namespace sharp
 

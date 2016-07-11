@@ -78,9 +78,12 @@ using sharp::IsDzZip;
 using sharp::IsV;
 using sharp::FreeCallback;
 using sharp::CalculateCrop;
+using sharp::Is16Bit;
+using sharp::MaximumImageAlpha;
+using sharp::GetBooleanOperation;
+
 using sharp::counterProcess;
 using sharp::counterQueue;
-using sharp::GetBooleanOperation;
 
 class PipelineWorker : public AsyncWorker {
  public:
@@ -409,13 +412,12 @@ class PipelineWorker : public AsyncWorker {
       }
 
       // Calculate maximum alpha value based on input image pixel depth
-      bool is16Bit = (image.format() == VIPS_FORMAT_USHORT);
-      double maxAlpha = is16Bit ? 65535.0 : 255.0;
+      double const maxAlpha = MaximumImageAlpha(image.interpretation());
 
       // Flatten image to remove alpha channel
       if (baton->flatten && HasAlpha(image)) {
         // Scale up 8-bit values to match 16-bit input image
-        double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+        double const multiplier = Is16Bit(image.interpretation()) ? 256.0 : 1.0;
         // Background colour
         std::vector<double> background {
           baton->background[0] * multiplier,
@@ -471,7 +473,7 @@ class PipelineWorker : public AsyncWorker {
       // Ensure image has an alpha channel when there is an overlay
       bool hasOverlay = baton->overlayBufferInLength > 0 || !baton->overlayFileIn.empty();
       if (hasOverlay && !HasAlpha(image)) {
-        double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+        double const multiplier = Is16Bit(image.interpretation()) ? 256.0 : 1.0;
         image = image.bandjoin(
           VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
         );
@@ -481,10 +483,7 @@ class PipelineWorker : public AsyncWorker {
       bool shouldBlur = baton->blurSigma != 0.0;
       bool shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool shouldSharpen = baton->sharpenSigma != 0.0;
-      bool shouldThreshold = baton->threshold != 0;
       bool shouldCutout = baton->overlayCutout;
-      bool shouldBandbool = baton->bandBoolOp < VIPS_OPERATION_BOOLEAN_LAST &&
-                            baton->bandBoolOp >= VIPS_OPERATION_BOOLEAN_AND;
       bool shouldPremultiplyAlpha = HasAlpha(image) &&
         (shouldAffineTransform || shouldBlur || shouldConv || shouldSharpen || (hasOverlay && !shouldCutout));
 
@@ -554,7 +553,7 @@ class PipelineWorker : public AsyncWorker {
       if (image.width() != baton->width || image.height() != baton->height) {
         if (baton->canvas == Canvas::EMBED) {
           // Scale up 8-bit values to match 16-bit input image
-          double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+          double const multiplier = Is16Bit(image.interpretation()) ? 256.0 : 1.0;
           // Create background colour
           std::vector<double> background;
           if (image.bands() > 2) {
@@ -617,7 +616,7 @@ class PipelineWorker : public AsyncWorker {
       // Extend edges
       if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
         // Scale up 8-bit values to match 16-bit input image
-        const double multiplier = (image.interpretation() == VIPS_INTERPRETATION_RGB16) ? 256.0 : 1.0;
+        double const multiplier = Is16Bit(image.interpretation()) ? 256.0 : 1.0;
         // Create background colour
         std::vector<double> background {
           baton->background[0] * multiplier,
@@ -643,7 +642,7 @@ class PipelineWorker : public AsyncWorker {
       }
 
       // Threshold - must happen before blurring, due to the utility of blurring after thresholding
-      if (shouldThreshold) {
+      if (baton->threshold != 0) {
         image = Threshold(image, baton->threshold, baton->thresholdGrayscale);
       }
 
@@ -758,7 +757,7 @@ class PipelineWorker : public AsyncWorker {
       if (shouldPremultiplyAlpha) {
         image = image.unpremultiply(VImage::option()->set("max_alpha", maxAlpha));
         // Cast pixel values to integer
-        if (is16Bit) {
+        if (Is16Bit(image.interpretation())) {
           image = image.cast(VIPS_FORMAT_USHORT);
         } else {
           image = image.cast(VIPS_FORMAT_UCHAR);
@@ -776,7 +775,7 @@ class PipelineWorker : public AsyncWorker {
       }
 
       // Convert image to sRGB, if not already
-      if (image.interpretation() == VIPS_INTERPRETATION_RGB16) {
+      if (Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
       }
       if (image.interpretation() != VIPS_INTERPRETATION_sRGB) {
@@ -828,7 +827,7 @@ class PipelineWorker : public AsyncWorker {
       }
 
       // Apply per-channel Bandbool bitwise operations after all other operations
-      if (shouldBandbool) {
+      if (baton->bandBoolOp >= VIPS_OPERATION_BOOLEAN_AND && baton->bandBoolOp < VIPS_OPERATION_BOOLEAN_LAST) {
         image = Bandbool(image, baton->bandBoolOp);
       }
 

@@ -162,8 +162,8 @@ namespace sharp {
 
     // the range of the mask and the image need to match .. one could be
     // 16-bit, one 8-bit
-    int dstMax = MaximumImageAlpha(dst.interpretation());
-    int maskMax = MaximumImageAlpha(mask.interpretation());
+    double const dstMax = MaximumImageAlpha(dst.interpretation());
+    double const maskMax = MaximumImageAlpha(mask.interpretation());
 
     // combine the new mask and the existing alpha ... there are
     // many ways of doing this, mult is the simplest
@@ -419,7 +419,7 @@ namespace sharp {
     // significantly different from this
     std::vector<double> background = image(0, 0);
 
-    int max = MaximumImageAlpha(image.interpretation());
+    double const max = MaximumImageAlpha(image.interpretation());
 
     // we need to smooth the image, subtract the background from every pixel, take
     // the absolute value of the difference, then threshold
