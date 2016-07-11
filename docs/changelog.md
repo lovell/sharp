@@ -50,6 +50,26 @@ Requires libvips v8.3.1
   [#490](https://github.com/lovell/sharp/issues/490)
   [@jwagner](https://github.com/jwagner)
 
+* Add trim operation to remove "boring" edges.
+  [#492](https://github.com/lovell/sharp/pull/492)
+  [@kleisauke](https://github.com/kleisauke)
+
+* Add bandbool feature for channel-wise boolean operations.
+  [#496](https://github.com/lovell/sharp/pull/496)
+  [@mhirsch](https://github.com/mhirsch)
+
+* Add extractChannel operation to extract a channel from an image.
+  [#497](https://github.com/lovell/sharp/pull/497)
+  [@mhirsch](https://github.com/mhirsch)
+
+* Add ability to read and write native libvips .v files.
+  [#500](https://github.com/lovell/sharp/pull/500)
+  [@mhirsch](https://github.com/mhirsch)
+
+* Add boolean feature for bitwise image operations.
+  [#501](https://github.com/lovell/sharp/pull/501)
+  [@mhirsch](https://github.com/mhirsch)
+
 #### v0.15.0 - 21<sup>st</sup> May 2016
 
 * Use libvips' new Lanczos 3 kernel as default for image reduction.

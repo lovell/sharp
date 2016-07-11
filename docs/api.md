@@ -298,24 +298,11 @@ sharp(input)
   });
 ```
 
-#### extractChannel(channel)
+#### trim([tolerance])
 
-Extract a channel from the image. The following channel names are equivalent:
+Trim "boring" pixels from all edges that contain values within a percentage similarity of the top-left pixel.
 
- * Red: `0, 'red'`
- * Green: `1, 'green'`
- * Blue: `2, 'blue'`
-
-The result will be a single-channel grayscale image.
-
-```javascript
-sharp(input)
-  .extractChannel('green')
-  .toFile('input_green.jpg',function(err, info) {
-    // info.channels === 1
-    // input_green.jpg contains the green channel of the input image
-   });
-```
+* `tolerance`, if present, is an integral Number between 1 and 99 representing the percentage similarity, defaulting to 10.
 
 #### background(rgba)
 
@@ -502,15 +489,30 @@ sharp('input.png')
   });
 ```
 
+#### extractChannel(channel)
+
+Extract a single channel from a multi-channel image.
+
+* `channel` is a zero-indexed integral Number representing the band number to extract. `red`, `green` or `blue` are also accepted as an alternative to `0`, `1` or `2` respectively.
+
+```javascript
+sharp(input)
+  .extractChannel('green')
+  .toFile('input_green.jpg', function(err, info) {
+    // info.channels === 1
+    // input_green.jpg contains the green channel of the input image
+   });
+```
+
 #### bandbool(operation)
 
-Perform a bitwise boolean operation on image color channels (bands in vips terminology). The result is a single channel grayscale image. Bandbool is performed at the end of the image processing pipeline, after gamma correction, colorspace conversion, normalization, and other operations. This makes it possible to create an image that contains the unaltered result of the boolean operation. Note that the alpha channel of the image is included in `bandbool` operations. All channels are cast to an integer type before the operation. `bandbool` takes no effect on single channel images.
+Perform a bitwise boolean operation on all input image channels (bands) to produce a single channel output image.
 
-`operation` is a string containing the name of the bitwise operator to be appled to image color channels, which can be one of:
+`operation` is a string containing the name of the bitwise operator to be appled to image channels, which can be one of:
 
- * `and` performs a bitwise and operation, like the c-operator `&`
- * `or` performs a bitwise or operation, like the c-operator `|`
- * `eor` performs a bitwise exclusive or operation, like the c-operator `^`
+* `and` performs a bitwise and operation, like the c-operator `&`.
+* `or` performs a bitwise or operation, like the c-operator `|`.
+* `eor` performs a bitwise exclusive or operation, like the c-operator `^`.
 
 ```javascript
 sharp('input.png')
@@ -518,23 +520,23 @@ sharp('input.png')
   .toFile('output.png')
 ```
 
-In the above example if `input.png` is a 3 channel RGB image, `output.png` will be a 1 channel grayscale image where each pixel `P = R & G & B`. For example, if `I(1,1) = [247, 170, 14] = [0b11110111, 0b10101010, 0b00001111]` then `O(1,1) = 0b11110111 & 0b10101010 & 0b00001111 = 0b00000010 = 2`.
+In the above example if `input.png` is a 3 channel RGB image, `output.png` will be a 1 channel grayscale image where each pixel `P = R & G & B`.
+For example, if `I(1,1) = [247, 170, 14] = [0b11110111, 0b10101010, 0b00001111]` then `O(1,1) = 0b11110111 & 0b10101010 & 0b00001111 = 0b00000010 = 2`.
 
 #### boolean(image, operation)
 
-Perform a bitwise boolean operation with `image`.
+Perform a bitwise boolean operation with `image`, where `image` is one of the following:
 
-`image` is one of the following.
-
-* Buffer contianing PNG, WebP, GIF or SVG image data, or
+* Buffer containing PNG, WebP, GIF or SVG image data, or
 * String containing the path to an image file
 
-This operation creates an output image where each pixel is the result of the selected bitwise boolean `operation`, between the corresponding pixels of the input images. The boolean operation can be one of the following:
+This operation creates an output image where each pixel is the result of the selected bitwise boolean `operation` between the corresponding pixels of the input images.
+The boolean operation can be one of the following:
 
- * `and` performs a bitwise and operation, like the c-operator `&`
- * `or` performs a bitwise or operation, like the c-operator `|`
- * `eor` performs a bitwise exclusive or operation, like the c-operator `^`
-  
+* `and` performs a bitwise and operation, like the c-operator `&`.
+* `or` performs a bitwise or operation, like the c-operator `|`.
+* `eor` performs a bitwise exclusive or operation, like the c-operator `^`.
+
 ### Output
 
 #### toFile(path, [callback])
