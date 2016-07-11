@@ -24,7 +24,7 @@ describe('Trim borders', function() {
   it('16-bit PNG with alpha channel', function(done) {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 32)
-      .trim()
+      .trim(20)
       .toBuffer(function(err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -36,4 +36,13 @@ describe('Trim borders', function() {
       });
   });
 
+  describe('Invalid thresholds', function() {
+    [-1, 100, 'fail', {}].forEach(function(threshold) {
+      it(threshold, function() {
+        assert.throws(function() {
+          sharp().trim(threshold);
+        });
+      });
+    });
+  });
 });

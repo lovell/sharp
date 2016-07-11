@@ -400,17 +400,27 @@ describe('Overlays', function() {
           assert.strictEqual(3, info.channels);
           fixtures.assertSimilar(expected, data, done);
         });
-      
     });
 
+    it('Overlay with invalid cutout option', function() {
+      assert.throws(function() {
+        sharp().overlayWith('ignore', { cutout: 1 });
+      });
+    });
+
+    it('Overlay with invalid tile option', function() {
+      assert.throws(function() {
+        sharp().overlayWith('ignore', { tile: 1 });
+      });
+    });
 
     it('Overlay with very large offset', function(done) {
       var expected = fixtures.expected('overlay-very-large-offset.jpg');
       sharp(fixtures.inputJpg)
         .resize(400)
         .overlayWith(fixtures.inputPngWithTransparency16bit, {
-          left: 1000000,
-          top: 100000
+          left: 10000,
+          top: 10000
         })
         .toBuffer(function(err, data, info) {
           if (err) throw err;

@@ -359,12 +359,12 @@ Sharp.prototype.ignoreAspectRatio = function() {
 };
 
 Sharp.prototype.flatten = function(flatten) {
-  this.options.flatten = (typeof flatten === 'boolean') ? flatten : true;
+  this.options.flatten = isBoolean(flatten) ? flatten : true;
   return this;
 };
 
 Sharp.prototype.negate = function(negate) {
-  this.options.negate = (typeof negate === 'boolean') ? negate : true;
+  this.options.negate = isBoolean(negate) ? negate : true;
   return this;
 };
 
@@ -379,16 +379,11 @@ Sharp.prototype.boolean = function(operand, operator) {
   } else {
     throw new Error('Unsupported boolean operand ' + typeof operand);
   }
-  if (!isString(operator)) {
+  if (isString(operator) && contains(operator, ['and', 'or', 'eor'])) {
+    this.options.booleanOp = operator;
+  } else {
     throw new Error('Invalid boolean operation ' + operator);
   }
-  operator = operator.toLowerCase();
-  var ops = ['and', 'or', 'eor'];
-  if(ops.indexOf(operator) == -1) {
-    throw new Error('Invalid boolean operation ' + operator);
-  }
-  this.options.booleanOp = operator;
-
   return this;
 };
 
@@ -404,69 +399,52 @@ Sharp.prototype.overlayWith = function(overlay, options) {
     throw new Error('Unsupported overlay ' + typeof overlay);
   }
   if (isObject(options)) {
-    if(isDefined(options.tile)) {
-      setTileOption(options.tile, this.options);
+    if (isDefined(options.tile)) {
+      if (isBoolean(options.tile)) {
+        this.options.overlayTile = options.tile;
+      } else {
+        throw new Error('Invalid overlay tile ' + options.tile);
+      }
     }
-    if(isDefined(options.cutout)) {
-      setCutoutOption(options.cutout, this.options);
+    if (isDefined(options.cutout)) {
+      if (isBoolean(options.cutout)) {
+        this.options.overlayCutout = options.cutout;
+      } else {
+        throw new Error('Invalid overlay cutout ' + options.cutout);
+      }
     }
-    if(isDefined(options.left) || isDefined(options.top)) {
-      setOffsetOption(options.top, options.left, this.options);
+    if (isDefined(options.left) || isDefined(options.top)) {
+      if (
+        isInteger(options.left) && inRange(options.left, 0, maximum.width) &&
+        isInteger(options.top) && inRange(options.top, 0, maximum.height)
+      ) {
+        this.options.overlayXOffset = options.left;
+        this.options.overlayYOffset = options.top;
+      } else {
+        throw new Error('Invalid overlay left ' + options.left + ' and/or top ' + options.top);
+      }
     }
     if (isDefined(options.gravity)) {
-      setGravityOption(options.gravity, this.options);
+      if(isInteger(options.gravity) && inRange(options.gravity, 0, 8)) {
+        this.options.overlayGravity = options.gravity;
+      } else if (isString(options.gravity) && isInteger(module.exports.gravity[options.gravity])) {
+        this.options.overlayGravity = module.exports.gravity[options.gravity];
+      } else {
+        throw new Error('Unsupported overlay gravity ' + options.gravity);
+      }
     }
   }
   return this;
 };
 
 /*
-  Supporting functions for overlayWith
-*/
-function setTileOption(tile, options) {
-  if(isBoolean(tile)) {
-    options.overlayTile = tile;
-  } else {
-    throw new Error('Invalid Value for tile ' + tile + ' Only Boolean Values allowed for overlay.tile.');
-  }
-}
-
-function setCutoutOption(cutout, options) {
-  if(isBoolean(cutout)) {
-    options.overlayCutout = cutout;
-  } else {
-    throw new Error('Invalid Value for cutout ' + cutout + ' Only Boolean Values allowed for overlay.cutout.');
-  }
-}
-
-function setOffsetOption(top, left, options) {
-  if(isInteger(left) && left >= 0 && isInteger(top) && top >= 0) {
-    options.overlayXOffset = left;
-    options.overlayYOffset = top;
-  } else {
-    throw new Error('Unsupported top and/or left offset values');
-  }
-}
-
-function setGravityOption(gravity, options) {
-  if(isInteger(gravity) && inRange(gravity, 0, 8)) {
-    options.overlayGravity = gravity;
-  } else if (isString(gravity) && isInteger(module.exports.gravity[gravity])) {
-    options.overlayGravity = module.exports.gravity[gravity];
-  } else {
-    throw new Error('Unsupported overlay gravity ' + gravity);
-  }
-}
-
-
-/*
   Rotate output image by 0, 90, 180 or 270 degrees
   Auto-rotation based on the EXIF Orientation tag is represented by an angle of -1
 */
 Sharp.prototype.rotate = function(angle) {
-  if (typeof angle === 'undefined') {
+  if (!isDefined(angle)) {
     this.options.angle = -1;
-  } else if (!Number.isNaN(angle) && [0, 90, 180, 270].indexOf(angle) !== -1) {
+  } else if (isInteger(angle) && contains(angle, [0, 90, 180, 270])) {
     this.options.angle = angle;
   } else {
     throw new Error('Unsupported angle (0, 90, 180, 270) ' + angle);
@@ -478,7 +456,7 @@ Sharp.prototype.rotate = function(angle) {
   Flip the image vertically, about the Y axis
 */
 Sharp.prototype.flip = function(flip) {
-  this.options.flip = (typeof flip === 'boolean') ? flip : true;
+  this.options.flip = isBoolean(flip) ? flip : true;
   return this;
 };
 
@@ -486,7 +464,7 @@ Sharp.prototype.flip = function(flip) {
   Flop the image horizontally, about the X axis
 */
 Sharp.prototype.flop = function(flop) {
-  this.options.flop = (typeof flop === 'boolean') ? flop : true;
+  this.options.flop = isBoolean(flop) ? flop : true;
   return this;
 };
 
@@ -496,7 +474,7 @@ Sharp.prototype.flop = function(flop) {
     "change the dimensions of the image only if its width or height exceeds the geometry specification"
 */
 Sharp.prototype.withoutEnlargement = function(withoutEnlargement) {
-  this.options.withoutEnlargement = (typeof withoutEnlargement === 'boolean') ? withoutEnlargement : true;
+  this.options.withoutEnlargement = isBoolean(withoutEnlargement) ? withoutEnlargement : true;
   return this;
 };
 
@@ -588,23 +566,20 @@ Sharp.prototype.sharpen = function(sigma, flat, jagged) {
 };
 
 Sharp.prototype.threshold = function(threshold, options) {
-  if (typeof threshold === 'undefined') {
+  if (!isDefined(threshold)) {
     this.options.threshold = 128;
-  } else if (typeof threshold === 'boolean') {
+  } else if (isBoolean(threshold)) {
     this.options.threshold = threshold ? 128 : 0;
-  } else if (typeof threshold === 'number' && !Number.isNaN(threshold) && (threshold % 1 === 0) && threshold >= 0 && threshold <= 255) {
+  } else if (isInteger(threshold) && inRange(threshold, 0, 255)) {
     this.options.threshold = threshold;
   } else {
     throw new Error('Invalid threshold (0 to 255) ' + threshold);
   }
-
-  if(typeof options === 'undefined' ||
-     options.greyscale === true || options.grayscale === true) {
+  if (!isObject(options) || options.greyscale === true || options.grayscale === true) {
     this.options.thresholdGrayscale = true;
   } else {
     this.options.thresholdGrayscale = false;
   }
-
   return this;
 };
 
@@ -614,14 +589,13 @@ Sharp.prototype.threshold = function(threshold, options) {
       Defaulting to 10 when no tolerance is given.
  */
 Sharp.prototype.trim = function(tolerance) {
-  if (typeof tolerance === 'undefined') {
+  if (!isDefined(tolerance)) {
     this.options.trimTolerance = 10;
   } else if (isInteger(tolerance) && inRange(tolerance, 1, 99)) {
     this.options.trimTolerance = tolerance;
   } else {
     throw new Error('Invalid trim tolerance (1 to 99) ' + tolerance);
   }
-
   return this;
 };
 
@@ -630,10 +604,10 @@ Sharp.prototype.trim = function(tolerance) {
   Improves brightness of resized image in non-linear colour spaces.
 */
 Sharp.prototype.gamma = function(gamma) {
-  if (typeof gamma === 'undefined') {
+  if (!isDefined(gamma)) {
     // Default gamma correction of 2.2 (sRGB)
     this.options.gamma = 2.2;
-  } else if (!Number.isNaN(gamma) && gamma >= 1 && gamma <= 3) {
+  } else if (isNumber(gamma) && inRange(gamma, 1, 3)) {
     this.options.gamma = gamma;
   } else {
     throw new Error('Invalid gamma correction (1.0 to 3.0) ' + gamma);
@@ -645,7 +619,7 @@ Sharp.prototype.gamma = function(gamma) {
   Enhance output image contrast by stretching its luminance to cover the full dynamic range
 */
 Sharp.prototype.normalize = function(normalize) {
-  this.options.normalize = (typeof normalize === 'boolean') ? normalize : true;
+  this.options.normalize = isBoolean(normalize) ? normalize : true;
   return this;
 };
 Sharp.prototype.normalise = Sharp.prototype.normalize;
@@ -654,15 +628,11 @@ Sharp.prototype.normalise = Sharp.prototype.normalize;
   Perform boolean/bitwise operation on image color channels - results in one channel image
 */
 Sharp.prototype.bandbool = function(boolOp) {
-  if(typeof boolOp !== 'string') {
-    throw new Error('Invalid bandbool operation');
+  if (isString(boolOp) && contains(boolOp, ['and', 'or', 'eor'])) {
+    this.options.bandBoolOp = boolOp;
+  } else {
+    throw new Error('Invalid bandbool operation ' + boolOp);
   }
-  boolOp = boolOp.toLowerCase();
-  var ops = ['and', 'or', 'eor'];
-  if(ops.indexOf(boolOp) == -1) {
-    throw new Error('Invalid bandbool operation');
-  }
-  this.options.bandBoolOp = boolOp;
   return this;
 };
 
@@ -670,23 +640,23 @@ Sharp.prototype.bandbool = function(boolOp) {
   Convert to greyscale
 */
 Sharp.prototype.greyscale = function(greyscale) {
-  this.options.greyscale = (typeof greyscale === 'boolean') ? greyscale : true;
+  this.options.greyscale = isBoolean(greyscale) ? greyscale : true;
   return this;
 };
 Sharp.prototype.grayscale = Sharp.prototype.greyscale;
 
 Sharp.prototype.progressive = function(progressive) {
-  this.options.progressive = (typeof progressive === 'boolean') ? progressive : true;
+  this.options.progressive = isBoolean(progressive) ? progressive : true;
   return this;
 };
 
 Sharp.prototype.sequentialRead = function(sequentialRead) {
-  this.options.sequentialRead = (typeof sequentialRead === 'boolean') ? sequentialRead : true;
+  this.options.sequentialRead = isBoolean(sequentialRead) ? sequentialRead : true;
   return this;
 };
 
 Sharp.prototype.quality = function(quality) {
-  if (!Number.isNaN(quality) && quality >= 1 && quality <= 100 && quality % 1 === 0) {
+  if (isInteger(quality) && inRange(quality, 1, 100)) {
     this.options.quality = quality;
   } else {
     throw new Error('Invalid quality (1 to 100) ' + quality);
@@ -698,7 +668,7 @@ Sharp.prototype.quality = function(quality) {
   zlib compression level for PNG output
 */
 Sharp.prototype.compressionLevel = function(compressionLevel) {
-  if (!Number.isNaN(compressionLevel) && compressionLevel >= 0 && compressionLevel <= 9) {
+  if (isInteger(compressionLevel) && inRange(compressionLevel, 0, 9)) {
     this.options.compressionLevel = compressionLevel;
   } else {
     throw new Error('Invalid compressionLevel (0 to 9) ' + compressionLevel);
@@ -710,7 +680,7 @@ Sharp.prototype.compressionLevel = function(compressionLevel) {
   Disable the use of adaptive row filtering for PNG output
 */
 Sharp.prototype.withoutAdaptiveFiltering = function(withoutAdaptiveFiltering) {
-  this.options.withoutAdaptiveFiltering = (typeof withoutAdaptiveFiltering === 'boolean') ? withoutAdaptiveFiltering : true;
+  this.options.withoutAdaptiveFiltering = isBoolean(withoutAdaptiveFiltering) ? withoutAdaptiveFiltering : true;
   return this;
 };
 
@@ -718,7 +688,7 @@ Sharp.prototype.withoutAdaptiveFiltering = function(withoutAdaptiveFiltering) {
   Disable the use of chroma subsampling for JPEG output
 */
 Sharp.prototype.withoutChromaSubsampling = function(withoutChromaSubsampling) {
-  this.options.withoutChromaSubsampling = (typeof withoutChromaSubsampling === 'boolean') ? withoutChromaSubsampling : true;
+  this.options.withoutChromaSubsampling = isBoolean(withoutChromaSubsampling) ? withoutChromaSubsampling : true;
   return this;
 };
 
@@ -726,7 +696,7 @@ Sharp.prototype.withoutChromaSubsampling = function(withoutChromaSubsampling) {
   Apply trellis quantisation to JPEG output - requires mozjpeg 3.0+
 */
 Sharp.prototype.trellisQuantisation = function(trellisQuantisation) {
-  this.options.trellisQuantisation = (typeof trellisQuantisation === 'boolean') ? trellisQuantisation : true;
+  this.options.trellisQuantisation = isBoolean(trellisQuantisation) ? trellisQuantisation : true;
   return this;
 };
 Sharp.prototype.trellisQuantization = Sharp.prototype.trellisQuantisation;
@@ -735,7 +705,7 @@ Sharp.prototype.trellisQuantization = Sharp.prototype.trellisQuantisation;
   Apply overshoot deringing to JPEG output - requires mozjpeg 3.0+
 */
 Sharp.prototype.overshootDeringing = function(overshootDeringing) {
-  this.options.overshootDeringing = (typeof overshootDeringing === 'boolean') ? overshootDeringing : true;
+  this.options.overshootDeringing = isBoolean(overshootDeringing) ? overshootDeringing : true;
   return this;
 };
 
@@ -743,7 +713,7 @@ Sharp.prototype.overshootDeringing = function(overshootDeringing) {
   Optimise scans in progressive JPEG output - requires mozjpeg 3.0+
 */
 Sharp.prototype.optimiseScans = function(optimiseScans) {
-  this.options.optimiseScans = (typeof optimiseScans === 'boolean') ? optimiseScans : true;
+  this.options.optimiseScans = isBoolean(optimiseScans) ? optimiseScans : true;
   if (this.options.optimiseScans) {
     this.progressive();
   }
@@ -757,16 +727,10 @@ Sharp.prototype.optimizeScans = Sharp.prototype.optimiseScans;
     orientation: numeric value for EXIF Orientation tag
 */
 Sharp.prototype.withMetadata = function(withMetadata) {
-  this.options.withMetadata = (typeof withMetadata === 'boolean') ? withMetadata : true;
-  if (typeof withMetadata === 'object') {
-    if ('orientation' in withMetadata) {
-      if (
-        typeof withMetadata.orientation === 'number' &&
-        !Number.isNaN(withMetadata.orientation) &&
-        withMetadata.orientation % 1 === 0 &&
-        withMetadata.orientation >= 1 &&
-        withMetadata.orientation <= 8
-      ) {
+  this.options.withMetadata = isBoolean(withMetadata) ? withMetadata : true;
+  if (isObject(withMetadata)) {
+    if (isDefined(withMetadata.orientation)) {
+      if (isInteger(withMetadata.orientation) && inRange(withMetadata.orientation, 1, 8)) {
         this.options.withMetadataOrientation = withMetadata.orientation;
       } else {
         throw new Error('Invalid orientation (1 to 8) ' + withMetadata.orientation);
@@ -1013,12 +977,11 @@ Sharp.prototype.raw = function() {
   @param format is either the id as a String or an Object with an 'id' attribute
 */
 Sharp.prototype.toFormat = function(formatOut) {
-  if (isObject(formatOut) && isDefined(formatOut.id)) {
-    formatOut = formatOut.id;
-  }
-  if (
-    isDefined(formatOut) &&
-      ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'].indexOf(formatOut) !== -1
+  if (isObject(formatOut) && isString(formatOut.id)) {
+    this.options.formatOut = formatOut.id;
+  } else if (
+    isString(formatOut) &&
+    contains(formatOut, ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'])
   ) {
     this.options.formatOut = formatOut;
   } else {

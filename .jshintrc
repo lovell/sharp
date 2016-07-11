@@ -2,7 +2,7 @@
   "strict": true,
   "node": true,
   "maxparams": 4,
-  "maxcomplexity": 13,
+  "maxcomplexity": 14,
   "globals": {
     "beforeEach": true,
     "afterEach": true,

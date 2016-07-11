@@ -54,9 +54,9 @@ describe('Boolean operation between two images', function() {
     });
   });
 
-  if('Invalid input', function() {
+  it('Missing input', function() {
     assert.throws(function() {
-      sharp().boolean([], 'eor');
+      sharp().boolean();
     });
   });
 });
