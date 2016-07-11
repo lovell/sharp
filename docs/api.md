@@ -727,6 +727,8 @@ If `options` is provided, sets the limits of _libvips'_ operation cache.
 
 `options` can also be a boolean, where `true` enables the default cache settings and `false` disables all caching.
 
+Existing entries in the cache will be trimmed after any change in limits.
+
 This method always returns cache statistics, useful for determining how much working memory is required for a particular task.
 
 ```javascript
