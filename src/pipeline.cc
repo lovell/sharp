@@ -774,20 +774,6 @@ class PipelineWorker : public AsyncWorker {
         image = Normalize(image);
       }
 
-      // Convert image to sRGB, if not already
-      if (Is16Bit(image.interpretation())) {
-        image = image.cast(VIPS_FORMAT_USHORT);
-      }
-      if (image.interpretation() != VIPS_INTERPRETATION_sRGB) {
-        image = image.colourspace(VIPS_INTERPRETATION_sRGB);
-        // Transform colours from embedded profile to sRGB profile
-        if (baton->withMetadata && HasProfile(image)) {
-          image = image.icc_transform(const_cast<char*>(srgbProfile.data()), VImage::option()
-            ->set("embedded", TRUE)
-          );
-        }
-      }
-
       // Apply bitwise boolean operation between images
       if (baton->booleanOp != VIPS_OPERATION_BOOLEAN_LAST &&
           (baton->booleanBufferInLength > 0 || !baton->booleanFileIn.empty())) {
@@ -838,6 +824,20 @@ class PipelineWorker : public AsyncWorker {
           return Error();
         }
         image = image.extract_band(baton->extractChannel);
+      }
+
+      // Convert image to sRGB, if not already
+      if (Is16Bit(image.interpretation())) {
+        image = image.cast(VIPS_FORMAT_USHORT);
+      }
+      if (image.interpretation() != VIPS_INTERPRETATION_sRGB) {
+        image = image.colourspace(VIPS_INTERPRETATION_sRGB);
+        // Transform colours from embedded profile to sRGB profile
+        if (baton->withMetadata && HasProfile(image)) {
+          image = image.icc_transform(const_cast<char*>(srgbProfile.data()), VImage::option()
+            ->set("embedded", TRUE)
+          );
+        }
       }
 
       // Override EXIF Orientation tag
