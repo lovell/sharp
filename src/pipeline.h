@@ -69,6 +69,7 @@ struct PipelineBaton {
   int trimTolerance;
   double gamma;
   bool greyscale;
+  bool greyscaleOutput;
   bool normalize;
   int angle;
   bool rotateBeforePreExtract;
@@ -137,6 +138,7 @@ struct PipelineBaton {
     trimTolerance(0),
     gamma(0.0),
     greyscale(false),
+    greyscaleOutput(false),
     normalize(false),
     angle(0),
     flip(false),

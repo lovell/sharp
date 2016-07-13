@@ -778,7 +778,11 @@ class PipelineWorker : public AsyncWorker {
       if (Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
       }
-      if (image.interpretation() != VIPS_INTERPRETATION_sRGB) {
+      if (baton->greyscaleOutput && image.interpretation() != VIPS_INTERPRETATION_B_W) {
+        // Need to convert to grayscale
+        image = image.colourspace(VIPS_INTERPRETATION_B_W);
+      } else if (!baton->greyscaleOutput && image.interpretation() != VIPS_INTERPRETATION_sRGB) {
+        // Need to convert to sRGB
         image = image.colourspace(VIPS_INTERPRETATION_sRGB);
         // Transform colours from embedded profile to sRGB profile
         if (baton->withMetadata && HasProfile(image)) {
@@ -1232,6 +1236,7 @@ NAN_METHOD(pipeline) {
   }
   baton->gamma = attrAs<double>(options, "gamma");
   baton->greyscale = attrAs<bool>(options, "greyscale");
+  baton->greyscaleOutput = attrAs<bool>(options, "greyscaleOutput");
   baton->normalize = attrAs<bool>(options, "normalize");
   baton->angle = attrAs<int32_t>(options, "angle");
   baton->rotateBeforePreExtract = attrAs<bool>(options, "rotateBeforePreExtract");
