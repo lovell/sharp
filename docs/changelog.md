@@ -4,7 +4,7 @@
 
 Requires libvips v8.3.1
 
-#### v0.15.1 - TBD
+#### v0.15.1 - 12<sup>th</sup> July 2016
 
 * Concat Stream-based input in single operation for ~+3% perf and less GC.
   [#429](https://github.com/lovell/sharp/issues/429)
