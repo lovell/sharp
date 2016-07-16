@@ -91,8 +91,6 @@ var Sharp = function(input, options) {
     greyscale: false,
     greyscaleOutput: false,
     normalize: 0,
-    bandBoolOp: null,
-    booleanOp: null,
     booleanBufferIn: null,
     booleanFileIn: '',
     // overlay
