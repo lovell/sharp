@@ -1289,10 +1289,14 @@ NAN_METHOD(pipeline) {
     }
   }
   // Bandbool operation
-  baton->bandBoolOp = GetBooleanOperation(attrAsStr(options, "bandBoolOp"));
+  if(Has(options, New("bandBoolOp").ToLocalChecked()).FromJust()) {
+    baton->bandBoolOp = GetBooleanOperation(attrAsStr(options, "bandBoolOp"));
+  }
 
   // Boolean operation
-  baton->booleanOp = GetBooleanOperation(attrAsStr(options, "booleanOp"));
+  if(Has(options, New("booleanOp").ToLocalChecked()).FromJust()) {
+    baton->booleanOp = GetBooleanOperation(attrAsStr(options, "booleanOp"));
+  }
 
   // Function to notify of queue length changes
   Callback *queueListener = new Callback(

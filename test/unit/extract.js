@@ -181,6 +181,7 @@ describe('Partial image extraction', function() {
         .extract({ left: 3000, top: 10, width: 10, height: 10 })
         .toBuffer(function(err) {
           assert(err instanceof Error);
+          assert.strictEqual(err.message, "extract_area: bad extract area\n");
           done();
         });
     });
