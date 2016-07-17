@@ -512,7 +512,7 @@ sharp(input)
 
 #### joinChannel(channels)
 
-Join a data channel to the image. The meaning of the added channels depends on the output colourspace, set with `toColourspace()`. By default output will be web-friendly sRGB, with additional channels interpreted as alpha channels.
+Join a data channel to the image. The meaning of the added channels depends on the output colourspace, set with `toColourspace()`. By default the output image will be web-friendly sRGB, with additional channels interpreted as alpha channels.
 
 `channels` is one of
 * a single file path

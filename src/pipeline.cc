@@ -232,7 +232,6 @@ class PipelineWorker : public AsyncWorker {
         image = Trim(image, baton->trimTolerance);
       }
 
-
       // Pre extraction
       if (baton->topOffsetPre != -1) {
         image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
@@ -1071,7 +1070,6 @@ class PipelineWorker : public AsyncWorker {
     } catch (VError const &err) {
       (baton->err).append(err.what());
     }
-
     // Clean up libvips' per-request data and threads
     vips_error_clear();
     vips_thread_shutdown();

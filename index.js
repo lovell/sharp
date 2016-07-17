@@ -687,7 +687,6 @@ Sharp.prototype.greyscale = function(greyscale) {
 };
 Sharp.prototype.grayscale = Sharp.prototype.greyscale;
 
-
 /*
   Set output colourspace
 */
@@ -896,6 +895,7 @@ module.exports.colourspace = {
   cmyk: 'cmyk',
   srgb: 'srgb'
 };
+module.exports.colorspace = module.exports.colourspace;
 
 /*
   Resize image to width x height pixels
