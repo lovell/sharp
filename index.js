@@ -92,6 +92,8 @@ var Sharp = function(input, options) {
     normalize: 0,
     booleanBufferIn: null,
     booleanFileIn: '',
+    joinChannelBuffersIn: [],
+    joinChannelFilesIn: [],
     // overlay
     overlayFileIn: '',
     overlayBufferIn: null,
@@ -117,6 +119,7 @@ var Sharp = function(input, options) {
     tileSize: 256,
     tileOverlap: 0,
     extractChannel: -1,
+    outputMode: 'srgb',
     // Function to notify of queue length changes
     queueListener: function(queueLength) {
       module.exports.queue.emit('change', queueLength);
@@ -436,6 +439,47 @@ Sharp.prototype.overlayWith = function(overlay, options) {
 };
 
 /*
+  Add another color channel to the image
+*/
+Sharp.prototype.joinChannel = function(images) {
+  if (Array.isArray(images)) {
+    // Array of image file names or buffers, not mixed
+    var type = images.reduce(function(prev, curr) {
+      if((isBuffer(prev) && isBuffer(curr)) || (isString(prev) && isString(curr)))
+        return prev;
+      return false;
+    });
+    if (isString(type)) {
+      // Array of files input
+      if(this.options.joinChannelBuffersIn.length > 0)
+        throw new Error('Already joining buffers');
+      this.options.joinChannelFilesIn = this.options.joinChannelFilesIn.concat(images);
+    } else if (isBuffer(type)) {
+      // Array of buffers input
+      if(this.options.joinChannelFilesIn.length > 0)
+        throw new Error('Already joining files');
+      this.options.joinChannelBuffersIn = this.options.joinChannelBuffersIn.concat(images);
+    } else {
+      // Mixed input or non-string or non-buffer input
+      throw new Error('Invalid input array to joinChannel');
+    }
+  } else if (isString(images)) {
+    // File input
+    if(this.options.joinChannelBuffersIn.length > 0)
+      throw new Error('Already joining buffers');
+    this.options.joinChannelFilesIn.push(images);
+  } else if (isBuffer(images)) {
+    // Buffer input
+    if(this.options.joinChannelFilesIn.length > 0)
+      throw new Error('Already joining files');
+    this.options.joinChannelBuffersIn.push(images);
+  } else {
+    throw new Error('Invalid input to joinChannel');
+  }
+  return this;
+};
+
+/*
   Rotate output image by 0, 90, 180 or 270 degrees
   Auto-rotation based on the EXIF Orientation tag is represented by an angle of -1
 */
@@ -643,6 +687,19 @@ Sharp.prototype.greyscale = function(greyscale) {
 };
 Sharp.prototype.grayscale = Sharp.prototype.greyscale;
 
+
+/*
+  Set output colourspace
+*/
+Sharp.prototype.toColourspace = function(colourspace) {
+  if (!isString(colourspace) ) {
+    throw new Error('Invalid output colourspace ' + colourspace);
+  }
+  this.options.outputMode = colourspace;
+  return this;
+};
+Sharp.prototype.toColorspace = Sharp.prototype.toColourspace;
+
 Sharp.prototype.progressive = function(progressive) {
   this.options.progressive = isBoolean(progressive) ? progressive : true;
   return this;
@@ -830,6 +887,14 @@ module.exports.bool = {
   and: 'and',
   or: 'or',
   eor: 'eor'
+};
+// Colourspaces
+module.exports.colourspace = {
+  multiband: 'multiband',
+  'b-w': 'b-w',
+  bw: 'b-w',
+  cmyk: 'cmyk',
+  srgb: 'srgb'
 };
 
 /*

@@ -60,7 +60,7 @@ Fast access to image metadata without decoding any compressed image data.
 * `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
 * `width`: Number of pixels wide
 * `height`: Number of pixels high
-* `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L522)
+* `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L568)
 * `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
 * `density`: Number of pixels per inch (DPI), if present
 * `hasProfile`: Boolean indicating the presence of an embedded ICC profile
@@ -445,7 +445,7 @@ Convert to 8-bit greyscale; 256 shades of grey.
 
 This is a linear operation. If the input image is in a non-linear colour space such as sRGB, use `gamma()` with `greyscale()` for the best results.
 
-The output image will still be web-friendly sRGB and contain three (identical) channels.
+By default the output image will be web-friendly sRGB and contain three (identical) color channels. This may be overridden by other sharp operations such as `toColourspace('b-w')`, which will produce an output image containing one color channel. An alpha channel may be present, and will be unchanged by the operation.
 
 #### normalize() / normalise()
 
@@ -489,11 +489,17 @@ sharp('input.png')
   });
 ```
 
+#### toColourspace(colourspace) / toColorspace(colorspace)
+
+Set the output colourspace. By default output image will be web-friendly sRGB, with additional channels interpreted as alpha channels.  
+  
+`colourspace` is a string or `sharp.colourspace` enum that identifies an output colourspace. String arguments comprise vips colour space interpretation names  e.g. `srgb`, `rgb`, `scrgb`, `cmyk`, `lab`, `xyz`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L568)
+  
 #### extractChannel(channel)
 
 Extract a single channel from a multi-channel image.
 
-* `channel` is a zero-indexed integral Number representing the band number to extract. `red`, `green` or `blue` are also accepted as an alternative to `0`, `1` or `2` respectively.
+`channel` is a zero-indexed integral Number representing the band number to extract. `red`, `green` or `blue` are also accepted as an alternative to `0`, `1` or `2` respectively.
 
 ```javascript
 sharp(input)
@@ -503,6 +509,20 @@ sharp(input)
     // input_green.jpg contains the green channel of the input image
    });
 ```
+
+#### joinChannel(channels)
+
+Join a data channel to the image. The meaning of the added channels depends on the output colourspace, set with `toColourspace()`. By default output will be web-friendly sRGB, with additional channels interpreted as alpha channels.
+
+`channels` is one of
+* a single file path
+* an array of file paths
+* a single buffer
+* an array of buffers
+
+Note that channel ordering follows vips convention:
+* sRGB: 0: Red, 1: Green, 2: Blue, 3: Alpha
+* CMYK: 0: Magenta, 1: Cyan, 2: Yellow, 3: Black, 4: Alpha
 
 #### bandbool(operation)
 

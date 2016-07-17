@@ -133,6 +133,11 @@ namespace sharp {
   */
   VipsOperationBoolean GetBooleanOperation(std::string const opStr);
 
+  /*
+    Get interpretation type from string
+  */
+  VipsInterpretation GetInterpretation(std::string const typeStr);
+
 }  // namespace sharp
 
 #endif  // SRC_COMMON_H_

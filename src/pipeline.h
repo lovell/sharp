@@ -42,6 +42,9 @@ struct PipelineBaton {
   std::string booleanFileIn;
   char *booleanBufferIn;
   size_t booleanBufferInLength;
+  std::vector<std::string> joinChannelFilesIn;
+  std::vector<char *> joinChannelBuffersIn;
+  std::vector<size_t> joinChannelBuffersInLength;
   int topOffsetPre;
   int leftOffsetPre;
   int widthPre;
@@ -99,6 +102,7 @@ struct PipelineBaton {
   VipsOperationBoolean bandBoolOp;
   VipsOperationBoolean booleanOp;
   int extractChannel;
+  VipsInterpretation outputMode;
   int tileSize;
   int tileOverlap;
   VipsForeignDzContainer tileContainer;
@@ -163,6 +167,7 @@ struct PipelineBaton {
     bandBoolOp(VIPS_OPERATION_BOOLEAN_LAST),
     booleanOp(VIPS_OPERATION_BOOLEAN_LAST),
     extractChannel(-1),
+    outputMode(VIPS_INTERPRETATION_LAST),
     tileSize(256),
     tileOverlap(0),
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),
