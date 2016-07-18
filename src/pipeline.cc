@@ -4,7 +4,7 @@
 #include <utility>
 #include <memory>
 #include <numeric>
-#include <unordered_map>
+#include <map>
 
 #include <vips/vips8>
 
@@ -112,7 +112,7 @@ class PipelineWorker : public AsyncWorker {
     // Increment processing task counter
     g_atomic_int_inc(&counterProcess);
 
-    std::unordered_map<VipsInterpretation, std::string> profileMap;
+    std::map<VipsInterpretation, std::string> profileMap;
     // Default sRGB ICC profile from https://packages.debian.org/sid/all/icc-profiles-free/filelist
     profileMap.insert(
       std::pair<VipsInterpretation, std::string>(VIPS_INTERPRETATION_sRGB,
