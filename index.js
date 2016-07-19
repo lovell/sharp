@@ -94,6 +94,9 @@ var Sharp = function(input, options) {
     booleanFileIn: '',
     joinChannelBuffersIn: [],
     joinChannelFilesIn: [],
+    joinChannelRawWidth: 0,
+    joinChannelRawHeight: 0,
+    joinChannelRawChannels: 0,
     // overlay
     overlayFileIn: '',
     overlayBufferIn: null,
@@ -441,7 +444,7 @@ Sharp.prototype.overlayWith = function(overlay, options) {
 /*
   Add another color channel to the image
 */
-Sharp.prototype.joinChannel = function(images) {
+Sharp.prototype.joinChannel = function(images, options) {
   if (Array.isArray(images)) {
     // Array of image file names or buffers, not mixed
     var type = images.reduce(function(prev, curr) {
@@ -475,6 +478,22 @@ Sharp.prototype.joinChannel = function(images) {
     this.options.joinChannelBuffersIn.push(images);
   } else {
     throw new Error('Invalid input to joinChannel');
+  }
+  if (isObject(options)) {
+    if (isDefined(options.raw)) {
+      if (
+        isObject(options.raw) &&
+        isInteger(options.raw.width) && inRange(options.raw.width, 1, maximum.width) &&
+        isInteger(options.raw.height) && inRange(options.raw.height, 1, maximum.height) &&
+        isInteger(options.raw.channels) && inRange(options.raw.channels, 1, 4)
+      ) {
+        this.options.joinChannelRawWidth = options.raw.width;
+        this.options.joinChannelRawHeight = options.raw.height;
+        this.options.joinChannelRawChannels = options.raw.channels;
+      } else {
+        throw new Error('joinChannel: expected width, height and channels for raw pixel input');
+      }
+    }
   }
   return this;
 };

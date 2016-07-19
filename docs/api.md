@@ -510,7 +510,7 @@ sharp(input)
    });
 ```
 
-#### joinChannel(channels)
+#### joinChannel(channels, [options])
 
 Join a data channel to the image. The meaning of the added channels depends on the output colourspace, set with `toColourspace()`. By default the output image will be web-friendly sRGB, with additional channels interpreted as alpha channels.
 
@@ -523,6 +523,8 @@ Join a data channel to the image. The meaning of the added channels depends on t
 Note that channel ordering follows vips convention:
 * sRGB: 0: Red, 1: Green, 2: Blue, 3: Alpha
 * CMYK: 0: Magenta, 1: Cyan, 2: Yellow, 3: Black, 4: Alpha
+
+Buffers may be any of the image formats supported by sharp: JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data. In the case of a RAW buffer, the `options` object should contain a `raw` attribute, which follows the format of the attribute of the same name in the `sharp()` constructor. See `sharp()` for details. See `raw()` for pixel ordering. 
 
 #### bandbool(operation)
 

@@ -566,20 +566,41 @@ class PipelineWorker : public AsyncWorker {
         if (baton->joinChannelBuffersIn.size() > 0 &&
             baton->joinChannelBuffersIn.size() == baton->joinChannelBuffersInLength.size()) {
           // Joining with buffers
-          for(unsigned int i = 0; i < baton->joinChannelBuffersIn.size(); i++) {
-            joinImageType = DetermineImageType(baton->joinChannelBuffersIn[i], baton->joinChannelBuffersInLength[i]);
-            if (joinImageType != ImageType::UNKNOWN) {
+          if (baton->joinChannelRawWidth > 0 && baton->joinChannelRawHeight > 0 && baton->joinChannelRawChannels > 0) {
+            // Raw, uncompressed pixe data
+            for(unsigned int i = 0; i < baton->joinChannelBuffersIn.size(); i++) {
               try {
-                joinImage = VImage::new_from_buffer(
-                  baton->joinChannelBuffersIn[i], baton->joinChannelBuffersInLength[i],
-                  nullptr, VImage::option()->set("access", baton->accessMethod));
+                joinImage = VImage::new_from_memory(baton->joinChannelBuffersIn[i],
+                                                    baton->joinChannelBuffersInLength[i],
+                                                    baton->joinChannelRawWidth, baton->joinChannelRawHeight,
+                                                    baton->joinChannelRawChannels, VIPS_FORMAT_UCHAR);
                 image = image.bandjoin(joinImage);
-              } catch (...) {
-                (baton->err).append("Join Channel buffer has corrupt header");
+                joinImageType = ImageType::RAW;
+              } catch (VError const &err) {
+                (baton->err).append(err.what());
                 joinImageType = ImageType::UNKNOWN;
+                break;
               }
-            } else {
-              (baton->err).append("Join Channel buffer contains unsupported image format");
+            }
+          } else {
+            // Compressed data
+            for(unsigned int i = 0; i < baton->joinChannelBuffersIn.size(); i++) {
+              joinImageType = DetermineImageType(baton->joinChannelBuffersIn[i], baton->joinChannelBuffersInLength[i]);
+              if (joinImageType != ImageType::UNKNOWN) {
+                try {
+                  joinImage = VImage::new_from_buffer(
+                    baton->joinChannelBuffersIn[i], baton->joinChannelBuffersInLength[i],
+                    nullptr, VImage::option()->set("access", baton->accessMethod));
+                  image = image.bandjoin(joinImage);
+                } catch (...) {
+                  (baton->err).append("Join Channel buffer has corrupt header");
+                  joinImageType = ImageType::UNKNOWN;
+                  break;
+                }
+              } else {
+                (baton->err).append("Join Channel buffer contains unsupported image format");
+                break;
+              }
             }
           }
         } else if (baton->joinChannelFilesIn.size() > 0) {
@@ -1305,6 +1326,9 @@ NAN_METHOD(pipeline) {
     baton->joinChannelBuffersIn.push_back(node::Buffer::Data(joinChannelBufferIn));
     buffersToPersist.push_back(joinChannelBufferIn);
   }
+  baton->joinChannelRawWidth = attrAs<int32_t>(options, "joinChannelRawWidth");
+  baton->joinChannelRawHeight = attrAs<int32_t>(options, "joinChannelRawHeight");
+  baton->joinChannelRawChannels = attrAs<int32_t>(options, "joinChannelRawChannels");
   // Operators
   baton->flatten = attrAs<bool>(options, "flatten");
   baton->negate = attrAs<bool>(options, "negate");

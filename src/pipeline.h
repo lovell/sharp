@@ -45,6 +45,9 @@ struct PipelineBaton {
   std::vector<std::string> joinChannelFilesIn;
   std::vector<char *> joinChannelBuffersIn;
   std::vector<size_t> joinChannelBuffersInLength;
+  int joinChannelRawWidth;
+  int joinChannelRawHeight;
+  int joinChannelRawChannels;
   int topOffsetPre;
   int leftOffsetPre;
   int widthPre;
@@ -125,6 +128,9 @@ struct PipelineBaton {
     overlayTile(false),
     overlayCutout(false),
     booleanBufferInLength(0),
+    joinChannelRawWidth(0),
+    joinChannelRawHeight(0),
+    joinChannelRawChannels(0),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),
