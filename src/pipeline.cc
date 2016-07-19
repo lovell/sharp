@@ -625,7 +625,7 @@ class PipelineWorker : public AsyncWorker {
         if(joinImageType == ImageType::UNKNOWN) {
           return Error();
         } else {
-          image = image.copy(VImage::option()->set("interpretation", baton->outputMode));
+          image = image.copy(VImage::option()->set("interpretation", baton->colourspace));
         }
       }
 
@@ -913,14 +913,14 @@ class PipelineWorker : public AsyncWorker {
       if (Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
       }
-      if (image.interpretation() != baton->outputMode) {
+      if (image.interpretation() != baton->colourspace) {
         // Need to convert image
-        image = image.colourspace(baton->outputMode);
+        image = image.colourspace(baton->colourspace);
         // Transform colours from embedded profile to output profile
         if (baton->withMetadata &&
             HasProfile(image) &&
-            profileMap[baton->outputMode] != std::string()) {
-          image = image.icc_transform(const_cast<char*>(profileMap[baton->outputMode].data()),
+            profileMap[baton->colourspace] != std::string()) {
+          image = image.icc_transform(const_cast<char*>(profileMap[baton->colourspace].data()),
             VImage::option()->set("embedded", TRUE)
           );
         }
@@ -955,7 +955,7 @@ class PipelineWorker : public AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "jpeg";
-          if(baton->outputMode == VIPS_INTERPRETATION_CMYK) {
+          if(baton->colourspace == VIPS_INTERPRETATION_CMYK) {
             baton->channels = std::min(baton->channels, 4);
           } else {
             baton->channels = std::min(baton->channels, 3);
@@ -1365,9 +1365,9 @@ NAN_METHOD(pipeline) {
   baton->optimiseScans = attrAs<bool>(options, "optimiseScans");
   baton->withMetadata = attrAs<bool>(options, "withMetadata");
   baton->withMetadataOrientation = attrAs<int32_t>(options, "withMetadataOrientation");
-  baton->outputMode = GetInterpretation(attrAsStr(options, "outputMode"));
-  if(baton->outputMode == VIPS_INTERPRETATION_ERROR)
-    baton->outputMode = VIPS_INTERPRETATION_sRGB;
+  baton->colourspace = GetInterpretation(attrAsStr(options, "colourspace"));
+  if(baton->colourspace == VIPS_INTERPRETATION_ERROR)
+    baton->colourspace = VIPS_INTERPRETATION_sRGB;
   // Output
   baton->formatOut = attrAsStr(options, "formatOut");
   baton->fileOut = attrAsStr(options, "fileOut");

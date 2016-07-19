@@ -4,6 +4,7 @@ var assert = require('assert');
 var fs = require('fs');
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
+var BluebirdPromise = require('bluebird');
 
 describe('Image channel insertion', function() {
 
@@ -85,7 +86,7 @@ describe('Image channel insertion', function() {
   });
 
   it('Join raw buffers to RGB', function(done) {
-    Promise.all([
+    BluebirdPromise.all([
       sharp(fixtures.inputPngTestJoinChannel).toColourspace('b-w').raw().toBuffer(),
       sharp(fixtures.inputPngStripesH).toColourspace('b-w').raw().toBuffer()
     ]).then(

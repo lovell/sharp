@@ -122,7 +122,7 @@ var Sharp = function(input, options) {
     tileSize: 256,
     tileOverlap: 0,
     extractChannel: -1,
-    outputMode: 'srgb',
+    colourspace: 'srgb',
     // Function to notify of queue length changes
     queueListener: function(queueLength) {
       module.exports.queue.emit('change', queueLength);
@@ -713,7 +713,7 @@ Sharp.prototype.toColourspace = function(colourspace) {
   if (!isString(colourspace) ) {
     throw new Error('Invalid output colourspace ' + colourspace);
   }
-  this.options.outputMode = colourspace;
+  this.options.colourspace = colourspace;
   return this;
 };
 Sharp.prototype.toColorspace = Sharp.prototype.toColourspace;

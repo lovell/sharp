@@ -7,7 +7,6 @@
     "beforeEach": true,
     "afterEach": true,
     "describe": true,
-    "it": true,
-    "Promise": true
+    "it": true
   }
 }
