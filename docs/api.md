@@ -457,7 +457,7 @@ Overlay (composite) a image containing an alpha channel over the processed (resi
 
 `image` is one of the following, and must be the same size or smaller than the processed image:
 
-* Buffer containing PNG, WebP, GIF or SVG image data, or
+* Buffer containing PNG, WebP, GIF, SVG, or RAW image data, or
 * String containing the path to an image file, with most major transparency formats supported.
 
 `options`, if present, is an Object with the following optional attributes:
@@ -467,6 +467,7 @@ Overlay (composite) a image containing an alpha channel over the processed (resi
 * `left` is an integral Number representing the pixel offset from the left edge.
 * `tile` is a Boolean, defaulting to `false`. When set to `true` repeats the overlay image across the entire image with the given `gravity`.
 * `cutout` is a Boolean, defaulting to `false`. When set to `true` applies only the alpha channel of the overlay image to the image to be overlaid, giving the appearance of one image being cut out of another.
+* `raw` is a required attribute when using a RAW formatted input buffer. It is an object containing  `width`, `height` and `channels` attributes describing the raw buffer. This syntax mirrors the input RAW buffer syntax in the `sharp()` constructor. See `raw()` for pixel ordering.
 
 If both `top` and `left` are provided, they take precedence over `gravity`.
 
@@ -523,11 +524,11 @@ sharp('input.png')
 In the above example if `input.png` is a 3 channel RGB image, `output.png` will be a 1 channel grayscale image where each pixel `P = R & G & B`.
 For example, if `I(1,1) = [247, 170, 14] = [0b11110111, 0b10101010, 0b00001111]` then `O(1,1) = 0b11110111 & 0b10101010 & 0b00001111 = 0b00000010 = 2`.
 
-#### boolean(image, operation)
+#### boolean(image, operation, [options])
 
 Perform a bitwise boolean operation with `image`, where `image` is one of the following:
 
-* Buffer containing PNG, WebP, GIF or SVG image data, or
+* Buffer containing PNG, WebP, GIF, SVG or RAW image data, or
 * String containing the path to an image file
 
 This operation creates an output image where each pixel is the result of the selected bitwise boolean `operation` between the corresponding pixels of the input images.
@@ -536,6 +537,8 @@ The boolean operation can be one of the following:
 * `and` performs a bitwise and operation, like the c-operator `&`.
 * `or` performs a bitwise or operation, like the c-operator `|`.
 * `eor` performs a bitwise exclusive or operation, like the c-operator `^`.
+
+To use RAW input, the `options` argument is required to contain an attribute `raw`, an object containing `width`, `height` and `channels` attributes describing the raw buffer. This syntax mirrors the input RAW buffer syntax in the `sharp()` constructor. See `raw()` for pixel ordering. 
 
 ### Output
 

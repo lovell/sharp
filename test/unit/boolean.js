@@ -39,7 +39,22 @@ describe('Boolean operation between two images', function() {
           fixtures.assertSimilar(fixtures.expected('boolean_' + op + '_result.jpg'), data, done);
         });
     });
+  });
 
+  it('Raw buffer input', function(done) {
+    sharp(fixtures.inputJpgBooleanTest).raw().toBuffer(
+      function(err, buf, info) {
+        if (err) throw err;
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .boolean(buf, 'and', {raw: info})
+          .toBuffer(function(err, data, info) {
+            if (err) throw err;
+            assert.strictEqual(320, info.width);
+            assert.strictEqual(240, info.height);
+            fixtures.assertSimilar(fixtures.expected('boolean_and_result.jpg'), data, done);
+          });
+      });
   });
 
   it('Invalid operation', function() {
@@ -59,4 +74,11 @@ describe('Boolean operation between two images', function() {
       sharp().boolean();
     });
   });
+
+  it('Invalid raw buffer description', function() {
+    assert.throws(function() {
+      sharp().boolean(fs.readFileSync(fixtures.inputJpg),{raw:{}});
+    });
+  });
+
 });

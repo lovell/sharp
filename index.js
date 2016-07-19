@@ -90,8 +90,12 @@ var Sharp = function(input, options) {
     gamma: 0,
     greyscale: false,
     normalize: 0,
+    // boolean
     booleanBufferIn: null,
     booleanFileIn: '',
+    booleanRawWidth: 0,
+    booleanRawHeight: 0,
+    booleanRawChannels: 0,
     // overlay
     overlayFileIn: '',
     overlayBufferIn: null,
@@ -100,6 +104,9 @@ var Sharp = function(input, options) {
     overlayYOffset : -1,
     overlayTile: false,
     overlayCutout: false,
+    overlayRawWidth: 0,
+    overlayRawHeight: 0,
+    overlayRawChannels: 0,
     // output options
     formatOut: 'input',
     fileOut: '',
@@ -369,7 +376,7 @@ Sharp.prototype.negate = function(negate) {
 /*
   Bitwise boolean operations between images
 */
-Sharp.prototype.boolean = function(operand, operator) {
+Sharp.prototype.boolean = function(operand, operator, options) {
   if (isString(operand)) {
     this.options.booleanFileIn = operand;
   } else if (isBuffer(operand)) {
@@ -382,6 +389,23 @@ Sharp.prototype.boolean = function(operand, operator) {
   } else {
     throw new Error('Invalid boolean operation ' + operator);
   }
+  if (isObject(options)) {
+    if (isDefined(options.raw)) {
+      if (
+        isObject(options.raw) &&
+        isInteger(options.raw.width) && inRange(options.raw.width, 1, maximum.width) &&
+        isInteger(options.raw.height) && inRange(options.raw.height, 1, maximum.height) &&
+        isInteger(options.raw.channels) && inRange(options.raw.channels, 1, 4)
+      ) {
+        this.options.booleanRawWidth = options.raw.width;
+        this.options.booleanRawHeight = options.raw.height;
+        this.options.booleanRawChannels = options.raw.channels;
+      } else {
+        throw new Error('Boolean: expected width, height and channels for raw pixel input');
+      }
+    }
+  }
+
   return this;
 };
 
@@ -389,6 +413,8 @@ Sharp.prototype.boolean = function(operand, operator) {
   Overlay with another image, using an optional gravity
 */
 Sharp.prototype.overlayWith = function(overlay, options) {
+  /* jshint maxcomplexity:16 */
+  
   if (isString(overlay)) {
     this.options.overlayFileIn = overlay;
   } else if (isBuffer(overlay)) {
@@ -431,6 +457,21 @@ Sharp.prototype.overlayWith = function(overlay, options) {
         throw new Error('Unsupported overlay gravity ' + options.gravity);
       }
     }
+    if (isDefined(options.raw)) {
+      if (
+        isObject(options.raw) &&
+        isInteger(options.raw.width) && inRange(options.raw.width, 1, maximum.width) &&
+        isInteger(options.raw.height) && inRange(options.raw.height, 1, maximum.height) &&
+        isInteger(options.raw.channels) && inRange(options.raw.channels, 1, 4)
+      ) {
+        this.options.overlayRawWidth = options.raw.width;
+        this.options.overlayRawHeight = options.raw.height;
+        this.options.overlayRawChannels = options.raw.channels;
+      } else {
+        throw new Error('Overlay: expected width, height and channels for raw pixel input');
+      }
+    }
+
   }
   return this;
 };
