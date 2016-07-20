@@ -548,7 +548,7 @@ describe('Overlays', function() {
       });
   });
 
-  if('Fail with invalid raw buffer description', function() {
+  it('Fail with invalid raw buffer description', function() {
     assert.throws(function() {
       sharp().overlayWith(fs.readFileSyc(fixtures.inputJpg),{raw:{}});
     });
