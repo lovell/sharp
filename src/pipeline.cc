@@ -803,7 +803,7 @@ class PipelineWorker : public AsyncWorker {
             try {
               booleanImage = VImage::new_from_memory(baton->booleanBufferIn, baton->booleanBufferInLength,
                 baton->booleanRawWidth, baton->booleanRawHeight, baton->booleanRawChannels, VIPS_FORMAT_UCHAR);
-              if (baton->rawChannels < 3) {
+              if (baton->booleanRawChannels < 3) {
                 booleanImage.get_image()->Type = VIPS_INTERPRETATION_B_W;
               } else {
                 booleanImage.get_image()->Type = VIPS_INTERPRETATION_sRGB;
