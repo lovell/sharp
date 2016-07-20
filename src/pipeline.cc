@@ -697,6 +697,7 @@ class PipelineWorker : public AsyncWorker {
           }
         }
         if (overlayImageType == ImageType::UNKNOWN) {
+          (baton->err).append("Overlay file type is unknown");
           return Error();
         }
         // Check if overlay is tiled
