@@ -884,9 +884,12 @@ class PipelineWorker : public AsyncWorker {
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" && inputImageType == ImageType::PNG)) {
+          // Strip profile
+          if (!baton->withMetadata) {
+            vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
+          }
           // Write PNG to buffer
           VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
-            ->set("strip", !baton->withMetadata)
             ->set("compression", baton->compressionLevel)
             ->set("interlace", baton->progressive)
             ->set("filter", baton->withoutAdaptiveFiltering ?
@@ -961,9 +964,12 @@ class PipelineWorker : public AsyncWorker {
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || isPng || (matchInput && inputImageType == ImageType::PNG)) {
+          // Strip profile
+          if (!baton->withMetadata) {
+            vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
+          }
           // Write PNG to file
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
             ->set("compression", baton->compressionLevel)
             ->set("interlace", baton->progressive)
             ->set("filter", baton->withoutAdaptiveFiltering ?

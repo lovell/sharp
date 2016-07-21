@@ -18,6 +18,10 @@ Requires libvips v8.3.1
   [#511](https://github.com/lovell/sharp/pull/511)
   [@mhirsch](https://github.com/mhirsch)
 
+* Ensure ICC profiles are removed from PNG output unless withMetadata used.
+  [#521](https://github.com/lovell/sharp/issues/521)
+  [@ChrisPinewood](https://github.com/ChrisPinewood)
+
 #### v0.15.1 - 12<sup>th</sup> July 2016
 
 * Concat Stream-based input in single operation for ~+3% perf and less GC.
