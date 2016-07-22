@@ -683,18 +683,35 @@ class PipelineWorker : public AsyncWorker {
         VImage overlayImage;
         ImageType overlayImageType = ImageType::UNKNOWN;
         if (baton->overlayBufferInLength > 0) {
-          // Overlay with image from buffer
-          overlayImageType = DetermineImageType(baton->overlayBufferIn, baton->overlayBufferInLength);
-          if (overlayImageType != ImageType::UNKNOWN) {
+          if (baton->overlayRawWidth > 0 && baton->overlayRawHeight > 0 && baton->overlayRawChannels > 0) {
+            // Raw, uncompressed pixel data
             try {
-              overlayImage = VImage::new_from_buffer(baton->overlayBufferIn, baton->overlayBufferInLength,
-                nullptr, VImage::option()->set("access", baton->accessMethod));
-            } catch (...) {
-              (baton->err).append("Overlay buffer has corrupt header");
-              overlayImageType = ImageType::UNKNOWN;
+              overlayImage = VImage::new_from_memory(baton->overlayBufferIn, baton->overlayBufferInLength,
+                baton->overlayRawWidth, baton->overlayRawHeight, baton->overlayRawChannels, VIPS_FORMAT_UCHAR);
+              if (baton->overlayRawChannels < 3) {
+                overlayImage.get_image()->Type = VIPS_INTERPRETATION_B_W;
+              } else {
+                overlayImage.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+              }
+              overlayImageType = ImageType::RAW;
+            } catch(VError const &err) {
+              (baton->err).append(err.what());
+              inputImageType = ImageType::UNKNOWN;
             }
           } else {
-            (baton->err).append("Overlay buffer contains unsupported image format");
+            // Overlay with image from buffer
+            overlayImageType = DetermineImageType(baton->overlayBufferIn, baton->overlayBufferInLength);
+            if (overlayImageType != ImageType::UNKNOWN) {
+              try {
+                overlayImage = VImage::new_from_buffer(baton->overlayBufferIn, baton->overlayBufferInLength,
+                  nullptr, VImage::option()->set("access", baton->accessMethod));
+              } catch (...) {
+                (baton->err).append("Overlay buffer has corrupt header");
+                overlayImageType = ImageType::UNKNOWN;
+              }
+            } else {
+              (baton->err).append("Overlay buffer contains unsupported image format");
+            }
           }
         } else {
           // Overlay with image from file
@@ -794,17 +811,35 @@ class PipelineWorker : public AsyncWorker {
         ImageType booleanImageType = ImageType::UNKNOWN;
         if (baton->booleanBufferInLength > 0) {
           // Buffer input for boolean operation
-          booleanImageType = DetermineImageType(baton->booleanBufferIn, baton->booleanBufferInLength);
-          if (booleanImageType != ImageType::UNKNOWN) {
+          if (baton->booleanRawWidth > 0 && baton->booleanRawHeight > 0 && baton->booleanRawChannels > 0) {
+            // Raw, uncompressed pixel data
             try {
-              booleanImage = VImage::new_from_buffer(baton->booleanBufferIn, baton->booleanBufferInLength,
-                nullptr, VImage::option()->set("access", baton->accessMethod));
-            } catch (...) {
-              (baton->err).append("Boolean operation buffer has corrupt header");
+              booleanImage = VImage::new_from_memory(baton->booleanBufferIn, baton->booleanBufferInLength,
+                baton->booleanRawWidth, baton->booleanRawHeight, baton->booleanRawChannels, VIPS_FORMAT_UCHAR);
+              if (baton->booleanRawChannels < 3) {
+                booleanImage.get_image()->Type = VIPS_INTERPRETATION_B_W;
+              } else {
+                booleanImage.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+              }
+              booleanImageType = ImageType::RAW;
+            } catch(VError const &err) {
+              (baton->err).append(err.what());
               booleanImageType = ImageType::UNKNOWN;
             }
           } else {
-            (baton->err).append("Boolean operation buffer contains unsupported image format");
+            // Compressed data
+            booleanImageType = DetermineImageType(baton->booleanBufferIn, baton->booleanBufferInLength);
+            if (booleanImageType != ImageType::UNKNOWN) {
+              try {
+                booleanImage = VImage::new_from_buffer(baton->booleanBufferIn, baton->booleanBufferInLength,
+                  nullptr, VImage::option()->set("access", baton->accessMethod));
+              } catch (...) {
+                (baton->err).append("Boolean operation buffer has corrupt header");
+                booleanImageType = ImageType::UNKNOWN;
+              }
+            } else {
+              (baton->err).append("Boolean operation buffer contains unsupported image format");
+            }
           }
         } else if (!baton->booleanFileIn.empty()) {
           // File input for boolean operation
@@ -862,6 +897,7 @@ class PipelineWorker : public AsyncWorker {
       baton->channels = image.bands();
       baton->width = image.width();
       baton->height = image.height();
+
       // Output
       if (baton->fileOut == "") {
         // Buffer output
@@ -1216,6 +1252,9 @@ NAN_METHOD(pipeline) {
     baton->overlayBufferInLength = node::Buffer::Length(overlayBufferIn);
     baton->overlayBufferIn = node::Buffer::Data(overlayBufferIn);
     buffersToPersist.push_back(overlayBufferIn);
+    baton->overlayRawWidth = attrAs<int32_t>(options, "overlayRawWidth");
+    baton->overlayRawHeight = attrAs<int32_t>(options, "overlayRawHeight");
+    baton->overlayRawChannels = attrAs<int32_t>(options, "overlayRawChannels");
   }
   baton->overlayGravity = attrAs<int32_t>(options, "overlayGravity");
   baton->overlayXOffset = attrAs<int32_t>(options, "overlayXOffset");
@@ -1230,6 +1269,9 @@ NAN_METHOD(pipeline) {
     baton->booleanBufferInLength = node::Buffer::Length(booleanBufferIn);
     baton->booleanBufferIn = node::Buffer::Data(booleanBufferIn);
     buffersToPersist.push_back(booleanBufferIn);
+    baton->booleanRawWidth = attrAs<int32_t>(options, "booleanRawWidth");
+    baton->booleanRawHeight = attrAs<int32_t>(options, "booleanRawHeight");
+    baton->booleanRawChannels = attrAs<int32_t>(options, "booleanRawChannels");
   }
   // Resize options
   baton->withoutEnlargement = attrAs<bool>(options, "withoutEnlargement");

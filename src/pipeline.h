@@ -39,9 +39,15 @@ struct PipelineBaton {
   int overlayYOffset;
   bool overlayTile;
   bool overlayCutout;
+  int overlayRawWidth;
+  int overlayRawHeight;
+  int overlayRawChannels;
   std::string booleanFileIn;
   char *booleanBufferIn;
   size_t booleanBufferInLength;
+  int booleanRawWidth;
+  int booleanRawHeight;
+  int booleanRawChannels;
   int topOffsetPre;
   int leftOffsetPre;
   int widthPre;
@@ -120,7 +126,13 @@ struct PipelineBaton {
     overlayYOffset(-1),
     overlayTile(false),
     overlayCutout(false),
+    overlayRawWidth(0),
+    overlayRawHeight(0),
+    overlayRawChannels(0),
     booleanBufferInLength(0),
+    booleanRawWidth(0),
+    booleanRawHeight(0),
+    booleanRawChannels(0),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),

@@ -126,6 +126,26 @@ describe('Overlays', function() {
       });
   });
 
+  it('Composite rgb+alpha raw buffer onto JPEG', function(done) {
+    var paths = getPaths('overlay-jpeg-with-rgb', 'jpg');
+
+    sharp(fixtures.inputPngOverlayLayer1)
+      .raw()
+      .toBuffer(function(err, buf, info) {
+        if (err) throw err;
+
+        sharp(fixtures.inputJpg)
+          .resize(2048, 1536)
+          .overlayWith(buf, {raw:info})
+          .toFile(paths.actual, function(error, info) {
+            if (error) return done(error);
+            fixtures.assertMaxColourDistance(paths.actual, paths.expected, 102);
+            done();
+          });
+      });
+  });
+    
+
   it('Composite greyscale+alpha PNG onto JPEG', function(done) {
     var paths = getPaths('overlay-jpeg-with-greyscale', 'jpg');
 
@@ -526,6 +546,12 @@ describe('Overlays', function() {
         assert.strictEqual(3, info.channels);
         fixtures.assertSimilar(expected, data, done);
       });
+  });
+
+  it('Fail with invalid raw buffer description', function() {
+    assert.throws(function() {
+      sharp().overlayWith(fs.readFileSyc(fixtures.inputJpg),{raw:{}});
+    });
   });
 
 });
