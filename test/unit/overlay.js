@@ -528,4 +528,12 @@ describe('Overlays', function() {
       });
   });
 
+  it('Throws an error when called with an invalid file', function(done) {
+    sharp(fixtures.inputJpg).overlayWith('notfound.png')
+      .toBuffer(function(err) {
+        assert(err instanceof Error);
+        done();
+      });
+  });
+
 });
