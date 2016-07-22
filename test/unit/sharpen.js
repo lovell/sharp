@@ -46,19 +46,21 @@ describe('Sharpen', function() {
       });
   });
 
-  it('specific radius/levels with alpha channel', function(done) {
-    sharp(fixtures.inputPngWithTransparency)
-      .resize(320, 240)
-      .sharpen(5, 4, 8)
-      .toBuffer(function(err, data, info) {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(4, info.channels);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('sharpen-rgba.png'), data, done);
-      });
-  });
+  if (!process.env.SHARP_TEST_WITHOUT_CACHE) {
+    it('specific radius/levels with alpha channel', function(done) {
+      sharp(fixtures.inputPngWithTransparency)
+        .resize(320, 240)
+        .sharpen(5, 4, 8)
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(4, info.channels);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(240, info.height);
+          fixtures.assertSimilar(fixtures.expected('sharpen-rgba.png'), data, done);
+        });
+    });
+  }
 
   it('mild sharpen', function(done) {
     sharp(fixtures.inputJpg)
