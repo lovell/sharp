@@ -338,7 +338,7 @@ class PipelineWorker : public AsyncWorker {
         }
       }
 
-      // If integral x and y shrink are equal, try to use libjpeg shrink-on-load,
+      // If integral x and y shrink are equal, try to use shrink-on-load for JPEG and WebP,
       // but not when applying gamma correction or pre-resize extract
       int shrink_on_load = 1;
       if (
@@ -361,13 +361,6 @@ class PipelineWorker : public AsyncWorker {
         }
       }
       if (shrink_on_load > 1) {
-        // Recalculate integral shrink and double residual
-        xfactor = std::max(xfactor, 1.0);
-        yfactor = std::max(yfactor, 1.0);
-        xshrink = std::max(1, static_cast<int>(floor(xfactor)));
-        yshrink = std::max(1, static_cast<int>(floor(yfactor)));
-        xresidual = static_cast<double>(xshrink) / xfactor;
-        yresidual = static_cast<double>(yshrink) / yfactor;
         // Reload input using shrink-on-load
         VOption *option = VImage::option()->set("shrink", shrink_on_load);
         if (baton->bufferInLength > 1) {
@@ -388,6 +381,26 @@ class PipelineWorker : public AsyncWorker {
             // Reload WebP file
             image = VImage::webpload(const_cast<char*>((baton->fileIn).data()), option);
           }
+        }
+        // Recalculate integral shrink and double residual
+        int shrunkOnLoadWidth = image.width();
+        int shrunkOnLoadHeight = image.height();
+        if (!baton->rotateBeforePreExtract &&
+          (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
+          // Swap input output width and height when rotating by 90 or 270 degrees
+          std::swap(shrunkOnLoadWidth, shrunkOnLoadHeight);
+        }
+        xfactor = static_cast<double>(shrunkOnLoadWidth) / static_cast<double>(targetResizeWidth);
+        yfactor = static_cast<double>(shrunkOnLoadHeight) / static_cast<double>(targetResizeHeight);
+        xshrink = std::max(1, static_cast<int>(floor(xfactor)));
+        yshrink = std::max(1, static_cast<int>(floor(yfactor)));
+        xresidual = static_cast<double>(xshrink) / xfactor;
+        yresidual = static_cast<double>(yshrink) / yfactor;
+        if (
+          !baton->rotateBeforePreExtract &&
+          (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)
+        ) {
+          std::swap(xresidual, yresidual);
         }
       }
 
@@ -907,9 +920,12 @@ class PipelineWorker : public AsyncWorker {
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" && inputImageType == ImageType::PNG)) {
+          // Strip profile
+          if (!baton->withMetadata) {
+            vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
+          }
           // Write PNG to buffer
           VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
-            ->set("strip", !baton->withMetadata)
             ->set("compression", baton->compressionLevel)
             ->set("interlace", baton->progressive)
             ->set("filter", baton->withoutAdaptiveFiltering ?
@@ -984,9 +1000,12 @@ class PipelineWorker : public AsyncWorker {
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || isPng || (matchInput && inputImageType == ImageType::PNG)) {
+          // Strip profile
+          if (!baton->withMetadata) {
+            vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
+          }
           // Write PNG to file
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
             ->set("compression", baton->compressionLevel)
             ->set("interlace", baton->progressive)
             ->set("filter", baton->withoutAdaptiveFiltering ?
