@@ -328,6 +328,22 @@ describe('Image metadata', function() {
       });
   });
 
+  it('Remove metadata from PNG output', function(done) {
+    sharp(fixtures.inputJpgWithExif)
+      .png()
+      .toBuffer(function(err, buffer) {
+        if (err) throw err;
+        sharp(buffer).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(false, metadata.hasProfile);
+          assert.strictEqual('undefined', typeof metadata.orientation);
+          assert.strictEqual('undefined', typeof metadata.exif);
+          assert.strictEqual('undefined', typeof metadata.icc);
+          done();
+        });
+      });
+  });
+
   it('File input with corrupt header fails gracefully', function(done) {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .metadata(function(err) {

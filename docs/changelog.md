@@ -4,6 +4,24 @@
 
 Requires libvips v8.3.1
 
+#### v0.15.2 - TBD
+
+* Ensure boolean, bandbool, extractChannel ops occur before sRGB conversion.
+  [#504](https://github.com/lovell/sharp/pull/504)
+  [@mhirsch](https://github.com/mhirsch)
+
+* Recalculate factors after WebP shrink-on-load to avoid round-to-zero errors.
+  [#508](https://github.com/lovell/sharp/issues/508)
+  [@asilvas](https://github.com/asilvas)
+
+* Prevent boolean errors during extract operation.
+  [#511](https://github.com/lovell/sharp/pull/511)
+  [@mhirsch](https://github.com/mhirsch)
+
+* Ensure ICC profiles are removed from PNG output unless withMetadata used.
+  [#521](https://github.com/lovell/sharp/issues/521)
+  [@ChrisPinewood](https://github.com/ChrisPinewood)
+
 #### v0.15.1 - 12<sup>th</sup> July 2016
 
 * Concat Stream-based input in single operation for ~+3% perf and less GC.

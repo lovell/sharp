@@ -2,7 +2,7 @@ FROM debian:wheezy
 MAINTAINER Lovell Fuller <npm@lovell.info>
 
 # Build dependencies
-RUN apt-get update && apt-get install -y build-essential autoconf libtool nasm gtk-doc-tools texinfo
+RUN apt-get update && apt-get install -y build-essential autoconf libtool nasm gtk-doc-tools texinfo advancecomp
 
 # Create working directories
 ENV DEPS=/deps \
@@ -218,4 +218,5 @@ RUN echo "{\n\
 
 # Create .tar.gz
 WORKDIR ${TARGET}
-RUN GZIP=-9 tar czf /libvips-${VERSION_VIPS}-lin.tar.gz include lib
+RUN tar czf /libvips-${VERSION_VIPS}-lin.tar.gz include lib
+RUN advdef --recompress --shrink-insane /libvips-${VERSION_VIPS}-lin.tar.gz
