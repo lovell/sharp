@@ -128,6 +128,29 @@ describe('Resize dimensions', function() {
     done();
   });
 
+  if (sharp.format.webp.output.buffer) {
+    it('WebP shrink-on-load rounds to zero, ensure recalculation is correct', function(done) {
+      sharp(fixtures.inputJpg)
+        .resize(1080, 607)
+        .webp()
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('webp', info.format);
+          assert.strictEqual(1080, info.width);
+          assert.strictEqual(607, info.height);
+          sharp(data)
+            .resize(233, 131)
+            .toBuffer(function(err, data, info) {
+              if (err) throw err;
+              assert.strictEqual('webp', info.format);
+              assert.strictEqual(233, info.width);
+              assert.strictEqual(131, info.height);
+              done();
+            });
+        });
+    });
+  }
+
   if (sharp.format.tiff.input.file) {
     it('TIFF embed known to cause rounding errors', function(done) {
       sharp(fixtures.inputTiff)
