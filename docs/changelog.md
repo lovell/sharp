@@ -1,10 +1,10 @@
 # Changelog
 
-### v0.15 - "*outfit*"
+### v0.16 - "*pencil*"
 
-Requires libvips v8.3.1
+Requires libvips v8.3.2
 
-#### v0.15.2 - TBD
+#### v0.16.0 - TBD
 
 * Ensure boolean, bandbool, extractChannel ops occur before sRGB conversion.
   [#504](https://github.com/lovell/sharp/pull/504)
@@ -21,6 +21,10 @@ Requires libvips v8.3.1
 * Ensure ICC profiles are removed from PNG output unless withMetadata used.
   [#521](https://github.com/lovell/sharp/issues/521)
   [@ChrisPinewood](https://github.com/ChrisPinewood)
+
+### v0.15 - "*outfit*"
+
+Requires libvips v8.3.1
 
 #### v0.15.1 - 12<sup>th</sup> July 2016
 

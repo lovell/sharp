@@ -3,7 +3,7 @@ MAINTAINER Lovell Fuller <npm@lovell.info>
 
 RUN apt-get update && apt-get install -y curl zip advancecomp
 
-ENV VERSION_VIPS=8.3.1
+ENV VERSION_VIPS=8.3.2
 
 # Fetch and unzip
 RUN mkdir /vips
