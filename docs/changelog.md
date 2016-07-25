@@ -6,6 +6,8 @@ Requires libvips v8.3.2
 
 #### v0.16.0 - TBD
 
+* Remove deprecated interpolateWith method - use resize(w, h, { interpolator: ... })
+
 * Ensure boolean, bandbool, extractChannel ops occur before sRGB conversion.
   [#504](https://github.com/lovell/sharp/pull/504)
   [@mhirsch](https://github.com/mhirsch)

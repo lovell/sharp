@@ -62,11 +62,11 @@
     "color": "^0.11.3",
     "nan": "^2.4.0",
     "semver": "^5.2.0",
-    "request": "^2.73.0",
+    "request": "^2.74.0",
     "tar": "^2.2.1"
   },
   "devDependencies": {
-    "async": "^1.5.2",
+    "async": "^2.0.1",
     "bufferutil": "^1.2.1",
     "coveralls": "^2.11.9",
     "exif-reader": "^1.0.0",
@@ -75,7 +75,7 @@
     "mocha": "^2.5.3",
     "mocha-jshint": "^2.3.1",
     "node-cpplint": "^0.4.0",
-    "rimraf": "^2.5.3",
+    "rimraf": "^2.5.4",
     "unzip": "^0.1.11"
   },
   "license": "Apache-2.0",

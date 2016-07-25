@@ -43,6 +43,7 @@ Any change that modifies the existing public API should be added to the relevant
 | ------: | :--------- |
 | v0.16.0 | pencil     |
 | v0.17.0 | quill      |
+| v0.18.0 | ridge      |
 
 Please squash your changes into a single commit using a command like `git rebase -i upstream/<wip-branch>`.
 

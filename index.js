@@ -876,13 +876,6 @@ Sharp.prototype.resize = function(width, height, options) {
   }
   return this;
 };
-Sharp.prototype.interpolateWith = util.deprecate(function(interpolator) {
-  return this.resize(
-    this.options.width > 0 ? this.options.width : null,
-    this.options.height > 0 ? this.options.height : null,
-    { interpolator: interpolator }
-  );
-}, 'interpolateWith: Please use resize(w, h, { interpolator: ... }) instead');
 
 /*
   Limit the total number of pixels for input images

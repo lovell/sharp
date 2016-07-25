@@ -60,12 +60,4 @@ describe('Interpolators and kernels', function() {
     });
   });
 
-  describe('deprecated interpolateWith method still works', function() {
-    it('resize then interpolateWith', function() {
-      sharp().resize(1, 1).interpolateWith('bicubic');
-    });
-    it('interpolateWith then resize', function() {
-      sharp().interpolateWith('bicubic').resize(1, 1);
-    });
-  });
 });
