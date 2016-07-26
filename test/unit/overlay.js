@@ -528,4 +528,28 @@ describe('Overlays', function() {
       });
   });
 
+  it('Composite RGBA raw buffer onto JPEG', function(done) {
+    sharp(fixtures.inputPngOverlayLayer1)
+      .raw()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        sharp(fixtures.inputJpg)
+          .resize(2048, 1536)
+          .overlayWith(data, { raw: info })
+          .toBuffer(function(err, data) {
+            if (err) throw err;
+            fixtures.assertSimilar(fixtures.expected('overlay-jpeg-with-rgb.jpg'), data, done);
+          });
+      });
+  });
+
+  it('Throws an error when called with an invalid file', function(done) {
+    sharp(fixtures.inputJpg)
+      .overlayWith('notfound.png')
+      .toBuffer(function(err) {
+        assert(err instanceof Error);
+        done();
+      });
+  });
+
 });

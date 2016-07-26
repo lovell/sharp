@@ -1,31 +1,52 @@
 #include <cstdlib>
 #include <string>
 #include <string.h>
+
+#include <node.h>
+#include <node_buffer.h>
 #include <vips/vips8>
 
+#include "nan.h"
 #include "common.h"
-
-// Verify platform and compiler compatibility
-
-#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 2))
-#error libvips version 8.2.0+ required - see sharp.dimens.io/page/install
-#endif
-
-#if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
-#error GCC version 4.6+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
-#endif
-
-#if (defined(__clang__) && defined(__has_feature))
-#if (!__has_feature(cxx_range_for))
-#error clang version 3.0+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
-#endif
-#endif
-
-#define EXIF_IFD0_ORIENTATION "exif-ifd0-Orientation"
 
 using vips::VImage;
 
 namespace sharp {
+
+  // Convenience methods to access the attributes of a v8::Object
+  bool HasAttr(v8::Handle<v8::Object> obj, std::string attr) {
+    return Nan::Has(obj, Nan::New(attr).ToLocalChecked()).FromJust();
+  }
+  std::string AttrAsStr(v8::Handle<v8::Object> obj, std::string attr) {
+    return *Nan::Utf8String(Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked());
+  }
+
+  // Create an InputDescriptor instance from a v8::Object describing an input image
+  InputDescriptor* CreateInputDescriptor(
+    v8::Handle<v8::Object> input, std::vector<v8::Local<v8::Object>> buffersToPersist
+  ) {
+    Nan::HandleScope();
+    InputDescriptor *descriptor = new InputDescriptor;
+    if (HasAttr(input, "file")) {
+      descriptor->file = AttrAsStr(input, "file");
+    } else {
+      v8::Local<v8::Object> buffer = AttrAs<v8::Object>(input, "buffer");
+      descriptor->bufferLength = node::Buffer::Length(buffer);
+      descriptor->buffer = node::Buffer::Data(buffer);
+      buffersToPersist.push_back(buffer);
+    }
+    // Density for vector-based input
+    if (HasAttr(input, "density")) {
+      descriptor->density = AttrTo<uint32_t>(input, "density");
+    }
+    // Raw pixel input
+    if (HasAttr(input, "rawChannels")) {
+      descriptor->rawChannels = AttrTo<uint32_t>(input, "rawChannels");
+      descriptor->rawWidth = AttrTo<uint32_t>(input, "rawWidth");
+      descriptor->rawHeight = AttrTo<uint32_t>(input, "rawHeight");
+    }
+    return descriptor;
+  }
 
   // How many tasks are in the queue?
   volatile int counterQueue = 0;
@@ -147,6 +168,73 @@ namespace sharp {
       }
     }
     return imageType;
+  }
+
+  /*
+    Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
+  */
+  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor, VipsAccess accessMethod) {
+    VImage image;
+    ImageType imageType;
+    if (descriptor->buffer != nullptr) {
+      // From buffer
+      if (descriptor->rawChannels > 0) {
+        // Raw, uncompressed pixel data
+        image = VImage::new_from_memory(descriptor->buffer, descriptor->bufferLength,
+          descriptor->rawWidth, descriptor->rawHeight, descriptor->rawChannels, VIPS_FORMAT_UCHAR);
+        if (descriptor->rawChannels < 3) {
+          image.get_image()->Type = VIPS_INTERPRETATION_B_W;
+        } else {
+          image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+        }
+        imageType = ImageType::RAW;
+      } else {
+        // Compressed data
+        imageType = DetermineImageType(descriptor->buffer, descriptor->bufferLength);
+        if (imageType != ImageType::UNKNOWN) {
+          try {
+            vips::VOption *option = VImage::option()->set("access", accessMethod);
+            if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
+              option->set("dpi", static_cast<double>(descriptor->density));
+            }
+            if (imageType == ImageType::MAGICK) {
+              option->set("density", std::to_string(descriptor->density).data());
+            }
+            image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
+            if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
+              SetDensity(image, descriptor->density);
+            }
+          } catch (...) {
+            throw vips::VError("Input buffer has corrupt header");
+          }
+        } else {
+          throw vips::VError("Input buffer contains unsupported image format");
+        }
+      }
+    } else {
+      // From filesystem
+      imageType = DetermineImageType(descriptor->file.data());
+      if (imageType != ImageType::UNKNOWN) {
+        try {
+          vips::VOption *option = VImage::option()->set("access", accessMethod);
+          if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
+            option->set("dpi", static_cast<double>(descriptor->density));
+          }
+          if (imageType == ImageType::MAGICK) {
+            option->set("density", std::to_string(descriptor->density).data());
+          }
+          image = VImage::new_from_file(descriptor->file.data(), option);
+          if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
+            SetDensity(image, descriptor->density);
+          }
+        } catch (...) {
+          throw vips::VError("Input file has corrupt header");
+        }
+      } else {
+        throw vips::VError("Input file is missing or of an unsupported image format");
+      }
+    }
+    return std::make_tuple(image, imageType);
   }
 
   /*

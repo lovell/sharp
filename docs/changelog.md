@@ -21,11 +21,16 @@ Requires libvips v8.3.2
   [#511](https://github.com/lovell/sharp/pull/511)
   [@mhirsch](https://github.com/mhirsch)
 
+* Add support for raw pixel data with boolean and withOverlay operations.
+  [#516](https://github.com/lovell/sharp/pull/516)
+  [@mhirsch](https://github.com/mhirsch)
+
 * Ensure ICC profiles are removed from PNG output unless withMetadata used.
   [#521](https://github.com/lovell/sharp/issues/521)
   [@ChrisPinewood](https://github.com/ChrisPinewood)
 
 * Remove deprecated interpolateWith method - use resize(w, h, { interpolator: ... })
+  [#310](https://github.com/lovell/sharp/issues/310)
 
 ### v0.15 - "*outfit*"
 
