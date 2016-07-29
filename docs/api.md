@@ -439,13 +439,13 @@ This can improve the perceived brightness of a resized image in non-linear colou
 
 JPEG input images will not take advantage of the shrink-on-load performance optimisation when applying a gamma correction.
 
-#### grayscale() / greyscale()
+#### grayscale([options]) / greyscale([options])
 
 Convert to 8-bit greyscale; 256 shades of grey.
 
 This is a linear operation. If the input image is in a non-linear colour space such as sRGB, use `gamma()` with `greyscale()` for the best results.
 
-The output image will still be web-friendly sRGB and contain three (identical) channels.
+`options`, if present is an Object with an optional attribute `outputMode`, which controls the output mode of the grayscale image. By default the output image will be web-friendly sRGB and contain three (identical) color channels. If `outputMode` is 'gray' or 'grey', the output image will contain one color channel. An alpha channel may or may not be present due to other operations and input data.
 
 #### normalize() / normalise()
 

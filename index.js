@@ -89,6 +89,7 @@ var Sharp = function(input, options) {
     trimTolerance: 0,
     gamma: 0,
     greyscale: false,
+    greyscaleOutput: false,
     normalize: 0,
     booleanBufferIn: null,
     booleanFileIn: '',
@@ -639,6 +640,8 @@ Sharp.prototype.bandbool = function(boolOp) {
 */
 Sharp.prototype.greyscale = function(greyscale) {
   this.options.greyscale = isBoolean(greyscale) ? greyscale : true;
+  this.options.greyscaleOutput = isObject(greyscale) &&
+    (greyscale.outputMode === 'grey' || greyscale.outputMode === 'gray');
   return this;
 };
 Sharp.prototype.grayscale = Sharp.prototype.greyscale;
