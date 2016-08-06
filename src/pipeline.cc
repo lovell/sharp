@@ -581,6 +581,20 @@ class PipelineWorker : public Nan::AsyncWorker {
           // 'cut out' the image, premultiplication is not required
           image = sharp::Cutout(overlayImage, image, baton->overlayGravity);
         } else {
+          // Ensure overlay has alpha channel
+          if (!HasAlpha(overlayImage)) {
+            double const multiplier = Is16Bit(overlayImage.interpretation()) ? 256.0 : 1.0;
+            overlayImage = overlayImage.bandjoin(
+              VImage::new_matrix(overlayImage.width(), overlayImage.height()).new_from_image(255 * multiplier)
+            );
+          }
+          // Ensure image has alpha channel
+          if (!HasAlpha(image)) {
+            double const multiplier = Is16Bit(image.interpretation()) ? 256.0 : 1.0;
+            image = image.bandjoin(
+              VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
+            );
+          }
           // Ensure overlay is premultiplied sRGB
           overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB).premultiply();
           if (baton->overlayXOffset >= 0 && baton->overlayYOffset >= 0) {

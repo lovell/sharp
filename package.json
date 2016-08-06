@@ -26,7 +26,8 @@
     "Chintan Thakkar <lemnisk8@gmail.com>",
     "F. Orlando Galashan <frulo@gmx.de>",
     "Kleis Auke Wolthuizen <info@kleisauke.nl>",
-    "Matt Hirsch <mhirsch@media.mit.edu>"
+    "Matt Hirsch <mhirsch@media.mit.edu>",
+    "Matthias Thoemmes <thoemmes@gmail.com>"
   ],
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
   "scripts": {
