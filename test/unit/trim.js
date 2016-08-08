@@ -38,7 +38,7 @@ describe('Trim borders', function() {
 
   describe('Invalid thresholds', function() {
     [-1, 100, 'fail', {}].forEach(function(threshold) {
-      it(threshold, function() {
+      it(JSON.stringify(threshold), function() {
         assert.throws(function() {
           sharp().trim(threshold);
         });
