@@ -93,4 +93,10 @@ describe('Colour space conversion', function() {
       });
   });
 
+  it('Invalid input', function() {
+    assert.throws(function() {
+      sharp(fixtures.inputJpg)
+        .toColourspace(null);
+    });
+  });
 });
