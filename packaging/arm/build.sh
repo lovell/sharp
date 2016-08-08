@@ -19,27 +19,27 @@ export CXXFLAGS="-O3"
 # Dependency version numbers
 VERSION_ZLIB=1.2.8
 VERSION_FFI=3.2.1
-VERSION_GLIB=2.48.0
+VERSION_GLIB=2.49.4
 VERSION_XML2=2.9.4
-VERSION_GSF=1.14.36
+VERSION_GSF=1.14.39
 VERSION_EXIF=0.6.21
-VERSION_LCMS2=2.7
+VERSION_LCMS2=2.8
 VERSION_JPEG=1.5.0
 VERSION_PNG16=1.6.23
-VERSION_WEBP=0.5.0
+VERSION_WEBP=0.5.1
 VERSION_TIFF=4.0.6
 VERSION_ORC=0.4.25
-VERSION_GDKPIXBUF=2.34.0
-VERSION_FREETYPE=2.6.3
-VERSION_FONTCONFIG=2.11.95
-VERSION_HARFBUZZ=1.2.6
+VERSION_GDKPIXBUF=2.35.2
+VERSION_FREETYPE=2.6.5
+VERSION_FONTCONFIG=2.12.0
+VERSION_HARFBUZZ=1.3.0
 VERSION_PIXMAN=0.34.0
 VERSION_CAIRO=1.14.6
 VERSION_PANGO=1.40.1
 VERSION_CROCO=0.6.11
-VERSION_SVG=2.40.15
+VERSION_SVG=2.40.16
 VERSION_GIF=5.1.4
-VERSION_VIPS=8.3.1
+VERSION_VIPS=8.3.2
 
 # Least out-of-sync Sourceforge mirror
 SOURCEFORGE_MIRROR=netix
@@ -56,7 +56,7 @@ cd ${DEPS}/ffi
 ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --disable-builddir && make install-strip
 
 mkdir ${DEPS}/glib
-curl -Ls https://download.gnome.org/sources/glib/2.48/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
+curl -Ls https://download.gnome.org/sources/glib/2.49/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
 cd ${DEPS}/glib
 ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --with-pcre=internal && make install-strip
 
@@ -107,7 +107,7 @@ cd ${DEPS}/orc
 ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking && make install-strip
 
 mkdir ${DEPS}/gdkpixbuf
-curl -Ls https://download.gnome.org/sources/gdk-pixbuf/2.34/gdk-pixbuf-${VERSION_GDKPIXBUF}.tar.xz | tar xJC ${DEPS}/gdkpixbuf --strip-components=1
+curl -Ls https://download.gnome.org/sources/gdk-pixbuf/2.35/gdk-pixbuf-${VERSION_GDKPIXBUF}.tar.xz | tar xJC ${DEPS}/gdkpixbuf --strip-components=1
 cd ${DEPS}/gdkpixbuf
 LD_LIBRARY_PATH=${TARGET}/lib ./configure --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
   --disable-introspection --disable-modules --without-libpng --without-libjpeg --without-libtiff --without-gdiplus --with-included-loaders= \

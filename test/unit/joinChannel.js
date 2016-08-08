@@ -89,8 +89,8 @@ describe('Image channel insertion', function() {
     BluebirdPromise.all([
       sharp(fixtures.inputPngTestJoinChannel).toColourspace('b-w').raw().toBuffer(),
       sharp(fixtures.inputPngStripesH).toColourspace('b-w').raw().toBuffer()
-    ]).then(
-      function(buffers) {
+    ])
+      .then(function(buffers) {
         sharp(fixtures.inputPng)
           .resize(320, 240)
           .joinChannel(buffers,
@@ -106,6 +106,9 @@ describe('Image channel insertion', function() {
             assert.strictEqual(3, info.channels);
             fixtures.assertSimilar(fixtures.expected('joinChannel-rgb.jpg'), data, done);
           });
+      })
+      .catch(function(err) {
+        throw err;
       });
   });
 
@@ -126,21 +129,6 @@ describe('Image channel insertion', function() {
     assert.throws(function() {
       sharp(fixtures.inputJpg)
         .joinChannel();
-    });
-  });
-
-  it('Invalid file / buffer mix', function() {
-    assert.throws(function() {
-      sharp(fixtures.inputPng)
-        .joinChannel([fixtures.inputPngTestJoinChannel, fs.readFileSync(fixtures.inputPngTestJoinChannel)]);
-    });
-  });
-
-  it('Invalid file / buffer mix, two commands', function() {
-    assert.throws(function() {
-      sharp(fixtures.inputPng)
-        .joinChannel(fixtures.inputPngTestJoinChannel)
-        .joinChannel(fs.readFileSync(fixtures.inputPngTestJoinChannel));
     });
   });
 

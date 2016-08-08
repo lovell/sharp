@@ -1,135 +1,54 @@
+#include <numeric>
+
 #include <node.h>
 #include <vips/vips8>
 
 #include "nan.h"
-
 #include "common.h"
 #include "metadata.h"
 
-using v8::Handle;
-using v8::Local;
-using v8::Value;
-using v8::Object;
-using v8::Number;
-using v8::String;
-using v8::Boolean;
-using v8::Function;
-using v8::Exception;
-
-using Nan::AsyncQueueWorker;
-using Nan::AsyncWorker;
-using Nan::Callback;
-using Nan::HandleScope;
-using Nan::Utf8String;
-using Nan::Has;
-using Nan::Get;
-using Nan::Set;
-using Nan::New;
-using Nan::NewBuffer;
-using Nan::Null;
-using Nan::Error;
-
-using vips::VImage;
-using vips::VError;
-
-using sharp::ImageType;
-using sharp::ImageTypeId;
-using sharp::DetermineImageType;
-using sharp::HasProfile;
-using sharp::HasAlpha;
-using sharp::ExifOrientation;
-using sharp::HasDensity;
-using sharp::GetDensity;
-using sharp::FreeCallback;
-using sharp::counterQueue;
-
-struct MetadataBaton {
-  // Input
-  std::string fileIn;
-  char *bufferIn;
-  size_t bufferInLength;
-  // Output
-  std::string format;
-  int width;
-  int height;
-  std::string space;
-  int channels;
-  int density;
-  bool hasProfile;
-  bool hasAlpha;
-  int orientation;
-  char *exif;
-  size_t exifLength;
-  char *icc;
-  size_t iccLength;
-  std::string err;
-
-  MetadataBaton():
-    bufferInLength(0),
-    density(0),
-    orientation(0),
-    exifLength(0),
-    iccLength(0) {}
-};
-
-class MetadataWorker : public AsyncWorker {
+class MetadataWorker : public Nan::AsyncWorker {
  public:
-  MetadataWorker(Callback *callback, MetadataBaton *baton, const Local<Object> &bufferIn) :
-    AsyncWorker(callback), baton(baton) {
-      if (baton->bufferInLength > 0) {
-        SaveToPersistent("bufferIn", bufferIn);
+  MetadataWorker(
+    Nan::Callback *callback, MetadataBaton *baton,
+    std::vector<v8::Local<v8::Object>> const buffersToPersist
+  ) : Nan::AsyncWorker(callback), baton(baton), buffersToPersist(buffersToPersist) {
+    // Protect Buffer objects from GC, keyed on index
+    std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
+      [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
+        SaveToPersistent(index, buffer);
+        return index + 1;
       }
-    }
+    );
+  }
   ~MetadataWorker() {}
 
   void Execute() {
     // Decrement queued task counter
-    g_atomic_int_dec_and_test(&counterQueue);
+    g_atomic_int_dec_and_test(&sharp::counterQueue);
 
-    ImageType imageType = ImageType::UNKNOWN;
-    VImage image;
-    if (baton->bufferInLength > 0) {
-      // From buffer
-      imageType = DetermineImageType(baton->bufferIn, baton->bufferInLength);
-      if (imageType != ImageType::UNKNOWN) {
-        try {
-          image = VImage::new_from_buffer(baton->bufferIn, baton->bufferInLength, nullptr);
-        } catch (...) {
-          (baton->err).append("Input buffer has corrupt header");
-          imageType = ImageType::UNKNOWN;
-        }
-      } else {
-        (baton->err).append("Input buffer contains unsupported image format");
-      }
-    } else {
-      // From file
-      imageType = DetermineImageType(baton->fileIn.data());
-      if (imageType != ImageType::UNKNOWN) {
-        try {
-          image = VImage::new_from_file(baton->fileIn.data());
-        } catch (...) {
-          (baton->err).append("Input file has corrupt header");
-          imageType = ImageType::UNKNOWN;
-        }
-      } else {
-        (baton->err).append("Input file is missing or of an unsupported image format");
-      }
+    vips::VImage image;
+    sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
+    try {
+      std::tie(image, imageType) = OpenInput(baton->input, VIPS_ACCESS_SEQUENTIAL);
+    } catch (vips::VError const &err) {
+      (baton->err).append(err.what());
     }
-    if (imageType != ImageType::UNKNOWN) {
+    if (imageType != sharp::ImageType::UNKNOWN) {
       // Image type
-      baton->format = ImageTypeId(imageType);
+      baton->format = sharp::ImageTypeId(imageType);
       // VipsImage attributes
       baton->width = image.width();
       baton->height = image.height();
       baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image.interpretation());
       baton->channels = image.bands();
-      if (HasDensity(image)) {
-        baton->density = GetDensity(image);
+      if (sharp::HasDensity(image)) {
+        baton->density = sharp::GetDensity(image);
       }
-      baton->hasProfile = HasProfile(image);
+      baton->hasProfile = sharp::HasProfile(image);
       // Derived attributes
-      baton->hasAlpha = HasAlpha(image);
-      baton->orientation = ExifOrientation(image);
+      baton->hasAlpha = sharp::HasAlpha(image);
+      baton->orientation = sharp::ExifOrientation(image);
       // EXIF
       if (image.get_typeof(VIPS_META_EXIF_NAME) == VIPS_TYPE_BLOB) {
         size_t exifLength;
@@ -147,53 +66,59 @@ class MetadataWorker : public AsyncWorker {
         baton->iccLength = iccLength;
       }
     }
+
     // Clean up
     vips_error_clear();
     vips_thread_shutdown();
   }
 
   void HandleOKCallback () {
-    HandleScope();
+    using Nan::New;
+    using Nan::Set;
+    Nan::HandleScope();
 
-    Local<Value> argv[2] = { Null(), Null() };
+    v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::Null() };
     if (!baton->err.empty()) {
-      // Error
-      argv[0] = Error(baton->err.data());
+      argv[0] = Nan::Error(baton->err.data());
     } else {
       // Metadata Object
-      Local<Object> info = New<Object>();
-      Set(info, New("format").ToLocalChecked(), New<String>(baton->format).ToLocalChecked());
-      Set(info, New("width").ToLocalChecked(), New<Number>(baton->width));
-      Set(info, New("height").ToLocalChecked(), New<Number>(baton->height));
-      Set(info, New("space").ToLocalChecked(), New<String>(baton->space).ToLocalChecked());
-      Set(info, New("channels").ToLocalChecked(), New<Number>(baton->channels));
+      v8::Local<v8::Object> info = New<v8::Object>();
+      Set(info, New("format").ToLocalChecked(), New<v8::String>(baton->format).ToLocalChecked());
+      Set(info, New("width").ToLocalChecked(), New<v8::Uint32>(baton->width));
+      Set(info, New("height").ToLocalChecked(), New<v8::Uint32>(baton->height));
+      Set(info, New("space").ToLocalChecked(), New<v8::String>(baton->space).ToLocalChecked());
+      Set(info, New("channels").ToLocalChecked(), New<v8::Uint32>(baton->channels));
       if (baton->density > 0) {
-        Set(info, New("density").ToLocalChecked(), New<Number>(baton->density));
+        Set(info, New("density").ToLocalChecked(), New<v8::Uint32>(baton->density));
       }
-      Set(info, New("hasProfile").ToLocalChecked(), New<Boolean>(baton->hasProfile));
-      Set(info, New("hasAlpha").ToLocalChecked(), New<Boolean>(baton->hasAlpha));
+      Set(info, New("hasProfile").ToLocalChecked(), New<v8::Boolean>(baton->hasProfile));
+      Set(info, New("hasAlpha").ToLocalChecked(), New<v8::Boolean>(baton->hasAlpha));
       if (baton->orientation > 0) {
-        Set(info, New("orientation").ToLocalChecked(), New<Number>(baton->orientation));
+        Set(info, New("orientation").ToLocalChecked(), New<v8::Uint32>(baton->orientation));
       }
       if (baton->exifLength > 0) {
         Set(info,
           New("exif").ToLocalChecked(),
-          NewBuffer(baton->exif, baton->exifLength, FreeCallback, nullptr).ToLocalChecked()
+          Nan::NewBuffer(baton->exif, baton->exifLength, sharp::FreeCallback, nullptr).ToLocalChecked()
         );
       }
       if (baton->iccLength > 0) {
         Set(info,
           New("icc").ToLocalChecked(),
-          NewBuffer(baton->icc, baton->iccLength, FreeCallback, nullptr).ToLocalChecked()
+          Nan::NewBuffer(baton->icc, baton->iccLength, sharp::FreeCallback, nullptr).ToLocalChecked()
         );
       }
       argv[1] = info;
     }
 
-    // Dispose of Persistent wrapper around input Buffer so it can be garbage collected
-    if (baton->bufferInLength > 0) {
-      GetFromPersistent("bufferIn");
-    }
+    // Dispose of Persistent wrapper around input Buffers so they can be garbage collected
+    std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
+      [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
+        GetFromPersistent(index);
+        return index + 1;
+      }
+    );
+    delete baton->input;
     delete baton;
 
     // Return to JavaScript
@@ -202,32 +127,27 @@ class MetadataWorker : public AsyncWorker {
 
  private:
   MetadataBaton* baton;
+  std::vector<v8::Local<v8::Object>> buffersToPersist;
 };
 
 /*
   metadata(options, callback)
 */
 NAN_METHOD(metadata) {
-  HandleScope();
+  // Input Buffers must not undergo GC compaction during processing
+  std::vector<v8::Local<v8::Object>> buffersToPersist;
 
   // V8 objects are converted to non-V8 types held in the baton struct
   MetadataBaton *baton = new MetadataBaton;
-  Local<Object> options = info[0].As<Object>();
+  v8::Local<v8::Object> options = info[0].As<v8::Object>();
 
-  // Input filename
-  baton->fileIn = *Utf8String(Get(options, New("fileIn").ToLocalChecked()).ToLocalChecked());
-  // Input Buffer object
-  Local<Object> bufferIn;
-  if (node::Buffer::HasInstance(Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked())) {
-    bufferIn = Get(options, New("bufferIn").ToLocalChecked()).ToLocalChecked().As<Object>();
-    baton->bufferInLength = node::Buffer::Length(bufferIn);
-    baton->bufferIn = node::Buffer::Data(bufferIn);
-  }
+  // Input
+  baton->input = sharp::CreateInputDescriptor(sharp::AttrAs<v8::Object>(options, "input"), buffersToPersist);
 
   // Join queue for worker thread
-  Callback *callback = new Callback(info[1].As<Function>());
-  AsyncQueueWorker(new MetadataWorker(callback, baton, bufferIn));
+  Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+  Nan::AsyncQueueWorker(new MetadataWorker(callback, baton, buffersToPersist));
 
   // Increment queued task counter
-  g_atomic_int_inc(&counterQueue);
+  g_atomic_int_inc(&sharp::counterQueue);
 }

@@ -1,10 +1,13 @@
 # Changelog
 
-### v0.15 - "*outfit*"
+### v0.16 - "*pencil*"
 
-Requires libvips v8.3.1
+Requires libvips v8.3.2
 
-#### v0.15.2 - TBD
+#### v0.16.0 - TBD
+
+* Add pre-compiled libvips for OS X.
+  [#312](https://github.com/lovell/sharp/issues/312)
 
 * Ensure boolean, bandbool, extractChannel ops occur before sRGB conversion.
   [#504](https://github.com/lovell/sharp/pull/504)
@@ -18,9 +21,20 @@ Requires libvips v8.3.1
   [#511](https://github.com/lovell/sharp/pull/511)
   [@mhirsch](https://github.com/mhirsch)
 
+* Add support for raw pixel data with boolean and withOverlay operations.
+  [#516](https://github.com/lovell/sharp/pull/516)
+  [@mhirsch](https://github.com/mhirsch)
+
 * Ensure ICC profiles are removed from PNG output unless withMetadata used.
   [#521](https://github.com/lovell/sharp/issues/521)
   [@ChrisPinewood](https://github.com/ChrisPinewood)
+
+* Remove deprecated interpolateWith method - use resize(w, h, { interpolator: ... })
+  [#310](https://github.com/lovell/sharp/issues/310)
+
+### v0.15 - "*outfit*"
+
+Requires libvips v8.3.1
 
 #### v0.15.1 - 12<sup>th</sup> July 2016
 

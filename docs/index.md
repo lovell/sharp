@@ -13,11 +13,8 @@ Lanczos resampling ensures quality is not sacrificed for speed.
 As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
-Most Windows (x64), Linux and ARMv6+ systems do not require
+OS X, Windows (x64), Linux (x64, ARM) systems do not require
 the installation of any external runtime dependencies.
-
-Use with OS X is as simple as running `brew install homebrew/science/vips`
-to install the libvips dependency.
 
 [![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.png?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
 

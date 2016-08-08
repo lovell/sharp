@@ -4,11 +4,69 @@
 #include <string>
 #include <tuple>
 
+#include <node.h>
 #include <vips/vips8>
+
+#include "nan.h"
+
+// Verify platform and compiler compatibility
+
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 3))
+#error libvips version 8.3.x required - see sharp.dimens.io/page/install
+#endif
+
+#if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
+#error GCC version 4.6+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
+#endif
+
+#if (defined(__clang__) && defined(__has_feature))
+#if (!__has_feature(cxx_range_for))
+#error clang version 3.0+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
+#endif
+#endif
+
+#define EXIF_IFD0_ORIENTATION "exif-ifd0-Orientation"
 
 using vips::VImage;
 
 namespace sharp {
+
+  struct InputDescriptor {
+    std::string name;
+    std::string file;
+    char *buffer;
+    size_t bufferLength;
+    int density;
+    int rawChannels;
+    int rawWidth;
+    int rawHeight;
+
+    InputDescriptor():
+      buffer(nullptr),
+      bufferLength(0),
+      density(72),
+      rawChannels(0),
+      rawWidth(0),
+      rawHeight(0) {}
+  };
+
+  // Convenience methods to access the attributes of a v8::Object
+  bool HasAttr(v8::Handle<v8::Object> obj, std::string attr);
+  std::string AttrAsStr(v8::Handle<v8::Object> obj, std::string attr);
+  template<typename T> v8::Local<T> AttrAs(v8::Handle<v8::Object> obj, std::string attr) {
+    return Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked().As<T>();
+  }
+  template<typename T> T AttrTo(v8::Handle<v8::Object> obj, std::string attr) {
+    return Nan::To<T>(Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked()).FromJust();
+  }
+  template<typename T> T AttrTo(v8::Handle<v8::Object> obj, int attr) {
+    return Nan::To<T>(Nan::Get(obj, attr).ToLocalChecked()).FromJust();
+  }
+
+  // Create an InputDescriptor instance from a v8::Object describing an input image
+  InputDescriptor* CreateInputDescriptor(
+    v8::Handle<v8::Object> input, std::vector<v8::Local<v8::Object>> buffersToPersist
+  );
 
   enum class ImageType {
     JPEG,
@@ -56,6 +114,11 @@ namespace sharp {
     Determine image format of a file.
   */
   ImageType DetermineImageType(char const *file);
+
+  /*
+    Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
+  */
+  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor, VipsAccess accessMethod);
 
   /*
     Does this image have an embedded profile?
