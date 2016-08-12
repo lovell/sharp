@@ -6,7 +6,7 @@ if ! type docker >/dev/null; then
   exit 1
 fi
 
-version_node=4.4.2
+version_node=6.3.0
 
 test="npm run clean; npm install --unsafe-perm; npm test"
 
@@ -43,7 +43,7 @@ fi
 
 # Archlinux 2015.06.01
 echo "Testing archlinux..."
-if docker run -i -t --rm -v $PWD:/v base/archlinux:2015.06.01 >packaging/archlinux.log 2>&1 sh -c "cd /v; ./packaging/test/archlinux.sh; $test";
+if docker run -i -t --rm -v $PWD:/v pritunl/archlinux:latest >packaging/archlinux.log 2>&1 sh -c "cd /v; ./packaging/test/archlinux.sh; $test";
 then echo "archlinux OK"
 else echo "archlinux fail" && cat packaging/archlinux.log
 fi

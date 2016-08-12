@@ -8,4 +8,5 @@ lib
 include
 packaging/libvips*
 packaging/*.log
+!packaging/build
 .DS_Store

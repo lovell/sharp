@@ -175,7 +175,7 @@
               '../lib/libxml2.so',
               '../lib/libz.so',
               # Ensure runtime linking is relative to sharp.node
-              '-Wl,-rpath=\'$${ORIGIN}/../../lib\''
+              '-Wl,--disable-new-dtags -Wl,-rpath=\'$${ORIGIN}/../../lib\''
             ]
           }]
         ]

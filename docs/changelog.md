@@ -2,11 +2,11 @@
 
 ### v0.16 - "*pencil*"
 
-Requires libvips v8.3.2
+Requires libvips v8.3.3
 
 #### v0.16.0 - TBD
 
-* Add pre-compiled libvips for OS X.
+* Add pre-compiled libvips for OS X, ARMv7 and ARMv8.
   [#312](https://github.com/lovell/sharp/issues/312)
 
 * Ensure boolean, bandbool, extractChannel ops occur before sRGB conversion.
