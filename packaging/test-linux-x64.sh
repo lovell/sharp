@@ -23,15 +23,15 @@ done
 # Centos 7
 echo "Testing centos7..."
 if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/centos7:$version_node >packaging/$dist.log 2>&1 sh -c "cd /v; $test";
-then echo "$dist OK"
-else echo "$dist fail" && cat packaging/$dist.log
+then echo "centos7 OK"
+else echo "centos7 fail" && cat packaging/$dist.log
 fi
 
 # Fedora 22
 echo "Testing fedora22..."
 if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/fedora22:$version_node >packaging/$dist.log 2>&1 sh -c "cd /v; $test";
-then echo "$dist OK"
-else echo "$dist fail" && cat packaging/$dist.log
+then echo "fedora22 OK"
+else echo "fedora22 fail" && cat packaging/$dist.log
 fi
 
 # openSUSE 13.2
