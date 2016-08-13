@@ -25,9 +25,17 @@ Requires libvips v8.3.3
   [#516](https://github.com/lovell/sharp/pull/516)
   [@mhirsch](https://github.com/mhirsch)
 
+* Prevent bandbool creating a single channel sRGB image.
+  [#519](https://github.com/lovell/sharp/pull/519)
+  [@mhirsch](https://github.com/mhirsch)
+
 * Ensure ICC profiles are removed from PNG output unless withMetadata used.
   [#521](https://github.com/lovell/sharp/issues/521)
   [@ChrisPinewood](https://github.com/ChrisPinewood)
+
+* Add alpha channels, if missing, to overlayWith images.
+  [#540](https://github.com/lovell/sharp/pull/540)
+  [@cmtt](https://github.com/cmtt)
 
 * Remove deprecated interpolateWith method - use resize(w, h, { interpolator: ... })
   [#310](https://github.com/lovell/sharp/issues/310)
