@@ -583,14 +583,14 @@ class PipelineWorker : public Nan::AsyncWorker {
         } else {
           // Ensure overlay has alpha channel
           if (!HasAlpha(overlayImage)) {
-            double const multiplier = Is16Bit(overlayImage.interpretation()) ? 256.0 : 1.0;
+            double const multiplier = sharp::Is16Bit(overlayImage.interpretation()) ? 256.0 : 1.0;
             overlayImage = overlayImage.bandjoin(
               VImage::new_matrix(overlayImage.width(), overlayImage.height()).new_from_image(255 * multiplier)
             );
           }
           // Ensure image has alpha channel
           if (!HasAlpha(image)) {
-            double const multiplier = Is16Bit(image.interpretation()) ? 256.0 : 1.0;
+            double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
             image = image.bandjoin(
               VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
             );
