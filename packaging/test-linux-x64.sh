@@ -6,7 +6,7 @@ if ! type docker >/dev/null; then
   exit 1
 fi
 
-version_node=4.4.2
+version_node=6.3.0
 
 test="npm run clean; npm install --unsafe-perm; npm test"
 
@@ -23,15 +23,15 @@ done
 # Centos 7
 echo "Testing centos7..."
 if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/centos7:$version_node >packaging/$dist.log 2>&1 sh -c "cd /v; $test";
-then echo "$dist OK"
-else echo "$dist fail" && cat packaging/$dist.log
+then echo "centos7 OK"
+else echo "centos7 fail" && cat packaging/$dist.log
 fi
 
 # Fedora 22
 echo "Testing fedora22..."
 if docker run -i -t --rm -v $PWD:/v -e "NODE_ENV=development" nodesource/fedora22:$version_node >packaging/$dist.log 2>&1 sh -c "cd /v; $test";
-then echo "$dist OK"
-else echo "$dist fail" && cat packaging/$dist.log
+then echo "fedora22 OK"
+else echo "fedora22 fail" && cat packaging/$dist.log
 fi
 
 # openSUSE 13.2
@@ -43,7 +43,7 @@ fi
 
 # Archlinux 2015.06.01
 echo "Testing archlinux..."
-if docker run -i -t --rm -v $PWD:/v base/archlinux:2015.06.01 >packaging/archlinux.log 2>&1 sh -c "cd /v; ./packaging/test/archlinux.sh; $test";
+if docker run -i -t --rm -v $PWD:/v pritunl/archlinux:latest >packaging/archlinux.log 2>&1 sh -c "cd /v; ./packaging/test/archlinux.sh; $test";
 then echo "archlinux OK"
 else echo "archlinux fail" && cat packaging/archlinux.log
 fi

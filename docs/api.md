@@ -453,12 +453,12 @@ Enhance output image contrast by stretching its luminance to cover the full dyna
 
 #### overlayWith(image, [options])
 
-Overlay (composite) a image containing an alpha channel over the processed (resized, extracted etc.) image.
+Overlay (composite) a image over the processed (resized, extracted etc.) image.
 
 `image` is one of the following, and must be the same size or smaller than the processed image:
 
-* Buffer containing PNG, WebP, GIF, SVG, raw pixel image data, or
-* String containing the path to an image file, with most major transparency formats supported.
+* Buffer containing image data, or
+* String containing the path to an image file
 
 `options`, if present, is an Object with the following optional attributes:
 

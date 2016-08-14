@@ -396,7 +396,8 @@ namespace sharp {
     Perform boolean/bitwise operation on image color channels - results in one channel image
   */
   VImage Bandbool(VImage image, VipsOperationBoolean const boolean) {
-    return image.bandbool(boolean);
+    image = image.bandbool(boolean);
+    return image.copy(VImage::option()->set("interpretation", VIPS_INTERPRETATION_B_W));
   }
 
   /*

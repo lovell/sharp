@@ -22,7 +22,7 @@ fi
 export SSHPASS=hypriot
 
 echo "Copying sharp source to device"
-sshpass -e scp -o PreferredAuthentications=password -r ../../sharp root@${IP}:/root/sharp
+sshpass -e scp -o PreferredAuthentications=password -r ../../sharp pirate@${IP}:/home/pirate/sharp
 
 echo "Compile and test within container"
-sshpass -e ssh -o PreferredAuthentications=password -t root@${IP} "docker run -i -t --rm -v \${PWD}/sharp:/s hypriot/rpi-node:5 sh -c 'cd /s && npm install --unsafe-perm && npm test'"
+sshpass -e ssh -o PreferredAuthentications=password -t pirate@${IP} "docker run --rm -v \${PWD}/sharp:/s hypriot/rpi-node:6 sh -c 'cd /s && npm install --unsafe-perm && npm test'"

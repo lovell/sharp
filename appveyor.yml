@@ -1,4 +1,4 @@
-os: Previous Visual Studio 2015
+os: Visual Studio 2015
 version: "{build}"
 build: off
 platform: x64
@@ -10,6 +10,7 @@ environment:
   - nodejs_version: "6"
 install:
   - ps: Install-Product node $env:nodejs_version x64
+  - npm install -g npm@latest
   - npm install
 test_script:
   - npm run-script test-win

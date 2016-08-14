@@ -1,30 +1,43 @@
 #!/bin/sh
+set -e
 
-VERSION_VIPS=8.3.2
+if [ $# -lt 1 ]; then
+  echo
+  echo "Usage: $0 VERSION [PLATFORM]"
+  echo "Build shared libraries for libvips and its dependencies via containers"
+  echo
+  echo "Please specify the libvips VERSION, e.g. 8.3.3"
+  echo
+  echo "Optionally build for only one PLATFORM, defaults to building for all"
+  echo "Possible values for PLATFORM are: win32-x64, linux-x64, linux-armv6,"
+  echo "linux-armv7, linux-armv8"
+  echo
+  exit 1
+fi
+VERSION_VIPS="$1"
+PLATFORM="${2:-all}"
 
 # Is docker available?
-
 if ! type docker >/dev/null; then
   echo "Please install docker"
   exit 1
 fi
 
-# TODO: docker v1.9.0 allows build-time args - https://github.com/docker/docker/pull/15182
+# Windows (x64)
+if [ $PLATFORM = "all" ] || [ $PLATFORM = "win32-x64" ]; then
+  echo "Building win32-x64..."
+  docker build -t vips-dev-win32-x64 win32-x64
+  docker run --rm -e "VERSION_VIPS=${VERSION_VIPS}" -v $PWD:/packaging vips-dev-win32-x64 sh -c "/packaging/build/win.sh"
+fi
 
-# Windows
+# Linux (x64, ARMv6, ARMv7, ARMv8)
+for flavour in linux-x64 linux-armv6 linux-armv7 linux-armv8; do
+  if [ $PLATFORM = "all" ] || [ $PLATFORM = $flavour ]; then
+    echo "Building $flavour..."
+    docker build -t vips-dev-$flavour $flavour
+    docker run --rm -e "VERSION_VIPS=${VERSION_VIPS}" -v $PWD:/packaging vips-dev-$flavour sh -c "/packaging/build/lin.sh"
+  fi
+done
 
-docker build -t vips-dev-win win
-WIN_CONTAINER_ID=$(docker run -d vips-dev-win)
-docker cp "${WIN_CONTAINER_ID}:/libvips-${VERSION_VIPS}-win.tar.gz" .
-docker rm "${WIN_CONTAINER_ID}"
-
-# Linux
-
-docker build -t vips-dev-lin lin
-LIN_CONTAINER_ID=$(docker run -d vips-dev-lin)
-docker cp "${LIN_CONTAINER_ID}:/libvips-${VERSION_VIPS}-lin.tar.gz" .
-docker rm "${LIN_CONTAINER_ID}"
-
-# Checksums
-
+# Display checksums
 sha256sum *.tar.gz

@@ -154,11 +154,20 @@ describe('Overlays', function() {
     });
   }
 
-  it('Fail when overlay does not contain alpha channel', function(done) {
+  it('Composite JPEG onto PNG', function(done) {
     sharp(fixtures.inputPngOverlayLayer1)
-      .overlayWith(fixtures.inputJpg)
+      .overlayWith(fixtures.inputJpgWithLandscapeExif1)
       .toBuffer(function(error) {
-        assert.strictEqual(true, error instanceof Error);
+        if (error) return done(error);
+        done();
+      });
+  });
+
+  it('Composite opaque JPEG onto JPEG', function(done) {
+    sharp(fixtures.inputJpg)
+      .overlayWith(fixtures.inputJpgWithLandscapeExif1)
+      .toBuffer(function(error) {
+        if (error) return done(error);
         done();
       });
   });

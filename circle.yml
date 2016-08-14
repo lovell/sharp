@@ -3,4 +3,4 @@ machine:
     - docker
 test:
   override:
-    - ./packaging/test.sh
+    - ./packaging/test-linux-x64.sh

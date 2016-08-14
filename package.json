@@ -26,7 +26,8 @@
     "Chintan Thakkar <lemnisk8@gmail.com>",
     "F. Orlando Galashan <frulo@gmx.de>",
     "Kleis Auke Wolthuizen <info@kleisauke.nl>",
-    "Matt Hirsch <mhirsch@media.mit.edu>"
+    "Matt Hirsch <mhirsch@media.mit.edu>",
+    "Matthias Thoemmes <thoemmes@gmail.com>"
   ],
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
   "scripts": {
@@ -34,7 +35,7 @@
     "test": "VIPS_WARNING=0 node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --slow=5000 --timeout=30000 ./test/unit/*.js",
     "test-win": "node ./node_modules/mocha/bin/mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
-    "test-packaging": "./packaging/test.sh",
+    "test-packaging": "./packaging/test-linux-x64.sh",
     "test-clean": "rm -rf coverage/ test/fixtures/output.* && npm install && npm test"
   },
   "main": "index.js",
@@ -80,7 +81,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.3.2"
+    "libvips": "8.3.3"
   },
   "engines": {
     "node": ">=0.10"

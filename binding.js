@@ -46,6 +46,24 @@ var unpack = function(tarPath, done) {
     .pipe(extractor);
 };
 
+var platformId = function() {
+  var id = [process.platform, process.arch].join('-');
+  if (process.arch === 'arm') {
+    switch(process.config.variables.arm_version) {
+      case '8':
+        id = id + 'v8';
+        break;
+      case '7':
+        id = id + 'v7';
+        break;
+      default:
+        id = id + 'v6';
+        break;
+    }
+  }
+  return id;
+};
+
 // Error
 var error = function(msg) {
   if (msg instanceof Error) {
@@ -77,8 +95,7 @@ module.exports.download_vips = function() {
       }
     }
     // Arch/platform-specific .tar.gz
-    var platform = (process.arch === 'arm') ? 'arm' : process.platform.substr(0, 3);
-    var tarFilename = ['libvips', minimumLibvipsVersion, platform].join('-') + '.tar.gz';
+    var tarFilename = ['libvips', minimumLibvipsVersion, platformId()].join('-') + '.tar.gz';
     var tarPath = path.join(__dirname, 'packaging', tarFilename);
     if (isFile(tarPath)) {
       unpack(tarPath);
