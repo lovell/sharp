@@ -437,8 +437,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           std::tie(joinImage, joinImageType) = sharp::OpenInput(baton->joinChannelIn[i], baton->accessMethod);
 
           image = image.bandjoin(joinImage);
-          image = image.copy(VImage::option()->set("interpretation", baton->colourspace));
         }
+        image = image.copy(VImage::option()->set("interpretation", baton->colourspace));
       }
 
       // Crop/embed
