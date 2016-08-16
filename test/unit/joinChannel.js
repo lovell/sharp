@@ -112,6 +112,22 @@ describe('Image channel insertion', function() {
       });
   });
 
+  it('Grayscale to RGBA, files, two arrays', function(done) {
+    sharp(fixtures.inputPng) // gray -> red
+      .resize(320, 240)
+      .joinChannel([fs.readFileSync(fixtures.inputPngTestJoinChannel)]) // new green channel
+      .joinChannel([fs.readFileSync(fixtures.inputPngStripesH),         // new blue channel
+                    fs.readFileSync(fixtures.inputPngStripesV)])        // new alpha channel
+      .toColourspace('srgb')
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        assert.strictEqual(4, info.channels);
+        fixtures.assertSimilar(fixtures.expected('joinChannel-rgba.png'), data, done);
+      });
+  });
+
   it('Invalid raw buffer description', function() {
     assert.throws(function() {
       sharp().joinChannel(fs.readFileSync(fixtures.inputPng),{raw:{}});

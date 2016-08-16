@@ -428,8 +428,8 @@ Sharp.prototype.overlayWith = function(overlay, options) {
 */
 Sharp.prototype.joinChannel = function(images, options) {
   if (Array.isArray(images)) {
-    images.forEach(function(image, index) {
-      this.options.joinChannelIn[index] = this._createInputDescriptor(image, options);
+    images.forEach(function(image) {
+      this.options.joinChannelIn.push(this._createInputDescriptor(image, options));
     }, this);
   } else {
     this.options.joinChannelIn.push(this._createInputDescriptor(images, options));
