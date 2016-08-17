@@ -86,6 +86,7 @@ var Sharp = function(input, options) {
     normalize: 0,
     booleanBufferIn: null,
     booleanFileIn: '',
+    joinChannelIn: [],
     // overlay
     overlayGravity: 0,
     overlayXOffset : -1,
@@ -109,6 +110,7 @@ var Sharp = function(input, options) {
     tileSize: 256,
     tileOverlap: 0,
     extractChannel: -1,
+    colourspace: 'srgb',
     // Function to notify of queue length changes
     queueListener: function(queueLength) {
       module.exports.queue.emit('change', queueLength);
@@ -422,6 +424,20 @@ Sharp.prototype.overlayWith = function(overlay, options) {
 };
 
 /*
+  Add another color channel to the image
+*/
+Sharp.prototype.joinChannel = function(images, options) {
+  if (Array.isArray(images)) {
+    images.forEach(function(image) {
+      this.options.joinChannelIn.push(this._createInputDescriptor(image, options));
+    }, this);
+  } else {
+    this.options.joinChannelIn.push(this._createInputDescriptor(images, options));
+  }
+  return this;
+};
+
+/*
   Rotate output image by 0, 90, 180 or 270 degrees
   Auto-rotation based on the EXIF Orientation tag is represented by an angle of -1
 */
@@ -629,6 +645,18 @@ Sharp.prototype.greyscale = function(greyscale) {
 };
 Sharp.prototype.grayscale = Sharp.prototype.greyscale;
 
+/*
+  Set output colourspace
+*/
+Sharp.prototype.toColourspace = function(colourspace) {
+  if (!isString(colourspace) ) {
+    throw new Error('Invalid output colourspace ' + colourspace);
+  }
+  this.options.colourspace = colourspace;
+  return this;
+};
+Sharp.prototype.toColorspace = Sharp.prototype.toColourspace;
+
 Sharp.prototype.progressive = function(progressive) {
   this.options.progressive = isBoolean(progressive) ? progressive : true;
   return this;
@@ -817,6 +845,15 @@ module.exports.bool = {
   or: 'or',
   eor: 'eor'
 };
+// Colourspaces
+module.exports.colourspace = {
+  multiband: 'multiband',
+  'b-w': 'b-w',
+  bw: 'b-w',
+  cmyk: 'cmyk',
+  srgb: 'srgb'
+};
+module.exports.colorspace = module.exports.colourspace;
 
 /*
   Resize image to width x height pixels

@@ -32,6 +32,7 @@ struct PipelineBaton {
   int overlayYOffset;
   bool overlayTile;
   bool overlayCutout;
+  std::vector<sharp::InputDescriptor *> joinChannelIn;
   int topOffsetPre;
   int leftOffsetPre;
   int widthPre;
@@ -90,6 +91,7 @@ struct PipelineBaton {
   VipsOperationBoolean booleanOp;
   VipsOperationBoolean bandBoolOp;
   int extractChannel;
+  VipsInterpretation colourspace;
   int tileSize;
   int tileOverlap;
   VipsForeignDzContainer tileContainer;
@@ -148,6 +150,7 @@ struct PipelineBaton {
     booleanOp(VIPS_OPERATION_BOOLEAN_LAST),
     bandBoolOp(VIPS_OPERATION_BOOLEAN_LAST),
     extractChannel(-1),
+    colourspace(VIPS_INTERPRETATION_LAST),
     tileSize(256),
     tileOverlap(0),
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),

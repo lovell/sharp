@@ -430,4 +430,13 @@ namespace sharp {
     );
   }
 
+  /*
+    Get interpretation type from string
+  */
+  VipsInterpretation GetInterpretation(std::string const typeStr) {
+    return static_cast<VipsInterpretation>(
+      vips_enum_from_nick(nullptr, VIPS_TYPE_INTERPRETATION, typeStr.data())
+    );
+  }
+
 }  // namespace sharp

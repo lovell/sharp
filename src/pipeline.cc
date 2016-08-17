@@ -4,6 +4,7 @@
 #include <utility>
 #include <memory>
 #include <numeric>
+#include <map>
 
 #include <vips/vips8>
 #include <node.h>
@@ -39,8 +40,15 @@ class PipelineWorker : public Nan::AsyncWorker {
     // Increment processing task counter
     g_atomic_int_inc(&sharp::counterProcess);
 
+    std::map<VipsInterpretation, std::string> profileMap;
     // Default sRGB ICC profile from https://packages.debian.org/sid/all/icc-profiles-free/filelist
-    std::string srgbProfile = baton->iccProfilePath + "sRGB.icc";
+    profileMap.insert(
+      std::pair<VipsInterpretation, std::string>(VIPS_INTERPRETATION_sRGB,
+                                                 baton->iccProfilePath + "sRGB.icc"));
+    // Convert to sRGB using default CMYK profile from http://www.argyllcms.com/cmyk.icm
+    profileMap.insert(
+      std::pair<VipsInterpretation, std::string>(VIPS_INTERPRETATION_CMYK,
+                                                 baton->iccProfilePath + "cmyk.icm"));
 
     try {
       // Open input
@@ -266,7 +274,8 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (sharp::HasProfile(image)) {
         // Convert to sRGB using embedded profile
         try {
-          image = image.icc_transform(const_cast<char*>(srgbProfile.data()), VImage::option()
+          image = image.icc_transform(
+            const_cast<char*>(profileMap[VIPS_INTERPRETATION_sRGB].data()), VImage::option()
             ->set("embedded", TRUE)
             ->set("intent", VIPS_INTENT_PERCEPTUAL)
           );
@@ -274,10 +283,9 @@ class PipelineWorker : public Nan::AsyncWorker {
           // Ignore failure of embedded profile
         }
       } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
-        // Convert to sRGB using default CMYK profile from http://www.argyllcms.com/cmyk.icm
-        std::string cmykProfile = baton->iccProfilePath + "cmyk.icm";
-        image = image.icc_transform(const_cast<char*>(srgbProfile.data()), VImage::option()
-          ->set("input_profile", cmykProfile.data())
+        image = image.icc_transform(
+          const_cast<char*>(profileMap[VIPS_INTERPRETATION_sRGB].data()), VImage::option()
+          ->set("input_profile", profileMap[VIPS_INTERPRETATION_CMYK].data())
           ->set("intent", VIPS_INTENT_PERCEPTUAL)
         );
       }
@@ -418,6 +426,19 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (baton->flop) {
         image = image.flip(VIPS_DIRECTION_HORIZONTAL);
         sharp::RemoveExifOrientation(image);
+      }
+
+      // Join additional color channels to the image
+      if(baton->joinChannelIn.size() > 0) {
+        VImage joinImage;
+        ImageType joinImageType = ImageType::UNKNOWN;
+
+        for(unsigned int i = 0; i < baton->joinChannelIn.size(); i++) {
+          std::tie(joinImage, joinImageType) = sharp::OpenInput(baton->joinChannelIn[i], baton->accessMethod);
+
+          image = image.bandjoin(joinImage);
+        }
+        image = image.copy(VImage::option()->set("interpretation", baton->colourspace));
       }
 
       // Crop/embed
@@ -654,12 +675,15 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (sharp::Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
       }
-      if (image.interpretation() != VIPS_INTERPRETATION_sRGB) {
-        image = image.colourspace(VIPS_INTERPRETATION_sRGB);
-        // Transform colours from embedded profile to sRGB profile
-        if (baton->withMetadata && sharp::HasProfile(image)) {
-          image = image.icc_transform(const_cast<char*>(srgbProfile.data()), VImage::option()
-            ->set("embedded", TRUE)
+      if (image.interpretation() != baton->colourspace) {
+        // Need to convert image
+        image = image.colourspace(baton->colourspace);
+        // Transform colours from embedded profile to output profile
+        if (baton->withMetadata &&
+            sharp::HasProfile(image) &&
+            profileMap[baton->colourspace] != std::string()) {
+          image = image.icc_transform(const_cast<char*>(profileMap[baton->colourspace].data()),
+            VImage::option()->set("embedded", TRUE)
           );
         }
       }
@@ -693,7 +717,11 @@ class PipelineWorker : public Nan::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "jpeg";
-          baton->channels = std::min(baton->channels, 3);
+          if(baton->colourspace == VIPS_INTERPRETATION_CMYK) {
+            baton->channels = std::min(baton->channels, 4);
+          } else {
+            baton->channels = std::min(baton->channels, 3);
+          }
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" && inputImageType == ImageType::PNG)) {
           // Strip profile
           if (!baton->withMetadata) {
@@ -1021,6 +1049,19 @@ NAN_METHOD(pipeline) {
   baton->crop = AttrTo<int32_t>(options, "crop");
   baton->kernel = AttrAsStr(options, "kernel");
   baton->interpolator = AttrAsStr(options, "interpolator");
+  // Join Channel Options
+  if(HasAttr(options, "joinChannelIn")) {
+    v8::Local<v8::Object> joinChannelObject = Nan::Get(options, Nan::New("joinChannelIn").ToLocalChecked())
+      .ToLocalChecked().As<v8::Object>();
+    v8::Local<v8::Array> joinChannelArray = joinChannelObject.As<v8::Array>();
+    int joinChannelArrayLength = AttrTo<int32_t>(joinChannelObject, "length");
+    for(int i = 0; i < joinChannelArrayLength; i++) {
+      baton->joinChannelIn.push_back(
+        CreateInputDescriptor(
+          Nan::Get(joinChannelArray, i).ToLocalChecked().As<v8::Object>(),
+          buffersToPersist));
+    }
+  }
   // Operators
   baton->flatten = AttrTo<bool>(options, "flatten");
   baton->negate = AttrTo<bool>(options, "negate");
@@ -1077,6 +1118,9 @@ NAN_METHOD(pipeline) {
   baton->optimiseScans = AttrTo<bool>(options, "optimiseScans");
   baton->withMetadata = AttrTo<bool>(options, "withMetadata");
   baton->withMetadataOrientation = AttrTo<uint32_t>(options, "withMetadataOrientation");
+  baton->colourspace = sharp::GetInterpretation(AttrAsStr(options, "colourspace"));
+  if(baton->colourspace == VIPS_INTERPRETATION_ERROR)
+    baton->colourspace = VIPS_INTERPRETATION_sRGB;
   // Output
   baton->formatOut = AttrAsStr(options, "formatOut");
   baton->fileOut = AttrAsStr(options, "fileOut");

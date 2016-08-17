@@ -29,6 +29,20 @@ describe('Colour space conversion', function() {
       .toFile(fixtures.path('output.greyscale-not.jpg'), done);
   });
 
+  it('Greyscale with single channel output', function(done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .greyscale()
+      .toColourspace('b-w')
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(1, info.channels);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('output.greyscale-single.jpg'), data, done);
+      });
+  });
+
   if (sharp.format.tiff.input.file && sharp.format.webp.output.buffer) {
     it('From 1-bit TIFF to sRGB WebP [slow]', function(done) {
       sharp(fixtures.inputTiff)
@@ -79,4 +93,10 @@ describe('Colour space conversion', function() {
       });
   });
 
+  it('Invalid input', function() {
+    assert.throws(function() {
+      sharp(fixtures.inputJpg)
+        .toColourspace(null);
+    });
+  });
 });

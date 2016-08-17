@@ -15,13 +15,12 @@ describe('Bandbool per-channel boolean operations', function() {
     it(op + ' operation', function(done) {
       sharp(fixtures.inputPngBooleanNoAlpha)
         .bandbool(op)
+        .toColourspace('b-w')
         .toBuffer(function(err, data, info) {
-          // should use .toColourspace('b-w') here to get 1 channel output, when it is merged
           if (err) throw err;
           assert.strictEqual(200, info.width);
           assert.strictEqual(200, info.height);
-          //assert.strictEqual(1, info.channels);
-          assert.strictEqual(3, info.channels);
+          assert.strictEqual(1, info.channels);
           fixtures.assertSimilar(fixtures.expected('bandbool_' + op + '_result.png'), data, done);
         });
     });
