@@ -918,6 +918,11 @@ class PipelineWorker : public Nan::AsyncWorker {
     delete baton->input;
     delete baton->overlay;
     delete baton->boolean;
+    for_each(baton->joinChannelIn.begin(), baton->joinChannelIn.end(),
+      [this](sharp::InputDescriptor *joinChannelIn) {
+        delete joinChannelIn;
+      }
+    );
     delete baton;
 
     // Decrement processing task counter

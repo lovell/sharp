@@ -29,7 +29,16 @@
   ...
   fun:jpeg_finish_compress
 }
-
+{
+  value_jpeg_obj
+  Memcheck:Value8
+  obj:*/libjpeg.so*
+}
+{
+  cond_jpeg_obj
+  Memcheck:Cond
+  obj:*/libjpeg.so*
+}
 # libpng
 {
   cond_libpng_png_read_row

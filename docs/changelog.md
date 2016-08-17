@@ -21,6 +21,10 @@ Requires libvips v8.3.3
   [#511](https://github.com/lovell/sharp/pull/511)
   [@mhirsch](https://github.com/mhirsch)
 
+* Add joinChannel and toColourspace/toColorspace operations.
+  [#513](https://github.com/lovell/sharp/pull/513)
+  [@mhirsch](https://github.com/mhirsch)
+
 * Add support for raw pixel data with boolean and withOverlay operations.
   [#516](https://github.com/lovell/sharp/pull/516)
   [@mhirsch](https://github.com/mhirsch)
