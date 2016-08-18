@@ -4,7 +4,7 @@
 
 Requires libvips v8.3.3
 
-#### v0.16.0 - TBD
+#### v0.16.0 - 18<sup>th</sup> August 2016
 
 * Add pre-compiled libvips for OS X, ARMv7 and ARMv8.
   [#312](https://github.com/lovell/sharp/issues/312)
