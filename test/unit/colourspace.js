@@ -4,6 +4,7 @@ var assert = require('assert');
 
 var sharp = require('../../index');
 var fixtures = require('../fixtures');
+var icc = require('icc');
 
 describe('Colour space conversion', function() {
 
@@ -93,10 +94,38 @@ describe('Colour space conversion', function() {
       });
   });
 
-  it('Invalid input', function() {
+  it('From profile-less RGB to sRGB with user provided profile', function(done) {
+    sharp(fixtures.inputJpg)
+      .withIcc('Bluish.icc')
+      .withMetadata()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        sharp(data).metadata(function(err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(true, metadata.hasProfile);
+          assert.strictEqual('srgb', metadata.space);
+          var iccProfile = icc.parse(metadata.icc);
+          assert.strictEqual('lcms', iccProfile.cmm);
+          assert.strictEqual('lcms', iccProfile.creator);
+          assert.strictEqual('Apple', iccProfile.platform);
+          assert.strictEqual('Monitor', iccProfile.deviceClass);
+          fixtures.assertSimilar(fixtures.expected('withIcc_Bluish.jpg'), data, done);
+        });
+      });
+  });
+  
+  it('Invalid input to toColourspace', function() {
     assert.throws(function() {
       sharp(fixtures.inputJpg)
         .toColourspace(null);
+    });
+  });
+
+  it('Invalid input to withIcc', function() {
+    assert.throws(function() {
+      sharp(fixtures.inputJpg)
+        .withIcc();
     });
   });
 });

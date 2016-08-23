@@ -34,6 +34,7 @@ class PipelineWorker : public Nan::AsyncWorker {
   void Execute() {
     using sharp::HasAlpha;
     using sharp::ImageType;
+    using sharp::FileExists;
 
     // Decrement queued task counter
     g_atomic_int_dec_and_test(&sharp::counterQueue);
@@ -270,8 +271,33 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
       }
 
+      // Check for input ICC override (withIcc)
+      bool overrideIcc = false;
+      if (baton->withIcc.length() > 0) {
+        std::string iccPath(baton->withIcc);
+        if (FileExists(iccPath)) {
+          overrideIcc = true;
+        } else {
+          // check in the iccProfilePath directory
+          iccPath.insert(0, baton->iccProfilePath);
+          if (FileExists(iccPath)) {
+            overrideIcc = true;
+            baton->withIcc = iccPath;
+          } else {
+            // throw an error if the icc profile is not found
+            throw vips::VError("ICC Profile not found: " + baton->withIcc);
+          }
+        }
+      }
+
       // Ensure we're using a device-independent colour space
-      if (sharp::HasProfile(image)) {
+      if (overrideIcc) {
+        image = image.icc_transform(
+          const_cast<char*>(profileMap[VIPS_INTERPRETATION_sRGB].data()), VImage::option()
+          ->set("input_profile", baton->withIcc.data())
+          ->set("intent", VIPS_INTENT_PERCEPTUAL)
+          );
+      } else if (sharp::HasProfile(image)) {
         // Convert to sRGB using embedded profile
         try {
           image = image.icc_transform(
@@ -1123,6 +1149,7 @@ NAN_METHOD(pipeline) {
   baton->optimiseScans = AttrTo<bool>(options, "optimiseScans");
   baton->withMetadata = AttrTo<bool>(options, "withMetadata");
   baton->withMetadataOrientation = AttrTo<uint32_t>(options, "withMetadataOrientation");
+  baton->withIcc = AttrAsStr(options, "withIcc");
   baton->colourspace = sharp::GetInterpretation(AttrAsStr(options, "colourspace"));
   if(baton->colourspace == VIPS_INTERPRETATION_ERROR)
     baton->colourspace = VIPS_INTERPRETATION_sRGB;

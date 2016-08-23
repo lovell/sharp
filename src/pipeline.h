@@ -82,6 +82,7 @@ struct PipelineBaton {
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
+  std::string withIcc;
   std::unique_ptr<double[]> convKernel;
   int convKernelWidth;
   int convKernelHeight;

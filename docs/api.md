@@ -643,6 +643,12 @@ This has no effect if the input image does not have an EXIF `Orientation` tag.
 
 The default behaviour, when `withMetadata` is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
 
+#### withIcc(path)
+
+Set an input ICC profile defining the colourspace for the image loaded by sharp. If an embedded profile is present, this profile will override the embedded profile.
+
+`path` is a string containing the location of the input ICC profile on disk.
+ 
 #### tile(options)
 
 The size, overlap, container and directory layout to use when generating square Deep Zoom image pyramid tiles.

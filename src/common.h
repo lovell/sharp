@@ -201,6 +201,11 @@ namespace sharp {
   */
   VipsInterpretation GetInterpretation(std::string const typeStr);
 
+  /*
+    Check if a file exists
+  */
+  bool FileExists( const std::string &file);
+
 }  // namespace sharp
 
 #endif  // SRC_COMMON_H_

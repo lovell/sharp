@@ -9,6 +9,13 @@
 #include "nan.h"
 #include "common.h"
 
+#ifdef _WIN32  // for FileExists
+#include <io.h>
+#define access _access_s
+#else
+#include <unistd.h>
+#endif
+
 using vips::VImage;
 
 namespace sharp {
@@ -437,6 +444,13 @@ namespace sharp {
     return static_cast<VipsInterpretation>(
       vips_enum_from_nick(nullptr, VIPS_TYPE_INTERPRETATION, typeStr.data())
     );
+  }
+
+  /*
+    Check if a file exists
+  */
+  bool FileExists( const std::string &file) {
+    return access( file.c_str(), 0 ) == 0;
   }
 
 }  // namespace sharp
