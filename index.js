@@ -503,22 +503,25 @@ Sharp.prototype.blur = function(sigma) {
   Convolve the image with a kernel.
 */
 Sharp.prototype.convolve = function(kernel) {
-  if (!isDefined(kernel) || !isDefined(kernel.kernel) ||
-      !isDefined(kernel.width) || !isDefined(kernel.height) ||
-      !inRange(kernel.width,3,1001) || !inRange(kernel.height,3,1001) ||
+  if (!isObject(kernel) || !Array.isArray(kernel.kernel) ||
+      !isInteger(kernel.width) || !isInteger(kernel.height) ||
+      !inRange(kernel.width, 3, 1001) || !inRange(kernel.height, 3, 1001) ||
       kernel.height * kernel.width != kernel.kernel.length
      ) {
     // must pass in a kernel
     throw new Error('Invalid convolution kernel');
   }
-  if(!isDefined(kernel.scale)) {
-    var sum = 0;
-    kernel.kernel.forEach(function(e) {
-      sum += e;
-    });
-    kernel.scale = sum;
+  // Default scale is sum of kernel values
+  if (!isInteger(kernel.scale)) {
+    kernel.scale = kernel.kernel.reduce(function(a, b) {
+      return a + b;
+    }, 0);
   }
-  if(!isDefined(kernel.offset)) {
+  // Clamp scale to a minimum value of 1
+  if (kernel.scale < 1) {
+    kernel.scale = 1;
+  }
+  if (!isInteger(kernel.offset)) {
     kernel.offset = 0;
   }
   this.options.convKernel = kernel;

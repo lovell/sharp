@@ -4,6 +4,12 @@
 
 Requires libvips v8.3.3
 
+#### v0.16.1 - TBD
+
+* Ensure convolution kernel scale is clamped to a minimum value of 1.
+  [#561](https://github.com/lovell/sharp/issues/561)
+  [@abagshaw](https://github.com/abagshaw)
+
 #### v0.16.0 - 18<sup>th</sup> August 2016
 
 * Add pre-compiled libvips for OS X, ARMv7 and ARMv8.
