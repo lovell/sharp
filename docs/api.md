@@ -642,6 +642,7 @@ Set the use off lossless output of WebP output formats. The default quality is `
 
 Enable preprocessing on lossy compression of WebP formats to increase compression by up to 50%.
 
+`nearLossless` is a boolean where `true` enables and `false` disables near lossless output.
 
 #### progressive()
 
