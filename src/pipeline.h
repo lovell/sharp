@@ -73,6 +73,9 @@ struct PipelineBaton {
   bool withoutEnlargement;
   VipsAccess accessMethod;
   int quality;
+  int alphaQuality;
+  bool lossless;
+  bool nearLossless;
   int compressionLevel;
   bool withoutAdaptiveFiltering;
   bool withoutChromaSubsampling;
@@ -134,6 +137,9 @@ struct PipelineBaton {
     progressive(false),
     withoutEnlargement(false),
     quality(80),
+    alphaQuality(100),
+    lossless(false),
+    nearLossless(false),
     compressionLevel(6),
     withoutAdaptiveFiltering(false),
     withoutChromaSubsampling(false),
