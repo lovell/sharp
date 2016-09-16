@@ -10,6 +10,10 @@ Requires libvips v8.3.3
   [#561](https://github.com/lovell/sharp/issues/561)
   [@abagshaw](https://github.com/abagshaw)
 
+* Correct calculation of y-axis placement when overlaying image at a fixed point.
+  [#566](https://github.com/lovell/sharp/issues/566)
+  [@Nateowami](https://github.com/Nateowami)
+
 #### v0.16.0 - 18<sup>th</sup> August 2016
 
 * Add pre-compiled libvips for OS X, ARMv7 and ARMv8.

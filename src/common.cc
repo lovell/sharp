@@ -391,7 +391,7 @@ namespace sharp {
 
     if(y >= 0 && y < (inHeight - outHeight)) {
       top = y;
-    } else if(x >= (inHeight - outHeight)) {
+    } else if(y >= (inHeight - outHeight)) {
       top = inHeight - outHeight;
     }
 

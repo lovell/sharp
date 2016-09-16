@@ -437,7 +437,27 @@ describe('Overlays', function() {
           assert.strictEqual(3, info.channels);
           fixtures.assertSimilar(expected, data, done);
         });
-      
+    });
+
+    it('Overlay 100x100 with 50x50 so bottom edges meet', function(done) {
+      sharp(fixtures.inputJpg)
+        .resize(50, 50)
+        .toBuffer(function(err, overlay) {
+          if (err) throw err;
+          sharp(fixtures.inputJpgWithLandscapeExif1)
+            .resize(100, 100)
+            .overlayWith(overlay, {
+              top: 50,
+              left: 40
+            })
+            .toBuffer(function(err, data, info) {
+              if (err) throw err;
+              assert.strictEqual('jpeg', info.format);
+              assert.strictEqual(100, info.width);
+              assert.strictEqual(100, info.height);
+              fixtures.assertSimilar(fixtures.expected('overlay-bottom-edges-meet.jpg'), data, done);
+            });
+        });
     });
   });
 
