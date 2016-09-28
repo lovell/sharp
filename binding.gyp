@@ -51,7 +51,6 @@
     ],
     # Nested variables "pattern" borrowed from http://src.chromium.org/viewvc/chrome/trunk/src/build/common.gypi
     'variables': {
-      'sharp_cxx11%': '0',
       'variables': {
         'variables': {
           'conditions': [
@@ -92,10 +91,6 @@
       'src/sharp.cc',
       'src/utilities.cc'
     ],
-    'defines': [
-      '_GLIBCXX_USE_CXX11_ABI=<(sharp_cxx11)',
-      '_ALLOW_KEYWORD_MACROS'
-    ],
     'include_dirs': [
       '<!(node -e "require(\'nan\')")'
     ],
@@ -109,6 +104,10 @@
           }, {
             'libraries': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips-cpp)']
           }]
+        ],
+        'defines': [
+          # Inspect libvips-cpp.so to determine which C++11 ABI version was used and set _GLIBCXX_USE_CXX11_ABI accordingly. This is quite horrible.
+          '_GLIBCXX_USE_CXX11_ABI=<!(if readelf -Ws "$(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs-only-L vips-cpp | cut -c 3-)/libvips-cpp.so" | c++filt | grep -qF __cxx11;then echo "1";else echo "0";fi)'
         ]
       }, {
         # Attempt to download pre-built libvips and install locally within node_modules
@@ -119,6 +118,9 @@
         ],
         'conditions': [
           ['OS == "win"', {
+            'defines': [
+              '_ALLOW_KEYWORD_MACROS'
+            ],
             'libraries': [
               '../lib/libvips.lib',
               '../lib/libglib-2.0.lib',
@@ -142,6 +144,9 @@
             'variables': {
               'download_vips': '<!(LDD_VERSION="<!(ldd --version 2>&1 || true)" node -e "require(\'./binding\').download_vips()")'
             },
+            'defines': [
+              '_GLIBCXX_USE_CXX11_ABI=0'
+            ],
             'libraries': [
               '../lib/libvips-cpp.so',
               '../lib/libvips.so',

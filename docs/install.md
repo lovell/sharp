@@ -22,24 +22,15 @@ Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ C
 * Debian 7, 8
 * Ubuntu 12.04, 14.04, 16.04
 * Centos 7
-* Fedora 22, 23
+* Fedora 23, 24
 * openSUSE 13.2
 * Archlinux
 * Raspbian Jessie
-* Amazon Linux 2016.03
+* Amazon Linux 2016.03, 2016.09
 
-To use your own version of libvips instead of the provided binaries, make sure it is
-at least the version listed under `config.libvips` in the `package.json` file and
-that it can be located using `pkg-config --modversion vips-cpp`.
-
-There are [changes in the C++11 ABI](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html)
-when using v5.1+ of the `g++` compiler.
-If you have installed `libvips-dev` via package manager on an OS such as Debian testing/unstable,
-you can pass the required value of the `_GLIBCXX_USE_CXX11_ABI` macro using the `--sharp-cxx11` flag.
-
-```sh
-npm install --sharp-cxx11=1
-```
+To use a globally-installed version of libvips instead of the provided binaries,
+make sure it is at least the version listed under `config.libvips` in the `package.json` file
+and that it can be located using `pkg-config --modversion vips-cpp`.
 
 If you are using non-stadard paths (anything other than `/usr` or `/usr/local`),
 you might need to set `PKG_CONFIG_PATH` during `npm install`

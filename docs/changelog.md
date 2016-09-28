@@ -6,6 +6,8 @@ Requires libvips v8.3.3
 
 #### v0.16.1 - TBD
 
+* C++11 ABI version is now auto-detected, remove sharp-cxx11 installation flag.
+
 * Ensure convolution kernel scale is clamped to a minimum value of 1.
   [#561](https://github.com/lovell/sharp/issues/561)
   [@abagshaw](https://github.com/abagshaw)
