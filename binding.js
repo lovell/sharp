@@ -17,6 +17,16 @@ var minimumLibvipsVersion = process.env.npm_package_config_libvips || require('.
 
 var vipsHeaderPath = path.join(__dirname, 'include', 'vips', 'vips.h');
 
+var platform = process.env.npm_config_platform || process.platform;
+
+var arch = process.env.npm_config_arch || process.arch;
+var arm_version = process.env.npm_config_armv || process.config.variables.arm_version;
+
+if (arch === 'arch64' || arch === 'armhf') {
+  arch = 'arm';
+  if (arch === 'arch64') arm_version = '8';
+}
+
 // -- Helpers
 
 // Does this file exist?
@@ -47,9 +57,9 @@ var unpack = function(tarPath, done) {
 };
 
 var platformId = function() {
-  var id = [process.platform, process.arch].join('-');
-  if (process.arch === 'arm') {
-    switch(process.config.variables.arm_version) {
+  var id = [platform, arch].join('-');
+  if (arch === 'arm') {
+    switch(arm_version) {
       case '8':
         id = id + 'v8';
         break;
@@ -79,7 +89,7 @@ module.exports.download_vips = function() {
   // Has vips been installed locally?
   if (!isFile(vipsHeaderPath)) {
     // Ensure Intel 64-bit or ARM
-    if (process.arch === 'ia32') {
+    if (arch === 'ia32') {
       error('Intel Architecture 32-bit systems require manual installation - please see http://sharp.dimens.io/en/stable/install/');
     }
     // Ensure glibc >= 2.15
