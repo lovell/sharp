@@ -8,6 +8,9 @@ Requires libvips v8.3.3
 
 * C++11 ABI version is now auto-detected, remove sharp-cxx11 installation flag.
 
+* Add experimental 'attention' crop strategy.
+  [#295](https://github.com/lovell/sharp/issues/295)
+
 * Include .node extension for Meteor's require() implementation.
   [#537](https://github.com/lovell/sharp/issues/537)
   [@isjackwild](https://github.com/isjackwild)

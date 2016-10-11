@@ -1,3 +1,4 @@
 node_modules
 test/bench/node_modules
+test/saliency/humanae/node_modules
 coverage

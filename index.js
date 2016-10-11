@@ -260,7 +260,8 @@ module.exports.gravity = {
 
 // Strategies for automagic behaviour
 module.exports.strategy = {
-  entropy: 16
+  entropy: 16,
+  attention: 17
 };
 
 /*
@@ -277,7 +278,7 @@ Sharp.prototype.crop = function(crop) {
   } else if (isString(crop) && isInteger(module.exports.gravity[crop])) {
     // Gravity (string)
     this.options.crop = module.exports.gravity[crop];
-  } else if (isInteger(crop) && crop === module.exports.strategy.entropy) {
+  } else if (isInteger(crop) && crop >= module.exports.strategy.entropy) {
     // Strategy
     this.options.crop = crop;
   } else {

@@ -1,8 +1,10 @@
 #ifndef SRC_OPERATIONS_H_
 #define SRC_OPERATIONS_H_
 
-#include <tuple>
+#include <algorithm>
+#include <functional>
 #include <memory>
+#include <tuple>
 #include <vips/vips8>
 
 using vips::VImage;
@@ -63,14 +65,21 @@ namespace sharp {
   VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged);
 
   /*
-    Calculate crop area based on image entropy
+    Crop strategy functors
   */
-  std::tuple<int, int> EntropyCrop(VImage image, int const outWidth, int const outHeight);
+  struct EntropyStrategy {
+    double operator()(VImage image);
+  };
+  struct AttentionStrategy {
+    double operator()(VImage image);
+  };
 
   /*
-    Calculate the Shannon entropy for an image
+    Calculate crop area based on given strategy (Entropy, Attention)
   */
-  double Entropy(VImage image);
+  std::tuple<int, int> Crop(
+    VImage image, int const outWidth, int const outHeight, std::function<double(VImage)> strategy
+  );
 
   /*
     Insert a tile cache to prevent over-computation of any previous operations in the pipeline

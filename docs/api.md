@@ -175,12 +175,11 @@ Possible attributes of `sharp.gravity` are
 `north`, `northeast`, `east`, `southeast`, `south`,
 `southwest`, `west`, `northwest`, `center` and `centre`.
 
-Possible attributes of the experimental `sharp.strategy` are:
+The experimental strategy-based approach resizes so one dimension is at its target length
+then repeatedly ranks edge regions, discarding the edge with the lowest score based on the selected strategy.
 
-* `entropy`: resize so one dimension is at its target size
-then repeatedly remove pixels from the edge with the lowest
-[Shannon entropy](https://en.wikipedia.org/wiki/Entropy_%28information_theory%29)
-until it too reaches the target size.
+* `entropy`: focus on the region with the highest [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_%28information_theory%29).
+* `attention`: focus on the region with the highest luminance frequency, colour saturation and presence of skin tones.
 
 The default crop option is a `center`/`centre` gravity.
 

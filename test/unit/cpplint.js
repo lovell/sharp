@@ -29,6 +29,9 @@ describe('cpplint', function() {
             },
             whitespace: {
               parens: false
+            },
+            runtime: {
+              indentation_namespace: false
             }
           }
         }, function(err, report) {

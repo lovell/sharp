@@ -488,13 +488,18 @@ class PipelineWorker : public Nan::AsyncWorker {
             std::tie(left, top) = sharp::CalculateCrop(
               image.width(), image.height(), baton->width, baton->height, baton->crop
             );
-          } else {
+          } else if (baton->crop == 16) {
             // Entropy-based crop
-            std::tie(left, top) = sharp::EntropyCrop(image, baton->width, baton->height);
+            std::tie(left, top) = sharp::Crop(image, baton->width, baton->height, sharp::EntropyStrategy());
+          } else {
+            // Attention-based crop
+            std::tie(left, top) = sharp::Crop(image, baton->width, baton->height, sharp::AttentionStrategy());
           }
           int width = std::min(image.width(), baton->width);
           int height = std::min(image.height(), baton->height);
           image = image.extract_area(left, top, width, height);
+          baton->cropCalcLeft = left;
+          baton->cropCalcTop = top;
         }
       }
 
@@ -890,6 +895,10 @@ class PipelineWorker : public Nan::AsyncWorker {
       Set(info, New("width").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(width)));
       Set(info, New("height").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(height)));
       Set(info, New("channels").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->channels)));
+      if (baton->cropCalcLeft != -1 && baton->cropCalcLeft != -1) {
+        Set(info, New("cropCalcLeft").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->cropCalcLeft)));
+        Set(info, New("cropCalcTop").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->cropCalcTop)));
+      }
 
       if (baton->bufferOutLength > 0) {
         // Pass ownership of output data to Buffer instance

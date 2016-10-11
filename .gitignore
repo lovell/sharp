@@ -4,6 +4,10 @@ coverage
 test/bench/node_modules
 test/fixtures/output*
 test/leak/libvips.supp
+test/saliency/report.json
+test/saliency/Image*
+test/saliency/[Uu]serData*
+!test/saliency/userData.js
 lib
 include
 packaging/libvips*

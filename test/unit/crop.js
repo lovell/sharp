@@ -172,7 +172,9 @@ describe('Crop', function() {
           assert.strictEqual(3, info.channels);
           assert.strictEqual(80, info.width);
           assert.strictEqual(320, info.height);
-          fixtures.assertSimilar(fixtures.expected('crop-entropy.jpg'), data, done);
+          assert.strictEqual(250, info.cropCalcLeft);
+          assert.strictEqual(0, info.cropCalcTop);
+          fixtures.assertSimilar(fixtures.expected('crop-strategy.jpg'), data, done);
         });
     });
 
@@ -186,10 +188,47 @@ describe('Crop', function() {
           assert.strictEqual(4, info.channels);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          fixtures.assertSimilar(fixtures.expected('crop-entropy.png'), data, done);
+          assert.strictEqual(0, info.cropCalcLeft);
+          assert.strictEqual(80, info.cropCalcTop);
+          fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
 
   });
 
+  describe('Attention strategy', function() {
+
+    it('JPEG', function(done) {
+      sharp(fixtures.inputJpgWithCmykProfile)
+        .resize(80, 320)
+        .crop(sharp.strategy.attention)
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual(80, info.width);
+          assert.strictEqual(320, info.height);
+          assert.strictEqual(250, info.cropCalcLeft);
+          assert.strictEqual(0, info.cropCalcTop);
+          fixtures.assertSimilar(fixtures.expected('crop-strategy.jpg'), data, done);
+        });
+    });
+
+    it('PNG', function(done) {
+      sharp(fixtures.inputPngWithTransparency)
+        .resize(320, 80)
+        .crop(sharp.strategy.attention)
+        .toBuffer(function(err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(4, info.channels);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80, info.height);
+          assert.strictEqual(0, info.cropCalcLeft);
+          assert.strictEqual(80, info.cropCalcTop);
+          fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
+        });
+    });
+
+  });
 });

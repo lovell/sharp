@@ -46,6 +46,8 @@ struct PipelineBaton {
   int channels;
   Canvas canvas;
   int crop;
+  int cropCalcLeft;
+  int cropCalcTop;
   std::string kernel;
   std::string interpolator;
   double background[4];
@@ -112,6 +114,8 @@ struct PipelineBaton {
     channels(0),
     canvas(Canvas::CROP),
     crop(0),
+    cropCalcLeft(-1),
+    cropCalcTop(-1),
     flatten(false),
     negate(false),
     blurSigma(0.0),
