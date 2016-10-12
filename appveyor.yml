@@ -4,6 +4,10 @@ build: off
 platform: x64
 environment:
   VIPS_WARNING: 0
+  node_pre_gyp_accessKeyId:
+    secure: FZqYCWy6PGfdCY6lUMMwurrstrVJWFl+0a4mSas/JZo=
+  node_pre_gyp_secretAccessKey:
+    secure: x961+zy88oXOB9rM+uT0gzjy+2ToB699qDVwf6HTsENsiOTdFMT6I3tCbzWiLI+0
   matrix:
   - nodejs_version: "0.12"
   - nodejs_version: "4"
@@ -11,6 +15,10 @@ environment:
 install:
   - ps: Install-Product node $env:nodejs_version x64
   - npm install -g npm@latest
-  - npm install
+  - npm install --build-from-source
 test_script:
   - npm run-script test-win
+on_success:
+  - .\node_modules\.bin\node-pre-gyp package
+  - SET CM=%APPVEYOR_REPO_COMMIT_MESSAGE%
+  - if not "%CM%" == "%CM:[publish binary]=%" .\node_modules\.bin\node-pre-gyp --msvs_version=2013 publish
