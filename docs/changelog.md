@@ -4,7 +4,7 @@
 
 Requires libvips v8.3.3
 
-#### v0.16.1 - TBD
+#### v0.16.1 - 13<sup>th</sup> October 2016
 
 * C++11 ABI version is now auto-detected, remove sharp-cxx11 installation flag.
 

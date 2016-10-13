@@ -519,6 +519,36 @@ async.series({
             }
           });
       }
+    }).add('sharp-crop-entropy', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer)
+          .resize(width, height)
+          .crop(sharp.strategy.entropy)
+          .toBuffer(function(err, buffer) {
+            if (err) {
+              throw err;
+            } else {
+              assert.notStrictEqual(null, buffer);
+              deferred.resolve();
+            }
+          });
+      }
+    }).add('sharp-crop-attention', {
+      defer: true,
+      fn: function(deferred) {
+        sharp(inputJpgBuffer)
+          .resize(width, height)
+          .crop(sharp.strategy.attention)
+          .toBuffer(function(err, buffer) {
+            if (err) {
+              throw err;
+            } else {
+              assert.notStrictEqual(null, buffer);
+              deferred.resolve();
+            }
+          });
+      }
     }).on('cycle', function(event) {
       console.log('operations ' + String(event.target));
     }).on('complete', function() {
