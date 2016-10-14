@@ -4,6 +4,12 @@
 
 Requires libvips v8.3.3
 
+#### v0.16.2 - TBD
+
+* Restrict readelf usage to Linux only when detecting global libvips version.
+  [#602](https://github.com/lovell/sharp/issues/602)
+  [@caoko](https://github.com/caoko)
+
 #### v0.16.1 - 13<sup>th</sup> October 2016
 
 * C++11 ABI version is now auto-detected, remove sharp-cxx11 installation flag.
