@@ -18,23 +18,23 @@ export CXXFLAGS="${FLAGS}"
 # Dependency version numbers
 VERSION_ZLIB=1.2.8
 VERSION_FFI=3.2.1
-VERSION_GLIB=2.49.4
+VERSION_GLIB=2.50.1
 VERSION_XML2=2.9.4
-VERSION_GSF=1.14.39
+VERSION_GSF=1.14.40
 VERSION_EXIF=0.6.21
 VERSION_LCMS2=2.8
-VERSION_JPEG=1.5.0
+VERSION_JPEG=1.5.1
 VERSION_PNG16=1.6.25
 VERSION_WEBP=0.5.1
 VERSION_TIFF=4.0.6
-VERSION_ORC=0.4.25
-VERSION_GDKPIXBUF=2.35.2
-VERSION_FREETYPE=2.6.5
-VERSION_FONTCONFIG=2.12.0
-VERSION_HARFBUZZ=1.3.0
+VERSION_ORC=0.4.26
+VERSION_GDKPIXBUF=2.36.0
+VERSION_FREETYPE=2.7
+VERSION_FONTCONFIG=2.12.1
+VERSION_HARFBUZZ=1.3.2
 VERSION_PIXMAN=0.34.0
 VERSION_CAIRO=1.14.6
-VERSION_PANGO=1.40.1
+VERSION_PANGO=1.40.3
 VERSION_CROCO=0.6.11
 VERSION_SVG=2.40.16
 VERSION_GIF=5.1.4
@@ -56,11 +56,11 @@ cd ${DEPS}/ffi
 make install-strip
 
 mkdir ${DEPS}/glib
-curl -Ls https://download.gnome.org/sources/glib/2.49/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
+curl -Ls https://download.gnome.org/sources/glib/2.50/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
 cd ${DEPS}/glib
 echo glib_cv_stack_grows=no >>glib.cache
 echo glib_cv_uscore=no >>glib.cache
-./configure --cache-file=glib.cache --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --with-pcre=internal
+./configure --cache-file=glib.cache --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --with-pcre=internal --disable-libmount
 make install-strip
 
 mkdir ${DEPS}/xml2
@@ -125,10 +125,10 @@ cd ${TARGET}/lib
 rm -rf liborc-test-*
 
 mkdir ${DEPS}/gdkpixbuf
-curl -Ls https://download.gnome.org/sources/gdk-pixbuf/2.35/gdk-pixbuf-${VERSION_GDKPIXBUF}.tar.xz | tar xJC ${DEPS}/gdkpixbuf --strip-components=1
+curl -Ls https://download.gnome.org/sources/gdk-pixbuf/2.36/gdk-pixbuf-${VERSION_GDKPIXBUF}.tar.xz | tar xJC ${DEPS}/gdkpixbuf --strip-components=1
 cd ${DEPS}/gdkpixbuf
 LD_LIBRARY_PATH=${TARGET}/lib \
-./configure --cache-file=gdkpixbuf.cache --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --disable-introspection --disable-modules --disable-gio-sniffing --without-libpng --without-libjpeg --without-libtiff --without-gdiplus --with-included-loaders=
+./configure --cache-file=gdkpixbuf.cache --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --disable-introspection --disable-modules --disable-gio-sniffing --without-libtiff --without-gdiplus --with-included-loaders=png,jpeg
 make install-strip
 
 mkdir ${DEPS}/freetype
@@ -188,7 +188,7 @@ cd ${DEPS}/gif
 make install-strip
 
 mkdir ${DEPS}/vips
-curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.3/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
+curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.4/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
 cd ${DEPS}/vips
 ./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
   --disable-debug --disable-introspection --without-python --without-fftw \

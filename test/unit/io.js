@@ -668,48 +668,60 @@ describe('Input/output', function() {
       });
   });
 
-  if (sharp.format.svg.input.file) {
-    it('Convert SVG to PNG at default 72DPI', function(done) {
-      sharp(fixtures.inputSvg)
-        .resize(1024)
-        .extract({left: 290, top: 760, width: 40, height: 40})
-        .toFormat('png')
-        .toBuffer(function(err, data, info) {
+  it('Convert SVG to PNG at default 72DPI', function(done) {
+    sharp(fixtures.inputSvg)
+      .resize(1024)
+      .extract({left: 290, top: 760, width: 40, height: 40})
+      .toFormat('png')
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(40, info.width);
+        assert.strictEqual(40, info.height);
+        fixtures.assertSimilar(fixtures.expected('svg72.png'), data, function(err) {
           if (err) throw err;
-          assert.strictEqual('png', info.format);
-          assert.strictEqual(40, info.width);
-          assert.strictEqual(40, info.height);
-          fixtures.assertSimilar(fixtures.expected('svg72.png'), data, function(err) {
+          sharp(data).metadata(function(err, info) {
             if (err) throw err;
-            sharp(data).metadata(function(err, info) {
-              if (err) throw err;
-              assert.strictEqual(72, info.density);
-              done();
-            });
+            assert.strictEqual(72, info.density);
+            done();
           });
         });
-    });
-    it('Convert SVG to PNG at 300DPI', function(done) {
-      sharp(fixtures.inputSvg, { density: 1200 })
-        .resize(1024)
-        .extract({left: 290, top: 760, width: 40, height: 40})
-        .toFormat('png')
-        .toBuffer(function(err, data, info) {
+      });
+  });
+
+  it('Convert SVG to PNG at 300DPI', function(done) {
+    sharp(fixtures.inputSvg, { density: 1200 })
+      .resize(1024)
+      .extract({left: 290, top: 760, width: 40, height: 40})
+      .toFormat('png')
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(40, info.width);
+        assert.strictEqual(40, info.height);
+        fixtures.assertSimilar(fixtures.expected('svg1200.png'), data, function(err) {
           if (err) throw err;
-          assert.strictEqual('png', info.format);
-          assert.strictEqual(40, info.width);
-          assert.strictEqual(40, info.height);
-          fixtures.assertSimilar(fixtures.expected('svg1200.png'), data, function(err) {
+          sharp(data).metadata(function(err, info) {
             if (err) throw err;
-            sharp(data).metadata(function(err, info) {
-              if (err) throw err;
-              assert.strictEqual(1200, info.density);
-              done();
-            });
+            assert.strictEqual(1200, info.density);
+            done();
           });
         });
-    });
-  }
+      });
+  });
+
+  it('Convert SVG with embedded images to PNG, respecting dimensions', function(done) {
+    sharp(fixtures.inputSvgWithEmbeddedImages)
+      .png()
+      .toBuffer(function(err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(480, info.width);
+        assert.strictEqual(360, info.height);
+        assert.strictEqual(4, info.channels);
+        fixtures.assertSimilar(fixtures.expected('svg-embedded.png'), data, done);
+      });
+  });
 
   if (sharp.format.tiff.input.buffer) {
     it('Load TIFF from Buffer', function(done) {
@@ -760,22 +772,6 @@ describe('Input/output', function() {
           assert.strictEqual(8, info.width);
           assert.strictEqual(4, info.height);
           assert.strictEqual(4, info.channels);
-          done();
-        });
-    });
-  }
-
-  if (sharp.format.openslide.input.file) {
-    it('Load Aperio SVS file via Openslide', function(done) {
-      sharp(fixtures.inputSvs)
-        .resize(320, 240)
-        .jpeg()
-        .toBuffer(function(err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(true, data.length > 0);
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(240, info.height);
           done();
         });
     });

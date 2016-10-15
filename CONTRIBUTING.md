@@ -41,7 +41,6 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.16.0 | pencil     |
 | v0.17.0 | quill      |
 | v0.18.0 | ridge      |
 
@@ -90,4 +89,9 @@ npm run test-packaging
 
 ## Finally
 
-Please feel free to ask any questions via a [new issue](https://github.com/lovell/sharp/issues/new) or contact me by [e-mail](https://github.com/lovell/sharp/blob/master/package.json#L4).
+Please feel free to ask any questions via a
+[new issue](https://github.com/lovell/sharp/issues/new).
+
+If you're unable to post details publicly, please
+[e-mail](https://github.com/lovell/sharp/blob/master/package.json#L4)
+for private, paid consulting.

@@ -278,6 +278,17 @@
   fun:_ZN6icu_568Collator19getAvailableLocalesERi
 }
 {
+  leak_nodejs_thread_start
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:calloc
+  fun:allocate_dtv
+  fun:_dl_allocate_tls
+  fun:allocate_stack
+  ...
+  fun:_ZN2v84base6Thread5StartEv
+}
+{
   leak_nan_FunctionCallbackInfo
   Memcheck:Leak
   match-leak-kinds: definite

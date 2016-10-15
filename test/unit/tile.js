@@ -144,10 +144,10 @@ describe('Tile', function() {
   if (sharp.format.dz.output.file) {
 
     it('Deep Zoom layout', function(done) {
-      var directory = fixtures.path('output.dz_files');
+      var directory = fixtures.path('output.dzi_files');
       rimraf(directory, function() {
         sharp(fixtures.inputJpg)
-          .toFile(fixtures.path('output.dz.dzi'), function(err, info) {
+          .toFile(fixtures.path('output.dzi'), function(err, info) {
             if (err) throw err;
             assert.strictEqual('dz', info.format);
             assertDeepZoomTiles(directory, 256, 13, done);
@@ -156,14 +156,14 @@ describe('Tile', function() {
     });
 
     it('Deep Zoom layout with custom size+overlap', function(done) {
-      var directory = fixtures.path('output.dz.512_files');
+      var directory = fixtures.path('output.512.dzi_files');
       rimraf(directory, function() {
         sharp(fixtures.inputJpg)
           .tile({
             size: 512,
             overlap: 16
           })
-          .toFile(fixtures.path('output.dz.512.dzi'), function(err, info) {
+          .toFile(fixtures.path('output.512.dzi'), function(err, info) {
             if (err) throw err;
             assert.strictEqual('dz', info.format);
             assertDeepZoomTiles(directory, 512 + 2 * 16, 13, done);
@@ -172,7 +172,7 @@ describe('Tile', function() {
     });
 
     it('Zoomify layout', function(done) {
-      var directory = fixtures.path('output.zoomify');
+      var directory = fixtures.path('output.zoomify.dzi');
       rimraf(directory, function() {
         sharp(fixtures.inputJpg)
           .tile({
@@ -192,13 +192,13 @@ describe('Tile', function() {
     });
 
     it('Google layout', function(done) {
-      var directory = fixtures.path('output.google');
+      var directory = fixtures.path('output.google.dzi');
       rimraf(directory, function() {
         sharp(fixtures.inputJpg)
           .tile({
             layout: 'google'
           })
-          .toFile(fixtures.path('output.google.dzi'), function(err, info) {
+          .toFile(directory, function(err, info) {
             if (err) throw err;
             assert.strictEqual('dz', info.format);
             fs.stat(path.join(directory, '0', '0', '0.jpg'), function(err, stat) {
@@ -244,7 +244,7 @@ describe('Tile', function() {
           .tile({
             container: 'zip'
           })
-          .toFile(fixtures.path('output.dz.containeropt.dzi'), function(err, info) {
+          .toFile(container, function(err, info) {
             // Vips overrides .dzi extension to .zip used by container var below
             if (err) throw err;
             assert.strictEqual('dz', info.format);

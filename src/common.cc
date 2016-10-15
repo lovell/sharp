@@ -263,11 +263,8 @@ namespace sharp {
   */
   int ExifOrientation(VImage image) {
     int orientation = 0;
-    if (image.get_typeof(EXIF_IFD0_ORIENTATION) != 0) {
-      char const *exif = image.get_string(EXIF_IFD0_ORIENTATION);
-      if (exif != nullptr) {
-        orientation = atoi(&exif[0]);
-      }
+    if (image.get_typeof(VIPS_META_ORIENTATION) != 0) {
+      orientation = image.get_int(VIPS_META_ORIENTATION);
     }
     return orientation;
   }
@@ -276,16 +273,14 @@ namespace sharp {
     Set EXIF Orientation of image.
   */
   void SetExifOrientation(VImage image, int const orientation) {
-    char exif[3];
-    g_snprintf(exif, sizeof(exif), "%d", orientation);
-    image.set(EXIF_IFD0_ORIENTATION, exif);
+    image.set(VIPS_META_ORIENTATION, orientation);
   }
 
   /*
     Remove EXIF Orientation from image.
   */
   void RemoveExifOrientation(VImage image) {
-    SetExifOrientation(image, 0);
+    vips_image_remove(image.get_image(), VIPS_META_ORIENTATION);
   }
 
   /*

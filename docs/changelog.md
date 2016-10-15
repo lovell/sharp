@@ -1,5 +1,15 @@
 # Changelog
 
+### v0.17 - "*quill*"
+
+Requires libvips v8.4.2
+
+#### v0.17.0 - TBD
+
+* Ensure support for embedded base64 PNG and JPEG images within an SVG.
+  [#601](https://github.com/lovell/sharp/issues/601)
+  [@dynamite-ready](https://github.com/dynamite-ready)
+
 ### v0.16 - "*pencil*"
 
 Requires libvips v8.3.3

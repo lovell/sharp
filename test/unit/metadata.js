@@ -69,7 +69,7 @@ describe('Image metadata', function() {
         assert.strictEqual(300, metadata.density);
         assert.strictEqual(false, metadata.hasProfile);
         assert.strictEqual(false, metadata.hasAlpha);
-        assert.strictEqual('undefined', typeof metadata.orientation);
+        assert.strictEqual(1, metadata.orientation);
         assert.strictEqual('undefined', typeof metadata.exif);
         assert.strictEqual('undefined', typeof metadata.icc);
         done();
@@ -140,10 +140,10 @@ describe('Image metadata', function() {
         assert.strictEqual('gif', metadata.format);
         assert.strictEqual(800, metadata.width);
         assert.strictEqual(533, metadata.height);
-        assert.strictEqual(4, metadata.channels);
+        assert.strictEqual(3, metadata.channels);
         assert.strictEqual('undefined', typeof metadata.density);
         assert.strictEqual(false, metadata.hasProfile);
-        assert.strictEqual(true, metadata.hasAlpha);
+        assert.strictEqual(false, metadata.hasAlpha);
         assert.strictEqual('undefined', typeof metadata.orientation);
         assert.strictEqual('undefined', typeof metadata.exif);
         assert.strictEqual('undefined', typeof metadata.icc);
@@ -156,7 +156,7 @@ describe('Image metadata', function() {
         assert.strictEqual('gif', metadata.format);
         assert.strictEqual(2, metadata.width);
         assert.strictEqual(1, metadata.height);
-        assert.strictEqual(4, metadata.channels);
+        assert.strictEqual(2, metadata.channels);
         assert.strictEqual('undefined', typeof metadata.density);
         assert.strictEqual(false, metadata.hasProfile);
         assert.strictEqual(true, metadata.hasAlpha);

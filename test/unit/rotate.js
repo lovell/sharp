@@ -127,7 +127,7 @@ describe('Rotation', function() {
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
         sharp(data).metadata(function(err, metadata) {
-          assert.strictEqual(false, 'orientation' in metadata);
+          assert.strictEqual(1, metadata.orientation);
           fixtures.assertSimilar(fixtures.expected('exif-5.jpg'), data, done);
         });
       });
@@ -177,7 +177,7 @@ describe('Rotation', function() {
         assert.strictEqual(261, info.height);
         sharp(data).metadata(function(err, metadata) {
           if (err) throw err;
-          assert.strictEqual(false, 'orientation' in metadata);
+          assert.strictEqual(1, metadata.orientation);
           fixtures.assertSimilar(fixtures.expected('flip.jpg'), data, done);
         });
       });
@@ -195,7 +195,7 @@ describe('Rotation', function() {
         assert.strictEqual(261, info.height);
         sharp(data).metadata(function(err, metadata) {
           if (err) throw err;
-          assert.strictEqual(false, 'orientation' in metadata);
+          assert.strictEqual(1, metadata.orientation);
           fixtures.assertSimilar(fixtures.expected('flop.jpg'), data, done);
         });
       });
