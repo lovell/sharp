@@ -625,6 +625,24 @@ The output quality to use for lossy JPEG, WebP and TIFF output formats. The defa
 
 `quality` is a Number between 1 and 100.
 
+#### alphaQuality(alphaQuality)
+
+The output quality to use for the alpha channel of WebP output formats. The default quality is `100`.
+
+`alphaQuality` is a Number between 1 and 100.
+
+#### lossless(lossless)
+
+Set the use off lossless output of WebP output formats. The default quality is `false`.
+
+`lossless` is ais a boolean where `true` enables and `false` disables lossless output.
+
+#### nearLossless(nearLossless)
+
+Enable preprocessing on lossy compression of WebP formats to increase compression by up to 50%.
+
+`nearLossless` is a boolean where `true` enables and `false` disables near lossless output.
+
 #### progressive()
 
 Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.

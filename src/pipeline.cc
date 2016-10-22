@@ -749,6 +749,9 @@ class PipelineWorker : public Nan::AsyncWorker {
           VipsArea *area = VIPS_AREA(image.webpsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->quality)
+            ->set("lossless", baton->lossless )
+            ->set("near_lossless", baton->nearLossless)
+            ->set("alpha_q", baton->alphaQuality)
           ));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -1124,6 +1127,9 @@ NAN_METHOD(pipeline) {
   // Output options
   baton->progressive = AttrTo<bool>(options, "progressive");
   baton->quality = AttrTo<int32_t>(options, "quality");
+  baton->alphaQuality = AttrTo<int32_t>(options, "alphaQuality");
+  baton->lossless = AttrTo<bool>(options, "lossless");
+  baton->nearLossless = AttrTo<bool>(options, "nearLossless");
   baton->compressionLevel = AttrTo<int32_t>(options, "compressionLevel");
   baton->withoutAdaptiveFiltering = AttrTo<bool>(options, "withoutAdaptiveFiltering");
   baton->withoutChromaSubsampling = AttrTo<bool>(options, "withoutChromaSubsampling");

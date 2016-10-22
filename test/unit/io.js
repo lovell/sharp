@@ -384,6 +384,21 @@ describe('Input/output', function() {
           done();
         });
     });
+
+    it('WebP alpha compression', function(done) {
+      sharp(fixtures.inputPngWithGreyAlpha).toFormat(sharp.format.webp).quality(90).alphaQuality(100).toBuffer(function(err, buffer100) {
+        if (err) throw err;
+        sharp(fixtures.inputPngWithGreyAlpha).toFormat(sharp.format.webp).quality(90).alphaQuality(80).toBuffer(function(err, buffer80) {
+          if (err) throw err;
+          sharp(fixtures.inputPngWithGreyAlpha).toFormat(sharp.format.webp).quality(90).alphaQuality(60).toBuffer(function(err, buffer60) {
+            if (err) throw err;
+            assert(buffer80.length < buffer100.length);
+            assert(buffer60.length < buffer80.length);
+            done();
+          });
+        });
+      });
+    });
   }
 
   it('Invalid output format', function(done) {

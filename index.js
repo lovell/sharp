@@ -98,6 +98,9 @@ var Sharp = function(input, options) {
     fileOut: '',
     progressive: false,
     quality: 80,
+    alphaQuality: 100,
+    lossless: false,
+    nearLossless: false,
     compressionLevel: 6,
     withoutAdaptiveFiltering: false,
     withoutChromaSubsampling: false,
@@ -677,6 +680,25 @@ Sharp.prototype.quality = function(quality) {
   } else {
     throw new Error('Invalid quality (1 to 100) ' + quality);
   }
+  return this;
+};
+
+Sharp.prototype.alphaQuality = function(alphaQuality) {
+  if (isInteger(alphaQuality) && inRange(alphaQuality, 1, 100)) {
+    this.options.alphaQuality = alphaQuality;
+  } else {
+    throw new Error('Invalid alphaQuality (1 to 100) ' + alphaQuality);
+  }
+  return this;
+};
+
+Sharp.prototype.lossless = function(lossless) {
+  this.options.lossless = isBoolean(lossless) ? lossless : true;
+  return this;
+};
+
+Sharp.prototype.nearLossless = function(nearLossless) {
+  this.options.nearLossless = isBoolean(nearLossless) ? nearLossless : true;
   return this;
 };
 
