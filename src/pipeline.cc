@@ -709,13 +709,13 @@ class PipelineWorker : public Nan::AsyncWorker {
           // Write JPEG to buffer
           VipsArea *area = VIPS_AREA(image.jpegsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
-            ->set("Q", baton->quality)
+            ->set("Q", baton->jpegQuality)
+            ->set("interlace", baton->jpegProgressive)
+            ->set("no_subsample", baton->jpegChromaSubsampling == "4:4:4")
+            ->set("trellis_quant", baton->jpegTrellisQuantisation)
+            ->set("overshoot_deringing", baton->jpegOvershootDeringing)
+            ->set("optimize_scans", baton->jpegOptimiseScans)
             ->set("optimize_coding", TRUE)
-            ->set("no_subsample", baton->withoutChromaSubsampling)
-            ->set("trellis_quant", baton->trellisQuantisation)
-            ->set("overshoot_deringing", baton->overshootDeringing)
-            ->set("optimize_scans", baton->optimiseScans)
-            ->set("interlace", baton->progressive)
           ));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -734,10 +734,10 @@ class PipelineWorker : public Nan::AsyncWorker {
           }
           // Write PNG to buffer
           VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
-            ->set("compression", baton->compressionLevel)
-            ->set("interlace", baton->progressive)
-            ->set("filter", baton->withoutAdaptiveFiltering ?
-              VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
+            ->set("interlace", baton->pngProgressive)
+            ->set("compression", baton->pngCompressionLevel)
+            ->set("filter", baton->pngAdaptiveFiltering ?
+              VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE )
           ));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -748,7 +748,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           // Write WEBP to buffer
           VipsArea *area = VIPS_AREA(image.webpsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
-            ->set("Q", baton->quality)
+            ->set("Q", baton->webpQuality)
           ));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -784,26 +784,26 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
       } else {
         // File output
-        bool isJpeg = sharp::IsJpeg(baton->fileOut);
-        bool isPng = sharp::IsPng(baton->fileOut);
-        bool isWebp = sharp::IsWebp(baton->fileOut);
-        bool isTiff = sharp::IsTiff(baton->fileOut);
-        bool isDz = sharp::IsDz(baton->fileOut);
-        bool isDzZip = sharp::IsDzZip(baton->fileOut);
-        bool isV = sharp::IsV(baton->fileOut);
-        bool matchInput = baton->formatOut == "input" &&
+        bool const isJpeg = sharp::IsJpeg(baton->fileOut);
+        bool const isPng = sharp::IsPng(baton->fileOut);
+        bool const isWebp = sharp::IsWebp(baton->fileOut);
+        bool const isTiff = sharp::IsTiff(baton->fileOut);
+        bool const isDz = sharp::IsDz(baton->fileOut);
+        bool const isDzZip = sharp::IsDzZip(baton->fileOut);
+        bool const isV = sharp::IsV(baton->fileOut);
+        bool const matchInput = baton->formatOut == "input" &&
           !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip || isV);
         if (baton->formatOut == "jpeg" || isJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
           // Write JPEG to file
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
-            ->set("Q", baton->quality)
+            ->set("Q", baton->jpegQuality)
+            ->set("interlace", baton->jpegProgressive)
+            ->set("no_subsample", baton->jpegChromaSubsampling == "4:4:4")
+            ->set("trellis_quant", baton->jpegTrellisQuantisation)
+            ->set("overshoot_deringing", baton->jpegOvershootDeringing)
+            ->set("optimize_scans", baton->jpegOptimiseScans)
             ->set("optimize_coding", TRUE)
-            ->set("no_subsample", baton->withoutChromaSubsampling)
-            ->set("trellis_quant", baton->trellisQuantisation)
-            ->set("overshoot_deringing", baton->overshootDeringing)
-            ->set("optimize_scans", baton->optimiseScans)
-            ->set("interlace", baton->progressive)
           );
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
@@ -814,24 +814,24 @@ class PipelineWorker : public Nan::AsyncWorker {
           }
           // Write PNG to file
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("compression", baton->compressionLevel)
-            ->set("interlace", baton->progressive)
-            ->set("filter", baton->withoutAdaptiveFiltering ?
-              VIPS_FOREIGN_PNG_FILTER_NONE : VIPS_FOREIGN_PNG_FILTER_ALL)
+            ->set("interlace", baton->pngProgressive)
+            ->set("compression", baton->pngCompressionLevel)
+            ->set("filter", baton->pngAdaptiveFiltering ?
+              VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE )
           );
           baton->formatOut = "png";
         } else if (baton->formatOut == "webp" || isWebp || (matchInput && inputImageType == ImageType::WEBP)) {
           // Write WEBP to file
           image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
-            ->set("Q", baton->quality)
+            ->set("Q", baton->webpQuality)
           );
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
           // Write TIFF to file
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
-            ->set("Q", baton->quality)
+            ->set("Q", baton->tiffQuality)
             ->set("compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG)
           );
           baton->formatOut = "tiff";
@@ -1121,23 +1121,27 @@ NAN_METHOD(pipeline) {
       baton->convKernel[i] = AttrTo<double>(kdata, i);
     }
   }
-  // Output options
-  baton->progressive = AttrTo<bool>(options, "progressive");
-  baton->quality = AttrTo<int32_t>(options, "quality");
-  baton->compressionLevel = AttrTo<int32_t>(options, "compressionLevel");
-  baton->withoutAdaptiveFiltering = AttrTo<bool>(options, "withoutAdaptiveFiltering");
-  baton->withoutChromaSubsampling = AttrTo<bool>(options, "withoutChromaSubsampling");
-  baton->trellisQuantisation = AttrTo<bool>(options, "trellisQuantisation");
-  baton->overshootDeringing = AttrTo<bool>(options, "overshootDeringing");
-  baton->optimiseScans = AttrTo<bool>(options, "optimiseScans");
-  baton->withMetadata = AttrTo<bool>(options, "withMetadata");
-  baton->withMetadataOrientation = AttrTo<uint32_t>(options, "withMetadataOrientation");
   baton->colourspace = sharp::GetInterpretation(AttrAsStr(options, "colourspace"));
-  if(baton->colourspace == VIPS_INTERPRETATION_ERROR)
+  if (baton->colourspace == VIPS_INTERPRETATION_ERROR) {
     baton->colourspace = VIPS_INTERPRETATION_sRGB;
+  }
   // Output
   baton->formatOut = AttrAsStr(options, "formatOut");
   baton->fileOut = AttrAsStr(options, "fileOut");
+  baton->withMetadata = AttrTo<bool>(options, "withMetadata");
+  baton->withMetadataOrientation = AttrTo<uint32_t>(options, "withMetadataOrientation");
+  // Format-specific
+  baton->jpegQuality = AttrTo<uint32_t>(options, "jpegQuality");
+  baton->jpegProgressive = AttrTo<bool>(options, "jpegProgressive");
+  baton->jpegChromaSubsampling = AttrAsStr(options, "jpegChromaSubsampling");
+  baton->jpegTrellisQuantisation = AttrTo<bool>(options, "jpegTrellisQuantisation");
+  baton->jpegOvershootDeringing = AttrTo<bool>(options, "jpegOvershootDeringing");
+  baton->jpegOptimiseScans = AttrTo<bool>(options, "jpegOptimiseScans");
+  baton->pngProgressive = AttrTo<bool>(options, "pngProgressive");
+  baton->pngCompressionLevel = AttrTo<uint32_t>(options, "pngCompressionLevel");
+  baton->pngAdaptiveFiltering = AttrTo<bool>(options, "pngAdaptiveFiltering");
+  baton->webpQuality = AttrTo<uint32_t>(options, "webpQuality");
+  baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
   // Tile output
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");

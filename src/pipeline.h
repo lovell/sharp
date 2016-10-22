@@ -71,16 +71,19 @@ struct PipelineBaton {
   int extendBottom;
   int extendLeft;
   int extendRight;
-  bool progressive;
   bool withoutEnlargement;
   VipsAccess accessMethod;
-  int quality;
-  int compressionLevel;
-  bool withoutAdaptiveFiltering;
-  bool withoutChromaSubsampling;
-  bool trellisQuantisation;
-  bool overshootDeringing;
-  bool optimiseScans;
+  int jpegQuality;
+  bool jpegProgressive;
+  std::string jpegChromaSubsampling;
+  bool jpegTrellisQuantisation;
+  bool jpegOvershootDeringing;
+  bool jpegOptimiseScans;
+  bool pngProgressive;
+  int pngCompressionLevel;
+  bool pngAdaptiveFiltering;
+  int webpQuality;
+  int tiffQuality;
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
@@ -135,15 +138,18 @@ struct PipelineBaton {
     extendBottom(0),
     extendLeft(0),
     extendRight(0),
-    progressive(false),
     withoutEnlargement(false),
-    quality(80),
-    compressionLevel(6),
-    withoutAdaptiveFiltering(false),
-    withoutChromaSubsampling(false),
-    trellisQuantisation(false),
-    overshootDeringing(false),
-    optimiseScans(false),
+    jpegQuality(80),
+    jpegProgressive(false),
+    jpegChromaSubsampling("4:2:0"),
+    jpegTrellisQuantisation(false),
+    jpegOvershootDeringing(false),
+    jpegOptimiseScans(false),
+    pngProgressive(false),
+    pngCompressionLevel(6),
+    pngAdaptiveFiltering(true),
+    webpQuality(80),
+    tiffQuality(80),
     withMetadata(false),
     withMetadataOrientation(-1),
     convKernelWidth(0),

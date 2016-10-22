@@ -87,30 +87,34 @@ var Sharp = function(input, options) {
     booleanBufferIn: null,
     booleanFileIn: '',
     joinChannelIn: [],
+    extractChannel: -1,
+    colourspace: 'srgb',
     // overlay
     overlayGravity: 0,
     overlayXOffset : -1,
     overlayYOffset : -1,
     overlayTile: false,
     overlayCutout: false,
-    // output options
-    formatOut: 'input',
+    // output
     fileOut: '',
-    progressive: false,
-    quality: 80,
-    compressionLevel: 6,
-    withoutAdaptiveFiltering: false,
-    withoutChromaSubsampling: false,
-    trellisQuantisation: false,
-    overshootDeringing: false,
-    optimiseScans: false,
+    formatOut: 'input',
     streamOut: false,
     withMetadata: false,
     withMetadataOrientation: -1,
+    // output format
+    jpegQuality: 80,
+    jpegProgressive: false,
+    jpegChromaSubsampling: '4:2:0',
+    jpegTrellisQuantisation: false,
+    jpegOvershootDeringing: false,
+    jpegOptimiseScans: false,
+    pngProgressive: false,
+    pngCompressionLevel: 6,
+    pngAdaptiveFiltering: true,
+    webpQuality: 80,
+    tiffQuality: 80,
     tileSize: 256,
     tileOverlap: 0,
-    extractChannel: -1,
-    colourspace: 'srgb',
     // Function to notify of queue length changes
     queueListener: function(queueLength) {
       module.exports.queue.emit('change', queueLength);
@@ -145,6 +149,9 @@ var isDefined = function(val) {
 };
 var isObject = function(val) {
   return typeof val === 'object';
+};
+var isFunction = function(val) {
+  return typeof val === 'function';
 };
 var isBoolean = function(val) {
   return typeof val === 'boolean';
@@ -661,80 +668,63 @@ Sharp.prototype.toColourspace = function(colourspace) {
 };
 Sharp.prototype.toColorspace = Sharp.prototype.toColourspace;
 
-Sharp.prototype.progressive = function(progressive) {
-  this.options.progressive = isBoolean(progressive) ? progressive : true;
-  return this;
-};
-
 Sharp.prototype.sequentialRead = function(sequentialRead) {
   this.options.sequentialRead = isBoolean(sequentialRead) ? sequentialRead : true;
   return this;
 };
 
-Sharp.prototype.quality = function(quality) {
-  if (isInteger(quality) && inRange(quality, 1, 100)) {
-    this.options.quality = quality;
-  } else {
-    throw new Error('Invalid quality (1 to 100) ' + quality);
-  }
+// Deprecated output options
+Sharp.prototype.quality = util.deprecate(function(quality) {
+  var formatOut = this.options.formatOut;
+  var options = { quality: quality };
+  this.jpeg(options).webp(options).tiff(options);
+  this.options.formatOut = formatOut;
   return this;
-};
-
-/*
-  zlib compression level for PNG output
-*/
-Sharp.prototype.compressionLevel = function(compressionLevel) {
-  if (isInteger(compressionLevel) && inRange(compressionLevel, 0, 9)) {
-    this.options.compressionLevel = compressionLevel;
-  } else {
-    throw new Error('Invalid compressionLevel (0 to 9) ' + compressionLevel);
-  }
+}, 'quality: use jpeg({ quality: ... }), webp({ quality: ... }) and/or tiff({ quality: ... }) instead');
+Sharp.prototype.progressive = util.deprecate(function(progressive) {
+  var formatOut = this.options.formatOut;
+  var options = { progressive: (progressive !== false) };
+  this.jpeg(options).png(options);
+  this.options.formatOut = formatOut;
   return this;
-};
-
-/*
-  Disable the use of adaptive row filtering for PNG output
-*/
-Sharp.prototype.withoutAdaptiveFiltering = function(withoutAdaptiveFiltering) {
-  this.options.withoutAdaptiveFiltering = isBoolean(withoutAdaptiveFiltering) ? withoutAdaptiveFiltering : true;
+}, 'progressive: use jpeg({ progressive: ... }) and/or png({ progressive: ... }) instead');
+Sharp.prototype.compressionLevel = util.deprecate(function(compressionLevel) {
+  var formatOut = this.options.formatOut;
+  this.png({ compressionLevel: compressionLevel });
+  this.options.formatOut = formatOut;
   return this;
-};
-
-/*
-  Disable the use of chroma subsampling for JPEG output
-*/
-Sharp.prototype.withoutChromaSubsampling = function(withoutChromaSubsampling) {
-  this.options.withoutChromaSubsampling = isBoolean(withoutChromaSubsampling) ? withoutChromaSubsampling : true;
+}, 'compressionLevel: use png({ compressionLevel: ... }) instead');
+Sharp.prototype.withoutAdaptiveFiltering = util.deprecate(function(withoutAdaptiveFiltering) {
+  var formatOut = this.options.formatOut;
+  this.png({ adaptiveFiltering: (withoutAdaptiveFiltering === false) });
+  this.options.formatOut = formatOut;
   return this;
-};
-
-/*
-  Apply trellis quantisation to JPEG output - requires mozjpeg 3.0+
-*/
-Sharp.prototype.trellisQuantisation = function(trellisQuantisation) {
-  this.options.trellisQuantisation = isBoolean(trellisQuantisation) ? trellisQuantisation : true;
+}, 'withoutAdaptiveFiltering: use png({ adaptiveFiltering: ... }) instead');
+Sharp.prototype.withoutChromaSubsampling = util.deprecate(function(withoutChromaSubsampling) {
+  var formatOut = this.options.formatOut;
+  this.jpeg({ chromaSubsampling: (withoutChromaSubsampling === false) ? '4:2:0' : '4:4:4' });
+  this.options.formatOut = formatOut;
   return this;
-};
+}, 'withoutChromaSubsampling: use jpeg({ chromaSubsampling: "4:4:4" }) instead');
+Sharp.prototype.trellisQuantisation = util.deprecate(function(trellisQuantisation) {
+  var formatOut = this.options.formatOut;
+  this.jpeg({ trellisQuantisation: (trellisQuantisation !== false) });
+  this.options.formatOut = formatOut;
+  return this;
+}, 'trellisQuantisation: use jpeg({ trellisQuantisation: ... }) instead');
 Sharp.prototype.trellisQuantization = Sharp.prototype.trellisQuantisation;
-
-/*
-  Apply overshoot deringing to JPEG output - requires mozjpeg 3.0+
-*/
-Sharp.prototype.overshootDeringing = function(overshootDeringing) {
-  this.options.overshootDeringing = isBoolean(overshootDeringing) ? overshootDeringing : true;
+Sharp.prototype.overshootDeringing = util.deprecate(function(overshootDeringing) {
+  var formatOut = this.options.formatOut;
+  this.jpeg({ overshootDeringing: (overshootDeringing !== false) });
+  this.options.formatOut = formatOut;
   return this;
-};
-
-/*
-  Optimise scans in progressive JPEG output - requires mozjpeg 3.0+
-*/
-Sharp.prototype.optimiseScans = function(optimiseScans) {
-  this.options.optimiseScans = isBoolean(optimiseScans) ? optimiseScans : true;
-  if (this.options.optimiseScans) {
-    this.progressive();
-  }
+}, 'overshootDeringing: use jpeg({ overshootDeringing: ... }) instead');
+Sharp.prototype.optimiseScans = util.deprecate(function(optimiseScans) {
+  var formatOut = this.options.formatOut;
+  this.jpeg({ optimiseScans: (optimiseScans !== false) });
+  this.options.formatOut = formatOut;
   return this;
-};
+}, 'optimiseScans: use jpeg({ optimiseScans: ... }) instead');
 Sharp.prototype.optimizeScans = Sharp.prototype.optimiseScans;
 
 /*
@@ -924,13 +914,14 @@ Sharp.prototype.limitInputPixels = function(limit) {
   return this;
 };
 
-/*
-  Write output image data to a file
-*/
+/**
+ * Write output image data to a file
+ * @throws {Error} if an attempt has been made to force Buffer/Stream output type
+ */
 Sharp.prototype.toFile = function(fileOut, callback) {
   if (!fileOut || fileOut.length === 0) {
     var errOutputInvalid = new Error('Invalid output');
-    if (typeof callback === 'function') {
+    if (isFunction(callback)) {
       callback(errOutputInvalid);
     } else {
       return BluebirdPromise.reject(errOutputInvalid);
@@ -938,7 +929,7 @@ Sharp.prototype.toFile = function(fileOut, callback) {
   } else {
     if (this.options.input.file === fileOut) {
       var errOutputIsInput = new Error('Cannot use same file for input and output');
-      if (typeof callback === 'function') {
+      if (isFunction(callback)) {
         callback(errOutputIsInput);
       } else {
         return BluebirdPromise.reject(errOutputIsInput);
@@ -951,61 +942,188 @@ Sharp.prototype.toFile = function(fileOut, callback) {
   return this;
 };
 
-/*
-  Write output to a Buffer
-*/
+/**
+ * Write output to a Buffer.
+ * @param {Function} [callback]
+ * @returns {Promise} when no callback is provided
+ */
 Sharp.prototype.toBuffer = function(callback) {
   return this._pipeline(callback);
 };
 
-/*
-  Force JPEG output
-*/
-Sharp.prototype.jpeg = function() {
-  this.options.formatOut = 'jpeg';
+/**
+ * Update the output format unless options.force is false,
+ * in which case revert to input format.
+ * @private
+ * @param {String} formatOut
+ * @param {Object} [options]
+ * @param {Boolean} [options.force=true] - force output format, otherwise attempt to use input format
+ * @returns {Object} this
+ */
+Sharp.prototype._updateFormatOut = function(formatOut, options) {
+  this.options.formatOut = (isObject(options) && options.force === false) ? 'input' : formatOut;
   return this;
 };
 
-/*
-  Force PNG output
-*/
-Sharp.prototype.png = function() {
-  this.options.formatOut = 'png';
-  return this;
-};
-
-/*
-  Force WebP output
-*/
-Sharp.prototype.webp = function() {
-  this.options.formatOut = 'webp';
-  return this;
-};
-
-/*
-  Force raw, uint8 output
-*/
-Sharp.prototype.raw = function() {
-  this.options.formatOut = 'raw';
-  return this;
-};
-
-/*
-  Force output to a given format
-  @param format is either the id as a String or an Object with an 'id' attribute
-*/
-Sharp.prototype.toFormat = function(formatOut) {
-  if (isObject(formatOut) && isString(formatOut.id)) {
-    this.options.formatOut = formatOut.id;
-  } else if (
-    isString(formatOut) &&
-    contains(formatOut, ['jpeg', 'png', 'webp', 'raw', 'tiff', 'dz', 'input'])
-  ) {
-    this.options.formatOut = formatOut;
+/**
+ * Update a Boolean attribute of the this.options Object.
+ * @private
+ * @param {String} key
+ * @param {Boolean} val
+ * @returns {void}
+ */
+Sharp.prototype._setBooleanOption = function(key, val) {
+  if (isBoolean(val)) {
+    this.options[key] = val;
   } else {
-    throw new Error('Unsupported output format ' + formatOut);
+    throw new Error('Invalid ' + key + ' (boolean) ' + val);
   }
-  return this;
+};
+
+/**
+ * Use these JPEG options for output image.
+ * @param {Object} [options] - output options
+ * @param {Number} [options.quality=80] - quality, integer 1-100
+ * @param {Boolean} [options.progressive=false] - use progressive (interlace) scan
+ * @param {String} [options.chromaSubsampling='4:2:0'] - set to '4:4:4' to prevent chroma subsampling when quality <= 90
+ * @param {Boolean} [trellisQuantisation=false] - apply trellis quantisation, requires mozjpeg
+ * @param {Boolean} [overshootDeringing=false] - apply overshoot deringing, requires mozjpeg
+ * @param {Boolean} [optimiseScans=false] - optimise progressive scans, assumes progressive=true, requires mozjpeg
+ * @param {Boolean} [options.force=true] - force JPEG output, otherwise attempt to use input format
+ * @returns {Object} this
+ * @throws {Error} Invalid options
+ */
+Sharp.prototype.jpeg = function(options) {
+  if (isObject(options)) {
+    if (isDefined(options.quality)) {
+      if (isInteger(options.quality) && inRange(options.quality, 1, 100)) {
+        this.options.jpegQuality = options.quality;
+      } else {
+        throw new Error('Invalid quality (integer, 1-100) ' + options.quality);
+      }
+    }
+    if (isDefined(options.progressive)) {
+      this._setBooleanOption('jpegProgressive', options.progressive);
+    }
+    if (isDefined(options.chromaSubsampling)) {
+      if (isString(options.chromaSubsampling) && contains(options.chromaSubsampling, ['4:2:0', '4:4:4'])) {
+        this.options.jpegChromaSubsampling = options.chromaSubsampling;
+      } else {
+        throw new Error('Invalid chromaSubsampling (4:2:0, 4:4:4) ' + options.chromaSubsampling);
+      }
+    }
+    options.trellisQuantisation = options.trellisQuantisation || options.trellisQuantization;
+    if (isDefined(options.trellisQuantisation)) {
+      this._setBooleanOption('jpegTrellisQuantisation', options.trellisQuantisation);
+    }
+    if (isDefined(options.overshootDeringing)) {
+      this._setBooleanOption('jpegOvershootDeringing', options.overshootDeringing);
+    }
+    options.optimiseScans = options.optimiseScans || options.optimizeScans;
+    if (isDefined(options.optimiseScans)) {
+      this._setBooleanOption('jpegOptimiseScans', options.optimiseScans);
+      if (options.optimiseScans) {
+        this.options.jpegProgressive = true;
+      }
+    }
+  }
+  return this._updateFormatOut('jpeg', options);
+};
+
+/**
+ * Use these PNG options for output image.
+ * @param {Object} [options]
+ * @param {Boolean} [options.progressive=false] - use progressive (interlace) scan
+ * @param {Number} [options.compressionLevel=6] - zlib compression level
+ * @param {Boolean} [options.adaptiveFiltering=true] - use adaptive row filtering
+ * @param {Boolean} [options.force=true] - force PNG output, otherwise attempt to use input format
+ * @returns {Object} this
+ * @throws {Error} Invalid options
+ */
+Sharp.prototype.png = function(options) {
+  if (isObject(options)) {
+    if (isDefined(options.progressive)) {
+      this._setBooleanOption('pngProgressive', options.progressive);
+    }
+    if (isDefined(options.compressionLevel)) {
+      if (isInteger(options.compressionLevel) && inRange(options.compressionLevel, 0, 9)) {
+        this.options.pngCompressionLevel = options.compressionLevel;
+      } else {
+        throw new Error('Invalid compressionLevel (integer, 0-9) ' + options.compressionLevel);
+      }
+    }
+    if (isDefined(options.adaptiveFiltering)) {
+      this._setBooleanOption('pngAdaptiveFiltering', options.adaptiveFiltering);
+    }
+  }
+  return this._updateFormatOut('png', options);
+};
+
+/**
+ * Use these WebP options for output image.
+ * @param {Object} [options] - output options
+ * @param {Number} [options.quality=80] - quality, integer 1-100
+ * @param {Boolean} [options.force=true] - force WebP output, otherwise attempt to use input format
+ * @returns {Object} this
+ * @throws {Error} Invalid options
+ */
+Sharp.prototype.webp = function(options) {
+  if (isObject(options)) {
+    if (isDefined(options.quality)) {
+      if (isInteger(options.quality) && inRange(options.quality, 1, 100)) {
+        this.options.webpQuality = options.quality;
+      } else {
+        throw new Error('Invalid quality (integer, 1-100) ' + options.quality);
+      }
+    }
+  }
+  return this._updateFormatOut('webp', options);
+};
+
+/**
+ * Use these TIFF options for output image.
+ * @param {Object} [options] - output options
+ * @param {Number} [options.quality=80] - quality, integer 1-100
+ * @param {Boolean} [options.force=true] - force TIFF output, otherwise attempt to use input format
+ * @returns {Object} this
+ * @throws {Error} Invalid options
+ */
+Sharp.prototype.tiff = function(options) {
+  if (isObject(options)) {
+    if (isDefined(options.quality)) {
+      if (isInteger(options.quality) && inRange(options.quality, 1, 100)) {
+        this.options.tiffQuality = options.quality;
+      } else {
+        throw new Error('Invalid quality (integer, 1-100) ' + options.quality);
+      }
+    }
+  }
+  return this._updateFormatOut('tiff', options);
+};
+
+/**
+ * Force output to be raw, uncompressed uint8 pixel data.
+ * @returns {Object} this
+ */
+Sharp.prototype.raw = function() {
+  return this._updateFormatOut('raw');
+};
+
+/**
+ * Force output to a given format.
+ * @param {String|Object} format - as a String or an Object with an 'id' attribute
+ * @param {Object} options - output options
+ * @returns {Object} this
+ * @throws {Error} unsupported format or options
+ */
+Sharp.prototype.toFormat = function(format, options) {
+  if (isObject(format) && isString(format.id)) {
+    format = format.id;
+  }
+  if (!contains(format, ['jpeg', 'png', 'webp', 'tiff', 'raw'])) {
+    throw new Error('Unsupported output format ' + format);
+  }
+  return this[format](options);
 };
 
 /*
@@ -1164,14 +1282,14 @@ Sharp.prototype.clone = function() {
   Get and set cache memory, file and item limits
 */
 module.exports.cache = function(options) {
-  if (typeof options === 'boolean') {
+  if (isBoolean(options)) {
     if (options) {
       // Default cache settings of 50MB, 20 files, 100 items
       return sharp.cache(50, 20, 100);
     } else {
       return sharp.cache(0, 0, 0);
     }
-  } else if (typeof options === 'object') {
+  } else if (isObject(options)) {
     return sharp.cache(options.memory, options.files, options.items);
   } else {
     return sharp.cache();
@@ -1184,10 +1302,7 @@ module.exports.cache(true);
   Get and set size of thread pool
 */
 module.exports.concurrency = function(concurrency) {
-  if (typeof concurrency !== 'number' || Number.isNaN(concurrency)) {
-    concurrency = null;
-  }
-  return sharp.concurrency(concurrency);
+  return sharp.concurrency(isInteger(concurrency) ? concurrency : null);
 };
 
 /*
@@ -1201,10 +1316,7 @@ module.exports.counters = function() {
   Get and set use of SIMD vector unit instructions
 */
 module.exports.simd = function(simd) {
-  if (typeof simd !== 'boolean') {
-    simd = null;
-  }
-  return sharp.simd(simd);
+  return sharp.simd(isBoolean(simd) ? simd : null);
 };
 // Switch off default
 module.exports.simd(false);

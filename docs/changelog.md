@@ -6,6 +6,13 @@ Requires libvips v8.4.2
 
 #### v0.17.0 - TBD
 
+* Deprecate the following output format "option" functions:
+    quality, progressive, compressionLevel, withoutAdaptiveFiltering,
+    withoutChromaSubsampling, trellisQuantisation, trellisQuantization,
+    overshootDeringing, optimiseScans and optimizeScans.
+  Access to these is now via output format functions, for example `quality(n)`
+    is now `jpeg({quality: n})` and/or `webp({quality: n})`.
+
 * Ensure support for embedded base64 PNG and JPEG images within an SVG.
   [#601](https://github.com/lovell/sharp/issues/601)
   [@dynamite-ready](https://github.com/dynamite-ready)

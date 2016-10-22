@@ -590,17 +590,51 @@ Write image data to a Buffer, the format of which will match the input image by 
 
 A Promises/A+ promise is returned when `callback` is not provided.
 
-#### jpeg()
+#### jpeg([options])
 
 Use JPEG format for the output image.
 
-#### png()
+`options`, if present, is an Object with the following optional attributes:
+
+* `quality` is an integral Number between 1 and 100, default 80. Using quality >90 forces a `chromaSubsampling` value of '4:4:4'.
+* `progressive` is a Boolean to control the use of progressive (interlace) scan, default false.
+* `chromaSubsampling` is a String with the value '4:2:0' (default) or '4:4:4' to control [chroma subsampling](http://en.wikipedia.org/wiki/Chroma_subsampling).
+* `force` is a Boolean, where true (default) will force the use of JPEG output and false will use the input format.
+
+The following, additional options require libvips to have been compiled with mozjpeg support:
+
+* `trellisQuantisation` / `trellisQuantization` is a Boolean, default false, to control the use of [trellis quantisation](http://en.wikipedia.org/wiki/Trellis_quantization).
+* `overshootDeringing` is a Boolean, default false, to reduce the effects of [ringing](http://en.wikipedia.org/wiki/Ringing_%28signal%29).
+* `optimiseScans` / `optimizeScans` is a Boolean, default false, when true calculates which spectrum of DCT coefficients uses the fewest bits for each progressive scan.
+
+#### png([options])
 
 Use PNG format for the output image.
 
-#### webp()
+`options`, if present, is an Object with the following optional attributes:
+
+* `progressive` is a Boolean to control the use of progressive (interlace) scan, default false.
+* `compressionLevel` is an integral Number between 0 and 9, default 6, to set the _zlib_ compression level.
+* `adaptiveFiltering` is a Boolean to control [adaptive row filtering](https://en.wikipedia.org/wiki/Portable_Network_Graphics#Filtering), true for adaptive (default), false for none.
+* `force` is a Boolean, where true (default) will force the use of PNG output and false will use the input format.
+
+#### webp([options])
 
 Use WebP format for the output image.
+
+`options`, if present, is an Object with the following optional attributes:
+
+* `quality` is an integral Number between 1 and 100, default 80.
+* `force` is a Boolean, where true (default) will force the use of WebP output and false will use the input format.
+
+#### tiff([options])
+
+Use TIFF format for the output image.
+
+`options`, if present, is an Object with the following optional attributes:
+
+* `quality` is an integral Number between 1 and 100, default 80.
+* `force` is a Boolean, where true (default) will force the use of TIFF output and false will use the input format.
 
 #### raw()
 
@@ -612,22 +646,12 @@ The number of channels depends on the input image and selected options.
 * 3 channels for colour images without alpha transparency, with bytes ordered \[red, green, blue, red, green, blue, etc.\]).
 * 4 channels for colour images with alpha transparency, with bytes ordered \[red, green, blue, alpha, red, green, blue, alpha, etc.\].
 
-#### toFormat(format)
+#### toFormat(format, [options])
 
 Convenience method for the above output format methods, where `format` is either:
 
 * an attribute of the `sharp.format` Object e.g. `sharp.format.jpeg`, or
-* a String containing `jpeg`, `png`, `webp` or `raw`.
-
-#### quality(quality)
-
-The output quality to use for lossy JPEG, WebP and TIFF output formats. The default quality is `80`.
-
-`quality` is a Number between 1 and 100.
-
-#### progressive()
-
-Use progressive (interlace) scan for JPEG and PNG output. This typically reduces compression performance by 30% but results in an image that can be rendered sooner when decompressed.
+* a String containing `jpeg`, `png`, `webp`, `tiff` or `raw`.
 
 #### withMetadata([metadata])
 
@@ -665,49 +689,6 @@ sharp('input.tiff')
     // output_files contains 512x512 tiles grouped by zoom level
   });
 ```
-
-#### withoutChromaSubsampling()
-
-Disable the use of [chroma subsampling](http://en.wikipedia.org/wiki/Chroma_subsampling) with JPEG output (4:4:4).
-
-This can improve colour representation at higher quality settings (90+),
-but usually increases output file size and typically reduces performance by 25%.
-
-The default behaviour is to use chroma subsampling (4:2:0).
-
-#### compressionLevel(compressionLevel)
-
-An advanced setting for the _zlib_ compression level of the lossless PNG output format. The default level is `6`.
-
-`compressionLevel` is a Number between 0 and 9.
-
-#### withoutAdaptiveFiltering()
-
-An advanced setting to disable adaptive row filtering for the lossless PNG output format.
-
-#### trellisQuantisation() / trellisQuantization()
-
-_Requires libvips to have been compiled with mozjpeg support_
-
-An advanced setting to apply the use of
-[trellis quantisation](http://en.wikipedia.org/wiki/Trellis_quantization) with JPEG output.
-Reduces file size and slightly increases relative quality at the cost of increased compression time.
-
-#### overshootDeringing()
-
-_Requires libvips to have been compiled with mozjpeg support_
-
-An advanced setting to reduce the effects of
-[ringing](http://en.wikipedia.org/wiki/Ringing_%28signal%29) in JPEG output,
-in particular where black text appears on a white background (or vice versa).
-
-#### optimiseScans() / optimizeScans()
-
-_Requires libvips to have been compiled with mozjpeg support_
-
-An advanced setting for progressive (interlace) JPEG output.
-Calculates which spectrum of DCT coefficients uses the fewest bits.
-Usually reduces file size at the cost of increased compression time.
 
 ### Attributes
 
