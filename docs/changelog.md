@@ -4,7 +4,7 @@
 
 Requires libvips v8.3.3
 
-#### v0.16.2 - TBD
+#### v0.16.2 - 22<sup>nd</sup> October 2016
 
 * Restrict readelf usage to Linux only when detecting global libvips version.
   [#602](https://github.com/lovell/sharp/issues/602)
