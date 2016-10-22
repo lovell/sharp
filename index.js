@@ -107,6 +107,7 @@ var Sharp = function(input, options) {
     streamOut: false,
     withMetadata: false,
     withMetadataOrientation: -1,
+    withIcc: '',
     tileSize: 256,
     tileOverlap: 0,
     extractChannel: -1,
@@ -753,6 +754,17 @@ Sharp.prototype.withMetadata = function(withMetadata) {
       }
     }
   }
+  return this;
+};
+
+/*
+  Add an input ICC profile to the image
+*/
+Sharp.prototype.withIcc = function(iccPath) {
+  if (!isString(iccPath)) {
+    throw new Error('Invalid ICC Path');
+  }
+  this.options.withIcc = iccPath;
   return this;
 };
 
