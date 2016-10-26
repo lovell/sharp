@@ -1,21 +1,20 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
 
-var cpplint = require('node-cpplint/lib/');
+const cpplint = require('node-cpplint/lib/');
 
-describe('cpplint', function() {
-
+describe('cpplint', function () {
   // Ignore cpplint failures, possibly newline-related, on Windows
   if (process.platform !== 'win32') {
     // List C++ source files
-    fs.readdirSync(path.join(__dirname, '..', '..', 'src')).filter(function(source) {
+    fs.readdirSync(path.join(__dirname, '..', '..', 'src')).filter(function (source) {
       return source !== 'libvips';
-    }).forEach(function(source) {
-      var file = path.join('src', source);
-      it(file, function(done) {
+    }).forEach(function (source) {
+      const file = path.join('src', source);
+      it(file, function (done) {
         // Lint each source file
         cpplint({
           files: [file],
@@ -34,18 +33,16 @@ describe('cpplint', function() {
               indentation_namespace: false
             }
           }
-        }, function(err, report) {
+        }, function (err, report) {
           if (err) {
             throw err;
           }
-          var expected = {};
+          const expected = {};
           expected[file] = [];
           assert.deepEqual(expected, report);
           done();
         });
       });
-
     });
   }
-
 });

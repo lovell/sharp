@@ -1,5 +1,4 @@
 'use strict';
-/*jshint esversion: 6 */
 
 const fs = require('fs');
 const request = require('request');
@@ -10,7 +9,7 @@ const client = tumblr.createClient({
   consumer_secret: '***'
 });
 
-const fetchImages = function(offset) {
+const fetchImages = function (offset) {
   console.log(`Fetching offset ${offset}`);
   client.posts('humanae', {
     type: 'photo',
@@ -21,8 +20,7 @@ const fetchImages = function(offset) {
       response.posts.forEach((post) => {
         const url = post.photos[0].alt_sizes
           .filter((image) => image.width === 100)
-          .map((image) => image.url)
-          [0];
+          .map((image) => image.url)[0];
         const filename = `./images/${post.id}.jpg`;
         try {
           fs.statSync(filename);

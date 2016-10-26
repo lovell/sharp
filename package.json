@@ -87,9 +87,6 @@
   "semistandard": {
     "env": [
       "mocha"
-    ],
-    "ignore": [
-      "test"
     ]
   }
 }

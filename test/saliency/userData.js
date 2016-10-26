@@ -1,5 +1,4 @@
 'use strict';
-/*jshint esversion: 6, loopfunc: true */
 
 const fs = require('fs');
 const path = require('path');
@@ -8,8 +7,8 @@ const userDataDir = 'UserData';
 
 const images = {};
 
-const median = function(values) {
-  values.sort(function(a,b) {
+const median = function (values) {
+  values.sort(function (a, b) {
     return a - b;
   });
   const half = Math.floor(values.length / 2);
@@ -21,7 +20,7 @@ const median = function(values) {
 };
 
 // List of files
-fs.readdirSync(userDataDir).forEach(function(file) {
+fs.readdirSync(userDataDir).forEach(function (file) {
   // Contents of file
   const lines = fs.readFileSync(path.join(userDataDir, file), {encoding: 'utf-8'}).split(/\r\n/);
   // First line = number of entries
@@ -39,8 +38,11 @@ fs.readdirSync(userDataDir).forEach(function(file) {
     const regions = lines[linePos].split('; ');
     linePos = linePos + 2;
     // Parse human-labelled regions for min/max coords
-    const lefts = [], tops = [], rights = [], bottoms = [];
-    regions.forEach(function(region) {
+    const lefts = [];
+    const tops = [];
+    const rights = [];
+    const bottoms = [];
+    regions.forEach(function (region) {
       if (region.indexOf(' ') !== -1) {
         const coords = region.split(' ');
         lefts.push(parseInt(coords[0], 10));

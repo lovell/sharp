@@ -1,12 +1,11 @@
 'use strict';
 
-var assert = require('assert');
+const assert = require('assert');
 
-var sharp = require('../../index');
-var fixtures = require('../fixtures');
+const sharp = require('../../index');
+const fixtures = require('../fixtures');
 
-describe('Crop', function() {
-
+describe('Crop', function () {
   [
     {
       name: 'North',
@@ -113,12 +112,12 @@ describe('Crop', function() {
       gravity: sharp.gravity.northwest,
       fixture: 'gravity-west.jpg'
     }
-  ].forEach(function(settings) {
-    it(settings.name + ' gravity', function(done) {
+  ].forEach(function (settings) {
+    it(settings.name + ' gravity', function (done) {
       sharp(fixtures.inputJpg)
         .resize(settings.width, settings.height)
         .crop(settings.gravity)
-        .toBuffer(function(err, data, info) {
+        .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual(settings.width, info.width);
           assert.strictEqual(settings.height, info.height);
@@ -127,11 +126,11 @@ describe('Crop', function() {
     });
   });
 
-  it('Allows specifying the gravity as a string', function(done) {
+  it('Allows specifying the gravity as a string', function (done) {
     sharp(fixtures.inputJpg)
       .resize(80, 320)
       .crop('east')
-      .toBuffer(function(err, data, info) {
+      .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(80, info.width);
         assert.strictEqual(320, info.height);
@@ -139,34 +138,33 @@ describe('Crop', function() {
       });
   });
 
-  it('Invalid values fail', function() {
-    assert.throws(function() {
+  it('Invalid values fail', function () {
+    assert.throws(function () {
       sharp().crop(9);
     });
-    assert.throws(function() {
+    assert.throws(function () {
       sharp().crop(1.1);
     });
-    assert.throws(function() {
+    assert.throws(function () {
       sharp().crop(-1);
     });
-    assert.throws(function() {
+    assert.throws(function () {
       sharp().crop('zoinks');
     });
   });
 
-  it('Uses default value when none specified', function() {
-    assert.doesNotThrow(function() {
+  it('Uses default value when none specified', function () {
+    assert.doesNotThrow(function () {
       sharp().crop();
     });
   });
 
-  describe('Entropy-based strategy', function() {
-
-    it('JPEG', function(done) {
+  describe('Entropy-based strategy', function () {
+    it('JPEG', function (done) {
       sharp(fixtures.inputJpgWithCmykProfile)
         .resize(80, 320)
         .crop(sharp.strategy.entropy)
-        .toBuffer(function(err, data, info) {
+        .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(3, info.channels);
@@ -178,11 +176,11 @@ describe('Crop', function() {
         });
     });
 
-    it('PNG', function(done) {
+    it('PNG', function (done) {
       sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80)
         .crop(sharp.strategy.entropy)
-        .toBuffer(function(err, data, info) {
+        .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('png', info.format);
           assert.strictEqual(4, info.channels);
@@ -193,16 +191,14 @@ describe('Crop', function() {
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
-
   });
 
-  describe('Attention strategy', function() {
-
-    it('JPEG', function(done) {
+  describe('Attention strategy', function () {
+    it('JPEG', function (done) {
       sharp(fixtures.inputJpgWithCmykProfile)
         .resize(80, 320)
         .crop(sharp.strategy.attention)
-        .toBuffer(function(err, data, info) {
+        .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(3, info.channels);
@@ -214,11 +210,11 @@ describe('Crop', function() {
         });
     });
 
-    it('PNG', function(done) {
+    it('PNG', function (done) {
       sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80)
         .crop(sharp.strategy.attention)
-        .toBuffer(function(err, data, info) {
+        .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('png', info.format);
           assert.strictEqual(4, info.channels);
@@ -229,6 +225,5 @@ describe('Crop', function() {
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
-
   });
 });
