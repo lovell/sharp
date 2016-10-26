@@ -1,34 +1,32 @@
 'use strict';
 
-var path = require('path');
-var assert = require('assert');
-var sharp = require('../../index');
-var maxColourDistance = require('../../build/Release/sharp')._maxColourDistance;
+const path = require('path');
+const sharp = require('../../index');
+const maxColourDistance = require('../../build/Release/sharp')._maxColourDistance;
 
 // Helpers
-var getPath = function(filename) {
+const getPath = function (filename) {
   return path.join(__dirname, filename);
 };
 
 // Generates a 64-bit-as-binary-string image fingerprint
 // Based on the dHash gradient method - see http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html
-var fingerprint = function(image, callback) {
+const fingerprint = function (image, callback) {
   sharp(image)
     .greyscale()
     .normalise()
     .resize(9, 8)
     .ignoreAspectRatio()
     .raw()
-    .toBuffer(function(err, data) {
+    .toBuffer(function (err, data) {
       if (err) {
         callback(err);
       } else {
-        var fingerprint = '';
-        for (var col = 0; col < 8; col++) {
-          var gradient = 0;
-          for (var row = 0; row < 8; row++) {
-            var left = data[row * 8 + col];
-            var right = data[row * 8 + col + 1];
+        let fingerprint = '';
+        for (let col = 0; col < 8; col++) {
+          for (let row = 0; row < 8; row++) {
+            const left = data[row * 8 + col];
+            const right = data[row * 8 + col + 1];
             fingerprint = fingerprint + (left < right ? '1' : '0');
           }
         }
@@ -109,14 +107,14 @@ module.exports = {
   path: getPath,
 
   // Path for expected output images
-  expected: function(filename) {
+  expected: function (filename) {
     return getPath(path.join('expected', filename));
   },
 
   // Verify similarity of expected vs actual images via fingerprint
   // Specify distance threshold using `options={threshold: 42}`, default
   // `threshold` is 5;
-  assertSimilar: function(expectedImage, actualImage, options, callback) {
+  assertSimilar: function (expectedImage, actualImage, options, callback) {
     if (typeof options === 'function') {
       callback = options;
       options = {};
@@ -138,12 +136,12 @@ module.exports = {
       throw new TypeError('`callback` must be a function');
     }
 
-    fingerprint(expectedImage, function(err, expectedFingerprint) {
+    fingerprint(expectedImage, function (err, expectedFingerprint) {
       if (err) return callback(err);
-      fingerprint(actualImage, function(err, actualFingerprint) {
+      fingerprint(actualImage, function (err, actualFingerprint) {
         if (err) return callback(err);
-        var distance = 0;
-        for (var i = 0; i < 64; i++) {
+        let distance = 0;
+        for (let i = 0; i < 64; i++) {
           if (expectedFingerprint[i] !== actualFingerprint[i]) {
             distance++;
           }
@@ -158,7 +156,7 @@ module.exports = {
     });
   },
 
-  assertMaxColourDistance: function(actualImagePath, expectedImagePath, acceptedDistance) {
+  assertMaxColourDistance: function (actualImagePath, expectedImagePath, acceptedDistance) {
     if (typeof actualImagePath !== 'string') {
       throw new TypeError('`actualImagePath` must be a string; got ' + actualImagePath);
     }
@@ -169,7 +167,7 @@ module.exports = {
       // Default threshold
       acceptedDistance = 1;
     }
-    var distance = maxColourDistance(actualImagePath, expectedImagePath);
+    const distance = maxColourDistance(actualImagePath, expectedImagePath);
     if (distance > acceptedDistance) {
       throw new Error('Expected maximum absolute distance of ' + acceptedDistance + ', actual ' + distance);
     }

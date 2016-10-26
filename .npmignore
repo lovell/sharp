@@ -14,3 +14,4 @@ lib
 include
 packaging
 preinstall.sh
+.nyc_output

@@ -2,9 +2,11 @@
 
 ### v0.17 - "*quill*"
 
-Requires libvips v8.4.2
+Requires libvips v8.4.2.
 
 #### v0.17.0 - TBD
+
+* Drop support for versions of Node prior to v4.
 
 * Deprecate the following output format "option" functions:
     quality, progressive, compressionLevel, withoutAdaptiveFiltering,
