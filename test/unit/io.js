@@ -1064,6 +1064,10 @@ describe('Input/output', function () {
       .toFormat('jpeg')
       .toBuffer(function (err, data, info) {
         assert.strictEqual(err.message.indexOf('memory area too small') > 0, true);
+        const readable = fs.createReadStream(fixtures.inputJPGBig);
+        const inPipeline = sharp()
+          .resize(840, 472)
+          .raw();
         const goodPipeline = sharp(null, {raw: {width: 840, height: 472, channels: 3}})
           .toFormat('jpeg')
           .toBuffer(function (err, data, info) {
