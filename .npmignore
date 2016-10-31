@@ -10,8 +10,7 @@ test
 appveyor.yml
 circle.yml
 mkdocs.yml
-lib
-include
+vendor
 packaging
 preinstall.sh
 .nyc_output

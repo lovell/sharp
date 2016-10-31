@@ -29,7 +29,7 @@ const isFile = function (file) {
 };
 
 const unpack = function (tarPath, done) {
-  const extractor = tar.Extract({ path: __dirname });
+  const extractor = tar.Extract({ path: path.join(__dirname, 'vendor') });
   if (done) {
     extractor.on('end', done);
   }
@@ -64,7 +64,7 @@ const error = function (msg) {
 
 module.exports.download_vips = function () {
   // Has vips been installed locally?
-  const vipsHeaderPath = path.join(__dirname, 'include', 'vips', 'vips.h');
+  const vipsHeaderPath = path.join(__dirname, 'vendor', 'include', 'vips', 'vips.h');
   if (!isFile(vipsHeaderPath)) {
     // Ensure Intel 64-bit or ARM
     if (arch === 'ia32') {

@@ -31,7 +31,7 @@
     "Matthias Thoemmes <thoemmes@gmail.com>"
   ],
   "scripts": {
-    "clean": "rm -rf node_modules/ build/ include/ lib/ coverage/ test/fixtures/output.*",
+    "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
     "test": "semistandard && cross-env VIPS_WARNING=0 nyc --reporter=lcov --branches=96 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
     "test-packaging": "./packaging/test-linux-x64.sh"

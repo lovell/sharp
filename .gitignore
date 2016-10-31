@@ -8,8 +8,7 @@ test/saliency/report.json
 test/saliency/Image*
 test/saliency/[Uu]serData*
 !test/saliency/userData.js
-lib
-include
+vendor
 packaging/libvips*
 packaging/*.log
 !packaging/build
