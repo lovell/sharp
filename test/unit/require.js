@@ -10,6 +10,6 @@ describe('Require-time checks', function () {
   */
   it('Require alongside C++ module that does not use libc++', function () {
     const bufferutil = require('bufferutil');
-    const sharp = require('../../index');
+    const sharp = require('../../');
   });
 });

@@ -62,6 +62,17 @@ A method to be removed should be deprecated in the next major version then remov
 
 By way of example, the [bilinearInterpolation method](https://github.com/lovell/sharp/blob/v0.6.0/index.js#L155) present in v0.5.0 was deprecated in v0.6.0 and removed in v0.7.0.
 
+## Documentation
+
+The public API is documented with [JSDoc](http://usejsdoc.org/) annotated comments.
+These can be converted to Markdown by running:
+
+```sh
+npm run docs
+```
+
+Please include documentation updates in any Pull Request that modifies the public API.
+
 ## Run the tests
 
 ### Functional tests and static code analysis

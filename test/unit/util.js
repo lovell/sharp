@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const sharp = require('../../index');
+const sharp = require('../../');
 
 const defaultConcurrency = sharp.concurrency();
 

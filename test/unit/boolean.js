@@ -4,7 +4,7 @@ const fs = require('fs');
 const assert = require('assert');
 
 const fixtures = require('../fixtures');
-const sharp = require('../../index');
+const sharp = require('../../');
 
 describe('Boolean operation between two images', function () {
   const inputJpgBooleanTestBuffer = fs.readFileSync(fixtures.inputJpgBooleanTest);

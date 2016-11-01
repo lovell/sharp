@@ -5,7 +5,7 @@ const assert = require('assert');
 const exifReader = require('exif-reader');
 const icc = require('icc');
 
-const sharp = require('../../index');
+const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Image metadata', function () {

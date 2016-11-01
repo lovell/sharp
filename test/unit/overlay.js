@@ -4,7 +4,7 @@ const fs = require('fs');
 const assert = require('assert');
 
 const fixtures = require('../fixtures');
-const sharp = require('../../index');
+const sharp = require('../../');
 
 // Helpers
 const getPaths = function (baseName, extension) {

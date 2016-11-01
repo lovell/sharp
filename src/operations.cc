@@ -37,7 +37,6 @@ namespace sharp {
     return dst;
   }
 
-
   VImage Composite(VImage src, VImage dst, const int x, const int y) {
     if(IsInputValidForComposition(src, dst)) {
       // Enlarge overlay src, if required
@@ -178,7 +177,7 @@ namespace sharp {
   /*
    * Stretch luminance to cover full dynamic range.
    */
-  VImage Normalize(VImage image) {
+  VImage Normalise(VImage image) {
     // Get original colourspace
     VipsInterpretation typeBeforeNormalize = image.interpretation();
     if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {

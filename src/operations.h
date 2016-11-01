@@ -41,7 +41,7 @@ namespace sharp {
   /*
    * Stretch luminance to cover full dynamic range.
    */
-  VImage Normalize(VImage image);
+  VImage Normalise(VImage image);
 
   /*
    * Gamma encoding/decoding

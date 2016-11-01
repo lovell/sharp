@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const sharp = require('../../index');
+const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 const assertNormalized = function (data) {
@@ -17,13 +17,9 @@ const assertNormalized = function (data) {
 };
 
 describe('Normalization', function () {
-  it('uses the same prototype for both spellings', function () {
-    assert.strictEqual(sharp.prototype.normalize, sharp.prototype.normalise);
-  });
-
   it('spreads rgb image values between 0 and 255', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
-      .normalize()
+      .normalise()
       .raw()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -47,7 +43,7 @@ describe('Normalization', function () {
 
   it('stretches greyscale images with alpha channel', function (done) {
     sharp(fixtures.inputPngWithGreyAlpha)
-      .normalize()
+      .normalise()
       .raw()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -73,7 +69,7 @@ describe('Normalization', function () {
 
   it('keeps the alpha channel of greyscale images intact', function (done) {
     sharp(fixtures.inputPngWithGreyAlpha)
-      .normalize()
+      .normalise()
       .toBuffer(function (err, data) {
         if (err) throw err;
         sharp(data).metadata(function (err, metadata) {
@@ -99,7 +95,7 @@ describe('Normalization', function () {
 
   it('works with 16-bit RGBA images', function (done) {
     sharp(fixtures.inputPngWithTransparency16bit)
-      .normalize()
+      .normalise()
       .raw()
       .toBuffer(function (err, data, info) {
         if (err) throw err;

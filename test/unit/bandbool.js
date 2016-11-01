@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const fixtures = require('../fixtures');
-const sharp = require('../../index');
+const sharp = require('../../');
 
 describe('Bandbool per-channel boolean operations', function () {
   [

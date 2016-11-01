@@ -649,9 +649,9 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = sharp::Gamma(image, baton->gamma);
       }
 
-      // Apply normalization - stretch luminance to cover full dynamic range
-      if (baton->normalize) {
-        image = sharp::Normalize(image);
+      // Apply normalisation - stretch luminance to cover full dynamic range
+      if (baton->normalise) {
+        image = sharp::Normalise(image);
       }
 
       // Apply bitwise boolean operation between images
@@ -1091,7 +1091,7 @@ NAN_METHOD(pipeline) {
   }
   baton->gamma = AttrTo<double>(options, "gamma");
   baton->greyscale = AttrTo<bool>(options, "greyscale");
-  baton->normalize = AttrTo<bool>(options, "normalize");
+  baton->normalise = AttrTo<bool>(options, "normalise");
   baton->angle = AttrTo<int32_t>(options, "angle");
   baton->rotateBeforePreExtract = AttrTo<bool>(options, "rotateBeforePreExtract");
   baton->flip = AttrTo<bool>(options, "flip");

@@ -3,7 +3,7 @@
 const fs = require('fs');
 const assert = require('assert');
 
-const sharp = require('../../index');
+const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Input/output', function () {

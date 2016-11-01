@@ -3,7 +3,7 @@
 const assert = require('assert');
 const fs = require('fs');
 
-const sharp = require('../../index');
+const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Image channel insertion', function () {

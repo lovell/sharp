@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const fixtures = require('../fixtures');
-const sharp = require('../../index');
+const sharp = require('../../');
 
 describe('Alpha transparency', function () {
   it('Flatten to black', function (done) {

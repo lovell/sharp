@@ -12,6 +12,15 @@ dev_addr: 0.0.0.0:10101
 pages:
   - Home: index.md
   - Installation: install.md
-  - API: api.md
+  - API:
+    - Constructor: api-constructor.md
+    - Input: api-input.md
+    - Output: api-output.md
+    - "Resizing images": api-resize.md
+    - "Compositing images": api-composite.md
+    - "Image operations": api-operation.md
+    - "Colour manipulation": api-colour.md
+    - "Channel manipulation": api-channel.md
+    - Utilities: api-utility.md
   - Performance: performance.md
   - Changelog: changelog.md

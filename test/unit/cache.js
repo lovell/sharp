@@ -1,6 +1,6 @@
 'use strict';
 
-const sharp = require('../../index');
+const sharp = require('../../');
 
 // Define SHARP_TEST_WITHOUT_CACHE environment variable to prevent use of libvips' cache
 

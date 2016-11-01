@@ -8,7 +8,7 @@ const eachLimit = require('async/eachLimit');
 const rimraf = require('rimraf');
 const unzip = require('unzip');
 
-const sharp = require('../../index');
+const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 // Verifies all tiles in a given dz output directory are <= size

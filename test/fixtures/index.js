@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const sharp = require('../../index');
+const sharp = require('../../');
 const maxColourDistance = require('../../build/Release/sharp')._maxColourDistance;
 
 // Helpers

@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const sharp = require('../../index');
+const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Extend', function () {
