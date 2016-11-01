@@ -6,6 +6,8 @@
   "globals": {
     "beforeEach": true,
     "afterEach": true,
+    "before": true,
+    "after": true,
     "describe": true,
     "it": true
   }
