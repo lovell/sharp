@@ -161,7 +161,7 @@ sharp('input.tiff')
   .tile({
     size: 512
   })
-  .toFile('output.dzi', function(err, info) {
+  .toFile('output.dz', function(err, info) {
     // output.dzi is the Deep Zoom XML definition
     // output_files contains 512x512 tiles grouped by zoom level
   });
