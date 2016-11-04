@@ -17,7 +17,7 @@ describe('Colour space conversion', function () {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .gamma()
-      .greyscale()
+      .grayscale()
       .toFile(fixtures.path('output.greyscale-gamma-2.2.jpg'), done);
   });
 

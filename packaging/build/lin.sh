@@ -140,7 +140,7 @@ make install
 mkdir ${DEPS}/fontconfig
 curl -Ls https://www.freedesktop.org/software/fontconfig/release/fontconfig-${VERSION_FONTCONFIG}.tar.bz2 | tar xjC ${DEPS}/fontconfig --strip-components=1
 cd ${DEPS}/fontconfig
-./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --enable-libxml2
+./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --enable-libxml2 --sysconfdir=/etc
 make install-strip
 
 mkdir ${DEPS}/harfbuzz
