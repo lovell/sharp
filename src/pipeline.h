@@ -50,6 +50,7 @@ struct PipelineBaton {
   int cropCalcTop;
   std::string kernel;
   std::string interpolator;
+  bool centreSampling;
   double background[4];
   bool flatten;
   bool negate;
@@ -119,6 +120,7 @@ struct PipelineBaton {
     crop(0),
     cropCalcLeft(-1),
     cropCalcTop(-1),
+    centreSampling(false),
     flatten(false),
     negate(false),
     blurSigma(0.0),

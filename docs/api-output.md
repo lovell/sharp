@@ -68,6 +68,7 @@ Use these JPEG options for output image.
 -   `trellisQuantisation` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** apply trellis quantisation, requires mozjpeg (optional, default `false`)
 -   `overshootDeringing` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** apply overshoot deringing, requires mozjpeg (optional, default `false`)
 -   `optimiseScans` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** optimise progressive scans, forces progressive, requires mozjpeg (optional, default `false`)
+-   `optimizeScans` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** alternative spelling of optimiseScans (optional, default `false`)
 
 
 -   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid options

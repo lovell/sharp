@@ -388,10 +388,16 @@ class PipelineWorker : public Nan::AsyncWorker {
             throw vips::VError("Unknown kernel");
           }
           if (yresidual < 1.0) {
-            image = image.reducev(1.0 / yresidual, VImage::option()->set("kernel", kernel));
+            image = image.reducev(1.0 / yresidual, VImage::option()
+              ->set("kernel", kernel)
+              ->set("centre", baton->centreSampling)
+            );
           }
           if (xresidual < 1.0) {
-            image = image.reduceh(1.0 / xresidual, VImage::option()->set("kernel", kernel));
+            image = image.reduceh(1.0 / xresidual, VImage::option()
+              ->set("kernel", kernel)
+              ->set("centre", baton->centreSampling)
+            );
           }
         }
         // Perform affine enlargement
@@ -1063,6 +1069,7 @@ NAN_METHOD(pipeline) {
   baton->crop = AttrTo<int32_t>(options, "crop");
   baton->kernel = AttrAsStr(options, "kernel");
   baton->interpolator = AttrAsStr(options, "interpolator");
+  baton->centreSampling = AttrTo<bool>(options, "centreSampling");
   // Join Channel Options
   if(HasAttr(options, "joinChannelIn")) {
     v8::Local<v8::Object> joinChannelObject = Nan::Get(options, Nan::New("joinChannelIn").ToLocalChecked())

@@ -15,6 +15,9 @@ Requires libvips v8.4.2.
   Access to these is now via output format functions, for example `quality(n)`
     is now `jpeg({quality: n})` and/or `webp({quality: n})`.
 
+* Expose libvips' "centre" resize option to mimic \*magick's +0.5px convention.
+  [#568](https://github.com/lovell/sharp/issues/568)
+
 * Ensure support for embedded base64 PNG and JPEG images within an SVG.
   [#601](https://github.com/lovell/sharp/issues/601)
   [@dynamite-ready](https://github.com/dynamite-ready)

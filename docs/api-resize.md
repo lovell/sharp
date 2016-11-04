@@ -27,6 +27,8 @@ Possible enlargement interpolators are:
 -   `options` **\[[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)]** 
     -   `options.kernel` **\[[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)]** the kernel to use for image reduction. (optional, default `'lanczos3'`)
     -   `options.interpolator` **\[[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)]** the interpolator to use for image enlargement. (optional, default `'bicubic'`)
+    -   `options.centreSampling` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** use \*magick centre sampling convention instead of corner sampling. (optional, default `false`)
+    -   `options.centerSampling` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** alternative spelling of centreSampling. (optional, default `false`)
 
 **Examples**
 
