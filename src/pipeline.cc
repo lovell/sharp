@@ -917,8 +917,9 @@ class PipelineWorker : public Nan::AsyncWorker {
       } else {
         // Add file size to info
         GStatBuf st;
-        g_stat(baton->fileOut.data(), &st);
-        Set(info, New("size").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(st.st_size)));
+        if (g_stat(baton->fileOut.data(), &st) == 0) {
+          Set(info, New("size").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(st.st_size)));
+        }
         argv[1] = info;
       }
     }
