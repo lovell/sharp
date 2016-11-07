@@ -9,6 +9,7 @@ const Benchmark = require('benchmark');
 // Contenders
 const gm = require('gm');
 const imagemagick = require('imagemagick');
+const mapnik = require('mapnik');
 const jimp = require('jimp');
 const sharp = require('../../');
 let imagemagickNative;
@@ -125,6 +126,38 @@ async.series({
         }
       });
     }
+    // mapnik
+    jpegSuite.add('mapnik-file-file', {
+      defer: true,
+      fn: function (deferred) {
+        mapnik.Image.open(fixtures.inputJpg, function (err, img) {
+          if (err) throw err;
+          img
+            .resize(width, height, {
+              scaling_method: mapnik.imageScaling.lanczos
+            })
+            .save(fixtures.outputJpg, 'jpeg:quality=80', function (err) {
+              if (err) throw err;
+              deferred.resolve();
+            });
+        });
+      }
+    }).add('mapnik-buffer-buffer', {
+      defer: true,
+      fn: function (deferred) {
+        mapnik.Image.fromBytes(inputJpgBuffer, function (err, img) {
+          if (err) throw err;
+          img
+            .resize(width, height, {
+              scaling_method: mapnik.imageScaling.lanczos
+            })
+            .encode('jpeg:quality=80', function (err) {
+              if (err) throw err;
+              deferred.resolve();
+            });
+        });
+      }
+    });
     // imagemagick
     jpegSuite.add('imagemagick-file-file', {
       defer: true,
@@ -174,8 +207,8 @@ async.series({
       defer: true,
       fn: function (deferred) {
         gm(inputJpgBuffer)
-          .resize(width, height)
           .filter('Lanczos')
+          .resize(width, height)
           .quality(80)
           .write(fixtures.outputJpg, function (err) {
             if (err) {
@@ -189,8 +222,8 @@ async.series({
       defer: true,
       fn: function (deferred) {
         gm(inputJpgBuffer)
-          .resize(width, height)
           .filter('Lanczos')
+          .resize(width, height)
           .quality(80)
           .toBuffer(function (err, buffer) {
             if (err) {
@@ -205,8 +238,8 @@ async.series({
       defer: true,
       fn: function (deferred) {
         gm(fixtures.inputJpg)
-          .resize(width, height)
           .filter('Lanczos')
+          .resize(width, height)
           .quality(80)
           .write(fixtures.outputJpg, function (err) {
             if (err) {
@@ -220,8 +253,8 @@ async.series({
       defer: true,
       fn: function (deferred) {
         gm(fixtures.inputJpg)
-          .resize(width, height)
           .filter('Lanczos')
+          .resize(width, height)
           .quality(80)
           .toBuffer(function (err, buffer) {
             if (err) {
@@ -447,7 +480,7 @@ async.series({
       fn: function (deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .progressive()
+          .jpeg({ progressive: true })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -462,7 +495,7 @@ async.series({
       fn: function (deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .withoutChromaSubsampling()
+          .jpeg({ chromaSubsampling: '4:4:4' })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -674,6 +707,52 @@ async.series({
         }
       });
     }
+    // mapnik
+    pngSuite.add('mapnik-file-file', {
+      defer: true,
+      fn: function (deferred) {
+        mapnik.Image.open(fixtures.inputPng, function (err, img) {
+          if (err) throw err;
+          img.premultiply(function (err, img) {
+            if (err) throw err;
+            img.resize(width, height, {
+              scaling_method: mapnik.imageScaling.lanczos
+            }, function (err, img) {
+              if (err) throw err;
+              img.demultiply(function (err, img) {
+                if (err) throw err;
+                img.save(fixtures.outputPng, 'png', function (err) {
+                  if (err) throw err;
+                  deferred.resolve();
+                });
+              });
+            });
+          });
+        });
+      }
+    }).add('mapnik-buffer-buffer', {
+      defer: true,
+      fn: function (deferred) {
+        mapnik.Image.fromBytes(inputPngBuffer, function (err, img) {
+          if (err) throw err;
+          img.premultiply(function (err, img) {
+            if (err) throw err;
+            img.resize(width, height, {
+              scaling_method: mapnik.imageScaling.lanczos
+            }, function (err, img) {
+              if (err) throw err;
+              img.demultiply(function (err, img) {
+                if (err) throw err;
+                img.encode('png', function (err) {
+                  if (err) throw err;
+                  deferred.resolve();
+                });
+              });
+            });
+          });
+        });
+      }
+    });
     // imagemagick
     pngSuite.add('imagemagick-file-file', {
       defer: true,
@@ -714,8 +793,8 @@ async.series({
       defer: true,
       fn: function (deferred) {
         gm(fixtures.inputPng)
-          .resize(width, height)
           .filter('Lanczos')
+          .resize(width, height)
           .write(fixtures.outputPng, function (err) {
             if (err) {
               throw err;
@@ -728,8 +807,8 @@ async.series({
       defer: true,
       fn: function (deferred) {
         gm(fixtures.inputPng)
-          .resize(width, height)
           .filter('Lanczos')
+          .resize(width, height)
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -800,7 +879,7 @@ async.series({
       fn: function (deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
-          .progressive()
+          .png({ progressive: true })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -815,7 +894,7 @@ async.series({
       fn: function (deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
-          .withoutAdaptiveFiltering()
+          .png({ adaptiveFiltering: false })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;

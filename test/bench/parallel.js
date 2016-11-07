@@ -5,7 +5,7 @@ process.env.UV_THREADPOOL_SIZE = 64;
 const assert = require('assert');
 const async = require('async');
 
-const sharp = require('../../index');
+const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 const width = 720;

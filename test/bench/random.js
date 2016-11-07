@@ -5,7 +5,7 @@ const gm = require('gm');
 const assert = require('assert');
 const Benchmark = require('benchmark');
 
-const sharp = require('../../index');
+const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 sharp.cache(false);
