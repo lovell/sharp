@@ -9,7 +9,7 @@ RUN \
   apt-get install -y curl && \
   dpkg --add-architecture arm64 && \
   apt-get update && \
-  apt-get install -y crossbuild-essential-arm64 autoconf libtool nasm gtk-doc-tools texinfo advancecomp libglib2.0-dev
+  apt-get install -y crossbuild-essential-arm64 autoconf libtool nasm gtk-doc-tools texinfo advancecomp libglib2.0-dev jq
 
 # Compiler settings
 ENV \
