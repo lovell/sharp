@@ -35,9 +35,11 @@
     "test": "semistandard && cross-env VIPS_WARNING=0 nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
     "test-packaging": "./packaging/test-linux-x64.sh",
-    "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done"
+    "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done",
+    "types": "cd lib && jsdoc -d . -t ../node_modules/tsd-jsdoc constructor.js input.js resize.js composite.js operation.js colour.js channel.js output.js utility.js"
   },
-  "main": "lib/",
+  "main": "lib/index.js",
+  "types": "lib/types.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/lovell/sharp"
@@ -72,11 +74,13 @@
     "documentation": "^4.0.0-beta12",
     "exif-reader": "^1.0.1",
     "icc": "^0.0.2",
+    "jsdoc": "^3.4.2",
     "mocha": "^3.1.2",
     "node-cpplint": "^0.4.0",
     "nyc": "^8.4.0",
     "rimraf": "^2.5.4",
     "semistandard": "^9.1.0",
+    "tsd-jsdoc": "^1.0.1",
     "unzip": "^0.1.11"
   },
   "license": "Apache-2.0",
