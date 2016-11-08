@@ -19,7 +19,7 @@ yarn add sharp
 [![Ubuntu 14.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 [![Linux Build Status](https://circleci.com/gh/lovell/sharp.svg?style=svg&circle-token=6cb6d1d287a51af83722b19ed8885377fbc85e5c)](https://circleci.com/gh/lovell/sharp)
 
-libvips and its dependencies are fetched and stored within `node_modules/sharp/lib` during `npm install`.
+libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
 This involves an automated HTTPS download of approximately 6.5MB.
 
 Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ CPUs should "just work", e.g.:
@@ -62,8 +62,8 @@ via `sharp.cache(false)` to avoid a stack overflow.
 
 [![OS X 10.9.5 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
-libvips and its dependencies are fetched and stored within `node_modules/sharp/lib` during `npm install`.
-This involves an automated HTTPS download of approximately 6.5MB.
+libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
+This involves an automated HTTPS download of approximately 6.3MB.
 
 To use your own version of libvips instead of the provided binaries, make sure it is
 at least the version listed under `config.libvips` in the `package.json` file and
@@ -73,7 +73,7 @@ that it can be located using `pkg-config --modversion vips-cpp`.
 
 [![Windows x64 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
 
-libvips and its dependencies are fetched and stored within `node_modules\sharp` during `npm install`.
+libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
 This involves an automated HTTPS download of approximately 9MB.
 
 Only 64-bit (x64) `node.exe` is supported.

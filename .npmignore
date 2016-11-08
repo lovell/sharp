@@ -2,8 +2,6 @@ build
 node_modules
 coverage
 .editorconfig
-.jshintignore
-.jshintrc
 .gitignore
 test
 .travis.yml
