@@ -28,7 +28,8 @@
     "F. Orlando Galashan <frulo@gmx.de>",
     "Kleis Auke Wolthuizen <info@kleisauke.nl>",
     "Matt Hirsch <mhirsch@media.mit.edu>",
-    "Matthias Thoemmes <thoemmes@gmail.com>"
+    "Matthias Thoemmes <thoemmes@gmail.com>",
+    "Patrick Paskaris <patrick@paskaris.gr>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",

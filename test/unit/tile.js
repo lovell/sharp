@@ -128,6 +128,22 @@ describe('Tile', function () {
     });
   });
 
+  it('Valid formats pass', function () {
+    ['jpeg', 'png', 'webp'].forEach(function (format) {
+      assert.doesNotThrow(function () {
+        sharp().toFormat(format).tile();
+      });
+    });
+  });
+
+  it('Invalid formats fail', function () {
+    ['zoinks', 1, 'tiff', 'raw'].forEach(function (format) {
+      assert.throws(function () {
+        sharp().toFormat(format).tile();
+      });
+    });
+  });
+
   it('Prevent larger overlap than default size', function () {
     assert.throws(function () {
       sharp().tile({overlap: 257});
@@ -215,6 +231,31 @@ describe('Tile', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual('number', typeof info.size);
           fs.stat(path.join(directory, '0', '0', '0.jpg'), function (err, stat) {
+            if (err) throw err;
+            assert.strictEqual(true, stat.isFile());
+            assert.strictEqual(true, stat.size > 0);
+            done();
+          });
+        });
+    });
+  });
+
+  it('Google layout with custom format', function (done) {
+    const directory = fixtures.path('output.png.google.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .png()
+        .tile({
+          layout: 'google'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          fs.stat(path.join(directory, '0', '0', '0.png'), function (err, stat) {
             if (err) throw err;
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);

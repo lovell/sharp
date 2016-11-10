@@ -846,6 +846,41 @@ class PipelineWorker : public Nan::AsyncWorker {
           if (isDzZip) {
             baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
           }
+          // Forward format options through suffix
+          std::string suffix;
+          if (baton->tileFormat == "png") {
+            suffix = ".png[interlace="
+              + std::string(baton->pngProgressive ? "TRUE" : "FALSE")
+              + ",compression="
+              + std::to_string(baton->pngCompressionLevel)
+              + ",filter="
+              + std::string(baton->pngAdaptiveFiltering ? "all" : "none")
+              + "]";
+          } else if (baton->tileFormat == "webp") {
+            suffix = ".webp[Q="
+              + std::to_string(baton->webpQuality)
+              + "]";
+          } else {
+            if (baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_GOOGLE
+              || baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY) {
+              suffix = ".jpg";
+            } else {
+              suffix = ".jpeg";
+            }
+            suffix += "[Q="
+              + std::to_string(baton->jpegQuality)
+              + ",interlace="
+              + std::string(baton->jpegProgressive ? "TRUE" : "FALSE")
+              + ",no_subsample="
+              + std::string(baton->jpegChromaSubsampling == "4:4:4" ? "TRUE": "FALSE")
+              + ",trellis_quant="
+              + std::string(baton->jpegTrellisQuantisation ? "TRUE" : "FALSE")
+              + ",overshoot_deringing="
+              + std::string(baton->jpegOvershootDeringing ? "TRUE": "FALSE")
+              + ",optimize_scans="
+              + std::string(baton->jpegOptimiseScans ? "TRUE": "FALSE")
+              + ",optimize_coding=TRUE]";
+          }
           // Write DZ to file
           image.dzsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
@@ -853,6 +888,7 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("overlap", baton->tileOverlap)
             ->set("container", baton->tileContainer)
             ->set("layout", baton->tileLayout)
+            ->set("suffix", const_cast<char*>(suffix.data()))
           );
           baton->formatOut = "dz";
         } else if (baton->formatOut == "v" || isV || (matchInput && inputImageType == ImageType::VIPS)) {
@@ -1167,6 +1203,7 @@ NAN_METHOD(pipeline) {
   } else {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
   }
+  baton->tileFormat = AttrAsStr(options, "tileFormat");
 
   // Function to notify of queue length changes
   Nan::Callback *queueListener = new Nan::Callback(AttrAs<v8::Function>(options, "queueListener"));
