@@ -137,7 +137,7 @@ describe('Tile', function () {
   });
 
   it('Invalid formats fail', function () {
-    ['zoinks', 1, 'tiff', 'raw'].forEach(function (format) {
+    ['tiff', 'raw'].forEach(function (format) {
       assert.throws(function () {
         sharp().toFormat(format).tile();
       });
