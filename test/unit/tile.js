@@ -240,11 +240,11 @@ describe('Tile', function () {
     });
   });
 
-  it('Google layout with custom format', function (done) {
-    const directory = fixtures.path('output.png.google.dzi');
+  it('Google layout with jpeg format', function (done) {
+    const directory = fixtures.path('output.jpg.google.dzi');
     rimraf(directory, function () {
       sharp(fixtures.inputJpg)
-        .png()
+        .jpeg({ quality: 1 })
         .tile({
           layout: 'google'
         })
@@ -255,11 +255,91 @@ describe('Tile', function () {
           assert.strictEqual(2225, info.height);
           assert.strictEqual(3, info.channels);
           assert.strictEqual('number', typeof info.size);
-          fs.stat(path.join(directory, '0', '0', '0.png'), function (err, stat) {
+          const sample = path.join(directory, '0', '0', '0.jpg');
+          sharp(sample).metadata(function (err, metadata) {
             if (err) throw err;
-            assert.strictEqual(true, stat.isFile());
-            assert.strictEqual(true, stat.size > 0);
-            done();
+            assert.strictEqual('jpeg', metadata.format);
+            assert.strictEqual('srgb', metadata.space);
+            assert.strictEqual(3, metadata.channels);
+            assert.strictEqual(false, metadata.hasProfile);
+            assert.strictEqual(false, metadata.hasAlpha);
+            assert.strictEqual(true, metadata.width === 256);
+            assert.strictEqual(true, metadata.height === 256);
+            fs.stat(sample, function (err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.size < 2000);
+              done();
+            });
+          });
+        });
+    });
+  });
+
+  it('Google layout with png format', function (done) {
+    const directory = fixtures.path('output.png.google.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .png({ compressionLevel: 1 })
+        .tile({
+          layout: 'google'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          const sample = path.join(directory, '0', '0', '0.png');
+          sharp(sample).metadata(function (err, metadata) {
+            if (err) throw err;
+            assert.strictEqual('png', metadata.format);
+            assert.strictEqual('srgb', metadata.space);
+            assert.strictEqual(3, metadata.channels);
+            assert.strictEqual(false, metadata.hasProfile);
+            assert.strictEqual(false, metadata.hasAlpha);
+            assert.strictEqual(true, metadata.width === 256);
+            assert.strictEqual(true, metadata.height === 256);
+            fs.stat(sample, function (err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.size > 44000);
+              done();
+            });
+          });
+        });
+    });
+  });
+
+  it('Google layout with webp format', function (done) {
+    const directory = fixtures.path('output.webp.google.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .webp({ quality: 1 })
+        .tile({
+          layout: 'google'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          const sample = path.join(directory, '0', '0', '0.webp');
+          sharp(sample).metadata(function (err, metadata) {
+            if (err) throw err;
+            assert.strictEqual('webp', metadata.format);
+            assert.strictEqual('srgb', metadata.space);
+            assert.strictEqual(3, metadata.channels);
+            assert.strictEqual(false, metadata.hasProfile);
+            assert.strictEqual(false, metadata.hasAlpha);
+            assert.strictEqual(true, metadata.width === 256);
+            assert.strictEqual(true, metadata.height === 256);
+            fs.stat(sample, function (err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.size < 2000);
+              done();
+            });
           });
         });
     });
