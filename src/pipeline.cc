@@ -849,37 +849,31 @@ class PipelineWorker : public Nan::AsyncWorker {
           // Forward format options through suffix
           std::string suffix;
           if (baton->tileFormat == "png") {
-            suffix = ".png[interlace="
-              + std::string(baton->pngProgressive ? "TRUE" : "FALSE")
-              + ",compression="
-              + std::to_string(baton->pngCompressionLevel)
-              + ",filter="
-              + std::string(baton->pngAdaptiveFiltering ? "all" : "none")
-              + "]";
+            std::vector<std::pair<std::string, std::string>> options {
+              {"interlace", baton->pngProgressive ? "TRUE" : "FALSE"},
+              {"compression", std::to_string(baton->pngCompressionLevel)},
+              {"filter", baton->pngAdaptiveFiltering ? "all" : "none"}
+            };
+            suffix = AssembleSuffixString(".png", options);
           } else if (baton->tileFormat == "webp") {
-            suffix = ".webp[Q="
-              + std::to_string(baton->webpQuality)
-              + "]";
+            std::vector<std::pair<std::string, std::string>> options {
+              {"Q", std::to_string(baton->webpQuality)}
+            };
+            suffix = AssembleSuffixString(".webp", options);
           } else {
-            if (baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_GOOGLE
-              || baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY) {
-              suffix = ".jpg";
-            } else {
-              suffix = ".jpeg";
-            }
-            suffix += "[Q="
-              + std::to_string(baton->jpegQuality)
-              + ",interlace="
-              + std::string(baton->jpegProgressive ? "TRUE" : "FALSE")
-              + ",no_subsample="
-              + std::string(baton->jpegChromaSubsampling == "4:4:4" ? "TRUE": "FALSE")
-              + ",trellis_quant="
-              + std::string(baton->jpegTrellisQuantisation ? "TRUE" : "FALSE")
-              + ",overshoot_deringing="
-              + std::string(baton->jpegOvershootDeringing ? "TRUE": "FALSE")
-              + ",optimize_scans="
-              + std::string(baton->jpegOptimiseScans ? "TRUE": "FALSE")
-              + ",optimize_coding=TRUE]";
+            std::string extname = baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_GOOGLE
+              || baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY
+                ? ".jpg" : ".jpeg";
+            std::vector<std::pair<std::string, std::string>> options {
+              {"Q", std::to_string(baton->jpegQuality)},
+              {"interlace", baton->jpegProgressive ? "TRUE" : "FALSE"},
+              {"no_subsample", baton->jpegChromaSubsampling == "4:4:4" ? "TRUE": "FALSE"},
+              {"trellis_quant", baton->jpegTrellisQuantisation ? "TRUE" : "FALSE"},
+              {"overshoot_deringing", baton->jpegOvershootDeringing ? "TRUE": "FALSE"},
+              {"optimize_scans", baton->jpegOptimiseScans ? "TRUE": "FALSE"},
+              {"optimize_coding", "TRUE"}
+            };
+            suffix = AssembleSuffixString(extname, options);
           }
           // Write DZ to file
           image.dzsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -1024,6 +1018,23 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
     }
     return std::make_tuple(rotate, flip, flop);
+  }
+
+  /*
+    Assemble the suffix argument to dzsave, which is the format (by extname)
+    alongisde comma-separated arguments to the corresponding `formatsave` vips
+    action.
+  */
+  std::string
+  AssembleSuffixString(std::string extname, std::vector<std::pair<std::string, std::string>> options) {
+    std::string argument;
+    for (auto const &option : options) {
+      if (!argument.empty()) {
+        argument += ",";
+      }
+      argument += option.first + "=" + option.second;
+    }
+    return extname + "[" + argument + "]";
   }
 
   /*
