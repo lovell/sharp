@@ -102,6 +102,7 @@ struct PipelineBaton {
   int tileOverlap;
   VipsForeignDzContainer tileContainer;
   VipsForeignDzLayout tileLayout;
+  std::string tileFormat;
 
   PipelineBaton():
     input(nullptr),
