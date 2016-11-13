@@ -263,8 +263,8 @@ describe('Tile', function () {
             assert.strictEqual(3, metadata.channels);
             assert.strictEqual(false, metadata.hasProfile);
             assert.strictEqual(false, metadata.hasAlpha);
-            assert.strictEqual(true, metadata.width === 256);
-            assert.strictEqual(true, metadata.height === 256);
+            assert.strictEqual(256, metadata.width);
+            assert.strictEqual(256, metadata.height);
             fs.stat(sample, function (err, stat) {
               if (err) throw err;
               assert.strictEqual(true, stat.size < 2000);
@@ -298,8 +298,8 @@ describe('Tile', function () {
             assert.strictEqual(3, metadata.channels);
             assert.strictEqual(false, metadata.hasProfile);
             assert.strictEqual(false, metadata.hasAlpha);
-            assert.strictEqual(true, metadata.width === 256);
-            assert.strictEqual(true, metadata.height === 256);
+            assert.strictEqual(256, metadata.width);
+            assert.strictEqual(256, metadata.height);
             fs.stat(sample, function (err, stat) {
               if (err) throw err;
               assert.strictEqual(true, stat.size > 44000);
@@ -333,8 +333,8 @@ describe('Tile', function () {
             assert.strictEqual(3, metadata.channels);
             assert.strictEqual(false, metadata.hasProfile);
             assert.strictEqual(false, metadata.hasAlpha);
-            assert.strictEqual(true, metadata.width === 256);
-            assert.strictEqual(true, metadata.height === 256);
+            assert.strictEqual(256, metadata.width);
+            assert.strictEqual(256, metadata.height);
             fs.stat(sample, function (err, stat) {
               if (err) throw err;
               assert.strictEqual(true, stat.size < 2000);

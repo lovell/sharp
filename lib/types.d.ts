@@ -770,15 +770,15 @@ declare function withMetadata(withMetadata?: { orientation: Number }): Sharp;
  * @param {Number} [options.quality=80] - quality, integer 1-100
  * @param {Boolean} [options.progressive=false] - use progressive (interlace) scan
  * @param {String} [options.chromaSubsampling='4:2:0'] - set to '4:4:4' to prevent chroma subsampling when quality <= 90
- * @param {Boolean} [trellisQuantisation=false] - apply trellis quantisation, requires mozjpeg
- * @param {Boolean} [overshootDeringing=false] - apply overshoot deringing, requires mozjpeg
- * @param {Boolean} [optimiseScans=false] - optimise progressive scans, forces progressive, requires mozjpeg
- * @param {Boolean} [optimizeScans=false] - alternative spelling of optimiseScans
+ * @param {Boolean} [options.trellisQuantisation=false] - apply trellis quantisation, requires mozjpeg
+ * @param {Boolean} [options.overshootDeringing=false] - apply overshoot deringing, requires mozjpeg
+ * @param {Boolean} [options.optimiseScans=false] - optimise progressive scans, forces progressive, requires mozjpeg
+ * @param {Boolean} [options.optimizeScans=false] - alternative spelling of optimiseScans
  * @param {Boolean} [options.force=true] - force JPEG output, otherwise attempt to use input format
  * @returns {Sharp}
  * @throws {Error} Invalid options
  */
-declare function jpeg(options?: { quality: Number, progressive: Boolean, chromaSubsampling: String, force: Boolean }, trellisQuantisation?: Boolean, overshootDeringing?: Boolean, optimiseScans?: Boolean, optimizeScans?: Boolean): Sharp;
+declare function jpeg(options?: { quality: Number, progressive: Boolean, chromaSubsampling: String, trellisQuantisation: Boolean, overshootDeringing: Boolean, optimiseScans: Boolean, optimizeScans: Boolean, force: Boolean }): Sharp;
 
 /**
  * Use these PNG options for output image.
@@ -829,10 +829,12 @@ declare function toFormat(format: (String|Object), options: Object): Sharp;
 
 /**
  * Use tile-based deep zoom (image pyramid) output.
- * You can also use a `.zip` or `.szi` file extension with `toFile` to write to a compressed archive file format.
+ * Set the format and options for tile images via the `toFormat`, `jpeg`, `png` or `webp` functions.
+ * Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed archive file format.
  *
  * @example
  *  sharp('input.tiff')
+ *   .png()
  *   .tile({
  *     size: 512
  *   })

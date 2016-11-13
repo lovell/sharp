@@ -26,6 +26,10 @@ Requires libvips v8.4.2.
   [#601](https://github.com/lovell/sharp/issues/601)
   [@dynamite-ready](https://github.com/dynamite-ready)
 
+* Add support for PNG and WebP tile-based output formats (in addition to JPEG).
+  [#622](https://github.com/lovell/sharp/pull/622)
+  [@ppaskaris](https://github.com/ppaskaris)
+
 ### v0.16 - "*pencil*"
 
 Requires libvips v8.3.3

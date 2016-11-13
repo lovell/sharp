@@ -64,11 +64,11 @@ Use these JPEG options for output image.
     -   `options.quality` **\[[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** quality, integer 1-100 (optional, default `80`)
     -   `options.progressive` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** use progressive (interlace) scan (optional, default `false`)
     -   `options.chromaSubsampling` **\[[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)]** set to '4:4:4' to prevent chroma subsampling when quality &lt;= 90 (optional, default `'4:2:0'`)
+    -   `options.trellisQuantisation` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** apply trellis quantisation, requires mozjpeg (optional, default `false`)
+    -   `options.overshootDeringing` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** apply overshoot deringing, requires mozjpeg (optional, default `false`)
+    -   `options.optimiseScans` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** optimise progressive scans, forces progressive, requires mozjpeg (optional, default `false`)
+    -   `options.optimizeScans` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** alternative spelling of optimiseScans (optional, default `false`)
     -   `options.force` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** force JPEG output, otherwise attempt to use input format (optional, default `true`)
--   `trellisQuantisation` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** apply trellis quantisation, requires mozjpeg (optional, default `false`)
--   `overshootDeringing` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** apply overshoot deringing, requires mozjpeg (optional, default `false`)
--   `optimiseScans` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** optimise progressive scans, forces progressive, requires mozjpeg (optional, default `false`)
--   `optimizeScans` **\[[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]** alternative spelling of optimiseScans (optional, default `false`)
 
 
 -   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid options
@@ -145,7 +145,8 @@ Returns **Sharp**
 # tile
 
 Use tile-based deep zoom (image pyramid) output.
-You can also use a `.zip` or `.szi` file extension with `toFile` to write to a compressed archive file format.
+Set the format and options for tile images via the `toFormat`, `jpeg`, `png` or `webp` functions.
+Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed archive file format.
 
 **Parameters**
 
@@ -159,6 +160,7 @@ You can also use a `.zip` or `.szi` file extension with `toFile` to write to a c
 
 ```javascript
 sharp('input.tiff')
+  .png()
   .tile({
     size: 512
   })
