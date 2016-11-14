@@ -60,4 +60,19 @@ describe('Extend', function () {
         fixtures.assertSimilar(fixtures.expected('addAlphaChanelBeforeExtend.png'), data, done);
       });
   });
+
+  it('PNG with 2 channels', function (done) {
+    sharp(fixtures.inputPngWithGreyAlpha)
+      .background('transparent')
+      .extend({top: 0, bottom: 20, left: 0, right: 20})
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(420, info.width);
+        assert.strictEqual(320, info.height);
+        assert.strictEqual(4, info.channels);
+        fixtures.assertSimilar(fixtures.expected('extend-2channel.png'), data, done);
+      });
+  });
 });
