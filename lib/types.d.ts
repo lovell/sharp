@@ -1,5 +1,5 @@
 /**
- * @name sharp
+ * @class Sharp
  *
  * Constructor factory to create an instance of `sharp`, to which further methods are chained.
  *
@@ -41,14 +41,69 @@
  * @returns {Sharp}
  * @throws {Error} Invalid parameters
  */
-declare var sharp
+declare class Sharp {
+   /**
+    * @class Sharp
+    *
+    * Constructor factory to create an instance of `sharp`, to which further methods are chained.
+    *
+    * JPEG, PNG or WebP format image data can be streamed out from this object.
+    * When using Stream based output, derived attributes are available from the `info` event.
+    *
+    * Implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
+    *
+    * @example
+    * sharp('input.jpg')
+    *   .resize(300, 200)
+    *   .toFile('output.jpg', function(err) {
+    *     // output.jpg is a 300 pixels wide and 200 pixels high image
+    *     // containing a scaled and cropped version of input.jpg
+    *   });
+    *
+    * @example
+    * // Read image data from readableStream,
+    * // resize to 300 pixels wide,
+    * // emit an 'info' event with calculated dimensions
+    * // and finally write image data to writableStream
+    * var transformer = sharp()
+    *   .resize(300)
+    *   .on('info', function(info) {
+    *     console.log('Image height is ' + info.height);
+    *   });
+    * readableStream.pipe(transformer).pipe(writableStream);
+    *
+    * @param {(Buffer|String)} [input] - if present, can be
+    *  a Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
+    *  a String containing the path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
+    *  JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when null or undefined.
+    * @param {Object} [options] - if present, is an Object with optional attributes.
+    * @param {Number} [options.density=72] - integral number representing the DPI for vector images.
+    * @param {Object} [options.raw] - describes raw pixel image data. See `raw()` for pixel ordering.
+    * @param {Number} [options.raw.width]
+    * @param {Number} [options.raw.height]
+    * @param {Number} [options.raw.channels]
+    * @returns {Sharp}
+    * @throws {Error} Invalid parameters
+    */
+   constructor(input?: (Buffer|String), options?: { density: Number, raw: Object });
 
-Constructor factory to create an instance of `sharp`, to which further methods are chained.
+   /**
+    * An Object containing nested boolean values representing the available input and output formats/methods.
+    * @example
+    * console.log(sharp.format());
+    * @returns {Object}
+    */
+   static format: any;
 
-JPEG, PNG or WebP format image data can be streamed out from this object.
-When using Stream based output, derived attributes are available from the `info` event.
+   /**
+    * An Object containing the version numbers of libvips and its dependencies.
+    * @member
+    * @example
+    * console.log(sharp.versions);
+    */
+   static versions: any;
 
-Implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.: any;
+}
 
 /**
  * Pixel limits.
@@ -145,9 +200,9 @@ declare function clone(): Sharp;
  *   });
  *
  * @param {Function} [callback] - called with the arguments `(err, metadata)`
- * @returns {Promise|Sharp}
+ * @returns {Promise<Object>|Sharp}
  */
-declare function metadata(callback?: (() => any)): (Promise|Sharp);
+declare function metadata(callback?: (() => any)): (Promise.<Object>|Sharp);
 
 /**
  * Do not process input images where the number of pixels (width * height) exceeds this limit.
@@ -570,13 +625,13 @@ declare function normalize(normalize?: Boolean): Sharp;
  * @param {Object} kernel
  * @param {Number} kernel.width - width of the kernel in pixels.
  * @param {Number} kernel.height - width of the kernel in pixels.
- * @param {Array} kernel.kernel - Array of length `width*height` containing the kernel values.
+ * @param {Array<Number>} kernel.kernel - Array of length `width*height` containing the kernel values.
  * @param {Number} [kernel.scale=sum] - the scale of the kernel in pixels.
  * @param {Number} [kernel.offset=0] - the offset of the kernel in pixels.
  * @returns {Sharp}
  * @throws {Error} Invalid parameters
  */
-declare function convolve(kernel: { width: Number, height: Number, kernel: Array, scale: Number, offset: Number }): Sharp;
+declare function convolve(kernel: { width: Number, height: Number, kernel: Number[], scale: Number, offset: Number }): Sharp;
 
 /**
  * Any pixel value greather than or equal to the threshold value will be set to 255, otherwise it will be set to 0.
@@ -697,12 +752,12 @@ declare function extractChannel(channel: (Number|String)): Sharp;
  * Buffers may be any of the image formats supported by sharp: JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data.
  * For raw pixel input, the `options` object should contain a `raw` attribute, which follows the format of the attribute of the same name in the `sharp()` constructor.
  *
- * @param {Array|String|Buffer} images - one or more images (file paths, Buffers).
+ * @param {Array<String|Buffer>|String|Buffer} images - one or more images (file paths, Buffers).
  * @param {Object} options - image options, see `sharp()` constructor.
  * @returns {Sharp}
  * @throws {Error} Invalid parameters
  */
-declare function joinChannel(images: (Array|String|Buffer), options: Object): Sharp;
+declare function joinChannel(images: ((String|Buffer)[]|String|Buffer), options: Object): Sharp;
 
 /**
  * Perform a bitwise boolean operation on all input image channels (bands) to produce a single channel output image.
@@ -734,10 +789,10 @@ declare function bandbool(boolOp: String): Sharp;
  * @param {String} fileOut - the path to write the image data to.
  * @param {Function} [callback] - called on completion with two arguments `(err, info)`.
  * `info` contains the output image `format`, `size` (bytes), `width`, `height` and `channels`.
- * @returns {Promise} - when no callback is provided
+ * @returns {Promise<Object>} - when no callback is provided
  * @throws {Error} Invalid parameters
  */
-declare function toFile(fileOut: String, callback?: (() => any)): Promise;
+declare function toFile(fileOut: String, callback?: (() => any)): Promise.<Object>;
 
 /**
  * Write output to a Buffer.
@@ -749,9 +804,9 @@ declare function toFile(fileOut: String, callback?: (() => any)): Promise;
  * A Promises/A+ promise is returned when `callback` is not provided.
  *
  * @param {Function} [callback]
- * @returns {Promise} - when no callback is provided
+ * @returns {Promise<Buffer>} - when no callback is provided
  */
-declare function toBuffer(callback?: (() => any)): Promise;
+declare function toBuffer(callback?: (() => any)): Promise.<Buffer>;
 
 /**
  * Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.

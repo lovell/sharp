@@ -238,7 +238,7 @@ Convolve the image with the specified kernel.
 -   `kernel` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
     -   `kernel.width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** width of the kernel in pixels.
     -   `kernel.height` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** width of the kernel in pixels.
-    -   `kernel.kernel` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of length `width*height` containing the kernel values.
+    -   `kernel.kernel` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)>** Array of length `width*height` containing the kernel values.
     -   `kernel.scale` **\[[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** the scale of the kernel in pixels. (optional, default `sum`)
     -   `kernel.offset` **\[[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** the offset of the kernel in pixels. (optional, default `0`)
 

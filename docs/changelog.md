@@ -30,6 +30,10 @@ Requires libvips v8.4.2.
   [#622](https://github.com/lovell/sharp/pull/622)
   [@ppaskaris](https://github.com/ppaskaris)
 
+* Allow use of extend with greyscale input.
+  [#623](https://github.com/lovell/sharp/pull/623)
+  [@ppaskaris](https://github.com/ppaskaris)
+
 ### v0.16 - "*pencil*"
 
 Requires libvips v8.3.3
