@@ -37,7 +37,7 @@
     "test-leak": "./test/leak/leak.sh",
     "test-packaging": "./packaging/test-linux-x64.sh",
     "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done",
-    "types": "cd lib && jsdoc -d . -t ../node_modules/tsd-jsdoc constructor.js input.js resize.js composite.js operation.js colour.js channel.js output.js utility.js"
+    "types": "./packaging/types.sh"
   },
   "main": "lib/index.js",
   "types": "lib/types.d.ts",
@@ -81,7 +81,7 @@
     "nyc": "^9.0.1",
     "rimraf": "^2.5.4",
     "semistandard": "^9.1.0",
-    "tsd-jsdoc": "^1.0.1",
+    "tsd-jsdoc": "lovell/tsd-jsdoc#add-support-for-promises",
     "unzip": "^0.1.11"
   },
   "license": "Apache-2.0",

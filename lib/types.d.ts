@@ -1,3 +1,5 @@
+declare module "sharp" {
+
 /**
  * @class Sharp
  *
@@ -202,7 +204,7 @@ declare function clone(): Sharp;
  * @param {Function} [callback] - called with the arguments `(err, metadata)`
  * @returns {Promise<Object>|Sharp}
  */
-declare function metadata(callback?: (() => any)): (Promise.<Object>|Sharp);
+declare function metadata(callback?: (() => any)): (Promise<Object>|Sharp);
 
 /**
  * Do not process input images where the number of pixels (width * height) exceeds this limit.
@@ -792,7 +794,7 @@ declare function bandbool(boolOp: String): Sharp;
  * @returns {Promise<Object>} - when no callback is provided
  * @throws {Error} Invalid parameters
  */
-declare function toFile(fileOut: String, callback?: (() => any)): Promise.<Object>;
+declare function toFile(fileOut: String, callback?: (() => any)): Promise<Object>;
 
 /**
  * Write output to a Buffer.
@@ -806,7 +808,7 @@ declare function toFile(fileOut: String, callback?: (() => any)): Promise.<Objec
  * @param {Function} [callback]
  * @returns {Promise<Buffer>} - when no callback is provided
  */
-declare function toBuffer(callback?: (() => any)): Promise.<Buffer>;
+declare function toBuffer(callback?: (() => any)): Promise<Buffer>;
 
 /**
  * Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
@@ -1016,4 +1018,6 @@ declare function counters(): Object;
  * @returns {Boolean}
  */
 declare function simd(simd?: Boolean): Boolean;
+
+}
 
