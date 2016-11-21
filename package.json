@@ -36,8 +36,7 @@
     "test": "semistandard && cross-env VIPS_WARNING=0 nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
     "test-packaging": "./packaging/test-linux-x64.sh",
-    "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done",
-    "types": "./packaging/types.sh"
+    "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done"
   },
   "main": "lib/index.js",
   "types": "lib/types.d.ts",
@@ -75,13 +74,11 @@
     "documentation": "^4.0.0-beta13",
     "exif-reader": "^1.0.1",
     "icc": "^0.0.2",
-    "jsdoc": "^3.4.3",
     "mocha": "^3.1.2",
     "node-cpplint": "^0.4.0",
     "nyc": "^9.0.1",
     "rimraf": "^2.5.4",
     "semistandard": "^9.1.0",
-    "tsd-jsdoc": "lovell/tsd-jsdoc#add-support-for-promises",
     "unzip": "^0.1.11"
   },
   "license": "Apache-2.0",

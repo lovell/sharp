@@ -15,10 +15,6 @@ Requires libvips v8.4.2.
   Access to these is now via output format functions, for example `quality(n)`
     is now `jpeg({quality: n})` and/or `webp({quality: n})`.
 
-* Provide experimental, automated TypeScript declaration.
-  [#472](https://github.com/lovell/sharp/issues/472)
-  [@davidreher](https://github.com/davidreher)
-
 * Expose libvips' "centre" resize option to mimic \*magick's +0.5px convention.
   [#568](https://github.com/lovell/sharp/issues/568)
 
