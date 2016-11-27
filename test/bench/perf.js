@@ -28,7 +28,7 @@ try {
 const fixtures = require('../fixtures');
 
 const width = 720;
-const height = 480;
+const height = 588;
 
 // Disable libvips cache to ensure tests are as fair as they can be
 sharp.cache(false);

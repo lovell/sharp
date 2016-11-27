@@ -8,7 +8,7 @@
     "test": "VIPS_WARNING=0 node perf && node random && node parallel"
   },
   "devDependencies": {
-    "async": "^2.1.1",
+    "async": "^2.1.4",
     "benchmark": "^2.1.2",
     "gm": "^1.23.0",
     "imagemagick": "^0.1.3",

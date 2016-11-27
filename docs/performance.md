@@ -2,8 +2,8 @@
 
 ### Test environment
 
-* AWS EC2 [c4.xlarge](http://aws.amazon.com/ec2/instance-types/#c4) (4x E5-2666 v3 @ 2.90GHz)
-* Ubuntu 16.04.1 LTS (HVM, SSD)
+* AWS EC2 eu-central-1 [c4.xlarge](http://aws.amazon.com/ec2/instance-types/#c4) (4x E5-2666 v3 @ 2.90GHz)
+* Ubuntu 16.04.1 LTS (HVM, SSD, 20161115, ami-82cf0aed)
 * Node.js v6.9.1
 
 ### The contenders
@@ -19,25 +19,25 @@
 ### The task
 
 Decompress a 2725x2225 JPEG image,
-resize to 720x480 using Lanczos 3 resampling (where available),
+resize to 720x588 using Lanczos 3 resampling (where available),
 then compress to JPEG at a "quality" setting of 80.
 
 ### Results
 
 | Module             | Input  | Output | Ops/sec | Speed-up |
 | :----------------- | :----- | :----- | ------: | -------: |
-| jimp (bilinear)    | buffer | buffer |    1.05 |      1.0 |
-| lwip               | buffer | buffer |    2.32 |      2.2 |
-| mapnik             | buffer | buffer |    2.90 |      2.8 |
-| imagemagick-native | buffer | buffer |    4.00 |      3.8 |
-| imagemagick        | file   | file   |    7.16 |      6.8 |
-| gm                 | buffer | buffer |    7.12 |      6.8 |
-| gm                 | file   | file   |    7.16 |      6.8 |
-| sharp              | stream | stream |   27.97 |     26.6 |
-| sharp              | file   | file   |   28.69 |     27.3 |
-| sharp              | buffer | file   |   28.81 |     27.4 |
-| sharp              | file   | buffer |   28.99 |     27.6 |
-| sharp              | buffer | buffer |   29.17 |     27.8 |
+| jimp (bilinear)    | buffer | buffer |    1.06 |      1.0 |
+| lwip               | buffer | buffer |    1.87 |      1.8 |
+| mapnik             | buffer | buffer |    2.91 |      2.7 |
+| imagemagick-native | buffer | buffer |    4.03 |      3.8 |
+| imagemagick        | file   | file   |    7.10 |      6.7 |
+| gm                 | buffer | buffer |    7.08 |      6.7 |
+| gm                 | file   | file   |    7.10 |      6.7 |
+| sharp              | stream | stream |   27.61 |     26.0 |
+| sharp              | file   | file   |   28.41 |     26.8 |
+| sharp              | buffer | file   |   28.71 |     27.1 |
+| sharp              | file   | buffer |   28.60 |     27.0 |
+| sharp              | buffer | buffer |   29.08 |     27.4 |
 
 Greater libvips performance can be expected with caching enabled (default)
 and using 8+ core machines, especially those with larger L1/L2 CPU caches.
