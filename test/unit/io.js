@@ -457,11 +457,16 @@ describe('Input/output', function () {
         });
     });
 
-    it('Match GIF input, therefore fail', function (done) {
+    it('Autoconvert GIF input to PNG output', function (done) {
       sharp(fixtures.inputGif)
         .resize(320, 80)
-        .toFile(fixtures.outputZoinks, function (err) {
-          assert(!!err);
+        .toFile(fixtures.outputZoinks, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual(true, info.size > 0);
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80, info.height);
+          fs.unlinkSync(fixtures.outputZoinks);
           done();
         });
     });
@@ -696,9 +701,8 @@ describe('Input/output', function () {
       });
   });
 
-  it('Convert SVG with embedded images to PNG, respecting dimensions', function (done) {
+  it('Convert SVG with embedded images to PNG, respecting dimensions, autoconvert to PNG', function (done) {
     sharp(fixtures.inputSvgWithEmbeddedImages)
-      .png()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('png', info.format);
@@ -772,10 +776,9 @@ describe('Input/output', function () {
       });
   });
 
-  it('Load GIF grey+alpha from file', function (done) {
+  it('Load GIF grey+alpha from file, auto convert to PNG', function (done) {
     sharp(fixtures.inputGifGreyPlusAlpha)
       .resize(8, 4)
-      .png()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);

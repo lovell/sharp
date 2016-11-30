@@ -15,6 +15,8 @@ Requires libvips v8.4.2.
   Access to these is now via output format functions, for example `quality(n)`
     is now `jpeg({quality: n})` and/or `webp({quality: n})`.
 
+* Autoconvert GIF and SVG input to PNG output if no other format is specified.
+
 * Expose libvips' "centre" resize option to mimic \*magick's +0.5px convention.
   [#568](https://github.com/lovell/sharp/issues/568)
 

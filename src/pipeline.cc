@@ -743,7 +743,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           } else {
             baton->channels = std::min(baton->channels, 3);
           }
-        } else if (baton->formatOut == "png" || (baton->formatOut == "input" && inputImageType == ImageType::PNG)) {
+        } else if (baton->formatOut == "png" || (baton->formatOut == "input" &&
+          (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
           // Strip profile
           if (!baton->withMetadata) {
             vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
@@ -823,7 +824,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           );
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
-        } else if (baton->formatOut == "png" || isPng || (matchInput && inputImageType == ImageType::PNG)) {
+        } else if (baton->formatOut == "png" || isPng || (matchInput &&
+          (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
           // Strip profile
           if (!baton->withMetadata) {
             vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
