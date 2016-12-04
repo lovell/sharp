@@ -300,6 +300,12 @@ namespace sharp {
     Calculate the intensity of edges, skin tone and saturation
   */
   double AttentionStrategy::operator()(VImage image) {
+    // Flatten RGBA onto a mid-grey background
+    if (image.bands() == 4 && HasAlpha(image)) {
+      double const midgrey = sharp::Is16Bit(image.interpretation()) ? 32768.0 : 128.0;
+      std::vector<double> background { midgrey, midgrey, midgrey };
+      image = image.flatten(VImage::option()->set("background", background));
+    }
     // Convert to LAB colourspace
     VImage lab = image.colourspace(VIPS_INTERPRETATION_LAB);
     VImage l = lab[0];

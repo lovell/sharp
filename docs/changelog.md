@@ -24,6 +24,11 @@ Requires libvips v8.4.2.
   [#601](https://github.com/lovell/sharp/issues/601)
   [@dynamite-ready](https://github.com/dynamite-ready)
 
+* Ensure premultiply operation occurs before box filter shrink.
+  [#605](https://github.com/lovell/sharp/issues/605)
+  [@CmdrShepardsPie](https://github.com/CmdrShepardsPie)
+  [@teroparvinen](https://github.com/teroparvinen)
+
 * Add support for PNG and WebP tile-based output formats (in addition to JPEG).
   [#622](https://github.com/lovell/sharp/pull/622)
   [@ppaskaris](https://github.com/ppaskaris)

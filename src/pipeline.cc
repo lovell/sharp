@@ -290,9 +290,6 @@ class PipelineWorker : public Nan::AsyncWorker {
         );
       }
 
-      // Calculate maximum alpha value based on input image pixel depth
-      double const maxAlpha = sharp::MaximumImageAlpha(image.interpretation());
-
       // Flatten image to remove alpha channel
       if (baton->flatten && HasAlpha(image)) {
         // Scale up 8-bit values to match 16-bit input image
@@ -305,7 +302,6 @@ class PipelineWorker : public Nan::AsyncWorker {
         };
         image = image.flatten(VImage::option()
           ->set("background", background)
-          ->set("max_alpha", maxAlpha)
         );
       }
 
@@ -324,7 +320,33 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = image.colourspace(VIPS_INTERPRETATION_B_W);
       }
 
-      if (xshrink > 1 || yshrink > 1) {
+      // Ensure image has an alpha channel when there is an overlay
+      bool hasOverlay = baton->overlay != nullptr;
+      if (hasOverlay && !HasAlpha(image)) {
+        double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
+        image = image.bandjoin(
+          VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
+        );
+      }
+
+      bool const shouldShrink = xshrink > 1 || yshrink > 1;
+      bool const shouldReduce = xresidual != 1.0 || yresidual != 1.0;
+      bool const shouldBlur = baton->blurSigma != 0.0;
+      bool const shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
+      bool const shouldSharpen = baton->sharpenSigma != 0.0;
+      bool const shouldCutout = baton->overlayCutout;
+      bool const shouldPremultiplyAlpha = HasAlpha(image) &&
+        (shouldShrink || shouldReduce || shouldBlur || shouldConv || shouldSharpen || (hasOverlay && !shouldCutout));
+
+      // Premultiply image alpha channel before all transformations to avoid
+      // dark fringing around bright pixels
+      // See: http://entropymine.com/imageworsener/resizealpha/
+      if (shouldPremultiplyAlpha) {
+        image = image.premultiply();
+      }
+
+      // Fast, integral box-shrink
+      if (shouldShrink) {
         if (yshrink > 1) {
           image = image.shrinkv(yshrink);
         }
@@ -349,32 +371,8 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
       }
 
-      // Ensure image has an alpha channel when there is an overlay
-      bool hasOverlay = baton->overlay != nullptr;
-      if (hasOverlay && !HasAlpha(image)) {
-        double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
-        image = image.bandjoin(
-          VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier)
-        );
-      }
-
-      bool shouldAffineTransform = xresidual != 1.0 || yresidual != 1.0;
-      bool shouldBlur = baton->blurSigma != 0.0;
-      bool shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
-      bool shouldSharpen = baton->sharpenSigma != 0.0;
-      bool shouldCutout = baton->overlayCutout;
-      bool shouldPremultiplyAlpha = HasAlpha(image) &&
-        (shouldAffineTransform || shouldBlur || shouldConv || shouldSharpen || (hasOverlay && !shouldCutout));
-
-      // Premultiply image alpha channel before all transformations to avoid
-      // dark fringing around bright pixels
-      // See: http://entropymine.com/imageworsener/resizealpha/
-      if (shouldPremultiplyAlpha) {
-        image = image.premultiply(VImage::option()->set("max_alpha", maxAlpha));
-      }
-
       // Use affine increase or kernel reduce with the remaining float part
-      if (shouldAffineTransform) {
+      if (xresidual != 1.0 || yresidual != 1.0) {
         // Insert tile cache to prevent over-computation of previous operations
         if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL) {
           image = sharp::TileCache(image, yresidual);
@@ -651,7 +649,7 @@ class PipelineWorker : public Nan::AsyncWorker {
 
       // Reverse premultiplication after all transformations:
       if (shouldPremultiplyAlpha) {
-        image = image.unpremultiply(VImage::option()->set("max_alpha", maxAlpha));
+        image = image.unpremultiply();
         // Cast pixel values to integer
         if (sharp::Is16Bit(image.interpretation())) {
           image = image.cast(VIPS_FORMAT_USHORT);
