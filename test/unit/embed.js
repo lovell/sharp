@@ -26,7 +26,7 @@ describe('Embed', function () {
     it('JPEG within WebP, to include alpha channel', function (done) {
       sharp(fixtures.inputJpg)
         .resize(320, 240)
-        .background({r: 0, g: 0, b: 0, a: 0})
+        .background({r: 0, g: 0, b: 0, alpha: 0})
         .embed()
         .webp()
         .toBuffer(function (err, data, info) {
@@ -75,7 +75,7 @@ describe('Embed', function () {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 16)
       .embed()
-      .background({r: 0, g: 0, b: 0, a: 0})
+      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -91,7 +91,7 @@ describe('Embed', function () {
     sharp(fixtures.inputPngWithGreyAlpha)
       .resize(32, 16)
       .embed()
-      .background({r: 0, g: 0, b: 0, a: 0})
+      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);

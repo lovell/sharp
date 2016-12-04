@@ -22,7 +22,7 @@ describe('Extend', function () {
   it('extend sides unequally with RGBA', function (done) {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(120)
-      .background({r: 0, g: 0, b: 0, a: 0})
+      .background({r: 0, g: 0, b: 0, alpha: 0})
       .extend({top: 50, bottom: 0, left: 10, right: 35})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -50,7 +50,7 @@ describe('Extend', function () {
 
   it('should add alpha channel before extending with a transparent Background', function (done) {
     sharp(fixtures.inputJpgWithLandscapeExif1)
-      .background({r: 0, g: 0, b: 0, a: 0})
+      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toFormat(sharp.format.png)
       .extend({top: 0, bottom: 10, left: 0, right: 10})
       .toBuffer(function (err, data, info) {
