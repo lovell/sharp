@@ -38,9 +38,11 @@ describe('Image channel insertion', function () {
   it('Grayscale to RGBA, buffer', function (done) {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
-      .joinChannel([fixtures.inputPngTestJoinChannel,
-                    fixtures.inputPngStripesH,
-                    fixtures.inputPngStripesV]) // new green + blue + alpha channel
+      .joinChannel([
+        fixtures.inputPngTestJoinChannel,
+        fixtures.inputPngStripesH,
+        fixtures.inputPngStripesV
+      ]) // new green + blue + alpha channel
       .toColourspace(sharp.colourspace.srgb)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -54,9 +56,11 @@ describe('Image channel insertion', function () {
   it('Grayscale to RGBA, file', function (done) {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
-      .joinChannel([fs.readFileSync(fixtures.inputPngTestJoinChannel), // new green channel
-                    fs.readFileSync(fixtures.inputPngStripesH),        // new blue channel
-                    fs.readFileSync(fixtures.inputPngStripesV)])       // new alpha channel
+      .joinChannel([
+        fs.readFileSync(fixtures.inputPngTestJoinChannel), // new green channel
+        fs.readFileSync(fixtures.inputPngStripesH), // new blue channel
+        fs.readFileSync(fixtures.inputPngStripesV) // new alpha channel
+      ])
       .toColourspace('srgb')
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -70,9 +74,11 @@ describe('Image channel insertion', function () {
   it('Grayscale to CMYK, buffers', function (done) {
     sharp(fixtures.inputPng) // gray -> magenta
       .resize(320, 240)
-      .joinChannel([fs.readFileSync(fixtures.inputPngTestJoinChannel), // new cyan channel
-                    fs.readFileSync(fixtures.inputPngStripesH),        // new yellow channel
-                    fs.readFileSync(fixtures.inputPngStripesV)])       // new black channel
+      .joinChannel([
+        fs.readFileSync(fixtures.inputPngTestJoinChannel), // new cyan channel
+        fs.readFileSync(fixtures.inputPngStripesH), // new yellow channel
+        fs.readFileSync(fixtures.inputPngStripesV) // new black channel
+      ])
       .toColorspace('cmyk')
       .toFormat('jpeg')
       .toBuffer(function (err, data, info) {
@@ -92,12 +98,13 @@ describe('Image channel insertion', function () {
       .then(function (buffers) {
         sharp(fixtures.inputPng)
           .resize(320, 240)
-          .joinChannel(buffers,
-                       { raw: {
-                         width: 320,
-                         height: 240,
-                         channels: 1
-                       }})
+          .joinChannel(buffers, {
+            raw: {
+              width: 320,
+              height: 240,
+              channels: 1
+            }
+          })
           .toBuffer(function (err, data, info) {
             if (err) throw err;
             assert.strictEqual(320, info.width);
@@ -115,8 +122,10 @@ describe('Image channel insertion', function () {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
       .joinChannel([fs.readFileSync(fixtures.inputPngTestJoinChannel)]) // new green channel
-      .joinChannel([fs.readFileSync(fixtures.inputPngStripesH),         // new blue channel
-                    fs.readFileSync(fixtures.inputPngStripesV)])        // new alpha channel
+      .joinChannel([
+        fs.readFileSync(fixtures.inputPngStripesH), // new blue channel
+        fs.readFileSync(fixtures.inputPngStripesV) // new alpha channel
+      ])
       .toColourspace('srgb')
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -135,15 +144,13 @@ describe('Image channel insertion', function () {
 
   it('Invalid input', function () {
     assert.throws(function () {
-      sharp(fixtures.inputJpg)
-        .joinChannel(1);
+      sharp(fixtures.inputJpg).joinChannel(1);
     });
   });
 
   it('No arguments', function () {
     assert.throws(function () {
-      sharp(fixtures.inputJpg)
-        .joinChannel();
+      sharp(fixtures.inputJpg).joinChannel();
     });
   });
 });

@@ -13,9 +13,11 @@ describe('Convolve', function () {
         height: 3,
         scale: 50,
         offset: 0,
-        kernel: [ 10, 20, 10,
-                   0, 0, 0,
-                  10, 20, 10 ]
+        kernel: [
+          10, 20, 10,
+          0, 0, 0,
+          10, 20, 10
+        ]
       })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -31,9 +33,11 @@ describe('Convolve', function () {
       .convolve({
         width: 3,
         height: 3,
-        kernel: [ 1, 0, 1,
-                  2, 0, 2,
-                  1, 0, 1 ]
+        kernel: [
+          1, 0, 1,
+          2, 0, 2,
+          1, 0, 1
+        ]
       })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -50,9 +54,11 @@ describe('Convolve', function () {
       .convolve({
         width: 3,
         height: 3,
-        kernel: [ -1, 0, 1,
-                  -2, 0, 2,
-                  -1, 0, 1 ]
+        kernel: [
+          -1, 0, 1,
+          -2, 0, 2,
+          -1, 0, 1
+        ]
       })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
