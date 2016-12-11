@@ -3,7 +3,7 @@
 # background
 
 Set the background for the `embed`, `flatten` and `extend` operations.
-The default background is `{r: 0, g: 0, b: 0, a: 1}`, black without transparency.
+The default background is `{r: 0, g: 0, b: 0, alpha: 1}`, black without transparency.
 
 Delegates to the _color_ module, which can throw an Error
 but is liberal in what it accepts, clipping values to sensible min/max.

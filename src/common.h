@@ -199,6 +199,11 @@ namespace sharp {
   */
   VipsInterpretation GetInterpretation(std::string const typeStr);
 
+  /*
+    Convert RGBA value to another colourspace
+  */
+  std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba, VipsInterpretation const interpretation);
+
 }  // namespace sharp
 
 #endif  // SRC_COMMON_H_

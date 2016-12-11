@@ -470,6 +470,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           if (baton->background[3] < 255.0 || HasAlpha(image)) {
             background.push_back(baton->background[3] * multiplier);
           }
+          // Ensure background colour uses correct colourspace
+          background = sharp::GetRgbaAsColourspace(background, image.interpretation());
           // Add non-transparent alpha channel, if required
           if (baton->background[3] < 255.0 && !HasAlpha(image)) {
             image = image.bandjoin(
@@ -538,6 +540,8 @@ class PipelineWorker : public Nan::AsyncWorker {
         if (baton->background[3] < 255.0 || HasAlpha(image)) {
           background.push_back(baton->background[3] * multiplier);
         }
+        // Ensure background colour uses correct colourspace
+        background = sharp::GetRgbaAsColourspace(background, image.interpretation());
         // Add non-transparent alpha channel, if required
         if (baton->background[3] < 255.0 && !HasAlpha(image)) {
           image = image.bandjoin(
@@ -689,14 +693,13 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
         image = image.extract_band(baton->extractChannel);
       }
-
       // Convert image to sRGB, if not already
       if (sharp::Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
       }
       if (image.interpretation() != baton->colourspace) {
-        // Need to convert image
-        image = image.colourspace(baton->colourspace);
+        // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
+        image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         // Transform colours from embedded profile to output profile
         if (baton->withMetadata &&
             sharp::HasProfile(image) &&

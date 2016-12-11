@@ -434,4 +434,20 @@ namespace sharp {
     );
   }
 
+  /*
+    Convert RGBA value to another colourspace
+  */
+  std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba, VipsInterpretation const interpretation) {
+    int const bands = static_cast<int>(rgba.size());
+    if (bands < 3 || interpretation == VIPS_INTERPRETATION_sRGB || interpretation == VIPS_INTERPRETATION_RGB) {
+      return rgba;
+    } else {
+      VImage pixel = VImage::new_matrix(1, 1);
+      pixel.set("bands", bands);
+      pixel = pixel.new_from_image(rgba);
+      pixel = pixel.colourspace(interpretation, VImage::option()->set("source_space", VIPS_INTERPRETATION_sRGB));
+      return pixel(0, 0);
+    }
+  }
+
 }  // namespace sharp

@@ -37,6 +37,10 @@ Requires libvips v8.4.2.
   [#623](https://github.com/lovell/sharp/pull/623)
   [@ppaskaris](https://github.com/ppaskaris)
 
+* Allow non-RGB input to embed/extend onto background with an alpha channel.
+  [#646](https://github.com/lovell/sharp/issues/646)
+  [@DaGaMs](https://github.com/DaGaMs)
+
 ### v0.16 - "*pencil*"
 
 Requires libvips v8.3.3
