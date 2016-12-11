@@ -4,7 +4,7 @@
 
 Requires libvips v8.4.2.
 
-#### v0.17.0 - TBD
+#### v0.17.0 - 11<sup>th</sup> December 2016
 
 * Drop support for versions of Node prior to v4.
 

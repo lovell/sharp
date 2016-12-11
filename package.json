@@ -39,7 +39,6 @@
     "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done"
   },
   "main": "lib/index.js",
-  "types": "lib/types.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/lovell/sharp"
