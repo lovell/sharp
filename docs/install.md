@@ -44,15 +44,9 @@ and `LD_LIBRARY_PATH` at runtime.
 This allows the use of newer versions of libvips with older versions of sharp.
 
 For 32-bit Intel CPUs and older Linux-based operating systems such as Centos 6,
-a system-wide installation of the most suitable version of
-libvips and its dependencies can be achieved by running
-the following command as a user with `sudo` access
-(requires `curl` and `pkg-config`):
+it is recommended to install a system-wide installation of libvips from source:
 
-```sh
-# WARNING: This script is deprecated. You probably don't need to run it. Please read above.
-curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
-```
+https://github.com/jcupitt/libvips#building-libvips-from-a-source-tarball
 
 For Linux-based operating systems such as Alpine that use musl libc,
 the smaller stack size means libvips' cache should be disabled
