@@ -271,11 +271,8 @@ namespace sharp {
   */
   int ExifOrientation(VImage image) {
     int orientation = 0;
-    if (image.get_typeof(EXIF_IFD0_ORIENTATION) != 0) {
-      char const *exif = image.get_string(EXIF_IFD0_ORIENTATION);
-      if (exif != nullptr) {
-        orientation = atoi(&exif[0]);
-      }
+    if (image.get_typeof(VIPS_META_ORIENTATION) != 0) {
+      orientation = image.get_int(VIPS_META_ORIENTATION);
     }
     return orientation;
   }
@@ -284,16 +281,14 @@ namespace sharp {
     Set EXIF Orientation of image.
   */
   void SetExifOrientation(VImage image, int const orientation) {
-    char exif[3];
-    g_snprintf(exif, sizeof(exif), "%d", orientation);
-    image.set(EXIF_IFD0_ORIENTATION, exif);
+    image.set(VIPS_META_ORIENTATION, orientation);
   }
 
   /*
     Remove EXIF Orientation from image.
   */
   void RemoveExifOrientation(VImage image) {
-    SetExifOrientation(image, 0);
+    vips_image_remove(image.get_image(), VIPS_META_ORIENTATION);
   }
 
   /*
@@ -399,7 +394,7 @@ namespace sharp {
 
     if(y >= 0 && y < (inHeight - outHeight)) {
       top = y;
-    } else if(x >= (inHeight - outHeight)) {
+    } else if(y >= (inHeight - outHeight)) {
       top = inHeight - outHeight;
     }
 
@@ -436,6 +431,31 @@ namespace sharp {
     return static_cast<VipsOperationBoolean>(
       vips_enum_from_nick(nullptr, VIPS_TYPE_OPERATION_BOOLEAN, opStr.data())
     );
+  }
+
+  /*
+    Get interpretation type from string
+  */
+  VipsInterpretation GetInterpretation(std::string const typeStr) {
+    return static_cast<VipsInterpretation>(
+      vips_enum_from_nick(nullptr, VIPS_TYPE_INTERPRETATION, typeStr.data())
+    );
+  }
+
+  /*
+    Convert RGBA value to another colourspace
+  */
+  std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba, VipsInterpretation const interpretation) {
+    int const bands = static_cast<int>(rgba.size());
+    if (bands < 3 || interpretation == VIPS_INTERPRETATION_sRGB || interpretation == VIPS_INTERPRETATION_RGB) {
+      return rgba;
+    } else {
+      VImage pixel = VImage::new_matrix(1, 1);
+      pixel.set("bands", bands);
+      pixel = pixel.new_from_image(rgba);
+      pixel = pixel.colourspace(interpretation, VImage::option()->set("source_space", VIPS_INTERPRETATION_sRGB));
+      return pixel(0, 0);
+    }
   }
 
 }  // namespace sharp

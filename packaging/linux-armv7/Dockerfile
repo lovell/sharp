@@ -11,7 +11,7 @@ RUN \
   curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add - && \
   dpkg --add-architecture armhf && \
   apt-get update && \
-  apt-get install -y crossbuild-essential-armhf autoconf libtool nasm gtk-doc-tools texinfo advancecomp libglib2.0-dev
+  apt-get install -y crossbuild-essential-armhf autoconf libtool nasm gtk-doc-tools texinfo advancecomp libglib2.0-dev jq
 
 # Compiler settings
 ENV \

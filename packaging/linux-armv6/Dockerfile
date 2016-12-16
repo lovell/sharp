@@ -7,7 +7,7 @@ MAINTAINER Lovell Fuller <npm@lovell.info>
 # Build dependencies
 RUN \
   apt-get update && \
-  apt-get install -y build-essential curl autoconf libtool nasm gtk-doc-tools texinfo advancecomp libglib2.0-dev
+  apt-get install -y build-essential curl autoconf libtool nasm gtk-doc-tools texinfo advancecomp libglib2.0-dev jq
 
 # Compiler settings
 ENV \

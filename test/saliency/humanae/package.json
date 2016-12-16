@@ -1,0 +1,9 @@
+{
+  "name": "sharp-crop-strategy-attention-model-humanae",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "request": "^2.75.0",
+    "tumblr.js": "^1.1.1"
+  }
+}

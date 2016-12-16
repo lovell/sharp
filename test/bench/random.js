@@ -1,26 +1,26 @@
 'use strict';
 
-var imagemagick = require('imagemagick');
-var gm = require('gm');
-var assert = require('assert');
-var Benchmark = require('benchmark');
+const imagemagick = require('imagemagick');
+const gm = require('gm');
+const assert = require('assert');
+const Benchmark = require('benchmark');
 
-var sharp = require('../../index');
-var fixtures = require('../fixtures');
+const sharp = require('../../');
+const fixtures = require('../fixtures');
 
 sharp.cache(false);
 sharp.simd(true);
 
-var min = 320;
-var max = 960;
+const min = 320;
+const max = 960;
 
-var randomDimension = function() {
+const randomDimension = function () {
   return Math.ceil(Math.random() * (max - min) + min);
 };
 
 new Benchmark.Suite('random').add('imagemagick', {
   defer: true,
-  fn: function(deferred) {
+  fn: function (deferred) {
     imagemagick.resize({
       srcPath: fixtures.inputJpg,
       dstPath: fixtures.outputJpg,
@@ -29,7 +29,7 @@ new Benchmark.Suite('random').add('imagemagick', {
       height: randomDimension(),
       format: 'jpg',
       filter: 'Lanczos'
-    }, function(err) {
+    }, function (err) {
       if (err) {
         throw err;
       } else {
@@ -39,7 +39,7 @@ new Benchmark.Suite('random').add('imagemagick', {
   }
 }).add('gm', {
   defer: true,
-  fn: function(deferred) {
+  fn: function (deferred) {
     gm(fixtures.inputJpg)
       .resize(randomDimension(), randomDimension())
       .filter('Lanczos')
@@ -55,10 +55,10 @@ new Benchmark.Suite('random').add('imagemagick', {
   }
 }).add('sharp', {
   defer: true,
-  fn: function(deferred) {
+  fn: function (deferred) {
     sharp(fixtures.inputJpg)
       .resize(randomDimension(), randomDimension())
-      .toBuffer(function(err, buffer) {
+      .toBuffer(function (err, buffer) {
         if (err) {
           throw err;
         } else {
@@ -67,9 +67,9 @@ new Benchmark.Suite('random').add('imagemagick', {
         }
       });
   }
-}).on('cycle', function(event) {
+}).on('cycle', function (event) {
   console.log(String(event.target));
-}).on('complete', function() {
-  var winner = this.filter('fastest').map('name');
+}).on('complete', function () {
+  const winner = this.filter('fastest').map('name');
   assert.strictEqual('sharp', String(winner), 'sharp was slower than ' + winner);
 }).run();

@@ -29,7 +29,16 @@
   ...
   fun:jpeg_finish_compress
 }
-
+{
+  value_jpeg_obj
+  Memcheck:Value8
+  obj:*/libjpeg.so*
+}
+{
+  cond_jpeg_obj
+  Memcheck:Cond
+  obj:*/libjpeg.so*
+}
 # libpng
 {
   cond_libpng_png_read_row
@@ -267,6 +276,17 @@
   match-leak-kinds: possible
   ...
   fun:_ZN6icu_568Collator19getAvailableLocalesERi
+}
+{
+  leak_nodejs_thread_start
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:calloc
+  fun:allocate_dtv
+  fun:_dl_allocate_tls
+  fun:allocate_stack
+  ...
+  fun:_ZN2v84base6Thread5StartEv
 }
 {
   leak_nan_FunctionCallbackInfo

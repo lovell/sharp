@@ -11,8 +11,8 @@
 
 // Verify platform and compiler compatibility
 
-#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 3))
-#error libvips version 8.3.x required - see sharp.dimens.io/page/install
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 4))
+#error libvips version 8.4.x required - see sharp.dimens.io/page/install
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
@@ -24,8 +24,6 @@
 #error clang version 3.0+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
 #endif
 #endif
-
-#define EXIF_IFD0_ORIENTATION "exif-ifd0-Orientation"
 
 using vips::VImage;
 
@@ -196,6 +194,16 @@ namespace sharp {
     Get boolean operation type from string
   */
   VipsOperationBoolean GetBooleanOperation(std::string const opStr);
+
+  /*
+    Get interpretation type from string
+  */
+  VipsInterpretation GetInterpretation(std::string const typeStr);
+
+  /*
+    Convert RGBA value to another colourspace
+  */
+  std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba, VipsInterpretation const interpretation);
 
 }  // namespace sharp
 

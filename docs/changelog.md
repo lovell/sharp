@@ -1,10 +1,76 @@
 # Changelog
 
+### v0.17 - "*quill*"
+
+Requires libvips v8.4.2.
+
+#### v0.17.0 - 11<sup>th</sup> December 2016
+
+* Drop support for versions of Node prior to v4.
+
+* Deprecate the following output format "option" functions:
+    quality, progressive, compressionLevel, withoutAdaptiveFiltering,
+    withoutChromaSubsampling, trellisQuantisation, trellisQuantization,
+    overshootDeringing, optimiseScans and optimizeScans.
+  Access to these is now via output format functions, for example `quality(n)`
+    is now `jpeg({quality: n})` and/or `webp({quality: n})`.
+
+* Autoconvert GIF and SVG input to PNG output if no other format is specified.
+
+* Expose libvips' "centre" resize option to mimic \*magick's +0.5px convention.
+  [#568](https://github.com/lovell/sharp/issues/568)
+
+* Ensure support for embedded base64 PNG and JPEG images within an SVG.
+  [#601](https://github.com/lovell/sharp/issues/601)
+  [@dynamite-ready](https://github.com/dynamite-ready)
+
+* Ensure premultiply operation occurs before box filter shrink.
+  [#605](https://github.com/lovell/sharp/issues/605)
+  [@CmdrShepardsPie](https://github.com/CmdrShepardsPie)
+  [@teroparvinen](https://github.com/teroparvinen)
+
+* Add support for PNG and WebP tile-based output formats (in addition to JPEG).
+  [#622](https://github.com/lovell/sharp/pull/622)
+  [@ppaskaris](https://github.com/ppaskaris)
+
+* Allow use of extend with greyscale input.
+  [#623](https://github.com/lovell/sharp/pull/623)
+  [@ppaskaris](https://github.com/ppaskaris)
+
+* Allow non-RGB input to embed/extend onto background with an alpha channel.
+  [#646](https://github.com/lovell/sharp/issues/646)
+  [@DaGaMs](https://github.com/DaGaMs)
+
 ### v0.16 - "*pencil*"
 
 Requires libvips v8.3.3
 
-#### v0.16.0 - TBD
+#### v0.16.2 - 22<sup>nd</sup> October 2016
+
+* Restrict readelf usage to Linux only when detecting global libvips version.
+  [#602](https://github.com/lovell/sharp/issues/602)
+  [@caoko](https://github.com/caoko)
+
+#### v0.16.1 - 13<sup>th</sup> October 2016
+
+* C++11 ABI version is now auto-detected, remove sharp-cxx11 installation flag.
+
+* Add experimental 'attention' crop strategy.
+  [#295](https://github.com/lovell/sharp/issues/295)
+
+* Include .node extension for Meteor's require() implementation.
+  [#537](https://github.com/lovell/sharp/issues/537)
+  [@isjackwild](https://github.com/isjackwild)
+
+* Ensure convolution kernel scale is clamped to a minimum value of 1.
+  [#561](https://github.com/lovell/sharp/issues/561)
+  [@abagshaw](https://github.com/abagshaw)
+
+* Correct calculation of y-axis placement when overlaying image at a fixed point.
+  [#566](https://github.com/lovell/sharp/issues/566)
+  [@Nateowami](https://github.com/Nateowami)
+
+#### v0.16.0 - 18<sup>th</sup> August 2016
 
 * Add pre-compiled libvips for OS X, ARMv7 and ARMv8.
   [#312](https://github.com/lovell/sharp/issues/312)
@@ -19,6 +85,10 @@ Requires libvips v8.3.3
 
 * Prevent boolean errors during extract operation.
   [#511](https://github.com/lovell/sharp/pull/511)
+  [@mhirsch](https://github.com/mhirsch)
+
+* Add joinChannel and toColourspace/toColorspace operations.
+  [#513](https://github.com/lovell/sharp/pull/513)
   [@mhirsch](https://github.com/mhirsch)
 
 * Add support for raw pixel data with boolean and withOverlay operations.

@@ -5,8 +5,10 @@ MAINTAINER Lovell Fuller <npm@lovell.info>
 
 # Build dependencies
 RUN \
+  echo "deb http://ftp.debian.org/debian wheezy-backports main" | tee /etc/apt/sources.list.d/wheezy-backports.list && \
   apt-get update && \
-  apt-get install -y build-essential autoconf libtool nasm gtk-doc-tools texinfo advancecomp
+  apt-get install -y build-essential autoconf libtool nasm gtk-doc-tools texinfo advancecomp && \
+  apt-get -t wheezy-backports install -y jq
 
 # Compiler settings
 ENV \

@@ -1,5 +1,9 @@
 # sharp
 
+```sh
+npm install sharp
+```
+
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
@@ -15,6 +19,43 @@ rotation, extraction, compositing and gamma correction are available.
 
 OS X, Windows (x64), Linux (x64, ARM) systems do not require
 the installation of any external runtime dependencies.
+
+## Examples
+
+```javascript
+import sharp from 'sharp';
+```
+
+```javascript
+sharp(inputBuffer)
+  .resize(320, 240)
+  .toFile('output.webp', (err, info) => ... );
+```
+
+```javascript
+sharp('input.jpg')
+  .rotate()
+  .resize(200)
+  .toBuffer()
+  .then( data => ... )
+  .catch( err => ... );
+```
+
+```javascript
+const roundedCorners = new Buffer(
+  '<svg><rect x="0" y="0" width="200" height="200" rx="50" ry="50"/></svg>'
+);
+
+const roundedCornerResizer =
+  sharp()
+    .resize(200, 200)
+    .overlayWith(roundedCorners, { cutout: true })
+    .png();
+
+readableStream
+  .pipe(roundedCornerResizer)
+  .pipe(writableStream);
+```
 
 [![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.png?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
 

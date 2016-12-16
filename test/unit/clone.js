@@ -1,27 +1,26 @@
 'use strict';
 
-var fs = require('fs');
-var assert = require('assert');
+const fs = require('fs');
+const assert = require('assert');
 
-var sharp = require('../../index');
-var fixtures = require('../fixtures');
+const sharp = require('../../');
+const fixtures = require('../fixtures');
 
-describe('Clone', function() {
-
-  beforeEach(function() {
+describe('Clone', function () {
+  beforeEach(function () {
     sharp.cache(false);
   });
-  afterEach(function() {
+  afterEach(function () {
     sharp.cache(true);
   });
 
-  it('Read from Stream and write to multiple Streams', function(done) {
-    var finishEventsExpected = 2;
+  it('Read from Stream and write to multiple Streams', function (done) {
+    let finishEventsExpected = 2;
     // Output stream 1
-    var output1 = fixtures.path('output.multi-stream.1.jpg');
-    var writable1 = fs.createWriteStream(output1);
-    writable1.on('finish', function() {
-      sharp(output1).toBuffer(function(err, data, info) {
+    const output1 = fixtures.path('output.multi-stream.1.jpg');
+    const writable1 = fs.createWriteStream(output1);
+    writable1.on('finish', function () {
+      sharp(output1).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -36,10 +35,10 @@ describe('Clone', function() {
       });
     });
     // Output stream 2
-    var output2 = fixtures.path('output.multi-stream.2.jpg');
-    var writable2 = fs.createWriteStream(output2);
-    writable2.on('finish', function() {
-      sharp(output2).toBuffer(function(err, data, info) {
+    const output2 = fixtures.path('output.multi-stream.2.jpg');
+    const writable2 = fs.createWriteStream(output2);
+    writable2.on('finish', function () {
+      sharp(output2).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -54,12 +53,11 @@ describe('Clone', function() {
       });
     });
     // Create parent instance
-    var rotator = sharp().rotate(90);
+    const rotator = sharp().rotate(90);
     // Cloned instances with differing dimensions
     rotator.clone().resize(320, 240).pipe(writable1);
     rotator.clone().resize(100, 122).pipe(writable2);
     // Go
     fs.createReadStream(fixtures.inputJpg).pipe(rotator);
   });
-
 });

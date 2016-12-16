@@ -4,9 +4,13 @@ coverage
 test/bench/node_modules
 test/fixtures/output*
 test/leak/libvips.supp
-lib
-include
+test/saliency/report.json
+test/saliency/Image*
+test/saliency/[Uu]serData*
+!test/saliency/userData.js
+vendor
 packaging/libvips*
 packaging/*.log
 !packaging/build
 .DS_Store
+.nyc_output

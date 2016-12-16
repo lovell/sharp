@@ -1,35 +1,35 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
 
-var async = require('async');
-var rimraf = require('rimraf');
-var unzip = require('unzip');
+const eachLimit = require('async/eachLimit');
+const rimraf = require('rimraf');
+const unzip = require('unzip');
 
-var sharp = require('../../index');
-var fixtures = require('../fixtures');
+const sharp = require('../../');
+const fixtures = require('../fixtures');
 
 // Verifies all tiles in a given dz output directory are <= size
-var assertDeepZoomTiles = function(directory, expectedSize, expectedLevels, done) {
+const assertDeepZoomTiles = function (directory, expectedSize, expectedLevels, done) {
   // Get levels
-  var levels = fs.readdirSync(directory);
+  const levels = fs.readdirSync(directory);
   assert.strictEqual(expectedLevels, levels.length);
   // Get tiles
-  var tiles = [];
-  levels.forEach(function(level) {
+  const tiles = [];
+  levels.forEach(function (level) {
     // Verify level directory name
     assert.strictEqual(true, /^[0-9]+$/.test(level));
-    fs.readdirSync(path.join(directory, level)).forEach(function(tile) {
+    fs.readdirSync(path.join(directory, level)).forEach(function (tile) {
       // Verify tile file name
       assert.strictEqual(true, /^[0-9]+_[0-9]+\.jpeg$/.test(tile));
       tiles.push(path.join(directory, level, tile));
     });
   });
   // Verify each tile is <= expectedSize
-  async.eachSeries(tiles, function(tile, done) {
-    sharp(tile).metadata(function(err, metadata) {
+  eachLimit(tiles, 8, function (tile, done) {
+    sharp(tile).metadata(function (err, metadata) {
       if (err) {
         done(err);
       } else {
@@ -46,11 +46,10 @@ var assertDeepZoomTiles = function(directory, expectedSize, expectedLevels, done
   }, done);
 };
 
-describe('Tile', function() {
-
-  it('Valid size values pass', function() {
-    [1, 8192].forEach(function(size) {
-      assert.doesNotThrow(function() {
+describe('Tile', function () {
+  it('Valid size values pass', function () {
+    [1, 8192].forEach(function (size) {
+      assert.doesNotThrow(function () {
         sharp().tile({
           size: size
         });
@@ -58,9 +57,9 @@ describe('Tile', function() {
     });
   });
 
-  it('Invalid size values fail', function() {
-    ['zoinks', 1.1, -1, 0, 8193].forEach(function(size) {
-      assert.throws(function() {
+  it('Invalid size values fail', function () {
+    ['zoinks', 1.1, -1, 0, 8193].forEach(function (size) {
+      assert.throws(function () {
         sharp().tile({
           size: size
         });
@@ -68,9 +67,9 @@ describe('Tile', function() {
     });
   });
 
-  it('Valid overlap values pass', function() {
-    [0, 8192].forEach(function(overlap) {
-      assert.doesNotThrow(function() {
+  it('Valid overlap values pass', function () {
+    [0, 8192].forEach(function (overlap) {
+      assert.doesNotThrow(function () {
         sharp().tile({
           size: 8192,
           overlap: overlap
@@ -79,9 +78,9 @@ describe('Tile', function() {
     });
   });
 
-  it('Invalid overlap values fail', function() {
-    ['zoinks', 1.1, -1, 8193].forEach(function(overlap) {
-      assert.throws(function() {
+  it('Invalid overlap values fail', function () {
+    ['zoinks', 1.1, -1, 8193].forEach(function (overlap) {
+      assert.throws(function () {
         sharp().tile({
           overlap: overlap
         });
@@ -89,9 +88,9 @@ describe('Tile', function() {
     });
   });
 
-  it('Valid container values pass', function() {
-    ['fs', 'zip'].forEach(function(container) {
-      assert.doesNotThrow(function() {
+  it('Valid container values pass', function () {
+    ['fs', 'zip'].forEach(function (container) {
+      assert.doesNotThrow(function () {
         sharp().tile({
           container: container
         });
@@ -99,9 +98,9 @@ describe('Tile', function() {
     });
   });
 
-  it('Invalid container values fail', function() {
-    ['zoinks', 1].forEach(function(container) {
-      assert.throws(function() {
+  it('Invalid container values fail', function () {
+    ['zoinks', 1].forEach(function (container) {
+      assert.throws(function () {
         sharp().tile({
           container: container
         });
@@ -109,9 +108,9 @@ describe('Tile', function() {
     });
   });
 
-  it('Valid layout values pass', function() {
-    ['dz', 'google', 'zoomify'].forEach(function(layout) {
-      assert.doesNotThrow(function() {
+  it('Valid layout values pass', function () {
+    ['dz', 'google', 'zoomify'].forEach(function (layout) {
+      assert.doesNotThrow(function () {
         sharp().tile({
           layout: layout
         });
@@ -119,9 +118,9 @@ describe('Tile', function() {
     });
   });
 
-  it('Invalid layout values fail', function() {
-    ['zoinks', 1].forEach(function(layout) {
-      assert.throws(function() {
+  it('Invalid layout values fail', function () {
+    ['zoinks', 1].forEach(function (layout) {
+      assert.throws(function () {
         sharp().tile({
           layout: layout
         });
@@ -129,140 +128,280 @@ describe('Tile', function() {
     });
   });
 
-  it('Prevent larger overlap than default size', function() {
-    assert.throws(function() {
+  it('Valid formats pass', function () {
+    ['jpeg', 'png', 'webp'].forEach(function (format) {
+      assert.doesNotThrow(function () {
+        sharp().toFormat(format).tile();
+      });
+    });
+  });
+
+  it('Invalid formats fail', function () {
+    ['tiff', 'raw'].forEach(function (format) {
+      assert.throws(function () {
+        sharp().toFormat(format).tile();
+      });
+    });
+  });
+
+  it('Prevent larger overlap than default size', function () {
+    assert.throws(function () {
       sharp().tile({overlap: 257});
     });
   });
 
-  it('Prevent larger overlap than provided size', function() {
-    assert.throws(function() {
+  it('Prevent larger overlap than provided size', function () {
+    assert.throws(function () {
       sharp().tile({size: 512, overlap: 513});
     });
   });
 
-  if (sharp.format.dz.output.file) {
-
-    it('Deep Zoom layout', function(done) {
-      var directory = fixtures.path('output.dz_files');
-      rimraf(directory, function() {
-        sharp(fixtures.inputJpg)
-          .toFile(fixtures.path('output.dz.dzi'), function(err, info) {
-            if (err) throw err;
-            assert.strictEqual('dz', info.format);
-            assertDeepZoomTiles(directory, 256, 13, done);
-          });
-      });
+  it('Deep Zoom layout', function (done) {
+    const directory = fixtures.path('output.dzi_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .toFile(fixtures.path('output.dzi'), function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('undefined', typeof info.size);
+          assertDeepZoomTiles(directory, 256, 13, done);
+        });
     });
+  });
 
-    it('Deep Zoom layout with custom size+overlap', function(done) {
-      var directory = fixtures.path('output.dz.512_files');
-      rimraf(directory, function() {
-        sharp(fixtures.inputJpg)
-          .tile({
-            size: 512,
-            overlap: 16
-          })
-          .toFile(fixtures.path('output.dz.512.dzi'), function(err, info) {
-            if (err) throw err;
-            assert.strictEqual('dz', info.format);
-            assertDeepZoomTiles(directory, 512 + 2 * 16, 13, done);
-          });
-      });
+  it('Deep Zoom layout with custom size+overlap', function (done) {
+    const directory = fixtures.path('output.512.dzi_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          size: 512,
+          overlap: 16
+        })
+        .toFile(fixtures.path('output.512.dzi'), function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('undefined', typeof info.size);
+          assertDeepZoomTiles(directory, 512 + 2 * 16, 13, done);
+        });
     });
+  });
 
-    it('Zoomify layout', function(done) {
-      var directory = fixtures.path('output.zoomify');
-      rimraf(directory, function() {
-        sharp(fixtures.inputJpg)
-          .tile({
-            layout: 'zoomify'
-          })
-          .toFile(fixtures.path('output.zoomify.dzi'), function(err, info) {
+  it('Zoomify layout', function (done) {
+    const directory = fixtures.path('output.zoomify.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          layout: 'zoomify'
+        })
+        .toFile(fixtures.path('output.zoomify.dzi'), function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          fs.stat(path.join(directory, 'ImageProperties.xml'), function (err, stat) {
             if (err) throw err;
-            assert.strictEqual('dz', info.format);
-            fs.stat(path.join(directory, 'ImageProperties.xml'), function(err, stat) {
+            assert.strictEqual(true, stat.isFile());
+            assert.strictEqual(true, stat.size > 0);
+            done();
+          });
+        });
+    });
+  });
+
+  it('Google layout', function (done) {
+    const directory = fixtures.path('output.google.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          layout: 'google'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          fs.stat(path.join(directory, '0', '0', '0.jpg'), function (err, stat) {
+            if (err) throw err;
+            assert.strictEqual(true, stat.isFile());
+            assert.strictEqual(true, stat.size > 0);
+            done();
+          });
+        });
+    });
+  });
+
+  it('Google layout with jpeg format', function (done) {
+    const directory = fixtures.path('output.jpg.google.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .jpeg({ quality: 1 })
+        .tile({
+          layout: 'google'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          const sample = path.join(directory, '0', '0', '0.jpg');
+          sharp(sample).metadata(function (err, metadata) {
+            if (err) throw err;
+            assert.strictEqual('jpeg', metadata.format);
+            assert.strictEqual('srgb', metadata.space);
+            assert.strictEqual(3, metadata.channels);
+            assert.strictEqual(false, metadata.hasProfile);
+            assert.strictEqual(false, metadata.hasAlpha);
+            assert.strictEqual(256, metadata.width);
+            assert.strictEqual(256, metadata.height);
+            fs.stat(sample, function (err, stat) {
               if (err) throw err;
-              assert.strictEqual(true, stat.isFile());
-              assert.strictEqual(true, stat.size > 0);
+              assert.strictEqual(true, stat.size < 2000);
               done();
             });
           });
-      });
+        });
     });
+  });
 
-    it('Google layout', function(done) {
-      var directory = fixtures.path('output.google');
-      rimraf(directory, function() {
-        sharp(fixtures.inputJpg)
-          .tile({
-            layout: 'google'
-          })
-          .toFile(fixtures.path('output.google.dzi'), function(err, info) {
+  it('Google layout with png format', function (done) {
+    const directory = fixtures.path('output.png.google.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .png({ compressionLevel: 1 })
+        .tile({
+          layout: 'google'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          const sample = path.join(directory, '0', '0', '0.png');
+          sharp(sample).metadata(function (err, metadata) {
             if (err) throw err;
-            assert.strictEqual('dz', info.format);
-            fs.stat(path.join(directory, '0', '0', '0.jpg'), function(err, stat) {
+            assert.strictEqual('png', metadata.format);
+            assert.strictEqual('srgb', metadata.space);
+            assert.strictEqual(3, metadata.channels);
+            assert.strictEqual(false, metadata.hasProfile);
+            assert.strictEqual(false, metadata.hasAlpha);
+            assert.strictEqual(256, metadata.width);
+            assert.strictEqual(256, metadata.height);
+            fs.stat(sample, function (err, stat) {
               if (err) throw err;
-              assert.strictEqual(true, stat.isFile());
-              assert.strictEqual(true, stat.size > 0);
+              assert.strictEqual(true, stat.size > 44000);
               done();
             });
           });
-      });
+        });
     });
+  });
 
-    it('Write to ZIP container using file extension', function(done) {
-      var container = fixtures.path('output.dz.container.zip');
-      var extractTo = fixtures.path('output.dz.container');
-      var directory = path.join(extractTo, 'output.dz.container_files');
-      rimraf(directory, function() {
-        sharp(fixtures.inputJpg)
-          .toFile(container, function(err, info) {
+  it('Google layout with webp format', function (done) {
+    const directory = fixtures.path('output.webp.google.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .webp({ quality: 1 })
+        .tile({
+          layout: 'google'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          const sample = path.join(directory, '0', '0', '0.webp');
+          sharp(sample).metadata(function (err, metadata) {
             if (err) throw err;
-            assert.strictEqual('dz', info.format);
-            fs.stat(container, function(err, stat) {
+            assert.strictEqual('webp', metadata.format);
+            assert.strictEqual('srgb', metadata.space);
+            assert.strictEqual(3, metadata.channels);
+            assert.strictEqual(false, metadata.hasProfile);
+            assert.strictEqual(false, metadata.hasAlpha);
+            assert.strictEqual(256, metadata.width);
+            assert.strictEqual(256, metadata.height);
+            fs.stat(sample, function (err, stat) {
               if (err) throw err;
-              assert.strictEqual(true, stat.isFile());
-              assert.strictEqual(true, stat.size > 0);
-              fs.createReadStream(container)
-                .pipe(unzip.Extract({path: path.dirname(extractTo)}))
-                .on('error', function(err) { throw err; })
-                .on('close', function() {
-                  assertDeepZoomTiles(directory, 256, 13, done);
-                });
+              assert.strictEqual(true, stat.size < 2000);
+              done();
             });
           });
-      });
+        });
     });
+  });
 
-    it('Write to ZIP container using container tile option', function(done) {
-      var container = fixtures.path('output.dz.containeropt.zip');
-      var extractTo = fixtures.path('output.dz.containeropt');
-      var directory = path.join(extractTo, 'output.dz.containeropt_files');
-      rimraf(directory, function() {
-        sharp(fixtures.inputJpg)
-          .tile({
-            container: 'zip'
-          })
-          .toFile(fixtures.path('output.dz.containeropt.dzi'), function(err, info) {
-            // Vips overrides .dzi extension to .zip used by container var below
+  it('Write to ZIP container using file extension', function (done) {
+    const container = fixtures.path('output.dz.container.zip');
+    const extractTo = fixtures.path('output.dz.container');
+    const directory = path.join(extractTo, 'output.dz.container_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .toFile(container, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          fs.stat(container, function (err, stat) {
             if (err) throw err;
-            assert.strictEqual('dz', info.format);
-            fs.stat(container, function(err, stat) {
-              if (err) throw err;
-              assert.strictEqual(true, stat.isFile());
-              assert.strictEqual(true, stat.size > 0);
-              fs.createReadStream(container)
-                .pipe(unzip.Extract({path: path.dirname(extractTo)}))
-                .on('error', function(err) { throw err; })
-                .on('close', function() {
-                  assertDeepZoomTiles(directory, 256, 13, done);
-                });
-            });
+            assert.strictEqual(true, stat.isFile());
+            assert.strictEqual(true, stat.size > 0);
+            fs.createReadStream(container)
+              .pipe(unzip.Extract({path: path.dirname(extractTo)}))
+              .on('error', function (err) { throw err; })
+              .on('close', function () {
+                assertDeepZoomTiles(directory, 256, 13, done);
+              });
           });
-      });
+        });
     });
+  });
 
-  }
-
+  it('Write to ZIP container using container tile option', function (done) {
+    const container = fixtures.path('output.dz.containeropt.zip');
+    const extractTo = fixtures.path('output.dz.containeropt');
+    const directory = path.join(extractTo, 'output.dz.containeropt_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          container: 'zip'
+        })
+        .toFile(container, function (err, info) {
+          // Vips overrides .dzi extension to .zip used by container var below
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          fs.stat(container, function (err, stat) {
+            if (err) throw err;
+            assert.strictEqual(true, stat.isFile());
+            assert.strictEqual(true, stat.size > 0);
+            fs.createReadStream(container)
+              .pipe(unzip.Extract({path: path.dirname(extractTo)}))
+              .on('error', function (err) { throw err; })
+              .on('close', function () {
+                assertDeepZoomTiles(directory, 256, 13, done);
+              });
+          });
+        });
+    });
+  });
 });

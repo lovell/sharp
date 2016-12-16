@@ -1,6 +1,7 @@
 #include <algorithm>
-#include <tuple>
+#include <functional>
 #include <memory>
+#include <tuple>
 #include <vips/vips8>
 
 #include "common.h"
@@ -35,7 +36,6 @@ namespace sharp {
     // If the input was not valid for composition the return the input image itself
     return dst;
   }
-
 
   VImage Composite(VImage src, VImage dst, const int x, const int y) {
     if(IsInputValidForComposition(src, dst)) {
@@ -177,7 +177,7 @@ namespace sharp {
   /*
    * Stretch luminance to cover full dynamic range.
    */
-  VImage Normalize(VImage image) {
+  VImage Normalise(VImage image) {
     // Get original colourspace
     VipsInterpretation typeBeforeNormalize = image.interpretation();
     if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {
@@ -290,81 +290,115 @@ namespace sharp {
   }
 
   /*
+    Calculate the Shannon entropy
+  */
+  double EntropyStrategy::operator()(VImage image) {
+    return image.hist_find().hist_entropy();
+  }
+
+  /*
+    Calculate the intensity of edges, skin tone and saturation
+  */
+  double AttentionStrategy::operator()(VImage image) {
+    // Flatten RGBA onto a mid-grey background
+    if (image.bands() == 4 && HasAlpha(image)) {
+      double const midgrey = sharp::Is16Bit(image.interpretation()) ? 32768.0 : 128.0;
+      std::vector<double> background { midgrey, midgrey, midgrey };
+      image = image.flatten(VImage::option()->set("background", background));
+    }
+    // Convert to LAB colourspace
+    VImage lab = image.colourspace(VIPS_INTERPRETATION_LAB);
+    VImage l = lab[0];
+    VImage a = lab[1];
+    VImage b = lab[2];
+    // Edge detect luminosity with the Sobel operator
+    VImage sobel = vips::VImage::new_matrixv(3, 3,
+      -1.0, 0.0, 1.0,
+      -2.0, 0.0, 2.0,
+      -1.0, 0.0, 1.0);
+    VImage edges = l.conv(sobel).abs() + l.conv(sobel.rot90()).abs();
+    // Skin tone chroma thresholds trained with http://humanae.tumblr.com/
+    VImage skin = (a >= 3) & (a <= 22) & (b >= 4) & (b <= 31);
+    // Chroma >~50% saturation
+    VImage lch = lab.colourspace(VIPS_INTERPRETATION_LCH);
+    VImage c = lch[1];
+    VImage saturation = c > 60;
+    // Find maximum in combined saliency mask
+    VImage mask = edges + skin + saturation;
+    return mask.max();
+  }
+
+  /*
     Calculate crop area based on image entropy
   */
-  std::tuple<int, int> EntropyCrop(VImage image, int const outWidth, int const outHeight) {
+  std::tuple<int, int> Crop(
+    VImage image, int const outWidth, int const outHeight, std::function<double(VImage)> strategy
+  ) {
     int left = 0;
     int top = 0;
     int const inWidth = image.width();
     int const inHeight = image.height();
     if (inWidth > outWidth) {
-      // Reduce width by repeated removing slices from edge with lowest entropy
+      // Reduce width by repeated removing slices from edge with lowest score
       int width = inWidth;
-      double leftEntropy = 0.0;
-      double rightEntropy = 0.0;
+      double leftScore = 0.0;
+      double rightScore = 0.0;
       // Max width of each slice
       int const maxSliceWidth = static_cast<int>(ceil((inWidth - outWidth) / 8.0));
       while (width > outWidth) {
         // Width of current slice
         int const slice = std::min(width - outWidth, maxSliceWidth);
-        if (leftEntropy == 0.0) {
-          // Update entropy of left slice
-          leftEntropy = Entropy(image.extract_area(left, 0, slice, inHeight));
+        if (leftScore == 0.0) {
+          // Update score of left slice
+          leftScore = strategy(image.extract_area(left, 0, slice, inHeight));
         }
-        if (rightEntropy == 0.0) {
-          // Update entropy of right slice
-          rightEntropy = Entropy(image.extract_area(width - slice - 1, 0, slice, inHeight));
+        if (rightScore == 0.0) {
+          // Update score of right slice
+          rightScore = strategy(image.extract_area(width - slice - 1, 0, slice, inHeight));
         }
-        // Keep slice with highest entropy
-        if (leftEntropy >= rightEntropy) {
+        // Keep slice with highest score
+        if (leftScore >= rightScore) {
           // Discard right slice
-          rightEntropy = 0.0;
+          rightScore = 0.0;
         } else {
           // Discard left slice
-          leftEntropy = 0.0;
+          leftScore = 0.0;
           left = left + slice;
         }
         width = width - slice;
       }
     }
     if (inHeight > outHeight) {
-      // Reduce height by repeated removing slices from edge with lowest entropy
+      // Reduce height by repeated removing slices from edge with lowest score
       int height = inHeight;
-      double topEntropy = 0.0;
-      double bottomEntropy = 0.0;
+      double topScore = 0.0;
+      double bottomScore = 0.0;
       // Max height of each slice
       int const maxSliceHeight = static_cast<int>(ceil((inHeight - outHeight) / 8.0));
       while (height > outHeight) {
         // Height of current slice
         int const slice = std::min(height - outHeight, maxSliceHeight);
-        if (topEntropy == 0.0) {
-          // Update entropy of top slice
-          topEntropy = Entropy(image.extract_area(0, top, inWidth, slice));
+        if (topScore == 0.0) {
+          // Update score of top slice
+          topScore = strategy(image.extract_area(0, top, inWidth, slice));
         }
-        if (bottomEntropy == 0.0) {
-          // Update entropy of bottom slice
-          bottomEntropy = Entropy(image.extract_area(0, height - slice - 1, inWidth, slice));
+        if (bottomScore == 0.0) {
+          // Update score of bottom slice
+          bottomScore = strategy(image.extract_area(0, height - slice - 1, inWidth, slice));
         }
-        // Keep slice with highest entropy
-        if (topEntropy >= bottomEntropy) {
+        // Keep slice with highest score
+        if (topScore >= bottomScore) {
           // Discard bottom slice
-          bottomEntropy = 0.0;
+          bottomScore = 0.0;
         } else {
           // Discard top slice
-          topEntropy = 0.0;
+          topScore = 0.0;
           top = top + slice;
         }
         height = height - slice;
       }
     }
     return std::make_tuple(left, top);
-  }
-
-  /*
-    Calculate the Shannon entropy for an image
-  */
-  double Entropy(VImage image) {
-    return image.hist_find().hist_entropy();
   }
 
   /*

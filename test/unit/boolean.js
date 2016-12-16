@@ -1,26 +1,25 @@
 'use strict';
 
-var fs = require('fs');
-var assert = require('assert');
-var fixtures = require('../fixtures');
-var sharp = require('../../index');
+const fs = require('fs');
+const assert = require('assert');
 
-describe('Boolean operation between two images', function() {
+const fixtures = require('../fixtures');
+const sharp = require('../../');
 
-  var inputJpgBooleanTestBuffer = fs.readFileSync(fixtures.inputJpgBooleanTest);
+describe('Boolean operation between two images', function () {
+  const inputJpgBooleanTestBuffer = fs.readFileSync(fixtures.inputJpgBooleanTest);
 
   [
     sharp.bool.and,
     sharp.bool.or,
     sharp.bool.eor
   ]
-  .forEach(function(op) {
-
-    it(op + ' operation, file', function(done) {
+  .forEach(function (op) {
+    it(op + ' operation, file', function (done) {
       sharp(fixtures.inputJpg)
         .resize(320, 240)
         .boolean(fixtures.inputJpgBooleanTest, op)
-        .toBuffer(function(err, data, info) {
+        .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual(320, info.width);
           assert.strictEqual(240, info.height);
@@ -28,11 +27,11 @@ describe('Boolean operation between two images', function() {
         });
     });
 
-    it(op + ' operation, buffer', function(done) {
+    it(op + ' operation, buffer', function (done) {
       sharp(fixtures.inputJpg)
         .resize(320, 240)
         .boolean(inputJpgBooleanTestBuffer, op)
-        .toBuffer(function(err, data, info) {
+        .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual(320, info.width);
           assert.strictEqual(240, info.height);
@@ -40,15 +39,15 @@ describe('Boolean operation between two images', function() {
         });
     });
 
-    it(op + ' operation, raw', function(done) {
+    it(op + ' operation, raw', function (done) {
       sharp(fixtures.inputJpgBooleanTest)
         .raw()
-        .toBuffer(function(err, data, info) {
+        .toBuffer(function (err, data, info) {
           if (err) throw err;
           sharp(fixtures.inputJpg)
             .resize(320, 240)
             .boolean(data, op, { raw: info })
-            .toBuffer(function(err, data, info) {
+            .toBuffer(function (err, data, info) {
               if (err) throw err;
               assert.strictEqual(320, info.width);
               assert.strictEqual(240, info.height);
@@ -56,23 +55,22 @@ describe('Boolean operation between two images', function() {
             });
         });
     });
-
   });
 
-  it('Invalid operation', function() {
-    assert.throws(function() {
+  it('Invalid operation', function () {
+    assert.throws(function () {
       sharp().boolean(fixtures.inputJpgBooleanTest, 'fail');
     });
   });
 
-  it('Invalid operation, non-string', function() {
-    assert.throws(function() {
+  it('Invalid operation, non-string', function () {
+    assert.throws(function () {
       sharp().boolean(fixtures.inputJpgBooleanTest, null);
     });
   });
 
-  it('Missing input', function() {
-    assert.throws(function() {
+  it('Missing input', function () {
+    assert.throws(function () {
       sharp().boolean();
     });
   });

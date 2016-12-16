@@ -2,15 +2,13 @@ build
 node_modules
 coverage
 .editorconfig
-.jshintignore
-.jshintrc
 .gitignore
 test
 .travis.yml
 appveyor.yml
 circle.yml
 mkdocs.yml
-lib
-include
+vendor
 packaging
 preinstall.sh
+.nyc_output
