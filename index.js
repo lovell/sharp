@@ -192,6 +192,13 @@ Sharp.prototype._createInputDescriptor = function(input, inputOptions, container
         throw new Error('Invalid density (1 to 2400) ' + inputOptions.density);
       }
     }
+    // page number
+    if (isDefined(inputOptions.page)) {
+      if (isInteger(inputOptions.page)) {
+        inputDescriptor.page = inputOptions.page;
+      }
+      // todo: check page range?
+    }
     // Raw pixel input
     if (isDefined(inputOptions.raw)) {
       if (
@@ -207,7 +214,7 @@ Sharp.prototype._createInputDescriptor = function(input, inputOptions, container
         throw new Error('Expected width, height and channels for raw pixel input');
       }
     }
-  } else if (isDefined(inputOptions)) {
+  } else if (isDefined(inputOptions)) {o
     throw new Error('Invalid input options ' + inputOptions);
   }
   return inputDescriptor;
@@ -307,7 +314,7 @@ Sharp.prototype.extractChannel = function(channel) {
   else if (channel === 'green')
     channel = 1;
   else if (channel === 'blue')
-    channel = 2;
+    channel = 2;o
   if(isInteger(channel) && inRange(channel,0,4)) {
     this.options.extractChannel = channel;
   } else {
