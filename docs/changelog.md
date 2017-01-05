@@ -4,6 +4,15 @@
 
 Requires libvips v8.4.2.
 
+#### v0.17.1 - TBD
+
+* Improve error messages for invalid parameters.
+  [@spikeon](https://github.com/spikeon)
+  [#644](https://github.com/lovell/sharp/pull/644)
+
+* Simplify expression for finding vips-cpp libdir.
+  [#656](https://github.com/lovell/sharp/pull/656)
+
 #### v0.17.0 - 11<sup>th</sup> December 2016
 
 * Drop support for versions of Node prior to v4.

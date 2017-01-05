@@ -66,37 +66,37 @@ describe('Resize dimensions', function () {
   it('Invalid width - NaN', function () {
     assert.throws(function () {
       sharp().resize('spoons', 240);
-    });
+    }, /Expected integer between 1 and 16383 for width but received spoons of type string/);
   });
 
   it('Invalid height - NaN', function () {
     assert.throws(function () {
       sharp().resize(320, 'spoons');
-    });
+    }, /Expected integer between 1 and 16383 for height but received spoons of type string/);
   });
 
   it('Invalid width - float', function () {
     assert.throws(function () {
       sharp().resize(1.5, 240);
-    });
+    }, /Expected integer between 1 and 16383 for width but received 1.5 of type number/);
   });
 
   it('Invalid height - float', function () {
     assert.throws(function () {
       sharp().resize(320, 1.5);
-    });
+    }, /Expected integer between 1 and 16383 for height but received 1.5 of type number/);
   });
 
   it('Invalid width - too large', function () {
     assert.throws(function () {
       sharp().resize(0x4000, 240);
-    });
+    }, /Expected integer between 1 and 16383 for width but received 16384 of type number/);
   });
 
   it('Invalid height - too large', function () {
     assert.throws(function () {
       sharp().resize(320, 0x4000);
-    });
+    }, /Expected integer between 1 and 16383 for height but received 16384 of type number/);
   });
 
   it('WebP shrink-on-load rounds to zero, ensure recalculation is correct', function (done) {

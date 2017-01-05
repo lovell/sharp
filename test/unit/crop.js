@@ -141,16 +141,16 @@ describe('Crop', function () {
   it('Invalid values fail', function () {
     assert.throws(function () {
       sharp().crop(9);
-    });
+    }, /Expected valid crop id\/name\/strategy for crop but received 9 of type number/);
     assert.throws(function () {
       sharp().crop(1.1);
-    });
+    }, /Expected valid crop id\/name\/strategy for crop but received 1.1 of type number/);
     assert.throws(function () {
       sharp().crop(-1);
-    });
+    }, /Expected valid crop id\/name\/strategy for crop but received -1 of type number/);
     assert.throws(function () {
       sharp().crop('zoinks');
-    });
+    }, /Expected valid crop id\/name\/strategy for crop but received zoinks of type string/);
   });
 
   it('Uses default value when none specified', function () {
