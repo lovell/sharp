@@ -94,6 +94,9 @@ the help and code contributions of the following people:
 * [Kleis Auke Wolthuizen](https://github.com/kleisauke)
 * [Matt Hirsch](https://github.com/mhirsch)
 * [Rahul Nanwani](https://github.com/rnanwani)
+* [Matthias Thoemmes](https://github.com/cmtt)
+* [Patrick Paskaris](https://github.com/ppaskaris)
+* [Jérémy Lal](https://github.com/kapouer)
 
 Thank you!
 
