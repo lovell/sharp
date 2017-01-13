@@ -110,7 +110,7 @@ contain an alpha channel, even when the input image does not.
 ```javascript
 sharp('input.gif')
   .resize(200, 300)
-  .background({r: 0, g: 0, b: 0, a: 0})
+  .background({r: 0, g: 0, b: 0, alpha: 0})
   .embed()
   .toFormat(sharp.format.webp)
   .toBuffer(function(err, outputBuffer) {
