@@ -98,11 +98,11 @@ module.exports.download_vips = function () {
           } catch (err) {}
         });
       });
-      const gotOpt = {};
-      if (process.env.npm_config_https_proxy) {
-        // Use the NPM-configured HTTPS proxy
-        gotOpt.agent = caw(process.env.npm_config_https_proxy);
-      }
+      const gotOpt = {
+        agent: caw(null, {
+          protocol: 'https'
+        })
+      };
       const url = distBaseUrl + tarFilename;
       got.stream(url, gotOpt).on('response', function (response) {
         if (response.statusCode !== 200) {

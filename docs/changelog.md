@@ -13,6 +13,10 @@ Requires libvips v8.4.2.
 * Simplify expression for finding vips-cpp libdir.
   [#656](https://github.com/lovell/sharp/pull/656)
 
+* Allow HTTP-over-HTTPS proxy when downloading pre-compiled dependencies.
+  [@wangzhiwei1888](https://github.com/wangzhiwei1888)
+  [#679](https://github.com/lovell/sharp/issues/679)
+
 #### v0.17.0 - 11<sup>th</sup> December 2016
 
 * Drop support for versions of Node prior to v4.
