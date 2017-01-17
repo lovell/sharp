@@ -84,6 +84,9 @@ struct PipelineBaton {
   int pngCompressionLevel;
   bool pngAdaptiveFiltering;
   int webpQuality;
+  int webpAlphaQuality;
+  bool webpNearLossless;
+  bool webpLossless;
   int tiffQuality;
   std::string err;
   bool withMetadata;

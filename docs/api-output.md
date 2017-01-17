@@ -115,6 +115,9 @@ Use these WebP options for output image.
 
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** output options
     -   `options.quality` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** quality, integer 1-100 (optional, default `80`)
+    -   `options.alphaQuality` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** quality of alpha layer, integer 0-100 (optional, default `100`)
+    -   `options.lossless` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** use lossless compression mode (optional, default `false`)
+    -   `options.nearLossless` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** use near_lossless compression mode (optional, default `false`)
     -   `options.force` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** force WebP output, otherwise attempt to use input format (optional, default `true`)
 
 
