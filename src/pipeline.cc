@@ -767,6 +767,9 @@ class PipelineWorker : public Nan::AsyncWorker {
           VipsArea *area = VIPS_AREA(image.webpsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->webpQuality)
+            ->set("lossless", baton->webpLossless)
+            ->set("near_lossless", baton->webpNearLossless)
+            ->set("alpha_q", baton->webpAlphaQuality)
           ));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -844,6 +847,9 @@ class PipelineWorker : public Nan::AsyncWorker {
           image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->webpQuality)
+            ->set("lossless", baton->webpLossless)
+            ->set("near_lossless", baton->webpNearLossless)
+            ->set("alpha_q", baton->webpAlphaQuality)
           );
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
@@ -870,7 +876,10 @@ class PipelineWorker : public Nan::AsyncWorker {
             suffix = AssembleSuffixString(".png", options);
           } else if (baton->tileFormat == "webp") {
             std::vector<std::pair<std::string, std::string>> options {
-              {"Q", std::to_string(baton->webpQuality)}
+              {"Q", std::to_string(baton->webpQuality)},
+              {"alpha_q", std::to_string(baton->webpAlphaQuality)},
+              {"lossless", baton->webpLossless ? "TRUE" : "FALSE"},
+              {"near_lossless", baton->webpNearLossless ? "TRUE" : "FALSE"}
             };
             suffix = AssembleSuffixString(".webp", options);
           } else {
@@ -1209,6 +1218,11 @@ NAN_METHOD(pipeline) {
   baton->pngCompressionLevel = AttrTo<uint32_t>(options, "pngCompressionLevel");
   baton->pngAdaptiveFiltering = AttrTo<bool>(options, "pngAdaptiveFiltering");
   baton->webpQuality = AttrTo<uint32_t>(options, "webpQuality");
+  baton->webpAlphaQuality = AttrTo<uint32_t>(options, "webpAlphaQuality");
+  baton->webpLossless = AttrTo<bool>(options, "webpLossless");
+  if(HasAttr(options, "webpNearLossless")) {
+    baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
+  }
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
   // Tile output
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
