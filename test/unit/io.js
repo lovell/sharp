@@ -408,7 +408,7 @@ describe('Input/output', function () {
 
     it('should use near-lossless when both lossless and nearLossless are specified', function (done) {
       sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-        .webp({nearLossless: true, quality: 50, lossless : true})
+        .webp({nearLossless: true, quality: 50, lossless: true})
         .toBuffer(function (err50, data50, info50) {
           if (err50) throw err50;
           assert.strictEqual(true, data50.length > 0);
