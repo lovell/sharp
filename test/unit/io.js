@@ -395,9 +395,20 @@ describe('Input/output', function () {
         });
     });
 
-    it('should work for webp near-lossless with correct size', function (done) {
+    it('should work for webp near-lossless', function (done) {
       sharp(fixtures.inputPngAlphaPremultiplicationSmall)
         .webp({nearLossless: true, quality: 50})
+        .toBuffer(function (err50, data50, info50) {
+          if (err50) throw err50;
+          assert.strictEqual(true, data50.length > 0);
+          assert.strictEqual('webp', info50.format);
+          fixtures.assertSimilar(fixtures.expected('webp-near-lossless-50.webp'), data50, done);
+        });
+    });
+
+    it('should use near-lossless when both lossless and nearLossless are specified', function (done) {
+      sharp(fixtures.inputPngAlphaPremultiplicationSmall)
+        .webp({nearLossless: true, quality: 50, lossless : true})
         .toBuffer(function (err50, data50, info50) {
           if (err50) throw err50;
           assert.strictEqual(true, data50.length > 0);

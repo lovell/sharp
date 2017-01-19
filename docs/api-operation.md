@@ -169,7 +169,7 @@ This operation will always occur after resizing and extraction, if any.
 // to the top, left and right edges and 20 to the bottom edge
 sharp(input)
   .resize(140)
-  .background({r: 0, g: 0, b: 0, alpha: 0})
+  .background({r: 0, g: 0, b: 0, a: 0})
   .extend({top: 10, bottom: 20, left: 10, right: 10})
   ...
 ```
