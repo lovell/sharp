@@ -4,6 +4,12 @@
 
 Requires libvips v8.4.2.
 
+#### v0.17.2 - TBD
+
+* Expose WebP alpha quality, lossless and near-lossless output options.
+  [#685](https://github.com/lovell/sharp/pull/685)
+  [@rnanwani](https://github.com/rnanwani)
+
 #### v0.17.1 - 15<sup>th</sup> January 2017
 
 * Improve error messages for invalid parameters.

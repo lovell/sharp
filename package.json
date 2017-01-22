@@ -30,7 +30,8 @@
     "Matt Hirsch <mhirsch@media.mit.edu>",
     "Matthias Thoemmes <thoemmes@gmail.com>",
     "Patrick Paskaris <patrick@paskaris.gr>",
-    "Jérémy Lal <kapouer@melix.org>"
+    "Jérémy Lal <kapouer@melix.org>",
+    "Rahul Nanwani <r.nanwani@gmail.com>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
@@ -76,7 +77,7 @@
     "icc": "^1.0.0",
     "mocha": "^3.2.0",
     "node-cpplint": "^0.4.0",
-    "nyc": "^10.0.0",
+    "nyc": "^10.1.2",
     "rimraf": "^2.5.4",
     "semistandard": "^9.2.1",
     "unzip": "^0.1.11"
