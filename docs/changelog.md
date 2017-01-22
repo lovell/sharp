@@ -6,6 +6,10 @@ Requires libvips v8.4.2.
 
 #### v0.17.2 - TBD
 
+* Ensure Readable side of Stream can start flowing after Writable side has finished.
+  [#671](https://github.com/lovell/sharp/issues/671)
+  [@danhaller](https://github.com/danhaller)
+
 * Expose WebP alpha quality, lossless and near-lossless output options.
   [#685](https://github.com/lovell/sharp/pull/685)
   [@rnanwani](https://github.com/rnanwani)

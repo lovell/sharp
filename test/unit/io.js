@@ -157,6 +157,28 @@ describe('Input/output', function () {
     readableButNotAnImage.pipe(writable);
   });
 
+  it('Readable side of Stream can start flowing after Writable side has finished', function (done) {
+    const readable = fs.createReadStream(fixtures.inputJpg);
+    const writable = fs.createWriteStream(fixtures.outputJpg);
+    writable.on('finish', function () {
+      sharp(fixtures.outputJpg).toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(data.length, info.size);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fs.unlinkSync(fixtures.outputJpg);
+        done();
+      });
+    });
+    const pipeline = sharp().resize(320, 240);
+    readable.pipe(pipeline);
+    pipeline.on('finish', function () {
+      pipeline.pipe(writable);
+    });
+  });
+
   it('Sequential read, force JPEG', function (done) {
     sharp(fixtures.inputJpg)
       .sequentialRead()
