@@ -1,12 +1,27 @@
+// Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <cstdlib>
 #include <string>
 #include <string.h>
+#include <vector>
 
 #include <node.h>
 #include <node_buffer.h>
+#include <nan.h>
 #include <vips/vips8>
 
-#include "nan.h"
 #include "common.h"
 
 using vips::VImage;
@@ -254,8 +269,7 @@ namespace sharp {
     return (
       (bands == 2 && interpretation == VIPS_INTERPRETATION_B_W) ||
       (bands == 4 && interpretation != VIPS_INTERPRETATION_CMYK) ||
-      (bands == 5 && interpretation == VIPS_INTERPRETATION_CMYK)
-    );
+      (bands == 5 && interpretation == VIPS_INTERPRETATION_CMYK));
   }
 
   /*
@@ -378,23 +392,23 @@ namespace sharp {
     int top = 0;
 
     // assign only if valid
-    if(x >= 0 && x < (inWidth - outWidth)) {
+    if (x >= 0 && x < (inWidth - outWidth)) {
       left = x;
-    } else if(x >= (inWidth - outWidth)) {
+    } else if (x >= (inWidth - outWidth)) {
       left = inWidth - outWidth;
     }
 
-    if(y >= 0 && y < (inHeight - outHeight)) {
+    if (y >= 0 && y < (inHeight - outHeight)) {
       top = y;
-    } else if(y >= (inHeight - outHeight)) {
+    } else if (y >= (inHeight - outHeight)) {
       top = inHeight - outHeight;
     }
 
     // the resulting left and top could have been outside the image after calculation from bottom/right edges
-    if(left < 0) {
+    if (left < 0) {
       left = 0;
     }
-    if(top < 0) {
+    if (top < 0) {
       top = 0;
     }
 
@@ -421,8 +435,7 @@ namespace sharp {
   */
   VipsOperationBoolean GetBooleanOperation(std::string const opStr) {
     return static_cast<VipsOperationBoolean>(
-      vips_enum_from_nick(nullptr, VIPS_TYPE_OPERATION_BOOLEAN, opStr.data())
-    );
+      vips_enum_from_nick(nullptr, VIPS_TYPE_OPERATION_BOOLEAN, opStr.data()));
   }
 
   /*
@@ -430,8 +443,7 @@ namespace sharp {
   */
   VipsInterpretation GetInterpretation(std::string const typeStr) {
     return static_cast<VipsInterpretation>(
-      vips_enum_from_nick(nullptr, VIPS_TYPE_INTERPRETATION, typeStr.data())
-    );
+      vips_enum_from_nick(nullptr, VIPS_TYPE_INTERPRETATION, typeStr.data()));
   }
 
   /*

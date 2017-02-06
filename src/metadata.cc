@@ -1,9 +1,24 @@
+// Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <numeric>
+#include <vector>
 
 #include <node.h>
+#include <nan.h>
 #include <vips/vips8>
 
-#include "nan.h"
 #include "common.h"
 #include "metadata.h"
 
@@ -11,15 +26,14 @@ class MetadataWorker : public Nan::AsyncWorker {
  public:
   MetadataWorker(
     Nan::Callback *callback, MetadataBaton *baton,
-    std::vector<v8::Local<v8::Object>> const buffersToPersist
-  ) : Nan::AsyncWorker(callback), baton(baton), buffersToPersist(buffersToPersist) {
+    std::vector<v8::Local<v8::Object>> const buffersToPersist)
+    : Nan::AsyncWorker(callback), baton(baton), buffersToPersist(buffersToPersist) {
     // Protect Buffer objects from GC, keyed on index
     std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
       [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
         SaveToPersistent(index, buffer);
         return index + 1;
-      }
-    );
+      });
   }
   ~MetadataWorker() {}
 
@@ -72,7 +86,7 @@ class MetadataWorker : public Nan::AsyncWorker {
     vips_thread_shutdown();
   }
 
-  void HandleOKCallback () {
+  void HandleOKCallback() {
     using Nan::New;
     using Nan::Set;
     Nan::HandleScope();
@@ -99,14 +113,12 @@ class MetadataWorker : public Nan::AsyncWorker {
       if (baton->exifLength > 0) {
         Set(info,
           New("exif").ToLocalChecked(),
-          Nan::NewBuffer(baton->exif, baton->exifLength, sharp::FreeCallback, nullptr).ToLocalChecked()
-        );
+          Nan::NewBuffer(baton->exif, baton->exifLength, sharp::FreeCallback, nullptr).ToLocalChecked());
       }
       if (baton->iccLength > 0) {
         Set(info,
           New("icc").ToLocalChecked(),
-          Nan::NewBuffer(baton->icc, baton->iccLength, sharp::FreeCallback, nullptr).ToLocalChecked()
-        );
+          Nan::NewBuffer(baton->icc, baton->iccLength, sharp::FreeCallback, nullptr).ToLocalChecked());
       }
       argv[1] = info;
     }
@@ -116,8 +128,7 @@ class MetadataWorker : public Nan::AsyncWorker {
       [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
         GetFromPersistent(index);
         return index + 1;
-      }
-    );
+      });
     delete baton->input;
     delete baton;
 

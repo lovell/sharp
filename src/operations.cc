@@ -1,7 +1,23 @@
+// Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <algorithm>
 #include <functional>
 #include <memory>
 #include <tuple>
+#include <vector>
+
 #include <vips/vips8>
 
 #include "common.h"
@@ -17,7 +33,7 @@ namespace sharp {
     Assumes alpha channels are already premultiplied and will be unpremultiplied after.
    */
   VImage Composite(VImage src, VImage dst, const int gravity) {
-    if(IsInputValidForComposition(src, dst)) {
+    if (IsInputValidForComposition(src, dst)) {
       // Enlarge overlay src, if required
       if (src.width() < dst.width() || src.height() < dst.height()) {
         // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
@@ -28,8 +44,7 @@ namespace sharp {
         std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
         src = src.embed(left, top, dst.width(), dst.height(), VImage::option()
           ->set("extend", VIPS_EXTEND_BACKGROUND)
-          ->set("background", background)
-        );
+          ->set("background", background));
       }
       return CompositeImage(src, dst);
     }
@@ -38,7 +53,7 @@ namespace sharp {
   }
 
   VImage Composite(VImage src, VImage dst, const int x, const int y) {
-    if(IsInputValidForComposition(src, dst)) {
+    if (IsInputValidForComposition(src, dst)) {
       // Enlarge overlay src, if required
       if (src.width() < dst.width() || src.height() < dst.height()) {
         // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
@@ -49,8 +64,7 @@ namespace sharp {
         std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
         src = src.embed(left, top, dst.width(), dst.height(), VImage::option()
           ->set("extend", VIPS_EXTEND_BACKGROUND)
-          ->set("background", background)
-        );
+          ->set("background", background));
       }
       return CompositeImage(src, dst);
     }
@@ -145,12 +159,11 @@ namespace sharp {
       std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
       mask = mask.embed(left, top, dst.width(), dst.height(), VImage::option()
               ->set("extend", VIPS_EXTEND_BACKGROUND)
-              ->set("background", background)
-      );
+              ->set("background", background));
     }
 
     // we use the mask alpha if it has alpha
-    if(maskHasAlpha) {
+    if (maskHasAlpha) {
       mask = mask.extract_band(mask.bands() - 1, VImage::option()->set("n", 1));;
     }
 
@@ -284,8 +297,8 @@ namespace sharp {
         colourspaceBeforeSharpen = VIPS_INTERPRETATION_sRGB;
       }
       return image.sharpen(
-        VImage::option()->set("sigma", sigma)->set("m1", flat)->set("m2", jagged)
-      ).colourspace(colourspaceBeforeSharpen);
+        VImage::option()->set("sigma", sigma)->set("m1", flat)->set("m2", jagged))
+        .colourspace(colourspaceBeforeSharpen);
     }
   }
 
@@ -415,12 +428,11 @@ namespace sharp {
       ->set("tile_height", 10)
       ->set("max_tiles", static_cast<int>(round(1.0 + need_lines / 10.0)))
       ->set("access", VIPS_ACCESS_SEQUENTIAL)
-      ->set("threaded", TRUE)
-    );
+      ->set("threaded", TRUE));
   }
 
   VImage Threshold(VImage image, double const threshold, bool const thresholdGrayscale) {
-    if(!thresholdGrayscale) {
+    if (!thresholdGrayscale) {
       return image >= threshold;
     }
     return image.colourspace(VIPS_INTERPRETATION_B_W) >= threshold;
@@ -485,7 +497,7 @@ namespace sharp {
     int width = right - left;
     int height = bottom - top;
 
-    if(width <= 0 || height <= 0) {
+    if (width <= 0 || height <= 0) {
       throw VError("Unexpected error while trimming. Try to lower the tolerance");
     }
 
