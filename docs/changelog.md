@@ -4,7 +4,7 @@
 
 Requires libvips v8.4.2.
 
-#### v0.17.2 - TBD
+#### v0.17.2 - 11<sup>th</sup> February 2017
 
 * Ensure Readable side of Stream can start flowing after Writable side has finished.
   [#671](https://github.com/lovell/sharp/issues/671)
