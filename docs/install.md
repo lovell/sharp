@@ -12,7 +12,7 @@ yarn add sharp
 
 * Node v4+
 * C++11 compatible compiler such as gcc 4.8+, clang 3.0+ or MSVC 2013+
-* [node-gyp](https://github.com/TooTallNate/node-gyp#installation) and its dependencies
+* [node-gyp](https://github.com/TooTallNate/node-gyp#installation) and its dependencies (includes Python)
 
 ### Linux
 
@@ -27,7 +27,7 @@ Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ C
 * Debian 7, 8
 * Ubuntu 12.04, 14.04, 16.04
 * Centos 7
-* Fedora 23, 24
+* Fedora
 * openSUSE 13.2
 * Archlinux
 * Raspbian Jessie
@@ -134,7 +134,6 @@ You can now download your deployment ZIP using `scp` and upload it to Lambda. Be
 
 * [gulp-responsive](https://www.npmjs.com/package/gulp-responsive)
 * [grunt-sharp](https://www.npmjs.com/package/grunt-sharp)
-
 
 ### CLI tools
 
