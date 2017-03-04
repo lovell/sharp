@@ -77,16 +77,58 @@ describe('Input/output', function () {
     readable.pipe(pipeline);
   });
 
-  it('Read from Stream and write to Buffer via Promise', function (done) {
-    const readable = fs.createReadStream(fixtures.inputJpg);
+  it('Read from Stream and write to Buffer via Promise resolved with Buffer', function () {
     const pipeline = sharp().resize(1, 1);
-    pipeline.toBuffer().then(function (data) {
-      assert.strictEqual(true, data.length > 0);
-      done();
-    }).catch(function (err) {
-      throw err;
-    });
-    readable.pipe(pipeline);
+    fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
+    return pipeline
+      .toBuffer({resolveWithObject: false})
+      .then(function (data) {
+        assert.strictEqual(true, data instanceof Buffer);
+        assert.strictEqual(true, data.length > 0);
+      });
+  });
+
+  it('Read from Stream and write to Buffer via Promise resolved with Object', function () {
+    const pipeline = sharp().resize(1, 1);
+    fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
+    return pipeline
+      .toBuffer({resolveWithObject: true})
+      .then(function (object) {
+        assert.strictEqual('object', typeof object);
+        assert.strictEqual('object', typeof object.info);
+        assert.strictEqual('jpeg', object.info.format);
+        assert.strictEqual(1, object.info.width);
+        assert.strictEqual(1, object.info.height);
+        assert.strictEqual(3, object.info.channels);
+        assert.strictEqual(true, object.data instanceof Buffer);
+        assert.strictEqual(true, object.data.length > 0);
+      });
+  });
+
+  it('Read from File and write to Buffer via Promise resolved with Buffer', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(1, 1)
+      .toBuffer({resolveWithObject: false})
+      .then(function (data) {
+        assert.strictEqual(true, data instanceof Buffer);
+        assert.strictEqual(true, data.length > 0);
+      });
+  });
+
+  it('Read from File and write to Buffer via Promise resolved with Object', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(1, 1)
+      .toBuffer({resolveWithObject: true})
+      .then(function (object) {
+        assert.strictEqual('object', typeof object);
+        assert.strictEqual('object', typeof object.info);
+        assert.strictEqual('jpeg', object.info.format);
+        assert.strictEqual(1, object.info.width);
+        assert.strictEqual(1, object.info.height);
+        assert.strictEqual(3, object.info.channels);
+        assert.strictEqual(true, object.data instanceof Buffer);
+        assert.strictEqual(true, object.data.length > 0);
+      });
   });
 
   it('Read from Stream and write to Stream', function (done) {

@@ -4,6 +4,12 @@
 
 Requires libvips v8.4.2.
 
+#### v0.17.3 - TBD
+
+* Allow toBuffer to optionally resolve a Promise with both info and data.
+  [#143](https://github.com/lovell/sharp/issues/143)
+  [@salzhrani](https://github.com/salzhrani)
+
 #### v0.17.2 - 11<sup>th</sup> February 2017
 
 * Ensure Readable side of Stream can start flowing after Writable side has finished.

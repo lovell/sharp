@@ -40,15 +40,17 @@ Write output to a Buffer.
 JPEG, PNG, WebP, and RAW output are supported.
 By default, the format will match the input image, except GIF and SVG input which become PNG output.
 
-`callback`, if present, gets three arguments `(err, buffer, info)` where:
+`callback`, if present, gets three arguments `(err, data, info)` where:
 
--   `err` is an error message, if any.
--   `buffer` is the output image data.
+-   `err` is an error, if any.
+-   `data` is the output image data.
 -   `info` contains the output image `format`, `size` (bytes), `width`, `height` and `channels`.
-    A Promises/A+ promise is returned when `callback` is not provided.
+    A Promise is returned when `callback` is not provided.
 
 **Parameters**
 
+-   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+    -   `options.resolveWithObject` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`.
 -   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** 
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Buffer](https://nodejs.org/api/buffer.html)>** when no callback is provided
