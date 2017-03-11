@@ -44,7 +44,7 @@ namespace sharp {
     InputDescriptor *descriptor = new InputDescriptor;
     if (HasAttr(input, "file")) {
       descriptor->file = AttrAsStr(input, "file");
-    } else {
+    } else if (HasAttr(input, "buffer")) {
       v8::Local<v8::Object> buffer = AttrAs<v8::Object>(input, "buffer");
       descriptor->bufferLength = node::Buffer::Length(buffer);
       descriptor->buffer = node::Buffer::Data(buffer);
@@ -59,6 +59,16 @@ namespace sharp {
       descriptor->rawChannels = AttrTo<uint32_t>(input, "rawChannels");
       descriptor->rawWidth = AttrTo<uint32_t>(input, "rawWidth");
       descriptor->rawHeight = AttrTo<uint32_t>(input, "rawHeight");
+    }
+    // Create new image
+    if (HasAttr(input, "createChannels")) {
+      descriptor->createChannels = AttrTo<uint32_t>(input, "createChannels");
+      descriptor->createWidth = AttrTo<uint32_t>(input, "createWidth");
+      descriptor->createHeight = AttrTo<uint32_t>(input, "createHeight");
+      v8::Local<v8::Object> createBackground = AttrAs<v8::Object>(input, "createBackground");
+      for (unsigned int i = 0; i < 4; i++) {
+        descriptor->createBackground[i] = AttrTo<double>(createBackground, i);
+      }
     }
     return descriptor;
   }
@@ -192,7 +202,6 @@ namespace sharp {
     VImage image;
     ImageType imageType;
     if (descriptor->buffer != nullptr) {
-      // From buffer
       if (descriptor->rawChannels > 0) {
         // Raw, uncompressed pixel data
         image = VImage::new_from_memory(descriptor->buffer, descriptor->bufferLength,
@@ -227,26 +236,41 @@ namespace sharp {
         }
       }
     } else {
-      // From filesystem
-      imageType = DetermineImageType(descriptor->file.data());
-      if (imageType != ImageType::UNKNOWN) {
-        try {
-          vips::VOption *option = VImage::option()->set("access", accessMethod);
-          if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
-            option->set("dpi", static_cast<double>(descriptor->density));
-          }
-          if (imageType == ImageType::MAGICK) {
-            option->set("density", std::to_string(descriptor->density).data());
-          }
-          image = VImage::new_from_file(descriptor->file.data(), option);
-          if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
-            SetDensity(image, descriptor->density);
-          }
-        } catch (...) {
-          throw vips::VError("Input file has corrupt header");
+      if (descriptor->createChannels > 0) {
+        // Create new image
+        std::vector<double> background = {
+          descriptor->createBackground[0],
+          descriptor->createBackground[1],
+          descriptor->createBackground[2]
+        };
+        if (descriptor->createChannels == 4) {
+          background.push_back(descriptor->createBackground[3]);
         }
+        image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight).new_from_image(background);
+        image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+        imageType = ImageType::RAW;
       } else {
-        throw vips::VError("Input file is missing or of an unsupported image format");
+        // From filesystem
+        imageType = DetermineImageType(descriptor->file.data());
+        if (imageType != ImageType::UNKNOWN) {
+          try {
+            vips::VOption *option = VImage::option()->set("access", accessMethod);
+            if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
+              option->set("dpi", static_cast<double>(descriptor->density));
+            }
+            if (imageType == ImageType::MAGICK) {
+              option->set("density", std::to_string(descriptor->density).data());
+            }
+            image = VImage::new_from_file(descriptor->file.data(), option);
+            if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
+              SetDensity(image, descriptor->density);
+            }
+          } catch (...) {
+            throw vips::VError("Input file has corrupt header");
+          }
+        } else {
+          throw vips::VError("Input file is missing or of an unsupported image format");
+        }
       }
     }
     return std::make_tuple(image, imageType);

@@ -1100,7 +1100,7 @@ NAN_METHOD(pipeline) {
   // Background colour
   v8::Local<v8::Object> background = AttrAs<v8::Object>(options, "background");
   for (unsigned int i = 0; i < 4; i++) {
-    baton->background[i] = AttrTo<uint32_t>(background, i);
+    baton->background[i] = AttrTo<double>(background, i);
   }
   // Overlay options
   if (HasAttr(options, "overlay")) {

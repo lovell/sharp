@@ -10,6 +10,10 @@ Requires libvips v8.4.2.
   [#143](https://github.com/lovell/sharp/issues/143)
   [@salzhrani](https://github.com/salzhrani)
 
+* Create blank image of given width, height, channels and background.
+  [#470](https://github.com/lovell/sharp/issues/470)
+  [@pjarts](https://github.com/pjarts)
+
 #### v0.17.2 - 11<sup>th</sup> February 2017
 
 * Ensure Readable side of Stream can start flowing after Writable side has finished.

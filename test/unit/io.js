@@ -1156,6 +1156,66 @@ describe('Input/output', function () {
     });
   });
 
+  describe('create new image', function () {
+    it('RGB', function (done) {
+      const create = {
+        width: 10,
+        height: 20,
+        channels: 3,
+        background: { r: 0, g: 255, b: 0 }
+      };
+      sharp(null, { create: create })
+        .jpeg()
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(create.width, info.width);
+          assert.strictEqual(create.height, info.height);
+          assert.strictEqual(create.channels, info.channels);
+          assert.strictEqual('jpeg', info.format);
+          fixtures.assertSimilar(fixtures.expected('create-rgb.jpg'), data, done);
+        });
+    });
+    it('RGBA', function (done) {
+      const create = {
+        width: 20,
+        height: 10,
+        channels: 4,
+        background: { r: 255, g: 0, b: 0, alpha: 128 }
+      };
+      sharp(null, { create: create })
+        .png()
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(create.width, info.width);
+          assert.strictEqual(create.height, info.height);
+          assert.strictEqual(create.channels, info.channels);
+          assert.strictEqual('png', info.format);
+          fixtures.assertSimilar(fixtures.expected('create-rgba.png'), data, done);
+        });
+    });
+    it('Invalid channels', function () {
+      const create = {
+        width: 10,
+        height: 20,
+        channels: 2,
+        background: { r: 0, g: 0, b: 0 }
+      };
+      assert.throws(function () {
+        sharp(null, { create: create });
+      });
+    });
+    it('Missing background', function () {
+      const create = {
+        width: 10,
+        height: 20,
+        channels: 3
+      };
+      assert.throws(function () {
+        sharp(null, { create: create });
+      });
+    });
+  });
+
   it('Queue length change events', function (done) {
     let eventCounter = 0;
     const queueListener = function (queueLength) {

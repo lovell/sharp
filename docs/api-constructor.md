@@ -17,10 +17,15 @@
      JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when null or undefined.
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** if present, is an Object with optional attributes.
     -   `options.density` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** integral number representing the DPI for vector images. (optional, default `72`)
-    -   `options.raw` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** describes raw pixel image data. See `raw()` for pixel ordering.
+    -   `options.raw` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** describes raw pixel input image data. See `raw()` for pixel ordering.
         -   `options.raw.width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
         -   `options.raw.height` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-        -   `options.raw.channels` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+        -   `options.raw.channels` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 1-4
+    -   `options.create` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** describes a new image to be created.
+        -   `options.create.width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+        -   `options.create.height` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+        -   `options.create.channels` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 3-4
+        -   `options.create.background` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object))?** parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
 
 **Examples**
 
@@ -44,6 +49,21 @@ var transformer = sharp()
     console.log('Image height is ' + info.height);
   });
 readableStream.pipe(transformer).pipe(writableStream);
+```
+
+```javascript
+// Create a blank 300x200 PNG image of semi-transluent red pixels
+sharp(null, {
+  create: {
+    width: 300,
+    height: 200,
+    channels: 4,
+    background: { r: 255, g: 0, b: 0, alpha: 128 }
+  }
+})
+.png()
+.toBuffer()
+.then( ... );
 ```
 
 -   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters

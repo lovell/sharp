@@ -52,6 +52,10 @@ namespace sharp {
     int rawChannels;
     int rawWidth;
     int rawHeight;
+    int createChannels;
+    int createWidth;
+    int createHeight;
+    double createBackground[4];
 
     InputDescriptor():
       buffer(nullptr),
@@ -59,7 +63,15 @@ namespace sharp {
       density(72),
       rawChannels(0),
       rawWidth(0),
-      rawHeight(0) {}
+      rawHeight(0),
+      createChannels(0),
+      createWidth(0),
+      createHeight(0) {
+        createBackground[0] = 0.0;
+        createBackground[1] = 0.0;
+        createBackground[2] = 0.0;
+        createBackground[3] = 255.0;
+      }
   };
 
   // Convenience methods to access the attributes of a v8::Object
