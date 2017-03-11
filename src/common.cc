@@ -60,6 +60,10 @@ namespace sharp {
       descriptor->rawWidth = AttrTo<uint32_t>(input, "rawWidth");
       descriptor->rawHeight = AttrTo<uint32_t>(input, "rawHeight");
     }
+    // Page
+    if (HasAttr(input, "page")) {
+        descriptor->page = AttrTo<uint32_t>(input, "page");
+    }
     return descriptor;
   }
 
@@ -237,6 +241,10 @@ namespace sharp {
           }
           if (imageType == ImageType::MAGICK) {
             option->set("density", std::to_string(descriptor->density).data());
+          }
+          if (imageType == ImageType::TIFF) {
+            //printf("It is a TIFF File!!  %s", std::to_string(descriptor->page).data());
+            option->set("page", static_cast<int>(descriptor->page));
           }
           image = VImage::new_from_file(descriptor->file.data(), option);
           if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {

@@ -52,6 +52,7 @@ namespace sharp {
     int rawChannels;
     int rawWidth;
     int rawHeight;
+    int page;
 
     InputDescriptor():
       buffer(nullptr),
