@@ -1140,9 +1140,6 @@ NAN_METHOD(pipeline) {
   baton->threshold = AttrTo<int32_t>(options, "threshold");
   baton->thresholdGrayscale = AttrTo<bool>(options, "thresholdGrayscale");
   baton->trimTolerance = AttrTo<int32_t>(options, "trimTolerance");
-  if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL && baton->trimTolerance != 0) {
-    baton->accessMethod = VIPS_ACCESS_RANDOM;
-  }
   baton->gamma = AttrTo<double>(options, "gamma");
   baton->greyscale = AttrTo<bool>(options, "greyscale");
   baton->normalise = AttrTo<bool>(options, "normalise");
@@ -1217,6 +1214,12 @@ NAN_METHOD(pipeline) {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
   }
   baton->tileFormat = AttrAsStr(options, "tileFormat");
+  // Force random access for certain operations
+  if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL && (
+    baton->trimTolerance != 0 || baton->normalise ||
+    baton->crop == 16 || baton->crop == 17)) {
+    baton->accessMethod = VIPS_ACCESS_RANDOM;
+  }
 
   // Function to notify of queue length changes
   Nan::Callback *queueListener = new Nan::Callback(AttrAs<v8::Function>(options, "queueListener"));
