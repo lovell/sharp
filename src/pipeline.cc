@@ -392,7 +392,10 @@ class PipelineWorker : public Nan::AsyncWorker {
         if (yresidual < 1.0 || xresidual < 1.0) {
           VipsKernel kernel = static_cast<VipsKernel>(
             vips_enum_from_nick(nullptr, VIPS_TYPE_KERNEL, baton->kernel.data()));
-          if (kernel != VIPS_KERNEL_CUBIC && kernel != VIPS_KERNEL_LANCZOS2 && kernel != VIPS_KERNEL_LANCZOS3) {
+          if (
+            kernel != VIPS_KERNEL_NEAREST && kernel != VIPS_KERNEL_CUBIC && kernel != VIPS_KERNEL_LANCZOS2 &&
+            kernel != VIPS_KERNEL_LANCZOS3
+          ) {
             throw vips::VError("Unknown kernel");
           }
           if (yresidual < 1.0) {
