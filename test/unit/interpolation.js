@@ -8,6 +8,7 @@ const fixtures = require('../fixtures');
 describe('Interpolators and kernels', function () {
   describe('Reducers', function () {
     [
+      sharp.kernel.nearest,
       sharp.kernel.cubic,
       sharp.kernel.lanczos2,
       sharp.kernel.lanczos3
