@@ -14,6 +14,10 @@ Requires libvips v8.4.2.
   [#470](https://github.com/lovell/sharp/issues/470)
   [@pjarts](https://github.com/pjarts)
 
+* Add support for the "nearest" kernel for image reductions.
+  [#732](https://github.com/lovell/sharp/pull/732)
+  [@alice0meta](https://github.com/alice0meta)
+
 #### v0.17.2 - 11<sup>th</sup> February 2017
 
 * Ensure Readable side of Stream can start flowing after Writable side has finished.

@@ -97,6 +97,7 @@ the help and code contributions of the following people:
 * [Matthias Thoemmes](https://github.com/cmtt)
 * [Patrick Paskaris](https://github.com/ppaskaris)
 * [Jérémy Lal](https://github.com/kapouer)
+* [Alice Monday](https://github.com/alice0meta)
 
 Thank you!
 
