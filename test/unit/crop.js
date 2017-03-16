@@ -191,6 +191,22 @@ describe('Crop', function () {
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
+
+    it('supports the strategy passed as a string', function (done) {
+      sharp(fixtures.inputPngWithTransparency)
+        .resize(320, 80)
+        .crop('entropy')
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(4, info.channels);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80, info.height);
+          assert.strictEqual(0, info.cropCalcLeft);
+          assert.strictEqual(80, info.cropCalcTop);
+          fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
+        });
+    });
   });
 
   describe('Attention strategy', function () {
@@ -214,6 +230,22 @@ describe('Crop', function () {
       sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80)
         .crop(sharp.strategy.attention)
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(4, info.channels);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80, info.height);
+          assert.strictEqual(0, info.cropCalcLeft);
+          assert.strictEqual(80, info.cropCalcTop);
+          fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
+        });
+    });
+
+    it('supports the strategy passed as a string', function (done) {
+      sharp(fixtures.inputPngWithTransparency)
+        .resize(320, 80)
+        .crop('attention')
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('png', info.format);
