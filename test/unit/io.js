@@ -861,6 +861,36 @@ describe('Input/output', function () {
     });
   });
 
+  it('TIFF lzw compression does not throw error', function() {
+    assert.doesNotThrow(function () {
+      sharp().tiff({compression:'lzw'});
+    });
+  });
+
+  it('TIFF deflate compression does not throw error', function() {
+    assert.doesNotThrow(function () {
+      sharp().tiff({compression:'deflate'});
+    });
+  });
+
+  it('TIFF zip compression does not throw error', function() {
+    assert.doesNotThrow(function () {
+      sharp().tiff({compression:'zip'});
+    });
+  });
+
+  it('TIFF invalid compression option throws', function() {
+    assert.throws(function () {
+      sharp().tiff({compression:0});
+    });
+  });
+
+  it('TIFF invalid compression option throws', function() {
+    assert.throws(function () {
+      sharp().tiff({compression:'a'});
+    });
+  })
+
   it('Input and output formats match when not forcing', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
