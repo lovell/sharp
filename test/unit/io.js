@@ -889,7 +889,31 @@ describe('Input/output', function () {
     assert.throws(function () {
       sharp().tiff({compression:'a'});
     });
-  })
+  });
+
+  it('TIFF invalid predictor option throws', function() {
+    assert.throws(function () {
+      sharp().tiff({predictor:'a'});
+    });
+  });
+
+  it('TIFF horizontal predictor does not throw error', function() {
+    assert.doesNotThrow(function () {
+      sharp().tiff({predictor:'horizontal'});
+    });
+  });
+
+  it('TIFF float predictor does not throw error', function() {
+    assert.doesNotThrow(function () {
+      sharp().tiff({predictor:'float'});
+    });
+  });
+
+  it('TIFF none predictor does not throw error', function() {
+    assert.doesNotThrow(function () {
+      sharp().tiff({predictor:'none'});
+    });
+  });
 
   it('Input and output formats match when not forcing', function (done) {
     sharp(fixtures.inputJpg)
