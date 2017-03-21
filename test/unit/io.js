@@ -861,57 +861,57 @@ describe('Input/output', function () {
     });
   });
 
-  it('TIFF lzw compression does not throw error', function() {
+  it('TIFF lzw compression does not throw error', function () {
     assert.doesNotThrow(function () {
-      sharp().tiff({compression:'lzw'});
+      sharp().tiff({ compression: 'lzw' });
     });
   });
 
-  it('TIFF deflate compression does not throw error', function() {
+  it('TIFF deflate compression does not throw error', function () {
     assert.doesNotThrow(function () {
-      sharp().tiff({compression:'deflate'});
+      sharp().tiff({ compression: 'deflate' });
     });
   });
 
-  it('TIFF zip compression does not throw error', function() {
+  it('TIFF zip compression does not throw error', function () {
     assert.doesNotThrow(function () {
-      sharp().tiff({compression:'zip'});
+      sharp().tiff({ compression: 'zip' });
     });
   });
 
-  it('TIFF invalid compression option throws', function() {
+  it('TIFF invalid compression option throws', function () {
     assert.throws(function () {
-      sharp().tiff({compression:0});
+      sharp().tiff({ compression: 0 });
     });
   });
 
-  it('TIFF invalid compression option throws', function() {
+  it('TIFF invalid compression option throws', function () {
     assert.throws(function () {
-      sharp().tiff({compression:'a'});
+      sharp().tiff({ compression: 'a' });
     });
   });
 
-  it('TIFF invalid predictor option throws', function() {
+  it('TIFF invalid predictor option throws', function () {
     assert.throws(function () {
-      sharp().tiff({predictor:'a'});
+      sharp().tiff({ predictor: 'a' });
     });
   });
 
-  it('TIFF horizontal predictor does not throw error', function() {
+  it('TIFF horizontal predictor does not throw error', function () {
     assert.doesNotThrow(function () {
-      sharp().tiff({predictor:'horizontal'});
+      sharp().tiff({ predictor: 'horizontal' });
     });
   });
 
-  it('TIFF float predictor does not throw error', function() {
+  it('TIFF float predictor does not throw error', function () {
     assert.doesNotThrow(function () {
-      sharp().tiff({predictor:'float'});
+      sharp().tiff({ predictor: 'float' });
     });
   });
 
-  it('TIFF none predictor does not throw error', function() {
+  it('TIFF none predictor does not throw error', function () {
     assert.doesNotThrow(function () {
-      sharp().tiff({predictor:'none'});
+      sharp().tiff({ predictor: 'none' });
     });
   });
 
