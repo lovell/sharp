@@ -1200,7 +1200,7 @@ NAN_METHOD(pipeline) {
   baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
   // tiff compression options
-  std::string tiffCompression = AttrAsStr(options, "tileCompression");
+  std::string tiffCompression = AttrAsStr(options, "tiffCompression");
   if (tiffCompression == "deflate" || tiffCompression == "zip") {
     baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_DEFLATE;
   } else if (tiffCompression == "lzw"){
