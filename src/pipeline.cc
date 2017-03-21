@@ -839,13 +839,10 @@ class PipelineWorker : public Nan::AsyncWorker {
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
           // Write TIFF to file
-          VipsForeignTiffCompression compression = baton->tiffCompression == "deflate" ? VIPS_FOREIGN_TIFF_COMPRESSION_DEFLATE :
-            baton->tiffCompression == "lzw" ? VIPS_FOREIGN_TIFF_COMPRESSION_LZW :
-            VIPS_FOREIGN_TIFF_COMPRESSION_JPEG;
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
-            ->set("compression", compression));
+            ->set("compression", baton->tiffCompression));
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
@@ -1202,6 +1199,17 @@ NAN_METHOD(pipeline) {
   baton->webpLossless = AttrTo<bool>(options, "webpLossless");
   baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
+  // tiff compression options
+  std::string tiffCompression = AttrAsStr(options, "tileCompression");
+  if (tiffCompression == "deflate" || tiffCompression == "zip") {
+    baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_DEFLATE;
+  } else if (tiffCompression == "lzw"){
+    baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_LZW;
+  } else {
+    baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_JPEG;
+  }
+
+
   // Tile output
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");
