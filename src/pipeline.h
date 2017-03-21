@@ -104,6 +104,7 @@ struct PipelineBaton {
   bool webpNearLossless;
   bool webpLossless;
   int tiffQuality;
+  VipsForeignTiffCompression tiffCompression;
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
