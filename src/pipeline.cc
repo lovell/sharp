@@ -1204,7 +1204,7 @@ NAN_METHOD(pipeline) {
   std::string tiffCompression = AttrAsStr(options, "tiffCompression");
   if (tiffCompression == "deflate") {
     baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_DEFLATE;
-  } else if (tiffCompression == "lzw"){
+  } else if (tiffCompression == "lzw") {
     baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_LZW;
   } else {
     baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_JPEG;
@@ -1212,7 +1212,7 @@ NAN_METHOD(pipeline) {
   std::string tiffPredictor = AttrAsStr(options, "tiffPredictor");
   if (tiffPredictor == "horizontal") {
     baton->tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL;
-  } else if (tiffPredictor == "float"){
+  } else if (tiffPredictor == "float") {
     baton->tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT;
   } else {
     baton->tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_NONE;

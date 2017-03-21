@@ -873,12 +873,6 @@ describe('Input/output', function () {
     });
   });
 
-  it('TIFF zip compression does not throw error', function () {
-    assert.doesNotThrow(function () {
-      sharp().tiff({ compression: 'zip' });
-    });
-  });
-
   it('TIFF invalid compression option throws', function () {
     assert.throws(function () {
       sharp().tiff({ compression: 0 });
