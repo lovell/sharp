@@ -173,6 +173,7 @@ struct PipelineBaton {
     pngAdaptiveFiltering(true),
     webpQuality(80),
     tiffQuality(80),
+    tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
     withMetadata(false),
     withMetadataOrientation(-1),
     convKernelWidth(0),
