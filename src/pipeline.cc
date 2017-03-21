@@ -1201,12 +1201,20 @@ NAN_METHOD(pipeline) {
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
   // tiff compression options
   std::string tiffCompression = AttrAsStr(options, "tiffCompression");
-  if (tiffCompression == "deflate" || tiffCompression == "zip") {
+  if (tiffCompression == "deflate") {
     baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_DEFLATE;
   } else if (tiffCompression == "lzw"){
     baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_LZW;
   } else {
     baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_JPEG;
+  }
+  std::string tiffPredictor = AttrAsStr(options, "tiffPredictor");
+  if (tiffPredictor == "horizontal") {
+    baton->tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL;
+  } else if (tiffPredictor == "float"){
+    baton->tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT;
+  } else {
+    baton->tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_NONE;
   }
 
 
