@@ -839,10 +839,13 @@ class PipelineWorker : public Nan::AsyncWorker {
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
           // Write TIFF to file
+          VipsForeignTiffCompression compression = baton->tiffCompression == "deflate" ? VIPS_FOREIGN_TIFF_COMPRESSION_DEFLATE :
+            baton->tiffCompression == "lzw" ? VIPS_FOREIGN_TIFF_COMPRESSION_LZW :
+            VIPS_FOREIGN_TIFF_COMPRESSION_JPEG;
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
-            ->set("compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG));
+            ->set("compression", compression));
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
