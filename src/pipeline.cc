@@ -842,7 +842,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
-            ->set("compression", baton->tiffCompression));
+            ->set("compression", baton->tiffCompression)
+            ->set("predictor", baton->tiffPredictor) );
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
