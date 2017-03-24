@@ -58,6 +58,11 @@ namespace sharp {
   VImage Normalise(VImage image);
 
   /*
+   * Linear adjustment (a * in + b)
+   */
+  VImage Linear(VImage image, double const a, double const b);
+
+  /*
    * Gamma encoding/decoding
    */
   VImage Gamma(VImage image, double const exponent);

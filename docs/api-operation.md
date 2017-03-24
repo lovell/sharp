@@ -12,6 +12,7 @@
 -   [flatten](#flatten)
 -   [trim](#trim)
 -   [gamma](#gamma)
+-   [linear](#linear)
 -   [negate](#negate)
 -   [normalise](#normalise)
 -   [normalize](#normalize)
@@ -212,6 +213,20 @@ when applying a gamma correction.
 **Parameters**
 
 -   `gamma` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** value between 1.0 and 3.0. (optional, default `2.2`)
+
+
+-   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+
+Returns **Sharp** 
+
+## linear
+
+Apply the linear formula a \* input + b to the image (levels adjustment)
+
+**Parameters**
+
+-   `a` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** multiplier (optional, default `1.0`)
+-   `b` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** offset (optional, default `0.0`)
 
 
 -   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
