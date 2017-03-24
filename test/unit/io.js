@@ -861,10 +861,11 @@ describe('Input/output', function () {
     });
   });
 
-  if('TIFF lzw compression shrinks test file', function () {
+  it('TIFF lzw compression shrinks test file', function (done) {
     let startSize;
-    const image = sharp(fixtures.inputUncompressedTiff)
+    sharp(fixtures.inputUncompressedTiff)
           .toBuffer((err, buffer, info) => {
+            if (err) throw err;
             startSize = info.size;
           })
           .tiff({
@@ -873,6 +874,7 @@ describe('Input/output', function () {
             predictor: 'horizontal'
           })
           .toBuffer((err, buffer, info) => {
+            if (err) throw err;
             assert.strictEqual('jpeg', info.format);
             assert(info.size < startSize);
             done();

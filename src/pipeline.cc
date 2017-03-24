@@ -1201,25 +1201,12 @@ NAN_METHOD(pipeline) {
   baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
   // tiff compression options
-  VipsForeignTiffCompression tiffCompression = static_cast<VipsForeignTiffCompression>(
-            vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_COMPRESSION, baton->tiffCompression.data()));
-  // std::string tiffCompression = AttrAsStr(options, "tiffCompression");
-  // if (tiffCompression == "deflate") {
-  //   baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_DEFLATE;
-  // } else if (tiffCompression == "lzw") {
-  //   baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_LZW;
-  // } else {
-  //   baton->tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_JPEG;
-  // }
-  std::string tiffPredictor = AttrAsStr(options, "tiffPredictor");
-  if (tiffPredictor == "horizontal") {
-    baton->tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL;
-  } else if (tiffPredictor == "float") {
-    baton->tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT;
-  } else {
-    baton->tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_NONE;
-  }
-
+  baton->tiffCompression = static_cast<VipsForeignTiffCompression>(
+  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_COMPRESSION,
+    AttrAsStr(options, "tiffCompression").data()));
+  baton->tiffPredictor = static_cast<VipsForeignTiffPredictor>(
+  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_PREDICTOR,
+    AttrAsStr(options, "tiffPredictor").data()));
 
   // Tile output
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
