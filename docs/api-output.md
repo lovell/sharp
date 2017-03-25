@@ -27,7 +27,8 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 -   `fileOut` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to write the image data to.
 -   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** called on completion with two arguments `(err, info)`.
-    `info` contains the output image `format`, `size` (bytes), `width`, `height` and `channels`.
+    `info` contains the output image `format`, `size` (bytes), `width`, `height`,
+    `channels` and `premultiplied` (indicating if premultiplication was used).
 
 
 -   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
@@ -44,7 +45,8 @@ By default, the format will match the input image, except GIF and SVG input whic
 
 -   `err` is an error, if any.
 -   `data` is the output image data.
--   `info` contains the output image `format`, `size` (bytes), `width`, `height` and `channels`.
+-   `info` contains the output image `format`, `size` (bytes), `width`, `height`,
+    `channels` and `premultiplied` (indicating if premultiplication was used).
     A Promise is returned when `callback` is not provided.
 
 **Parameters**
