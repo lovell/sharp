@@ -863,11 +863,11 @@ describe('Input/output', function () {
 
   it('TIFF lzw compression shrinks test file', function (done) {
     let startSize;
+    fs.statSync(fixtures.inputUncompressedTiff, (err, stats) => {
+      if (err) throw err;
+      startSize = stats.size;
+    });
     sharp(fixtures.inputUncompressedTiff)
-          .toBuffer((err, buffer, info) => {
-            if (err) throw err;
-            startSize = info.size;
-          })
           .tiff({
             compression: 'lzw',
             force: true,
