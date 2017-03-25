@@ -29,67 +29,32 @@ using vips::VError;
 namespace sharp {
 
   /*
-    Alpha composite src over dst with given gravity.
-    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
+    Composite overlayImage over image at given position
+    Assumes alpha channels are already premultiplied and will be unpremultiplied after
    */
-  VImage Composite(VImage src, VImage dst, const int gravity) {
-    if (IsInputValidForComposition(src, dst)) {
-      // Enlarge overlay src, if required
-      if (src.width() < dst.width() || src.height() < dst.height()) {
-        // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
-        int left;
-        int top;
-        std::tie(left, top) = CalculateCrop(dst.width(), dst.height(), src.width(), src.height(), gravity);
-        // Embed onto transparent background
-        std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
-        src = src.embed(left, top, dst.width(), dst.height(), VImage::option()
+  VImage Composite(VImage image, VImage overlayImage, int const left, int const top) {
+    if (HasAlpha(overlayImage)) {
+      // Alpha composite
+      if (overlayImage.width() < image.width() || overlayImage.height() < image.height()) {
+        // Enlarge overlay
+        std::vector<double> const background { 0.0, 0.0, 0.0, 0.0 };
+        overlayImage = overlayImage.embed(left, top, image.width(), image.height(), VImage::option()
           ->set("extend", VIPS_EXTEND_BACKGROUND)
           ->set("background", background));
       }
-      return CompositeImage(src, dst);
-    }
-    // If the input was not valid for composition the return the input image itself
-    return dst;
-  }
-
-  VImage Composite(VImage src, VImage dst, const int x, const int y) {
-    if (IsInputValidForComposition(src, dst)) {
-      // Enlarge overlay src, if required
-      if (src.width() < dst.width() || src.height() < dst.height()) {
-        // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
-        int left;
-        int top;
-        std::tie(left, top) = CalculateCrop(dst.width(), dst.height(), src.width(), src.height(), x, y);
-        // Embed onto transparent background
-        std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
-        src = src.embed(left, top, dst.width(), dst.height(), VImage::option()
-          ->set("extend", VIPS_EXTEND_BACKGROUND)
-          ->set("background", background));
+      return AlphaComposite(image, overlayImage);
+    } else {
+      if (HasAlpha(image)) {
+        // Add alpha channel to overlayImage so channels match
+        double const multiplier = sharp::Is16Bit(overlayImage.interpretation()) ? 256.0 : 1.0;
+        overlayImage = overlayImage.bandjoin(
+          VImage::new_matrix(overlayImage.width(), overlayImage.height()).new_from_image(255 * multiplier));
       }
-      return CompositeImage(src, dst);
+      return image.insert(overlayImage, left, top);
     }
-    // If the input was not valid for composition the return the input image itself
-    return dst;
   }
 
-  bool IsInputValidForComposition(VImage src, VImage dst) {
-    using sharp::CalculateCrop;
-    using sharp::HasAlpha;
-
-    if (!HasAlpha(src)) {
-      throw VError("Overlay image must have an alpha channel");
-    }
-    if (!HasAlpha(dst)) {
-      throw VError("Image to be overlaid must have an alpha channel");
-    }
-    if (src.width() > dst.width() || src.height() > dst.height()) {
-      throw VError("Overlay image must have same dimensions or smaller");
-    }
-
-    return true;
-  }
-
-  VImage CompositeImage(VImage src, VImage dst) {
+  VImage AlphaComposite(VImage dst, VImage src) {
     // Split src into non-alpha and alpha channels
     VImage srcWithoutAlpha = src.extract_band(0, VImage::option()->set("n", src.bands() - 1));
     VImage srcAlpha = src[src.bands() - 1] * (1.0 / 255.0);

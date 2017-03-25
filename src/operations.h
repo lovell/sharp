@@ -32,20 +32,14 @@ namespace sharp {
   VImage Composite(VImage src, VImage dst, const int gravity);
 
   /*
-    Alpha composite src over dst with given x and y offsets.
-    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
+    Composite overlayImage over image at given position
    */
-  VImage Composite(VImage src, VImage dst, const int x, const int y);
+  VImage Composite(VImage image, VImage overlayImage, int const x, int const y);
 
   /*
-    Check if the src and dst Images for composition operation are valid
+    Alpha composite overlayImage over image, assumes matching dimensions
   */
-  bool IsInputValidForComposition(VImage src, VImage dst);
-
-  /*
-    Given a valid src and dst, returns the composite of the two images
-  */
-  VImage CompositeImage(VImage src, VImage dst);
+  VImage AlphaComposite(VImage image, VImage overlayImage);
 
   /*
     Cutout src over dst with given gravity.

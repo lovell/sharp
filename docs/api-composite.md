@@ -11,6 +11,8 @@ Overlay (composite) an image over the processed (resized, extracted etc.) image.
 The overlay image must be the same size or smaller than the processed image.
 If both `top` and `left` options are provided, they take precedence over `gravity`.
 
+If the overlay image contains an alpha channel then composition with premultiplication will occur.
+
 **Parameters**
 
 -   `overlay` **([Buffer](https://nodejs.org/api/buffer.html) \| [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String))** Buffer containing image data or String containing the path to an image file.
