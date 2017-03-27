@@ -83,9 +83,8 @@ cd /usr/ports/graphics/vips/ && make install clean
 
 ### Heroku
 
-[Alessandro Tagliapietra](https://github.com/alex88) maintains an
-[Heroku buildpack for libvips](https://github.com/alex88/heroku-buildpack-vips)
-and its dependencies.
+Set [NODE_MODULES_CACHE](https://devcenter.heroku.com/articles/nodejs-support#cache-behavior)
+to `false` when using the `yarn` package manager.
 
 ### Docker
 
