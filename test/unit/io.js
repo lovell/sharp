@@ -862,19 +862,26 @@ describe('Input/output', function () {
   });
 
   it('TIFF lzw compression shrinks test file', function (done) {
-    const startSize = fs.statSync(fixtures.inputUncompressedTiff).size;
-    sharp(fixtures.inputUncompressedTiff)
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
           .tiff({
             compression: 'lzw',
             force: true,
             predictor: 'horizontal'
           })
-          .toBuffer((err, buffer, info) => {
+          .toFile(fixtures.outputTiff, (err, info) => {
             if (err) throw err;
-            assert.strictEqual('jpeg', info.format);
+            assert.strictEqual('tiff', info.format);
             assert(info.size < startSize);
+            fs.unlinkSync(fixtures.outputTiff);
             done();
           });
+  });
+
+  it('TIFF none compression does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ compression: 'none' });
+    });
   });
 
   it('TIFF lzw compression does not throw error', function () {
