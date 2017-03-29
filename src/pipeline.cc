@@ -842,7 +842,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
-            ->set("compression", VIPS_FOREIGN_TIFF_COMPRESSION_JPEG));
+            ->set("compression", baton->tiffCompression)
+            ->set("predictor", baton->tiffPredictor) );
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
@@ -1199,6 +1200,14 @@ NAN_METHOD(pipeline) {
   baton->webpLossless = AttrTo<bool>(options, "webpLossless");
   baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
+  // tiff compression options
+  baton->tiffCompression = static_cast<VipsForeignTiffCompression>(
+  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_COMPRESSION,
+    AttrAsStr(options, "tiffCompression").data()));
+  baton->tiffPredictor = static_cast<VipsForeignTiffPredictor>(
+  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_PREDICTOR,
+    AttrAsStr(options, "tiffPredictor").data()));
+
   // Tile output
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");

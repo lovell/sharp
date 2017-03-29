@@ -861,6 +861,130 @@ describe('Input/output', function () {
     });
   });
 
+  it('TIFF lzw compression with horizontal predictor shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+          .tiff({
+            compression: 'lzw',
+            force: true,
+            // note: lzw compression is imperfect and sometimes
+            // generates larger files, as it does with this input
+            // if no predictor is used.
+            predictor: 'horizontal'
+          })
+          .toFile(fixtures.outputTiff, (err, info) => {
+            if (err) throw err;
+            assert.strictEqual('tiff', info.format);
+            assert(info.size < startSize);
+            fs.unlinkSync(fixtures.outputTiff);
+            done();
+          });
+  });
+
+  it('TIFF deflate compression with hoizontal predictor shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+          .tiff({
+            compression: 'deflate',
+            force: true,
+            predictor: 'horizontal'
+          })
+          .toFile(fixtures.outputTiff, (err, info) => {
+            if (err) throw err;
+            assert.strictEqual('tiff', info.format);
+            assert(info.size < startSize);
+            fs.unlinkSync(fixtures.outputTiff);
+            done();
+          });
+  });
+
+  it('TIFF deflate compression without predictor shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+          .tiff({
+            compression: 'deflate',
+            force: true,
+            predictor: 'none'
+          })
+          .toFile(fixtures.outputTiff, (err, info) => {
+            if (err) throw err;
+            assert.strictEqual('tiff', info.format);
+            assert(info.size < startSize);
+            fs.unlinkSync(fixtures.outputTiff);
+            done();
+          });
+  });
+
+  it('TIFF jpeg compression shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+          .tiff({
+            compression: 'jpeg',
+            force: true
+          })
+          .toFile(fixtures.outputTiff, (err, info) => {
+            if (err) throw err;
+            assert.strictEqual('tiff', info.format);
+            assert(info.size < startSize);
+            fs.unlinkSync(fixtures.outputTiff);
+            done();
+          });
+  });
+
+  it('TIFF none compression does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ compression: 'none' });
+    });
+  });
+
+  it('TIFF lzw compression does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ compression: 'lzw' });
+    });
+  });
+
+  it('TIFF deflate compression does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ compression: 'deflate' });
+    });
+  });
+
+  it('TIFF invalid compression option throws', function () {
+    assert.throws(function () {
+      sharp().tiff({ compression: 0 });
+    });
+  });
+
+  it('TIFF invalid compression option throws', function () {
+    assert.throws(function () {
+      sharp().tiff({ compression: 'a' });
+    });
+  });
+
+  it('TIFF invalid predictor option throws', function () {
+    assert.throws(function () {
+      sharp().tiff({ predictor: 'a' });
+    });
+  });
+
+  it('TIFF horizontal predictor does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ predictor: 'horizontal' });
+    });
+  });
+
+  it('TIFF float predictor does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ predictor: 'float' });
+    });
+  });
+
+  it('TIFF none predictor does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ predictor: 'none' });
+    });
+  });
+
   it('Input and output formats match when not forcing', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
