@@ -84,7 +84,7 @@ cd /usr/ports/graphics/vips/ && make install clean
 ### Heroku
 
 libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 22MB.
+This involves an automated HTTPS download of approximately 6.5MB.
 
 Set [NODE_MODULES_CACHE](https://devcenter.heroku.com/articles/nodejs-support#cache-behavior)
 to `false` when using the `yarn` package manager.
