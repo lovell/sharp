@@ -1168,7 +1168,7 @@ describe('Input/output', function () {
       sharp(fixtures.inputJpg).metadata(function (err, metadata) {
         if (err) throw err;
         sharp(fixtures.inputJpg)
-          .limitInputPixels(metadata.width * metadata.height - 1)
+          .limitInputPixels((metadata.width * metadata.height) - 1)
           .toBuffer(function (err) {
             assert.strictEqual(true, !!err);
             done();

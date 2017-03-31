@@ -25,8 +25,8 @@ const fingerprint = function (image, callback) {
         let fingerprint = '';
         for (let col = 0; col < 8; col++) {
           for (let row = 0; row < 8; row++) {
-            const left = data[row * 8 + col];
-            const right = data[row * 8 + col + 1];
+            const left = data[(row * 8) + col];
+            const right = data[(row * 8) + col + 1];
             fingerprint = fingerprint + (left < right ? '1' : '0');
           }
         }

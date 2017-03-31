@@ -17,6 +17,7 @@ By default, the resized image is centre cropped to the exact size specified.
 
 Possible reduction kernels are:
 
+-   `nearest`: Use [nearest neighbour interpolation](http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation).
 -   `cubic`: Use a [Catmull-Rom spline](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline).
 -   `lanczos2`: Use a [Lanczos kernel](https://en.wikipedia.org/wiki/Lanczos_resampling#Lanczos_kernel) with `a=2`.
 -   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).

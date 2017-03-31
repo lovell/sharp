@@ -187,7 +187,7 @@ describe('Tile', function () {
           assert.strictEqual(2225, info.height);
           assert.strictEqual(3, info.channels);
           assert.strictEqual('undefined', typeof info.size);
-          assertDeepZoomTiles(directory, 512 + 2 * 16, 13, done);
+          assertDeepZoomTiles(directory, 512 + (2 * 16), 13, done);
         });
     });
   });

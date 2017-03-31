@@ -136,6 +136,8 @@ Use these TIFF options for output image.
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** output options
     -   `options.quality` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** quality, integer 1-100 (optional, default `80`)
     -   `options.force` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** force TIFF output, otherwise attempt to use input format (optional, default `true`)
+    -   `options.compression` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** compression options: lzw, deflate, jpeg (optional, default `'jpeg'`)
+    -   `options.predictor` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** compression predictor options: none, horizontal, float (optional, default `'none'`)
 
 
 -   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid options

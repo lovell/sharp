@@ -15,7 +15,7 @@ const min = 320;
 const max = 960;
 
 const randomDimension = function () {
-  return Math.ceil(Math.random() * (max - min) + min);
+  return Math.ceil((Math.random() * (max - min)) + min);
 };
 
 new Benchmark.Suite('random').add('imagemagick', {
