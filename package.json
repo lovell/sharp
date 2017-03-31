@@ -33,7 +33,8 @@
     "Patrick Paskaris <patrick@paskaris.gr>",
     "Jérémy Lal <kapouer@melix.org>",
     "Rahul Nanwani <r.nanwani@gmail.com>",
-    "Alice Monday <alice0meta@gmail.com>"
+    "Alice Monday <alice0meta@gmail.com>",
+    "Kristo Jorgenson <kristo.jorgenson@gmail.com>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",

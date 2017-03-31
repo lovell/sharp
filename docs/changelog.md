@@ -18,6 +18,10 @@ Requires libvips v8.4.2.
   [#732](https://github.com/lovell/sharp/pull/732)
   [@alice0meta](https://github.com/alice0meta)
 
+* Add support for TIFF compression and predictor options.
+  [#738](https://github.com/lovell/sharp/pull/738)
+  [@kristojorg](https://github.com/kristojorg)
+
 #### v0.17.2 - 11<sup>th</sup> February 2017
 
 * Ensure Readable side of Stream can start flowing after Writable side has finished.

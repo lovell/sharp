@@ -98,6 +98,7 @@ the help and code contributions of the following people:
 * [Patrick Paskaris](https://github.com/ppaskaris)
 * [Jérémy Lal](https://github.com/kapouer)
 * [Alice Monday](https://github.com/alice0meta)
+* [Kristo Jorgenson](https://github.com/kristojorg)
 
 Thank you!
 
