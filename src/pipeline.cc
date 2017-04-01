@@ -838,6 +838,10 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
+          // Cast pixel values to float, if required
+          if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
+            image = image.cast(VIPS_FORMAT_FLOAT);
+          }
           // Write TIFF to file
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)

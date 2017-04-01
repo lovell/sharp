@@ -864,71 +864,75 @@ describe('Input/output', function () {
   it('TIFF lzw compression with horizontal predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
-          .tiff({
-            compression: 'lzw',
-            force: true,
-            // note: lzw compression is imperfect and sometimes
-            // generates larger files, as it does with this input
-            // if no predictor is used.
-            predictor: 'horizontal'
-          })
-          .toFile(fixtures.outputTiff, (err, info) => {
-            if (err) throw err;
-            assert.strictEqual('tiff', info.format);
-            assert(info.size < startSize);
-            fs.unlinkSync(fixtures.outputTiff);
-            done();
-          });
+      .tiff({
+        compression: 'lzw',
+        predictor: 'horizontal'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
   });
 
   it('TIFF deflate compression with hoizontal predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
-          .tiff({
-            compression: 'deflate',
-            force: true,
-            predictor: 'horizontal'
-          })
-          .toFile(fixtures.outputTiff, (err, info) => {
-            if (err) throw err;
-            assert.strictEqual('tiff', info.format);
-            assert(info.size < startSize);
-            fs.unlinkSync(fixtures.outputTiff);
-            done();
-          });
+      .tiff({
+        compression: 'deflate',
+        predictor: 'horizontal'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('TIFF deflate compression with float predictor shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+      .tiff({
+        compression: 'deflate',
+        predictor: 'float'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
   });
 
   it('TIFF deflate compression without predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
-          .tiff({
-            compression: 'deflate',
-            force: true,
-            predictor: 'none'
-          })
-          .toFile(fixtures.outputTiff, (err, info) => {
-            if (err) throw err;
-            assert.strictEqual('tiff', info.format);
-            assert(info.size < startSize);
-            fs.unlinkSync(fixtures.outputTiff);
-            done();
-          });
+      .tiff({
+        compression: 'deflate',
+        predictor: 'none'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
   });
 
   it('TIFF jpeg compression shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
-          .tiff({
-            compression: 'jpeg',
-            force: true
-          })
-          .toFile(fixtures.outputTiff, (err, info) => {
-            if (err) throw err;
-            assert.strictEqual('tiff', info.format);
-            assert(info.size < startSize);
-            fs.unlinkSync(fixtures.outputTiff);
-            done();
-          });
+      .tiff({
+        compression: 'jpeg'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
   });
 
   it('TIFF none compression does not throw error', function () {
