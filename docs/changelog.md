@@ -4,7 +4,7 @@
 
 Requires libvips v8.4.2.
 
-#### v0.17.3 - TBD
+#### v0.17.3 - 1<sup>st</sup> April 2017
 
 * Allow toBuffer to optionally resolve a Promise with both info and data.
   [#143](https://github.com/lovell/sharp/issues/143)
