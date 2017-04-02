@@ -16,25 +16,26 @@ export CFLAGS="${FLAGS}"
 export CXXFLAGS="${FLAGS}"
 
 # Dependency version numbers
-VERSION_ZLIB=1.2.10
+VERSION_ZLIB=1.2.11
 VERSION_FFI=3.2.1
-VERSION_GLIB=2.50.1
+VERSION_GLIB=2.52.0
 VERSION_XML2=2.9.4
-VERSION_GSF=1.14.40
+VERSION_GSF=1.14.41
 VERSION_EXIF=0.6.21
 VERSION_LCMS2=2.8
 VERSION_JPEG=1.5.1
 VERSION_PNG16=1.6.28
-VERSION_WEBP=0.5.1
-VERSION_TIFF=4.0.6
+VERSION_WEBP=0.6.0
+VERSION_TIFF=4.0.7
 VERSION_ORC=0.4.26
-VERSION_GDKPIXBUF=2.36.0
-VERSION_FREETYPE=2.7
+VERSION_GDKPIXBUF=2.36.6
+VERSION_FREETYPE=2.7.1
+VERSION_EXPAT=2.2.0
 VERSION_FONTCONFIG=2.12.1
-VERSION_HARFBUZZ=1.3.2
+VERSION_HARFBUZZ=1.4.5
 VERSION_PIXMAN=0.34.0
-VERSION_CAIRO=1.14.6
-VERSION_PANGO=1.40.3
+VERSION_CAIRO=1.14.8
+VERSION_PANGO=1.40.4
 VERSION_CROCO=0.6.11
 VERSION_SVG=2.40.16
 VERSION_GIF=5.1.4
@@ -56,11 +57,12 @@ cd ${DEPS}/ffi
 make install-strip
 
 mkdir ${DEPS}/glib
-curl -Ls https://download.gnome.org/sources/glib/2.50/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
+curl -Ls https://download.gnome.org/sources/glib/2.52/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
 cd ${DEPS}/glib
 echo glib_cv_stack_grows=no >>glib.cache
 echo glib_cv_uscore=no >>glib.cache
-./configure --cache-file=glib.cache --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --with-pcre=internal --disable-libmount
+./configure --cache-file=glib.cache --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
+  --with-pcre=internal --disable-libmount
 make install-strip
 
 mkdir ${DEPS}/xml2
@@ -87,6 +89,9 @@ make install-strip
 mkdir ${DEPS}/lcms2
 curl -Ls http://${SOURCEFORGE_MIRROR}.dl.sourceforge.net/project/lcms/lcms/${VERSION_LCMS2}/lcms2-${VERSION_LCMS2}.tar.gz | tar xzC ${DEPS}/lcms2 --strip-components=1
 cd ${DEPS}/lcms2
+# Apply patches for lcms2 vulnerabilities reported since v2.8
+VERSION_LCMS2_GIT_MASTER_SHA=$(curl -Ls https://api.github.com/repos/mm2/Little-CMS/git/refs/heads/master | jq -r '.object.sha' | head -c7)
+curl -Ls https://github.com/mm2/Little-CMS/compare/lcms2.8...master.patch | patch -p1 -t || true
 ./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking
 make install-strip
 
@@ -106,15 +111,16 @@ make install-strip
 mkdir ${DEPS}/webp
 curl -Ls http://downloads.webmproject.org/releases/webp/libwebp-${VERSION_WEBP}.tar.gz | tar xzC ${DEPS}/webp --strip-components=1
 cd ${DEPS}/webp
-./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --disable-neon
+./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
+  --disable-neon --enable-libwebpmux
 make install-strip
 
 mkdir ${DEPS}/tiff
 curl -Ls http://download.osgeo.org/libtiff/tiff-${VERSION_TIFF}.tar.gz | tar xzC ${DEPS}/tiff --strip-components=1
 cd ${DEPS}/tiff
-# Apply patches for various libtiff security vulnerabilities reported since v4.0.6
+# Apply patches for libtiff vulnerabilities reported since v4.0.7
 VERSION_TIFF_GIT_MASTER_SHA=$(curl -Ls https://api.github.com/repos/vadz/libtiff/git/refs/heads/master | jq -r '.object.sha' | head -c7)
-curl -Ls https://github.com/vadz/libtiff/compare/Release-v4-0-6...master.patch | patch -p1 -t || true
+curl -Ls https://github.com/vadz/libtiff/compare/Release-v4-0-7...master.patch | patch -p1 -t || true
 if [ -n "${CHOST}" ]; then autoreconf -fiv; fi
 ./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --disable-mdi --disable-pixarlog --disable-cxx
 make install-strip
@@ -130,8 +136,11 @@ rm -rf liborc-test-*
 mkdir ${DEPS}/gdkpixbuf
 curl -Ls https://download.gnome.org/sources/gdk-pixbuf/2.36/gdk-pixbuf-${VERSION_GDKPIXBUF}.tar.xz | tar xJC ${DEPS}/gdkpixbuf --strip-components=1
 cd ${DEPS}/gdkpixbuf
+touch gdk-pixbuf/loaders.cache
 LD_LIBRARY_PATH=${TARGET}/lib \
-./configure --cache-file=gdkpixbuf.cache --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --disable-introspection --disable-modules --disable-gio-sniffing --without-libtiff --without-gdiplus --with-included-loaders=png,jpeg
+./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
+  --disable-introspection --disable-modules --disable-gio-sniffing \
+  --without-libtiff --without-gdiplus --with-included-loaders=png,jpeg
 make install-strip
 
 mkdir ${DEPS}/freetype
@@ -140,10 +149,17 @@ cd ${DEPS}/freetype
 ./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static
 make install
 
+mkdir ${DEPS}/expat
+curl -Ls http://${SOURCEFORGE_MIRROR}.dl.sourceforge.net/project/expat/expat/${VERSION_EXPAT}/expat-${VERSION_EXPAT}.tar.bz2 | tar xjC ${DEPS}/expat --strip-components=1
+cd ${DEPS}/expat
+./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static
+make install
+
 mkdir ${DEPS}/fontconfig
 curl -Ls https://www.freedesktop.org/software/fontconfig/release/fontconfig-${VERSION_FONTCONFIG}.tar.bz2 | tar xjC ${DEPS}/fontconfig --strip-components=1
 cd ${DEPS}/fontconfig
-./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --enable-libxml2 --sysconfdir=/etc
+./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
+  --with-expat-includes=${TARGET}/include --with-expat-lib=${TARGET}/lib --sysconfdir=/etc
 make install-strip
 
 mkdir ${DEPS}/harfbuzz
@@ -191,7 +207,7 @@ cd ${DEPS}/gif
 make install-strip
 
 mkdir ${DEPS}/vips
-curl -Ls http://www.vips.ecs.soton.ac.uk/supported/8.4/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
+curl -Ls https://github.com/jcupitt/libvips/releases/download/v${VERSION_VIPS}/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
 cd ${DEPS}/vips
 ./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking \
   --disable-debug --disable-introspection --without-python --without-fftw \
@@ -212,6 +228,7 @@ echo "{\n\
   \"cairo\": \"${VERSION_CAIRO}\",\n\
   \"croco\": \"${VERSION_CROCO}\",\n\
   \"exif\": \"${VERSION_EXIF}\",\n\
+  \"expat\": \"${VERSION_EXPAT}\",\n\
   \"ffi\": \"${VERSION_FFI}\",\n\
   \"fontconfig\": \"${VERSION_FONTCONFIG}\",\n\
   \"freetype\": \"${VERSION_FREETYPE}\",\n\
@@ -221,7 +238,7 @@ echo "{\n\
   \"gsf\": \"${VERSION_GSF}\",\n\
   \"harfbuzz\": \"${VERSION_HARFBUZZ}\",\n\
   \"jpeg\": \"${VERSION_JPEG}\",\n\
-  \"lcms\": \"${VERSION_LCMS2}\",\n\
+  \"lcms\": \"${VERSION_LCMS2}-${VERSION_LCMS2_GIT_MASTER_SHA}\",\n\
   \"orc\": \"${VERSION_ORC}\",\n\
   \"pango\": \"${VERSION_PANGO}\",\n\
   \"pixman\": \"${VERSION_PIXMAN}\",\n\

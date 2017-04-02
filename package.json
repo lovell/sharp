@@ -1,7 +1,7 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
-  "version": "0.17.3",
+  "version": "0.18.0-alpha",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://github.com/lovell/sharp",
   "contributors": [
@@ -38,7 +38,7 @@
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
-    "test": "semistandard && cc && cross-env VIPS_WARNING=0 nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
+    "test": "semistandard && cc && nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
     "test-packaging": "./packaging/test-linux-x64.sh",
     "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done"
@@ -72,10 +72,9 @@
     "tar": "^2.2.1"
   },
   "devDependencies": {
-    "async": "^2.2.0",
+    "async": "^2.3.0",
     "bufferutil": "^3.0.0",
     "cc": "^1.0.0",
-    "cross-env": "^4.0.0",
     "documentation": "^4.0.0-beta.18",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
@@ -87,7 +86,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.4.2"
+    "libvips": "8.5.1"
   },
   "engines": {
     "node": ">=4"
