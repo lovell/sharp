@@ -77,10 +77,8 @@ An Object containing nested boolean values representing the available input and 
 **Examples**
 
 ```javascript
-console.log(sharp.format());
+console.log(sharp.format);
 ```
-
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
 ### versions
 
