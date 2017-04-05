@@ -33,9 +33,10 @@
 class PipelineWorker : public Nan::AsyncWorker {
  public:
   PipelineWorker(
-    Nan::Callback *callback, PipelineBaton *baton, Nan::Callback *queueListener,
-    std::vector<v8::Local<v8::Object>> const buffersToPersist)
-    : Nan::AsyncWorker(callback), baton(baton), queueListener(queueListener), buffersToPersist(buffersToPersist) {
+    Nan::Callback *callback, PipelineBaton *baton, Nan::Callback *debuglog, Nan::Callback *queueListener,
+    std::vector<v8::Local<v8::Object>> const buffersToPersist) :
+    Nan::AsyncWorker(callback), baton(baton), debuglog(debuglog), queueListener(queueListener),
+    buffersToPersist(buffersToPersist) {
     // Protect Buffer objects from GC, keyed on index
     std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
       [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
@@ -979,6 +980,14 @@ class PipelineWorker : public Nan::AsyncWorker {
       });
     delete baton;
 
+    // Handle warnings
+    std::string warning = sharp::VipsWarningPop();
+    while (!warning.empty()) {
+      v8::Local<v8::Value> message[1] = { New(warning).ToLocalChecked() };
+      debuglog->Call(1, message);
+      warning = sharp::VipsWarningPop();
+    }
+
     // Decrement processing task counter
     g_atomic_int_dec_and_test(&sharp::counterProcess);
     v8::Local<v8::Value> queueLength[1] = { New<v8::Uint32>(sharp::counterQueue) };
@@ -991,6 +1000,7 @@ class PipelineWorker : public Nan::AsyncWorker {
 
  private:
   PipelineBaton *baton;
+  Nan::Callback *debuglog;
   Nan::Callback *queueListener;
   std::vector<v8::Local<v8::Object>> buffersToPersist;
 
@@ -1239,12 +1249,15 @@ NAN_METHOD(pipeline) {
     baton->accessMethod = VIPS_ACCESS_RANDOM;
   }
 
+  // Function to notify of libvips warnings
+  Nan::Callback *debuglog = new Nan::Callback(AttrAs<v8::Function>(options, "debuglog"));
+
   // Function to notify of queue length changes
   Nan::Callback *queueListener = new Nan::Callback(AttrAs<v8::Function>(options, "queueListener"));
 
   // Join queue for worker thread
   Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
-  Nan::AsyncQueueWorker(new PipelineWorker(callback, baton, queueListener, buffersToPersist));
+  Nan::AsyncQueueWorker(new PipelineWorker(callback, baton, debuglog, queueListener, buffersToPersist));
 
   // Increment queued task counter
   g_atomic_int_inc(&sharp::counterQueue);

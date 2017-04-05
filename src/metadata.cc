@@ -25,9 +25,10 @@
 class MetadataWorker : public Nan::AsyncWorker {
  public:
   MetadataWorker(
-    Nan::Callback *callback, MetadataBaton *baton,
-    std::vector<v8::Local<v8::Object>> const buffersToPersist)
-    : Nan::AsyncWorker(callback), baton(baton), buffersToPersist(buffersToPersist) {
+    Nan::Callback *callback, MetadataBaton *baton, Nan::Callback *debuglog,
+    std::vector<v8::Local<v8::Object>> const buffersToPersist) :
+    Nan::AsyncWorker(callback), baton(baton), debuglog(debuglog),
+    buffersToPersist(buffersToPersist) {
     // Protect Buffer objects from GC, keyed on index
     std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
       [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
@@ -132,12 +133,21 @@ class MetadataWorker : public Nan::AsyncWorker {
     delete baton->input;
     delete baton;
 
+    // Handle warnings
+    std::string warning = sharp::VipsWarningPop();
+    while (!warning.empty()) {
+      v8::Local<v8::Value> message[1] = { New(warning).ToLocalChecked() };
+      debuglog->Call(1, message);
+      warning = sharp::VipsWarningPop();
+    }
+
     // Return to JavaScript
     callback->Call(2, argv);
   }
 
  private:
   MetadataBaton* baton;
+  Nan::Callback *debuglog;
   std::vector<v8::Local<v8::Object>> buffersToPersist;
 };
 
@@ -155,9 +165,12 @@ NAN_METHOD(metadata) {
   // Input
   baton->input = sharp::CreateInputDescriptor(sharp::AttrAs<v8::Object>(options, "input"), buffersToPersist);
 
+  // Function to notify of libvips warnings
+  Nan::Callback *debuglog = new Nan::Callback(sharp::AttrAs<v8::Function>(options, "debuglog"));
+
   // Join queue for worker thread
   Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
-  Nan::AsyncQueueWorker(new MetadataWorker(callback, baton, buffersToPersist));
+  Nan::AsyncQueueWorker(new MetadataWorker(callback, baton, debuglog, buffersToPersist));
 
   // Increment queued task counter
   g_atomic_int_inc(&sharp::counterQueue);

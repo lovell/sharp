@@ -1,5 +1,15 @@
 # Changelog
 
+### v0.18 - "*ridge*"
+
+Requires libvips v8.5.2.
+
+#### v0.18.0 - TBD
+
+* Expose warnings from libvips via NODE_DEBUG=sharp environment variable.
+  [#607](https://github.com/lovell/sharp/issues/607)
+  [@puzrin](https://github.com/puzrin)
+
 ### v0.17 - "*quill*"
 
 Requires libvips v8.4.2.
