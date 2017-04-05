@@ -190,6 +190,16 @@ namespace sharp {
   void FreeCallback(char* data, void* hint);
 
   /*
+    Called with warnings from the glib-registered "VIPS" domain
+  */
+  void VipsWarningCallback(char const* log_domain, GLogLevelFlags log_level, char const* message, void* ignore);
+
+  /*
+    Pop the oldest warning message from the queue
+  */
+  std::string VipsWarningPop();
+
+  /*
     Calculate the (left, top) coordinates of the output image
     within the input image, applying the given gravity.
   */
