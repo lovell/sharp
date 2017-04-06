@@ -73,7 +73,7 @@ module.exports.download_vips = function () {
     // Ensure glibc >= 2.15
     const lddVersion = process.env.LDD_VERSION;
     if (lddVersion) {
-      if (/(glibc|gnu libc)/i.test(lddVersion)) {
+      if (/(glibc|gnu libc|gentoo)/i.test(lddVersion)) {
         const glibcVersion = lddVersion ? lddVersion.split(/\n/)[0].split(' ').slice(-1)[0].trim() : '';
         if (glibcVersion && semver.lt(glibcVersion + '.0', '2.13.0')) {
           error('glibc version ' + glibcVersion + ' requires manual installation - please see http://sharp.dimens.io/en/stable/install/');
