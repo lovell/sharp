@@ -308,6 +308,16 @@ describe('Input/output', function () {
   });
 
   describe('Fail for unsupported input', function () {
+    it('Undefined', function () {
+      assert.throws(function () {
+        sharp(undefined);
+      });
+    });
+    it('Null', function () {
+      assert.throws(function () {
+        sharp(null);
+      });
+    });
     it('Numeric', function () {
       assert.throws(function () {
         sharp(1);
