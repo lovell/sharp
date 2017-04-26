@@ -99,6 +99,7 @@ the help and code contributions of the following people:
 * [Jérémy Lal](https://github.com/kapouer)
 * [Alice Monday](https://github.com/alice0meta)
 * [Kristo Jorgenson](https://github.com/kristojorg)
+* [Yves Bos](https://github.com/YvesBos)
 
 Thank you!
 
