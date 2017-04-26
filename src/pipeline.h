@@ -106,6 +106,7 @@ struct PipelineBaton {
   int tiffQuality;
   VipsForeignTiffCompression tiffCompression;
   VipsForeignTiffPredictor tiffPredictor;
+  bool tiffSquash;
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
@@ -176,6 +177,7 @@ struct PipelineBaton {
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_NONE),
+    tiffSquash(false),
     withMetadata(false),
     withMetadataOrientation(-1),
     convKernelWidth(0),

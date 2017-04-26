@@ -861,6 +861,44 @@ describe('Input/output', function () {
     });
   });
 
+  it('Not squashing TIFF to a bit depth of 1 should not change the file size', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiff8BitDepth).size;
+    sharp(fixtures.inputTiff8BitDepth)
+      .toColourspace('b-w') // can only squash 1 band uchar images
+      .tiff({
+        squash: false,
+        compression: 'none'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size === startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('Squashing TIFF to a bit depth of 1 should significantly reduce file size', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiff8BitDepth).size;
+    sharp(fixtures.inputTiff8BitDepth)
+      .toColourspace('b-w') // can only squash 1 band uchar images
+      .tiff({
+        squash: true,
+        compression: 'none'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < (startSize / 2));
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('Invalid TIFF squash value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ squash: 'true' });
+    });
+  });
+
   it('TIFF lzw compression with horizontal predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
