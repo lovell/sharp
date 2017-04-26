@@ -288,7 +288,7 @@ describe('Input/output', function () {
   });
 
   it('Fail when input is empty Buffer', function (done) {
-    sharp(new Buffer(0)).toBuffer().then(function () {
+    sharp(Buffer.alloc(0)).toBuffer().then(function () {
       assert(false);
       done();
     }).catch(function (err) {
@@ -298,7 +298,7 @@ describe('Input/output', function () {
   });
 
   it('Fail when input is invalid Buffer', function (done) {
-    sharp(new Buffer([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
+    sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
       assert(false);
       done();
     }).catch(function (err) {

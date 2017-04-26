@@ -68,7 +68,7 @@
     "caw": "^2.0.0",
     "color": "^1.0.3",
     "got": "^6.7.1",
-    "nan": "^2.5.1",
+    "nan": "^2.6.2",
     "semver": "^5.3.0",
     "tar": "^2.2.1"
   },
@@ -76,18 +76,18 @@
     "async": "^2.3.0",
     "bufferutil": "^3.0.0",
     "cc": "^1.0.0",
-    "documentation": "^4.0.0-beta.18",
+    "documentation": "^4.0.0-rc.0",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
-    "mocha": "^3.2.0",
-    "nyc": "^10.2.0",
+    "mocha": "^3.3.0",
+    "nyc": "^10.2.2",
     "rimraf": "^2.5.4",
-    "semistandard": "^10.0.0",
+    "semistandard": "^11.0.0",
     "unzip": "^0.1.11"
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.5.1"
+    "libvips": "8.5.4"
   },
   "engines": {
     "node": ">=4"
