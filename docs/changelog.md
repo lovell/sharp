@@ -14,6 +14,14 @@ Requires libvips v8.5.2.
   [#607](https://github.com/lovell/sharp/issues/607)
   [@puzrin](https://github.com/puzrin)
 
+* Ensure ARM64 pre-built binaries use correct C++11 ABI version.
+  [#772](https://github.com/lovell/sharp/issues/772)
+  [@ajiratech2](https://github.com/ajiratech2)
+
+* Expose libvips' "squash" parameter to enable 1-bit TIFF output.
+  [#783](https://github.com/lovell/sharp/pull/783)
+  [@YvesBos](https://github.com/YvesBos)
+
 ### v0.17 - "*quill*"
 
 Requires libvips v8.4.2.

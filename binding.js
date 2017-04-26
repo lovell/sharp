@@ -42,8 +42,8 @@ const unpack = function (tarPath, done) {
 
 const platformId = function () {
   const platformId = [platform];
-  if (arch === 'arm' || arch === 'armhf' || arch === 'arch64') {
-    const armVersion = (arch === 'arch64') ? '8' : process.env.npm_config_armv || process.config.variables.arm_version || '6';
+  if (arch === 'arm' || arch === 'armhf' || arch === 'arm64') {
+    const armVersion = (arch === 'arm64') ? '8' : process.env.npm_config_armv || process.config.variables.arm_version || '6';
     platformId.push('armv' + armVersion);
   } else {
     platformId.push(arch);

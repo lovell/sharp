@@ -15,4 +15,4 @@ RUN \
 ENV \
   PLATFORM=linux-armv8 \
   CHOST=aarch64-linux-gnu \
-  FLAGS="-march=armv8-a -Os"
+  FLAGS="-march=armv8-a -Os -D_GLIBCXX_USE_CXX11_ABI=0"
