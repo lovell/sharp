@@ -80,16 +80,12 @@ class PipelineWorker : public Nan::AsyncWorker {
 
       // Calculate angle of rotation
       VipsAngle rotation;
-      bool flip;
-      bool flop;
-      std::tie(rotation, flip, flop) = CalculateRotationAndFlip(baton->angle, image);
-      if (flip && !baton->flip) {
-        // Add flip operation due to EXIF mirroring
-        baton->flip = TRUE;
-      }
-      if (flop && !baton->flop) {
-        // Add flip operation due to EXIF mirroring
-        baton->flop = TRUE;
+      if (baton->useExifOrientation) {
+        // Rotate and flip image according to Exif orientation
+        // (ignore the requested rotation and flip)
+        std::tie(rotation, baton->flip, baton->flop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
+      } else {
+        rotation = CalculateAngleRotation(baton->angle);
       }
 
       // Rotate pre-extract
@@ -995,37 +991,41 @@ class PipelineWorker : public Nan::AsyncWorker {
   std::vector<v8::Local<v8::Object>> buffersToPersist;
 
   /*
-    Calculate the angle of rotation and need-to-flip for the output image.
-    In order of priority:
-     1. Use explicitly requested angle (supports 90, 180, 270)
-     2. Use input image EXIF Orientation header - supports mirroring
-     3. Otherwise default to zero, i.e. no rotation
+    Calculate the angle of rotation and need-to-flip for the given Exif orientation
+    By default, returns zero, i.e. no rotation.
   */
   std::tuple<VipsAngle, bool, bool>
-  CalculateRotationAndFlip(int const angle, vips::VImage image) {
+  CalculateExifRotationAndFlip(int const exifOrientation) {
     VipsAngle rotate = VIPS_ANGLE_D0;
     bool flip = FALSE;
     bool flop = FALSE;
-    if (angle == -1) {
-      switch (sharp::ExifOrientation(image)) {
-        case 6: rotate = VIPS_ANGLE_D90; break;
-        case 3: rotate = VIPS_ANGLE_D180; break;
-        case 8: rotate = VIPS_ANGLE_D270; break;
-        case 2: flop = TRUE; break;  // flop 1
-        case 7: flip = TRUE; rotate = VIPS_ANGLE_D90; break;  // flip 6
-        case 4: flop = TRUE; rotate = VIPS_ANGLE_D180; break;  // flop 3
-        case 5: flip = TRUE; rotate = VIPS_ANGLE_D270; break;  // flip 8
-      }
-    } else {
-      if (angle == 90) {
-        rotate = VIPS_ANGLE_D90;
-      } else if (angle == 180) {
-        rotate = VIPS_ANGLE_D180;
-      } else if (angle == 270) {
-        rotate = VIPS_ANGLE_D270;
-      }
+    switch (exifOrientation) {
+      case 6: rotate = VIPS_ANGLE_D90; break;
+      case 3: rotate = VIPS_ANGLE_D180; break;
+      case 8: rotate = VIPS_ANGLE_D270; break;
+      case 2: flop = TRUE; break;  // flop 1
+      case 7: flip = TRUE; rotate = VIPS_ANGLE_D90; break;  // flip 6
+      case 4: flop = TRUE; rotate = VIPS_ANGLE_D180; break;  // flop 3
+      case 5: flip = TRUE; rotate = VIPS_ANGLE_D270; break;  // flip 8
     }
     return std::make_tuple(rotate, flip, flop);
+  }
+
+  /*
+    Calculate the rotation for the given angle.
+    Supports any positive or negative angle that is a multiple of 90.
+  */
+  VipsAngle
+  CalculateAngleRotation(int angle) {
+    angle = angle % 360;
+    if (angle < 0)
+      angle = 360 + angle;
+    switch (angle) {
+      case 90: return VIPS_ANGLE_D90;
+      case 180: return VIPS_ANGLE_D180;
+      case 270: return VIPS_ANGLE_D270;
+    }
+    return VIPS_ANGLE_D0;
   }
 
   /*
@@ -1152,6 +1152,7 @@ NAN_METHOD(pipeline) {
   baton->gamma = AttrTo<double>(options, "gamma");
   baton->greyscale = AttrTo<bool>(options, "greyscale");
   baton->normalise = AttrTo<bool>(options, "normalise");
+  baton->useExifOrientation = AttrTo<bool>(options, "useExifOrientation");
   baton->angle = AttrTo<int32_t>(options, "angle");
   baton->rotateBeforePreExtract = AttrTo<bool>(options, "rotateBeforePreExtract");
   baton->flip = AttrTo<bool>(options, "flip");

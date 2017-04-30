@@ -64,6 +64,7 @@ module.exports = {
   inputJpgWithCorruptHeader: getPath('corrupt-header.jpg'),
   inputJpgWithLowContrast: getPath('low-contrast.jpg'), // http://www.flickr.com/photos/grizdave/2569067123/
   inputJpgLarge: getPath('giant-image.jpg'),
+  inputJpg320x240: getPath('320x240.jpg'), // http://www.andrewault.net/2010/01/26/create-a-test-pattern-video-with-perl/
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
