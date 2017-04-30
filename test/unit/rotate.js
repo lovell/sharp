@@ -34,6 +34,28 @@ describe('Rotation', function () {
     });
   });
 
+  [-3690, -450, -90, 90, 450, 3690].forEach(function (angle) {
+    it('Rotate by any 90-multiple angle (' + angle + 'deg)', function (done) {
+      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(240, info.width);
+        assert.strictEqual(320, info.height);
+        done();
+      });
+    });
+  });
+
+  [-3780, -540, 0, 180, 540, 3780].forEach(function (angle) {
+    it('Rotate by any 180-multiple angle (' + angle + 'deg)', function (done) {
+      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+    });
+  });
+
   it('Rotate by 270 degrees, square output ignoring aspect ratio', function (done) {
     sharp(fixtures.inputJpg)
       .resize(240, 240)
