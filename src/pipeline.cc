@@ -417,16 +417,24 @@ class PipelineWorker : public Nan::AsyncWorker {
               ->set("centre", baton->centreSampling));
           }
         }
-        // Perform affine enlargement
+        // Perform enlargement
         if (yresidual > 1.0 || xresidual > 1.0) {
-          vips::VInterpolate interpolator = vips::VInterpolate::new_from_name(baton->interpolator.data());
-          if (yresidual > 1.0) {
-            image = image.affine({1.0, 0.0, 0.0, yresidual}, VImage::option()
-              ->set("interpolate", interpolator));
-          }
-          if (xresidual > 1.0) {
-            image = image.affine({xresidual, 0.0, 0.0, 1.0}, VImage::option()
-              ->set("interpolate", interpolator));
+          if (trunc(xresidual) == xresidual && trunc(yresidual) == yresidual && baton->interpolator == "nearest") {
+            // Fast, integral nearest neighbour enlargement
+            image = image.zoom(xresidual, yresidual);
+          } else {
+            // Floating point affine transformation
+            vips::VInterpolate interpolator = vips::VInterpolate::new_from_name(baton->interpolator.data());
+            if (yresidual > 1.0 && xresidual > 1.0) {
+              image = image.affine({xresidual, 0.0, 0.0, yresidual}, VImage::option()
+                ->set("interpolate", interpolator));
+            } else if (yresidual > 1.0) {
+              image = image.affine({1.0, 0.0, 0.0, yresidual}, VImage::option()
+                ->set("interpolate", interpolator));
+            } else if (xresidual > 1.0) {
+              image = image.affine({xresidual, 0.0, 0.0, 1.0}, VImage::option()
+                ->set("interpolate", interpolator));
+            }
           }
         }
       }

@@ -14,6 +14,10 @@ Requires libvips v8.5.2.
   [#607](https://github.com/lovell/sharp/issues/607)
   [@puzrin](https://github.com/puzrin)
 
+* Improve performance and accuracy of nearest neighbour integral upsampling.
+  [#752](https://github.com/lovell/sharp/issues/752)
+  [@MrIbby](https://github.com/MrIbby)
+
 * Ensure ARM64 pre-built binaries use correct C++11 ABI version.
   [#772](https://github.com/lovell/sharp/issues/772)
   [@ajiratech2](https://github.com/ajiratech2)
