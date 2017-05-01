@@ -140,6 +140,7 @@ Use these TIFF options for output image.
     -   `options.force` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** force TIFF output, otherwise attempt to use input format (optional, default `true`)
     -   `options.compression` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** compression options: lzw, deflate, jpeg (optional, default `'jpeg'`)
     -   `options.predictor` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** compression predictor options: none, horizontal, float (optional, default `'none'`)
+    -   `options.squash` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** squash 8-bit images down to 1 bit (optional, default `false`)
 
 
 -   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid options
