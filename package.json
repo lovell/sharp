@@ -37,7 +37,8 @@
     "Kristo Jorgenson <kristo.jorgenson@gmail.com>",
     "YvesBos <yves_bos@outlook.com>",
     "Guy Maliar <guy@tailorbrands.com>",
-    "Nicolas Coden <nicolas@ncoden.fr>"
+    "Nicolas Coden <nicolas@ncoden.fr>",
+    "Sukant Garg <garg_sms@yahoo.in>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",

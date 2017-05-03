@@ -358,4 +358,14 @@ namespace sharp {
     return image.extract_area(left, top, width, height);
   }
 
+  VImage Tilt(VImage image, int const angle) {
+    // If the image lacks the alpha channel, we add it here
+    // Without this, any image without alpha channel will have black fill around it
+    // This is unitended behavior
+    if (!HasAlpha(image)) {
+      image = image.bandjoin(255);
+    }
+    return image.similarity(VImage::option()->set("angle", angle));
+  }
+
 }  // namespace sharp
