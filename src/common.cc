@@ -348,6 +348,25 @@ namespace sharp {
   }
 
   /*
+    Check the proposed format supports the current dimensions.
+  */
+  void AssertImageTypeDimensions(VImage image, ImageType const imageType) {
+    if (imageType == ImageType::JPEG) {
+      if (image.width() > 65535 || image.height() > 65535) {
+        throw vips::VError("Processed image is too large for the JPEG format");
+      }
+    } else if (imageType == ImageType::PNG) {
+      if (image.width() > 2147483647 || image.height() > 2147483647) {
+        throw vips::VError("Processed image is too large for the PNG format");
+      }
+    } else if (imageType == ImageType::WEBP) {
+      if (image.width() > 16383 || image.height() > 16383) {
+        throw vips::VError("Processed image is too large for the WebP format");
+      }
+    }
+  }
+
+  /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
   void FreeCallback(char* data, void* hint) {

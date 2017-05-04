@@ -185,6 +185,11 @@ namespace sharp {
   void SetDensity(VImage image, const int density);
 
   /*
+    Check the proposed format supports the current dimensions.
+  */
+  void AssertImageTypeDimensions(VImage image, ImageType const imageType);
+
+  /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
   void FreeCallback(char* data, void* hint);

@@ -6,6 +6,10 @@ Requires libvips v8.5.2.
 
 #### v0.18.0 - TBD
 
+* Ensure maximum output dimensions are based on the format to be used.
+  [#176](https://github.com/lovell/sharp/issues/176)
+  [@stephanebachelier](https://github.com/stephanebachelier)
+
 * Avoid costly (un)premultiply when using overlayWith without alpha channel.
   [#573](https://github.com/lovell/sharp/issues/573)
   [@strarsis](https://github.com/strarsis)

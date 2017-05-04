@@ -66,37 +66,47 @@ describe('Resize dimensions', function () {
   it('Invalid width - NaN', function () {
     assert.throws(function () {
       sharp().resize('spoons', 240);
-    }, /Expected integer between 1 and 16383 for width but received spoons of type string/);
+    }, /Expected positive integer for width but received spoons of type string/);
   });
 
   it('Invalid height - NaN', function () {
     assert.throws(function () {
       sharp().resize(320, 'spoons');
-    }, /Expected integer between 1 and 16383 for height but received spoons of type string/);
+    }, /Expected positive integer for height but received spoons of type string/);
   });
 
   it('Invalid width - float', function () {
     assert.throws(function () {
       sharp().resize(1.5, 240);
-    }, /Expected integer between 1 and 16383 for width but received 1.5 of type number/);
+    }, /Expected positive integer for width but received 1.5 of type number/);
   });
 
   it('Invalid height - float', function () {
     assert.throws(function () {
       sharp().resize(320, 1.5);
-    }, /Expected integer between 1 and 16383 for height but received 1.5 of type number/);
+    }, /Expected positive integer for height but received 1.5 of type number/);
   });
 
-  it('Invalid width - too large', function () {
-    assert.throws(function () {
-      sharp().resize(0x4000, 240);
-    }, /Expected integer between 1 and 16383 for width but received 16384 of type number/);
+  it('Invalid width - too large', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(0x4000, 1)
+      .webp()
+      .toBuffer(function (err) {
+        assert.strictEqual(true, err instanceof Error);
+        assert.strictEqual('Processed image is too large for the WebP format', err.message);
+        done();
+      });
   });
 
-  it('Invalid height - too large', function () {
-    assert.throws(function () {
-      sharp().resize(320, 0x4000);
-    }, /Expected integer between 1 and 16383 for height but received 16384 of type number/);
+  it('Invalid height - too large', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(1, 0x4000)
+      .webp()
+      .toBuffer(function (err) {
+        assert.strictEqual(true, err instanceof Error);
+        assert.strictEqual('Processed image is too large for the WebP format', err.message);
+        done();
+      });
   });
 
   it('WebP shrink-on-load rounds to zero, ensure recalculation is correct', function (done) {

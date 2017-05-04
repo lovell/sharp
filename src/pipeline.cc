@@ -738,6 +738,7 @@ class PipelineWorker : public Nan::AsyncWorker {
         // Buffer output
         if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == ImageType::JPEG)) {
           // Write JPEG to buffer
+          sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
           VipsArea *area = VIPS_AREA(image.jpegsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->jpegQuality)
@@ -759,11 +760,12 @@ class PipelineWorker : public Nan::AsyncWorker {
           }
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" &&
           (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
+          // Write PNG to buffer
+          sharp::AssertImageTypeDimensions(image, ImageType::PNG);
           // Strip profile
           if (!baton->withMetadata) {
             vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
           }
-          // Write PNG to buffer
           VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
             ->set("interlace", baton->pngProgressive)
             ->set("compression", baton->pngCompressionLevel)
@@ -775,6 +777,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           baton->formatOut = "png";
         } else if (baton->formatOut == "webp" || (baton->formatOut == "input" && inputImageType == ImageType::WEBP)) {
           // Write WEBP to buffer
+          sharp::AssertImageTypeDimensions(image, ImageType::WEBP);
           VipsArea *area = VIPS_AREA(image.webpsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->webpQuality)
@@ -787,11 +790,14 @@ class PipelineWorker : public Nan::AsyncWorker {
           vips_area_unref(area);
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || (baton->formatOut == "input" && inputImageType == ImageType::TIFF)) {
+          // Write TIFF to buffer
+          if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
+            sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
+          }
           // Cast pixel values to float, if required
           if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
             image = image.cast(VIPS_FORMAT_FLOAT);
           }
-          // Write TIFF to buffer
           VipsArea *area = VIPS_AREA(image.tiffsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
@@ -844,6 +850,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip || isV);
         if (baton->formatOut == "jpeg" || isJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
           // Write JPEG to file
+          sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->jpegQuality)
@@ -857,11 +864,12 @@ class PipelineWorker : public Nan::AsyncWorker {
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || isPng || (matchInput &&
           (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
+          // Write PNG to file
+          sharp::AssertImageTypeDimensions(image, ImageType::PNG);
           // Strip profile
           if (!baton->withMetadata) {
             vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
           }
-          // Write PNG to file
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("interlace", baton->pngProgressive)
             ->set("compression", baton->pngCompressionLevel)
@@ -869,6 +877,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           baton->formatOut = "png";
         } else if (baton->formatOut == "webp" || isWebp || (matchInput && inputImageType == ImageType::WEBP)) {
           // Write WEBP to file
+          AssertImageTypeDimensions(image, ImageType::WEBP);
           image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->webpQuality)
@@ -877,11 +886,14 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
+          // Write TIFF to file
+          if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
+            sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
+          }
           // Cast pixel values to float, if required
           if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
             image = image.cast(VIPS_FORMAT_FLOAT);
           }
-          // Write TIFF to file
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
