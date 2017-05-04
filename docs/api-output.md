@@ -38,7 +38,7 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 ## toBuffer
 
 Write output to a Buffer.
-JPEG, PNG, WebP, and RAW output are supported.
+JPEG, PNG, WebP, TIFF and RAW output are supported.
 By default, the format will match the input image, except GIF and SVG input which become PNG output.
 
 `callback`, if present, gets three arguments `(err, data, info)` where:

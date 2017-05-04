@@ -734,7 +734,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       baton->width = image.width();
       baton->height = image.height();
       // Output
-      if (baton->fileOut == "") {
+      if (baton->fileOut.empty()) {
         // Buffer output
         if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == ImageType::JPEG)) {
           // Write JPEG to buffer
@@ -786,6 +786,24 @@ class PipelineWorker : public Nan::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "webp";
+        } else if (baton->formatOut == "tiff" || (baton->formatOut == "input" && inputImageType == ImageType::TIFF)) {
+          // Cast pixel values to float, if required
+          if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
+            image = image.cast(VIPS_FORMAT_FLOAT);
+          }
+          // Write TIFF to buffer
+          VipsArea *area = VIPS_AREA(image.tiffsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->tiffQuality)
+            ->set("squash", baton->tiffSquash)
+            ->set("compression", baton->tiffCompression)
+            ->set("predictor", baton->tiffPredictor)));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "tiff";
+          baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "raw" || (baton->formatOut == "input" && inputImageType == ImageType::RAW)) {
           // Write raw, uncompressed image data to buffer
           if (baton->greyscale || image.interpretation() == VIPS_INTERPRETATION_B_W) {

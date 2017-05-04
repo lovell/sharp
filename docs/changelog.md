@@ -10,6 +10,10 @@ Requires libvips v8.5.2.
   [#573](https://github.com/lovell/sharp/issues/573)
   [@strarsis](https://github.com/strarsis)
 
+* Add support for Buffer and Stream-based TIFF output.
+  [#587](https://github.com/lovell/sharp/issues/587)
+  [@strarsis](https://github.com/strarsis)
+
 * Expose warnings from libvips via NODE_DEBUG=sharp environment variable.
   [#607](https://github.com/lovell/sharp/issues/607)
   [@puzrin](https://github.com/puzrin)

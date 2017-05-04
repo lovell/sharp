@@ -837,6 +837,20 @@ describe('Input/output', function () {
       });
   });
 
+  it('Save TIFF to Buffer', function (done) {
+    sharp(fixtures.inputTiff)
+      .resize(320, 240)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(data.length, info.size);
+        assert.strictEqual('tiff', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
   it('Invalid WebP quality throws error', function () {
     assert.throws(function () {
       sharp().webp({ quality: 101 });
@@ -914,7 +928,7 @@ describe('Input/output', function () {
       });
   });
 
-  it('TIFF deflate compression with hoizontal predictor shrinks test file', function (done) {
+  it('TIFF deflate compression with horizontal predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({

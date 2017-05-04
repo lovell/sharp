@@ -22,7 +22,7 @@ the installation of any external runtime dependencies.
 
 This module supports reading JPEG, PNG, WebP, TIFF, GIF and SVG images.
 
-Output images can be in JPEG, PNG and WebP formats as well as uncompressed raw pixel data.
+Output images can be in JPEG, PNG, WebP and TIFF formats as well as uncompressed raw pixel data.
 
 Streams, Buffer objects and the filesystem can be used for input and output.
 
