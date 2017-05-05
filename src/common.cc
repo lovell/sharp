@@ -218,6 +218,7 @@ namespace sharp {
         if (imageType != ImageType::UNKNOWN) {
           try {
             vips::VOption *option = VImage::option()->set("access", accessMethod);
+            option->set("fail", true); // FIXME: how do you want to plumb the baton's failOnError into OpenInput?
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", static_cast<double>(descriptor->density));
             }
@@ -255,6 +256,8 @@ namespace sharp {
         if (imageType != ImageType::UNKNOWN) {
           try {
             vips::VOption *option = VImage::option()->set("access", accessMethod);
+            option->set("fail", true); // FIXME
+
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", static_cast<double>(descriptor->density));
             }

@@ -64,6 +64,7 @@ module.exports = {
   inputJpgWithCorruptHeader: getPath('corrupt-header.jpg'),
   inputJpgWithLowContrast: getPath('low-contrast.jpg'), // http://www.flickr.com/photos/grizdave/2569067123/
   inputJpgLarge: getPath('giant-image.jpg'),
+  inputJpgTruncated: getPath('truncated.jpg'), // head -c 5000 2569067123_aca715a2ee_o.jpg > truncated.jpg
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain

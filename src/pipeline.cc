@@ -1079,6 +1079,8 @@ NAN_METHOD(pipeline) {
   baton->iccProfilePath = AttrAsStr(options, "iccProfilePath");
   baton->accessMethod = AttrTo<bool>(options, "sequentialRead") ?
     VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
+  baton->fail = AttrTo<bool>(options, "failOnErrors");
+
   // Limit input images to a given number of pixels, where pixels = width * height
   baton->limitInputPixels = AttrTo<int32_t>(options, "limitInputPixels");
   // Extract image options
