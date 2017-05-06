@@ -73,22 +73,6 @@ namespace sharp {
   VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged);
 
   /*
-    Crop strategy functors
-  */
-  struct EntropyStrategy {
-    double operator()(VImage image);
-  };
-  struct AttentionStrategy {
-    double operator()(VImage image);
-  };
-
-  /*
-    Calculate crop area based on given strategy (Entropy, Attention)
-  */
-  std::tuple<int, int> Crop(
-    VImage image, int const outWidth, int const outHeight, std::function<double(VImage)> strategy);
-
-  /*
     Insert a tile cache to prevent over-computation of any previous operations in the pipeline
   */
   VImage TileCache(VImage image, double const factor);

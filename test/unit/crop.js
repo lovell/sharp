@@ -161,7 +161,7 @@ describe('Crop', function () {
 
   describe('Entropy-based strategy', function () {
     it('JPEG', function (done) {
-      sharp(fixtures.inputJpgWithCmykProfile)
+      sharp(fixtures.inputJpg)
         .resize(80, 320)
         .crop(sharp.strategy.entropy)
         .toBuffer(function (err, data, info) {
@@ -170,9 +170,7 @@ describe('Crop', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual(80, info.width);
           assert.strictEqual(320, info.height);
-          assert.strictEqual(250, info.cropCalcLeft);
-          assert.strictEqual(0, info.cropCalcTop);
-          fixtures.assertSimilar(fixtures.expected('crop-strategy.jpg'), data, done);
+          fixtures.assertSimilar(fixtures.expected('crop-strategy-entropy.jpg'), data, done);
         });
     });
 
@@ -186,8 +184,6 @@ describe('Crop', function () {
           assert.strictEqual(4, info.channels);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          assert.strictEqual(0, info.cropCalcLeft);
-          assert.strictEqual(80, info.cropCalcTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
@@ -202,8 +198,6 @@ describe('Crop', function () {
           assert.strictEqual(4, info.channels);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          assert.strictEqual(0, info.cropCalcLeft);
-          assert.strictEqual(80, info.cropCalcTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
@@ -211,7 +205,7 @@ describe('Crop', function () {
 
   describe('Attention strategy', function () {
     it('JPEG', function (done) {
-      sharp(fixtures.inputJpgWithCmykProfile)
+      sharp(fixtures.inputJpg)
         .resize(80, 320)
         .crop(sharp.strategy.attention)
         .toBuffer(function (err, data, info) {
@@ -220,9 +214,7 @@ describe('Crop', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual(80, info.width);
           assert.strictEqual(320, info.height);
-          assert.strictEqual(250, info.cropCalcLeft);
-          assert.strictEqual(0, info.cropCalcTop);
-          fixtures.assertSimilar(fixtures.expected('crop-strategy.jpg'), data, done);
+          fixtures.assertSimilar(fixtures.expected('crop-strategy-attention.jpg'), data, done);
         });
     });
 
@@ -236,8 +228,6 @@ describe('Crop', function () {
           assert.strictEqual(4, info.channels);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          assert.strictEqual(0, info.cropCalcLeft);
-          assert.strictEqual(80, info.cropCalcTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
@@ -252,8 +242,6 @@ describe('Crop', function () {
           assert.strictEqual(4, info.channels);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          assert.strictEqual(0, info.cropCalcLeft);
-          assert.strictEqual(80, info.cropCalcTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });

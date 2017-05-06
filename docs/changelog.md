@@ -22,6 +22,9 @@ Requires libvips v8.5.2.
   [#607](https://github.com/lovell/sharp/issues/607)
   [@puzrin](https://github.com/puzrin)
 
+* Switch to the libvips implementation of "attention" and "entropy" crop strategies.
+  [#727](https://github.com/lovell/sharp/issues/727)
+
 * Improve performance and accuracy of nearest neighbour integral upsampling.
   [#752](https://github.com/lovell/sharp/issues/752)
   [@MrIbby](https://github.com/MrIbby)

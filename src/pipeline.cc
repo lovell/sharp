@@ -509,24 +509,20 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("background", background));
         } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
           // Crop/max/min
-          int left;
-          int top;
           if (baton->crop < 9) {
             // Gravity-based crop
+            int left;
+            int top;
             std::tie(left, top) = sharp::CalculateCrop(
               image.width(), image.height(), baton->width, baton->height, baton->crop);
-          } else if (baton->crop == 16) {
-            // Entropy-based crop
-            std::tie(left, top) = sharp::Crop(image, baton->width, baton->height, sharp::EntropyStrategy());
+            int width = std::min(image.width(), baton->width);
+            int height = std::min(image.height(), baton->height);
+            image = image.extract_area(left, top, width, height);
           } else {
-            // Attention-based crop
-            std::tie(left, top) = sharp::Crop(image, baton->width, baton->height, sharp::AttentionStrategy());
+            // Attention-based or Entropy-based crop
+            image = image.smartcrop(baton->width, baton->height, VImage::option()
+              ->set("interesting", baton->crop == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
           }
-          int width = std::min(image.width(), baton->width);
-          int height = std::min(image.height(), baton->height);
-          image = image.extract_area(left, top, width, height);
-          baton->cropCalcLeft = left;
-          baton->cropCalcTop = top;
         }
       }
 
