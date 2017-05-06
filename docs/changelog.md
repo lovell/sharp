@@ -29,6 +29,10 @@ Requires libvips v8.5.2.
   [#752](https://github.com/lovell/sharp/issues/752)
   [@MrIbby](https://github.com/MrIbby)
 
+* Constructor single argument API: allow plain object, reject null/undefined.
+  [#768](https://github.com/lovell/sharp/issues/768)
+  [@kub1x](https://github.com/kub1x)
+
 * Ensure ARM64 pre-built binaries use correct C++11 ABI version.
   [#772](https://github.com/lovell/sharp/issues/772)
   [@ajiratech2](https://github.com/ajiratech2)

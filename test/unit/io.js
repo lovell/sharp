@@ -308,6 +308,16 @@ describe('Input/output', function () {
   });
 
   describe('Fail for unsupported input', function () {
+    it('Undefined', function () {
+      assert.throws(function () {
+        sharp(undefined);
+      });
+    });
+    it('Null', function () {
+      assert.throws(function () {
+        sharp(null);
+      });
+    });
     it('Numeric', function () {
       assert.throws(function () {
         sharp(1);
@@ -316,11 +326,6 @@ describe('Input/output', function () {
     it('Boolean', function () {
       assert.throws(function () {
         sharp(true);
-      });
-    });
-    it('Empty Object', function () {
-      assert.throws(function () {
-        sharp({});
       });
     });
     it('Error Object', function () {
@@ -1257,27 +1262,27 @@ describe('Input/output', function () {
   describe('Raw pixel input', function () {
     it('Missing options', function () {
       assert.throws(function () {
-        sharp(null, { raw: {} });
+        sharp({ raw: {} });
       });
     });
     it('Incomplete options', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 1, height: 1 } });
+        sharp({ raw: { width: 1, height: 1 } });
       });
     });
     it('Invalid channels', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 1, height: 1, channels: 5 } });
+        sharp({ raw: { width: 1, height: 1, channels: 5 } });
       });
     });
     it('Invalid height', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 1, height: 0, channels: 4 } });
+        sharp({ raw: { width: 1, height: 0, channels: 4 } });
       });
     });
     it('Invalid width', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 'zoinks', height: 1, channels: 4 } });
+        sharp({ raw: { width: 'zoinks', height: 1, channels: 4 } });
       });
     });
     it('RGB', function (done) {
@@ -1344,7 +1349,7 @@ describe('Input/output', function () {
         channels: 3,
         background: { r: 0, g: 255, b: 0 }
       };
-      sharp(null, { create: create })
+      sharp({ create: create })
         .jpeg()
         .toBuffer(function (err, data, info) {
           if (err) throw err;
@@ -1362,7 +1367,7 @@ describe('Input/output', function () {
         channels: 4,
         background: { r: 255, g: 0, b: 0, alpha: 128 }
       };
-      sharp(null, { create: create })
+      sharp({ create: create })
         .png()
         .toBuffer(function (err, data, info) {
           if (err) throw err;
@@ -1381,7 +1386,7 @@ describe('Input/output', function () {
         background: { r: 0, g: 0, b: 0 }
       };
       assert.throws(function () {
-        sharp(null, { create: create });
+        sharp({ create: create });
       });
     });
     it('Missing background', function () {
@@ -1391,7 +1396,7 @@ describe('Input/output', function () {
         channels: 3
       };
       assert.throws(function () {
-        sharp(null, { create: create });
+        sharp({ create: create });
       });
     });
   });
