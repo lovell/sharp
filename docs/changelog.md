@@ -14,6 +14,10 @@ Requires libvips v8.5.2.
   [#573](https://github.com/lovell/sharp/issues/573)
   [@strarsis](https://github.com/strarsis)
 
+* Include pixel depth (e.g. "uchar") when reading metadata.
+  [#577](https://github.com/lovell/sharp/issues/577)
+  [@moedusa](https://github.com/moedusa)
+
 * Add support for Buffer and Stream-based TIFF output.
   [#587](https://github.com/lovell/sharp/issues/587)
   [@strarsis](https://github.com/strarsis)

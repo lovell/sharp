@@ -57,6 +57,7 @@ class MetadataWorker : public Nan::AsyncWorker {
       baton->height = image.height();
       baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image.interpretation());
       baton->channels = image.bands();
+      baton->depth = vips_enum_nick(VIPS_TYPE_BAND_FORMAT, image.format());
       if (sharp::HasDensity(image)) {
         baton->density = sharp::GetDensity(image);
       }
@@ -103,6 +104,7 @@ class MetadataWorker : public Nan::AsyncWorker {
       Set(info, New("height").ToLocalChecked(), New<v8::Uint32>(baton->height));
       Set(info, New("space").ToLocalChecked(), New<v8::String>(baton->space).ToLocalChecked());
       Set(info, New("channels").ToLocalChecked(), New<v8::Uint32>(baton->channels));
+      Set(info, New("depth").ToLocalChecked(), New<v8::String>(baton->depth).ToLocalChecked());
       if (baton->density > 0) {
         Set(info, New("density").ToLocalChecked(), New<v8::Uint32>(baton->density));
       }
