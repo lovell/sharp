@@ -41,6 +41,10 @@ Requires libvips v8.5.2.
   [#772](https://github.com/lovell/sharp/issues/772)
   [@ajiratech2](https://github.com/ajiratech2)
 
+* Prevent aliasing by using dynamic values for shrink(-on-load).
+  [#781](https://github.com/lovell/sharp/issues/781)
+  [@kleisauke](https://github.com/kleisauke)
+
 * Expose libvips' "squash" parameter to enable 1-bit TIFF output.
   [#783](https://github.com/lovell/sharp/pull/783)
   [@YvesBos](https://github.com/YvesBos)

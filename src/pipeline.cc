@@ -242,6 +242,12 @@ class PipelineWorker : public Nan::AsyncWorker {
           shrink_on_load = 2;
         }
       }
+      // Help ensure a final kernel-based reduction to prevent shrink aliasing
+      if (shrink_on_load > 1 && (xresidual == 1.0 || yresidual == 1.0)) {
+        shrink_on_load = shrink_on_load / 2;
+        xfactor = xfactor * 2;
+        yfactor = yfactor * 2;
+      }
       if (shrink_on_load > 1) {
         // Reload input using shrink-on-load
         vips::VOption *option = VImage::option()->set("shrink", shrink_on_load);
@@ -284,6 +290,13 @@ class PipelineWorker : public Nan::AsyncWorker {
         ) {
           std::swap(xresidual, yresidual);
         }
+      }
+      // Help ensure a final kernel-based reduction to prevent shrink aliasing
+      if ((xshrink > 1 || yshrink > 1) && (xresidual == 1.0 || yresidual == 1.0)) {
+        xshrink = xshrink / 2;
+        yshrink = yshrink / 2;
+        xresidual = xresidual / 2.0;
+        yresidual = yresidual / 2.0;
       }
 
       // Ensure we're using a device-independent colour space

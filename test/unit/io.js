@@ -1335,7 +1335,7 @@ describe('Input/output', function () {
               assert.strictEqual(256, info.width);
               assert.strictEqual(192, info.height);
               assert.strictEqual(4, info.channels);
-              fixtures.assertSimilar(fixtures.inputPngOverlayLayer1, data, done);
+              fixtures.assertSimilar(fixtures.inputPngOverlayLayer1, data, { threshold: 7 }, done);
             });
         });
     });
