@@ -7,11 +7,12 @@ const assert = require('assert');
 const Benchmark = require('benchmark');
 
 // Contenders
+const sharp = require('../../');
 const gm = require('gm');
 const imagemagick = require('imagemagick');
 const mapnik = require('mapnik');
 const jimp = require('jimp');
-const sharp = require('../../');
+const images = require('images');
 let imagemagickNative;
 try {
   imagemagickNative = require('imagemagick-native');
@@ -20,7 +21,7 @@ try {
 }
 let lwip;
 try {
-  lwip = require('lwip');
+  lwip = require('pajk-lwip');
 } catch (err) {
   console.log('Excluding lwip');
 }
@@ -145,7 +146,7 @@ async.series({
     }).add('mapnik-buffer-buffer', {
       defer: true,
       fn: function (deferred) {
-        mapnik.Image.fromBytes(inputJpgBuffer, function (err, img) {
+        mapnik.Image.fromBytes(inputJpgBuffer, { max_size: 3000 }, function (err, img) {
           if (err) throw err;
           img
             .resize(width, height, {
@@ -265,6 +266,12 @@ async.series({
             }
           });
       }
+    });
+    // images
+    jpegSuite.add('images-file-file', function () {
+      images(fixtures.inputJpg)
+        .resize(width, height)
+        .save(fixtures.outputJpg, { quality: 80 });
     });
     // sharp
     jpegSuite.add('sharp-buffer-file', {
@@ -733,7 +740,7 @@ async.series({
     }).add('mapnik-buffer-buffer', {
       defer: true,
       fn: function (deferred) {
-        mapnik.Image.fromBytes(inputPngBuffer, function (err, img) {
+        mapnik.Image.fromBytes(inputPngBuffer, { max_size: 3000 }, function (err, img) {
           if (err) throw err;
           img.premultiply(function (err, img) {
             if (err) throw err;
@@ -818,6 +825,12 @@ async.series({
             }
           });
       }
+    });
+    // images
+    pngSuite.add('images-file-file', function () {
+      images(fixtures.inputPng)
+        .resize(width, height)
+        .save(fixtures.outputPng);
     });
     // sharp
     pngSuite.add('sharp-buffer-file', {
@@ -957,7 +970,7 @@ async.series({
     }).add('sharp-file-buffer', {
       defer: true,
       fn: function (deferred) {
-        sharp(fixtures.inputWebp)
+        sharp(fixtures.inputWebP)
           .resize(width, height)
           .toBuffer(function (err, buffer) {
             if (err) {
