@@ -36,6 +36,7 @@ enum class Canvas {
 
 struct PipelineBaton {
   sharp::InputDescriptor *input;
+  bool fail;
   std::string iccProfilePath;
   int limitInputPixels;
   std::string formatOut;
@@ -129,6 +130,7 @@ struct PipelineBaton {
 
   PipelineBaton():
     input(nullptr),
+    fail(false),
     limitInputPixels(0),
     bufferOutLength(0),
     overlay(nullptr),
