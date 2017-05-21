@@ -35,7 +35,8 @@
     "Rahul Nanwani <r.nanwani@gmail.com>",
     "Alice Monday <alice0meta@gmail.com>",
     "Kristo Jorgenson <kristo.jorgenson@gmail.com>",
-    "YvesBos <yves_bos@outlook.com>"
+    "YvesBos <yves_bos@outlook.com>",
+    "Guy Maliar <guy@tailorbrands.com>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",

@@ -105,6 +105,13 @@ docker pull marcbachmann/libvips
 docker pull wjordan/libvips
 ```
 
+[Tailor Brands](https://github.com/TailorBrands) maintain
+[Debian-based Dockerfiles for libvips and nodejs](https://github.com/TailorBrands/docker-libvips).
+
+```sh
+docker pull tailor/docker-libvips
+```
+
 ### AWS Lambda
 
 In order to use sharp on AWS Lambda, you need to [create a deployment package](http://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html). Because sharp
