@@ -3,7 +3,6 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const zlib = require('zlib');
 
 const caw = require('caw');
 const got = require('got');
@@ -29,15 +28,16 @@ const isFile = function (file) {
 };
 
 const unpack = function (tarPath, done) {
-  const extractor = tar.Extract({ path: path.join(__dirname, 'vendor') });
-  if (done) {
-    extractor.on('end', done);
-  }
-  extractor.on('error', error);
-  fs.createReadStream(tarPath)
-    .on('error', error)
-    .pipe(zlib.Unzip())
-    .pipe(extractor);
+  const vendorPath = path.join(__dirname, 'vendor');
+  fs.mkdirSync(vendorPath);
+  tar
+    .extract({
+      file: tarPath,
+      cwd: vendorPath,
+      strict: true
+    })
+    .then(done)
+    .catch(error);
 };
 
 const platformId = function () {

@@ -18,7 +18,7 @@ export CXXFLAGS="${FLAGS}"
 # Dependency version numbers
 VERSION_ZLIB=1.2.11
 VERSION_FFI=3.2.1
-VERSION_GLIB=2.52.0
+VERSION_GLIB=2.53.1
 VERSION_XML2=2.9.4
 VERSION_GSF=1.14.41
 VERSION_EXIF=0.6.21
@@ -29,15 +29,15 @@ VERSION_WEBP=0.6.0
 VERSION_TIFF=4.0.7
 VERSION_ORC=0.4.26
 VERSION_GDKPIXBUF=2.36.6
-VERSION_FREETYPE=2.7.1
+VERSION_FREETYPE=2.8
 VERSION_EXPAT=2.2.0
 VERSION_FONTCONFIG=2.12.1
-VERSION_HARFBUZZ=1.4.5
+VERSION_HARFBUZZ=1.4.6
 VERSION_PIXMAN=0.34.0
 VERSION_CAIRO=1.14.8
-VERSION_PANGO=1.40.4
-VERSION_CROCO=0.6.11
-VERSION_SVG=2.40.16
+VERSION_PANGO=1.40.5
+VERSION_CROCO=0.6.12
+VERSION_SVG=2.40.17
 VERSION_GIF=5.1.4
 
 # Least out-of-sync Sourceforge mirror
@@ -57,7 +57,7 @@ cd ${DEPS}/ffi
 make install-strip
 
 mkdir ${DEPS}/glib
-curl -Ls https://download.gnome.org/sources/glib/2.52/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
+curl -Ls https://download.gnome.org/sources/glib/2.53/glib-${VERSION_GLIB}.tar.xz | tar xJC ${DEPS}/glib --strip-components=1
 cd ${DEPS}/glib
 echo glib_cv_stack_grows=no >>glib.cache
 echo glib_cv_uscore=no >>glib.cache

@@ -2,7 +2,7 @@
 
 ### v0.18 - "*ridge*"
 
-Requires libvips v8.5.2.
+Requires libvips v8.5.5.
 
 #### v0.18.0 - TBD
 
