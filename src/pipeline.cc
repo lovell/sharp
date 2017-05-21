@@ -434,7 +434,7 @@ class PipelineWorker : public Nan::AsyncWorker {
         if (yresidual > 1.0 || xresidual > 1.0) {
           if (trunc(xresidual) == xresidual && trunc(yresidual) == yresidual && baton->interpolator == "nearest") {
             // Fast, integral nearest neighbour enlargement
-            image = image.zoom(xresidual, yresidual);
+            image = image.zoom(static_cast<int>(xresidual), static_cast<int>(yresidual));
           } else {
             // Floating point affine transformation
             vips::VInterpolate interpolator = vips::VInterpolate::new_from_name(baton->interpolator.data());
