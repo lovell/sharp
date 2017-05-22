@@ -266,7 +266,7 @@ describe('Input/output', function () {
         assert.strictEqual(240, info.height);
         done();
       });
-  });  
+  });
 
   it('Fail when output File is input File', function (done) {
     sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, function (err) {
