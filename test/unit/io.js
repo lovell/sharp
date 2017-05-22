@@ -252,6 +252,21 @@ describe('Input/output', function () {
         done();
       });
   });
+  
+  it('Support output to jpg format', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .toFormat('jpg')
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(data.length, info.size);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });  
 
   it('Fail when output File is input File', function (done) {
     sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, function (err) {
