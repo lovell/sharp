@@ -29,67 +29,32 @@ using vips::VError;
 namespace sharp {
 
   /*
-    Alpha composite src over dst with given gravity.
-    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
+    Composite overlayImage over image at given position
+    Assumes alpha channels are already premultiplied and will be unpremultiplied after
    */
-  VImage Composite(VImage src, VImage dst, const int gravity) {
-    if (IsInputValidForComposition(src, dst)) {
-      // Enlarge overlay src, if required
-      if (src.width() < dst.width() || src.height() < dst.height()) {
-        // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
-        int left;
-        int top;
-        std::tie(left, top) = CalculateCrop(dst.width(), dst.height(), src.width(), src.height(), gravity);
-        // Embed onto transparent background
-        std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
-        src = src.embed(left, top, dst.width(), dst.height(), VImage::option()
+  VImage Composite(VImage image, VImage overlayImage, int const left, int const top) {
+    if (HasAlpha(overlayImage)) {
+      // Alpha composite
+      if (overlayImage.width() < image.width() || overlayImage.height() < image.height()) {
+        // Enlarge overlay
+        std::vector<double> const background { 0.0, 0.0, 0.0, 0.0 };
+        overlayImage = overlayImage.embed(left, top, image.width(), image.height(), VImage::option()
           ->set("extend", VIPS_EXTEND_BACKGROUND)
           ->set("background", background));
       }
-      return CompositeImage(src, dst);
-    }
-    // If the input was not valid for composition the return the input image itself
-    return dst;
-  }
-
-  VImage Composite(VImage src, VImage dst, const int x, const int y) {
-    if (IsInputValidForComposition(src, dst)) {
-      // Enlarge overlay src, if required
-      if (src.width() < dst.width() || src.height() < dst.height()) {
-        // Calculate the (left, top) coordinates of the output image within the input image, applying the given gravity.
-        int left;
-        int top;
-        std::tie(left, top) = CalculateCrop(dst.width(), dst.height(), src.width(), src.height(), x, y);
-        // Embed onto transparent background
-        std::vector<double> background { 0.0, 0.0, 0.0, 0.0 };
-        src = src.embed(left, top, dst.width(), dst.height(), VImage::option()
-          ->set("extend", VIPS_EXTEND_BACKGROUND)
-          ->set("background", background));
+      return AlphaComposite(image, overlayImage);
+    } else {
+      if (HasAlpha(image)) {
+        // Add alpha channel to overlayImage so channels match
+        double const multiplier = sharp::Is16Bit(overlayImage.interpretation()) ? 256.0 : 1.0;
+        overlayImage = overlayImage.bandjoin(
+          VImage::new_matrix(overlayImage.width(), overlayImage.height()).new_from_image(255 * multiplier));
       }
-      return CompositeImage(src, dst);
+      return image.insert(overlayImage, left, top);
     }
-    // If the input was not valid for composition the return the input image itself
-    return dst;
   }
 
-  bool IsInputValidForComposition(VImage src, VImage dst) {
-    using sharp::CalculateCrop;
-    using sharp::HasAlpha;
-
-    if (!HasAlpha(src)) {
-      throw VError("Overlay image must have an alpha channel");
-    }
-    if (!HasAlpha(dst)) {
-      throw VError("Image to be overlaid must have an alpha channel");
-    }
-    if (src.width() > dst.width() || src.height() > dst.height()) {
-      throw VError("Overlay image must have same dimensions or smaller");
-    }
-
-    return true;
-  }
-
-  VImage CompositeImage(VImage src, VImage dst) {
+  VImage AlphaComposite(VImage dst, VImage src) {
     // Split src into non-alpha and alpha channels
     VImage srcWithoutAlpha = src.extract_band(0, VImage::option()->set("n", src.bands() - 1));
     VImage srcAlpha = src[src.bands() - 1] * (1.0 / 255.0);
@@ -300,118 +265,6 @@ namespace sharp {
         VImage::option()->set("sigma", sigma)->set("m1", flat)->set("m2", jagged))
         .colourspace(colourspaceBeforeSharpen);
     }
-  }
-
-  /*
-    Calculate the Shannon entropy
-  */
-  double EntropyStrategy::operator()(VImage image) {
-    return image.hist_find().hist_entropy();
-  }
-
-  /*
-    Calculate the intensity of edges, skin tone and saturation
-  */
-  double AttentionStrategy::operator()(VImage image) {
-    // Flatten RGBA onto a mid-grey background
-    if (image.bands() == 4 && HasAlpha(image)) {
-      double const midgrey = sharp::Is16Bit(image.interpretation()) ? 32768.0 : 128.0;
-      std::vector<double> background { midgrey, midgrey, midgrey };
-      image = image.flatten(VImage::option()->set("background", background));
-    }
-    // Convert to LAB colourspace
-    VImage lab = image.colourspace(VIPS_INTERPRETATION_LAB);
-    VImage l = lab[0];
-    VImage a = lab[1];
-    VImage b = lab[2];
-    // Edge detect luminosity with the Sobel operator
-    VImage sobel = vips::VImage::new_matrixv(3, 3,
-      -1.0, 0.0, 1.0,
-      -2.0, 0.0, 2.0,
-      -1.0, 0.0, 1.0);
-    VImage edges = l.conv(sobel).abs() + l.conv(sobel.rot90()).abs();
-    // Skin tone chroma thresholds trained with http://humanae.tumblr.com/
-    VImage skin = (a >= 3) & (a <= 22) & (b >= 4) & (b <= 31);
-    // Chroma >~50% saturation
-    VImage lch = lab.colourspace(VIPS_INTERPRETATION_LCH);
-    VImage c = lch[1];
-    VImage saturation = c > 60;
-    // Find maximum in combined saliency mask
-    VImage mask = edges + skin + saturation;
-    return mask.max();
-  }
-
-  /*
-    Calculate crop area based on image entropy
-  */
-  std::tuple<int, int> Crop(
-    VImage image, int const outWidth, int const outHeight, std::function<double(VImage)> strategy
-  ) {
-    int left = 0;
-    int top = 0;
-    int const inWidth = image.width();
-    int const inHeight = image.height();
-    if (inWidth > outWidth) {
-      // Reduce width by repeated removing slices from edge with lowest score
-      int width = inWidth;
-      double leftScore = 0.0;
-      double rightScore = 0.0;
-      // Max width of each slice
-      int const maxSliceWidth = static_cast<int>(ceil((inWidth - outWidth) / 8.0));
-      while (width > outWidth) {
-        // Width of current slice
-        int const slice = std::min(width - outWidth, maxSliceWidth);
-        if (leftScore == 0.0) {
-          // Update score of left slice
-          leftScore = strategy(image.extract_area(left, 0, slice, inHeight));
-        }
-        if (rightScore == 0.0) {
-          // Update score of right slice
-          rightScore = strategy(image.extract_area(width - slice - 1, 0, slice, inHeight));
-        }
-        // Keep slice with highest score
-        if (leftScore >= rightScore) {
-          // Discard right slice
-          rightScore = 0.0;
-        } else {
-          // Discard left slice
-          leftScore = 0.0;
-          left = left + slice;
-        }
-        width = width - slice;
-      }
-    }
-    if (inHeight > outHeight) {
-      // Reduce height by repeated removing slices from edge with lowest score
-      int height = inHeight;
-      double topScore = 0.0;
-      double bottomScore = 0.0;
-      // Max height of each slice
-      int const maxSliceHeight = static_cast<int>(ceil((inHeight - outHeight) / 8.0));
-      while (height > outHeight) {
-        // Height of current slice
-        int const slice = std::min(height - outHeight, maxSliceHeight);
-        if (topScore == 0.0) {
-          // Update score of top slice
-          topScore = strategy(image.extract_area(0, top, inWidth, slice));
-        }
-        if (bottomScore == 0.0) {
-          // Update score of bottom slice
-          bottomScore = strategy(image.extract_area(0, height - slice - 1, inWidth, slice));
-        }
-        // Keep slice with highest score
-        if (topScore >= bottomScore) {
-          // Discard bottom slice
-          bottomScore = 0.0;
-        } else {
-          // Discard top slice
-          topScore = 0.0;
-          top = top + slice;
-        }
-        height = height - slice;
-      }
-    }
-    return std::make_tuple(left, top);
   }
 
   /*

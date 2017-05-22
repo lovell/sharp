@@ -1,5 +1,54 @@
 # Changelog
 
+### v0.18 - "*ridge*"
+
+Requires libvips v8.5.5.
+
+#### v0.18.0 - TBD
+
+* Ensure maximum output dimensions are based on the format to be used.
+  [#176](https://github.com/lovell/sharp/issues/176)
+  [@stephanebachelier](https://github.com/stephanebachelier)
+
+* Avoid costly (un)premultiply when using overlayWith without alpha channel.
+  [#573](https://github.com/lovell/sharp/issues/573)
+  [@strarsis](https://github.com/strarsis)
+
+* Include pixel depth (e.g. "uchar") when reading metadata.
+  [#577](https://github.com/lovell/sharp/issues/577)
+  [@moedusa](https://github.com/moedusa)
+
+* Add support for Buffer and Stream-based TIFF output.
+  [#587](https://github.com/lovell/sharp/issues/587)
+  [@strarsis](https://github.com/strarsis)
+
+* Expose warnings from libvips via NODE_DEBUG=sharp environment variable.
+  [#607](https://github.com/lovell/sharp/issues/607)
+  [@puzrin](https://github.com/puzrin)
+
+* Switch to the libvips implementation of "attention" and "entropy" crop strategies.
+  [#727](https://github.com/lovell/sharp/issues/727)
+
+* Improve performance and accuracy of nearest neighbour integral upsampling.
+  [#752](https://github.com/lovell/sharp/issues/752)
+  [@MrIbby](https://github.com/MrIbby)
+
+* Constructor single argument API: allow plain object, reject null/undefined.
+  [#768](https://github.com/lovell/sharp/issues/768)
+  [@kub1x](https://github.com/kub1x)
+
+* Ensure ARM64 pre-built binaries use correct C++11 ABI version.
+  [#772](https://github.com/lovell/sharp/issues/772)
+  [@ajiratech2](https://github.com/ajiratech2)
+
+* Prevent aliasing by using dynamic values for shrink(-on-load).
+  [#781](https://github.com/lovell/sharp/issues/781)
+  [@kleisauke](https://github.com/kleisauke)
+
+* Expose libvips' "squash" parameter to enable 1-bit TIFF output.
+  [#783](https://github.com/lovell/sharp/pull/783)
+  [@YvesBos](https://github.com/YvesBos)
+
 ### v0.17 - "*quill*"
 
 Requires libvips v8.4.2.

@@ -29,6 +29,7 @@ struct MetadataBaton {
   int height;
   std::string space;
   int channels;
+  std::string depth;
   int density;
   bool hasProfile;
   bool hasAlpha;

@@ -288,7 +288,7 @@ describe('Input/output', function () {
   });
 
   it('Fail when input is empty Buffer', function (done) {
-    sharp(new Buffer(0)).toBuffer().then(function () {
+    sharp(Buffer.alloc(0)).toBuffer().then(function () {
       assert(false);
       done();
     }).catch(function (err) {
@@ -298,7 +298,7 @@ describe('Input/output', function () {
   });
 
   it('Fail when input is invalid Buffer', function (done) {
-    sharp(new Buffer([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
+    sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
       assert(false);
       done();
     }).catch(function (err) {
@@ -308,6 +308,16 @@ describe('Input/output', function () {
   });
 
   describe('Fail for unsupported input', function () {
+    it('Undefined', function () {
+      assert.throws(function () {
+        sharp(undefined);
+      });
+    });
+    it('Null', function () {
+      assert.throws(function () {
+        sharp(null);
+      });
+    });
     it('Numeric', function () {
       assert.throws(function () {
         sharp(1);
@@ -316,11 +326,6 @@ describe('Input/output', function () {
     it('Boolean', function () {
       assert.throws(function () {
         sharp(true);
-      });
-    });
-    it('Empty Object', function () {
-      assert.throws(function () {
-        sharp({});
       });
     });
     it('Error Object', function () {
@@ -837,6 +842,20 @@ describe('Input/output', function () {
       });
   });
 
+  it('Save TIFF to Buffer', function (done) {
+    sharp(fixtures.inputTiff)
+      .resize(320, 240)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(data.length, info.size);
+        assert.strictEqual('tiff', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
   it('Invalid WebP quality throws error', function () {
     assert.throws(function () {
       sharp().webp({ quality: 101 });
@@ -914,7 +933,7 @@ describe('Input/output', function () {
       });
   });
 
-  it('TIFF deflate compression with hoizontal predictor shrinks test file', function (done) {
+  it('TIFF deflate compression with horizontal predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -1243,27 +1262,27 @@ describe('Input/output', function () {
   describe('Raw pixel input', function () {
     it('Missing options', function () {
       assert.throws(function () {
-        sharp(null, { raw: {} });
+        sharp({ raw: {} });
       });
     });
     it('Incomplete options', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 1, height: 1 } });
+        sharp({ raw: { width: 1, height: 1 } });
       });
     });
     it('Invalid channels', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 1, height: 1, channels: 5 } });
+        sharp({ raw: { width: 1, height: 1, channels: 5 } });
       });
     });
     it('Invalid height', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 1, height: 0, channels: 4 } });
+        sharp({ raw: { width: 1, height: 0, channels: 4 } });
       });
     });
     it('Invalid width', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 'zoinks', height: 1, channels: 4 } });
+        sharp({ raw: { width: 'zoinks', height: 1, channels: 4 } });
       });
     });
     it('RGB', function (done) {
@@ -1316,7 +1335,7 @@ describe('Input/output', function () {
               assert.strictEqual(256, info.width);
               assert.strictEqual(192, info.height);
               assert.strictEqual(4, info.channels);
-              fixtures.assertSimilar(fixtures.inputPngOverlayLayer1, data, done);
+              fixtures.assertSimilar(fixtures.inputPngOverlayLayer1, data, { threshold: 7 }, done);
             });
         });
     });
@@ -1330,7 +1349,7 @@ describe('Input/output', function () {
         channels: 3,
         background: { r: 0, g: 255, b: 0 }
       };
-      sharp(null, { create: create })
+      sharp({ create: create })
         .jpeg()
         .toBuffer(function (err, data, info) {
           if (err) throw err;
@@ -1348,7 +1367,7 @@ describe('Input/output', function () {
         channels: 4,
         background: { r: 255, g: 0, b: 0, alpha: 128 }
       };
-      sharp(null, { create: create })
+      sharp({ create: create })
         .png()
         .toBuffer(function (err, data, info) {
           if (err) throw err;
@@ -1367,7 +1386,7 @@ describe('Input/output', function () {
         background: { r: 0, g: 0, b: 0 }
       };
       assert.throws(function () {
-        sharp(null, { create: create });
+        sharp({ create: create });
       });
     });
     it('Missing background', function () {
@@ -1377,7 +1396,7 @@ describe('Input/output', function () {
         channels: 3
       };
       assert.throws(function () {
-        sharp(null, { create: create });
+        sharp({ create: create });
       });
     });
   });

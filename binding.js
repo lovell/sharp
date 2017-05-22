@@ -3,7 +3,6 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const zlib = require('zlib');
 
 const caw = require('caw');
 const got = require('got');
@@ -29,21 +28,22 @@ const isFile = function (file) {
 };
 
 const unpack = function (tarPath, done) {
-  const extractor = tar.Extract({ path: path.join(__dirname, 'vendor') });
-  if (done) {
-    extractor.on('end', done);
-  }
-  extractor.on('error', error);
-  fs.createReadStream(tarPath)
-    .on('error', error)
-    .pipe(zlib.Unzip())
-    .pipe(extractor);
+  const vendorPath = path.join(__dirname, 'vendor');
+  fs.mkdirSync(vendorPath);
+  tar
+    .extract({
+      file: tarPath,
+      cwd: vendorPath,
+      strict: true
+    })
+    .then(done)
+    .catch(error);
 };
 
 const platformId = function () {
   const platformId = [platform];
-  if (arch === 'arm' || arch === 'armhf' || arch === 'arch64') {
-    const armVersion = (arch === 'arch64') ? '8' : process.env.npm_config_armv || process.config.variables.arm_version || '6';
+  if (arch === 'arm' || arch === 'armhf' || arch === 'arm64') {
+    const armVersion = (arch === 'arm64') ? '8' : process.env.npm_config_armv || process.config.variables.arm_version || '6';
     platformId.push('armv' + armVersion);
   } else {
     platformId.push(arch);

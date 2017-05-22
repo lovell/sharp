@@ -32,20 +32,14 @@ namespace sharp {
   VImage Composite(VImage src, VImage dst, const int gravity);
 
   /*
-    Alpha composite src over dst with given x and y offsets.
-    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
+    Composite overlayImage over image at given position
    */
-  VImage Composite(VImage src, VImage dst, const int x, const int y);
+  VImage Composite(VImage image, VImage overlayImage, int const x, int const y);
 
   /*
-    Check if the src and dst Images for composition operation are valid
+    Alpha composite overlayImage over image, assumes matching dimensions
   */
-  bool IsInputValidForComposition(VImage src, VImage dst);
-
-  /*
-    Given a valid src and dst, returns the composite of the two images
-  */
-  VImage CompositeImage(VImage src, VImage dst);
+  VImage AlphaComposite(VImage image, VImage overlayImage);
 
   /*
     Cutout src over dst with given gravity.
@@ -77,22 +71,6 @@ namespace sharp {
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
    */
   VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged);
-
-  /*
-    Crop strategy functors
-  */
-  struct EntropyStrategy {
-    double operator()(VImage image);
-  };
-  struct AttentionStrategy {
-    double operator()(VImage image);
-  };
-
-  /*
-    Calculate crop area based on given strategy (Entropy, Attention)
-  */
-  std::tuple<int, int> Crop(
-    VImage image, int const outWidth, int const outHeight, std::function<double(VImage)> strategy);
 
   /*
     Insert a tile cache to prevent over-computation of any previous operations in the pipeline

@@ -34,8 +34,9 @@ A Promises/A+ promise is returned when `callback` is not provided.
 -   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
 -   `width`: Number of pixels wide
 -   `height`: Number of pixels high
--   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L568)
+-   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L636)
 -   `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
+-   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L672)
 -   `density`: Number of pixels per inch (DPI), if present
 -   `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 -   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
@@ -88,6 +89,6 @@ This will reduce memory usage and can improve performance on some systems.
 
 **Parameters**
 
--   `sequentialRead` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?**  (optional, default `true`)
+-   `sequentialRead` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
 
 Returns **Sharp** 
