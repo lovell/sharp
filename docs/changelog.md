@@ -49,6 +49,14 @@ Requires libvips v8.5.5.
   [#783](https://github.com/lovell/sharp/pull/783)
   [@YvesBos](https://github.com/YvesBos)
 
+* Add support for rotation using any multiple of +/-90 degrees.
+  [#791](https://github.com/lovell/sharp/pull/791)
+  [@ncoden](https://github.com/ncoden)
+
+* Add "jpg" alias to toFormat as shortened form of "jpeg".
+  [#814](https://github.com/lovell/sharp/pull/814)
+  [@jingsam](https://github.com/jingsam)
+
 ### v0.17 - "*quill*"
 
 Requires libvips v8.4.2.

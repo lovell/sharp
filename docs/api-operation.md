@@ -24,7 +24,10 @@
 Rotate the output image by either an explicit angle
 or auto-orient based on the EXIF `Orientation` tag.
 
-Use this method without angle to determine the angle from EXIF data.
+If an angle is provided, it is converted to a valid 90/180/270deg rotation.
+For example, `-450` will produce a 270deg rotation.
+
+If no angle is provided, it is determined from the EXIF data.
 Mirroring is supported and may infer the use of a flip operation.
 
 The use of `rotate` implies the removal of the EXIF `Orientation` tag, if any.
@@ -34,7 +37,7 @@ for example `rotate(x).extract(y)` will produce a different result to `extract(y
 
 **Parameters**
 
--   `angle` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 0, 90, 180 or 270. (optional, default `auto`)
+-   `angle` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** angle of rotation, must be a multiple of 90. (optional, default `auto`)
 
 **Examples**
 

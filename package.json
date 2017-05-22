@@ -75,14 +75,14 @@
     "tar": "^3.1.3"
   },
   "devDependencies": {
-    "async": "^2.4.0",
-    "cc": "^1.0.0",
+    "async": "^2.4.1",
+    "cc": "^1.0.1",
     "documentation": "^4.0.0-rc.1",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "mocha": "^3.4.1",
     "nyc": "^10.3.2",
-    "rimraf": "^2.5.4",
+    "rimraf": "^2.6.1",
     "semistandard": "^11.0.0",
     "unzip": "^0.1.11"
   },
