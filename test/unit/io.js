@@ -252,7 +252,7 @@ describe('Input/output', function () {
         done();
       });
   });
-  
+
   it('Support output to jpg format', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
