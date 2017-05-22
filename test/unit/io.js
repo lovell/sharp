@@ -254,7 +254,7 @@ describe('Input/output', function () {
   });
 
   it('Support output to jpg format', function (done) {
-    sharp(fixtures.inputJpg)
+    sharp(fixtures.inputPng)
       .resize(320, 240)
       .toFormat('jpg')
       .toBuffer(function (err, data, info) {
