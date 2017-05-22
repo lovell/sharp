@@ -81,6 +81,7 @@ struct PipelineBaton {
   double gamma;
   bool greyscale;
   bool normalise;
+  bool useExifOrientation;
   int angle;
   bool rotateBeforePreExtract;
   bool flip;
@@ -158,6 +159,7 @@ struct PipelineBaton {
     gamma(0.0),
     greyscale(false),
     normalise(false),
+    useExifOrientation(false),
     angle(0),
     flip(false),
     flop(false),

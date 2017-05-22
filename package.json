@@ -36,7 +36,8 @@
     "Alice Monday <alice0meta@gmail.com>",
     "Kristo Jorgenson <kristo.jorgenson@gmail.com>",
     "YvesBos <yves_bos@outlook.com>",
-    "Guy Maliar <guy@tailorbrands.com>"
+    "Guy Maliar <guy@tailorbrands.com>",
+    "Nicolas Coden <nicolas@ncoden.fr>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
