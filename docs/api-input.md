@@ -28,7 +28,7 @@ Returns **Sharp**
 
 ## metadata
 
-Fast access to image metadata without decoding any compressed image data.
+Fast access to (uncached) image metadata without decoding any compressed image data.
 A Promises/A+ promise is returned when `callback` is not provided.
 
 -   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
