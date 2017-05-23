@@ -6,6 +6,11 @@ Requires libvips v8.5.5.
 
 #### v0.18.0 - TBD
 
+* Remove the previously-deprecated output format "option" functions:
+    quality, progressive, compressionLevel, withoutAdaptiveFiltering,
+    withoutChromaSubsampling, trellisQuantisation, trellisQuantization,
+    overshootDeringing, optimiseScans and optimizeScans.
+
 * Ensure maximum output dimensions are based on the format to be used.
   [#176](https://github.com/lovell/sharp/issues/176)
   [@stephanebachelier](https://github.com/stephanebachelier)
