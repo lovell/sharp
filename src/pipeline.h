@@ -69,6 +69,7 @@ struct PipelineBaton {
   std::string interpolator;
   bool centreSampling;
   double background[4];
+  double tint[3];
   bool flatten;
   bool negate;
   double blurSigma;
