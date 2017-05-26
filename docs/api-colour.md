@@ -3,6 +3,7 @@
 ### Table of Contents
 
 -   [background](#background)
+-   [tint](#tint)
 -   [greyscale](#greyscale)
 -   [grayscale](#grayscale)
 -   [toColourspace](#tocolourspace)
@@ -20,6 +21,20 @@ The alpha value is a float between `0` (transparent) and `1` (opaque).
 **Parameters**
 
 -   `rgba` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object))** parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
+
+
+-   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameter
+
+Returns **Sharp** 
+
+## tint
+
+Tint the image using the colour provided, while preserving the image luminance.
+An alpha channel may be present, and will be unchanged by the operation.
+
+**Parameters**
+
+-   `rgb` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object))** parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green and blue.
 
 
 -   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameter

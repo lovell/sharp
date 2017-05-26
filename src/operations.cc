@@ -153,6 +153,40 @@ namespace sharp {
   }
 
   /*
+   * Tint an image using the colour specified, preserving the original image luminance
+   */
+  VImage Tint(VImage image, std::vector<double> colour) {
+    // Get original colourspace
+    VipsInterpretation typeBeforeNormalize = image.interpretation();
+    if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {
+      typeBeforeNormalize = VIPS_INTERPRETATION_sRGB;
+    }
+    if (HasAlpha(image)) {
+        colour.push_back(0);
+    }
+    // Create an image that matches the original, but has every pixel set to the tint colour
+    VImage pixel = image.new_from_image(colour);
+    // Convert to LAB colourspace
+    VImage lab = image.colourspace(VIPS_INTERPRETATION_LAB);
+    VImage labPixel = pixel.colourspace(VIPS_INTERPRETATION_LAB);
+    // Extract luminance from the image
+    VImage luminance = lab[0];
+    // and the 2 chroma bands from the pixel image
+    VImage chroma = labPixel.extract_band(1, VImage::option()->set("n", 2));
+    // Create the tinted version by combining the L from the original, and the Chroma from the tint colour pixel
+    // convert back to the original colour space
+    VImage tinted = luminance.bandjoin(chroma).colourspace(typeBeforeNormalize);
+    // Attach original alpha channel, if any
+    if (HasAlpha(image)) {
+      // Extract original alpha channel
+      VImage alpha = image[image.bands() - 1];
+      // Join alpha channel to normalised image
+      tinted = tinted.bandjoin(alpha);
+    }
+    return tinted;
+  }
+
+  /*
    * Stretch luminance to cover full dynamic range.
    */
   VImage Normalise(VImage image) {
