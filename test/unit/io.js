@@ -933,6 +933,46 @@ describe('Input/output', function () {
     });
   });
 
+  it('TIFF setting xres and yres', function (done) {
+    const res = 300;
+    const image = sharp(fixtures.inputTiff8BitDepth)
+      .tiff({
+        xres: (res),
+        yres: (res)
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert.strictEqual(image.options.tiffXres, res);
+        assert.strictEqual(image.options.tiffYres, res);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('TIFF not setting xres and yres, default value should be retained', function (done) {
+    const image = sharp(fixtures.inputTiff8BitDepth)
+      .tiff()
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert.strictEqual(image.options.tiffXres, 10); // 10 is the default value
+        assert.strictEqual(image.options.tiffYres, 10); // 10 is the default value
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('TIFF invalid xres value should throw an error', function () {
+    assert.throws(function () {
+      sharp().tiff({ xres: '300' });
+    });
+  });
+
+  it('TIFF invalid yres value should throw an error', function () {
+    assert.throws(function () {
+      sharp().tiff({ yres: '300' });
+    });
+  });
+
   it('TIFF lzw compression with horizontal predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
