@@ -4,7 +4,7 @@
 
 Requires libvips v8.5.5.
 
-#### v0.18.0 - TBD
+#### v0.18.0 - 30<sup>th</sup> May 2017
 
 * Remove the previously-deprecated output format "option" functions:
     quality, progressive, compressionLevel, withoutAdaptiveFiltering,
