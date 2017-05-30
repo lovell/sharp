@@ -955,8 +955,8 @@ describe('Input/output', function () {
       .toFile(fixtures.outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
-        assert.strictEqual(image.options.tiffXres, 10.0); // 10.0 is the default value
-        assert.strictEqual(image.options.tiffYres, 10.0); // 10.0 is the default value
+        assert.strictEqual(image.options.tiffXres, 1.0); // 1.0 is the default value
+        assert.strictEqual(image.options.tiffYres, 1.0); // 1.0 is the default value
         fs.unlink(fixtures.outputTiff, done);
       });
   });
