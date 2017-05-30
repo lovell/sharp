@@ -934,7 +934,7 @@ describe('Input/output', function () {
   });
 
   it('TIFF setting xres and yres', function (done) {
-    const res = 300;
+    const res = 300.0;
     const image = sharp(fixtures.inputTiff8BitDepth)
       .tiff({
         xres: (res),
@@ -955,21 +955,21 @@ describe('Input/output', function () {
       .toFile(fixtures.outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
-        assert.strictEqual(image.options.tiffXres, 10); // 10 is the default value
-        assert.strictEqual(image.options.tiffYres, 10); // 10 is the default value
+        assert.strictEqual(image.options.tiffXres, 10.0); // 10.0 is the default value
+        assert.strictEqual(image.options.tiffYres, 10.0); // 10.0 is the default value
         fs.unlink(fixtures.outputTiff, done);
       });
   });
 
   it('TIFF invalid xres value should throw an error', function () {
     assert.throws(function () {
-      sharp().tiff({ xres: '300' });
+      sharp().tiff({ xres: '300.0' });
     });
   });
 
   it('TIFF invalid yres value should throw an error', function () {
     assert.throws(function () {
-      sharp().tiff({ yres: '300' });
+      sharp().tiff({ yres: '300.0' });
     });
   });
 
