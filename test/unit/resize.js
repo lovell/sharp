@@ -413,14 +413,39 @@ describe('Resize dimensions', function () {
     });
   });
 
-  it('Dimensions that result in differing shrinks on each axis', function () {
-    return sharp(fixtures.inputJpg)
+  it('Dimensions that result in differing even shrinks on each axis', function (done) {
+    sharp(fixtures.inputJpg)
       .resize(645, 399)
-      .toBuffer()
-      .then(function (data) {
-        return sharp(data)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(645, info.width);
+        assert.strictEqual(399, info.height);
+        sharp(data)
           .resize(150, 100)
-          .toBuffer();
+          .toBuffer(function (err, data, info) {
+            if (err) throw err;
+            assert.strictEqual(150, info.width);
+            assert.strictEqual(100, info.height);
+            fixtures.assertSimilar(fixtures.expected('resize-diff-shrink-even.jpg'), data, done);
+          });
+      });
+  });
+
+  it('Dimensions that result in differing odd shrinks on each axis', function (done) {
+    return sharp(fixtures.inputJpg)
+      .resize(600, 399)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(600, info.width);
+        assert.strictEqual(399, info.height);
+        sharp(data)
+          .resize(200)
+          .toBuffer(function (err, data, info) {
+            if (err) throw err;
+            assert.strictEqual(200, info.width);
+            assert.strictEqual(133, info.height);
+            fixtures.assertSimilar(fixtures.expected('resize-diff-shrink-odd.jpg'), data, done);
+          });
       });
   });
 });

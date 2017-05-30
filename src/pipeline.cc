@@ -291,8 +291,8 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (xshrink > 1 && yshrink > 1 && (xresidual == 1.0 || yresidual == 1.0)) {
         xshrink = xshrink / 2;
         yshrink = yshrink / 2;
-        xresidual = xresidual / 2.0;
-        yresidual = yresidual / 2.0;
+        xresidual = static_cast<double>(xshrink) / xfactor;
+        yresidual = static_cast<double>(yshrink) / yfactor;
       }
 
       // Ensure we're using a device-independent colour space
