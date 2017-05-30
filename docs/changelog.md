@@ -4,6 +4,12 @@
 
 Requires libvips v8.5.5.
 
+#### v0.18.1 - TBD
+
+* Remove regression from #781 that could cause incorrect shrink calculation.
+  [#831](https://github.com/lovell/sharp/issues/831)
+  [@suprMax](https://github.com/suprMax)
+
 #### v0.18.0 - 30<sup>th</sup> May 2017
 
 * Remove the previously-deprecated output format "option" functions:

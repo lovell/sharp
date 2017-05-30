@@ -288,7 +288,7 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
       }
       // Help ensure a final kernel-based reduction to prevent shrink aliasing
-      if ((xshrink > 1 || yshrink > 1) && (xresidual == 1.0 || yresidual == 1.0)) {
+      if (xshrink > 1 && yshrink > 1 && (xresidual == 1.0 || yresidual == 1.0)) {
         xshrink = xshrink / 2;
         yshrink = yshrink / 2;
         xresidual = xresidual / 2.0;

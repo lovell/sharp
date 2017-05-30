@@ -412,4 +412,15 @@ describe('Resize dimensions', function () {
       sharp().resize(32, 24, { centreSampling: 1 });
     });
   });
+
+  it('Dimensions that result in differing shrinks on each axis', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(645, 399)
+      .toBuffer()
+      .then(function (data) {
+        return sharp(data)
+          .resize(150, 100)
+          .toBuffer();
+      });
+  });
 });
