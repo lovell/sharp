@@ -945,7 +945,7 @@ describe('Input/output', function () {
         assert.strictEqual('tiff', info.format);
         sharp(fixtures.outputTiff).metadata(function (err, metadata) {
           if (err) throw err;
-          assert.strictEqual(metadata.density, res*2.54); // convert to dpi
+          assert.strictEqual(metadata.density, res * 2.54); // convert to dpi
           fs.unlink(fixtures.outputTiff, done);
         });
       });
