@@ -935,7 +935,7 @@ describe('Input/output', function () {
 
   it('TIFF setting xres and yres on file', function (done) {
     const res = 1000.0; // inputTiff has a dpi of 300 (res*2.54)
-    const image = sharp(fixtures.inputTiff)
+    sharp(fixtures.inputTiff)
       .tiff({
         xres: (res),
         yres: (res)
@@ -944,10 +944,10 @@ describe('Input/output', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         sharp(fixtures.outputTiff).metadata(function (err, metadata) {
-            if (err) throw err;
-            assert.strictEqual(metadata.density, res*2.54); // convert to dpi
-            fs.unlink(fixtures.outputTiff, done);
-           });
+          if (err) throw err;
+          assert.strictEqual(metadata.density, res*2.54); // convert to dpi
+          fs.unlink(fixtures.outputTiff, done);
+        });
       });
   });
 
