@@ -809,6 +809,9 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("squash", baton->tiffSquash)
             ->set("compression", baton->tiffCompression)
             ->set("predictor", baton->tiffPredictor)));
+            ->set("predictor", baton->tiffPredictor)
+            ->set("xres", baton->tiffXres)
+            ->set("yres", baton->tiffYres)
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
           area->free_fn = nullptr;

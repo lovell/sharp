@@ -933,9 +933,9 @@ describe('Input/output', function () {
     });
   });
 
-  it('TIFF setting xres and yres', function (done) {
-    const res = 300.0;
-    const image = sharp(fixtures.inputTiff8BitDepth)
+  it('TIFF setting xres and yres on file', function (done) {
+    const res = 1000.0; // inputTiff has a dpi of 300 (res*2.54)
+    const image = sharp(fixtures.inputTiff)
       .tiff({
         xres: (res),
         yres: (res)
@@ -943,33 +943,23 @@ describe('Input/output', function () {
       .toFile(fixtures.outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
-        assert.strictEqual(image.options.tiffXres, res);
-        assert.strictEqual(image.options.tiffYres, res);
-        fs.unlink(fixtures.outputTiff, done);
-      });
-  });
-
-  it('TIFF not setting xres and yres, default value should be retained', function (done) {
-    const image = sharp(fixtures.inputTiff8BitDepth)
-      .tiff()
-      .toFile(fixtures.outputTiff, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual('tiff', info.format);
-        assert.strictEqual(image.options.tiffXres, 1.0); // 1.0 is the default value
-        assert.strictEqual(image.options.tiffYres, 1.0); // 1.0 is the default value
-        fs.unlink(fixtures.outputTiff, done);
+        sharp(fixtures.outputTiff).metadata(function (err, metadata) {
+            if (err) throw err;
+            assert.strictEqual(metadata.density, res*2.54); // convert to dpi
+            fs.unlink(fixtures.outputTiff, done);
+           });
       });
   });
 
   it('TIFF invalid xres value should throw an error', function () {
     assert.throws(function () {
-      sharp().tiff({ xres: '300.0' });
+      sharp().tiff({ xres: '1000.0' });
     });
   });
 
   it('TIFF invalid yres value should throw an error', function () {
     assert.throws(function () {
-      sharp().tiff({ yres: '300.0' });
+      sharp().tiff({ yres: '1000.0' });
     });
   });
 
