@@ -951,6 +951,23 @@ describe('Input/output', function () {
       });
   });
 
+  it('TIFF setting xres and yres on buffer', function (done) {
+    const res = 1000.0; // inputTiff has a dpi of 300 (res*2.54)
+    sharp(fixtures.inputTiff)
+      .tiff({
+        xres: (res),
+        yres: (res)
+      })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        sharp(data).metadata(function (err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(metadata.density, res * 2.54); // convert to dpi
+          done();
+        });
+      });
+  });
+
   it('TIFF invalid xres value should throw an error', function () {
     assert.throws(function () {
       sharp().tiff({ xres: '1000.0' });
