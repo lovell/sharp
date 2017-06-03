@@ -808,7 +808,9 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("Q", baton->tiffQuality)
             ->set("squash", baton->tiffSquash)
             ->set("compression", baton->tiffCompression)
-            ->set("predictor", baton->tiffPredictor)));
+            ->set("predictor", baton->tiffPredictor)
+            ->set("xres", baton->tiffXres)
+            ->set("yres", baton->tiffYres)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
           area->free_fn = nullptr;
@@ -904,7 +906,9 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("Q", baton->tiffQuality)
             ->set("squash", baton->tiffSquash)
             ->set("compression", baton->tiffCompression)
-            ->set("predictor", baton->tiffPredictor));
+            ->set("predictor", baton->tiffPredictor)
+            ->set("xres", baton->tiffXres)
+            ->set("yres", baton->tiffYres));
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
@@ -1277,6 +1281,8 @@ NAN_METHOD(pipeline) {
   baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
   baton->tiffSquash = AttrTo<bool>(options, "tiffSquash");
+  baton->tiffXres = AttrTo<double>(options, "tiffXres");
+  baton->tiffYres = AttrTo<double>(options, "tiffYres");
   // tiff compression options
   baton->tiffCompression = static_cast<VipsForeignTiffCompression>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_COMPRESSION,
