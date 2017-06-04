@@ -4,6 +4,12 @@
 
 Requires libvips v8.5.5.
 
+#### v0.18.2 - TBD
+
+* Expose libvips' xres and yres properties for TIFF output.
+  [#828](https://github.com/lovell/sharp/pull/828)
+  [@YvesBos](https://github.com/YvesBos)
+
 #### v0.18.1 - 30<sup>th</sup> May 2017
 
 * Remove regression from #781 that could cause incorrect shrink calculation.
