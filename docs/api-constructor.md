@@ -80,8 +80,6 @@ An Object containing nested boolean values representing the available input and 
 console.log(sharp.format);
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
-
 ### versions
 
 An Object containing the version numbers of libvips and its dependencies.
