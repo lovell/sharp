@@ -48,8 +48,17 @@ it is recommended to install a system-wide installation of libvips from source:
 
 https://github.com/jcupitt/libvips#building-libvips-from-a-source-tarball
 
-For Linux-based operating systems such as Alpine that use musl libc,
-the smaller stack size means libvips' cache should be disabled
+#### Alpine Linux
+
+libvips is available in the
+[testing repository](https://pkgs.alpinelinux.org/packages?name=vips-dev):
+
+```sh
+apk add vips-dev --update-cache --repository https://dl-3.alpinelinux.org/alpine/edge/testing/
+```
+
+The smaller stack size of musl libc means
+libvips may need to be used without a cache
 via `sharp.cache(false)` to avoid a stack overflow.
 
 ### Mac OS
