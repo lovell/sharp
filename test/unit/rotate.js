@@ -253,4 +253,32 @@ describe('Rotation', function () {
         fixtures.assertSimilar(fixtures.inputJpg, data, done);
       });
   });
+
+  it('Auto-rotate and flip', function (done) {
+    sharp(fixtures.inputJpgWithExif)
+      .rotate()
+      .flip()
+      .resize(320)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('rotate-and-flip.jpg'), data, done);
+      });
+  });
+
+  it('Auto-rotate and flop', function (done) {
+    sharp(fixtures.inputJpgWithExif)
+      .rotate()
+      .flop()
+      .resize(320)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('rotate-and-flop.jpg'), data, done);
+      });
+  });
 });

@@ -83,8 +83,11 @@ class PipelineWorker : public Nan::AsyncWorker {
       VipsAngle rotation;
       if (baton->useExifOrientation) {
         // Rotate and flip image according to Exif orientation
-        // (ignore the requested rotation and flip)
-        std::tie(rotation, baton->flip, baton->flop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
+        bool flip;
+        bool flop;
+        std::tie(rotation, flip, flop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
+        baton->flip = baton->flip || flip;
+        baton->flop = baton->flop || flop;
       } else {
         rotation = CalculateAngleRotation(baton->angle);
       }

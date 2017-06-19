@@ -10,6 +10,10 @@ Requires libvips v8.5.5.
   [#828](https://github.com/lovell/sharp/pull/828)
   [@YvesBos](https://github.com/YvesBos)
 
+* Ensure flip and flop operations work with auto-rotate.
+  [#837](https://github.com/lovell/sharp/issues/837)
+  [@rexxars](https://github.com/rexxars)
+
 #### v0.18.1 - 30<sup>th</sup> May 2017
 
 * Remove regression from #781 that could cause incorrect shrink calculation.
