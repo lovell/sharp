@@ -9,7 +9,7 @@ const got = require('got');
 const semver = require('semver');
 const tar = require('tar');
 
-const distBaseUrl = 'https://dl.bintray.com/lovell/sharp/';
+const distBaseUrl = process.env.SHARP_DIST_BASE_URL || 'https://dl.bintray.com/lovell/sharp/';
 
 // Use NPM-provided environment variable where available, falling back to require-based method for Electron
 const minimumLibvipsVersion = process.env.npm_package_config_libvips || require('./package.json').config.libvips;

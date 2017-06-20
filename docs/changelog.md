@@ -14,6 +14,9 @@ Requires libvips v8.5.5.
   [#837](https://github.com/lovell/sharp/issues/837)
   [@rexxars](https://github.com/rexxars)
 
+* Allow binary download URL override via SHARP_DIST_BASE_URL env variable.
+  [#841](https://github.com/lovell/sharp/issues/841)
+
 #### v0.18.1 - 30<sup>th</sup> May 2017
 
 * Remove regression from #781 that could cause incorrect shrink calculation.
