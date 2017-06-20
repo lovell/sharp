@@ -91,7 +91,7 @@
     "libvips": "8.5.5"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=4.5.0"
   },
   "semistandard": {
     "env": [

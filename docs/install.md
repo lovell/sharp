@@ -10,7 +10,7 @@ yarn add sharp
 
 ### Prerequisites
 
-* Node v4+
+* Node v4.5.0+
 * C++11 compatible compiler such as gcc 4.8+, clang 3.0+ or MSVC 2013+
 * [node-gyp](https://github.com/TooTallNate/node-gyp#installation) and its dependencies (includes Python)
 
