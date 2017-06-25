@@ -32,6 +32,7 @@ Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ C
 * Archlinux
 * Raspbian Jessie
 * Amazon Linux 2016.03, 2016.09
+* Solus
 
 To use a globally-installed version of libvips instead of the provided binaries,
 make sure it is at least the version listed under `config.libvips` in the `package.json` file
