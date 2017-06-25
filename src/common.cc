@@ -438,9 +438,11 @@ namespace sharp {
         // Southeast
         left = inWidth - outWidth;
         top = inHeight - outHeight;
+        break;
       case 7:
         // Southwest
         top = inHeight - outHeight;
+        break;
       case 8:
         // Northwest
         break;
