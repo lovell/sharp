@@ -193,15 +193,26 @@ configuration file to prevent the use of coders known to be vulnerable.
 Set the `MAGICK_CONFIGURE_PATH` environment variable
 to the directory containing the `policy.xml` file.
 
-### Licences
+### Pre-compiled libvips binaries
 
 If a global installation of libvips that meets the
 minimum version requirement cannot be found,
-this module will download a pre-compiled bundle of libvips
+this module will attempt to download a pre-compiled bundle of libvips
 and its dependencies on Linux and Windows machines.
 
 Should you need to manually download and inspect these files,
 you can do so via https://dl.bintray.com/lovell/sharp/
+
+Should you wish to install these from your own location,
+set the `SHARP_DIST_BASE_URL` environment variable, e.g.
+
+```sh
+SHARP_DIST_BASE_URL="https://hostname/path/" npm install sharp
+```
+
+to use `https://hostname/path/libvips-x.y.z-platform.tar.gz`.
+
+### Licences
 
 This module is licensed under the terms of the
 [Apache 2.0 Licence](https://github.com/lovell/sharp/blob/master/LICENSE).
