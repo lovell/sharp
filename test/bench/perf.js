@@ -12,7 +12,12 @@ const gm = require('gm');
 const imagemagick = require('imagemagick');
 const mapnik = require('mapnik');
 const jimp = require('jimp');
-const images = require('images');
+let images;
+try {
+  images = require('images');
+} catch (err) {
+  console.log('Excluding node-images');
+}
 let imagemagickNative;
 try {
   imagemagickNative = require('imagemagick-native');
@@ -268,11 +273,13 @@ async.series({
       }
     });
     // images
-    jpegSuite.add('images-file-file', function () {
-      images(fixtures.inputJpg)
-        .resize(width, height)
-        .save(fixtures.outputJpg, { quality: 80 });
-    });
+    if (typeof images !== 'undefined') {
+      jpegSuite.add('images-file-file', function () {
+        images(fixtures.inputJpg)
+          .resize(width, height)
+          .save(fixtures.outputJpg, { quality: 80 });
+      });
+    }
     // sharp
     jpegSuite.add('sharp-buffer-file', {
       defer: true,
@@ -827,11 +834,13 @@ async.series({
       }
     });
     // images
-    pngSuite.add('images-file-file', function () {
-      images(fixtures.inputPng)
-        .resize(width, height)
-        .save(fixtures.outputPng);
-    });
+    if (typeof images !== 'undefined') {
+      pngSuite.add('images-file-file', function () {
+        images(fixtures.inputPng)
+          .resize(width, height)
+          .save(fixtures.outputPng);
+      });
+    }
     // sharp
     pngSuite.add('sharp-buffer-file', {
       defer: true,
