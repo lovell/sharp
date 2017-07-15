@@ -8,6 +8,7 @@ const caw = require('caw');
 const got = require('got');
 const semver = require('semver');
 const tar = require('tar');
+const detectLibc = require('detect-libc');
 
 const distBaseUrl = process.env.SHARP_DIST_BASE_URL || 'https://dl.bintray.com/lovell/sharp/';
 
@@ -68,19 +69,15 @@ module.exports.download_vips = function () {
   if (!isFile(vipsHeaderPath)) {
     // Ensure Intel 64-bit or ARM
     if (arch === 'ia32') {
-      error('Intel Architecture 32-bit systems require manual installation - please see http://sharp.dimens.io/en/stable/install/');
+      error('Intel Architecture 32-bit systems require manual installation of libvips - please see http://sharp.dimens.io/page/install');
     }
-    // Ensure glibc >= 2.15
-    const lddVersion = process.env.LDD_VERSION;
-    if (lddVersion) {
-      if (/(glibc|gnu libc|gentoo|solus)/i.test(lddVersion)) {
-        const glibcVersion = lddVersion ? lddVersion.split(/\n/)[0].split(' ').slice(-1)[0].trim() : '';
-        if (glibcVersion && semver.lt(glibcVersion + '.0', '2.13.0')) {
-          error('glibc version ' + glibcVersion + ' requires manual installation - please see http://sharp.dimens.io/en/stable/install/');
-        }
-      } else {
-        error(lddVersion.split(/\n/)[0] + ' requires manual installation - please see http://sharp.dimens.io/en/stable/install/');
-      }
+    // Ensure glibc Linux
+    if (detectLibc.isNonGlibcLinux) {
+      error(`Use with ${detectLibc.family} libc requires manual installation of libvips - please see http://sharp.dimens.io/page/install`);
+    }
+    // Ensure glibc >= 2.13
+    if (detectLibc.family === detectLibc.GLIBC && detectLibc.version && semver.lt(`${detectLibc.version}.0`, '2.13.0')) {
+      error(`Use with glibc version ${detectLibc.version} requires manual installation of libvips - please see http://sharp.dimens.io/page/install`);
     }
     // Arch/platform-specific .tar.gz
     const tarFilename = ['libvips', minimumLibvipsVersion, platformId()].join('-') + '.tar.gz';

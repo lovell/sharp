@@ -69,6 +69,7 @@
   "dependencies": {
     "caw": "^2.0.0",
     "color": "^2.0.0",
+    "detect-libc": "^0.2.0",
     "got": "^7.1.0",
     "nan": "^2.6.2",
     "semver": "^5.3.0",

@@ -144,7 +144,7 @@
           }],
           ['OS == "linux"', {
             'variables': {
-              'download_vips': '<!(LDD_VERSION="<!(ldd --version 2>&1 || true)" node -e "require(\'./binding\').download_vips()")'
+              'download_vips': '<!(node -e "require(\'./binding\').download_vips()")'
             },
             'defines': [
               '_GLIBCXX_USE_CXX11_ABI=0'

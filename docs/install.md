@@ -47,7 +47,7 @@ This allows the use of newer versions of libvips with older versions of sharp.
 For 32-bit Intel CPUs and older Linux-based operating systems such as Centos 6,
 it is recommended to install a system-wide installation of libvips from source:
 
-https://github.com/jcupitt/libvips#building-libvips-from-a-source-tarball
+https://jcupitt.github.io/libvips/install.html#building-libvips-from-a-source-tarball
 
 #### Alpine Linux
 
