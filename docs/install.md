@@ -91,6 +91,9 @@ This can be achieved via [FreshPorts](https://www.freshports.org/graphics/vips/)
 cd /usr/ports/graphics/vips/ && make install clean
 ```
 
+FreeBSD's gcc v4 and v5 need `CXXFLAGS=-D_GLIBCXX_USE_C99` set for C++11 support due to
+https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=193528
+
 ### Heroku
 
 libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
