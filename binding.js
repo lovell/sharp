@@ -10,10 +10,10 @@ const semver = require('semver');
 const tar = require('tar');
 const detectLibc = require('detect-libc');
 
-const distBaseUrl = process.env.SHARP_DIST_BASE_URL || 'https://dl.bintray.com/lovell/sharp/';
-
 // Use NPM-provided environment variable where available, falling back to require-based method for Electron
 const minimumLibvipsVersion = process.env.npm_package_config_libvips || require('./package.json').config.libvips;
+
+const distBaseUrl = process.env.SHARP_DIST_BASE_URL || `https://github.com/lovell/sharp-libvips/releases/download/v${minimumLibvipsVersion}/`;
 
 const platform = process.env.npm_config_platform || process.platform;
 
@@ -81,37 +81,32 @@ module.exports.download_vips = function () {
     }
     // Arch/platform-specific .tar.gz
     const tarFilename = ['libvips', minimumLibvipsVersion, platformId()].join('-') + '.tar.gz';
-    const tarPathLocal = path.join(__dirname, 'packaging', tarFilename);
-    if (isFile(tarPathLocal)) {
-      unpack(tarPathLocal);
-    } else {
-      // Download to per-process temporary file
-      const tarPathTemp = path.join(os.tmpdir(), process.pid + '-' + tarFilename);
-      const tmpFile = fs.createWriteStream(tarPathTemp).on('finish', function () {
-        unpack(tarPathTemp, function () {
-          // Attempt to remove temporary file
-          try {
-            fs.unlinkSync(tarPathTemp);
-          } catch (err) {}
-        });
+    // Download to per-process temporary file
+    const tarPathTemp = path.join(os.tmpdir(), process.pid + '-' + tarFilename);
+    const tmpFile = fs.createWriteStream(tarPathTemp).on('finish', function () {
+      unpack(tarPathTemp, function () {
+        // Attempt to remove temporary file
+        try {
+          fs.unlinkSync(tarPathTemp);
+        } catch (err) {}
       });
-      const url = distBaseUrl + tarFilename;
-      const simpleGetOpt = {
-        url: url,
-        agent: caw(null, {
-          protocol: 'https'
-        })
-      };
-      simpleGet(simpleGetOpt, function (err, response) {
-        if (err) {
-          error('Download of ' + url + ' failed: ' + err.message);
-        }
-        if (response.statusCode !== 200) {
-          error(url + ' status code ' + response.statusCode);
-        }
-        response.pipe(tmpFile);
-      });
-    }
+    });
+    const url = distBaseUrl + tarFilename;
+    const simpleGetOpt = {
+      url: url,
+      agent: caw(null, {
+        protocol: 'https'
+      })
+    };
+    simpleGet(simpleGetOpt, function (err, response) {
+      if (err) {
+        error('Download of ' + url + ' failed: ' + err.message);
+      }
+      if (response.statusCode !== 200) {
+        error(url + ' status code ' + response.statusCode);
+      }
+      response.pipe(tmpFile);
+    });
   }
 };
 
