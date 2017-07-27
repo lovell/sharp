@@ -9,8 +9,6 @@ test/saliency/Image*
 test/saliency/[Uu]serData*
 !test/saliency/userData.js
 vendor
-packaging/libvips*
-packaging/*.log
-!packaging/build
+.gitattributes
 .DS_Store
 .nyc_output

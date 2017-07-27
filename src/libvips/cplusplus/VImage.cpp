@@ -566,34 +566,6 @@ VImage::new_from_buffer( void *buf, size_t len, const char *option_string,
 }
 
 VImage 
-VImage::new_from_image( std::vector<double> pixel )
-{
-	VImage onepx = VImage::black( 1, 1, 
-		VImage::option()->set( "bands", bands() ) ); 
-
-	onepx = (onepx + pixel).cast( format() );
-
-	VImage big = onepx.embed( 0, 0, width(), height(), 
-		VImage::option()->set( "extend", VIPS_EXTEND_COPY ) ); 
-
-	big = big.copy( 
-		VImage::option()->
-			set( "interpretation", interpretation() )->
-			set( "xres", xres() )->
-			set( "yres", yres() )->
-			set( "xoffset", xres() )->
-			set( "yoffset", yres() ) ); 
-
-	return( big ); 
-}
-
-VImage 
-VImage::new_from_image( double pixel )
-{
-	return( new_from_image( to_vectorv( 1, pixel ) ) ); 
-}
-
-VImage 
 VImage::new_matrix( int width, int height ) 
 {
 	return( VImage( vips_image_new_matrix( width, height ) ) ); 
@@ -693,10 +665,10 @@ VImage::bandsplit( VOption *options )
 VImage 
 VImage::bandjoin( VImage other, VOption *options )
 {
-    VImage v[2] = { *this, other }; 
-    std::vector<VImage> vec( v, v + VIPS_NUMBER( v ) );
+	VImage v[2] = { *this, other }; 
+	std::vector<VImage> vec( v, v + VIPS_NUMBER( v ) );
 
-    return( bandjoin( vec, options ) ); 
+	return( bandjoin( vec, options ) ); 
 }
 
 std::complex<double> 

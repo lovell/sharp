@@ -534,6 +534,9 @@ class PipelineWorker : public Nan::AsyncWorker {
             // Attention-based or Entropy-based crop
             image = image.smartcrop(baton->width, baton->height, VImage::option()
               ->set("interesting", baton->crop == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
+            baton->hasCropOffset = true;
+            baton->cropOffsetLeft = image.xoffset();
+            baton->cropOffsetTop = image.yoffset();
           }
         }
       }
@@ -1005,9 +1008,11 @@ class PipelineWorker : public Nan::AsyncWorker {
       Set(info, New("height").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(height)));
       Set(info, New("channels").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->channels)));
       Set(info, New("premultiplied").ToLocalChecked(), New<v8::Boolean>(baton->premultiplied));
-      if (baton->cropCalcLeft != -1 && baton->cropCalcLeft != -1) {
-        Set(info, New("cropCalcLeft").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->cropCalcLeft)));
-        Set(info, New("cropCalcTop").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->cropCalcTop)));
+      if (baton->hasCropOffset) {
+        Set(info, New("cropOffsetLeft").ToLocalChecked(),
+          New<v8::Int32>(static_cast<int32_t>(baton->cropOffsetLeft)));
+        Set(info, New("cropOffsetTop").ToLocalChecked(),
+          New<v8::Int32>(static_cast<int32_t>(baton->cropOffsetTop)));
       }
 
       if (baton->bufferOutLength > 0) {
