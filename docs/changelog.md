@@ -1,5 +1,15 @@
 # Changelog
 
+### v0.19 - "*suit*"
+
+Requires libvips v8.6.0.
+
+#### v0.19.0 - TBD
+
+* Expose offset coordinates of strategy-based crop.
+  [#868](https://github.com/lovell/sharp/issues/868)
+  [@mirohristov-com](https://github.com/mirohristov-com)
+
 ### v0.18 - "*ridge*"
 
 Requires libvips v8.5.5.

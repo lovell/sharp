@@ -1,7 +1,7 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
-  "version": "0.18.4",
+  "version": "0.19.0-alpha",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://github.com/lovell/sharp",
   "contributors": [
@@ -44,7 +44,6 @@
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
     "test": "semistandard && cc && nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
-    "test-packaging": "./packaging/test-linux-x64.sh",
     "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done"
   },
   "main": "lib/index.js",
@@ -71,10 +70,10 @@
     "caw": "^2.0.0",
     "color": "^2.0.0",
     "detect-libc": "^0.2.0",
-    "nan": "^2.6.2",
-    "semver": "^5.3.0",
+    "nan": "^2.7.0",
+    "semver": "^5.4.1",
     "simple-get": "^2.7.0",
-    "tar": "^3.1.5"
+    "tar": "^4.0.1"
   },
   "devDependencies": {
     "async": "^2.5.0",
@@ -82,15 +81,15 @@
     "documentation": "^4.0.0-rc.1",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
-    "mocha": "^3.4.2",
-    "nyc": "^11.0.3",
+    "mocha": "^3.5.0",
+    "nyc": "^11.1.0",
     "rimraf": "^2.6.1",
     "semistandard": "^11.0.0",
     "unzip": "^0.1.11"
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.5.5"
+    "libvips": "8.6.0"
   },
   "engines": {
     "node": ">=4.5.0"
