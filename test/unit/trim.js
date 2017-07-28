@@ -20,6 +20,20 @@ describe('Trim borders', function () {
       });
   });
 
+  it('Skip shrink-on-load', function (done) {
+    const expected = fixtures.expected('alpha-layer-2-trim-resize.jpg');
+    sharp(fixtures.inputJpgOverlayLayer2)
+      .trim()
+      .resize(300)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(300, info.width);
+        assert.strictEqual(300, info.height);
+        fixtures.assertSimilar(expected, data, done);
+      });
+  });
+
   it('16-bit PNG with alpha channel', function (done) {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 32)

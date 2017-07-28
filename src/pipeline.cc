@@ -220,12 +220,12 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
 
       // If integral x and y shrink are equal, try to use shrink-on-load for JPEG and WebP,
-      // but not when applying gamma correction or pre-resize extract
+      // but not when applying gamma correction, pre-resize extract or trim
       int shrink_on_load = 1;
       if (
         xshrink == yshrink && xshrink >= 2 &&
         (inputImageType == ImageType::JPEG || inputImageType == ImageType::WEBP) &&
-        baton->gamma == 0 && baton->topOffsetPre == -1
+        baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimTolerance == 0
       ) {
         if (xshrink >= 8) {
           xfactor = xfactor / 8;
