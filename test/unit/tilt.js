@@ -87,7 +87,7 @@ describe('Tilt the image', function () {
         sharp(fixtures.inputTilt)
           .rotate(270)
           .toBuffer(function (error, rotateData) {
-            if (err) throw error;
+            if (error) throw error;
             fixtures.assertSimilar(expected, data, function () {
               fixtures.assertSimilar(rotateData, data, done);
             });
