@@ -25,8 +25,8 @@ const fingerprint = function (image, callback) {
         let fingerprint = '';
         for (let col = 0; col < 8; col++) {
           for (let row = 0; row < 8; row++) {
-            const left = data[row * 8 + col];
-            const right = data[row * 8 + col + 1];
+            const left = data[(row * 8) + col];
+            const right = data[(row * 8) + col + 1];
             fingerprint = fingerprint + (left < right ? '1' : '0');
           }
         }
@@ -64,6 +64,8 @@ module.exports = {
   inputJpgWithCorruptHeader: getPath('corrupt-header.jpg'),
   inputJpgWithLowContrast: getPath('low-contrast.jpg'), // http://www.flickr.com/photos/grizdave/2569067123/
   inputJpgLarge: getPath('giant-image.jpg'),
+  inputJpg320x240: getPath('320x240.jpg'), // http://www.andrewault.net/2010/01/26/create-a-test-pattern-video-with-perl/
+  inputJpgOverlayLayer2: getPath('alpha-layer-2-ink.jpg'),
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
@@ -84,6 +86,8 @@ module.exports = {
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp
   inputTiff: getPath('G31D.TIF'), // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
   inputTiffCielab: getPath('cielab-dagams.tiff'), // https://github.com/lovell/sharp/issues/646
+  inputTiffUncompressed: getPath('uncompressed_tiff.tiff'), // https://code.google.com/archive/p/imagetestsuite/wikis/TIFFTestSuite.wiki file: 0c84d07e1b22b76f24cccc70d8788e4a.tif
+  inputTiff8BitDepth: getPath('8bit_depth.tiff'),
   inputGif: getPath('Crash_test.gif'), // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
   inputGifGreyPlusAlpha: getPath('grey-plus-alpha.gif'), // http://i.imgur.com/gZ5jlmE.gif
   inputSvg: getPath('check.svg'), // http://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg
@@ -102,6 +106,7 @@ module.exports = {
   outputPng: getPath('output.png'),
   outputWebP: getPath('output.webp'),
   outputV: getPath('output.v'),
+  outputTiff: getPath('output.tiff'),
   outputZoinks: getPath('output.zoinks'), // an 'unknown' file extension
 
   // Path for tests requiring human inspection

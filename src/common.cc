@@ -1,12 +1,29 @@
+// Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <cstdlib>
 #include <string>
 #include <string.h>
+#include <vector>
+#include <queue>
+#include <mutex>
 
 #include <node.h>
 #include <node_buffer.h>
+#include <nan.h>
 #include <vips/vips8>
 
-#include "nan.h"
 #include "common.h"
 
 using vips::VImage;
@@ -29,7 +46,7 @@ namespace sharp {
     InputDescriptor *descriptor = new InputDescriptor;
     if (HasAttr(input, "file")) {
       descriptor->file = AttrAsStr(input, "file");
-    } else {
+    } else if (HasAttr(input, "buffer")) {
       v8::Local<v8::Object> buffer = AttrAs<v8::Object>(input, "buffer");
       descriptor->bufferLength = node::Buffer::Length(buffer);
       descriptor->buffer = node::Buffer::Data(buffer);
@@ -44,6 +61,16 @@ namespace sharp {
       descriptor->rawChannels = AttrTo<uint32_t>(input, "rawChannels");
       descriptor->rawWidth = AttrTo<uint32_t>(input, "rawWidth");
       descriptor->rawHeight = AttrTo<uint32_t>(input, "rawHeight");
+    }
+    // Create new image
+    if (HasAttr(input, "createChannels")) {
+      descriptor->createChannels = AttrTo<uint32_t>(input, "createChannels");
+      descriptor->createWidth = AttrTo<uint32_t>(input, "createWidth");
+      descriptor->createHeight = AttrTo<uint32_t>(input, "createHeight");
+      v8::Local<v8::Object> createBackground = AttrAs<v8::Object>(input, "createBackground");
+      for (unsigned int i = 0; i < 4; i++) {
+        descriptor->createBackground[i] = AttrTo<double>(createBackground, i);
+      }
     }
     return descriptor;
   }
@@ -177,7 +204,6 @@ namespace sharp {
     VImage image;
     ImageType imageType;
     if (descriptor->buffer != nullptr) {
-      // From buffer
       if (descriptor->rawChannels > 0) {
         // Raw, uncompressed pixel data
         image = VImage::new_from_memory(descriptor->buffer, descriptor->bufferLength,
@@ -212,26 +238,41 @@ namespace sharp {
         }
       }
     } else {
-      // From filesystem
-      imageType = DetermineImageType(descriptor->file.data());
-      if (imageType != ImageType::UNKNOWN) {
-        try {
-          vips::VOption *option = VImage::option()->set("access", accessMethod);
-          if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
-            option->set("dpi", static_cast<double>(descriptor->density));
-          }
-          if (imageType == ImageType::MAGICK) {
-            option->set("density", std::to_string(descriptor->density).data());
-          }
-          image = VImage::new_from_file(descriptor->file.data(), option);
-          if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
-            SetDensity(image, descriptor->density);
-          }
-        } catch (...) {
-          throw vips::VError("Input file has corrupt header");
+      if (descriptor->createChannels > 0) {
+        // Create new image
+        std::vector<double> background = {
+          descriptor->createBackground[0],
+          descriptor->createBackground[1],
+          descriptor->createBackground[2]
+        };
+        if (descriptor->createChannels == 4) {
+          background.push_back(descriptor->createBackground[3]);
         }
+        image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight).new_from_image(background);
+        image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+        imageType = ImageType::RAW;
       } else {
-        throw vips::VError("Input file is missing or of an unsupported image format");
+        // From filesystem
+        imageType = DetermineImageType(descriptor->file.data());
+        if (imageType != ImageType::UNKNOWN) {
+          try {
+            vips::VOption *option = VImage::option()->set("access", accessMethod);
+            if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
+              option->set("dpi", static_cast<double>(descriptor->density));
+            }
+            if (imageType == ImageType::MAGICK) {
+              option->set("density", std::to_string(descriptor->density).data());
+            }
+            image = VImage::new_from_file(descriptor->file.data(), option);
+            if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
+              SetDensity(image, descriptor->density);
+            }
+          } catch (...) {
+            throw vips::VError("Input file has corrupt header");
+          }
+        } else {
+          throw vips::VError("Input file is missing or of an unsupported image format");
+        }
       }
     }
     return std::make_tuple(image, imageType);
@@ -254,8 +295,7 @@ namespace sharp {
     return (
       (bands == 2 && interpretation == VIPS_INTERPRETATION_B_W) ||
       (bands == 4 && interpretation != VIPS_INTERPRETATION_CMYK) ||
-      (bands == 5 && interpretation == VIPS_INTERPRETATION_CMYK)
-    );
+      (bands == 5 && interpretation == VIPS_INTERPRETATION_CMYK));
   }
 
   /*
@@ -308,12 +348,58 @@ namespace sharp {
   }
 
   /*
+    Check the proposed format supports the current dimensions.
+  */
+  void AssertImageTypeDimensions(VImage image, ImageType const imageType) {
+    if (imageType == ImageType::JPEG) {
+      if (image.width() > 65535 || image.height() > 65535) {
+        throw vips::VError("Processed image is too large for the JPEG format");
+      }
+    } else if (imageType == ImageType::PNG) {
+      if (image.width() > 2147483647 || image.height() > 2147483647) {
+        throw vips::VError("Processed image is too large for the PNG format");
+      }
+    } else if (imageType == ImageType::WEBP) {
+      if (image.width() > 16383 || image.height() > 16383) {
+        throw vips::VError("Processed image is too large for the WebP format");
+      }
+    }
+  }
+
+  /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
   void FreeCallback(char* data, void* hint) {
     if (data != nullptr) {
       g_free(data);
     }
+  }
+
+  /*
+    Temporary buffer of warnings
+  */
+  std::queue<std::string> vipsWarnings;
+  std::mutex vipsWarningsMutex;
+
+  /*
+    Called with warnings from the glib-registered "VIPS" domain
+  */
+  void VipsWarningCallback(char const* log_domain, GLogLevelFlags log_level, char const* message, void* ignore) {
+    std::lock_guard<std::mutex> lock(vipsWarningsMutex);
+    vipsWarnings.emplace(message);
+  }
+
+  /*
+    Pop the oldest warning message from the queue
+  */
+  std::string VipsWarningPop() {
+    std::string warning;
+    std::lock_guard<std::mutex> lock(vipsWarningsMutex);
+    if (!vipsWarnings.empty()) {
+      warning = vipsWarnings.front();
+      vipsWarnings.pop();
+    }
+    return warning;
   }
 
   /*
@@ -352,9 +438,11 @@ namespace sharp {
         // Southeast
         left = inWidth - outWidth;
         top = inHeight - outHeight;
+        break;
       case 7:
         // Southwest
         top = inHeight - outHeight;
+        break;
       case 8:
         // Northwest
         break;
@@ -378,23 +466,23 @@ namespace sharp {
     int top = 0;
 
     // assign only if valid
-    if(x >= 0 && x < (inWidth - outWidth)) {
+    if (x >= 0 && x < (inWidth - outWidth)) {
       left = x;
-    } else if(x >= (inWidth - outWidth)) {
+    } else if (x >= (inWidth - outWidth)) {
       left = inWidth - outWidth;
     }
 
-    if(y >= 0 && y < (inHeight - outHeight)) {
+    if (y >= 0 && y < (inHeight - outHeight)) {
       top = y;
-    } else if(y >= (inHeight - outHeight)) {
+    } else if (y >= (inHeight - outHeight)) {
       top = inHeight - outHeight;
     }
 
     // the resulting left and top could have been outside the image after calculation from bottom/right edges
-    if(left < 0) {
+    if (left < 0) {
       left = 0;
     }
-    if(top < 0) {
+    if (top < 0) {
       top = 0;
     }
 
@@ -421,8 +509,7 @@ namespace sharp {
   */
   VipsOperationBoolean GetBooleanOperation(std::string const opStr) {
     return static_cast<VipsOperationBoolean>(
-      vips_enum_from_nick(nullptr, VIPS_TYPE_OPERATION_BOOLEAN, opStr.data())
-    );
+      vips_enum_from_nick(nullptr, VIPS_TYPE_OPERATION_BOOLEAN, opStr.data()));
   }
 
   /*
@@ -430,8 +517,7 @@ namespace sharp {
   */
   VipsInterpretation GetInterpretation(std::string const typeStr) {
     return static_cast<VipsInterpretation>(
-      vips_enum_from_nick(nullptr, VIPS_TYPE_INTERPRETATION, typeStr.data())
-    );
+      vips_enum_from_nick(nullptr, VIPS_TYPE_INTERPRETATION, typeStr.data()));
   }
 
   /*

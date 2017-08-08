@@ -1,3 +1,17 @@
+// Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef SRC_OPERATIONS_H_
 #define SRC_OPERATIONS_H_
 
@@ -18,20 +32,14 @@ namespace sharp {
   VImage Composite(VImage src, VImage dst, const int gravity);
 
   /*
-    Alpha composite src over dst with given x and y offsets.
-    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
+    Composite overlayImage over image at given position
    */
-  VImage Composite(VImage src, VImage dst, const int x, const int y);
+  VImage Composite(VImage image, VImage overlayImage, int const x, int const y);
 
   /*
-    Check if the src and dst Images for composition operation are valid
+    Alpha composite overlayImage over image, assumes matching dimensions
   */
-  bool IsInputValidForComposition(VImage src, VImage dst);
-
-  /*
-    Given a valid src and dst, returns the composite of the two images
-  */
-  VImage CompositeImage(VImage src, VImage dst);
+  VImage AlphaComposite(VImage image, VImage overlayImage);
 
   /*
     Cutout src over dst with given gravity.
@@ -63,23 +71,6 @@ namespace sharp {
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
    */
   VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged);
-
-  /*
-    Crop strategy functors
-  */
-  struct EntropyStrategy {
-    double operator()(VImage image);
-  };
-  struct AttentionStrategy {
-    double operator()(VImage image);
-  };
-
-  /*
-    Calculate crop area based on given strategy (Entropy, Attention)
-  */
-  std::tuple<int, int> Crop(
-    VImage image, int const outWidth, int const outHeight, std::function<double(VImage)> strategy
-  );
 
   /*
     Insert a tile cache to prevent over-computation of any previous operations in the pipeline

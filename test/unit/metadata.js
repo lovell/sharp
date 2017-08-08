@@ -17,6 +17,7 @@ describe('Image metadata', function () {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
@@ -35,6 +36,7 @@ describe('Image metadata', function () {
       assert.strictEqual(600, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual(72, metadata.density);
       assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
@@ -56,25 +58,24 @@ describe('Image metadata', function () {
     });
   });
 
-  if (sharp.format.tiff.input.file) {
-    it('TIFF', function (done) {
-      sharp(fixtures.inputTiff).metadata(function (err, metadata) {
-        if (err) throw err;
-        assert.strictEqual('tiff', metadata.format);
-        assert.strictEqual(2464, metadata.width);
-        assert.strictEqual(3248, metadata.height);
-        assert.strictEqual('b-w', metadata.space);
-        assert.strictEqual(1, metadata.channels);
-        assert.strictEqual(300, metadata.density);
-        assert.strictEqual(false, metadata.hasProfile);
-        assert.strictEqual(false, metadata.hasAlpha);
-        assert.strictEqual(1, metadata.orientation);
-        assert.strictEqual('undefined', typeof metadata.exif);
-        assert.strictEqual('undefined', typeof metadata.icc);
-        done();
-      });
+  it('TIFF', function (done) {
+    sharp(fixtures.inputTiff).metadata(function (err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('tiff', metadata.format);
+      assert.strictEqual(2464, metadata.width);
+      assert.strictEqual(3248, metadata.height);
+      assert.strictEqual('b-w', metadata.space);
+      assert.strictEqual(1, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
+      assert.strictEqual(300, metadata.density);
+      assert.strictEqual(false, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual(1, metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
+      done();
     });
-  }
+  });
 
   it('PNG', function (done) {
     sharp(fixtures.inputPng).metadata(function (err, metadata) {
@@ -84,6 +85,7 @@ describe('Image metadata', function () {
       assert.strictEqual(2074, metadata.height);
       assert.strictEqual('b-w', metadata.space);
       assert.strictEqual(1, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual(300, metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
@@ -102,6 +104,7 @@ describe('Image metadata', function () {
       assert.strictEqual(1536, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(4, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual(72, metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(true, metadata.hasAlpha);
@@ -112,80 +115,59 @@ describe('Image metadata', function () {
     });
   });
 
-  if (sharp.format.webp.input.file) {
-    it('WebP', function (done) {
-      sharp(fixtures.inputWebP).metadata(function (err, metadata) {
-        if (err) throw err;
-        assert.strictEqual('webp', metadata.format);
-        assert.strictEqual(1024, metadata.width);
-        assert.strictEqual(772, metadata.height);
-        assert.strictEqual('srgb', metadata.space);
-        assert.strictEqual(3, metadata.channels);
-        assert.strictEqual('undefined', typeof metadata.density);
-        assert.strictEqual(false, metadata.hasProfile);
-        assert.strictEqual(false, metadata.hasAlpha);
-        assert.strictEqual('undefined', typeof metadata.orientation);
-        assert.strictEqual('undefined', typeof metadata.exif);
-        assert.strictEqual('undefined', typeof metadata.icc);
-        done();
-      });
+  it('WebP', function (done) {
+    sharp(fixtures.inputWebP).metadata(function (err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('webp', metadata.format);
+      assert.strictEqual(1024, metadata.width);
+      assert.strictEqual(772, metadata.height);
+      assert.strictEqual('srgb', metadata.space);
+      assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
+      assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual(false, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
+      done();
     });
-  }
+  });
 
-  if (sharp.format.gif.input.file) {
-    it('GIF via giflib', function (done) {
-      sharp(fixtures.inputGif).metadata(function (err, metadata) {
-        if (err) throw err;
-        assert.strictEqual('gif', metadata.format);
-        assert.strictEqual(800, metadata.width);
-        assert.strictEqual(533, metadata.height);
-        assert.strictEqual(3, metadata.channels);
-        assert.strictEqual('undefined', typeof metadata.density);
-        assert.strictEqual(false, metadata.hasProfile);
-        assert.strictEqual(false, metadata.hasAlpha);
-        assert.strictEqual('undefined', typeof metadata.orientation);
-        assert.strictEqual('undefined', typeof metadata.exif);
-        assert.strictEqual('undefined', typeof metadata.icc);
-        done();
-      });
+  it('GIF via giflib', function (done) {
+    sharp(fixtures.inputGif).metadata(function (err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('gif', metadata.format);
+      assert.strictEqual(800, metadata.width);
+      assert.strictEqual(533, metadata.height);
+      assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
+      assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual(false, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
+      done();
     });
-    it('GIF grey+alpha via giflib', function (done) {
-      sharp(fixtures.inputGifGreyPlusAlpha).metadata(function (err, metadata) {
-        if (err) throw err;
-        assert.strictEqual('gif', metadata.format);
-        assert.strictEqual(2, metadata.width);
-        assert.strictEqual(1, metadata.height);
-        assert.strictEqual(2, metadata.channels);
-        assert.strictEqual('undefined', typeof metadata.density);
-        assert.strictEqual(false, metadata.hasProfile);
-        assert.strictEqual(true, metadata.hasAlpha);
-        assert.strictEqual('undefined', typeof metadata.orientation);
-        assert.strictEqual('undefined', typeof metadata.exif);
-        assert.strictEqual('undefined', typeof metadata.icc);
-        done();
-      });
+  });
+  it('GIF grey+alpha via giflib', function (done) {
+    sharp(fixtures.inputGifGreyPlusAlpha).metadata(function (err, metadata) {
+      if (err) throw err;
+      assert.strictEqual('gif', metadata.format);
+      assert.strictEqual(2, metadata.width);
+      assert.strictEqual(1, metadata.height);
+      assert.strictEqual(2, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
+      assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual(false, metadata.hasProfile);
+      assert.strictEqual(true, metadata.hasAlpha);
+      assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
+      done();
     });
-  }
-
-  if (sharp.format.openslide.input.file) {
-    it('Aperio SVS via openslide', function (done) {
-      sharp(fixtures.inputSvs).metadata(function (err, metadata) {
-        if (err) throw err;
-        assert.strictEqual('openslide', metadata.format);
-        assert.strictEqual(2220, metadata.width);
-        assert.strictEqual(2967, metadata.height);
-        assert.strictEqual(4, metadata.channels);
-        assert.strictEqual('undefined', typeof metadata.density);
-        assert.strictEqual('rgb', metadata.space);
-        assert.strictEqual(false, metadata.hasProfile);
-        assert.strictEqual(true, metadata.hasAlpha);
-        assert.strictEqual('undefined', typeof metadata.orientation);
-        assert.strictEqual('undefined', typeof metadata.exif);
-        assert.strictEqual('undefined', typeof metadata.icc);
-        done();
-      });
-    });
-  }
+  });
 
   it('File in, Promise out', function (done) {
     sharp(fixtures.inputJpg).metadata().then(function (metadata) {
@@ -194,6 +176,7 @@ describe('Image metadata', function () {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
@@ -222,6 +205,7 @@ describe('Image metadata', function () {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
@@ -244,6 +228,7 @@ describe('Image metadata', function () {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
@@ -264,6 +249,7 @@ describe('Image metadata', function () {
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);

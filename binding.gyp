@@ -144,7 +144,7 @@
           }],
           ['OS == "linux"', {
             'variables': {
-              'download_vips': '<!(LDD_VERSION="<!(ldd --version 2>&1 || true)" node -e "require(\'./binding\').download_vips()")'
+              'download_vips': '<!(node -e "require(\'./binding\').download_vips()")'
             },
             'defines': [
               '_GLIBCXX_USE_CXX11_ABI=0'
@@ -267,7 +267,7 @@
             'vendor/lib/libstdc++-6.dll',
             'vendor/lib/libtiff-5.dll',
             'vendor/lib/libvips-42.dll',
-            'vendor/lib/libwebp-6.dll',
+            'vendor/lib/libwebp-7.dll',
             'vendor/lib/libxml2-2.dll',
             'vendor/lib/zlib1.dll'
           ]

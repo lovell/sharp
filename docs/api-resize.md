@@ -17,6 +17,7 @@ By default, the resized image is centre cropped to the exact size specified.
 
 Possible reduction kernels are:
 
+-   `nearest`: Use [nearest neighbour interpolation](http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation).
 -   `cubic`: Use a [Catmull-Rom spline](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline).
 -   `lanczos2`: Use a [Lanczos kernel](https://en.wikipedia.org/wiki/Lanczos_resampling#Lanczos_kernel) with `a=2`.
 -   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
@@ -32,13 +33,13 @@ Possible enlargement interpolators are:
 
 **Parameters**
 
--   `width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels wide the resultant image should be, between 1 and 16383 (0x3FFF). Use `null` or `undefined` to auto-scale the width to match the height.
--   `height` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels high the resultant image should be, between 1 and 16383. Use `null` or `undefined` to auto-scale the height to match the width.
+-   `width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
+-   `height` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
-    -   `options.kernel` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** the kernel to use for image reduction. (optional, default `'lanczos3'`)
-    -   `options.interpolator` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** the interpolator to use for image enlargement. (optional, default `'bicubic'`)
-    -   `options.centreSampling` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** use \*magick centre sampling convention instead of corner sampling. (optional, default `false`)
-    -   `options.centerSampling` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** alternative spelling of centreSampling. (optional, default `false`)
+    -   `options.kernel` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the kernel to use for image reduction. (optional, default `'lanczos3'`)
+    -   `options.interpolator` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the interpolator to use for image enlargement. (optional, default `'bicubic'`)
+    -   `options.centreSampling` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use \*magick centre sampling convention instead of corner sampling. (optional, default `false`)
+    -   `options.centerSampling` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** alternative spelling of centreSampling. (optional, default `false`)
 
 **Examples**
 
@@ -77,7 +78,7 @@ then repeatedly ranks edge regions, discarding the edge with the lowest score ba
 
 **Parameters**
 
--   `crop` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** A member of `sharp.gravity` to crop to an edge/corner or `sharp.strategy` to crop dynamically. (optional, default `'centre'`)
+-   `crop` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** A member of `sharp.gravity` to crop to an edge/corner or `sharp.strategy` to crop dynamically. (optional, default `'centre'`)
 
 **Examples**
 
@@ -171,6 +172,6 @@ This is equivalent to GraphicsMagick's `>` geometry option:
 
 **Parameters**
 
--   `withoutEnlargement` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?**  (optional, default `true`)
+-   `withoutEnlargement` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
 
 Returns **Sharp** 

@@ -17,9 +17,9 @@ useful for determining how much working memory is required for a particular task
 **Parameters**
 
 -   `options` **([Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean))** Object with the following attributes, or Boolean where true uses default cache settings and false removes all caching.
-    -   `options.memory` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** is the maximum memory in MB to use for this cache (optional, default `50`)
-    -   `options.files` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** is the maximum number of files to hold open (optional, default `20`)
-    -   `options.items` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** is the maximum number of operations to cache (optional, default `100`)
+    -   `options.memory` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** is the maximum memory in MB to use for this cache (optional, default `50`)
+    -   `options.files` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** is the maximum number of files to hold open (optional, default `20`)
+    -   `options.items` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** is the maximum number of operations to cache (optional, default `100`)
 
 **Examples**
 
@@ -89,7 +89,7 @@ Versions of liborc prior to 0.4.25 are known to segfault under heavy load.
 
 **Parameters**
 
--   `simd` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?**  (optional, default `false`)
+-   `simd` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
 
 **Examples**
 

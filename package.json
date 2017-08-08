@@ -1,8 +1,9 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
-  "version": "0.17.1",
+  "version": "0.18.2",
   "author": "Lovell Fuller <npm@lovell.info>",
+  "homepage": "https://github.com/lovell/sharp",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
     "Jonathan Ong <jonathanrichardong@gmail.com>",
@@ -31,11 +32,16 @@
     "Matthias Thoemmes <thoemmes@gmail.com>",
     "Patrick Paskaris <patrick@paskaris.gr>",
     "Jérémy Lal <kapouer@melix.org>",
-    "Rahul Nanwani <r.nanwani@gmail.com>"
+    "Rahul Nanwani <r.nanwani@gmail.com>",
+    "Alice Monday <alice0meta@gmail.com>",
+    "Kristo Jorgenson <kristo.jorgenson@gmail.com>",
+    "YvesBos <yves_bos@outlook.com>",
+    "Guy Maliar <guy@tailorbrands.com>",
+    "Nicolas Coden <nicolas@ncoden.fr>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
-    "test": "semistandard && cross-env VIPS_WARNING=0 nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
+    "test": "semistandard && cc && nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-leak": "./test/leak/leak.sh",
     "test-packaging": "./packaging/test-linux-x64.sh",
     "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done"
@@ -62,36 +68,43 @@
   ],
   "dependencies": {
     "caw": "^2.0.0",
-    "color": "^1.0.3",
-    "got": "^6.7.1",
-    "nan": "^2.5.0",
+    "color": "^2.0.0",
+    "detect-libc": "^0.2.0",
+    "got": "^7.1.0",
+    "nan": "^2.6.2",
     "semver": "^5.3.0",
-    "tar": "^2.2.1"
+    "tar": "^3.1.5"
   },
   "devDependencies": {
-    "async": "^2.1.4",
-    "bufferutil": "^1.3.0",
-    "cross-env": "^3.1.4",
-    "documentation": "^4.0.0-beta.18",
+    "async": "^2.5.0",
+    "cc": "^1.0.1",
+    "documentation": "^4.0.0-rc.1",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
-    "mocha": "^3.2.0",
-    "node-cpplint": "^0.4.0",
-    "nyc": "^10.1.2",
-    "rimraf": "^2.5.4",
-    "semistandard": "^9.2.1",
+    "mocha": "^3.4.2",
+    "nyc": "^11.0.3",
+    "rimraf": "^2.6.1",
+    "semistandard": "^11.0.0",
     "unzip": "^0.1.11"
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.4.2"
+    "libvips": "8.5.5"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=4.5.0"
   },
   "semistandard": {
     "env": [
       "mocha"
+    ]
+  },
+  "cc": {
+    "linelength": "120",
+    "filter": [
+      "build/c++11",
+      "build/include",
+      "runtime/indentation_namespace"
     ]
   }
 }

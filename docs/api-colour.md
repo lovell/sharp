@@ -37,7 +37,7 @@ An alpha channel may be present, and will be unchanged by the operation.
 
 **Parameters**
 
--   `greyscale` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?**  (optional, default `true`)
+-   `greyscale` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -47,7 +47,7 @@ Alternative spelling of `greyscale`.
 
 **Parameters**
 
--   `grayscale` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?**  (optional, default `true`)
+-   `grayscale` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
 
 Returns **Sharp** 
 

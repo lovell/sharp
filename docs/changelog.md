@@ -1,10 +1,113 @@
 # Changelog
 
+### v0.18 - "*ridge*"
+
+Requires libvips v8.5.5.
+
+#### v0.18.2 - 1<sup>st</sup> July 2017
+
+* Expose libvips' xres and yres properties for TIFF output.
+  [#828](https://github.com/lovell/sharp/pull/828)
+  [@YvesBos](https://github.com/YvesBos)
+
+* Ensure flip and flop operations work with auto-rotate.
+  [#837](https://github.com/lovell/sharp/issues/837)
+  [@rexxars](https://github.com/rexxars)
+
+* Allow binary download URL override via SHARP_DIST_BASE_URL env variable.
+  [#841](https://github.com/lovell/sharp/issues/841)
+
+* Add support for Solus Linux.
+  [#857](https://github.com/lovell/sharp/pull/857)
+  [@ekremkaraca](https://github.com/ekremkaraca)
+
+#### v0.18.1 - 30<sup>th</sup> May 2017
+
+* Remove regression from #781 that could cause incorrect shrink calculation.
+  [#831](https://github.com/lovell/sharp/issues/831)
+  [@suprMax](https://github.com/suprMax)
+
+#### v0.18.0 - 30<sup>th</sup> May 2017
+
+* Remove the previously-deprecated output format "option" functions:
+    quality, progressive, compressionLevel, withoutAdaptiveFiltering,
+    withoutChromaSubsampling, trellisQuantisation, trellisQuantization,
+    overshootDeringing, optimiseScans and optimizeScans.
+
+* Ensure maximum output dimensions are based on the format to be used.
+  [#176](https://github.com/lovell/sharp/issues/176)
+  [@stephanebachelier](https://github.com/stephanebachelier)
+
+* Avoid costly (un)premultiply when using overlayWith without alpha channel.
+  [#573](https://github.com/lovell/sharp/issues/573)
+  [@strarsis](https://github.com/strarsis)
+
+* Include pixel depth (e.g. "uchar") when reading metadata.
+  [#577](https://github.com/lovell/sharp/issues/577)
+  [@moedusa](https://github.com/moedusa)
+
+* Add support for Buffer and Stream-based TIFF output.
+  [#587](https://github.com/lovell/sharp/issues/587)
+  [@strarsis](https://github.com/strarsis)
+
+* Expose warnings from libvips via NODE_DEBUG=sharp environment variable.
+  [#607](https://github.com/lovell/sharp/issues/607)
+  [@puzrin](https://github.com/puzrin)
+
+* Switch to the libvips implementation of "attention" and "entropy" crop strategies.
+  [#727](https://github.com/lovell/sharp/issues/727)
+
+* Improve performance and accuracy of nearest neighbour integral upsampling.
+  [#752](https://github.com/lovell/sharp/issues/752)
+  [@MrIbby](https://github.com/MrIbby)
+
+* Constructor single argument API: allow plain object, reject null/undefined.
+  [#768](https://github.com/lovell/sharp/issues/768)
+  [@kub1x](https://github.com/kub1x)
+
+* Ensure ARM64 pre-built binaries use correct C++11 ABI version.
+  [#772](https://github.com/lovell/sharp/issues/772)
+  [@ajiratech2](https://github.com/ajiratech2)
+
+* Prevent aliasing by using dynamic values for shrink(-on-load).
+  [#781](https://github.com/lovell/sharp/issues/781)
+  [@kleisauke](https://github.com/kleisauke)
+
+* Expose libvips' "squash" parameter to enable 1-bit TIFF output.
+  [#783](https://github.com/lovell/sharp/pull/783)
+  [@YvesBos](https://github.com/YvesBos)
+
+* Add support for rotation using any multiple of +/-90 degrees.
+  [#791](https://github.com/lovell/sharp/pull/791)
+  [@ncoden](https://github.com/ncoden)
+
+* Add "jpg" alias to toFormat as shortened form of "jpeg".
+  [#814](https://github.com/lovell/sharp/pull/814)
+  [@jingsam](https://github.com/jingsam)
+
 ### v0.17 - "*quill*"
 
 Requires libvips v8.4.2.
 
-#### v0.17.2 - TBD
+#### v0.17.3 - 1<sup>st</sup> April 2017
+
+* Allow toBuffer to optionally resolve a Promise with both info and data.
+  [#143](https://github.com/lovell/sharp/issues/143)
+  [@salzhrani](https://github.com/salzhrani)
+
+* Create blank image of given width, height, channels and background.
+  [#470](https://github.com/lovell/sharp/issues/470)
+  [@pjarts](https://github.com/pjarts)
+
+* Add support for the "nearest" kernel for image reductions.
+  [#732](https://github.com/lovell/sharp/pull/732)
+  [@alice0meta](https://github.com/alice0meta)
+
+* Add support for TIFF compression and predictor options.
+  [#738](https://github.com/lovell/sharp/pull/738)
+  [@kristojorg](https://github.com/kristojorg)
+
+#### v0.17.2 - 11<sup>th</sup> February 2017
 
 * Ensure Readable side of Stream can start flowing after Writable side has finished.
   [#671](https://github.com/lovell/sharp/issues/671)

@@ -1,18 +1,32 @@
+// Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef SRC_COMMON_H_
 #define SRC_COMMON_H_
 
 #include <string>
 #include <tuple>
+#include <vector>
 
 #include <node.h>
+#include <nan.h>
 #include <vips/vips8>
-
-#include "nan.h"
 
 // Verify platform and compiler compatibility
 
-#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 4))
-#error libvips version 8.4.x required - see sharp.dimens.io/page/install
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 5))
+#error libvips version 8.5.x required - see sharp.dimens.io/page/install
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
@@ -38,6 +52,10 @@ namespace sharp {
     int rawChannels;
     int rawWidth;
     int rawHeight;
+    int createChannels;
+    int createWidth;
+    int createHeight;
+    double createBackground[4];
 
     InputDescriptor():
       buffer(nullptr),
@@ -45,7 +63,15 @@ namespace sharp {
       density(72),
       rawChannels(0),
       rawWidth(0),
-      rawHeight(0) {}
+      rawHeight(0),
+      createChannels(0),
+      createWidth(0),
+      createHeight(0) {
+        createBackground[0] = 0.0;
+        createBackground[1] = 0.0;
+        createBackground[2] = 0.0;
+        createBackground[3] = 255.0;
+      }
   };
 
   // Convenience methods to access the attributes of a v8::Object
@@ -63,8 +89,7 @@ namespace sharp {
 
   // Create an InputDescriptor instance from a v8::Object describing an input image
   InputDescriptor* CreateInputDescriptor(
-    v8::Handle<v8::Object> input, std::vector<v8::Local<v8::Object>> buffersToPersist
-  );
+    v8::Handle<v8::Object> input, std::vector<v8::Local<v8::Object>> buffersToPersist);
 
   enum class ImageType {
     JPEG,
@@ -160,9 +185,24 @@ namespace sharp {
   void SetDensity(VImage image, const int density);
 
   /*
+    Check the proposed format supports the current dimensions.
+  */
+  void AssertImageTypeDimensions(VImage image, ImageType const imageType);
+
+  /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
   void FreeCallback(char* data, void* hint);
+
+  /*
+    Called with warnings from the glib-registered "VIPS" domain
+  */
+  void VipsWarningCallback(char const* log_domain, GLogLevelFlags log_level, char const* message, void* ignore);
+
+  /*
+    Pop the oldest warning message from the queue
+  */
+  std::string VipsWarningPop();
 
   /*
     Calculate the (left, top) coordinates of the output image

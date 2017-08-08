@@ -1,14 +1,13 @@
 site_name: sharp
-site_url: http://sharp.dimens.io/
+site_url: http://sharp.pixelplumbing.com/
 repo_url: https://github.com/lovell/sharp
 site_description: High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images
-copyright: <a href="https://dimens.io/">dimens.io</a>
-google_analytics: ['UA-13034748-12', 'sharp.dimens.io']
+copyright: <a href="https://pixelplumbing.com/">pixelplumbing.com</a>
+google_analytics: ['UA-13034748-12', 'sharp.pixelplumbing.com']
 theme: readthedocs
 markdown_extensions:
   - toc:
       permalink: True
-dev_addr: 0.0.0.0:10101
 pages:
   - Home: index.md
   - Installation: install.md

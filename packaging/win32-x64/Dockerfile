@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:stretch
 MAINTAINER Lovell Fuller <npm@lovell.info>
 
 # Create Debian-based container suitable for post-processing Windows x64 binaries

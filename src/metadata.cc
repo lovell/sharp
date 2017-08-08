@@ -1,25 +1,40 @@
+// Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <numeric>
+#include <vector>
 
 #include <node.h>
+#include <nan.h>
 #include <vips/vips8>
 
-#include "nan.h"
 #include "common.h"
 #include "metadata.h"
 
 class MetadataWorker : public Nan::AsyncWorker {
  public:
   MetadataWorker(
-    Nan::Callback *callback, MetadataBaton *baton,
-    std::vector<v8::Local<v8::Object>> const buffersToPersist
-  ) : Nan::AsyncWorker(callback), baton(baton), buffersToPersist(buffersToPersist) {
+    Nan::Callback *callback, MetadataBaton *baton, Nan::Callback *debuglog,
+    std::vector<v8::Local<v8::Object>> const buffersToPersist) :
+    Nan::AsyncWorker(callback), baton(baton), debuglog(debuglog),
+    buffersToPersist(buffersToPersist) {
     // Protect Buffer objects from GC, keyed on index
     std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
       [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
         SaveToPersistent(index, buffer);
         return index + 1;
-      }
-    );
+      });
   }
   ~MetadataWorker() {}
 
@@ -42,6 +57,7 @@ class MetadataWorker : public Nan::AsyncWorker {
       baton->height = image.height();
       baton->space = vips_enum_nick(VIPS_TYPE_INTERPRETATION, image.interpretation());
       baton->channels = image.bands();
+      baton->depth = vips_enum_nick(VIPS_TYPE_BAND_FORMAT, image.format());
       if (sharp::HasDensity(image)) {
         baton->density = sharp::GetDensity(image);
       }
@@ -72,7 +88,7 @@ class MetadataWorker : public Nan::AsyncWorker {
     vips_thread_shutdown();
   }
 
-  void HandleOKCallback () {
+  void HandleOKCallback() {
     using Nan::New;
     using Nan::Set;
     Nan::HandleScope();
@@ -88,6 +104,7 @@ class MetadataWorker : public Nan::AsyncWorker {
       Set(info, New("height").ToLocalChecked(), New<v8::Uint32>(baton->height));
       Set(info, New("space").ToLocalChecked(), New<v8::String>(baton->space).ToLocalChecked());
       Set(info, New("channels").ToLocalChecked(), New<v8::Uint32>(baton->channels));
+      Set(info, New("depth").ToLocalChecked(), New<v8::String>(baton->depth).ToLocalChecked());
       if (baton->density > 0) {
         Set(info, New("density").ToLocalChecked(), New<v8::Uint32>(baton->density));
       }
@@ -99,14 +116,12 @@ class MetadataWorker : public Nan::AsyncWorker {
       if (baton->exifLength > 0) {
         Set(info,
           New("exif").ToLocalChecked(),
-          Nan::NewBuffer(baton->exif, baton->exifLength, sharp::FreeCallback, nullptr).ToLocalChecked()
-        );
+          Nan::NewBuffer(baton->exif, baton->exifLength, sharp::FreeCallback, nullptr).ToLocalChecked());
       }
       if (baton->iccLength > 0) {
         Set(info,
           New("icc").ToLocalChecked(),
-          Nan::NewBuffer(baton->icc, baton->iccLength, sharp::FreeCallback, nullptr).ToLocalChecked()
-        );
+          Nan::NewBuffer(baton->icc, baton->iccLength, sharp::FreeCallback, nullptr).ToLocalChecked());
       }
       argv[1] = info;
     }
@@ -116,10 +131,17 @@ class MetadataWorker : public Nan::AsyncWorker {
       [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
         GetFromPersistent(index);
         return index + 1;
-      }
-    );
+      });
     delete baton->input;
     delete baton;
+
+    // Handle warnings
+    std::string warning = sharp::VipsWarningPop();
+    while (!warning.empty()) {
+      v8::Local<v8::Value> message[1] = { New(warning).ToLocalChecked() };
+      debuglog->Call(1, message);
+      warning = sharp::VipsWarningPop();
+    }
 
     // Return to JavaScript
     callback->Call(2, argv);
@@ -127,6 +149,7 @@ class MetadataWorker : public Nan::AsyncWorker {
 
  private:
   MetadataBaton* baton;
+  Nan::Callback *debuglog;
   std::vector<v8::Local<v8::Object>> buffersToPersist;
 };
 
@@ -144,9 +167,12 @@ NAN_METHOD(metadata) {
   // Input
   baton->input = sharp::CreateInputDescriptor(sharp::AttrAs<v8::Object>(options, "input"), buffersToPersist);
 
+  // Function to notify of libvips warnings
+  Nan::Callback *debuglog = new Nan::Callback(sharp::AttrAs<v8::Function>(options, "debuglog"));
+
   // Join queue for worker thread
   Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
-  Nan::AsyncQueueWorker(new MetadataWorker(callback, baton, buffersToPersist));
+  Nan::AsyncQueueWorker(new MetadataWorker(callback, baton, debuglog, buffersToPersist));
 
   // Increment queued task counter
   g_atomic_int_inc(&sharp::counterQueue);

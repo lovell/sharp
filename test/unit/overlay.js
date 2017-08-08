@@ -155,20 +155,22 @@ describe('Overlays', function () {
     });
   }
 
-  it('Composite JPEG onto PNG', function (done) {
+  it('Composite JPEG onto PNG, no premultiply', function (done) {
     sharp(fixtures.inputPngOverlayLayer1)
       .overlayWith(fixtures.inputJpgWithLandscapeExif1)
-      .toBuffer(function (error) {
-        if (error) return done(error);
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(false, info.premultiplied);
         done();
       });
   });
 
-  it('Composite opaque JPEG onto JPEG', function (done) {
+  it('Composite opaque JPEG onto JPEG, no premultiply', function (done) {
     sharp(fixtures.inputJpg)
       .overlayWith(fixtures.inputJpgWithLandscapeExif1)
-      .toBuffer(function (error) {
-        if (error) return done(error);
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(false, info.premultiplied);
         done();
       });
   });
@@ -561,19 +563,36 @@ describe('Overlays', function () {
         sharp(fixtures.inputJpg)
           .resize(2048, 1536)
           .overlayWith(data, { raw: info })
-          .toBuffer(function (err, data) {
+          .toBuffer(function (err, data, info) {
             if (err) throw err;
+            assert.strictEqual(true, info.premultiplied);
             fixtures.assertSimilar(fixtures.expected('overlay-jpeg-with-rgb.jpg'), data, done);
           });
       });
   });
 
-  it('Throws an error when called with an invalid file', function (done) {
+  it('Returns an error when called with an invalid file', function (done) {
     sharp(fixtures.inputJpg)
       .overlayWith('notfound.png')
       .toBuffer(function (err) {
         assert(err instanceof Error);
         done();
+      });
+  });
+
+  it('Composite JPEG onto JPEG, no premultiply', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(480, 320)
+      .overlayWith(fixtures.inputJpgBooleanTest)
+      .png()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(480, info.width);
+        assert.strictEqual(320, info.height);
+        assert.strictEqual(3, info.channels);
+        assert.strictEqual(false, info.premultiplied);
+        fixtures.assertSimilar(fixtures.expected('overlay-jpeg-with-jpeg.jpg'), data, done);
       });
   });
 });

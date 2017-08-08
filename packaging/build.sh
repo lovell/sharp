@@ -23,6 +23,11 @@ if ! type docker >/dev/null; then
   exit 1
 fi
 
+# Update base images
+for baseimage in debian:wheezy debian:jessie debian:stretch socialdefect/raspbian-jessie-core; do
+  docker pull $baseimage
+done
+
 # Windows (x64)
 if [ $PLATFORM = "all" ] || [ $PLATFORM = "win32-x64" ]; then
   echo "Building win32-x64..."

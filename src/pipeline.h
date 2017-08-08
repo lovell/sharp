@@ -1,12 +1,28 @@
+// Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef SRC_PIPELINE_H_
 #define SRC_PIPELINE_H_
 
 #include <memory>
+#include <string>
+#include <vector>
 
+#include <nan.h>
 #include <vips/vips8>
 
-#include "nan.h"
-#include "common.h"
+#include "./common.h"
 
 NAN_METHOD(pipeline);
 
@@ -48,6 +64,7 @@ struct PipelineBaton {
   int crop;
   int cropCalcLeft;
   int cropCalcTop;
+  bool premultiplied;
   std::string kernel;
   std::string interpolator;
   bool centreSampling;
@@ -64,6 +81,7 @@ struct PipelineBaton {
   double gamma;
   bool greyscale;
   bool normalise;
+  bool useExifOrientation;
   int angle;
   bool rotateBeforePreExtract;
   bool flip;
@@ -88,6 +106,11 @@ struct PipelineBaton {
   bool webpNearLossless;
   bool webpLossless;
   int tiffQuality;
+  VipsForeignTiffCompression tiffCompression;
+  VipsForeignTiffPredictor tiffPredictor;
+  bool tiffSquash;
+  double tiffXres;
+  double tiffYres;
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
@@ -124,6 +147,7 @@ struct PipelineBaton {
     crop(0),
     cropCalcLeft(-1),
     cropCalcTop(-1),
+    premultiplied(false),
     centreSampling(false),
     flatten(false),
     negate(false),
@@ -137,6 +161,7 @@ struct PipelineBaton {
     gamma(0.0),
     greyscale(false),
     normalise(false),
+    useExifOrientation(false),
     angle(0),
     flip(false),
     flop(false),
@@ -156,6 +181,11 @@ struct PipelineBaton {
     pngAdaptiveFiltering(true),
     webpQuality(80),
     tiffQuality(80),
+    tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
+    tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_NONE),
+    tiffSquash(false),
+    tiffXres(1.0),
+    tiffYres(1.0),
     withMetadata(false),
     withMetadataOrientation(-1),
     convKernelWidth(0),

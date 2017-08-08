@@ -77,16 +77,58 @@ describe('Input/output', function () {
     readable.pipe(pipeline);
   });
 
-  it('Read from Stream and write to Buffer via Promise', function (done) {
-    const readable = fs.createReadStream(fixtures.inputJpg);
+  it('Read from Stream and write to Buffer via Promise resolved with Buffer', function () {
     const pipeline = sharp().resize(1, 1);
-    pipeline.toBuffer().then(function (data) {
-      assert.strictEqual(true, data.length > 0);
-      done();
-    }).catch(function (err) {
-      throw err;
-    });
-    readable.pipe(pipeline);
+    fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
+    return pipeline
+      .toBuffer({resolveWithObject: false})
+      .then(function (data) {
+        assert.strictEqual(true, data instanceof Buffer);
+        assert.strictEqual(true, data.length > 0);
+      });
+  });
+
+  it('Read from Stream and write to Buffer via Promise resolved with Object', function () {
+    const pipeline = sharp().resize(1, 1);
+    fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
+    return pipeline
+      .toBuffer({resolveWithObject: true})
+      .then(function (object) {
+        assert.strictEqual('object', typeof object);
+        assert.strictEqual('object', typeof object.info);
+        assert.strictEqual('jpeg', object.info.format);
+        assert.strictEqual(1, object.info.width);
+        assert.strictEqual(1, object.info.height);
+        assert.strictEqual(3, object.info.channels);
+        assert.strictEqual(true, object.data instanceof Buffer);
+        assert.strictEqual(true, object.data.length > 0);
+      });
+  });
+
+  it('Read from File and write to Buffer via Promise resolved with Buffer', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(1, 1)
+      .toBuffer({resolveWithObject: false})
+      .then(function (data) {
+        assert.strictEqual(true, data instanceof Buffer);
+        assert.strictEqual(true, data.length > 0);
+      });
+  });
+
+  it('Read from File and write to Buffer via Promise resolved with Object', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(1, 1)
+      .toBuffer({resolveWithObject: true})
+      .then(function (object) {
+        assert.strictEqual('object', typeof object);
+        assert.strictEqual('object', typeof object.info);
+        assert.strictEqual('jpeg', object.info.format);
+        assert.strictEqual(1, object.info.width);
+        assert.strictEqual(1, object.info.height);
+        assert.strictEqual(3, object.info.channels);
+        assert.strictEqual(true, object.data instanceof Buffer);
+        assert.strictEqual(true, object.data.length > 0);
+      });
   });
 
   it('Read from Stream and write to Stream', function (done) {
@@ -211,6 +253,21 @@ describe('Input/output', function () {
       });
   });
 
+  it('Support output to jpg format', function (done) {
+    sharp(fixtures.inputPng)
+      .resize(320, 240)
+      .toFormat('jpg')
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(data.length, info.size);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
   it('Fail when output File is input File', function (done) {
     sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, function (err) {
       assert(!!err);
@@ -246,7 +303,7 @@ describe('Input/output', function () {
   });
 
   it('Fail when input is empty Buffer', function (done) {
-    sharp(new Buffer(0)).toBuffer().then(function () {
+    sharp(Buffer.alloc(0)).toBuffer().then(function () {
       assert(false);
       done();
     }).catch(function (err) {
@@ -256,7 +313,7 @@ describe('Input/output', function () {
   });
 
   it('Fail when input is invalid Buffer', function (done) {
-    sharp(new Buffer([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
+    sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
       assert(false);
       done();
     }).catch(function (err) {
@@ -266,6 +323,16 @@ describe('Input/output', function () {
   });
 
   describe('Fail for unsupported input', function () {
+    it('Undefined', function () {
+      assert.throws(function () {
+        sharp(undefined);
+      });
+    });
+    it('Null', function () {
+      assert.throws(function () {
+        sharp(null);
+      });
+    });
     it('Numeric', function () {
       assert.throws(function () {
         sharp(1);
@@ -274,11 +341,6 @@ describe('Input/output', function () {
     it('Boolean', function () {
       assert.throws(function () {
         sharp(true);
-      });
-    });
-    it('Empty Object', function () {
-      assert.throws(function () {
-        sharp({});
       });
     });
     it('Error Object', function () {
@@ -795,6 +857,20 @@ describe('Input/output', function () {
       });
   });
 
+  it('Save TIFF to Buffer', function (done) {
+    sharp(fixtures.inputTiff)
+      .resize(320, 240)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(data.length, info.size);
+        assert.strictEqual('tiff', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
   it('Invalid WebP quality throws error', function () {
     assert.throws(function () {
       sharp().webp({ quality: 101 });
@@ -816,6 +892,219 @@ describe('Input/output', function () {
   it('Missing TIFF quality does not throw error', function () {
     assert.doesNotThrow(function () {
       sharp().tiff();
+    });
+  });
+
+  it('Not squashing TIFF to a bit depth of 1 should not change the file size', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiff8BitDepth).size;
+    sharp(fixtures.inputTiff8BitDepth)
+      .toColourspace('b-w') // can only squash 1 band uchar images
+      .tiff({
+        squash: false,
+        compression: 'none'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size === startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('Squashing TIFF to a bit depth of 1 should significantly reduce file size', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiff8BitDepth).size;
+    sharp(fixtures.inputTiff8BitDepth)
+      .toColourspace('b-w') // can only squash 1 band uchar images
+      .tiff({
+        squash: true,
+        compression: 'none'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < (startSize / 2));
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('Invalid TIFF squash value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ squash: 'true' });
+    });
+  });
+
+  it('TIFF setting xres and yres on file', function (done) {
+    const res = 1000.0; // inputTiff has a dpi of 300 (res*2.54)
+    sharp(fixtures.inputTiff)
+      .tiff({
+        xres: (res),
+        yres: (res)
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        sharp(fixtures.outputTiff).metadata(function (err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(metadata.density, res * 2.54); // convert to dpi
+          fs.unlink(fixtures.outputTiff, done);
+        });
+      });
+  });
+
+  it('TIFF setting xres and yres on buffer', function (done) {
+    const res = 1000.0; // inputTiff has a dpi of 300 (res*2.54)
+    sharp(fixtures.inputTiff)
+      .tiff({
+        xres: (res),
+        yres: (res)
+      })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        sharp(data).metadata(function (err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(metadata.density, res * 2.54); // convert to dpi
+          done();
+        });
+      });
+  });
+
+  it('TIFF invalid xres value should throw an error', function () {
+    assert.throws(function () {
+      sharp().tiff({ xres: '1000.0' });
+    });
+  });
+
+  it('TIFF invalid yres value should throw an error', function () {
+    assert.throws(function () {
+      sharp().tiff({ yres: '1000.0' });
+    });
+  });
+
+  it('TIFF lzw compression with horizontal predictor shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+      .tiff({
+        compression: 'lzw',
+        predictor: 'horizontal'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('TIFF deflate compression with horizontal predictor shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+      .tiff({
+        compression: 'deflate',
+        predictor: 'horizontal'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('TIFF deflate compression with float predictor shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+      .tiff({
+        compression: 'deflate',
+        predictor: 'float'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('TIFF deflate compression without predictor shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+      .tiff({
+        compression: 'deflate',
+        predictor: 'none'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('TIFF jpeg compression shrinks test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+      .tiff({
+        compression: 'jpeg'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
+  it('TIFF none compression does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ compression: 'none' });
+    });
+  });
+
+  it('TIFF lzw compression does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ compression: 'lzw' });
+    });
+  });
+
+  it('TIFF deflate compression does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ compression: 'deflate' });
+    });
+  });
+
+  it('TIFF invalid compression option throws', function () {
+    assert.throws(function () {
+      sharp().tiff({ compression: 0 });
+    });
+  });
+
+  it('TIFF invalid compression option throws', function () {
+    assert.throws(function () {
+      sharp().tiff({ compression: 'a' });
+    });
+  });
+
+  it('TIFF invalid predictor option throws', function () {
+    assert.throws(function () {
+      sharp().tiff({ predictor: 'a' });
+    });
+  });
+
+  it('TIFF horizontal predictor does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ predictor: 'horizontal' });
+    });
+  });
+
+  it('TIFF float predictor does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ predictor: 'float' });
+    });
+  });
+
+  it('TIFF none predictor does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ predictor: 'none' });
     });
   });
 
@@ -1002,7 +1291,7 @@ describe('Input/output', function () {
       sharp(fixtures.inputJpg).metadata(function (err, metadata) {
         if (err) throw err;
         sharp(fixtures.inputJpg)
-          .limitInputPixels(metadata.width * metadata.height - 1)
+          .limitInputPixels((metadata.width * metadata.height) - 1)
           .toBuffer(function (err) {
             assert.strictEqual(true, !!err);
             done();
@@ -1035,27 +1324,27 @@ describe('Input/output', function () {
   describe('Raw pixel input', function () {
     it('Missing options', function () {
       assert.throws(function () {
-        sharp(null, { raw: {} });
+        sharp({ raw: {} });
       });
     });
     it('Incomplete options', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 1, height: 1 } });
+        sharp({ raw: { width: 1, height: 1 } });
       });
     });
     it('Invalid channels', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 1, height: 1, channels: 5 } });
+        sharp({ raw: { width: 1, height: 1, channels: 5 } });
       });
     });
     it('Invalid height', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 1, height: 0, channels: 4 } });
+        sharp({ raw: { width: 1, height: 0, channels: 4 } });
       });
     });
     it('Invalid width', function () {
       assert.throws(function () {
-        sharp(null, { raw: { width: 'zoinks', height: 1, channels: 4 } });
+        sharp({ raw: { width: 'zoinks', height: 1, channels: 4 } });
       });
     });
     it('RGB', function (done) {
@@ -1108,9 +1397,69 @@ describe('Input/output', function () {
               assert.strictEqual(256, info.width);
               assert.strictEqual(192, info.height);
               assert.strictEqual(4, info.channels);
-              fixtures.assertSimilar(fixtures.inputPngOverlayLayer1, data, done);
+              fixtures.assertSimilar(fixtures.inputPngOverlayLayer1, data, { threshold: 7 }, done);
             });
         });
+    });
+  });
+
+  describe('create new image', function () {
+    it('RGB', function (done) {
+      const create = {
+        width: 10,
+        height: 20,
+        channels: 3,
+        background: { r: 0, g: 255, b: 0 }
+      };
+      sharp({ create: create })
+        .jpeg()
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(create.width, info.width);
+          assert.strictEqual(create.height, info.height);
+          assert.strictEqual(create.channels, info.channels);
+          assert.strictEqual('jpeg', info.format);
+          fixtures.assertSimilar(fixtures.expected('create-rgb.jpg'), data, done);
+        });
+    });
+    it('RGBA', function (done) {
+      const create = {
+        width: 20,
+        height: 10,
+        channels: 4,
+        background: { r: 255, g: 0, b: 0, alpha: 128 }
+      };
+      sharp({ create: create })
+        .png()
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(create.width, info.width);
+          assert.strictEqual(create.height, info.height);
+          assert.strictEqual(create.channels, info.channels);
+          assert.strictEqual('png', info.format);
+          fixtures.assertSimilar(fixtures.expected('create-rgba.png'), data, done);
+        });
+    });
+    it('Invalid channels', function () {
+      const create = {
+        width: 10,
+        height: 20,
+        channels: 2,
+        background: { r: 0, g: 0, b: 0 }
+      };
+      assert.throws(function () {
+        sharp({ create: create });
+      });
+    });
+    it('Missing background', function () {
+      const create = {
+        width: 10,
+        height: 20,
+        channels: 3
+      };
+      assert.throws(function () {
+        sharp({ create: create });
+      });
     });
   });
 
