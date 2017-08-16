@@ -30,7 +30,10 @@ import sharp from 'sharp';
 sharp(inputBuffer)
   .resize(320, 240)
   .toFile('output.webp', (err, info) => ... );
+  // A Promises/A+ promise is returned when callback is not provided.
 ```
+
+
 
 ```javascript
 sharp('input.jpg')
