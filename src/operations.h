@@ -97,6 +97,11 @@ namespace sharp {
   */
   VImage Trim(VImage image, int const tolerance);
 
+  /*
+    Tilt the image by an arbitrary degree
+   */
+  VImage Tilt(VImage image, int const angle);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

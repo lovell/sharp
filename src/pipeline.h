@@ -83,6 +83,7 @@ struct PipelineBaton {
   bool normalise;
   bool useExifOrientation;
   int angle;
+  int tiltAngle;
   bool rotateBeforePreExtract;
   bool flip;
   bool flop;
@@ -163,6 +164,7 @@ struct PipelineBaton {
     normalise(false),
     useExifOrientation(false),
     angle(0),
+    tiltAngle(0),
     flip(false),
     flop(false),
     extendTop(0),

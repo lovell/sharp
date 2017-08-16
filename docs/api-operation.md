@@ -3,6 +3,7 @@
 ### Table of Contents
 
 -   [rotate](#rotate)
+-   [tilt](#tilt)
 -   [extract](#extract)
 -   [flip](#flip)
 -   [flop](#flop)
@@ -49,6 +50,45 @@ const pipeline = sharp()
     // outputBuffer contains 200px high JPEG image data,
     // auto-rotated using EXIF Orientation tag
     // info.width and info.height contain the dimensions of the resized image
+  });
+readableStream.pipe(pipeline);
+```
+
+-   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+
+Returns **Sharp** 
+
+## tilt
+
+Tilt the output image by an arbitrary angle.
+
+The image dimensions will be preserved after tilt operation. This can lead to
+loss of image information. To prevent cropping of image after tilt,
+`ignoreAspectRatio` can be used. The tilted image received after using
+`ignoreAspectRatio` can be significantly larger than the original image
+but without any loss of information.
+
+This method automatically adds an alpha channel to the images without one.
+This is done on purpose because without this all images lacking alpha will
+get black fill around them.
+
+Like `rotate`, the use of this method implies removal of the EXIF `Orientation` tag, if present.
+
+This method uses `rotate` if the angle is a valid parameter for `rotate`
+
+**Parameters**
+
+-   `angle` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** An integer. Positive integers tilt clockwise, while negative integers tilt counter-clockwise
+
+**Examples**
+
+```javascript
+const pipeline = sharp()
+  .tilt(20)
+  .resize(null, 200)
+  .toBuffer(function (err, outputBuffer) {
+    // outputBuffer contains 200px high JPEG image data,
+    // tilted by 20 degrees clockwise
   });
 readableStream.pipe(pipeline);
 ```

@@ -102,6 +102,8 @@ module.exports = {
 
   inputV: getPath('vfile.v'),
 
+  inputTilt: getPath('compiler-time.jpg'), // http://www.cs.cmu.edu/~tom7/csnotes/spring03/compiler-time.gif
+
   outputJpg: getPath('output.jpg'),
   outputPng: getPath('output.png'),
   outputWebP: getPath('output.webp'),
