@@ -4,6 +4,7 @@
 
 -   [clone](#clone)
 -   [metadata](#metadata)
+-   [stats](#stats)
 -   [limitInputPixels](#limitinputpixels)
 -   [sequentialRead](#sequentialread)
 
@@ -66,6 +67,42 @@ image
 ```
 
 Returns **([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)> | Sharp)** 
+
+## stats
+
+Access to pixel-derived image statistics for every channel in the image
+A Promises/A+ promise is returned when `callback` is not provided.
+
+-   `channels`: Array of channel statistics for each channel in the image. Each channel statistic contains 
+    -   `min` (minimum value in the channel)
+    -   `max` (maximum value in the channel)
+    -   `sum` (sum of all values in a channel)
+    -   `squaresSum` (sum of squared values in a channel)
+    -   `mean` (mean of the values in a channel)
+    -   `stdev` (standard deviation for the values in a channel)
+    -   `minX` (x-coordinate of one of the pixel where the minimum lies)
+    -   `minY` (y-coordinate of one of the pixel where the minimum lies)
+    -   `maxX` (x-coordinate of one of the pixel where the maximum lies)
+    -   `maxY` (y-coordinate of one of the pixel where the maximum lies)
+-   `isOpaque`: Value to identify if the image is opaque or transparent, based on the presence and use of alpha channel
+
+**Parameters**
+
+-   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, metadata)`
+
+**Examples**
+
+```javascript
+const image = sharp(inputJpg);
+image
+  .stats()
+  .then(function(stats) {
+    // stats contains the channel-wise statistics array and the isOpaque value
+  })
+```
+
+Returns **([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)> | Sharp)** 
+
 
 ## limitInputPixels
 
