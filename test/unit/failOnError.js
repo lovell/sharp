@@ -21,8 +21,8 @@ describe('failOnError', function () {
   it('rejects invalid values', function () {
     assert.doesNotThrow(function () {
       sharp(fixtures.inputJpg, { failOnError: true });
-    })
-    
+    });
+
     assert.throws(function () {
       sharp(fixtures.inputJpg, { failOnError: 'zoinks' });
     });
@@ -36,6 +36,7 @@ describe('failOnError', function () {
     sharp(fixtures.inputJpgTruncated, { failOnError: true })
       .resize(320, 240)
       .toBuffer(function (err, data, info) {
+        assert.equal(err, null);
         assert.equal(data.byteLength, 0);
         done();
       });
@@ -46,7 +47,7 @@ describe('failOnError', function () {
       .resize(320, 240)
       .toBuffer()
       .then(buffer => {
-        assert.equal(buffer.byteLength, 0)
-      })
+        assert.equal(buffer.byteLength, 0);
+      });
   });
 });
