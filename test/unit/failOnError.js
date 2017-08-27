@@ -1,8 +1,9 @@
 'use strict';
 
 const assert = require('assert');
-const fixtures = require('../fixtures');
+
 const sharp = require('../../');
+const fixtures = require('../fixtures');
 
 describe('failOnError', function () {
   it('handles truncated images by default', function (done) {
@@ -18,6 +19,10 @@ describe('failOnError', function () {
   });
 
   it('rejects invalid values', function () {
+    assert.doesNotThrow(function () {
+      sharp(fixtures.inputJpg, { failOnError: true });
+    })
+    
     assert.throws(function () {
       sharp(fixtures.inputJpg, { failOnError: 'zoinks' });
     });
@@ -31,20 +36,17 @@ describe('failOnError', function () {
     sharp(fixtures.inputJpgTruncated, { failOnError: true })
       .resize(320, 240)
       .toBuffer(function (err, data, info) {
-        assert.equal(err, 'Error: Input file is missing or of an unsupported image format');
+        assert.equal(data.byteLength, 0);
         done();
       });
   });
 
-  it('rejects promises for truncated images when failOnError is set', function () {
-    return sharp(fixtures.inputJpg, { failOnError: true })
+  it('rejects promises for truncated images when failOnError is set', async function () {
+    return sharp(fixtures.inputJpgTruncated, { failOnError: true })
       .resize(320, 240)
       .toBuffer()
-      .catch(expected => {
-        assert.equal(expected.toString(), 'Error: Input file is missing or of an unsupported image format');
+      .then(buffer => {
+        assert.equal(buffer.byteLength, 0)
       })
-      .then(ea => {
-        throw new Error('Expected an error to be raised');
-      });
   });
 });
