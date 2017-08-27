@@ -42,7 +42,7 @@ describe('failOnError', function () {
       });
   });
 
-  it('rejects promises for truncated images when failOnError is set', async function () {
+  it('rejects promises for truncated images when failOnError is set', function () {
     return sharp(fixtures.inputJpgTruncated, { failOnError: true })
       .resize(320, 240)
       .toBuffer()
