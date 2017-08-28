@@ -52,6 +52,9 @@ namespace sharp {
       descriptor->buffer = node::Buffer::Data(buffer);
       buffersToPersist.push_back(buffer);
     }
+    if (HasAttr(input, "failOnError")) {
+      descriptor->failOnError = AttrTo<bool>(input, "failOnError");
+    }
     // Density for vector-based input
     if (HasAttr(input, "density")) {
       descriptor->density = AttrTo<uint32_t>(input, "density");
