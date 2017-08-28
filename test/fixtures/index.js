@@ -83,6 +83,9 @@ module.exports = {
   inputPngAlphaPremultiplicationLarge: getPath('alpha-premultiply-2048x1536-paper.png'),
   inputPngBooleanNoAlpha: getPath('bandbool.png'),
   inputPngTestJoinChannel: getPath('testJoinChannel.png'),
+  inputPng320x240: getPath('saw-320x240.png'),
+  inputPngTruncated: getPath('saw-truncated.png'),
+  inputPngPunched: getPath('saw-punched.png'),
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp

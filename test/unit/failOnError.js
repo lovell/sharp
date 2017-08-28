@@ -19,11 +19,23 @@ describe.only('failOnError', function () {
       });
   });
 
-  it('handles zero-punched corrupted images', function (done) {
+  it('handles zero-punched corrupted JPEG', function (done) {
     sharp(fixtures.inputJpgPunched)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('punched.jpg'), data, done);
+      });
+  });
+
+  it('handles zero-punched corrupted PNG', function (done) {
+    sharp(fixtures.inputPngPunched)
+      // .toFile(fixtures.expected('truncated.png'), done);
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
         fixtures.assertSimilar(fixtures.expected('punched.jpg'), data, done);
@@ -44,7 +56,7 @@ describe.only('failOnError', function () {
     });
   });
 
-  it('returns errors to callback for truncated images when failOnError is set', function (done) {
+  it('returns errors to callback for truncated JPEG when failOnError is set', function (done) {
     sharp(fixtures.inputJpgTruncated, { failOnError: true })
       .toBuffer(function (err, data, info) {
         console.dir({err, info});  // TODO(mceachen): delete
@@ -55,7 +67,18 @@ describe.only('failOnError', function () {
       });
   });
 
-  it('returns errors to callback for zero-punched images when failOnError is set', function (done) {
+  it('returns errors to callback for truncated PNG when failOnError is set', function (done) {
+    sharp(fixtures.inputPngTruncated, { failOnError: true })
+      .toBuffer(function (err, data, info) {
+        console.dir({err, info});  // TODO(mceachen): delete
+        assert.equal(err, 'Error: Premature end of PNG file');
+        assert.equal(data, null);
+        assert.equal(info.size, 0);
+        done();
+      });
+  });
+
+  it('returns errors to callback for zero-punched JPEG when failOnError is set', function (done) {
     sharp(fixtures.inputJpgPunched, { failOnError: true })
       .toBuffer(function (err, data, info) {
         console.dir({err, info});  // TODO(mceachen): delete
@@ -66,10 +89,20 @@ describe.only('failOnError', function () {
       });
   });
 
+  it('returns errors to callback for zero-punched PNG when failOnError is set', function (done) {
+    sharp(fixtures.inputPngPunched, { failOnError: true })
+      .toBuffer(function (err, data, info) {
+        console.dir({err, info});  // TODO(mceachen): delete
+        assert.equal(err, 'Error: Corrupt PNG data: (something about CRC error, probably) ');
+        assert.equal(data, null);
+        assert.equal(info.size, 0);
+        done();
+      });
+  });
+
   it('rejects promises for truncated images when failOnError is set', function () {
     return new Promise(function (resolve, reject) {
       sharp(fixtures.inputJpgTruncated, { failOnError: true })
-        .resize(320, 240)
         .toBuffer()
         .then(function () {
           reject(new Error('Error was expected'));
