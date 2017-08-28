@@ -53,10 +53,10 @@ describe.only('failOnError', function () {
         assert.equal(info.size, 0);
         done();
       });
-    });
-    
+  });
+
   it('returns errors to callback for zero-punched images when failOnError is set', function (done) {
-      sharp(fixtures.inputJpgPunched, { failOnError: true })
+    sharp(fixtures.inputJpgPunched, { failOnError: true })
       .toBuffer(function (err, data, info) {
         console.dir({err, info});  // TODO(mceachen): delete
         assert.equal(err, 'Error: Corrupt JPEG data: 66 extraneous bytes before marker 0xd9');
@@ -75,8 +75,8 @@ describe.only('failOnError', function () {
           reject(new Error('Error was expected'));
         })
       .catch(function (err) {
-        console.log('Caught expected error ' + expected);  // TODO(mceachen): delete
-        assert.include(err.toString(), "Premature end of JPEG file");
+        console.log('Caught expected error ' + err);  // TODO(mceachen): delete
+        assert.include(err.toString(), 'Premature end of JPEG file');
         resolve();
       });
     });
