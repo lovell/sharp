@@ -215,6 +215,13 @@ SHARP_DIST_BASE_URL="https://hostname/path/" npm install sharp
 
 to use `https://hostname/path/libvips-x.y.z-platform.tar.gz`.
 
+Should you need to download from a URL that requires basic authentication,
+set the `SHARP_DIST_AUTH_HEADER` environment variable, e.g.
+
+```sh
+SHARP_DIST_AUTH_HEADER="username:password" SHARP_DIST_BASE_URL="https://hostname/path/" npm install sharp
+```
+
 ### Licences
 
 This module is licensed under the terms of the
