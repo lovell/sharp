@@ -19,6 +19,8 @@ const platform = process.env.npm_config_platform || process.platform;
 
 const arch = process.env.npm_config_arch || process.arch;
 
+const distAuthHeader = process.env.SHARP_DIST_AUTH_HEADER;
+
 // -- Helpers
 
 // Does this file exist?
@@ -100,6 +102,9 @@ module.exports.download_vips = function () {
           protocol: 'https'
         })
       };
+      if (distAuthHeader) {
+        gotOpt.auth = distAuthHeader;
+      }
       const url = distBaseUrl + tarFilename;
       got.stream(url, gotOpt).on('response', function (response) {
         if (response.statusCode !== 200) {
