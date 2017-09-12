@@ -81,6 +81,7 @@ module.exports = {
   inputPngAlphaPremultiplicationLarge: getPath('alpha-premultiply-2048x1536-paper.png'),
   inputPngBooleanNoAlpha: getPath('bandbool.png'),
   inputPngTestJoinChannel: getPath('testJoinChannel.png'),
+  inputPngRGBWithAlpha: getPath('2569067123_aca715a2ee_o.png'), // http://www.flickr.com/photos/grizdave/2569067123/ (same as inputJpg)
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp

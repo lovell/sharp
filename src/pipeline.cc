@@ -710,6 +710,12 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = sharp::Bandbool(image, baton->bandBoolOp);
       }
 
+      // Tint the image
+      if (baton->tint[0] < 255 || baton->tint[1] < 255 || baton->tint[2] < 255) {
+        std::vector<double> colour {baton->tint[0], baton->tint[1], baton->tint[2]};
+        image = sharp::Tint(image, colour);
+      }
+
       // Extract an image channel (aka vips band)
       if (baton->extractChannel > -1) {
         if (baton->extractChannel >= image.bands()) {
@@ -1187,6 +1193,11 @@ NAN_METHOD(pipeline) {
   v8::Local<v8::Object> background = AttrAs<v8::Object>(options, "background");
   for (unsigned int i = 0; i < 4; i++) {
     baton->background[i] = AttrTo<double>(background, i);
+  }
+  // Tint colour
+  v8::Local<v8::Object> tint = AttrAs<v8::Object>(options, "tint");
+  for (unsigned int i = 0; i < 3; i++) {
+    baton->tint[i] = AttrTo<double>(tint, i);
   }
   // Overlay options
   if (HasAttr(options, "overlay")) {

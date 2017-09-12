@@ -47,6 +47,11 @@ namespace sharp {
   VImage Cutout(VImage src, VImage dst, const int gravity);
 
   /*
+   * Tint an image using the colour specified, preserving the original image luminance
+   */
+  VImage Tint(VImage image, std::vector<double> colour);
+
+  /*
    * Stretch luminance to cover full dynamic range.
    */
   VImage Normalise(VImage image);
