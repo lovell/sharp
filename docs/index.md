@@ -100,6 +100,8 @@ the help and code contributions of the following people:
 * [Alice Monday](https://github.com/alice0meta)
 * [Kristo Jorgenson](https://github.com/kristojorg)
 * [Yves Bos](https://github.com/YvesBos)
+* [Nicolas Coden](https://github.com/ncoden)
+* [Matt Parrish](https://github.com/pbomb)
 
 Thank you!
 
