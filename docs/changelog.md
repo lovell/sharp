@@ -4,6 +4,12 @@
 
 Requires libvips v8.5.5.
 
+#### v0.18.4 - TBD
+
+* Ensure input Buffer really is marked as Persistent, prevents mark-sweep GC.
+  [#950](https://github.com/lovell/sharp/issues/950)
+  [@lfdoherty](https://github.com/lfdoherty)
+
 #### v0.18.3 - 13<sup>th</sup> September 2017
 
 * Skip shrink-on-load when trimming.

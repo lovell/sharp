@@ -40,7 +40,7 @@ namespace sharp {
 
   // Create an InputDescriptor instance from a v8::Object describing an input image
   InputDescriptor* CreateInputDescriptor(
-    v8::Handle<v8::Object> input, std::vector<v8::Local<v8::Object>> buffersToPersist
+    v8::Handle<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist
   ) {
     Nan::HandleScope();
     InputDescriptor *descriptor = new InputDescriptor;

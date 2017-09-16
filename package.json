@@ -105,7 +105,8 @@
     "filter": [
       "build/c++11",
       "build/include",
-      "runtime/indentation_namespace"
+      "runtime/indentation_namespace",
+      "runtime/references"
     ]
   }
 }
