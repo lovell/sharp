@@ -4,7 +4,7 @@
 
 Requires libvips v8.5.5.
 
-#### v0.18.4 - TBD
+#### v0.18.4 - 18<sup>th</sup> September 2017
 
 * Ensure input Buffer really is marked as Persistent, prevents mark-sweep GC.
   [#950](https://github.com/lovell/sharp/issues/950)
