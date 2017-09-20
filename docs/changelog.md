@@ -4,6 +4,22 @@
 
 Requires libvips v8.5.5.
 
+#### v0.18.4 - 18<sup>th</sup> September 2017
+
+* Ensure input Buffer really is marked as Persistent, prevents mark-sweep GC.
+  [#950](https://github.com/lovell/sharp/issues/950)
+  [@lfdoherty](https://github.com/lfdoherty)
+
+#### v0.18.3 - 13<sup>th</sup> September 2017
+
+* Skip shrink-on-load when trimming.
+  [#888](https://github.com/lovell/sharp/pull/888)
+  [@kleisauke](https://github.com/kleisauke)
+
+* Migrate from got to simple-get for basic auth support.
+  [#945](https://github.com/lovell/sharp/pull/945)
+  [@pbomb](https://github.com/pbomb)
+
 #### v0.18.2 - 1<sup>st</sup> July 2017
 
 * Expose libvips' xres and yres properties for TIFF output.
