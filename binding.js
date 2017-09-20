@@ -5,7 +5,7 @@ const os = require('os');
 const path = require('path');
 
 const caw = require('caw');
-const got = require('got');
+const simpleGet = require('simple-get');
 const semver = require('semver');
 const tar = require('tar');
 const detectLibc = require('detect-libc');
@@ -95,19 +95,22 @@ module.exports.download_vips = function () {
           } catch (err) {}
         });
       });
-      const gotOpt = {
+      const url = distBaseUrl + tarFilename;
+      const simpleGetOpt = {
+        url: url,
         agent: caw(null, {
           protocol: 'https'
         })
       };
-      const url = distBaseUrl + tarFilename;
-      got.stream(url, gotOpt).on('response', function (response) {
+      simpleGet(simpleGetOpt, function (err, response) {
+        if (err) {
+          error('Download of ' + url + ' failed: ' + err.message);
+        }
         if (response.statusCode !== 200) {
           error(url + ' status code ' + response.statusCode);
         }
-      }).on('error', function (err) {
-        error('Download of ' + url + ' failed: ' + err.message);
-      }).pipe(tmpFile);
+        response.pipe(tmpFile);
+      });
     }
   }
 };

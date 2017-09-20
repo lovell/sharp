@@ -1,7 +1,7 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
-  "version": "0.18.2",
+  "version": "0.18.4",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://github.com/lovell/sharp",
   "contributors": [
@@ -37,7 +37,8 @@
     "Kristo Jorgenson <kristo.jorgenson@gmail.com>",
     "YvesBos <yves_bos@outlook.com>",
     "Guy Maliar <guy@tailorbrands.com>",
-    "Nicolas Coden <nicolas@ncoden.fr>"
+    "Nicolas Coden <nicolas@ncoden.fr>",
+    "Matt Parrish <matt.r.parrish@gmail.com>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
@@ -70,9 +71,9 @@
     "caw": "^2.0.0",
     "color": "^2.0.0",
     "detect-libc": "^0.2.0",
-    "got": "^7.1.0",
     "nan": "^2.6.2",
     "semver": "^5.3.0",
+    "simple-get": "^2.7.0",
     "tar": "^3.1.5"
   },
   "devDependencies": {
@@ -104,7 +105,8 @@
     "filter": [
       "build/c++11",
       "build/include",
-      "runtime/indentation_namespace"
+      "runtime/indentation_namespace",
+      "runtime/references"
     ]
   }
 }
