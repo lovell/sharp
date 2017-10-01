@@ -29,6 +29,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 -   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** called on completion with two arguments `(err, info)`.
     `info` contains the output image `format`, `size` (bytes), `width`, `height`,
     `channels` and `premultiplied` (indicating if premultiplication was used).
+    When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
 
 
 -   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
@@ -102,8 +103,8 @@ Use these PNG options for output image.
 
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
     -   `options.progressive` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use progressive (interlace) scan (optional, default `false`)
-    -   `options.compressionLevel` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** zlib compression level (optional, default `6`)
-    -   `options.adaptiveFiltering` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use adaptive row filtering (optional, default `true`)
+    -   `options.compressionLevel` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** zlib compression level, 0-9 (optional, default `9`)
+    -   `options.adaptiveFiltering` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use adaptive row filtering (optional, default `false`)
     -   `options.force` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** force PNG output, otherwise attempt to use input format (optional, default `true`)
 
 

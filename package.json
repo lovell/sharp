@@ -78,7 +78,7 @@
   "devDependencies": {
     "async": "^2.5.0",
     "cc": "^1.0.1",
-    "documentation": "^4.0.0-rc.1",
+    "documentation": "^5.3.2",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "mocha": "^3.5.0",
