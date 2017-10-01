@@ -23,7 +23,7 @@ the installation of any external runtime dependencies.
 ## Examples
 
 ```javascript
-import sharp from 'sharp';
+const sharp = require('sharp');
 ```
 
 ```javascript
@@ -32,8 +32,6 @@ sharp(inputBuffer)
   .toFile('output.webp', (err, info) => ... );
   // A Promises/A+ promise is returned when callback is not provided.
 ```
-
-
 
 ```javascript
 sharp('input.jpg')

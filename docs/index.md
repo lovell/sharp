@@ -55,9 +55,9 @@ without having to use separate command line tools like
 [jpegoptim](https://github.com/tjko/jpegoptim) and
 [jpegtran](http://jpegclub.org/jpegtran/).
 
-PNG filtering can be disabled,
+PNG filtering is disabled by default,
 which for diagrams and line art often produces the same result
-as [pngcrush](http://pmt.sourceforge.net/pngcrush/).
+as [pngcrush](https://pmt.sourceforge.io/pngcrush/).
 
 ### Contributing
 
