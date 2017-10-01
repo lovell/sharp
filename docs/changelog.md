@@ -10,6 +10,10 @@ Requires libvips v8.6.0.
   [#868](https://github.com/lovell/sharp/issues/868)
   [@mirohristov-com](https://github.com/mirohristov-com)
 
+* PNG output now defaults to adaptiveFiltering=false, compressionLevel=9
+  [#872](https://github.com/lovell/sharp/issues/872)
+  [@wmertens](https://github.com/wmertens)
+
 ### v0.18 - "*ridge*"
 
 Requires libvips v8.5.5.
