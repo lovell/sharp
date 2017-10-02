@@ -85,7 +85,12 @@ Only 64-bit (x64) `node.exe` is supported.
 ### FreeBSD
 
 libvips must be installed before `npm install` is run.
-This can be achieved via [FreshPorts](https://www.freshports.org/graphics/vips/):
+
+This can be achieved via package or ports:
+
+```sh
+pkg install -y pkgconf vips
+```
 
 ```sh
 cd /usr/ports/graphics/vips/ && make install clean
