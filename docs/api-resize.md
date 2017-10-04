@@ -172,6 +172,6 @@ This is equivalent to GraphicsMagick's `>` geometry option:
 
 **Parameters**
 
--   `withoutEnlargement` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `withoutEnlargement` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
 
 Returns **Sharp** 
