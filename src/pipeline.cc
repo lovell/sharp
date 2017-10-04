@@ -223,19 +223,20 @@ class PipelineWorker : public Nan::AsyncWorker {
       // but not when applying gamma correction, pre-resize extract or trim
       int shrink_on_load = 1;
       if (
-        xshrink == yshrink && xshrink >= 2 &&
+        xshrink == yshrink && xshrink >= 4 &&
         (inputImageType == ImageType::JPEG || inputImageType == ImageType::WEBP) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimTolerance == 0
       ) {
-        if (xshrink >= 8) {
+        if (xshrink >= 16) {
           xfactor = xfactor / 8;
           yfactor = yfactor / 8;
           shrink_on_load = 8;
-        } else if (xshrink >= 4) {
+        }
+        else if (xshrink >= 8) {
           xfactor = xfactor / 4;
           yfactor = yfactor / 4;
           shrink_on_load = 4;
-        } else if (xshrink >= 2) {
+        } else if (xshrink >= 4) {
           xfactor = xfactor / 2;
           yfactor = yfactor / 2;
           shrink_on_load = 2;
@@ -376,8 +377,25 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = image.premultiply();
       }
 
+
+      if (xfactor != 1.0 || yfactor != 1.0) {
+        VipsKernel kernel = static_cast<VipsKernel>(
+          vips_enum_from_nick(nullptr, VIPS_TYPE_KERNEL, baton->kernel.data()));
+        if (
+          kernel != VIPS_KERNEL_NEAREST && kernel != VIPS_KERNEL_CUBIC && kernel != VIPS_KERNEL_LANCZOS2 &&
+          kernel != VIPS_KERNEL_LANCZOS3
+        ) {
+          throw vips::VError("Unknown kernel");
+        }
+
+        image = image.resize(1.0 / xfactor, VImage::option()
+          ->set("vscale", 1.0 / yfactor)
+          ->set("kernel", kernel)
+          ->set("centre", baton->centreSampling));
+      }
+
       // Fast, integral box-shrink
-      if (shouldShrink) {
+      /*if (shouldShrink) {
         if (yshrink > 1) {
           image = image.shrinkv(yshrink);
         }
@@ -450,7 +468,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           }
         }
       }
-
+*/
       // Rotate
       if (!baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
         image = image.rot(rotation);
@@ -483,6 +501,7 @@ class PipelineWorker : public Nan::AsyncWorker {
 
       // Crop/embed
       if (image.width() != baton->width || image.height() != baton->height) {
+
         if (baton->canvas == Canvas::EMBED) {
           // Scale up 8-bit values to match 16-bit input image
           double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
