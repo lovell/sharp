@@ -448,4 +448,27 @@ describe('Resize dimensions', function () {
           });
       });
   });
+
+  // Need to fix these tests to not call resize again in assertion
+  it('Can turn off Shrink On Load', function (done) {
+    return sharp(fixtures.inputJpgShrinkOnLoad)
+      .resize(200, null, {shrinkOnLoad: false})
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(200, info.width);
+        assert.strictEqual(90, info.height);
+        fixtures.assertSimilar(fixtures.expected('shrink-on-load-false.jpg'), data, {threshold: 1}, done);
+      });
+  });
+
+  it('Can turn on Shrink On Load', function (done) {
+    return sharp(fixtures.inputJpgShrinkOnLoad)
+      .resize(200, null, {shrinkOnLoad: true})
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(200, info.width);
+        assert.strictEqual(90, info.height);
+        fixtures.assertSimilar(fixtures.expected('shrink-on-load-true.jpg'), data, {threshold: 1}, done);
+      });
+  });
 });

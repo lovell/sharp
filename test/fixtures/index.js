@@ -66,6 +66,7 @@ module.exports = {
   inputJpgLarge: getPath('giant-image.jpg'),
   inputJpg320x240: getPath('320x240.jpg'), // http://www.andrewault.net/2010/01/26/create-a-test-pattern-video-with-perl/
   inputJpgOverlayLayer2: getPath('alpha-layer-2-ink.jpg'),
+  inputJpgShrinkOnLoad: getPath('shrink-on-load-test.jpg'),
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain

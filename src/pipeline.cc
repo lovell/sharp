@@ -225,7 +225,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (
         xshrink == yshrink && xshrink >= 2 &&
         (inputImageType == ImageType::JPEG || inputImageType == ImageType::WEBP) &&
-        baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimTolerance == 0
+        baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimTolerance == 0 && baton->shrinkOnLoad
       ) {
         if (xshrink >= 8) {
           xfactor = xfactor / 8;
@@ -1203,6 +1203,7 @@ NAN_METHOD(pipeline) {
   baton->kernel = AttrAsStr(options, "kernel");
   baton->interpolator = AttrAsStr(options, "interpolator");
   baton->centreSampling = AttrTo<bool>(options, "centreSampling");
+  baton->shrinkOnLoad = AttrTo<bool>(options, "shrinkOnLoad");
   // Join Channel Options
   if (HasAttr(options, "joinChannelIn")) {
     v8::Local<v8::Object> joinChannelObject = Nan::Get(options, Nan::New("joinChannelIn").ToLocalChecked())
