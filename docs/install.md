@@ -157,6 +157,10 @@ You can now download your deployment ZIP using `scp` and upload it to Lambda. Be
 * [gulp-responsive](https://www.npmjs.com/package/gulp-responsive)
 * [grunt-sharp](https://www.npmjs.com/package/grunt-sharp)
 
+### Coding tools
+
+* [Sharp TypeScript Types](https://www.npmjs.com/package/@types/sharp)
+
 ### CLI tools
 
 * [sharp-cli](https://www.npmjs.com/package/sharp-cli)
