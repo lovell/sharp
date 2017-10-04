@@ -66,6 +66,8 @@ module.exports = {
   inputJpgLarge: getPath('giant-image.jpg'),
   inputJpg320x240: getPath('320x240.jpg'), // http://www.andrewault.net/2010/01/26/create-a-test-pattern-video-with-perl/
   inputJpgOverlayLayer2: getPath('alpha-layer-2-ink.jpg'),
+  inputJpgTruncated: getPath('truncated.jpg'), // head -c 10000 2569067123_aca715a2ee_o.jpg > truncated.jpg
+  inputJpgPunched: getPath('punched.jpg'), // cp 320x240.jpg punched.jpg && punch punched.jpg 16
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
@@ -81,6 +83,9 @@ module.exports = {
   inputPngAlphaPremultiplicationLarge: getPath('alpha-premultiply-2048x1536-paper.png'),
   inputPngBooleanNoAlpha: getPath('bandbool.png'),
   inputPngTestJoinChannel: getPath('testJoinChannel.png'),
+  inputPng320x240: getPath('saw-320x240.png'),
+  inputPngTruncated: getPath('saw-truncated.png'),
+  inputPngPunched: getPath('saw-punched.png'),
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp

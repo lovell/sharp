@@ -121,7 +121,8 @@
         'conditions': [
           ['OS == "win"', {
             'defines': [
-              '_ALLOW_KEYWORD_MACROS'
+              '_ALLOW_KEYWORD_MACROS',
+              '_HAS_EXCEPTIONS=1'
             ],
             'libraries': [
               '../vendor/lib/libvips.lib',
