@@ -64,14 +64,14 @@ describe('failOnError', function () {
     });
   });
 
-  it('rejects promises for truncated JPEG when failOnError is set', async function () {
-    let result, err;
-    try {
-      result = await sharp(fixtures.inputJpgTruncated, { failOnError: true }).toBuffer();
-    } catch (error) {
-      err = error;
-    }
-    assert.equal(result, null);
-    assert.ok(err.message.includes('VipsJpeg: Premature end of JPEG file'), err);
+  it('rejects promises for truncated JPEG when failOnError is set', function (done) {
+    sharp(fixtures.inputJpgTruncated, { failOnError: true })
+      .toBuffer()
+      .then(() => {
+        throw new Error('Expected rejection');
+      })
+      .catch(err => {
+        done(err.message.includes('VipsJpeg: Premature end of JPEG file') ? undefined : err);
+      });
   });
 });
