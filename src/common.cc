@@ -52,9 +52,7 @@ namespace sharp {
       descriptor->buffer = node::Buffer::Data(buffer);
       buffersToPersist.push_back(buffer);
     }
-    if (HasAttr(input, "failOnError")) {
-      descriptor->failOnError = AttrTo<bool>(input, "failOnError");
-    }
+    descriptor->failOnError = AttrTo<bool>(input, "failOnError");
     // Density for vector-based input
     if (HasAttr(input, "density")) {
       descriptor->density = AttrTo<uint32_t>(input, "density");
@@ -222,10 +220,9 @@ namespace sharp {
         imageType = DetermineImageType(descriptor->buffer, descriptor->bufferLength);
         if (imageType != ImageType::UNKNOWN) {
           try {
-            vips::VOption *option = VImage::option()->set("access", accessMethod);
-            if (descriptor->failOnError) {
-              option->set("fail", TRUE);
-            }
+            vips::VOption *option = VImage::option()
+              ->set("access", accessMethod)
+              ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", static_cast<double>(descriptor->density));
             }
