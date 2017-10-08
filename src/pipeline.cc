@@ -249,7 +249,9 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
       if (shrink_on_load > 1) {
         // Reload input using shrink-on-load
-        vips::VOption *option = VImage::option()->set("shrink", shrink_on_load);
+        vips::VOption *option = VImage::option()
+          ->set("shrink", shrink_on_load)
+          ->set("fail", baton->input->failOnError);
         if (baton->input->buffer != nullptr) {
           VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
           if (inputImageType == ImageType::JPEG) {

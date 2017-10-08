@@ -47,6 +47,7 @@ namespace sharp {
     std::string name;
     std::string file;
     char *buffer;
+    bool failOnError;
     size_t bufferLength;
     int density;
     int rawChannels;
@@ -59,6 +60,7 @@ namespace sharp {
 
     InputDescriptor():
       buffer(nullptr),
+      failOnError(FALSE),
       bufferLength(0),
       density(72),
       rawChannels(0),
