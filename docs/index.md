@@ -102,6 +102,7 @@ the help and code contributions of the following people:
 * [Yves Bos](https://github.com/YvesBos)
 * [Nicolas Coden](https://github.com/ncoden)
 * [Matt Parrish](https://github.com/pbomb)
+* [Matthew McEachen](https://github.com/mceachen)
 
 Thank you!
 

@@ -16,6 +16,9 @@
      a String containing the path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
      JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** if present, is an Object with optional attributes.
+    -   `options.failOnError` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** by default apply a "best effort"
+         to decode images, even if the data is corrupt or invalid. Set this flag to true
+         if you'd rather halt processing and raise an error when loading invalid images. (optional, default `false`)
     -   `options.density` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** integral number representing the DPI for vector images. (optional, default `72`)
     -   `options.raw` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** describes raw pixel input image data. See `raw()` for pixel ordering.
         -   `options.raw.width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
