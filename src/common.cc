@@ -259,10 +259,9 @@ namespace sharp {
         imageType = DetermineImageType(descriptor->file.data());
         if (imageType != ImageType::UNKNOWN) {
           try {
-            vips::VOption *option = VImage::option()->set("access", accessMethod);
-            if (descriptor->failOnError) {
-              option->set("fail", TRUE);
-            }
+            vips::VOption *option = VImage::option()
+              ->set("access", accessMethod);
+              ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", static_cast<double>(descriptor->density));
             }
