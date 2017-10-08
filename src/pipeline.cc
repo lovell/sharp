@@ -250,6 +250,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (shrink_on_load > 1) {
         // Reload input using shrink-on-load
         vips::VOption *option = VImage::option()
+          ->set("access", baton->accessMethod)
           ->set("shrink", shrink_on_load)
           ->set("fail", baton->input->failOnError);
         if (baton->input->buffer != nullptr) {
