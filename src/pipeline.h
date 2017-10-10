@@ -67,7 +67,6 @@ struct PipelineBaton {
   int cropOffsetTop;
   bool premultiplied;
   std::string kernel;
-  std::string interpolator;
   bool centreSampling;
   bool fastShrinkOnLoad;
   double background[4];
