@@ -25,7 +25,7 @@
 
 // Verify platform and compiler compatibility
 
-#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 6))
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 5))
 #error libvips version 8.6.x required - see sharp.dimens.io/page/install
 #endif
 
