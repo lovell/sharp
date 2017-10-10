@@ -1140,7 +1140,6 @@ NAN_METHOD(pipeline) {
   baton->withoutEnlargement = AttrTo<bool>(options, "withoutEnlargement");
   baton->crop = AttrTo<int32_t>(options, "crop");
   baton->kernel = AttrAsStr(options, "kernel");
-  baton->interpolator = AttrAsStr(options, "interpolator");
   baton->centreSampling = AttrTo<bool>(options, "centreSampling");
   baton->fastShrinkOnLoad = AttrTo<bool>(options, "fastShrinkOnLoad");
   // Join Channel Options

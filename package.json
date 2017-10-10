@@ -39,7 +39,8 @@
     "Guy Maliar <guy@tailorbrands.com>",
     "Nicolas Coden <nicolas@ncoden.fr>",
     "Matt Parrish <matt.r.parrish@gmail.com>",
-    "Matthew McEachen <matthew+github@mceachen.org>"
+    "Matthew McEachen <matthew+github@mceachen.org>",
+    "Jarda Kotěšovec <jarda.kotesovec@gmail.com>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",

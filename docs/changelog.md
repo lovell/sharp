@@ -18,6 +18,10 @@ Requires libvips v8.6.0.
   [#976](https://github.com/lovell/sharp/pull/976)
   [@mceachen](https://github.com/mceachen)
 
+* Resize: switch to libvips' implementation, make fastShrinkOnLoad optional, remove interpolators.
+  [#977](https://github.com/lovell/sharp/pull/977)
+  [@jardakotesovec](https://github.com/jardakotesovec)
+
 ### v0.18 - "*ridge*"
 
 Requires libvips v8.5.5.
