@@ -222,20 +222,27 @@ class PipelineWorker : public Nan::AsyncWorker {
       // If integral x and y shrink are equal, try to use shrink-on-load for JPEG and WebP,
       // but not when applying gamma correction, pre-resize extract or trim
       int shrink_on_load = 1;
+
+      int shrink_on_load_factor = 1;
+      // Leave at least a factor of two for the final resize step, when fastShrinkOnLoad: false
+      // for more consistent results and avoid occasional small image shifting
+      if (!baton->fastShrinkOnLoad) {
+        shrink_on_load_factor = 2;
+      }
       if (
-        xshrink == yshrink && xshrink >= 2 &&
+        xshrink == yshrink && xshrink >= 2 * shrink_on_load_factor &&
         (inputImageType == ImageType::JPEG || inputImageType == ImageType::WEBP) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimTolerance == 0
       ) {
-        if (xshrink >= 8) {
+        if (xshrink >= 8 * shrink_on_load_factor) {
           xfactor = xfactor / 8;
           yfactor = yfactor / 8;
           shrink_on_load = 8;
-        } else if (xshrink >= 4) {
+        } else if (xshrink >= 4 * shrink_on_load_factor) {
           xfactor = xfactor / 4;
           yfactor = yfactor / 4;
           shrink_on_load = 4;
-        } else if (xshrink >= 2) {
+        } else if (xshrink >= 2 * shrink_on_load_factor) {
           xfactor = xfactor / 2;
           yfactor = yfactor / 2;
           shrink_on_load = 2;
@@ -1135,6 +1142,7 @@ NAN_METHOD(pipeline) {
   baton->kernel = AttrAsStr(options, "kernel");
   baton->interpolator = AttrAsStr(options, "interpolator");
   baton->centreSampling = AttrTo<bool>(options, "centreSampling");
+  baton->fastShrinkOnLoad = AttrTo<bool>(options, "fastShrinkOnLoad");
   // Join Channel Options
   if (HasAttr(options, "joinChannelIn")) {
     v8::Local<v8::Object> joinChannelObject = Nan::Get(options, Nan::New("joinChannelIn").ToLocalChecked())
