@@ -98,6 +98,7 @@ describe('Partial image extraction', function () {
     sharp(fixtures.inputPngWithGreyAlpha)
       .extract({ left: 20, top: 10, width: 380, height: 280 })
       .rotate(90)
+      .jpeg()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(280, info.width);

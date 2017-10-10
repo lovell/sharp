@@ -67,6 +67,7 @@ module.exports = {
   inputJpg320x240: getPath('320x240.jpg'), // http://www.andrewault.net/2010/01/26/create-a-test-pattern-video-with-perl/
   inputJpgOverlayLayer2: getPath('alpha-layer-2-ink.jpg'),
   inputJpgTruncated: getPath('truncated.jpg'), // head -c 10000 2569067123_aca715a2ee_o.jpg > truncated.jpg
+  inputJpgCenteredImage: getPath('centered_image.jpeg'),
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
