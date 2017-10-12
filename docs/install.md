@@ -16,7 +16,7 @@ yarn add sharp
 
 ### Linux
 
-[![Ubuntu 14.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
+[![Ubuntu 16.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 [![Linux Build Status](https://circleci.com/gh/lovell/sharp.svg?style=svg&circle-token=6cb6d1d287a51af83722b19ed8885377fbc85e5c)](https://circleci.com/gh/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
@@ -25,13 +25,13 @@ This involves an automated HTTPS download of approximately 7MB.
 Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ CPUs should "just work", e.g.:
 
 * Debian 7, 8
-* Ubuntu 12.04, 14.04, 16.04
+* Ubuntu 14.04, 16.04
 * Centos 7
 * Fedora
 * openSUSE 13.2
 * Archlinux
 * Raspbian Jessie
-* Amazon Linux 2016.03, 2016.09
+* Amazon Linux 2017.03.1
 * Solus
 
 To use a globally-installed version of libvips instead of the provided binaries,
@@ -78,14 +78,19 @@ that it can be located using `pkg-config --modversion vips-cpp`.
 [![Windows x64 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 11MB.
+This involves an automated HTTPS download of approximately 12MB.
 
 Only 64-bit (x64) `node.exe` is supported.
 
 ### FreeBSD
 
 libvips must be installed before `npm install` is run.
-This can be achieved via [FreshPorts](https://www.freshports.org/graphics/vips/):
+
+This can be achieved via package or ports:
+
+```sh
+pkg install -y pkgconf vips
+```
 
 ```sh
 cd /usr/ports/graphics/vips/ && make install clean

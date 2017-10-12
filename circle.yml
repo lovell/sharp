@@ -1,8 +1,0 @@
-machine:
-  node:
-    version: v4.8.4
-  services:
-    - docker
-test:
-  override:
-    - ./packaging/test-linux-x64.sh

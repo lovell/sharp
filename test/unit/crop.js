@@ -170,6 +170,8 @@ describe('Crop', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual(80, info.width);
           assert.strictEqual(320, info.height);
+          assert.strictEqual(-117, info.cropOffsetLeft);
+          assert.strictEqual(0, info.cropOffsetTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy-entropy.jpg'), data, done);
         });
     });
@@ -184,6 +186,8 @@ describe('Crop', function () {
           assert.strictEqual(4, info.channels);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
+          assert.strictEqual(0, info.cropOffsetLeft);
+          assert.strictEqual(-80, info.cropOffsetTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
@@ -198,6 +202,8 @@ describe('Crop', function () {
           assert.strictEqual(4, info.channels);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
+          assert.strictEqual(0, info.cropOffsetLeft);
+          assert.strictEqual(-80, info.cropOffsetTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
@@ -214,6 +220,8 @@ describe('Crop', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual(80, info.width);
           assert.strictEqual(320, info.height);
+          assert.strictEqual(-143, info.cropOffsetLeft);
+          assert.strictEqual(0, info.cropOffsetTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy-attention.jpg'), data, done);
         });
     });
@@ -228,6 +236,8 @@ describe('Crop', function () {
           assert.strictEqual(4, info.channels);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
+          assert.strictEqual(0, info.cropOffsetLeft);
+          assert.strictEqual(0, info.cropOffsetTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
@@ -242,6 +252,8 @@ describe('Crop', function () {
           assert.strictEqual(4, info.channels);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
+          assert.strictEqual(0, info.cropOffsetLeft);
+          assert.strictEqual(0, info.cropOffsetTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });

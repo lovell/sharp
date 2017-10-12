@@ -26,7 +26,7 @@
 // Verify platform and compiler compatibility
 
 #if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 5))
-#error libvips version 8.5.x required - see sharp.dimens.io/page/install
+#error libvips version 8.6.x required - see sharp.dimens.io/page/install
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
@@ -47,6 +47,7 @@ namespace sharp {
     std::string name;
     std::string file;
     char *buffer;
+    bool failOnError;
     size_t bufferLength;
     int density;
     int rawChannels;
@@ -59,6 +60,7 @@ namespace sharp {
 
     InputDescriptor():
       buffer(nullptr),
+      failOnError(FALSE),
       bufferLength(0),
       density(72),
       rawChannels(0),

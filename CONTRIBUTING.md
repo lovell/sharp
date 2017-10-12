@@ -14,7 +14,7 @@ New bugs are assigned a `triage` label whilst under investigation.
 
 If a [similar request](https://github.com/lovell/sharp/labels/enhancement) exists, it's probably fastest to add a comment to it about your requirement.
 
-Implementation is usually straightforward if _libvips_ [already supports](http://www.vips.ecs.soton.ac.uk/supported/current/doc/html/libvips/ch03.html) the feature you need.
+Implementation is usually straightforward if _libvips_ [already supports](https://jcupitt.github.io/libvips/API/current/) the feature you need.
 
 ## Submit a Pull Request to fix a bug
 
@@ -41,8 +41,8 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.18.0 | ridge      |
 | v0.19.0 | suit       |
+| v0.20.0 | teeth      |
 
 Please squash your changes into a single commit using a command like `git rebase -i upstream/<wip-branch>`.
 
