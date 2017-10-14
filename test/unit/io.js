@@ -628,6 +628,29 @@ describe('Input/output', function () {
       });
     });
 
+    it('default compressionLevel generates smaller file than compressionLevel=6', function (done) {
+      // First generate with default compressionLevel
+      sharp(fixtures.inputPng)
+        .resize(320, 240)
+        .png()
+        .toBuffer(function (err, defaultData, defaultInfo) {
+          if (err) throw err;
+          assert.strictEqual(true, defaultData.length > 0);
+          assert.strictEqual('png', defaultInfo.format);
+          // Then generate with compressionLevel=6
+          sharp(fixtures.inputPng)
+            .resize(320, 240)
+            .png({ compressionLevel: 6 })
+            .toBuffer(function (err, largerData, largerInfo) {
+              if (err) throw err;
+              assert.strictEqual(true, largerData.length > 0);
+              assert.strictEqual('png', largerInfo.format);
+              assert.strictEqual(true, defaultData.length < largerData.length);
+              done();
+            });
+        });
+    });
+
     it('without adaptiveFiltering generates smaller file', function (done) {
       // First generate with adaptive filtering
       sharp(fixtures.inputPng)
@@ -808,7 +831,7 @@ describe('Input/output', function () {
       });
   });
 
-  it('Convert SVG to PNG at 300DPI', function (done) {
+  it.skip('Convert SVG to PNG at 1200DPI', function (done) {
     sharp(fixtures.inputSvg, { density: 1200 })
       .resize(1024)
       .extract({left: 290, top: 760, width: 40, height: 40})

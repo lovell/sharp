@@ -48,11 +48,12 @@ describe('Gamma correction', function () {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(320)
       .gamma()
+      .jpeg()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
-        assert.strictEqual('png', info.format);
+        assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
-        fixtures.assertSimilar(fixtures.expected('gamma-alpha.jpg'), data, { threshold: 20 }, done);
+        fixtures.assertSimilar(fixtures.expected('gamma-alpha.jpg'), data, done);
       });
   });
 

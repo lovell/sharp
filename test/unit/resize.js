@@ -448,4 +448,70 @@ describe('Resize dimensions', function () {
           });
       });
   });
+
+  it('fastShrinkOnLoad: false ensures image is not shifted', function (done) {
+    return sharp(fixtures.inputJpgCenteredImage)
+      .resize(9, 8, {
+        fastShrinkOnLoad: false,
+        centreSampling: true
+      })
+      .png()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(9, info.width);
+        assert.strictEqual(8, info.height);
+        // higher threshold makes it pass for both jpeg and jpeg-turbo libs
+        fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load-false.png'), data, { threshold: 7 }, done);
+      });
+  });
+
+  it('fastShrinkOnLoad: true (default) might result in shifted image', function (done) {
+    return sharp(fixtures.inputJpgCenteredImage)
+    .resize(9, 8, {
+      centreSampling: true
+    })
+    .png()
+    .toBuffer(function (err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(9, info.width);
+      assert.strictEqual(8, info.height);
+      fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load-true.png'), data, done);
+    });
+  });
+
+  [
+    sharp.kernel.nearest,
+    sharp.kernel.cubic,
+    sharp.kernel.lanczos2,
+    sharp.kernel.lanczos3
+  ].forEach(function (kernel) {
+    it(`kernel ${kernel}`, function (done) {
+      sharp(fixtures.inputJpg)
+        .resize(320, null, { kernel: kernel })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(320, info.width);
+          fixtures.assertSimilar(fixtures.inputJpg, data, done);
+        });
+    });
+  });
+
+  it('nearest upsampling with integral factor', function (done) {
+    sharp(fixtures.inputTiff8BitDepth)
+      .resize(210, 210, { kernel: 'nearest' })
+      .png()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(210, info.width);
+        assert.strictEqual(210, info.height);
+        done();
+      });
+  });
+
+  it('unknown kernel throws', function () {
+    assert.throws(function () {
+      sharp().resize(null, null, { kernel: 'unknown' });
+    });
+  });
 });

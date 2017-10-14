@@ -1,5 +1,27 @@
 # Changelog
 
+### v0.19 - "*suit*"
+
+Requires libvips v8.6.0.
+
+#### v0.19.0 - TBD
+
+* Expose offset coordinates of strategy-based crop.
+  [#868](https://github.com/lovell/sharp/issues/868)
+  [@mirohristov-com](https://github.com/mirohristov-com)
+
+* PNG output now defaults to adaptiveFiltering=false, compressionLevel=9
+  [#872](https://github.com/lovell/sharp/issues/872)
+  [@wmertens](https://github.com/wmertens)
+
+* Add failOnError option to fail-fast on bad input image data.
+  [#976](https://github.com/lovell/sharp/pull/976)
+  [@mceachen](https://github.com/mceachen)
+
+* Resize: switch to libvips' implementation, make fastShrinkOnLoad optional, remove interpolators.
+  [#977](https://github.com/lovell/sharp/pull/977)
+  [@jardakotesovec](https://github.com/jardakotesovec)
+
 ### v0.18 - "*ridge*"
 
 Requires libvips v8.5.5.
