@@ -335,6 +335,11 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = image.invert();
       }
 
+      // Linear adjustment (a * in + b)
+      if (baton->linearA != 1.0 || baton->linearB != 0.0) {
+        image = sharp::Linear(image, baton->linearA, baton->linearB);
+      }
+
       // Gamma encoding (darken)
       if (baton->gamma >= 1 && baton->gamma <= 3) {
         image = sharp::Gamma(image, 1.0 / baton->gamma);
@@ -1226,6 +1231,8 @@ NAN_METHOD(pipeline) {
   baton->threshold = AttrTo<int32_t>(options, "threshold");
   baton->thresholdGrayscale = AttrTo<bool>(options, "thresholdGrayscale");
   baton->trimTolerance = AttrTo<int32_t>(options, "trimTolerance");
+  baton->linearA = AttrTo<double>(options, "linearA");
+  baton->linearB = AttrTo<double>(options, "linearB");
   baton->gamma = AttrTo<double>(options, "gamma");
   baton->greyscale = AttrTo<bool>(options, "greyscale");
   baton->normalise = AttrTo<bool>(options, "normalise");

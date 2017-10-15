@@ -78,6 +78,8 @@ struct PipelineBaton {
   int threshold;
   bool thresholdGrayscale;
   int trimTolerance;
+  double linearA;
+  double linearB;
   double gamma;
   bool greyscale;
   bool normalise;
@@ -158,6 +160,8 @@ struct PipelineBaton {
     threshold(0),
     thresholdGrayscale(true),
     trimTolerance(0),
+    linearA(1.0),
+    linearB(0.0),
     gamma(0.0),
     greyscale(false),
     normalise(false),
