@@ -87,6 +87,8 @@ Returns **Sharp**
 An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`.
 This will reduce memory usage and can improve performance on some systems.
 
+The default behaviour _before_ function call is `false`, meaning the libvips access method is not sequential.
+
 **Parameters**
 
 -   `sequentialRead` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)

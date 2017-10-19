@@ -184,7 +184,7 @@ struct PipelineBaton {
     webpQuality(80),
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
-    tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_NONE),
+    tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
     tiffSquash(false),
     tiffXres(1.0),
     tiffYres(1.0),
