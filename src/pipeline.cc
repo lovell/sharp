@@ -447,12 +447,25 @@ class PipelineWorker : public Nan::AsyncWorker {
             image = image.bandjoin(
               VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier));
           }
+
           // Embed
-          int left = static_cast<int>(round((baton->width - image.width()) / 2));
-          int top = static_cast<int>(round((baton->height - image.height()) / 2));
-          image = image.embed(left, top, baton->width, baton->height, VImage::option()
+
+          // Calculate where to position the embeded image if gravity specified, else center.
+          int left;
+          int top;
+
+          left = static_cast<int>(round((baton->width - image.width()) / 2));
+          top = static_cast<int>(round((baton->height - image.height()) / 2));
+
+          int width = std::max(image.width(), baton->width);
+          int height = std::max(image.height(), baton->height);
+          std::tie(left, top) = sharp::CalculateEmbedPosition(
+            image.width(), image.height(), baton->width, baton->height, baton->embed);
+
+          image = image.embed(left, top, width, height, VImage::option()
             ->set("extend", VIPS_EXTEND_BACKGROUND)
             ->set("background", background));
+
         } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
           // Crop/max/min
           if (baton->crop < 9) {
@@ -1139,6 +1152,7 @@ NAN_METHOD(pipeline) {
   // Resize options
   baton->withoutEnlargement = AttrTo<bool>(options, "withoutEnlargement");
   baton->crop = AttrTo<int32_t>(options, "crop");
+  baton->embed = AttrTo<int32_t>(options, "embed");
   baton->kernel = AttrAsStr(options, "kernel");
   baton->centreSampling = AttrTo<bool>(options, "centreSampling");
   baton->fastShrinkOnLoad = AttrTo<bool>(options, "fastShrinkOnLoad");
