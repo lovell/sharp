@@ -22,6 +22,8 @@ Requires libvips v8.6.0.
   [#977](https://github.com/lovell/sharp/pull/977)
   [@jardakotesovec](https://github.com/jardakotesovec)
 
+* TIFF output: switch default predictor from 'none' to 'horizontal' to match libvips' behaviour.
+
 ### v0.18 - "*ridge*"
 
 Requires libvips v8.5.5.

@@ -160,6 +160,8 @@ Do not enlarge the output image if the input image width _or_ height are already
 This is equivalent to GraphicsMagick's `>` geometry option:
 "_change the dimensions of the image only if its width or height exceeds the geometry specification_".
 
+The default behaviour _before_ function call is `false`, meaning the image will be enlarged.
+
 **Parameters**
 
 -   `withoutEnlargement` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
