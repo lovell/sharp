@@ -66,7 +66,11 @@ class StatsWorker : public Nan::AsyncWorker {
       (baton->err).append(err.what());
     }
     if (imageType != sharp::ImageType::UNKNOWN) {
-      stats = image.stats();
+      try {
+        stats = image.stats();
+      } catch (vips::VError const &err) {
+        (baton->err).append(err.what());
+      }
 
       int bands = image.bands();
       for (int b = 1; b <= bands; b++) {

@@ -338,10 +338,12 @@ describe('Image Stats', function () {
     readable.pipe(pipeline);
   });
 
-  it('Stream in, Promise out', function (done) {
-    const readable = fs.createReadStream(fixtures.inputJpg);
+  it('Stream in, Promise out', function () {
     const pipeline = sharp();
-    pipeline.stats().then(function (stats) {
+
+    fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
+
+    return pipeline.stats().then(function (stats) {
       assert.strictEqual(true, stats.isOpaque);
 
       // red channel
@@ -379,13 +381,9 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
       assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
       assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
-
-      done();
     }).catch(function (err) {
       throw err;
     });
-
-    readable.pipe(pipeline);
   });
 
   it('File input with corrupt header fails gracefully', function (done) {
@@ -405,7 +403,7 @@ describe('Image Stats', function () {
   });
 
   it('Non-existent file in, Promise out', function (done) {
-    sharp('fail').metadata().then(function (metadata) {
+    sharp('fail').stats().then(function (stats) {
       throw new Error('Non-existent file');
     }, function (err) {
       assert.ok(!!err);
