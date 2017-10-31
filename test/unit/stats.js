@@ -386,11 +386,64 @@ describe('Image Stats', function () {
     });
   });
 
+  it('File in, Promise out', function () {
+    return sharp(fixtures.inputJpg).stats().then(function (stats) {
+      assert.strictEqual(true, stats.isOpaque);
+
+      // red channel
+      assert.strictEqual(0, stats.channels[0]['min']);
+      assert.strictEqual(255, stats.channels[0]['max']);
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['sum'], 615101275));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 83061892917));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 101.44954540768993));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 58.373870588815414));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+
+      // green channel
+      assert.strictEqual(0, stats.channels[1]['min']);
+      assert.strictEqual(255, stats.channels[1]['max']);
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['sum'], 462824115));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['squaresSum'], 47083677255));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['mean'], 76.33425255128337));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['stdev'], 44.03023262954866));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+
+      // blue channel
+      assert.strictEqual(0, stats.channels[2]['min']);
+      assert.strictEqual(255, stats.channels[2]['max']);
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['sum'], 372986756));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['squaresSum'], 32151543524));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['mean'], 61.51724663436759));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['stdev'], 38.96702865090125));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+    }).catch(function (err) {
+      throw err;
+    });
+  });
+
   it('File input with corrupt header fails gracefully', function (done) {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .stats(function (err) {
         assert.strictEqual(true, !!err);
         done();
+      });
+  });
+
+  it('File input with corrupt header fails gracefully, Promise out', function () {
+    return sharp(fixtures.inputJpgWithCorruptHeader)
+      .stats().then(function (stats) {
+        throw new Error('Corrupt Header file');
+      }).catch(function (err) {
+        assert.ok(!!err);
       });
   });
 
