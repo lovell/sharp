@@ -4,12 +4,12 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const caw = require('caw');
 const simpleGet = require('simple-get');
 const semver = require('semver');
 const tar = require('tar');
 const detectLibc = require('detect-libc');
 
+const agent = require('./lib/agent');
 const platform = require('./lib/platform');
 
 // Use NPM-provided environment variable where available, falling back to require-based method for Electron
@@ -81,9 +81,7 @@ module.exports.download_vips = function () {
   const url = distBaseUrl + tarFilename;
   const simpleGetOpt = {
     url: url,
-    agent: caw(null, {
-      protocol: 'https'
-    })
+    agent: agent()
   };
   simpleGet(simpleGetOpt, function (err, response) {
     if (err) {
