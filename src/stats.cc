@@ -55,6 +55,7 @@ class StatsWorker : public Nan::AsyncWorker {
     g_atomic_int_dec_and_test(&sharp::counterQueue);
     using Nan::New;
     using Nan::Set;
+    using sharp::MaximumImageAlpha;
 
     vips::VImage image;
     vips::VImage stats;
@@ -68,23 +69,23 @@ class StatsWorker : public Nan::AsyncWorker {
     if (imageType != sharp::ImageType::UNKNOWN) {
       try {
         stats = image.stats();
+        int bands = image.bands();
+        double const max = MaximumImageAlpha(image.interpretation());
+        for (int b = 1; b <= bands; b++) {
+          ChannelStats cStats(stats.getpoint(STAT_MIN_INDEX, b).front(), stats.getpoint(STAT_MAX_INDEX, b).front(),
+                              stats.getpoint(STAT_SUM_INDEX, b).front(), stats.getpoint(STAT_SQ_SUM_INDEX, b).front(),
+                              stats.getpoint(STAT_MEAN_INDEX, b).front(), stats.getpoint(STAT_STDEV_INDEX, b).front(),
+                              stats.getpoint(STAT_MINX_INDEX, b).front(), stats.getpoint(STAT_MINY_INDEX, b).front(),
+                              stats.getpoint(STAT_MAXX_INDEX, b).front(), stats.getpoint(STAT_MAXY_INDEX, b).front());
+          baton->channelStats.push_back(cStats);
+        }
+
+        // alpha layer is there and the last band i.e. alpha has its max value greater than 0)
+        if (sharp::HasAlpha(image) && stats.getpoint(STAT_MIN_INDEX, bands).front() != max) {
+          baton->isOpaque = false;
+        }
       } catch (vips::VError const &err) {
         (baton->err).append(err.what());
-      }
-
-      int bands = image.bands();
-      for (int b = 1; b <= bands; b++) {
-        ChannelStats cStats(stats.getpoint(STAT_MIN_INDEX, b).front(), stats.getpoint(STAT_MAX_INDEX, b).front(),
-                            stats.getpoint(STAT_SUM_INDEX, b).front(), stats.getpoint(STAT_SQ_SUM_INDEX, b).front(),
-                            stats.getpoint(STAT_MEAN_INDEX, b).front(), stats.getpoint(STAT_STDEV_INDEX, b).front(),
-                            stats.getpoint(STAT_MINX_INDEX, b).front(), stats.getpoint(STAT_MINY_INDEX, b).front(),
-                            stats.getpoint(STAT_MAXX_INDEX, b).front(), stats.getpoint(STAT_MAXY_INDEX, b).front());
-        baton->channelStats.push_back(cStats);
-      }
-
-      // alpha layer is there and the last band i.e. alpha has its max value greater than 0)
-      if (sharp::HasAlpha(image) && stats.getpoint(STAT_MAX_INDEX, bands).front() > 0) {
-        baton->isOpaque = false;
       }
     }
 
