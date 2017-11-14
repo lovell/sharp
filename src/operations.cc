@@ -362,8 +362,6 @@ namespace sharp {
    * Calculate (a * in + b)
    */
   VImage Linear(VImage image, double const a, double const b) {
-    return image.linear(a, b);
-    /*
     if (HasAlpha(image)) {
       // Separate alpha channel
       VImage imageWithoutAlpha = image.extract_band(0,
@@ -373,6 +371,5 @@ namespace sharp {
     } else {
       return image.linear(a, b);
     }
-    */
   }
 }  // namespace sharp
