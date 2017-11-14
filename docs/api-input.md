@@ -4,7 +4,6 @@
 
 -   [clone](#clone)
 -   [metadata](#metadata)
--   [stats](#stats)
 -   [limitInputPixels](#limitinputpixels)
 -   [sequentialRead](#sequentialread)
 
