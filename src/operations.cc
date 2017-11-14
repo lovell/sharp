@@ -358,4 +358,21 @@ namespace sharp {
     return image.extract_area(left, top, width, height);
   }
 
+  /*
+   * Calculate (a * in + b)
+   */
+  VImage Linear(VImage image, double const a, double const b) {
+    return image.linear(a, b);
+    /*
+    if (HasAlpha(image)) {
+      // Separate alpha channel
+      VImage imageWithoutAlpha = image.extract_band(0,
+        VImage::option()->set("n", image.bands() - 1));
+      VImage alpha = image[image.bands() - 1];
+      return imageWithoutAlpha.linear(a, b).bandjoin(alpha);
+    } else {
+      return image.linear(a, b);
+    }
+    */
+  }
 }  // namespace sharp
