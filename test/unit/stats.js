@@ -575,6 +575,19 @@ describe('Image Stats', function () {
       });
   });
 
+  it('File input with corrupt header fails gracefully, Stream In, Promise Out', function () {
+    const pipeline = sharp();
+
+    fs.createReadStream(fixtures.inputJpgWithCorruptHeader).pipe(pipeline);
+
+    return pipeline
+      .stats().then(function (stats) {
+        throw new Error('Corrupt Header file');
+      }).catch(function (err) {
+        assert.ok(!!err);
+      });
+  });
+
   it('Buffer input with corrupt header fails gracefully', function (done) {
     sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
       .stats(function (err) {
