@@ -38,7 +38,8 @@
     "YvesBos <yves_bos@outlook.com>",
     "Guy Maliar <guy@tailorbrands.com>",
     "Nicolas Coden <nicolas@ncoden.fr>",
-    "Matt Parrish <matt.r.parrish@gmail.com>"
+    "Matt Parrish <matt.r.parrish@gmail.com>",
+    "Marcel Bretschneider <marcel.bretschneider@gmail.com>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
