@@ -46,6 +46,7 @@ struct ChannelStats {
 struct StatsBaton {
   // Input
   sharp::InputDescriptor *input;
+  VipsAccess accessMethod;
 
   // Output
   std::vector<ChannelStats> channelStats;

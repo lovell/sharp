@@ -2,8 +2,6 @@
 
 const fs = require('fs');
 const assert = require('assert');
-// const exifReader = require('exif-reader');
-// const icc = require('icc');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -34,10 +32,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 83061892917));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 101.44954540768993));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 58.373870588815414));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 2725));
 
       // green channel
       assert.strictEqual(0, stats.channels[1]['min']);
@@ -46,10 +48,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['squaresSum'], 47083677255));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['mean'], 76.33425255128337));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['stdev'], 44.03023262954866));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minX']) && isInRange(stats.channels[1]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minY']) && isInRange(stats.channels[1]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']) && isInRange(stats.channels[1]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']) && isInRange(stats.channels[1]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxY'], 0, 2725));
 
       // blue channel
       assert.strictEqual(0, stats.channels[2]['min']);
@@ -58,10 +64,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['squaresSum'], 32151543524));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['mean'], 61.51724663436759));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['stdev'], 38.96702865090125));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minX']) && isInRange(stats.channels[2]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minY']) && isInRange(stats.channels[2]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']) && isInRange(stats.channels[2]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']) && isInRange(stats.channels[2]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxY'], 0, 2725));
 
       done();
     });
@@ -80,10 +90,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 354798898650));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 238.8259925648822));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 62.15121915523771));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2809));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2074));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2809));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2074));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2809));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 2074));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2809));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 2074));
       done();
     });
   });
@@ -100,10 +114,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 202898092725));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 252.9394769668579));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 22.829537532816));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2048));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 1536));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2048));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 1536));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2048));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 1536));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2048));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 1536));
 
       // green channel
       assert.strictEqual(0, stats.channels[1]['min']);
@@ -112,10 +130,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['squaresSum'], 202898092725));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['mean'], 252.9394769668579));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['stdev'], 22.829537532816));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minX']) && isInRange(stats.channels[1]['minX'], 0, 2048));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minY']) && isInRange(stats.channels[1]['minY'], 0, 1536));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']) && isInRange(stats.channels[1]['maxX'], 0, 2048));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']) && isInRange(stats.channels[1]['maxY'], 0, 1536));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minX'], 0, 2048));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minY'], 0, 1536));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxX'], 0, 2048));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxY'], 0, 1536));
 
       // blue channel
       assert.strictEqual(0, stats.channels[2]['min']);
@@ -124,10 +146,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['squaresSum'], 202898092725));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['mean'], 252.9394769668579));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['stdev'], 22.829537532816));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minX']) && isInRange(stats.channels[2]['minX'], 0, 2048));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minY']) && isInRange(stats.channels[2]['minY'], 0, 1536));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']) && isInRange(stats.channels[2]['maxX'], 0, 2048));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']) && isInRange(stats.channels[2]['maxY'], 0, 1536));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minX'], 0, 2048));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minY'], 0, 1536));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxX'], 0, 2048));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxY'], 0, 1536));
 
       // alpha channel
       assert.strictEqual(0, stats.channels[3]['min']);
@@ -136,10 +162,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[3]['squaresSum'], 1333571132));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[3]['mean'], 1.7640247344970703));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[3]['stdev'], 20.51387814157297));
-      assert.strictEqual(true, isInteger(stats.channels[3]['minX']) && isInRange(stats.channels[3]['minX'], 0, 2048));
-      assert.strictEqual(true, isInteger(stats.channels[3]['minY']) && isInRange(stats.channels[3]['minY'], 0, 1536));
-      assert.strictEqual(true, isInteger(stats.channels[3]['maxX']) && isInRange(stats.channels[3]['maxX'], 0, 2048));
-      assert.strictEqual(true, isInteger(stats.channels[3]['maxY']) && isInRange(stats.channels[3]['maxY'], 0, 1536));
+      assert.strictEqual(true, isInteger(stats.channels[3]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[3]['minX'], 0, 2048));
+      assert.strictEqual(true, isInteger(stats.channels[3]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[3]['minY'], 0, 1536));
+      assert.strictEqual(true, isInteger(stats.channels[3]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[3]['maxX'], 0, 2048));
+      assert.strictEqual(true, isInteger(stats.channels[3]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[3]['maxY'], 0, 1536));
 
       done();
     });
@@ -158,10 +188,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[3]['squaresSum'], 0));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[3]['mean'], 0));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[3]['stdev'], 0));
-      assert.strictEqual(true, isInteger(stats.channels[3]['minX']) && isInRange(stats.channels[3]['minX'], 0, 300));
-      assert.strictEqual(true, isInteger(stats.channels[3]['minY']) && isInRange(stats.channels[3]['minY'], 0, 300));
-      assert.strictEqual(true, isInteger(stats.channels[3]['maxX']) && isInRange(stats.channels[3]['maxX'], 0, 300));
-      assert.strictEqual(true, isInteger(stats.channels[3]['maxY']) && isInRange(stats.channels[3]['maxY'], 0, 300));
+      assert.strictEqual(true, isInteger(stats.channels[3]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[3]['minX'], 0, 300));
+      assert.strictEqual(true, isInteger(stats.channels[3]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[3]['minY'], 0, 300));
+      assert.strictEqual(true, isInteger(stats.channels[3]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[3]['maxX'], 0, 300));
+      assert.strictEqual(true, isInteger(stats.channels[3]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[3]['maxY'], 0, 300));
 
       done();
     });
@@ -179,10 +213,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 481252886100));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 235.81772349417824));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 67.25712856093298));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2464));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 3248));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2464));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 3248));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2464));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 3248));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2464));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 3248));
 
       done();
     });
@@ -201,10 +239,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 11379783198));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 105.36169496842616));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 57.39412151419967));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 1024));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 772));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 1024));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 772));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 1024));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 772));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 1024));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 772));
 
       // green channel
       assert.strictEqual(0, stats.channels[1]['min']);
@@ -213,10 +255,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['squaresSum'], 20774687595));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['mean'], 152.9072025279307));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['stdev'], 53.84143349689916));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minX']) && isInRange(stats.channels[1]['minX'], 0, 1024));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minY']) && isInRange(stats.channels[1]['minY'], 0, 772));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']) && isInRange(stats.channels[1]['maxX'], 0, 1024));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']) && isInRange(stats.channels[1]['maxY'], 0, 772));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minX'], 0, 1024));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minY'], 0, 772));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxX'], 0, 1024));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxY'], 0, 772));
 
       // blue channel
       assert.strictEqual(0, stats.channels[2]['min']);
@@ -225,10 +271,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['squaresSum'], 28449125593));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['mean'], 175.75450711423252));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['stdev'], 71.39929031070358));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minX']) && isInRange(stats.channels[2]['minX'], 0, 1024));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minY']) && isInRange(stats.channels[2]['minY'], 0, 772));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']) && isInRange(stats.channels[2]['maxX'], 0, 1024));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']) && isInRange(stats.channels[2]['maxY'], 0, 772));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minX'], 0, 1024));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minY'], 0, 772));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxX'], 0, 1024));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxY'], 0, 772));
 
       done();
     });
@@ -247,10 +297,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 8002132113));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 131.53936444652908));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 38.26389131415863));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 800));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 533));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 800));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 533));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 800));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 533));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 800));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 533));
 
       // green channel
       assert.strictEqual(43, stats.channels[1]['min']);
@@ -259,10 +313,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['squaresSum'], 8548344254));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['mean'], 137.45815196998123));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['stdev'], 33.955424103758205));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minX']) && isInRange(stats.channels[1]['minX'], 0, 800));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minY']) && isInRange(stats.channels[1]['minY'], 0, 533));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']) && isInRange(stats.channels[1]['maxX'], 0, 800));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']) && isInRange(stats.channels[1]['maxY'], 0, 533));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minX'], 0, 800));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minY'], 0, 533));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxX'], 0, 800));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxY'], 0, 533));
 
       // blue channel
       assert.strictEqual(51, stats.channels[2]['min']);
@@ -271,10 +329,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['squaresSum'], 6450556071));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['mean'], 116.38959896810506));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['stdev'], 39.7669551046809));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minX']) && isInRange(stats.channels[2]['minX'], 0, 800));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minY']) && isInRange(stats.channels[2]['minY'], 0, 533));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']) && isInRange(stats.channels[2]['maxX'], 0, 800));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']) && isInRange(stats.channels[2]['maxY'], 0, 533));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minX'], 0, 800));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minY'], 0, 533));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxX'], 0, 800));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxY'], 0, 533));
 
       done();
     });
@@ -292,10 +354,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 10201));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 50.5));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 71.4177848998413));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 1));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 1));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 1));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 1));
 
       // alpha channel
       assert.strictEqual(0, stats.channels[1]['min']);
@@ -304,10 +370,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['squaresSum'], 65025));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['mean'], 127.5));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['stdev'], 180.31222920256963));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minX']) && isInRange(stats.channels[1]['minX'], 0, 2));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minY']) && isInRange(stats.channels[1]['minY'], 0, 1));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']) && isInRange(stats.channels[1]['maxX'], 0, 2));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']) && isInRange(stats.channels[1]['maxY'], 0, 1));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minX'], 0, 2));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minY'], 0, 1));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxX'], 0, 2));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxY'], 0, 1));
 
       done();
     });
@@ -326,10 +396,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 83061892917));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 101.44954540768993));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 58.373870588815414));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 2725));
 
       // green channel
       assert.strictEqual(0, stats.channels[1]['min']);
@@ -338,10 +412,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['squaresSum'], 47083677255));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['mean'], 76.33425255128337));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['stdev'], 44.03023262954866));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minX']) && isInRange(stats.channels[1]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[1]['minY']) && isInRange(stats.channels[1]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']) && isInRange(stats.channels[1]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']) && isInRange(stats.channels[1]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[1]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[1]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[1]['maxY'], 0, 2725));
 
       // blue channel
       assert.strictEqual(0, stats.channels[2]['min']);
@@ -350,10 +428,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['squaresSum'], 32151543524));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['mean'], 61.51724663436759));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['stdev'], 38.96702865090125));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minX']) && isInRange(stats.channels[2]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[2]['minY']) && isInRange(stats.channels[2]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']) && isInRange(stats.channels[2]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']) && isInRange(stats.channels[2]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[2]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[2]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[2]['maxY'], 0, 2725));
 
       done();
     });
@@ -375,10 +457,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 83061892917));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 101.44954540768993));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 58.373870588815414));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 2725));
 
       // green channel
       assert.strictEqual(0, stats.channels[1]['min']);
@@ -387,10 +473,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['squaresSum'], 47083677255));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['mean'], 76.33425255128337));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['stdev'], 44.03023262954866));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 2725));
 
       // blue channel
       assert.strictEqual(0, stats.channels[2]['min']);
@@ -399,10 +489,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['squaresSum'], 32151543524));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['mean'], 61.51724663436759));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['stdev'], 38.96702865090125));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 2725));
     }).catch(function (err) {
       throw err;
     });
@@ -419,10 +513,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['squaresSum'], 83061892917));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['mean'], 101.44954540768993));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[0]['stdev'], 58.373870588815414));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 2725));
 
       // green channel
       assert.strictEqual(0, stats.channels[1]['min']);
@@ -431,10 +529,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['squaresSum'], 47083677255));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['mean'], 76.33425255128337));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[1]['stdev'], 44.03023262954866));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 2725));
 
       // blue channel
       assert.strictEqual(0, stats.channels[2]['min']);
@@ -443,10 +545,14 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['squaresSum'], 32151543524));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['mean'], 61.51724663436759));
       assert.strictEqual(true, isInAcceptableRange(stats.channels[2]['stdev'], 38.96702865090125));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minX']) && isInRange(stats.channels[0]['minX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['minY']) && isInRange(stats.channels[0]['minY'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']) && isInRange(stats.channels[0]['maxX'], 0, 2725));
-      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']) && isInRange(stats.channels[0]['maxY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['minY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['minY'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxX']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxX'], 0, 2725));
+      assert.strictEqual(true, isInteger(stats.channels[0]['maxY']));
+      assert.strictEqual(true, isInRange(stats.channels[0]['maxY'], 0, 2725));
     }).catch(function (err) {
       throw err;
     });

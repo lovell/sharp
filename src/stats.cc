@@ -62,7 +62,7 @@ class StatsWorker : public Nan::AsyncWorker {
     sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
 
     try {
-      std::tie(image, imageType) = OpenInput(baton->input, VIPS_ACCESS_SEQUENTIAL);
+      std::tie(image, imageType) = OpenInput(baton->input, baton->accessMethod);
     } catch (vips::VError const &err) {
       (baton->err).append(err.what());
     }
@@ -72,11 +72,14 @@ class StatsWorker : public Nan::AsyncWorker {
         int bands = image.bands();
         double const max = MaximumImageAlpha(image.interpretation());
         for (int b = 1; b <= bands; b++) {
-          ChannelStats cStats(stats.getpoint(STAT_MIN_INDEX, b).front(), stats.getpoint(STAT_MAX_INDEX, b).front(),
+          ChannelStats cStats(static_cast<int>(stats.getpoint(STAT_MIN_INDEX, b).front()),
+                              static_cast<int>(stats.getpoint(STAT_MAX_INDEX, b).front()),
                               stats.getpoint(STAT_SUM_INDEX, b).front(), stats.getpoint(STAT_SQ_SUM_INDEX, b).front(),
                               stats.getpoint(STAT_MEAN_INDEX, b).front(), stats.getpoint(STAT_STDEV_INDEX, b).front(),
-                              stats.getpoint(STAT_MINX_INDEX, b).front(), stats.getpoint(STAT_MINY_INDEX, b).front(),
-                              stats.getpoint(STAT_MAXX_INDEX, b).front(), stats.getpoint(STAT_MAXY_INDEX, b).front());
+                              static_cast<int>(stats.getpoint(STAT_MINX_INDEX, b).front()),
+                              static_cast<int>(stats.getpoint(STAT_MINY_INDEX, b).front()),
+                              static_cast<int>(stats.getpoint(STAT_MAXX_INDEX, b).front()),
+                              static_cast<int>(stats.getpoint(STAT_MAXY_INDEX, b).front()));
           baton->channelStats.push_back(cStats);
         }
 
@@ -160,6 +163,8 @@ class StatsWorker : public Nan::AsyncWorker {
   stats(options, callback)
 */
 NAN_METHOD(stats) {
+  using sharp::AttrTo;
+
   // Input Buffers must not undergo GC compaction during processing
   std::vector<v8::Local<v8::Object>> buffersToPersist;
 
@@ -169,6 +174,7 @@ NAN_METHOD(stats) {
 
   // Input
   baton->input = sharp::CreateInputDescriptor(sharp::AttrAs<v8::Object>(options, "input"), buffersToPersist);
+  baton->accessMethod = AttrTo<bool>(options, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
 
   // Function to notify of libvips warnings
   Nan::Callback *debuglog = new Nan::Callback(sharp::AttrAs<v8::Function>(options, "debuglog"));
