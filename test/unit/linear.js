@@ -75,8 +75,5 @@ describe('Linear adjustment', function () {
       sharp(fixtures.inputPngOverlayLayer1)
         .linear(undefined, { 'bar': 'baz' });
     });
-
   });
 });
-
-
