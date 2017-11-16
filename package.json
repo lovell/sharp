@@ -69,13 +69,13 @@
     "vips"
   ],
   "dependencies": {
-    "caw": "^2.0.0",
     "color": "^2.0.0",
-    "detect-libc": "^0.2.0",
+    "detect-libc": "^1.0.2",
     "nan": "^2.7.0",
     "semver": "^5.4.1",
     "simple-get": "^2.7.0",
-    "tar": "^4.0.1"
+    "tar": "^4.0.1",
+    "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
     "async": "^2.5.0",
@@ -84,7 +84,7 @@
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "mocha": "^4.0.1",
-    "nyc": "^11.1.0",
+    "nyc": "^11.3.0",
     "rimraf": "^2.6.1",
     "semistandard": "^11.0.0",
     "unzip": "^0.1.11"
