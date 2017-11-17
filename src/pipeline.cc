@@ -472,8 +472,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             image = image.smartcrop(baton->width, baton->height, VImage::option()
               ->set("interesting", baton->crop == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
             baton->hasCropOffset = true;
-            baton->cropOffsetLeft = image.xoffset();
-            baton->cropOffsetTop = image.yoffset();
+            baton->cropOffsetLeft = static_cast<int>(image.xoffset());
+            baton->cropOffsetTop = static_cast<int>(image.yoffset());
           }
         }
       }
