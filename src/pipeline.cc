@@ -466,6 +466,9 @@ class PipelineWorker : public Nan::AsyncWorker {
             image = image.extract_area(left, top, width, height);
           } else {
             // Attention-based or Entropy-based crop
+            image = image.tilecache(VImage::option()
+              ->set("access", baton->accessMethod)
+              ->set("threaded", TRUE));
             image = image.smartcrop(baton->width, baton->height, VImage::option()
               ->set("interesting", baton->crop == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
             baton->hasCropOffset = true;

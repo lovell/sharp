@@ -22,6 +22,10 @@ Requires libvips v8.6.0.
   [#977](https://github.com/lovell/sharp/pull/977)
   [@jardakotesovec](https://github.com/jardakotesovec)
 
+* Add tilecache before smartcrop to avoid over-computation of previous operations.
+  [#1028](https://github.com/lovell/sharp/issues/1028)
+  [@coffeebite](https://github.com/coffeebite)
+
 * TIFF output: switch default predictor from 'none' to 'horizontal' to match libvips' behaviour.
 
 ### v0.18 - "*ridge*"
