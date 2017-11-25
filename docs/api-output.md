@@ -21,7 +21,7 @@ If an explicit output format is not selected, it will be inferred from the exten
 with JPEG, PNG, WebP, TIFF, DZI, and libvips' V format supported.
 Note that raw pixel data is only supported for buffer output.
 
-A Promises/A+ promise is returned when `callback` is not provided.
+A `Promise` is returned when `callback` is not provided.
 
 **Parameters**
 
@@ -48,7 +48,9 @@ By default, the format will match the input image, except GIF and SVG input whic
 -   `data` is the output image data.
 -   `info` contains the output image `format`, `size` (bytes), `width`, `height`,
     `channels` and `premultiplied` (indicating if premultiplication was used).
-    A Promise is returned when `callback` is not provided.
+    When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
+
+A `Promise` is returned when `callback` is not provided.
 
 **Parameters**
 
