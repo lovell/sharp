@@ -101,7 +101,7 @@ describe('Embed', function () {
       });
   });
 
-  it('embed TIFF in LAB colourspace onto RGBA background', function (done) {
+  it.skip('embed TIFF in LAB colourspace onto RGBA background', function (done) {
     sharp(fixtures.inputTiffCielab)
       .resize(64, 128)
       .embed()

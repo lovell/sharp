@@ -18,7 +18,7 @@ Requires libvips v8.6.0.
   [#976](https://github.com/lovell/sharp/pull/976)
   [@mceachen](https://github.com/mceachen)
 
-* Resize: switch to libvips' implementation, make fastShrinkOnLoad optional, remove interpolators.
+* Resize: switch to libvips' implementation, make fastShrinkOnLoad optional, remove interpolator and centreSampling options.
   [#977](https://github.com/lovell/sharp/pull/977)
   [@jardakotesovec](https://github.com/jardakotesovec)
 

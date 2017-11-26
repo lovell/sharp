@@ -381,8 +381,7 @@ class PipelineWorker : public Nan::AsyncWorker {
 
         image = image.resize(1.0 / xfactor, VImage::option()
           ->set("vscale", 1.0 / yfactor)
-          ->set("kernel", kernel)
-          ->set("centre", baton->centreSampling));
+          ->set("kernel", kernel));
       }
 
       // Rotate
@@ -1143,7 +1142,6 @@ NAN_METHOD(pipeline) {
   baton->withoutEnlargement = AttrTo<bool>(options, "withoutEnlargement");
   baton->crop = AttrTo<int32_t>(options, "crop");
   baton->kernel = AttrAsStr(options, "kernel");
-  baton->centreSampling = AttrTo<bool>(options, "centreSampling");
   baton->fastShrinkOnLoad = AttrTo<bool>(options, "fastShrinkOnLoad");
   // Join Channel Options
   if (HasAttr(options, "joinChannelIn")) {
