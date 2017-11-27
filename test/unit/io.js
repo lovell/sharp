@@ -924,7 +924,8 @@ describe('Input/output', function () {
       .toColourspace('b-w') // can only squash 1 band uchar images
       .tiff({
         squash: false,
-        compression: 'none'
+        compression: 'none',
+        predictor: 'none'
       })
       .toFile(fixtures.outputTiff, (err, info) => {
         if (err) throw err;
@@ -940,7 +941,8 @@ describe('Input/output', function () {
       .toColourspace('b-w') // can only squash 1 band uchar images
       .tiff({
         squash: true,
-        compression: 'none'
+        compression: 'none',
+        predictor: 'none'
       })
       .toFile(fixtures.outputTiff, (err, info) => {
         if (err) throw err;
