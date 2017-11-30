@@ -45,6 +45,7 @@
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
     "test": "semistandard && cc && nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
+    "coverage": "./test/coverage/report.sh",
     "test-leak": "./test/leak/leak.sh",
     "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done"
   },
@@ -74,7 +75,7 @@
     "nan": "^2.8.0",
     "semver": "^5.4.1",
     "simple-get": "^2.7.0",
-    "tar": "^4.0.1",
+    "tar": "^4.1.1",
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
@@ -84,7 +85,7 @@
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "mocha": "^4.0.1",
-    "nyc": "^11.3.0",
+    "nyc": "^11.4.0",
     "rimraf": "^2.6.1",
     "semistandard": "^11.0.0",
     "unzip": "^0.1.11"
