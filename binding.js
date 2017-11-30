@@ -70,7 +70,7 @@ module.exports.download_vips = function () {
   const tarFilename = ['libvips', minimumLibvipsVersion, currentPlatformId].join('-') + '.tar.gz';
   // Download to per-process temporary file
   const tarPathTemp = path.join(os.tmpdir(), `${process.pid}-${tarFilename}`);
-  const tmpFile = fs.createWriteStream(tarPathTemp).on('finish', function () {
+  const tmpFile = fs.createWriteStream(tarPathTemp).on('close', function () {
     unpack(tarPathTemp, function () {
       // Attempt to remove temporary file
       try {
