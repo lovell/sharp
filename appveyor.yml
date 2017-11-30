@@ -11,6 +11,6 @@ environment:
 install:
   - ps: Install-Product node $env:nodejs_version x64
   - npm install -g npm@5.3.x
-  - npm install
+  - appveyor-retry npm install
 test_script:
   - npm test
