@@ -17,7 +17,6 @@ matrix:
       dist: trusty
       sudo: false
       node_js: "9"
-  allow_failures:
     - os: osx
       osx_image: xcode8
       node_js: "4"
