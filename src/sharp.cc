@@ -20,6 +20,7 @@
 #include "metadata.h"
 #include "pipeline.h"
 #include "utilities.h"
+#include "stats.h"
 
 NAN_MODULE_INIT(init) {
   vips_init("sharp");
@@ -46,6 +47,8 @@ NAN_MODULE_INIT(init) {
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(format)).ToLocalChecked());
   Nan::Set(target, Nan::New("_maxColourDistance").ToLocalChecked(),
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(_maxColourDistance)).ToLocalChecked());
+  Nan::Set(target, Nan::New("stats").ToLocalChecked(),
+    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(stats)).ToLocalChecked());
 }
 
 NODE_MODULE(sharp, init)

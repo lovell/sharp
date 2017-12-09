@@ -71,6 +71,7 @@ module.exports = {
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
+  inputPngCompleteTransparency: getPath('full-transparent.png'),
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),
   inputPngWithOneColor: getPath('2x2_fdcce6.png'),
   inputPngWithTransparency16bit: getPath('tbgn2c16.png'), // http://www.schaik.com/pngsuite/tbgn2c16.png

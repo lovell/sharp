@@ -86,6 +86,7 @@
     'sources': [
       'src/common.cc',
       'src/metadata.cc',
+      'src/stats.cc',
       'src/operations.cc',
       'src/pipeline.cc',
       'src/sharp.cc',
