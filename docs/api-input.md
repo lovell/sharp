@@ -4,6 +4,7 @@
 
 -   [clone](#clone)
 -   [metadata](#metadata)
+-   [stats](#stats)
 -   [limitInputPixels](#limitinputpixels)
 -   [sequentialRead](#sequentialread)
 
@@ -69,10 +70,10 @@ Returns **([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 
 ## stats
 
-Access to pixel-derived image statistics for every channel in the image
-A Promises/A+ promise is returned when `callback` is not provided.
+Access to pixel-derived image statistics for every channel in the image.
+A Promise is returned when `callback` is not provided.
 
--   `channels`: Array of channel statistics for each channel in the image. Each channel statistic contains 
+-   `channels`: Array of channel statistics for each channel in the image. Each channel statistic contains
     -   `min` (minimum value in the channel)
     -   `max` (maximum value in the channel)
     -   `sum` (sum of all values in a channel)
@@ -87,7 +88,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 **Parameters**
 
--   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, metadata)`
+-   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, stats)`
 
 **Examples**
 
@@ -96,12 +97,11 @@ const image = sharp(inputJpg);
 image
   .stats()
   .then(function(stats) {
-    // stats contains the channel-wise statistics array and the isOpaque value
-  })
+     // stats contains the channel-wise statistics array and the isOpaque value
+  });
 ```
 
-Returns **([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)> | Sharp)** 
-
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)>** 
 
 ## limitInputPixels
 

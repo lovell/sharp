@@ -14,6 +14,10 @@ Requires libvips v8.6.0.
   [#872](https://github.com/lovell/sharp/issues/872)
   [@wmertens](https://github.com/wmertens)
 
+* Add stats feature for pixel-derived image statistics.
+  [#915](https://github.com/lovell/sharp/pull/915)
+  [@rnanwani](https://github.com/rnanwani)
+
 * Add failOnError option to fail-fast on bad input image data.
   [#976](https://github.com/lovell/sharp/pull/976)
   [@mceachen](https://github.com/mceachen)
