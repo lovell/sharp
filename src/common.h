@@ -208,6 +208,13 @@ namespace sharp {
 
   /*
     Calculate the (left, top) coordinates of the output image
+    within the input image, applying the given gravity during an embed.
+  */
+  std::tuple<int, int> CalculateEmbedPosition(int const inWidth, int const inHeight,
+    int const outWidth, int const outHeight, int const gravity);
+
+  /*
+    Calculate the (left, top) coordinates of the output image
     within the input image, applying the given gravity.
   */
   std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,

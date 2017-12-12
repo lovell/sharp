@@ -62,6 +62,7 @@ struct PipelineBaton {
   int channels;
   Canvas canvas;
   int crop;
+  int embed;
   bool hasCropOffset;
   int cropOffsetLeft;
   int cropOffsetTop;
@@ -145,6 +146,7 @@ struct PipelineBaton {
     channels(0),
     canvas(Canvas::CROP),
     crop(0),
+    embed(0),
     hasCropOffset(false),
     cropOffsetLeft(0),
     cropOffsetTop(0),
