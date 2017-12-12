@@ -26,6 +26,10 @@ Requires libvips v8.6.0.
   [#977](https://github.com/lovell/sharp/pull/977)
   [@jardakotesovec](https://github.com/jardakotesovec)
 
+* Attach finish event listener to a clone only for Stream-based input.
+  [#995](https://github.com/lovell/sharp/issues/995)
+  [@whmountains](https://github.com/whmountains)
+
 * Add tilecache before smartcrop to avoid over-computation of previous operations.
   [#1028](https://github.com/lovell/sharp/issues/1028)
   [@coffeebite](https://github.com/coffeebite)
