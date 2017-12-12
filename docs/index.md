@@ -104,6 +104,7 @@ the help and code contributions of the following people:
 * [Matt Parrish](https://github.com/pbomb)
 * [Matthew McEachen](https://github.com/mceachen)
 * [Jarda Kotěšovec](https://github.com/jardakotesovec)
+* [Kenric D'Souza](https://github.com/AzureByte)
 
 Thank you!
 

@@ -30,6 +30,10 @@ Requires libvips v8.6.0.
   [#1028](https://github.com/lovell/sharp/issues/1028)
   [@coffeebite](https://github.com/coffeebite)
 
+* Add support for gravity option to existing embed feature.
+  [#1038](https://github.com/lovell/sharp/pull/1038)
+  [@AzureByte](https://github.com/AzureByte)
+
 * TIFF output: switch default predictor from 'none' to 'horizontal' to match libvips' behaviour.
 
 ### v0.18 - "*ridge*"

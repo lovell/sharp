@@ -94,6 +94,10 @@ then embed on a background of the exact `width` and `height` specified.
 If the background contains an alpha value then WebP and PNG format output images will
 contain an alpha channel, even when the input image does not.
 
+**Parameters**
+
+-   `embed` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** A member of `sharp.gravity` to embed to an edge/corner. (optional, default `'centre'`)
+
 **Examples**
 
 ```javascript
@@ -110,6 +114,8 @@ sharp('input.gif')
     // containing a scaled version, embedded on a transparent canvas, of input.gif
   });
 ```
+
+-   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
 
 Returns **Sharp** 
 
