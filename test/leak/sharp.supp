@@ -156,9 +156,26 @@
   fun:vips_region_generate
 }
 {
-  cond_libvips_col_sRGB2scRGB_8
+  value_libvips_col_sRGB2scRGB_8
   Memcheck:Value8
   fun:vips_col_sRGB2scRGB_8
+}
+{
+  value_libvips_col_sRGB2scRGB_line_8
+  Memcheck:Value8
+  fun:vips_sRGB2scRGB_line_8
+}
+{
+  value_libvips_write_webp
+  Memcheck:Value8
+  ...
+  fun:write_webp.constprop.1
+  fun:vips__webp_write_buffer
+}
+{
+  cond_libvips_vips_cast_gen
+  Memcheck:Cond
+  fun:vips_cast_gen
 }
 {
   cond_libvips_vips_region_fill
@@ -271,6 +288,20 @@
   fun:_ZN4node17CreateEnvironmentEPN2v87IsolateEP9uv_loop_sNS0_5LocalINS0_7ContextEEEiPKPKciSB_
 }
 {
+  leak_nodejs_Environment_Start
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node11Environment5StartEiPKPKciS4_b
+}
+{
+  leak_nodejs_node9inspector5Agent5Start
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node9inspector5Agent5StartEPN2v88PlatformEPKcRKNS_12DebugOptionsE
+}
+{
   leak_nodejs_icu_getAvailableLocales
   Memcheck:Leak
   match-leak-kinds: possible
@@ -364,4 +395,11 @@
   match-leak-kinds: possible
   ...
   fun:_ZN2v88internal8Malloced3NewEm
+}
+{
+  leak_v8_inspector10toString
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN12v8_inspector10toString16ERKNS_10StringViewE
 }
