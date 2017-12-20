@@ -1146,6 +1146,26 @@ describe('Input/output', function () {
       });
   });
 
+  it('toFormat=JPEG takes precedence over WebP extension', function (done) {
+    sharp(fixtures.inputPng)
+      .jpeg()
+      .toFile(fixtures.outputWebP, function (err, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        done();
+      });
+  });
+
+  it('toFormat=WebP takes precedence over JPEG extension', function (done) {
+    sharp(fixtures.inputPng)
+      .webp()
+      .toFile(fixtures.outputJpg, function (err, info) {
+        if (err) throw err;
+        assert.strictEqual('webp', info.format);
+        done();
+      });
+  });
+
   it('Load GIF from Buffer', function (done) {
     const inputGifBuffer = fs.readFileSync(fixtures.inputGif);
     sharp(inputGifBuffer)

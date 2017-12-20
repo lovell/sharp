@@ -808,9 +808,10 @@ class PipelineWorker : public Nan::AsyncWorker {
         bool const isDz = sharp::IsDz(baton->fileOut);
         bool const isDzZip = sharp::IsDzZip(baton->fileOut);
         bool const isV = sharp::IsV(baton->fileOut);
-        bool const matchInput = baton->formatOut == "input" &&
-          !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip || isV);
-        if (baton->formatOut == "jpeg" || isJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
+        bool const mightMatchInput = baton->formatOut == "input";
+        bool const willMatchInput = mightMatchInput && !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip || isV);
+        if (baton->formatOut == "jpeg" || (mightMatchInput && isJpeg) ||
+          (willMatchInput && inputImageType == ImageType::JPEG)) {
           // Write JPEG to file
           sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -824,7 +825,7 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("optimize_coding", TRUE));
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
-        } else if (baton->formatOut == "png" || isPng || (matchInput &&
+        } else if (baton->formatOut == "png" || (mightMatchInput && isPng) || (willMatchInput &&
           (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
           // Write PNG to file
           sharp::AssertImageTypeDimensions(image, ImageType::PNG);
@@ -837,9 +838,10 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("compression", baton->pngCompressionLevel)
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE));
           baton->formatOut = "png";
-        } else if (baton->formatOut == "webp" || isWebp || (matchInput && inputImageType == ImageType::WEBP)) {
+        } else if (baton->formatOut == "webp" || (mightMatchInput && isWebp) ||
+          (willMatchInput && inputImageType == ImageType::WEBP)) {
           // Write WEBP to file
-          AssertImageTypeDimensions(image, ImageType::WEBP);
+          sharp::AssertImageTypeDimensions(image, ImageType::WEBP);
           image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->webpQuality)
@@ -847,7 +849,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("near_lossless", baton->webpNearLossless)
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
-        } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
+        } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
+          (willMatchInput && inputImageType == ImageType::TIFF)) {
           // Write TIFF to file
           if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
             sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
@@ -911,7 +914,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("layout", baton->tileLayout)
             ->set("suffix", const_cast<char*>(suffix.data())));
           baton->formatOut = "dz";
-        } else if (baton->formatOut == "v" || isV || (matchInput && inputImageType == ImageType::VIPS)) {
+        } else if (baton->formatOut == "v" || (mightMatchInput && isV) ||
+          (willMatchInput && inputImageType == ImageType::VIPS)) {
           // Write V to file
           image.vipssave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata));
