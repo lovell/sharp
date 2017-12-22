@@ -132,30 +132,18 @@ docker pull tailor/docker-libvips
 
 ### AWS Lambda
 
-In order to use sharp on AWS Lambda, you need to [create a deployment package](http://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html). Because sharp
-downloads and links libraries for the current platform during `npm install` you have to
-do this on a system similar to the [Lambda Execution Environment](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html). The easiest ways to do this, is to setup a
-small t2.micro instance using the AMI ID listed in the previous link, ssh into it as ec2-user
-and follow the instructions below.
-
-Install dependencies:
+A [deployment package](http://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html) for the
+[Lambda Execution Environment](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)
+can be built using Docker.
 
 ```sh
-curl -s https://rpm.nodesource.com/setup_4.x | sudo bash -
-sudo yum install -y gcc-c++ nodejs
+rm -rf node_modules/sharp
+docker run -v "$PWD":/var/task lambci/lambda:build-nodejs6.10 npm install
 ```
 
-Copy your code and package.json to the instance using `scp` and create a deployment package:
+Set the Lambda runtime to Node.js 6.10.
 
-```sh
-cd sharp-lambda-example
-npm install
-zip -ur9 ../sharp-lambda-example.zip index.js node_modules
-```
-
-You can now download your deployment ZIP using `scp` and upload it to Lambda. Be sure to set your Lambda runtime to Node.js 4.3.
-
-**Performance Tip:** To get the best performance on Lambda choose the largest memory available because this also gives you the most cpu time (a 1536 MB function is 12x faster than a 128 MB function).
+To get the best performance select the largest memory available. A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
 ### Build tools
 
@@ -213,7 +201,7 @@ this module will attempt to download a pre-compiled bundle of libvips
 and its dependencies on Linux and Windows machines.
 
 Should you need to manually download and inspect these files,
-you can do so via https://dl.bintray.com/lovell/sharp/
+you can do so via https://github.com/lovell/sharp-libvips/releases
 
 Should you wish to install these from your own location,
 set the `SHARP_DIST_BASE_URL` environment variable, e.g.
