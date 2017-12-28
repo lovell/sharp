@@ -38,6 +38,10 @@ struct MetadataBaton {
   size_t exifLength;
   char *icc;
   size_t iccLength;
+  char *iptc;
+  size_t iptcLength;
+  char *xmp;
+  size_t xmpLength;
   std::string err;
 
   MetadataBaton():
@@ -52,7 +56,11 @@ struct MetadataBaton {
     exif(nullptr),
     exifLength(0),
     icc(nullptr),
-    iccLength(0) {}
+    iccLength(0),
+    iptc(nullptr),
+    iptcLength(0),
+    xmp(nullptr),
+    xmpLength(0) {}
 };
 
 NAN_METHOD(metadata);
