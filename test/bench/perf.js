@@ -601,7 +601,7 @@ async.series({
       callback(null, this.filter('fastest').map('name'));
     }).run();
   },
-  // Comparitive speed of kernels
+  // Comparative speed of kernels
   kernels: function (callback) {
     const inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
     (new Benchmark.Suite('kernels')).add('sharp-cubic', {
@@ -911,12 +911,12 @@ async.series({
             }
           });
       }
-    }).add('sharp-withoutAdaptiveFiltering', {
+    }).add('sharp-adaptiveFiltering', {
       defer: true,
       fn: function (deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
-          .png({ adaptiveFiltering: false })
+          .png({ adaptiveFiltering: true })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
