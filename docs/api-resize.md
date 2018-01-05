@@ -24,11 +24,11 @@ Possible kernels are:
 
 **Parameters**
 
--   `width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
--   `height` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
-    -   `options.kernel` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the kernel to use for image reduction. (optional, default `'lanczos3'`)
-    -   `options.fastShrinkOnLoad` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
+-   `width` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
+-   `height` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+    -   `options.kernel` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the kernel to use for image reduction. (optional, default `'lanczos3'`)
+    -   `options.fastShrinkOnLoad` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
 
 **Examples**
 
@@ -47,7 +47,7 @@ sharp(inputBuffer)
   });
 ```
 
--   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
 
 Returns **Sharp** 
 
@@ -66,7 +66,7 @@ then repeatedly ranks edge regions, discarding the edge with the lowest score ba
 
 **Parameters**
 
--   `crop` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** A member of `sharp.gravity` to crop to an edge/corner or `sharp.strategy` to crop dynamically. (optional, default `'centre'`)
+-   `crop` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** A member of `sharp.gravity` to crop to an edge/corner or `sharp.strategy` to crop dynamically. (optional, default `'centre'`)
 
 **Examples**
 
@@ -82,7 +82,7 @@ const transformer = sharp()
 readableStream.pipe(transformer).pipe(writableStream);
 ```
 
--   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
 
 Returns **Sharp** 
 
@@ -96,7 +96,7 @@ contain an alpha channel, even when the input image does not.
 
 **Parameters**
 
--   `embed` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** A member of `sharp.gravity` to embed to an edge/corner. (optional, default `'centre'`)
+-   `embed` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** A member of `sharp.gravity` to embed to an edge/corner. (optional, default `'centre'`)
 
 **Examples**
 
@@ -115,7 +115,7 @@ sharp('input.gif')
   });
 ```
 
--   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
 
 Returns **Sharp** 
 
@@ -168,6 +168,6 @@ The default behaviour _before_ function call is `false`, meaning the image will 
 
 **Parameters**
 
--   `withoutEnlargement` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `withoutEnlargement` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
 
 Returns **Sharp** 

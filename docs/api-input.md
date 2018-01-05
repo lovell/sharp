@@ -47,7 +47,7 @@ A Promises/A+ promise is returned when `callback` is not provided.
 
 **Parameters**
 
--   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, metadata)`
+-   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, metadata)`
 
 **Examples**
 
@@ -66,7 +66,7 @@ image
   });
 ```
 
-Returns **([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)> | Sharp)** 
+Returns **([Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)> | Sharp)** 
 
 ## stats
 
@@ -88,7 +88,7 @@ A Promise is returned when `callback` is not provided.
 
 **Parameters**
 
--   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, stats)`
+-   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, stats)`
 
 **Examples**
 
@@ -101,7 +101,7 @@ image
   });
 ```
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)>** 
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)>** 
 
 ## limitInputPixels
 
@@ -111,10 +111,10 @@ The default limit is 268402689 (0x3FFF _ 0x3FFF) pixels.
 
 **Parameters**
 
--   `limit` **([Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) \| [Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean))** an integral Number of pixels, zero or false to remove limit, true to use default limit.
+-   `limit` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) \| [Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean))** an integral Number of pixels, zero or false to remove limit, true to use default limit.
 
 
--   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid limit
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid limit
 
 Returns **Sharp** 
 
@@ -127,6 +127,6 @@ The default behaviour _before_ function call is `false`, meaning the libvips acc
 
 **Parameters**
 
--   `sequentialRead` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `sequentialRead` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
 
 Returns **Sharp** 
