@@ -436,14 +436,14 @@ describe('Resize dimensions', function () {
 
   it('fastShrinkOnLoad: true (default) might result in shifted image', function (done) {
     return sharp(fixtures.inputJpgCenteredImage)
-    .resize(9, 8)
-    .png()
-    .toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(9, info.width);
-      assert.strictEqual(8, info.height);
-      fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load-true.png'), data, done);
-    });
+      .resize(9, 8)
+      .png()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(9, info.width);
+        assert.strictEqual(8, info.height);
+        fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load-true.png'), data, done);
+      });
   });
 
   [

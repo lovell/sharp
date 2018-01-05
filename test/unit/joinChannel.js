@@ -11,7 +11,7 @@ describe('Image channel insertion', function () {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
       .joinChannel(fixtures.inputPngTestJoinChannel) // new green channel
-      .joinChannel(fixtures.inputPngStripesH)        // new blue channel
+      .joinChannel(fixtures.inputPngStripesH) // new blue channel
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(320, info.width);
@@ -25,7 +25,7 @@ describe('Image channel insertion', function () {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
       .joinChannel(fs.readFileSync(fixtures.inputPngTestJoinChannel)) // new green channel
-      .joinChannel(fs.readFileSync(fixtures.inputPngStripesH))        // new blue channel
+      .joinChannel(fs.readFileSync(fixtures.inputPngStripesH)) // new blue channel
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(320, info.width);
