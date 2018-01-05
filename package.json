@@ -77,7 +77,7 @@
     "nan": "^2.8.0",
     "semver": "^5.4.1",
     "simple-get": "^2.7.0",
-    "tar": "4.0.2",
+    "tar": "^4.2.0",
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
