@@ -56,15 +56,15 @@ module.exports.download_vips = function () {
   // Ensure Intel 64-bit or ARM
   const arch = process.env.npm_config_arch || process.arch;
   if (arch === 'ia32') {
-    error(`Intel Architecture 32-bit systems require manual installation of libvips >= ${minimumLibvipsVersion} - please see http://sharp.dimens.io/page/install`);
+    error(`Intel Architecture 32-bit systems require manual installation of libvips >= ${minimumLibvipsVersion} - please see http://sharp.pixelplumbing.com/page/install`);
   }
   // Ensure glibc Linux
   if (detectLibc.isNonGlibcLinux) {
-    error(`Use with ${detectLibc.family} libc requires manual installation of libvips >= ${minimumLibvipsVersion} - please see http://sharp.dimens.io/page/install`);
+    error(`Use with ${detectLibc.family} libc requires manual installation of libvips >= ${minimumLibvipsVersion} - please see http://sharp.pixelplumbing.com/page/install`);
   }
   // Ensure glibc >= 2.13
   if (detectLibc.family === detectLibc.GLIBC && detectLibc.version && semver.lt(`${detectLibc.version}.0`, '2.13.0')) {
-    error(`Use with glibc version ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion} - please see http://sharp.dimens.io/page/install`);
+    error(`Use with glibc version ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion} - please see http://sharp.pixelplumbing.com/page/install`);
   }
   // Arch/platform-specific .tar.gz
   const tarFilename = ['libvips', minimumLibvipsVersion, currentPlatformId].join('-') + '.tar.gz';

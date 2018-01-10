@@ -30,12 +30,12 @@
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
-#error GCC version 4.6+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
+#error GCC version 4.6+ is required for C++11 features - see sharp.pixelplumbing.com/page/install#prerequisites
 #endif
 
 #if (defined(__clang__) && defined(__has_feature))
 #if (!__has_feature(cxx_range_for))
-#error clang version 3.0+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
+#error clang version 3.0+ is required for C++11 features - see sharp.pixelplumbing.com/page/install#prerequisites
 #endif
 #endif
 
