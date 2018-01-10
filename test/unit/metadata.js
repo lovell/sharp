@@ -58,6 +58,23 @@ describe('Image metadata', function () {
     });
   });
 
+  it('JPEG with IPTC/XMP', function (done) {
+    sharp(fixtures.inputJpgWithIptcAndXmp).metadata(function (err, metadata) {
+      if (err) throw err;
+      // IPTC
+      assert.strictEqual('object', typeof metadata.iptc);
+      assert.strictEqual(true, metadata.iptc instanceof Buffer);
+      assert.strictEqual(18250, metadata.iptc.byteLength);
+      assert.strictEqual(metadata.iptc.indexOf(Buffer.from('Photoshop')), 0);
+      // XMP
+      assert.strictEqual('object', typeof metadata.xmp);
+      assert.strictEqual(true, metadata.xmp instanceof Buffer);
+      assert.strictEqual(12495, metadata.xmp.byteLength);
+      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('http://ns.adobe.com/xap/1.0')), 0);
+      done();
+    });
+  });
+
   it('TIFF', function (done) {
     sharp(fixtures.inputTiff).metadata(function (err, metadata) {
       if (err) throw err;
