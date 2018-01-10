@@ -41,7 +41,11 @@ Requires libvips v8.6.0.
 * Add support for gravity option to existing embed feature.
   [#1038](https://github.com/lovell/sharp/pull/1038)
   [@AzureByte](https://github.com/AzureByte)
-  
+
+* Expose IPTC and XMP metadata when available.
+  [#1079](https://github.com/lovell/sharp/pull/1079)
+  [@oaleynik](https://github.com/oaleynik)
+
 * TIFF output: switch default predictor from 'none' to 'horizontal' to match libvips' behaviour.
 
 ### v0.18 - "*ridge*"

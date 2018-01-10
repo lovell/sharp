@@ -44,6 +44,8 @@ A Promises/A+ promise is returned when `callback` is not provided.
 -   `orientation`: Number value of the EXIF Orientation header, if present
 -   `exif`: Buffer containing raw EXIF data, if present
 -   `icc`: Buffer containing raw [ICC](https://www.npmjs.com/package/icc) profile data, if present
+-   `iptc`: Buffer containing raw IPTC data, if present
+-   `xmp`: Buffer containing raw XMP data, if present
 
 **Parameters**
 
