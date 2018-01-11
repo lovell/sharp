@@ -2,9 +2,9 @@
 
 ### v0.19 - "*suit*"
 
-Requires libvips v8.6.0.
+Requires libvips v8.6.1.
 
-#### v0.19.0 - TBD
+#### v0.19.0 - 11<sup>th</sup> January 2018
 
 * Expose offset coordinates of strategy-based crop.
   [#868](https://github.com/lovell/sharp/issues/868)
