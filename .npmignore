@@ -2,13 +2,12 @@ build
 node_modules
 coverage
 .editorconfig
+.gitattributes
 .gitignore
 test
 .travis.yml
 appveyor.yml
-circle.yml
 mkdocs.yml
 vendor
-packaging
-preinstall.sh
 .nyc_output
+CONTRIBUTING.md
