@@ -162,7 +162,7 @@ Returns **Sharp**
 
 Do not enlarge the output image if the input image width _or_ height are already less than the required dimensions.
 This is equivalent to GraphicsMagick's `>` geometry option:
-"_change the dimensions of the image only if its width or height exceeds the geometry specification_". Use with `max()` to preserve the image's aspect ratio.
+"_change the dimensions of the image only if its width or height exceeds the geometry specification_".
 
 The default behaviour _before_ function call is `false`, meaning the image will be enlarged.
 
