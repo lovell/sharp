@@ -62,12 +62,13 @@ struct PipelineBaton {
   int channels;
   Canvas canvas;
   int crop;
-  int cropCalcLeft;
-  int cropCalcTop;
+  int embed;
+  bool hasCropOffset;
+  int cropOffsetLeft;
+  int cropOffsetTop;
   bool premultiplied;
   std::string kernel;
-  std::string interpolator;
-  bool centreSampling;
+  bool fastShrinkOnLoad;
   double background[4];
   bool flatten;
   bool negate;
@@ -147,10 +148,11 @@ struct PipelineBaton {
     channels(0),
     canvas(Canvas::CROP),
     crop(0),
-    cropCalcLeft(-1),
-    cropCalcTop(-1),
+    embed(0),
+    hasCropOffset(false),
+    cropOffsetLeft(0),
+    cropOffsetTop(0),
     premultiplied(false),
-    centreSampling(false),
     flatten(false),
     negate(false),
     blurSigma(0.0),
@@ -181,12 +183,12 @@ struct PipelineBaton {
     jpegOvershootDeringing(false),
     jpegOptimiseScans(false),
     pngProgressive(false),
-    pngCompressionLevel(6),
-    pngAdaptiveFiltering(true),
+    pngCompressionLevel(9),
+    pngAdaptiveFiltering(false),
     webpQuality(80),
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
-    tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_NONE),
+    tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
     tiffSquash(false),
     tiffXres(1.0),
     tiffYres(1.0),

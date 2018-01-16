@@ -386,33 +386,6 @@ describe('Resize dimensions', function () {
     });
   });
 
-  it('Centre vs corner convention return different results', function (done) {
-    sharp(fixtures.inputJpg)
-      .resize(32, 24, { centreSampling: false })
-      .greyscale()
-      .raw()
-      .toBuffer(function (err, cornerData) {
-        if (err) throw err;
-        assert.strictEqual(768, cornerData.length);
-        sharp(fixtures.inputJpg)
-          .resize(32, 24, { centerSampling: true })
-          .greyscale()
-          .raw()
-          .toBuffer(function (err, centreData) {
-            if (err) throw err;
-            assert.strictEqual(768, centreData.length);
-            assert.notStrictEqual(0, cornerData.compare(centreData));
-            done();
-          });
-      });
-  });
-
-  it('Invalid centreSampling option', function () {
-    assert.throws(function () {
-      sharp().resize(32, 24, { centreSampling: 1 });
-    });
-  });
-
   it('Dimensions that result in differing even shrinks on each axis', function (done) {
     sharp(fixtures.inputJpg)
       .resize(645, 399)
@@ -447,5 +420,65 @@ describe('Resize dimensions', function () {
             fixtures.assertSimilar(fixtures.expected('resize-diff-shrink-odd.jpg'), data, done);
           });
       });
+  });
+
+  it('fastShrinkOnLoad: false ensures image is not shifted', function (done) {
+    return sharp(fixtures.inputJpgCenteredImage)
+      .resize(9, 8, { fastShrinkOnLoad: false })
+      .png()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(9, info.width);
+        assert.strictEqual(8, info.height);
+        fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load-false.png'), data, done);
+      });
+  });
+
+  it('fastShrinkOnLoad: true (default) might result in shifted image', function (done) {
+    return sharp(fixtures.inputJpgCenteredImage)
+      .resize(9, 8)
+      .png()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(9, info.width);
+        assert.strictEqual(8, info.height);
+        fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load-true.png'), data, done);
+      });
+  });
+
+  [
+    sharp.kernel.nearest,
+    sharp.kernel.cubic,
+    sharp.kernel.lanczos2,
+    sharp.kernel.lanczos3
+  ].forEach(function (kernel) {
+    it(`kernel ${kernel}`, function (done) {
+      sharp(fixtures.inputJpg)
+        .resize(320, null, { kernel: kernel })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(320, info.width);
+          fixtures.assertSimilar(fixtures.inputJpg, data, done);
+        });
+    });
+  });
+
+  it('nearest upsampling with integral factor', function (done) {
+    sharp(fixtures.inputTiff8BitDepth)
+      .resize(210, 210, { kernel: 'nearest' })
+      .png()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(210, info.width);
+        assert.strictEqual(210, info.height);
+        done();
+      });
+  });
+
+  it('unknown kernel throws', function () {
+    assert.throws(function () {
+      sharp().resize(null, null, { kernel: 'unknown' });
+    });
   });
 });

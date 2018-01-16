@@ -1,5 +1,53 @@
 # Changelog
 
+### v0.19 - "*suit*"
+
+Requires libvips v8.6.1.
+
+#### v0.19.0 - 11<sup>th</sup> January 2018
+
+* Expose offset coordinates of strategy-based crop.
+  [#868](https://github.com/lovell/sharp/issues/868)
+  [@mirohristov-com](https://github.com/mirohristov-com)
+
+* PNG output now defaults to adaptiveFiltering=false, compressionLevel=9
+  [#872](https://github.com/lovell/sharp/issues/872)
+  [@wmertens](https://github.com/wmertens)
+
+* Add stats feature for pixel-derived image statistics.
+  [#915](https://github.com/lovell/sharp/pull/915)
+  [@rnanwani](https://github.com/rnanwani)
+
+* Add failOnError option to fail-fast on bad input image data.
+  [#976](https://github.com/lovell/sharp/pull/976)
+  [@mceachen](https://github.com/mceachen)
+
+* Resize: switch to libvips' implementation, make fastShrinkOnLoad optional, remove interpolator and centreSampling options.
+  [#977](https://github.com/lovell/sharp/pull/977)
+  [@jardakotesovec](https://github.com/jardakotesovec)
+
+* Attach finish event listener to a clone only for Stream-based input.
+  [#995](https://github.com/lovell/sharp/issues/995)
+  [@whmountains](https://github.com/whmountains)
+
+* Add tilecache before smartcrop to avoid over-computation of previous operations.
+  [#1028](https://github.com/lovell/sharp/issues/1028)
+  [@coffeebite](https://github.com/coffeebite)
+
+* Prevent toFile extension taking precedence over requested format.
+  [#1037](https://github.com/lovell/sharp/issues/1037)
+  [@tomgallagher](https://github.com/tomgallagher)
+
+* Add support for gravity option to existing embed feature.
+  [#1038](https://github.com/lovell/sharp/pull/1038)
+  [@AzureByte](https://github.com/AzureByte)
+
+* Expose IPTC and XMP metadata when available.
+  [#1079](https://github.com/lovell/sharp/pull/1079)
+  [@oaleynik](https://github.com/oaleynik)
+
+* TIFF output: switch default predictor from 'none' to 'horizontal' to match libvips' behaviour.
+
 ### v0.18 - "*ridge*"
 
 Requires libvips v8.5.5.

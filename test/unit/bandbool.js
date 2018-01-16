@@ -10,20 +10,20 @@ describe('Bandbool per-channel boolean operations', function () {
     sharp.bool.or,
     sharp.bool.eor
   ]
-  .forEach(function (op) {
-    it(op + ' operation', function (done) {
-      sharp(fixtures.inputPngBooleanNoAlpha)
-        .bandbool(op)
-        .toColourspace('b-w')
-        .toBuffer(function (err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(200, info.width);
-          assert.strictEqual(200, info.height);
-          assert.strictEqual(1, info.channels);
-          fixtures.assertSimilar(fixtures.expected('bandbool_' + op + '_result.png'), data, done);
-        });
+    .forEach(function (op) {
+      it(op + ' operation', function (done) {
+        sharp(fixtures.inputPngBooleanNoAlpha)
+          .bandbool(op)
+          .toColourspace('b-w')
+          .toBuffer(function (err, data, info) {
+            if (err) throw err;
+            assert.strictEqual(200, info.width);
+            assert.strictEqual(200, info.height);
+            assert.strictEqual(1, info.channels);
+            fixtures.assertSimilar(fixtures.expected('bandbool_' + op + '_result.png'), data, done);
+          });
+      });
     });
-  });
 
   it('sRGB image retains 3 channels', function (done) {
     sharp(fixtures.inputJpg)

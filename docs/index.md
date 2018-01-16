@@ -55,9 +55,9 @@ without having to use separate command line tools like
 [jpegoptim](https://github.com/tjko/jpegoptim) and
 [jpegtran](http://jpegclub.org/jpegtran/).
 
-PNG filtering can be disabled,
+PNG filtering is disabled by default,
 which for diagrams and line art often produces the same result
-as [pngcrush](http://pmt.sourceforge.net/pngcrush/).
+as [pngcrush](https://pmt.sourceforge.io/pngcrush/).
 
 ### Contributing
 
@@ -102,12 +102,15 @@ the help and code contributions of the following people:
 * [Yves Bos](https://github.com/YvesBos)
 * [Nicolas Coden](https://github.com/ncoden)
 * [Matt Parrish](https://github.com/pbomb)
+* [Matthew McEachen](https://github.com/mceachen)
+* [Jarda Kotěšovec](https://github.com/jardakotesovec)
+* [Kenric D'Souza](https://github.com/AzureByte)
 
 Thank you!
 
 ### Licence
 
-Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+Copyright 2013, 2014, 2015, 2016, 2017, 2018 Lovell Fuller and contributors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

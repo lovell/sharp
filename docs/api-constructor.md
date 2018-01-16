@@ -11,21 +11,24 @@
 
 **Parameters**
 
--   `input` **([Buffer](https://nodejs.org/api/buffer.html) \| [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String))?** if present, can be
+-   `input` **([Buffer](https://nodejs.org/api/buffer.html) \| [String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String))?** if present, can be
      a Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
      a String containing the path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
      JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** if present, is an Object with optional attributes.
-    -   `options.density` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** integral number representing the DPI for vector images. (optional, default `72`)
-    -   `options.raw` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** describes raw pixel input image data. See `raw()` for pixel ordering.
-        -   `options.raw.width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-        -   `options.raw.height` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-        -   `options.raw.channels` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 1-4
-    -   `options.create` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** describes a new image to be created.
-        -   `options.create.width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-        -   `options.create.height` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-        -   `options.create.channels` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 3-4
-        -   `options.create.background` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object))?** parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** if present, is an Object with optional attributes.
+    -   `options.failOnError` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** by default apply a "best effort"
+         to decode images, even if the data is corrupt or invalid. Set this flag to true
+         if you'd rather halt processing and raise an error when loading invalid images. (optional, default `false`)
+    -   `options.density` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** integral number representing the DPI for vector images. (optional, default `72`)
+    -   `options.raw` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** describes raw pixel input image data. See `raw()` for pixel ordering.
+        -   `options.raw.width` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+        -   `options.raw.height` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+        -   `options.raw.channels` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 1-4
+    -   `options.create` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** describes a new image to be created.
+        -   `options.create.width` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+        -   `options.create.height` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+        -   `options.create.channels` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 3-4
+        -   `options.create.background` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object))?** parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
 
 **Examples**
 
@@ -66,7 +69,7 @@ sharp({
 .then( ... );
 ```
 
--   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
 
 Returns **[Sharp](#sharp)** 
 
@@ -80,7 +83,7 @@ An Object containing nested boolean values representing the available input and 
 console.log(sharp.format);
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
 ### versions
 

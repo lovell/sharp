@@ -4,6 +4,7 @@
 
 -   [clone](#clone)
 -   [metadata](#metadata)
+-   [stats](#stats)
 -   [limitInputPixels](#limitinputpixels)
 -   [sequentialRead](#sequentialread)
 
@@ -43,10 +44,12 @@ A Promises/A+ promise is returned when `callback` is not provided.
 -   `orientation`: Number value of the EXIF Orientation header, if present
 -   `exif`: Buffer containing raw EXIF data, if present
 -   `icc`: Buffer containing raw [ICC](https://www.npmjs.com/package/icc) profile data, if present
+-   `iptc`: Buffer containing raw IPTC data, if present
+-   `xmp`: Buffer containing raw XMP data, if present
 
 **Parameters**
 
--   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, metadata)`
+-   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, metadata)`
 
 **Examples**
 
@@ -65,7 +68,42 @@ image
   });
 ```
 
-Returns **([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)> | Sharp)** 
+Returns **([Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)> | Sharp)** 
+
+## stats
+
+Access to pixel-derived image statistics for every channel in the image.
+A Promise is returned when `callback` is not provided.
+
+-   `channels`: Array of channel statistics for each channel in the image. Each channel statistic contains
+    -   `min` (minimum value in the channel)
+    -   `max` (maximum value in the channel)
+    -   `sum` (sum of all values in a channel)
+    -   `squaresSum` (sum of squared values in a channel)
+    -   `mean` (mean of the values in a channel)
+    -   `stdev` (standard deviation for the values in a channel)
+    -   `minX` (x-coordinate of one of the pixel where the minimum lies)
+    -   `minY` (y-coordinate of one of the pixel where the minimum lies)
+    -   `maxX` (x-coordinate of one of the pixel where the maximum lies)
+    -   `maxY` (y-coordinate of one of the pixel where the maximum lies)
+-   `isOpaque`: Value to identify if the image is opaque or transparent, based on the presence and use of alpha channel
+
+**Parameters**
+
+-   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, stats)`
+
+**Examples**
+
+```javascript
+const image = sharp(inputJpg);
+image
+  .stats()
+  .then(function(stats) {
+     // stats contains the channel-wise statistics array and the isOpaque value
+  });
+```
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)>** 
 
 ## limitInputPixels
 
@@ -75,10 +113,10 @@ The default limit is 268402689 (0x3FFF _ 0x3FFF) pixels.
 
 **Parameters**
 
--   `limit` **([Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) \| [Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean))** an integral Number of pixels, zero or false to remove limit, true to use default limit.
+-   `limit` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) \| [Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean))** an integral Number of pixels, zero or false to remove limit, true to use default limit.
 
 
--   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid limit
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid limit
 
 Returns **Sharp** 
 
@@ -87,8 +125,10 @@ Returns **Sharp**
 An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`.
 This will reduce memory usage and can improve performance on some systems.
 
+The default behaviour _before_ function call is `false`, meaning the libvips access method is not sequential.
+
 **Parameters**
 
--   `sequentialRead` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `sequentialRead` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
 
 Returns **Sharp** 

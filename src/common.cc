@@ -52,6 +52,7 @@ namespace sharp {
       descriptor->buffer = node::Buffer::Data(buffer);
       buffersToPersist.push_back(buffer);
     }
+    descriptor->failOnError = AttrTo<bool>(input, "failOnError");
     // Density for vector-based input
     if (HasAttr(input, "density")) {
       descriptor->density = AttrTo<uint32_t>(input, "density");
@@ -219,7 +220,9 @@ namespace sharp {
         imageType = DetermineImageType(descriptor->buffer, descriptor->bufferLength);
         if (imageType != ImageType::UNKNOWN) {
           try {
-            vips::VOption *option = VImage::option()->set("access", accessMethod);
+            vips::VOption *option = VImage::option()
+              ->set("access", accessMethod)
+              ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", static_cast<double>(descriptor->density));
             }
@@ -256,7 +259,9 @@ namespace sharp {
         imageType = DetermineImageType(descriptor->file.data());
         if (imageType != ImageType::UNKNOWN) {
           try {
-            vips::VOption *option = VImage::option()->set("access", accessMethod);
+            vips::VOption *option = VImage::option()
+              ->set("access", accessMethod)
+              ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", static_cast<double>(descriptor->density));
             }
@@ -404,7 +409,62 @@ namespace sharp {
 
   /*
     Calculate the (left, top) coordinates of the output image
-    within the input image, applying the given gravity.
+    within the input image, applying the given gravity during an embed.
+
+    @Azurebyte: We are basically swapping the inWidth and outWidth, inHeight and outHeight from the CalculateCrop function.
+  */
+  std::tuple<int, int> CalculateEmbedPosition(int const inWidth, int const inHeight,
+    int const outWidth, int const outHeight, int const gravity) {
+
+    int left = 0;
+    int top = 0;
+    switch (gravity) {
+      case 1:
+        // North
+        left = (outWidth - inWidth) / 2;
+        break;
+      case 2:
+        // East
+        left = outWidth - inWidth;
+        top = (outHeight - inHeight) / 2;
+        break;
+      case 3:
+        // South
+        left = (outWidth - inWidth) / 2;
+        top = outHeight - inHeight;
+        break;
+      case 4:
+        // West
+        top = (outHeight - inHeight) / 2;
+        break;
+      case 5:
+        // Northeast
+        left = outWidth - inWidth;
+        break;
+      case 6:
+        // Southeast
+        left = outWidth - inWidth;
+        top = outHeight - inHeight;
+        break;
+      case 7:
+        // Southwest
+        top = outHeight - inHeight;
+        break;
+      case 8:
+        // Northwest
+        // Which is the default is 0,0 so we do not assign anything here.
+        break;
+      default:
+        // Centre
+        left = (outWidth - inWidth) / 2;
+        top = (outHeight - inHeight) / 2;
+    }
+    return std::make_tuple(left, top);
+  }
+
+  /*
+    Calculate the (left, top) coordinates of the output image
+    within the input image, applying the given gravity during a crop.
   */
   std::tuple<int, int> CalculateCrop(int const inWidth, int const inHeight,
     int const outWidth, int const outHeight, int const gravity) {

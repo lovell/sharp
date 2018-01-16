@@ -15,51 +15,39 @@
 Resize image to `width` x `height`.
 By default, the resized image is centre cropped to the exact size specified.
 
-Possible reduction kernels are:
+Possible kernels are:
 
 -   `nearest`: Use [nearest neighbour interpolation](http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation).
 -   `cubic`: Use a [Catmull-Rom spline](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline).
 -   `lanczos2`: Use a [Lanczos kernel](https://en.wikipedia.org/wiki/Lanczos_resampling#Lanczos_kernel) with `a=2`.
 -   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
 
-Possible enlargement interpolators are:
-
--   `nearest`: Use [nearest neighbour interpolation](http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation).
--   `bilinear`: Use [bilinear interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation), faster than bicubic but with less smooth results.
--   `vertexSplitQuadraticBasisSpline`: Use the smoother [VSQBS interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/vsqbs.cpp#L48) to prevent "staircasing" when enlarging.
--   `bicubic`: Use [bicubic interpolation](http://en.wikipedia.org/wiki/Bicubic_interpolation) (the default).
--   `locallyBoundedBicubic`: Use [LBB interpolation](https://github.com/jcupitt/libvips/blob/master/libvips/resample/lbb.cpp#L100), which prevents some "[acutance](http://en.wikipedia.org/wiki/Acutance)" but typically reduces performance by a factor of 2.
--   `nohalo`: Use [Nohalo interpolation](http://eprints.soton.ac.uk/268086/), which prevents acutance but typically reduces performance by a factor of 3.
-
 **Parameters**
 
--   `width` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
--   `height` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
-    -   `options.kernel` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the kernel to use for image reduction. (optional, default `'lanczos3'`)
-    -   `options.interpolator` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the interpolator to use for image enlargement. (optional, default `'bicubic'`)
-    -   `options.centreSampling` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use \*magick centre sampling convention instead of corner sampling. (optional, default `false`)
-    -   `options.centerSampling` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** alternative spelling of centreSampling. (optional, default `false`)
+-   `width` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
+-   `height` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+    -   `options.kernel` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the kernel to use for image reduction. (optional, default `'lanczos3'`)
+    -   `options.fastShrinkOnLoad` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
 
 **Examples**
 
 ```javascript
 sharp(inputBuffer)
   .resize(200, 300, {
-    kernel: sharp.kernel.lanczos2,
-    interpolator: sharp.interpolator.nohalo
+    kernel: sharp.kernel.nearest
   })
   .background('white')
   .embed()
   .toFile('output.tiff')
   .then(function() {
     // output.tiff is a 200 pixels wide and 300 pixels high image
-    // containing a lanczos2/nohalo scaled version, embedded on a white canvas,
+    // containing a nearest-neighbour scaled version, embedded on a white canvas,
     // of the image data in inputBuffer
   });
 ```
 
--   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
 
 Returns **Sharp** 
 
@@ -78,7 +66,7 @@ then repeatedly ranks edge regions, discarding the edge with the lowest score ba
 
 **Parameters**
 
--   `crop` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** A member of `sharp.gravity` to crop to an edge/corner or `sharp.strategy` to crop dynamically. (optional, default `'centre'`)
+-   `crop` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** A member of `sharp.gravity` to crop to an edge/corner or `sharp.strategy` to crop dynamically. (optional, default `'centre'`)
 
 **Examples**
 
@@ -94,7 +82,7 @@ const transformer = sharp()
 readableStream.pipe(transformer).pipe(writableStream);
 ```
 
--   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
 
 Returns **Sharp** 
 
@@ -105,6 +93,10 @@ then embed on a background of the exact `width` and `height` specified.
 
 If the background contains an alpha value then WebP and PNG format output images will
 contain an alpha channel, even when the input image does not.
+
+**Parameters**
+
+-   `embed` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** A member of `sharp.gravity` to embed to an edge/corner. (optional, default `'centre'`)
 
 **Examples**
 
@@ -122,6 +114,8 @@ sharp('input.gif')
     // containing a scaled version, embedded on a transparent canvas, of input.gif
   });
 ```
+
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
 
 Returns **Sharp** 
 
@@ -169,9 +163,12 @@ Returns **Sharp**
 Do not enlarge the output image if the input image width _or_ height are already less than the required dimensions.
 This is equivalent to GraphicsMagick's `>` geometry option:
 "_change the dimensions of the image only if its width or height exceeds the geometry specification_".
+Use with `max()` to preserve the image's aspect ratio.
+
+The default behaviour _before_ function call is `false`, meaning the image will be enlarged.
 
 **Parameters**
 
--   `withoutEnlargement` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `withoutEnlargement` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
 
 Returns **Sharp** 

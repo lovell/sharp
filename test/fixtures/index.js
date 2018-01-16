@@ -57,6 +57,7 @@ module.exports = {
 
   inputJpg: getPath('2569067123_aca715a2ee_o.jpg'), // http://www.flickr.com/photos/grizdave/2569067123/
   inputJpgWithExif: getPath('Landscape_8.jpg'), // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_8.jpg
+  inputJpgWithIptcAndXmp: getPath('Landscape_9.jpg'), // https://unsplash.com/photos/RWAIyGmgHTQ
   inputJpgWithExifMirroring: getPath('Landscape_5.jpg'), // https://github.com/recurser/exif-orientation-examples/blob/master/Landscape_5.jpg
   inputJpgWithGammaHoliness: getPath('gamma_dalai_lama_gray.jpg'), // http://www.4p8.com/eric.brasseur/gamma.html
   inputJpgWithCmykProfile: getPath('Channel_digital_image_CMYK_color.jpg'), // http://en.wikipedia.org/wiki/File:Channel_digital_image_CMYK_color.jpg
@@ -66,9 +67,12 @@ module.exports = {
   inputJpgLarge: getPath('giant-image.jpg'),
   inputJpg320x240: getPath('320x240.jpg'), // http://www.andrewault.net/2010/01/26/create-a-test-pattern-video-with-perl/
   inputJpgOverlayLayer2: getPath('alpha-layer-2-ink.jpg'),
+  inputJpgTruncated: getPath('truncated.jpg'), // head -c 10000 2569067123_aca715a2ee_o.jpg > truncated.jpg
+  inputJpgCenteredImage: getPath('centered_image.jpeg'),
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
+  inputPngCompleteTransparency: getPath('full-transparent.png'),
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),
   inputPngWithOneColor: getPath('2x2_fdcce6.png'),
   inputPngWithTransparency16bit: getPath('tbgn2c16.png'), // http://www.schaik.com/pngsuite/tbgn2c16.png
@@ -81,6 +85,8 @@ module.exports = {
   inputPngAlphaPremultiplicationLarge: getPath('alpha-premultiply-2048x1536-paper.png'),
   inputPngBooleanNoAlpha: getPath('bandbool.png'),
   inputPngTestJoinChannel: getPath('testJoinChannel.png'),
+  inputPngTruncated: getPath('truncated.png'), // gm convert 2569067123_aca715a2ee_o.jpg -resize 320x240 saw.png ; head -c 10000 saw.png > truncated.png
+  inputPngEmbed: getPath('embedgravitybird.png'), // Released to sharp under a CC BY 4.0
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp

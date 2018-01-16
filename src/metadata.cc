@@ -81,6 +81,22 @@ class MetadataWorker : public Nan::AsyncWorker {
         memcpy(baton->icc, icc, iccLength);
         baton->iccLength = iccLength;
       }
+      // IPTC
+      if (image.get_typeof(VIPS_META_IPCT_NAME) == VIPS_TYPE_BLOB) {
+        size_t iptcLength;
+        void const *iptc = image.get_blob(VIPS_META_IPCT_NAME, &iptcLength);
+        baton->iptc = static_cast<char *>(g_malloc(iptcLength));
+        memcpy(baton->iptc, iptc, iptcLength);
+        baton->iptcLength = iptcLength;
+      }
+      // XMP
+      if (image.get_typeof(VIPS_META_XMP_NAME) == VIPS_TYPE_BLOB) {
+        size_t xmpLength;
+        void const *xmp = image.get_blob(VIPS_META_XMP_NAME, &xmpLength);
+        baton->xmp = static_cast<char *>(g_malloc(xmpLength));
+        memcpy(baton->xmp, xmp, xmpLength);
+        baton->xmpLength = xmpLength;
+      }
     }
 
     // Clean up
@@ -122,6 +138,16 @@ class MetadataWorker : public Nan::AsyncWorker {
         Set(info,
           New("icc").ToLocalChecked(),
           Nan::NewBuffer(baton->icc, baton->iccLength, sharp::FreeCallback, nullptr).ToLocalChecked());
+      }
+      if (baton->iptcLength > 0) {
+        Set(info,
+          New("iptc").ToLocalChecked(),
+          Nan::NewBuffer(baton->iptc, baton->iptcLength, sharp::FreeCallback, nullptr).ToLocalChecked());
+      }
+      if (baton->xmpLength > 0) {
+        Set(info,
+          New("xmp").ToLocalChecked(),
+          Nan::NewBuffer(baton->xmp, baton->xmpLength, sharp::FreeCallback, nullptr).ToLocalChecked());
       }
       argv[1] = info;
     }

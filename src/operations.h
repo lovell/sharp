@@ -73,11 +73,6 @@ namespace sharp {
   VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged);
 
   /*
-    Insert a tile cache to prevent over-computation of any previous operations in the pipeline
-  */
-  VImage TileCache(VImage image, double const factor);
-
-  /*
     Threshold an image
   */
   VImage Threshold(VImage image, double const threshold, bool const thresholdColor);

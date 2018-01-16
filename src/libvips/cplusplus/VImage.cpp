@@ -205,6 +205,30 @@ VOption::set( const char *name, std::vector<double> value )
 	return( this );
 }
 
+// input int array
+VOption *
+VOption::set( const char *name, std::vector<int> value )
+{
+	Pair *pair = new Pair( name );
+
+	int *array;
+	unsigned int i; 
+
+	pair->input = true;
+
+	g_value_init( &pair->value, VIPS_TYPE_ARRAY_INT );
+	vips_value_set_array_int( &pair->value, NULL,
+		static_cast< int >( value.size() ) );
+	array = vips_value_get_array_int( &pair->value, NULL ); 
+
+	for( i = 0; i < value.size(); i++ )  
+		array[i] = value[i]; 
+
+	options.push_back( pair );
+
+	return( this );
+}
+
 // input image array
 VOption *
 VOption::set( const char *name, std::vector<VImage> value )
@@ -465,8 +489,7 @@ VImage::call_option_string( const char *operation_name,
 		operation_name );
 
 	if( !(operation = vips_operation_new( operation_name )) ) {
-		if( options )
-			delete options;
+		delete options;
 		throw( VError() ); 
 	}
 
@@ -563,34 +586,6 @@ VImage::new_from_buffer( void *buf, size_t len, const char *option_string,
 	call_option_string( operation_name, option_string, options ); 
 
 	return( out );
-}
-
-VImage 
-VImage::new_from_image( std::vector<double> pixel )
-{
-	VImage onepx = VImage::black( 1, 1, 
-		VImage::option()->set( "bands", bands() ) ); 
-
-	onepx = (onepx + pixel).cast( format() );
-
-	VImage big = onepx.embed( 0, 0, width(), height(), 
-		VImage::option()->set( "extend", VIPS_EXTEND_COPY ) ); 
-
-	big = big.copy( 
-		VImage::option()->
-			set( "interpretation", interpretation() )->
-			set( "xres", xres() )->
-			set( "yres", yres() )->
-			set( "xoffset", xres() )->
-			set( "yoffset", yres() ) ); 
-
-	return( big ); 
-}
-
-VImage 
-VImage::new_from_image( double pixel )
-{
-	return( new_from_image( to_vectorv( 1, pixel ) ) ); 
 }
 
 VImage 
@@ -693,10 +688,21 @@ VImage::bandsplit( VOption *options )
 VImage 
 VImage::bandjoin( VImage other, VOption *options )
 {
-    VImage v[2] = { *this, other }; 
-    std::vector<VImage> vec( v, v + VIPS_NUMBER( v ) );
+	VImage v[2] = { *this, other }; 
+	std::vector<VImage> vec( v, v + VIPS_NUMBER( v ) );
 
-    return( bandjoin( vec, options ) ); 
+	return( bandjoin( vec, options ) ); 
+}
+
+VImage 
+VImage::composite( VImage other, VipsBlendMode mode, VOption *options )
+{
+	VImage v[2] = { *this, other }; 
+	std::vector<VImage> ivec( v, v + VIPS_NUMBER( v ) );
+	int m[1] = { static_cast<int>( mode ) }; 
+	std::vector<int> mvec( m, m + VIPS_NUMBER( m ) );
+
+	return( composite( ivec, mvec, options ) ); 
 }
 
 std::complex<double> 

@@ -25,17 +25,17 @@
 
 // Verify platform and compiler compatibility
 
-#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 5))
-#error libvips version 8.5.x required - see sharp.dimens.io/page/install
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 6))
+#error libvips version 8.6.1+ is required - see sharp.pixelplumbing.com/page/install
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
-#error GCC version 4.6+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
+#error GCC version 4.6+ is required for C++11 features - see sharp.pixelplumbing.com/page/install#prerequisites
 #endif
 
 #if (defined(__clang__) && defined(__has_feature))
 #if (!__has_feature(cxx_range_for))
-#error clang version 3.0+ is required for C++11 features - see sharp.dimens.io/page/install#prerequisites
+#error clang version 3.0+ is required for C++11 features - see sharp.pixelplumbing.com/page/install#prerequisites
 #endif
 #endif
 
@@ -47,6 +47,7 @@ namespace sharp {
     std::string name;
     std::string file;
     char *buffer;
+    bool failOnError;
     size_t bufferLength;
     int density;
     int rawChannels;
@@ -59,6 +60,7 @@ namespace sharp {
 
     InputDescriptor():
       buffer(nullptr),
+      failOnError(FALSE),
       bufferLength(0),
       density(72),
       rawChannels(0),
@@ -203,6 +205,13 @@ namespace sharp {
     Pop the oldest warning message from the queue
   */
   std::string VipsWarningPop();
+
+  /*
+    Calculate the (left, top) coordinates of the output image
+    within the input image, applying the given gravity during an embed.
+  */
+  std::tuple<int, int> CalculateEmbedPosition(int const inWidth, int const inHeight,
+    int const outWidth, int const outHeight, int const gravity);
 
   /*
     Calculate the (left, top) coordinates of the output image

@@ -23,7 +23,7 @@ the installation of any external runtime dependencies.
 ## Examples
 
 ```javascript
-import sharp from 'sharp';
+const sharp = require('sharp');
 ```
 
 ```javascript
@@ -32,8 +32,6 @@ sharp(inputBuffer)
   .toFile('output.webp', (err, info) => ... );
   // A Promises/A+ promise is returned when callback is not provided.
 ```
-
-
 
 ```javascript
 sharp('input.jpg')
@@ -64,11 +62,11 @@ readableStream
 
 ### Documentation
 
-Visit [sharp.dimens.io](http://sharp.dimens.io/) for complete
-[installation instructions](http://sharp.dimens.io/page/install),
-[API documentation](http://sharp.dimens.io/page/api),
-[benchmark tests](http://sharp.dimens.io/page/performance) and
-[changelog](http://sharp.dimens.io/page/changelog).
+Visit [sharp.pixelplumbing.com](http://sharp.pixelplumbing.com/) for complete
+[installation instructions](http://sharp.pixelplumbing.com/page/install),
+[API documentation](http://sharp.pixelplumbing.com/page/api),
+[benchmark tests](http://sharp.pixelplumbing.com/page/performance) and
+[changelog](http://sharp.pixelplumbing.com/page/changelog).
 
 ### Contributing
 
@@ -77,7 +75,7 @@ covers reporting bugs, requesting features and submitting code changes.
 
 ### Licence
 
-Copyright 2013, 2014, 2015, 2016, 2017 Lovell Fuller and contributors.
+Copyright 2013, 2014, 2015, 2016, 2017, 2018 Lovell Fuller and contributors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

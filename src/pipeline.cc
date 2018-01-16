@@ -222,20 +222,27 @@ class PipelineWorker : public Nan::AsyncWorker {
       // If integral x and y shrink are equal, try to use shrink-on-load for JPEG and WebP,
       // but not when applying gamma correction, pre-resize extract or trim
       int shrink_on_load = 1;
+
+      int shrink_on_load_factor = 1;
+      // Leave at least a factor of two for the final resize step, when fastShrinkOnLoad: false
+      // for more consistent results and avoid occasional small image shifting
+      if (!baton->fastShrinkOnLoad) {
+        shrink_on_load_factor = 2;
+      }
       if (
-        xshrink == yshrink && xshrink >= 2 &&
+        xshrink == yshrink && xshrink >= 2 * shrink_on_load_factor &&
         (inputImageType == ImageType::JPEG || inputImageType == ImageType::WEBP) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimTolerance == 0
       ) {
-        if (xshrink >= 8) {
+        if (xshrink >= 8 * shrink_on_load_factor) {
           xfactor = xfactor / 8;
           yfactor = yfactor / 8;
           shrink_on_load = 8;
-        } else if (xshrink >= 4) {
+        } else if (xshrink >= 4 * shrink_on_load_factor) {
           xfactor = xfactor / 4;
           yfactor = yfactor / 4;
           shrink_on_load = 4;
-        } else if (xshrink >= 2) {
+        } else if (xshrink >= 2 * shrink_on_load_factor) {
           xfactor = xfactor / 2;
           yfactor = yfactor / 2;
           shrink_on_load = 2;
@@ -249,7 +256,10 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
       if (shrink_on_load > 1) {
         // Reload input using shrink-on-load
-        vips::VOption *option = VImage::option()->set("shrink", shrink_on_load);
+        vips::VOption *option = VImage::option()
+          ->set("access", baton->accessMethod)
+          ->set("shrink", shrink_on_load)
+          ->set("fail", baton->input->failOnError);
         if (baton->input->buffer != nullptr) {
           VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
           if (inputImageType == ImageType::JPEG) {
@@ -279,23 +289,6 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
         xfactor = static_cast<double>(shrunkOnLoadWidth) / static_cast<double>(targetResizeWidth);
         yfactor = static_cast<double>(shrunkOnLoadHeight) / static_cast<double>(targetResizeHeight);
-        xshrink = std::max(1, static_cast<int>(floor(xfactor)));
-        yshrink = std::max(1, static_cast<int>(floor(yfactor)));
-        xresidual = static_cast<double>(xshrink) / xfactor;
-        yresidual = static_cast<double>(yshrink) / yfactor;
-        if (
-          !baton->rotateBeforePreExtract &&
-          (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)
-        ) {
-          std::swap(xresidual, yresidual);
-        }
-      }
-      // Help ensure a final kernel-based reduction to prevent shrink aliasing
-      if (xshrink > 1 && yshrink > 1 && (xresidual == 1.0 || yresidual == 1.0)) {
-        xshrink = xshrink / 2;
-        yshrink = yshrink / 2;
-        xresidual = static_cast<double>(xshrink) / xfactor;
-        yresidual = static_cast<double>(yshrink) / yfactor;
       }
 
       // Ensure we're using a device-independent colour space
@@ -361,13 +354,12 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
       }
 
-      bool const shouldShrink = xshrink > 1 || yshrink > 1;
-      bool const shouldReduce = xresidual != 1.0 || yresidual != 1.0;
+      bool const shouldResize = xfactor != 1.0 || yfactor != 1.0;
       bool const shouldBlur = baton->blurSigma != 0.0;
       bool const shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
       bool const shouldPremultiplyAlpha = HasAlpha(image) &&
-        (shouldShrink || shouldReduce || shouldBlur || shouldConv || shouldSharpen || shouldOverlayWithAlpha);
+        (shouldResize || shouldBlur || shouldConv || shouldSharpen || shouldOverlayWithAlpha);
 
       // Premultiply image alpha channel before all transformations to avoid
       // dark fringing around bright pixels
@@ -376,79 +368,20 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = image.premultiply();
       }
 
-      // Fast, integral box-shrink
-      if (shouldShrink) {
-        if (yshrink > 1) {
-          image = image.shrinkv(yshrink);
-        }
-        if (xshrink > 1) {
-          image = image.shrinkh(xshrink);
-        }
-        // Recalculate residual float based on dimensions of required vs shrunk images
-        int shrunkWidth = image.width();
-        int shrunkHeight = image.height();
-        if (!baton->rotateBeforePreExtract &&
-          (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
-          // Swap input output width and height when rotating by 90 or 270 degrees
-          std::swap(shrunkWidth, shrunkHeight);
-        }
-        xresidual = static_cast<double>(targetResizeWidth) / static_cast<double>(shrunkWidth);
-        yresidual = static_cast<double>(targetResizeHeight) / static_cast<double>(shrunkHeight);
+      // Resize
+      if (shouldResize) {
+        VipsKernel kernel = static_cast<VipsKernel>(
+          vips_enum_from_nick(nullptr, VIPS_TYPE_KERNEL, baton->kernel.data()));
         if (
-          !baton->rotateBeforePreExtract &&
-          (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)
+          kernel != VIPS_KERNEL_NEAREST && kernel != VIPS_KERNEL_CUBIC && kernel != VIPS_KERNEL_LANCZOS2 &&
+          kernel != VIPS_KERNEL_LANCZOS3
         ) {
-          std::swap(xresidual, yresidual);
+          throw vips::VError("Unknown kernel");
         }
-      }
 
-      // Use affine increase or kernel reduce with the remaining float part
-      if (xresidual != 1.0 || yresidual != 1.0) {
-        // Insert tile cache to prevent over-computation of previous operations
-        if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL) {
-          image = sharp::TileCache(image, yresidual);
-        }
-        // Perform kernel-based reduction
-        if (yresidual < 1.0 || xresidual < 1.0) {
-          VipsKernel kernel = static_cast<VipsKernel>(
-            vips_enum_from_nick(nullptr, VIPS_TYPE_KERNEL, baton->kernel.data()));
-          if (
-            kernel != VIPS_KERNEL_NEAREST && kernel != VIPS_KERNEL_CUBIC && kernel != VIPS_KERNEL_LANCZOS2 &&
-            kernel != VIPS_KERNEL_LANCZOS3
-          ) {
-            throw vips::VError("Unknown kernel");
-          }
-          if (yresidual < 1.0) {
-            image = image.reducev(1.0 / yresidual, VImage::option()
-              ->set("kernel", kernel)
-              ->set("centre", baton->centreSampling));
-          }
-          if (xresidual < 1.0) {
-            image = image.reduceh(1.0 / xresidual, VImage::option()
-              ->set("kernel", kernel)
-              ->set("centre", baton->centreSampling));
-          }
-        }
-        // Perform enlargement
-        if (yresidual > 1.0 || xresidual > 1.0) {
-          if (trunc(xresidual) == xresidual && trunc(yresidual) == yresidual && baton->interpolator == "nearest") {
-            // Fast, integral nearest neighbour enlargement
-            image = image.zoom(static_cast<int>(xresidual), static_cast<int>(yresidual));
-          } else {
-            // Floating point affine transformation
-            vips::VInterpolate interpolator = vips::VInterpolate::new_from_name(baton->interpolator.data());
-            if (yresidual > 1.0 && xresidual > 1.0) {
-              image = image.affine({xresidual, 0.0, 0.0, yresidual}, VImage::option()
-                ->set("interpolate", interpolator));
-            } else if (yresidual > 1.0) {
-              image = image.affine({1.0, 0.0, 0.0, yresidual}, VImage::option()
-                ->set("interpolate", interpolator));
-            } else if (xresidual > 1.0) {
-              image = image.affine({xresidual, 0.0, 0.0, 1.0}, VImage::option()
-                ->set("interpolate", interpolator));
-            }
-          }
-        }
+        image = image.resize(1.0 / xfactor, VImage::option()
+          ->set("vscale", 1.0 / yfactor)
+          ->set("kernel", kernel));
       }
 
       // Rotate
@@ -513,12 +446,25 @@ class PipelineWorker : public Nan::AsyncWorker {
             image = image.bandjoin(
               VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier));
           }
+
           // Embed
-          int left = static_cast<int>(round((baton->width - image.width()) / 2));
-          int top = static_cast<int>(round((baton->height - image.height()) / 2));
-          image = image.embed(left, top, baton->width, baton->height, VImage::option()
+
+          // Calculate where to position the embeded image if gravity specified, else center.
+          int left;
+          int top;
+
+          left = static_cast<int>(round((baton->width - image.width()) / 2));
+          top = static_cast<int>(round((baton->height - image.height()) / 2));
+
+          int width = std::max(image.width(), baton->width);
+          int height = std::max(image.height(), baton->height);
+          std::tie(left, top) = sharp::CalculateEmbedPosition(
+            image.width(), image.height(), baton->width, baton->height, baton->embed);
+
+          image = image.embed(left, top, width, height, VImage::option()
             ->set("extend", VIPS_EXTEND_BACKGROUND)
             ->set("background", background));
+
         } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
           // Crop/max/min
           if (baton->crop < 9) {
@@ -532,8 +478,14 @@ class PipelineWorker : public Nan::AsyncWorker {
             image = image.extract_area(left, top, width, height);
           } else {
             // Attention-based or Entropy-based crop
+            image = image.tilecache(VImage::option()
+              ->set("access", baton->accessMethod)
+              ->set("threaded", TRUE));
             image = image.smartcrop(baton->width, baton->height, VImage::option()
               ->set("interesting", baton->crop == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
+            baton->hasCropOffset = true;
+            baton->cropOffsetLeft = static_cast<int>(image.xoffset());
+            baton->cropOffsetTop = static_cast<int>(image.yoffset());
           }
         }
       }
@@ -861,9 +813,10 @@ class PipelineWorker : public Nan::AsyncWorker {
         bool const isDz = sharp::IsDz(baton->fileOut);
         bool const isDzZip = sharp::IsDzZip(baton->fileOut);
         bool const isV = sharp::IsV(baton->fileOut);
-        bool const matchInput = baton->formatOut == "input" &&
-          !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip || isV);
-        if (baton->formatOut == "jpeg" || isJpeg || (matchInput && inputImageType == ImageType::JPEG)) {
+        bool const mightMatchInput = baton->formatOut == "input";
+        bool const willMatchInput = mightMatchInput && !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip || isV);
+        if (baton->formatOut == "jpeg" || (mightMatchInput && isJpeg) ||
+          (willMatchInput && inputImageType == ImageType::JPEG)) {
           // Write JPEG to file
           sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -877,7 +830,7 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("optimize_coding", TRUE));
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
-        } else if (baton->formatOut == "png" || isPng || (matchInput &&
+        } else if (baton->formatOut == "png" || (mightMatchInput && isPng) || (willMatchInput &&
           (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
           // Write PNG to file
           sharp::AssertImageTypeDimensions(image, ImageType::PNG);
@@ -890,9 +843,10 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("compression", baton->pngCompressionLevel)
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE));
           baton->formatOut = "png";
-        } else if (baton->formatOut == "webp" || isWebp || (matchInput && inputImageType == ImageType::WEBP)) {
+        } else if (baton->formatOut == "webp" || (mightMatchInput && isWebp) ||
+          (willMatchInput && inputImageType == ImageType::WEBP)) {
           // Write WEBP to file
-          AssertImageTypeDimensions(image, ImageType::WEBP);
+          sharp::AssertImageTypeDimensions(image, ImageType::WEBP);
           image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->webpQuality)
@@ -900,7 +854,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("near_lossless", baton->webpNearLossless)
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
-        } else if (baton->formatOut == "tiff" || isTiff || (matchInput && inputImageType == ImageType::TIFF)) {
+        } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
+          (willMatchInput && inputImageType == ImageType::TIFF)) {
           // Write TIFF to file
           if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
             sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
@@ -964,7 +919,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("layout", baton->tileLayout)
             ->set("suffix", const_cast<char*>(suffix.data())));
           baton->formatOut = "dz";
-        } else if (baton->formatOut == "v" || isV || (matchInput && inputImageType == ImageType::VIPS)) {
+        } else if (baton->formatOut == "v" || (mightMatchInput && isV) ||
+          (willMatchInput && inputImageType == ImageType::VIPS)) {
           // Write V to file
           image.vipssave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata));
@@ -1010,9 +966,11 @@ class PipelineWorker : public Nan::AsyncWorker {
       Set(info, New("height").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(height)));
       Set(info, New("channels").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->channels)));
       Set(info, New("premultiplied").ToLocalChecked(), New<v8::Boolean>(baton->premultiplied));
-      if (baton->cropCalcLeft != -1 && baton->cropCalcLeft != -1) {
-        Set(info, New("cropCalcLeft").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->cropCalcLeft)));
-        Set(info, New("cropCalcTop").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->cropCalcTop)));
+      if (baton->hasCropOffset) {
+        Set(info, New("cropOffsetLeft").ToLocalChecked(),
+          New<v8::Int32>(static_cast<int32_t>(baton->cropOffsetLeft)));
+        Set(info, New("cropOffsetTop").ToLocalChecked(),
+          New<v8::Int32>(static_cast<int32_t>(baton->cropOffsetTop)));
       }
 
       if (baton->bufferOutLength > 0) {
@@ -1205,9 +1163,9 @@ NAN_METHOD(pipeline) {
   // Resize options
   baton->withoutEnlargement = AttrTo<bool>(options, "withoutEnlargement");
   baton->crop = AttrTo<int32_t>(options, "crop");
+  baton->embed = AttrTo<int32_t>(options, "embed");
   baton->kernel = AttrAsStr(options, "kernel");
-  baton->interpolator = AttrAsStr(options, "interpolator");
-  baton->centreSampling = AttrTo<bool>(options, "centreSampling");
+  baton->fastShrinkOnLoad = AttrTo<bool>(options, "fastShrinkOnLoad");
   // Join Channel Options
   if (HasAttr(options, "joinChannelIn")) {
     v8::Local<v8::Object> joinChannelObject = Nan::Get(options, Nan::New("joinChannelIn").ToLocalChecked())

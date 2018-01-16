@@ -60,4 +60,18 @@ describe('Clone', function () {
     // Go
     fs.createReadStream(fixtures.inputJpg).pipe(rotator);
   });
+
+  it('Stream-based input attaches finish event listener to original', function () {
+    const original = sharp();
+    const clone = original.clone();
+    assert.strictEqual(1, original.listenerCount('finish'));
+    assert.strictEqual(0, clone.listenerCount('finish'));
+  });
+
+  it('Non Stream-based input does not attach finish event listeners', function () {
+    const original = sharp(fixtures.inputJpg);
+    const clone = original.clone();
+    assert.strictEqual(0, original.listenerCount('finish'));
+    assert.strictEqual(0, clone.listenerCount('finish'));
+  });
 });

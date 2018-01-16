@@ -31,6 +31,7 @@ async.mapSeries([1, 1, 2, 4, 8, 16, 32, 64], function (parallelism, next) {
     function (err, ids) {
       assert(!err);
       assert(ids.length === parallelism);
+      ids.sort();
       const mean = ids.reduce(function (a, b) {
         return a + b;
       }) / ids.length;
