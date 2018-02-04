@@ -4,6 +4,12 @@
 
 Requires libvips v8.6.1.
 
+#### v0.19.1 - TBD
+
+* Expose libvips' linear transform feature.
+  [#1024](https://github.com/lovell/sharp/pull/1024)
+  [@3epnm](https://github.com/3epnm)
+
 #### v0.19.0 - 11<sup>th</sup> January 2018
 
 * Expose offset coordinates of strategy-based crop.

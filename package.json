@@ -43,7 +43,8 @@
     "Matthew McEachen <matthew+github@mceachen.org>",
     "Jarda Kotěšovec <jarda.kotesovec@gmail.com>",
     "Kenric D'Souza <kenric.dsouza@gmail.com>",
-    "Oleh Aleinyk <oleg.aleynik@gmail.com>"
+    "Oleh Aleinyk <oleg.aleynik@gmail.com>",
+    "Marcel Bretschneider <marcel.bretschneider@gmail.com>"
   ],
   "scripts": {
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
@@ -74,12 +75,12 @@
     "vips"
   ],
   "dependencies": {
-    "color": "^2.0.1",
+    "color": "^3.0.0",
     "detect-libc": "^1.0.3",
     "nan": "^2.8.0",
-    "semver": "^5.4.1",
+    "semver": "^5.5.0",
     "simple-get": "^2.7.0",
-    "tar": "^4.2.0",
+    "tar": "^4.3.2",
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
@@ -88,7 +89,7 @@
     "documentation": "^5.3.5",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
-    "mocha": "^4.1.0",
+    "mocha": "^5.0.0",
     "nyc": "^11.4.1",
     "rimraf": "^2.6.2",
     "semistandard": "^12.0.0",

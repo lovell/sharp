@@ -329,10 +329,10 @@ Apply the linear formula a \* input + b to the image (levels adjustment)
 
 **Parameters**
 
--   `a` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** multiplier (optional, default `1.0`)
--   `b` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** offset (optional, default `0.0`)
+-   `a` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** multiplier (optional, default `1.0`)
+-   `b` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** offset (optional, default `0.0`)
 
 
--   Throws **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
 
 Returns **Sharp** 

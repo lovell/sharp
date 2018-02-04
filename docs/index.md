@@ -105,6 +105,8 @@ the help and code contributions of the following people:
 * [Matthew McEachen](https://github.com/mceachen)
 * [Jarda Kotěšovec](https://github.com/jardakotesovec)
 * [Kenric D'Souza](https://github.com/AzureByte)
+* [Oleh Aleinyk](https://github.com/oaleynik)
+* [Marcel Bretschneider](https://github.com/3epnm)
 
 Thank you!
 
