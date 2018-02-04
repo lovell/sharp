@@ -644,6 +644,11 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = sharp::Gamma(image, baton->gamma);
       }
 
+      // Linear adjustment (a * in + b)
+      if (baton->linearA != 1.0 || baton->linearB != 0.0) {
+        image = sharp::Linear(image, baton->linearA, baton->linearB);
+      }
+
       // Apply normalisation - stretch luminance to cover full dynamic range
       if (baton->normalise) {
         image = sharp::Normalise(image);
@@ -1185,6 +1190,8 @@ NAN_METHOD(pipeline) {
   baton->thresholdGrayscale = AttrTo<bool>(options, "thresholdGrayscale");
   baton->trimTolerance = AttrTo<int32_t>(options, "trimTolerance");
   baton->gamma = AttrTo<double>(options, "gamma");
+  baton->linearA = AttrTo<double>(options, "linearA");
+  baton->linearB = AttrTo<double>(options, "linearB");
   baton->greyscale = AttrTo<bool>(options, "greyscale");
   baton->normalise = AttrTo<bool>(options, "normalise");
   baton->useExifOrientation = AttrTo<bool>(options, "useExifOrientation");

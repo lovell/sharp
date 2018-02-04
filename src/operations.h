@@ -92,6 +92,11 @@ namespace sharp {
   */
   VImage Trim(VImage image, int const tolerance);
 
+  /*
+   * Linear adjustment (a * in + b)
+   */
+  VImage Linear(VImage image, double const a, double const b);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_
