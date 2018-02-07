@@ -917,7 +917,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("overlap", baton->tileOverlap)
             ->set("container", baton->tileContainer)
             ->set("layout", baton->tileLayout)
-            ->set("suffix", const_cast<char*>(suffix.data())));
+            ->set("suffix", const_cast<char*>(suffix.data()))
+            ->set("angle", CalculateAngleRotation(baton->tileAngle)));
           baton->formatOut = "dz";
         } else if (baton->formatOut == "v" || (mightMatchInput && isV) ||
           (willMatchInput && inputImageType == ImageType::VIPS)) {
@@ -1283,6 +1284,7 @@ NAN_METHOD(pipeline) {
     baton->crop == 16 || baton->crop == 17)) {
     baton->accessMethod = VIPS_ACCESS_RANDOM;
   }
+  baton->tileAngle = AttrTo<uint32_t>(options, "tileAngle");
 
   // Function to notify of libvips warnings
   Nan::Callback *debuglog = new Nan::Callback(AttrAs<v8::Function>(options, "debuglog"));

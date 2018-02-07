@@ -132,6 +132,7 @@ struct PipelineBaton {
   VipsForeignDzContainer tileContainer;
   VipsForeignDzLayout tileLayout;
   std::string tileFormat;
+  int tileAngle;
 
   PipelineBaton():
     input(nullptr),
@@ -206,7 +207,8 @@ struct PipelineBaton {
     tileSize(256),
     tileOverlap(0),
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),
-    tileLayout(VIPS_FOREIGN_DZ_LAYOUT_DZ) {
+    tileLayout(VIPS_FOREIGN_DZ_LAYOUT_DZ),
+    tileAngle(0){
       background[0] = 0.0;
       background[1] = 0.0;
       background[2] = 0.0;

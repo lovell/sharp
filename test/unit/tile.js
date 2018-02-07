@@ -146,13 +146,18 @@ describe('Tile', function () {
 
   it('Prevent larger overlap than default size', function () {
     assert.throws(function () {
-      sharp().tile({overlap: 257});
+      sharp().tile({
+        overlap: 257
+      });
     });
   });
 
   it('Prevent larger overlap than provided size', function () {
     assert.throws(function () {
-      sharp().tile({size: 512, overlap: 513});
+      sharp().tile({
+        size: 512,
+        overlap: 513
+      });
     });
   });
 
@@ -244,7 +249,9 @@ describe('Tile', function () {
     const directory = fixtures.path('output.jpg.google.dzi');
     rimraf(directory, function () {
       sharp(fixtures.inputJpg)
-        .jpeg({ quality: 1 })
+        .jpeg({
+          quality: 1
+        })
         .tile({
           layout: 'google'
         })
@@ -279,7 +286,9 @@ describe('Tile', function () {
     const directory = fixtures.path('output.png.google.dzi');
     rimraf(directory, function () {
       sharp(fixtures.inputJpg)
-        .png({ compressionLevel: 1 })
+        .png({
+          compressionLevel: 1
+        })
         .tile({
           layout: 'google'
         })
@@ -314,7 +323,9 @@ describe('Tile', function () {
     const directory = fixtures.path('output.webp.google.dzi');
     rimraf(directory, function () {
       sharp(fixtures.inputJpg)
-        .webp({ quality: 1 })
+        .webp({
+          quality: 1
+        })
         .tile({
           layout: 'google'
         })
@@ -363,8 +374,12 @@ describe('Tile', function () {
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);
             fs.createReadStream(container)
-              .pipe(unzip.Extract({path: path.dirname(extractTo)}))
-              .on('error', function (err) { throw err; })
+              .pipe(unzip.Extract({
+                path: path.dirname(extractTo)
+              }))
+              .on('error', function (err) {
+                throw err;
+              })
               .on('close', function () {
                 assertDeepZoomTiles(directory, 256, 13, done);
               });
@@ -395,13 +410,39 @@ describe('Tile', function () {
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);
             fs.createReadStream(container)
-              .pipe(unzip.Extract({path: path.dirname(extractTo)}))
-              .on('error', function (err) { throw err; })
+              .pipe(unzip.Extract({
+                path: path.dirname(extractTo)
+              }))
+              .on('error', function (err) {
+                throw err;
+              })
               .on('close', function () {
                 assertDeepZoomTiles(directory, 256, 13, done);
               });
           });
         });
     });
+  });
+
+  it('test rotation', function (done) {
+    sharp('/Users/bianco/mat/singleres/rgb.tif')
+      .resize(1024, 1024)
+      .background({
+        r: 0,
+        g: 0,
+        b: 0
+      })
+      .embed()
+      .rotate(90)
+      .jpeg()
+      .tile({
+        size: 512,
+        layout: 'google',
+        angle: 90
+      })
+      .toFile('./t/')
+      .catch(err => {
+        console.log(err);
+      });
   });
 });
