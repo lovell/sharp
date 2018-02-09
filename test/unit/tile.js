@@ -161,6 +161,26 @@ describe('Tile', function () {
     });
   });
 
+  it('Valid rotation angle values pass', function () {
+    [90, 270, -90].forEach(function (angle) {
+      assert.doesNotThrow(function () {
+        sharp().tile({
+          angle: angle
+        });
+      });
+    });
+  });
+
+  it('Invalid rotation angle values fail', function () {
+    ['zoinks', 1.1, -1, 27].forEach(function (angle) {
+      assert.throws(function () {
+        sharp().tile({
+          angle: angle
+        });
+      });
+    });
+  });
+
   it('Deep Zoom layout', function (done) {
     const directory = fixtures.path('output.dzi_files');
     rimraf(directory, function () {
@@ -193,6 +213,26 @@ describe('Tile', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual('undefined', typeof info.size);
           assertDeepZoomTiles(directory, 512 + (2 * 16), 13, done);
+        });
+    });
+  });
+
+  it('Deep Zoom layout with custom size+angle', function (done) {
+    const directory = fixtures.path('output.512_90.dzi_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          size: 512,
+          angle: 90
+        })
+        .toFile(fixtures.path('output.512_90.dzi'), function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('undefined', typeof info.size);
+          assertDeepZoomTiles(directory, 512, 13, done);
         });
     });
   });
@@ -422,27 +462,5 @@ describe('Tile', function () {
           });
         });
     });
-  });
-
-  it('test rotation', function (done) {
-    sharp('/Users/bianco/mat/singleres/rgb.tif')
-      .resize(1024, 1024)
-      .background({
-        r: 0,
-        g: 0,
-        b: 0
-      })
-      .embed()
-      .rotate(90)
-      .jpeg()
-      .tile({
-        size: 512,
-        layout: 'google',
-        angle: 90
-      })
-      .toFile('./t/')
-      .catch(err => {
-        console.log(err);
-      });
   });
 });

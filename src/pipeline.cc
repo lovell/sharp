@@ -1264,6 +1264,7 @@ NAN_METHOD(pipeline) {
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");
   std::string tileContainer = AttrAsStr(options, "tileContainer");
+  baton->tileAngle = AttrTo<uint32_t>(options, "tileAngle");
   if (tileContainer == "zip") {
     baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
   } else {
@@ -1284,7 +1285,6 @@ NAN_METHOD(pipeline) {
     baton->crop == 16 || baton->crop == 17)) {
     baton->accessMethod = VIPS_ACCESS_RANDOM;
   }
-  baton->tileAngle = AttrTo<uint32_t>(options, "tileAngle");
 
   // Function to notify of libvips warnings
   Nan::Callback *debuglog = new Nan::Callback(AttrAs<v8::Function>(options, "debuglog"));
