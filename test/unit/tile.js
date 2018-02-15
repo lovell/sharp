@@ -233,6 +233,20 @@ describe('Tile', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual('undefined', typeof info.size);
           assertDeepZoomTiles(directory, 512, 13, done);
+          // Verifies tiles in 10th level are rotated
+          let tile = path.join(directory, '10', '0_1.jpeg');
+          // verify that the width and height correspond to the rotated image
+          // expected are w=512 and h=170 for the 0_1.jpeg.
+          // if a 0 angle is supplied to the .tile function
+          // the expected values are w=170 and h=512 for the 1_0.jpeg
+          sharp(tile).metadata(function (err, metadata) {
+            if (err) {
+              throw err;
+            } else {
+              assert.strictEqual(true, metadata.width === 512);
+              assert.strictEqual(true, metadata.height === 170);
+            }
+          });
         });
     });
   });
