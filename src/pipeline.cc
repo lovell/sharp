@@ -1264,7 +1264,7 @@ NAN_METHOD(pipeline) {
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");
   std::string tileContainer = AttrAsStr(options, "tileContainer");
-  baton->tileAngle = AttrTo<uint32_t>(options, "tileAngle");
+  baton->tileAngle = AttrTo<int32_t>(options, "tileAngle");
   if (tileContainer == "zip") {
     baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
   } else {
