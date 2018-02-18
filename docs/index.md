@@ -107,6 +107,7 @@ the help and code contributions of the following people:
 * [Kenric D'Souza](https://github.com/AzureByte)
 * [Oleh Aleinyk](https://github.com/oaleynik)
 * [Marcel Bretschneider](https://github.com/3epnm)
+* [Andrea Bianco](https://github.com/BiancoA)
 
 Thank you!
 

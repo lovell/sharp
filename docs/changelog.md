@@ -10,6 +10,10 @@ Requires libvips v8.6.1.
   [#1024](https://github.com/lovell/sharp/pull/1024)
   [@3epnm](https://github.com/3epnm)
 
+* Expose angle option for tile-based output.
+  [#1121](https://github.com/lovell/sharp/pull/1121)
+  [@BiancoA](https://github.com/BiancoA)
+
 #### v0.19.0 - 11<sup>th</sup> January 2018
 
 * Expose offset coordinates of strategy-based crop.

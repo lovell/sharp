@@ -183,6 +183,7 @@ Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed arc
 -   `tile` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
     -   `tile.size` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
     -   `tile.overlap` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
+    -   `tile.angle` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
     -   `tile.container` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
     -   `tile.layout` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** filesystem layout, possible values are `dz`, `zoomify` or `google`. (optional, default `'dz'`)
 
