@@ -146,13 +146,38 @@ describe('Tile', function () {
 
   it('Prevent larger overlap than default size', function () {
     assert.throws(function () {
-      sharp().tile({overlap: 257});
+      sharp().tile({
+        overlap: 257
+      });
     });
   });
 
   it('Prevent larger overlap than provided size', function () {
     assert.throws(function () {
-      sharp().tile({size: 512, overlap: 513});
+      sharp().tile({
+        size: 512,
+        overlap: 513
+      });
+    });
+  });
+
+  it('Valid rotation angle values pass', function () {
+    [90, 270, -90].forEach(function (angle) {
+      assert.doesNotThrow(function () {
+        sharp().tile({
+          angle: angle
+        });
+      });
+    });
+  });
+
+  it('Invalid rotation angle values fail', function () {
+    ['zoinks', 1.1, -1, 27].forEach(function (angle) {
+      assert.throws(function () {
+        sharp().tile({
+          angle: angle
+        });
+      });
     });
   });
 
@@ -188,6 +213,40 @@ describe('Tile', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual('undefined', typeof info.size);
           assertDeepZoomTiles(directory, 512 + (2 * 16), 13, done);
+        });
+    });
+  });
+
+  it('Deep Zoom layout with custom size+angle', function (done) {
+    const directory = fixtures.path('output.512_90.dzi_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          size: 512,
+          angle: 90
+        })
+        .toFile(fixtures.path('output.512_90.dzi'), function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('undefined', typeof info.size);
+          assertDeepZoomTiles(directory, 512, 13, done);
+          // Verifies tiles in 10th level are rotated
+          let tile = path.join(directory, '10', '0_1.jpeg');
+          // verify that the width and height correspond to the rotated image
+          // expected are w=512 and h=170 for the 0_1.jpeg.
+          // if a 0 angle is supplied to the .tile function
+          // the expected values are w=170 and h=512 for the 1_0.jpeg
+          sharp(tile).metadata(function (err, metadata) {
+            if (err) {
+              throw err;
+            } else {
+              assert.strictEqual(true, metadata.width === 512);
+              assert.strictEqual(true, metadata.height === 170);
+            }
+          });
         });
     });
   });
@@ -244,7 +303,9 @@ describe('Tile', function () {
     const directory = fixtures.path('output.jpg.google.dzi');
     rimraf(directory, function () {
       sharp(fixtures.inputJpg)
-        .jpeg({ quality: 1 })
+        .jpeg({
+          quality: 1
+        })
         .tile({
           layout: 'google'
         })
@@ -279,7 +340,9 @@ describe('Tile', function () {
     const directory = fixtures.path('output.png.google.dzi');
     rimraf(directory, function () {
       sharp(fixtures.inputJpg)
-        .png({ compressionLevel: 1 })
+        .png({
+          compressionLevel: 1
+        })
         .tile({
           layout: 'google'
         })
@@ -314,7 +377,9 @@ describe('Tile', function () {
     const directory = fixtures.path('output.webp.google.dzi');
     rimraf(directory, function () {
       sharp(fixtures.inputJpg)
-        .webp({ quality: 1 })
+        .webp({
+          quality: 1
+        })
         .tile({
           layout: 'google'
         })
@@ -363,8 +428,12 @@ describe('Tile', function () {
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);
             fs.createReadStream(container)
-              .pipe(unzip.Extract({path: path.dirname(extractTo)}))
-              .on('error', function (err) { throw err; })
+              .pipe(unzip.Extract({
+                path: path.dirname(extractTo)
+              }))
+              .on('error', function (err) {
+                throw err;
+              })
               .on('close', function () {
                 assertDeepZoomTiles(directory, 256, 13, done);
               });
@@ -395,8 +464,12 @@ describe('Tile', function () {
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);
             fs.createReadStream(container)
-              .pipe(unzip.Extract({path: path.dirname(extractTo)}))
-              .on('error', function (err) { throw err; })
+              .pipe(unzip.Extract({
+                path: path.dirname(extractTo)
+              }))
+              .on('error', function (err) {
+                throw err;
+              })
               .on('close', function () {
                 assertDeepZoomTiles(directory, 256, 13, done);
               });

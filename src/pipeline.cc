@@ -917,7 +917,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("overlap", baton->tileOverlap)
             ->set("container", baton->tileContainer)
             ->set("layout", baton->tileLayout)
-            ->set("suffix", const_cast<char*>(suffix.data())));
+            ->set("suffix", const_cast<char*>(suffix.data()))
+            ->set("angle", CalculateAngleRotation(baton->tileAngle)));
           baton->formatOut = "dz";
         } else if (baton->formatOut == "v" || (mightMatchInput && isV) ||
           (willMatchInput && inputImageType == ImageType::VIPS)) {
@@ -1263,6 +1264,7 @@ NAN_METHOD(pipeline) {
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");
   std::string tileContainer = AttrAsStr(options, "tileContainer");
+  baton->tileAngle = AttrTo<int32_t>(options, "tileAngle");
   if (tileContainer == "zip") {
     baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
   } else {
