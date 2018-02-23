@@ -14,6 +14,10 @@ Requires libvips v8.6.1.
   [#1121](https://github.com/lovell/sharp/pull/1121)
   [@BiancoA](https://github.com/BiancoA)
 
+* Prevent crop operation when image already at or below target dimensions.
+  [#1134](https://github.com/lovell/sharp/issues/1134)
+  [@pieh](https://github.com/pieh)
+
 #### v0.19.0 - 11<sup>th</sup> January 2018
 
 * Expose offset coordinates of strategy-based crop.

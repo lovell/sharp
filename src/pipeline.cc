@@ -465,7 +465,10 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("extend", VIPS_EXTEND_BACKGROUND)
             ->set("background", background));
 
-        } else if (baton->canvas != Canvas::IGNORE_ASPECT) {
+        } else if (
+          baton->canvas != Canvas::IGNORE_ASPECT &&
+          (image.width() > baton->width || image.height() > baton->height)
+        ) {
           // Crop/max/min
           if (baton->crop < 9) {
             // Gravity-based crop

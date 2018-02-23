@@ -159,6 +159,24 @@ describe('Crop', function () {
     });
   });
 
+  it('Skip crop when post-resize dimensions are at or below target dimensions', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(1600, 1200)
+      .toBuffer()
+      .then(function (input) {
+        return sharp(input)
+          .resize(1110)
+          .crop(sharp.strategy.attention)
+          .toBuffer({ resolveWithObject: true })
+          .then(function (result) {
+            assert.strictEqual(1110, result.info.width);
+            assert.strictEqual(832, result.info.height);
+            assert.strictEqual(undefined, result.info.cropOffsetLeft);
+            assert.strictEqual(undefined, result.info.cropOffsetTop);
+          });
+      });
+  });
+
   describe('Entropy-based strategy', function () {
     it('JPEG', function (done) {
       sharp(fixtures.inputJpg)
