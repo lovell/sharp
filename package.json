@@ -78,7 +78,7 @@
   "dependencies": {
     "color": "^3.0.0",
     "detect-libc": "^1.0.3",
-    "nan": "^2.8.0",
+    "nan": "^2.9.2",
     "semver": "^5.5.0",
     "simple-get": "^2.7.0",
     "tar": "^4.3.2",

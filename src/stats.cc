@@ -28,7 +28,8 @@ class StatsWorker : public Nan::AsyncWorker {
   StatsWorker(
     Nan::Callback *callback, StatsBaton *baton, Nan::Callback *debuglog,
     std::vector<v8::Local<v8::Object>> const buffersToPersist) :
-    Nan::AsyncWorker(callback), baton(baton), debuglog(debuglog),
+    Nan::AsyncWorker(callback, "sharp:StatsWorker"),
+    baton(baton), debuglog(debuglog),
     buffersToPersist(buffersToPersist) {
     // Protect Buffer objects from GC, keyed on index
     std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
@@ -145,12 +146,12 @@ class StatsWorker : public Nan::AsyncWorker {
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
       v8::Local<v8::Value> message[1] = { New(warning).ToLocalChecked() };
-      debuglog->Call(1, message);
+      debuglog->Call(1, message, async_resource);
       warning = sharp::VipsWarningPop();
     }
 
     // Return to JavaScript
-    callback->Call(2, argv);
+    callback->Call(2, argv, async_resource);
   }
 
  private:

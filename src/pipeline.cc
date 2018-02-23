@@ -35,7 +35,8 @@ class PipelineWorker : public Nan::AsyncWorker {
   PipelineWorker(
     Nan::Callback *callback, PipelineBaton *baton, Nan::Callback *debuglog, Nan::Callback *queueListener,
     std::vector<v8::Local<v8::Object>> const buffersToPersist) :
-    Nan::AsyncWorker(callback), baton(baton), debuglog(debuglog), queueListener(queueListener),
+    Nan::AsyncWorker(callback, "sharp:PipelineWorker"),
+    baton(baton), debuglog(debuglog), queueListener(queueListener),
     buffersToPersist(buffersToPersist) {
     // Protect Buffer objects from GC, keyed on index
     std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
@@ -1014,18 +1015,18 @@ class PipelineWorker : public Nan::AsyncWorker {
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
       v8::Local<v8::Value> message[1] = { New(warning).ToLocalChecked() };
-      debuglog->Call(1, message);
+      debuglog->Call(1, message, async_resource);
       warning = sharp::VipsWarningPop();
     }
 
     // Decrement processing task counter
     g_atomic_int_dec_and_test(&sharp::counterProcess);
     v8::Local<v8::Value> queueLength[1] = { New<v8::Uint32>(sharp::counterQueue) };
-    queueListener->Call(1, queueLength);
+    queueListener->Call(1, queueLength, async_resource);
     delete queueListener;
 
     // Return to JavaScript
-    callback->Call(3, argv);
+    callback->Call(3, argv, async_resource);
   }
 
  private:
@@ -1302,5 +1303,6 @@ NAN_METHOD(pipeline) {
   // Increment queued task counter
   g_atomic_int_inc(&sharp::counterQueue);
   v8::Local<v8::Value> queueLength[1] = { Nan::New<v8::Uint32>(sharp::counterQueue) };
-  queueListener->Call(1, queueLength);
+  v8::Local<v8::Object> recv = Nan::New<v8::Object>();
+  Nan::Call(*queueListener, recv, 1, queueLength);
 }
