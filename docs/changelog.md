@@ -4,7 +4,7 @@
 
 Requires libvips v8.6.1.
 
-#### v0.19.1 - TBD
+#### v0.19.1 - 24<sup>th</sup> February 2018
 
 * Expose libvips' linear transform feature.
   [#1024](https://github.com/lovell/sharp/pull/1024)
