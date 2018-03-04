@@ -9,5 +9,6 @@ test
 appveyor.yml
 mkdocs.yml
 vendor
+.prebuildrc
 .nyc_output
 CONTRIBUTING.md

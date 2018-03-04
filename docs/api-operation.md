@@ -2,23 +2,23 @@
 
 ### Table of Contents
 
--   [rotate](#rotate)
--   [extract](#extract)
--   [flip](#flip)
--   [flop](#flop)
--   [sharpen](#sharpen)
--   [blur](#blur)
--   [extend](#extend)
--   [flatten](#flatten)
--   [trim](#trim)
--   [gamma](#gamma)
--   [negate](#negate)
--   [normalise](#normalise)
--   [normalize](#normalize)
--   [convolve](#convolve)
--   [threshold](#threshold)
--   [boolean](#boolean)
--   [linear](#linear)
+-   [rotate][1]
+-   [extract][2]
+-   [flip][3]
+-   [flop][4]
+-   [sharpen][5]
+-   [blur][6]
+-   [extend][7]
+-   [flatten][8]
+-   [trim][9]
+-   [gamma][10]
+-   [negate][11]
+-   [normalise][12]
+-   [normalize][13]
+-   [convolve][14]
+-   [threshold][15]
+-   [boolean][16]
+-   [linear][17]
 
 ## rotate
 
@@ -38,7 +38,7 @@ for example `rotate(x).extract(y)` will produce a different result to `extract(y
 
 **Parameters**
 
--   `angle` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** angle of rotation, must be a multiple of 90. (optional, default `auto`)
+-   `angle` **[Number][18]** angle of rotation, must be a multiple of 90. (optional, default `auto`)
 
 **Examples**
 
@@ -54,7 +54,7 @@ const pipeline = sharp()
 readableStream.pipe(pipeline);
 ```
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -68,11 +68,11 @@ Extract a region of the image.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
-    -   `options.left` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** zero-indexed offset from left edge
-    -   `options.top` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** zero-indexed offset from top edge
-    -   `options.width` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** dimension of extracted image
-    -   `options.height` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** dimension of extracted image
+-   `options` **[Object][20]** 
+    -   `options.left` **[Number][18]** zero-indexed offset from left edge
+    -   `options.top` **[Number][18]** zero-indexed offset from top edge
+    -   `options.width` **[Number][18]** dimension of extracted image
+    -   `options.height` **[Number][18]** dimension of extracted image
 
 **Examples**
 
@@ -94,7 +94,7 @@ sharp(input)
   });
 ```
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -105,7 +105,7 @@ The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 
 **Parameters**
 
--   `flip` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `flip` **[Boolean][21]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -116,7 +116,7 @@ The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
 **Parameters**
 
--   `flop` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `flop` **[Boolean][21]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -129,12 +129,12 @@ Separate control over the level of sharpening in "flat" and "jagged" areas is av
 
 **Parameters**
 
--   `sigma` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
--   `flat` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
--   `jagged` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
+-   `sigma` **[Number][18]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
+-   `flat` **[Number][18]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
+-   `jagged` **[Number][18]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -146,10 +146,10 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 
 **Parameters**
 
--   `sigma` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
+-   `sigma` **[Number][18]?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -160,11 +160,11 @@ This operation will always occur after resizing and extraction, if any.
 
 **Parameters**
 
--   `extend` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) \| [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object))** single pixel count to add to all edges or an Object with per-edge counts
-    -   `extend.top` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-    -   `extend.left` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-    -   `extend.bottom` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-    -   `extend.right` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+-   `extend` **([Number][18] \| [Object][20])** single pixel count to add to all edges or an Object with per-edge counts
+    -   `extend.top` **[Number][18]?** 
+    -   `extend.left` **[Number][18]?** 
+    -   `extend.bottom` **[Number][18]?** 
+    -   `extend.right` **[Number][18]?** 
 
 **Examples**
 
@@ -178,7 +178,7 @@ sharp(input)
   ...
 ```
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -188,7 +188,7 @@ Merge alpha transparency channel, if any, with `background`.
 
 **Parameters**
 
--   `flatten` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `flatten` **[Boolean][21]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -198,10 +198,10 @@ Trim "boring" pixels from all edges that contain values within a percentage simi
 
 **Parameters**
 
--   `tolerance` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** value between 1 and 99 representing the percentage similarity. (optional, default `10`)
+-   `tolerance` **[Number][18]** value between 1 and 99 representing the percentage similarity. (optional, default `10`)
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -215,10 +215,10 @@ when applying a gamma correction.
 
 **Parameters**
 
--   `gamma` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** value between 1.0 and 3.0. (optional, default `2.2`)
+-   `gamma` **[Number][18]** value between 1.0 and 3.0. (optional, default `2.2`)
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -228,7 +228,7 @@ Produce the "negative" of the image.
 
 **Parameters**
 
--   `negate` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `negate` **[Boolean][21]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -238,7 +238,7 @@ Enhance output image contrast by stretching its luminance to cover the full dyna
 
 **Parameters**
 
--   `normalise` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `normalise` **[Boolean][21]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -248,7 +248,7 @@ Alternative spelling of normalise.
 
 **Parameters**
 
--   `normalize` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `normalize` **[Boolean][21]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -258,12 +258,12 @@ Convolve the image with the specified kernel.
 
 **Parameters**
 
--   `kernel` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
-    -   `kernel.width` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** width of the kernel in pixels.
-    -   `kernel.height` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** width of the kernel in pixels.
-    -   `kernel.kernel` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)>** Array of length `width*height` containing the kernel values.
-    -   `kernel.scale` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** the scale of the kernel in pixels. (optional, default `sum`)
-    -   `kernel.offset` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** the offset of the kernel in pixels. (optional, default `0`)
+-   `kernel` **[Object][20]** 
+    -   `kernel.width` **[Number][18]** width of the kernel in pixels.
+    -   `kernel.height` **[Number][18]** width of the kernel in pixels.
+    -   `kernel.kernel` **[Array][22]&lt;[Number][18]>** Array of length `width*height` containing the kernel values.
+    -   `kernel.scale` **[Number][18]** the scale of the kernel in pixels. (optional, default `sum`)
+    -   `kernel.offset` **[Number][18]** the offset of the kernel in pixels. (optional, default `0`)
 
 **Examples**
 
@@ -281,7 +281,7 @@ sharp(input)
   });
 ```
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -291,13 +291,13 @@ Any pixel value greather than or equal to the threshold value will be set to 255
 
 **Parameters**
 
--   `threshold` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
-    -   `options.greyscale` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** convert to single channel greyscale. (optional, default `true`)
-    -   `options.grayscale` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** alternative spelling for greyscale. (optional, default `true`)
+-   `threshold` **[Number][18]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
+-   `options` **[Object][20]?** 
+    -   `options.greyscale` **[Boolean][21]** convert to single channel greyscale. (optional, default `true`)
+    -   `options.grayscale` **[Boolean][21]** alternative spelling for greyscale. (optional, default `true`)
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -310,16 +310,16 @@ the selected bitwise boolean `operation` between the corresponding pixels of the
 
 **Parameters**
 
--   `operand` **([Buffer](https://nodejs.org/api/buffer.html) \| [String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String))** Buffer containing image data or String containing the path to an image file.
--   `operator` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
-    -   `options.raw` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** describes operand when using raw pixel data.
-        -   `options.raw.width` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-        -   `options.raw.height` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
-        -   `options.raw.channels` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+-   `operand` **([Buffer][23] \| [String][24])** Buffer containing image data or String containing the path to an image file.
+-   `operator` **[String][24]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+-   `options` **[Object][20]?** 
+    -   `options.raw` **[Object][20]?** describes operand when using raw pixel data.
+        -   `options.raw.width` **[Number][18]?** 
+        -   `options.raw.height` **[Number][18]?** 
+        -   `options.raw.channels` **[Number][18]?** 
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -329,10 +329,58 @@ Apply the linear formula a \* input + b to the image (levels adjustment)
 
 **Parameters**
 
--   `a` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** multiplier (optional, default `1.0`)
--   `b` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** offset (optional, default `0.0`)
+-   `a` **[Number][18]** multiplier (optional, default `1.0`)
+-   `b` **[Number][18]** offset (optional, default `0.0`)
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][19]** Invalid parameters
 
 Returns **Sharp** 
+
+[1]: #rotate
+
+[2]: #extract
+
+[3]: #flip
+
+[4]: #flop
+
+[5]: #sharpen
+
+[6]: #blur
+
+[7]: #extend
+
+[8]: #flatten
+
+[9]: #trim
+
+[10]: #gamma
+
+[11]: #negate
+
+[12]: #normalise
+
+[13]: #normalize
+
+[14]: #convolve
+
+[15]: #threshold
+
+[16]: #boolean
+
+[17]: #linear
+
+[18]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[21]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[22]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[23]: https://nodejs.org/api/buffer.html
+
+[24]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String

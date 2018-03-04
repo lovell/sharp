@@ -2,11 +2,11 @@
 
 ### Table of Contents
 
--   [clone](#clone)
--   [metadata](#metadata)
--   [stats](#stats)
--   [limitInputPixels](#limitinputpixels)
--   [sequentialRead](#sequentialread)
+-   [clone][1]
+-   [metadata][2]
+-   [stats][3]
+-   [limitInputPixels][4]
+-   [sequentialRead][5]
 
 ## clone
 
@@ -33,23 +33,23 @@ Fast access to (uncached) image metadata without decoding any compressed image d
 A Promises/A+ promise is returned when `callback` is not provided.
 
 -   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
--   `width`: Number of pixels wide
--   `height`: Number of pixels high
--   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L636)
+-   `width`: Number of pixels wide (EXIF orientation is not taken into consideration)
+-   `height`: Number of pixels high (EXIF orientation is not taken into consideration)
+-   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][6]
 -   `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
--   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L672)
+-   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][7]
 -   `density`: Number of pixels per inch (DPI), if present
 -   `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 -   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 -   `orientation`: Number value of the EXIF Orientation header, if present
 -   `exif`: Buffer containing raw EXIF data, if present
--   `icc`: Buffer containing raw [ICC](https://www.npmjs.com/package/icc) profile data, if present
+-   `icc`: Buffer containing raw [ICC][8] profile data, if present
 -   `iptc`: Buffer containing raw IPTC data, if present
 -   `xmp`: Buffer containing raw XMP data, if present
 
 **Parameters**
 
--   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, metadata)`
+-   `callback` **[Function][9]?** called with the arguments `(err, metadata)`
 
 **Examples**
 
@@ -68,7 +68,7 @@ image
   });
 ```
 
-Returns **([Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)> | Sharp)** 
+Returns **([Promise][10]&lt;[Object][11]> | Sharp)** 
 
 ## stats
 
@@ -90,7 +90,7 @@ A Promise is returned when `callback` is not provided.
 
 **Parameters**
 
--   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** called with the arguments `(err, stats)`
+-   `callback` **[Function][9]?** called with the arguments `(err, stats)`
 
 **Examples**
 
@@ -103,7 +103,7 @@ image
   });
 ```
 
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)>** 
+Returns **[Promise][10]&lt;[Object][11]>** 
 
 ## limitInputPixels
 
@@ -113,10 +113,10 @@ The default limit is 268402689 (0x3FFF _ 0x3FFF) pixels.
 
 **Parameters**
 
--   `limit` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) \| [Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean))** an integral Number of pixels, zero or false to remove limit, true to use default limit.
+-   `limit` **([Number][12] \| [Boolean][13])** an integral Number of pixels, zero or false to remove limit, true to use default limit.
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid limit
+-   Throws **[Error][14]** Invalid limit
 
 Returns **Sharp** 
 
@@ -129,6 +129,34 @@ The default behaviour _before_ function call is `false`, meaning the libvips acc
 
 **Parameters**
 
--   `sequentialRead` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `sequentialRead` **[Boolean][13]**  (optional, default `true`)
 
 Returns **Sharp** 
+
+[1]: #clone
+
+[2]: #metadata
+
+[3]: #stats
+
+[4]: #limitinputpixels
+
+[5]: #sequentialread
+
+[6]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L636
+
+[7]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L672
+
+[8]: https://www.npmjs.com/package/icc
+
+[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error

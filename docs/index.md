@@ -13,8 +13,9 @@ Lanczos resampling ensures quality is not sacrificed for speed.
 As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
-OS X, Windows (x64), Linux (x64, ARM) systems do not require
-the installation of any external runtime dependencies.
+Most 64-bit OS X, Windows and Linux (glibc) systems running
+Node versions 4, 6, 8 and 9
+do not require any additional install or runtime dependencies.
 
 [![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.png?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
 
@@ -46,7 +47,7 @@ are held in memory and processed at a time,
 taking full advantage of multiple CPU cores and L1/L2/L3 cache.
 
 Everything remains non-blocking thanks to _libuv_,
-no child processes are spawned and Promises/A+ are supported.
+no child processes are spawned and Promises/async/await are supported.
 
 ### Optimal
 

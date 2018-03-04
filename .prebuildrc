@@ -1,0 +1,4 @@
+{
+  "include-regex": "(sharp\\.node|libvips-cpp\\.dll)",
+  "strip": true
+}

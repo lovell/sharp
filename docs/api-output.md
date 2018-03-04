@@ -2,16 +2,16 @@
 
 ### Table of Contents
 
--   [toFile](#tofile)
--   [toBuffer](#tobuffer)
--   [withMetadata](#withmetadata)
--   [jpeg](#jpeg)
--   [png](#png)
--   [webp](#webp)
--   [tiff](#tiff)
--   [raw](#raw)
--   [toFormat](#toformat)
--   [tile](#tile)
+-   [toFile][1]
+-   [toBuffer][2]
+-   [withMetadata][3]
+-   [jpeg][4]
+-   [png][5]
+-   [webp][6]
+-   [tiff][7]
+-   [raw][8]
+-   [toFormat][9]
+-   [tile][10]
 
 ## toFile
 
@@ -25,16 +25,16 @@ A `Promise` is returned when `callback` is not provided.
 
 **Parameters**
 
--   `fileOut` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to write the image data to.
--   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** called on completion with two arguments `(err, info)`.
+-   `fileOut` **[String][11]** the path to write the image data to.
+-   `callback` **[Function][12]?** called on completion with two arguments `(err, info)`.
     `info` contains the output image `format`, `size` (bytes), `width`, `height`,
     `channels` and `premultiplied` (indicating if premultiplication was used).
     When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][13]** Invalid parameters
 
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)>** when no callback is provided
+Returns **[Promise][14]&lt;[Object][15]>** when no callback is provided
 
 ## toBuffer
 
@@ -54,11 +54,11 @@ A `Promise` is returned when `callback` is not provided.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
-    -   `options.resolveWithObject` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`.
--   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** 
+-   `options` **[Object][15]?** 
+    -   `options.resolveWithObject` **[Boolean][16]?** Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`.
+-   `callback` **[Function][12]?** 
 
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Buffer](https://nodejs.org/api/buffer.html)>** when no callback is provided
+Returns **[Promise][14]&lt;[Buffer][17]>** when no callback is provided
 
 ## withMetadata
 
@@ -68,11 +68,11 @@ This will also convert to and add a web-friendly sRGB ICC profile.
 
 **Parameters**
 
--   `withMetadata` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
-    -   `withMetadata.orientation` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** value between 1 and 8, used to update the EXIF `Orientation` tag.
+-   `withMetadata` **[Object][15]?** 
+    -   `withMetadata.orientation` **[Number][18]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][13]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -82,18 +82,18 @@ Use these JPEG options for output image.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** output options
-    -   `options.quality` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** quality, integer 1-100 (optional, default `80`)
-    -   `options.progressive` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use progressive (interlace) scan (optional, default `false`)
-    -   `options.chromaSubsampling` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** set to '4:4:4' to prevent chroma subsampling when quality &lt;= 90 (optional, default `'4:2:0'`)
-    -   `options.trellisQuantisation` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** apply trellis quantisation, requires mozjpeg (optional, default `false`)
-    -   `options.overshootDeringing` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** apply overshoot deringing, requires mozjpeg (optional, default `false`)
-    -   `options.optimiseScans` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** optimise progressive scans, forces progressive, requires mozjpeg (optional, default `false`)
-    -   `options.optimizeScans` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** alternative spelling of optimiseScans (optional, default `false`)
-    -   `options.force` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** force JPEG output, otherwise attempt to use input format (optional, default `true`)
+-   `options` **[Object][15]?** output options
+    -   `options.quality` **[Number][18]** quality, integer 1-100 (optional, default `80`)
+    -   `options.progressive` **[Boolean][16]** use progressive (interlace) scan (optional, default `false`)
+    -   `options.chromaSubsampling` **[String][11]** set to '4:4:4' to prevent chroma subsampling when quality &lt;= 90 (optional, default `'4:2:0'`)
+    -   `options.trellisQuantisation` **[Boolean][16]** apply trellis quantisation, requires mozjpeg (optional, default `false`)
+    -   `options.overshootDeringing` **[Boolean][16]** apply overshoot deringing, requires mozjpeg (optional, default `false`)
+    -   `options.optimiseScans` **[Boolean][16]** optimise progressive scans, forces progressive, requires mozjpeg (optional, default `false`)
+    -   `options.optimizeScans` **[Boolean][16]** alternative spelling of optimiseScans (optional, default `false`)
+    -   `options.force` **[Boolean][16]** force JPEG output, otherwise attempt to use input format (optional, default `true`)
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid options
+-   Throws **[Error][13]** Invalid options
 
 Returns **Sharp** 
 
@@ -103,14 +103,14 @@ Use these PNG options for output image.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
-    -   `options.progressive` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use progressive (interlace) scan (optional, default `false`)
-    -   `options.compressionLevel` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** zlib compression level, 0-9 (optional, default `9`)
-    -   `options.adaptiveFiltering` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use adaptive row filtering (optional, default `false`)
-    -   `options.force` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** force PNG output, otherwise attempt to use input format (optional, default `true`)
+-   `options` **[Object][15]?** 
+    -   `options.progressive` **[Boolean][16]** use progressive (interlace) scan (optional, default `false`)
+    -   `options.compressionLevel` **[Number][18]** zlib compression level, 0-9 (optional, default `9`)
+    -   `options.adaptiveFiltering` **[Boolean][16]** use adaptive row filtering (optional, default `false`)
+    -   `options.force` **[Boolean][16]** force PNG output, otherwise attempt to use input format (optional, default `true`)
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid options
+-   Throws **[Error][13]** Invalid options
 
 Returns **Sharp** 
 
@@ -120,15 +120,15 @@ Use these WebP options for output image.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** output options
-    -   `options.quality` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** quality, integer 1-100 (optional, default `80`)
-    -   `options.alphaQuality` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** quality of alpha layer, integer 0-100 (optional, default `100`)
-    -   `options.lossless` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use lossless compression mode (optional, default `false`)
-    -   `options.nearLossless` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** use near_lossless compression mode (optional, default `false`)
-    -   `options.force` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** force WebP output, otherwise attempt to use input format (optional, default `true`)
+-   `options` **[Object][15]?** output options
+    -   `options.quality` **[Number][18]** quality, integer 1-100 (optional, default `80`)
+    -   `options.alphaQuality` **[Number][18]** quality of alpha layer, integer 0-100 (optional, default `100`)
+    -   `options.lossless` **[Boolean][16]** use lossless compression mode (optional, default `false`)
+    -   `options.nearLossless` **[Boolean][16]** use near_lossless compression mode (optional, default `false`)
+    -   `options.force` **[Boolean][16]** force WebP output, otherwise attempt to use input format (optional, default `true`)
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid options
+-   Throws **[Error][13]** Invalid options
 
 Returns **Sharp** 
 
@@ -138,17 +138,17 @@ Use these TIFF options for output image.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** output options
-    -   `options.quality` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** quality, integer 1-100 (optional, default `80`)
-    -   `options.force` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** force TIFF output, otherwise attempt to use input format (optional, default `true`)
-    -   `options.compression` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** compression options: lzw, deflate, jpeg (optional, default `'jpeg'`)
-    -   `options.predictor` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** compression predictor options: none, horizontal, float (optional, default `'horizontal'`)
-    -   `options.xres` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** horizontal resolution in pixels/mm (optional, default `1.0`)
-    -   `options.yres` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** vertical resolution in pixels/mm (optional, default `1.0`)
-    -   `options.squash` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** squash 8-bit images down to 1 bit (optional, default `false`)
+-   `options` **[Object][15]?** output options
+    -   `options.quality` **[Number][18]** quality, integer 1-100 (optional, default `80`)
+    -   `options.force` **[Boolean][16]** force TIFF output, otherwise attempt to use input format (optional, default `true`)
+    -   `options.compression` **[Boolean][16]** compression options: lzw, deflate, jpeg (optional, default `'jpeg'`)
+    -   `options.predictor` **[Boolean][16]** compression predictor options: none, horizontal, float (optional, default `'horizontal'`)
+    -   `options.xres` **[Number][18]** horizontal resolution in pixels/mm (optional, default `1.0`)
+    -   `options.yres` **[Number][18]** vertical resolution in pixels/mm (optional, default `1.0`)
+    -   `options.squash` **[Boolean][16]** squash 8-bit images down to 1 bit (optional, default `false`)
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid options
+-   Throws **[Error][13]** Invalid options
 
 Returns **Sharp** 
 
@@ -164,11 +164,11 @@ Force output to a given format.
 
 **Parameters**
 
--   `format` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object))** as a String or an Object with an 'id' attribute
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** output options
+-   `format` **([String][11] \| [Object][15])** as a String or an Object with an 'id' attribute
+-   `options` **[Object][15]** output options
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** unsupported format or options
+-   Throws **[Error][13]** unsupported format or options
 
 Returns **Sharp** 
 
@@ -180,12 +180,12 @@ Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed arc
 
 **Parameters**
 
--   `tile` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
-    -   `tile.size` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
-    -   `tile.overlap` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
-    -   `tile.angle` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
-    -   `tile.container` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
-    -   `tile.layout` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** filesystem layout, possible values are `dz`, `zoomify` or `google`. (optional, default `'dz'`)
+-   `tile` **[Object][15]?** 
+    -   `tile.size` **[Number][18]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
+    -   `tile.overlap` **[Number][18]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
+    -   `tile.angle` **[Number][18]** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
+    -   `tile.container` **[String][11]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
+    -   `tile.layout` **[String][11]** filesystem layout, possible values are `dz`, `zoomify` or `google`. (optional, default `'dz'`)
 
 **Examples**
 
@@ -201,6 +201,42 @@ sharp('input.tiff')
   });
 ```
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][13]** Invalid parameters
 
 Returns **Sharp** 
+
+[1]: #tofile
+
+[2]: #tobuffer
+
+[3]: #withmetadata
+
+[4]: #jpeg
+
+[5]: #png
+
+[6]: #webp
+
+[7]: #tiff
+
+[8]: #raw
+
+[9]: #toformat
+
+[10]: #tile
+
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+
+[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
+[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[17]: https://nodejs.org/api/buffer.html
+
+[18]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number

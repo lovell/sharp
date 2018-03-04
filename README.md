@@ -4,6 +4,10 @@
 npm install sharp
 ```
 
+```sh
+yarn add sharp
+```
+
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
@@ -17,8 +21,9 @@ Lanczos resampling ensures quality is not sacrificed for speed.
 As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
-OS X, Windows (x64), Linux (x64, ARM) systems do not require
-the installation of any external runtime dependencies.
+Most modern 64-bit OS X, Windows and Linux (glibc) systems running
+Node versions 4, 6, 8 and 9
+do not require any additional install or runtime dependencies.
 
 ## Examples
 

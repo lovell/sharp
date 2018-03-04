@@ -5,9 +5,6 @@
       ['OS == "win"', {
         # Build libvips C++ binding for Windows due to MSVC std library ABI changes
         'type': 'shared_library',
-        'variables': {
-          'download_vips': '<!(node -e "require(\'./binding\').download_vips()")'
-        },
         'defines': [
           'VIPS_CPLUSPLUS_EXPORTS',
           '_ALLOW_KEYWORD_MACROS'
@@ -49,37 +46,15 @@
     'dependencies': [
       'libvips-cpp'
     ],
-    # Nested variables "pattern" borrowed from http://src.chromium.org/viewvc/chrome/trunk/src/build/common.gypi
     'variables': {
-      'variables': {
-        'variables': {
-          'conditions': [
-            ['OS != "win"', {
-              # Build the PKG_CONFIG_PATH environment variable with all possible combinations
-              'pkg_config_path': '<!(which brew >/dev/null 2>&1 && eval $(brew --env) && echo $PKG_CONFIG_LIBDIR || true):$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig'
-            }, {
-              'pkg_config_path': ''
-            }]
-          ],
-        },
-        'conditions': [
-          ['OS != "win"', {
-            # Which version, if any, of libvips is available globally via pkg-config?
-            'global_vips_version': '<!(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --modversion vips-cpp 2>/dev/null || true)'
-          }, {
-            'global_vips_version': ''
-          }]
-        ],
-        'pkg_config_path%': '<(pkg_config_path)'
-      },
-      'pkg_config_path%': '<(pkg_config_path)',
       'runtime_link%': 'shared',
       'conditions': [
         ['OS != "win"', {
-          # Does the globally available version of libvips, if any, meet the minimum version requirement?
-          'use_global_vips': '<!(GLOBAL_VIPS_VERSION="<(global_vips_version)" node -e "require(\'./binding\').use_global_vips()")'
+          'pkg_config_path': '<!(node -e "console.log(require(\'./lib/libvips\').pkgConfigPath())")',
+          'use_global_libvips': '<!(node -e "console.log(Boolean(require(\'./lib/libvips\').useGlobalLibvips()).toString())")'
         }, {
-          'use_global_vips': ''
+          'pkg_config_path': '',
+          'use_global_libvips': ''
         }]
       ]
     },
@@ -96,7 +71,7 @@
       '<!(node -e "require(\'nan\')")'
     ],
     'conditions': [
-      ['use_global_vips == "true"', {
+      ['use_global_libvips == "true"', {
         # Use pkg-config for include and lib
         'include_dirs': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --cflags-only-I vips-cpp vips glib-2.0 | sed s\/-I//g)'],
         'conditions': [
@@ -113,7 +88,7 @@
           }]
         ]
       }, {
-        # Attempt to download pre-built libvips and install locally within node_modules
+        # Use pre-built libvips stored locally within node_modules
         'include_dirs': [
           'vendor/include',
           'vendor/include/glib-2.0',
@@ -131,9 +106,6 @@
             ]
           }],
           ['OS == "mac"', {
-            'variables': {
-              'download_vips': '<!(node -e "require(\'./binding\').download_vips()")'
-            },
             'libraries': [
               '../vendor/lib/libvips-cpp.42.dylib',
               '../vendor/lib/libvips.42.dylib',
@@ -144,9 +116,6 @@
             ]
           }],
           ['OS == "linux"', {
-            'variables': {
-              'download_vips': '<!(node -e "require(\'./binding\').download_vips()")'
-            },
             'defines': [
               '_GLIBCXX_USE_CXX11_ABI=0'
             ],
@@ -219,65 +188,5 @@
         ]
       }
     },
-  }, {
-    'target_name': 'win_copy_dlls',
-    'type': 'none',
-    'dependencies': [
-      'sharp'
-    ],
-    'conditions': [
-      ['OS == "win"', {
-        # Windows lacks support for rpath
-        'copies': [{
-          'destination': 'build/Release',
-          'files': [
-            'vendor/lib/libasprintf-0.dll',
-            'vendor/lib/libcairo-2.dll',
-            'vendor/lib/libcairo-gobject-2.dll',
-            'vendor/lib/libcairo-script-interpreter-2.dll',
-            'vendor/lib/libcharset-1.dll',
-            'vendor/lib/libcroco-0.6-3.dll',
-            'vendor/lib/libexif-12.dll',
-            'vendor/lib/libexpat-1.dll',
-            'vendor/lib/libffi-6.dll',
-            'vendor/lib/libfftw3-3.dll',
-            'vendor/lib/libfontconfig-1.dll',
-            'vendor/lib/libfreetype-6.dll',
-            'vendor/lib/libgcc_s_seh-1.dll',
-            'vendor/lib/libgdk_pixbuf-2.0-0.dll',
-            'vendor/lib/libgettextlib-0-19-8.dll',
-            'vendor/lib/libgettextpo-1.dll',
-            'vendor/lib/libgettextsrc-0-19-8.dll',
-            'vendor/lib/libgif-7.dll',
-            'vendor/lib/libgio-2.0-0.dll',
-            'vendor/lib/libglib-2.0-0.dll',
-            'vendor/lib/libgmodule-2.0-0.dll',
-            'vendor/lib/libgobject-2.0-0.dll',
-            'vendor/lib/libgsf-1-114.dll',
-            'vendor/lib/libgthread-2.0-0.dll',
-            'vendor/lib/libharfbuzz-0.dll',
-            'vendor/lib/libiconv-2.dll',
-            'vendor/lib/libintl-9.dll',
-            'vendor/lib/libjpeg-62.dll',
-            'vendor/lib/liblcms2-2.dll',
-            'vendor/lib/libpango-1.0-0.dll',
-            'vendor/lib/libpangocairo-1.0-0.dll',
-            'vendor/lib/libpangoft2-1.0-0.dll',
-            'vendor/lib/libpangowin32-1.0-0.dll',
-            'vendor/lib/libpixman-1-0.dll',
-            'vendor/lib/libpng16-16.dll',
-            'vendor/lib/libquadmath-0.dll',
-            'vendor/lib/librsvg-2-2.dll',
-            'vendor/lib/libssp-0.dll',
-            'vendor/lib/libstdc++-6.dll',
-            'vendor/lib/libtiff-5.dll',
-            'vendor/lib/libvips-42.dll',
-            'vendor/lib/libwebp-7.dll',
-            'vendor/lib/libxml2-2.dll',
-            'vendor/lib/zlib1.dll'
-          ]
-        }]
-      }]
-    ]
   }]
 }

@@ -1,7 +1,7 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
-  "version": "0.19.1",
+  "version": "0.20.0-rc.1",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://github.com/lovell/sharp",
   "contributors": [
@@ -48,8 +48,9 @@
     "Andrea Bianco <andrea.bianco@unibas.ch>"
   ],
   "scripts": {
+    "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
     "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
-    "test": "semistandard && cc && nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
+    "test": "semistandard && cc && nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js && prebuild-ci",
     "coverage": "./test/coverage/report.sh",
     "test-leak": "./test/leak/leak.sh",
     "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md lib/$m.js >docs/api-$m.md; done"
@@ -79,6 +80,9 @@
     "color": "^3.0.0",
     "detect-libc": "^1.0.3",
     "nan": "^2.9.2",
+    "fs-copy-file-sync": "^1.0.1",
+    "npmlog": "^4.1.2",
+    "prebuild-install": "^2.5.0",
     "semver": "^5.5.0",
     "simple-get": "^2.7.0",
     "tar": "^4.4.0",
@@ -87,11 +91,13 @@
   "devDependencies": {
     "async": "^2.6.0",
     "cc": "^1.0.1",
-    "documentation": "^5.4.0",
+    "documentation": "^6.0.0",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "mocha": "^5.0.1",
     "nyc": "^11.5.0",
+    "prebuild": "^7.4.0",
+    "prebuild-ci": "^2.2.3",
     "rimraf": "^2.6.2",
     "semistandard": "^12.0.1",
     "unzip": "^0.1.11"

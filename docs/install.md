@@ -8,11 +8,28 @@ npm install sharp
 yarn add sharp
 ```
 
-### Prerequisites
+## Prerequisites
 
 * Node v4.5.0+
+
+### Building from source
+
+Pre-compiled binaries for sharp are provided for use with
+Node versions 4, 6, 8 and 9 on
+64-bit Windows, OS X and Linux platforms.
+
+Sharp will be built from source at install time when:
+
+* a globally-installed libvips is detected,
+* pre-compiled binaries do not exist for the current platform and Node version, or
+* when the `npm install --build-from-source` flag is used.
+
+Building from source requires:
+
 * C++11 compatible compiler such as gcc 4.8+, clang 3.0+ or MSVC 2013+
 * [node-gyp](https://github.com/TooTallNate/node-gyp#installation) and its dependencies (includes Python)
+
+## libvips
 
 ### Linux
 
@@ -23,14 +40,14 @@ This involves an automated HTTPS download of approximately 7MB.
 
 Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ CPUs should "just work", e.g.:
 
-* Debian 7, 8
-* Ubuntu 14.04, 16.04
-* Centos 7
+* Debian 7+
+* Ubuntu 14.04+
+* Centos 7+
 * Fedora
-* openSUSE 13.2
+* openSUSE 13.2+
 * Archlinux
 * Raspbian Jessie
-* Amazon Linux 2017.03.1
+* Amazon Linux
 * Solus
 
 To use a globally-installed version of libvips instead of the provided binaries,
@@ -63,7 +80,7 @@ via `sharp.cache(false)` to avoid a stack overflow.
 
 ### Mac OS
 
-[![OS X 10.9.5 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
+[![OS X 10.12 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
 This involves an automated HTTPS download of approximately 7MB.

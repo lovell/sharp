@@ -2,11 +2,11 @@
 
 ### Table of Contents
 
--   [background](#background)
--   [greyscale](#greyscale)
--   [grayscale](#grayscale)
--   [toColourspace](#tocolourspace)
--   [toColorspace](#tocolorspace)
+-   [background][1]
+-   [greyscale][2]
+-   [grayscale][3]
+-   [toColourspace][4]
+-   [toColorspace][5]
 
 ## background
 
@@ -19,10 +19,10 @@ The alpha value is a float between `0` (transparent) and `1` (opaque).
 
 **Parameters**
 
--   `rgba` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object))** parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
+-   `rgba` **([String][6] \| [Object][7])** parsed by the [color][8] module to extract values for red, green, blue and alpha.
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameter
+-   Throws **[Error][9]** Invalid parameter
 
 Returns **Sharp** 
 
@@ -37,7 +37,7 @@ An alpha channel may be present, and will be unchanged by the operation.
 
 **Parameters**
 
--   `greyscale` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `greyscale` **[Boolean][10]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -47,7 +47,7 @@ Alternative spelling of `greyscale`.
 
 **Parameters**
 
--   `grayscale` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `grayscale` **[Boolean][10]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -58,10 +58,10 @@ By default output image will be web-friendly sRGB, with additional channels inte
 
 **Parameters**
 
--   `colourspace` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...](https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L568)
+-   `colourspace` **[String][6]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][11]
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][9]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -71,9 +71,31 @@ Alternative spelling of `toColourspace`.
 
 **Parameters**
 
--   `colorspace` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** output colorspace.
+-   `colorspace` **[String][6]?** output colorspace.
 
 
--   Throws **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** Invalid parameters
+-   Throws **[Error][9]** Invalid parameters
 
 Returns **Sharp** 
+
+[1]: #background
+
+[2]: #greyscale
+
+[3]: #grayscale
+
+[4]: #tocolourspace
+
+[5]: #tocolorspace
+
+[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[8]: https://www.npmjs.org/package/color
+
+[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[11]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L568
