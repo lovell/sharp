@@ -1,8 +1,10 @@
 # Changelog
 
-### v0.20 - "*teeth*"
+### v0.20 - "*prebuild*"
 
-#### v0.20.0 - TBD
+Requires libvips v8.6.1.
+
+#### v0.20.0 - 5<sup>th</sup> March 2018
 
 * Add support for prebuilt sharp binaries on common platforms.
   [#186](https://github.com/lovell/sharp/issues/186)
