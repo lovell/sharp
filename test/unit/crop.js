@@ -159,7 +159,7 @@ describe('Crop', function () {
     });
   });
 
-  it('Skip crop when post-resize dimensions are at or below target dimensions', function () {
+  it('Skip crop when post-resize dimensions are at target', function () {
     return sharp(fixtures.inputJpg)
       .resize(1600, 1200)
       .toBuffer()
@@ -173,6 +173,25 @@ describe('Crop', function () {
             assert.strictEqual(832, result.info.height);
             assert.strictEqual(undefined, result.info.cropOffsetLeft);
             assert.strictEqual(undefined, result.info.cropOffsetTop);
+          });
+      });
+  });
+
+  it('Clamp before crop when one post-resize dimension is below target', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(1024, 1034)
+      .toBuffer()
+      .then(function (input) {
+        return sharp(input)
+          .rotate(270)
+          .resize(256)
+          .crop(sharp.strategy.entropy)
+          .toBuffer({ resolveWithObject: true })
+          .then(function (result) {
+            assert.strictEqual(256, result.info.width);
+            assert.strictEqual(253, result.info.height);
+            assert.strictEqual(0, result.info.cropOffsetLeft);
+            assert.strictEqual(0, result.info.cropOffsetTop);
           });
       });
   });

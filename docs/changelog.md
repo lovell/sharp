@@ -4,6 +4,12 @@
 
 Requires libvips v8.6.1.
 
+#### v0.20.1 - TBD
+
+* Prevent smartcrop error when cumulative rounding is below target size.
+  [#1154](https://github.com/lovell/sharp/issues/1154)
+  [@ralrom](https://github.com/ralrom)
+
 #### v0.20.0 - 5<sup>th</sup> March 2018
 
 * Add support for prebuilt sharp binaries on common platforms.

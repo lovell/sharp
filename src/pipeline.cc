@@ -482,6 +482,12 @@ class PipelineWorker : public Nan::AsyncWorker {
             image = image.extract_area(left, top, width, height);
           } else {
             // Attention-based or Entropy-based crop
+            if (baton->width > image.width()) {
+              baton->width = image.width();
+            }
+            if (baton->height > image.height()) {
+              baton->height = image.height();
+            }
             image = image.tilecache(VImage::option()
               ->set("access", baton->accessMethod)
               ->set("threaded", TRUE));
