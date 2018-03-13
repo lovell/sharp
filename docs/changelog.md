@@ -6,6 +6,9 @@ Requires libvips v8.6.1.
 
 #### v0.20.1 - TBD
 
+* Improve installation experience when a globally-installed libvips below the minimum required version is found.
+  [#1148](https://github.com/lovell/sharp/issues/1148)
+
 * Prevent smartcrop error when cumulative rounding is below target size.
   [#1154](https://github.com/lovell/sharp/issues/1154)
   [@ralrom](https://github.com/ralrom)

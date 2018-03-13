@@ -18,8 +18,9 @@ const minimumLibvipsVersion = libvips.minimumLibvipsVersion;
 const distBaseUrl = process.env.SHARP_DIST_BASE_URL || `https://github.com/lovell/sharp-libvips/releases/download/v${minimumLibvipsVersion}/`;
 
 try {
-  const globalLibvipsVersion = libvips.globalLibvipsVersion();
-  if (globalLibvipsVersion) {
+  const useGlobalLibvips = libvips.useGlobalLibvips();
+  if (useGlobalLibvips) {
+    const globalLibvipsVersion = libvips.globalLibvipsVersion();
     npmLog.info('sharp', `Detected globally-installed libvips v${globalLibvipsVersion}`);
     npmLog.info('sharp', 'Building from source via node-gyp');
     process.exit(1);
