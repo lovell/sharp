@@ -69,6 +69,8 @@ module.exports = {
   inputJpgOverlayLayer2: getPath('alpha-layer-2-ink.jpg'),
   inputJpgTruncated: getPath('truncated.jpg'), // head -c 10000 2569067123_aca715a2ee_o.jpg > truncated.jpg
   inputJpgCenteredImage: getPath('centered_image.jpeg'),
+  inputJpgRandom: getPath('random.jpg'), // convert -size 200x200 xc:   +noise Random   random.jpg
+  inputJpgThRandom: getPath('thRandom.jpg'), // convert random.jpg  -channel G -threshold 5% -separate +channel -negate thRandom.jpg
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain

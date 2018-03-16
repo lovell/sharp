@@ -97,6 +97,11 @@ namespace sharp {
    */
   VImage Linear(VImage image, double const a, double const b);
 
+  /*
+   * Median filter with mask size m
+   */
+  VImage Median(VImage image, int const m);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

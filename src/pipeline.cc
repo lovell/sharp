@@ -359,6 +359,8 @@ class PipelineWorker : public Nan::AsyncWorker {
       bool const shouldBlur = baton->blurSigma != 0.0;
       bool const shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
+      bool const shouldApplyMedian = baton->medianSize > 0;
+
       bool const shouldPremultiplyAlpha = HasAlpha(image) &&
         (shouldResize || shouldBlur || shouldConv || shouldSharpen || shouldOverlayWithAlpha);
 
@@ -544,7 +546,10 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
           VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
       }
-
+      // Median - must happen before blurring, due to the utility of blurring after thresholding
+      if (shouldApplyMedian) {
+        image = sharp::Median(image, baton->medianSize);
+      }
       // Threshold - must happen before blurring, due to the utility of blurring after thresholding
       if (baton->threshold != 0) {
         image = sharp::Threshold(image, baton->threshold, baton->thresholdGrayscale);
@@ -1194,6 +1199,7 @@ NAN_METHOD(pipeline) {
   baton->flatten = AttrTo<bool>(options, "flatten");
   baton->negate = AttrTo<bool>(options, "negate");
   baton->blurSigma = AttrTo<double>(options, "blurSigma");
+  baton->medianSize = AttrTo<double>(options, "medianSize");
   baton->sharpenSigma = AttrTo<double>(options, "sharpenSigma");
   baton->sharpenFlat = AttrTo<double>(options, "sharpenFlat");
   baton->sharpenJagged = AttrTo<double>(options, "sharpenJagged");
