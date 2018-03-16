@@ -79,7 +79,7 @@
   "dependencies": {
     "color": "^3.0.0",
     "detect-libc": "^1.0.3",
-    "nan": "^2.9.2",
+    "nan": "^2.10.0",
     "fs-copy-file-sync": "^1.0.1",
     "npmlog": "^4.1.2",
     "prebuild-install": "^2.5.1",
@@ -91,11 +91,11 @@
   "devDependencies": {
     "async": "^2.6.0",
     "cc": "^1.0.1",
-    "documentation": "^6.0.0",
+    "documentation": "^6.1.0",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
-    "mocha": "^5.0.1",
-    "nyc": "^11.5.0",
+    "mocha": "^5.0.4",
+    "nyc": "^11.6.0",
     "prebuild": "^7.4.0",
     "prebuild-ci": "^2.2.3",
     "rimraf": "^2.6.2",
