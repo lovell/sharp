@@ -548,7 +548,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
       // Median - must happen before blurring, due to the utility of blurring after thresholding
       if (shouldApplyMedian) {
-        image = sharp::Median(image, baton->medianSize);
+        image = image.median(baton->medianSize);
       }
       // Threshold - must happen before blurring, due to the utility of blurring after thresholding
       if (baton->threshold != 0) {
@@ -1199,7 +1199,7 @@ NAN_METHOD(pipeline) {
   baton->flatten = AttrTo<bool>(options, "flatten");
   baton->negate = AttrTo<bool>(options, "negate");
   baton->blurSigma = AttrTo<double>(options, "blurSigma");
-  baton->medianSize = AttrTo<double>(options, "medianSize");
+  baton->medianSize = AttrTo<uint32_t>(options, "medianSize");
   baton->sharpenSigma = AttrTo<double>(options, "sharpenSigma");
   baton->sharpenFlat = AttrTo<double>(options, "sharpenFlat");
   baton->sharpenJagged = AttrTo<double>(options, "sharpenJagged");
