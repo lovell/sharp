@@ -355,11 +355,4 @@ namespace sharp {
       return image.linear(a, b);
     }
   }
-
-  /*
-   * Median filter with mask size m
-   */
-  VImage Median(VImage image, int const m) {
-      return image.rank(m, m, (m*m)/2);
-  }
 }  // namespace sharp
