@@ -13,6 +13,10 @@ Requires libvips v8.6.1.
   [#1154](https://github.com/lovell/sharp/issues/1154)
   [@ralrom](https://github.com/ralrom)
 
+* Expose libvips' median filter operation.
+  [#1161](https://github.com/lovell/sharp/pull/1161)
+  [@BiancoA](https://github.com/BiancoA)
+
 #### v0.20.0 - 5<sup>th</sup> March 2018
 
 * Add support for prebuilt sharp binaries on common platforms.
