@@ -73,6 +73,7 @@ struct PipelineBaton {
   bool flatten;
   bool negate;
   double blurSigma;
+  int medianSize;
   double sharpenSigma;
   double sharpenFlat;
   double sharpenJagged;
@@ -157,6 +158,7 @@ struct PipelineBaton {
     flatten(false),
     negate(false),
     blurSigma(0.0),
+    medianSize(0),
     sharpenSigma(0.0),
     sharpenFlat(1.0),
     sharpenJagged(2.0),
