@@ -4,7 +4,7 @@
 
 Requires libvips v8.6.1.
 
-#### v0.20.1 - TBD
+#### v0.20.1 - 17<sup>th</sup> March 2018
 
 * Improve installation experience when a globally-installed libvips below the minimum required version is found.
   [#1148](https://github.com/lovell/sharp/issues/1148)
