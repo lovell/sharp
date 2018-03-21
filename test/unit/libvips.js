@@ -58,5 +58,13 @@ describe('libvips binaries', function () {
       const hasVendoredLibvips = libvips.hasVendoredLibvips();
       assert.strictEqual('boolean', typeof hasVendoredLibvips);
     });
+    it('useGlobalLibvips can be ignored via an env var', function () {
+      process.env.SHARP_IGNORE_GLOBAL_LIBVIPS = 1;
+
+      const useGlobalLibvips = libvips.useGlobalLibvips();
+      assert.strictEqual(false, useGlobalLibvips);
+
+      delete process.env.SHARP_IGNORE_GLOBAL_LIBVIPS;
+    });
   });
 });
