@@ -54,7 +54,7 @@ To use a globally-installed version of libvips instead of the provided binaries,
 make sure it is at least the version listed under `config.libvips` in the `package.json` file
 and that it can be located using `pkg-config --modversion vips-cpp`.
 
-If you are using non-stadard paths (anything other than `/usr` or `/usr/local`),
+If you are using non-standard paths (anything other than `/usr` or `/usr/local`),
 you might need to set `PKG_CONFIG_PATH` during `npm install`
 and `LD_LIBRARY_PATH` at runtime.
 
@@ -211,10 +211,17 @@ to the directory containing the `policy.xml` file.
 
 ### Pre-compiled libvips binaries
 
-If a global installation of libvips that meets the
-minimum version requirement cannot be found,
-this module will attempt to download a pre-compiled bundle of libvips
-and its dependencies on Linux and Windows machines.
+This module will attempt to download a pre-compiled bundle of libvips
+and its dependencies on Linux and Windows machines under either of these
+conditions:
+
+1. If a global installation of libvips that meets the
+minimum version requirement cannot be found;
+1. If `SHARP_IGNORE_GLOBAL_LIBVIPS` environment variable is set.
+
+```sh
+SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install sharp
+```
 
 Should you need to manually download and inspect these files,
 you can do so via https://github.com/lovell/sharp-libvips/releases
