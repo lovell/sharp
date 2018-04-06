@@ -31,6 +31,19 @@ A `Promise` is returned when `callback` is not provided.
     `channels` and `premultiplied` (indicating if premultiplication was used).
     When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
 
+**Examples**
+
+```javascript
+sharp(input)
+  .toFile('output.png', (err, info) => { ... });
+```
+
+```javascript
+sharp(input)
+  .toFile('output.png')
+  .then(info => { ... })
+  .catch(err => { ... });
+```
 
 -   Throws **[Error][13]** Invalid parameters
 
@@ -58,6 +71,27 @@ A `Promise` is returned when `callback` is not provided.
     -   `options.resolveWithObject` **[Boolean][16]?** Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`.
 -   `callback` **[Function][12]?** 
 
+**Examples**
+
+```javascript
+sharp(input)
+  .toBuffer((err, data, info) => { ... });
+```
+
+```javascript
+sharp(input)
+  .toBuffer()
+  .then(data => { ... })
+  .catch(err => { ... });
+```
+
+```javascript
+sharp(input)
+  .toBuffer({ resolveWithObject: true })
+  .then(({ data, info }) => { ... })
+  .catch(err => { ... });
+```
+
 Returns **[Promise][14]&lt;[Buffer][17]>** when no callback is provided
 
 ## withMetadata
@@ -71,6 +105,14 @@ This will also convert to and add a web-friendly sRGB ICC profile.
 -   `withMetadata` **[Object][15]?** 
     -   `withMetadata.orientation` **[Number][18]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
 
+**Examples**
+
+```javascript
+sharp('input.jpg')
+  .withMetadata()
+  .toFile('output-with-metadata.jpg')
+  .then(info => { ... });
+```
 
 -   Throws **[Error][13]** Invalid parameters
 
@@ -92,6 +134,17 @@ Use these JPEG options for output image.
     -   `options.optimizeScans` **[Boolean][16]** alternative spelling of optimiseScans (optional, default `false`)
     -   `options.force` **[Boolean][16]** force JPEG output, otherwise attempt to use input format (optional, default `true`)
 
+**Examples**
+
+```javascript
+// Convert any input to very high quality JPEG output
+const data = await sharp(input)
+  .jpeg({
+    quality: 100,
+    chromaSubsampling: '4:4:4'
+  })
+  .toBuffer();
+```
 
 -   Throws **[Error][13]** Invalid options
 
@@ -101,6 +154,9 @@ Returns **Sharp**
 
 Use these PNG options for output image.
 
+PNG output is always full colour at 8 or 16 bits per pixel.
+Indexed PNG input at 1, 2 or 4 bits per pixel is converted to 8 bits per pixel.
+
 **Parameters**
 
 -   `options` **[Object][15]?** 
@@ -109,6 +165,14 @@ Use these PNG options for output image.
     -   `options.adaptiveFiltering` **[Boolean][16]** use adaptive row filtering (optional, default `false`)
     -   `options.force` **[Boolean][16]** force PNG output, otherwise attempt to use input format (optional, default `true`)
 
+**Examples**
+
+```javascript
+// Convert any input to PNG output
+const data = await sharp(input)
+  .png()
+  .toBuffer();
+```
 
 -   Throws **[Error][13]** Invalid options
 
@@ -127,6 +191,14 @@ Use these WebP options for output image.
     -   `options.nearLossless` **[Boolean][16]** use near_lossless compression mode (optional, default `false`)
     -   `options.force` **[Boolean][16]** force WebP output, otherwise attempt to use input format (optional, default `true`)
 
+**Examples**
+
+```javascript
+// Convert any input to lossless WebP output
+const data = await sharp(input)
+  .webp({ lossless: true })
+  .toBuffer();
+```
 
 -   Throws **[Error][13]** Invalid options
 
@@ -147,6 +219,18 @@ Use these TIFF options for output image.
     -   `options.yres` **[Number][18]** vertical resolution in pixels/mm (optional, default `1.0`)
     -   `options.squash` **[Boolean][16]** squash 8-bit images down to 1 bit (optional, default `false`)
 
+**Examples**
+
+```javascript
+// Convert SVG input to LZW-compressed, 1 bit per pixel TIFF output
+sharp('input.svg')
+  .tiff({
+    compression: 'lzw',
+    squash: true
+  })
+  .toFile('1-bpp-output.tiff')
+  .then(info => { ... });
+```
 
 -   Throws **[Error][13]** Invalid options
 
@@ -155,6 +239,15 @@ Returns **Sharp**
 ## raw
 
 Force output to be raw, uncompressed uint8 pixel data.
+
+**Examples**
+
+```javascript
+// Extract raw RGB pixel data from JPEG input
+const { data, info } = await sharp('input.jpg')
+  .raw()
+  .toBuffer({ resolveWithObject: true });
+```
 
 Returns **Sharp** 
 
@@ -167,6 +260,14 @@ Force output to a given format.
 -   `format` **([String][11] \| [Object][15])** as a String or an Object with an 'id' attribute
 -   `options` **[Object][15]** output options
 
+**Examples**
+
+```javascript
+// Convert any input to PNG output
+const data = await sharp(input)
+  .toFormat('png')
+  .toBuffer();
+```
 
 -   Throws **[Error][13]** unsupported format or options
 
