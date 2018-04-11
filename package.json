@@ -45,7 +45,8 @@
     "Kenric D'Souza <kenric.dsouza@gmail.com>",
     "Oleh Aleinyk <oleg.aleynik@gmail.com>",
     "Marcel Bretschneider <marcel.bretschneider@gmail.com>",
-    "Andrea Bianco <andrea.bianco@unibas.ch>"
+    "Andrea Bianco <andrea.bianco@unibas.ch>",
+    "Rik Heywood <rik@rik.org>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",

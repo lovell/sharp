@@ -47,6 +47,11 @@ namespace sharp {
   VImage Cutout(VImage src, VImage dst, const int gravity);
 
   /*
+   * Tint an image using the specified chroma, preserving the original image luminance
+   */
+  VImage Tint(VImage image, double const a, double const b);
+
+  /*
    * Stretch luminance to cover full dynamic range.
    */
   VImage Normalise(VImage image);

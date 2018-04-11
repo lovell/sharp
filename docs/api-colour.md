@@ -3,10 +3,11 @@
 ### Table of Contents
 
 -   [background][1]
--   [greyscale][2]
--   [grayscale][3]
--   [toColourspace][4]
--   [toColorspace][5]
+-   [tint][2]
+-   [greyscale][3]
+-   [grayscale][4]
+-   [toColourspace][5]
+-   [toColorspace][6]
 
 ## background
 
@@ -19,10 +20,24 @@ The alpha value is a float between `0` (transparent) and `1` (opaque).
 
 **Parameters**
 
--   `rgba` **([String][6] \| [Object][7])** parsed by the [color][8] module to extract values for red, green, blue and alpha.
+-   `rgba` **([String][7] \| [Object][8])** parsed by the [color][9] module to extract values for red, green, blue and alpha.
 
 
--   Throws **[Error][9]** Invalid parameter
+-   Throws **[Error][10]** Invalid parameter
+
+Returns **Sharp** 
+
+## tint
+
+Tint the image using the provided chroma while preserving the image luminance.
+An alpha channel may be present and will be unchanged by the operation.
+
+**Parameters**
+
+-   `rgb` **([String][7] \| [Object][8])** parsed by the [color][9] module to extract chroma values.
+
+
+-   Throws **[Error][10]** Invalid parameter
 
 Returns **Sharp** 
 
@@ -37,7 +52,7 @@ An alpha channel may be present, and will be unchanged by the operation.
 
 **Parameters**
 
--   `greyscale` **[Boolean][10]**  (optional, default `true`)
+-   `greyscale` **[Boolean][11]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -47,7 +62,7 @@ Alternative spelling of `greyscale`.
 
 **Parameters**
 
--   `grayscale` **[Boolean][10]**  (optional, default `true`)
+-   `grayscale` **[Boolean][11]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -58,10 +73,10 @@ By default output image will be web-friendly sRGB, with additional channels inte
 
 **Parameters**
 
--   `colourspace` **[String][6]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][11]
+-   `colourspace` **[String][7]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][12]
 
 
--   Throws **[Error][9]** Invalid parameters
+-   Throws **[Error][10]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -71,31 +86,33 @@ Alternative spelling of `toColourspace`.
 
 **Parameters**
 
--   `colorspace` **[String][6]?** output colorspace.
+-   `colorspace` **[String][7]?** output colorspace.
 
 
--   Throws **[Error][9]** Invalid parameters
+-   Throws **[Error][10]** Invalid parameters
 
 Returns **Sharp** 
 
 [1]: #background
 
-[2]: #greyscale
+[2]: #tint
 
-[3]: #grayscale
+[3]: #greyscale
 
-[4]: #tocolourspace
+[4]: #grayscale
 
-[5]: #tocolorspace
+[5]: #tocolourspace
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[6]: #tocolorspace
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[8]: https://www.npmjs.org/package/color
+[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[9]: https://www.npmjs.org/package/color
 
-[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
 
-[11]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L568
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[12]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L568

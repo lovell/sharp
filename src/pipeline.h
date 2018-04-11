@@ -70,6 +70,8 @@ struct PipelineBaton {
   std::string kernel;
   bool fastShrinkOnLoad;
   double background[4];
+  double tintA;
+  double tintB;
   bool flatten;
   bool negate;
   double blurSigma;
@@ -155,6 +157,8 @@ struct PipelineBaton {
     cropOffsetLeft(0),
     cropOffsetTop(0),
     premultiplied(false),
+    tintA(0.0),
+    tintB(0.0),
     flatten(false),
     negate(false),
     blurSigma(0.0),
