@@ -46,7 +46,8 @@
     "Oleh Aleinyk <oleg.aleynik@gmail.com>",
     "Marcel Bretschneider <marcel.bretschneider@gmail.com>",
     "Andrea Bianco <andrea.bianco@unibas.ch>",
-    "Rik Heywood <rik@rik.org>"
+    "Rik Heywood <rik@rik.org>",
+    "Thomas Parisot <hi@oncletom.io>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
@@ -92,7 +93,7 @@
   "devDependencies": {
     "async": "^2.6.0",
     "cc": "^1.0.2",
-    "documentation": "^6.1.0",
+    "documentation": "^6.2.0",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "mocha": "^5.0.5",

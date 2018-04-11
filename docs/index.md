@@ -109,6 +109,8 @@ the help and code contributions of the following people:
 * [Oleh Aleinyk](https://github.com/oaleynik)
 * [Marcel Bretschneider](https://github.com/3epnm)
 * [Andrea Bianco](https://github.com/BiancoA)
+* [Rik Heywood](https://github.com/rikh42)
+* [Thomas Parisot](https://github.com/oncletom)
 
 Thank you!
 

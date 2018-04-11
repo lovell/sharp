@@ -10,6 +10,10 @@ Requires libvips v8.6.1.
   [#825](https://github.com/lovell/sharp/pull/825)
   [@rikh42](https://github.com/rikh42)
 
+* Add environment variable to ignore globally-installed libvips.
+  [#1165](https://github.com/lovell/sharp/pull/1165)
+  [@oncletom](https://github.com/oncletom)
+
 #### v0.20.1 - 17<sup>th</sup> March 2018
 
 * Improve installation experience when a globally-installed libvips below the minimum required version is found.
