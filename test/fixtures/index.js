@@ -94,6 +94,7 @@ module.exports = {
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp
   inputTiff: getPath('G31D.TIF'), // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
+  inputTiffMultipage: getPath('G31D_MULTI.TIF'), // gm convert G31D.TIF -resize 50% G31D_2.TIF ; tiffcp G31D.TIF G31D_2.TIF G31D_MULTI.TIF
   inputTiffCielab: getPath('cielab-dagams.tiff'), // https://github.com/lovell/sharp/issues/646
   inputTiffUncompressed: getPath('uncompressed_tiff.tiff'), // https://code.google.com/archive/p/imagetestsuite/wikis/TIFFTestSuite.wiki file: 0c84d07e1b22b76f24cccc70d8788e4a.tif
   inputTiff8BitDepth: getPath('8bit_depth.tiff'),
