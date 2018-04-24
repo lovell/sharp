@@ -528,6 +528,22 @@ describe('Input/output', function () {
       });
   });
 
+  it('TIFF file input with invalid page fails gracefully', function (done) {
+    sharp(fixtures.inputTiffMultipage, { page: 2 })
+      .toBuffer(function (err) {
+        assert.strictEqual(true, !!err);
+        done();
+      });
+  });
+
+  it('TIFF buffer input with invalid page fails gracefully', function (done) {
+    sharp(fs.readFileSync(fixtures.inputTiffMultipage), { page: 2 })
+      .toBuffer(function (err) {
+        assert.strictEqual(true, !!err);
+        done();
+      });
+  });
+
   describe('Output filename with unknown extension', function () {
     it('Match JPEG input', function (done) {
       sharp(fixtures.inputJpg)
@@ -877,6 +893,53 @@ describe('Input/output', function () {
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
         done();
+      });
+  });
+
+  it('Load multi-page TIFF\'s from file', function (done) {
+    sharp(fixtures.inputTiffMultipage) // defaults to page 0
+      .jpeg()
+      .toBuffer(function (err, defaultData, defaultInfo) {
+        if (err) throw err;
+        assert.strictEqual(true, defaultData.length > 0);
+        assert.strictEqual(defaultData.length, defaultInfo.size);
+        assert.strictEqual('jpeg', defaultInfo.format);
+
+        sharp(fixtures.inputTiffMultipage, { page: 1 }) // 50%-scale copy of page 0
+          .jpeg()
+          .toBuffer(function (err, scaledData, scaledInfo) {
+            if (err) throw err;
+            assert.strictEqual(true, scaledData.length > 0);
+            assert.strictEqual(scaledData.length, scaledInfo.size);
+            assert.strictEqual('jpeg', scaledInfo.format);
+            assert.strictEqual(defaultInfo.width, scaledInfo.width * 2);
+            assert.strictEqual(defaultInfo.height, scaledInfo.height * 2);
+            done();
+          });
+      });
+  });
+
+  it('Load multi-page TIFF\'s from Buffer', function (done) {
+    const inputTiffBuffer = fs.readFileSync(fixtures.inputTiffMultipage);
+    sharp(inputTiffBuffer) // defaults to page 0
+      .jpeg()
+      .toBuffer(function (err, defaultData, defaultInfo) {
+        if (err) throw err;
+        assert.strictEqual(true, defaultData.length > 0);
+        assert.strictEqual(defaultData.length, defaultInfo.size);
+        assert.strictEqual('jpeg', defaultInfo.format);
+
+        sharp(inputTiffBuffer, { page: 1 }) // 50%-scale copy of page 0
+          .jpeg()
+          .toBuffer(function (err, scaledData, scaledInfo) {
+            if (err) throw err;
+            assert.strictEqual(true, scaledData.length > 0);
+            assert.strictEqual(scaledData.length, scaledInfo.size);
+            assert.strictEqual('jpeg', scaledInfo.format);
+            assert.strictEqual(defaultInfo.width, scaledInfo.width * 2);
+            assert.strictEqual(defaultInfo.height, scaledInfo.height * 2);
+            done();
+          });
       });
   });
 

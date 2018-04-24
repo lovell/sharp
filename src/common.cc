@@ -63,6 +63,10 @@ namespace sharp {
       descriptor->rawWidth = AttrTo<uint32_t>(input, "rawWidth");
       descriptor->rawHeight = AttrTo<uint32_t>(input, "rawHeight");
     }
+    // Page input for multi-page TIFF
+    if (HasAttr(input, "page")) {
+      descriptor->page = AttrTo<uint32_t>(input, "page");
+    }
     // Create new image
     if (HasAttr(input, "createChannels")) {
       descriptor->createChannels = AttrTo<uint32_t>(input, "createChannels");
@@ -229,6 +233,9 @@ namespace sharp {
             if (imageType == ImageType::MAGICK) {
               option->set("density", std::to_string(descriptor->density).data());
             }
+            if (imageType == ImageType::TIFF) {
+             option->set("page", descriptor->page);
+            }
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               SetDensity(image, descriptor->density);
@@ -267,6 +274,9 @@ namespace sharp {
             }
             if (imageType == ImageType::MAGICK) {
               option->set("density", std::to_string(descriptor->density).data());
+            }
+            if (imageType == ImageType::TIFF) {
+             option->set("page", descriptor->page);
             }
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
