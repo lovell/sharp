@@ -213,7 +213,7 @@ Use these TIFF options for output image.
 -   `options` **[Object][15]?** output options
     -   `options.quality` **[Number][18]** quality, integer 1-100 (optional, default `80`)
     -   `options.force` **[Boolean][16]** force TIFF output, otherwise attempt to use input format (optional, default `true`)
-    -   `options.compression` **[Boolean][16]** compression options: lzw, deflate, jpeg (optional, default `'jpeg'`)
+    -   `options.compression` **[Boolean][16]** compression options: lzw, deflate, jpeg, ccittfax4 (optional, default `'jpeg'`)
     -   `options.predictor` **[Boolean][16]** compression predictor options: none, horizontal, float (optional, default `'horizontal'`)
     -   `options.xres` **[Number][18]** horizontal resolution in pixels/mm (optional, default `1.0`)
     -   `options.yres` **[Number][18]** vertical resolution in pixels/mm (optional, default `1.0`)
