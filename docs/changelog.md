@@ -14,6 +14,10 @@ Requires libvips v8.6.1.
   [#1165](https://github.com/lovell/sharp/pull/1165)
   [@oncletom](https://github.com/oncletom)
 
+* Add support for page selection with multi-page input (GIF/TIFF).
+  [#1204](https://github.com/lovell/sharp/pull/1204)
+  [@woolite64](https://github.com/woolite64)
+
 #### v0.20.1 - 17<sup>th</sup> March 2018
 
 * Improve installation experience when a globally-installed libvips below the minimum required version is found.

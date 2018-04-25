@@ -111,6 +111,7 @@ the help and code contributions of the following people:
 * [Andrea Bianco](https://github.com/BiancoA)
 * [Rik Heywood](https://github.com/rikh42)
 * [Thomas Parisot](https://github.com/oncletom)
+* [Nathan Graves](https://github.com/woolite64)
 
 Thank you!
 
