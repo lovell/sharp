@@ -7,10 +7,10 @@ environment:
   - nodejs_version: "4"
   - nodejs_version: "6"
   - nodejs_version: "8"
-  - nodejs_version: "9"
+  - nodejs_version: "10"
 install:
   - ps: Install-Product node $env:nodejs_version x64
-  - npm install -g npm@5.3.x
+  - npm install -g npm@5
   - npm install
 test_script:
   - npm test

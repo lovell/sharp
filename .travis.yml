@@ -16,7 +16,7 @@ matrix:
     - os: linux
       dist: trusty
       sudo: false
-      node_js: "9"
+      node_js: "10"
     - os: osx
       osx_image: xcode8.3
       node_js: "4"
@@ -28,7 +28,7 @@ matrix:
       node_js: "8"
     - os: osx
       osx_image: xcode8.3
-      node_js: "9"
+      node_js: "10"
 after_success:
   - npm install coveralls
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js

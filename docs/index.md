@@ -14,7 +14,7 @@ As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
 Most 64-bit OS X, Windows and Linux (glibc) systems running
-Node versions 4, 6, 8 and 9
+Node versions 4, 6, 8 and 10
 do not require any additional install or runtime dependencies.
 
 [![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.png?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
