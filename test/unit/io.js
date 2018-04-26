@@ -1083,6 +1083,22 @@ describe('Input/output', function () {
       });
   });
 
+  it('TIFF ccittfax4 compression shrinks b-w test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiff).size;
+    sharp(fixtures.inputTiff)
+      .toColourspace('b-w')
+      .tiff({
+        squash: true,
+        compression: 'ccittfax4'
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        fs.unlink(fixtures.outputTiff, done);
+      });
+  });
+
   it('TIFF deflate compression with horizontal predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
