@@ -18,6 +18,10 @@ Requires libvips v8.6.1.
   [#1204](https://github.com/lovell/sharp/pull/1204)
   [@woolite64](https://github.com/woolite64)
 
+* Add support for Group4 (CCITTFAX4) compression with TIFF output.
+  [#1208](https://github.com/lovell/sharp/pull/1208)
+  [@woolite64](https://github.com/woolite64)
+
 #### v0.20.1 - 17<sup>th</sup> March 2018
 
 * Improve installation experience when a globally-installed libvips below the minimum required version is found.
