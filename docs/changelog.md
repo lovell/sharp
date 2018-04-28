@@ -4,7 +4,7 @@
 
 Requires libvips v8.6.1.
 
-#### v0.20.2 - TBD
+#### v0.20.2 - 28<sup>th</sup> April 2018
 
 * Add tint operation to set image chroma.
   [#825](https://github.com/lovell/sharp/pull/825)

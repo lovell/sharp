@@ -41,7 +41,6 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.20.0 | prebuild   |
 | v0.21.0 | teeth      |
 | v0.22.0 | uptake     |
 
@@ -88,15 +87,6 @@ Requires [Valgrind](http://valgrind.org/).
 
 ```sh
 npm run test-leak
-```
-
-### Packaging tests
-
-Tests the installation on a number of Linux-based operating systems.
-Requires docker.
-
-```sh
-npm run test-packaging
 ```
 
 ## Finally
