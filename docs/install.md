@@ -161,6 +161,18 @@ Set the Lambda runtime to Node.js 6.10.
 
 To get the best performance select the largest memory available. A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
+### NW.js
+
+Run the `nw-gyp` tool after installation.
+
+```sh
+cd node-modules/sharp
+nw-gyp rebuild --arch=x64 --target=[your nw version]
+node node_modules/sharp/install/dll-copy
+```
+
+See also http://docs.nwjs.io/en/latest/For%20Users/Advanced/Use%20Native%20Node%20Modules/
+
 ### Build tools
 
 * [gulp-responsive](https://www.npmjs.com/package/gulp-responsive)
