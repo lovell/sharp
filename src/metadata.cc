@@ -83,9 +83,9 @@ class MetadataWorker : public Nan::AsyncWorker {
         baton->iccLength = iccLength;
       }
       // IPTC
-      if (image.get_typeof(VIPS_META_IPCT_NAME) == VIPS_TYPE_BLOB) {
+      if (image.get_typeof(VIPS_META_IPTC_NAME) == VIPS_TYPE_BLOB) {
         size_t iptcLength;
-        void const *iptc = image.get_blob(VIPS_META_IPCT_NAME, &iptcLength);
+        void const *iptc = image.get_blob(VIPS_META_IPTC_NAME, &iptcLength);
         baton->iptc = static_cast<char *>(g_malloc(iptcLength));
         memcpy(baton->iptc, iptc, iptcLength);
         baton->iptcLength = iptcLength;
