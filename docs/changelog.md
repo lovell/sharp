@@ -4,6 +4,12 @@
 
 Requires libvips v8.6.1.
 
+#### v0.20.3 - TBD
+
+* Fix tint operation by ensuring LAB interpretation and allowing negative values.
+  [#1235](https://github.com/lovell/sharp/issues/1235)
+  [@wezside](https://github.com/wezside)
+
 #### v0.20.2 - 28<sup>th</sup> April 2018
 
 * Add tint operation to set image chroma.

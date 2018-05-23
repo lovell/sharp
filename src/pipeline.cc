@@ -683,7 +683,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
 
       // Tint the image
-      if (baton->tintA > 0 || baton->tintB > 0) {
+      if (baton->tintA < 128.0 || baton->tintB < 128.0) {
         image = sharp::Tint(image, baton->tintA, baton->tintB);
       }
 
