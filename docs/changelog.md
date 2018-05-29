@@ -4,7 +4,7 @@
 
 Requires libvips v8.6.1.
 
-#### v0.20.3 - TBD
+#### v0.20.3 - 29<sup>th</sup> May 2018
 
 * Fix tint operation by ensuring LAB interpretation and allowing negative values.
   [#1235](https://github.com/lovell/sharp/issues/1235)
