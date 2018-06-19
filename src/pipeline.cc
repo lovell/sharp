@@ -694,7 +694,9 @@ class PipelineWorker : public Nan::AsyncWorker {
           (baton->err).append("Cannot extract channel from image. Too few channels in image.");
           return Error();
         }
-        image = image.extract_band(baton->extractChannel);
+        image = image
+          .extract_band(baton->extractChannel)
+          .copy(VImage::option()->set("interpretation", VIPS_INTERPRETATION_B_W));
       }
       // Convert image to sRGB, if not already
       if (sharp::Is16Bit(image.interpretation())) {

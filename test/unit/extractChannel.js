@@ -54,6 +54,21 @@ describe('Image channel extraction', function () {
       });
   });
 
+  it('With colorspace conversion', function (done) {
+    const output = fixtures.path('output.extract-lch.jpg');
+    sharp(fixtures.inputJpg)
+      .toColourspace('lch')
+      .extractChannel(1)
+      .resize(320, 240)
+      .toFile(output, function (err, info) {
+        if (err) throw err;
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertMaxColourDistance(output, fixtures.expected('extract-lch.jpg'));
+        done();
+      });
+  });
+
   it('Invalid channel number', function () {
     assert.throws(function () {
       sharp(fixtures.inputJpg)

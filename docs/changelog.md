@@ -10,6 +10,10 @@ Requires libvips v8.6.1.
   [#1241](https://github.com/lovell/sharp/issues/1241)
   [@anahit42](https://github.com/anahit42)
 
+* Ensure extractChannel sets correct single-channel colour space interpretation.
+  [#1257](https://github.com/lovell/sharp/issues/1257)
+  [@jeremychone](https://github.com/jeremychone)
+
 #### v0.20.3 - 29<sup>th</sup> May 2018
 
 * Fix tint operation by ensuring LAB interpretation and allowing negative values.
