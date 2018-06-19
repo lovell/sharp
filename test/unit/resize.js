@@ -130,6 +130,25 @@ describe('Resize dimensions', function () {
       });
   });
 
+  it('JPEG shrink-on-load with 90 degree rotation, ensure recalculation is correct', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(1920, 1280)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(1920, info.width);
+        assert.strictEqual(1280, info.height);
+        sharp(data)
+          .rotate(90)
+          .resize(533, 800)
+          .toBuffer(function (err, data, info) {
+            if (err) throw err;
+            assert.strictEqual(533, info.width);
+            assert.strictEqual(800, info.height);
+            done();
+          });
+      });
+  });
+
   it('TIFF embed known to cause rounding errors', function (done) {
     sharp(fixtures.inputTiff)
       .resize(240, 320)

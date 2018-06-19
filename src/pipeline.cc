@@ -281,15 +281,17 @@ class PipelineWorker : public Nan::AsyncWorker {
           }
         }
         // Recalculate integral shrink and double residual
-        int shrunkOnLoadWidth = image.width();
-        int shrunkOnLoadHeight = image.height();
+        int const shrunkOnLoadWidth = image.width();
+        int const shrunkOnLoadHeight = image.height();
         if (!baton->rotateBeforePreExtract &&
           (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
-          // Swap input output width and height when rotating by 90 or 270 degrees
-          std::swap(shrunkOnLoadWidth, shrunkOnLoadHeight);
+          // Swap when rotating by 90 or 270 degrees
+          xfactor = static_cast<double>(shrunkOnLoadWidth) / static_cast<double>(targetResizeHeight);
+          yfactor = static_cast<double>(shrunkOnLoadHeight) / static_cast<double>(targetResizeWidth);
+        } else {
+          xfactor = static_cast<double>(shrunkOnLoadWidth) / static_cast<double>(targetResizeWidth);
+          yfactor = static_cast<double>(shrunkOnLoadHeight) / static_cast<double>(targetResizeHeight);
         }
-        xfactor = static_cast<double>(shrunkOnLoadWidth) / static_cast<double>(targetResizeWidth);
-        yfactor = static_cast<double>(shrunkOnLoadHeight) / static_cast<double>(targetResizeHeight);
       }
 
       // Ensure we're using a device-independent colour space
@@ -381,7 +383,6 @@ class PipelineWorker : public Nan::AsyncWorker {
         ) {
           throw vips::VError("Unknown kernel");
         }
-
         image = image.resize(1.0 / xfactor, VImage::option()
           ->set("vscale", 1.0 / yfactor)
           ->set("kernel", kernel));

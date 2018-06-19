@@ -4,6 +4,12 @@
 
 Requires libvips v8.6.1.
 
+#### v0.20.3 - TBD
+
+* Prevent possible rounding error when using shrink-on-load and 90/270 degree rotation.
+  [#1241](https://github.com/lovell/sharp/issues/1241)
+  [@anahit42](https://github.com/anahit42)
+
 #### v0.20.3 - 29<sup>th</sup> May 2018
 
 * Fix tint operation by ensuring LAB interpretation and allowing negative values.

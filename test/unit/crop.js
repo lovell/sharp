@@ -177,25 +177,6 @@ describe('Crop', function () {
       });
   });
 
-  it('Clamp before crop when one post-resize dimension is below target', function () {
-    return sharp(fixtures.inputJpg)
-      .resize(1024, 1034)
-      .toBuffer()
-      .then(function (input) {
-        return sharp(input)
-          .rotate(270)
-          .resize(256)
-          .crop(sharp.strategy.entropy)
-          .toBuffer({ resolveWithObject: true })
-          .then(function (result) {
-            assert.strictEqual(256, result.info.width);
-            assert.strictEqual(253, result.info.height);
-            assert.strictEqual(0, result.info.cropOffsetLeft);
-            assert.strictEqual(0, result.info.cropOffsetTop);
-          });
-      });
-  });
-
   describe('Entropy-based strategy', function () {
     it('JPEG', function (done) {
       sharp(fixtures.inputJpg)
