@@ -3,9 +3,16 @@
 ### Table of Contents
 
 -   [cache][1]
--   [concurrency][2]
--   [counters][3]
--   [simd][4]
+    -   [Parameters][2]
+    -   [Examples][3]
+-   [concurrency][4]
+    -   [Parameters][5]
+    -   [Examples][6]
+-   [counters][7]
+    -   [Examples][8]
+-   [simd][9]
+    -   [Parameters][10]
+    -   [Examples][11]
 
 ## cache
 
@@ -14,14 +21,14 @@ Existing entries in the cache will be trimmed after any change in limits.
 This method always returns cache statistics,
 useful for determining how much working memory is required for a particular task.
 
-**Parameters**
+### Parameters
 
--   `options` **([Object][5] \| [Boolean][6])** Object with the following attributes, or Boolean where true uses default cache settings and false removes all caching (optional, default `true`)
-    -   `options.memory` **[Number][7]** is the maximum memory in MB to use for this cache (optional, default `50`)
-    -   `options.files` **[Number][7]** is the maximum number of files to hold open (optional, default `20`)
-    -   `options.items` **[Number][7]** is the maximum number of operations to cache (optional, default `100`)
+-   `options` **([Object][12] \| [Boolean][13])** Object with the following attributes, or Boolean where true uses default cache settings and false removes all caching (optional, default `true`)
+    -   `options.memory` **[Number][14]** is the maximum memory in MB to use for this cache (optional, default `50`)
+    -   `options.files` **[Number][14]** is the maximum number of files to hold open (optional, default `20`)
+    -   `options.items` **[Number][14]** is the maximum number of operations to cache (optional, default `100`)
 
-**Examples**
+### Examples
 
 ```javascript
 const stats = sharp.cache();
@@ -33,7 +40,7 @@ sharp.cache( { files: 0 } );
 sharp.cache(false);
 ```
 
-Returns **[Object][5]** 
+Returns **[Object][12]** 
 
 ## concurrency
 
@@ -47,11 +54,11 @@ is limited by libuv's `UV_THREADPOOL_SIZE` environment variable.
 
 This method always returns the current concurrency.
 
-**Parameters**
+### Parameters
 
--   `concurrency` **[Number][7]?** 
+-   `concurrency` **[Number][14]?** 
 
-**Examples**
+### Examples
 
 ```javascript
 const threads = sharp.concurrency(); // 4
@@ -59,7 +66,7 @@ sharp.concurrency(2); // 2
 sharp.concurrency(0); // 4
 ```
 
-Returns **[Number][7]** concurrency
+Returns **[Number][14]** concurrency
 
 ## counters
 
@@ -68,13 +75,13 @@ Provides access to internal task counters.
 -   queue is the number of tasks this module has queued waiting for _libuv_ to provide a worker thread from its pool.
 -   process is the number of resize tasks currently being processed.
 
-**Examples**
+### Examples
 
 ```javascript
 const counters = sharp.counters(); // { queue: 2, process: 4 }
 ```
 
-Returns **[Object][5]** 
+Returns **[Object][12]** 
 
 ## simd
 
@@ -87,11 +94,11 @@ by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM N
 This feature is currently off by default but future versions may reverse this.
 Versions of liborc prior to 0.4.25 are known to segfault under heavy load.
 
-**Parameters**
+### Parameters
 
--   `simd` **[Boolean][6]**  (optional, default `false`)
+-   `simd` **[Boolean][13]**  (optional, default `false`)
 
-**Examples**
+### Examples
 
 ```javascript
 const simd = sharp.simd();
@@ -103,18 +110,32 @@ const simd = sharp.simd(true);
 // attempts to enable the use of SIMD, returning true if available
 ```
 
-Returns **[Boolean][6]** 
+Returns **[Boolean][13]** 
 
 [1]: #cache
 
-[2]: #concurrency
+[2]: #parameters
 
-[3]: #counters
+[3]: #examples
 
-[4]: #simd
+[4]: #concurrency
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[5]: #parameters-1
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[6]: #examples-1
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[7]: #counters
+
+[8]: #examples-2
+
+[9]: #simd
+
+[10]: #parameters-2
+
+[11]: #examples-3
+
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number

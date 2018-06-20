@@ -3,23 +3,45 @@
 ### Table of Contents
 
 -   [rotate][1]
--   [extract][2]
--   [flip][3]
--   [flop][4]
--   [sharpen][5]
--   [median][6]
--   [blur][7]
--   [extend][8]
--   [flatten][9]
--   [trim][10]
--   [gamma][11]
--   [negate][12]
--   [normalise][13]
--   [normalize][14]
--   [convolve][15]
--   [threshold][16]
--   [boolean][17]
--   [linear][18]
+    -   [Parameters][2]
+    -   [Examples][3]
+-   [extract][4]
+    -   [Parameters][5]
+    -   [Examples][6]
+-   [flip][7]
+    -   [Parameters][8]
+-   [flop][9]
+    -   [Parameters][10]
+-   [sharpen][11]
+    -   [Parameters][12]
+-   [median][13]
+    -   [Parameters][14]
+-   [blur][15]
+    -   [Parameters][16]
+-   [extend][17]
+    -   [Parameters][18]
+    -   [Examples][19]
+-   [flatten][20]
+    -   [Parameters][21]
+-   [trim][22]
+    -   [Parameters][23]
+-   [gamma][24]
+    -   [Parameters][25]
+-   [negate][26]
+    -   [Parameters][27]
+-   [normalise][28]
+    -   [Parameters][29]
+-   [normalize][30]
+    -   [Parameters][31]
+-   [convolve][32]
+    -   [Parameters][33]
+    -   [Examples][34]
+-   [threshold][35]
+    -   [Parameters][36]
+-   [boolean][37]
+    -   [Parameters][38]
+-   [linear][39]
+    -   [Parameters][40]
 
 ## rotate
 
@@ -37,11 +59,11 @@ The use of `rotate` implies the removal of the EXIF `Orientation` tag, if any.
 Method order is important when both rotating and extracting regions,
 for example `rotate(x).extract(y)` will produce a different result to `extract(y).rotate(x)`.
 
-**Parameters**
+### Parameters
 
--   `angle` **[Number][19]** angle of rotation, must be a multiple of 90. (optional, default `auto`)
+-   `angle` **[Number][41]** angle of rotation, must be a multiple of 90. (optional, default `auto`)
 
-**Examples**
+### Examples
 
 ```javascript
 const pipeline = sharp()
@@ -55,7 +77,7 @@ const pipeline = sharp()
 readableStream.pipe(pipeline);
 ```
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -67,15 +89,15 @@ Extract a region of the image.
 -   Use `extract` after `resize` for post-resize extraction.
 -   Use `extract` before and after for both.
 
-**Parameters**
+### Parameters
 
--   `options` **[Object][21]** 
-    -   `options.left` **[Number][19]** zero-indexed offset from left edge
-    -   `options.top` **[Number][19]** zero-indexed offset from top edge
-    -   `options.width` **[Number][19]** dimension of extracted image
-    -   `options.height` **[Number][19]** dimension of extracted image
+-   `options` **[Object][43]** 
+    -   `options.left` **[Number][41]** zero-indexed offset from left edge
+    -   `options.top` **[Number][41]** zero-indexed offset from top edge
+    -   `options.width` **[Number][41]** dimension of extracted image
+    -   `options.height` **[Number][41]** dimension of extracted image
 
-**Examples**
+### Examples
 
 ```javascript
 sharp(input)
@@ -95,7 +117,7 @@ sharp(input)
   });
 ```
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -104,9 +126,9 @@ Returns **Sharp**
 Flip the image about the vertical Y axis. This always occurs after rotation, if any.
 The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 
-**Parameters**
+### Parameters
 
--   `flip` **[Boolean][22]**  (optional, default `true`)
+-   `flip` **[Boolean][44]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -115,9 +137,9 @@ Returns **Sharp**
 Flop the image about the horizontal X axis. This always occurs after rotation, if any.
 The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
-**Parameters**
+### Parameters
 
--   `flop` **[Boolean][22]**  (optional, default `true`)
+-   `flop` **[Boolean][44]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -128,14 +150,14 @@ When used without parameters, performs a fast, mild sharpen of the output image.
 When a `sigma` is provided, performs a slower, more accurate sharpen of the L channel in the LAB colour space.
 Separate control over the level of sharpening in "flat" and "jagged" areas is available.
 
-**Parameters**
+### Parameters
 
--   `sigma` **[Number][19]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
--   `flat` **[Number][19]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
--   `jagged` **[Number][19]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
+-   `sigma` **[Number][41]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
+-   `flat` **[Number][41]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
+-   `jagged` **[Number][41]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
 
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -144,12 +166,12 @@ Returns **Sharp**
 Apply median filter.
 When used without parameters the default window is 3x3.
 
-**Parameters**
+### Parameters
 
--   `size` **[Number][19]** square mask size: size x size (optional, default `3`)
+-   `size` **[Number][41]** square mask size: size x size (optional, default `3`)
 
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -159,12 +181,12 @@ Blur the image.
 When used without parameters, performs a fast, mild blur of the output image.
 When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 
-**Parameters**
+### Parameters
 
--   `sigma` **[Number][19]?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
+-   `sigma` **[Number][41]?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
 
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -173,15 +195,15 @@ Returns **Sharp**
 Extends/pads the edges of the image with the colour provided to the `background` method.
 This operation will always occur after resizing and extraction, if any.
 
-**Parameters**
+### Parameters
 
--   `extend` **([Number][19] \| [Object][21])** single pixel count to add to all edges or an Object with per-edge counts
-    -   `extend.top` **[Number][19]?** 
-    -   `extend.left` **[Number][19]?** 
-    -   `extend.bottom` **[Number][19]?** 
-    -   `extend.right` **[Number][19]?** 
+-   `extend` **([Number][41] \| [Object][43])** single pixel count to add to all edges or an Object with per-edge counts
+    -   `extend.top` **[Number][41]?** 
+    -   `extend.left` **[Number][41]?** 
+    -   `extend.bottom` **[Number][41]?** 
+    -   `extend.right` **[Number][41]?** 
 
-**Examples**
+### Examples
 
 ```javascript
 // Resize to 140 pixels wide, then add 10 transparent pixels
@@ -193,7 +215,7 @@ sharp(input)
   ...
 ```
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -201,9 +223,9 @@ Returns **Sharp**
 
 Merge alpha transparency channel, if any, with `background`.
 
-**Parameters**
+### Parameters
 
--   `flatten` **[Boolean][22]**  (optional, default `true`)
+-   `flatten` **[Boolean][44]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -211,12 +233,12 @@ Returns **Sharp**
 
 Trim "boring" pixels from all edges that contain values within a percentage similarity of the top-left pixel.
 
-**Parameters**
+### Parameters
 
--   `tolerance` **[Number][19]** value between 1 and 99 representing the percentage similarity. (optional, default `10`)
+-   `tolerance` **[Number][41]** value between 1 and 99 representing the percentage similarity. (optional, default `10`)
 
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -228,12 +250,12 @@ This can improve the perceived brightness of a resized image in non-linear colou
 JPEG and WebP input images will not take advantage of the shrink-on-load performance optimisation
 when applying a gamma correction.
 
-**Parameters**
+### Parameters
 
--   `gamma` **[Number][19]** value between 1.0 and 3.0. (optional, default `2.2`)
+-   `gamma` **[Number][41]** value between 1.0 and 3.0. (optional, default `2.2`)
 
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -241,9 +263,9 @@ Returns **Sharp**
 
 Produce the "negative" of the image.
 
-**Parameters**
+### Parameters
 
--   `negate` **[Boolean][22]**  (optional, default `true`)
+-   `negate` **[Boolean][44]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -251,9 +273,9 @@ Returns **Sharp**
 
 Enhance output image contrast by stretching its luminance to cover the full dynamic range.
 
-**Parameters**
+### Parameters
 
--   `normalise` **[Boolean][22]**  (optional, default `true`)
+-   `normalise` **[Boolean][44]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -261,9 +283,9 @@ Returns **Sharp**
 
 Alternative spelling of normalise.
 
-**Parameters**
+### Parameters
 
--   `normalize` **[Boolean][22]**  (optional, default `true`)
+-   `normalize` **[Boolean][44]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -271,16 +293,16 @@ Returns **Sharp**
 
 Convolve the image with the specified kernel.
 
-**Parameters**
+### Parameters
 
--   `kernel` **[Object][21]** 
-    -   `kernel.width` **[Number][19]** width of the kernel in pixels.
-    -   `kernel.height` **[Number][19]** width of the kernel in pixels.
-    -   `kernel.kernel` **[Array][23]&lt;[Number][19]>** Array of length `width*height` containing the kernel values.
-    -   `kernel.scale` **[Number][19]** the scale of the kernel in pixels. (optional, default `sum`)
-    -   `kernel.offset` **[Number][19]** the offset of the kernel in pixels. (optional, default `0`)
+-   `kernel` **[Object][43]** 
+    -   `kernel.width` **[Number][41]** width of the kernel in pixels.
+    -   `kernel.height` **[Number][41]** width of the kernel in pixels.
+    -   `kernel.kernel` **[Array][45]&lt;[Number][41]>** Array of length `width*height` containing the kernel values.
+    -   `kernel.scale` **[Number][41]** the scale of the kernel in pixels. (optional, default `sum`)
+    -   `kernel.offset` **[Number][41]** the offset of the kernel in pixels. (optional, default `0`)
 
-**Examples**
+### Examples
 
 ```javascript
 sharp(input)
@@ -296,7 +318,7 @@ sharp(input)
   });
 ```
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -304,15 +326,15 @@ Returns **Sharp**
 
 Any pixel value greather than or equal to the threshold value will be set to 255, otherwise it will be set to 0.
 
-**Parameters**
+### Parameters
 
--   `threshold` **[Number][19]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
--   `options` **[Object][21]?** 
-    -   `options.greyscale` **[Boolean][22]** convert to single channel greyscale. (optional, default `true`)
-    -   `options.grayscale` **[Boolean][22]** alternative spelling for greyscale. (optional, default `true`)
+-   `threshold` **[Number][41]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
+-   `options` **[Object][43]?** 
+    -   `options.greyscale` **[Boolean][44]** convert to single channel greyscale. (optional, default `true`)
+    -   `options.grayscale` **[Boolean][44]** alternative spelling for greyscale. (optional, default `true`)
 
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -323,18 +345,18 @@ Perform a bitwise boolean operation with operand image.
 This operation creates an output image where each pixel is the result of
 the selected bitwise boolean `operation` between the corresponding pixels of the input images.
 
-**Parameters**
+### Parameters
 
--   `operand` **([Buffer][24] \| [String][25])** Buffer containing image data or String containing the path to an image file.
--   `operator` **[String][25]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
--   `options` **[Object][21]?** 
-    -   `options.raw` **[Object][21]?** describes operand when using raw pixel data.
-        -   `options.raw.width` **[Number][19]?** 
-        -   `options.raw.height` **[Number][19]?** 
-        -   `options.raw.channels` **[Number][19]?** 
+-   `operand` **([Buffer][46] \| [String][47])** Buffer containing image data or String containing the path to an image file.
+-   `operator` **[String][47]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+-   `options` **[Object][43]?** 
+    -   `options.raw` **[Object][43]?** describes operand when using raw pixel data.
+        -   `options.raw.width` **[Number][41]?** 
+        -   `options.raw.height` **[Number][41]?** 
+        -   `options.raw.channels` **[Number][41]?** 
 
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -342,62 +364,106 @@ Returns **Sharp**
 
 Apply the linear formula a \* input + b to the image (levels adjustment)
 
-**Parameters**
+### Parameters
 
--   `a` **[Number][19]** multiplier (optional, default `1.0`)
--   `b` **[Number][19]** offset (optional, default `0.0`)
+-   `a` **[Number][41]** multiplier (optional, default `1.0`)
+-   `b` **[Number][41]** offset (optional, default `0.0`)
 
 
--   Throws **[Error][20]** Invalid parameters
+-   Throws **[Error][42]** Invalid parameters
 
 Returns **Sharp** 
 
 [1]: #rotate
 
-[2]: #extract
+[2]: #parameters
 
-[3]: #flip
+[3]: #examples
 
-[4]: #flop
+[4]: #extract
 
-[5]: #sharpen
+[5]: #parameters-1
 
-[6]: #median
+[6]: #examples-1
 
-[7]: #blur
+[7]: #flip
 
-[8]: #extend
+[8]: #parameters-2
 
-[9]: #flatten
+[9]: #flop
 
-[10]: #trim
+[10]: #parameters-3
 
-[11]: #gamma
+[11]: #sharpen
 
-[12]: #negate
+[12]: #parameters-4
 
-[13]: #normalise
+[13]: #median
 
-[14]: #normalize
+[14]: #parameters-5
 
-[15]: #convolve
+[15]: #blur
 
-[16]: #threshold
+[16]: #parameters-6
 
-[17]: #boolean
+[17]: #extend
 
-[18]: #linear
+[18]: #parameters-7
 
-[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[19]: #examples-2
 
-[20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[20]: #flatten
 
-[21]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[21]: #parameters-8
 
-[22]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[22]: #trim
 
-[23]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[23]: #parameters-9
 
-[24]: https://nodejs.org/api/buffer.html
+[24]: #gamma
 
-[25]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[25]: #parameters-10
+
+[26]: #negate
+
+[27]: #parameters-11
+
+[28]: #normalise
+
+[29]: #parameters-12
+
+[30]: #normalize
+
+[31]: #parameters-13
+
+[32]: #convolve
+
+[33]: #parameters-14
+
+[34]: #examples-3
+
+[35]: #threshold
+
+[36]: #parameters-15
+
+[37]: #boolean
+
+[38]: #parameters-16
+
+[39]: #linear
+
+[40]: #parameters-17
+
+[41]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[42]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[43]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[44]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[45]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[46]: https://nodejs.org/api/buffer.html
+
+[47]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String

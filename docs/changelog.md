@@ -4,7 +4,7 @@
 
 Requires libvips v8.6.1.
 
-#### v0.20.3 - TBD
+#### v0.20.4 - TBD
 
 * Prevent possible rounding error when using shrink-on-load and 90/270 degree rotation.
   [#1241](https://github.com/lovell/sharp/issues/1241)

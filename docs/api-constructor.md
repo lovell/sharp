@@ -3,35 +3,40 @@
 ### Table of Contents
 
 -   [Sharp][1]
-    -   [format][2]
-    -   [versions][3]
--   [queue][4]
+    -   [Parameters][2]
+    -   [Examples][3]
+    -   [format][4]
+        -   [Examples][5]
+    -   [versions][6]
+        -   [Examples][7]
+-   [queue][8]
+    -   [Examples][9]
 
 ## Sharp
 
-**Parameters**
+### Parameters
 
--   `input` **([Buffer][5] \| [String][6])?** if present, can be
+-   `input` **([Buffer][10] \| [String][11])?** if present, can be
      a Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
      a String containing the path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
      JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
--   `options` **[Object][7]?** if present, is an Object with optional attributes.
-    -   `options.failOnError` **[Boolean][8]** by default apply a "best effort"
+-   `options` **[Object][12]?** if present, is an Object with optional attributes.
+    -   `options.failOnError` **[Boolean][13]** by default apply a "best effort"
          to decode images, even if the data is corrupt or invalid. Set this flag to true
          if you'd rather halt processing and raise an error when loading invalid images. (optional, default `false`)
-    -   `options.density` **[Number][9]** integral number representing the DPI for vector images. (optional, default `72`)
-    -   `options.page` **[Number][9]** page number to extract for multi-page input (GIF, TIFF) (optional, default `0`)
-    -   `options.raw` **[Object][7]?** describes raw pixel input image data. See `raw()` for pixel ordering.
-        -   `options.raw.width` **[Number][9]?** 
-        -   `options.raw.height` **[Number][9]?** 
-        -   `options.raw.channels` **[Number][9]?** 1-4
-    -   `options.create` **[Object][7]?** describes a new image to be created.
-        -   `options.create.width` **[Number][9]?** 
-        -   `options.create.height` **[Number][9]?** 
-        -   `options.create.channels` **[Number][9]?** 3-4
-        -   `options.create.background` **([String][6] \| [Object][7])?** parsed by the [color][10] module to extract values for red, green, blue and alpha.
+    -   `options.density` **[Number][14]** integral number representing the DPI for vector images. (optional, default `72`)
+    -   `options.page` **[Number][14]** page number to extract for multi-page input (GIF, TIFF) (optional, default `0`)
+    -   `options.raw` **[Object][12]?** describes raw pixel input image data. See `raw()` for pixel ordering.
+        -   `options.raw.width` **[Number][14]?** 
+        -   `options.raw.height` **[Number][14]?** 
+        -   `options.raw.channels` **[Number][14]?** 1-4
+    -   `options.create` **[Object][12]?** describes a new image to be created.
+        -   `options.create.width` **[Number][14]?** 
+        -   `options.create.height` **[Number][14]?** 
+        -   `options.create.channels` **[Number][14]?** 3-4
+        -   `options.create.background` **([String][11] \| [Object][12])?** parsed by the [color][15] module to extract values for red, green, blue and alpha.
 
-**Examples**
+### Examples
 
 ```javascript
 sharp('input.jpg')
@@ -70,27 +75,27 @@ sharp({
 .then( ... );
 ```
 
--   Throws **[Error][11]** Invalid parameters
+-   Throws **[Error][16]** Invalid parameters
 
-Returns **[Sharp][12]** 
+Returns **[Sharp][17]** 
 
 ### format
 
 An Object containing nested boolean values representing the available input and output formats/methods.
 
-**Examples**
+#### Examples
 
 ```javascript
 console.log(sharp.format);
 ```
 
-Returns **[Object][7]** 
+Returns **[Object][12]** 
 
 ### versions
 
 An Object containing the version numbers of libvips and its dependencies.
 
-**Examples**
+#### Examples
 
 ```javascript
 console.log(sharp.versions);
@@ -103,7 +108,7 @@ An EventEmitter that emits a `change` event when a task is either:
 -   queued, waiting for _libuv_ to provide a worker thread
 -   complete
 
-**Examples**
+### Examples
 
 ```javascript
 sharp.queue.on('change', function(queueLength) {
@@ -113,24 +118,34 @@ sharp.queue.on('change', function(queueLength) {
 
 [1]: #sharp
 
-[2]: #format
+[2]: #parameters
 
-[3]: #versions
+[3]: #examples
 
-[4]: #queue
+[4]: #format
 
-[5]: https://nodejs.org/api/buffer.html
+[5]: #examples-1
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[6]: #versions
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[7]: #examples-2
 
-[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[8]: #queue
 
-[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[9]: #examples-3
 
-[10]: https://www.npmjs.org/package/color
+[10]: https://nodejs.org/api/buffer.html
 
-[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[12]: #sharp
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[15]: https://www.npmjs.org/package/color
+
+[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[17]: #sharp

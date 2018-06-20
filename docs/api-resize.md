@@ -3,12 +3,20 @@
 ### Table of Contents
 
 -   [resize][1]
--   [crop][2]
--   [embed][3]
--   [max][4]
--   [min][5]
--   [ignoreAspectRatio][6]
--   [withoutEnlargement][7]
+    -   [Parameters][2]
+    -   [Examples][3]
+-   [crop][4]
+    -   [Parameters][5]
+    -   [Examples][6]
+-   [embed][7]
+    -   [Parameters][8]
+    -   [Examples][9]
+-   [max][10]
+    -   [Examples][11]
+-   [min][12]
+-   [ignoreAspectRatio][13]
+-   [withoutEnlargement][14]
+    -   [Parameters][15]
 
 ## resize
 
@@ -17,20 +25,20 @@ By default, the resized image is centre cropped to the exact size specified.
 
 Possible kernels are:
 
--   `nearest`: Use [nearest neighbour interpolation][8].
--   `cubic`: Use a [Catmull-Rom spline][9].
--   `lanczos2`: Use a [Lanczos kernel][10] with `a=2`.
+-   `nearest`: Use [nearest neighbour interpolation][16].
+-   `cubic`: Use a [Catmull-Rom spline][17].
+-   `lanczos2`: Use a [Lanczos kernel][18] with `a=2`.
 -   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
 
-**Parameters**
+### Parameters
 
--   `width` **[Number][11]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
--   `height` **[Number][11]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
--   `options` **[Object][12]?** 
-    -   `options.kernel` **[String][13]** the kernel to use for image reduction. (optional, default `'lanczos3'`)
-    -   `options.fastShrinkOnLoad` **[Boolean][14]** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
+-   `width` **[Number][19]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
+-   `height` **[Number][19]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
+-   `options` **[Object][20]?** 
+    -   `options.kernel` **[String][21]** the kernel to use for image reduction. (optional, default `'lanczos3'`)
+    -   `options.fastShrinkOnLoad` **[Boolean][22]** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
 
-**Examples**
+### Examples
 
 ```javascript
 sharp(inputBuffer)
@@ -47,7 +55,7 @@ sharp(inputBuffer)
   });
 ```
 
--   Throws **[Error][15]** Invalid parameters
+-   Throws **[Error][23]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -61,14 +69,14 @@ Possible attributes of the optional `sharp.gravity` are `north`, `northeast`, `e
 The experimental strategy-based approach resizes so one dimension is at its target length
 then repeatedly ranks edge regions, discarding the edge with the lowest score based on the selected strategy.
 
--   `entropy`: focus on the region with the highest [Shannon entropy][16].
+-   `entropy`: focus on the region with the highest [Shannon entropy][24].
 -   `attention`: focus on the region with the highest luminance frequency, colour saturation and presence of skin tones.
 
-**Parameters**
+### Parameters
 
--   `crop` **[String][13]** A member of `sharp.gravity` to crop to an edge/corner or `sharp.strategy` to crop dynamically. (optional, default `'centre'`)
+-   `crop` **[String][21]** A member of `sharp.gravity` to crop to an edge/corner or `sharp.strategy` to crop dynamically. (optional, default `'centre'`)
 
-**Examples**
+### Examples
 
 ```javascript
 const transformer = sharp()
@@ -82,7 +90,7 @@ const transformer = sharp()
 readableStream.pipe(transformer).pipe(writableStream);
 ```
 
--   Throws **[Error][15]** Invalid parameters
+-   Throws **[Error][23]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -94,11 +102,11 @@ then embed on a background of the exact `width` and `height` specified.
 If the background contains an alpha value then WebP and PNG format output images will
 contain an alpha channel, even when the input image does not.
 
-**Parameters**
+### Parameters
 
--   `embed` **[String][13]** A member of `sharp.gravity` to embed to an edge/corner. (optional, default `'centre'`)
+-   `embed` **[String][21]** A member of `sharp.gravity` to embed to an edge/corner. (optional, default `'centre'`)
 
-**Examples**
+### Examples
 
 ```javascript
 sharp('input.gif')
@@ -115,7 +123,7 @@ sharp('input.gif')
   });
 ```
 
--   Throws **[Error][15]** Invalid parameters
+-   Throws **[Error][23]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -126,7 +134,7 @@ while ensuring its dimensions are less than or equal to the `width` and `height`
 
 Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
 
-**Examples**
+### Examples
 
 ```javascript
 sharp(inputBuffer)
@@ -167,40 +175,56 @@ Use with `max()` to preserve the image's aspect ratio.
 
 The default behaviour _before_ function call is `false`, meaning the image will be enlarged.
 
-**Parameters**
+### Parameters
 
--   `withoutEnlargement` **[Boolean][14]**  (optional, default `true`)
+-   `withoutEnlargement` **[Boolean][22]**  (optional, default `true`)
 
 Returns **Sharp** 
 
 [1]: #resize
 
-[2]: #crop
+[2]: #parameters
 
-[3]: #embed
+[3]: #examples
 
-[4]: #max
+[4]: #crop
 
-[5]: #min
+[5]: #parameters-1
 
-[6]: #ignoreaspectratio
+[6]: #examples-1
 
-[7]: #withoutenlargement
+[7]: #embed
 
-[8]: http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation
+[8]: #parameters-2
 
-[9]: https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline
+[9]: #examples-2
 
-[10]: https://en.wikipedia.org/wiki/Lanczos_resampling#Lanczos_kernel
+[10]: #max
 
-[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[11]: #examples-3
 
-[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[12]: #min
 
-[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[13]: #ignoreaspectratio
 
-[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[14]: #withoutenlargement
 
-[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[15]: #parameters-3
 
-[16]: https://en.wikipedia.org/wiki/Entropy_%28information_theory%29
+[16]: http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation
+
+[17]: https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline
+
+[18]: https://en.wikipedia.org/wiki/Lanczos_resampling#Lanczos_kernel
+
+[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[21]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[22]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[23]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[24]: https://en.wikipedia.org/wiki/Entropy_%28information_theory%29

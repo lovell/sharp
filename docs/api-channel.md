@@ -3,18 +3,23 @@
 ### Table of Contents
 
 -   [extractChannel][1]
--   [joinChannel][2]
--   [bandbool][3]
+    -   [Parameters][2]
+    -   [Examples][3]
+-   [joinChannel][4]
+    -   [Parameters][5]
+-   [bandbool][6]
+    -   [Parameters][7]
+    -   [Examples][8]
 
 ## extractChannel
 
 Extract a single channel from a multi-channel image.
 
-**Parameters**
+### Parameters
 
--   `channel` **([Number][4] \| [String][5])** zero-indexed band number to extract, or `red`, `green` or `blue` as alternative to `0`, `1` or `2` respectively.
+-   `channel` **([Number][9] \| [String][10])** zero-indexed band number to extract, or `red`, `green` or `blue` as alternative to `0`, `1` or `2` respectively.
 
-**Examples**
+### Examples
 
 ```javascript
 sharp(input)
@@ -25,7 +30,7 @@ sharp(input)
    });
 ```
 
--   Throws **[Error][6]** Invalid channel
+-   Throws **[Error][11]** Invalid channel
 
 Returns **Sharp** 
 
@@ -42,13 +47,13 @@ Channel ordering follows vips convention:
 Buffers may be any of the image formats supported by sharp: JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data.
 For raw pixel input, the `options` object should contain a `raw` attribute, which follows the format of the attribute of the same name in the `sharp()` constructor.
 
-**Parameters**
+### Parameters
 
--   `images` **([Array][7]&lt;([String][5] \| [Buffer][8])> | [String][5] \| [Buffer][8])** one or more images (file paths, Buffers).
--   `options` **[Object][9]** image options, see `sharp()` constructor.
+-   `images` **([Array][12]&lt;([String][10] \| [Buffer][13])> | [String][10] \| [Buffer][13])** one or more images (file paths, Buffers).
+-   `options` **[Object][14]** image options, see `sharp()` constructor.
 
 
--   Throws **[Error][6]** Invalid parameters
+-   Throws **[Error][11]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -56,11 +61,11 @@ Returns **Sharp**
 
 Perform a bitwise boolean operation on all input image channels (bands) to produce a single channel output image.
 
-**Parameters**
+### Parameters
 
--   `boolOp` **[String][5]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+-   `boolOp` **[String][10]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
 
-**Examples**
+### Examples
 
 ```javascript
 sharp('3-channel-rgb-input.png')
@@ -72,24 +77,34 @@ sharp('3-channel-rgb-input.png')
   });
 ```
 
--   Throws **[Error][6]** Invalid parameters
+-   Throws **[Error][11]** Invalid parameters
 
 Returns **Sharp** 
 
 [1]: #extractchannel
 
-[2]: #joinchannel
+[2]: #parameters
 
-[3]: #bandbool
+[3]: #examples
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[4]: #joinchannel
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[5]: #parameters-1
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[6]: #bandbool
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[7]: #parameters-2
 
-[8]: https://nodejs.org/api/buffer.html
+[8]: #examples-1
 
-[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[13]: https://nodejs.org/api/buffer.html
+
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object

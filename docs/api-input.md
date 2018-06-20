@@ -3,10 +3,17 @@
 ### Table of Contents
 
 -   [clone][1]
--   [metadata][2]
--   [stats][3]
--   [limitInputPixels][4]
--   [sequentialRead][5]
+    -   [Examples][2]
+-   [metadata][3]
+    -   [Parameters][4]
+    -   [Examples][5]
+-   [stats][6]
+    -   [Parameters][7]
+    -   [Examples][8]
+-   [limitInputPixels][9]
+    -   [Parameters][10]
+-   [sequentialRead][11]
+    -   [Parameters][12]
 
 ## clone
 
@@ -14,7 +21,7 @@ Take a "snapshot" of the Sharp instance, returning a new instance.
 Cloned instances inherit the input of their parent instance.
 This allows multiple output Streams and therefore multiple processing pipelines to share a single input Stream.
 
-**Examples**
+### Examples
 
 ```javascript
 const pipeline = sharp().rotate();
@@ -35,23 +42,23 @@ A Promises/A+ promise is returned when `callback` is not provided.
 -   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
 -   `width`: Number of pixels wide (EXIF orientation is not taken into consideration)
 -   `height`: Number of pixels high (EXIF orientation is not taken into consideration)
--   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][6]
+-   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][13]
 -   `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
--   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][7]
+-   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][14]
 -   `density`: Number of pixels per inch (DPI), if present
 -   `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 -   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 -   `orientation`: Number value of the EXIF Orientation header, if present
 -   `exif`: Buffer containing raw EXIF data, if present
--   `icc`: Buffer containing raw [ICC][8] profile data, if present
+-   `icc`: Buffer containing raw [ICC][15] profile data, if present
 -   `iptc`: Buffer containing raw IPTC data, if present
 -   `xmp`: Buffer containing raw XMP data, if present
 
-**Parameters**
+### Parameters
 
--   `callback` **[Function][9]?** called with the arguments `(err, metadata)`
+-   `callback` **[Function][16]?** called with the arguments `(err, metadata)`
 
-**Examples**
+### Examples
 
 ```javascript
 const image = sharp(inputJpg);
@@ -68,7 +75,7 @@ image
   });
 ```
 
-Returns **([Promise][10]&lt;[Object][11]> | Sharp)** 
+Returns **([Promise][17]&lt;[Object][18]> | Sharp)** 
 
 ## stats
 
@@ -88,11 +95,11 @@ A Promise is returned when `callback` is not provided.
     -   `maxY` (y-coordinate of one of the pixel where the maximum lies)
 -   `isOpaque`: Value to identify if the image is opaque or transparent, based on the presence and use of alpha channel
 
-**Parameters**
+### Parameters
 
--   `callback` **[Function][9]?** called with the arguments `(err, stats)`
+-   `callback` **[Function][16]?** called with the arguments `(err, stats)`
 
-**Examples**
+### Examples
 
 ```javascript
 const image = sharp(inputJpg);
@@ -103,7 +110,7 @@ image
   });
 ```
 
-Returns **[Promise][10]&lt;[Object][11]>** 
+Returns **[Promise][17]&lt;[Object][18]>** 
 
 ## limitInputPixels
 
@@ -111,12 +118,12 @@ Do not process input images where the number of pixels (width _ height) exceeds 
 Assumes image dimensions contained in the input metadata can be trusted.
 The default limit is 268402689 (0x3FFF _ 0x3FFF) pixels.
 
-**Parameters**
+### Parameters
 
--   `limit` **([Number][12] \| [Boolean][13])** an integral Number of pixels, zero or false to remove limit, true to use default limit.
+-   `limit` **([Number][19] \| [Boolean][20])** an integral Number of pixels, zero or false to remove limit, true to use default limit.
 
 
--   Throws **[Error][14]** Invalid limit
+-   Throws **[Error][21]** Invalid limit
 
 Returns **Sharp** 
 
@@ -127,36 +134,50 @@ This will reduce memory usage and can improve performance on some systems.
 
 The default behaviour _before_ function call is `false`, meaning the libvips access method is not sequential.
 
-**Parameters**
+### Parameters
 
--   `sequentialRead` **[Boolean][13]**  (optional, default `true`)
+-   `sequentialRead` **[Boolean][20]**  (optional, default `true`)
 
 Returns **Sharp** 
 
 [1]: #clone
 
-[2]: #metadata
+[2]: #examples
 
-[3]: #stats
+[3]: #metadata
 
-[4]: #limitinputpixels
+[4]: #parameters
 
-[5]: #sequentialread
+[5]: #examples-1
 
-[6]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L636
+[6]: #stats
 
-[7]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L672
+[7]: #parameters-1
 
-[8]: https://www.npmjs.com/package/icc
+[8]: #examples-2
 
-[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[9]: #limitinputpixels
 
-[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[10]: #parameters-2
 
-[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[11]: #sequentialread
 
-[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[12]: #parameters-3
 
-[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[13]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L636
 
-[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[14]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L672
+
+[15]: https://www.npmjs.com/package/icc
+
+[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+
+[17]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
+[18]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[21]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error

@@ -3,6 +3,8 @@
 ### Table of Contents
 
 -   [overlayWith][1]
+    -   [Parameters][2]
+    -   [Examples][3]
 
 ## overlayWith
 
@@ -13,27 +15,27 @@ If both `top` and `left` options are provided, they take precedence over `gravit
 
 If the overlay image contains an alpha channel then composition with premultiplication will occur.
 
-**Parameters**
+### Parameters
 
--   `overlay` **([Buffer][2] \| [String][3])** Buffer containing image data or String containing the path to an image file.
--   `options` **[Object][4]?** 
-    -   `options.gravity` **[String][3]** gravity at which to place the overlay. (optional, default `'centre'`)
-    -   `options.top` **[Number][5]?** the pixel offset from the top edge.
-    -   `options.left` **[Number][5]?** the pixel offset from the left edge.
-    -   `options.tile` **[Boolean][6]** set to true to repeat the overlay image across the entire image with the given `gravity`. (optional, default `false`)
-    -   `options.cutout` **[Boolean][6]** set to true to apply only the alpha channel of the overlay image to the input image, giving the appearance of one image being cut out of another. (optional, default `false`)
-    -   `options.density` **[Number][5]** integral number representing the DPI for vector overlay image. (optional, default `72`)
-    -   `options.raw` **[Object][4]?** describes overlay when using raw pixel data.
-        -   `options.raw.width` **[Number][5]?** 
-        -   `options.raw.height` **[Number][5]?** 
-        -   `options.raw.channels` **[Number][5]?** 
-    -   `options.create` **[Object][4]?** describes a blank overlay to be created.
-        -   `options.create.width` **[Number][5]?** 
-        -   `options.create.height` **[Number][5]?** 
-        -   `options.create.channels` **[Number][5]?** 3-4
-        -   `options.create.background` **([String][3] \| [Object][4])?** parsed by the [color][7] module to extract values for red, green, blue and alpha.
+-   `overlay` **([Buffer][4] \| [String][5])** Buffer containing image data or String containing the path to an image file.
+-   `options` **[Object][6]?** 
+    -   `options.gravity` **[String][5]** gravity at which to place the overlay. (optional, default `'centre'`)
+    -   `options.top` **[Number][7]?** the pixel offset from the top edge.
+    -   `options.left` **[Number][7]?** the pixel offset from the left edge.
+    -   `options.tile` **[Boolean][8]** set to true to repeat the overlay image across the entire image with the given `gravity`. (optional, default `false`)
+    -   `options.cutout` **[Boolean][8]** set to true to apply only the alpha channel of the overlay image to the input image, giving the appearance of one image being cut out of another. (optional, default `false`)
+    -   `options.density` **[Number][7]** integral number representing the DPI for vector overlay image. (optional, default `72`)
+    -   `options.raw` **[Object][6]?** describes overlay when using raw pixel data.
+        -   `options.raw.width` **[Number][7]?** 
+        -   `options.raw.height` **[Number][7]?** 
+        -   `options.raw.channels` **[Number][7]?** 
+    -   `options.create` **[Object][6]?** describes a blank overlay to be created.
+        -   `options.create.width` **[Number][7]?** 
+        -   `options.create.height` **[Number][7]?** 
+        -   `options.create.channels` **[Number][7]?** 3-4
+        -   `options.create.background` **([String][5] \| [Object][6])?** parsed by the [color][9] module to extract values for red, green, blue and alpha.
 
-**Examples**
+### Examples
 
 ```javascript
 sharp('input.png')
@@ -54,22 +56,26 @@ sharp('input.png')
   });
 ```
 
--   Throws **[Error][8]** Invalid parameters
+-   Throws **[Error][10]** Invalid parameters
 
 Returns **Sharp** 
 
 [1]: #overlaywith
 
-[2]: https://nodejs.org/api/buffer.html
+[2]: #parameters
 
-[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[3]: #examples
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[4]: https://nodejs.org/api/buffer.html
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[7]: https://www.npmjs.org/package/color
+[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[9]: https://www.npmjs.org/package/color
+
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
