@@ -826,6 +826,36 @@ describe('Input/output', function () {
       });
   });
 
+  it('Optimise coding generates smaller output length', function (done) {
+    // First generate with optimize coding enabled (default)
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .jpeg()
+      .toBuffer(function (err, withOptimiseCoding, withInfo) {
+        if (err) throw err;
+        assert.strictEqual(true, withOptimiseCoding.length > 0);
+        assert.strictEqual(withOptimiseCoding.length, withInfo.size);
+        assert.strictEqual('jpeg', withInfo.format);
+        assert.strictEqual(320, withInfo.width);
+        assert.strictEqual(240, withInfo.height);
+        // Then generate with coding disabled
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .jpeg({ optimizeCoding: false })
+          .toBuffer(function (err, withoutOptimiseCoding, withoutInfo) {
+            if (err) throw err;
+            assert.strictEqual(true, withoutOptimiseCoding.length > 0);
+            assert.strictEqual(withoutOptimiseCoding.length, withoutInfo.size);
+            assert.strictEqual('jpeg', withoutInfo.format);
+            assert.strictEqual(320, withoutInfo.width);
+            assert.strictEqual(240, withoutInfo.height);
+            // Verify optimised image is of a smaller size
+            assert.strictEqual(true, withOptimiseCoding.length < withoutOptimiseCoding.length);
+            done();
+          });
+      });
+  });
+
   it('Convert SVG to PNG at default 72DPI', function (done) {
     sharp(fixtures.inputSvg)
       .resize(1024)

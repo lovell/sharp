@@ -104,6 +104,7 @@ struct PipelineBaton {
   bool jpegTrellisQuantisation;
   bool jpegOvershootDeringing;
   bool jpegOptimiseScans;
+  bool jpegOptimiseCoding;
   bool pngProgressive;
   int pngCompressionLevel;
   bool pngAdaptiveFiltering;
@@ -189,6 +190,7 @@ struct PipelineBaton {
     jpegTrellisQuantisation(false),
     jpegOvershootDeringing(false),
     jpegOptimiseScans(false),
+    jpegOptimiseCoding(true),
     pngProgressive(false),
     pngCompressionLevel(9),
     pngAdaptiveFiltering(false),

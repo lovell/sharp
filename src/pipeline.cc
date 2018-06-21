@@ -735,7 +735,7 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("trellis_quant", baton->jpegTrellisQuantisation)
             ->set("overshoot_deringing", baton->jpegOvershootDeringing)
             ->set("optimize_scans", baton->jpegOptimiseScans)
-            ->set("optimize_coding", TRUE)));
+            ->set("optimize_coding", baton->jpegOptimiseCoding)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
           area->free_fn = nullptr;
@@ -850,7 +850,7 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("trellis_quant", baton->jpegTrellisQuantisation)
             ->set("overshoot_deringing", baton->jpegOvershootDeringing)
             ->set("optimize_scans", baton->jpegOptimiseScans)
-            ->set("optimize_coding", TRUE));
+            ->set("optimize_coding", baton->jpegOptimiseCoding));
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || (mightMatchInput && isPng) || (willMatchInput &&
@@ -929,7 +929,7 @@ class PipelineWorker : public Nan::AsyncWorker {
               {"trellis_quant", baton->jpegTrellisQuantisation ? "TRUE" : "FALSE"},
               {"overshoot_deringing", baton->jpegOvershootDeringing ? "TRUE": "FALSE"},
               {"optimize_scans", baton->jpegOptimiseScans ? "TRUE": "FALSE"},
-              {"optimize_coding", "TRUE"}
+              {"optimize_coding", baton->jpegOptimiseCoding ? "TRUE": "FALSE"}
             };
             suffix = AssembleSuffixString(extname, options);
           }
@@ -1268,6 +1268,7 @@ NAN_METHOD(pipeline) {
   baton->jpegTrellisQuantisation = AttrTo<bool>(options, "jpegTrellisQuantisation");
   baton->jpegOvershootDeringing = AttrTo<bool>(options, "jpegOvershootDeringing");
   baton->jpegOptimiseScans = AttrTo<bool>(options, "jpegOptimiseScans");
+  baton->jpegOptimiseCoding = AttrTo<bool>(options, "jpegOptimiseCoding");
   baton->pngProgressive = AttrTo<bool>(options, "pngProgressive");
   baton->pngCompressionLevel = AttrTo<uint32_t>(options, "pngCompressionLevel");
   baton->pngAdaptiveFiltering = AttrTo<bool>(options, "pngAdaptiveFiltering");
