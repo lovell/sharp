@@ -5,6 +5,8 @@ site_description: High performance Node.js image processing, the fastest module 
 copyright: <a href="https://pixelplumbing.com/">pixelplumbing.com</a>
 google_analytics: ['UA-13034748-12', 'sharp.pixelplumbing.com']
 theme: readthedocs
+extra_css:
+  - css/extra.css
 markdown_extensions:
   - toc:
       permalink: True

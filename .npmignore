@@ -8,6 +8,7 @@ test
 .travis.yml
 appveyor.yml
 mkdocs.yml
+docs/css/
 vendor
 .prebuildrc
 .nyc_output

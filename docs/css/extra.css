@@ -1,0 +1,5 @@
+/* Nest document subheadings in navigation */
+ul.subnav ul:not(.subnav) {
+  padding-left: 2em;
+  font-size: 80%;
+}
