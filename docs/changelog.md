@@ -4,7 +4,7 @@
 
 Requires libvips v8.6.1.
 
-#### v0.20.5 - TBD
+#### v0.20.5 - 27<sup>th</sup> June 2018
 
 * Expose libjpeg optimize_coding flag.
   [#1265](https://github.com/lovell/sharp/pull/1265)
