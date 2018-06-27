@@ -48,7 +48,8 @@
     "Andrea Bianco <andrea.bianco@unibas.ch>",
     "Rik Heywood <rik@rik.org>",
     "Thomas Parisot <hi@oncletom.io>",
-    "Nathan Graves <nathanrgraves+github@gmail.com>"
+    "Nathan Graves <nathanrgraves+github@gmail.com>",
+    "Tom Lokhorst <tom@lokhorst.eu>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",

@@ -4,6 +4,12 @@
 
 Requires libvips v8.6.1.
 
+#### v0.20.5 - TBD
+
+* Expose libjpeg optimize_coding flag.
+  [#1265](https://github.com/lovell/sharp/pull/1265)
+  [@tomlokhorst](https://github.com/tomlokhorst)
+
 #### v0.20.4 - 20<sup>th</sup> June 2018
 
 * Prevent possible rounding error when using shrink-on-load and 90/270 degree rotation.

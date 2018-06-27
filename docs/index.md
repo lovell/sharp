@@ -112,6 +112,7 @@ the help and code contributions of the following people:
 * [Rik Heywood](https://github.com/rikh42)
 * [Thomas Parisot](https://github.com/oncletom)
 * [Nathan Graves](https://github.com/woolite64)
+* [Tom Lokhorst](https://github.com/tomlokhorst)
 
 Thank you!
 
