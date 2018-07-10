@@ -4,6 +4,16 @@
 
 Requires libvips v8.6.1.
 
+#### v0.20.6 - TBD
+
+* Expose mozjpeg quant_table flag.
+  [#1285](https://github.com/lovell/sharp/pull/1285)
+  [@rexxars](https://github.com/rexxars)
+
+* Allow full WebP alphaQuality range of 0-100.
+  [#1290](https://github.com/lovell/sharp/pull/1290)
+  [@sylvaindumont](https://github.com/sylvaindumont)
+
 #### v0.20.5 - 27<sup>th</sup> June 2018
 
 * Expose libjpeg optimize_coding flag.

@@ -113,6 +113,8 @@ the help and code contributions of the following people:
 * [Thomas Parisot](https://github.com/oncletom)
 * [Nathan Graves](https://github.com/woolite64)
 * [Tom Lokhorst](https://github.com/tomlokhorst)
+* [Espen Hovlandsdal](https://github.com/rexxars)
+* [Sylvain Dumont](https://github.com/sylvaindumont)
 
 Thank you!
 
