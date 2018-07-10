@@ -116,6 +116,8 @@ Use these JPEG options for output image.
     -   `options.progressive` **[Boolean][6]** use progressive (interlace) scan (optional, default `false`)
     -   `options.chromaSubsampling` **[String][1]** set to '4:4:4' to prevent chroma subsampling when quality &lt;= 90 (optional, default `'4:2:0'`)
     -   `options.trellisQuantisation` **[Boolean][6]** apply trellis quantisation, requires mozjpeg (optional, default `false`)
+    -   `options.quantisationTable` **[Number][8]** [quantisation table][9] to use, integer 0-8 (optional, default `0`)
+    -   `options.quantizationTable` **[Number][8]** alternative spelling of quantisationTable (optional, default `0`)
     -   `options.overshootDeringing` **[Boolean][6]** apply overshoot deringing, requires mozjpeg (optional, default `false`)
     -   `options.optimiseScans` **[Boolean][6]** optimise progressive scans, forces progressive, requires mozjpeg (optional, default `false`)
     -   `options.optimizeScans` **[Boolean][6]** alternative spelling of optimiseScans (optional, default `false`)
@@ -312,3 +314,5 @@ Returns **Sharp**
 [7]: https://nodejs.org/api/buffer.html
 
 [8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[9]:  https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave

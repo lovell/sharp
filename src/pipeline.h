@@ -102,6 +102,7 @@ struct PipelineBaton {
   bool jpegProgressive;
   std::string jpegChromaSubsampling;
   bool jpegTrellisQuantisation;
+  int jpegQuantisationTable;
   bool jpegOvershootDeringing;
   bool jpegOptimiseScans;
   bool jpegOptimiseCoding;
@@ -188,6 +189,7 @@ struct PipelineBaton {
     jpegProgressive(false),
     jpegChromaSubsampling("4:2:0"),
     jpegTrellisQuantisation(false),
+    jpegQuantisationTable(0),
     jpegOvershootDeringing(false),
     jpegOptimiseScans(false),
     jpegOptimiseCoding(true),

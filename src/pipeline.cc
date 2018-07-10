@@ -733,6 +733,7 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("interlace", baton->jpegProgressive)
             ->set("no_subsample", baton->jpegChromaSubsampling == "4:4:4")
             ->set("trellis_quant", baton->jpegTrellisQuantisation)
+            ->set("quant_table", baton->jpegQuantisationTable)
             ->set("overshoot_deringing", baton->jpegOvershootDeringing)
             ->set("optimize_scans", baton->jpegOptimiseScans)
             ->set("optimize_coding", baton->jpegOptimiseCoding)));
@@ -848,6 +849,7 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("interlace", baton->jpegProgressive)
             ->set("no_subsample", baton->jpegChromaSubsampling == "4:4:4")
             ->set("trellis_quant", baton->jpegTrellisQuantisation)
+            ->set("quant_table", baton->jpegQuantisationTable)
             ->set("overshoot_deringing", baton->jpegOvershootDeringing)
             ->set("optimize_scans", baton->jpegOptimiseScans)
             ->set("optimize_coding", baton->jpegOptimiseCoding));
@@ -927,6 +929,7 @@ class PipelineWorker : public Nan::AsyncWorker {
               {"interlace", baton->jpegProgressive ? "TRUE" : "FALSE"},
               {"no_subsample", baton->jpegChromaSubsampling == "4:4:4" ? "TRUE": "FALSE"},
               {"trellis_quant", baton->jpegTrellisQuantisation ? "TRUE" : "FALSE"},
+              {"quant_table", std::to_string(baton->jpegQuantisationTable)},
               {"overshoot_deringing", baton->jpegOvershootDeringing ? "TRUE": "FALSE"},
               {"optimize_scans", baton->jpegOptimiseScans ? "TRUE": "FALSE"},
               {"optimize_coding", baton->jpegOptimiseCoding ? "TRUE": "FALSE"}
@@ -1266,6 +1269,7 @@ NAN_METHOD(pipeline) {
   baton->jpegProgressive = AttrTo<bool>(options, "jpegProgressive");
   baton->jpegChromaSubsampling = AttrAsStr(options, "jpegChromaSubsampling");
   baton->jpegTrellisQuantisation = AttrTo<bool>(options, "jpegTrellisQuantisation");
+  baton->jpegQuantisationTable = AttrTo<uint32_t>(options, "jpegQuantisationTable");
   baton->jpegOvershootDeringing = AttrTo<bool>(options, "jpegOvershootDeringing");
   baton->jpegOptimiseScans = AttrTo<bool>(options, "jpegOptimiseScans");
   baton->jpegOptimiseCoding = AttrTo<bool>(options, "jpegOptimiseCoding");

@@ -389,6 +389,16 @@ describe('Input/output', function () {
     });
   });
 
+  describe('Invalid JPEG quantisation table', function () {
+    [-1, 88.2, 'test'].forEach(function (table) {
+      it(table.toString(), function () {
+        assert.throws(function () {
+          sharp().jpeg({ quantisationTable: table });
+        });
+      });
+    });
+  });
+
   it('Progressive JPEG image', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -851,6 +861,37 @@ describe('Input/output', function () {
             assert.strictEqual(240, withoutInfo.height);
             // Verify optimised image is of a smaller size
             assert.strictEqual(true, withOptimiseCoding.length < withoutOptimiseCoding.length);
+            done();
+          });
+      });
+  });
+
+  it('Specifying quantisation table provides different JPEG', function (done) {
+    // First generate with default quantisation table
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .jpeg({ optimiseCoding: false })
+      .toBuffer(function (err, withDefaultQuantisationTable, withInfo) {
+        if (err) throw err;
+        assert.strictEqual(true, withDefaultQuantisationTable.length > 0);
+        assert.strictEqual(withDefaultQuantisationTable.length, withInfo.size);
+        assert.strictEqual('jpeg', withInfo.format);
+        assert.strictEqual(320, withInfo.width);
+        assert.strictEqual(240, withInfo.height);
+        // Then generate with different quantisation table
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .jpeg({ optimiseCoding: false, quantisationTable: 3 })
+          .toBuffer(function (err, withQuantTable3, withoutInfo) {
+            if (err) throw err;
+            assert.strictEqual(true, withQuantTable3.length > 0);
+            assert.strictEqual(withQuantTable3.length, withoutInfo.size);
+            assert.strictEqual('jpeg', withoutInfo.format);
+            assert.strictEqual(320, withoutInfo.width);
+            assert.strictEqual(240, withoutInfo.height);
+
+            // Verify image is same (as mozjpeg may not be present) size or less
+            assert.strictEqual(true, withQuantTable3.length <= withDefaultQuantisationTable.length);
             done();
           });
       });
