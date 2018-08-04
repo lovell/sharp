@@ -17,6 +17,9 @@ Requires libvips v8.6.1.
 * Ensure vendor platform mismatch throws error at install time.
   [#1303](https://github.com/lovell/sharp/issues/1303)
 
+* Improve install time error messages for FreeBSD users.
+  [#1310](https://github.com/lovell/sharp/issues/1310)
+
 #### v0.20.5 - 27<sup>th</sup> June 2018
 
 * Expose libjpeg optimize_coding flag.
