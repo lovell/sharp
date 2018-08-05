@@ -14,6 +14,9 @@ Requires libvips v8.6.1.
   [#1290](https://github.com/lovell/sharp/pull/1290)
   [@sylvaindumont](https://github.com/sylvaindumont)
 
+* Cache libvips binaries to reduce re-install time.
+  [#1301](https://github.com/lovell/sharp/issues/1301)
+
 * Ensure vendor platform mismatch throws error at install time.
   [#1303](https://github.com/lovell/sharp/issues/1303)
 

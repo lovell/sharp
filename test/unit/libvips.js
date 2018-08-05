@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const fs = require('fs');
 const semver = require('semver');
 const libvips = require('../../lib/libvips');
 
@@ -65,6 +66,12 @@ describe('libvips binaries', function () {
       assert.strictEqual(false, useGlobalLibvips);
 
       delete process.env.SHARP_IGNORE_GLOBAL_LIBVIPS;
+    });
+    it('cachePath returns a valid path ending with _libvips', function () {
+      const cachePath = libvips.cachePath();
+      assert.strictEqual('string', typeof cachePath);
+      assert.strictEqual('_libvips', cachePath.substr(-8));
+      assert.strictEqual(true, fs.existsSync(cachePath));
     });
   });
 });

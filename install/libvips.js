@@ -17,6 +17,22 @@ const platform = require('../lib/platform');
 const minimumLibvipsVersion = libvips.minimumLibvipsVersion;
 const distBaseUrl = process.env.SHARP_DIST_BASE_URL || `https://github.com/lovell/sharp-libvips/releases/download/v${minimumLibvipsVersion}/`;
 
+const extractTarball = function (tarPath) {
+  const vendorPath = path.join(__dirname, '..', 'vendor');
+  if (!fs.existsSync(vendorPath)) {
+    fs.mkdirSync(vendorPath);
+  }
+  tar
+    .extract({
+      file: tarPath,
+      cwd: vendorPath,
+      strict: true
+    })
+    .catch(function (err) {
+      throw err;
+    });
+};
+
 try {
   const useGlobalLibvips = libvips.useGlobalLibvips();
   if (useGlobalLibvips) {
@@ -47,37 +63,29 @@ try {
     }
     // Download to per-process temporary file
     const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.gz';
-    const tarPathTemp = path.join(os.tmpdir(), `${process.pid}-${tarFilename}`);
-    const tmpFile = fs.createWriteStream(tarPathTemp);
-    const url = distBaseUrl + tarFilename;
-    npmLog.info('sharp', `Downloading ${url}`);
-    simpleGet({ url: url, agent: agent() }, function (err, response) {
-      if (err) {
-        throw err;
-      }
-      if (response.statusCode !== 200) {
-        throw new Error(`Status ${response.statusCode}`);
-      }
-      response.pipe(tmpFile);
-    });
-    tmpFile.on('close', function () {
-      const vendorPath = path.join(__dirname, '..', 'vendor');
-      fs.mkdirSync(vendorPath);
-      tar
-        .extract({
-          file: tarPathTemp,
-          cwd: vendorPath,
-          strict: true
-        })
-        .then(function () {
-          try {
-            fs.unlinkSync(tarPathTemp);
-          } catch (err) {}
-        })
-        .catch(function (err) {
+    const tarPathCache = path.join(libvips.cachePath(), tarFilename);
+    if (fs.existsSync(tarPathCache)) {
+      npmLog.info('sharp', `Using cached ${tarPathCache}`);
+      extractTarball(tarPathCache);
+    } else {
+      const tarPathTemp = path.join(os.tmpdir(), `${process.pid}-${tarFilename}`);
+      const tmpFile = fs.createWriteStream(tarPathTemp);
+      const url = distBaseUrl + tarFilename;
+      npmLog.info('sharp', `Downloading ${url}`);
+      simpleGet({ url: url, agent: agent() }, function (err, response) {
+        if (err) {
           throw err;
-        });
-    });
+        }
+        if (response.statusCode !== 200) {
+          throw new Error(`Status ${response.statusCode}`);
+        }
+        response.pipe(tmpFile);
+      });
+      tmpFile.on('close', function () {
+        fs.renameSync(tarPathTemp, tarPathCache);
+        extractTarball(tarPathCache);
+      });
+    }
   }
 } catch (err) {
   npmLog.error('sharp', err.message);
