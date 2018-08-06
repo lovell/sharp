@@ -59,7 +59,6 @@ class StatsWorker : public Nan::AsyncWorker {
     using sharp::MaximumImageAlpha;
 
     vips::VImage image;
-    vips::VImage stats;
     sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
 
     try {
@@ -69,9 +68,8 @@ class StatsWorker : public Nan::AsyncWorker {
     }
     if (imageType != sharp::ImageType::UNKNOWN) {
       try {
-        stats = image.stats();
-        int bands = image.bands();
-        double const max = MaximumImageAlpha(image.interpretation());
+        vips::VImage stats = image.stats();
+        int const bands = image.bands();
         for (int b = 1; b <= bands; b++) {
           ChannelStats cStats(static_cast<int>(stats.getpoint(STAT_MIN_INDEX, b).front()),
                               static_cast<int>(stats.getpoint(STAT_MAX_INDEX, b).front()),
@@ -83,11 +81,15 @@ class StatsWorker : public Nan::AsyncWorker {
                               static_cast<int>(stats.getpoint(STAT_MAXY_INDEX, b).front()));
           baton->channelStats.push_back(cStats);
         }
-
-        // alpha layer is there and the last band i.e. alpha has its max value greater than 0)
-        if (sharp::HasAlpha(image) && stats.getpoint(STAT_MIN_INDEX, bands).front() != max) {
-          baton->isOpaque = false;
+        // Image is not opaque when alpha layer is present and contains a non-mamixa value
+        if (sharp::HasAlpha(image)) {
+          double const minAlpha = static_cast<double>(stats.getpoint(STAT_MIN_INDEX, bands).front());
+          if (minAlpha != MaximumImageAlpha(image.interpretation())) {
+            baton->isOpaque = false;
+          }
         }
+        // Estimate entropy via histogram of greyscale value frequency
+        baton->entropy = std::abs(image.colourspace(VIPS_INTERPRETATION_B_W)[0].hist_find().hist_entropy());
       } catch (vips::VError const &err) {
         (baton->err).append(err.what());
       }
@@ -130,6 +132,7 @@ class StatsWorker : public Nan::AsyncWorker {
 
       Set(info, New("channels").ToLocalChecked(), channels);
       Set(info, New("isOpaque").ToLocalChecked(), New<v8::Boolean>(baton->isOpaque));
+      Set(info, New("entropy").ToLocalChecked(), New<v8::Number>(baton->entropy));
       argv[1] = info;
     }
 

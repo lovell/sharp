@@ -51,12 +51,14 @@ struct StatsBaton {
   // Output
   std::vector<ChannelStats> channelStats;
   bool isOpaque;
+  double entropy;
 
   std::string err;
 
   StatsBaton():
     input(nullptr),
-    isOpaque(true)
+    isOpaque(true),
+    entropy(0.0)
     {}
 };
 

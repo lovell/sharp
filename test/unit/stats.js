@@ -24,6 +24,7 @@ describe('Image Stats', function () {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
 
       // red channel
       assert.strictEqual(0, stats.channels[0]['min']);
@@ -82,6 +83,7 @@ describe('Image Stats', function () {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0.3409031108021736));
 
       // red channel
       assert.strictEqual(0, stats.channels[0]['min']);
@@ -105,7 +107,9 @@ describe('Image Stats', function () {
   it('PNG with transparency', function (done) {
     sharp(fixtures.inputPngWithTransparency).stats(function (err, stats) {
       if (err) throw err;
+
       assert.strictEqual(false, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0.06778064835816622));
 
       // red channel
       assert.strictEqual(0, stats.channels[0]['min']);
@@ -180,6 +184,7 @@ describe('Image Stats', function () {
       if (err) throw err;
 
       assert.strictEqual(false, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0));
 
       // alpha channel
       assert.strictEqual(0, stats.channels[3]['min']);
@@ -204,7 +209,9 @@ describe('Image Stats', function () {
   it('Tiff', function (done) {
     sharp(fixtures.inputTiff).stats(function (err, stats) {
       if (err) throw err;
+
       assert.strictEqual(true, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0.3851250782608986));
 
       // red channel
       assert.strictEqual(0, stats.channels[0]['min']);
@@ -231,6 +238,7 @@ describe('Image Stats', function () {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.51758075132966));
 
       // red channel
       assert.strictEqual(0, stats.channels[0]['min']);
@@ -289,6 +297,7 @@ describe('Image Stats', function () {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 6.087309412541799));
 
       // red channel
       assert.strictEqual(35, stats.channels[0]['min']);
@@ -345,7 +354,9 @@ describe('Image Stats', function () {
   it('Grayscale GIF with alpha', function (done) {
     sharp(fixtures.inputGifGreyPlusAlpha).stats(function (err, stats) {
       if (err) throw err;
+
       assert.strictEqual(false, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 1));
 
       // gray channel
       assert.strictEqual(0, stats.channels[0]['min']);
@@ -387,7 +398,9 @@ describe('Image Stats', function () {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp().stats(function (err, stats) {
       if (err) throw err;
+
       assert.strictEqual(true, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
 
       // red channel
       assert.strictEqual(0, stats.channels[0]['min']);
@@ -449,6 +462,7 @@ describe('Image Stats', function () {
 
     return pipeline.stats().then(function (stats) {
       assert.strictEqual(true, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
 
       // red channel
       assert.strictEqual(0, stats.channels[0]['min']);
@@ -505,6 +519,7 @@ describe('Image Stats', function () {
   it('File in, Promise out', function () {
     return sharp(fixtures.inputJpg).stats().then(function (stats) {
       assert.strictEqual(true, stats.isOpaque);
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
 
       // red channel
       assert.strictEqual(0, stats.channels[0]['min']);

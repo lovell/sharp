@@ -23,6 +23,8 @@ Requires libvips v8.6.1.
 * Improve install time error messages for FreeBSD users.
   [#1310](https://github.com/lovell/sharp/issues/1310)
 
+* Add experimental entropy field to stats response.
+
 #### v0.20.5 - 27<sup>th</sup> June 2018
 
 * Expose libjpeg optimize_coding flag.
