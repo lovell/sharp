@@ -6,6 +6,9 @@ Requires libvips v8.6.1.
 
 #### v0.20.6 - TBD
 
+* Add removeAlpha operation to remove alpha channel, if any.
+  [#1248](https://github.com/lovell/sharp/issues/1248)
+
 * Expose mozjpeg quant_table flag.
   [#1285](https://github.com/lovell/sharp/pull/1285)
   [@rexxars](https://github.com/rexxars)

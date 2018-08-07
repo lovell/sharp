@@ -29,6 +29,16 @@ using vips::VError;
 namespace sharp {
 
   /*
+    Removes alpha channel, if any.
+  */
+  VImage RemoveAlpha(VImage image) {
+    if (HasAlpha(image)) {
+      image = image.extract_band(0, VImage::option()->set("n", image.bands() - 1));
+    }
+    return image;
+  }
+
+  /*
     Composite overlayImage over image at given position
     Assumes alpha channels are already premultiplied and will be unpremultiplied after
    */
@@ -223,10 +233,8 @@ namespace sharp {
   VImage Gamma(VImage image, double const exponent) {
     if (HasAlpha(image)) {
       // Separate alpha channel
-      VImage imageWithoutAlpha = image.extract_band(0,
-        VImage::option()->set("n", image.bands() - 1));
       VImage alpha = image[image.bands() - 1];
-      return imageWithoutAlpha.gamma(VImage::option()->set("exponent", exponent)).bandjoin(alpha);
+      return RemoveAlpha(image).gamma(VImage::option()->set("exponent", exponent)).bandjoin(alpha);
     } else {
       return image.gamma(VImage::option()->set("exponent", exponent));
     }
@@ -374,10 +382,8 @@ namespace sharp {
   VImage Linear(VImage image, double const a, double const b) {
     if (HasAlpha(image)) {
       // Separate alpha channel
-      VImage imageWithoutAlpha = image.extract_band(0,
-        VImage::option()->set("n", image.bands() - 1));
       VImage alpha = image[image.bands() - 1];
-      return imageWithoutAlpha.linear(a, b).bandjoin(alpha);
+      return RemoveAlpha(image).linear(a, b).bandjoin(alpha);
     } else {
       return image.linear(a, b);
     }

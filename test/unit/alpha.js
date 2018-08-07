@@ -81,35 +81,45 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Enlargement with non-nearest neighbor interpolation shouldn’t cause dark edges', function (done) {
+  it('Enlargement with non-nearest neighbor interpolation shouldn’t cause dark edges', function () {
     const base = 'alpha-premultiply-enlargement-2048x1536-paper.png';
     const actual = fixtures.path('output.' + base);
     const expected = fixtures.expected(base);
-    sharp(fixtures.inputPngAlphaPremultiplicationSmall)
+    return sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .resize(2048, 1536)
-      .toFile(actual, function (err) {
-        if (err) {
-          done(err);
-        } else {
-          fixtures.assertMaxColourDistance(actual, expected, 102);
-          done();
-        }
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, expected, 102);
       });
   });
 
-  it('Reduction with non-nearest neighbor interpolation shouldn’t cause dark edges', function (done) {
+  it('Reduction with non-nearest neighbor interpolation shouldn’t cause dark edges', function () {
     const base = 'alpha-premultiply-reduction-1024x768-paper.png';
     const actual = fixtures.path('output.' + base);
     const expected = fixtures.expected(base);
-    sharp(fixtures.inputPngAlphaPremultiplicationLarge)
+    return sharp(fixtures.inputPngAlphaPremultiplicationLarge)
       .resize(1024, 768)
-      .toFile(actual, function (err) {
-        if (err) {
-          done(err);
-        } else {
-          fixtures.assertMaxColourDistance(actual, expected, 102);
-          done();
-        }
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, expected, 102);
       });
+  });
+
+  it('Removes alpha from fixtures with transparency, ignores those without', function () {
+    return Promise.all([
+      fixtures.inputPngWithTransparency,
+      fixtures.inputPngWithTransparency16bit,
+      fixtures.inputWebPWithTransparency,
+      fixtures.inputJpg,
+      fixtures.inputPng,
+      fixtures.inputWebP
+    ].map(function (input) {
+      return sharp(input)
+        .removeAlpha()
+        .toBuffer({ resolveWithObject: true })
+        .then(function (result) {
+          assert.strictEqual(3, result.info.channels);
+        });
+    }));
   });
 });

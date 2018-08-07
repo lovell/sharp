@@ -26,6 +26,11 @@ using vips::VImage;
 namespace sharp {
 
   /*
+    Removes alpha channel, if any.
+  */
+  VImage RemoveAlpha(VImage image);
+
+  /*
     Alpha composite src over dst with given gravity.
     Assumes alpha channels are already premultiplied and will be unpremultiplied after.
    */
