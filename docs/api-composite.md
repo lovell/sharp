@@ -40,8 +40,7 @@ sharp('input.png')
   .overlayWith('overlay.png', { gravity: sharp.gravity.southeast } )
   .sharpen()
   .withMetadata()
-  .quality(90)
-  .webp()
+  .webp( { quality: 90 } )
   .toBuffer()
   .then(function(outputBuffer) {
     // outputBuffer contains upside down, 300px wide, alpha channel flattened
