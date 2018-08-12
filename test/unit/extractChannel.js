@@ -69,6 +69,17 @@ describe('Image channel extraction', function () {
       });
   });
 
+  it('Alpha from 16-bit PNG', function (done) {
+    const output = fixtures.path('output.extract-alpha-16bit.jpg');
+    sharp(fixtures.inputPngWithTransparency16bit)
+      .extractChannel(3)
+      .toFile(output, function (err, info) {
+        if (err) throw err;
+        fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-16bit.jpg'));
+        done();
+      });
+  });
+
   it('Invalid channel number', function () {
     assert.throws(function () {
       sharp(fixtures.inputJpg)

@@ -694,9 +694,12 @@ class PipelineWorker : public Nan::AsyncWorker {
           (baton->err).append("Cannot extract channel from image. Too few channels in image.");
           return Error();
         }
+        VipsInterpretation const interpretation = sharp::Is16Bit(image.interpretation())
+          ? VIPS_INTERPRETATION_GREY16
+          : VIPS_INTERPRETATION_B_W;
         image = image
           .extract_band(baton->extractChannel)
-          .copy(VImage::option()->set("interpretation", VIPS_INTERPRETATION_B_W));
+          .copy(VImage::option()->set("interpretation", interpretation));
       }
 
       // Remove alpha channel, if any
