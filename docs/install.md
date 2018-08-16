@@ -161,6 +161,8 @@ Set the Lambda runtime to Node.js 6.10.
 
 To get the best performance select the largest memory available. A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
+See https://github.com/dioptre/lampic for a working Sharp example on AWS Lambda
+
 ### NW.js
 
 Run the `nw-gyp` tool after installation.
