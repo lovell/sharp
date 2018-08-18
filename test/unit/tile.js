@@ -46,6 +46,51 @@ const assertDeepZoomTiles = function (directory, expectedSize, expectedLevels, d
   }, done);
 };
 
+const assertZoomifyTiles = function (directory, expectedTileSize, expectedLevels, done) {
+  fs.stat(path.join(directory, 'ImageProperties.xml'), function (err, stat) {
+    if (err) throw err;
+    assert.ok(stat.isFile());
+    assert.ok(stat.size > 0);
+
+    let maxTileLevel = -1;
+    fs.readdirSync(path.join(directory, 'TileGroup0')).forEach(function (tile) {
+      // Verify tile file name
+      assert.ok(/^[0-9]+-[0-9]+-[0-9]+\.jpg$/.test(tile));
+      let level = parseInt(tile.split('-')[0]);
+      maxTileLevel = Math.max(maxTileLevel, level);
+    });
+
+    assert.strictEqual(maxTileLevel + 1, expectedLevels); // add one to account for zero level tile
+
+    done();
+  });
+};
+
+const assertGoogleTiles = function (directory, expectedTileSize, expectedLevels, done) {
+  const levels = fs.readdirSync(directory);
+  assert.strictEqual(expectedLevels, levels.length - 1); // subtract one to account for default blank tile
+
+  fs.stat(path.join(directory, 'blank.png'), function (err, stat) {
+    if (err) throw err;
+    assert.ok(stat.isFile());
+    assert.ok(stat.size > 0);
+
+    // Basic check to confirm lowest and highest level tiles exist
+    fs.stat(path.join(directory, '0', '0', '0.jpg'), function (err, stat) {
+      if (err) throw err;
+      assert.strictEqual(true, stat.isFile());
+      assert.strictEqual(true, stat.size > 0);
+
+      fs.stat(path.join(directory, (expectedLevels - 1).toString(), '0', '0.jpg'), function (err, stat) {
+        if (err) throw err;
+        assert.strictEqual(true, stat.isFile());
+        assert.strictEqual(true, stat.size > 0);
+        done();
+      });
+    });
+  });
+};
+
 describe('Tile', function () {
   it('Valid size values pass', function () {
     [1, 8192].forEach(function (size) {
@@ -140,6 +185,26 @@ describe('Tile', function () {
     ['tiff', 'raw'].forEach(function (format) {
       assert.throws(function () {
         sharp().toFormat(format).tile();
+      });
+    });
+  });
+
+  it('Valid depths pass', function () {
+    ['onepixel', 'onetile', 'one'].forEach(function (depth) {
+      assert.doesNotThrow(function (depth) {
+        sharp().tile({
+          depth: depth
+        });
+      });
+    });
+  });
+
+  it('Invalid depths fail', function () {
+    ['depth', 1].forEach(function (depth) {
+      assert.throws(function () {
+        sharp().tile({
+          depth: depth
+        });
       });
     });
   });
@@ -251,6 +316,54 @@ describe('Tile', function () {
     });
   });
 
+  it('Deep Zoom layout with depth of one', function (done) {
+    const directory = fixtures.path('output.512_depth_one.dzi_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          size: 512,
+          depth: 'one'
+        })
+        .toFile(fixtures.path('output.512_depth_one.dzi'), function (err, info) {
+          if (err) throw err;
+          // Verify only one depth generated
+          assertDeepZoomTiles(directory, 512, 1, done);
+        });
+    });
+  });
+
+  it('Deep Zoom layout with depth of onepixel', function (done) {
+    const directory = fixtures.path('output.512_depth_onepixel.dzi_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          size: 512,
+          depth: 'onepixel'
+        })
+        .toFile(fixtures.path('output.512_depth_onepixel.dzi'), function (err, info) {
+          if (err) throw err;
+          // Verify only one depth generated
+          assertDeepZoomTiles(directory, 512, 13, done);
+        });
+    });
+  });
+
+  it('Deep Zoom layout with depth of onetile', function (done) {
+    const directory = fixtures.path('output.256_depth_onetile.dzi_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          size: 256,
+          depth: 'onetile'
+        })
+        .toFile(fixtures.path('output.256_depth_onetile.dzi'), function (err, info) {
+          if (err) throw err;
+          // Verify only one depth generated
+          assertDeepZoomTiles(directory, 256, 5, done);
+        });
+    });
+  });
+
   it('Zoomify layout', function (done) {
     const directory = fixtures.path('output.zoomify.dzi');
     rimraf(directory, function () {
@@ -271,6 +384,69 @@ describe('Tile', function () {
             assert.strictEqual(true, stat.size > 0);
             done();
           });
+        });
+    });
+  });
+
+  it('Zoomify layout with depth one', function (done) {
+    const directory = fixtures.path('output.zoomify.depth_one.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          size: 256,
+          layout: 'zoomify',
+          depth: 'one'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          assertZoomifyTiles(directory, 256, 1, done);
+        });
+    });
+  });
+
+  it('Zoomify layout with depth onetile', function (done) {
+    const directory = fixtures.path('output.zoomify.depth_onetile.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          size: 256,
+          layout: 'zoomify',
+          depth: 'onetile'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          assertZoomifyTiles(directory, 256, 5, done);
+        });
+    });
+  });
+
+  it('Zoomify layout with depth onepixel', function (done) {
+    const directory = fixtures.path('output.zoomify.depth_onepixel.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          size: 256,
+          layout: 'zoomify',
+          depth: 'onepixel'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          assertZoomifyTiles(directory, 256, 13, done);
         });
     });
   });
@@ -406,6 +582,72 @@ describe('Tile', function () {
               done();
             });
           });
+        });
+    });
+  });
+
+  it('Google layout with depth one', function (done) {
+    const directory = fixtures.path('output.google_depth_one.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          layout: 'google',
+          depth: 'one',
+          size: 256
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+
+          assertGoogleTiles(directory, 256, 1, done);
+        });
+    });
+  });
+
+  it('Google layout with depth onepixel', function (done) {
+    const directory = fixtures.path('output.google_depth_onepixel.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          layout: 'google',
+          depth: 'onepixel',
+          size: 256
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+
+          assertGoogleTiles(directory, 256, 13, done);
+        });
+    });
+  });
+
+  it('Google layout with depth onetile', function (done) {
+    const directory = fixtures.path('output.google_depth_onetile.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          layout: 'google',
+          depth: 'onetile',
+          size: 256
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+
+          assertGoogleTiles(directory, 256, 5, done);
         });
     });
   });

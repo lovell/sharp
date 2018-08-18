@@ -946,14 +946,22 @@ class PipelineWorker : public Nan::AsyncWorker {
             suffix = AssembleSuffixString(extname, options);
           }
           // Write DZ to file
-          image.dzsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
-            ->set("tile_size", baton->tileSize)
-            ->set("overlap", baton->tileOverlap)
-            ->set("container", baton->tileContainer)
-            ->set("layout", baton->tileLayout)
-            ->set("suffix", const_cast<char*>(suffix.data()))
-            ->set("angle", CalculateAngleRotation(baton->tileAngle)));
+          vips::VOption *options = VImage::option()
+                                       ->set("strip", !baton->withMetadata)
+                                       ->set("tile_size", baton->tileSize)
+                                       ->set("overlap", baton->tileOverlap)
+                                       ->set("container", baton->tileContainer)
+                                       ->set("layout", baton->tileLayout)
+                                       ->set("suffix", const_cast<char*>(suffix.data()))
+                                       ->set("angle", CalculateAngleRotation(baton->tileAngle));
+
+          // libvips chooses a default depth based on layout. Instead of replicating that logic here by
+          // not passing anything - libvips will handle choice
+          if (baton->tileDepth < VIPS_FOREIGN_DZ_DEPTH_LAST) {
+            options->set("depth", baton->tileDepth);
+          }
+
+          image.dzsave(const_cast<char*>(baton->fileOut.data()), options);
           baton->formatOut = "dz";
         } else if (baton->formatOut == "v" || (mightMatchInput && isV) ||
           (willMatchInput && inputImageType == ImageType::VIPS)) {
@@ -1321,6 +1329,17 @@ NAN_METHOD(pipeline) {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
   }
   baton->tileFormat = AttrAsStr(options, "tileFormat");
+  std::string tileDepth = AttrAsStr(options, "tileDepth");
+  if (tileDepth == "onetile") {
+    baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_ONETILE;
+  } else if (tileDepth == "one") {
+    baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_ONE;
+  } else if (tileDepth == "onepixel") {
+    baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_ONEPIXEL;
+  } else {
+    // signal that we do not want to pass any value to dzSave
+    baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_LAST;
+  }
   // Force random access for certain operations
   if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL && (
     baton->trimTolerance != 0 || baton->normalise ||
