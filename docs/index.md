@@ -115,6 +115,7 @@ the help and code contributions of the following people:
 * [Tom Lokhorst](https://github.com/tomlokhorst)
 * [Espen Hovlandsdal](https://github.com/rexxars)
 * [Sylvain Dumont](https://github.com/sylvaindumont)
+* [Alun Davies](https://github.com/alundavies)
 
 Thank you!
 

@@ -51,7 +51,8 @@
     "Nathan Graves <nathanrgraves+github@gmail.com>",
     "Tom Lokhorst <tom@lokhorst.eu>",
     "Espen Hovlandsdal <espen@hovlandsdal.com>",
-    "Sylvain Dumont <sylvain.dumont35@gmail.com>"
+    "Sylvain Dumont <sylvain.dumont35@gmail.com>",
+    "Alun Davies <alun.owain.davies@googlemail.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",

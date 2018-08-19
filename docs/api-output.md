@@ -278,10 +278,10 @@ Warning: multiple sharp instances concurrently producing tile output can expose 
     -   `tile.size` **[Number][8]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
     -   `tile.overlap` **[Number][8]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
     -   `tile.angle` **[Number][8]** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
+    -   `tile.depth` **[String][1]?** how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout.
     -   `tile.container` **[String][1]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
-    -   `tile.layout` **[String][1]** filesystem layout, possible values are `dz`, `zoomify` or `google`. (optional, default `'dz'`) 
-    -   `tile.depth` **[String][1]** pyramid depth, possible values are `onepixel`, `onetile` or `one`. (optional, default - libvips selects one based on layout) 
-    
+    -   `tile.layout` **[String][1]** filesystem layout, possible values are `dz`, `zoomify` or `google`. (optional, default `'dz'`)
+
 ### Examples
 
 ```javascript

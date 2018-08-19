@@ -29,6 +29,10 @@ Requires libvips v8.6.1.
 * Ensure extractChannel works with 16-bit images.
   [#1330](https://github.com/lovell/sharp/issues/1330)
 
+* Expose depth option for tile-based output.
+  [#1342](https://github.com/lovell/sharp/pull/1342)
+  [@alundavies](https://github.com/alundavies)
+
 * Add experimental entropy field to stats response.
 
 #### v0.20.5 - 27<sup>th</sup> June 2018
