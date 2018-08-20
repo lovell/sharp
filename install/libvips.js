@@ -9,6 +9,7 @@ const npmLog = require('npmlog');
 const semver = require('semver');
 const simpleGet = require('simple-get');
 const tar = require('tar');
+const copyFileSync = require('fs-copy-file-sync');
 
 const agent = require('../lib/agent');
 const libvips = require('../lib/libvips');
@@ -82,7 +83,14 @@ try {
         response.pipe(tmpFile);
       });
       tmpFile.on('close', function () {
-        fs.renameSync(tarPathTemp, tarPathCache);
+        try {
+          // Attempt to rename
+          fs.renameSync(tarPathTemp, tarPathCache);
+        } catch (err) {
+          // Fall back to copy and unlink
+          copyFileSync(tarPathTemp, tarPathCache);
+          fs.unlinkSync(tarPathTemp);
+        }
         extractTarball(tarPathCache);
       });
     }
