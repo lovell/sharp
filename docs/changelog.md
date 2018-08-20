@@ -4,7 +4,7 @@
 
 Requires libvips v8.6.1.
 
-#### v0.20.6 - TBD
+#### v0.20.6 - 20<sup>th</sup> August 2018
 
 * Add removeAlpha operation to remove alpha channel, if any.
   [#1248](https://github.com/lovell/sharp/issues/1248)
