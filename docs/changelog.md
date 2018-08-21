@@ -4,7 +4,7 @@
 
 Requires libvips v8.6.1.
 
-#### v0.20.7 - TBD
+#### v0.20.7 - 21<sup>st</sup> August 2018
 
 * Use copy+unlink if rename operation fails during installation.
   [#1345](https://github.com/lovell/sharp/issues/1345)
