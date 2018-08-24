@@ -20,8 +20,12 @@ const distBaseUrl = process.env.SHARP_DIST_BASE_URL || `https://github.com/lovel
 
 const extractTarball = function (tarPath) {
   const vendorPath = path.join(__dirname, '..', 'vendor');
-  if (!fs.existsSync(vendorPath)) {
+  try {
     fs.mkdirSync(vendorPath);
+  } catch (err) {
+    if (err.code !== 'EEXIST') {
+      throw err;
+    }
   }
   tar
     .extract({
