@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const copyFileSync = require('fs-copy-file-sync');
+const libvips = require('../lib/libvips');
 const npmLog = require('npmlog');
 
 if (process.platform === 'win32') {
@@ -11,8 +12,8 @@ if (process.platform === 'win32') {
   const buildReleaseDir = path.join(buildDir, 'Release');
   npmLog.info('sharp', `Creating ${buildReleaseDir}`);
   try {
-    fs.mkdirSync(buildDir);
-    fs.mkdirSync(buildReleaseDir);
+    libvips.mkdirSync(buildDir);
+    libvips.mkdirSync(buildReleaseDir);
   } catch (err) {}
   const vendorLibDir = path.join(__dirname, '..', 'vendor', 'lib');
   npmLog.info('sharp', `Copying DLLs from ${vendorLibDir} to ${buildReleaseDir}`);

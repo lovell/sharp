@@ -4,6 +4,7 @@ const assert = require('assert');
 const fs = require('fs');
 const semver = require('semver');
 const libvips = require('../../lib/libvips');
+const mockFS = require('mock-fs');
 
 const originalPlatform = process.platform;
 
@@ -72,6 +73,36 @@ describe('libvips binaries', function () {
       assert.strictEqual('string', typeof cachePath);
       assert.strictEqual('_libvips', cachePath.substr(-8));
       assert.strictEqual(true, fs.existsSync(cachePath));
+    });
+  });
+
+  describe('safe directory creation', function () {
+    before(function () {
+      mockFS({
+        exampleDirA: {
+          exampleDirB: {
+            exampleFile: 'Example test file'
+          }
+        }
+      });
+    });
+    after(function () { mockFS.restore(); });
+
+    it('mkdirSync creates a directory', function () {
+      const dirPath = 'createdDir';
+
+      libvips.mkdirSync(dirPath);
+      assert.strictEqual(true, fs.existsSync(dirPath));
+    });
+    it('mkdirSync does not throw error or overwrite an existing dir', function () {
+      const dirPath = 'exampleDirA';
+      const nestedDirPath = 'exampleDirA/exampleDirB';
+      assert.strictEqual(true, fs.existsSync(dirPath));
+
+      libvips.mkdirSync(dirPath);
+
+      assert.strictEqual(true, fs.existsSync(dirPath));
+      assert.strictEqual(true, fs.existsSync(nestedDirPath));
     });
   });
 });
