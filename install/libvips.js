@@ -20,9 +20,7 @@ const distBaseUrl = process.env.SHARP_DIST_BASE_URL || `https://github.com/lovel
 
 const extractTarball = function (tarPath) {
   const vendorPath = path.join(__dirname, '..', 'vendor');
-  if (!fs.existsSync(vendorPath)) {
-    fs.mkdirSync(vendorPath);
-  }
+  libvips.mkdirSync(vendorPath);
   tar
     .extract({
       file: tarPath,
