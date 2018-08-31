@@ -49,7 +49,7 @@ namespace sharp {
     char *buffer;
     bool failOnError;
     size_t bufferLength;
-    int density;
+    double density;
     int rawChannels;
     int rawWidth;
     int rawHeight;
@@ -63,7 +63,7 @@ namespace sharp {
       buffer(nullptr),
       failOnError(FALSE),
       bufferLength(0),
-      density(72),
+      density(72.0),
       rawChannels(0),
       rawWidth(0),
       rawHeight(0),
@@ -186,7 +186,7 @@ namespace sharp {
   /*
     Set pixels/mm resolution based on a pixels/inch density.
   */
-  void SetDensity(VImage image, const int density);
+  void SetDensity(VImage image, const double density);
 
   /*
     Check the proposed format supports the current dimensions.
