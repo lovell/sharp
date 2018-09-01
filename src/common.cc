@@ -55,7 +55,7 @@ namespace sharp {
     descriptor->failOnError = AttrTo<bool>(input, "failOnError");
     // Density for vector-based input
     if (HasAttr(input, "density")) {
-      descriptor->density = AttrTo<uint32_t>(input, "density");
+      descriptor->density = AttrTo<double>(input, "density");
     }
     // Raw pixel input
     if (HasAttr(input, "rawChannels")) {
@@ -228,7 +228,7 @@ namespace sharp {
               ->set("access", accessMethod)
               ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
-              option->set("dpi", static_cast<double>(descriptor->density));
+              option->set("dpi", descriptor->density);
             }
             if (imageType == ImageType::MAGICK) {
               option->set("density", std::to_string(descriptor->density).data());
@@ -270,7 +270,7 @@ namespace sharp {
               ->set("access", accessMethod)
               ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
-              option->set("dpi", static_cast<double>(descriptor->density));
+              option->set("dpi", descriptor->density);
             }
             if (imageType == ImageType::MAGICK) {
               option->set("density", std::to_string(descriptor->density).data());
@@ -355,8 +355,8 @@ namespace sharp {
   /*
     Set pixels/mm resolution based on a pixels/inch density.
   */
-  void SetDensity(VImage image, const int density) {
-    const double pixelsPerMm = static_cast<double>(density) / 25.4;
+  void SetDensity(VImage image, const double density) {
+    const double pixelsPerMm = density / 25.4;
     image.set("Xres", pixelsPerMm);
     image.set("Yres", pixelsPerMm);
     image.set(VIPS_META_RESOLUTION_UNIT, "in");

@@ -18,7 +18,7 @@ If the overlay image contains an alpha channel then composition with premultipli
     -   `options.left` **[Number][4]?** the pixel offset from the left edge.
     -   `options.tile` **[Boolean][5]** set to true to repeat the overlay image across the entire image with the given `gravity`. (optional, default `false`)
     -   `options.cutout` **[Boolean][5]** set to true to apply only the alpha channel of the overlay image to the input image, giving the appearance of one image being cut out of another. (optional, default `false`)
-    -   `options.density` **[Number][4]** integral number representing the DPI for vector overlay image. (optional, default `72`)
+    -   `options.density` **[Number][4]** number representing the DPI for vector overlay image. (optional, default `72`)
     -   `options.raw` **[Object][3]?** describes overlay when using raw pixel data.
         -   `options.raw.width` **[Number][4]?** 
         -   `options.raw.height` **[Number][4]?** 

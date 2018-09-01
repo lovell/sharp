@@ -939,6 +939,21 @@ describe('Input/output', function () {
       });
   });
 
+  it('Convert SVG to PNG at 14.4DPI', function (done) {
+    sharp(fixtures.inputSvg, { density: 14.4 })
+      .toFormat('png')
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(20, info.width);
+        assert.strictEqual(20, info.height);
+        fixtures.assertSimilar(fixtures.expected('svg14.4.png'), data, function (err) {
+          if (err) throw err;
+          done();
+        });
+      });
+  });
+
   it('Convert SVG with embedded images to PNG, respecting dimensions, autoconvert to PNG', function (done) {
     sharp(fixtures.inputSvgWithEmbeddedImages)
       .toBuffer(function (err, data, info) {
@@ -1504,11 +1519,6 @@ describe('Input/output', function () {
     it('Invalid density: string', function () {
       assert.throws(function () {
         sharp(null, { density: 'zoinks' });
-      });
-    });
-    it('Invalid density: float', function () {
-      assert.throws(function () {
-        sharp(null, { density: 0.5 });
       });
     });
     it('Ignore unknown attribute', function () {
