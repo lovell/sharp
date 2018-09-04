@@ -52,7 +52,9 @@
     "Tom Lokhorst <tom@lokhorst.eu>",
     "Espen Hovlandsdal <espen@hovlandsdal.com>",
     "Sylvain Dumont <sylvain.dumont35@gmail.com>",
-    "Alun Davies <alun.owain.davies@googlemail.com>"
+    "Alun Davies <alun.owain.davies@googlemail.com>",
+    "Aidan Hoolachan <ajhoolachan21@gmail.com>",
+    "Axel Eirola <axel.eirola@iki.fi>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
@@ -86,7 +88,7 @@
   "dependencies": {
     "color": "^3.0.0",
     "detect-libc": "^1.0.3",
-    "nan": "^2.10.0",
+    "nan": "^2.11.0",
     "fs-copy-file-sync": "^1.1.1",
     "npmlog": "^4.1.2",
     "prebuild-install": "^4.0.0",
@@ -99,12 +101,12 @@
     "async": "^2.6.1",
     "cc": "^1.0.2",
     "decompress-zip": "^0.3.1",
-    "documentation": "^8.1.1",
+    "documentation": "^8.1.2",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "mocha": "^5.2.0",
     "mock-fs": "^4.6.0",
-    "nyc": "^12.0.2",
+    "nyc": "^13.0.1",
     "prebuild": "^7.6.2",
     "prebuild-ci": "^2.2.3",
     "rimraf": "^2.6.2",

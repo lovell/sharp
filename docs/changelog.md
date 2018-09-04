@@ -4,6 +4,16 @@
 
 Requires libvips v8.6.1.
 
+#### v0.20.8 - TBD
+
+* Avoid race conditions when creating directories during installation.
+  [#1358](https://github.com/lovell/sharp/pull/1358)
+  [@ajhool](https://github.com/ajhool)
+
+* Accept floating point values for input density parameter.
+  [#1362](https://github.com/lovell/sharp/pull/1362)
+  [@aeirola](https://github.com/aeirola)
+
 #### v0.20.7 - 21<sup>st</sup> August 2018
 
 * Use copy+unlink if rename operation fails during installation.

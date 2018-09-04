@@ -116,6 +116,8 @@ the help and code contributions of the following people:
 * [Espen Hovlandsdal](https://github.com/rexxars)
 * [Sylvain Dumont](https://github.com/sylvaindumont)
 * [Alun Davies](https://github.com/alundavies)
+* [Aidan Hoolachan](https://github.com/ajhool)
+* [Axel Eirola](https://github.com/aeirola)
 
 Thank you!
 
