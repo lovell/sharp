@@ -4,7 +4,7 @@
 
 Requires libvips v8.6.1.
 
-#### v0.20.8 - TBD
+#### v0.20.8 - 5<sup>th</sup> September 2018
 
 * Avoid race conditions when creating directories during installation.
   [#1358](https://github.com/lovell/sharp/pull/1358)
