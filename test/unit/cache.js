@@ -1,9 +1,10 @@
 'use strict';
 
+const detectLibc = require('detect-libc');
 const sharp = require('../../');
 
-// Define SHARP_TEST_WITHOUT_CACHE environment variable to prevent use of libvips' cache
+const usingCache = detectLibc.family !== detectLibc.MUSL;
 
 beforeEach(function () {
-  sharp.cache(!process.env.SHARP_TEST_WITHOUT_CACHE);
+  sharp.cache(usingCache);
 });

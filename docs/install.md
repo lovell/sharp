@@ -15,7 +15,7 @@ yarn add sharp
 ### Building from source
 
 Pre-compiled binaries for sharp are provided for use with
-Node versions 4, 6, 8 and 10 on
+Node versions 6, 8 and 10 on
 64-bit Windows, OS X and Linux platforms.
 
 Sharp will be built from source at install time when:
@@ -27,7 +27,7 @@ Sharp will be built from source at install time when:
 Building from source requires:
 
 * C++11 compatible compiler such as gcc 4.8+, clang 3.0+ or MSVC 2013+
-* [node-gyp](https://github.com/TooTallNate/node-gyp#installation) and its dependencies (includes Python)
+* [node-gyp](https://github.com/nodejs/node-gyp#installation) and its dependencies (includes Python 2.7)
 
 ## libvips
 
@@ -36,13 +36,14 @@ Building from source requires:
 [![Ubuntu 16.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 7MB.
+This involves an automated HTTPS download of approximately 8MB.
 
-Most recent Linux-based operating systems with glibc running on x64 and ARMv6+ CPUs should "just work", e.g.:
+Most Linux-based (glibc, musl) operating systems running on x64 and ARMv6+ CPUs should "just work", e.g.:
 
 * Debian 7+
 * Ubuntu 14.04+
 * Centos 7+
+* Alpine 3.8+ (Node 8 and 10)
 * Fedora
 * openSUSE 13.2+
 * Archlinux
@@ -61,9 +62,9 @@ and `LD_LIBRARY_PATH` at runtime.
 This allows the use of newer versions of libvips with older versions of sharp.
 
 For 32-bit Intel CPUs and older Linux-based operating systems such as Centos 6,
-it is recommended to install a system-wide installation of libvips from source:
+compiling libvips from source is recommended.
 
-https://jcupitt.github.io/libvips/install.html#building-libvips-from-a-source-tarball
+[https://jcupitt.github.io/libvips/install.html#building-libvips-from-a-source-tarball](https://jcupitt.github.io/libvips/install.html#building-libvips-from-a-source-tarball)
 
 #### Alpine Linux
 
@@ -71,7 +72,7 @@ libvips is available in the
 [testing repository](https://pkgs.alpinelinux.org/packages?name=vips-dev):
 
 ```sh
-apk add vips-dev fftw-dev --update-cache --repository https://dl-3.alpinelinux.org/alpine/edge/testing/
+apk add vips-dev fftw-dev build-base --update-cache --repository https://dl-3.alpinelinux.org/alpine/edge/testing/
 ```
 
 The smaller stack size of musl libc means
@@ -94,7 +95,7 @@ that it can be located using `pkg-config --modversion vips-cpp`.
 [![Windows x64 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 12MB.
+This involves an automated HTTPS download of approximately 13MB.
 
 Only 64-bit (x64) `node.exe` is supported.
 
@@ -116,9 +117,6 @@ FreeBSD's gcc v4 and v5 need `CXXFLAGS=-D_GLIBCXX_USE_C99` set for C++11 support
 https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=193528
 
 ### Heroku
-
-libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 7MB.
 
 Set [NODE_MODULES_CACHE](https://devcenter.heroku.com/articles/nodejs-support#cache-behavior)
 to `false` when using the `yarn` package manager.
@@ -154,12 +152,13 @@ can be built using Docker.
 
 ```sh
 rm -rf node_modules/sharp
-docker run -v "$PWD":/var/task lambci/lambda:build-nodejs6.10 npm install
+docker run -v "$PWD":/var/task lambci/lambda:build-nodejs8.10 npm install
 ```
 
-Set the Lambda runtime to Node.js 6.10.
+Set the Lambda runtime to Node.js 8.10.
 
-To get the best performance select the largest memory available. A 1536 MB function provides ~12x more CPU time than a 128 MB function.
+To get the best performance select the largest memory available.
+A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
 ### NW.js
 
@@ -171,7 +170,7 @@ nw-gyp rebuild --arch=x64 --target=[your nw version]
 node node_modules/sharp/install/dll-copy
 ```
 
-See also http://docs.nwjs.io/en/latest/For%20Users/Advanced/Use%20Native%20Node%20Modules/
+[http://docs.nwjs.io/en/latest/For%20Users/Advanced/Use%20Native%20Node%20Modules/](http://docs.nwjs.io/en/latest/For%20Users/Advanced/Use%20Native%20Node%20Modules/)
 
 ### Build tools
 
@@ -199,28 +198,6 @@ and [Valgrind](http://valgrind.org/) have been used to test
 the most popular web-based formats, as well as libvips itself,
 you are advised to perform your own testing and sandboxing.
 
-ImageMagick in particular has a relatively large attack surface,
-which can be partially mitigated with a
-[policy.xml](http://www.imagemagick.org/script/resources.php)
-configuration file to prevent the use of coders known to be vulnerable.
-
-```xml
-<policymap>
-  <policy domain="coder" rights="none" pattern="EPHEMERAL" />
-  <policy domain="coder" rights="none" pattern="URL" />
-  <policy domain="coder" rights="none" pattern="HTTPS" />
-  <policy domain="coder" rights="none" pattern="MVG" />
-  <policy domain="coder" rights="none" pattern="MSL" />
-  <policy domain="coder" rights="none" pattern="TEXT" />
-  <policy domain="coder" rights="none" pattern="SHOW" />
-  <policy domain="coder" rights="none" pattern="WIN" />
-  <policy domain="coder" rights="none" pattern="PLT" />
-</policymap>
-```
-
-Set the `MAGICK_CONFIGURE_PATH` environment variable
-to the directory containing the `policy.xml` file.
-
 ### Pre-compiled libvips binaries
 
 This module will attempt to download a pre-compiled bundle of libvips
@@ -236,7 +213,8 @@ SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install sharp
 ```
 
 Should you need to manually download and inspect these files,
-you can do so via https://github.com/lovell/sharp-libvips/releases
+you can do so via
+[https://github.com/lovell/sharp-libvips/releases](https://github.com/lovell/sharp-libvips/releases)
 
 Should you wish to install these from your own location,
 set the `SHARP_DIST_BASE_URL` environment variable, e.g.
@@ -265,6 +243,8 @@ Use of libraries under the terms of the LGPLv3 is via the
 | expat         | MIT Licence                                                                                              |
 | fontconfig    | [fontconfig Licence](https://cgit.freedesktop.org/fontconfig/tree/COPYING) (BSD-like)                    |
 | freetype      | [freetype Licence](http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT) (BSD-like) |
+| fribidi       | LGPLv3                                                                                                   |
+| gettext       | LGPLv3                                                                                                   |
 | giflib        | MIT Licence                                                                                              |
 | glib          | LGPLv3                                                                                                   |
 | harfbuzz      | MIT Licence                                                                                              |

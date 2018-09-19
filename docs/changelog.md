@@ -1,5 +1,17 @@
 # Changelog
 
+### v0.21 - "*teeth*"
+
+Requires libvips v8.7.0.
+
+#### v0.21.0 - TBD
+
+* Drop Node 4 support.
+  [#1212](https://github.com/lovell/sharp/issues/1212)
+
+* Add experimental prebuilt binaries for musl-based Linux.
+  [#1379](https://github.com/lovell/sharp/issues/1379)
+
 ### v0.20 - "*prebuild*"
 
 Requires libvips v8.6.1.

@@ -1,5 +1,5 @@
 // bodies for vips operations
-// Sun 26 Nov 17:44:23 GMT 2017
+// Mon 11 Jun 14:28:56 BST 2018
 // this file is generated automatically, do not edit!
 
 void VImage::system( char * cmd_format , VOption *options )
@@ -9,7 +9,7 @@ void VImage::system( char * cmd_format , VOption *options )
             set( "cmd-format", cmd_format ) );
 }
 
-VImage VImage::add( VImage right , VOption *options )
+VImage VImage::add( VImage right , VOption *options ) const
 {
     VImage out;
 
@@ -22,7 +22,7 @@ VImage VImage::add( VImage right , VOption *options )
     return( out );
 }
 
-VImage VImage::subtract( VImage right , VOption *options )
+VImage VImage::subtract( VImage right , VOption *options ) const
 {
     VImage out;
 
@@ -35,7 +35,7 @@ VImage VImage::subtract( VImage right , VOption *options )
     return( out );
 }
 
-VImage VImage::multiply( VImage right , VOption *options )
+VImage VImage::multiply( VImage right , VOption *options ) const
 {
     VImage out;
 
@@ -48,7 +48,7 @@ VImage VImage::multiply( VImage right , VOption *options )
     return( out );
 }
 
-VImage VImage::divide( VImage right , VOption *options )
+VImage VImage::divide( VImage right , VOption *options ) const
 {
     VImage out;
 
@@ -61,7 +61,7 @@ VImage VImage::divide( VImage right , VOption *options )
     return( out );
 }
 
-VImage VImage::relational( VImage right , VipsOperationRelational relational , VOption *options )
+VImage VImage::relational( VImage right , VipsOperationRelational relational , VOption *options ) const
 {
     VImage out;
 
@@ -75,7 +75,7 @@ VImage VImage::relational( VImage right , VipsOperationRelational relational , V
     return( out );
 }
 
-VImage VImage::remainder( VImage right , VOption *options )
+VImage VImage::remainder( VImage right , VOption *options ) const
 {
     VImage out;
 
@@ -88,7 +88,7 @@ VImage VImage::remainder( VImage right , VOption *options )
     return( out );
 }
 
-VImage VImage::boolean( VImage right , VipsOperationBoolean boolean , VOption *options )
+VImage VImage::boolean( VImage right , VipsOperationBoolean boolean , VOption *options ) const
 {
     VImage out;
 
@@ -102,7 +102,7 @@ VImage VImage::boolean( VImage right , VipsOperationBoolean boolean , VOption *o
     return( out );
 }
 
-VImage VImage::math2( VImage right , VipsOperationMath2 math2 , VOption *options )
+VImage VImage::math2( VImage right , VipsOperationMath2 math2 , VOption *options ) const
 {
     VImage out;
 
@@ -116,7 +116,7 @@ VImage VImage::math2( VImage right , VipsOperationMath2 math2 , VOption *options
     return( out );
 }
 
-VImage VImage::complex2( VImage right , VipsOperationComplex2 cmplx , VOption *options )
+VImage VImage::complex2( VImage right , VipsOperationComplex2 cmplx , VOption *options ) const
 {
     VImage out;
 
@@ -130,7 +130,7 @@ VImage VImage::complex2( VImage right , VipsOperationComplex2 cmplx , VOption *o
     return( out );
 }
 
-VImage VImage::complexform( VImage right , VOption *options )
+VImage VImage::complexform( VImage right , VOption *options ) const
 {
     VImage out;
 
@@ -155,7 +155,7 @@ VImage VImage::sum( std::vector<VImage> in , VOption *options )
     return( out );
 }
 
-VImage VImage::invert( VOption *options )
+VImage VImage::invert( VOption *options ) const
 {
     VImage out;
 
@@ -167,7 +167,7 @@ VImage VImage::invert( VOption *options )
     return( out );
 }
 
-VImage VImage::linear( std::vector<double> a , std::vector<double> b , VOption *options )
+VImage VImage::linear( std::vector<double> a , std::vector<double> b , VOption *options ) const
 {
     VImage out;
 
@@ -181,7 +181,7 @@ VImage VImage::linear( std::vector<double> a , std::vector<double> b , VOption *
     return( out );
 }
 
-VImage VImage::math( VipsOperationMath math , VOption *options )
+VImage VImage::math( VipsOperationMath math , VOption *options ) const
 {
     VImage out;
 
@@ -194,7 +194,7 @@ VImage VImage::math( VipsOperationMath math , VOption *options )
     return( out );
 }
 
-VImage VImage::abs( VOption *options )
+VImage VImage::abs( VOption *options ) const
 {
     VImage out;
 
@@ -206,7 +206,7 @@ VImage VImage::abs( VOption *options )
     return( out );
 }
 
-VImage VImage::sign( VOption *options )
+VImage VImage::sign( VOption *options ) const
 {
     VImage out;
 
@@ -218,7 +218,7 @@ VImage VImage::sign( VOption *options )
     return( out );
 }
 
-VImage VImage::round( VipsOperationRound round , VOption *options )
+VImage VImage::round( VipsOperationRound round , VOption *options ) const
 {
     VImage out;
 
@@ -231,7 +231,7 @@ VImage VImage::round( VipsOperationRound round , VOption *options )
     return( out );
 }
 
-VImage VImage::relational_const( VipsOperationRelational relational , std::vector<double> c , VOption *options )
+VImage VImage::relational_const( VipsOperationRelational relational , std::vector<double> c , VOption *options ) const
 {
     VImage out;
 
@@ -245,7 +245,7 @@ VImage VImage::relational_const( VipsOperationRelational relational , std::vecto
     return( out );
 }
 
-VImage VImage::remainder_const( std::vector<double> c , VOption *options )
+VImage VImage::remainder_const( std::vector<double> c , VOption *options ) const
 {
     VImage out;
 
@@ -258,7 +258,7 @@ VImage VImage::remainder_const( std::vector<double> c , VOption *options )
     return( out );
 }
 
-VImage VImage::boolean_const( VipsOperationBoolean boolean , std::vector<double> c , VOption *options )
+VImage VImage::boolean_const( VipsOperationBoolean boolean , std::vector<double> c , VOption *options ) const
 {
     VImage out;
 
@@ -272,7 +272,7 @@ VImage VImage::boolean_const( VipsOperationBoolean boolean , std::vector<double>
     return( out );
 }
 
-VImage VImage::math2_const( VipsOperationMath2 math2 , std::vector<double> c , VOption *options )
+VImage VImage::math2_const( VipsOperationMath2 math2 , std::vector<double> c , VOption *options ) const
 {
     VImage out;
 
@@ -286,7 +286,7 @@ VImage VImage::math2_const( VipsOperationMath2 math2 , std::vector<double> c , V
     return( out );
 }
 
-VImage VImage::complex( VipsOperationComplex cmplx , VOption *options )
+VImage VImage::complex( VipsOperationComplex cmplx , VOption *options ) const
 {
     VImage out;
 
@@ -299,7 +299,7 @@ VImage VImage::complex( VipsOperationComplex cmplx , VOption *options )
     return( out );
 }
 
-VImage VImage::complexget( VipsOperationComplexget get , VOption *options )
+VImage VImage::complexget( VipsOperationComplexget get , VOption *options ) const
 {
     VImage out;
 
@@ -312,7 +312,7 @@ VImage VImage::complexget( VipsOperationComplexget get , VOption *options )
     return( out );
 }
 
-double VImage::avg( VOption *options )
+double VImage::avg( VOption *options ) const
 {
     double out;
 
@@ -324,7 +324,7 @@ double VImage::avg( VOption *options )
     return( out );
 }
 
-double VImage::min( VOption *options )
+double VImage::min( VOption *options ) const
 {
     double out;
 
@@ -336,7 +336,7 @@ double VImage::min( VOption *options )
     return( out );
 }
 
-double VImage::max( VOption *options )
+double VImage::max( VOption *options ) const
 {
     double out;
 
@@ -348,7 +348,7 @@ double VImage::max( VOption *options )
     return( out );
 }
 
-double VImage::deviate( VOption *options )
+double VImage::deviate( VOption *options ) const
 {
     double out;
 
@@ -360,7 +360,7 @@ double VImage::deviate( VOption *options )
     return( out );
 }
 
-VImage VImage::stats( VOption *options )
+VImage VImage::stats( VOption *options ) const
 {
     VImage out;
 
@@ -372,7 +372,7 @@ VImage VImage::stats( VOption *options )
     return( out );
 }
 
-VImage VImage::hist_find( VOption *options )
+VImage VImage::hist_find( VOption *options ) const
 {
     VImage out;
 
@@ -384,7 +384,7 @@ VImage VImage::hist_find( VOption *options )
     return( out );
 }
 
-VImage VImage::hist_find_ndim( VOption *options )
+VImage VImage::hist_find_ndim( VOption *options ) const
 {
     VImage out;
 
@@ -396,7 +396,7 @@ VImage VImage::hist_find_ndim( VOption *options )
     return( out );
 }
 
-VImage VImage::hist_find_indexed( VImage index , VOption *options )
+VImage VImage::hist_find_indexed( VImage index , VOption *options ) const
 {
     VImage out;
 
@@ -409,7 +409,7 @@ VImage VImage::hist_find_indexed( VImage index , VOption *options )
     return( out );
 }
 
-VImage VImage::hough_line( VOption *options )
+VImage VImage::hough_line( VOption *options ) const
 {
     VImage out;
 
@@ -421,7 +421,7 @@ VImage VImage::hough_line( VOption *options )
     return( out );
 }
 
-VImage VImage::hough_circle( VOption *options )
+VImage VImage::hough_circle( VOption *options ) const
 {
     VImage out;
 
@@ -433,7 +433,7 @@ VImage VImage::hough_circle( VOption *options )
     return( out );
 }
 
-VImage VImage::project( VImage * rows , VOption *options )
+VImage VImage::project( VImage * rows , VOption *options ) const
 {
     VImage columns;
 
@@ -446,7 +446,7 @@ VImage VImage::project( VImage * rows , VOption *options )
     return( columns );
 }
 
-VImage VImage::profile( VImage * rows , VOption *options )
+VImage VImage::profile( VImage * rows , VOption *options ) const
 {
     VImage columns;
 
@@ -459,7 +459,7 @@ VImage VImage::profile( VImage * rows , VOption *options )
     return( columns );
 }
 
-VImage VImage::measure( int h , int v , VOption *options )
+VImage VImage::measure( int h , int v , VOption *options ) const
 {
     VImage out;
 
@@ -473,7 +473,7 @@ VImage VImage::measure( int h , int v , VOption *options )
     return( out );
 }
 
-std::vector<double> VImage::getpoint( int x , int y , VOption *options )
+std::vector<double> VImage::getpoint( int x , int y , VOption *options ) const
 {
     std::vector<double> out_array;
 
@@ -487,7 +487,7 @@ std::vector<double> VImage::getpoint( int x , int y , VOption *options )
     return( out_array );
 }
 
-int VImage::find_trim( int * top , int * width , int * height , VOption *options )
+int VImage::find_trim( int * top , int * width , int * height , VOption *options ) const
 {
     int left;
 
@@ -502,7 +502,7 @@ int VImage::find_trim( int * top , int * width , int * height , VOption *options
     return( left );
 }
 
-VImage VImage::copy( VOption *options )
+VImage VImage::copy( VOption *options ) const
 {
     VImage out;
 
@@ -514,7 +514,7 @@ VImage VImage::copy( VOption *options )
     return( out );
 }
 
-VImage VImage::tilecache( VOption *options )
+VImage VImage::tilecache( VOption *options ) const
 {
     VImage out;
 
@@ -526,7 +526,7 @@ VImage VImage::tilecache( VOption *options )
     return( out );
 }
 
-VImage VImage::linecache( VOption *options )
+VImage VImage::linecache( VOption *options ) const
 {
     VImage out;
 
@@ -538,7 +538,7 @@ VImage VImage::linecache( VOption *options )
     return( out );
 }
 
-VImage VImage::sequential( VOption *options )
+VImage VImage::sequential( VOption *options ) const
 {
     VImage out;
 
@@ -550,7 +550,7 @@ VImage VImage::sequential( VOption *options )
     return( out );
 }
 
-VImage VImage::cache( VOption *options )
+VImage VImage::cache( VOption *options ) const
 {
     VImage out;
 
@@ -562,7 +562,7 @@ VImage VImage::cache( VOption *options )
     return( out );
 }
 
-VImage VImage::embed( int x , int y , int width , int height , VOption *options )
+VImage VImage::embed( int x , int y , int width , int height , VOption *options ) const
 {
     VImage out;
 
@@ -578,7 +578,7 @@ VImage VImage::embed( int x , int y , int width , int height , VOption *options 
     return( out );
 }
 
-VImage VImage::gravity( VipsCompassDirection direction , int width , int height , VOption *options )
+VImage VImage::gravity( VipsCompassDirection direction , int width , int height , VOption *options ) const
 {
     VImage out;
 
@@ -593,7 +593,7 @@ VImage VImage::gravity( VipsCompassDirection direction , int width , int height 
     return( out );
 }
 
-VImage VImage::flip( VipsDirection direction , VOption *options )
+VImage VImage::flip( VipsDirection direction , VOption *options ) const
 {
     VImage out;
 
@@ -606,7 +606,7 @@ VImage VImage::flip( VipsDirection direction , VOption *options )
     return( out );
 }
 
-VImage VImage::insert( VImage sub , int x , int y , VOption *options )
+VImage VImage::insert( VImage sub , int x , int y , VOption *options ) const
 {
     VImage out;
 
@@ -621,7 +621,7 @@ VImage VImage::insert( VImage sub , int x , int y , VOption *options )
     return( out );
 }
 
-VImage VImage::join( VImage in2 , VipsDirection direction , VOption *options )
+VImage VImage::join( VImage in2 , VipsDirection direction , VOption *options ) const
 {
     VImage out;
 
@@ -647,7 +647,7 @@ VImage VImage::arrayjoin( std::vector<VImage> in , VOption *options )
     return( out );
 }
 
-VImage VImage::extract_area( int left , int top , int width , int height , VOption *options )
+VImage VImage::extract_area( int left , int top , int width , int height , VOption *options ) const
 {
     VImage out;
 
@@ -663,7 +663,7 @@ VImage VImage::extract_area( int left , int top , int width , int height , VOpti
     return( out );
 }
 
-VImage VImage::smartcrop( int width , int height , VOption *options )
+VImage VImage::smartcrop( int width , int height , VOption *options ) const
 {
     VImage out;
 
@@ -677,7 +677,7 @@ VImage VImage::smartcrop( int width , int height , VOption *options )
     return( out );
 }
 
-VImage VImage::extract_band( int band , VOption *options )
+VImage VImage::extract_band( int band , VOption *options ) const
 {
     VImage out;
 
@@ -702,7 +702,7 @@ VImage VImage::bandjoin( std::vector<VImage> in , VOption *options )
     return( out );
 }
 
-VImage VImage::bandjoin_const( std::vector<double> c , VOption *options )
+VImage VImage::bandjoin_const( std::vector<double> c , VOption *options ) const
 {
     VImage out;
 
@@ -727,7 +727,7 @@ VImage VImage::bandrank( std::vector<VImage> in , VOption *options )
     return( out );
 }
 
-VImage VImage::bandmean( VOption *options )
+VImage VImage::bandmean( VOption *options ) const
 {
     VImage out;
 
@@ -739,7 +739,7 @@ VImage VImage::bandmean( VOption *options )
     return( out );
 }
 
-VImage VImage::bandbool( VipsOperationBoolean boolean , VOption *options )
+VImage VImage::bandbool( VipsOperationBoolean boolean , VOption *options ) const
 {
     VImage out;
 
@@ -752,7 +752,7 @@ VImage VImage::bandbool( VipsOperationBoolean boolean , VOption *options )
     return( out );
 }
 
-VImage VImage::replicate( int across , int down , VOption *options )
+VImage VImage::replicate( int across , int down , VOption *options ) const
 {
     VImage out;
 
@@ -766,7 +766,7 @@ VImage VImage::replicate( int across , int down , VOption *options )
     return( out );
 }
 
-VImage VImage::cast( VipsBandFormat format , VOption *options )
+VImage VImage::cast( VipsBandFormat format , VOption *options ) const
 {
     VImage out;
 
@@ -779,7 +779,7 @@ VImage VImage::cast( VipsBandFormat format , VOption *options )
     return( out );
 }
 
-VImage VImage::rot( VipsAngle angle , VOption *options )
+VImage VImage::rot( VipsAngle angle , VOption *options ) const
 {
     VImage out;
 
@@ -792,7 +792,7 @@ VImage VImage::rot( VipsAngle angle , VOption *options )
     return( out );
 }
 
-VImage VImage::rot45( VOption *options )
+VImage VImage::rot45( VOption *options ) const
 {
     VImage out;
 
@@ -804,7 +804,7 @@ VImage VImage::rot45( VOption *options )
     return( out );
 }
 
-VImage VImage::autorot( VOption *options )
+VImage VImage::autorot( VOption *options ) const
 {
     VImage out;
 
@@ -816,7 +816,7 @@ VImage VImage::autorot( VOption *options )
     return( out );
 }
 
-VImage VImage::ifthenelse( VImage in1 , VImage in2 , VOption *options )
+VImage VImage::ifthenelse( VImage in1 , VImage in2 , VOption *options ) const
 {
     VImage out;
 
@@ -830,7 +830,7 @@ VImage VImage::ifthenelse( VImage in1 , VImage in2 , VOption *options )
     return( out );
 }
 
-VImage VImage::recomb( VImage m , VOption *options )
+VImage VImage::recomb( VImage m , VOption *options ) const
 {
     VImage out;
 
@@ -843,7 +843,7 @@ VImage VImage::recomb( VImage m , VOption *options )
     return( out );
 }
 
-VImage VImage::bandfold( VOption *options )
+VImage VImage::bandfold( VOption *options ) const
 {
     VImage out;
 
@@ -855,7 +855,7 @@ VImage VImage::bandfold( VOption *options )
     return( out );
 }
 
-VImage VImage::bandunfold( VOption *options )
+VImage VImage::bandunfold( VOption *options ) const
 {
     VImage out;
 
@@ -867,7 +867,7 @@ VImage VImage::bandunfold( VOption *options )
     return( out );
 }
 
-VImage VImage::flatten( VOption *options )
+VImage VImage::flatten( VOption *options ) const
 {
     VImage out;
 
@@ -879,7 +879,7 @@ VImage VImage::flatten( VOption *options )
     return( out );
 }
 
-VImage VImage::premultiply( VOption *options )
+VImage VImage::premultiply( VOption *options ) const
 {
     VImage out;
 
@@ -891,7 +891,7 @@ VImage VImage::premultiply( VOption *options )
     return( out );
 }
 
-VImage VImage::unpremultiply( VOption *options )
+VImage VImage::unpremultiply( VOption *options ) const
 {
     VImage out;
 
@@ -903,7 +903,7 @@ VImage VImage::unpremultiply( VOption *options )
     return( out );
 }
 
-VImage VImage::grid( int tile_height , int across , int down , VOption *options )
+VImage VImage::grid( int tile_height , int across , int down , VOption *options ) const
 {
     VImage out;
 
@@ -918,7 +918,19 @@ VImage VImage::grid( int tile_height , int across , int down , VOption *options 
     return( out );
 }
 
-VImage VImage::scale( VOption *options )
+VImage VImage::transpose3d( VOption *options ) const
+{
+    VImage out;
+
+    call( "transpose3d" ,
+        (options ? options : VImage::option()) ->
+            set( "in", *this ) ->
+            set( "out", &out ) );
+
+    return( out );
+}
+
+VImage VImage::scale( VOption *options ) const
 {
     VImage out;
 
@@ -930,7 +942,7 @@ VImage VImage::scale( VOption *options )
     return( out );
 }
 
-VImage VImage::wrap( VOption *options )
+VImage VImage::wrap( VOption *options ) const
 {
     VImage out;
 
@@ -942,7 +954,7 @@ VImage VImage::wrap( VOption *options )
     return( out );
 }
 
-VImage VImage::zoom( int xfac , int yfac , VOption *options )
+VImage VImage::zoom( int xfac , int yfac , VOption *options ) const
 {
     VImage out;
 
@@ -956,7 +968,7 @@ VImage VImage::zoom( int xfac , int yfac , VOption *options )
     return( out );
 }
 
-VImage VImage::subsample( int xfac , int yfac , VOption *options )
+VImage VImage::subsample( int xfac , int yfac , VOption *options ) const
 {
     VImage out;
 
@@ -970,7 +982,7 @@ VImage VImage::subsample( int xfac , int yfac , VOption *options )
     return( out );
 }
 
-VImage VImage::msb( VOption *options )
+VImage VImage::msb( VOption *options ) const
 {
     VImage out;
 
@@ -982,7 +994,7 @@ VImage VImage::msb( VOption *options )
     return( out );
 }
 
-VImage VImage::byteswap( VOption *options )
+VImage VImage::byteswap( VOption *options ) const
 {
     VImage out;
 
@@ -994,7 +1006,7 @@ VImage VImage::byteswap( VOption *options )
     return( out );
 }
 
-VImage VImage::falsecolour( VOption *options )
+VImage VImage::falsecolour( VOption *options ) const
 {
     VImage out;
 
@@ -1006,7 +1018,7 @@ VImage VImage::falsecolour( VOption *options )
     return( out );
 }
 
-VImage VImage::gamma( VOption *options )
+VImage VImage::gamma( VOption *options ) const
 {
     VImage out;
 
@@ -1025,6 +1037,20 @@ VImage VImage::composite( std::vector<VImage> in , std::vector<int> mode , VOpti
     call( "composite" ,
         (options ? options : VImage::option()) ->
             set( "in", in ) ->
+            set( "out", &out ) ->
+            set( "mode", mode ) );
+
+    return( out );
+}
+
+VImage VImage::composite2( VImage overlay , VipsBlendMode mode , VOption *options ) const
+{
+    VImage out;
+
+    call( "composite2" ,
+        (options ? options : VImage::option()) ->
+            set( "base", *this ) ->
+            set( "overlay", overlay ) ->
             set( "out", &out ) ->
             set( "mode", mode ) );
 
@@ -1318,7 +1344,7 @@ VImage VImage::mask_fractal( int width , int height , double fractal_dimension ,
     return( out );
 }
 
-VImage VImage::buildlut( VOption *options )
+VImage VImage::buildlut( VOption *options ) const
 {
     VImage out;
 
@@ -1330,7 +1356,7 @@ VImage VImage::buildlut( VOption *options )
     return( out );
 }
 
-VImage VImage::invertlut( VOption *options )
+VImage VImage::invertlut( VOption *options ) const
 {
     VImage out;
 
@@ -1731,7 +1757,7 @@ VImage VImage::openexrload( char * filename , VOption *options )
     return( out );
 }
 
-void VImage::csvsave( char * filename , VOption *options )
+void VImage::csvsave( char * filename , VOption *options ) const
 {
     call( "csvsave" ,
         (options ? options : VImage::option()) ->
@@ -1739,7 +1765,7 @@ void VImage::csvsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-void VImage::matrixsave( char * filename , VOption *options )
+void VImage::matrixsave( char * filename , VOption *options ) const
 {
     call( "matrixsave" ,
         (options ? options : VImage::option()) ->
@@ -1747,14 +1773,14 @@ void VImage::matrixsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-void VImage::matrixprint( VOption *options )
+void VImage::matrixprint( VOption *options ) const
 {
     call( "matrixprint" ,
         (options ? options : VImage::option()) ->
             set( "in", *this ) );
 }
 
-void VImage::rawsave( char * filename , VOption *options )
+void VImage::rawsave( char * filename , VOption *options ) const
 {
     call( "rawsave" ,
         (options ? options : VImage::option()) ->
@@ -1762,7 +1788,7 @@ void VImage::rawsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-void VImage::rawsave_fd( int fd , VOption *options )
+void VImage::rawsave_fd( int fd , VOption *options ) const
 {
     call( "rawsave_fd" ,
         (options ? options : VImage::option()) ->
@@ -1770,7 +1796,7 @@ void VImage::rawsave_fd( int fd , VOption *options )
             set( "fd", fd ) );
 }
 
-void VImage::vipssave( char * filename , VOption *options )
+void VImage::vipssave( char * filename , VOption *options ) const
 {
     call( "vipssave" ,
         (options ? options : VImage::option()) ->
@@ -1778,7 +1804,7 @@ void VImage::vipssave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-void VImage::ppmsave( char * filename , VOption *options )
+void VImage::ppmsave( char * filename , VOption *options ) const
 {
     call( "ppmsave" ,
         (options ? options : VImage::option()) ->
@@ -1786,7 +1812,7 @@ void VImage::ppmsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-void VImage::radsave( char * filename , VOption *options )
+void VImage::radsave( char * filename , VOption *options ) const
 {
     call( "radsave" ,
         (options ? options : VImage::option()) ->
@@ -1794,7 +1820,7 @@ void VImage::radsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-VipsBlob * VImage::radsave_buffer( VOption *options )
+VipsBlob * VImage::radsave_buffer( VOption *options ) const
 {
     VipsBlob * buffer;
 
@@ -1806,7 +1832,7 @@ VipsBlob * VImage::radsave_buffer( VOption *options )
     return( buffer );
 }
 
-void VImage::dzsave( char * filename , VOption *options )
+void VImage::dzsave( char * filename , VOption *options ) const
 {
     call( "dzsave" ,
         (options ? options : VImage::option()) ->
@@ -1814,7 +1840,7 @@ void VImage::dzsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-VipsBlob * VImage::dzsave_buffer( VOption *options )
+VipsBlob * VImage::dzsave_buffer( VOption *options ) const
 {
     VipsBlob * buffer;
 
@@ -1826,7 +1852,7 @@ VipsBlob * VImage::dzsave_buffer( VOption *options )
     return( buffer );
 }
 
-void VImage::pngsave( char * filename , VOption *options )
+void VImage::pngsave( char * filename , VOption *options ) const
 {
     call( "pngsave" ,
         (options ? options : VImage::option()) ->
@@ -1834,7 +1860,7 @@ void VImage::pngsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-VipsBlob * VImage::pngsave_buffer( VOption *options )
+VipsBlob * VImage::pngsave_buffer( VOption *options ) const
 {
     VipsBlob * buffer;
 
@@ -1846,7 +1872,7 @@ VipsBlob * VImage::pngsave_buffer( VOption *options )
     return( buffer );
 }
 
-void VImage::jpegsave( char * filename , VOption *options )
+void VImage::jpegsave( char * filename , VOption *options ) const
 {
     call( "jpegsave" ,
         (options ? options : VImage::option()) ->
@@ -1854,7 +1880,7 @@ void VImage::jpegsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-VipsBlob * VImage::jpegsave_buffer( VOption *options )
+VipsBlob * VImage::jpegsave_buffer( VOption *options ) const
 {
     VipsBlob * buffer;
 
@@ -1866,14 +1892,14 @@ VipsBlob * VImage::jpegsave_buffer( VOption *options )
     return( buffer );
 }
 
-void VImage::jpegsave_mime( VOption *options )
+void VImage::jpegsave_mime( VOption *options ) const
 {
     call( "jpegsave_mime" ,
         (options ? options : VImage::option()) ->
             set( "in", *this ) );
 }
 
-void VImage::webpsave( char * filename , VOption *options )
+void VImage::webpsave( char * filename , VOption *options ) const
 {
     call( "webpsave" ,
         (options ? options : VImage::option()) ->
@@ -1881,7 +1907,7 @@ void VImage::webpsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-VipsBlob * VImage::webpsave_buffer( VOption *options )
+VipsBlob * VImage::webpsave_buffer( VOption *options ) const
 {
     VipsBlob * buffer;
 
@@ -1893,7 +1919,7 @@ VipsBlob * VImage::webpsave_buffer( VOption *options )
     return( buffer );
 }
 
-void VImage::tiffsave( char * filename , VOption *options )
+void VImage::tiffsave( char * filename , VOption *options ) const
 {
     call( "tiffsave" ,
         (options ? options : VImage::option()) ->
@@ -1901,7 +1927,7 @@ void VImage::tiffsave( char * filename , VOption *options )
             set( "filename", filename ) );
 }
 
-VipsBlob * VImage::tiffsave_buffer( VOption *options )
+VipsBlob * VImage::tiffsave_buffer( VOption *options ) const
 {
     VipsBlob * buffer;
 
@@ -1913,7 +1939,27 @@ VipsBlob * VImage::tiffsave_buffer( VOption *options )
     return( buffer );
 }
 
-void VImage::fitssave( char * filename , VOption *options )
+void VImage::magicksave( char * filename , VOption *options ) const
+{
+    call( "magicksave" ,
+        (options ? options : VImage::option()) ->
+            set( "in", *this ) ->
+            set( "filename", filename ) );
+}
+
+VipsBlob * VImage::magicksave_buffer( VOption *options ) const
+{
+    VipsBlob * buffer;
+
+    call( "magicksave_buffer" ,
+        (options ? options : VImage::option()) ->
+            set( "in", *this ) ->
+            set( "buffer", &buffer ) );
+
+    return( buffer );
+}
+
+void VImage::fitssave( char * filename , VOption *options ) const
 {
     call( "fitssave" ,
         (options ? options : VImage::option()) ->
@@ -1947,7 +1993,7 @@ VImage VImage::thumbnail_buffer( VipsBlob * buffer , int width , VOption *option
     return( out );
 }
 
-VImage VImage::thumbnail_image( int width , VOption *options )
+VImage VImage::thumbnail_image( int width , VOption *options ) const
 {
     VImage out;
 
@@ -1960,7 +2006,7 @@ VImage VImage::thumbnail_image( int width , VOption *options )
     return( out );
 }
 
-VImage VImage::mapim( VImage index , VOption *options )
+VImage VImage::mapim( VImage index , VOption *options ) const
 {
     VImage out;
 
@@ -1973,7 +2019,7 @@ VImage VImage::mapim( VImage index , VOption *options )
     return( out );
 }
 
-VImage VImage::shrink( double hshrink , double vshrink , VOption *options )
+VImage VImage::shrink( double hshrink , double vshrink , VOption *options ) const
 {
     VImage out;
 
@@ -1987,7 +2033,7 @@ VImage VImage::shrink( double hshrink , double vshrink , VOption *options )
     return( out );
 }
 
-VImage VImage::shrinkh( int hshrink , VOption *options )
+VImage VImage::shrinkh( int hshrink , VOption *options ) const
 {
     VImage out;
 
@@ -2000,7 +2046,7 @@ VImage VImage::shrinkh( int hshrink , VOption *options )
     return( out );
 }
 
-VImage VImage::shrinkv( int vshrink , VOption *options )
+VImage VImage::shrinkv( int vshrink , VOption *options ) const
 {
     VImage out;
 
@@ -2013,7 +2059,7 @@ VImage VImage::shrinkv( int vshrink , VOption *options )
     return( out );
 }
 
-VImage VImage::reduceh( double hshrink , VOption *options )
+VImage VImage::reduceh( double hshrink , VOption *options ) const
 {
     VImage out;
 
@@ -2026,7 +2072,7 @@ VImage VImage::reduceh( double hshrink , VOption *options )
     return( out );
 }
 
-VImage VImage::reducev( double vshrink , VOption *options )
+VImage VImage::reducev( double vshrink , VOption *options ) const
 {
     VImage out;
 
@@ -2039,7 +2085,7 @@ VImage VImage::reducev( double vshrink , VOption *options )
     return( out );
 }
 
-VImage VImage::reduce( double hshrink , double vshrink , VOption *options )
+VImage VImage::reduce( double hshrink , double vshrink , VOption *options ) const
 {
     VImage out;
 
@@ -2053,7 +2099,7 @@ VImage VImage::reduce( double hshrink , double vshrink , VOption *options )
     return( out );
 }
 
-VImage VImage::quadratic( VImage coeff , VOption *options )
+VImage VImage::quadratic( VImage coeff , VOption *options ) const
 {
     VImage out;
 
@@ -2066,7 +2112,7 @@ VImage VImage::quadratic( VImage coeff , VOption *options )
     return( out );
 }
 
-VImage VImage::affine( std::vector<double> matrix , VOption *options )
+VImage VImage::affine( std::vector<double> matrix , VOption *options ) const
 {
     VImage out;
 
@@ -2079,7 +2125,7 @@ VImage VImage::affine( std::vector<double> matrix , VOption *options )
     return( out );
 }
 
-VImage VImage::similarity( VOption *options )
+VImage VImage::similarity( VOption *options ) const
 {
     VImage out;
 
@@ -2091,7 +2137,20 @@ VImage VImage::similarity( VOption *options )
     return( out );
 }
 
-VImage VImage::resize( double scale , VOption *options )
+VImage VImage::rotate( double angle , VOption *options ) const
+{
+    VImage out;
+
+    call( "rotate" ,
+        (options ? options : VImage::option()) ->
+            set( "in", *this ) ->
+            set( "out", &out ) ->
+            set( "angle", angle ) );
+
+    return( out );
+}
+
+VImage VImage::resize( double scale , VOption *options ) const
 {
     VImage out;
 
@@ -2104,7 +2163,7 @@ VImage VImage::resize( double scale , VOption *options )
     return( out );
 }
 
-VImage VImage::colourspace( VipsInterpretation space , VOption *options )
+VImage VImage::colourspace( VipsInterpretation space , VOption *options ) const
 {
     VImage out;
 
@@ -2117,7 +2176,7 @@ VImage VImage::colourspace( VipsInterpretation space , VOption *options )
     return( out );
 }
 
-VImage VImage::Lab2XYZ( VOption *options )
+VImage VImage::Lab2XYZ( VOption *options ) const
 {
     VImage out;
 
@@ -2129,7 +2188,7 @@ VImage VImage::Lab2XYZ( VOption *options )
     return( out );
 }
 
-VImage VImage::XYZ2Lab( VOption *options )
+VImage VImage::XYZ2Lab( VOption *options ) const
 {
     VImage out;
 
@@ -2141,7 +2200,7 @@ VImage VImage::XYZ2Lab( VOption *options )
     return( out );
 }
 
-VImage VImage::Lab2LCh( VOption *options )
+VImage VImage::Lab2LCh( VOption *options ) const
 {
     VImage out;
 
@@ -2153,7 +2212,7 @@ VImage VImage::Lab2LCh( VOption *options )
     return( out );
 }
 
-VImage VImage::LCh2Lab( VOption *options )
+VImage VImage::LCh2Lab( VOption *options ) const
 {
     VImage out;
 
@@ -2165,7 +2224,7 @@ VImage VImage::LCh2Lab( VOption *options )
     return( out );
 }
 
-VImage VImage::LCh2CMC( VOption *options )
+VImage VImage::LCh2CMC( VOption *options ) const
 {
     VImage out;
 
@@ -2177,7 +2236,7 @@ VImage VImage::LCh2CMC( VOption *options )
     return( out );
 }
 
-VImage VImage::CMC2LCh( VOption *options )
+VImage VImage::CMC2LCh( VOption *options ) const
 {
     VImage out;
 
@@ -2189,7 +2248,7 @@ VImage VImage::CMC2LCh( VOption *options )
     return( out );
 }
 
-VImage VImage::XYZ2Yxy( VOption *options )
+VImage VImage::XYZ2Yxy( VOption *options ) const
 {
     VImage out;
 
@@ -2201,7 +2260,7 @@ VImage VImage::XYZ2Yxy( VOption *options )
     return( out );
 }
 
-VImage VImage::Yxy2XYZ( VOption *options )
+VImage VImage::Yxy2XYZ( VOption *options ) const
 {
     VImage out;
 
@@ -2213,7 +2272,7 @@ VImage VImage::Yxy2XYZ( VOption *options )
     return( out );
 }
 
-VImage VImage::scRGB2XYZ( VOption *options )
+VImage VImage::scRGB2XYZ( VOption *options ) const
 {
     VImage out;
 
@@ -2225,7 +2284,7 @@ VImage VImage::scRGB2XYZ( VOption *options )
     return( out );
 }
 
-VImage VImage::XYZ2scRGB( VOption *options )
+VImage VImage::XYZ2scRGB( VOption *options ) const
 {
     VImage out;
 
@@ -2237,7 +2296,7 @@ VImage VImage::XYZ2scRGB( VOption *options )
     return( out );
 }
 
-VImage VImage::LabQ2Lab( VOption *options )
+VImage VImage::LabQ2Lab( VOption *options ) const
 {
     VImage out;
 
@@ -2249,7 +2308,7 @@ VImage VImage::LabQ2Lab( VOption *options )
     return( out );
 }
 
-VImage VImage::Lab2LabQ( VOption *options )
+VImage VImage::Lab2LabQ( VOption *options ) const
 {
     VImage out;
 
@@ -2261,7 +2320,7 @@ VImage VImage::Lab2LabQ( VOption *options )
     return( out );
 }
 
-VImage VImage::LabQ2LabS( VOption *options )
+VImage VImage::LabQ2LabS( VOption *options ) const
 {
     VImage out;
 
@@ -2273,7 +2332,7 @@ VImage VImage::LabQ2LabS( VOption *options )
     return( out );
 }
 
-VImage VImage::LabS2LabQ( VOption *options )
+VImage VImage::LabS2LabQ( VOption *options ) const
 {
     VImage out;
 
@@ -2285,7 +2344,7 @@ VImage VImage::LabS2LabQ( VOption *options )
     return( out );
 }
 
-VImage VImage::LabS2Lab( VOption *options )
+VImage VImage::LabS2Lab( VOption *options ) const
 {
     VImage out;
 
@@ -2297,7 +2356,7 @@ VImage VImage::LabS2Lab( VOption *options )
     return( out );
 }
 
-VImage VImage::Lab2LabS( VOption *options )
+VImage VImage::Lab2LabS( VOption *options ) const
 {
     VImage out;
 
@@ -2309,7 +2368,7 @@ VImage VImage::Lab2LabS( VOption *options )
     return( out );
 }
 
-VImage VImage::rad2float( VOption *options )
+VImage VImage::rad2float( VOption *options ) const
 {
     VImage out;
 
@@ -2321,7 +2380,7 @@ VImage VImage::rad2float( VOption *options )
     return( out );
 }
 
-VImage VImage::float2rad( VOption *options )
+VImage VImage::float2rad( VOption *options ) const
 {
     VImage out;
 
@@ -2333,7 +2392,7 @@ VImage VImage::float2rad( VOption *options )
     return( out );
 }
 
-VImage VImage::LabQ2sRGB( VOption *options )
+VImage VImage::LabQ2sRGB( VOption *options ) const
 {
     VImage out;
 
@@ -2345,7 +2404,7 @@ VImage VImage::LabQ2sRGB( VOption *options )
     return( out );
 }
 
-VImage VImage::sRGB2HSV( VOption *options )
+VImage VImage::sRGB2HSV( VOption *options ) const
 {
     VImage out;
 
@@ -2357,7 +2416,7 @@ VImage VImage::sRGB2HSV( VOption *options )
     return( out );
 }
 
-VImage VImage::HSV2sRGB( VOption *options )
+VImage VImage::HSV2sRGB( VOption *options ) const
 {
     VImage out;
 
@@ -2369,7 +2428,7 @@ VImage VImage::HSV2sRGB( VOption *options )
     return( out );
 }
 
-VImage VImage::icc_import( VOption *options )
+VImage VImage::icc_import( VOption *options ) const
 {
     VImage out;
 
@@ -2381,7 +2440,7 @@ VImage VImage::icc_import( VOption *options )
     return( out );
 }
 
-VImage VImage::icc_export( VOption *options )
+VImage VImage::icc_export( VOption *options ) const
 {
     VImage out;
 
@@ -2393,7 +2452,7 @@ VImage VImage::icc_export( VOption *options )
     return( out );
 }
 
-VImage VImage::icc_transform( char * output_profile , VOption *options )
+VImage VImage::icc_transform( char * output_profile , VOption *options ) const
 {
     VImage out;
 
@@ -2406,7 +2465,7 @@ VImage VImage::icc_transform( char * output_profile , VOption *options )
     return( out );
 }
 
-VImage VImage::dE76( VImage right , VOption *options )
+VImage VImage::dE76( VImage right , VOption *options ) const
 {
     VImage out;
 
@@ -2419,7 +2478,7 @@ VImage VImage::dE76( VImage right , VOption *options )
     return( out );
 }
 
-VImage VImage::dE00( VImage right , VOption *options )
+VImage VImage::dE00( VImage right , VOption *options ) const
 {
     VImage out;
 
@@ -2432,7 +2491,7 @@ VImage VImage::dE00( VImage right , VOption *options )
     return( out );
 }
 
-VImage VImage::dECMC( VImage right , VOption *options )
+VImage VImage::dECMC( VImage right , VOption *options ) const
 {
     VImage out;
 
@@ -2445,7 +2504,7 @@ VImage VImage::dECMC( VImage right , VOption *options )
     return( out );
 }
 
-VImage VImage::sRGB2scRGB( VOption *options )
+VImage VImage::sRGB2scRGB( VOption *options ) const
 {
     VImage out;
 
@@ -2457,7 +2516,7 @@ VImage VImage::sRGB2scRGB( VOption *options )
     return( out );
 }
 
-VImage VImage::scRGB2BW( VOption *options )
+VImage VImage::scRGB2BW( VOption *options ) const
 {
     VImage out;
 
@@ -2469,7 +2528,7 @@ VImage VImage::scRGB2BW( VOption *options )
     return( out );
 }
 
-VImage VImage::scRGB2sRGB( VOption *options )
+VImage VImage::scRGB2sRGB( VOption *options ) const
 {
     VImage out;
 
@@ -2481,7 +2540,7 @@ VImage VImage::scRGB2sRGB( VOption *options )
     return( out );
 }
 
-VImage VImage::maplut( VImage lut , VOption *options )
+VImage VImage::maplut( VImage lut , VOption *options ) const
 {
     VImage out;
 
@@ -2494,7 +2553,7 @@ VImage VImage::maplut( VImage lut , VOption *options )
     return( out );
 }
 
-int VImage::percent( double percent , VOption *options )
+int VImage::percent( double percent , VOption *options ) const
 {
     int threshold;
 
@@ -2507,7 +2566,7 @@ int VImage::percent( double percent , VOption *options )
     return( threshold );
 }
 
-VImage VImage::stdif( int width , int height , VOption *options )
+VImage VImage::stdif( int width , int height , VOption *options ) const
 {
     VImage out;
 
@@ -2521,7 +2580,7 @@ VImage VImage::stdif( int width , int height , VOption *options )
     return( out );
 }
 
-VImage VImage::hist_cum( VOption *options )
+VImage VImage::hist_cum( VOption *options ) const
 {
     VImage out;
 
@@ -2533,7 +2592,7 @@ VImage VImage::hist_cum( VOption *options )
     return( out );
 }
 
-VImage VImage::hist_match( VImage ref , VOption *options )
+VImage VImage::hist_match( VImage ref , VOption *options ) const
 {
     VImage out;
 
@@ -2546,7 +2605,7 @@ VImage VImage::hist_match( VImage ref , VOption *options )
     return( out );
 }
 
-VImage VImage::hist_norm( VOption *options )
+VImage VImage::hist_norm( VOption *options ) const
 {
     VImage out;
 
@@ -2558,7 +2617,7 @@ VImage VImage::hist_norm( VOption *options )
     return( out );
 }
 
-VImage VImage::hist_equal( VOption *options )
+VImage VImage::hist_equal( VOption *options ) const
 {
     VImage out;
 
@@ -2570,7 +2629,7 @@ VImage VImage::hist_equal( VOption *options )
     return( out );
 }
 
-VImage VImage::hist_plot( VOption *options )
+VImage VImage::hist_plot( VOption *options ) const
 {
     VImage out;
 
@@ -2582,7 +2641,7 @@ VImage VImage::hist_plot( VOption *options )
     return( out );
 }
 
-VImage VImage::hist_local( int width , int height , VOption *options )
+VImage VImage::hist_local( int width , int height , VOption *options ) const
 {
     VImage out;
 
@@ -2596,7 +2655,7 @@ VImage VImage::hist_local( int width , int height , VOption *options )
     return( out );
 }
 
-bool VImage::hist_ismonotonic( VOption *options )
+bool VImage::hist_ismonotonic( VOption *options ) const
 {
     bool monotonic;
 
@@ -2608,7 +2667,7 @@ bool VImage::hist_ismonotonic( VOption *options )
     return( monotonic );
 }
 
-double VImage::hist_entropy( VOption *options )
+double VImage::hist_entropy( VOption *options ) const
 {
     double out;
 
@@ -2620,7 +2679,7 @@ double VImage::hist_entropy( VOption *options )
     return( out );
 }
 
-VImage VImage::conv( VImage mask , VOption *options )
+VImage VImage::conv( VImage mask , VOption *options ) const
 {
     VImage out;
 
@@ -2633,7 +2692,7 @@ VImage VImage::conv( VImage mask , VOption *options )
     return( out );
 }
 
-VImage VImage::conva( VImage mask , VOption *options )
+VImage VImage::conva( VImage mask , VOption *options ) const
 {
     VImage out;
 
@@ -2646,7 +2705,7 @@ VImage VImage::conva( VImage mask , VOption *options )
     return( out );
 }
 
-VImage VImage::convf( VImage mask , VOption *options )
+VImage VImage::convf( VImage mask , VOption *options ) const
 {
     VImage out;
 
@@ -2659,7 +2718,7 @@ VImage VImage::convf( VImage mask , VOption *options )
     return( out );
 }
 
-VImage VImage::convi( VImage mask , VOption *options )
+VImage VImage::convi( VImage mask , VOption *options ) const
 {
     VImage out;
 
@@ -2672,7 +2731,7 @@ VImage VImage::convi( VImage mask , VOption *options )
     return( out );
 }
 
-VImage VImage::compass( VImage mask , VOption *options )
+VImage VImage::compass( VImage mask , VOption *options ) const
 {
     VImage out;
 
@@ -2685,7 +2744,7 @@ VImage VImage::compass( VImage mask , VOption *options )
     return( out );
 }
 
-VImage VImage::convsep( VImage mask , VOption *options )
+VImage VImage::convsep( VImage mask , VOption *options ) const
 {
     VImage out;
 
@@ -2698,7 +2757,7 @@ VImage VImage::convsep( VImage mask , VOption *options )
     return( out );
 }
 
-VImage VImage::convasep( VImage mask , VOption *options )
+VImage VImage::convasep( VImage mask , VOption *options ) const
 {
     VImage out;
 
@@ -2711,7 +2770,7 @@ VImage VImage::convasep( VImage mask , VOption *options )
     return( out );
 }
 
-VImage VImage::fastcor( VImage ref , VOption *options )
+VImage VImage::fastcor( VImage ref , VOption *options ) const
 {
     VImage out;
 
@@ -2724,7 +2783,7 @@ VImage VImage::fastcor( VImage ref , VOption *options )
     return( out );
 }
 
-VImage VImage::spcor( VImage ref , VOption *options )
+VImage VImage::spcor( VImage ref , VOption *options ) const
 {
     VImage out;
 
@@ -2737,7 +2796,7 @@ VImage VImage::spcor( VImage ref , VOption *options )
     return( out );
 }
 
-VImage VImage::sharpen( VOption *options )
+VImage VImage::sharpen( VOption *options ) const
 {
     VImage out;
 
@@ -2749,7 +2808,7 @@ VImage VImage::sharpen( VOption *options )
     return( out );
 }
 
-VImage VImage::gaussblur( double sigma , VOption *options )
+VImage VImage::gaussblur( double sigma , VOption *options ) const
 {
     VImage out;
 
@@ -2762,7 +2821,31 @@ VImage VImage::gaussblur( double sigma , VOption *options )
     return( out );
 }
 
-VImage VImage::fwfft( VOption *options )
+VImage VImage::canny( VOption *options ) const
+{
+    VImage out;
+
+    call( "canny" ,
+        (options ? options : VImage::option()) ->
+            set( "in", *this ) ->
+            set( "out", &out ) );
+
+    return( out );
+}
+
+VImage VImage::sobel( VOption *options ) const
+{
+    VImage out;
+
+    call( "sobel" ,
+        (options ? options : VImage::option()) ->
+            set( "in", *this ) ->
+            set( "out", &out ) );
+
+    return( out );
+}
+
+VImage VImage::fwfft( VOption *options ) const
 {
     VImage out;
 
@@ -2774,7 +2857,7 @@ VImage VImage::fwfft( VOption *options )
     return( out );
 }
 
-VImage VImage::invfft( VOption *options )
+VImage VImage::invfft( VOption *options ) const
 {
     VImage out;
 
@@ -2786,7 +2869,7 @@ VImage VImage::invfft( VOption *options )
     return( out );
 }
 
-VImage VImage::freqmult( VImage mask , VOption *options )
+VImage VImage::freqmult( VImage mask , VOption *options ) const
 {
     VImage out;
 
@@ -2799,7 +2882,7 @@ VImage VImage::freqmult( VImage mask , VOption *options )
     return( out );
 }
 
-VImage VImage::spectrum( VOption *options )
+VImage VImage::spectrum( VOption *options ) const
 {
     VImage out;
 
@@ -2811,7 +2894,7 @@ VImage VImage::spectrum( VOption *options )
     return( out );
 }
 
-VImage VImage::phasecor( VImage in2 , VOption *options )
+VImage VImage::phasecor( VImage in2 , VOption *options ) const
 {
     VImage out;
 
@@ -2824,7 +2907,7 @@ VImage VImage::phasecor( VImage in2 , VOption *options )
     return( out );
 }
 
-VImage VImage::morph( VImage mask , VipsOperationMorphology morph , VOption *options )
+VImage VImage::morph( VImage mask , VipsOperationMorphology morph , VOption *options ) const
 {
     VImage out;
 
@@ -2838,7 +2921,7 @@ VImage VImage::morph( VImage mask , VipsOperationMorphology morph , VOption *opt
     return( out );
 }
 
-VImage VImage::rank( int width , int height , int index , VOption *options )
+VImage VImage::rank( int width , int height , int index , VOption *options ) const
 {
     VImage out;
 
@@ -2853,7 +2936,7 @@ VImage VImage::rank( int width , int height , int index , VOption *options )
     return( out );
 }
 
-double VImage::countlines( VipsDirection direction , VOption *options )
+double VImage::countlines( VipsDirection direction , VOption *options ) const
 {
     double nolines;
 
@@ -2866,7 +2949,7 @@ double VImage::countlines( VipsDirection direction , VOption *options )
     return( nolines );
 }
 
-VImage VImage::labelregions( VOption *options )
+VImage VImage::labelregions( VOption *options ) const
 {
     VImage mask;
 
@@ -2878,7 +2961,7 @@ VImage VImage::labelregions( VOption *options )
     return( mask );
 }
 
-VImage VImage::fill_nearest( VOption *options )
+VImage VImage::fill_nearest( VOption *options ) const
 {
     VImage out;
 
@@ -2890,7 +2973,7 @@ VImage VImage::fill_nearest( VOption *options )
     return( out );
 }
 
-void VImage::draw_rect( std::vector<double> ink , int left , int top , int width , int height , VOption *options )
+void VImage::draw_rect( std::vector<double> ink , int left , int top , int width , int height , VOption *options ) const
 {
     call( "draw_rect" ,
         (options ? options : VImage::option()) ->
@@ -2902,7 +2985,7 @@ void VImage::draw_rect( std::vector<double> ink , int left , int top , int width
             set( "height", height ) );
 }
 
-void VImage::draw_mask( std::vector<double> ink , VImage mask , int x , int y , VOption *options )
+void VImage::draw_mask( std::vector<double> ink , VImage mask , int x , int y , VOption *options ) const
 {
     call( "draw_mask" ,
         (options ? options : VImage::option()) ->
@@ -2913,7 +2996,7 @@ void VImage::draw_mask( std::vector<double> ink , VImage mask , int x , int y , 
             set( "y", y ) );
 }
 
-void VImage::draw_line( std::vector<double> ink , int x1 , int y1 , int x2 , int y2 , VOption *options )
+void VImage::draw_line( std::vector<double> ink , int x1 , int y1 , int x2 , int y2 , VOption *options ) const
 {
     call( "draw_line" ,
         (options ? options : VImage::option()) ->
@@ -2925,7 +3008,7 @@ void VImage::draw_line( std::vector<double> ink , int x1 , int y1 , int x2 , int
             set( "y2", y2 ) );
 }
 
-void VImage::draw_circle( std::vector<double> ink , int cx , int cy , int radius , VOption *options )
+void VImage::draw_circle( std::vector<double> ink , int cx , int cy , int radius , VOption *options ) const
 {
     call( "draw_circle" ,
         (options ? options : VImage::option()) ->
@@ -2936,7 +3019,7 @@ void VImage::draw_circle( std::vector<double> ink , int cx , int cy , int radius
             set( "radius", radius ) );
 }
 
-void VImage::draw_flood( std::vector<double> ink , int x , int y , VOption *options )
+void VImage::draw_flood( std::vector<double> ink , int x , int y , VOption *options ) const
 {
     call( "draw_flood" ,
         (options ? options : VImage::option()) ->
@@ -2946,7 +3029,7 @@ void VImage::draw_flood( std::vector<double> ink , int x , int y , VOption *opti
             set( "y", y ) );
 }
 
-void VImage::draw_image( VImage sub , int x , int y , VOption *options )
+void VImage::draw_image( VImage sub , int x , int y , VOption *options ) const
 {
     call( "draw_image" ,
         (options ? options : VImage::option()) ->
@@ -2956,7 +3039,7 @@ void VImage::draw_image( VImage sub , int x , int y , VOption *options )
             set( "y", y ) );
 }
 
-void VImage::draw_smudge( int left , int top , int width , int height , VOption *options )
+void VImage::draw_smudge( int left , int top , int width , int height , VOption *options ) const
 {
     call( "draw_smudge" ,
         (options ? options : VImage::option()) ->
@@ -2967,7 +3050,7 @@ void VImage::draw_smudge( int left , int top , int width , int height , VOption 
             set( "height", height ) );
 }
 
-VImage VImage::merge( VImage sec , VipsDirection direction , int dx , int dy , VOption *options )
+VImage VImage::merge( VImage sec , VipsDirection direction , int dx , int dy , VOption *options ) const
 {
     VImage out;
 
@@ -2983,7 +3066,7 @@ VImage VImage::merge( VImage sec , VipsDirection direction , int dx , int dy , V
     return( out );
 }
 
-VImage VImage::mosaic( VImage sec , VipsDirection direction , int xref , int yref , int xsec , int ysec , VOption *options )
+VImage VImage::mosaic( VImage sec , VipsDirection direction , int xref , int yref , int xsec , int ysec , VOption *options ) const
 {
     VImage out;
 
@@ -3001,7 +3084,7 @@ VImage VImage::mosaic( VImage sec , VipsDirection direction , int xref , int yre
     return( out );
 }
 
-VImage VImage::mosaic1( VImage sec , VipsDirection direction , int xr1 , int yr1 , int xs1 , int ys1 , int xr2 , int yr2 , int xs2 , int ys2 , VOption *options )
+VImage VImage::mosaic1( VImage sec , VipsDirection direction , int xr1 , int yr1 , int xs1 , int ys1 , int xr2 , int yr2 , int xs2 , int ys2 , VOption *options ) const
 {
     VImage out;
 
@@ -3023,7 +3106,7 @@ VImage VImage::mosaic1( VImage sec , VipsDirection direction , int xr1 , int yr1
     return( out );
 }
 
-VImage VImage::match( VImage sec , int xr1 , int yr1 , int xs1 , int ys1 , int xr2 , int yr2 , int xs2 , int ys2 , VOption *options )
+VImage VImage::match( VImage sec , int xr1 , int yr1 , int xs1 , int ys1 , int xr2 , int yr2 , int xs2 , int ys2 , VOption *options ) const
 {
     VImage out;
 
@@ -3044,7 +3127,7 @@ VImage VImage::match( VImage sec , int xr1 , int yr1 , int xs1 , int ys1 , int x
     return( out );
 }
 
-VImage VImage::globalbalance( VOption *options )
+VImage VImage::globalbalance( VOption *options ) const
 {
     VImage out;
 

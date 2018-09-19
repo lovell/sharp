@@ -54,9 +54,6 @@ try {
     if (platformAndArch === 'freebsd-x64') {
       throw new Error(`FreeBSD systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
-    if (detectLibc.isNonGlibcLinux) {
-      throw new Error(`Use with ${detectLibc.family} libc requires manual installation of libvips >= ${minimumLibvipsVersion}`);
-    }
     if (detectLibc.family === detectLibc.GLIBC && detectLibc.version && semver.lt(`${detectLibc.version}.0`, '2.13.0')) {
       throw new Error(`Use with glibc version ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
     }

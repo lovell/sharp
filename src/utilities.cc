@@ -259,7 +259,7 @@ NAN_METHOD(_maxColourDistance) {
     }
     // Calculate colour distance
     maxColourDistance = image1.dE00(image2).max();
-  } catch (VError err) {
+  } catch (VError const &err) {
     return ThrowError(err.what());
   }
 

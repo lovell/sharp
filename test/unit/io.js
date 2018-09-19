@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const assert = require('assert');
+const rimraf = require('rimraf');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -16,7 +17,7 @@ describe('Input/output', function () {
 
   it('Read from File and write to Stream', function (done) {
     const writable = fs.createWriteStream(fixtures.outputJpg);
-    writable.on('finish', function () {
+    writable.on('close', function () {
       sharp(fixtures.outputJpg).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -24,8 +25,7 @@ describe('Input/output', function () {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fs.unlinkSync(fixtures.outputJpg);
-        done();
+        rimraf(fixtures.outputJpg, done);
       });
     });
     sharp(fixtures.inputJpg).resize(320, 240).pipe(writable);
@@ -34,7 +34,7 @@ describe('Input/output', function () {
   it('Read from Buffer and write to Stream', function (done) {
     const inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
     const writable = fs.createWriteStream(fixtures.outputJpg);
-    writable.on('finish', function () {
+    writable.on('close', function () {
       sharp(fixtures.outputJpg).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -42,8 +42,7 @@ describe('Input/output', function () {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fs.unlinkSync(fixtures.outputJpg);
-        done();
+        rimraf(fixtures.outputJpg, done);
       });
     });
     sharp(inputJpgBuffer).resize(320, 240).pipe(writable);
@@ -57,8 +56,7 @@ describe('Input/output', function () {
       assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
-      fs.unlinkSync(fixtures.outputJpg);
-      done();
+      rimraf(fixtures.outputJpg, done);
     });
     readable.pipe(pipeline);
   });
@@ -134,7 +132,7 @@ describe('Input/output', function () {
   it('Read from Stream and write to Stream', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const writable = fs.createWriteStream(fixtures.outputJpg);
-    writable.on('finish', function () {
+    writable.on('close', function () {
       sharp(fixtures.outputJpg).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -142,8 +140,7 @@ describe('Input/output', function () {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fs.unlinkSync(fixtures.outputJpg);
-        done();
+        rimraf(fixtures.outputJpg, done);
       });
     });
     const pipeline = sharp().resize(320, 240);
@@ -162,10 +159,9 @@ describe('Input/output', function () {
       assert.strictEqual(3, info.channels);
       infoEventEmitted = true;
     });
-    writable.on('finish', function () {
+    writable.on('close', function () {
       assert.strictEqual(true, infoEventEmitted);
-      fs.unlinkSync(fixtures.outputJpg);
-      done();
+      rimraf(fixtures.outputJpg, done);
     });
     readable.pipe(pipeline).pipe(writable);
   });
@@ -177,8 +173,7 @@ describe('Input/output', function () {
       anErrorWasEmitted = !!err;
     }).on('end', function () {
       assert(anErrorWasEmitted);
-      fs.unlinkSync(fixtures.outputJpg);
-      done();
+      rimraf(fixtures.outputJpg, done);
     });
     const readableButNotAnImage = fs.createReadStream(__filename);
     const writable = fs.createWriteStream(fixtures.outputJpg);
@@ -192,8 +187,7 @@ describe('Input/output', function () {
       anErrorWasEmitted = !!err;
     }).on('end', function () {
       assert(anErrorWasEmitted);
-      fs.unlinkSync(fixtures.outputJpg);
-      done();
+      rimraf(fixtures.outputJpg, done);
     });
     const writable = fs.createWriteStream(fixtures.outputJpg);
     readableButNotAnImage.pipe(writable);
@@ -202,7 +196,7 @@ describe('Input/output', function () {
   it('Readable side of Stream can start flowing after Writable side has finished', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const writable = fs.createWriteStream(fixtures.outputJpg);
-    writable.on('finish', function () {
+    writable.on('close', function () {
       sharp(fixtures.outputJpg).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -210,8 +204,7 @@ describe('Input/output', function () {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fs.unlinkSync(fixtures.outputJpg);
-        done();
+        rimraf(fixtures.outputJpg, done);
       });
     });
     const pipeline = sharp().resize(320, 240);
@@ -564,8 +557,7 @@ describe('Input/output', function () {
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          fs.unlinkSync(fixtures.outputZoinks);
-          done();
+          rimraf(fixtures.outputZoinks, done);
         });
     });
 
@@ -578,8 +570,7 @@ describe('Input/output', function () {
           assert.strictEqual('png', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          fs.unlinkSync(fixtures.outputZoinks);
-          done();
+          rimraf(fixtures.outputZoinks, done);
         });
     });
 
@@ -592,8 +583,7 @@ describe('Input/output', function () {
           assert.strictEqual('webp', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          fs.unlinkSync(fixtures.outputZoinks);
-          done();
+          rimraf(fixtures.outputZoinks, done);
         });
     });
 
@@ -606,8 +596,7 @@ describe('Input/output', function () {
           assert.strictEqual('tiff', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          fs.unlinkSync(fixtures.outputZoinks);
-          done();
+          rimraf(fixtures.outputZoinks, done);
         });
     });
 
@@ -620,8 +609,7 @@ describe('Input/output', function () {
           assert.strictEqual('png', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          fs.unlinkSync(fixtures.outputZoinks);
-          done();
+          rimraf(fixtures.outputZoinks, done);
         });
     });
 
@@ -635,8 +623,7 @@ describe('Input/output', function () {
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          fs.unlinkSync(fixtures.outputZoinks);
-          done();
+          rimraf(fixtures.outputZoinks, done);
         });
     });
   });
@@ -1080,7 +1067,7 @@ describe('Input/output', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size === startSize);
-        fs.unlink(fixtures.outputTiff, done);
+        rimraf(fixtures.outputTiff, done);
       });
   });
 
@@ -1097,7 +1084,7 @@ describe('Input/output', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < (startSize / 2));
-        fs.unlink(fixtures.outputTiff, done);
+        rimraf(fixtures.outputTiff, done);
       });
   });
 
@@ -1120,7 +1107,7 @@ describe('Input/output', function () {
         sharp(fixtures.outputTiff).metadata(function (err, metadata) {
           if (err) throw err;
           assert.strictEqual(metadata.density, res * 2.54); // convert to dpi
-          fs.unlink(fixtures.outputTiff, done);
+          rimraf(fixtures.outputTiff, done);
         });
       });
   });
@@ -1165,7 +1152,7 @@ describe('Input/output', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        fs.unlink(fixtures.outputTiff, done);
+        rimraf(fixtures.outputTiff, done);
       });
   });
 
@@ -1181,7 +1168,7 @@ describe('Input/output', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        fs.unlink(fixtures.outputTiff, done);
+        rimraf(fixtures.outputTiff, done);
       });
   });
 
@@ -1196,7 +1183,7 @@ describe('Input/output', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        fs.unlink(fixtures.outputTiff, done);
+        rimraf(fixtures.outputTiff, done);
       });
   });
 
@@ -1211,7 +1198,7 @@ describe('Input/output', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        fs.unlink(fixtures.outputTiff, done);
+        rimraf(fixtures.outputTiff, done);
       });
   });
 
@@ -1226,7 +1213,7 @@ describe('Input/output', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        fs.unlink(fixtures.outputTiff, done);
+        rimraf(fixtures.outputTiff, done);
       });
   });
 
@@ -1240,7 +1227,7 @@ describe('Input/output', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        fs.unlink(fixtures.outputTiff, done);
+        rimraf(fixtures.outputTiff, done);
       });
   });
 
@@ -1384,8 +1371,7 @@ describe('Input/output', function () {
         assert.strictEqual('v', info.format);
         assert.strictEqual(70, info.width);
         assert.strictEqual(60, info.height);
-        fs.unlinkSync(fixtures.outputV);
-        done();
+        rimraf(fixtures.outputV, done);
       });
   });
 

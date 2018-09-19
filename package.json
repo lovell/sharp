@@ -58,7 +58,7 @@
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
-    "clean": "rm -rf node_modules/ build/ vendor/ coverage/ test/fixtures/output.*",
+    "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "semistandard && cc && nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js && prebuild-ci",
     "coverage": "./test/coverage/report.sh",
     "test-leak": "./test/leak/leak.sh",
@@ -91,9 +91,9 @@
     "nan": "^2.11.0",
     "fs-copy-file-sync": "^1.1.1",
     "npmlog": "^4.1.2",
-    "prebuild-install": "^4.0.0",
+    "prebuild-install": "^5.0.0",
     "semver": "^5.5.1",
-    "simple-get": "^2.8.1",
+    "simple-get": "^3.0.3",
     "tar": "^4.4.6",
     "tunnel-agent": "^0.6.0"
   },
@@ -105,19 +105,19 @@
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "mocha": "^5.2.0",
-    "mock-fs": "^4.6.0",
-    "nyc": "^12.0.1",
-    "prebuild": "^7.6.2",
+    "mock-fs": "^4.7.0",
+    "nyc": "^13.1.0",
+    "prebuild": "^8.0.1",
     "prebuild-ci": "^2.2.3",
     "rimraf": "^2.6.2",
     "semistandard": "^12.0.1"
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.6.1"
+    "libvips": "8.7.0"
   },
   "engines": {
-    "node": ">=4.5.0"
+    "node": ">=6"
   },
   "semistandard": {
     "env": [

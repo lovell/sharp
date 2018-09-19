@@ -894,10 +894,6 @@ class PipelineWorker : public Nan::AsyncWorker {
           if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
             sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
           }
-          // Cast pixel values to float, if required
-          if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
-            image = image.cast(VIPS_FORMAT_FLOAT);
-          }
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
