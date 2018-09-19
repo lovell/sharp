@@ -115,7 +115,7 @@ describe('Partial image extraction', function () {
         if (err) throw err;
         assert.strictEqual(280, info.width);
         assert.strictEqual(380, info.height);
-        fixtures.assertSimilar(fixtures.expected('rotate-extract.jpg'), data, { threshold: 6 }, done);
+        fixtures.assertSimilar(fixtures.expected('rotate-extract.jpg'), data, { threshold: 7 }, done);
       });
   });
 

@@ -9,6 +9,9 @@ Requires libvips v8.7.0.
 * Drop Node 4 support.
   [#1212](https://github.com/lovell/sharp/issues/1212)
 
+* Enable SIMD convolution by default.
+  [#1213](https://github.com/lovell/sharp/issues/1213)
+
 * Add experimental prebuilt binaries for musl-based Linux.
   [#1379](https://github.com/lovell/sharp/issues/1379)
 
