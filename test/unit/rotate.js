@@ -23,6 +23,33 @@ describe('Rotation', function () {
     });
   });
 
+  it('Rotate by 30 degrees with semi-transparent background', function (done) {
+    sharp(fixtures.inputJpg)
+      .rotate(30, {background: { r: 255, g: 0, b: 0, alpha: 0.5 }})
+      .resize(320)
+      .png()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(408, info.width);
+        assert.strictEqual(386, info.height);
+        fixtures.assertSimilar(fixtures.expected('rotate-transparent-bg.png'), data, done);
+      });
+  });
+
+  it('Rotate by 30 degrees with solid background', function (done) {
+    sharp(fixtures.inputJpg)
+      .rotate(30, {background: { r: 255, g: 0, b: 0, alpha: 0.5 }})
+      .resize(320)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(408, info.width);
+        assert.strictEqual(386, info.height);
+        fixtures.assertSimilar(fixtures.expected('rotate-solid-bg.jpg'), data, done);
+      });
+  });
+
   it('Rotate by 90 degrees, respecting output input size', function (done) {
     sharp(fixtures.inputJpg).rotate(90).resize(320, 240).toBuffer(function (err, data, info) {
       if (err) throw err;
@@ -34,12 +61,34 @@ describe('Rotation', function () {
     });
   });
 
+  it('Rotate by 30 degrees, respecting output input size', function (done) {
+    sharp(fixtures.inputJpg).rotate(30).resize(320, 240).toBuffer(function (err, data, info) {
+      if (err) throw err;
+      assert.strictEqual(true, data.length > 0);
+      assert.strictEqual('jpeg', info.format);
+      assert.strictEqual(397, info.width);
+      assert.strictEqual(368, info.height);
+      done();
+    });
+  });
+
   [-3690, -450, -90, 90, 450, 3690].forEach(function (angle) {
     it('Rotate by any 90-multiple angle (' + angle + 'deg)', function (done) {
       sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(240, info.width);
         assert.strictEqual(320, info.height);
+        done();
+      });
+    });
+  });
+
+  [-3750, -510, -150, 30, 390, 3630].forEach(function (angle) {
+    it('Rotate by any 30-multiple angle (' + angle + 'deg)', function (done) {
+      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(397, info.width);
+        assert.strictEqual(368, info.height);
         done();
       });
     });
@@ -74,6 +123,24 @@ describe('Rotation', function () {
       });
   });
 
+  it('Rotate by 315 degrees, square output ignoring aspect ratio', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(240, 240)
+      .ignoreAspectRatio()
+      .rotate(315)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(339, info.width);
+        assert.strictEqual(339, info.height);
+        sharp(data).metadata(function (err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(339, metadata.width);
+          assert.strictEqual(339, metadata.height);
+          done();
+        });
+      });
+  });
+
   it('Rotate by 270 degrees, rectangular output ignoring aspect ratio', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -87,6 +154,24 @@ describe('Rotation', function () {
           if (err) throw err;
           assert.strictEqual(320, metadata.width);
           assert.strictEqual(240, metadata.height);
+          done();
+        });
+      });
+  });
+
+  it('Rotate by 30 degrees, rectangular output ignoring aspect ratio', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .ignoreAspectRatio()
+      .rotate(30)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(397, info.width);
+        assert.strictEqual(368, info.height);
+        sharp(data).metadata(function (err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(397, metadata.width);
+          assert.strictEqual(368, metadata.height);
           done();
         });
       });
@@ -185,9 +270,9 @@ describe('Rotation', function () {
       });
   });
 
-  it('Rotate to an invalid angle, should fail', function () {
+  it('Rotate with a string argument, should fail', function () {
     assert.throws(function () {
-      sharp(fixtures.inputJpg).rotate(1);
+      sharp(fixtures.inputJpg).rotate('not-a-number');
     });
   });
 

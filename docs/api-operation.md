@@ -5,8 +5,11 @@
 Rotate the output image by either an explicit angle
 or auto-orient based on the EXIF `Orientation` tag.
 
-If an angle is provided, it is converted to a valid 90/180/270deg rotation.
+If an angle is provided, it is converted to a valid positive degree rotation.
 For example, `-450` will produce a 270deg rotation.
+
+If an angle that is not a multiple of 90 is provided, the color of the
+background color can be provided with the `background` option.
 
 If no angle is provided, it is determined from the EXIF data.
 Mirroring is supported and may infer the use of a flip operation.
@@ -19,6 +22,8 @@ for example `rotate(x).extract(y)` will produce a different result to `extract(y
 ### Parameters
 
 -   `angle` **[Number][1]** angle of rotation, must be a multiple of 90. (optional, default `auto`)
+-   `options` **[Object][2]?** if present, is an Object with optional attributes.
+    -   `options.background` **([String][3] \| [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
 
 ### Examples
 
@@ -34,7 +39,7 @@ const pipeline = sharp()
 readableStream.pipe(pipeline);
 ```
 
--   Throws **[Error][2]** Invalid parameters
+-   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -45,7 +50,7 @@ The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 
 ### Parameters
 
--   `flip` **[Boolean][3]**  (optional, default `true`)
+-   `flip` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -56,7 +61,7 @@ The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
 ### Parameters
 
--   `flop` **[Boolean][3]**  (optional, default `true`)
+-   `flop` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -74,7 +79,7 @@ Separate control over the level of sharpening in "flat" and "jagged" areas is av
 -   `jagged` **[Number][1]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
 
 
--   Throws **[Error][2]** Invalid parameters
+-   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -88,7 +93,7 @@ When used without parameters the default window is 3x3.
 -   `size` **[Number][1]** square mask size: size x size (optional, default `3`)
 
 
--   Throws **[Error][2]** Invalid parameters
+-   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -103,7 +108,7 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 -   `sigma` **[Number][1]?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
 
 
--   Throws **[Error][2]** Invalid parameters
+-   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -113,7 +118,7 @@ Merge alpha transparency channel, if any, with `background`.
 
 ### Parameters
 
--   `flatten` **[Boolean][3]**  (optional, default `true`)
+-   `flatten` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -130,7 +135,7 @@ when applying a gamma correction.
 -   `gamma` **[Number][1]** value between 1.0 and 3.0. (optional, default `2.2`)
 
 
--   Throws **[Error][2]** Invalid parameters
+-   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -140,7 +145,7 @@ Produce the "negative" of the image.
 
 ### Parameters
 
--   `negate` **[Boolean][3]**  (optional, default `true`)
+-   `negate` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -150,7 +155,7 @@ Enhance output image contrast by stretching its luminance to cover the full dyna
 
 ### Parameters
 
--   `normalise` **[Boolean][3]**  (optional, default `true`)
+-   `normalise` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -160,7 +165,7 @@ Alternative spelling of normalise.
 
 ### Parameters
 
--   `normalize` **[Boolean][3]**  (optional, default `true`)
+-   `normalize` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -170,10 +175,10 @@ Convolve the image with the specified kernel.
 
 ### Parameters
 
--   `kernel` **[Object][4]** 
+-   `kernel` **[Object][2]** 
     -   `kernel.width` **[Number][1]** width of the kernel in pixels.
     -   `kernel.height` **[Number][1]** width of the kernel in pixels.
-    -   `kernel.kernel` **[Array][5]&lt;[Number][1]>** Array of length `width*height` containing the kernel values.
+    -   `kernel.kernel` **[Array][7]&lt;[Number][1]>** Array of length `width*height` containing the kernel values.
     -   `kernel.scale` **[Number][1]** the scale of the kernel in pixels. (optional, default `sum`)
     -   `kernel.offset` **[Number][1]** the offset of the kernel in pixels. (optional, default `0`)
 
@@ -193,7 +198,7 @@ sharp(input)
   });
 ```
 
--   Throws **[Error][2]** Invalid parameters
+-   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -204,12 +209,12 @@ Any pixel value greather than or equal to the threshold value will be set to 255
 ### Parameters
 
 -   `threshold` **[Number][1]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
--   `options` **[Object][4]?** 
-    -   `options.greyscale` **[Boolean][3]** convert to single channel greyscale. (optional, default `true`)
-    -   `options.grayscale` **[Boolean][3]** alternative spelling for greyscale. (optional, default `true`)
+-   `options` **[Object][2]?** 
+    -   `options.greyscale` **[Boolean][6]** convert to single channel greyscale. (optional, default `true`)
+    -   `options.grayscale` **[Boolean][6]** alternative spelling for greyscale. (optional, default `true`)
 
 
--   Throws **[Error][2]** Invalid parameters
+-   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -222,16 +227,16 @@ the selected bitwise boolean `operation` between the corresponding pixels of the
 
 ### Parameters
 
--   `operand` **([Buffer][6] \| [String][7])** Buffer containing image data or String containing the path to an image file.
--   `operator` **[String][7]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
--   `options` **[Object][4]?** 
-    -   `options.raw` **[Object][4]?** describes operand when using raw pixel data.
+-   `operand` **([Buffer][8] \| [String][3])** Buffer containing image data or String containing the path to an image file.
+-   `operator` **[String][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+-   `options` **[Object][2]?** 
+    -   `options.raw` **[Object][2]?** describes operand when using raw pixel data.
         -   `options.raw.width` **[Number][1]?** 
         -   `options.raw.height` **[Number][1]?** 
         -   `options.raw.channels` **[Number][1]?** 
 
 
--   Throws **[Error][2]** Invalid parameters
+-   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -245,20 +250,22 @@ Apply the linear formula a \* input + b to the image (levels adjustment)
 -   `b` **[Number][1]** offset (optional, default `0.0`)
 
 
--   Throws **[Error][2]** Invalid parameters
+-   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[4]: https://www.npmjs.org/package/color
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
 
-[6]: https://nodejs.org/api/buffer.html
+[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[8]: https://nodejs.org/api/buffer.html
