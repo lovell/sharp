@@ -41,7 +41,6 @@ matrix:
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
-  allow_failures:
     - name: "OS X - Node 6"
       os: osx
       osx_image: xcode9.2
