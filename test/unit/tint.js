@@ -9,7 +9,7 @@ describe('Tint', function () {
   it('tints rgb image red', function (done) {
     const output = fixtures.path('output.tint-red.jpg');
     sharp(fixtures.inputJpg)
-      .resize(320, 240)
+      .resize(320, 240, { fastShrinkOnLoad: false })
       .tint('#FF0000')
       .toFile(output, function (err, info) {
         if (err) throw err;
@@ -22,7 +22,7 @@ describe('Tint', function () {
   it('tints rgb image green', function (done) {
     const output = fixtures.path('output.tint-green.jpg');
     sharp(fixtures.inputJpg)
-      .resize(320, 240)
+      .resize(320, 240, { fastShrinkOnLoad: false })
       .tint('#00FF00')
       .toFile(output, function (err, info) {
         if (err) throw err;
@@ -35,7 +35,7 @@ describe('Tint', function () {
   it('tints rgb image blue', function (done) {
     const output = fixtures.path('output.tint-blue.jpg');
     sharp(fixtures.inputJpg)
-      .resize(320, 240)
+      .resize(320, 240, { fastShrinkOnLoad: false })
       .tint('#0000FF')
       .toFile(output, function (err, info) {
         if (err) throw err;
@@ -48,7 +48,7 @@ describe('Tint', function () {
   it('tints rgb image with sepia tone', function (done) {
     const output = fixtures.path('output.tint-sepia.jpg');
     sharp(fixtures.inputJpg)
-      .resize(320, 240)
+      .resize(320, 240, { fastShrinkOnLoad: false })
       .tint('#704214')
       .toFile(output, function (err, info) {
         if (err) throw err;
@@ -62,7 +62,7 @@ describe('Tint', function () {
   it('tints rgb image with sepia tone with rgb colour', function (done) {
     const output = fixtures.path('output.tint-sepia.jpg');
     sharp(fixtures.inputJpg)
-      .resize(320, 240)
+      .resize(320, 240, { fastShrinkOnLoad: false })
       .tint([112, 66, 20])
       .toFile(output, function (err, info) {
         if (err) throw err;
@@ -76,7 +76,7 @@ describe('Tint', function () {
   it('tints rgb image with alpha channel', function (done) {
     const output = fixtures.path('output.tint-alpha.png');
     sharp(fixtures.inputPngRGBWithAlpha)
-      .resize(320, 240)
+      .resize(320, 240, { fastShrinkOnLoad: false })
       .tint('#704214')
       .toFile(output, function (err, info) {
         if (err) throw err;
@@ -90,7 +90,7 @@ describe('Tint', function () {
   it('tints cmyk image red', function (done) {
     const output = fixtures.path('output.tint-cmyk.jpg');
     sharp(fixtures.inputJpgWithCmykProfile)
-      .resize(320, 240)
+      .resize(320, 240, { fastShrinkOnLoad: false })
       .tint('#FF0000')
       .toFile(output, function (err, info) {
         if (err) throw err;

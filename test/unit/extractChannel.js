@@ -59,7 +59,7 @@ describe('Image channel extraction', function () {
     sharp(fixtures.inputJpg)
       .toColourspace('lch')
       .extractChannel(1)
-      .resize(320, 240)
+      .resize(320, 240, { fastShrinkOnLoad: false })
       .toFile(output, function (err, info) {
         if (err) throw err;
         assert.strictEqual(320, info.width);
