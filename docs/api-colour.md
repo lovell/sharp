@@ -94,4 +94,4 @@ Returns **Sharp**
 
 [5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[6]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L568
+[6]: https://github.com/libvips/libvips/blob/master/libvips/iofuncs/enumtypes.c#L568

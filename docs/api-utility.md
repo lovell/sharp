@@ -77,23 +77,20 @@ Requires libvips to have been compiled with liborc support.
 Improves the performance of `resize`, `blur` and `sharpen` operations
 by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM NEON.
 
-This feature is currently off by default but future versions may reverse this.
-Versions of liborc prior to 0.4.25 are known to segfault under heavy load.
-
 ### Parameters
 
--   `simd` **[Boolean][2]**  (optional, default `false`)
+-   `simd` **[Boolean][2]**  (optional, default `true`)
 
 ### Examples
 
 ```javascript
 const simd = sharp.simd();
-// simd is `true` if SIMD is currently enabled
+// simd is `true` if the runtime use of liborc is currently enabled
 ```
 
 ```javascript
-const simd = sharp.simd(true);
-// attempts to enable the use of SIMD, returning true if available
+const simd = sharp.simd(false);
+// prevent libvips from using liborc at runtime
 ```
 
 Returns **[Boolean][2]** 

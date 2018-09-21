@@ -37,7 +37,7 @@ and [Leaflet](https://github.com/turban/Leaflet.Zoomify).
 ### Fast
 
 This module is powered by the blazingly fast
-[libvips](https://github.com/jcupitt/libvips) image processing library,
+[libvips](https://github.com/libvips/libvips) image processing library,
 originally created in 1989 at Birkbeck College
 and currently maintained by
 [John Cupitt](https://github.com/jcupitt).

@@ -78,7 +78,7 @@ namespace sharp {
     //
     // References:
     // - http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
-    // - https://github.com/jcupitt/ruby-vips/issues/28#issuecomment-9014826
+    // - https://github.com/libvips/ruby-vips/issues/28#issuecomment-9014826
     //
     // out_a = src_a + dst_a * (1 - src_a)
     //                         ^^^^^^^^^^^

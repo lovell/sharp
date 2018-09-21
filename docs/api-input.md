@@ -126,9 +126,9 @@ The default behaviour _before_ function call is `false`, meaning the libvips acc
 
 Returns **Sharp** 
 
-[1]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L636
+[1]: https://github.com/libvips/libvips/blob/master/libvips/iofuncs/enumtypes.c#L636
 
-[2]: https://github.com/jcupitt/libvips/blob/master/libvips/iofuncs/enumtypes.c#L672
+[2]: https://github.com/libvips/libvips/blob/master/libvips/iofuncs/enumtypes.c#L672
 
 [3]: https://www.npmjs.com/package/icc
 

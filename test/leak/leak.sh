@@ -5,7 +5,7 @@ if ! type valgrind >/dev/null; then
   exit 1
 fi
 
-curl -o ./test/leak/libvips.supp https://raw.githubusercontent.com/jcupitt/libvips/master/libvips.supp
+curl -o ./test/leak/libvips.supp https://raw.githubusercontent.com/libvips/libvips/master/libvips.supp
 
 for test in ./test/unit/*.js; do
   G_SLICE=always-malloc G_DEBUG=gc-friendly valgrind \
