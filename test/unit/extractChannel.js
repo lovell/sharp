@@ -64,7 +64,7 @@ describe('Image channel extraction', function () {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        fixtures.assertMaxColourDistance(output, fixtures.expected('extract-lch.jpg'));
+        fixtures.assertMaxColourDistance(output, fixtures.expected('extract-lch.jpg'), 9);
         done();
       });
   });

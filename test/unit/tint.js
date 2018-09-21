@@ -14,7 +14,7 @@ describe('Tint', function () {
       .toFile(output, function (err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
-        fixtures.assertMaxColourDistance(output, fixtures.expected('tint-red.jpg'), 10);
+        fixtures.assertMaxColourDistance(output, fixtures.expected('tint-red.jpg'), 18);
         done();
       });
   });
@@ -27,7 +27,7 @@ describe('Tint', function () {
       .toFile(output, function (err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
-        fixtures.assertMaxColourDistance(output, fixtures.expected('tint-green.jpg'), 10);
+        fixtures.assertMaxColourDistance(output, fixtures.expected('tint-green.jpg'), 27);
         done();
       });
   });
@@ -40,7 +40,7 @@ describe('Tint', function () {
       .toFile(output, function (err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
-        fixtures.assertMaxColourDistance(output, fixtures.expected('tint-blue.jpg'), 10);
+        fixtures.assertMaxColourDistance(output, fixtures.expected('tint-blue.jpg'), 14);
         done();
       });
   });
@@ -95,7 +95,7 @@ describe('Tint', function () {
       .toFile(output, function (err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
-        fixtures.assertMaxColourDistance(output, fixtures.expected('tint-cmyk.jpg'), 10);
+        fixtures.assertMaxColourDistance(output, fixtures.expected('tint-cmyk.jpg'), 15);
         done();
       });
   });
