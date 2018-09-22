@@ -38,46 +38,6 @@ readableStream.pipe(pipeline);
 
 Returns **Sharp** 
 
-## extract
-
-Extract a region of the image.
-
--   Use `extract` before `resize` for pre-resize extraction.
--   Use `extract` after `resize` for post-resize extraction.
--   Use `extract` before and after for both.
-
-### Parameters
-
--   `options` **[Object][3]** 
-    -   `options.left` **[Number][1]** zero-indexed offset from left edge
-    -   `options.top` **[Number][1]** zero-indexed offset from top edge
-    -   `options.width` **[Number][1]** dimension of extracted image
-    -   `options.height` **[Number][1]** dimension of extracted image
-
-### Examples
-
-```javascript
-sharp(input)
-  .extract({ left: left, top: top, width: width, height: height })
-  .toFile(output, function(err) {
-    // Extract a region of the input image, saving in the same format.
-  });
-```
-
-```javascript
-sharp(input)
-  .extract({ left: leftOffsetPre, top: topOffsetPre, width: widthPre, height: heightPre })
-  .resize(width, height)
-  .extract({ left: leftOffsetPost, top: topOffsetPost, width: widthPost, height: heightPost })
-  .toFile(output, function(err) {
-    // Extract a region, resize, then extract from the resized image
-  });
-```
-
--   Throws **[Error][2]** Invalid parameters
-
-Returns **Sharp** 
-
 ## flip
 
 Flip the image about the vertical Y axis. This always occurs after rotation, if any.
@@ -85,7 +45,7 @@ The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 
 ### Parameters
 
--   `flip` **[Boolean][4]**  (optional, default `true`)
+-   `flip` **[Boolean][3]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -96,7 +56,7 @@ The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
 ### Parameters
 
--   `flop` **[Boolean][4]**  (optional, default `true`)
+-   `flop` **[Boolean][3]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -147,55 +107,13 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 
 Returns **Sharp** 
 
-## extend
-
-Extends/pads the edges of the image with the colour provided to the `background` method.
-This operation will always occur after resizing and extraction, if any.
-
-### Parameters
-
--   `extend` **([Number][1] \| [Object][3])** single pixel count to add to all edges or an Object with per-edge counts
-    -   `extend.top` **[Number][1]?** 
-    -   `extend.left` **[Number][1]?** 
-    -   `extend.bottom` **[Number][1]?** 
-    -   `extend.right` **[Number][1]?** 
-
-### Examples
-
-```javascript
-// Resize to 140 pixels wide, then add 10 transparent pixels
-// to the top, left and right edges and 20 to the bottom edge
-sharp(input)
-  .resize(140)
-  .background({r: 0, g: 0, b: 0, alpha: 0})
-  .extend({top: 10, bottom: 20, left: 10, right: 10})
-  ...
-```
-
--   Throws **[Error][2]** Invalid parameters
-
-Returns **Sharp** 
-
 ## flatten
 
 Merge alpha transparency channel, if any, with `background`.
 
 ### Parameters
 
--   `flatten` **[Boolean][4]**  (optional, default `true`)
-
-Returns **Sharp** 
-
-## trim
-
-Trim "boring" pixels from all edges that contain values within a percentage similarity of the top-left pixel.
-
-### Parameters
-
--   `tolerance` **[Number][1]** value between 1 and 99 representing the percentage similarity. (optional, default `10`)
-
-
--   Throws **[Error][2]** Invalid parameters
+-   `flatten` **[Boolean][3]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -222,7 +140,7 @@ Produce the "negative" of the image.
 
 ### Parameters
 
--   `negate` **[Boolean][4]**  (optional, default `true`)
+-   `negate` **[Boolean][3]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -232,7 +150,7 @@ Enhance output image contrast by stretching its luminance to cover the full dyna
 
 ### Parameters
 
--   `normalise` **[Boolean][4]**  (optional, default `true`)
+-   `normalise` **[Boolean][3]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -242,7 +160,7 @@ Alternative spelling of normalise.
 
 ### Parameters
 
--   `normalize` **[Boolean][4]**  (optional, default `true`)
+-   `normalize` **[Boolean][3]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -252,7 +170,7 @@ Convolve the image with the specified kernel.
 
 ### Parameters
 
--   `kernel` **[Object][3]** 
+-   `kernel` **[Object][4]** 
     -   `kernel.width` **[Number][1]** width of the kernel in pixels.
     -   `kernel.height` **[Number][1]** width of the kernel in pixels.
     -   `kernel.kernel` **[Array][5]&lt;[Number][1]>** Array of length `width*height` containing the kernel values.
@@ -286,9 +204,9 @@ Any pixel value greather than or equal to the threshold value will be set to 255
 ### Parameters
 
 -   `threshold` **[Number][1]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
--   `options` **[Object][3]?** 
-    -   `options.greyscale` **[Boolean][4]** convert to single channel greyscale. (optional, default `true`)
-    -   `options.grayscale` **[Boolean][4]** alternative spelling for greyscale. (optional, default `true`)
+-   `options` **[Object][4]?** 
+    -   `options.greyscale` **[Boolean][3]** convert to single channel greyscale. (optional, default `true`)
+    -   `options.grayscale` **[Boolean][3]** alternative spelling for greyscale. (optional, default `true`)
 
 
 -   Throws **[Error][2]** Invalid parameters
@@ -306,8 +224,8 @@ the selected bitwise boolean `operation` between the corresponding pixels of the
 
 -   `operand` **([Buffer][6] \| [String][7])** Buffer containing image data or String containing the path to an image file.
 -   `operator` **[String][7]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
--   `options` **[Object][3]?** 
-    -   `options.raw` **[Object][3]?** describes operand when using raw pixel data.
+-   `options` **[Object][4]?** 
+    -   `options.raw` **[Object][4]?** describes operand when using raw pixel data.
         -   `options.raw.width` **[Number][1]?** 
         -   `options.raw.height` **[Number][1]?** 
         -   `options.raw.channels` **[Number][1]?** 
@@ -335,9 +253,9 @@ Returns **Sharp**
 
 [2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
 
-[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
 [5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 

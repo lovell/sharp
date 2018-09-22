@@ -163,6 +163,88 @@ The default behaviour _before_ function call is `false`, meaning the image will 
 
 Returns **Sharp** 
 
+## extend
+
+Extends/pads the edges of the image with the colour provided to the `background` method.
+This operation will always occur after resizing and extraction, if any.
+
+### Parameters
+
+-   `extend` **([Number][4] \| [Object][5])** single pixel count to add to all edges or an Object with per-edge counts
+    -   `extend.top` **[Number][4]?** 
+    -   `extend.left` **[Number][4]?** 
+    -   `extend.bottom` **[Number][4]?** 
+    -   `extend.right` **[Number][4]?** 
+
+### Examples
+
+```javascript
+// Resize to 140 pixels wide, then add 10 transparent pixels
+// to the top, left and right edges and 20 to the bottom edge
+sharp(input)
+  .resize(140)
+  .background({r: 0, g: 0, b: 0, alpha: 0})
+  .extend({top: 10, bottom: 20, left: 10, right: 10})
+  ...
+```
+
+-   Throws **[Error][8]** Invalid parameters
+
+Returns **Sharp** 
+
+## extract
+
+Extract a region of the image.
+
+-   Use `extract` before `resize` for pre-resize extraction.
+-   Use `extract` after `resize` for post-resize extraction.
+-   Use `extract` before and after for both.
+
+### Parameters
+
+-   `options` **[Object][5]** 
+    -   `options.left` **[Number][4]** zero-indexed offset from left edge
+    -   `options.top` **[Number][4]** zero-indexed offset from top edge
+    -   `options.width` **[Number][4]** dimension of extracted image
+    -   `options.height` **[Number][4]** dimension of extracted image
+
+### Examples
+
+```javascript
+sharp(input)
+  .extract({ left: left, top: top, width: width, height: height })
+  .toFile(output, function(err) {
+    // Extract a region of the input image, saving in the same format.
+  });
+```
+
+```javascript
+sharp(input)
+  .extract({ left: leftOffsetPre, top: topOffsetPre, width: widthPre, height: heightPre })
+  .resize(width, height)
+  .extract({ left: leftOffsetPost, top: topOffsetPost, width: widthPost, height: heightPost })
+  .toFile(output, function(err) {
+    // Extract a region, resize, then extract from the resized image
+  });
+```
+
+-   Throws **[Error][8]** Invalid parameters
+
+Returns **Sharp** 
+
+## trim
+
+Trim "boring" pixels from all edges that contain values within a percentage similarity of the top-left pixel.
+
+### Parameters
+
+-   `tolerance` **[Number][4]** value between 1 and 99 representing the percentage similarity. (optional, default `10`)
+
+
+-   Throws **[Error][8]** Invalid parameters
+
+Returns **Sharp** 
+
 [1]: http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation
 
 [2]: https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline
