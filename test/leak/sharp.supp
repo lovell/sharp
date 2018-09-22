@@ -233,7 +233,13 @@
   ...
   fun:uv__work_done
 }
-
+{
+  leak_libuv_FlushForegroundTasks
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node12NodePlatform28FlushForegroundTasksInternalEv
+}
 # nodejs warnings
 {
   param_nodejs_write_buffer

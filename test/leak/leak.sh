@@ -5,7 +5,7 @@ if ! type valgrind >/dev/null; then
   exit 1
 fi
 
-curl -o ./test/leak/libvips.supp https://raw.githubusercontent.com/libvips/libvips/master/libvips.supp
+curl -s -o ./test/leak/libvips.supp https://raw.githubusercontent.com/libvips/libvips/master/libvips.supp
 
 for test in ./test/unit/*.js; do
   G_SLICE=always-malloc G_DEBUG=gc-friendly valgrind \
@@ -16,5 +16,5 @@ for test in ./test/unit/*.js; do
     --show-leak-kinds=definite,indirect,possible \
     --num-callers=20 \
     --trace-children=yes \
-    mocha --slow=60000 --timeout=120000 "$test";
+    node node_modules/.bin/mocha --slow=60000 --timeout=120000 --file test/unit/beforeEach.js "$test";
 done
