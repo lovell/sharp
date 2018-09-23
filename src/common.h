@@ -255,6 +255,11 @@ namespace sharp {
   */
   std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba, VipsInterpretation const interpretation);
 
+  /*
+    Apply the alpha channel to a given colour
+   */
+  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, double colour[4]);
+
 }  // namespace sharp
 
 #endif  // SRC_COMMON_H_
