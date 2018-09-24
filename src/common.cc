@@ -602,4 +602,40 @@ namespace sharp {
     }
   }
 
+  /*
+    Apply the alpha channel to a given colour
+  */
+  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, double colour[4]) {
+    // Scale up 8-bit values to match 16-bit input image
+    double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
+    // Create alphaColour colour
+    std::vector<double> alphaColour;
+    if (image.bands() > 2) {
+      alphaColour = {
+        multiplier * colour[0],
+        multiplier * colour[1],
+        multiplier * colour[2]
+      };
+    } else {
+      // Convert sRGB to greyscale
+      alphaColour = { multiplier * (
+        0.2126 * colour[0] +
+        0.7152 * colour[1] +
+        0.0722 * colour[2])
+      };
+    }
+    // Add alpha channel to alphaColour colour
+    if (colour[3] < 255.0 || HasAlpha(image)) {
+      alphaColour.push_back(colour[3] * multiplier);
+    }
+    // Ensure alphaColour colour uses correct colourspace
+    alphaColour = sharp::GetRgbaAsColourspace(alphaColour, image.interpretation());
+    // Add non-transparent alpha channel, if required
+    if (colour[3] < 255.0 && !HasAlpha(image)) {
+      image = image.bandjoin(
+        VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier));
+    }
+    return std::make_tuple(image, alphaColour);
+  }
+
 }  // namespace sharp

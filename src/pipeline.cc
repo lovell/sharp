@@ -421,35 +421,8 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Crop/embed
       if (image.width() != baton->width || image.height() != baton->height) {
         if (baton->canvas == Canvas::EMBED) {
-          // Scale up 8-bit values to match 16-bit input image
-          double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
-          // Create background colour
           std::vector<double> background;
-          if (image.bands() > 2) {
-            background = {
-              multiplier * baton->background[0],
-              multiplier * baton->background[1],
-              multiplier * baton->background[2]
-            };
-          } else {
-            // Convert sRGB to greyscale
-            background = { multiplier * (
-              0.2126 * baton->background[0] +
-              0.7152 * baton->background[1] +
-              0.0722 * baton->background[2])
-            };
-          }
-          // Add alpha channel to background colour
-          if (baton->background[3] < 255.0 || HasAlpha(image)) {
-            background.push_back(baton->background[3] * multiplier);
-          }
-          // Ensure background colour uses correct colourspace
-          background = sharp::GetRgbaAsColourspace(background, image.interpretation());
-          // Add non-transparent alpha channel, if required
-          if (baton->background[3] < 255.0 && !HasAlpha(image)) {
-            image = image.bandjoin(
-              VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier));
-          }
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->background);
 
           // Embed
 
@@ -511,35 +484,9 @@ class PipelineWorker : public Nan::AsyncWorker {
 
       // Extend edges
       if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
-        // Scale up 8-bit values to match 16-bit input image
-        double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
-        // Create background colour
         std::vector<double> background;
-        if (image.bands() > 2) {
-          background = {
-            multiplier * baton->background[0],
-            multiplier * baton->background[1],
-            multiplier * baton->background[2]
-          };
-        } else {
-          // Convert sRGB to greyscale
-          background = { multiplier * (
-            0.2126 * baton->background[0] +
-            0.7152 * baton->background[1] +
-            0.0722 * baton->background[2])
-          };
-        }
-        // Add alpha channel to background colour
-        if (baton->background[3] < 255.0 || HasAlpha(image)) {
-          background.push_back(baton->background[3] * multiplier);
-        }
-        // Ensure background colour uses correct colourspace
-        background = sharp::GetRgbaAsColourspace(background, image.interpretation());
-        // Add non-transparent alpha channel, if required
-        if (baton->background[3] < 255.0 && !HasAlpha(image)) {
-          image = image.bandjoin(
-            VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier));
-        }
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->background);
+
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
         baton->height = image.height() + baton->extendTop + baton->extendBottom;
