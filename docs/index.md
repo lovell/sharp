@@ -118,6 +118,7 @@ the help and code contributions of the following people:
 * [Alun Davies](https://github.com/alundavies)
 * [Aidan Hoolachan](https://github.com/ajhool)
 * [Axel Eirola](https://github.com/aeirola)
+* [Freezy](https://github.com/freezy)
 
 Thank you!
 

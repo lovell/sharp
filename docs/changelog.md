@@ -15,6 +15,10 @@ Requires libvips v8.7.0.
 * Add experimental prebuilt binaries for musl-based Linux.
   [#1379](https://github.com/lovell/sharp/issues/1379)
 
+* Add support for arbitrary rotation angle via vips_rotate.
+  [#1385](https://github.com/lovell/sharp/pull/1385)
+  [@freezy](https://github.com/freezy)
+
 ### v0.20 - "*prebuild*"
 
 Requires libvips v8.6.1.

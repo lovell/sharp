@@ -8,8 +8,8 @@ or auto-orient based on the EXIF `Orientation` tag.
 If an angle is provided, it is converted to a valid positive degree rotation.
 For example, `-450` will produce a 270deg rotation.
 
-If an angle that is not a multiple of 90 is provided, the color of the
-background color can be provided with the `background` option.
+When rotating by an angle other than a multiple of 90,
+the background colour can be provided with the `background` option.
 
 If no angle is provided, it is determined from the EXIF data.
 Mirroring is supported and may infer the use of a flip operation.
@@ -21,7 +21,7 @@ for example `rotate(x).extract(y)` will produce a different result to `extract(y
 
 ### Parameters
 
--   `angle` **[Number][1]** angle of rotation, must be a multiple of 90. (optional, default `auto`)
+-   `angle` **[Number][1]** angle of rotation. (optional, default `auto`)
 -   `options` **[Object][2]?** if present, is an Object with optional attributes.
     -   `options.background` **([String][3] \| [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
 

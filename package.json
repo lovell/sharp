@@ -54,7 +54,8 @@
     "Sylvain Dumont <sylvain.dumont35@gmail.com>",
     "Alun Davies <alun.owain.davies@googlemail.com>",
     "Aidan Hoolachan <ajhoolachan21@gmail.com>",
-    "Axel Eirola <axel.eirola@iki.fi>"
+    "Axel Eirola <axel.eirola@iki.fi>",
+    "Freezy <freezy@xbmc.org>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
