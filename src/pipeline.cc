@@ -476,6 +476,13 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
       }
 
+      // Rotate by degree
+      if (baton->rotationAngle != 0.0) {
+        std::vector<double> background;
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground);
+        image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
+      }
+
       // Post extraction
       if (baton->topOffsetPost != -1) {
         image = image.extract_area(
@@ -1187,6 +1194,12 @@ NAN_METHOD(pipeline) {
   baton->normalise = AttrTo<bool>(options, "normalise");
   baton->useExifOrientation = AttrTo<bool>(options, "useExifOrientation");
   baton->angle = AttrTo<int32_t>(options, "angle");
+  baton->rotationAngle = AttrTo<double>(options, "rotationAngle");
+  // Rotation background colour
+  v8::Local<v8::Object> rotationBackground = AttrAs<v8::Object>(options, "rotationBackground");
+  for (unsigned int i = 0; i < 4; i++) {
+    baton->rotationBackground[i] = AttrTo<double>(rotationBackground, i);
+  }
   baton->rotateBeforePreExtract = AttrTo<bool>(options, "rotateBeforePreExtract");
   baton->flip = AttrTo<bool>(options, "flip");
   baton->flop = AttrTo<bool>(options, "flop");
