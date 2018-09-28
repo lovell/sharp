@@ -122,7 +122,7 @@ the help and code contributions of the following people:
 
 Thank you!
 
-### Licence
+### Licensing
 
 Copyright 2013, 2014, 2015, 2016, 2017, 2018 Lovell Fuller and contributors.
 
