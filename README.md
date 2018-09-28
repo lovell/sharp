@@ -78,7 +78,7 @@ Visit [sharp.pixelplumbing.com](http://sharp.pixelplumbing.com/) for complete
 A [guide for contributors](https://github.com/lovell/sharp/blob/master/CONTRIBUTING.md)
 covers reporting bugs, requesting features and submitting code changes.
 
-### Licence
+### Licensing
 
 Copyright 2013, 2014, 2015, 2016, 2017, 2018 Lovell Fuller and contributors.
 
