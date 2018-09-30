@@ -69,8 +69,9 @@ describe('Partial image extraction', function () {
 
   it('After resize and crop', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(500, 500)
-      .crop(sharp.gravity.north)
+      .resize(500, 500, {
+        position: sharp.gravity.north
+      })
       .extract({ left: 10, top: 10, width: 100, height: 100 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -83,8 +84,9 @@ describe('Partial image extraction', function () {
   it('Before and after resize and crop', function (done) {
     sharp(fixtures.inputJpg)
       .extract({ left: 0, top: 0, width: 700, height: 700 })
-      .resize(500, 500)
-      .crop(sharp.gravity.north)
+      .resize(500, 500, {
+        position: sharp.gravity.north
+      })
       .extract({ left: 10, top: 10, width: 100, height: 100 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;

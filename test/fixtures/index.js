@@ -15,8 +15,7 @@ const fingerprint = function (image, callback) {
   sharp(image)
     .greyscale()
     .normalise()
-    .resize(9, 8)
-    .ignoreAspectRatio()
+    .resize(9, 8, { fit: sharp.fit.fill })
     .raw()
     .toBuffer(function (err, data) {
       if (err) {

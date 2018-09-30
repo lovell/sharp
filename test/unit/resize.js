@@ -151,8 +151,7 @@ describe('Resize dimensions', function () {
 
   it('TIFF embed known to cause rounding errors', function (done) {
     sharp(fixtures.inputTiff)
-      .resize(240, 320)
-      .embed()
+      .resize(240, 320, { fit: sharp.fit.contain })
       .jpeg()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -178,10 +177,9 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Max width or height considering ratio (portrait)', function (done) {
+  it('fit=inside, portrait', function (done) {
     sharp(fixtures.inputTiff)
-      .resize(320, 320)
-      .max()
+      .resize(320, 320, { fit: sharp.fit.inside })
       .jpeg()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -193,10 +191,9 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Min width or height considering ratio (portrait)', function (done) {
+  it('fit=outside, portrait', function (done) {
     sharp(fixtures.inputTiff)
-      .resize(320, 320)
-      .min()
+      .resize(320, 320, { fit: sharp.fit.outside })
       .jpeg()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -208,10 +205,9 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Max width or height considering ratio (landscape)', function (done) {
+  it('fit=inside, landscape', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(320, 320)
-      .max()
+      .resize(320, 320, { fit: sharp.fit.inside })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -222,24 +218,9 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Provide only one dimension with max, should default to crop', function (done) {
+  it('fit=outside, landscape', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(320)
-      .max()
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(261, info.height);
-        done();
-      });
-  });
-
-  it('Min width or height considering ratio (landscape)', function (done) {
-    sharp(fixtures.inputJpg)
-      .resize(320, 320)
-      .min()
+      .resize(320, 320, { fit: sharp.fit.outside })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -250,10 +231,28 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Provide only one dimension with min, should default to crop', function (done) {
+  it('fit=inside, provide only one dimension', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(320)
-      .min()
+      .resize({
+        width: 320,
+        fit: sharp.fit.inside
+      })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(261, info.height);
+        done();
+      });
+  });
+
+  it('fit=outside, provide only one dimension', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize({
+        width: 320,
+        fit: sharp.fit.outside
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -266,8 +265,10 @@ describe('Resize dimensions', function () {
 
   it('Do not enlarge when input width is already less than output width', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(2800)
-      .withoutEnlargement()
+      .resize({
+        width: 2800,
+        withoutEnlargement: true
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -280,8 +281,10 @@ describe('Resize dimensions', function () {
 
   it('Do not enlarge when input height is already less than output height', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(null, 2300)
-      .withoutEnlargement()
+      .resize({
+        height: 2300,
+        withoutEnlargement: true
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -294,8 +297,10 @@ describe('Resize dimensions', function () {
 
   it('Do enlarge when input width is less than output width', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(2800)
-      .withoutEnlargement(false)
+      .resize({
+        width: 2800,
+        withoutEnlargement: false
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -306,103 +311,127 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Downscale width and height, ignoring aspect ratio', function (done) {
-    sharp(fixtures.inputJpg).resize(320, 320).ignoreAspectRatio().toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(320, info.height);
-      done();
-    });
+  it('fit=fill, downscale width and height', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 320, { fit: 'fill' })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(320, info.height);
+        done();
+      });
   });
 
-  it('Downscale width, ignoring aspect ratio', function (done) {
-    sharp(fixtures.inputJpg).resize(320).ignoreAspectRatio().toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(2225, info.height);
-      done();
-    });
+  it('fit=fill, downscale width', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize({
+        width: 320,
+        fit: 'fill'
+      })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(2225, info.height);
+        done();
+      });
   });
 
-  it('Downscale height, ignoring aspect ratio', function (done) {
-    sharp(fixtures.inputJpg).resize(null, 320).ignoreAspectRatio().toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(2725, info.width);
-      assert.strictEqual(320, info.height);
-      done();
-    });
+  it('fit=fill, downscale height', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize({
+        height: 320,
+        fit: 'fill'
+      })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(2725, info.width);
+        assert.strictEqual(320, info.height);
+        done();
+      });
   });
 
-  it('Upscale width and height, ignoring aspect ratio', function (done) {
-    sharp(fixtures.inputJpg).resize(3000, 3000).ignoreAspectRatio().toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(3000, info.width);
-      assert.strictEqual(3000, info.height);
-      done();
-    });
+  it('fit=fill, upscale width and height', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(3000, 3000, { fit: 'fill' })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(3000, info.width);
+        assert.strictEqual(3000, info.height);
+        done();
+      });
   });
 
-  it('Upscale width, ignoring aspect ratio', function (done) {
-    sharp(fixtures.inputJpg).resize(3000).ignoreAspectRatio().toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(3000, info.width);
-      assert.strictEqual(2225, info.height);
-      done();
-    });
+  it('fit=fill, upscale width', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(3000, null, { fit: 'fill' })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(3000, info.width);
+        assert.strictEqual(2225, info.height);
+        done();
+      });
   });
 
-  it('Upscale height, ignoring aspect ratio', function (done) {
-    sharp(fixtures.inputJpg).resize(null, 3000).ignoreAspectRatio().toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(2725, info.width);
-      assert.strictEqual(3000, info.height);
-      done();
-    });
+  it('fit=fill, upscale height', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(null, 3000, { fit: 'fill' })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(2725, info.width);
+        assert.strictEqual(3000, info.height);
+        done();
+      });
   });
 
-  it('Downscale width, upscale height, ignoring aspect ratio', function (done) {
-    sharp(fixtures.inputJpg).resize(320, 3000).ignoreAspectRatio().toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(3000, info.height);
-      done();
-    });
+  it('fit=fill, downscale width, upscale height', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 3000, { fit: 'fill' })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(3000, info.height);
+        done();
+      });
   });
 
-  it('Upscale width, downscale height, ignoring aspect ratio', function (done) {
-    sharp(fixtures.inputJpg).resize(3000, 320).ignoreAspectRatio().toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(3000, info.width);
-      assert.strictEqual(320, info.height);
-      done();
-    });
+  it('fit=fill, upscale width, downscale height', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(3000, 320, { fit: 'fill' })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(3000, info.width);
+        assert.strictEqual(320, info.height);
+        done();
+      });
   });
 
-  it('Identity transform, ignoring aspect ratio', function (done) {
-    sharp(fixtures.inputJpg).ignoreAspectRatio().toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(2725, info.width);
-      assert.strictEqual(2225, info.height);
-      done();
-    });
+  it('fit=fill, identity transform', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(null, null, { fit: 'fill' })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(2725, info.width);
+        assert.strictEqual(2225, info.height);
+        done();
+      });
   });
 
   it('Dimensions that result in differing even shrinks on each axis', function (done) {
@@ -498,6 +527,18 @@ describe('Resize dimensions', function () {
   it('unknown kernel throws', function () {
     assert.throws(function () {
       sharp().resize(null, null, { kernel: 'unknown' });
+    });
+  });
+
+  it('unknown fit throws', function () {
+    assert.throws(function () {
+      sharp().resize(null, null, { fit: 'unknown' });
+    });
+  });
+
+  it('unknown position throws', function () {
+    assert.throws(function () {
+      sharp().resize(null, null, { position: 'unknown' });
     });
   });
 });

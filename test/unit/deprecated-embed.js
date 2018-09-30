@@ -5,7 +5,7 @@ const assert = require('assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Embed', function () {
+describe('Deprecated embed', function () {
   it('Allows specifying the gravity as a string', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -111,23 +111,6 @@ describe('Embed', function () {
         assert.strictEqual(16, info.height);
         assert.strictEqual(4, info.channels);
         fixtures.assertSimilar(fixtures.expected('embed-2channel.png'), data, done);
-      });
-  });
-
-  it.skip('embed TIFF in LAB colourspace onto RGBA background', function (done) {
-    sharp(fixtures.inputTiffCielab)
-      .resize(64, 128)
-      .embed()
-      .background({r: 255, g: 102, b: 0, alpha: 0.5})
-      .png()
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(64, info.width);
-        assert.strictEqual(128, info.height);
-        assert.strictEqual(4, info.channels);
-        fixtures.assertSimilar(fixtures.expected('embed-lab-into-rgba.png'), data, done);
       });
   });
 

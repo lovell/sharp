@@ -6,6 +6,15 @@ Requires libvips v8.7.0.
 
 #### v0.21.0 - TBD
 
+* Deprecate the following resize-related functions:
+    `crop`, `embed`, `ignoreAspectRatio`, `max`, `min` and `withoutEnlargement`.
+  Access to these is now via options passed to the `resize` function.
+  For example:
+    `embed('north')` is now `resize(width, height, { fit: 'contain', position: 'north' })`,
+    `crop('attention')` is now `resize(width, height, { fit: 'cover', position: 'attention' })`,
+    `max().withoutEnlargement()` is now `resize(width, height, { fit: 'inside', withoutEnlargement: true })`.
+  [#1135](https://github.com/lovell/sharp/issues/1135)
+
 * Drop Node 4 support.
   [#1212](https://github.com/lovell/sharp/issues/1212)
 

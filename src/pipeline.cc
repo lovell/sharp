@@ -436,7 +436,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           int width = std::max(image.width(), baton->width);
           int height = std::max(image.height(), baton->height);
           std::tie(left, top) = sharp::CalculateEmbedPosition(
-            image.width(), image.height(), baton->width, baton->height, baton->embed);
+            image.width(), image.height(), baton->width, baton->height, baton->position);
 
           image = image.embed(left, top, width, height, VImage::option()
             ->set("extend", VIPS_EXTEND_BACKGROUND)
@@ -447,12 +447,12 @@ class PipelineWorker : public Nan::AsyncWorker {
           (image.width() > baton->width || image.height() > baton->height)
         ) {
           // Crop/max/min
-          if (baton->crop < 9) {
+          if (baton->position < 9) {
             // Gravity-based crop
             int left;
             int top;
             std::tie(left, top) = sharp::CalculateCrop(
-              image.width(), image.height(), baton->width, baton->height, baton->crop);
+              image.width(), image.height(), baton->width, baton->height, baton->position);
             int width = std::min(image.width(), baton->width);
             int height = std::min(image.height(), baton->height);
             image = image.extract_area(left, top, width, height);
@@ -468,7 +468,7 @@ class PipelineWorker : public Nan::AsyncWorker {
               ->set("access", baton->accessMethod)
               ->set("threaded", TRUE));
             image = image.smartcrop(baton->width, baton->height, VImage::option()
-              ->set("interesting", baton->crop == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
+              ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
             baton->hasCropOffset = true;
             baton->cropOffsetLeft = static_cast<int>(image.xoffset());
             baton->cropOffsetTop = static_cast<int>(image.yoffset());
@@ -1159,8 +1159,7 @@ NAN_METHOD(pipeline) {
   }
   // Resize options
   baton->withoutEnlargement = AttrTo<bool>(options, "withoutEnlargement");
-  baton->crop = AttrTo<int32_t>(options, "crop");
-  baton->embed = AttrTo<int32_t>(options, "embed");
+  baton->position = AttrTo<int32_t>(options, "position");
   baton->kernel = AttrAsStr(options, "kernel");
   baton->fastShrinkOnLoad = AttrTo<bool>(options, "fastShrinkOnLoad");
   // Join Channel Options
@@ -1299,7 +1298,7 @@ NAN_METHOD(pipeline) {
   // Force random access for certain operations
   if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL && (
     baton->trimTolerance != 0 || baton->normalise ||
-    baton->crop == 16 || baton->crop == 17)) {
+    baton->position == 16 || baton->position == 17)) {
     baton->accessMethod = VIPS_ACCESS_RANDOM;
   }
 

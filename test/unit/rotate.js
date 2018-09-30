@@ -107,8 +107,7 @@ describe('Rotation', function () {
 
   it('Rotate by 270 degrees, square output ignoring aspect ratio', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(240, 240)
-      .ignoreAspectRatio()
+      .resize(240, 240, { fit: sharp.fit.fill })
       .rotate(270)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -125,8 +124,7 @@ describe('Rotation', function () {
 
   it('Rotate by 315 degrees, square output ignoring aspect ratio', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(240, 240)
-      .ignoreAspectRatio()
+      .resize(240, 240, { fit: sharp.fit.fill })
       .rotate(315)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -143,8 +141,7 @@ describe('Rotation', function () {
 
   it('Rotate by 270 degrees, rectangular output ignoring aspect ratio', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .ignoreAspectRatio()
+      .resize(320, 240, { fit: sharp.fit.fill })
       .rotate(270)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -161,8 +158,7 @@ describe('Rotation', function () {
 
   it('Rotate by 30 degrees, rectangular output ignoring aspect ratio', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .ignoreAspectRatio()
+      .resize(320, 240, { fit: sharp.fit.fill })
       .rotate(30)
       .toBuffer(function (err, data, info) {
         if (err) throw err;

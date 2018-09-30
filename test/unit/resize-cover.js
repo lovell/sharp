@@ -5,45 +5,131 @@ const assert = require('assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Crop', function () {
+describe('Resize fit=cover', function () {
   [
+    // Position
     {
-      name: 'North',
+      name: 'Position: top',
+      width: 320,
+      height: 80,
+      gravity: sharp.position.top,
+      fixture: 'gravity-north.jpg'
+    },
+    {
+      name: 'Position: right',
+      width: 80,
+      height: 320,
+      gravity: sharp.position.right,
+      fixture: 'gravity-east.jpg'
+    },
+    {
+      name: 'Position: bottom',
+      width: 320,
+      height: 80,
+      gravity: sharp.position.bottom,
+      fixture: 'gravity-south.jpg'
+    },
+    {
+      name: 'Position: left',
+      width: 80,
+      height: 320,
+      gravity: sharp.position.left,
+      fixture: 'gravity-west.jpg'
+    },
+    {
+      name: 'Position: right top (top)',
+      width: 320,
+      height: 80,
+      gravity: sharp.position['right top'],
+      fixture: 'gravity-north.jpg'
+    },
+    {
+      name: 'Position: right top (right)',
+      width: 80,
+      height: 320,
+      gravity: sharp.position['right top'],
+      fixture: 'gravity-east.jpg'
+    },
+    {
+      name: 'Position: right bottom (bottom)',
+      width: 320,
+      height: 80,
+      gravity: sharp.position['right bottom'],
+      fixture: 'gravity-south.jpg'
+    },
+    {
+      name: 'Position: right bottom (right)',
+      width: 80,
+      height: 320,
+      gravity: sharp.position['right bottom'],
+      fixture: 'gravity-east.jpg'
+    },
+    {
+      name: 'Position: left bottom (bottom)',
+      width: 320,
+      height: 80,
+      gravity: sharp.position['left bottom'],
+      fixture: 'gravity-south.jpg'
+    },
+    {
+      name: 'Position: left bottom (left)',
+      width: 80,
+      height: 320,
+      gravity: sharp.position['left bottom'],
+      fixture: 'gravity-west.jpg'
+    },
+    {
+      name: 'Position: left top (top)',
+      width: 320,
+      height: 80,
+      gravity: sharp.position['left top'],
+      fixture: 'gravity-north.jpg'
+    },
+    {
+      name: 'Position: left top (left)',
+      width: 80,
+      height: 320,
+      gravity: sharp.position['left top'],
+      fixture: 'gravity-west.jpg'
+    },
+    // Gravity
+    {
+      name: 'Gravity: north',
       width: 320,
       height: 80,
       gravity: sharp.gravity.north,
       fixture: 'gravity-north.jpg'
     },
     {
-      name: 'East',
+      name: 'Gravity: east',
       width: 80,
       height: 320,
       gravity: sharp.gravity.east,
       fixture: 'gravity-east.jpg'
     },
     {
-      name: 'South',
+      name: 'Gravity: south',
       width: 320,
       height: 80,
       gravity: sharp.gravity.south,
       fixture: 'gravity-south.jpg'
     },
     {
-      name: 'West',
+      name: 'Gravity: west',
       width: 80,
       height: 320,
       gravity: sharp.gravity.west,
       fixture: 'gravity-west.jpg'
     },
     {
-      name: 'Center',
+      name: 'Gravity: center',
       width: 320,
       height: 80,
       gravity: sharp.gravity.center,
       fixture: 'gravity-center.jpg'
     },
     {
-      name: 'Centre',
+      name: 'Gravity: centre',
       width: 80,
       height: 320,
       gravity: sharp.gravity.centre,
@@ -57,66 +143,68 @@ describe('Crop', function () {
       fixture: 'gravity-centre.jpg'
     },
     {
-      name: 'Northeast',
+      name: 'Gravity: northeast (north)',
       width: 320,
       height: 80,
       gravity: sharp.gravity.northeast,
       fixture: 'gravity-north.jpg'
     },
     {
-      name: 'Northeast',
+      name: 'Gravity: northeast (east)',
       width: 80,
       height: 320,
       gravity: sharp.gravity.northeast,
       fixture: 'gravity-east.jpg'
     },
     {
-      name: 'Southeast',
+      name: 'Gravity: southeast (south)',
       width: 320,
       height: 80,
       gravity: sharp.gravity.southeast,
       fixture: 'gravity-south.jpg'
     },
     {
-      name: 'Southeast',
+      name: 'Gravity: southeast (east)',
       width: 80,
       height: 320,
       gravity: sharp.gravity.southeast,
       fixture: 'gravity-east.jpg'
     },
     {
-      name: 'Southwest',
+      name: 'Gravity: southwest (south)',
       width: 320,
       height: 80,
       gravity: sharp.gravity.southwest,
       fixture: 'gravity-south.jpg'
     },
     {
-      name: 'Southwest',
+      name: 'Gravity: southwest (west)',
       width: 80,
       height: 320,
       gravity: sharp.gravity.southwest,
       fixture: 'gravity-west.jpg'
     },
     {
-      name: 'Northwest',
+      name: 'Gravity: northwest (north)',
       width: 320,
       height: 80,
       gravity: sharp.gravity.northwest,
       fixture: 'gravity-north.jpg'
     },
     {
-      name: 'Northwest',
+      name: 'Gravity: northwest (west)',
       width: 80,
       height: 320,
       gravity: sharp.gravity.northwest,
       fixture: 'gravity-west.jpg'
     }
   ].forEach(function (settings) {
-    it(settings.name + ' gravity', function (done) {
+    it(settings.name, function (done) {
       sharp(fixtures.inputJpg)
-        .resize(settings.width, settings.height)
-        .crop(settings.gravity)
+        .resize(settings.width, settings.height, {
+          fit: sharp.fit.cover,
+          position: settings.gravity
+        })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual(settings.width, info.width);
@@ -128,8 +216,10 @@ describe('Crop', function () {
 
   it('Allows specifying the gravity as a string', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(80, 320)
-      .crop('east')
+      .resize(80, 320, {
+        fit: sharp.fit.cover,
+        position: 'east'
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(80, info.width);
@@ -138,24 +228,24 @@ describe('Crop', function () {
       });
   });
 
-  it('Invalid values fail', function () {
+  it('Invalid position values fail', function () {
     assert.throws(function () {
-      sharp().crop(9);
-    }, /Expected valid crop id\/name\/strategy for crop but received 9 of type number/);
+      sharp().resize(null, null, { fit: 'cover', position: 9 });
+    }, /Expected valid position\/gravity\/strategy for position but received 9 of type number/);
     assert.throws(function () {
-      sharp().crop(1.1);
-    }, /Expected valid crop id\/name\/strategy for crop but received 1.1 of type number/);
+      sharp().resize(null, null, { fit: 'cover', position: 1.1 });
+    }, /Expected valid position\/gravity\/strategy for position but received 1.1 of type number/);
     assert.throws(function () {
-      sharp().crop(-1);
-    }, /Expected valid crop id\/name\/strategy for crop but received -1 of type number/);
+      sharp().resize(null, null, { fit: 'cover', position: -1 });
+    }, /Expected valid position\/gravity\/strategy for position but received -1 of type number/);
     assert.throws(function () {
-      sharp().crop('zoinks');
-    }, /Expected valid crop id\/name\/strategy for crop but received zoinks of type string/);
+      sharp().resize(null, null, { fit: 'cover', position: 'zoinks' }).crop();
+    }, /Expected valid position\/gravity\/strategy for position but received zoinks of type string/);
   });
 
   it('Uses default value when none specified', function () {
     assert.doesNotThrow(function () {
-      sharp().crop();
+      sharp().resize(null, null, { fit: 'cover' });
     });
   });
 
@@ -165,8 +255,10 @@ describe('Crop', function () {
       .toBuffer()
       .then(function (input) {
         return sharp(input)
-          .resize(1110)
-          .crop(sharp.strategy.attention)
+          .resize(1110, null, {
+            fit: sharp.fit.cover,
+            position: sharp.strategy.attention
+          })
           .toBuffer({ resolveWithObject: true })
           .then(function (result) {
             assert.strictEqual(1110, result.info.width);
@@ -180,8 +272,10 @@ describe('Crop', function () {
   describe('Entropy-based strategy', function () {
     it('JPEG', function (done) {
       sharp(fixtures.inputJpg)
-        .resize(80, 320)
-        .crop(sharp.strategy.entropy)
+        .resize(80, 320, {
+          fit: 'cover',
+          position: sharp.strategy.entropy
+        })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('jpeg', info.format);
@@ -196,8 +290,10 @@ describe('Crop', function () {
 
     it('PNG', function (done) {
       sharp(fixtures.inputPngWithTransparency)
-        .resize(320, 80)
-        .crop(sharp.strategy.entropy)
+        .resize(320, 80, {
+          fit: 'cover',
+          position: sharp.strategy.entropy
+        })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('png', info.format);
@@ -212,8 +308,10 @@ describe('Crop', function () {
 
     it('supports the strategy passed as a string', function (done) {
       sharp(fixtures.inputPngWithTransparency)
-        .resize(320, 80)
-        .crop('entropy')
+        .resize(320, 80, {
+          fit: 'cover',
+          position: 'entropy'
+        })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('png', info.format);
@@ -230,8 +328,10 @@ describe('Crop', function () {
   describe('Attention strategy', function () {
     it('JPEG', function (done) {
       sharp(fixtures.inputJpg)
-        .resize(80, 320)
-        .crop(sharp.strategy.attention)
+        .resize(80, 320, {
+          fit: 'cover',
+          position: sharp.strategy.attention
+        })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('jpeg', info.format);
@@ -246,8 +346,10 @@ describe('Crop', function () {
 
     it('PNG', function (done) {
       sharp(fixtures.inputPngWithTransparency)
-        .resize(320, 80)
-        .crop(sharp.strategy.attention)
+        .resize(320, 80, {
+          fit: 'cover',
+          position: sharp.strategy.attention
+        })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('png', info.format);
@@ -262,8 +364,10 @@ describe('Crop', function () {
 
     it('supports the strategy passed as a string', function (done) {
       sharp(fixtures.inputPngWithTransparency)
-        .resize(320, 80)
-        .crop('attention')
+        .resize(320, 80, {
+          fit: 'cover',
+          position: 'attention'
+        })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('png', info.format);
