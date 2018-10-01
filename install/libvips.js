@@ -18,6 +18,12 @@ const platform = require('../lib/platform');
 const minimumLibvipsVersion = libvips.minimumLibvipsVersion;
 const distBaseUrl = process.env.SHARP_DIST_BASE_URL || `https://github.com/lovell/sharp-libvips/releases/download/v${minimumLibvipsVersion}/`;
 
+const fail = function (err) {
+  npmLog.error('sharp', err.message);
+  npmLog.error('sharp', 'Please see http://sharp.pixelplumbing.com/page/install');
+  process.exit(1);
+};
+
 const extractTarball = function (tarPath) {
   const vendorPath = path.join(__dirname, '..', 'vendor');
   libvips.mkdirSync(vendorPath);
@@ -27,9 +33,7 @@ const extractTarball = function (tarPath) {
       cwd: vendorPath,
       strict: true
     })
-    .catch(function (err) {
-      throw err;
-    });
+    .catch(fail);
 };
 
 try {
@@ -77,21 +81,21 @@ try {
         }
         response.pipe(tmpFile);
       });
-      tmpFile.on('close', function () {
-        try {
-          // Attempt to rename
-          fs.renameSync(tarPathTemp, tarPathCache);
-        } catch (err) {
-          // Fall back to copy and unlink
-          copyFileSync(tarPathTemp, tarPathCache);
-          fs.unlinkSync(tarPathTemp);
-        }
-        extractTarball(tarPathCache);
-      });
+      tmpFile
+        .on('error', fail)
+        .on('close', function () {
+          try {
+            // Attempt to rename
+            fs.renameSync(tarPathTemp, tarPathCache);
+          } catch (err) {
+            // Fall back to copy and unlink
+            copyFileSync(tarPathTemp, tarPathCache);
+            fs.unlinkSync(tarPathTemp);
+          }
+          extractTarball(tarPathCache);
+        });
     }
   }
 } catch (err) {
-  npmLog.error('sharp', err.message);
-  npmLog.error('sharp', 'Please see http://sharp.pixelplumbing.com/page/install');
-  process.exit(1);
+  fail(err);
 }
