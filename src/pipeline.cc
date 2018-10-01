@@ -318,9 +318,9 @@ class PipelineWorker : public Nan::AsyncWorker {
         double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
         // Background colour
         std::vector<double> background {
-          baton->background[0] * multiplier,
-          baton->background[1] * multiplier,
-          baton->background[2] * multiplier
+          baton->flattenBackground[0] * multiplier,
+          baton->flattenBackground[1] * multiplier,
+          baton->flattenBackground[2] * multiplier
         };
         image = image.flatten(VImage::option()
           ->set("background", background));
@@ -422,7 +422,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (image.width() != baton->width || image.height() != baton->height) {
         if (baton->canvas == Canvas::EMBED) {
           std::vector<double> background;
-          std::tie(image, background) = sharp::ApplyAlpha(image, baton->background);
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->resizeBackground);
 
           // Embed
 
@@ -492,7 +492,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Extend edges
       if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
         std::vector<double> background;
-        std::tie(image, background) = sharp::ApplyAlpha(image, baton->background);
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground);
 
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
@@ -1097,6 +1097,7 @@ NAN_METHOD(pipeline) {
   using sharp::AttrTo;
   using sharp::AttrAs;
   using sharp::AttrAsStr;
+  using sharp::AttrAsRgba;
   using sharp::CreateInputDescriptor;
 
   // Input Buffers must not undergo GC compaction during processing
@@ -1140,11 +1141,6 @@ NAN_METHOD(pipeline) {
   } else if (canvas == "ignore_aspect") {
     baton->canvas = Canvas::IGNORE_ASPECT;
   }
-  // Background colour
-  v8::Local<v8::Object> background = AttrAs<v8::Object>(options, "background");
-  for (unsigned int i = 0; i < 4; i++) {
-    baton->background[i] = AttrTo<double>(background, i);
-  }
   // Tint chroma
   baton->tintA = AttrTo<double>(options, "tintA");
   baton->tintB = AttrTo<double>(options, "tintB");
@@ -1160,6 +1156,7 @@ NAN_METHOD(pipeline) {
   // Resize options
   baton->withoutEnlargement = AttrTo<bool>(options, "withoutEnlargement");
   baton->position = AttrTo<int32_t>(options, "position");
+  baton->resizeBackground = AttrAsRgba(options, "resizeBackground");
   baton->kernel = AttrAsStr(options, "kernel");
   baton->fastShrinkOnLoad = AttrTo<bool>(options, "fastShrinkOnLoad");
   // Join Channel Options
@@ -1177,6 +1174,7 @@ NAN_METHOD(pipeline) {
   }
   // Operators
   baton->flatten = AttrTo<bool>(options, "flatten");
+  baton->flattenBackground = AttrAsRgba(options, "flattenBackground");
   baton->negate = AttrTo<bool>(options, "negate");
   baton->blurSigma = AttrTo<double>(options, "blurSigma");
   baton->medianSize = AttrTo<uint32_t>(options, "medianSize");
@@ -1194,11 +1192,7 @@ NAN_METHOD(pipeline) {
   baton->useExifOrientation = AttrTo<bool>(options, "useExifOrientation");
   baton->angle = AttrTo<int32_t>(options, "angle");
   baton->rotationAngle = AttrTo<double>(options, "rotationAngle");
-  // Rotation background colour
-  v8::Local<v8::Object> rotationBackground = AttrAs<v8::Object>(options, "rotationBackground");
-  for (unsigned int i = 0; i < 4; i++) {
-    baton->rotationBackground[i] = AttrTo<double>(rotationBackground, i);
-  }
+  baton->rotationBackground = AttrAsRgba(options, "rotationBackground");
   baton->rotateBeforePreExtract = AttrTo<bool>(options, "rotateBeforePreExtract");
   baton->flip = AttrTo<bool>(options, "flip");
   baton->flop = AttrTo<bool>(options, "flop");
@@ -1206,7 +1200,9 @@ NAN_METHOD(pipeline) {
   baton->extendBottom = AttrTo<int32_t>(options, "extendBottom");
   baton->extendLeft = AttrTo<int32_t>(options, "extendLeft");
   baton->extendRight = AttrTo<int32_t>(options, "extendRight");
+  baton->extendBackground = AttrAsRgba(options, "extendBackground");
   baton->extractChannel = AttrTo<int32_t>(options, "extractChannel");
+
   baton->removeAlpha = AttrTo<bool>(options, "removeAlpha");
   if (HasAttr(options, "boolean")) {
     baton->boolean = CreateInputDescriptor(AttrAs<v8::Object>(options, "boolean"), buffersToPersist);

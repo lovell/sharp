@@ -114,11 +114,11 @@ Returns **Sharp**
 
 ## flatten
 
-Merge alpha transparency channel, if any, with `background`.
+Merge alpha transparency channel, if any, with a background.
 
 ### Parameters
 
--   `flatten` **[Boolean][6]**  (optional, default `true`)
+-   `options`  
 
 Returns **Sharp** 
 

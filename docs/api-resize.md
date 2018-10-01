@@ -2,179 +2,126 @@
 
 ## resize
 
-Resize image to `width` x `height`.
-By default, the resized image is centre cropped to the exact size specified.
+Resize image to `width`, `height` or `width x height`.
 
-Possible kernels are:
+When both a `width` and `height` are provided, the possible methods by which the image should **fit** these are:
 
--   `nearest`: Use [nearest neighbour interpolation][1].
--   `cubic`: Use a [Catmull-Rom spline][2].
--   `lanczos2`: Use a [Lanczos kernel][3] with `a=2`.
--   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
+-   `cover`: Crop to cover both provided dimensions (the default).
+-   `contain`: Embed within both provided dimensions.
+-   `fill`: Ignore the aspect ratio of the input and stretch to both provided dimensions.
+-   `inside`: Preserving aspect ratio, resize the image to be as large as possible while ensuring its dimensions are less than or equal to both those specified.
+-   `outside`: Preserving aspect ratio, resize the image to be as small as possible while ensuring its dimensions are greater than or equal to both those specified.
+    Some of these values are based on the [object-fit][1] CSS property.
 
-### Parameters
+When using a `fit` of `cover` or `contain`, the default **position** is `centre`. Other options are:
 
--   `width` **[Number][4]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
--   `height` **[Number][4]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
--   `options` **[Object][5]?** 
-    -   `options.kernel` **[String][6]** the kernel to use for image reduction. (optional, default `'lanczos3'`)
-    -   `options.fastShrinkOnLoad` **[Boolean][7]** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
-
-### Examples
-
-```javascript
-sharp(inputBuffer)
-  .resize(200, 300, {
-    kernel: sharp.kernel.nearest
-  })
-  .background('white')
-  .embed()
-  .toFile('output.tiff')
-  .then(function() {
-    // output.tiff is a 200 pixels wide and 300 pixels high image
-    // containing a nearest-neighbour scaled version, embedded on a white canvas,
-    // of the image data in inputBuffer
-  });
-```
-
--   Throws **[Error][8]** Invalid parameters
-
-Returns **Sharp** 
-
-## crop
-
-Crop the resized image to the exact size specified, the default behaviour.
-
-Possible attributes of the optional `sharp.gravity` are `north`, `northeast`, `east`, `southeast`, `south`,
-`southwest`, `west`, `northwest`, `center` and `centre`.
+-   `sharp.position`: `top`, `right top`, `right`, `right bottom`, `bottom`, `left bottom`, `left`, `left top`.
+-   `sharp.gravity`: `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` or `centre`.
+-   `sharp.strategy`: `cover` only, dynamically crop using either the `entropy` or `attention` strategy.
+    Some of these values are based on the [object-position][2] CSS property.
 
 The experimental strategy-based approach resizes so one dimension is at its target length
 then repeatedly ranks edge regions, discarding the edge with the lowest score based on the selected strategy.
 
--   `entropy`: focus on the region with the highest [Shannon entropy][9].
+-   `entropy`: focus on the region with the highest [Shannon entropy][3].
 -   `attention`: focus on the region with the highest luminance frequency, colour saturation and presence of skin tones.
+
+Possible interpolation kernels are:
+
+-   `nearest`: Use [nearest neighbour interpolation][4].
+-   `cubic`: Use a [Catmull-Rom spline][5].
+-   `lanczos2`: Use a [Lanczos kernel][6] with `a=2`.
+-   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
 
 ### Parameters
 
--   `crop` **[String][6]** A member of `sharp.gravity` to crop to an edge/corner or `sharp.strategy` to crop dynamically. (optional, default `'centre'`)
+-   `width` **[Number][7]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
+-   `height` **[Number][7]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
+-   `options`  
 
 ### Examples
+
+```javascript
+sharp(input)
+  .resize({ width: 100 })
+  .toBuffer()
+  .then(data => {
+    // 100 pixels wide, auto-scaled height
+  });
+```
+
+```javascript
+sharp(input)
+  .resize({ height: 100 })
+  .toBuffer()
+  .then(data => {
+    // 100 pixels high, auto-scaled width
+  });
+```
+
+```javascript
+sharp(input)
+  .resize(200, 300, {
+    kernel: sharp.kernel.nearest,
+    fit: 'contain',
+    position: 'right top',
+    background: { r: 255, g: 255, b: 255, alpha: 0.5 }
+  })
+  .toFile('output.png')
+  .then(() => {
+    // output.png is a 200 pixels wide and 300 pixels high image
+    // containing a nearest-neighbour scaled version
+    // contained within the north-east corner of a semi-transparent white canvas
+  });
+```
 
 ```javascript
 const transformer = sharp()
-  .resize(200, 200)
-  .crop(sharp.strategy.entropy)
-  .on('error', function(err) {
-    console.log(err);
+  .resize({
+    width: 200,
+    height: 200,
+    fit: sharp.fit.cover,
+    position: sharp.strategy.entropy
   });
 // Read image data from readableStream
 // Write 200px square auto-cropped image data to writableStream
-readableStream.pipe(transformer).pipe(writableStream);
+readableStream
+  .pipe(transformer)
+  .pipe(writableStream);
 ```
 
--   Throws **[Error][8]** Invalid parameters
-
-Returns **Sharp** 
-
-## embed
-
-Preserving aspect ratio, resize the image to the maximum `width` or `height` specified
-then embed on a background of the exact `width` and `height` specified.
-
-If the background contains an alpha value then WebP and PNG format output images will
-contain an alpha channel, even when the input image does not.
-
-### Parameters
-
--   `embed` **[String][6]** A member of `sharp.gravity` to embed to an edge/corner. (optional, default `'centre'`)
-
-### Examples
-
 ```javascript
-sharp('input.gif')
-  .resize(200, 300)
-  .background({r: 0, g: 0, b: 0, alpha: 0})
-  .embed()
-  .toFormat(sharp.format.webp)
-  .toBuffer(function(err, outputBuffer) {
-    if (err) {
-      throw err;
-    }
-    // outputBuffer contains WebP image data of a 200 pixels wide and 300 pixels high
-    // containing a scaled version, embedded on a transparent canvas, of input.gif
-  });
-```
-
--   Throws **[Error][8]** Invalid parameters
-
-Returns **Sharp** 
-
-## max
-
-Preserving aspect ratio, resize the image to be as large as possible
-while ensuring its dimensions are less than or equal to the `width` and `height` specified.
-
-Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
-
-### Examples
-
-```javascript
-sharp(inputBuffer)
-  .resize(200, 200)
-  .max()
+sharp(input)
+  .resize(200, 200, {
+    fit: sharp.fit.inside,
+    withoutEnlargement: true
+  })
   .toFormat('jpeg')
   .toBuffer()
   .then(function(outputBuffer) {
-    // outputBuffer contains JPEG image data no wider than 200 pixels and no higher
-    // than 200 pixels regardless of the inputBuffer image dimensions
+    // outputBuffer contains JPEG image data
+    // no wider and no higher than 200 pixels
+    // and no larger than the input image
   });
 ```
 
-Returns **Sharp** 
-
-## min
-
-Preserving aspect ratio, resize the image to be as small as possible
-while ensuring its dimensions are greater than or equal to the `width` and `height` specified.
-
-Both `width` and `height` must be provided via `resize` otherwise the behaviour will default to `crop`.
-
-Returns **Sharp** 
-
-## ignoreAspectRatio
-
-Ignoring the aspect ratio of the input, stretch the image to
-the exact `width` and/or `height` provided via `resize`.
-
-Returns **Sharp** 
-
-## withoutEnlargement
-
-Do not enlarge the output image if the input image width _or_ height are already less than the required dimensions.
-This is equivalent to GraphicsMagick's `>` geometry option:
-"_change the dimensions of the image only if its width or height exceeds the geometry specification_".
-Use with `max()` to preserve the image's aspect ratio.
-
-The default behaviour _before_ function call is `false`, meaning the image will be enlarged.
-
-### Parameters
-
--   `withoutEnlargement` **[Boolean][7]**  (optional, default `true`)
+-   Throws **[Error][8]** Invalid parameters
 
 Returns **Sharp** 
 
 ## extend
 
-Extends/pads the edges of the image with the colour provided to the `background` method.
+Extends/pads the edges of the image with the provided background colour.
 This operation will always occur after resizing and extraction, if any.
 
 ### Parameters
 
--   `extend` **([Number][4] \| [Object][5])** single pixel count to add to all edges or an Object with per-edge counts
-    -   `extend.top` **[Number][4]?** 
-    -   `extend.left` **[Number][4]?** 
-    -   `extend.bottom` **[Number][4]?** 
-    -   `extend.right` **[Number][4]?** 
+-   `extend` **([Number][7] \| [Object][9])** single pixel count to add to all edges or an Object with per-edge counts
+    -   `extend.top` **[Number][7]?** 
+    -   `extend.left` **[Number][7]?** 
+    -   `extend.bottom` **[Number][7]?** 
+    -   `extend.right` **[Number][7]?** 
+    -   `extend.background` **([String][10] \| [Object][9])** background colour, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
 
 ### Examples
 
@@ -183,8 +130,14 @@ This operation will always occur after resizing and extraction, if any.
 // to the top, left and right edges and 20 to the bottom edge
 sharp(input)
   .resize(140)
-  .background({r: 0, g: 0, b: 0, alpha: 0})
-  .extend({top: 10, bottom: 20, left: 10, right: 10})
+  .)
+  .extend({
+    top: 10,
+    bottom: 20,
+    left: 10,
+    right: 10
+    background: { r: 0, g: 0, b: 0, alpha: 0 }
+  })
   ...
 ```
 
@@ -202,11 +155,11 @@ Extract a region of the image.
 
 ### Parameters
 
--   `options` **[Object][5]** 
-    -   `options.left` **[Number][4]** zero-indexed offset from left edge
-    -   `options.top` **[Number][4]** zero-indexed offset from top edge
-    -   `options.width` **[Number][4]** dimension of extracted image
-    -   `options.height` **[Number][4]** dimension of extracted image
+-   `options` **[Object][9]** 
+    -   `options.left` **[Number][7]** zero-indexed offset from left edge
+    -   `options.top` **[Number][7]** zero-indexed offset from top edge
+    -   `options.width` **[Number][7]** dimension of extracted image
+    -   `options.height` **[Number][7]** dimension of extracted image
 
 ### Examples
 
@@ -238,27 +191,31 @@ Trim "boring" pixels from all edges that contain values within a percentage simi
 
 ### Parameters
 
--   `tolerance` **[Number][4]** value between 1 and 99 representing the percentage similarity. (optional, default `10`)
+-   `tolerance` **[Number][7]** value between 1 and 99 representing the percentage similarity. (optional, default `10`)
 
 
 -   Throws **[Error][8]** Invalid parameters
 
 Returns **Sharp** 
 
-[1]: http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation
+[1]: https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
 
-[2]: https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline
+[2]: https://developer.mozilla.org/en-US/docs/Web/CSS/object-position
 
-[3]: https://en.wikipedia.org/wiki/Lanczos_resampling#Lanczos_kernel
+[3]: https://en.wikipedia.org/wiki/Entropy_%28information_theory%29
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[4]: http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[5]: https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[6]: https://en.wikipedia.org/wiki/Lanczos_resampling#Lanczos_kernel
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
 [8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
 
-[9]: https://en.wikipedia.org/wiki/Entropy_%28information_theory%29
+[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[11]: https://www.npmjs.org/package/color

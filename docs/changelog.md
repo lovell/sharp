@@ -15,6 +15,10 @@ Requires libvips v8.7.0.
     `max().withoutEnlargement()` is now `resize(width, height, { fit: 'inside', withoutEnlargement: true })`.
   [#1135](https://github.com/lovell/sharp/issues/1135)
 
+* Deprecate the `background` function.
+    Per-operation `background` options added to `resize`, `extend` and `flatten` operations.
+  [#1392](https://github.com/lovell/sharp/issues/1392)
+
 * Drop Node 4 support.
   [#1212](https://github.com/lovell/sharp/issues/1212)
 

@@ -38,8 +38,10 @@ describe('Resize fit=contain', function () {
 
   it('JPEG within WebP, to include alpha channel', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(320, 240, { fit: 'contain' })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .resize(320, 240, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
       .webp()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -82,8 +84,10 @@ describe('Resize fit=contain', function () {
 
   it('16-bit PNG with alpha channel onto RGBA', function (done) {
     sharp(fixtures.inputPngWithTransparency16bit)
-      .resize(32, 16, { fit: 'contain' })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .resize(32, 16, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -97,8 +101,10 @@ describe('Resize fit=contain', function () {
 
   it('PNG with 2 channels', function (done) {
     sharp(fixtures.inputPngWithGreyAlpha)
-      .resize(32, 16, { fit: 'contain' })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .resize(32, 16, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -112,8 +118,10 @@ describe('Resize fit=contain', function () {
 
   it.skip('TIFF in LAB colourspace onto RGBA background', function (done) {
     sharp(fixtures.inputTiffCielab)
-      .resize(64, 128, { fit: 'contain' })
-      .background({r: 255, g: 102, b: 0, alpha: 0.5})
+      .resize(64, 128, {
+        fit: 'contain',
+        background: { r: 255, g: 102, b: 0, alpha: 0.5 }
+      })
       .png()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -152,9 +160,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'top'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -170,9 +178,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right top'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -188,9 +196,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -206,9 +214,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right bottom'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -224,9 +232,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'bottom'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -242,9 +250,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left bottom'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -260,9 +268,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -278,9 +286,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left top'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -296,9 +304,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.north
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -314,9 +322,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.northeast
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -332,9 +340,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.east
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -350,9 +358,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.southeast
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -368,9 +376,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.south
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -386,9 +394,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.southwest
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -404,9 +412,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.west
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -422,9 +430,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.northwest
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -440,9 +448,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.center
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -458,9 +466,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'top'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -476,9 +484,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right top'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -494,9 +502,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -512,9 +520,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right bottom'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -530,9 +538,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'bottom'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -548,9 +556,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left bottom'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -566,9 +574,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -584,9 +592,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left top'
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -602,9 +610,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.north
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -620,9 +628,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.northeast
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -638,9 +646,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.east
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -656,9 +664,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.southeast
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -674,9 +682,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.south
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -692,9 +700,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.southwest
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -710,9 +718,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.west
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -728,9 +736,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.northwest
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -746,9 +754,9 @@ describe('Resize fit=contain', function () {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.center
       })
-      .background({r: 0, g: 0, b: 0, alpha: 0})
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);

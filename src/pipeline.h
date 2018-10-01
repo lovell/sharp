@@ -62,16 +62,17 @@ struct PipelineBaton {
   int channels;
   Canvas canvas;
   int position;
+  std::vector<double> resizeBackground;
   bool hasCropOffset;
   int cropOffsetLeft;
   int cropOffsetTop;
   bool premultiplied;
   std::string kernel;
   bool fastShrinkOnLoad;
-  double background[4];
   double tintA;
   double tintB;
   bool flatten;
+  std::vector<double> flattenBackground;
   bool negate;
   double blurSigma;
   int medianSize;
@@ -89,7 +90,7 @@ struct PipelineBaton {
   bool useExifOrientation;
   int angle;
   double rotationAngle;
-  double rotationBackground[4];
+  std::vector<double> rotationBackground;
   bool rotateBeforePreExtract;
   bool flip;
   bool flop;
@@ -97,6 +98,7 @@ struct PipelineBaton {
   int extendBottom;
   int extendLeft;
   int extendRight;
+  std::vector<double> extendBackground;
   bool withoutEnlargement;
   VipsAccess accessMethod;
   int jpegQuality;
@@ -157,6 +159,7 @@ struct PipelineBaton {
     channels(0),
     canvas(Canvas::CROP),
     position(0),
+    resizeBackground{ 0.0, 0.0, 0.0, 255.0 },
     hasCropOffset(false),
     cropOffsetLeft(0),
     cropOffsetTop(0),
@@ -164,6 +167,7 @@ struct PipelineBaton {
     tintA(128.0),
     tintB(128.0),
     flatten(false),
+    flattenBackground{ 0.0, 0.0, 0.0 },
     negate(false),
     blurSigma(0.0),
     medianSize(0),
@@ -181,12 +185,14 @@ struct PipelineBaton {
     useExifOrientation(false),
     angle(0),
     rotationAngle(0.0),
+    rotationBackground{ 0.0, 0.0, 0.0, 255.0 },
     flip(false),
     flop(false),
     extendTop(0),
     extendBottom(0),
     extendLeft(0),
     extendRight(0),
+    extendBackground{ 0.0, 0.0, 0.0, 255.0 },
     withoutEnlargement(false),
     jpegQuality(80),
     jpegProgressive(false),
@@ -223,12 +229,7 @@ struct PipelineBaton {
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),
     tileLayout(VIPS_FOREIGN_DZ_LAYOUT_DZ),
     tileAngle(0),
-    tileDepth(VIPS_FOREIGN_DZ_DEPTH_LAST){
-      background[0] = 0.0;
-      background[1] = 0.0;
-      background[2] = 0.0;
-      background[3] = 255.0;
-    }
+    tileDepth(VIPS_FOREIGN_DZ_DEPTH_LAST) {}
 };
 
 #endif  // SRC_PIPELINE_H_

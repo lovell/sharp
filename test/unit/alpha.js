@@ -19,9 +19,10 @@ describe('Alpha transparency', function () {
 
   it('Flatten to RGB orange', function (done) {
     sharp(fixtures.inputPngWithTransparency)
-      .flatten()
-      .background({r: 255, g: 102, b: 0})
       .resize(400, 300)
+      .flatten({
+        background: { r: 255, g: 102, b: 0 }
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(400, info.width);
@@ -32,9 +33,8 @@ describe('Alpha transparency', function () {
 
   it('Flatten to CSS/hex orange', function (done) {
     sharp(fixtures.inputPngWithTransparency)
-      .flatten()
-      .background('#ff6600')
       .resize(400, 300)
+      .flatten({ background: '#ff6600' })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(400, info.width);
@@ -46,8 +46,9 @@ describe('Alpha transparency', function () {
   it('Flatten 16-bit PNG with transparency to orange', function (done) {
     const output = fixtures.path('output.flatten-rgb16-orange.jpg');
     sharp(fixtures.inputPngWithTransparency16bit)
-      .flatten()
-      .background({r: 255, g: 102, b: 0})
+      .flatten({
+        background: { r: 255, g: 102, b: 0 }
+      })
       .toFile(output, function (err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
@@ -71,8 +72,7 @@ describe('Alpha transparency', function () {
 
   it('Ignored for JPEG', function (done) {
     sharp(fixtures.inputJpg)
-      .background('#ff0000')
-      .flatten()
+      .flatten({ background: '#ff0000' })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);

@@ -69,8 +69,10 @@ describe('Colour space conversion', function () {
 
   it('From CMYK to sRGB with white background, not yellow', function (done) {
     sharp(fixtures.inputJpgWithCmykProfile)
-      .resize(320, 240, { fit: sharp.fit.contain })
-      .background('white')
+      .resize(320, 240, {
+        fit: sharp.fit.contain,
+        background: 'white'
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);

@@ -37,6 +37,14 @@ namespace sharp {
   std::string AttrAsStr(v8::Handle<v8::Object> obj, std::string attr) {
     return *Nan::Utf8String(Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked());
   }
+  std::vector<double> AttrAsRgba(v8::Handle<v8::Object> obj, std::string attr) {
+    v8::Local<v8::Object> background = AttrAs<v8::Object>(obj, attr);
+    std::vector<double> rgba(4);
+    for (unsigned int i = 0; i < 4; i++) {
+      rgba[i] = AttrTo<double>(background, i);
+    }
+    return rgba;
+  }
 
   // Create an InputDescriptor instance from a v8::Object describing an input image
   InputDescriptor* CreateInputDescriptor(
@@ -72,10 +80,7 @@ namespace sharp {
       descriptor->createChannels = AttrTo<uint32_t>(input, "createChannels");
       descriptor->createWidth = AttrTo<uint32_t>(input, "createWidth");
       descriptor->createHeight = AttrTo<uint32_t>(input, "createHeight");
-      v8::Local<v8::Object> createBackground = AttrAs<v8::Object>(input, "createBackground");
-      for (unsigned int i = 0; i < 4; i++) {
-        descriptor->createBackground[i] = AttrTo<double>(createBackground, i);
-      }
+      descriptor->createBackground = AttrAsRgba(input, "createBackground");
     }
     return descriptor;
   }
@@ -605,7 +610,7 @@ namespace sharp {
   /*
     Apply the alpha channel to a given colour
   */
-  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, double colour[4]) {
+  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, std::vector<double> colour) {
     // Scale up 8-bit values to match 16-bit input image
     double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
     // Create alphaColour colour

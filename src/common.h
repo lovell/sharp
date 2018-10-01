@@ -57,7 +57,7 @@ namespace sharp {
     int createChannels;
     int createWidth;
     int createHeight;
-    double createBackground[4];
+    std::vector<double> createBackground;
 
     InputDescriptor():
       buffer(nullptr),
@@ -70,17 +70,14 @@ namespace sharp {
       page(0),
       createChannels(0),
       createWidth(0),
-      createHeight(0) {
-        createBackground[0] = 0.0;
-        createBackground[1] = 0.0;
-        createBackground[2] = 0.0;
-        createBackground[3] = 255.0;
-      }
+      createHeight(0),
+      createBackground{ 0.0, 0.0, 0.0, 255.0 } {}
   };
 
   // Convenience methods to access the attributes of a v8::Object
   bool HasAttr(v8::Handle<v8::Object> obj, std::string attr);
   std::string AttrAsStr(v8::Handle<v8::Object> obj, std::string attr);
+  std::vector<double> AttrAsRgba(v8::Handle<v8::Object> obj, std::string attr);
   template<typename T> v8::Local<T> AttrAs(v8::Handle<v8::Object> obj, std::string attr) {
     return Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked().As<T>();
   }
@@ -258,7 +255,7 @@ namespace sharp {
   /*
     Apply the alpha channel to a given colour
    */
-  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, double colour[4]);
+  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, std::vector<double> colour);
 
 }  // namespace sharp
 
