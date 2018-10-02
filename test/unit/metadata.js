@@ -19,6 +19,8 @@ describe('Image metadata', function () {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -38,6 +40,8 @@ describe('Image metadata', function () {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual(72, metadata.density);
+      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(true, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual(8, metadata.orientation);
@@ -85,6 +89,8 @@ describe('Image metadata', function () {
       assert.strictEqual(1, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual(300, metadata.density);
+      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual(1, metadata.orientation);
@@ -104,6 +110,8 @@ describe('Image metadata', function () {
       assert.strictEqual(1, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual(300, metadata.density);
+      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -123,6 +131,8 @@ describe('Image metadata', function () {
       assert.strictEqual(4, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual(72, metadata.density);
+      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(true, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -142,6 +152,8 @@ describe('Image metadata', function () {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -160,6 +172,8 @@ describe('Image metadata', function () {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -177,6 +191,8 @@ describe('Image metadata', function () {
       assert.strictEqual(2, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(true, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -195,6 +211,8 @@ describe('Image metadata', function () {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -224,6 +242,8 @@ describe('Image metadata', function () {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -247,6 +267,8 @@ describe('Image metadata', function () {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -268,6 +290,8 @@ describe('Image metadata', function () {
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
@@ -343,6 +367,56 @@ describe('Image metadata', function () {
           assert.strictEqual('undefined', typeof metadata.icc);
           done();
         });
+      });
+  });
+
+  it('chromaSubsampling 4:4:4:4 CMYK JPEG', function () {
+    return sharp(fixtures.inputJpgWithCmykProfile)
+      .metadata()
+      .then(function (metadata) {
+        assert.strictEqual('4:4:4:4', metadata.chromaSubsampling);
+      });
+  });
+
+  it('chromaSubsampling 4:4:4 RGB JPEG', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(10, 10)
+      .jpeg({ chromaSubsampling: '4:4:4' })
+      .toBuffer()
+      .then(function (data) {
+        return sharp(data)
+          .metadata()
+          .then(function (metadata) {
+            assert.strictEqual('4:4:4', metadata.chromaSubsampling);
+          });
+      });
+  });
+
+  it('isProgressive JPEG', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(10, 10)
+      .jpeg({ progressive: true })
+      .toBuffer()
+      .then(function (data) {
+        return sharp(data)
+          .metadata()
+          .then(function (metadata) {
+            assert.strictEqual(true, metadata.isProgressive);
+          });
+      });
+  });
+
+  it('isProgressive PNG', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(10, 10)
+      .png({ progressive: true })
+      .toBuffer()
+      .then(function (data) {
+        return sharp(data)
+          .metadata()
+          .then(function (metadata) {
+            assert.strictEqual(true, metadata.isProgressive);
+          });
       });
   });
 

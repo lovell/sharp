@@ -62,6 +62,12 @@ class MetadataWorker : public Nan::AsyncWorker {
       if (sharp::HasDensity(image)) {
         baton->density = sharp::GetDensity(image);
       }
+      if (image.get_typeof("jpeg-chroma-subsample") == VIPS_TYPE_REF_STRING) {
+        baton->chromaSubsampling = image.get_string("jpeg-chroma-subsample");
+      }
+      if (image.get_typeof("interlaced") == G_TYPE_INT) {
+        baton->isProgressive = image.get_int("interlaced") == 1;
+      }
       baton->hasProfile = sharp::HasProfile(image);
       // Derived attributes
       baton->hasAlpha = sharp::HasAlpha(image);
@@ -125,6 +131,12 @@ class MetadataWorker : public Nan::AsyncWorker {
       if (baton->density > 0) {
         Set(info, New("density").ToLocalChecked(), New<v8::Uint32>(baton->density));
       }
+      if (!baton->chromaSubsampling.empty()) {
+        Set(info,
+          New("chromaSubsampling").ToLocalChecked(),
+          New<v8::String>(baton->chromaSubsampling).ToLocalChecked());
+      }
+      Set(info, New("isProgressive").ToLocalChecked(), New<v8::Boolean>(baton->isProgressive));
       Set(info, New("hasProfile").ToLocalChecked(), New<v8::Boolean>(baton->hasProfile));
       Set(info, New("hasAlpha").ToLocalChecked(), New<v8::Boolean>(baton->hasAlpha));
       if (baton->orientation > 0) {

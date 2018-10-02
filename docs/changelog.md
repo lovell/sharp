@@ -22,6 +22,9 @@ Requires libvips v8.7.0.
 * Switch from custom trim operation to `vips_find_trim`.
   [#914](https://github.com/lovell/sharp/issues/914)
 
+* Add `chromaSubsampling` and `isProgressive` properties to `metadata` response.
+  [#1186](https://github.com/lovell/sharp/issues/1186)
+
 * Drop Node 4 support.
   [#1212](https://github.com/lovell/sharp/issues/1212)
 

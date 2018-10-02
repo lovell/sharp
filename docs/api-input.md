@@ -31,6 +31,8 @@ A Promises/A+ promise is returned when `callback` is not provided.
 -   `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
 -   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][2]
 -   `density`: Number of pixels per inch (DPI), if present
+-   `chromaSubsampling`: String containing JPEG chroma subsampling, `4:2:0` or `4:4:4` for RGB, `4:2:0:4` or `4:4:4:4` for CMYK
+-   `isProgressive`: Boolean indicating whether the image is interlaced using a progressive scan
 -   `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 -   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 -   `orientation`: Number value of the EXIF Orientation header, if present
