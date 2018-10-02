@@ -16,6 +16,8 @@ describe('Trim borders', function () {
         assert.strictEqual('png', info.format);
         assert.strictEqual(450, info.width);
         assert.strictEqual(322, info.height);
+        assert.strictEqual(-204, info.trimOffsetLeft);
+        assert.strictEqual(0, info.trimOffsetTop);
         fixtures.assertSimilar(expected, data, done);
       });
   });
@@ -29,6 +31,8 @@ describe('Trim borders', function () {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(300, info.width);
+        assert.strictEqual(-873, info.trimOffsetLeft);
+        assert.strictEqual(-554, info.trimOffsetTop);
         fixtures.assertSimilar(expected, data, done);
       });
   });
@@ -44,6 +48,8 @@ describe('Trim borders', function () {
         assert.strictEqual(32, info.width);
         assert.strictEqual(32, info.height);
         assert.strictEqual(4, info.channels);
+        assert.strictEqual(-2, info.trimOffsetLeft);
+        assert.strictEqual(-2, info.trimOffsetTop);
         fixtures.assertSimilar(fixtures.expected('trim-16bit-rgba.png'), data, done);
       });
   });

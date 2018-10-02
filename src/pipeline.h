@@ -82,6 +82,8 @@ struct PipelineBaton {
   int threshold;
   bool thresholdGrayscale;
   double trimThreshold;
+  int trimOffsetLeft;
+  int trimOffsetTop;
   double linearA;
   double linearB;
   double gamma;
@@ -177,6 +179,8 @@ struct PipelineBaton {
     threshold(0),
     thresholdGrayscale(true),
     trimThreshold(0.0),
+    trimOffsetLeft(0),
+    trimOffsetTop(0),
     linearA(1.0),
     linearB(0.0),
     gamma(0.0),

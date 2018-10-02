@@ -196,6 +196,7 @@ Returns **Sharp**
 ## trim
 
 Trim "boring" pixels from all edges that contain values similar to the top-left pixel.
+The `info` response Object will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
 ### Parameters
 

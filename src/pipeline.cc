@@ -102,6 +102,8 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Trim
       if (baton->trimThreshold > 0.0) {
         image = sharp::Trim(image, baton->trimThreshold);
+        baton->trimOffsetLeft = image.xoffset();
+        baton->trimOffsetTop = image.yoffset();
       }
 
       // Pre extraction
@@ -965,6 +967,12 @@ class PipelineWorker : public Nan::AsyncWorker {
           New<v8::Int32>(static_cast<int32_t>(baton->cropOffsetLeft)));
         Set(info, New("cropOffsetTop").ToLocalChecked(),
           New<v8::Int32>(static_cast<int32_t>(baton->cropOffsetTop)));
+      }
+      if (baton->trimThreshold > 0.0) {
+        Set(info, New("trimOffsetLeft").ToLocalChecked(),
+          New<v8::Int32>(static_cast<int32_t>(baton->trimOffsetLeft)));
+        Set(info, New("trimOffsetTop").ToLocalChecked(),
+          New<v8::Int32>(static_cast<int32_t>(baton->trimOffsetTop)));
       }
 
       if (baton->bufferOutLength > 0) {
