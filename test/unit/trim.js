@@ -3,6 +3,7 @@
 const assert = require('assert');
 
 const sharp = require('../../');
+const inRange = require('../../lib/is').inRange;
 const fixtures = require('../fixtures');
 
 describe('Trim borders', function () {
@@ -26,12 +27,15 @@ describe('Trim borders', function () {
     const expected = fixtures.expected('alpha-layer-2-trim-resize.jpg');
     sharp(fixtures.inputJpgOverlayLayer2)
       .trim()
-      .resize(300)
+      .resize({
+        width: 300,
+        fastShrinkOnLoad: false
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(300, info.width);
-        assert.strictEqual(-873, info.trimOffsetLeft);
+        assert.strictEqual(true, inRange(info.trimOffsetLeft, -873, -870));
         assert.strictEqual(-554, info.trimOffsetTop);
         fixtures.assertSimilar(expected, data, done);
       });
