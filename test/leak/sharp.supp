@@ -367,6 +367,17 @@
   fun:_ZN2v84base6Thread5StartEv
 }
 {
+  leak_nodejs_thread_TracingController
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:calloc
+  fun:allocate_dtv
+  fun:_dl_allocate_tls
+  fun:allocate_stack
+  ...
+  fun:_ZN4node12NodePlatformC1EiPN2v817TracingControllerE
+}
+{
   leak_nan_FunctionCallbackInfo
   Memcheck:Leak
   match-leak-kinds: definite
