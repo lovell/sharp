@@ -187,11 +187,11 @@ Returns **Sharp**
 
 ## trim
 
-Trim "boring" pixels from all edges that contain values within a percentage similarity of the top-left pixel.
+Trim "boring" pixels from all edges that contain values similar to the top-left pixel.
 
 ### Parameters
 
--   `tolerance` **[Number][7]** value between 1 and 99 representing the percentage similarity. (optional, default `10`)
+-   `threshold` **[Number][7]** the allowed difference from the top-left pixel, a number greater than zero. (optional, default `10`)
 
 
 -   Throws **[Error][8]** Invalid parameters

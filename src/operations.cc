@@ -327,15 +327,16 @@ namespace sharp {
   /*
     Trim an image
   */
-  VImage Trim(VImage image, int const threshold) {
+  VImage Trim(VImage image, double const threshold) {
     // Top-left pixel provides the background colour
     VImage background = image.extract_area(0, 0, 1, 1);
     if (HasAlpha(background)) {
       background = background.flatten();
     }
     int top, width, height;
-    int const left = image.find_trim(&top, &width, &height,
-      VImage::option()->set("background", background(0, 0)));
+    int const left = image.find_trim(&top, &width, &height, VImage::option()
+      ->set("background", background(0, 0))
+      ->set("threshold", threshold));
     if (width == 0 || height == 0) {
       throw VError("Unexpected error while trimming. Try to lower the tolerance");
     }

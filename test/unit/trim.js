@@ -29,7 +29,6 @@ describe('Trim borders', function () {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(300, info.width);
-        assert.strictEqual(300, info.height);
         fixtures.assertSimilar(expected, data, done);
       });
   });

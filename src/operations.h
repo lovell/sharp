@@ -100,7 +100,7 @@ namespace sharp {
   /*
     Trim an image
   */
-  VImage Trim(VImage image, int const threshold);
+  VImage Trim(VImage image, double const threshold);
 
   /*
    * Linear adjustment (a * in + b)
