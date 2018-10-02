@@ -81,7 +81,7 @@ struct PipelineBaton {
   double sharpenJagged;
   int threshold;
   bool thresholdGrayscale;
-  int trimTolerance;
+  double trimThreshold;
   double linearA;
   double linearB;
   double gamma;
@@ -176,7 +176,7 @@ struct PipelineBaton {
     sharpenJagged(2.0),
     threshold(0),
     thresholdGrayscale(true),
-    trimTolerance(0),
+    trimThreshold(0.0),
     linearA(1.0),
     linearB(0.0),
     gamma(0.0),

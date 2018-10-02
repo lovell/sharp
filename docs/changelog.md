@@ -19,6 +19,9 @@ Requires libvips v8.7.0.
     Per-operation `background` options added to `resize`, `extend` and `flatten` operations.
   [#1392](https://github.com/lovell/sharp/issues/1392)
 
+* Switch from custom trim operation to `vips_find_trim`.
+  [#914](https://github.com/lovell/sharp/issues/914)
+
 * Drop Node 4 support.
   [#1212](https://github.com/lovell/sharp/issues/1212)
 

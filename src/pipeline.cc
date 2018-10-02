@@ -100,8 +100,8 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
 
       // Trim
-      if (baton->trimTolerance != 0) {
-        image = sharp::Trim(image, baton->trimTolerance);
+      if (baton->trimThreshold > 0.0) {
+        image = sharp::Trim(image, baton->trimThreshold);
       }
 
       // Pre extraction
@@ -233,7 +233,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (
         xshrink == yshrink && xshrink >= 2 * shrink_on_load_factor &&
         (inputImageType == ImageType::JPEG || inputImageType == ImageType::WEBP) &&
-        baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimTolerance == 0
+        baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold == 0.0
       ) {
         if (xshrink >= 8 * shrink_on_load_factor) {
           xfactor = xfactor / 8;
@@ -1183,7 +1183,7 @@ NAN_METHOD(pipeline) {
   baton->sharpenJagged = AttrTo<double>(options, "sharpenJagged");
   baton->threshold = AttrTo<int32_t>(options, "threshold");
   baton->thresholdGrayscale = AttrTo<bool>(options, "thresholdGrayscale");
-  baton->trimTolerance = AttrTo<int32_t>(options, "trimTolerance");
+  baton->trimThreshold = AttrTo<double>(options, "trimThreshold");
   baton->gamma = AttrTo<double>(options, "gamma");
   baton->linearA = AttrTo<double>(options, "linearA");
   baton->linearB = AttrTo<double>(options, "linearB");
@@ -1293,7 +1293,7 @@ NAN_METHOD(pipeline) {
   }
   // Force random access for certain operations
   if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL && (
-    baton->trimTolerance != 0 || baton->normalise ||
+    baton->trimThreshold > 0.0 || baton->normalise ||
     baton->position == 16 || baton->position == 17)) {
     baton->accessMethod = VIPS_ACCESS_RANDOM;
   }
