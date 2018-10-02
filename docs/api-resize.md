@@ -37,7 +37,15 @@ Possible interpolation kernels are:
 
 -   `width` **[Number][7]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
 -   `height` **[Number][7]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
--   `options`  
+-   `options` **[Object][8]?** 
+    -   `options.width` **[String][9]?** alternative means of specifying `width`. If both are present this take priority.
+    -   `options.height` **[String][9]?** alternative means of specifying `height`. If both are present this take priority.
+    -   `options.fit` **[String][9]** how the image should be resized to fit both provided dimensions, one of `cover`, `contain`, `fill`, `inside` or `outside`. (optional, default `'cover'`)
+    -   `options.position` **[String][9]** position, gravity or strategy to use when `fit` is `cover` or `contain`. (optional, default `'centre'`)
+    -   `options.background` **([String][9] \| [Object][8])** background colour when using a `fit` of `contain`, parsed by the [color][10] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
+    -   `options.kernel` **[String][9]** the kernel to use for image reduction. (optional, default `'lanczos3'`)
+    -   `options.withoutEnlargement` **[Boolean][11]** do not enlarge if the width _or_ height are already less than the specified dimensions, equivalent to GraphicsMagick's `>` geometry option. (optional, default `false`)
+    -   `options.fastShrinkOnLoad` **[Boolean][11]** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
 
 ### Examples
 
@@ -105,7 +113,7 @@ sharp(input)
   });
 ```
 
--   Throws **[Error][8]** Invalid parameters
+-   Throws **[Error][12]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -116,12 +124,12 @@ This operation will always occur after resizing and extraction, if any.
 
 ### Parameters
 
--   `extend` **([Number][7] \| [Object][9])** single pixel count to add to all edges or an Object with per-edge counts
+-   `extend` **([Number][7] \| [Object][8])** single pixel count to add to all edges or an Object with per-edge counts
     -   `extend.top` **[Number][7]?** 
     -   `extend.left` **[Number][7]?** 
     -   `extend.bottom` **[Number][7]?** 
     -   `extend.right` **[Number][7]?** 
-    -   `extend.background` **([String][10] \| [Object][9])** background colour, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
+    -   `extend.background` **([String][9] \| [Object][8])** background colour, parsed by the [color][10] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
 
 ### Examples
 
@@ -141,7 +149,7 @@ sharp(input)
   ...
 ```
 
--   Throws **[Error][8]** Invalid parameters
+-   Throws **[Error][12]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -155,7 +163,7 @@ Extract a region of the image.
 
 ### Parameters
 
--   `options` **[Object][9]** 
+-   `options` **[Object][8]** 
     -   `options.left` **[Number][7]** zero-indexed offset from left edge
     -   `options.top` **[Number][7]** zero-indexed offset from top edge
     -   `options.width` **[Number][7]** dimension of extracted image
@@ -181,7 +189,7 @@ sharp(input)
   });
 ```
 
--   Throws **[Error][8]** Invalid parameters
+-   Throws **[Error][12]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -194,7 +202,7 @@ Trim "boring" pixels from all edges that contain values similar to the top-left 
 -   `threshold` **[Number][7]** the allowed difference from the top-left pixel, a number greater than zero. (optional, default `10`)
 
 
--   Throws **[Error][8]** Invalid parameters
+-   Throws **[Error][12]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -212,10 +220,12 @@ Returns **Sharp**
 
 [7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[10]: https://www.npmjs.org/package/color
 
-[11]: https://www.npmjs.org/package/color
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
