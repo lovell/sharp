@@ -25,6 +25,7 @@ Fast access to (uncached) image metadata without decoding any compressed image d
 A Promises/A+ promise is returned when `callback` is not provided.
 
 -   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
+-   `size`: Total size of image in bytes, for Stream and Buffer input only
 -   `width`: Number of pixels wide (EXIF orientation is not taken into consideration)
 -   `height`: Number of pixels high (EXIF orientation is not taken into consideration)
 -   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][1]

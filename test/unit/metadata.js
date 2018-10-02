@@ -13,6 +13,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputJpg).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
@@ -34,6 +35,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputJpgWithExif).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(450, metadata.width);
       assert.strictEqual(600, metadata.height);
       assert.strictEqual('srgb', metadata.space);
@@ -83,6 +85,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputTiff).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('tiff', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2464, metadata.width);
       assert.strictEqual(3248, metadata.height);
       assert.strictEqual('b-w', metadata.space);
@@ -104,6 +107,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputPng).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2809, metadata.width);
       assert.strictEqual(2074, metadata.height);
       assert.strictEqual('b-w', metadata.space);
@@ -125,6 +129,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputPngWithTransparency).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2048, metadata.width);
       assert.strictEqual(1536, metadata.height);
       assert.strictEqual('srgb', metadata.space);
@@ -146,6 +151,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputWebP).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('webp', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(1024, metadata.width);
       assert.strictEqual(772, metadata.height);
       assert.strictEqual('srgb', metadata.space);
@@ -167,6 +173,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputGif).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('gif', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(800, metadata.width);
       assert.strictEqual(533, metadata.height);
       assert.strictEqual(3, metadata.channels);
@@ -186,6 +193,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputGifGreyPlusAlpha).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('gif', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2, metadata.width);
       assert.strictEqual(1, metadata.height);
       assert.strictEqual(2, metadata.channels);
@@ -205,6 +213,7 @@ describe('Image metadata', function () {
   it('File in, Promise out', function (done) {
     sharp(fixtures.inputJpg).metadata().then(function (metadata) {
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
@@ -236,6 +245,7 @@ describe('Image metadata', function () {
     const pipeline = sharp();
     pipeline.metadata().then(function (metadata) {
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual(829183, metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
@@ -250,9 +260,7 @@ describe('Image metadata', function () {
       assert.strictEqual('undefined', typeof metadata.exif);
       assert.strictEqual('undefined', typeof metadata.icc);
       done();
-    }).catch(function (err) {
-      throw err;
-    });
+    }).catch(done);
     readable.pipe(pipeline);
   });
 
@@ -261,6 +269,7 @@ describe('Image metadata', function () {
     const pipeline = sharp().metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual(829183, metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);
@@ -284,6 +293,7 @@ describe('Image metadata', function () {
     image.metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
       assert.strictEqual('srgb', metadata.space);

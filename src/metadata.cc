@@ -123,6 +123,9 @@ class MetadataWorker : public Nan::AsyncWorker {
       // Metadata Object
       v8::Local<v8::Object> info = New<v8::Object>();
       Set(info, New("format").ToLocalChecked(), New<v8::String>(baton->format).ToLocalChecked());
+      if (baton->input->bufferLength > 0) {
+        Set(info, New("size").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->input->bufferLength)));
+      }
       Set(info, New("width").ToLocalChecked(), New<v8::Uint32>(baton->width));
       Set(info, New("height").ToLocalChecked(), New<v8::Uint32>(baton->height));
       Set(info, New("space").ToLocalChecked(), New<v8::String>(baton->space).ToLocalChecked());
