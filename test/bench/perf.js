@@ -12,23 +12,11 @@ const gm = require('gm');
 const imagemagick = require('imagemagick');
 const mapnik = require('mapnik');
 const jimp = require('jimp');
-let images;
-try {
-  images = require('images');
-} catch (err) {
-  console.log('Excluding node-images');
-}
 let imagemagickNative;
 try {
   imagemagickNative = require('imagemagick-native');
 } catch (err) {
   console.log('Excluding imagemagick-native');
-}
-let lwip;
-try {
-  lwip = require('pajk-lwip');
-} catch (err) {
-  console.log('Excluding lwip');
 }
 
 const fixtures = require('../fixtures');
@@ -38,8 +26,6 @@ const height = 588;
 
 // Disable libvips cache to ensure tests are as fair as they can be
 sharp.cache(false);
-// Enable use of SIMD
-sharp.simd(true);
 
 async.series({
   'jpeg': function (callback) {
@@ -87,51 +73,6 @@ async.series({
         });
       }
     });
-    // lwip
-    if (typeof lwip !== 'undefined') {
-      jpegSuite.add('lwip-file-file', {
-        defer: true,
-        fn: function (deferred) {
-          lwip.open(fixtures.inputJpg, function (err, image) {
-            if (err) {
-              throw err;
-            }
-            image.resize(width, height, 'lanczos', function (err, image) {
-              if (err) {
-                throw err;
-              }
-              image.writeFile(fixtures.outputJpg, {quality: 80}, function (err) {
-                if (err) {
-                  throw err;
-                }
-                deferred.resolve();
-              });
-            });
-          });
-        }
-      }).add('lwip-buffer-buffer', {
-        defer: true,
-        fn: function (deferred) {
-          lwip.open(inputJpgBuffer, 'jpg', function (err, image) {
-            if (err) {
-              throw err;
-            }
-            image.resize(width, height, 'lanczos', function (err, image) {
-              if (err) {
-                throw err;
-              }
-              image.toBuffer('jpg', {quality: 80}, function (err, buffer) {
-                if (err) {
-                  throw err;
-                }
-                assert.notStrictEqual(null, buffer);
-                deferred.resolve();
-              });
-            });
-          });
-        }
-      });
-    }
     // mapnik
     jpegSuite.add('mapnik-file-file', {
       defer: true,
@@ -272,14 +213,6 @@ async.series({
           });
       }
     });
-    // images
-    if (typeof images !== 'undefined') {
-      jpegSuite.add('images-file-file', function () {
-        images(fixtures.inputJpg)
-          .resize(width, height)
-          .save(fixtures.outputJpg, { quality: 80 });
-      });
-    }
     // sharp
     jpegSuite.add('sharp-buffer-file', {
       defer: true,
@@ -569,8 +502,10 @@ async.series({
       defer: true,
       fn: function (deferred) {
         sharp(inputJpgBuffer)
-          .resize(width, height)
-          .crop(sharp.strategy.entropy)
+          .resize(width, height, {
+            fit: 'cover',
+            position: sharp.strategy.entropy
+          })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -584,8 +519,10 @@ async.series({
       defer: true,
       fn: function (deferred) {
         sharp(inputJpgBuffer)
-          .resize(width, height)
-          .crop(sharp.strategy.attention)
+          .resize(width, height, {
+            fit: 'cover',
+            position: sharp.strategy.attention
+          })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -696,31 +633,6 @@ async.series({
         });
       }
     });
-    // lwip
-    if (typeof lwip !== 'undefined') {
-      pngSuite.add('lwip-buffer-buffer', {
-        defer: true,
-        fn: function (deferred) {
-          lwip.open(inputPngBuffer, 'png', function (err, image) {
-            if (err) {
-              throw err;
-            }
-            image.resize(width, height, 'lanczos', function (err, image) {
-              if (err) {
-                throw err;
-              }
-              image.toBuffer('png', function (err, buffer) {
-                if (err) {
-                  throw err;
-                }
-                assert.notStrictEqual(null, buffer);
-                deferred.resolve();
-              });
-            });
-          });
-        }
-      });
-    }
     // mapnik
     pngSuite.add('mapnik-file-file', {
       defer: true,
@@ -833,14 +745,6 @@ async.series({
           });
       }
     });
-    // images
-    if (typeof images !== 'undefined') {
-      pngSuite.add('images-file-file', function () {
-        images(fixtures.inputPng)
-          .resize(width, height)
-          .save(fixtures.outputPng);
-      });
-    }
     // sharp
     pngSuite.add('sharp-buffer-file', {
       defer: true,
