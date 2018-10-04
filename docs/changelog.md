@@ -4,7 +4,7 @@
 
 Requires libvips v8.7.0.
 
-#### v0.21.0 - TBD
+#### v0.21.0 - 4<sup>th</sup> October 2018
 
 * Deprecate the following resize-related functions:
     `crop`, `embed`, `ignoreAspectRatio`, `max`, `min` and `withoutEnlargement`.
