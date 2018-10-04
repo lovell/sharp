@@ -54,7 +54,7 @@ async.series({
             throw err;
           } else {
             image
-              .resize(width, height)
+              .resize(width, height, jimp.RESIZE_BICUBIC)
               .quality(80)
               .getBuffer(jimp.MIME_JPEG, function (err) {
                 if (err) {
@@ -74,7 +74,7 @@ async.series({
             throw err;
           } else {
             image
-              .resize(width, height)
+              .resize(width, height, jimp.RESIZE_BICUBIC)
               .quality(80)
               .write(fixtures.outputJpg, function (err) {
                 if (err) {
