@@ -95,7 +95,8 @@ that it can be located using `pkg-config --modversion vips-cpp`.
 [![Windows x64 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 13MB.
+This involves an automated HTTPS download of approximately 13MB.  If you are having issues during
+installation consider removing the directory ```C:\Users\[user]\AppData\Roaming\npm-cache\_libvips```.
 
 Only 64-bit (x64) `node.exe` is supported.
 
