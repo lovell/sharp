@@ -118,7 +118,8 @@ Merge alpha transparency channel, if any, with a background.
 
 ### Parameters
 
--   `options`  
+-   `options` **[Object][2]?** 
+    -   `options.background` **([String][3] \| [Object][2])** background colour, parsed by the [color][4] module, defaults to black. (optional, default `{r:0,g:0,b:0}`)
 
 Returns **Sharp** 
 
