@@ -218,7 +218,14 @@ you can do so via
 [https://github.com/lovell/sharp-libvips/releases](https://github.com/lovell/sharp-libvips/releases)
 
 Should you wish to install these from your own location,
-set the `SHARP_DIST_BASE_URL` environment variable, e.g.
+set the `sharp_dist_base_url` npm config option, e.g.
+
+```sh
+npm config set sharp_dist_base_url "https://hostname/path/"
+npm install sharp
+```
+
+or set the `SHARP_DIST_BASE_URL` environment variable, e.g.
 
 ```sh
 SHARP_DIST_BASE_URL="https://hostname/path/" npm install sharp

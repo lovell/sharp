@@ -4,6 +4,12 @@
 
 Requires libvips v8.7.0.
 
+#### v0.21.1 - TBD
+
+* Install: support `sharp_dist_base_url` npm config, like existing `SHARP_DIST_BASE_URL`.
+  [#1422](https://github.com/lovell/sharp/pull/1422)
+  [@SethWen](https://github.com/SethWen)
+
 #### v0.21.0 - 4<sup>th</sup> October 2018
 
 * Deprecate the following resize-related functions:
