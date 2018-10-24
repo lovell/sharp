@@ -72,7 +72,9 @@ libvips is available in the
 [testing repository](https://pkgs.alpinelinux.org/packages?name=vips-dev):
 
 ```sh
-apk add vips-dev fftw-dev build-base --update-cache --repository https://dl-3.alpinelinux.org/alpine/edge/testing/
+apk add vips-dev fftw-dev build-base --update-cache \
+    --repository https://dl-3.alpinelinux.org/alpine/edge/testing/ \
+    --repository https://dl-3.alpinelinux.org/alpine/edge/main
 ```
 
 The smaller stack size of musl libc means
