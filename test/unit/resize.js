@@ -497,6 +497,7 @@ describe('Resize dimensions', function () {
   [
     sharp.kernel.nearest,
     sharp.kernel.cubic,
+    sharp.kernel.mitchell,
     sharp.kernel.lanczos2,
     sharp.kernel.lanczos3
   ].forEach(function (kernel) {

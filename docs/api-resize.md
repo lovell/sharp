@@ -30,6 +30,7 @@ Possible interpolation kernels are:
 
 -   `nearest`: Use [nearest neighbour interpolation][4].
 -   `cubic`: Use a [Catmull-Rom spline][5].
+-   `mitchell`: Use a [Mitchell-Netravali spline][13].
 -   `lanczos2`: Use a [Lanczos kernel][6] with `a=2`.
 -   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
 
@@ -230,3 +231,5 @@ Returns **Sharp**
 [11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
 [12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[13]: https://www.cs.utexas.edu/~fussell/courses/cs384g-fall2013/lectures/mitchell/Mitchell.pdf
