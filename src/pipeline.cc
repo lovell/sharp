@@ -595,7 +595,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             std::tie(left, top) = sharp::CalculateCrop(image.width(), image.height(),
               overlayImage.width(), overlayImage.height(), baton->overlayGravity);
           }
-          image = sharp::Composite(image, overlayImage, left, top);
+          VipsBlendMode blendMode = MapBlendMode(baton->overlayBlendMode);
+          image = sharp::Composite(image, overlayImage, left, top, blendMode);
         }
       }
 
@@ -1071,6 +1072,28 @@ class PipelineWorker : public Nan::AsyncWorker {
   }
 
   /*
+    Maps a blend mode setting to a libvips blend mode enum.
+  */
+  VipsBlendMode
+  MapBlendMode(int blendMode) {
+    switch (blendMode) {
+      case 0: return VIPS_BLEND_MODE_OVER;
+      case 1: return VIPS_BLEND_MODE_DARKEN;
+      case 2: return VIPS_BLEND_MODE_MULTIPLY;
+      case 3: return VIPS_BLEND_MODE_COLOUR_BURN;
+      case 4: return VIPS_BLEND_MODE_LIGHTEN;
+      case 5: return VIPS_BLEND_MODE_SCREEN;
+      case 6: return VIPS_BLEND_MODE_COLOUR_DODGE;
+      case 7: return VIPS_BLEND_MODE_OVERLAY;
+      case 8: return VIPS_BLEND_MODE_SOFT_LIGHT;
+      case 9: return VIPS_BLEND_MODE_HARD_LIGHT;
+      case 10: return VIPS_BLEND_MODE_DIFFERENCE;
+      case 11: return VIPS_BLEND_MODE_EXCLUSION;
+    }
+    return VIPS_BLEND_MODE_OVER;
+  }
+
+  /*
     Assemble the suffix argument to dzsave, which is the format (by extname)
     alongisde comma-separated arguments to the corresponding `formatsave` vips
     action.
@@ -1160,6 +1183,7 @@ NAN_METHOD(pipeline) {
     baton->overlayYOffset = AttrTo<int32_t>(options, "overlayYOffset");
     baton->overlayTile = AttrTo<bool>(options, "overlayTile");
     baton->overlayCutout = AttrTo<bool>(options, "overlayCutout");
+    baton->overlayBlendMode = AttrTo<int32_t>(options, "overlayBlendMode");
   }
   // Resize options
   baton->withoutEnlargement = AttrTo<bool>(options, "withoutEnlargement");

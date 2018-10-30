@@ -42,66 +42,37 @@ namespace sharp {
     Composite overlayImage over image at given position
     Assumes alpha channels are already premultiplied and will be unpremultiplied after
    */
-  VImage Composite(VImage image, VImage overlayImage, int const left, int const top) {
-    if (HasAlpha(overlayImage)) {
-      // Alpha composite
-      if (overlayImage.width() < image.width() || overlayImage.height() < image.height()) {
-        // Enlarge overlay
-        std::vector<double> const background { 0.0, 0.0, 0.0, 0.0 };
-        overlayImage = overlayImage.embed(left, top, image.width(), image.height(), VImage::option()
-          ->set("extend", VIPS_EXTEND_BACKGROUND)
-          ->set("background", background));
-      }
-      return AlphaComposite(image, overlayImage);
-    } else {
-      if (HasAlpha(image)) {
+  VImage Composite(VImage image, VImage overlayImage, int left, int top, VipsBlendMode blendMode) {
+    bool imageHasAlpha = HasAlpha(image);
+
+    if (overlayImage.width() < image.width() || overlayImage.height() < image.height()) {
+      // Enlarge overlay
+      if (!HasAlpha(overlayImage)) {
         // Add alpha channel to overlayImage so channels match
         double const multiplier = sharp::Is16Bit(overlayImage.interpretation()) ? 256.0 : 1.0;
         overlayImage = overlayImage.bandjoin(
-          VImage::new_matrix(overlayImage.width(), overlayImage.height()).new_from_image(255 * multiplier));
+                VImage::new_matrix(overlayImage.width(), overlayImage.height()).new_from_image(255 * multiplier));
       }
-      return image.insert(overlayImage, left, top);
+
+      std::vector<double> const background{0.0, 0.0, 0.0, 0.0};
+      overlayImage = overlayImage.embed(left, top, image.width(), image.height(), VImage::option()
+              ->set("extend", VIPS_EXTEND_BACKGROUND)
+              ->set("background", background));
+
+      top = 0;
+      left = 0;
     }
-  }
 
-  VImage AlphaComposite(VImage dst, VImage src) {
-    // Split src into non-alpha and alpha channels
-    VImage srcWithoutAlpha = src.extract_band(0, VImage::option()->set("n", src.bands() - 1));
-    VImage srcAlpha = src[src.bands() - 1] * (1.0 / 255.0);
+    image = image.composite(overlayImage, blendMode, VImage::option()->
+            set("premultiplied", true)->
+            set("x", left)->
+            set("y", top));
 
-    // Split dst into non-alpha and alpha channels
-    VImage dstWithoutAlpha = dst.extract_band(0, VImage::option()->set("n", dst.bands() - 1));
-    VImage dstAlpha = dst[dst.bands() - 1] * (1.0 / 255.0);
+    if (!imageHasAlpha) {
+      image = RemoveAlpha(image);
+    }
 
-    //
-    // Compute normalized output alpha channel:
-    //
-    // References:
-    // - http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
-    // - https://github.com/libvips/ruby-vips/issues/28#issuecomment-9014826
-    //
-    // out_a = src_a + dst_a * (1 - src_a)
-    //                         ^^^^^^^^^^^
-    //                            t0
-    VImage t0 = srcAlpha.linear(-1.0, 1.0);
-    VImage outAlphaNormalized = srcAlpha + dstAlpha * t0;
-
-    //
-    // Compute output RGB channels:
-    //
-    // Wikipedia:
-    // out_rgb = (src_rgb * src_a + dst_rgb * dst_a * (1 - src_a)) / out_a
-    //                                                ^^^^^^^^^^^
-    //                                                    t0
-    //
-    // Omit division by `out_a` since `Compose` is supposed to output a
-    // premultiplied RGBA image as reversal of premultiplication is handled
-    // externally.
-    //
-    VImage outRGBPremultiplied = srcWithoutAlpha + dstWithoutAlpha * t0;
-
-    // Combine RGB and alpha channel into output image:
-    return outRGBPremultiplied.bandjoin(outAlphaNormalized * 255.0);
+    return image;
   }
 
   /*

@@ -595,4 +595,17 @@ describe('Overlays', function () {
         fixtures.assertSimilar(fixtures.expected('overlay-jpeg-with-jpeg.jpg'), data, done);
       });
   });
+
+  it('Overlays PNG on a solid background using difference blend mode', function (done) {
+    const paths = getPaths('alpha-layer-01-difference');
+
+    sharp(fixtures.inputPngOverlayLayer0)
+      .overlayWith(fixtures.inputPngOverlayLayer1, {blendMode: 'difference'})
+      .toFile(paths.actual, function (error) {
+        if (error) return done(error);
+
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected);
+        done();
+      });
+  });
 });

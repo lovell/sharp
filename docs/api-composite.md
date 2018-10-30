@@ -28,6 +28,7 @@ If the overlay image contains an alpha channel then composition with premultipli
         -   `options.create.height` **[Number][4]?** 
         -   `options.create.channels` **[Number][4]?** 3-4
         -   `options.create.background` **([String][2] \| [Object][3])?** parsed by the [color][6] module to extract values for red, green, blue and alpha.
+    -   `options.blendMode` **[String][2]** [blend mode][8] to composite images with (optional, default `'over'`). Possible values: `over`, `darken`, `multiply`, `color burn`, `lighten`, `screen`, `color dodge`, `overlay`, `soft light`,  `hard light`, `difference`, `exclusion`
 
 ### Examples
 
@@ -66,3 +67,5 @@ Returns **Sharp**
 [6]: https://www.npmjs.org/package/color
 
 [7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[8]: https://jcupitt.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode

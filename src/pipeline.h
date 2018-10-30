@@ -48,6 +48,7 @@ struct PipelineBaton {
   int overlayYOffset;
   bool overlayTile;
   bool overlayCutout;
+  int overlayBlendMode;
   std::vector<sharp::InputDescriptor *> joinChannelIn;
   int topOffsetPre;
   int leftOffsetPre;
@@ -156,6 +157,7 @@ struct PipelineBaton {
     overlayYOffset(-1),
     overlayTile(false),
     overlayCutout(false),
+    overlayBlendMode(0),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),

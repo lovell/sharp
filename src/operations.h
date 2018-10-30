@@ -39,12 +39,7 @@ namespace sharp {
   /*
     Composite overlayImage over image at given position
    */
-  VImage Composite(VImage image, VImage overlayImage, int const x, int const y);
-
-  /*
-    Alpha composite overlayImage over image, assumes matching dimensions
-  */
-  VImage AlphaComposite(VImage image, VImage overlayImage);
+  VImage Composite(VImage image, VImage overlayImage, int const x, int const y, VipsBlendMode blendMode);
 
   /*
     Cutout src over dst with given gravity.
