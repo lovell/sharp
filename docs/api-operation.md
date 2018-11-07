@@ -134,6 +134,7 @@ when applying a gamma correction.
 ### Parameters
 
 -   `gamma` **[Number][1]** value between 1.0 and 3.0. (optional, default `2.2`)
+-   `gammaOut` ** [Number][1]** value between 1.0 and 3.0. (optional, defaults to same as `gamma`)
 
 
 -   Throws **[Error][5]** Invalid parameters

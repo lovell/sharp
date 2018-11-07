@@ -14,6 +14,10 @@ Requires libvips v8.7.0.
   [#1438](https://github.com/lovell/sharp/pull/1438)
   [@Daiz](https://github.com/Daiz)
 
+* Add support for different output gamma from what is used for scaling.
+  [#1439](https://github.com/lovell/sharp/pull/1439)
+  [@Daiz](https://github.com/Daiz)
+
 #### v0.21.0 - 4<sup>th</sup> October 2018
 
 * Deprecate the following resize-related functions:
