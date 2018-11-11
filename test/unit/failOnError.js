@@ -49,8 +49,8 @@ describe('failOnError', function () {
   it('returns errors to callback for truncated JPEG when failOnError is set', function (done) {
     sharp(fixtures.inputJpgTruncated, { failOnError: true }).toBuffer(function (err, data, info) {
       assert.ok(err.message.includes('VipsJpeg: Premature end of JPEG file'), err);
-      assert.equal(data, null);
-      assert.equal(info, null);
+      assert.strictEqual(data, null);
+      assert.strictEqual(info, null);
       done();
     });
   });
@@ -58,8 +58,8 @@ describe('failOnError', function () {
   it('returns errors to callback for truncated PNG when failOnError is set', function (done) {
     sharp(fixtures.inputPngTruncated, { failOnError: true }).toBuffer(function (err, data, info) {
       assert.ok(err.message.includes('vipspng: libpng read error'), err);
-      assert.equal(data, null);
-      assert.equal(info, null);
+      assert.strictEqual(data, null);
+      assert.strictEqual(info, null);
       done();
     });
   });

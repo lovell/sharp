@@ -54,7 +54,7 @@ describe('Extend', function () {
   });
   it('partial object fails', function () {
     assert.throws(function () {
-      sharp().extend({top: 1});
+      sharp().extend({ top: 1 });
     });
   });
 

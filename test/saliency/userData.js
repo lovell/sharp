@@ -22,7 +22,7 @@ const median = function (values) {
 // List of files
 fs.readdirSync(userDataDir).forEach(function (file) {
   // Contents of file
-  const lines = fs.readFileSync(path.join(userDataDir, file), {encoding: 'utf-8'}).split(/\r\n/);
+  const lines = fs.readFileSync(path.join(userDataDir, file), { encoding: 'utf-8' }).split(/\r\n/);
   // First line = number of entries
   const entries = parseInt(lines[0], 10);
   // Verify number of entries

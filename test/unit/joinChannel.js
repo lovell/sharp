@@ -138,7 +138,7 @@ describe('Image channel insertion', function () {
 
   it('Invalid raw buffer description', function () {
     assert.throws(function () {
-      sharp().joinChannel(fs.readFileSync(fixtures.inputPng), {raw: {}});
+      sharp().joinChannel(fs.readFileSync(fixtures.inputPng), { raw: {} });
     });
   });
 

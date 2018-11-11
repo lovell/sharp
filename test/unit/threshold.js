@@ -132,7 +132,7 @@ describe('Threshold', function () {
   it('color threshold', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
-      .threshold(128, {'grayscale': false})
+      .threshold(128, { grayscale: false })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);

@@ -8,7 +8,7 @@ describe('Deprecated background', function () {
   it('Flatten to RGB orange', function (done) {
     sharp(fixtures.inputPngWithTransparency)
       .flatten()
-      .background({r: 255, g: 102, b: 0})
+      .background({ r: 255, g: 102, b: 0 })
       .resize(400, 300)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -35,7 +35,7 @@ describe('Deprecated background', function () {
     const output = fixtures.path('output.flatten-rgb16-orange.jpg');
     sharp(fixtures.inputPngWithTransparency16bit)
       .flatten()
-      .background({r: 255, g: 102, b: 0})
+      .background({ r: 255, g: 102, b: 0 })
       .toFile(output, function (err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
@@ -61,7 +61,7 @@ describe('Deprecated background', function () {
   it('extend all sides equally with RGB', function (done) {
     sharp(fixtures.inputJpg)
       .resize(120)
-      .background({r: 255, g: 0, b: 0})
+      .background({ r: 255, g: 0, b: 0 })
       .extend(10)
       .toBuffer(function (err, data, info) {
         if (err) throw err;

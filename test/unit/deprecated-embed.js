@@ -38,7 +38,7 @@ describe('Deprecated embed', function () {
   it('JPEG within WebP, to include alpha channel', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed()
       .webp()
       .toBuffer(function (err, data, info) {
@@ -86,7 +86,7 @@ describe('Deprecated embed', function () {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 16)
       .embed()
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -102,7 +102,7 @@ describe('Deprecated embed', function () {
     sharp(fixtures.inputPngWithGreyAlpha)
       .resize(32, 16)
       .embed()
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -153,7 +153,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity horizontal northwest', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.northwest)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -169,7 +169,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity horizontal north', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.north)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -185,7 +185,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity horizontal northeast', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.northeast)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -201,7 +201,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity horizontal east', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.east)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -217,7 +217,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity horizontal southeast', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.southeast)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -233,7 +233,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity horizontal south', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.south)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -249,7 +249,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity horizontal southwest', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.southwest)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -265,7 +265,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity horizontal west', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.west)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -281,7 +281,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity horizontal center', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.center)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -297,7 +297,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity vertical northwest', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.northwest)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -313,7 +313,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity vertical north', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.north)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -329,7 +329,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity vertical northeast', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.northeast)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -345,7 +345,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity vertical east', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.east)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -361,7 +361,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity vertical southeast', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.southeast)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -377,7 +377,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity vertical south', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.south)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -393,7 +393,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity vertical southwest', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.southwest)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -409,7 +409,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity vertical west', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.west)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -425,7 +425,7 @@ describe('Deprecated embed', function () {
   it('Embed gravity vertical center', function (done) {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200)
-      .background({r: 0, g: 0, b: 0, alpha: 0})
+      .background({ r: 0, g: 0, b: 0, alpha: 0 })
       .embed(sharp.gravity.center)
       .toBuffer(function (err, data, info) {
         if (err) throw err;

@@ -25,7 +25,7 @@ describe('Rotation', function () {
 
   it('Rotate by 30 degrees with semi-transparent background', function (done) {
     sharp(fixtures.inputJpg)
-      .rotate(30, {background: { r: 255, g: 0, b: 0, alpha: 0.5 }})
+      .rotate(30, { background: { r: 255, g: 0, b: 0, alpha: 0.5 } })
       .resize(320)
       .png()
       .toBuffer(function (err, data, info) {
@@ -39,7 +39,7 @@ describe('Rotation', function () {
 
   it('Rotate by 30 degrees with solid background', function (done) {
     sharp(fixtures.inputJpg)
-      .rotate(30, {background: { r: 255, g: 0, b: 0, alpha: 0.5 }})
+      .rotate(30, { background: { r: 255, g: 0, b: 0, alpha: 0.5 } })
       .resize(320)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -208,7 +208,7 @@ describe('Rotation', function () {
     sharp(fixtures.inputJpgWithExif)
       .rotate()
       .resize(320)
-      .withMetadata({orientation: 3})
+      .withMetadata({ orientation: 3 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);

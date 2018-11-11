@@ -79,7 +79,7 @@ describe('Input/output', function () {
     const pipeline = sharp().resize(1, 1);
     fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
     return pipeline
-      .toBuffer({resolveWithObject: false})
+      .toBuffer({ resolveWithObject: false })
       .then(function (data) {
         assert.strictEqual(true, data instanceof Buffer);
         assert.strictEqual(true, data.length > 0);
@@ -90,7 +90,7 @@ describe('Input/output', function () {
     const pipeline = sharp().resize(1, 1);
     fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
     return pipeline
-      .toBuffer({resolveWithObject: true})
+      .toBuffer({ resolveWithObject: true })
       .then(function (object) {
         assert.strictEqual('object', typeof object);
         assert.strictEqual('object', typeof object.info);
@@ -106,7 +106,7 @@ describe('Input/output', function () {
   it('Read from File and write to Buffer via Promise resolved with Buffer', function () {
     return sharp(fixtures.inputJpg)
       .resize(1, 1)
-      .toBuffer({resolveWithObject: false})
+      .toBuffer({ resolveWithObject: false })
       .then(function (data) {
         assert.strictEqual(true, data instanceof Buffer);
         assert.strictEqual(true, data.length > 0);
@@ -116,7 +116,7 @@ describe('Input/output', function () {
   it('Read from File and write to Buffer via Promise resolved with Object', function () {
     return sharp(fixtures.inputJpg)
       .resize(1, 1)
-      .toBuffer({resolveWithObject: true})
+      .toBuffer({ resolveWithObject: true })
       .then(function (object) {
         assert.strictEqual('object', typeof object);
         assert.strictEqual('object', typeof object.info);
@@ -462,7 +462,7 @@ describe('Input/output', function () {
 
     it('should work for webp alpha quality', function (done) {
       sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-        .webp({alphaQuality: 80})
+        .webp({ alphaQuality: 80 })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual(true, data.length > 0);
@@ -473,7 +473,7 @@ describe('Input/output', function () {
 
     it('should work for webp lossless', function (done) {
       sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-        .webp({lossless: true})
+        .webp({ lossless: true })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual(true, data.length > 0);
@@ -484,7 +484,7 @@ describe('Input/output', function () {
 
     it('should work for webp near-lossless', function (done) {
       sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-        .webp({nearLossless: true, quality: 50})
+        .webp({ nearLossless: true, quality: 50 })
         .toBuffer(function (err50, data50, info50) {
           if (err50) throw err50;
           assert.strictEqual(true, data50.length > 0);
@@ -495,7 +495,7 @@ describe('Input/output', function () {
 
     it('should use near-lossless when both lossless and nearLossless are specified', function (done) {
       sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-        .webp({nearLossless: true, quality: 50, lossless: true})
+        .webp({ nearLossless: true, quality: 50, lossless: true })
         .toBuffer(function (err50, data50, info50) {
           if (err50) throw err50;
           assert.strictEqual(true, data50.length > 0);
@@ -817,7 +817,7 @@ describe('Input/output', function () {
             assert.strictEqual(320, withInfo.width);
             assert.strictEqual(240, withInfo.height);
             // Verify image is of a different size (progressive output even without mozjpeg)
-            assert.notEqual(withData.length, withoutData.length);
+            assert.notStrictEqual(withData.length, withoutData.length);
             done();
           });
       });
@@ -887,7 +887,7 @@ describe('Input/output', function () {
   it('Convert SVG to PNG at default 72DPI', function (done) {
     sharp(fixtures.inputSvg)
       .resize(1024)
-      .extract({left: 290, top: 760, width: 40, height: 40})
+      .extract({ left: 290, top: 760, width: 40, height: 40 })
       .toFormat('png')
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -908,7 +908,7 @@ describe('Input/output', function () {
   it('Convert SVG to PNG at 1200DPI', function (done) {
     sharp(fixtures.inputSvg, { density: 1200 })
       .resize(1024)
-      .extract({left: 290, top: 760, width: 40, height: 40})
+      .extract({ left: 290, top: 760, width: 40, height: 40 })
       .toFormat('png')
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -1364,7 +1364,7 @@ describe('Input/output', function () {
 
   it('Save Vips V file', function (done) {
     sharp(fixtures.inputJpg)
-      .extract({left: 910, top: 1105, width: 70, height: 60})
+      .extract({ left: 910, top: 1105, width: 70, height: 60 })
       .toFile(fixtures.outputV, function (err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
@@ -1554,7 +1554,7 @@ describe('Input/output', function () {
               width: info.width,
               height: info.height,
               channels: info.channels
-            }})
+            } })
             .jpeg()
             .toBuffer(function (err, data, info) {
               if (err) throw err;
@@ -1581,7 +1581,7 @@ describe('Input/output', function () {
               width: info.width,
               height: info.height,
               channels: info.channels
-            }})
+            } })
             .png()
             .toBuffer(function (err, data, info) {
               if (err) throw err;
@@ -1683,7 +1683,7 @@ describe('Input/output', function () {
         assert.strictEqual(472, info.height);
         assert.strictEqual(3, info.channels);
       });
-    const badPipeline = sharp(null, {raw: {width: 840, height: 500, channels: 3}})
+    const badPipeline = sharp(null, { raw: { width: 840, height: 500, channels: 3 } })
       .toFormat('jpeg')
       .toBuffer(function (err, data, info) {
         assert.strictEqual(err.message.indexOf('memory area too small') > 0, true);
@@ -1691,7 +1691,7 @@ describe('Input/output', function () {
         const inPipeline = sharp()
           .resize(840, 472)
           .raw();
-        const goodPipeline = sharp(null, {raw: {width: 840, height: 472, channels: 3}})
+        const goodPipeline = sharp(null, { raw: { width: 840, height: 472, channels: 3 } })
           .toFormat('jpeg')
           .toBuffer(function (err, data, info) {
             if (err) throw err;
