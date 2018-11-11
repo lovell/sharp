@@ -131,10 +131,12 @@ This can improve the perceived brightness of a resized image in non-linear colou
 JPEG and WebP input images will not take advantage of the shrink-on-load performance optimisation
 when applying a gamma correction.
 
+Supply a second argument to use a different output gamma value, otherwise the first value is used in both cases.
+
 ### Parameters
 
 -   `gamma` **[Number][1]** value between 1.0 and 3.0. (optional, default `2.2`)
--   `gammaOut` ** [Number][1]** value between 1.0 and 3.0. (optional, defaults to same as `gamma`)
+-   `gammaOut` **[Number][1]?** value between 1.0 and 3.0. (optional, defaults to same as `gamma`)
 
 
 -   Throws **[Error][5]** Invalid parameters
