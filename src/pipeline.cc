@@ -612,8 +612,8 @@ class PipelineWorker : public Nan::AsyncWorker {
       baton->premultiplied = shouldPremultiplyAlpha;
 
       // Gamma decoding (brighten)
-      if (baton->gamma >= 1 && baton->gamma <= 3) {
-        image = sharp::Gamma(image, baton->gamma);
+      if (baton->gammaOut >= 1 && baton->gammaOut <= 3) {
+        image = sharp::Gamma(image, baton->gammaOut);
       }
 
       // Linear adjustment (a * in + b)
@@ -1193,6 +1193,7 @@ NAN_METHOD(pipeline) {
   baton->thresholdGrayscale = AttrTo<bool>(options, "thresholdGrayscale");
   baton->trimThreshold = AttrTo<double>(options, "trimThreshold");
   baton->gamma = AttrTo<double>(options, "gamma");
+  baton->gammaOut = AttrTo<double>(options, "gammaOut");
   baton->linearA = AttrTo<double>(options, "linearA");
   baton->linearB = AttrTo<double>(options, "linearB");
   baton->greyscale = AttrTo<bool>(options, "greyscale");

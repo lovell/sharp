@@ -87,6 +87,7 @@ struct PipelineBaton {
   double linearA;
   double linearB;
   double gamma;
+  double gammaOut;
   bool greyscale;
   bool normalise;
   bool useExifOrientation;
