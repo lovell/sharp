@@ -183,13 +183,22 @@
     },
     'configurations': {
       'Release': {
+        'cflags_cc': [
+          '-Wno-deprecated-declarations'
+        ],
+        'xcode_settings': {
+          'OTHER_CPLUSPLUSFLAGS': [
+            '-Wno-deprecated-declarations'
+          ]
+        },
         'msvs_settings': {
           'VCCLCompilerTool': {
             'ExceptionHandling': 1
           }
         },
         'msvs_disabled_warnings': [
-          4275
+          4275,
+          4996
         ]
       }
     },
