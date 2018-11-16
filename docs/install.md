@@ -149,16 +149,25 @@ docker pull tailor/docker-libvips
 
 ### AWS Lambda
 
-A [deployment package](http://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html) for the
-[Lambda Execution Environment](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)
-can be built using Docker.
+Set the Lambda runtime to Node.js 8.10.
+
+The binaries in the `node_modules` directory of the
+[deployment package](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html)
+must be for the Linux x64 platform/architecture.
+
+On non-Linux machines such as OS X and Windows run the following:
 
 ```sh
 rm -rf node_modules/sharp
-docker run -v "$PWD":/var/task lambci/lambda:build-nodejs8.10 npm install
+npm install --arch=x64 --platform=linux --target=8.10.0 sharp
 ```
 
-Set the Lambda runtime to Node.js 8.10.
+Alternatively a Docker container closely matching the Lambda runtime can be used:
+
+```sh
+rm -rf node_modules/sharp
+docker run -v "$PWD":/var/task lambci/lambda:build-nodejs8.10 npm install sharp
+```
 
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
