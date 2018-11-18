@@ -172,6 +172,44 @@ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs8.10 npm install sharp
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
+### Claudia.js
+
+Similar to AWS Lambda but Claudia deployment has to be done inside the docker.
+Therefore, AWS credentials also need to be passed into docker container.
+This assumes your credentials are stored in standard `$HOME/.aws/credentials` file.
+
+Create a bash script in the same folder as package.json. eg. claudia.sh. 
+Run `chmod +x` for this file and update the content as below:
+
+```sh
+docker run -it -v $PWD:/claudia -v $HOME/.aws:/root/.aws --rm lambci/lambda:build-nodejs8.10 /bin/bash -c "\
+cd /claudia
+rm -rf node_modules
+npm install -g claudia
+npm run create-function
+"
+```
+
+Add "create-function" and "deploy-claudia" scripts inside package.json.
+
+```json
+{
+  "scripts" : {
+    "create-function": "claudia create --no-optional-dependencies --name my-claudia --handler index.handler",
+    "deploy-claudia": "./claudia.sh"
+  }
+}
+```
+
+Do NOT run "create-function" inside your local machine, just run "deploy-claudia" inside the local machine.
+
+```sh
+npm run deploy-claudia
+```
+
+This will create all the artifacts inside the container. Zip file will also be created and then deployed from the container.
+You will need to create another sh file and script for the "claudia update" command in a similar way.
+
 ### NW.js
 
 Run the `nw-gyp` tool after installation.
