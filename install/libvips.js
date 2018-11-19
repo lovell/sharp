@@ -55,8 +55,8 @@ try {
     if (arch === 'ia32') {
       throw new Error(`Intel Architecture 32-bit systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
-    if (platformAndArch === 'freebsd-x64') {
-      throw new Error(`FreeBSD systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
+    if (platformAndArch === 'freebsd-x64' || platformAndArch === 'openbsd-x64' || platformAndArch === 'sunos-x64') {
+      throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
     if (detectLibc.family === detectLibc.GLIBC && detectLibc.version && semver.lt(`${detectLibc.version}.0`, '2.13.0')) {
       throw new Error(`Use with glibc version ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
