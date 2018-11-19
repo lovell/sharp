@@ -771,6 +771,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           if (baton->greyscale || image.interpretation() == VIPS_INTERPRETATION_B_W) {
             // Extract first band for greyscale image
             image = image[0];
+            baton->channels = 1;
           }
           if (image.format() != VIPS_FORMAT_UCHAR) {
             // Cast pixels to uint8 (unsigned char)

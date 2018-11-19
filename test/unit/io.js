@@ -1388,6 +1388,7 @@ describe('Input/output', function () {
           assert.strictEqual('raw', info.format);
           assert.strictEqual(32, info.width);
           assert.strictEqual(24, info.height);
+          assert.strictEqual(1, info.channels);
           done();
         });
     });

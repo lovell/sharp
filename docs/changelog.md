@@ -10,6 +10,9 @@ Requires libvips v8.7.0.
   [#1422](https://github.com/lovell/sharp/pull/1422)
   [@SethWen](https://github.com/SethWen)
 
+* Ensure `channel` metadata is correct for raw, greyscale output.
+  [#1425](https://github.com/lovell/sharp/issues/1425)
+
 * Add support for the "mitchell" kernel for image reductions.
   [#1438](https://github.com/lovell/sharp/pull/1438)
   [@Daiz](https://github.com/Daiz)
