@@ -139,7 +139,6 @@ This operation will always occur after resizing and extraction, if any.
 // to the top, left and right edges and 20 to the bottom edge
 sharp(input)
   .resize(140)
-  .)
   .extend({
     top: 10,
     bottom: 20,
