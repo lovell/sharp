@@ -184,6 +184,7 @@
     'configurations': {
       'Release': {
         'cflags_cc': [
+          '-Wno-cast-function-type',
           '-Wno-deprecated-declarations'
         ],
         'xcode_settings': {
