@@ -73,8 +73,8 @@ libvips is available in the
 
 ```sh
 apk add vips-dev fftw-dev build-base --update-cache \
-    --repository https://dl-3.alpinelinux.org/alpine/edge/testing/ \
-    --repository https://dl-3.alpinelinux.org/alpine/edge/main
+    --repository https://alpine.global.ssl.fastly.net/alpine/edge/testing/ \
+    --repository https://alpine.global.ssl.fastly.net/alpine/edge/main
 ```
 
 The smaller stack size of musl libc means
