@@ -525,6 +525,11 @@ class PipelineWorker : public Nan::AsyncWorker {
           baton->convKernel);
       }
 
+      // Recomb
+      if (baton->recombMatrix != NULL) {
+        image = sharp::Recomb(image, baton->recombMatrix);
+      }
+
       // Sharpen
       if (shouldSharpen) {
         image = sharp::Sharpen(image, baton->sharpenSigma, baton->sharpenFlat, baton->sharpenJagged);
@@ -1232,6 +1237,13 @@ NAN_METHOD(pipeline) {
     v8::Local<v8::Array> kdata = AttrAs<v8::Array>(kernel, "kernel");
     for (unsigned int i = 0; i < kernelSize; i++) {
       baton->convKernel[i] = AttrTo<double>(kdata, i);
+    }
+  }
+  if (HasAttr(options, "recombMatrix")) {
+    baton->recombMatrix = std::unique_ptr<double[]>(new double[9]);
+    v8::Local<v8::Array> recombMatrix = AttrAs<v8::Array>(options, "recombMatrix");
+    for (unsigned int i = 0; i < 9; i++) {
+       baton->recombMatrix[i] = AttrTo<double>(recombMatrix, i);
     }
   }
   baton->colourspace = sharp::GetInterpretation(AttrAsStr(options, "colourspace"));

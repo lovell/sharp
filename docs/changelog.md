@@ -25,6 +25,10 @@ Requires libvips v8.7.0.
   [#1475](https://github.com/lovell/sharp/pull/1475)
   [@jaubourg](https://github.com/jaubourg)
 
+* Expose libvips' recombination matrix operation.
+  [#1477](https://github.com/lovell/sharp/pull/1477)
+  [@fromkeith](https://github.com/fromkeith)
+
 #### v0.21.0 - 4<sup>th</sup> October 2018
 
 * Deprecate the following resize-related functions:

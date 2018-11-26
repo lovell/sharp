@@ -258,6 +258,35 @@ Apply the linear formula a \* input + b to the image (levels adjustment)
 
 Returns **Sharp** 
 
+## recomb
+
+Recomb the image with the specified matrix.
+
+### Parameters
+
+-   `inputMatrix`  
+-   `3x3` **[Array][7]&lt;[Array][7]&lt;[Number][1]>>** Recombination matrix
+
+### Examples
+
+```javascript
+sharp(input)
+  .recomb([
+   [0.3588, 0.7044, 0.1368],
+   [0.2990, 0.5870, 0.1140],
+   [0.2392, 0.4696, 0.0912],
+  ])
+  .raw()
+  .toBuffer(function(err, data, info) {
+    // data contains the raw pixel data after applying the recomb
+    // With this example input, a sepia filter has been applied
+  });
+```
+
+-   Throws **[Error][5]** Invalid parameters
+
+Returns **Sharp** 
+
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
 [2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object

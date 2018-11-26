@@ -120,6 +120,7 @@ the help and code contributions of the following people:
 * [Axel Eirola](https://github.com/aeirola)
 * [Freezy](https://github.com/freezy)
 * [Julian Aubourg](https://github.com/jaubourg)
+* [Keith Belovay](https://github.com/fromkeith)
 
 Thank you!
 

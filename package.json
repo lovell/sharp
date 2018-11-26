@@ -57,7 +57,8 @@
     "Axel Eirola <axel.eirola@iki.fi>",
     "Freezy <freezy@xbmc.org>",
     "Daiz <taneli.vatanen@gmail.com>",
-    "Julian Aubourg <j@ubourg.net>"
+    "Julian Aubourg <j@ubourg.net>",
+    "Keith Belovay <keith@picthrive.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
