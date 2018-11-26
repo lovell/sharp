@@ -279,6 +279,21 @@ namespace sharp {
   }
 
   /*
+   * Recomb with a 3x3 Matrix.
+   */
+  VImage Recomb(VImage image,
+    std::unique_ptr<double[]> const &recombMatrix
+  ) {
+    double* input = recombMatrix.get();
+    VImage asMatrix = VImage::new_matrixv(3, 3,
+        input[0], input[1], input[2],
+        input[3], input[4], input[5],
+        input[6], input[7], input[8]);
+
+    return image.recomb(asMatrix);
+  }
+
+  /*
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
    */
   VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged) {

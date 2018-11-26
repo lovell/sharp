@@ -107,6 +107,12 @@ namespace sharp {
    */
   VImage Linear(VImage image, double const a, double const b);
 
+  /*
+   * Perform Recombination based on given matrix
+   */
+  VImage Recomb(VImage image,
+    std::unique_ptr<double[]> const &recombMatrix);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

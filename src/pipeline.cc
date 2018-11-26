@@ -364,6 +364,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       bool const shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
       bool const shouldApplyMedian = baton->medianSize > 0;
+      bool const shouldRecomb = baton->recombMatrix != NULL;
 
       bool const shouldPremultiplyAlpha = HasAlpha(image) &&
         (shouldResize || shouldBlur || shouldConv || shouldSharpen || shouldOverlayWithAlpha);
@@ -523,6 +524,12 @@ class PipelineWorker : public Nan::AsyncWorker {
           baton->convKernelWidth, baton->convKernelHeight,
           baton->convKernelScale, baton->convKernelOffset,
           baton->convKernel);
+      }
+
+      // Recomb
+      if (shouldRecomb) {
+        image = sharp::Recomb(image,
+          baton->recombMatrix);
       }
 
       // Sharpen
@@ -1232,6 +1239,15 @@ NAN_METHOD(pipeline) {
     v8::Local<v8::Array> kdata = AttrAs<v8::Array>(kernel, "kernel");
     for (unsigned int i = 0; i < kernelSize; i++) {
       baton->convKernel[i] = AttrTo<double>(kdata, i);
+    }
+  }
+  if (HasAttr(options, "recombMatrix")) {
+    baton->recombMatrix = std::unique_ptr<double[]>(new double[9]);
+    v8::Local<v8::Array> topArray = AttrAs<v8::Array>(options, "recombMatrix");
+    for (unsigned int i = 0; i < 3; i++) {
+      for (unsigned int j = 0; j < 3; j++) {
+        baton->recombMatrix[i * 3 + j] = AttrTo<double>(topArray, i * 3 + j);
+      }
     }
   }
   baton->colourspace = sharp::GetInterpretation(AttrAsStr(options, "colourspace"));

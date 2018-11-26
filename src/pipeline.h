@@ -146,6 +146,7 @@ struct PipelineBaton {
   std::string tileFormat;
   int tileAngle;
   VipsForeignDzDepth tileDepth;
+  std::unique_ptr<double[]> recombMatrix;
 
   PipelineBaton():
     input(nullptr),
