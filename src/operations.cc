@@ -279,16 +279,21 @@ namespace sharp {
   }
 
   /*
-   * Recomb with a 3x3 Matrix.
+   * Recomb with a Matrix of the given bands/channel size.
+   * Eg. RGB will be a 3x3 matrix.
    */
   VImage Recomb(VImage image,
-    std::unique_ptr<double[]> const &recombMatrix
+    std::unique_ptr<double[]> const &recombMatrix,
+    int const numBands
   ) {
     double* input = recombMatrix.get();
-    VImage asMatrix = VImage::new_matrixv(3, 3,
-        input[0], input[1], input[2],
-        input[3], input[4], input[5],
-        input[6], input[7], input[8]);
+    VImage asMatrix = VImage::new_matrix(numBands, numBands);
+    VipsImage *vips_matrix = asMatrix.get_image();
+    for (int y = 0; y < numBands; y++) {
+      for (int x = 0; x < numBands; x++) {
+        *VIPS_MATRIX(vips_matrix, x, y) = input[y * numBands + x];
+      }
+    }
 
     return image.recomb(asMatrix);
   }

@@ -21,6 +21,21 @@ describe('Recomb', function () {
         fixtures.assertSimilar(fixtures.expected('Landscape_1-recomb-sepia.jpg'), data, done);
       });
   });
+  it('applies a sepia filter using recomb to an PNG with Alpha', function (done) {
+    sharp(fixtures.inputPngAlphaPremultiplicationSmall)
+      .recomb([
+        [0.3588, 0.7044, 0.1368],
+        [0.2990, 0.5870, 0.1140],
+        [0.2392, 0.4696, 0.0912]
+      ])
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(1024, info.width);
+        assert.strictEqual(768, info.height);
+        fixtures.assertSimilar(fixtures.expected('alpha-recomb-sepia.png'), data, done);
+      });
+  });
 
   it('applies a different sepia filter using recomb', function (done) {
     sharp(fixtures.inputJpgWithLandscapeExif1)

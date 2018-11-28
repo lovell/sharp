@@ -528,8 +528,29 @@ class PipelineWorker : public Nan::AsyncWorker {
 
       // Recomb
       if (shouldRecomb) {
+        // we have 4 channels, so we need to modify our matrix
+        // shift over the values from a 3x3 to a 4x4
+        int numBands = image.bands();
+        if (numBands == 4) {
+          // to do it inplace, start at the end!
+          for (int i = 2; i >= 0; i--) {
+            for (int j = 2; j >= 0; j--) {
+              baton->recombMatrix[i * 4 + j] = baton->recombMatrix[i * 3 + j];
+            }
+          }
+          // fill in the 0s for alpha (right edge and bottom row)
+          for (int i = 0; i < 4; i++) {
+            baton->recombMatrix[i * 4 + 4] = 0;
+            baton->recombMatrix[3 * 4 + i] = 0;
+          }
+          // add in the identity transform for alpha (bottom right corner)
+          baton->recombMatrix[4 * 4 - 1] = 1;
+        } else if (numBands != 3) {
+          // catch edge cases... VIPS will error, but at least we won't segfault.
+          numBands = 3;
+        }
         image = sharp::Recomb(image,
-          baton->recombMatrix);
+          baton->recombMatrix, numBands);
       }
 
       // Sharpen
@@ -1242,7 +1263,8 @@ NAN_METHOD(pipeline) {
     }
   }
   if (HasAttr(options, "recombMatrix")) {
-    baton->recombMatrix = std::unique_ptr<double[]>(new double[9]);
+    // set to 16, incase we need to add in the alpha channel later
+    baton->recombMatrix = std::unique_ptr<double[]>(new double[16]);
     v8::Local<v8::Array> topArray = AttrAs<v8::Array>(options, "recombMatrix");
     for (unsigned int i = 0; i < 3; i++) {
       for (unsigned int j = 0; j < 3; j++) {

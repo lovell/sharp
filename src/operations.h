@@ -108,10 +108,11 @@ namespace sharp {
   VImage Linear(VImage image, double const a, double const b);
 
   /*
-   * Perform Recombination based on given matrix
+   * Recomb with a Matrix of the given bands/channel size.
+   * Eg. RGB will be a 3x3 matrix.
    */
   VImage Recomb(VImage image,
-    std::unique_ptr<double[]> const &recombMatrix);
+    std::unique_ptr<double[]> const &recombMatrix, int const numBands);
 
 }  // namespace sharp
 
