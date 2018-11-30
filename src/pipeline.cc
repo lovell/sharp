@@ -763,6 +763,10 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("squash", baton->tiffSquash)
             ->set("compression", baton->tiffCompression)
             ->set("predictor", baton->tiffPredictor)
+            ->set("pyramid", baton->tiffPyramid)
+            ->set("tile", baton->tiffTile)
+            ->set("tile_height", baton->tiffTileHeight)
+            ->set("tile_width", baton->tiffTileWidth)
             ->set("xres", baton->tiffXres)
             ->set("yres", baton->tiffYres)));
           baton->bufferOut = static_cast<char*>(area->data);
@@ -862,6 +866,10 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("squash", baton->tiffSquash)
             ->set("compression", baton->tiffCompression)
             ->set("predictor", baton->tiffPredictor)
+            ->set("pyramid", baton->tiffPyramid)
+            ->set("tile", baton->tiffTile)
+            ->set("tile_height", baton->tiffTileHeight)
+            ->set("tile_width", baton->tiffTileWidth)
             ->set("xres", baton->tiffXres)
             ->set("yres", baton->tiffYres));
           baton->formatOut = "tiff";
@@ -1272,7 +1280,11 @@ NAN_METHOD(pipeline) {
   baton->webpLossless = AttrTo<bool>(options, "webpLossless");
   baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
+  baton->tiffPyramid = AttrTo<bool>(options, "tiffPyramid");
   baton->tiffSquash = AttrTo<bool>(options, "tiffSquash");
+  baton->tiffTile = AttrTo<bool>(options, "tiffTile");
+  baton->tiffTileWidth = AttrTo<uint32_t>(options, "tiffTileWidth");
+  baton->tiffTileHeight = AttrTo<uint32_t>(options, "tiffTileHeight");
   baton->tiffXres = AttrTo<double>(options, "tiffXres");
   baton->tiffYres = AttrTo<double>(options, "tiffYres");
   // tiff compression options
