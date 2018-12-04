@@ -65,7 +65,8 @@ describe('Recomb', function () {
         assert.strictEqual(450, info.height);
         fixtures.assertMaxColourDistance(
           output,
-          fixtures.expected('Landscape_1-recomb-sepia2.jpg')
+          fixtures.expected('Landscape_1-recomb-sepia2.jpg'),
+          17
         );
         done();
       });
