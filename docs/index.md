@@ -119,6 +119,7 @@ the help and code contributions of the following people:
 * [Aidan Hoolachan](https://github.com/ajhool)
 * [Axel Eirola](https://github.com/aeirola)
 * [Freezy](https://github.com/freezy)
+* [Julian Aubourg](https://github.com/jaubourg)
 
 Thank you!
 

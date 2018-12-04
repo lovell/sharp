@@ -21,6 +21,10 @@ Requires libvips v8.7.0.
   [#1439](https://github.com/lovell/sharp/pull/1439)
   [@Daiz](https://github.com/Daiz)
 
+* Build prototype with `Object.assign` to allow minification.
+  [#1475](https://github.com/lovell/sharp/pull/1475)
+  [@jaubourg](https://github.com/jaubourg)
+
 #### v0.21.0 - 4<sup>th</sup> October 2018
 
 * Deprecate the following resize-related functions:
