@@ -21,7 +21,8 @@ describe('Recomb', function () {
         assert.strictEqual(450, info.height);
         fixtures.assertMaxColourDistance(
           output,
-          fixtures.expected('Landscape_1-recomb-sepia.jpg')
+          fixtures.expected('Landscape_1-recomb-sepia.jpg'),
+          17
         );
         done();
       });
@@ -42,7 +43,8 @@ describe('Recomb', function () {
         assert.strictEqual(768, info.height);
         fixtures.assertMaxColourDistance(
           output,
-          fixtures.expected('alpha-recomb-sepia.png')
+          fixtures.expected('alpha-recomb-sepia.png'),
+          17
         );
         done();
       });
@@ -96,7 +98,8 @@ describe('Recomb', function () {
         assert.strictEqual(450, info.height);
         fixtures.assertMaxColourDistance(
           output,
-          fixtures.expected('Landscape_1-recomb-saturation.jpg')
+          fixtures.expected('Landscape_1-recomb-saturation.jpg'),
+          37
         );
         done();
       });
