@@ -58,7 +58,8 @@
     "Freezy <freezy@xbmc.org>",
     "Daiz <taneli.vatanen@gmail.com>",
     "Julian Aubourg <j@ubourg.net>",
-    "Keith Belovay <keith@picthrive.com>"
+    "Keith Belovay <keith@picthrive.com>",
+    "Michael B. Klein <mbklein@gmail.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",

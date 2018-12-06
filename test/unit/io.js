@@ -1285,6 +1285,84 @@ describe('Input/output', function () {
     });
   });
 
+  it('TIFF tiled pyramid image without compression enlarges test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+      .tiff({
+        compression: 'none',
+        pyramid: true,
+        tile: true,
+        tileHeight: 256,
+        tileWidth: 256
+      })
+      .toFile(fixtures.outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size > startSize);
+        rimraf(fixtures.outputTiff, done);
+      });
+  });
+
+  it('TIFF pyramid true value does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ pyramid: true });
+    });
+  });
+
+  it('Invalid TIFF pyramid value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ pyramid: 'true' });
+    });
+  });
+
+  it('Invalid TIFF tile value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ tile: 'true' });
+    });
+  });
+
+  it('TIFF tile true value does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ tile: true });
+    });
+  });
+
+  it('Valid TIFF tileHeight value does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ tileHeight: 512 });
+    });
+  });
+
+  it('Valid TIFF tileWidth value does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ tileWidth: 512 });
+    });
+  });
+
+  it('Invalid TIFF tileHeight value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ tileHeight: '256' });
+    });
+  });
+
+  it('Invalid TIFF tileWidth value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ tileWidth: '256' });
+    });
+  });
+
+  it('Invalid TIFF tileHeight value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ tileHeight: 0 });
+    });
+  });
+
+  it('Invalid TIFF tileWidth value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ tileWidth: 0 });
+    });
+  });
+
   it('Input and output formats match when not forcing', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
