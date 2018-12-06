@@ -29,6 +29,10 @@ Requires libvips v8.7.0.
   [#1477](https://github.com/lovell/sharp/pull/1477)
   [@fromkeith](https://github.com/fromkeith)
 
+* Expose libvips' pyramid/tile options for TIFF output.
+  [#1483](https://github.com/lovell/sharp/pull/1483)
+  [@mbklein](https://github.com/mbklein)
+
 #### v0.21.0 - 4<sup>th</sup> October 2018
 
 * Deprecate the following resize-related functions:

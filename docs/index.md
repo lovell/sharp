@@ -121,6 +121,7 @@ the help and code contributions of the following people:
 * [Freezy](https://github.com/freezy)
 * [Julian Aubourg](https://github.com/jaubourg)
 * [Keith Belovay](https://github.com/fromkeith)
+* [Michael B. Klein](https://github.com/mbklein)
 
 Thank you!
 
