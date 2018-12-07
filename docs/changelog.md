@@ -4,7 +4,7 @@
 
 Requires libvips v8.7.0.
 
-#### v0.21.1 - TBD
+#### v0.21.1 - 7<sup>th</sup> December 2018
 
 * Install: support `sharp_dist_base_url` npm config, like existing `SHARP_DIST_BASE_URL`.
   [#1422](https://github.com/lovell/sharp/pull/1422)
