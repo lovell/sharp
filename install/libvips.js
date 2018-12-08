@@ -79,7 +79,9 @@ try {
         if (response.statusCode !== 200) {
           throw new Error(`Status ${response.statusCode}`);
         }
-        response.pipe(tmpFile);
+        response
+          .on('error', fail)
+          .pipe(tmpFile);
       });
       tmpFile
         .on('error', fail)
