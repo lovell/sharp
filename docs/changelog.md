@@ -9,6 +9,9 @@ Requires libvips v8.7.0.
 * Prevent mutatation of options passed to `jpeg`.
   [#1516](https://github.com/lovell/sharp/issues/1516)
 
+* Ensure forced output format applied correctly when output chaining.
+  [#1528](https://github.com/lovell/sharp/issues/1528)
+
 #### v0.21.1 - 7<sup>th</sup> December 2018
 
 * Install: support `sharp_dist_base_url` npm config, like existing `SHARP_DIST_BASE_URL`.

@@ -1376,6 +1376,17 @@ describe('Input/output', function () {
       });
   });
 
+  it('Can force output format with output chaining', function () {
+    return sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .png({ force: true })
+      .jpeg({ force: false })
+      .toBuffer({ resolveWithObject: true })
+      .then(function (out) {
+        assert.strictEqual('png', out.info.format);
+      });
+  });
+
   it('toFormat=JPEG takes precedence over WebP extension', function (done) {
     sharp(fixtures.inputPng)
       .jpeg()
