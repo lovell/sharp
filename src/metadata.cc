@@ -71,6 +71,12 @@ class MetadataWorker : public Nan::AsyncWorker {
       if (image.get_typeof("palette-bit-depth") == G_TYPE_INT) {
         baton->paletteBitDepth = image.get_int("palette-bit-depth");
       }
+      if (image.get_typeof(VIPS_META_N_PAGES) == G_TYPE_INT) {
+        baton->pages = image.get_int(VIPS_META_N_PAGES);
+      }
+      if (image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
+        baton->pageHeight = image.get_int(VIPS_META_PAGE_HEIGHT);
+      }
       baton->hasProfile = sharp::HasProfile(image);
       // Derived attributes
       baton->hasAlpha = sharp::HasAlpha(image);
@@ -145,6 +151,12 @@ class MetadataWorker : public Nan::AsyncWorker {
       Set(info, New("isProgressive").ToLocalChecked(), New<v8::Boolean>(baton->isProgressive));
       if (baton->paletteBitDepth > 0) {
         Set(info, New("paletteBitDepth").ToLocalChecked(), New<v8::Uint32>(baton->paletteBitDepth));
+      }
+      if (baton->pages > 0) {
+        Set(info, New("pages").ToLocalChecked(), New<v8::Uint32>(baton->pages));
+      }
+      if (baton->pageHeight > 0) {
+        Set(info, New("pageHeight").ToLocalChecked(), New<v8::Uint32>(baton->pageHeight));
       }
       Set(info, New("hasProfile").ToLocalChecked(), New<v8::Boolean>(baton->hasProfile));
       Set(info, New("hasAlpha").ToLocalChecked(), New<v8::Boolean>(baton->hasAlpha));

@@ -103,6 +103,30 @@ describe('Image metadata', function () {
     });
   });
 
+  it('Multipage TIFF', function (done) {
+    sharp(fixtures.inputTiffMultipage).metadata(function (err, metadata) {
+      if (err) throw err;
+      console.log(metadata);
+      assert.strictEqual('tiff', metadata.format);
+      assert.strictEqual('undefined', typeof metadata.size);
+      assert.strictEqual(2464, metadata.width);
+      assert.strictEqual(3248, metadata.height);
+      assert.strictEqual('b-w', metadata.space);
+      assert.strictEqual(1, metadata.channels);
+      assert.strictEqual('uchar', metadata.depth);
+      assert.strictEqual(300, metadata.density);
+      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
+      assert.strictEqual(false, metadata.isProgressive);
+      assert.strictEqual(2, metadata.pages);
+      assert.strictEqual(false, metadata.hasProfile);
+      assert.strictEqual(false, metadata.hasAlpha);
+      assert.strictEqual(1, metadata.orientation);
+      assert.strictEqual('undefined', typeof metadata.exif);
+      assert.strictEqual('undefined', typeof metadata.icc);
+      done();
+    });
+  });
+
   it('PNG', function (done) {
     sharp(fixtures.inputPng).metadata(function (err, metadata) {
       if (err) throw err;
