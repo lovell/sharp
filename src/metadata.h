@@ -33,6 +33,7 @@ struct MetadataBaton {
   int density;
   std::string chromaSubsampling;
   bool isProgressive;
+  int paletteBitDepth;
   bool hasProfile;
   bool hasAlpha;
   int orientation;
@@ -53,6 +54,7 @@ struct MetadataBaton {
     channels(0),
     density(0),
     isProgressive(false),
+    paletteBitDepth(0),
     hasProfile(false),
     hasAlpha(false),
     orientation(0),
