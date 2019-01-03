@@ -106,7 +106,6 @@ describe('Image metadata', function () {
   it('Multipage TIFF', function (done) {
     sharp(fixtures.inputTiffMultipage).metadata(function (err, metadata) {
       if (err) throw err;
-      console.log(metadata);
       assert.strictEqual('tiff', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2464, metadata.width);
