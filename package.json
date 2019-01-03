@@ -97,7 +97,7 @@
     "color": "^3.1.0",
     "detect-libc": "^1.0.3",
     "fs-copy-file-sync": "^1.1.1",
-    "nan": "^2.11.1",
+    "nan": "^2.12.1",
     "npmlog": "^4.1.2",
     "prebuild-install": "^5.2.2",
     "semver": "^5.6.0",
