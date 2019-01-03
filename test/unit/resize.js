@@ -525,6 +525,40 @@ describe('Resize dimensions', function () {
       });
   });
 
+  it('Ensure shortest edge (height) is at least 1 pixel', function () {
+    return sharp({
+      create: {
+        width: 10,
+        height: 2,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .resize(2)
+      .toBuffer({ resolveWithObject: true })
+      .then(function (output) {
+        assert.strictEqual(2, output.info.width);
+        assert.strictEqual(1, output.info.height);
+      });
+  });
+
+  it('Ensure shortest edge (width) is at least 1 pixel', function () {
+    return sharp({
+      create: {
+        width: 2,
+        height: 10,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .resize(null, 2)
+      .toBuffer({ resolveWithObject: true })
+      .then(function (output) {
+        assert.strictEqual(1, output.info.width);
+        assert.strictEqual(2, output.info.height);
+      });
+  });
+
   it('unknown kernel throws', function () {
     assert.throws(function () {
       sharp().resize(null, null, { kernel: 'unknown' });

@@ -385,6 +385,15 @@ class PipelineWorker : public Nan::AsyncWorker {
         ) {
           throw vips::VError("Unknown kernel");
         }
+        // Ensure shortest edge is at least 1 pixel
+        if (image.width() / xfactor < 0.5) {
+          xfactor = 2 * image.width();
+          baton->width = 1;
+        }
+        if (image.height() / yfactor < 0.5) {
+          yfactor = 2 * image.height();
+          baton->height = 1;
+        }
         image = image.resize(1.0 / xfactor, VImage::option()
           ->set("vscale", 1.0 / yfactor)
           ->set("kernel", kernel));
