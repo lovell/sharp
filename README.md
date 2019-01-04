@@ -1,5 +1,7 @@
 # sharp
 
+<img src="docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
+
 ```sh
 npm install sharp
 ```
