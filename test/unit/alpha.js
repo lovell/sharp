@@ -115,10 +115,31 @@ describe('Alpha transparency', function () {
       fixtures.inputWebP
     ].map(function (input) {
       return sharp(input)
+        .resize(10)
         .removeAlpha()
         .toBuffer({ resolveWithObject: true })
         .then(function (result) {
           assert.strictEqual(3, result.info.channels);
+        });
+    }));
+  });
+
+  it('Ensures alpha from fixtures without transparency, ignores those with', function () {
+    return Promise.all([
+      fixtures.inputPngWithTransparency,
+      fixtures.inputPngWithTransparency16bit,
+      fixtures.inputWebPWithTransparency,
+      fixtures.inputJpg,
+      fixtures.inputPng,
+      fixtures.inputWebP
+    ].map(function (input) {
+      return sharp(input)
+        .resize(10)
+        .ensureAlpha()
+        .png()
+        .toBuffer({ resolveWithObject: true })
+        .then(function (result) {
+          assert.strictEqual(4, result.info.channels);
         });
     }));
   });

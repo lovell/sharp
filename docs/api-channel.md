@@ -16,6 +16,22 @@ sharp('rgba.png')
 
 Returns **Sharp** 
 
+## ensureAlpha
+
+Ensure alpha channel, if missing. The added alpha channel will be fully opaque. This is a no-op if the image already has an alpha channel.
+
+### Examples
+
+```javascript
+sharp('rgb.jpg')
+  .ensureAlpha()
+  .toFile('rgba.png', function(err, info) {
+    // rgba.png is a 4 channel image with a fully opaque alpha channel
+  });
+```
+
+Returns **Sharp** 
+
 ## extractChannel
 
 Extract a single channel from a multi-channel image.

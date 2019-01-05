@@ -31,6 +31,11 @@ namespace sharp {
   VImage RemoveAlpha(VImage image);
 
   /*
+    Ensures alpha channel, if missing.
+  */
+  VImage EnsureAlpha(VImage image);
+
+  /*
     Alpha composite src over dst with given gravity.
     Assumes alpha channels are already premultiplied and will be unpremultiplied after.
    */

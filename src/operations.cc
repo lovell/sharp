@@ -39,6 +39,18 @@ namespace sharp {
   }
 
   /*
+    Ensures alpha channel, if missing.
+  */
+  VImage EnsureAlpha(VImage image) {
+    if (!HasAlpha(image)) {
+      std::vector<double> alpha;
+      alpha.push_back(sharp::MaximumImageAlpha(image.interpretation()));
+      image = image.bandjoin_const(alpha);
+    }
+    return image;
+  }
+
+  /*
     Composite overlayImage over image at given position
     Assumes alpha channels are already premultiplied and will be unpremultiplied after
    */

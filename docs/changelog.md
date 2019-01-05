@@ -9,6 +9,9 @@ Requires libvips v8.7.0.
 * Ensure shortest edge is at least one pixel after resizing.
   [#1003](https://github.com/lovell/sharp/issues/1003)
 
+* Add `ensureAlpha` operation to add an alpha channel, if missing.
+  [#1153](https://github.com/lovell/sharp/issues/1153)
+
 * Expose `pages` and `pageHeight` metadata for multi-page input images.
   [#1205](https://github.com/lovell/sharp/issues/1205)
 

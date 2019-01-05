@@ -142,6 +142,7 @@ struct PipelineBaton {
   VipsOperationBoolean bandBoolOp;
   int extractChannel;
   bool removeAlpha;
+  bool ensureAlpha;
   VipsInterpretation colourspace;
   int tileSize;
   int tileOverlap;
@@ -237,6 +238,7 @@ struct PipelineBaton {
     bandBoolOp(VIPS_OPERATION_BOOLEAN_LAST),
     extractChannel(-1),
     removeAlpha(false),
+    ensureAlpha(false),
     colourspace(VIPS_INTERPRETATION_LAST),
     tileSize(256),
     tileOverlap(0),

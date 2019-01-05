@@ -677,6 +677,11 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = sharp::RemoveAlpha(image);
       }
 
+      // Ensure alpha channel, if missing
+      if (baton->ensureAlpha) {
+        image = sharp::EnsureAlpha(image);
+      }
+
       // Convert image to sRGB, if not already
       if (sharp::Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
@@ -1236,6 +1241,7 @@ NAN_METHOD(pipeline) {
   baton->extractChannel = AttrTo<int32_t>(options, "extractChannel");
 
   baton->removeAlpha = AttrTo<bool>(options, "removeAlpha");
+  baton->ensureAlpha = AttrTo<bool>(options, "ensureAlpha");
   if (HasAttr(options, "boolean")) {
     baton->boolean = CreateInputDescriptor(AttrAs<v8::Object>(options, "boolean"), buffersToPersist);
     baton->booleanOp = sharp::GetBooleanOperation(AttrAsStr(options, "booleanOp"));
