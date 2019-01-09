@@ -735,11 +735,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
           // Write PNG to buffer
           sharp::AssertImageTypeDimensions(image, ImageType::PNG);
-          // Strip profile
-          if (!baton->withMetadata) {
-            vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
-          }
           VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
             ->set("interlace", baton->pngProgressive)
             ->set("compression", baton->pngCompressionLevel)
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)));
@@ -848,11 +845,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
           // Write PNG to file
           sharp::AssertImageTypeDimensions(image, ImageType::PNG);
-          // Strip profile
-          if (!baton->withMetadata) {
-            vips_image_remove(image.get_image(), VIPS_META_ICC_NAME);
-          }
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
             ->set("interlace", baton->pngProgressive)
             ->set("compression", baton->pngCompressionLevel)
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE));

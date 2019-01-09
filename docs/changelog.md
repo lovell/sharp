@@ -6,6 +6,8 @@ Requires libvips v8.7.0.
 
 #### v0.21.2 - TBD
 
+* Ensure all metadata is removed from PNG output unless `withMetadata` used.
+
 * Ensure shortest edge is at least one pixel after resizing.
   [#1003](https://github.com/lovell/sharp/issues/1003)
 
