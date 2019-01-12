@@ -154,6 +154,11 @@ Indexed PNG input at 1, 2 or 4 bits per pixel is converted to 8 bits per pixel.
     -   `options.progressive` **[Boolean][6]** use progressive (interlace) scan (optional, default `false`)
     -   `options.compressionLevel` **[Number][8]** zlib compression level, 0-9 (optional, default `9`)
     -   `options.adaptiveFiltering` **[Boolean][6]** use adaptive row filtering (optional, default `false`)
+    -   `options.palette` **[Boolean][6]** quantise to a palette-based image with alpha transparency support, requires libimagequant (optional, default `false`)
+    -   `options.quality` **[Number][8]** use the lowest number of colours needed to achieve given quality, requires libimagequant (optional, default `100`)
+    -   `options.colours` **[Number][8]** maximum number of palette entries, requires libimagequant (optional, default `256`)
+    -   `options.colors` **[Number][8]** alternative spelling of `options.colours`, requires libimagequant (optional, default `256`)
+    -   `options.dither` **[Number][8]** level of Floyd-Steinberg error diffusion, requires libimagequant (optional, default `1.0`)
     -   `options.force` **[Boolean][6]** force PNG output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples

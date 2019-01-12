@@ -739,7 +739,11 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("interlace", baton->pngProgressive)
             ->set("compression", baton->pngCompressionLevel)
-            ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)));
+            ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)
+            ->set("palette", baton->pngPalette)
+            ->set("Q", baton->pngQuality)
+            ->set("colours", baton->pngColours)
+            ->set("dither", baton->pngDither)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
           area->free_fn = nullptr;
@@ -849,7 +853,11 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("interlace", baton->pngProgressive)
             ->set("compression", baton->pngCompressionLevel)
-            ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE));
+            ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)
+            ->set("palette", baton->pngPalette)
+            ->set("Q", baton->pngQuality)
+            ->set("colours", baton->pngColours)
+            ->set("dither", baton->pngDither));
           baton->formatOut = "png";
         } else if (baton->formatOut == "webp" || (mightMatchInput && isWebp) ||
           (willMatchInput && inputImageType == ImageType::WEBP)) {
@@ -1284,6 +1292,10 @@ NAN_METHOD(pipeline) {
   baton->pngProgressive = AttrTo<bool>(options, "pngProgressive");
   baton->pngCompressionLevel = AttrTo<uint32_t>(options, "pngCompressionLevel");
   baton->pngAdaptiveFiltering = AttrTo<bool>(options, "pngAdaptiveFiltering");
+  baton->pngPalette = AttrTo<bool>(options, "pngPalette");
+  baton->pngQuality = AttrTo<uint32_t>(options, "pngQuality");
+  baton->pngColours = AttrTo<uint32_t>(options, "pngColours");
+  baton->pngDither = AttrTo<double>(options, "pngDither");
   baton->webpQuality = AttrTo<uint32_t>(options, "webpQuality");
   baton->webpAlphaQuality = AttrTo<uint32_t>(options, "webpAlphaQuality");
   baton->webpLossless = AttrTo<bool>(options, "webpLossless");

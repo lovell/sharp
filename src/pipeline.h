@@ -115,6 +115,10 @@ struct PipelineBaton {
   bool pngProgressive;
   int pngCompressionLevel;
   bool pngAdaptiveFiltering;
+  bool pngPalette;
+  int pngQuality;
+  int pngColours;
+  double pngDither;
   int webpQuality;
   int webpAlphaQuality;
   bool webpNearLossless;
@@ -216,6 +220,10 @@ struct PipelineBaton {
     pngProgressive(false),
     pngCompressionLevel(9),
     pngAdaptiveFiltering(false),
+    pngPalette(false),
+    pngQuality(100),
+    pngColours(256),
+    pngDither(1.0),
     webpQuality(80),
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
