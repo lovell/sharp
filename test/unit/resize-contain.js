@@ -116,7 +116,7 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it.skip('TIFF in LAB colourspace onto RGBA background', function (done) {
+  it('TIFF in LAB colourspace onto RGBA background', function (done) {
     sharp(fixtures.inputTiffCielab)
       .resize(64, 128, {
         fit: 'contain',

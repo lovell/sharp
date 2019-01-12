@@ -297,7 +297,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
 
       // Ensure we're using a device-independent colour space
-      if (sharp::HasProfile(image)) {
+      if (sharp::HasProfile(image) && image.interpretation() != VIPS_INTERPRETATION_LABS) {
         // Convert to sRGB using embedded profile
         try {
           image = image.icc_transform(
