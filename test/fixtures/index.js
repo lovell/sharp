@@ -70,6 +70,7 @@ module.exports = {
   inputJpgCenteredImage: getPath('centered_image.jpeg'),
   inputJpgRandom: getPath('random.jpg'), // convert -size 200x200 xc:   +noise Random   random.jpg
   inputJpgThRandom: getPath('thRandom.jpg'), // convert random.jpg  -channel G -threshold 5% -separate +channel -negate thRandom.jpg
+  inputJpgLossless: getPath('testimgl.jpg'), // Lossless JPEG from ftp://ftp.fu-berlin.de/unix/X11/graphics/ImageMagick/delegates/ljpeg-6b.tar.gz
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain

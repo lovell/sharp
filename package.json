@@ -112,7 +112,7 @@
     "documentation": "^9.1.1",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
-    "license-checker": "^24.1.0",
+    "license-checker": "^25.0.1",
     "mocha": "^5.2.0",
     "mock-fs": "^4.7.0",
     "nyc": "^13.1.0",

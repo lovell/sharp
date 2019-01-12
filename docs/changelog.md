@@ -17,6 +17,9 @@ Requires libvips v8.7.0.
 * Expose `pages` and `pageHeight` metadata for multi-page input images.
   [#1205](https://github.com/lovell/sharp/issues/1205)
 
+* Expose underlying error message for invalid input.
+  [#1505](https://github.com/lovell/sharp/issues/1505)
+
 * Prevent mutatation of options passed to `jpeg`.
   [#1516](https://github.com/lovell/sharp/issues/1516)
 

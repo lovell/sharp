@@ -245,8 +245,8 @@ namespace sharp {
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               SetDensity(image, descriptor->density);
             }
-          } catch (...) {
-            throw vips::VError("Input buffer has corrupt header");
+          } catch (vips::VError const &err) {
+            throw vips::VError(std::string("Input buffer has corrupt header: ") + err.what());
           }
         } else {
           throw vips::VError("Input buffer contains unsupported image format");
@@ -287,8 +287,8 @@ namespace sharp {
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               SetDensity(image, descriptor->density);
             }
-          } catch (...) {
-            throw vips::VError("Input file has corrupt header");
+          } catch (vips::VError const &err) {
+            throw vips::VError(std::string("Input file has corrupt header: ") + err.what());
           }
         } else {
           throw vips::VError("Input file is missing or of an unsupported image format");

@@ -457,6 +457,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .metadata(function (err) {
         assert.strictEqual(true, !!err);
+        assert.strictEqual(true, /Input file has corrupt header: VipsJpeg: Premature end of JPEG file/.test(err.message));
         done();
       });
   });
@@ -465,6 +466,16 @@ describe('Image metadata', function () {
     sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
       .metadata(function (err) {
         assert.strictEqual(true, !!err);
+        assert.strictEqual(true, /Input buffer has corrupt header: VipsJpeg: Premature end of JPEG file/.test(err.message));
+        done();
+      });
+  });
+
+  it('Unsupported lossless JPEG passes underlying error message', function (done) {
+    sharp(fixtures.inputJpgLossless)
+      .metadata(function (err) {
+        assert.strictEqual(true, !!err);
+        assert.strictEqual(true, /Input file has corrupt header: VipsJpeg: Unsupported JPEG process: SOF type 0xc3/.test(err.message));
         done();
       });
   });
