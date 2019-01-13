@@ -4,7 +4,7 @@
 
 Requires libvips v8.7.0.
 
-#### v0.21.2 - TBD
+#### v0.21.2 - 13<sup>th</sup> January 2019
 
 * Ensure all metadata is removed from PNG output unless `withMetadata` used.
 
