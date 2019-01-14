@@ -20,7 +20,8 @@ const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SH
 
 const fail = function (err) {
   npmLog.error('sharp', err.message);
-  npmLog.error('sharp', 'Please see http://sharp.pixelplumbing.com/page/install');
+  npmLog.info('sharp', 'Attempting to build from source via node-gyp but this may fail due to the above error');
+  npmLog.info('sharp', 'Please see https://sharp.pixelplumbing.com/page/install for required dependencies');
   process.exit(1);
 };
 
