@@ -147,6 +147,47 @@
   ...
   fun:WebPDecode
 }
+{
+  cond_libwebp_generic
+  Memcheck:Cond
+  obj:/usr/lib/x86_64-linux-gnu/libwebp.so.6.0.2
+}
+
+# tiff
+{
+  param_tiff_write_encoded_tile
+  Memcheck:Param
+  write(buf)
+  fun:write
+  ...
+  fun:TIFFWriteEncodedTile
+}
+
+# gsf
+{
+  param_gsf_output_write
+  Memcheck:Param
+  write(buf)
+  fun:write
+  ...
+  fun:gsf_output_write
+}
+{
+  value_gsf_output_write_crc32_little
+  Memcheck:Value8
+  fun:crc32_little
+  ...
+  fun:gsf_output_write
+}
+
+# fontconfig
+{
+  leak_fontconfig_FcConfigSubstituteWithPat
+  Memcheck:Leak
+  match-leak-kinds: definite,indirect
+  ...
+  fun:FcConfigSubstituteWithPat
+}
 
 # libvips
 {
@@ -198,11 +239,27 @@
   fun:vips_region_prepare_to
 }
 {
+  cond_libvips_vips_stats_scan
+  Memcheck:Cond
+  fun:vips_stats_scan
+}
+{
   value_libvips_vips_region_fill
   Memcheck:Value8
   ...
   fun:vips_region_fill
   fun:vips_region_prepare
+}
+{
+  value_libvips_vips_hist_find_uchar_scan
+  Memcheck:Value8
+  fun:vips_hist_find_uchar_scan
+}
+{
+  value_libvips_write_webp_image
+  Memcheck:Value8
+  ...
+  fun:write_webp_image
 }
 {
   leak_libvips_init
@@ -376,6 +433,56 @@
   fun:allocate_stack
   ...
   fun:_ZN4node12NodePlatformC1EiPN2v817TracingControllerE
+}
+{
+  param_nodejs_delayed_task_scheduler
+  Memcheck:Param
+  epoll_ctl(event)
+  fun:epoll_ctl
+  fun:uv__io_poll
+  fun:uv_run
+  fun:_ZZN4node20BackgroundTaskRunner20DelayedTaskScheduler5StartEvENUlPvE_4_FUNES2_
+}
+{
+  param_nodejs_isolate_data
+  Memcheck:Param
+  epoll_ctl(event)
+  fun:epoll_ctl
+  fun:uv__io_poll
+  fun:uv_run
+  fun:_ZN4node5StartEPN2v87IsolateEPNS_11IsolateDataERKSt6vectorISsSaISsEES9_
+}
+{
+  param_nodejs_try_init_and_run_loop
+  Memcheck:Param
+  epoll_ctl(event)
+  fun:epoll_ctl
+  fun:uv__io_poll
+  fun:uv_run
+  fun:_ZN4node17SyncProcessRunner23TryInitializeAndRunLoopEN2v85LocalINS1_5ValueEEE
+}
+{
+  param_nodejs_run_exit_handlers
+  Memcheck:Param
+  epoll_ctl(event)
+  fun:epoll_ctl
+  fun:uv__io_poll
+  fun:uv_run
+  fun:_ZN4node7tracing5AgentD1Ev
+  fun:_ZN4node5._215D1Ev
+  fun:__run_exit_handlers
+}
+{
+  leak_nodejs_crypto_entropy_source
+  Memcheck:Leak
+  ...
+  fun:_ZN4node6crypto13EntropySourceEPhm
+}
+{
+  leak_nodejs_debug_options
+  Memcheck:Leak
+  ...
+  fun:_ZN4node9inspector5Agent5StartERKSsSt10shared_ptrINS_12DebugOptionsEEb
 }
 {
   leak_nan_FunctionCallbackInfo
