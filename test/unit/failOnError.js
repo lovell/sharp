@@ -6,10 +6,9 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('failOnError', function () {
-  it('handles truncated JPEG by default', function (done) {
-    sharp(fixtures.inputJpgTruncated)
+  it('handles truncated JPEG', function (done) {
+    sharp(fixtures.inputJpgTruncated, { failOnError: false })
       .resize(320, 240)
-      // .toFile(fixtures.expected('truncated.jpg'), done);
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
@@ -19,10 +18,9 @@ describe('failOnError', function () {
       });
   });
 
-  it('handles truncated PNG by default', function (done) {
-    sharp(fixtures.inputPngTruncated)
+  it('handles truncated PNG', function (done) {
+    sharp(fixtures.inputPngTruncated, { failOnError: false })
       .resize(320, 240)
-      // .toFile(fixtures.expected('truncated.png'), done);
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('png', info.format);
@@ -46,8 +44,8 @@ describe('failOnError', function () {
     });
   });
 
-  it('returns errors to callback for truncated JPEG when failOnError is set', function (done) {
-    sharp(fixtures.inputJpgTruncated, { failOnError: true }).toBuffer(function (err, data, info) {
+  it('returns errors to callback for truncated JPEG', function (done) {
+    sharp(fixtures.inputJpgTruncated).toBuffer(function (err, data, info) {
       assert.ok(err.message.includes('VipsJpeg: Premature end of JPEG file'), err);
       assert.strictEqual(data, null);
       assert.strictEqual(info, null);
@@ -55,8 +53,8 @@ describe('failOnError', function () {
     });
   });
 
-  it('returns errors to callback for truncated PNG when failOnError is set', function (done) {
-    sharp(fixtures.inputPngTruncated, { failOnError: true }).toBuffer(function (err, data, info) {
+  it('returns errors to callback for truncated PNG', function (done) {
+    sharp(fixtures.inputPngTruncated).toBuffer(function (err, data, info) {
       assert.ok(err.message.includes('vipspng: libpng read error'), err);
       assert.strictEqual(data, null);
       assert.strictEqual(info, null);
@@ -64,8 +62,8 @@ describe('failOnError', function () {
     });
   });
 
-  it('rejects promises for truncated JPEG when failOnError is set', function (done) {
-    sharp(fixtures.inputJpgTruncated, { failOnError: true })
+  it('rejects promises for truncated JPEG', function (done) {
+    sharp(fixtures.inputJpgTruncated)
       .toBuffer()
       .then(() => {
         throw new Error('Expected rejection');

@@ -4,6 +4,10 @@
 
 Requires libvips v8.7.0.
 
+#### v0.21.3 - TBD
+
+* Input image decoding now fails fast, set `failOnError` to change this behaviour.
+
 #### v0.21.2 - 13<sup>th</sup> January 2019
 
 * Ensure all metadata is removed from PNG output unless `withMetadata` used.

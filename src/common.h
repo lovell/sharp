@@ -61,7 +61,7 @@ namespace sharp {
 
     InputDescriptor():
       buffer(nullptr),
-      failOnError(FALSE),
+      failOnError(TRUE),
       bufferLength(0),
       density(72.0),
       rawChannels(0),
