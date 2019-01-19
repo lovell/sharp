@@ -11,7 +11,7 @@ If the overlay image contains an alpha channel then composition with premultipli
 
 ### Parameters
 
--   `overlay` **([Buffer][1] \| [String][2])** Buffer containing image data or String containing the path to an image file.
+-   `overlay` **([Buffer][1] \| [String][2])?** Buffer containing image data or String containing the path to an image file.
 -   `options` **[Object][3]?** 
     -   `options.gravity` **[String][2]** gravity at which to place the overlay. (optional, default `'centre'`)
     -   `options.top` **[Number][4]?** the pixel offset from the top edge.
