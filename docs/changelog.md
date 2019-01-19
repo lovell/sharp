@@ -4,7 +4,7 @@
 
 Requires libvips v8.7.0.
 
-#### v0.21.3 - TBD
+#### v0.21.3 - 19<sup>th</sup> January 2019
 
 * Input image decoding now fails fast, set `failOnError` to change this behaviour.
 
