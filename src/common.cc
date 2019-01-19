@@ -137,6 +137,7 @@ namespace sharp {
       case ImageType::VIPS: id = "v"; break;
       case ImageType::RAW: id = "raw"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
+      case ImageType::MISSING: id = "missing"; break;
     }
     return id;
   }
@@ -202,6 +203,10 @@ namespace sharp {
         imageType = ImageType::VIPS;
       } else if (EndsWith(loader, "Magick") || EndsWith(loader, "MagickFile")) {
         imageType = ImageType::MAGICK;
+      }
+    } else {
+      if (EndsWith(vips::VError().what(), " not found\n")) {
+        imageType = ImageType::MISSING;
       }
     }
     return imageType;
@@ -269,6 +274,9 @@ namespace sharp {
       } else {
         // From filesystem
         imageType = DetermineImageType(descriptor->file.data());
+        if (imageType == ImageType::MISSING) {
+          throw vips::VError("Input file is missing");
+        }
         if (imageType != ImageType::UNKNOWN) {
           try {
             vips::VOption *option = VImage::option()
@@ -291,7 +299,7 @@ namespace sharp {
             throw vips::VError(std::string("Input file has corrupt header: ") + err.what());
           }
         } else {
-          throw vips::VError("Input file is missing or of an unsupported image format");
+          throw vips::VError("Input file contains unsupported image format");
         }
       }
     }

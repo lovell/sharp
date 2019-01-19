@@ -106,7 +106,8 @@ namespace sharp {
     FITS,
     VIPS,
     RAW,
-    UNKNOWN
+    UNKNOWN,
+    MISSING
   };
 
   // How many tasks are in the queue?

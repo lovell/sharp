@@ -263,7 +263,8 @@ describe('Input/output', function () {
 
   it('Fail when output File is input File', function (done) {
     sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, function (err) {
-      assert(!!err);
+      assert(err instanceof Error);
+      assert.strictEqual('Cannot use same file for input and output', err.message);
       done();
     });
   });
@@ -273,14 +274,16 @@ describe('Input/output', function () {
       assert(false);
       done();
     }).catch(function (err) {
-      assert(!!err);
+      assert(err instanceof Error);
+      assert.strictEqual('Cannot use same file for input and output', err.message);
       done();
     });
   });
 
   it('Fail when output File is empty', function (done) {
     sharp(fixtures.inputJpg).toFile('', function (err) {
-      assert(!!err);
+      assert(err instanceof Error);
+      assert.strictEqual('Missing output file path', err.message);
       done();
     });
   });
@@ -290,7 +293,8 @@ describe('Input/output', function () {
       assert(false);
       done();
     }).catch(function (err) {
-      assert(!!err);
+      assert(err instanceof Error);
+      assert.strictEqual('Missing output file path', err.message);
       done();
     });
   });
@@ -301,6 +305,7 @@ describe('Input/output', function () {
       done();
     }).catch(function (err) {
       assert(err instanceof Error);
+      assert.strictEqual('Input buffer contains unsupported image format', err.message);
       done();
     });
   });
@@ -311,6 +316,18 @@ describe('Input/output', function () {
       done();
     }).catch(function (err) {
       assert(err instanceof Error);
+      assert.strictEqual('Input buffer contains unsupported image format', err.message);
+      done();
+    });
+  });
+
+  it('Fail when input file path is missing', function (done) {
+    sharp('does-not-exist').toBuffer().then(function () {
+      assert(false);
+      done();
+    }).catch(function (err) {
+      assert(err instanceof Error);
+      assert.strictEqual('Input file is missing', err.message);
       done();
     });
   });

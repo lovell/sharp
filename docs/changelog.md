@@ -8,6 +8,9 @@ Requires libvips v8.7.0.
 
 * Input image decoding now fails fast, set `failOnError` to change this behaviour.
 
+* Failed filesystem-based input now separates missing file and invalid format errors.
+  [#1542](https://github.com/lovell/sharp/issues/1542)
+
 #### v0.21.2 - 13<sup>th</sup> January 2019
 
 * Ensure all metadata is removed from PNG output unless `withMetadata` used.
