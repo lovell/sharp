@@ -1,5 +1,14 @@
 # Changelog
 
+### v0.22 - "*uptake*"
+
+Requires libvips v8.7.4.
+
+#### v0.22.0 - TBD
+
+* Remove functions previously deprecated in v0.21.0:
+    `background`, `crop`, `embed`, `ignoreAspectRatio`, `max`, `min` and `withoutEnlargement`.
+
 ### v0.21 - "*teeth*"
 
 Requires libvips v8.7.0.
