@@ -485,6 +485,20 @@
   fun:_ZN4node9inspector5Agent5StartERKSsSt10shared_ptrINS_12DebugOptionsEEb
 }
 {
+  leak_nodejs_start
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:_Znwm
+  fun:_ZN4node5StartEiPPc
+}
+{
+  leak_nodejs_start_background_task_runner
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node20BackgroundTaskRunnerC1Ei
+}
+{
   leak_nan_FunctionCallbackInfo
   Memcheck:Leak
   match-leak-kinds: definite
