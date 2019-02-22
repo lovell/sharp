@@ -143,7 +143,7 @@ sharp(input)
     top: 10,
     bottom: 20,
     left: 10,
-    right: 10
+    right: 10,
     background: { r: 0, g: 0, b: 0, alpha: 0 }
   })
   ...
