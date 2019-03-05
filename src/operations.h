@@ -97,6 +97,11 @@ namespace sharp {
    */
   VImage Recomb(VImage image, std::unique_ptr<double[]> const &matrix);
 
+  /*
+   * Modulate brightness, saturation and hue
+   */
+  VImage Modulate(VImage image, double const brightness, double const saturation, double const hue);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_
