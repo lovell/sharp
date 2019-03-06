@@ -3,13 +3,13 @@
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe.only('Modulate', function () {
+describe('Modulate', function () {
   it('should be able to hue-rotate', function (done) {
     sharp(fixtures.inputJpg)
       .modulate({ hue: 120 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('modulate-hue-120.jpg'), data, { threshold: 1 }, done);
+        fixtures.assertSimilar(fixtures.expected('modulate-hue-120.jpg'), data, { threshold: 2 }, done);
       });
   });
 
