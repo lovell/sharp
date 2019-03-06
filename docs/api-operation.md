@@ -41,7 +41,7 @@ readableStream.pipe(pipeline);
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## flip
 
@@ -52,7 +52,7 @@ The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 
 -   `flip` **[Boolean][6]**  (optional, default `true`)
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## flop
 
@@ -63,7 +63,7 @@ The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
 -   `flop` **[Boolean][6]**  (optional, default `true`)
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## sharpen
 
@@ -81,7 +81,7 @@ Separate control over the level of sharpening in "flat" and "jagged" areas is av
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## median
 
@@ -95,7 +95,7 @@ When used without parameters the default window is 3x3.
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## blur
 
@@ -110,7 +110,7 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## flatten
 
@@ -118,10 +118,10 @@ Merge alpha transparency channel, if any, with a background.
 
 ### Parameters
 
--   `options` **[Object][2]?**
+-   `options` **[Object][2]?** 
     -   `options.background` **([String][3] \| [Object][2])** background colour, parsed by the [color][4] module, defaults to black. (optional, default `{r:0,g:0,b:0}`)
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## gamma
 
@@ -141,7 +141,7 @@ Supply a second argument to use a different output gamma value, otherwise the fi
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## negate
 
@@ -151,7 +151,7 @@ Produce the "negative" of the image.
 
 -   `negate` **[Boolean][6]**  (optional, default `true`)
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## normalise
 
@@ -161,7 +161,7 @@ Enhance output image contrast by stretching its luminance to cover the full dyna
 
 -   `normalise` **[Boolean][6]**  (optional, default `true`)
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## normalize
 
@@ -171,7 +171,7 @@ Alternative spelling of normalise.
 
 -   `normalize` **[Boolean][6]**  (optional, default `true`)
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## convolve
 
@@ -179,7 +179,7 @@ Convolve the image with the specified kernel.
 
 ### Parameters
 
--   `kernel` **[Object][2]**
+-   `kernel` **[Object][2]** 
     -   `kernel.width` **[Number][1]** width of the kernel in pixels.
     -   `kernel.height` **[Number][1]** width of the kernel in pixels.
     -   `kernel.kernel` **[Array][7]&lt;[Number][1]>** Array of length `width*height` containing the kernel values.
@@ -204,7 +204,7 @@ sharp(input)
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## threshold
 
@@ -213,14 +213,14 @@ Any pixel value greather than or equal to the threshold value will be set to 255
 ### Parameters
 
 -   `threshold` **[Number][1]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
--   `options` **[Object][2]?**
+-   `options` **[Object][2]?** 
     -   `options.greyscale` **[Boolean][6]** convert to single channel greyscale. (optional, default `true`)
     -   `options.grayscale` **[Boolean][6]** alternative spelling for greyscale. (optional, default `true`)
 
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## boolean
 
@@ -233,16 +233,16 @@ the selected bitwise boolean `operation` between the corresponding pixels of the
 
 -   `operand` **([Buffer][8] \| [String][3])** Buffer containing image data or String containing the path to an image file.
 -   `operator` **[String][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
--   `options` **[Object][2]?**
+-   `options` **[Object][2]?** 
     -   `options.raw` **[Object][2]?** describes operand when using raw pixel data.
-        -   `options.raw.width` **[Number][1]?**
-        -   `options.raw.height` **[Number][1]?**
-        -   `options.raw.channels` **[Number][1]?**
+        -   `options.raw.width` **[Number][1]?** 
+        -   `options.raw.height` **[Number][1]?** 
+        -   `options.raw.channels` **[Number][1]?** 
 
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## linear
 
@@ -256,7 +256,7 @@ Apply the linear formula a \* input + b to the image (levels adjustment)
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## recomb
 
@@ -264,7 +264,7 @@ Recomb the image with the specified matrix.
 
 ### Parameters
 
--   `inputMatrix`
+-   `inputMatrix`  
 -   `3x3` **[Array][7]&lt;[Array][7]&lt;[Number][1]>>** Recombination matrix
 
 ### Examples
@@ -285,7 +285,7 @@ sharp(input)
 
 -   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## modulate
 
@@ -297,7 +297,6 @@ Transforms the image using brightness, saturation and hue rotation.
     -   `options.brightness` **[Number][1]?** Brightness multiplier
     -   `options.saturation` **[Number][1]?** Saturation multiplier
     -   `options.hue` **[Number][1]?** Degrees for hue rotation
-
 
 ### Examples
 
@@ -320,6 +319,8 @@ sharp(input)
     hue: 90
   });
 ```
+
+Returns **Sharp** 
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
