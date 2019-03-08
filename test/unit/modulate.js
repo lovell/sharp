@@ -4,57 +4,98 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Modulate', function () {
-  it('should be able to hue-rotate', function (done) {
-    sharp(fixtures.inputJpg)
+  it('should be able to hue-rotate', function () {
+    const base = 'modulate-hue-120.jpg';
+    const actual = fixtures.path('output.' + base);
+    const expected = fixtures.expected(base);
+
+    return sharp(fixtures.inputJpg)
       .modulate({ hue: 120 })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('modulate-hue-120.jpg'), data, { threshold: 2 }, done);
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, expected, 0);
       });
   });
 
-  it('should be able to brighten', function (done) {
-    sharp(fixtures.inputJpg)
+  it('should be able to brighten', function () {
+    const base = 'modulate-brightness-2.jpg';
+    const actual = fixtures.path('output.' + base);
+    const expected = fixtures.expected(base);
+
+    return sharp(fixtures.inputJpg)
       .modulate({ brightness: 2 })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('modulate-brightness-2.jpg'), data, { threshold: 1 }, done);
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, expected, 0);
       });
   });
 
-  it('should be able to unbrighten', function (done) {
-    sharp(fixtures.inputJpg)
+  it('should be able to unbrighten', function () {
+    const base = 'modulate-brightness-0-5.jpg';
+    const actual = fixtures.path('output.' + base);
+    const expected = fixtures.expected(base);
+
+    return sharp(fixtures.inputJpg)
       .modulate({ brightness: 0.5 })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('modulate-brightness-0-5.jpg'), data, { threshold: 1 }, done);
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, expected, 0);
       });
   });
 
-  it('should be able to saturate', function (done) {
-    sharp(fixtures.inputJpg)
+  it('should be able to saturate', function () {
+    const base = 'modulate-saturation-2.jpg';
+    const actual = fixtures.path('output.' + base);
+    const expected = fixtures.expected(base);
+
+    return sharp(fixtures.inputJpg)
       .modulate({ saturation: 2 })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('modulate-saturation-2.jpg'), data, { threshold: 1 }, done);
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, expected, 0);
       });
   });
 
-  it('should be able to desaturate', function (done) {
-    sharp(fixtures.inputJpg)
+  it('should be able to desaturate', function () {
+    const base = 'modulate-saturation-0.5.jpg';
+    const actual = fixtures.path('output.' + base);
+    const expected = fixtures.expected(base);
+
+    return sharp(fixtures.inputJpg)
       .modulate({ saturation: 0.5 })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('modulate-saturation-0-5.jpg'), data, { threshold: 1 }, done);
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, expected, 0);
       });
   });
 
-  it('should be able to modulate all channels', function (done) {
-    sharp(fixtures.inputJpg)
+  it('should be able to modulate all channels', function () {
+    const base = 'modulate-all.jpg';
+    const actual = fixtures.path('output.' + base);
+    const expected = fixtures.expected(base);
+
+    return sharp(fixtures.inputJpg)
       .modulate({ brightness: 2, saturation: 0.5, hue: 180 })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('modulate-all.jpg'), data, { threshold: 1 }, done);
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, expected, 0);
       });
+  });
+
+  describe('hue-rotate', function (done) {
+    [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360].forEach(function (angle) {
+      it('should properly hue rotate by ' + angle + 'deg', function () {
+        const base = 'modulate-hue-angle-' + angle + '.png';
+        const actual = fixtures.path('output.' + base);
+        const expected = fixtures.expected(base);
+
+        return sharp(fixtures.testPattern)
+          .modulate({ hue: angle })
+          .toFile(actual)
+          .then(function () {
+            fixtures.assertMaxColourDistance(actual, expected, 0);
+          });
+      });
+    });
   });
 });

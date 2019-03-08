@@ -186,9 +186,17 @@ namespace sharp {
   }
 
   VImage Modulate(VImage image, double const brightness, double const saturation, double const hue) {
-    return image
-      .colourspace(VIPS_INTERPRETATION_LCH)
-      .linear({brightness, saturation, 1}, {0, 0, hue});
+    image = image.colourspace(VIPS_INTERPRETATION_LCH);
+
+    if (HasAlpha(image)) {
+      // Separate alpha channel
+      VImage alpha = image[image.bands() - 1];
+      return RemoveAlpha(image)
+        .linear({brightness, saturation, 1}, {0, 0, hue})
+        .bandjoin(alpha);
+    } else {
+      return image.linear({brightness, saturation, 1}, {0, 0, hue});
+    }
   }
 
   /*
