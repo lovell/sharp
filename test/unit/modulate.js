@@ -1,9 +1,29 @@
 'use strict';
 
 const sharp = require('../../');
+const assert = require('assert');
 const fixtures = require('../fixtures');
 
 describe('Modulate', function () {
+  describe('Invalid options', function () {
+    [
+      { brightness: -1 },
+      { brightness: '50%' },
+      { brightness: null },
+      { saturation: -1 },
+      { saturation: '50%' },
+      { saturation: null },
+      { hue: '50deg' },
+      { hue: null }
+    ].forEach(function (options) {
+      it('should throw', function () {
+        assert.throws(function () {
+          sharp(fixtures.inputJpg).modulate(options);
+        });
+      });
+    });
+  });
+
   it('should be able to hue-rotate', function () {
     const base = 'modulate-hue-120.jpg';
     const actual = fixtures.path('output.' + base);
