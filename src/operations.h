@@ -36,27 +36,6 @@ namespace sharp {
   VImage EnsureAlpha(VImage image);
 
   /*
-    Alpha composite src over dst with given gravity.
-    Assumes alpha channels are already premultiplied and will be unpremultiplied after.
-   */
-  VImage Composite(VImage src, VImage dst, const int gravity);
-
-  /*
-    Composite overlayImage over image at given position
-   */
-  VImage Composite(VImage image, VImage overlayImage, int const x, int const y);
-
-  /*
-    Alpha composite overlayImage over image, assumes matching dimensions
-  */
-  VImage AlphaComposite(VImage image, VImage overlayImage);
-
-  /*
-    Cutout src over dst with given gravity.
-  */
-  VImage Cutout(VImage src, VImage dst, const int gravity);
-
-  /*
    * Tint an image using the specified chroma, preserving the original image luminance
    */
   VImage Tint(VImage image, double const a, double const b);

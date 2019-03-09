@@ -343,30 +343,19 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = image.colourspace(VIPS_INTERPRETATION_B_W);
       }
 
-      // Ensure image has an alpha channel when there is an overlay with an alpha channel
-      VImage overlayImage;
-      ImageType overlayImageType = ImageType::UNKNOWN;
-      bool shouldOverlayWithAlpha = FALSE;
-      if (baton->overlay != nullptr) {
-        std::tie(overlayImage, overlayImageType) = OpenInput(baton->overlay, baton->accessMethod);
-        if (HasAlpha(overlayImage)) {
-          shouldOverlayWithAlpha = !baton->overlayCutout;
-          if (!HasAlpha(image)) {
-            double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
-            image = image.bandjoin(
-              VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier));
-          }
-        }
-      }
-
       bool const shouldResize = xfactor != 1.0 || yfactor != 1.0;
       bool const shouldBlur = baton->blurSigma != 0.0;
       bool const shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
       bool const shouldApplyMedian = baton->medianSize > 0;
+      bool const shouldComposite = !baton->composite.empty();
+
+      if (shouldComposite && !HasAlpha(image)) {
+        image = sharp::EnsureAlpha(image);
+      }
 
       bool const shouldPremultiplyAlpha = HasAlpha(image) &&
-        (shouldResize || shouldBlur || shouldConv || shouldSharpen || shouldOverlayWithAlpha);
+        (shouldResize || shouldBlur || shouldConv || shouldSharpen || shouldComposite);
 
       // Premultiply image alpha channel before all transformations to avoid
       // dark fringing around bright pixels
@@ -544,72 +533,67 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = sharp::Sharpen(image, baton->sharpenSigma, baton->sharpenFlat, baton->sharpenJagged);
       }
 
-      // Composite with overlay, if present
-      if (baton->overlay != nullptr) {
-        // Verify overlay image is within current dimensions
-        if (overlayImage.width() > image.width() || overlayImage.height() > image.height()) {
-          throw vips::VError("Overlay image must have same dimensions or smaller");
-        }
-        // Check if overlay is tiled
-        if (baton->overlayTile) {
-          int const overlayImageWidth = overlayImage.width();
-          int const overlayImageHeight = overlayImage.height();
-          int across = 0;
-          int down = 0;
-          // Use gravity in overlay
-          if (overlayImageWidth <= baton->width) {
-            across = static_cast<int>(ceil(static_cast<double>(image.width()) / overlayImageWidth));
+      // Composite
+      if (shouldComposite) {
+        for (Composite *composite : baton->composite) {
+          VImage compositeImage;
+          ImageType compositeImageType = ImageType::UNKNOWN;
+          std::tie(compositeImage, compositeImageType) = OpenInput(composite->input, baton->accessMethod);
+          // Verify within current dimensions
+          if (compositeImage.width() > image.width() || compositeImage.height() > image.height()) {
+            throw vips::VError("Image to composite must have same dimensions or smaller");
           }
-          if (overlayImageHeight <= baton->height) {
-            down = static_cast<int>(ceil(static_cast<double>(image.height()) / overlayImageHeight));
-          }
-          if (across != 0 || down != 0) {
-            int left;
-            int top;
-            overlayImage = overlayImage.replicate(across, down);
-            if (baton->overlayXOffset >= 0 && baton->overlayYOffset >= 0) {
-              // the overlayX/YOffsets will now be used to CalculateCrop for extract_area
-              std::tie(left, top) = sharp::CalculateCrop(
-                overlayImage.width(), overlayImage.height(), image.width(), image.height(),
-                baton->overlayXOffset, baton->overlayYOffset);
-            } else {
-              // the overlayGravity will now be used to CalculateCrop for extract_area
-              std::tie(left, top) = sharp::CalculateCrop(
-                overlayImage.width(), overlayImage.height(), image.width(), image.height(), baton->overlayGravity);
+          // Check if overlay is tiled
+          if (composite->tile) {
+            int across = 0;
+            int down = 0;
+            // Use gravity in overlay
+            if (compositeImage.width() <= baton->width) {
+              across = static_cast<int>(ceil(static_cast<double>(image.width()) / compositeImage.width()));
             }
-            overlayImage = overlayImage.extract_area(left, top, image.width(), image.height());
-          }
-          // the overlayGravity was used for extract_area, therefore set it back to its default value of 0
-          baton->overlayGravity = 0;
-        }
-        if (baton->overlayCutout) {
-          // 'cut out' the image, premultiplication is not required
-          image = sharp::Cutout(overlayImage, image, baton->overlayGravity);
-        } else {
-          // Ensure overlay is sRGB
-          overlayImage = overlayImage.colourspace(VIPS_INTERPRETATION_sRGB);
-          // Ensure overlay matches premultiplication state
-          if (shouldPremultiplyAlpha) {
-            // Ensure overlay has alpha channel
-            if (!HasAlpha(overlayImage)) {
-              double const multiplier = sharp::Is16Bit(overlayImage.interpretation()) ? 256.0 : 1.0;
-              overlayImage = overlayImage.bandjoin(
-                VImage::new_matrix(overlayImage.width(), overlayImage.height()).new_from_image(255 * multiplier));
+            if (compositeImage.height() <= baton->height) {
+              down = static_cast<int>(ceil(static_cast<double>(image.height()) / compositeImage.height()));
             }
-            overlayImage = overlayImage.premultiply();
+            if (across != 0 || down != 0) {
+              int left;
+              int top;
+              compositeImage = compositeImage.replicate(across, down);
+              if (composite->left >= 0 && composite->top >= 0) {
+                std::tie(left, top) = sharp::CalculateCrop(
+                  compositeImage.width(), compositeImage.height(), image.width(), image.height(),
+                  composite->left, composite->top);
+              } else {
+                std::tie(left, top) = sharp::CalculateCrop(
+                  compositeImage.width(), compositeImage.height(), image.width(), image.height(), composite->gravity);
+              }
+              compositeImage = compositeImage.extract_area(left, top, image.width(), image.height());
+            }
+            // gravity was used for extract_area, set it back to its default value of 0
+            composite->gravity = 0;
           }
+          // Ensure image to composite is sRGB with premultiplied alpha
+          compositeImage = compositeImage.colourspace(VIPS_INTERPRETATION_sRGB);
+          if (!HasAlpha(compositeImage)) {
+            compositeImage = sharp::EnsureAlpha(compositeImage);
+          }
+          compositeImage = compositeImage.premultiply();
+          // Calculate position
           int left;
           int top;
-          if (baton->overlayXOffset >= 0 && baton->overlayYOffset >= 0) {
-            // Composite images at given offsets
+          if (composite->left >= 0 && composite->top >= 0) {
+            // Composite image at given offsets
             std::tie(left, top) = sharp::CalculateCrop(image.width(), image.height(),
-              overlayImage.width(), overlayImage.height(), baton->overlayXOffset, baton->overlayYOffset);
+              compositeImage.width(), compositeImage.height(), composite->left, composite->top);
           } else {
-            // Composite images with given gravity
+            // Composite image with given gravity
             std::tie(left, top) = sharp::CalculateCrop(image.width(), image.height(),
-              overlayImage.width(), overlayImage.height(), baton->overlayGravity);
+              compositeImage.width(), compositeImage.height(), composite->gravity);
           }
-          image = sharp::Composite(image, overlayImage, left, top);
+          // Composite
+          image = image.composite2(compositeImage, composite->mode, VImage::option()
+            ->set("premultiplied", TRUE)
+            ->set("x", left)
+            ->set("y", top));
         }
       }
 
@@ -1029,13 +1013,17 @@ class PipelineWorker : public Nan::AsyncWorker {
         GetFromPersistent(index);
         return index + 1;
       });
+
+    // Delete baton
     delete baton->input;
-    delete baton->overlay;
     delete baton->boolean;
-    for_each(baton->joinChannelIn.begin(), baton->joinChannelIn.end(),
-      [this](sharp::InputDescriptor *joinChannelIn) {
-        delete joinChannelIn;
-      });
+    for (Composite *composite : baton->composite) {
+      delete composite->input;
+      delete composite;
+    }
+    for (sharp::InputDescriptor *input : baton->joinChannelIn) {
+      delete input;
+    }
     delete baton;
 
     // Handle warnings
@@ -1182,14 +1170,21 @@ NAN_METHOD(pipeline) {
   // Tint chroma
   baton->tintA = AttrTo<double>(options, "tintA");
   baton->tintB = AttrTo<double>(options, "tintB");
-  // Overlay options
-  if (HasAttr(options, "overlay")) {
-    baton->overlay = CreateInputDescriptor(AttrAs<v8::Object>(options, "overlay"), buffersToPersist);
-    baton->overlayGravity = AttrTo<int32_t>(options, "overlayGravity");
-    baton->overlayXOffset = AttrTo<int32_t>(options, "overlayXOffset");
-    baton->overlayYOffset = AttrTo<int32_t>(options, "overlayYOffset");
-    baton->overlayTile = AttrTo<bool>(options, "overlayTile");
-    baton->overlayCutout = AttrTo<bool>(options, "overlayCutout");
+  // Composite
+  v8::Local<v8::Array> compositeArray = Nan::Get(options, Nan::New("composite").ToLocalChecked())
+    .ToLocalChecked().As<v8::Array>();
+  int const compositeArrayLength = AttrTo<uint32_t>(compositeArray, "length");
+  for (int i = 0; i < compositeArrayLength; i++) {
+    v8::Local<v8::Object> compositeObject = Nan::Get(compositeArray, i).ToLocalChecked().As<v8::Object>();
+    Composite *composite = new Composite;
+    composite->input = CreateInputDescriptor(AttrAs<v8::Object>(compositeObject, "input"), buffersToPersist);
+    composite->mode = static_cast<VipsBlendMode>(
+      vips_enum_from_nick(nullptr, VIPS_TYPE_BLEND_MODE, AttrAsStr(compositeObject, "blend").data()));
+    composite->gravity = AttrTo<uint32_t>(compositeObject, "gravity");
+    composite->left = AttrTo<int32_t>(compositeObject, "left");
+    composite->top = AttrTo<int32_t>(compositeObject, "top");
+    composite->tile = AttrTo<bool>(compositeObject, "tile");
+    baton->composite.push_back(composite);
   }
   // Resize options
   baton->withoutEnlargement = AttrTo<bool>(options, "withoutEnlargement");

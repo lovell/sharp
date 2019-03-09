@@ -140,37 +140,35 @@ describe('Overlays', function () {
       });
   });
 
-  if (sharp.format.webp.input.file) {
-    it('Composite WebP onto JPEG', function (done) {
-      const paths = getPaths('overlay-jpeg-with-webp', 'jpg');
+  it('Composite WebP onto JPEG', function (done) {
+    const paths = getPaths('overlay-jpeg-with-webp', 'jpg');
 
-      sharp(fixtures.inputJpg)
-        .resize(300, 300)
-        .overlayWith(fixtures.inputWebPWithTransparency)
-        .toFile(paths.actual, function (error, info) {
-          if (error) return done(error);
-          fixtures.assertMaxColourDistance(paths.actual, paths.expected, 102);
-          done();
-        });
-    });
-  }
-
-  it('Composite JPEG onto PNG, no premultiply', function (done) {
-    sharp(fixtures.inputPngOverlayLayer1)
-      .overlayWith(fixtures.inputJpgWithLandscapeExif1)
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(false, info.premultiplied);
+    sharp(fixtures.inputJpg)
+      .resize(300, 300)
+      .overlayWith(fixtures.inputWebPWithTransparency)
+      .toFile(paths.actual, function (error, info) {
+        if (error) return done(error);
+        fixtures.assertMaxColourDistance(paths.actual, paths.expected, 102);
         done();
       });
   });
 
-  it('Composite opaque JPEG onto JPEG, no premultiply', function (done) {
+  it('Composite JPEG onto PNG, ensure premultiply', function (done) {
+    sharp(fixtures.inputPngOverlayLayer1)
+      .overlayWith(fixtures.inputJpgWithLandscapeExif1)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, info.premultiplied);
+        done();
+      });
+  });
+
+  it('Composite opaque JPEG onto JPEG, ensure premultiply', function (done) {
     sharp(fixtures.inputJpg)
       .overlayWith(fixtures.inputJpgWithLandscapeExif1)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
-        assert.strictEqual(false, info.premultiplied);
+        assert.strictEqual(true, info.premultiplied);
         done();
       });
   });
@@ -409,12 +407,6 @@ describe('Overlays', function () {
         });
     });
 
-    it('Overlay with invalid cutout option', function () {
-      assert.throws(function () {
-        sharp().overlayWith('ignore', { cutout: 1 });
-      });
-    });
-
     it('Overlay with invalid tile option', function () {
       assert.throws(function () {
         sharp().overlayWith('ignore', { tile: 1 });
@@ -580,18 +572,17 @@ describe('Overlays', function () {
       });
   });
 
-  it('Composite JPEG onto JPEG, no premultiply', function (done) {
+  it('Composite JPEG onto JPEG', function (done) {
     sharp(fixtures.inputJpg)
       .resize(480, 320)
       .overlayWith(fixtures.inputJpgBooleanTest)
-      .png()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
-        assert.strictEqual('png', info.format);
+        assert.strictEqual('jpeg', info.format);
         assert.strictEqual(480, info.width);
         assert.strictEqual(320, info.height);
         assert.strictEqual(3, info.channels);
-        assert.strictEqual(false, info.premultiplied);
+        assert.strictEqual(true, info.premultiplied);
         fixtures.assertSimilar(fixtures.expected('overlay-jpeg-with-jpeg.jpg'), data, done);
       });
   });

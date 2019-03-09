@@ -9,6 +9,9 @@ Requires libvips v8.7.4.
 * Remove functions previously deprecated in v0.21.0:
     `background`, `crop`, `embed`, `ignoreAspectRatio`, `max`, `min` and `withoutEnlargement`.
 
+* Add `composite` operation supporting multiple images and blend modes; deprecate `overlayWith`.
+  [#728](https://github.com/lovell/sharp/issues/728)
+
 ### v0.21 - "*teeth*"
 
 Requires libvips v8.7.0.

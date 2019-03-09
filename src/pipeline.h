@@ -34,6 +34,23 @@ enum class Canvas {
   IGNORE_ASPECT
 };
 
+struct Composite {
+  sharp::InputDescriptor *input;
+  VipsBlendMode mode;
+  int gravity;
+  int left;
+  int top;
+  bool tile;
+
+  Composite():
+    input(nullptr),
+    mode(VIPS_BLEND_MODE_OVER),
+    gravity(0),
+    left(-1),
+    top(-1),
+    tile(false) {}
+};
+
 struct PipelineBaton {
   sharp::InputDescriptor *input;
   std::string iccProfilePath;
@@ -42,12 +59,7 @@ struct PipelineBaton {
   std::string fileOut;
   void *bufferOut;
   size_t bufferOutLength;
-  sharp::InputDescriptor *overlay;
-  int overlayGravity;
-  int overlayXOffset;
-  int overlayYOffset;
-  bool overlayTile;
-  bool overlayCutout;
+  std::vector<Composite *> composite;
   std::vector<sharp::InputDescriptor *> joinChannelIn;
   int topOffsetPre;
   int leftOffsetPre;
@@ -161,12 +173,6 @@ struct PipelineBaton {
     input(nullptr),
     limitInputPixels(0),
     bufferOutLength(0),
-    overlay(nullptr),
-    overlayGravity(0),
-    overlayXOffset(-1),
-    overlayYOffset(-1),
-    overlayTile(false),
-    overlayCutout(false),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),
