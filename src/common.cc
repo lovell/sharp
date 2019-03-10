@@ -213,6 +213,16 @@ namespace sharp {
   }
 
   /*
+    Does this image type support multiple pages?
+  */
+  bool ImageTypeSupportsPage(ImageType imageType) {
+    return
+      imageType == ImageType::GIF ||
+      imageType == ImageType::TIFF ||
+      imageType == ImageType::PDF;
+  }
+
+  /*
     Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
   */
   std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor, VipsAccess accessMethod) {
@@ -243,7 +253,7 @@ namespace sharp {
             if (imageType == ImageType::MAGICK) {
               option->set("density", std::to_string(descriptor->density).data());
             }
-            if (imageType == ImageType::TIFF || imageType == ImageType::PDF) {
+            if (ImageTypeSupportsPage(imageType)) {
              option->set("page", descriptor->page);
             }
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
@@ -288,7 +298,7 @@ namespace sharp {
             if (imageType == ImageType::MAGICK) {
               option->set("density", std::to_string(descriptor->density).data());
             }
-            if (imageType == ImageType::TIFF || imageType == ImageType::PDF) {
+            if (ImageTypeSupportsPage(imageType)) {
              option->set("page", descriptor->page);
             }
             image = VImage::new_from_file(descriptor->file.data(), option);

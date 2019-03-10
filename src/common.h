@@ -141,6 +141,11 @@ namespace sharp {
   ImageType DetermineImageType(char const *file);
 
   /*
+    Does this image type support multiple pages?
+  */
+  bool ImageTypeSupportsPage(ImageType imageType);
+
+  /*
     Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
   */
   std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor, VipsAccess accessMethod);
