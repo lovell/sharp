@@ -36,7 +36,7 @@ Building from source requires:
 [![Ubuntu 16.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 8MB.
+This involves an automated HTTPS download of approximately 9MB.
 
 Most Linux-based (glibc, musl) operating systems running on x64 and ARMv6+ CPUs should "just work", e.g.:
 
@@ -86,7 +86,7 @@ via `sharp.cache(false)` to avoid a stack overflow.
 [![OS X 10.12 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 7MB.
+This involves an automated HTTPS download of approximately 8MB.
 
 To use your own version of libvips instead of the provided binaries, make sure it is
 at least the version listed under `config.libvips` in the `package.json` file and
@@ -97,8 +97,9 @@ that it can be located using `pkg-config --modversion vips-cpp`.
 [![Windows x64 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 13MB.  If you are having issues during
-installation consider removing the directory ```C:\Users\[user]\AppData\Roaming\npm-cache\_libvips```.
+This involves an automated HTTPS download of approximately 14MB.
+If you are having issues during installation consider removing the directory
+`C:\Users\[user]\AppData\Roaming\npm-cache\_libvips`.
 
 Only 64-bit (x64) `node.exe` is supported.
 

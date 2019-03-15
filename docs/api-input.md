@@ -22,7 +22,7 @@ Returns **Sharp**
 ## metadata
 
 Fast access to (uncached) image metadata without decoding any compressed image data.
-A Promises/A+ promise is returned when `callback` is not provided.
+A `Promise` is returned when `callback` is not provided.
 
 -   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
 -   `size`: Total size of image in bytes, for Stream and Buffer input only
@@ -70,7 +70,7 @@ Returns **([Promise][5]&lt;[Object][6]> | Sharp)**
 ## stats
 
 Access to pixel-derived image statistics for every channel in the image.
-A Promise is returned when `callback` is not provided.
+A `Promise` is returned when `callback` is not provided.
 
 -   `channels`: Array of channel statistics for each channel in the image. Each channel statistic contains
     -   `min` (minimum value in the channel)
@@ -105,9 +105,9 @@ Returns **[Promise][5]&lt;[Object][6]>**
 
 ## limitInputPixels
 
-Do not process input images where the number of pixels (width _ height) exceeds this limit.
+Do not process input images where the number of pixels (width x height) exceeds this limit.
 Assumes image dimensions contained in the input metadata can be trusted.
-The default limit is 268402689 (0x3FFF _ 0x3FFF) pixels.
+The default limit is 268402689 (0x3FFF x 0x3FFF) pixels.
 
 ### Parameters
 
