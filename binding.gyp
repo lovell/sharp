@@ -140,7 +140,6 @@
               '../vendor/lib/libgsf-1.so',
               '../vendor/lib/libgthread-2.0.so',
               '../vendor/lib/libharfbuzz.so',
-              '../vendor/lib/libharfbuzz-subset.so.0',
               '../vendor/lib/libjpeg.so',
               '../vendor/lib/liblcms2.so',
               '../vendor/lib/liborc-0.4.so',
