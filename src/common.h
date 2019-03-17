@@ -53,6 +53,7 @@ namespace sharp {
     int rawChannels;
     int rawWidth;
     int rawHeight;
+    int pages;
     int page;
     int createChannels;
     int createWidth;
@@ -67,6 +68,7 @@ namespace sharp {
       rawChannels(0),
       rawWidth(0),
       rawHeight(0),
+      pages(1),
       page(0),
       createChannels(0),
       createWidth(0),

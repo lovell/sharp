@@ -517,37 +517,6 @@ describe('Input/output', function () {
       });
   });
 
-  it('Load GIF from Buffer', function (done) {
-    const inputGifBuffer = fs.readFileSync(fixtures.inputGif);
-    sharp(inputGifBuffer)
-      .resize(320, 240)
-      .jpeg()
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
-  });
-
-  it('Load GIF grey+alpha from file, auto convert to PNG', function (done) {
-    sharp(fixtures.inputGifGreyPlusAlpha)
-      .resize(8, 4)
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(8, info.width);
-        assert.strictEqual(4, info.height);
-        assert.strictEqual(4, info.channels);
-        done();
-      });
-  });
-
   it('Load Vips V file', function (done) {
     sharp(fixtures.inputV)
       .jpeg()

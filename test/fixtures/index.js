@@ -100,6 +100,7 @@ module.exports = {
   inputTiff8BitDepth: getPath('8bit_depth.tiff'),
   inputGif: getPath('Crash_test.gif'), // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
   inputGifGreyPlusAlpha: getPath('grey-plus-alpha.gif'), // http://i.imgur.com/gZ5jlmE.gif
+  inputGifAnimated: getPath('rotating-squares.gif'), // CC0 https://loading.io/spinner/blocks/-rotating-squares-preloader-gif
   inputSvg: getPath('check.svg'), // http://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg
   inputSvgWithEmbeddedImages: getPath('struct-image-04-t.svg'), // https://dev.w3.org/SVG/profiles/1.2T/test/svg/struct-image-04-t.svg
 
