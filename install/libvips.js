@@ -34,7 +34,12 @@ const extractTarball = function (tarPath) {
       cwd: vendorPath,
       strict: true
     })
-    .catch(fail);
+    .catch(function (err) {
+      if (/unexpected end of file/.test(err.message)) {
+        npmLog.error('sharp', `Please delete ${tarPath} as it is not a valid tarball`);
+      }
+      fail(err);
+    });
 };
 
 try {
