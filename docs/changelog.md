@@ -4,7 +4,7 @@
 
 Requires libvips v8.7.4.
 
-#### v0.22.0 - TBD
+#### v0.22.0 - 18<sup>th</sup> March 2019
 
 * Remove functions previously deprecated in v0.21.0:
     `background`, `crop`, `embed`, `ignoreAspectRatio`, `max`, `min` and `withoutEnlargement`.
