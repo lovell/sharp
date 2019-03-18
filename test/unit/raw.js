@@ -92,6 +92,31 @@ describe('Raw pixel data', function () {
             });
         });
     });
+
+    it('JPEG to raw Stream and back again', function (done) {
+      const width = 32;
+      const height = 24;
+      const writable = sharp({
+        raw: {
+          width,
+          height,
+          channels: 3
+        }
+      });
+      writable
+        .jpeg()
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('jpeg', info.format);
+          assert.strictEqual(32, info.width);
+          assert.strictEqual(24, info.height);
+          done();
+        });
+      sharp(fixtures.inputJpg)
+        .resize(width, height)
+        .raw()
+        .pipe(writable);
+    });
   });
 
   describe('Ouput raw, uncompressed image data', function () {

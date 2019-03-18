@@ -15,6 +15,9 @@ Requires libvips v8.7.4.
 * Add support for `pages` input option for multi-page input.
   [#1566](https://github.com/lovell/sharp/issues/1566)
 
+* Allow Stream-based input of raw pixel data.
+  [#1579](https://github.com/lovell/sharp/issues/1579)
+
 * Add support for `page` input option to GIF and PDF.
   [#1595](https://github.com/lovell/sharp/pull/1595)
   [@ramiel](https://github.com/ramiel)
