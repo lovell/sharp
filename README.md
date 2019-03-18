@@ -6,10 +6,6 @@
 npm install sharp
 ```
 
-```sh
-yarn add sharp
-```
-
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
@@ -33,21 +29,41 @@ do not require any additional install or runtime dependencies.
 const sharp = require('sharp');
 ```
 
+### Callback
+
 ```javascript
 sharp(inputBuffer)
   .resize(320, 240)
-  .toFile('output.webp', (err, info) => ... );
-  // A Promises/A+ promise is returned when callback is not provided.
+  .toFile('output.webp', (err, info) => { ... });
 ```
+
+### Promise
 
 ```javascript
 sharp('input.jpg')
   .rotate()
   .resize(200)
   .toBuffer()
-  .then( data => ... )
-  .catch( err => ... );
+  .then( data => { ... })
+  .catch( err => { ... });
 ```
+
+### Async/await
+
+```javascript
+const semiTransparentRedPng = await sharp({
+  create: {
+    width: 48,
+    height: 48,
+    channels: 4,
+    background: { r: 255, g: 0, b: 0, alpha: 0.5 }
+  }
+})
+  .png()
+  .toBuffer();
+```
+
+### Stream
 
 ```javascript
 const roundedCorners = Buffer.from(
@@ -57,7 +73,10 @@ const roundedCorners = Buffer.from(
 const roundedCornerResizer =
   sharp()
     .resize(200, 200)
-    .overlayWith(roundedCorners, { cutout: true })
+    .composite([{
+      input: roundedCorners,
+      blend: 'dest-in'
+    }])
     .png();
 
 readableStream
