@@ -36,7 +36,7 @@ describe('Modulate', function () {
       .modulate({ hue: 120 })
       .toFile(actual)
       .then(function () {
-        fixtures.assertMaxColourDistance(actual, expected, 0);
+        fixtures.assertMaxColourDistance(actual, expected, 25);
       });
   });
 
@@ -49,7 +49,7 @@ describe('Modulate', function () {
       .modulate({ brightness: 2 })
       .toFile(actual)
       .then(function () {
-        fixtures.assertMaxColourDistance(actual, expected, 0);
+        fixtures.assertMaxColourDistance(actual, expected, 25);
       });
   });
 
@@ -62,7 +62,7 @@ describe('Modulate', function () {
       .modulate({ brightness: 0.5 })
       .toFile(actual)
       .then(function () {
-        fixtures.assertMaxColourDistance(actual, expected, 0);
+        fixtures.assertMaxColourDistance(actual, expected, 25);
       });
   });
 
@@ -75,7 +75,7 @@ describe('Modulate', function () {
       .modulate({ saturation: 2 })
       .toFile(actual)
       .then(function () {
-        fixtures.assertMaxColourDistance(actual, expected, 0);
+        fixtures.assertMaxColourDistance(actual, expected, 25);
       });
   });
 
@@ -88,7 +88,7 @@ describe('Modulate', function () {
       .modulate({ saturation: 0.5 })
       .toFile(actual)
       .then(function () {
-        fixtures.assertMaxColourDistance(actual, expected, 0);
+        fixtures.assertMaxColourDistance(actual, expected, 25);
       });
   });
 
@@ -101,7 +101,7 @@ describe('Modulate', function () {
       .modulate({ brightness: 2, saturation: 0.5, hue: 180 })
       .toFile(actual)
       .then(function () {
-        fixtures.assertMaxColourDistance(actual, expected, 0);
+        fixtures.assertMaxColourDistance(actual, expected, 25);
       });
   });
 
@@ -116,7 +116,7 @@ describe('Modulate', function () {
           .modulate({ hue: angle })
           .toFile(actual)
           .then(function () {
-            fixtures.assertMaxColourDistance(actual, expected, 0);
+            fixtures.assertMaxColourDistance(actual, expected, 25);
           });
       });
     });
