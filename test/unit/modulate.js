@@ -75,7 +75,7 @@ describe('Modulate', function () {
       .modulate({ saturation: 2 })
       .toFile(actual)
       .then(function () {
-        fixtures.assertMaxColourDistance(actual, expected, 25);
+        fixtures.assertMaxColourDistance(actual, expected, 30);
       });
   });
 
