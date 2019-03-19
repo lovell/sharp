@@ -7,6 +7,9 @@ const fixtures = require('../fixtures');
 describe('Modulate', function () {
   describe('Invalid options', function () {
     [
+      null,
+      undefined,
+      10,
       { brightness: -1 },
       { brightness: '50%' },
       { brightness: null },
