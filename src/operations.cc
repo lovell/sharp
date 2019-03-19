@@ -190,7 +190,7 @@ namespace sharp {
       // Separate alpha channel
       VImage alpha = image[image.bands() - 1];
       return RemoveAlpha(image)
-        .colourspace(VIPS_INTERPRETATION_LCH);
+        .colourspace(VIPS_INTERPRETATION_LCH)
         .linear({brightness, saturation, 1}, {0, 0, hue})
         .bandjoin(alpha);
     } else {
