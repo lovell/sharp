@@ -20,7 +20,11 @@ and [https://www.cairographics.org/operators/][2]
 ### Parameters
 
 -   `images` **[Array][3]&lt;[Object][4]>** Ordered list of images to composite
-    -   `images[].input` **([Buffer][5] \| [String][6])?** Buffer containing image data or String containing the path to an image file.
+    -   `images[].input` **([Buffer][5] \| [String][6])?** Buffer containing image data, String containing the path to an image file, or Crate object (see bellow)
+        -   `images[].input.create` **[Object][4]?** describes a blank overlay to be created.
+            -   `images[].input.create.width` **[Number][7]?** 
+            -   `images[].input.create.height` **[Number][7]?** 
+            -   `images[].input.create.channels` **[Number][7]?** 3-4
     -   `images[].blend` **[String][6]** how to blend this image with the image below. (optional, default `'over'`)
     -   `images[].gravity` **[String][6]** gravity at which to place the overlay. (optional, default `'centre'`)
     -   `images[].top` **[Number][7]?** the pixel offset from the top edge.
@@ -31,11 +35,6 @@ and [https://www.cairographics.org/operators/][2]
         -   `images[].raw.width` **[Number][7]?** 
         -   `images[].raw.height` **[Number][7]?** 
         -   `images[].raw.channels` **[Number][7]?** 
-    -   `images[].create` **[Object][4]?** describes a blank overlay to be created.
-        -   `images[].create.width` **[Number][7]?** 
-        -   `images[].create.height` **[Number][7]?** 
-        -   `images[].create.channels` **[Number][7]?** 3-4
-        -   `images[].create.background` **([String][6] \| [Object][4])?** parsed by the [color][9] module to extract values for red, green, blue and alpha.
 
 ### Examples
 
@@ -56,7 +55,7 @@ sharp('input.png')
   });
 ```
 
--   Throws **[Error][10]** Invalid parameters
+-   Throws **[Error][9]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -76,6 +75,4 @@ Returns **Sharp**
 
 [8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[9]: https://www.npmjs.org/package/color
-
-[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
