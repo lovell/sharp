@@ -20,7 +20,7 @@ and [https://www.cairographics.org/operators/][2]
 ### Parameters
 
 -   `images` **[Array][3]&lt;[Object][4]>** Ordered list of images to composite
-    -   `images[].input` **([Buffer][5] \| [String][6])?** Buffer containing image data, String containing the path to an image file, or Crate object (see bellow)
+    -   `images[].input` **([Buffer][5] \| [String][6])?** Buffer containing image data, String containing the path to an image file, or Create object (see bellow)
         -   `images[].input.create` **[Object][4]?** describes a blank overlay to be created.
             -   `images[].input.create.width` **[Number][7]?** 
             -   `images[].input.create.height` **[Number][7]?** 
