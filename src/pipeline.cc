@@ -1217,7 +1217,7 @@ NAN_METHOD(pipeline) {
   baton->blurSigma = AttrTo<double>(options, "blurSigma");
   baton->brightness = AttrTo<double>(options, "brightness");
   baton->saturation = AttrTo<double>(options, "saturation");
-  baton->hue = AttrTo<double>(options, "hue");
+  baton->hue = AttrTo<int32_t>(options, "hue");
   baton->medianSize = AttrTo<uint32_t>(options, "medianSize");
   baton->sharpenSigma = AttrTo<double>(options, "sharpenSigma");
   baton->sharpenFlat = AttrTo<double>(options, "sharpenFlat");

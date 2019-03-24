@@ -89,7 +89,7 @@ struct PipelineBaton {
   double blurSigma;
   double brightness;
   double saturation;
-  double hue;
+  int hue;
   int medianSize;
   double sharpenSigma;
   double sharpenFlat;

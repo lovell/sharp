@@ -17,6 +17,7 @@ describe('Modulate', function () {
       { saturation: '50%' },
       { saturation: null },
       { hue: '50deg' },
+      { hue: 1.5 },
       { hue: null }
     ].forEach(function (options) {
       it('should throw', function () {

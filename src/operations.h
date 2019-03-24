@@ -100,7 +100,7 @@ namespace sharp {
   /*
    * Modulate brightness, saturation and hue
    */
-  VImage Modulate(VImage image, double const brightness, double const saturation, double const hue);
+  VImage Modulate(VImage image, double const brightness, double const saturation, int const hue);
 
 }  // namespace sharp
 
