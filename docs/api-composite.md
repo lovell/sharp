@@ -20,22 +20,22 @@ and [https://www.cairographics.org/operators/][2]
 ### Parameters
 
 -   `images` **[Array][3]&lt;[Object][4]>** Ordered list of images to composite
-    -   `images[].input` **([Buffer][5] \| [String][6])?** Buffer containing image data or String containing the path to an image file.
+    -   `images[].input` **([Buffer][5] \| [String][6])?** Buffer containing image data, String containing the path to an image file, or Create object (see bellow)
+        -   `images[].input.create` **[Object][4]?** describes a blank overlay to be created.
+            -   `images[].input.create.width` **[Number][7]?** 
+            -   `images[].input.create.height` **[Number][7]?** 
+            -   `images[].input.create.channels` **[Number][7]?** 3-4
+            -   `images[].input.create.background` **([String][6] \| [Object][4])?** parsed by the [color][8] module to extract values for red, green, blue and alpha.
     -   `images[].blend` **[String][6]** how to blend this image with the image below. (optional, default `'over'`)
     -   `images[].gravity` **[String][6]** gravity at which to place the overlay. (optional, default `'centre'`)
     -   `images[].top` **[Number][7]?** the pixel offset from the top edge.
     -   `images[].left` **[Number][7]?** the pixel offset from the left edge.
-    -   `images[].tile` **[Boolean][8]** set to true to repeat the overlay image across the entire image with the given `gravity`. (optional, default `false`)
+    -   `images[].tile` **[Boolean][9]** set to true to repeat the overlay image across the entire image with the given `gravity`. (optional, default `false`)
     -   `images[].density` **[Number][7]** number representing the DPI for vector overlay image. (optional, default `72`)
     -   `images[].raw` **[Object][4]?** describes overlay when using raw pixel data.
         -   `images[].raw.width` **[Number][7]?** 
         -   `images[].raw.height` **[Number][7]?** 
         -   `images[].raw.channels` **[Number][7]?** 
-    -   `images[].create` **[Object][4]?** describes a blank overlay to be created.
-        -   `images[].create.width` **[Number][7]?** 
-        -   `images[].create.height` **[Number][7]?** 
-        -   `images[].create.channels` **[Number][7]?** 3-4
-        -   `images[].create.background` **([String][6] \| [Object][4])?** parsed by the [color][9] module to extract values for red, green, blue and alpha.
 
 ### Examples
 
@@ -74,8 +74,8 @@ Returns **Sharp**
 
 [7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[8]: https://www.npmjs.org/package/color
 
-[9]: https://www.npmjs.org/package/color
+[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
 [10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
