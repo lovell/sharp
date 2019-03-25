@@ -124,6 +124,7 @@ the help and code contributions of the following people:
 * [Julian Aubourg](https://github.com/jaubourg)
 * [Keith Belovay](https://github.com/fromkeith)
 * [Michael B. Klein](https://github.com/mbklein)
+* [Jakub Michálek](https://github.com/Goues)
 
 Thank you!
 

@@ -4,6 +4,12 @@
 
 Requires libvips v8.7.4.
 
+#### v0.22.1 - TBD
+
+* Add `modulate` operation for brightness, saturation and hue.
+  [#1601](https://github.com/lovell/sharp/pull/1601)
+  [@Goues](https://github.com/Goues)
+
 #### v0.22.0 - 18<sup>th</sup> March 2019
 
 * Remove functions previously deprecated in v0.21.0:
