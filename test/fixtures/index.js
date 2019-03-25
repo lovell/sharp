@@ -120,6 +120,8 @@ module.exports = {
   outputTiff: getPath('output.tiff'),
   outputZoinks: getPath('output.zoinks'), // an 'unknown' file extension
 
+  testPattern: getPath('test-pattern.png'),
+
   // Path for tests requiring human inspection
   path: getPath,
 

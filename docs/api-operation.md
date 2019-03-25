@@ -287,6 +287,41 @@ sharp(input)
 
 Returns **Sharp** 
 
+## modulate
+
+Transforms the image using brightness, saturation and hue rotation.
+
+### Parameters
+
+-   `options` **[Object][2]?** 
+    -   `options.brightness` **[Number][1]?** Brightness multiplier
+    -   `options.saturation` **[Number][1]?** Saturation multiplier
+    -   `options.hue` **[Number][1]?** Degrees for hue rotation
+
+### Examples
+
+```javascript
+sharp(input)
+  .modulate({
+    brightness: 2 // increase lightness by a factor of 2
+  });
+
+sharp(input)
+  .modulate({
+    hue: 180 // hue-rotate by 180 degrees
+  });
+
+// decreate brightness and saturation while also hue-rotating by 90 degrees
+sharp(input)
+  .modulate({
+    brightness: 0.5,
+    saturation: 0.5,
+    hue: 90
+  });
+```
+
+Returns **Sharp** 
+
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
 [2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object

@@ -349,6 +349,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
       bool const shouldApplyMedian = baton->medianSize > 0;
       bool const shouldComposite = !baton->composite.empty();
+      bool const shouldModulate = baton->brightness != 1.0 || baton->saturation != 1.0 || baton->hue != 0.0;
 
       if (shouldComposite && !HasAlpha(image)) {
         image = sharp::EnsureAlpha(image);
@@ -526,6 +527,10 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Recomb
       if (baton->recombMatrix != NULL) {
         image = sharp::Recomb(image, baton->recombMatrix);
+      }
+
+      if (shouldModulate) {
+        image = sharp::Modulate(image, baton->brightness, baton->saturation, baton->hue);
       }
 
       // Sharpen
@@ -1210,6 +1215,9 @@ NAN_METHOD(pipeline) {
   baton->flattenBackground = AttrAsRgba(options, "flattenBackground");
   baton->negate = AttrTo<bool>(options, "negate");
   baton->blurSigma = AttrTo<double>(options, "blurSigma");
+  baton->brightness = AttrTo<double>(options, "brightness");
+  baton->saturation = AttrTo<double>(options, "saturation");
+  baton->hue = AttrTo<int32_t>(options, "hue");
   baton->medianSize = AttrTo<uint32_t>(options, "medianSize");
   baton->sharpenSigma = AttrTo<double>(options, "sharpenSigma");
   baton->sharpenFlat = AttrTo<double>(options, "sharpenFlat");
