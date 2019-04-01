@@ -163,11 +163,11 @@ Extract a region of the image.
 
 ### Parameters
 
--   `options` **[Object][9]** 
+-   `options` **[Object][9]** describes the region to extract using integral pixel values
     -   `options.left` **[Number][8]** zero-indexed offset from left edge
     -   `options.top` **[Number][8]** zero-indexed offset from top edge
-    -   `options.width` **[Number][8]** dimension of extracted image
-    -   `options.height` **[Number][8]** dimension of extracted image
+    -   `options.width` **[Number][8]** width of region to extract
+    -   `options.height` **[Number][8]** height of region to extract
 
 ### Examples
 
