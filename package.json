@@ -97,10 +97,10 @@
     "color": "^3.1.0",
     "detect-libc": "^1.0.3",
     "fs-copy-file-sync": "^1.1.1",
-    "nan": "^2.13.1",
+    "nan": "^2.13.2",
     "npmlog": "^4.1.2",
     "prebuild-install": "^5.2.5",
-    "semver": "^5.6.0",
+    "semver": "^6.0.0",
     "simple-get": "^3.0.3",
     "tar": "^4.4.8",
     "tunnel-agent": "^0.6.0"
@@ -116,7 +116,7 @@
     "mocha": "^6.0.2",
     "mock-fs": "^4.8.0",
     "nyc": "^13.3.0",
-    "prebuild": "8.1.0",
+    "prebuild": "^8.2.1",
     "prebuild-ci": "^2.3.0",
     "rimraf": "^2.6.3",
     "semistandard": "^13.0.1"
