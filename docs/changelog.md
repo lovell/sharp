@@ -10,6 +10,10 @@ Requires libvips v8.7.4.
   [#1601](https://github.com/lovell/sharp/pull/1601)
   [@Goues](https://github.com/Goues)
 
+* Improve help messaging should `require("sharp")` fail.
+  [#1638](https://github.com/lovell/sharp/pull/1638)
+  [@sidharthachatterjee](https://github.com/sidharthachatterjee)
+
 #### v0.22.0 - 18<sup>th</sup> March 2019
 
 * Remove functions previously deprecated in v0.21.0:

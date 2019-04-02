@@ -93,7 +93,6 @@
     "vips"
   ],
   "dependencies": {
-    "bindings": "^1.5.0",
     "color": "^3.1.0",
     "detect-libc": "^1.0.3",
     "fs-copy-file-sync": "^1.1.1",
