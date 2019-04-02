@@ -41,8 +41,8 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.22.0 | uptake     |
 | v0.23.0 | vision     |
+| v0.24.0 | wit        |
 
 Please squash your changes into a single commit using a command like `git rebase -i upstream/<wip-branch>`.
 
