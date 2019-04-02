@@ -10,7 +10,7 @@ yarn add sharp
 
 ## Prerequisites
 
-* Node v4.5.0+
+* Node.js v6+
 
 ### Building from source
 
