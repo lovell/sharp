@@ -12,9 +12,12 @@ New bugs are assigned a `triage` label whilst under investigation.
 
 ## Submit a new feature request
 
-If a [similar request](https://github.com/lovell/sharp/labels/enhancement) exists, it's probably fastest to add a comment to it about your requirement.
+If a [similar request](https://github.com/lovell/sharp/labels/enhancement) exists,
+it's probably fastest to add a comment to it about your requirement.
 
-Implementation is usually straightforward if _libvips_ [already supports](https://libvips.github.io/libvips/API/current/) the feature you need.
+Implementation is usually straightforward if libvips
+[already supports](https://libvips.github.io/libvips/API/current/func-list.html)
+the feature you need.
 
 ## Submit a Pull Request to fix a bug
 
@@ -48,11 +51,11 @@ Please squash your changes into a single commit using a command like `git rebase
 
 ### Add a new public method
 
-The API tries to be as fluent as possible. Image processing concepts follow the naming conventions from _libvips_ and, to a lesser extent, _ImageMagick_.
+The API tries to be as fluent as possible.
+Image processing concepts follow the naming conventions from libvips and, to a lesser extent, ImageMagick.
 
-Most methods have optional parameters and assume sensible defaults. Methods with mandatory parameters often have names like `doSomethingWith(X)`.
-
-Please ensure backwards compatibility where possible. Methods to modify previously default behaviour often have names like `withoutOptionY()` or `withExtraZ()`.
+Most methods have optional parameters and assume sensible defaults.
+Please ensure backwards compatibility where possible.
 
 Feel free to create a [new issue](https://github.com/lovell/sharp/issues/new) to gather feedback on a potential API change.
 
@@ -60,7 +63,7 @@ Feel free to create a [new issue](https://github.com/lovell/sharp/issues/new) to
 
 A method to be removed should be deprecated in the next major version then removed in the following major version.
 
-By way of example, the [bilinearInterpolation method](https://github.com/lovell/sharp/blob/v0.6.0/index.js#L155) present in v0.5.0 was deprecated in v0.6.0 and removed in v0.7.0.
+By way of example, the `background()` method present in v0.20.0 was deprecated in v0.21.0 and removed in v0.22.0.
 
 ## Documentation
 
