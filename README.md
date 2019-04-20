@@ -96,7 +96,7 @@ Visit [sharp.pixelplumbing.com](https://sharp.pixelplumbing.com/) for complete
 
 ### Contributing
 
-A [guide for contributors](https://github.com/lovell/sharp/blob/master/CONTRIBUTING.md)
+A [guide for contributors](https://github.com/lovell/sharp/blob/master/.github/CONTRIBUTING.md)
 covers reporting bugs, requesting features and submitting code changes.
 
 ### Licensing
