@@ -75,7 +75,8 @@ class PipelineWorker : public Nan::AsyncWorker {
 
       // Limit input images to a given number of pixels, where pixels = width * height
       // Ignore if 0
-      if (baton->limitInputPixels > 0 && image.width() * image.height() > baton->limitInputPixels) {
+      if (baton->limitInputPixels > 0 &&
+        static_cast<uint64_t>(image.width() * image.height()) > static_cast<uint64_t>(baton->limitInputPixels)) {
         (baton->err).append("Input image exceeds pixel limit");
         return Error();
       }
