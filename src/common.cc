@@ -31,13 +31,13 @@ using vips::VImage;
 namespace sharp {
 
   // Convenience methods to access the attributes of a v8::Object
-  bool HasAttr(v8::Handle<v8::Object> obj, std::string attr) {
+  bool HasAttr(v8::Local<v8::Object> obj, std::string attr) {
     return Nan::Has(obj, Nan::New(attr).ToLocalChecked()).FromJust();
   }
-  std::string AttrAsStr(v8::Handle<v8::Object> obj, std::string attr) {
+  std::string AttrAsStr(v8::Local<v8::Object> obj, std::string attr) {
     return *Nan::Utf8String(Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked());
   }
-  std::vector<double> AttrAsRgba(v8::Handle<v8::Object> obj, std::string attr) {
+  std::vector<double> AttrAsRgba(v8::Local<v8::Object> obj, std::string attr) {
     v8::Local<v8::Object> background = AttrAs<v8::Object>(obj, attr);
     std::vector<double> rgba(4);
     for (unsigned int i = 0; i < 4; i++) {
@@ -48,7 +48,7 @@ namespace sharp {
 
   // Create an InputDescriptor instance from a v8::Object describing an input image
   InputDescriptor* CreateInputDescriptor(
-    v8::Handle<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist
+    v8::Local<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist
   ) {
     Nan::HandleScope();
     InputDescriptor *descriptor = new InputDescriptor;

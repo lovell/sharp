@@ -77,22 +77,22 @@ namespace sharp {
   };
 
   // Convenience methods to access the attributes of a v8::Object
-  bool HasAttr(v8::Handle<v8::Object> obj, std::string attr);
-  std::string AttrAsStr(v8::Handle<v8::Object> obj, std::string attr);
-  std::vector<double> AttrAsRgba(v8::Handle<v8::Object> obj, std::string attr);
-  template<typename T> v8::Local<T> AttrAs(v8::Handle<v8::Object> obj, std::string attr) {
+  bool HasAttr(v8::Local<v8::Object> obj, std::string attr);
+  std::string AttrAsStr(v8::Local<v8::Object> obj, std::string attr);
+  std::vector<double> AttrAsRgba(v8::Local<v8::Object> obj, std::string attr);
+  template<typename T> v8::Local<T> AttrAs(v8::Local<v8::Object> obj, std::string attr) {
     return Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked().As<T>();
   }
-  template<typename T> T AttrTo(v8::Handle<v8::Object> obj, std::string attr) {
+  template<typename T> T AttrTo(v8::Local<v8::Object> obj, std::string attr) {
     return Nan::To<T>(Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked()).FromJust();
   }
-  template<typename T> T AttrTo(v8::Handle<v8::Object> obj, int attr) {
+  template<typename T> T AttrTo(v8::Local<v8::Object> obj, int attr) {
     return Nan::To<T>(Nan::Get(obj, attr).ToLocalChecked()).FromJust();
   }
 
   // Create an InputDescriptor instance from a v8::Object describing an input image
   InputDescriptor* CreateInputDescriptor(
-    v8::Handle<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist);
+    v8::Local<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist);
 
   enum class ImageType {
     JPEG,
