@@ -12,4 +12,4 @@ docs/css/
 vendor
 .prebuildrc
 .nyc_output
-CONTRIBUTING.md
+.github/
