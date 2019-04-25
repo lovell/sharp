@@ -8,8 +8,9 @@ environment:
   - nodejs_version: "8"
   - nodejs_version: "10"
   - nodejs_version: "11"
+  - nodejs_version: "12"
 install:
-  - ps: Install-Product node $env:nodejs_version x64
+  - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) x64
   - npm install -g npm@6
   - npm install
 test_script:
