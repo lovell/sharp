@@ -246,6 +246,26 @@ describe('Tile', function () {
     });
   });
 
+  it('Valid skipBlanks threshold values pass', function () {
+    [-1, 0, 255, 65535].forEach(function (skipBlanksThreshold) {
+      assert.doesNotThrow(function () {
+        sharp().tile({
+          skipBlanks: skipBlanksThreshold
+        });
+      });
+    });
+  });
+
+  it('InvalidskipBlanks threshold values fail', function () {
+    ['zoinks', -2, 65536].forEach(function (skipBlanksThreshold) {
+      assert.throws(function () {
+        sharp().tile({
+          skipBlanks: skipBlanksThreshold
+        });
+      });
+    });
+  });
+
   it('Deep Zoom layout', function (done) {
     const directory = fixtures.path('output.dzi_files');
     rimraf(directory, function () {
@@ -364,6 +384,25 @@ describe('Tile', function () {
     });
   });
 
+  it('Deep Zoom layout with skipBlanks', function (done) {
+    const directory = fixtures.path('output.256_skip_blanks.dzi_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpgOverlayLayer2)
+        .tile({
+          size: 256,
+          skipBlanks: 0
+        })
+        .toFile(fixtures.path('output.256_skip_blanks.dzi'), function (err, info) {
+          if (err) throw err;
+          // assert them 0_0.jpeg doesn't exist because it's a white tile
+          const whiteTilePath = path.join(directory, '11', '0_0.jpeg');
+          assert.strictEqual(fs.existsSync(whiteTilePath), false, `Tile shouldn't exist`);
+          // Verify only one depth generated
+          assertDeepZoomTiles(directory, 256, 12, done);
+        });
+    });
+  });
+
   it('Zoomify layout', function (done) {
     const directory = fixtures.path('output.zoomify.dzi');
     rimraf(directory, function () {
@@ -447,6 +486,30 @@ describe('Tile', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual('number', typeof info.size);
           assertZoomifyTiles(directory, 256, 13, done);
+        });
+    });
+  });
+
+  it('Zoomify layout with skip blanks', function (done) {
+    const directory = fixtures.path('output.zoomify.skipBlanks.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpgOverlayLayer2)
+        .tile({
+          size: 256,
+          layout: 'zoomify',
+          skipBlanks: 0
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          // assert them 0_0.jpeg doesn't exist because it's a white tile
+          const whiteTilePath = path.join(directory, 'TileGroup0', '2-0-0.jpg');
+          assert.strictEqual(fs.existsSync(whiteTilePath), false, `Tile shouldn't exist`);
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2048, info.width);
+          assert.strictEqual(1536, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          assertZoomifyTiles(directory, 256, 4, done);
         });
     });
   });
@@ -644,6 +707,31 @@ describe('Tile', function () {
           assert.strictEqual('dz', info.format);
           assert.strictEqual(2725, info.width);
           assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+
+          assertGoogleTiles(directory, 256, 5, done);
+        });
+    });
+  });
+
+  it('Google layout with default skip Blanks', function (done) {
+    const directory = fixtures.path('output.google_depth_skipBlanks.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputPng)
+        .tile({
+          layout: 'google',
+          size: 256
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+
+          const whiteTilePath = path.join(directory, '4', '8', '0.jpg');
+          assert.strictEqual(fs.existsSync(whiteTilePath), false, `Tile shouldn't exist`);
+
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2809, info.width);
+          assert.strictEqual(2074, info.height);
           assert.strictEqual(3, info.channels);
           assert.strictEqual('number', typeof info.size);
 

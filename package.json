@@ -59,7 +59,8 @@
     "Daiz <taneli.vatanen@gmail.com>",
     "Julian Aubourg <j@ubourg.net>",
     "Keith Belovay <keith@picthrive.com>",
-    "Michael B. Klein <mbklein@gmail.com>"
+    "Michael B. Klein <mbklein@gmail.com>",
+    "Jordan Prudhomme <jordan@raboland.fr>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
