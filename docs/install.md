@@ -10,12 +10,12 @@ yarn add sharp
 
 ## Prerequisites
 
-* Node.js v6+
+* Node.js v8.5.0+
 
 ### Building from source
 
 Pre-compiled binaries for sharp are provided for use with
-Node versions 6, 8, 10, 11 and 12 on
+Node versions 8, 10 and 12 on
 64-bit Windows, OS X and Linux platforms.
 
 Sharp will be built from source at install time when:
@@ -36,19 +36,20 @@ Building from source requires:
 [![Ubuntu 16.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 9MB.
+This involves an automated HTTPS download of approximately 10MB.
 
 Most Linux-based (glibc, musl) operating systems running on x64 and ARMv6+ CPUs should "just work", e.g.:
 
-* Debian 7+
+* Debian 8+
 * Ubuntu 14.04+
-* Centos 7+
-* Alpine 3.8+ (Node 8+)
+* Red Hat Enterprise 8
+* CentOS 8
+* Alpine 3.8+
 * Fedora
 * openSUSE 13.2+
 * Archlinux
 * Raspbian Jessie
-* Amazon Linux
+* Amazon Linux 2
 * Solus
 
 To use a globally-installed version of libvips instead of the provided binaries,
@@ -61,7 +62,8 @@ and `LD_LIBRARY_PATH` at runtime.
 
 This allows the use of newer versions of libvips with older versions of sharp.
 
-For 32-bit Intel CPUs and older Linux-based operating systems such as Centos 6,
+For 32-bit Intel CPUs and older Linux-based operating systems such as
+those based on Red Hat Enterprise Linux 7 (e.g. CentOS 7, Amazon Linux 1)
 compiling libvips from source is recommended.
 
 [https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball](https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball)
@@ -97,7 +99,7 @@ that it can be located using `pkg-config --modversion vips-cpp`.
 [![Windows x64 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
 
 libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 14MB.
+This involves an automated HTTPS download of approximately 10MB.
 If you are having issues during installation consider removing the directory
 `C:\Users\[user]\AppData\Roaming\npm-cache\_libvips`.
 
@@ -150,7 +152,7 @@ docker pull tailor/docker-libvips
 
 ### AWS Lambda
 
-Set the Lambda runtime to Node.js 8.10.
+Set the Lambda runtime to `nodejs10.x`.
 
 The binaries in the `node_modules` directory of the
 [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html)
@@ -160,14 +162,14 @@ On non-Linux machines such as OS X and Windows run the following:
 
 ```sh
 rm -rf node_modules/sharp
-npm install --arch=x64 --platform=linux --target=8.10.0 sharp
+npm install --arch=x64 --platform=linux --target=10.15.0 sharp
 ```
 
 Alternatively a Docker container closely matching the Lambda runtime can be used:
 
 ```sh
 rm -rf node_modules/sharp
-docker run -v "$PWD":/var/task lambci/lambda:build-nodejs8.10 npm install sharp
+docker run -v "$PWD":/var/task lambci/lambda:build-nodejs10.x npm install sharp
 ```
 
 To get the best performance select the largest memory available.

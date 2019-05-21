@@ -75,8 +75,8 @@ describe('Image metadata', function () {
       // XMP
       assert.strictEqual('object', typeof metadata.xmp);
       assert.strictEqual(true, metadata.xmp instanceof Buffer);
-      assert.strictEqual(12495, metadata.xmp.byteLength);
-      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('http://ns.adobe.com/xap/1.0')), 0);
+      assert.strictEqual(12466, metadata.xmp.byteLength);
+      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('<?xpacket begin="')), 0);
       done();
     });
   });

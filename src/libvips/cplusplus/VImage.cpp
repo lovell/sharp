@@ -563,7 +563,7 @@ VImage::new_from_file( const char *name, VOption *options )
 }
 
 VImage 
-VImage::new_from_buffer( void *buf, size_t len, const char *option_string, 
+VImage::new_from_buffer( const void *buf, size_t len, const char *option_string, 
 	VOption *options )
 {
 	const char *operation_name;
@@ -586,6 +586,13 @@ VImage::new_from_buffer( void *buf, size_t len, const char *option_string,
 	call_option_string( operation_name, option_string, options ); 
 
 	return( out );
+}
+
+VImage 
+VImage::new_from_buffer( const std::string &buf, const char *option_string, 
+	VOption *options )
+{
+	return( new_from_buffer( buf.c_str(), buf.size(), option_string, options ) );
 }
 
 VImage 

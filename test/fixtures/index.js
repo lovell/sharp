@@ -80,9 +80,6 @@ module.exports = {
   inputPngWithTransparency16bit: getPath('tbgn2c16.png'), // http://www.schaik.com/pngsuite/tbgn2c16.png
   inputPngOverlayLayer0: getPath('alpha-layer-0-background.png'),
   inputPngOverlayLayer1: getPath('alpha-layer-1-fill.png'),
-  inputPngOverlayLayer2: getPath('alpha-layer-2-ink.png'),
-  inputPngOverlayLayer1LowAlpha: getPath('alpha-layer-1-fill-low-alpha.png'),
-  inputPngOverlayLayer2LowAlpha: getPath('alpha-layer-2-ink-low-alpha.png'),
   inputPngAlphaPremultiplicationSmall: getPath('alpha-premultiply-1024x768-paper.png'),
   inputPngAlphaPremultiplicationLarge: getPath('alpha-premultiply-2048x1536-paper.png'),
   inputPngBooleanNoAlpha: getPath('bandbool.png'),

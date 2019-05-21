@@ -1,5 +1,16 @@
 # Changelog
 
+### v0.23 - "*vision*"
+
+Requires libvips v8.8.0.
+
+#### v0.23.0 - TBD
+
+* Remove `overlayWith` previously deprecated in v0.22.0.
+
+* Drop support for Node.js versions 6 and 11.
+  [#1212](https://github.com/lovell/sharp/issues/1674)
+
 ### v0.22 - "*uptake*"
 
 Requires libvips v8.7.4.

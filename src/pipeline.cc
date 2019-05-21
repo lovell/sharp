@@ -21,6 +21,8 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include <vips/vips8>
 #include <node.h>
@@ -29,6 +31,17 @@
 #include "common.h"
 #include "operations.h"
 #include "pipeline.h"
+
+#if defined(WIN32)
+#define STAT64_STRUCT __stat64
+#define STAT64_FUNCTION _stat64
+#elif defined(__APPLE__)
+#define STAT64_STRUCT stat
+#define STAT64_FUNCTION stat
+#else
+#define STAT64_STRUCT stat64
+#define STAT64_FUNCTION stat64
+#endif
 
 class PipelineWorker : public Nan::AsyncWorker {
  public:
@@ -1005,8 +1018,8 @@ class PipelineWorker : public Nan::AsyncWorker {
         argv[2] = info;
       } else {
         // Add file size to info
-        GStatBuf st;
-        if (g_stat(baton->fileOut.data(), &st) == 0) {
+        struct STAT64_STRUCT st;
+        if (STAT64_FUNCTION(baton->fileOut.data(), &st) == 0) {
           Set(info, New("size").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(st.st_size)));
         }
         argv[1] = info;

@@ -194,7 +194,7 @@ struct PipelineBaton {
     blurSigma(0.0),
     brightness(1.0),
     saturation(1.0),
-    hue(0.0),
+    hue(0),
     medianSize(0),
     sharpenSigma(0.0),
     sharpenFlat(1.0),

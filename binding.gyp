@@ -97,7 +97,8 @@
         'conditions': [
           ['OS == "win"', {
             'defines': [
-              '_ALLOW_KEYWORD_MACROS'
+              '_ALLOW_KEYWORD_MACROS',
+              '_FILE_OFFSET_BITS=64'
             ],
             'libraries': [
               '../vendor/lib/libvips.lib',
@@ -183,22 +184,15 @@
     'configurations': {
       'Release': {
         'cflags_cc': [
-          '-Wno-cast-function-type',
-          '-Wno-deprecated-declarations'
+          '-Wno-cast-function-type'
         ],
-        'xcode_settings': {
-          'OTHER_CPLUSPLUSFLAGS': [
-            '-Wno-deprecated-declarations'
-          ]
-        },
         'msvs_settings': {
           'VCCLCompilerTool': {
             'ExceptionHandling': 1
           }
         },
         'msvs_disabled_warnings': [
-          4275,
-          4996
+          4275
         ]
       }
     },

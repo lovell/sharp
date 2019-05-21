@@ -93,39 +93,38 @@
     "vips"
   ],
   "dependencies": {
-    "color": "^3.1.1",
+    "color": "^3.1.2",
     "detect-libc": "^1.0.3",
-    "fs-copy-file-sync": "^1.1.1",
-    "nan": "^2.13.2",
+    "nan": "^2.14.0",
     "npmlog": "^4.1.2",
     "prebuild-install": "^5.3.0",
-    "semver": "^6.0.0",
+    "semver": "^6.1.2",
     "simple-get": "^3.0.3",
-    "tar": "^4.4.8",
+    "tar": "^4.4.10",
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
-    "async": "^2.6.2",
+    "async": "^3.1.0",
     "cc": "^1.0.2",
     "decompress-zip": "^0.3.2",
-    "documentation": "^10.0.0",
+    "documentation": "^11.0.1",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "license-checker": "^25.0.1",
     "mocha": "^6.1.4",
-    "mock-fs": "^4.9.0",
-    "nyc": "^14.0.0",
-    "prebuild": "^8.2.1",
+    "mock-fs": "^4.10.1",
+    "nyc": "^14.1.1",
+    "prebuild": "^9.0.0",
     "prebuild-ci": "^3.0.0",
     "rimraf": "^2.6.3",
     "semistandard": "^13.0.1"
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.7.4"
+    "libvips": "8.8.0"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=8.5.0"
   },
   "semistandard": {
     "env": [
