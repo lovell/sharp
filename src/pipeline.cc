@@ -512,6 +512,16 @@ class PipelineWorker : public Nan::AsyncWorker {
         image = sharp::Threshold(image, baton->threshold, baton->thresholdGrayscale);
       }
 
+      // Dilate - must happen before blurring, due to the utility of dilating after thresholding
+      if (baton->dilateWidth != 0) {
+        image = sharp::Dilate(image, baton->dilateWidth);
+      }
+
+      // Erode - must happen before blurring, due to the utility of eroding after thresholding
+      if (baton->erodeWidth != 0) {
+        image = sharp::Erode(image, baton->erodeWidth);
+      }
+
       // Blur
       if (shouldBlur) {
         image = sharp::Blur(image, baton->blurSigma);
@@ -1230,6 +1240,8 @@ NAN_METHOD(pipeline) {
   baton->gammaOut = AttrTo<double>(options, "gammaOut");
   baton->linearA = AttrTo<double>(options, "linearA");
   baton->linearB = AttrTo<double>(options, "linearB");
+  baton->dilateWidth = AttrTo<int32_t>(options, "dilateWidth");
+  baton->erodeWidth = AttrTo<int32_t>(options, "erodeWidth");
   baton->greyscale = AttrTo<bool>(options, "greyscale");
   baton->normalise = AttrTo<bool>(options, "normalise");
   baton->useExifOrientation = AttrTo<bool>(options, "useExifOrientation");

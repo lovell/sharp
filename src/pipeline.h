@@ -101,6 +101,8 @@ struct PipelineBaton {
   int trimOffsetTop;
   double linearA;
   double linearB;
+  int dilateWidth;
+  int erodeWidth;
   double gamma;
   double gammaOut;
   bool greyscale;
@@ -206,6 +208,8 @@ struct PipelineBaton {
     trimOffsetTop(0),
     linearA(1.0),
     linearB(0.0),
+    dilateWidth(0),
+    erodeWidth(0),
     gamma(0.0),
     greyscale(false),
     normalise(false),

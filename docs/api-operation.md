@@ -112,6 +112,32 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 
 Returns **Sharp** 
 
+## dilate
+
+Dilate the image.
+
+### Parameters
+
+-   `width` **[Number][1]?** dilate width.
+
+
+-   Throws **[Error][5]** Invalid parameters
+
+Returns **Sharp** 
+
+## erode
+
+Erode the image.
+
+### Parameters
+
+-   `width` **[Number][1]?** erode width.
+
+
+-   Throws **[Error][5]** Invalid parameters
+
+Returns **Sharp** 
+
 ## flatten
 
 Merge alpha transparency channel, if any, with a background.

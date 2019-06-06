@@ -102,6 +102,16 @@ namespace sharp {
    */
   VImage Modulate(VImage image, double const brightness, double const saturation, int const hue);
 
+  /*
+   * Dilate an image
+   */
+  VImage Dilate(VImage image, int const width);
+
+  /*
+   * Erode an image
+   */
+  VImage Erode(VImage image, int const width);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_
