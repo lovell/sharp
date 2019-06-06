@@ -105,12 +105,12 @@ namespace sharp {
   /*
    * Dilate an image
    */
-  VImage Dilate(VImage image, int const width);
+  VImage Dilate(VImage image, int const maskWidth);
 
   /*
    * Erode an image
    */
-  VImage Erode(VImage image, int const width);
+  VImage Erode(VImage image, int const maskWidth);
 
 }  // namespace sharp
 

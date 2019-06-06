@@ -282,7 +282,8 @@ namespace sharp {
    * Dilate an image
    */
   VImage Dilate(VImage image, int const width) {
-    VImage mask = VImage::new_matrix(width, width);
+    int maskWidth = 2*width + 1;
+    VImage mask = VImage::new_matrix(maskWidth, maskWidth);
 
     return image.morph(
       mask,
@@ -293,7 +294,8 @@ namespace sharp {
    * Dilate an image
    */
   VImage Erode(VImage image, int const width) {
-    VImage mask = VImage::new_matrix(width, width);
+    int maskWidth = 2*width + 1;
+    VImage mask = VImage::new_matrix(maskWidth, maskWidth);
 
     return image.morph(
       mask,
