@@ -53,18 +53,10 @@ Possible interpolation kernels are:
 ```javascript
 sharp(input)
   .resize({ width: 100 })
+  .rotate() // Ensure orientation is preserved
   .toBuffer()
   .then(data => {
     // 100 pixels wide, auto-scaled height
-  });
-```
-
-```javascript
-sharp(input)
-  .resize({ height: 100 })
-  .toBuffer()
-  .then(data => {
-    // 100 pixels high, auto-scaled width
   });
 ```
 
@@ -76,6 +68,7 @@ sharp(input)
     position: 'right top',
     background: { r: 255, g: 255, b: 255, alpha: 0.5 }
   })
+  .rotate() // Ensure orientation is preserved
   .toFile('output.png')
   .then(() => {
     // output.png is a 200 pixels wide and 300 pixels high image
@@ -85,6 +78,9 @@ sharp(input)
 ```
 
 ```javascript
+// Read image data from readableStream
+// Write 200px square auto-cropped image data to writableStream
+
 const transformer = sharp()
   .resize({
     width: 200,
@@ -92,11 +88,11 @@ const transformer = sharp()
     fit: sharp.fit.cover,
     position: sharp.strategy.entropy
   });
-// Read image data from readableStream
-// Write 200px square auto-cropped image data to writableStream
+
 readableStream
   .pipe(transformer)
   .pipe(writableStream);
+
 ```
 
 ```javascript
@@ -105,6 +101,7 @@ sharp(input)
     fit: sharp.fit.inside,
     withoutEnlargement: true
   })
+  .rotate()
   .toFormat('jpeg')
   .toBuffer()
   .then(function(outputBuffer) {
