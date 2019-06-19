@@ -95,7 +95,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
 
       // Rotate pre-extract
-      if (baton->rotateBeforePreExtract ) {
+      if (baton->rotateBeforePreExtract) {
         if (rotation != VIPS_ANGLE_D0) {
           image = image.rot(rotation);
           sharp::RemoveExifOrientation(image);
