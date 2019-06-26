@@ -8,6 +8,9 @@ Requires libvips v8.8.0.
 
 * Remove `overlayWith` previously deprecated in v0.22.0.
 
+* Add experimental support for Worker Threads.
+  [#1558](https://github.com/lovell/sharp/issues/1558)
+
 * Drop support for Node.js versions 6 and 11.
   [#1674](https://github.com/lovell/sharp/issues/1674)
 

@@ -51,4 +51,4 @@ NAN_MODULE_INIT(init) {
     Nan::GetFunction(Nan::New<v8::FunctionTemplate>(stats)).ToLocalChecked());
 }
 
-NODE_MODULE(sharp, init)
+NAN_MODULE_WORKER_ENABLED(sharp, init)
