@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const fs = require('fs');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -71,5 +72,11 @@ describe('failOnError', function () {
       .catch(err => {
         done(err.message.includes('VipsJpeg: Premature end of JPEG file') ? undefined : err);
       });
+  });
+
+  it('handles stream-based input', function () {
+    const writable = sharp({ failOnError: false });
+    fs.createReadStream(fixtures.inputJpgTruncated).pipe(writable);
+    return writable.toBuffer();
   });
 });

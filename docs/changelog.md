@@ -9,7 +9,10 @@ Requires libvips v8.8.0.
 * Remove `overlayWith` previously deprecated in v0.22.0.
 
 * Drop support for Node.js versions 6 and 11.
-  [#1212](https://github.com/lovell/sharp/issues/1674)
+  [#1674](https://github.com/lovell/sharp/issues/1674)
+
+* Allow use of failOnError option with Stream-based input.
+  [#1691](https://github.com/lovell/sharp/issues/1691)
 
 ### v0.22 - "*uptake*"
 
