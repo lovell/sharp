@@ -69,7 +69,7 @@ compiling libvips from source is recommended.
 #### Alpine Linux
 
 libvips is available in the
-[testing repository](https://pkgs.alpinelinux.org/packages?name=vips-dev):
+[community repository](https://pkgs.alpinelinux.org/packages?name=vips-dev):
 
 ```sh
 apk add vips-dev fftw-dev build-base --update-cache \
