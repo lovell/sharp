@@ -110,6 +110,15 @@ namespace sharp {
   bool IsTiff(std::string const &str) {
     return EndsWith(str, ".tif") || EndsWith(str, ".tiff") || EndsWith(str, ".TIF") || EndsWith(str, ".TIFF");
   }
+  bool IsHeic(std::string const &str) {
+    return EndsWith(str, ".heic") || EndsWith(str, ".HEIC");
+  }
+  bool IsHeif(std::string const &str) {
+    return EndsWith(str, ".heif") || EndsWith(str, ".HEIF") || IsHeic(str) || IsAvif(str);
+  }
+  bool IsAvif(std::string const &str) {
+    return EndsWith(str, ".avif") || EndsWith(str, ".AVIF");
+  }
   bool IsDz(std::string const &str) {
     return EndsWith(str, ".dzi") || EndsWith(str, ".DZI");
   }
@@ -132,6 +141,7 @@ namespace sharp {
       case ImageType::TIFF: id = "tiff"; break;
       case ImageType::GIF: id = "gif"; break;
       case ImageType::SVG: id = "svg"; break;
+      case ImageType::HEIF: id = "heif"; break;
       case ImageType::PDF: id = "pdf"; break;
       case ImageType::MAGICK: id = "magick"; break;
       case ImageType::OPENSLIDE: id = "openslide"; break;
@@ -165,6 +175,8 @@ namespace sharp {
         imageType = ImageType::GIF;
       } else if (EndsWith(loader, "SvgBuffer")) {
         imageType = ImageType::SVG;
+      } else if (EndsWith(loader, "HeifBuffer")) {
+        imageType = ImageType::HEIF;
       } else if (EndsWith(loader, "PdfBuffer")) {
         imageType = ImageType::PDF;
       } else if (EndsWith(loader, "MagickBuffer")) {
@@ -196,6 +208,8 @@ namespace sharp {
         imageType = ImageType::GIF;
       } else if (EndsWith(loader, "SvgFile")) {
         imageType = ImageType::SVG;
+      } else if (EndsWith(loader, "HeifFile")) {
+        imageType = ImageType::HEIF;
       } else if (EndsWith(loader, "PdfFile")) {
         imageType = ImageType::PDF;
       } else if (EndsWith(loader, "Ppm")) {
@@ -222,6 +236,7 @@ namespace sharp {
     return
       imageType == ImageType::GIF ||
       imageType == ImageType::TIFF ||
+      imageType == ImageType::HEIF ||
       imageType == ImageType::PDF;
   }
 

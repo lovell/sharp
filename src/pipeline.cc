@@ -793,6 +793,18 @@ class PipelineWorker : public Nan::AsyncWorker {
           vips_area_unref(area);
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
+        } else if (baton->formatOut == "heif" || (baton->formatOut == "input" && inputImageType == ImageType::HEIF)) {
+          // Write HEIF to buffer
+          VipsArea *area = VIPS_AREA(image.heifsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("compression", baton->heifCompression)
+            ->set("Q", baton->heifQuality)
+            ->set("lossless", baton->heifLossless)));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "heif";
         } else if (baton->formatOut == "raw" || (baton->formatOut == "input" && inputImageType == ImageType::RAW)) {
           // Write raw, uncompressed image data to buffer
           if (baton->greyscale || image.interpretation() == VIPS_INTERPRETATION_B_W) {
@@ -827,6 +839,7 @@ class PipelineWorker : public Nan::AsyncWorker {
         bool const isPng = sharp::IsPng(baton->fileOut);
         bool const isWebp = sharp::IsWebp(baton->fileOut);
         bool const isTiff = sharp::IsTiff(baton->fileOut);
+        bool const isHeif = sharp::IsHeif(baton->fileOut);
         bool const isDz = sharp::IsDz(baton->fileOut);
         bool const isDzZip = sharp::IsDzZip(baton->fileOut);
         bool const isV = sharp::IsV(baton->fileOut);
@@ -893,6 +906,20 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("yres", baton->tiffYres));
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
+        } else if (baton->formatOut == "heif" || (mightMatchInput && isHeif) ||
+          (willMatchInput && inputImageType == ImageType::HEIF)) {
+          // Write HEIF to file
+          #ifdef VIPS_TYPE_FOREIGN_HEIF_COMPRESSION
+          if (sharp::IsAvif(baton->fileOut)) {
+            baton->heifCompression = VIPS_FOREIGN_HEIF_COMPRESSION_AV1;
+          }
+          #endif
+          image.heifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->heifQuality)
+            ->set("compression", baton->heifCompression)
+            ->set("lossless", baton->heifLossless));
+          baton->formatOut = "heif";
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
           if (isDzZip) {
             baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
@@ -1332,7 +1359,13 @@ NAN_METHOD(pipeline) {
   baton->tiffPredictor = static_cast<VipsForeignTiffPredictor>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_PREDICTOR,
     AttrAsStr(options, "tiffPredictor").data()));
-
+  baton->heifQuality = AttrTo<uint32_t>(options, "heifQuality");
+  baton->heifLossless = AttrTo<bool>(options, "heifLossless");
+  #ifdef VIPS_TYPE_FOREIGN_HEIF_COMPRESSION
+  baton->heifCompression = static_cast<VipsForeignHeifCompression>(
+  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
+    AttrAsStr(options, "heifCompression").data()));
+  #endif
   // Tile output
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");

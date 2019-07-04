@@ -34,8 +34,9 @@ A `Promise` is returned when `callback` is not provided.
 -   `density`: Number of pixels per inch (DPI), if present
 -   `chromaSubsampling`: String containing JPEG chroma subsampling, `4:2:0` or `4:4:4` for RGB, `4:2:0:4` or `4:4:4:4` for CMYK
 -   `isProgressive`: Boolean indicating whether the image is interlaced using a progressive scan
--   `pages`: Number of pages/frames contained within the image, with support for TIFF, PDF, animated GIF and animated WebP
+-   `pages`: Number of pages/frames contained within the image, with support for TIFF, HEIF, PDF, animated GIF and animated WebP
 -   `pageHeight`: Number of pixels high each page in this PDF image will be.
+-   `pagePrimary`: Number of the primary page in a HEIF image
 -   `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 -   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 -   `orientation`: Number value of the EXIF Orientation header, if present

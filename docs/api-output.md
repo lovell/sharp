@@ -236,6 +236,29 @@ sharp('input.svg')
 
 Returns **Sharp** 
 
+## heif
+
+Use these HEIF options for output image.
+
+Support for HEIF (HEIC/AVIF) is experimental.
+Do not use this in production systems.
+
+Requires a custom, globally-installed libvips compiled with support for libheif.
+
+Most versions of libheif support only the patent-encumbered HEVC compression format.
+
+### Parameters
+
+-   `options` **[Object][5]?** output options
+    -   `options.quality` **[Number][8]** quality, integer 1-100 (optional, default `80`)
+    -   `options.compression` **[Boolean][6]** compression format: hevc, avc, jpeg, av1 (optional, default `'hevc'`)
+    -   `options.lossless` **[Boolean][6]** use lossless compression (optional, default `false`)
+
+
+-   Throws **[Error][3]** Invalid options
+
+Returns **Sharp** 
+
 ## raw
 
 Force output to be raw, uncompressed uint8 pixel data.

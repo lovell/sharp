@@ -101,6 +101,7 @@ namespace sharp {
     TIFF,
     GIF,
     SVG,
+    HEIF,
     PDF,
     MAGICK,
     OPENSLIDE,
@@ -123,6 +124,9 @@ namespace sharp {
   bool IsPng(std::string const &str);
   bool IsWebp(std::string const &str);
   bool IsTiff(std::string const &str);
+  bool IsHeic(std::string const &str);
+  bool IsHeif(std::string const &str);
+  bool IsAvif(std::string const &str);
   bool IsDz(std::string const &str);
   bool IsDzZip(std::string const &str);
   bool IsV(std::string const &str);
