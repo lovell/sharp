@@ -17,6 +17,10 @@ Requires libvips v8.8.0.
 * Drop support for Node.js versions 6 and 11.
   [#1674](https://github.com/lovell/sharp/issues/1674)
 
+* Expose `skipBlanks` option for tile-based output.
+  [#1687](https://github.com/lovell/sharp/pull/1687)
+  [@RaboliotTheGrey](https://github.com/RaboliotTheGrey)
+
 * Allow use of failOnError option with Stream-based input.
   [#1691](https://github.com/lovell/sharp/issues/1691)
 
