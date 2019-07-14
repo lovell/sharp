@@ -760,6 +760,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("Q", baton->webpQuality)
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
+            ->set("smart_subsample", baton->webpSmartSubsample)
+            ->set("reduction_effort", baton->webpReductionEffort)
             ->set("alpha_q", baton->webpAlphaQuality)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -884,6 +886,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("Q", baton->webpQuality)
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
+            ->set("smart_subsample", baton->webpSmartSubsample)
+            ->set("reduction_effort", baton->webpReductionEffort)
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
@@ -938,7 +942,9 @@ class PipelineWorker : public Nan::AsyncWorker {
               {"Q", std::to_string(baton->webpQuality)},
               {"alpha_q", std::to_string(baton->webpAlphaQuality)},
               {"lossless", baton->webpLossless ? "TRUE" : "FALSE"},
-              {"near_lossless", baton->webpNearLossless ? "TRUE" : "FALSE"}
+              {"near_lossless", baton->webpNearLossless ? "TRUE" : "FALSE"},
+              {"smart_subsample", baton->webpSmartSubsample ? "TRUE" : "FALSE"},
+              {"reduction_effort", std::to_string(baton->webpReductionEffort)}
             };
             suffix = AssembleSuffixString(".webp", options);
           } else {
@@ -1345,6 +1351,8 @@ NAN_METHOD(pipeline) {
   baton->webpAlphaQuality = AttrTo<uint32_t>(options, "webpAlphaQuality");
   baton->webpLossless = AttrTo<bool>(options, "webpLossless");
   baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
+  baton->webpSmartSubsample = AttrTo<bool>(options, "webpSmartSubsample");
+  baton->webpReductionEffort = AttrTo<uint32_t>(options, "webpReductionEffort");
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
   baton->tiffPyramid = AttrTo<bool>(options, "tiffPyramid");
   baton->tiffSquash = AttrTo<bool>(options, "tiffSquash");

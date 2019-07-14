@@ -185,6 +185,8 @@ Use these WebP options for output image.
     -   `options.alphaQuality` **[Number][8]** quality of alpha layer, integer 0-100 (optional, default `100`)
     -   `options.lossless` **[Boolean][6]** use lossless compression mode (optional, default `false`)
     -   `options.nearLossless` **[Boolean][6]** use near_lossless compression mode (optional, default `false`)
+    -   `options.smartSubsample` **[Boolean][6]** use high quality chroma subsampling (optional, default `false`)
+    -   `options.reductionEffort` **[Number][8]** level of CPU effort to reduce file size, integer 0-6 (optional, default `4`)
     -   `options.force` **[Boolean][6]** force WebP output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples

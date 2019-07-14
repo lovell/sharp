@@ -11,6 +11,9 @@ Requires libvips v8.8.0.
 * Add experimental support for HEIF images. Requires libvips compiled with libheif.
   [#1105](https://github.com/lovell/sharp/issues/1105)
 
+* Expose libwebp `smartSubsample` and `reductionEffort` options.
+  [#1545](https://github.com/lovell/sharp/issues/1545)
+
 * Add experimental support for Worker Threads.
   [#1558](https://github.com/lovell/sharp/issues/1558)
 

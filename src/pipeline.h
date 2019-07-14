@@ -138,6 +138,8 @@ struct PipelineBaton {
   int webpAlphaQuality;
   bool webpNearLossless;
   bool webpLossless;
+  bool webpSmartSubsample;
+  int webpReductionEffort;
   int tiffQuality;
   VipsForeignTiffCompression tiffCompression;
   VipsForeignTiffPredictor tiffPredictor;
@@ -241,6 +243,11 @@ struct PipelineBaton {
     pngColours(256),
     pngDither(1.0),
     webpQuality(80),
+    webpAlphaQuality(100),
+    webpNearLossless(false),
+    webpLossless(false),
+    webpSmartSubsample(false),
+    webpReductionEffort(4),
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
