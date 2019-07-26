@@ -108,9 +108,16 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
 
       // Rotate pre-extract
-      if (baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
-        image = image.rot(rotation);
-        sharp::RemoveExifOrientation(image);
+      if (baton->rotateBeforePreExtract) {
+        if (rotation != VIPS_ANGLE_D0) {
+          image = image.rot(rotation);
+          sharp::RemoveExifOrientation(image);
+        }
+        if (baton->rotationAngle != 0.0) {
+          std::vector<double> background;
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground);
+          image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
+        }
       }
 
       // Trim
@@ -403,11 +410,12 @@ class PipelineWorker : public Nan::AsyncWorker {
           ->set("kernel", kernel));
       }
 
-      // Rotate
-      if (!baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
-        image = image.rot(rotation);
-        sharp::RemoveExifOrientation(image);
+      // Rotate post-extract 90-angle
+      if (!baton->rotateBeforePreExtract &&  rotation != VIPS_ANGLE_D0) {
+          image = image.rot(rotation);
+          sharp::RemoveExifOrientation(image);
       }
+
 
       // Flip (mirror about Y axis)
       if (baton->flip) {
@@ -491,8 +499,8 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
       }
 
-      // Rotate by degree
-      if (baton->rotationAngle != 0.0) {
+      // Rotate post-extract non-90 angle
+      if (!baton->rotateBeforePreExtract && baton->rotationAngle != 0.0) {
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground);
         image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
