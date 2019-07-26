@@ -174,7 +174,7 @@ struct PipelineBaton {
   VipsForeignDzLayout tileLayout;
   std::string tileFormat;
   int tileAngle;
-  int skipBlanks;
+  int tileSkipBlanks;
   VipsForeignDzDepth tileDepth;
   std::unique_ptr<double[]> recombMatrix;
 
@@ -279,7 +279,7 @@ struct PipelineBaton {
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),
     tileLayout(VIPS_FOREIGN_DZ_LAYOUT_DZ),
     tileAngle(0),
-    skipBlanks(-1),
+    tileSkipBlanks(-1),
     tileDepth(VIPS_FOREIGN_DZ_DEPTH_LAST) {}
 };
 
