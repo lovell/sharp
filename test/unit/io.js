@@ -392,6 +392,22 @@ describe('Input/output', function () {
       });
   });
 
+  it('Stream input with corrupt header fails gracefully', function (done) {
+    const transformer = sharp();
+    transformer
+      .toBuffer()
+      .then(function () {
+        done(new Error('Unexpectedly resolved Promise'));
+      })
+      .catch(function (err) {
+        assert.strictEqual(true, !!err);
+        done();
+      });
+    fs
+      .createReadStream(fixtures.inputJpgWithCorruptHeader)
+      .pipe(transformer);
+  });
+
   describe('Output filename with unknown extension', function () {
     it('Match JPEG input', function (done) {
       sharp(fixtures.inputJpg)

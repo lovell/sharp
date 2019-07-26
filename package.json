@@ -99,7 +99,7 @@
     "nan": "^2.14.0",
     "npmlog": "^4.1.2",
     "prebuild-install": "^5.3.0",
-    "semver": "^6.2.0",
+    "semver": "^6.3.0",
     "simple-get": "^3.0.3",
     "tar": "^4.4.10",
     "tunnel-agent": "^0.6.0"
