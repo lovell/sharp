@@ -2,7 +2,7 @@
 
 ### v0.23 - "*vision*"
 
-Requires libvips v8.8.0.
+Requires libvips v8.8.1.
 
 #### v0.23.0 - TBD
 

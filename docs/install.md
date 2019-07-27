@@ -42,14 +42,14 @@ Most Linux-based (glibc, musl) operating systems running on x64 and ARMv6+ CPUs 
 
 * Debian 8+
 * Ubuntu 14.04+
-* Red Hat Enterprise 8
-* CentOS 8
-* Alpine 3.8+
-* Fedora
+* Red Hat Enterprise 7+
+* CentOS 7+
+* Alpine 3.10+
+* Fedora 21+
 * openSUSE 13.2+
 * Archlinux
 * Raspbian Jessie
-* Amazon Linux 2
+* Amazon Linux
 * Solus
 
 To use a globally-installed version of libvips instead of the provided binaries,
@@ -63,7 +63,7 @@ and `LD_LIBRARY_PATH` at runtime.
 This allows the use of newer versions of libvips with older versions of sharp.
 
 For 32-bit Intel CPUs and older Linux-based operating systems such as
-those based on Red Hat Enterprise Linux 7 (e.g. CentOS 7, Amazon Linux 1)
+those based on Red Hat Enterprise 6 (e.g. CentOS 6)
 compiling libvips from source is recommended.
 
 [https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball](https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball)
