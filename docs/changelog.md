@@ -27,6 +27,10 @@ Requires libvips v8.8.1.
 * Allow use of failOnError option with Stream-based input.
   [#1691](https://github.com/lovell/sharp/issues/1691)
 
+* Fix rotate/extract ordering for non-90 angles.
+  [#1755](https://github.com/lovell/sharp/pull/1755)
+  [@iovdin](https://github.com/iovdin)
+
 ### v0.22 - "*uptake*"
 
 Requires libvips v8.7.4.
