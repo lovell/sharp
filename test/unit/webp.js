@@ -81,15 +81,15 @@ describe('WebP', function () {
       .resize(320, 240)
       .webp({ smartSubsample: false })
       .toBuffer()
-      .then(withoutSmartSubsample => {
+      .then(withoutSmartSubsample =>
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .webp({ smartSubsample: true })
           .toBuffer()
           .then(withSmartSubsample => {
             assert.strictEqual(true, withSmartSubsample.length > withoutSmartSubsample.length);
-          });
-      })
+          })
+      )
   );
 
   it('invalid smartSubsample throws', () => {
@@ -103,15 +103,15 @@ describe('WebP', function () {
       .resize(320, 240)
       .webp()
       .toBuffer()
-      .then(reductionEffort4 => {
+      .then(reductionEffort4 =>
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .webp({ reductionEffort: 6 })
           .toBuffer()
           .then(reductionEffort6 => {
             assert.strictEqual(true, reductionEffort4.length > reductionEffort6.length);
-          });
-      })
+          })
+      )
   );
 
   it('invalid reductionEffort throws', () => {
