@@ -4,7 +4,7 @@
 
 Requires libvips v8.8.1.
 
-#### v0.23.0 - TBD
+#### v0.23.0 - 29<sup>th</sup> July 2019
 
 * Remove `overlayWith` previously deprecated in v0.22.0.
 
@@ -27,7 +27,7 @@ Requires libvips v8.8.1.
   [#1687](https://github.com/lovell/sharp/pull/1687)
   [@RaboliotTheGrey](https://github.com/RaboliotTheGrey)
 
-* Allow use of failOnError option with Stream-based input.
+* Allow use of `failOnError` option with Stream-based input.
   [#1691](https://github.com/lovell/sharp/issues/1691)
 
 * Fix rotate/extract ordering for non-90 angles.
