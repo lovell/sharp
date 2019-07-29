@@ -17,6 +17,9 @@ Requires libvips v8.8.1.
 * Add experimental support for Worker Threads.
   [#1558](https://github.com/lovell/sharp/issues/1558)
 
+* Use libvips' built-in CMYK and sRGB profiles when required.
+  [#1619](https://github.com/lovell/sharp/issues/1619)
+
 * Drop support for Node.js versions 6 and 11.
   [#1674](https://github.com/lovell/sharp/issues/1674)
 

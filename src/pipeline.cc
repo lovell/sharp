@@ -70,16 +70,6 @@ class PipelineWorker : public Nan::AsyncWorker {
     // Increment processing task counter
     g_atomic_int_inc(&sharp::counterProcess);
 
-    std::map<VipsInterpretation, std::string> profileMap;
-    // Default sRGB ICC profile from https://packages.debian.org/sid/all/icc-profiles-free/filelist
-    profileMap.insert(
-      std::pair<VipsInterpretation, std::string>(VIPS_INTERPRETATION_sRGB,
-                                                 baton->iccProfilePath + "sRGB.icc"));
-    // Convert to sRGB using default CMYK profile from http://www.argyllcms.com/cmyk.icm
-    profileMap.insert(
-      std::pair<VipsInterpretation, std::string>(VIPS_INTERPRETATION_CMYK,
-                                                 baton->iccProfilePath + "cmyk.icm"));
-
     try {
       // Open input
       vips::VImage image;
@@ -321,17 +311,15 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (sharp::HasProfile(image) && image.interpretation() != VIPS_INTERPRETATION_LABS) {
         // Convert to sRGB using embedded profile
         try {
-          image = image.icc_transform(
-            const_cast<char*>(profileMap[VIPS_INTERPRETATION_sRGB].data()), VImage::option()
+          image = image.icc_transform("srgb", VImage::option()
             ->set("embedded", TRUE)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
           // Ignore failure of embedded profile
         }
       } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
-        image = image.icc_transform(
-          const_cast<char*>(profileMap[VIPS_INTERPRETATION_sRGB].data()), VImage::option()
-          ->set("input_profile", profileMap[VIPS_INTERPRETATION_CMYK].data())
+        image = image.icc_transform("srgb", VImage::option()
+          ->set("input_profile", "cmyk")
           ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
 
@@ -701,8 +689,8 @@ class PipelineWorker : public Nan::AsyncWorker {
         // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         // Transform colours from embedded profile to output profile
-        if (baton->withMetadata && sharp::HasProfile(image) && profileMap[baton->colourspace] != std::string()) {
-          image = image.icc_transform(const_cast<char*>(profileMap[baton->colourspace].data()),
+        if (baton->withMetadata && sharp::HasProfile(image)) {
+          image = image.icc_transform(vips_enum_nick(VIPS_TYPE_INTERPRETATION, baton->colourspace),
             VImage::option()->set("embedded", TRUE));
         }
       }
@@ -1196,9 +1184,6 @@ NAN_METHOD(pipeline) {
 
   // Input
   baton->input = CreateInputDescriptor(AttrAs<v8::Object>(options, "input"), buffersToPersist);
-
-  // ICC profile to use when input CMYK image has no embedded profile
-  baton->iccProfilePath = AttrAsStr(options, "iccProfilePath");
   baton->accessMethod = AttrTo<bool>(options, "sequentialRead") ?
     VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   // Limit input images to a given number of pixels, where pixels = width * height

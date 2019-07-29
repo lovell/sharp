@@ -53,7 +53,6 @@ struct Composite {
 
 struct PipelineBaton {
   sharp::InputDescriptor *input;
-  std::string iccProfilePath;
   int limitInputPixels;
   std::string formatOut;
   std::string fileOut;
