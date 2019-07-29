@@ -12,3 +12,9 @@ beforeEach(function () {
   sharp.simd(usingSimd);
   sharp.concurrency(concurrency);
 });
+
+afterEach(function () {
+  if (global.gc) {
+    global.gc();
+  }
+});
