@@ -118,6 +118,13 @@ describe('Utilities', function () {
         assert.strictEqual(true, sharp.format.raw[direction].stream);
       });
     });
+    it('vips format supports filesystem only', function () {
+      ['input', 'output'].forEach(function (direction) {
+        assert.strictEqual(true, sharp.format.vips[direction].file);
+        assert.strictEqual(false, sharp.format.vips[direction].buffer);
+        assert.strictEqual(false, sharp.format.vips[direction].stream);
+      });
+    });
   });
 
   describe('Versions', function () {

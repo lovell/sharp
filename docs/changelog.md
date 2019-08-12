@@ -4,6 +4,11 @@
 
 Requires libvips v8.8.1.
 
+#### v0.23.1 - TBD
+
+* Ensure `sharp.format.vips` is present and correct (filesystem only).
+  [#1813](https://github.com/lovell/sharp/issues/1813)
+
 #### v0.23.0 - 29<sup>th</sup> July 2019
 
 * Remove `overlayWith` previously deprecated in v0.22.0.

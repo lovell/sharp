@@ -147,7 +147,7 @@ namespace sharp {
       case ImageType::OPENSLIDE: id = "openslide"; break;
       case ImageType::PPM: id = "ppm"; break;
       case ImageType::FITS: id = "fits"; break;
-      case ImageType::VIPS: id = "v"; break;
+      case ImageType::VIPS: id = "vips"; break;
       case ImageType::RAW: id = "raw"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
       case ImageType::MISSING: id = "missing"; break;
