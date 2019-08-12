@@ -9,6 +9,10 @@ Requires libvips v8.8.1.
 * Ensure `sharp.format.vips` is present and correct (filesystem only).
   [#1813](https://github.com/lovell/sharp/issues/1813)
 
+* Allow use of 'heic' and 'heif' identifiers with `toFormat`.
+  [#1834](https://github.com/lovell/sharp/pull/1834)
+  [@jaubourg](https://github.com/jaubourg)
+
 #### v0.23.0 - 29<sup>th</sup> July 2019
 
 * Remove `overlayWith` previously deprecated in v0.22.0.
