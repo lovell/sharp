@@ -13,6 +13,8 @@ Requires libvips v8.8.1.
   [#1834](https://github.com/lovell/sharp/pull/1834)
   [@jaubourg](https://github.com/jaubourg)
 
+* Ensure image is at least 3x3 pixels before attempting trim operation.
+
 #### v0.23.0 - 29<sup>th</sup> July 2019
 
 * Remove `overlayWith` previously deprecated in v0.22.0.

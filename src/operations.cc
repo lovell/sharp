@@ -250,6 +250,9 @@ namespace sharp {
     Trim an image
   */
   VImage Trim(VImage image, double const threshold) {
+    if (image.width() < 3 && image.height() < 3) {
+      throw VError("Image to trim must be at least 3x3 pixels");
+    }
     // Top-left pixel provides the background colour
     VImage background = image.extract_area(0, 0, 1, 1);
     if (HasAlpha(background)) {
