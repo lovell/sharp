@@ -31,6 +31,7 @@ and [https://www.cairographics.org/operators/][2]
     -   `images[].top` **[Number][7]?** the pixel offset from the top edge.
     -   `images[].left` **[Number][7]?** the pixel offset from the left edge.
     -   `images[].tile` **[Boolean][9]** set to true to repeat the overlay image across the entire image with the given `gravity`. (optional, default `false`)
+    -   `images[].premultiplied` **[Boolean][9]** set to true to avoid premultipling the image below. Equivalent to the `--premultiplied` vips option. (optional, default `false`)
     -   `images[].density` **[Number][7]** number representing the DPI for vector overlay image. (optional, default `72`)
     -   `images[].raw` **[Object][4]?** describes overlay when using raw pixel data.
         -   `images[].raw.width` **[Number][7]?** 
