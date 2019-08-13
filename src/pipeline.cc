@@ -591,7 +591,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           if (!HasAlpha(compositeImage)) {
             compositeImage = sharp::EnsureAlpha(compositeImage);
           }
-          compositeImage = compositeImage.premultiply();
+          if (!composite->premultiplied) compositeImage = compositeImage.premultiply();
           // Calculate position
           int left;
           int top;
@@ -1230,6 +1230,7 @@ NAN_METHOD(pipeline) {
     composite->left = AttrTo<int32_t>(compositeObject, "left");
     composite->top = AttrTo<int32_t>(compositeObject, "top");
     composite->tile = AttrTo<bool>(compositeObject, "tile");
+    composite->premultiplied = AttrTo<bool>(compositeObject, "premultiplied");
     baton->composite.push_back(composite);
   }
   // Resize options
