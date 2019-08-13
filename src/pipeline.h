@@ -50,7 +50,7 @@ struct Composite {
     left(-1),
     top(-1),
     tile(false),
-	premultiplied(false) {}
+    premultiplied(false) {}
 };
 
 struct PipelineBaton {
