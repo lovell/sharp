@@ -41,6 +41,7 @@ struct Composite {
   int left;
   int top;
   bool tile;
+  bool premultiplied;
 
   Composite():
     input(nullptr),
@@ -48,7 +49,8 @@ struct Composite {
     gravity(0),
     left(-1),
     top(-1),
-    tile(false) {}
+    tile(false),
+    premultiplied(false) {}
 };
 
 struct PipelineBaton {

@@ -62,6 +62,65 @@ describe('composite', () => {
     })
   ));
 
+  it('premultiplied true', () => {
+    const filename = 'composite.premultiplied.png';
+    const below = fixtures.path(`input.below.${filename}`);
+    const above = fixtures.path(`input.above.${filename}`);
+    const actual = fixtures.path(`output.true.${filename}`);
+    const expected = fixtures.expected(`expected.true.${filename}`);
+    return sharp(below)
+      .composite([{
+        input: above,
+        blend: 'color-burn',
+        top: 0,
+        left: 0,
+        premultiplied: true
+      }])
+      .toFile(actual)
+      .then(() => {
+        fixtures.assertMaxColourDistance(actual, expected);
+      });
+  });
+
+  it('premultiplied false', () => {
+    const filename = 'composite.premultiplied.png';
+    const below = fixtures.path(`input.below.${filename}`);
+    const above = fixtures.path(`input.above.${filename}`);
+    const actual = fixtures.path(`output.false.${filename}`);
+    const expected = fixtures.expected(`expected.false.${filename}`);
+    return sharp(below)
+      .composite([{
+        input: above,
+        blend: 'color-burn',
+        top: 0,
+        left: 0,
+        premultiplied: false
+      }])
+      .toFile(actual)
+      .then(() => {
+        fixtures.assertMaxColourDistance(actual, expected);
+      });
+  });
+
+  it('premultiplied absent', () => {
+    const filename = 'composite.premultiplied.png';
+    const below = fixtures.path(`input.below.${filename}`);
+    const above = fixtures.path(`input.above.${filename}`);
+    const actual = fixtures.path(`output.absent.${filename}`);
+    const expected = fixtures.expected(`expected.absent.${filename}`);
+    return sharp(below)
+      .composite([{
+        input: above,
+        blend: 'color-burn',
+        top: 0,
+        left: 0
+      }])
+      .toFile(actual)
+      .then(() => {
+        fixtures.assertMaxColourDistance(actual, expected);
+      });
+  });
+
   it('multiple', () => {
     const filename = 'composite-multiple.png';
     const actual = fixtures.path(`output.${filename}`);
@@ -263,6 +322,12 @@ describe('composite', () => {
       assert.throws(() => {
         sharp().composite([{ input: 'test', tile: 'invalid' }]);
       }, /Expected boolean for tile but received invalid of type string/);
+    });
+
+    it('invalid premultiplied', () => {
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', premultiplied: 'invalid' }]);
+      }, /Expected boolean for premultiplied but received invalid of type string/);
     });
 
     it('invalid left', () => {
