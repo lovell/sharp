@@ -61,7 +61,8 @@
     "Keith Belovay <keith@picthrive.com>",
     "Michael B. Klein <mbklein@gmail.com>",
     "Jordan Prudhomme <jordan@raboland.fr>",
-    "Ilya Ovdin <iovdin@gmail.com>"
+    "Ilya Ovdin <iovdin@gmail.com>",
+    "Andargor <andargor@yahoo.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",

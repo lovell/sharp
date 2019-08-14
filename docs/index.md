@@ -126,6 +126,7 @@ the help and code contributions of the following people:
 * [Michael B. Klein](https://github.com/mbklein)
 * [Jakub Michálek](https://github.com/Goues)
 * [Ilya Ovdin](https://github.com/iovdin)
+* [Andargor](https://github.com/Andargor)
 
 Thank you!
 
