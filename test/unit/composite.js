@@ -324,6 +324,12 @@ describe('composite', () => {
       }, /Expected boolean for tile but received invalid of type string/);
     });
 
+    it('invalid premultiplied', () => {
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', premultiplied: 'invalid' }]);
+      }, /Expected boolean for premultiplied but received invalid of type string/);
+    });
+
     it('invalid left', () => {
       assert.throws(() => {
         sharp().composite([{ input: 'test', left: 0.5 }]);
