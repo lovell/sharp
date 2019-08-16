@@ -81,6 +81,18 @@ describe('Alpha transparency', function () {
       });
   });
 
+  it('Flatten with options but without colour does not throw', () => {
+    assert.doesNotThrow(() => {
+      sharp().flatten({});
+    });
+  });
+
+  it('Flatten to invalid colour throws', () => {
+    assert.throws(() => {
+      sharp().flatten({ background: 1 });
+    });
+  });
+
   it('Enlargement with non-nearest neighbor interpolation shouldn’t cause dark edges', function () {
     const base = 'alpha-premultiply-enlargement-2048x1536-paper.png';
     const actual = fixtures.path('output.' + base);
