@@ -87,6 +87,18 @@ describe('Resize dimensions', function () {
     }, /Expected positive integer for height but received 1.5 of type number/);
   });
 
+  it('Invalid width - via options', () => {
+    assert.throws(() => {
+      sharp().resize({ width: 1.5, height: 240 });
+    }, /Expected positive integer for width but received 1.5 of type number/);
+  });
+
+  it('Invalid height - via options', () => {
+    assert.throws(() => {
+      sharp().resize({ width: 320, height: 1.5 });
+    }, /Expected positive integer for height but received 1.5 of type number/);
+  });
+
   it('Invalid width - too large', function (done) {
     sharp(fixtures.inputJpg)
       .resize(0x4000, 1)

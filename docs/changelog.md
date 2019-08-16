@@ -9,6 +9,9 @@ Requires libvips v8.8.1.
 * Ensure `sharp.format.vips` is present and correct (filesystem only).
   [#1813](https://github.com/lovell/sharp/issues/1813)
 
+* Ensure invalid `width` and `height` provided as options to `resize` throw.
+  [#1817](https://github.com/lovell/sharp/issues/1817)
+
 * Allow use of 'heic' and 'heif' identifiers with `toFormat`.
   [#1834](https://github.com/lovell/sharp/pull/1834)
   [@jaubourg](https://github.com/jaubourg)
