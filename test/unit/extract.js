@@ -121,6 +121,32 @@ describe('Partial image extraction', function () {
       });
   });
 
+  it('Extract then rotate non-90 anagle', function (done) {
+    sharp(fixtures.inputPngWithGreyAlpha)
+      .extract({ left: 20, top: 10, width: 380, height: 280 })
+      .rotate(45)
+      .jpeg()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(467, info.width);
+        assert.strictEqual(467, info.height);
+        fixtures.assertSimilar(fixtures.expected('extract-rotate-45.jpg'), data, done);
+      });
+  });
+
+  it('Rotate then extract non-90 angle', function (done) {
+    sharp(fixtures.inputPngWithGreyAlpha)
+      .rotate(45)
+      .extract({ left: 20, top: 10, width: 380, height: 280 })
+      .jpeg()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(380, info.width);
+        assert.strictEqual(280, info.height);
+        fixtures.assertSimilar(fixtures.expected('rotate-extract-45.jpg'), data, { threshold: 7 }, done);
+      });
+  });
+
   describe('Invalid parameters', function () {
     describe('using the legacy extract(top,left,width,height) syntax', function () {
       it('String top', function () {

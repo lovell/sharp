@@ -44,8 +44,8 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.23.0 | vision     |
 | v0.24.0 | wit        |
+| v0.25.0 | yield      |
 
 Please squash your changes into a single commit using a command like `git rebase -i upstream/<wip-branch>`.
 
@@ -98,5 +98,5 @@ Please feel free to ask any questions via a
 [new issue](https://github.com/lovell/sharp/issues/new).
 
 If you're unable to post details publicly, please
-[e-mail](https://github.com/lovell/sharp/blob/master/package.json#L4)
+[e-mail](https://github.com/lovell/sharp/blob/master/package.json#L5)
 for private, paid consulting.

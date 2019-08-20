@@ -16,5 +16,5 @@ for test in ./test/unit/*.js; do
     --show-leak-kinds=definite,indirect,possible \
     --num-callers=20 \
     --trace-children=yes \
-    node node_modules/.bin/mocha --slow=60000 --timeout=120000 --file test/unit/beforeEach.js "$test";
+    node --expose-gc node_modules/.bin/mocha --slow=60000 --timeout=120000 --file test/unit/beforeEach.js "$test";
 done

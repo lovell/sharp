@@ -25,8 +25,8 @@
 
 // Verify platform and compiler compatibility
 
-#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 7))
-#error libvips version 8.7.0+ is required - see sharp.pixelplumbing.com/page/install
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 8))
+#error libvips version 8.8.0+ is required - see sharp.pixelplumbing.com/page/install
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
@@ -101,6 +101,7 @@ namespace sharp {
     TIFF,
     GIF,
     SVG,
+    HEIF,
     PDF,
     MAGICK,
     OPENSLIDE,
@@ -123,6 +124,9 @@ namespace sharp {
   bool IsPng(std::string const &str);
   bool IsWebp(std::string const &str);
   bool IsTiff(std::string const &str);
+  bool IsHeic(std::string const &str);
+  bool IsHeif(std::string const &str);
+  bool IsAvif(std::string const &str);
   bool IsDz(std::string const &str);
   bool IsDzZip(std::string const &str);
   bool IsV(std::string const &str);

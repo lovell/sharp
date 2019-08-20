@@ -1,11 +1,13 @@
 ---
 name: Question
-about: For help with an existing feature
+about: For help understanding an existing feature
 title: ''
 labels: question
 assignees: ''
 
 ---
+
+<!-- If this issue relates to installation, please use https://github.com/lovell/sharp/issues/new?labels=installation&template=installation.md instead. -->
 
 What are you trying to achieve?
 

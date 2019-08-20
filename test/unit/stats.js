@@ -394,6 +394,15 @@ describe('Image Stats', function () {
     });
   });
 
+  it('CMYK input without profile', () =>
+    sharp(fixtures.inputJpgWithCmykNoProfile)
+      .stats()
+      .then(stats => {
+        assert.strictEqual(4, stats.channels.length);
+        assert.strictEqual(true, stats.isOpaque);
+      })
+  );
+
   it('Stream in, Callback out', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp().stats(function (err, stats) {

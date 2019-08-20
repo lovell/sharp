@@ -21,6 +21,8 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include <vips/vips8>
 #include <node.h>
@@ -29,6 +31,17 @@
 #include "common.h"
 #include "operations.h"
 #include "pipeline.h"
+
+#if defined(WIN32)
+#define STAT64_STRUCT __stat64
+#define STAT64_FUNCTION _stat64
+#elif defined(__APPLE__)
+#define STAT64_STRUCT stat
+#define STAT64_FUNCTION stat
+#else
+#define STAT64_STRUCT stat64
+#define STAT64_FUNCTION stat64
+#endif
 
 class PipelineWorker : public Nan::AsyncWorker {
  public:
@@ -56,16 +69,6 @@ class PipelineWorker : public Nan::AsyncWorker {
     g_atomic_int_dec_and_test(&sharp::counterQueue);
     // Increment processing task counter
     g_atomic_int_inc(&sharp::counterProcess);
-
-    std::map<VipsInterpretation, std::string> profileMap;
-    // Default sRGB ICC profile from https://packages.debian.org/sid/all/icc-profiles-free/filelist
-    profileMap.insert(
-      std::pair<VipsInterpretation, std::string>(VIPS_INTERPRETATION_sRGB,
-                                                 baton->iccProfilePath + "sRGB.icc"));
-    // Convert to sRGB using default CMYK profile from http://www.argyllcms.com/cmyk.icm
-    profileMap.insert(
-      std::pair<VipsInterpretation, std::string>(VIPS_INTERPRETATION_CMYK,
-                                                 baton->iccProfilePath + "cmyk.icm"));
 
     try {
       // Open input
@@ -95,9 +98,16 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
 
       // Rotate pre-extract
-      if (baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
-        image = image.rot(rotation);
-        sharp::RemoveExifOrientation(image);
+      if (baton->rotateBeforePreExtract) {
+        if (rotation != VIPS_ANGLE_D0) {
+          image = image.rot(rotation);
+          sharp::RemoveExifOrientation(image);
+        }
+        if (baton->rotationAngle != 0.0) {
+          std::vector<double> background;
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground);
+          image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
+        }
       }
 
       // Trim
@@ -301,17 +311,15 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (sharp::HasProfile(image) && image.interpretation() != VIPS_INTERPRETATION_LABS) {
         // Convert to sRGB using embedded profile
         try {
-          image = image.icc_transform(
-            const_cast<char*>(profileMap[VIPS_INTERPRETATION_sRGB].data()), VImage::option()
+          image = image.icc_transform("srgb", VImage::option()
             ->set("embedded", TRUE)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
           // Ignore failure of embedded profile
         }
       } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
-        image = image.icc_transform(
-          const_cast<char*>(profileMap[VIPS_INTERPRETATION_sRGB].data()), VImage::option()
-          ->set("input_profile", profileMap[VIPS_INTERPRETATION_CMYK].data())
+        image = image.icc_transform("srgb", VImage::option()
+          ->set("input_profile", "cmyk")
           ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
 
@@ -390,11 +398,12 @@ class PipelineWorker : public Nan::AsyncWorker {
           ->set("kernel", kernel));
       }
 
-      // Rotate
-      if (!baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
-        image = image.rot(rotation);
-        sharp::RemoveExifOrientation(image);
+      // Rotate post-extract 90-angle
+      if (!baton->rotateBeforePreExtract &&  rotation != VIPS_ANGLE_D0) {
+          image = image.rot(rotation);
+          sharp::RemoveExifOrientation(image);
       }
+
 
       // Flip (mirror about Y axis)
       if (baton->flip) {
@@ -478,8 +487,8 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
       }
 
-      // Rotate by degree
-      if (baton->rotationAngle != 0.0) {
+      // Rotate post-extract non-90 angle
+      if (!baton->rotateBeforePreExtract && baton->rotationAngle != 0.0) {
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground);
         image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
@@ -592,7 +601,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           if (!HasAlpha(compositeImage)) {
             compositeImage = sharp::EnsureAlpha(compositeImage);
           }
-          compositeImage = compositeImage.premultiply();
+          if (!composite->premultiplied) compositeImage = compositeImage.premultiply();
           // Calculate position
           int left;
           int top;
@@ -690,8 +699,8 @@ class PipelineWorker : public Nan::AsyncWorker {
         // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         // Transform colours from embedded profile to output profile
-        if (baton->withMetadata && sharp::HasProfile(image) && profileMap[baton->colourspace] != std::string()) {
-          image = image.icc_transform(const_cast<char*>(profileMap[baton->colourspace].data()),
+        if (baton->withMetadata && sharp::HasProfile(image)) {
+          image = image.icc_transform(vips_enum_nick(VIPS_TYPE_INTERPRETATION, baton->colourspace),
             VImage::option()->set("embedded", TRUE));
         }
       }
@@ -757,6 +766,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("Q", baton->webpQuality)
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
+            ->set("smart_subsample", baton->webpSmartSubsample)
+            ->set("reduction_effort", baton->webpReductionEffort)
             ->set("alpha_q", baton->webpAlphaQuality)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -790,6 +801,18 @@ class PipelineWorker : public Nan::AsyncWorker {
           vips_area_unref(area);
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
+        } else if (baton->formatOut == "heif" || (baton->formatOut == "input" && inputImageType == ImageType::HEIF)) {
+          // Write HEIF to buffer
+          VipsArea *area = VIPS_AREA(image.heifsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("compression", baton->heifCompression)
+            ->set("Q", baton->heifQuality)
+            ->set("lossless", baton->heifLossless)));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "heif";
         } else if (baton->formatOut == "raw" || (baton->formatOut == "input" && inputImageType == ImageType::RAW)) {
           // Write raw, uncompressed image data to buffer
           if (baton->greyscale || image.interpretation() == VIPS_INTERPRETATION_B_W) {
@@ -824,6 +847,7 @@ class PipelineWorker : public Nan::AsyncWorker {
         bool const isPng = sharp::IsPng(baton->fileOut);
         bool const isWebp = sharp::IsWebp(baton->fileOut);
         bool const isTiff = sharp::IsTiff(baton->fileOut);
+        bool const isHeif = sharp::IsHeif(baton->fileOut);
         bool const isDz = sharp::IsDz(baton->fileOut);
         bool const isDzZip = sharp::IsDzZip(baton->fileOut);
         bool const isV = sharp::IsV(baton->fileOut);
@@ -868,6 +892,8 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("Q", baton->webpQuality)
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
+            ->set("smart_subsample", baton->webpSmartSubsample)
+            ->set("reduction_effort", baton->webpReductionEffort)
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
@@ -890,6 +916,20 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("yres", baton->tiffYres));
           baton->formatOut = "tiff";
           baton->channels = std::min(baton->channels, 3);
+        } else if (baton->formatOut == "heif" || (mightMatchInput && isHeif) ||
+          (willMatchInput && inputImageType == ImageType::HEIF)) {
+          // Write HEIF to file
+          #ifdef VIPS_TYPE_FOREIGN_HEIF_COMPRESSION
+          if (sharp::IsAvif(baton->fileOut)) {
+            baton->heifCompression = VIPS_FOREIGN_HEIF_COMPRESSION_AV1;
+          }
+          #endif
+          image.heifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("Q", baton->heifQuality)
+            ->set("compression", baton->heifCompression)
+            ->set("lossless", baton->heifLossless));
+          baton->formatOut = "heif";
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
           if (isDzZip) {
             baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
@@ -908,7 +948,9 @@ class PipelineWorker : public Nan::AsyncWorker {
               {"Q", std::to_string(baton->webpQuality)},
               {"alpha_q", std::to_string(baton->webpAlphaQuality)},
               {"lossless", baton->webpLossless ? "TRUE" : "FALSE"},
-              {"near_lossless", baton->webpNearLossless ? "TRUE" : "FALSE"}
+              {"near_lossless", baton->webpNearLossless ? "TRUE" : "FALSE"},
+              {"smart_subsample", baton->webpSmartSubsample ? "TRUE" : "FALSE"},
+              {"reduction_effort", std::to_string(baton->webpReductionEffort)}
             };
             suffix = AssembleSuffixString(".webp", options);
           } else {
@@ -935,7 +977,8 @@ class PipelineWorker : public Nan::AsyncWorker {
                                        ->set("container", baton->tileContainer)
                                        ->set("layout", baton->tileLayout)
                                        ->set("suffix", const_cast<char*>(suffix.data()))
-                                       ->set("angle", CalculateAngleRotation(baton->tileAngle));
+                                       ->set("angle", CalculateAngleRotation(baton->tileAngle))
+                                       ->set("skip_blanks", baton->tileSkipBlanks);
 
           // libvips chooses a default depth based on layout. Instead of replicating that logic here by
           // not passing anything - libvips will handle choice
@@ -1015,8 +1058,8 @@ class PipelineWorker : public Nan::AsyncWorker {
         argv[2] = info;
       } else {
         // Add file size to info
-        GStatBuf st;
-        if (g_stat(baton->fileOut.data(), &st) == 0) {
+        struct STAT64_STRUCT st;
+        if (STAT64_FUNCTION(baton->fileOut.data(), &st) == 0) {
           Set(info, New("size").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(st.st_size)));
         }
         argv[1] = info;
@@ -1151,9 +1194,6 @@ NAN_METHOD(pipeline) {
 
   // Input
   baton->input = CreateInputDescriptor(AttrAs<v8::Object>(options, "input"), buffersToPersist);
-
-  // ICC profile to use when input CMYK image has no embedded profile
-  baton->iccProfilePath = AttrAsStr(options, "iccProfilePath");
   baton->accessMethod = AttrTo<bool>(options, "sequentialRead") ?
     VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
   // Limit input images to a given number of pixels, where pixels = width * height
@@ -1200,6 +1240,7 @@ NAN_METHOD(pipeline) {
     composite->left = AttrTo<int32_t>(compositeObject, "left");
     composite->top = AttrTo<int32_t>(compositeObject, "top");
     composite->tile = AttrTo<bool>(compositeObject, "tile");
+    composite->premultiplied = AttrTo<bool>(compositeObject, "premultiplied");
     baton->composite.push_back(composite);
   }
   // Resize options
@@ -1316,6 +1357,8 @@ NAN_METHOD(pipeline) {
   baton->webpAlphaQuality = AttrTo<uint32_t>(options, "webpAlphaQuality");
   baton->webpLossless = AttrTo<bool>(options, "webpLossless");
   baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
+  baton->webpSmartSubsample = AttrTo<bool>(options, "webpSmartSubsample");
+  baton->webpReductionEffort = AttrTo<uint32_t>(options, "webpReductionEffort");
   baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
   baton->tiffPyramid = AttrTo<bool>(options, "tiffPyramid");
   baton->tiffSquash = AttrTo<bool>(options, "tiffSquash");
@@ -1331,12 +1374,19 @@ NAN_METHOD(pipeline) {
   baton->tiffPredictor = static_cast<VipsForeignTiffPredictor>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_PREDICTOR,
     AttrAsStr(options, "tiffPredictor").data()));
-
+  baton->heifQuality = AttrTo<uint32_t>(options, "heifQuality");
+  baton->heifLossless = AttrTo<bool>(options, "heifLossless");
+  #ifdef VIPS_TYPE_FOREIGN_HEIF_COMPRESSION
+  baton->heifCompression = static_cast<VipsForeignHeifCompression>(
+  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
+    AttrAsStr(options, "heifCompression").data()));
+  #endif
   // Tile output
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");
   std::string tileContainer = AttrAsStr(options, "tileContainer");
   baton->tileAngle = AttrTo<int32_t>(options, "tileAngle");
+  baton->tileSkipBlanks = AttrTo<int32_t>(options, "tileSkipBlanks");
   if (tileContainer == "zip") {
     baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
   } else {

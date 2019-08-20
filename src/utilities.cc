@@ -150,8 +150,9 @@ NAN_METHOD(format) {
 
   // Which load/save operations are available for each compressed format?
   Local<Object> format = New<Object>();
-  for (std::string f : {
-    "jpeg", "png", "webp", "tiff", "magick", "openslide", "dz", "ppm", "fits", "gif", "svg", "pdf", "v"
+  for (std::string const f : {
+    "jpeg", "png", "webp", "tiff", "magick", "openslide", "dz",
+    "ppm", "fits", "gif", "svg", "heif", "pdf", "vips"
   }) {
     // Input
     Local<Boolean> hasInputFile =

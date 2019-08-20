@@ -109,7 +109,7 @@ describe('TIFF', function () {
       .toFile(fixtures.outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
-        assert(info.size === startSize);
+        assert.strictEqual(startSize, info.size);
         rimraf(fixtures.outputTiff, done);
       });
   });

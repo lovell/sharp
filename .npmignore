@@ -13,3 +13,4 @@ vendor
 .prebuildrc
 .nyc_output
 .github/
+.vscode/

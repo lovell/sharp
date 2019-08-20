@@ -58,6 +58,27 @@ describe('Trim borders', function () {
       });
   });
 
+  it('Attempt to trim 2x2 pixel image fails', function (done) {
+    sharp({
+      create: {
+        width: 2,
+        height: 2,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .trim()
+      .toBuffer()
+      .then(() => {
+        done(new Error('Expected an error'));
+      })
+      .catch(err => {
+        assert.strictEqual('Image to trim must be at least 3x3 pixels', err.message);
+        done();
+      })
+      .catch(done);
+  });
+
   describe('Invalid thresholds', function () {
     [-1, 'fail', {}].forEach(function (threshold) {
       it(JSON.stringify(threshold), function () {

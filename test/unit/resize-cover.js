@@ -338,7 +338,7 @@ describe('Resize fit=cover', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual(80, info.width);
           assert.strictEqual(320, info.height);
-          assert.strictEqual(-143, info.cropOffsetLeft);
+          assert.strictEqual(-107, info.cropOffsetLeft);
           assert.strictEqual(0, info.cropOffsetTop);
           fixtures.assertSimilar(fixtures.expected('crop-strategy-attention.jpg'), data, done);
         });

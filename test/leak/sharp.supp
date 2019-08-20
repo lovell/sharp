@@ -150,7 +150,7 @@
 {
   cond_libwebp_generic
   Memcheck:Cond
-  obj:/usr/lib/x86_64-linux-gnu/libwebp.so.6.0.2
+  obj:*/libwebp.so.*
 }
 
 # tiff
@@ -188,6 +188,14 @@
   ...
   fun:FcConfigSubstituteWithPat
 }
+{
+  leak_fontconfig_init
+  Memcheck:Leak
+  match-leak-kinds: indirect
+  fun:calloc
+  ...
+  fun:FcInitLoadConfigAndFonts
+}
 
 # libvips
 {
@@ -219,6 +227,13 @@
   ...
   fun:write_webp.constprop.1
   fun:vips__webp_write_buffer
+}
+{
+  value_libvips_start_thread
+  Memcheck:Value8
+  obj:*/libvips.so.*
+  fun:start_thread
+  fun:clone
 }
 {
   cond_libvips_vips_cast_gen
@@ -262,6 +277,14 @@
   fun:write_webp_image
 }
 {
+  param_libvips_write_buf
+  Memcheck:Param
+  write(buf)
+  fun:write
+  ...
+  fun:start_thread
+}
+{
   leak_libvips_init
   Memcheck:Leak
   match-leak-kinds: reachable
@@ -283,6 +306,13 @@
   write(buf)
   ...
   fun:uv__fs_work
+}
+{
+  param_libuv_epoll_ctl
+  Memcheck:Param
+  epoll_ctl(event)
+  fun:epoll_ctl
+  fun:uv__io_poll
 }
 {
   cond_libuv_work_done
@@ -433,6 +463,30 @@
   fun:allocate_stack
   ...
   fun:_ZN4node12NodePlatformC1EiPN2v817TracingControllerE
+}
+{
+  leak_nodejs_start_isolate_data
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:_Znwm
+  ...
+  fun:_ZN4node5StartEPN2v87IsolateEPNS_11IsolateDataERKSt6vectorISsSaISsEES9_
+}
+{
+  leak_nodejs_runtime_stackguard_object_isolate
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:_Znwm
+  ...
+  fun:_ZN2v88internal18Runtime_StackGuardEiPPNS0_6ObjectEPNS0_7IsolateE
+}
+{
+  leak_nodejs_builtin_handleapicall_object_isolate
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:_Znwm
+  ...
+  fun:_ZN2v88internal21Builtin_HandleApiCallEiPPNS0_6ObjectEPNS0_7IsolateE
 }
 {
   param_nodejs_delayed_task_scheduler

@@ -89,8 +89,8 @@ This will also convert to and add a web-friendly sRGB ICC profile.
 
 ### Parameters
 
--   `withMetadata` **[Object][5]?** 
-    -   `withMetadata.orientation` **[Number][8]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
+-   `options` **[Object][5]?** 
+    -   `options.orientation` **[Number][8]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
 
 ### Examples
 
@@ -185,6 +185,8 @@ Use these WebP options for output image.
     -   `options.alphaQuality` **[Number][8]** quality of alpha layer, integer 0-100 (optional, default `100`)
     -   `options.lossless` **[Boolean][6]** use lossless compression mode (optional, default `false`)
     -   `options.nearLossless` **[Boolean][6]** use near_lossless compression mode (optional, default `false`)
+    -   `options.smartSubsample` **[Boolean][6]** use high quality chroma subsampling (optional, default `false`)
+    -   `options.reductionEffort` **[Number][8]** level of CPU effort to reduce file size, integer 0-6 (optional, default `4`)
     -   `options.force` **[Boolean][6]** force WebP output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
@@ -231,6 +233,29 @@ sharp('input.svg')
   .toFile('1-bpp-output.tiff')
   .then(info => { ... });
 ```
+
+-   Throws **[Error][3]** Invalid options
+
+Returns **Sharp** 
+
+## heif
+
+Use these HEIF options for output image.
+
+Support for HEIF (HEIC/AVIF) is experimental.
+Do not use this in production systems.
+
+Requires a custom, globally-installed libvips compiled with support for libheif.
+
+Most versions of libheif support only the patent-encumbered HEVC compression format.
+
+### Parameters
+
+-   `options` **[Object][5]?** output options
+    -   `options.quality` **[Number][8]** quality, integer 1-100 (optional, default `80`)
+    -   `options.compression` **[Boolean][6]** compression format: hevc, avc, jpeg, av1 (optional, default `'hevc'`)
+    -   `options.lossless` **[Boolean][6]** use lossless compression (optional, default `false`)
+
 
 -   Throws **[Error][3]** Invalid options
 
@@ -283,13 +308,14 @@ Warning: multiple sharp instances concurrently producing tile output can expose 
 
 ### Parameters
 
--   `tile` **[Object][5]?** 
-    -   `tile.size` **[Number][8]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
-    -   `tile.overlap` **[Number][8]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
-    -   `tile.angle` **[Number][8]** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
-    -   `tile.depth` **[String][1]?** how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout.
-    -   `tile.container` **[String][1]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
-    -   `tile.layout` **[String][1]** filesystem layout, possible values are `dz`, `zoomify` or `google`. (optional, default `'dz'`)
+-   `options` **[Object][5]?** 
+    -   `options.size` **[Number][8]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
+    -   `options.overlap` **[Number][8]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
+    -   `options.angle` **[Number][8]** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
+    -   `options.depth` **[String][1]?** how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout.
+    -   `options.skipBlanks` **[Number][8]** threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images (optional, default `-1`)
+    -   `options.container` **[String][1]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
+    -   `options.layout` **[String][1]** filesystem layout, possible values are `dz`, `zoomify` or `google`. (optional, default `'dz'`)
 
 ### Examples
 

@@ -41,6 +41,7 @@ struct Composite {
   int left;
   int top;
   bool tile;
+  bool premultiplied;
 
   Composite():
     input(nullptr),
@@ -48,12 +49,12 @@ struct Composite {
     gravity(0),
     left(-1),
     top(-1),
-    tile(false) {}
+    tile(false),
+    premultiplied(false) {}
 };
 
 struct PipelineBaton {
   sharp::InputDescriptor *input;
-  std::string iccProfilePath;
   int limitInputPixels;
   std::string formatOut;
   std::string fileOut;
@@ -140,6 +141,8 @@ struct PipelineBaton {
   int webpAlphaQuality;
   bool webpNearLossless;
   bool webpLossless;
+  bool webpSmartSubsample;
+  int webpReductionEffort;
   int tiffQuality;
   VipsForeignTiffCompression tiffCompression;
   VipsForeignTiffPredictor tiffPredictor;
@@ -150,6 +153,9 @@ struct PipelineBaton {
   int tiffTileWidth;
   double tiffXres;
   double tiffYres;
+  int heifQuality;
+  int heifCompression;  // TODO(libvips 8.9.0): VipsForeignHeifCompression
+  bool heifLossless;
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
@@ -171,6 +177,7 @@ struct PipelineBaton {
   VipsForeignDzLayout tileLayout;
   std::string tileFormat;
   int tileAngle;
+  int tileSkipBlanks;
   VipsForeignDzDepth tileDepth;
   std::unique_ptr<double[]> recombMatrix;
 
@@ -196,7 +203,7 @@ struct PipelineBaton {
     blurSigma(0.0),
     brightness(1.0),
     saturation(1.0),
-    hue(0.0),
+    hue(0),
     medianSize(0),
     sharpenSigma(0.0),
     sharpenFlat(1.0),
@@ -241,6 +248,11 @@ struct PipelineBaton {
     pngColours(256),
     pngDither(1.0),
     webpQuality(80),
+    webpAlphaQuality(100),
+    webpNearLossless(false),
+    webpLossless(false),
+    webpSmartSubsample(false),
+    webpReductionEffort(4),
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
@@ -251,6 +263,9 @@ struct PipelineBaton {
     tiffTileWidth(256),
     tiffXres(1.0),
     tiffYres(1.0),
+    heifQuality(80),
+    heifCompression(1),  // TODO(libvips 8.9.0): VIPS_FOREIGN_HEIF_COMPRESSION_HEVC
+    heifLossless(false),
     withMetadata(false),
     withMetadataOrientation(-1),
     convKernelWidth(0),
@@ -269,6 +284,7 @@ struct PipelineBaton {
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),
     tileLayout(VIPS_FOREIGN_DZ_LAYOUT_DZ),
     tileAngle(0),
+    tileSkipBlanks(-1),
     tileDepth(VIPS_FOREIGN_DZ_DEPTH_LAST) {}
 };
 

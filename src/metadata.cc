@@ -77,6 +77,9 @@ class MetadataWorker : public Nan::AsyncWorker {
       if (image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
         baton->pageHeight = image.get_int(VIPS_META_PAGE_HEIGHT);
       }
+      if (image.get_typeof("heif-primary") == G_TYPE_INT) {
+        baton->pagePrimary = image.get_int("heif-primary");
+      }
       baton->hasProfile = sharp::HasProfile(image);
       // Derived attributes
       baton->hasAlpha = sharp::HasAlpha(image);
@@ -157,6 +160,9 @@ class MetadataWorker : public Nan::AsyncWorker {
       }
       if (baton->pageHeight > 0) {
         Set(info, New("pageHeight").ToLocalChecked(), New<v8::Uint32>(baton->pageHeight));
+      }
+      if (baton->pagePrimary > -1) {
+        Set(info, New("pagePrimary").ToLocalChecked(), New<v8::Uint32>(baton->pagePrimary));
       }
       Set(info, New("hasProfile").ToLocalChecked(), New<v8::Boolean>(baton->hasProfile));
       Set(info, New("hasAlpha").ToLocalChecked(), New<v8::Boolean>(baton->hasAlpha));

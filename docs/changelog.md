@@ -1,5 +1,57 @@
 # Changelog
 
+### v0.23 - "*vision*"
+
+Requires libvips v8.8.1.
+
+#### v0.23.1 - TBD
+
+* Ensure `sharp.format.vips` is present and correct (filesystem only).
+  [#1813](https://github.com/lovell/sharp/issues/1813)
+
+* Ensure invalid `width` and `height` provided as options to `resize` throw.
+  [#1817](https://github.com/lovell/sharp/issues/1817)
+
+* Allow use of 'heic' and 'heif' identifiers with `toFormat`.
+  [#1834](https://github.com/lovell/sharp/pull/1834)
+  [@jaubourg](https://github.com/jaubourg)
+
+* Add `premultiplied` option to `composite` operation.
+  [#1835](https://github.com/lovell/sharp/pull/1835)
+  [@Andargor](https://github.com/Andargor)
+
+* Ensure image is at least 3x3 pixels before attempting trim operation.
+
+#### v0.23.0 - 29<sup>th</sup> July 2019
+
+* Remove `overlayWith` previously deprecated in v0.22.0.
+
+* Add experimental support for HEIF images. Requires libvips compiled with libheif.
+  [#1105](https://github.com/lovell/sharp/issues/1105)
+
+* Expose libwebp `smartSubsample` and `reductionEffort` options.
+  [#1545](https://github.com/lovell/sharp/issues/1545)
+
+* Add experimental support for Worker Threads.
+  [#1558](https://github.com/lovell/sharp/issues/1558)
+
+* Use libvips' built-in CMYK and sRGB profiles when required.
+  [#1619](https://github.com/lovell/sharp/issues/1619)
+
+* Drop support for Node.js versions 6 and 11.
+  [#1674](https://github.com/lovell/sharp/issues/1674)
+
+* Expose `skipBlanks` option for tile-based output.
+  [#1687](https://github.com/lovell/sharp/pull/1687)
+  [@RaboliotTheGrey](https://github.com/RaboliotTheGrey)
+
+* Allow use of `failOnError` option with Stream-based input.
+  [#1691](https://github.com/lovell/sharp/issues/1691)
+
+* Fix rotate/extract ordering for non-90 angles.
+  [#1755](https://github.com/lovell/sharp/pull/1755)
+  [@iovdin](https://github.com/iovdin)
+
 ### v0.22 - "*uptake*"
 
 Requires libvips v8.7.4.

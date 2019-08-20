@@ -75,4 +75,54 @@ describe('WebP', function () {
         fixtures.assertSimilar(fixtures.expected('webp-near-lossless-50.webp'), data50, done);
       });
   });
+
+  it('should produce a larger file size using smartSubsample', () =>
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .webp({ smartSubsample: false })
+      .toBuffer()
+      .then(withoutSmartSubsample =>
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .webp({ smartSubsample: true })
+          .toBuffer()
+          .then(withSmartSubsample => {
+            assert.strictEqual(true, withSmartSubsample.length > withoutSmartSubsample.length);
+          })
+      )
+  );
+
+  it('invalid smartSubsample throws', () => {
+    assert.throws(() => {
+      sharp().webp({ smartSubsample: 1 });
+    });
+  });
+
+  it('should produce a smaller file size with increased reductionEffort', () =>
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .webp()
+      .toBuffer()
+      .then(reductionEffort4 =>
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .webp({ reductionEffort: 6 })
+          .toBuffer()
+          .then(reductionEffort6 => {
+            assert.strictEqual(true, reductionEffort4.length > reductionEffort6.length);
+          })
+      )
+  );
+
+  it('invalid reductionEffort throws', () => {
+    assert.throws(() => {
+      sharp().webp({ reductionEffort: true });
+    });
+  });
+
+  it('out of range reductionEffort throws', () => {
+    assert.throws(() => {
+      sharp().webp({ reductionEffort: -1 });
+    });
+  });
 });

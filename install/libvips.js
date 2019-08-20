@@ -9,7 +9,6 @@ const npmLog = require('npmlog');
 const semver = require('semver');
 const simpleGet = require('simple-get');
 const tar = require('tar');
-const copyFileSync = require('fs-copy-file-sync');
 
 const agent = require('../lib/agent');
 const libvips = require('../lib/libvips');
@@ -64,7 +63,7 @@ try {
     if (platformAndArch === 'freebsd-x64' || platformAndArch === 'openbsd-x64' || platformAndArch === 'sunos-x64') {
       throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
-    if (detectLibc.family === detectLibc.GLIBC && detectLibc.version && semver.lt(`${detectLibc.version}.0`, '2.13.0')) {
+    if (detectLibc.family === detectLibc.GLIBC && detectLibc.version && semver.lt(`${detectLibc.version}.0`, '2.17.0')) {
       throw new Error(`Use with glibc version ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
     // Download to per-process temporary file
@@ -97,7 +96,7 @@ try {
             fs.renameSync(tarPathTemp, tarPathCache);
           } catch (err) {
             // Fall back to copy and unlink
-            copyFileSync(tarPathTemp, tarPathCache);
+            fs.copyFileSync(tarPathTemp, tarPathCache);
             fs.unlinkSync(tarPathTemp);
           }
           extractTarball(tarPathCache);

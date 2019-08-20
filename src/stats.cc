@@ -115,7 +115,7 @@ class StatsWorker : public Nan::AsyncWorker {
 
       std::vector<ChannelStats>::iterator it;
       int i = 0;
-      for (it=baton->channelStats.begin() ; it < baton->channelStats.end(); it++, i++) {
+      for (it = baton->channelStats.begin(); it < baton->channelStats.end(); it++, i++) {
         v8::Local<v8::Object> channelStat = New<v8::Object>();
         Set(channelStat, New("min").ToLocalChecked(), New<v8::Number>(it->min));
         Set(channelStat, New("max").ToLocalChecked(), New<v8::Number>(it->max));
@@ -127,7 +127,7 @@ class StatsWorker : public Nan::AsyncWorker {
         Set(channelStat, New("minY").ToLocalChecked(), New<v8::Number>(it->minY));
         Set(channelStat, New("maxX").ToLocalChecked(), New<v8::Number>(it->maxX));
         Set(channelStat, New("maxY").ToLocalChecked(), New<v8::Number>(it->maxY));
-        channels->Set(i, channelStat);
+        Set(channels, i, channelStat);
       }
 
       Set(info, New("channels").ToLocalChecked(), channels);

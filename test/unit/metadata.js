@@ -75,8 +75,8 @@ describe('Image metadata', function () {
       // XMP
       assert.strictEqual('object', typeof metadata.xmp);
       assert.strictEqual(true, metadata.xmp instanceof Buffer);
-      assert.strictEqual(12495, metadata.xmp.byteLength);
-      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('http://ns.adobe.com/xap/1.0')), 0);
+      assert.strictEqual(12466, metadata.xmp.byteLength);
+      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('<?xpacket begin="')), 0);
       done();
     });
   });
@@ -232,6 +232,26 @@ describe('Image metadata', function () {
       done();
     });
   });
+  it('vips', () =>
+    sharp(fixtures.inputV)
+      .metadata()
+      .then(metadata => {
+        assert.strictEqual('vips', metadata.format);
+        assert.strictEqual('undefined', typeof metadata.size);
+        assert.strictEqual(70, metadata.width);
+        assert.strictEqual(60, metadata.height);
+        assert.strictEqual(3, metadata.channels);
+        assert.strictEqual('uchar', metadata.depth);
+        assert.strictEqual(72, metadata.density);
+        assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
+        assert.strictEqual(false, metadata.isProgressive);
+        assert.strictEqual(false, metadata.hasProfile);
+        assert.strictEqual(false, metadata.hasAlpha);
+        assert.strictEqual('undefined', typeof metadata.orientation);
+        assert.strictEqual('undefined', typeof metadata.exif);
+        assert.strictEqual('undefined', typeof metadata.icc);
+      })
+  );
 
   it('File in, Promise out', function (done) {
     sharp(fixtures.inputJpg).metadata().then(function (metadata) {

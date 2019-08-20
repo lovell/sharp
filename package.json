@@ -1,7 +1,7 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
-  "version": "0.22.1",
+  "version": "0.23.0",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://github.com/lovell/sharp",
   "contributors": [
@@ -61,6 +61,9 @@
     "Keith Belovay <keith@picthrive.com>",
     "Michael B. Klein <mbklein@gmail.com>",
     "Wilbert van de Ridder <wilbert.ridder@gmail.com>"
+    "Jordan Prudhomme <jordan@raboland.fr>",
+    "Ilya Ovdin <iovdin@gmail.com>",
+    "Andargor <andargor@yahoo.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
@@ -94,39 +97,38 @@
     "vips"
   ],
   "dependencies": {
-    "color": "^3.1.1",
+    "color": "^3.1.2",
     "detect-libc": "^1.0.3",
-    "fs-copy-file-sync": "^1.1.1",
-    "nan": "^2.13.2",
+    "nan": "^2.14.0",
     "npmlog": "^4.1.2",
     "prebuild-install": "^5.3.0",
-    "semver": "^6.0.0",
+    "semver": "^6.3.0",
     "simple-get": "^3.0.3",
-    "tar": "^4.4.8",
+    "tar": "^4.4.10",
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
-    "async": "^2.6.2",
+    "async": "^3.1.0",
     "cc": "^1.0.2",
     "decompress-zip": "^0.3.2",
-    "documentation": "^10.0.0",
+    "documentation": "^12.1.1",
     "exif-reader": "^1.0.2",
     "icc": "^1.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^6.1.4",
-    "mock-fs": "^4.9.0",
-    "nyc": "^14.0.0",
-    "prebuild": "^8.2.1",
-    "prebuild-ci": "^3.0.0",
-    "rimraf": "^2.6.3",
+    "mocha": "^6.2.0",
+    "mock-fs": "^4.10.1",
+    "nyc": "^14.1.1",
+    "prebuild": "^9.0.1",
+    "prebuild-ci": "^3.1.0",
+    "rimraf": "^3.0.0",
     "semistandard": "^13.0.1"
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.7.4"
+    "libvips": "8.8.1"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=8.5.0"
   },
   "semistandard": {
     "env": [

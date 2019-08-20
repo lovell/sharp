@@ -36,6 +36,7 @@ struct MetadataBaton {
   int paletteBitDepth;
   int pages;
   int pageHeight;
+  int pagePrimary;
   bool hasProfile;
   bool hasAlpha;
   int orientation;
@@ -59,6 +60,7 @@ struct MetadataBaton {
     paletteBitDepth(0),
     pages(0),
     pageHeight(0),
+    pagePrimary(-1),
     hasProfile(false),
     hasAlpha(false),
     orientation(0),

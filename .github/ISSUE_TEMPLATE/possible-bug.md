@@ -1,11 +1,13 @@
 ---
 name: Possible bug
-about: Please provide steps to reproduce
+about: Something unexpected occurred **using** sharp
 title: ''
-labels: ''
+labels: triage
 assignees: ''
 
 ---
+
+<!-- If this issue relates to installation, please use https://github.com/lovell/sharp/issues/new?labels=installation&template=installation.md instead. -->
 
 What is the output of running `npx envinfo --binaries --languages --system --utilities`?
 
