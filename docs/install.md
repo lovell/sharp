@@ -74,9 +74,8 @@ libvips is available in the
 [community repository](https://pkgs.alpinelinux.org/packages?name=vips-dev):
 
 ```sh
-apk add vips-dev fftw-dev build-base --update-cache \
-    --repository https://alpine.global.ssl.fastly.net/alpine/edge/community/ \
-    --repository https://alpine.global.ssl.fastly.net/alpine/edge/main
+apk add --upgrade --no-cache vips-dev build-base \
+  --repository https://alpine.global.ssl.fastly.net/alpine/v3.10/community/
 ```
 
 The smaller stack size of musl libc means
