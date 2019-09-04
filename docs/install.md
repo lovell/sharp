@@ -74,7 +74,6 @@ libvips is available in the
 [community repository](https://pkgs.alpinelinux.org/packages?name=vips-dev):
 
 ```sh
-apk update && \
 apk upgrade && \
 apk add --update --no-cache --update-cache vips-dev fftw-dev build-base \
     --repository https://alpine.global.ssl.fastly.net/alpine/v3.10/community/ \
