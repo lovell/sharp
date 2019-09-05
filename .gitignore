@@ -14,3 +14,4 @@ vendor
 .nyc_output
 .vscode/
 package-lock.json
+.idea
