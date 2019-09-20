@@ -15,7 +15,7 @@ currentBuild.result = "SUCCESS"
 def notify(String result, String stage) {
   result = result ? 'FAILED': 'SUCCESS'
 
-  emailext attachLog: true, body: '', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:', to: 'mohit.gupta@monotype.com'
+  emailext attachLog: true, body: '', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:', to: 'rahul.garg@monotype.com'
 }
 
 
