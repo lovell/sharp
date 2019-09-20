@@ -253,13 +253,22 @@ namespace sharp {
     if (image.width() < 3 && image.height() < 3) {
       throw VError("Image to trim must be at least 3x3 pixels");
     }
+    VImage target = image;
     // Top-left pixel provides the background colour
     VImage background = image.extract_area(0, 0, 1, 1);
     if (HasAlpha(background)) {
-      background = background.flatten();
+      // Separate alpha channel for trim analysis if not fully opaque
+      int alphaChannel = image.bands() - 1;
+      if (background(0, 0)[alphaChannel] != MaximumImageAlpha(image.interpretation())) {
+        target = image[alphaChannel];
+        background = background[alphaChannel];
+      } else {
+        // Remove alpha channel
+        background = background.flatten();
+      }
     }
     int top, width, height;
-    int const left = image.find_trim(&top, &width, &height, VImage::option()
+    int const left = target.find_trim(&top, &width, &height, VImage::option()
       ->set("background", background(0, 0))
       ->set("threshold", threshold));
     if (width == 0 || height == 0) {

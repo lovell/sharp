@@ -58,6 +58,38 @@ describe('Trim borders', function () {
       });
   });
 
+  it('PNG with alpha channel - 100% transparency', function (done) {
+    sharp(fixtures.inputPngAlpha100Trim)
+      .trim(1)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(76, info.width);
+        assert.strictEqual(46, info.height);
+        assert.strictEqual(4, info.channels);
+        assert.strictEqual(-63, info.trimOffsetLeft);
+        assert.strictEqual(-26, info.trimOffsetTop);
+        fixtures.assertSimilar(fixtures.expected('trimAlpha100.png'), data, done);
+      });
+  });
+
+  it('PNG with alpha channel - 50% transparency', function (done) {
+    sharp(fixtures.inputPngAlpha50Trim)
+      .trim(1)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(76, info.width);
+        assert.strictEqual(46, info.height);
+        assert.strictEqual(4, info.channels);
+        assert.strictEqual(-63, info.trimOffsetLeft);
+        assert.strictEqual(-26, info.trimOffsetTop);
+        fixtures.assertSimilar(fixtures.expected('trimAlpha50.png'), data, done);
+      });
+  });
+
   it('Attempt to trim 2x2 pixel image fails', function (done) {
     sharp({
       create: {
