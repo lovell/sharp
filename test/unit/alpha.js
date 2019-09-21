@@ -54,7 +54,7 @@ describe('Alpha transparency', function () {
         assert.strictEqual(true, info.size > 0);
         assert.strictEqual(32, info.width);
         assert.strictEqual(32, info.height);
-        fixtures.assertMaxColourDistance(output, fixtures.expected('flatten-rgb16-orange.jpg'), 25);
+        fixtures.assertMaxColourDistance(output, fixtures.expected('flatten-rgb16-orange.jpg'), 10);
         done();
       });
   });
