@@ -53,7 +53,8 @@ describe('Raw pixel data', function () {
               width: info.width,
               height: info.height,
               channels: info.channels
-            } })
+            }
+          })
             .jpeg()
             .toBuffer(function (err, data, info) {
               if (err) throw err;
@@ -81,7 +82,8 @@ describe('Raw pixel data', function () {
               width: info.width,
               height: info.height,
               channels: info.channels
-            } })
+            }
+          })
             .png()
             .toBuffer(function (err, data, info) {
               if (err) throw err;

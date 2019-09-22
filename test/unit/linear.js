@@ -73,7 +73,7 @@ describe('Linear adjustment', function () {
 
     assert.throws(function () {
       sharp(fixtures.inputPngOverlayLayer1)
-        .linear(undefined, { 'bar': 'baz' });
+        .linear(undefined, { bar: 'baz' });
     });
   });
 });

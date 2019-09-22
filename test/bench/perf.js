@@ -28,7 +28,7 @@ const height = 588;
 sharp.cache(false);
 
 async.series({
-  'jpeg': function (callback) {
+  jpeg: function (callback) {
     const inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
     const jpegSuite = new Benchmark.Suite('jpeg');
     // jimp

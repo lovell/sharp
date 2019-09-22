@@ -56,7 +56,7 @@ const assertZoomifyTiles = function (directory, expectedTileSize, expectedLevels
     fs.readdirSync(path.join(directory, 'TileGroup0')).forEach(function (tile) {
       // Verify tile file name
       assert.ok(/^[0-9]+-[0-9]+-[0-9]+\.jpg$/.test(tile));
-      let level = parseInt(tile.split('-')[0]);
+      const level = parseInt(tile.split('-')[0]);
       maxTileLevel = Math.max(maxTileLevel, level);
     });
 
@@ -319,7 +319,7 @@ describe('Tile', function () {
           assert.strictEqual('undefined', typeof info.size);
           assertDeepZoomTiles(directory, 512, 13, done);
           // Verifies tiles in 10th level are rotated
-          let tile = path.join(directory, '10', '0_1.jpeg');
+          const tile = path.join(directory, '10', '0_1.jpeg');
           // verify that the width and height correspond to the rotated image
           // expected are w=512 and h=170 for the 0_1.jpeg.
           // if a 0 angle is supplied to the .tile function
@@ -396,7 +396,7 @@ describe('Tile', function () {
           if (err) throw err;
           // assert them 0_0.jpeg doesn't exist because it's a white tile
           const whiteTilePath = path.join(directory, '11', '0_0.jpeg');
-          assert.strictEqual(fs.existsSync(whiteTilePath), false, `Tile shouldn't exist`);
+          assert.strictEqual(fs.existsSync(whiteTilePath), false, 'Tile should not exist');
           // Verify only one depth generated
           assertDeepZoomTiles(directory, 256, 12, done);
         });
@@ -503,7 +503,7 @@ describe('Tile', function () {
           if (err) throw err;
           // assert them 0_0.jpeg doesn't exist because it's a white tile
           const whiteTilePath = path.join(directory, 'TileGroup0', '2-0-0.jpg');
-          assert.strictEqual(fs.existsSync(whiteTilePath), false, `Tile shouldn't exist`);
+          assert.strictEqual(fs.existsSync(whiteTilePath), false, 'Tile should not exist');
           assert.strictEqual('dz', info.format);
           assert.strictEqual(2048, info.width);
           assert.strictEqual(1536, info.height);
@@ -727,7 +727,7 @@ describe('Tile', function () {
           if (err) throw err;
 
           const whiteTilePath = path.join(directory, '4', '8', '0.jpg');
-          assert.strictEqual(fs.existsSync(whiteTilePath), false, `Tile shouldn't exist`);
+          assert.strictEqual(fs.existsSync(whiteTilePath), false, 'Tile should not exist');
 
           assert.strictEqual('dz', info.format);
           assert.strictEqual(2809, info.width);
