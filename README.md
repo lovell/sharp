@@ -11,7 +11,8 @@ is to convert large images in common formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
 
 Resizing an image is typically 4x-5x faster than using the
-quickest ImageMagick and GraphicsMagick settings.
+quickest ImageMagick and GraphicsMagick settings
+due to its use of [libvips](https://github.com/libvips/libvips).
 
 Colour spaces, embedded ICC profiles and alpha transparency channels are all handled correctly.
 Lanczos resampling ensures quality is not sacrificed for speed.
