@@ -12,12 +12,6 @@ const gm = require('gm');
 const imagemagick = require('imagemagick');
 const mapnik = require('mapnik');
 const jimp = require('jimp');
-let imagemagickNative;
-try {
-  imagemagickNative = require('imagemagick-native');
-} catch (err) {
-  console.log('Excluding imagemagick-native');
-}
 
 const fixtures = require('../fixtures');
 
@@ -126,29 +120,6 @@ async.series({
         });
       }
     });
-    // imagemagick-native
-    if (typeof imagemagickNative !== 'undefined') {
-      jpegSuite.add('imagemagick-native-buffer-buffer', {
-        defer: true,
-        fn: function (deferred) {
-          imagemagickNative.convert({
-            srcData: inputJpgBuffer,
-            quality: 80,
-            width: width,
-            height: height,
-            format: 'JPEG',
-            filter: 'Lanczos'
-          }, function (err, buffer) {
-            if (err) {
-              throw err;
-            } else {
-              assert.notStrictEqual(null, buffer);
-              deferred.resolve();
-            }
-          });
-        }
-      });
-    }
     // gm
     jpegSuite.add('gm-buffer-file', {
       defer: true,
@@ -698,22 +669,6 @@ async.series({
         });
       }
     });
-    // imagemagick-native
-    if (typeof imagemagickNative !== 'undefined') {
-      pngSuite.add('imagemagick-native-buffer-buffer', {
-        defer: true,
-        fn: function (deferred) {
-          imagemagickNative.convert({
-            srcData: inputPngBuffer,
-            width: width,
-            height: height,
-            format: 'PNG',
-            filter: 'Lanczos'
-          });
-          deferred.resolve();
-        }
-      });
-    }
     // gm
     pngSuite.add('gm-file-file', {
       defer: true,

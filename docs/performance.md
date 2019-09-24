@@ -10,7 +10,6 @@
 
 * [jimp](https://www.npmjs.com/package/jimp) v0.5.3 - Image processing in pure JavaScript. Provides bicubic interpolation.
 * [mapnik](https://www.npmjs.org/package/mapnik) v4.0.1 - Whilst primarily a map renderer, Mapnik contains bitmap image utilities.
-* [imagemagick-native](https://www.npmjs.com/package/imagemagick-native) v1.9.3 - Wrapper around libmagick++, supports Buffers only.
 * [imagemagick](https://www.npmjs.com/package/imagemagick) v0.1.3 - Supports filesystem only and "*has been unmaintained for a long time*".
 * [gm](https://www.npmjs.com/package/gm) v1.23.1 - Fully featured wrapper around GraphicsMagick's `gm` command line utility.
 * sharp v0.21.0 / libvips v8.7.0 - Caching within libvips disabled to ensure a fair comparison.
@@ -28,7 +27,6 @@ then compress to JPEG at a "quality" setting of 80.
 | jimp               | buffer | buffer |    0.71 |      1.0 |
 | mapnik             | buffer | buffer |    3.32 |      4.7 |
 | gm                 | buffer | buffer |    3.97 |      5.6 |
-| imagemagick-native | buffer | buffer |    4.06 |      5.7 |
 | imagemagick        | file   | file   |    4.24 |      6.0 |
 | sharp              | stream | stream |   25.30 |     35.6 |
 | sharp              | file   | file   |   26.17 |     36.9 |
