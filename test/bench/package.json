@@ -12,9 +12,9 @@
     "benchmark": "^2.1.4",
     "gm": "^1.23.1",
     "imagemagick": "^0.1.3",
-    "jimp": "^0.6.4",
-    "mapnik": "^4.2.1",
-    "semver": "^6.1.2"
+    "jimp": "^0.8.4",
+    "mapnik": "^4.3.1",
+    "semver": "^6.3.0"
   },
   "license": "Apache-2.0",
   "engines": {
