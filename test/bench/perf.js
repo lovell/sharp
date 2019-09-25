@@ -260,6 +260,9 @@ async.series({
           .then(function (buffer) {
             assert.notStrictEqual(null, buffer);
             deferred.resolve();
+          })
+          .catch(function (err) {
+            throw err;
           });
       }
     }).on('cycle', function (event) {
