@@ -4,7 +4,7 @@
 
 Requires libvips v8.8.1.
 
-#### v0.23.1 - TBD
+#### v0.23.1 - 26<sup>th</sup> September 2019
 
 * Ensure `sharp.format.vips` is present and correct (filesystem only).
   [#1813](https://github.com/lovell/sharp/issues/1813)
@@ -19,6 +19,10 @@ Requires libvips v8.8.1.
 * Add `premultiplied` option to `composite` operation.
   [#1835](https://github.com/lovell/sharp/pull/1835)
   [@Andargor](https://github.com/Andargor)
+
+* Allow instance reuse with differing `toBuffer` options.
+  [#1860](https://github.com/lovell/sharp/pull/1860)
+  [@RaboliotTheGrey](https://github.com/RaboliotTheGrey)
 
 * Ensure image is at least 3x3 pixels before attempting trim operation.
 
