@@ -4,6 +4,9 @@
 npm install sharp
 ```
 
+If you are having permissions error while attempting to install globally,
+try `npm install -g --unsafe-perm sharp` or `npm config set user root` then `npm install -g sharp`.
+
 ```sh
 yarn add sharp
 ```
