@@ -79,14 +79,16 @@ try {
       npmLog.info('sharp', `Downloading ${url}`);
       simpleGet({ url: url, agent: agent() }, function (err, response) {
         if (err) {
-          throw err;
+          fail(err);
+        } else if (response.statusCode === 404) {
+          fail(new Error(`Prebuilt libvips binaries are not yet available for ${platformAndArch}`));
+        } else if (response.statusCode !== 200) {
+          fail(new Error(`Status ${response.statusCode} ${response.statusMessage}`));
+        } else {
+          response
+            .on('error', fail)
+            .pipe(tmpFile);
         }
-        if (response.statusCode !== 200) {
-          throw new Error(`Status ${response.statusCode}`);
-        }
-        response
-          .on('error', fail)
-          .pipe(tmpFile);
       });
       tmpFile
         .on('error', fail)
