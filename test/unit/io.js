@@ -648,6 +648,16 @@ describe('Input/output', function () {
     it('Ignore unknown attribute', function () {
       sharp(null, { unknown: true });
     });
+    it('Invalid page property throws', function () {
+      assert.throws(function () {
+        sharp(null, { page: -1 });
+      }, /Expected integer between 0 and 100000 for page but received -1 of type number/);
+    });
+    it('Invalid pages property throws', function () {
+      assert.throws(function () {
+        sharp(null, { pages: '1' });
+      }, /Expected integer between -1 and 100000 for pages but received 1 of type string/);
+    });
   });
 
   describe('create new image', function () {
