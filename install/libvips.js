@@ -19,6 +19,9 @@ const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SH
 
 const fail = function (err) {
   npmLog.error('sharp', err.message);
+  if (err.code === 'EACCES') {
+    npmLog.info('sharp', 'Are you trying to install as a root or sudo user? Try again with the --unsafe-perm flag');
+  }
   npmLog.info('sharp', 'Attempting to build from source via node-gyp but this may fail due to the above error');
   npmLog.info('sharp', 'Please see https://sharp.pixelplumbing.com/page/install for required dependencies');
   process.exit(1);
