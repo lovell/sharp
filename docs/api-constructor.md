@@ -6,7 +6,7 @@
 
 -   `input` **([Buffer][1] \| [String][2])?** if present, can be
      a Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
-     a String containing the path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
+     a String containing the filesystem path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
      JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
 -   `options` **[Object][3]?** if present, is an Object with optional attributes.
     -   `options.failOnError` **[Boolean][4]** by default halt processing and raise an error when loading invalid images.
