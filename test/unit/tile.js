@@ -91,6 +91,40 @@ const assertGoogleTiles = function (directory, expectedTileSize, expectedLevels,
   });
 };
 
+// Verifies all square tiles in a given output directory are > size with overlap
+const assertTileOverlap = function (directory, tileSize) {
+  // Get levels
+  const levels = fs.readdirSync(directory);
+  // Get tiles
+  const tiles = [];
+  levels.forEach(function (level) {
+    // Verify level directory name
+    assert.strictEqual(true, /^[0-9]+$/.test(level));
+    fs.readdirSync(path.join(directory, level)).forEach(function (tile) {
+      // Verify tile file name
+      assert.strictEqual(true, /^[0-9]+_[0-9]+\.jpeg$/.test(tile));
+      tiles.push(path.join(directory, level, tile));
+    });
+  });
+
+  eachLimit(tiles, 8, function (tile, done) {
+    sharp(tile).metadata(function (err, metadata) {
+      if (err) {
+        done(err);
+      } else {
+        // Only checks square tiles
+        if (metadata.width >= tileSize && metadata.height >= tileSize) {
+          // Tiles with an overlap should be larger than original size
+          assert.strictEqual(true, metadata.width > tileSize);
+          assert.strictEqual(true, metadata.height > tileSize);
+        }
+
+        done();
+      }
+    });
+  });
+};
+
 describe('Tile', function () {
   it('Valid size values pass', function () {
     [1, 8192].forEach(function (size) {
@@ -297,6 +331,7 @@ describe('Tile', function () {
           assert.strictEqual(2225, info.height);
           assert.strictEqual(3, info.channels);
           assert.strictEqual('undefined', typeof info.size);
+          assertTileOverlap(directory, 512, 16);
           assertDeepZoomTiles(directory, 512 + (2 * 16), 13, done);
         });
     });
