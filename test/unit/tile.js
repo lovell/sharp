@@ -118,7 +118,6 @@ const assertTileOverlap = function (directory, tileSize) {
           assert.strictEqual(true, metadata.width > tileSize);
           assert.strictEqual(true, metadata.height > tileSize);
         }
-
         done();
       }
     });
@@ -331,7 +330,7 @@ describe('Tile', function () {
           assert.strictEqual(2225, info.height);
           assert.strictEqual(3, info.channels);
           assert.strictEqual('undefined', typeof info.size);
-          assertTileOverlap(directory, 512, 16);
+          assertTileOverlap(directory, 512);
           assertDeepZoomTiles(directory, 512 + (2 * 16), 13, done);
         });
     });
