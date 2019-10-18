@@ -62,7 +62,8 @@
     "Michael B. Klein <mbklein@gmail.com>",
     "Jordan Prudhomme <jordan@raboland.fr>",
     "Ilya Ovdin <iovdin@gmail.com>",
-    "Andargor <andargor@yahoo.com>"
+    "Andargor <andargor@yahoo.com>",
+    "Paul Neave <paul.neave@gmail.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",

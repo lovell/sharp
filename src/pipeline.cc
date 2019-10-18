@@ -968,6 +968,7 @@ class PipelineWorker : public Nan::AsyncWorker {
                                        ->set("layout", baton->tileLayout)
                                        ->set("suffix", const_cast<char*>(suffix.data()))
                                        ->set("angle", CalculateAngleRotation(baton->tileAngle))
+                                       ->set("background", baton->tileBackground)
                                        ->set("skip_blanks", baton->tileSkipBlanks);
 
           // libvips chooses a default depth based on layout. Instead of replicating that logic here by
@@ -1374,6 +1375,7 @@ NAN_METHOD(pipeline) {
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");
   std::string tileContainer = AttrAsStr(options, "tileContainer");
   baton->tileAngle = AttrTo<int32_t>(options, "tileAngle");
+  baton->tileBackground = AttrAsRgba(options, "tileBackground");
   baton->tileSkipBlanks = AttrTo<int32_t>(options, "tileSkipBlanks");
   if (tileContainer == "zip") {
     baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
