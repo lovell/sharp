@@ -959,6 +959,11 @@ class PipelineWorker : public Nan::AsyncWorker {
             };
             suffix = AssembleSuffixString(extname, options);
           }
+
+          // Remove alpha channel from tile background if image does not contain an alpha channel
+          if (!HasAlpha(image)) {
+            baton->tileBackground.pop_back();
+          }
           // Write DZ to file
           vips::VOption *options = VImage::option()
                                        ->set("strip", !baton->withMetadata)
