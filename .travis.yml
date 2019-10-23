@@ -84,6 +84,6 @@ matrix:
       node_js: "12"
     - name: "OS X - Node 13"
       os: osx
-      osx_image: xcode11.2
+      osx_image: xcode10
       language: node_js
       node_js: "13"
