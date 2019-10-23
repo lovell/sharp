@@ -7,6 +7,7 @@ environment:
   - nodejs_version: "8"
   - nodejs_version: "10"
   - nodejs_version: "12"
+  - nodejs_version: "13"
 install:
   - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) x64
   - npm install -g npm@6
