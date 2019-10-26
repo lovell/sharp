@@ -4,6 +4,16 @@
 
 Requires libvips v8.8.1.
 
+#### v0.23.2 - TBD
+
+* Add `background` option to tile output operation.
+  [#1924](https://github.com/lovell/sharp/pull/1924)
+  [@neave](https://github.com/neave)
+
+* Add support for Node.js 13.
+  [#1932](https://github.com/lovell/sharp/pull/1932)
+  [@MayhemYDG](https://github.com/MayhemYDG)
+
 #### v0.23.1 - 26<sup>th</sup> September 2019
 
 * Ensure `sharp.format.vips` is present and correct (filesystem only).
