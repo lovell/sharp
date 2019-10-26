@@ -104,7 +104,7 @@
     "prebuild-install": "^5.3.2",
     "semver": "^6.3.0",
     "simple-get": "^3.1.0",
-    "tar": "^5.0.2",
+    "tar": "^5.0.5",
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
@@ -115,8 +115,8 @@
     "exif-reader": "^1.0.3",
     "icc": "^1.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^6.2.1",
-    "mock-fs": "^4.10.1",
+    "mocha": "^6.2.2",
+    "mock-fs": "^4.10.2",
     "nyc": "^14.1.1",
     "prebuild": "^9.1.1",
     "prebuild-ci": "^3.1.0",
