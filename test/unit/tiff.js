@@ -85,6 +85,19 @@ describe('TIFF', function () {
       });
   });
 
+  it('Increasing TIFF quality increases file size', () =>
+    sharp(fixtures.inputJpgWithLandscapeExif1)
+      .tiff({ quality: 40 })
+      .toBuffer()
+      .then(tiff40 => sharp(fixtures.inputJpgWithLandscapeExif1)
+        .tiff({ quality: 90 })
+        .toBuffer()
+        .then(tiff90 =>
+          assert.strictEqual(true, tiff40.length < tiff90.length)
+        )
+      )
+  );
+
   it('Invalid TIFF quality throws error', function () {
     assert.throws(function () {
       sharp().tiff({ quality: 101 });
