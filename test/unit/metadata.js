@@ -307,6 +307,20 @@ describe('Image metadata', function () {
     readable.pipe(pipeline);
   });
 
+  it('Stream in, rejected Promise out', () => {
+    const pipeline = sharp();
+    fs
+      .createReadStream(__filename)
+      .pipe(pipeline);
+
+    return pipeline
+      .metadata()
+      .then(
+        () => Promise.reject(new Error('Expected metadata to reject')),
+        err => assert.strictEqual(err.message, 'Input buffer contains unsupported image format')
+      );
+  });
+
   it('Stream', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp().metadata(function (err, metadata) {
@@ -389,6 +403,34 @@ describe('Image metadata', function () {
         });
       });
   });
+
+  it('Include metadata in output, enabled via empty object', () =>
+    sharp(fixtures.inputJpgWithExif)
+      .withMetadata({})
+      .toBuffer()
+      .then((buffer) => sharp(buffer)
+        .metadata()
+        .then(metadata => {
+          assert.strictEqual(true, metadata.hasProfile);
+          assert.strictEqual(8, metadata.orientation);
+          assert.strictEqual('object', typeof metadata.exif);
+          assert.strictEqual(true, metadata.exif instanceof Buffer);
+          // EXIF
+          const exif = exifReader(metadata.exif);
+          assert.strictEqual('object', typeof exif);
+          assert.strictEqual('object', typeof exif.image);
+          assert.strictEqual('number', typeof exif.image.XResolution);
+          // ICC
+          assert.strictEqual('object', typeof metadata.icc);
+          assert.strictEqual(true, metadata.icc instanceof Buffer);
+          const profile = icc.parse(metadata.icc);
+          assert.strictEqual('object', typeof profile);
+          assert.strictEqual('RGB', profile.colorSpace);
+          assert.strictEqual('Perceptual', profile.intent);
+          assert.strictEqual('Monitor', profile.deviceClass);
+        })
+      )
+  );
 
   it('Remove EXIF metadata after a resize', function (done) {
     sharp(fixtures.inputJpgWithExif)
