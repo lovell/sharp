@@ -76,6 +76,14 @@
     "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md --markdown-toc=false lib/$m.js >docs/api-$m.md; done"
   },
   "main": "lib/index.js",
+  "files": [
+    "binding.gyp",
+    "docs/**",
+    "!docs/css/**",
+    "install/**",
+    "lib/**",
+    "src/**"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/lovell/sharp"
