@@ -259,4 +259,35 @@ describe('JPEG', function () {
           });
       });
   });
+
+  it('Specifying quantization table provides different JPEG', function (done) {
+    // First generate with default quantization table
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .jpeg({ optimiseCoding: false })
+      .toBuffer(function (err, withDefaultQuantizationTable, withInfo) {
+        if (err) throw err;
+        assert.strictEqual(true, withDefaultQuantizationTable.length > 0);
+        assert.strictEqual(withDefaultQuantizationTable.length, withInfo.size);
+        assert.strictEqual('jpeg', withInfo.format);
+        assert.strictEqual(320, withInfo.width);
+        assert.strictEqual(240, withInfo.height);
+        // Then generate with different quantization table
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .jpeg({ optimiseCoding: false, quantizationTable: 3 })
+          .toBuffer(function (err, withQuantTable3, withoutInfo) {
+            if (err) throw err;
+            assert.strictEqual(true, withQuantTable3.length > 0);
+            assert.strictEqual(withQuantTable3.length, withoutInfo.size);
+            assert.strictEqual('jpeg', withoutInfo.format);
+            assert.strictEqual(320, withoutInfo.width);
+            assert.strictEqual(240, withoutInfo.height);
+
+            // Verify image is same (as mozjpeg may not be present) size or less
+            assert.strictEqual(true, withQuantTable3.length <= withDefaultQuantizationTable.length);
+            done();
+          });
+      });
+  });
 });
