@@ -15,7 +15,7 @@ yarn add sharp
 ### Building from source
 
 Pre-compiled binaries for sharp are provided for use with
-Node versions 8, 10 and 12 on
+Node versions 8, 10, 12 and 13 on
 64-bit Windows, OS X and Linux platforms.
 
 Sharp will be built from source at install time when:
