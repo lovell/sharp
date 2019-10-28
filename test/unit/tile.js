@@ -91,36 +91,25 @@ const assertGoogleTiles = function (directory, expectedTileSize, expectedLevels,
   });
 };
 
-// Verifies all square tiles in a given output directory are > size with overlap
+// Verifies tiles at specified level in a given output directory are > size+overlap
 const assertTileOverlap = function (directory, tileSize) {
-  // Get levels
-  const levels = fs.readdirSync(directory);
-  // Get tiles
-  const tiles = [];
-  levels.forEach(function (level) {
-    // Verify level directory name
-    assert.strictEqual(true, /^[0-9]+$/.test(level));
-    fs.readdirSync(path.join(directory, level)).forEach(function (tile) {
-      // Verify tile file name
-      assert.strictEqual(true, /^[0-9]+_[0-9]+\.jpeg$/.test(tile));
-      tiles.push(path.join(directory, level, tile));
-    });
-  });
+  // Get sorted levels
+  const levels = fs.readdirSync(directory).sort((a, b) => a - b);
+  // Select the highest tile level
+  const highestLevel = levels[levels.length - 1];
+  // Get sorted tiles from greatest level
+  const tiles = fs.readdirSync(path.join(directory, highestLevel)).sort();
+  // Select a tile from the approximate center of the image
+  const squareTile = path.join(directory, highestLevel, tiles[Math.floor(tiles.length / 2)]);
 
-  eachLimit(tiles, 8, function (tile, done) {
-    sharp(tile).metadata(function (err, metadata) {
-      if (err) {
-        done(err);
-      } else {
-        // Only checks square tiles
-        if (metadata.width >= tileSize && metadata.height >= tileSize) {
-          // Tiles with an overlap should be larger than original size
-          assert.strictEqual(true, metadata.width > tileSize);
-          assert.strictEqual(true, metadata.height > tileSize);
-        }
-        done();
-      }
-    });
+  sharp(squareTile).metadata(function (err, metadata) {
+    if (err) {
+      throw err;
+    } else {
+      // Tile with an overlap should be larger than original size
+      assert.strictEqual(true, metadata.width > tileSize);
+      assert.strictEqual(true, metadata.height > tileSize);
+    }
   });
 };
 
