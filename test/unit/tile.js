@@ -92,7 +92,7 @@ const assertGoogleTiles = function (directory, expectedTileSize, expectedLevels,
 };
 
 // Verifies tiles at specified level in a given output directory are > size+overlap
-const assertTileOverlap = function (directory, tileSize) {
+const assertTileOverlap = function (directory, tileSize, done) {
   // Get sorted levels
   const levels = fs.readdirSync(directory).sort((a, b) => a - b);
   // Select the highest tile level
@@ -109,6 +109,7 @@ const assertTileOverlap = function (directory, tileSize) {
       // Tile with an overlap should be larger than original size
       assert.strictEqual(true, metadata.width > tileSize);
       assert.strictEqual(true, metadata.height > tileSize);
+      done();
     }
   });
 };
@@ -319,8 +320,9 @@ describe('Tile', function () {
           assert.strictEqual(2225, info.height);
           assert.strictEqual(3, info.channels);
           assert.strictEqual('undefined', typeof info.size);
-          assertTileOverlap(directory, 512);
-          assertDeepZoomTiles(directory, 512 + (2 * 16), 13, done);
+          assertDeepZoomTiles(directory, 512 + (2 * 16), 13, function () {
+            assertTileOverlap(directory, 512, done);
+          });
         });
     });
   });
