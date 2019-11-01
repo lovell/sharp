@@ -87,3 +87,5 @@ matrix:
       osx_image: xcode10
       language: node_js
       node_js: "13"
+cache:
+  npm: false
