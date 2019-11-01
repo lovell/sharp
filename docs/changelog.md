@@ -4,6 +4,12 @@
 
 Requires libvips v8.8.1.
 
+#### v0.23.3 - TBD
+
+* Ensure tile `overlap` option works as expected.
+  [#1921](https://github.com/lovell/sharp/pull/1921)
+  [@rustyguts](https://github.com/rustyguts)
+
 #### v0.23.2 - 28<sup>th</sup> October 2019
 
 * Add `background` option to tile output operation.

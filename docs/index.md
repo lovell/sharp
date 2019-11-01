@@ -128,6 +128,9 @@ the help and code contributions of the following people:
 * [Jakub Michálek](https://github.com/Goues)
 * [Ilya Ovdin](https://github.com/iovdin)
 * [Andargor](https://github.com/Andargor)
+* [Nicolas Stepien](https://github.com/MayhemYDG)
+* [Paul Neave](https://github.com/neave)
+* [Brendan Kennedy](https://github.com/rustyguts)
 
 Thank you!
 
