@@ -38,6 +38,9 @@
 #elif defined(__APPLE__)
 #define STAT64_STRUCT stat
 #define STAT64_FUNCTION stat
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
+#define STAT64_STRUCT stat
+#define STAT64_FUNCTION stat
 #else
 #define STAT64_STRUCT stat64
 #define STAT64_FUNCTION stat64
