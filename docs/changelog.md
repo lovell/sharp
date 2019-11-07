@@ -10,6 +10,10 @@ Requires libvips v8.8.1.
   [#1921](https://github.com/lovell/sharp/pull/1921)
   [@rustyguts](https://github.com/rustyguts)
 
+* Allow compilation on FreeBSD and variants (broken since v0.23.0)
+  [#1952](https://github.com/lovell/sharp/pull/1952)
+  [@pouya-eghbali](https://github.com/pouya-eghbali)
+
 #### v0.23.2 - 28<sup>th</sup> October 2019
 
 * Add `background` option to tile output operation.
