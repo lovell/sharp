@@ -246,6 +246,9 @@ SHARP_DIST_BASE_URL="https://hostname/path/" npm install sharp
 
 to use `https://hostname/path/libvips-x.y.z-platform.tar.gz`.
 
+To install the prebuilt sharp binaries from a custom URL, please see
+[https://github.com/prebuild/prebuild-install#custom-binaries](https://github.com/prebuild/prebuild-install#custom-binaries)
+
 ### Licences
 
 This module is licensed under the terms of the
