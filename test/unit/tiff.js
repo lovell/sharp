@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const assert = require('assert');
+const promisify = require('util').promisify;
 const rimraf = require('rimraf');
 
 const sharp = require('../../');
@@ -150,40 +151,40 @@ describe('TIFF', function () {
     });
   });
 
-  it('TIFF setting xres and yres on file', function (done) {
-    const res = 1000.0; // inputTiff has a dpi of 300 (res*2.54)
+  it('TIFF setting xres and yres on file', () =>
     sharp(fixtures.inputTiff)
       .tiff({
-        xres: (res),
-        yres: (res)
+        xres: 1000,
+        yres: 1000
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual('tiff', info.format);
-        sharp(fixtures.outputTiff).metadata(function (err, metadata) {
-          if (err) throw err;
-          assert.strictEqual(metadata.density, res * 2.54); // convert to dpi
-          rimraf(fixtures.outputTiff, done);
-        });
-      });
-  });
+      .toFile(fixtures.outputTiff)
+      .then(() => sharp(fixtures.outputTiff)
+        .metadata()
+        .then(({ density }) => {
+          assert.strictEqual(true,
+            density === 2540 || // libvips <= 8.8.2
+            density === 25400); // libvips >= 8.8.3
+          return promisify(rimraf)(fixtures.outputTiff);
+        })
+      )
+  );
 
-  it('TIFF setting xres and yres on buffer', function (done) {
-    const res = 1000.0; // inputTiff has a dpi of 300 (res*2.54)
+  it('TIFF setting xres and yres on buffer', () =>
     sharp(fixtures.inputTiff)
       .tiff({
-        xres: (res),
-        yres: (res)
+        xres: 1000,
+        yres: 1000
       })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        sharp(data).metadata(function (err, metadata) {
-          if (err) throw err;
-          assert.strictEqual(metadata.density, res * 2.54); // convert to dpi
-          done();
-        });
-      });
-  });
+      .toBuffer()
+      .then(data => sharp(data)
+        .metadata()
+        .then(({ density }) => {
+          assert.strictEqual(true,
+            density === 2540 || // libvips <= 8.8.2
+            density === 25400); // libvips >= 8.8.3
+        })
+      )
+  );
 
   it('TIFF invalid xres value should throw an error', function () {
     assert.throws(function () {

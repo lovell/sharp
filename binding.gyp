@@ -183,16 +183,22 @@
     },
     'configurations': {
       'Release': {
-        'cflags_cc': [
-          '-Wno-cast-function-type'
-        ],
-        'msvs_settings': {
-          'VCCLCompilerTool': {
-            'ExceptionHandling': 1
-          }
-        },
-        'msvs_disabled_warnings': [
-          4275
+        'conditions': [
+          ['OS == "linux"', {
+            'cflags_cc': [
+              '-Wno-cast-function-type'
+            ]
+          }],
+          ['OS == "win"', {
+            'msvs_settings': {
+              'VCCLCompilerTool': {
+                'ExceptionHandling': 1
+              }
+            },
+            'msvs_disabled_warnings': [
+              4275
+            ]
+          }]
         ]
       }
     },

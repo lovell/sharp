@@ -69,7 +69,7 @@
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
-    "test": "semistandard && cc && npm run test-unit && npm run test-licensing && prebuild-ci",
+    "test": "semistandard && cpplint && npm run test-unit && npm run test-licensing && prebuild-ci",
     "test-unit": "nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;MIT\"",
     "test-coverage": "./test/coverage/report.sh",
@@ -118,7 +118,7 @@
   },
   "devDependencies": {
     "async": "^3.1.0",
-    "cc": "^1.0.2",
+    "cc": "^2.0.1",
     "decompress-zip": "^0.3.2",
     "documentation": "^12.1.3",
     "exif-reader": "^1.0.3",
