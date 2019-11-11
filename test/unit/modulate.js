@@ -122,4 +122,21 @@ describe('Modulate', function () {
       });
     });
   });
+
+  it('should be able to use linear and modulate together', function () {
+    const base = 'modulate-linear.jpg';
+    const actual = fixtures.path('output.' + base);
+    const expected = fixtures.expected(base);
+
+    const contrast = 1.5;
+    const brightness = 0.5;
+
+    return sharp(fixtures.testPattern)
+      .linear(contrast, -(128 * contrast) + 128)
+      .modulate({ brightness })
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, expected);
+      });
+  });
 });
