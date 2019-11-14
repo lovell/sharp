@@ -13,6 +13,7 @@ const getPath = function (filename) {
 // Based on the dHash gradient method - see http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html
 const fingerprint = function (image, callback) {
   sharp(image)
+    .flatten('gray')
     .greyscale()
     .normalise()
     .resize(9, 8, { fit: sharp.fit.fill })
