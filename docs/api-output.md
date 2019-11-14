@@ -303,7 +303,7 @@ const data = await sharp(input)
 
 -   Throws **[Error][4]** unsupported format or options
 
-Returns **Sharp**
+Returns **Sharp** 
 
 ## tile
 
@@ -315,11 +315,11 @@ Warning: multiple sharp instances concurrently producing tile output can expose 
 
 ### Parameters
 
--   `options` **[Object][6]?**
+-   `options` **[Object][6]?** 
     -   `options.size` **[Number][9]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
     -   `options.overlap` **[Number][9]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
     -   `options.angle` **[Number][9]** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
-	-   `options.background` **([String][2] \| [Object][6])** background colour, parsed by the [color][10] module, defaults to white without transparency. (optional, default `{r:255,g:255,b:255,alpha:1}`)
+    -   `options.background` **([String][2] \| [Object][6])** background colour, parsed by the [color][10] module, defaults to white without transparency. (optional, default `{r:255,g:255,b:255,alpha:1}`)
     -   `options.depth` **[String][2]?** how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout.
     -   `options.skipBlanks` **[Number][9]** threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images (optional, default `-1`)
     -   `options.container` **[String][2]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
