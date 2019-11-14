@@ -6,6 +6,9 @@ Requires libvips v8.8.1.
 
 #### v0.23.3 - TBD
 
+* Ensure `trim` operation supports images contained in the alpha channel.
+  [#1597](https://github.com/lovell/sharp/issues/1597)
+
 * Ensure tile `overlap` option works as expected.
   [#1921](https://github.com/lovell/sharp/pull/1921)
   [@rustyguts](https://github.com/rustyguts)

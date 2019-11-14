@@ -87,6 +87,7 @@ module.exports = {
   inputPngTruncated: getPath('truncated.png'), // gm convert 2569067123_aca715a2ee_o.jpg -resize 320x240 saw.png ; head -c 10000 saw.png > truncated.png
   inputPngEmbed: getPath('embedgravitybird.png'), // Released to sharp under a CC BY 4.0
   inputPngRGBWithAlpha: getPath('2569067123_aca715a2ee_o.png'), // http://www.flickr.com/photos/grizdave/2569067123/ (same as inputJpg)
+  inputPngImageInAlpha: getPath('image-in-alpha.png'), // https://github.com/lovell/sharp/issues/1597
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp

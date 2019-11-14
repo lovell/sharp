@@ -41,6 +41,21 @@ describe('Trim borders', function () {
       });
   });
 
+  it('single colour PNG where alpha channel provides the image', () =>
+    sharp(fixtures.inputPngImageInAlpha)
+      .trim()
+      .toBuffer({ resolveWithObject: true })
+      .then(({ data, info }) => {
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(916, info.width);
+        assert.strictEqual(137, info.height);
+        assert.strictEqual(4, info.channels);
+        assert.strictEqual(-6, info.trimOffsetLeft);
+        assert.strictEqual(-20, info.trimOffsetTop);
+      })
+  );
+
   it('16-bit PNG with alpha channel', function (done) {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 32)

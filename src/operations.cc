@@ -266,12 +266,22 @@ namespace sharp {
     if (HasAlpha(background)) {
       background = background.flatten();
     }
-    int top, width, height;
-    int const left = image.find_trim(&top, &width, &height, VImage::option()
+    int left, top, width, height;
+    left = image.find_trim(&top, &width, &height, VImage::option()
       ->set("background", background(0, 0))
       ->set("threshold", threshold));
     if (width == 0 || height == 0) {
-      throw VError("Unexpected error while trimming. Try to lower the tolerance");
+      if (HasAlpha(image)) {
+        // Search alpha channel
+        VImage alpha = image[image.bands() - 1];
+        VImage backgroundAlpha = alpha.extract_area(0, 0, 1, 1);
+        left = alpha.find_trim(&top, &width, &height, VImage::option()
+          ->set("background", backgroundAlpha(0, 0))
+          ->set("threshold", threshold));
+      }
+      if (width == 0 || height == 0) {
+        throw VError("Unexpected error while trimming. Try to lower the tolerance");
+      }
     }
     return image.extract_area(left, top, width, height);
   }

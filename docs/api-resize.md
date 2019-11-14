@@ -196,6 +196,8 @@ Returns **Sharp**
 ## trim
 
 Trim "boring" pixels from all edges that contain values similar to the top-left pixel.
+Images consisting entirely of a single colour will calculate "boring" using the alpha channel, if any.
+
 The `info` response Object will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
 ### Parameters
