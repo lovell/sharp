@@ -150,10 +150,7 @@
   "cc": {
     "linelength": "120",
     "filter": [
-      "build/c++11",
-      "build/include",
-      "runtime/indentation_namespace",
-      "runtime/references"
+      "build/include"
     ]
   }
 }

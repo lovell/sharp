@@ -17,7 +17,7 @@
 #include <string.h>
 #include <vector>
 #include <queue>
-#include <mutex>
+#include <mutex>  // NOLINT(build/c++11)
 
 #include <node.h>
 #include <node_buffer.h>

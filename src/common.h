@@ -43,7 +43,7 @@ using vips::VImage;
 
 namespace sharp {
 
-  struct InputDescriptor {
+  struct InputDescriptor {  // NOLINT(runtime/indentation_namespace)
     std::string name;
     std::string file;
     char *buffer;
@@ -92,7 +92,7 @@ namespace sharp {
 
   // Create an InputDescriptor instance from a v8::Object describing an input image
   InputDescriptor* CreateInputDescriptor(
-    v8::Local<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist);
+    v8::Local<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist);  // NOLINT(runtime/references)
 
   enum class ImageType {
     JPEG,
