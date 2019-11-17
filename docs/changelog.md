@@ -4,7 +4,7 @@
 
 Requires libvips v8.8.1.
 
-#### v0.23.3 - TBD
+#### v0.23.3 - 17<sup>th</sup> November 2019
 
 * Ensure `trim` operation supports images contained in the alpha channel.
   [#1597](https://github.com/lovell/sharp/issues/1597)
