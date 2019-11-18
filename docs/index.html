@@ -12,15 +12,125 @@
   <div id="docute"></div>
   <script src="https://unpkg.com/docute@4/dist/docute.js"></script>
   <script>
+    const readTheDocsBaseURL = `https://sharp.pixelplumbing.com/en/`
+    const logoMarkup = `<div style="display:flex;margin:4%;"><img style="margin-right:5%" src="image/sharp-logo.svg"> <h3 style="font-weight:normal">Sharp</h3> </div>`;
+
     new Docute({
       title: 'Sharp',
-      'logo': `<div style="display:flex;margin:4%;"><img style="margin-right:5%" src="image/sharp-logo.svg"> <h3 style="font-weight:normal">Sharp</h3> </div>`,
+      'logo': logoMarkup,
       darkThemeToggler: true,
       detectSystemDarkTheme: true,
       footer: `<a href="https://pixelplumbing.com/" target="_blank">pixelplumbing.com<a>`,
-      editLinkBase: 'https://github.com/lovell/sharp/edit/master/docs',
-      editLinkText: 'Request documentation change',
       imageZoom: true,
+      editLinkText: 'Request documentation change',
+      editLinkBase: 'https://github.com/sebinbenjamin/sharp/edit/master/docs',
+      sourcePath: 'https://cdn.jsdelivr.net/gh/sebinbenjamin/sharp@master/docs',
+      overrides: {
+        '/': {
+          language: 'English'
+        },
+      },
+      versions: {
+        'v0.23.4-alpha': {
+          link: '/',
+        },
+        'v0.23.3': {
+          link: `${readTheDocsBaseURL}/v0.23.3/`,
+        },
+        'v0.23.2': {
+          link: `${readTheDocsBaseURL}/v0.23.2/`,
+        },
+        'v0.23.1': {
+          link: `${readTheDocsBaseURL}/v0.23.1/`,
+        },
+        'v0.23.0': {
+          link: `${readTheDocsBaseURL}/v0.23.0/`,
+        },
+        'v0.22.1': {
+          link: `${readTheDocsBaseURL}/v0.22.1/`,
+        },
+        'v0.22.0': {
+          link: `${readTheDocsBaseURL}/v0.22.0/`,
+        },
+        'v0.21.3': {
+          link: `${readTheDocsBaseURL}/v0.21.3/`,
+        },
+        'v0.21.2': {
+          link: `${readTheDocsBaseURL}/v0.21.2/`,
+        },
+        'v0.21.1': {
+          link: `${readTheDocsBaseURL}/v0.21.1/`,
+        },
+        'v0.21.0': {
+          link: `${readTheDocsBaseURL}/v0.21.0/`,
+        },
+        'v0.20.8': {
+          link: `${readTheDocsBaseURL}/v0.20.8/`,
+        },
+        'v0.20.7': {
+          link: `${readTheDocsBaseURL}/v0.20.7/`,
+        },
+        'v0.20.6': {
+          link: `${readTheDocsBaseURL}/v0.20.6/`,
+        },
+        'v0.20.5': {
+          link: `${readTheDocsBaseURL}/v0.20.5/`,
+        },
+        'v0.20.4': {
+          link: `${readTheDocsBaseURL}/v0.20.4/`,
+        },
+        'v0.20.3': {
+          link: `${readTheDocsBaseURL}/v0.20.3/`,
+        },
+        'v0.20.2': {
+          link: `${readTheDocsBaseURL}/v0.20.2/`,
+        },
+        'v0.20.1': {
+          link: `${readTheDocsBaseURL}/v0.20.1/`,
+        },
+        'v0.20.0': {
+          link: `${readTheDocsBaseURL}/v0.20.0/`,
+        },
+        'v0.19.1': {
+          link: `${readTheDocsBaseURL}/v0.19.1/`,
+        },
+        'v0.19.0': {
+          link: `${readTheDocsBaseURL}/v0.19.0/`,
+        },
+        'v0.18.4': {
+          link: `${readTheDocsBaseURL}/v0.18.4/`,
+        },
+        'v0.18.3': {
+          link: `${readTheDocsBaseURL}/v0.18.3/`,
+        },
+        'v0.18.2': {
+          link: `${readTheDocsBaseURL}/v0.18.2/`,
+        },
+        'v0.18.1': {
+          link: `${readTheDocsBaseURL}/v0.18.1/`,
+        },
+        'v0.18.0': {
+          link: `${readTheDocsBaseURL}/v0.18.0/`,
+        },
+        'v0.17.3': {
+          link: `${readTheDocsBaseURL}/v0.17.3/`,
+        },
+        'v0.17.2': {
+          link: `${readTheDocsBaseURL}/v0.17.2/`,
+        },
+        'v0.17.1': {
+          link: `${readTheDocsBaseURL}/v0.17.1/`,
+        },
+        'v0.17.0': {
+          link: `${readTheDocsBaseURL}/v0.17.0/`,
+        },
+        'v0.16.2': {
+          link: `${readTheDocsBaseURL}/v0.16.2/`,
+        },
+        'v0.15.1': {
+          link: `${readTheDocsBaseURL}/v0.15.1/`,
+        },
+      },
       nav: [
         {
           title: 'Home',
@@ -28,7 +138,7 @@
         },
         {
           title: 'Github',
-          link: 'https://github.com/lovell/sharp'
+          link: 'https://github.com/sebinbenjamin/sharp'
         }
       ],
       sidebar: [
@@ -96,7 +206,7 @@
         },
         {
           title: 'GitHub',
-          link: 'https://github.com/lovell/sharp'
+          link: 'https://github.com/sebinbenjamin/sharp'
         }
       ],
     })
