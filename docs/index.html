@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Sharp Docs</title>
+  <link rel="stylesheet" href="https://unpkg.com/docute@4/dist/docute.css">
+</head>
+
+<body>
+  <div id="docute"></div>
+  <script src="https://unpkg.com/docute@4/dist/docute.js"></script>
+  <script>
+    new Docute({
+      title: 'Sharp',
+      // sourcePath:'https://cdn.jsdelivr.net/gh/lovell/sharp@latest/docs/'
+      nav: [
+        {
+          title: 'Home',
+          link: '/'
+        },
+        {
+          title: 'Github',
+          link: 'https://github.com/lovell/sharp'
+        }
+      ],
+      sidebar: [
+        {
+          title: 'Home',
+          link: '/'
+        },
+        {
+          title: 'Getting Started',
+          children: [
+            {
+              title: 'Installation',
+              link: '/install'
+            }
+          ]
+        },
+        {
+          title: 'API',
+          children: [
+            {
+              title: 'Constructor',
+              link: '/api-constructor'
+            },
+            {
+              title: 'Input',
+              link: '/api-input'
+            },
+            {
+              title: 'Output',
+              link: '/api-output'
+            },
+            {
+              title: 'Resizing images',
+              link: '/api-resize'
+            },
+            {
+              title: 'Compositing images',
+              link: '/api-composite'
+            },
+            {
+              title: 'Image operations',
+              link: '/api-operation'
+            },
+            {
+              title: 'Colour manipulation',
+              link: '/api-colour'
+            },
+            {
+              title: 'Channel manipulation',
+              link: '/api-channel'
+            },
+            {
+              title: 'Utilities',
+              link: '/api-utility'
+            },
+          ],
+        },
+        {
+          title: 'Performance',
+          link: '/performance'
+        },
+        {
+          title: 'Changelog',
+          link: '/changelog'
+        },
+        {
+          title: 'GitHub',
+          link: 'https://github.com/lovell/sharp'
+        }
+      ],
+    })
+  </script>
+</body>
+
+</html>
