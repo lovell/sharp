@@ -14,7 +14,13 @@
   <script>
     new Docute({
       title: 'Sharp',
-      // sourcePath:'https://cdn.jsdelivr.net/gh/lovell/sharp@latest/docs/'
+      'logo': `<div style="display:flex;margin:4%;"><img style="margin-right:5%" src="image/sharp-logo.svg"> <h3 style="font-weight:normal">Sharp</h3> </div>`,
+      darkThemeToggler: true,
+      detectSystemDarkTheme: true,
+      footer: `<a href="https://pixelplumbing.com/" target="_blank">pixelplumbing.com<a>`,
+      editLinkBase: 'https://github.com/lovell/sharp/edit/master/docs',
+      editLinkText: 'Request documentation change',
+      imageZoom: true,
       nav: [
         {
           title: 'Home',
