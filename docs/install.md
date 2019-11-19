@@ -126,6 +126,9 @@ https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=193528
 Set [NODE_MODULES_CACHE](https://devcenter.heroku.com/articles/nodejs-support#cache-behavior)
 to `false` when using the `yarn` package manager.
 
+To reduce the effects of memory fragmentation, add the
+[jemalloc buildpack](https://github.com/gaffneyc/heroku-buildpack-jemalloc).
+
 ### Docker
 
 [Marc Bachmann](https://github.com/marcbachmann) maintains an
