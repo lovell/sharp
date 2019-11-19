@@ -106,6 +106,8 @@ Only 64-bit (x64) `node.exe` is supported.
 
 ### FreeBSD
 
+[![FreeBSD Build Status](https://api.cirrus-ci.com/github/lovell/sharp.svg)](https://cirrus-ci.com/github/lovell/sharp)
+
 libvips must be installed before `npm install` is run.
 
 This can be achieved via package or ports:
