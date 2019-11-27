@@ -277,7 +277,7 @@ namespace sharp {
             }
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
-              SetDensity(image, descriptor->density);
+              image = SetDensity(image, descriptor->density);
             }
           } catch (vips::VError const &err) {
             throw vips::VError(std::string("Input buffer has corrupt header: ") + err.what());
@@ -323,7 +323,7 @@ namespace sharp {
             }
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
-              SetDensity(image, descriptor->density);
+              image = SetDensity(image, descriptor->density);
             }
           } catch (vips::VError const &err) {
             throw vips::VError(std::string("Input file has corrupt header: ") + err.what());
@@ -370,15 +370,19 @@ namespace sharp {
   /*
     Set EXIF Orientation of image.
   */
-  void SetExifOrientation(VImage image, int const orientation) {
-    image.set(VIPS_META_ORIENTATION, orientation);
+  VImage SetExifOrientation(VImage image, int const orientation) {
+    VImage copy = image.copy();
+    copy.set(VIPS_META_ORIENTATION, orientation);
+    return copy;
   }
 
   /*
     Remove EXIF Orientation from image.
   */
-  void RemoveExifOrientation(VImage image) {
-    vips_image_remove(image.get_image(), VIPS_META_ORIENTATION);
+  VImage RemoveExifOrientation(VImage image) {
+    VImage copy = image.copy();
+    copy.remove(VIPS_META_ORIENTATION);
+    return copy;
   }
 
   /*
@@ -398,11 +402,13 @@ namespace sharp {
   /*
     Set pixels/mm resolution based on a pixels/inch density.
   */
-  void SetDensity(VImage image, const double density) {
+  VImage SetDensity(VImage image, const double density) {
     const double pixelsPerMm = density / 25.4;
-    image.set("Xres", pixelsPerMm);
-    image.set("Yres", pixelsPerMm);
-    image.set(VIPS_META_RESOLUTION_UNIT, "in");
+    VImage copy = image.copy();
+    copy.set("Xres", pixelsPerMm);
+    copy.set("Yres", pixelsPerMm);
+    copy.set(VIPS_META_RESOLUTION_UNIT, "in");
+    return copy;
   }
 
   /*

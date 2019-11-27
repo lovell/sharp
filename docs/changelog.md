@@ -4,6 +4,11 @@
 
 Requires libvips v8.8.1.
 
+#### v0.23.4 - TBD
+
+* Improve thread safety by using copy-on-write when updating metadata.
+  [#1986](https://github.com/lovell/sharp/issues/1986)
+
 #### v0.23.3 - 17<sup>th</sup> November 2019
 
 * Ensure `trim` operation supports images contained in the alpha channel.

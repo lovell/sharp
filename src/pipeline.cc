@@ -104,7 +104,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (baton->rotateBeforePreExtract) {
         if (rotation != VIPS_ANGLE_D0) {
           image = image.rot(rotation);
-          sharp::RemoveExifOrientation(image);
+          image = sharp::RemoveExifOrientation(image);
         }
         if (baton->rotationAngle != 0.0) {
           std::vector<double> background;
@@ -404,20 +404,20 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Rotate post-extract 90-angle
       if (!baton->rotateBeforePreExtract &&  rotation != VIPS_ANGLE_D0) {
           image = image.rot(rotation);
-          sharp::RemoveExifOrientation(image);
+          image = sharp::RemoveExifOrientation(image);
       }
 
 
       // Flip (mirror about Y axis)
       if (baton->flip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
-        sharp::RemoveExifOrientation(image);
+        image = sharp::RemoveExifOrientation(image);
       }
 
       // Flop (mirror about X axis)
       if (baton->flop) {
         image = image.flip(VIPS_DIRECTION_HORIZONTAL);
-        sharp::RemoveExifOrientation(image);
+        image = sharp::RemoveExifOrientation(image);
       }
 
       // Join additional color channels to the image
@@ -700,7 +700,7 @@ class PipelineWorker : public Nan::AsyncWorker {
 
       // Override EXIF Orientation tag
       if (baton->withMetadata && baton->withMetadataOrientation != -1) {
-        sharp::SetExifOrientation(image, baton->withMetadataOrientation);
+        image = sharp::SetExifOrientation(image, baton->withMetadataOrientation);
       }
 
       // Number of channels used in output image

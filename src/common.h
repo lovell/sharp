@@ -175,12 +175,12 @@ namespace sharp {
   /*
     Set EXIF Orientation of image.
   */
-  void SetExifOrientation(VImage image, int const orientation);
+  VImage SetExifOrientation(VImage image, int const orientation);
 
   /*
     Remove EXIF Orientation from image.
   */
-  void RemoveExifOrientation(VImage image);
+  VImage RemoveExifOrientation(VImage image);
 
   /*
     Does this image have a non-default density?
@@ -195,7 +195,7 @@ namespace sharp {
   /*
     Set pixels/mm resolution based on a pixels/inch density.
   */
-  void SetDensity(VImage image, const double density);
+  VImage SetDensity(VImage image, const double density);
 
   /*
     Check the proposed format supports the current dimensions.
