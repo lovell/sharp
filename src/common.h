@@ -49,6 +49,7 @@ namespace sharp {
     char *buffer;
     bool failOnError;
     size_t bufferLength;
+    bool isBuffer;
     double density;
     int rawChannels;
     int rawWidth;
@@ -64,6 +65,7 @@ namespace sharp {
       buffer(nullptr),
       failOnError(TRUE),
       bufferLength(0),
+      isBuffer(FALSE),
       density(72.0),
       rawChannels(0),
       rawWidth(0),

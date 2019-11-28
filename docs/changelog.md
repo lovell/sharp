@@ -6,6 +6,8 @@ Requires libvips v8.8.1.
 
 #### v0.23.4 - TBD
 
+* Handle zero-length Buffer objects when using Node.js v13.2.0+.
+
 * Improve thread safety by using copy-on-write when updating metadata.
   [#1986](https://github.com/lovell/sharp/issues/1986)
 

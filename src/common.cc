@@ -58,6 +58,7 @@ namespace sharp {
       v8::Local<v8::Object> buffer = AttrAs<v8::Object>(input, "buffer");
       descriptor->bufferLength = node::Buffer::Length(buffer);
       descriptor->buffer = node::Buffer::Data(buffer);
+      descriptor->isBuffer = TRUE;
       buffersToPersist.push_back(buffer);
     }
     descriptor->failOnError = AttrTo<bool>(input, "failOnError");
@@ -246,7 +247,7 @@ namespace sharp {
   std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor, VipsAccess accessMethod) {
     VImage image;
     ImageType imageType;
-    if (descriptor->buffer != nullptr) {
+    if (descriptor->isBuffer) {
       if (descriptor->rawChannels > 0) {
         // Raw, uncompressed pixel data
         image = VImage::new_from_memory(descriptor->buffer, descriptor->bufferLength,
