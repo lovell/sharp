@@ -116,6 +116,14 @@ class MetadataWorker : public Nan::AsyncWorker {
         memcpy(baton->xmp, xmp, xmpLength);
         baton->xmpLength = xmpLength;
       }
+      // TIFFTAG_PHOTOSHOP
+      if (image.get_typeof(VIPS_META_PHOTOSHOP_NAME) == VIPS_TYPE_BLOB) {
+        size_t tifftagPhotoshopLength;
+        void const *tifftagPhotoshop = image.get_blob(VIPS_META_PHOTOSHOP_NAME, &tifftagPhotoshopLength);
+        baton->tifftagPhotoshop = static_cast<char *>(g_malloc(tifftagPhotoshopLength));
+        memcpy(baton->tifftagPhotoshop, tifftagPhotoshop, tifftagPhotoshopLength);
+        baton->tifftagPhotoshopLength = tifftagPhotoshopLength;
+      }
     }
 
     // Clean up
@@ -188,6 +196,12 @@ class MetadataWorker : public Nan::AsyncWorker {
         Set(info,
           New("xmp").ToLocalChecked(),
           Nan::NewBuffer(baton->xmp, baton->xmpLength, sharp::FreeCallback, nullptr).ToLocalChecked());
+      }
+      if (baton->tifftagPhotoshopLength > 0) {
+        Set(info,
+          New("tifftagPhotoshop").ToLocalChecked(),
+          Nan::NewBuffer(baton->tifftagPhotoshop, baton->tifftagPhotoshopLength, sharp::FreeCallback, nullptr)
+            .ToLocalChecked());
       }
       argv[1] = info;
     }

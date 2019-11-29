@@ -515,6 +515,21 @@ describe('Image metadata', function () {
       });
   });
 
+  it('16-bit TIFF with TIFFTAG_PHOTOSHOP metadata', () =>
+    sharp(fixtures.inputTifftagPhotoshop)
+      .metadata()
+      .then(metadata => {
+        assert.strictEqual(metadata.format, 'tiff');
+        assert.strictEqual(metadata.width, 317);
+        assert.strictEqual(metadata.height, 211);
+        assert.strictEqual(metadata.space, 'rgb16');
+        assert.strictEqual(metadata.channels, 3);
+        assert.strictEqual(typeof metadata.tifftagPhotoshop, 'object');
+        assert.strictEqual(metadata.tifftagPhotoshop instanceof Buffer, true);
+        assert.strictEqual(metadata.tifftagPhotoshop.length, 6634);
+      })
+  );
+
   it('File input with corrupt header fails gracefully', function (done) {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .metadata(function (err) {

@@ -8,6 +8,9 @@ Requires libvips v8.8.1.
 
 * Handle zero-length Buffer objects when using Node.js v13.2.0+.
 
+* Expose raw TIFFTAG_PHOTOSHOP metadata.
+  [#1600](https://github.com/lovell/sharp/issues/1600)
+
 * Improve thread safety by using copy-on-write when updating metadata.
   [#1986](https://github.com/lovell/sharp/issues/1986)
 

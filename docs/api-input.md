@@ -44,6 +44,7 @@ A `Promise` is returned when `callback` is not provided.
 -   `icc`: Buffer containing raw [ICC][3] profile data, if present
 -   `iptc`: Buffer containing raw IPTC data, if present
 -   `xmp`: Buffer containing raw XMP data, if present
+-   `tifftagPhotoshop`: Buffer containing raw TIFFTAG_PHOTOSHOP data, if present
 
 ### Parameters
 

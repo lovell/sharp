@@ -97,6 +97,7 @@ module.exports = {
   inputTiffCielab: getPath('cielab-dagams.tiff'), // https://github.com/lovell/sharp/issues/646
   inputTiffUncompressed: getPath('uncompressed_tiff.tiff'), // https://code.google.com/archive/p/imagetestsuite/wikis/TIFFTestSuite.wiki file: 0c84d07e1b22b76f24cccc70d8788e4a.tif
   inputTiff8BitDepth: getPath('8bit_depth.tiff'),
+  inputTifftagPhotoshop: getPath('tifftag-photoshop.tiff'), // https://github.com/lovell/sharp/issues/1600
   inputGif: getPath('Crash_test.gif'), // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
   inputGifGreyPlusAlpha: getPath('grey-plus-alpha.gif'), // http://i.imgur.com/gZ5jlmE.gif
   inputGifAnimated: getPath('rotating-squares.gif'), // CC0 https://loading.io/spinner/blocks/-rotating-squares-preloader-gif

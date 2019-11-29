@@ -48,6 +48,8 @@ struct MetadataBaton {
   size_t iptcLength;
   char *xmp;
   size_t xmpLength;
+  char *tifftagPhotoshop;
+  size_t tifftagPhotoshopLength;
   std::string err;
 
   MetadataBaton():
@@ -71,7 +73,9 @@ struct MetadataBaton {
     iptc(nullptr),
     iptcLength(0),
     xmp(nullptr),
-    xmpLength(0) {}
+    xmpLength(0),
+    tifftagPhotoshop(nullptr),
+    tifftagPhotoshopLength(0) {}
 };
 
 NAN_METHOD(metadata);
