@@ -4,7 +4,7 @@
 
 Requires libvips v8.8.1.
 
-#### v0.23.4 - TBD
+#### v0.23.4 - 5<sup>th</sup> December 2019
 
 * Handle zero-length Buffer objects when using Node.js v13.2.0+.
 
