@@ -114,6 +114,15 @@ sharp(input)
   });
 ```
 
+```javascript
+const scaleByHalf = await sharp(input)
+  .metadata()
+  .then(({ width }) => sharp(input)
+    .resize(Math.round(width * 0.5))
+    .toBuffer()
+  );
+```
+
 -   Throws **[Error][13]** Invalid parameters
 
 Returns **Sharp** 
