@@ -131,29 +131,6 @@ to `false` when using the `yarn` package manager.
 To reduce the effects of memory fragmentation, add the
 [jemalloc buildpack](https://github.com/gaffneyc/heroku-buildpack-jemalloc).
 
-### Docker
-
-[Marc Bachmann](https://github.com/marcbachmann) maintains an
-[Ubuntu-based Dockerfile for libvips](https://github.com/marcbachmann/dockerfile-libvips).
-
-```sh
-docker pull marcbachmann/libvips
-```
-
-[Will Jordan](https://github.com/wjordan) maintains an
-[Alpine-based Dockerfile for libvips](https://github.com/wjordan/dockerfile-libvips).
-
-```sh
-docker pull wjordan/libvips
-```
-
-[Tailor Brands](https://github.com/TailorBrands) maintain
-[Debian-based Dockerfiles for libvips and nodejs](https://github.com/TailorBrands/docker-libvips).
-
-```sh
-docker pull tailor/docker-libvips
-```
-
 ### AWS Lambda
 
 Set the Lambda runtime to `nodejs10.x`.
