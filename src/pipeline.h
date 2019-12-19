@@ -169,6 +169,9 @@ struct PipelineBaton {
   bool removeAlpha;
   bool ensureAlpha;
   VipsInterpretation colourspace;
+  int pageHeight;
+  std::vector<int> *delay;
+  int loop;
   int tileSize;
   int tileOverlap;
   VipsForeignDzContainer tileContainer;
@@ -276,6 +279,9 @@ struct PipelineBaton {
     removeAlpha(false),
     ensureAlpha(false),
     colourspace(VIPS_INTERPRETATION_LAST),
+    pageHeight(0),
+    delay(nullptr),
+    loop(-1),
     tileSize(256),
     tileOverlap(0),
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),

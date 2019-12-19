@@ -134,7 +134,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.8.1"
+    "libvips": "8.9.0"
   },
   "engines": {
     "node": ">=8.5.0"
