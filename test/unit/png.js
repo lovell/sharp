@@ -103,6 +103,15 @@ describe('PNG', function () {
       });
   });
 
+  it('16-bit grey+alpha PNG identity transform', function () {
+    const actual = fixtures.path('output.16-bit-grey-alpha-identity.png');
+    return sharp(fixtures.inputPng16BitGreyAlpha)
+      .toFile(actual)
+      .then(function () {
+        fixtures.assertMaxColourDistance(actual, fixtures.expected('16-bit-grey-alpha-identity.png'));
+      });
+  });
+
   it('Valid PNG libimagequant palette value does not throw error', function () {
     assert.doesNotThrow(function () {
       sharp().png({ palette: false });

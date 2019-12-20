@@ -4,6 +4,11 @@
 
 Requires libvips v8.8.1.
 
+#### v0.23.5 - TBD
+
+* Ensure correct colour output for 16-bit, 2-channel PNG input with ICC profile.
+  [#2013](https://github.com/lovell/sharp/issues/2013)
+
 #### v0.23.4 - 5<sup>th</sup> December 2019
 
 * Handle zero-length Buffer objects when using Node.js v13.2.0+.

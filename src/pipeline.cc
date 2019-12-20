@@ -311,7 +311,11 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
 
       // Ensure we're using a device-independent colour space
-      if (sharp::HasProfile(image) && image.interpretation() != VIPS_INTERPRETATION_LABS) {
+      if (
+        sharp::HasProfile(image) &&
+        image.interpretation() != VIPS_INTERPRETATION_LABS &&
+        image.interpretation() != VIPS_INTERPRETATION_GREY16
+      ) {
         // Convert to sRGB using embedded profile
         try {
           image = image.icc_transform("srgb", VImage::option()
