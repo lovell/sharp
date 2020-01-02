@@ -21,7 +21,7 @@ As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
 Most modern 64-bit OS X, Windows and Linux systems running
-Node versions 8, 10, 12 and 13
+Node versions 10, 12 and 13
 do not require any additional install or runtime dependencies.
 
 ## Examples

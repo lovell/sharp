@@ -66,8 +66,11 @@ try {
     if (platformAndArch === 'freebsd-x64' || platformAndArch === 'openbsd-x64' || platformAndArch === 'sunos-x64') {
       throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
-    if (detectLibc.family === detectLibc.GLIBC && detectLibc.version && semver.lt(`${detectLibc.version}.0`, '2.17.0')) {
-      throw new Error(`Use with glibc version ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
+    if (detectLibc.family === detectLibc.GLIBC && detectLibc.version) {
+      const minimumGlibcVersion = arch === 'arm64' ? '2.29.0' : '2.17.0';
+      if (semver.lt(`${detectLibc.version}.0`, minimumGlibcVersion)) {
+        throw new Error(`Use with glibc ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
+      }
     }
     // Download to per-process temporary file
     const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.gz';
@@ -84,7 +87,7 @@ try {
         if (err) {
           fail(err);
         } else if (response.statusCode === 404) {
-          fail(new Error(`Prebuilt libvips binaries are not yet available for ${platformAndArch}`));
+          fail(new Error(`Prebuilt libvips ${minimumLibvipsVersion} binaries are not yet available for ${platformAndArch}`));
         } else if (response.statusCode !== 200) {
           fail(new Error(`Status ${response.statusCode} ${response.statusMessage}`));
         } else {

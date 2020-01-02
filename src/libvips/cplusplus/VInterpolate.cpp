@@ -61,7 +61,7 @@ VInterpolate::new_from_name( const char *name, VOption *options )
 }
 
 VOption *
-VOption::set( const char *name, VInterpolate value )
+VOption::set( const char *name, const VInterpolate value )
 {
 	Pair *pair = new Pair( name );
 

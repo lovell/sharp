@@ -197,7 +197,7 @@ namespace sharp {
       std::string const loader = load;
       if (EndsWith(loader, "JpegFile")) {
         imageType = ImageType::JPEG;
-      } else if (EndsWith(loader, "Png")) {
+      } else if (EndsWith(loader, "PngFile")) {
         imageType = ImageType::PNG;
       } else if (EndsWith(loader, "WebpFile")) {
         imageType = ImageType::WEBP;

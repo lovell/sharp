@@ -916,11 +916,9 @@ class PipelineWorker : public Nan::AsyncWorker {
         } else if (baton->formatOut == "heif" || (mightMatchInput && isHeif) ||
           (willMatchInput && inputImageType == ImageType::HEIF)) {
           // Write HEIF to file
-          #ifdef VIPS_TYPE_FOREIGN_HEIF_COMPRESSION
           if (sharp::IsAvif(baton->fileOut)) {
             baton->heifCompression = VIPS_FOREIGN_HEIF_COMPRESSION_AV1;
           }
-          #endif
           image.heifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->heifQuality)
@@ -966,29 +964,26 @@ class PipelineWorker : public Nan::AsyncWorker {
             };
             suffix = AssembleSuffixString(extname, options);
           }
-
           // Remove alpha channel from tile background if image does not contain an alpha channel
           if (!HasAlpha(image)) {
             baton->tileBackground.pop_back();
           }
           // Write DZ to file
           vips::VOption *options = VImage::option()
-                                       ->set("strip", !baton->withMetadata)
-                                       ->set("tile_size", baton->tileSize)
-                                       ->set("overlap", baton->tileOverlap)
-                                       ->set("container", baton->tileContainer)
-                                       ->set("layout", baton->tileLayout)
-                                       ->set("suffix", const_cast<char*>(suffix.data()))
-                                       ->set("angle", CalculateAngleRotation(baton->tileAngle))
-                                       ->set("background", baton->tileBackground)
-                                       ->set("skip_blanks", baton->tileSkipBlanks);
-
+            ->set("strip", !baton->withMetadata)
+            ->set("tile_size", baton->tileSize)
+            ->set("overlap", baton->tileOverlap)
+            ->set("container", baton->tileContainer)
+            ->set("layout", baton->tileLayout)
+            ->set("suffix", const_cast<char*>(suffix.data()))
+            ->set("angle", CalculateAngleRotation(baton->tileAngle))
+            ->set("background", baton->tileBackground)
+            ->set("skip_blanks", baton->tileSkipBlanks);
           // libvips chooses a default depth based on layout. Instead of replicating that logic here by
           // not passing anything - libvips will handle choice
           if (baton->tileDepth < VIPS_FOREIGN_DZ_DEPTH_LAST) {
             options->set("depth", baton->tileDepth);
           }
-
           image.dzsave(const_cast<char*>(baton->fileOut.data()), options);
           baton->formatOut = "dz";
         } else if (baton->formatOut == "v" || (mightMatchInput && isV) ||
@@ -1004,7 +999,12 @@ class PipelineWorker : public Nan::AsyncWorker {
         }
       }
     } catch (vips::VError const &err) {
-      (baton->err).append(err.what());
+      char const *what = err.what();
+      if (what && what[0]) {
+        (baton->err).append(what);
+      } else {
+        (baton->err).append("Unknown error");
+      }
     }
     // Clean up libvips' per-request data and threads
     vips_error_clear();
@@ -1377,11 +1377,9 @@ NAN_METHOD(pipeline) {
     AttrAsStr(options, "tiffPredictor").data()));
   baton->heifQuality = AttrTo<uint32_t>(options, "heifQuality");
   baton->heifLossless = AttrTo<bool>(options, "heifLossless");
-  #ifdef VIPS_TYPE_FOREIGN_HEIF_COMPRESSION
   baton->heifCompression = static_cast<VipsForeignHeifCompression>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
     AttrAsStr(options, "heifCompression").data()));
-  #endif
   // Tile output
   baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
   baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");

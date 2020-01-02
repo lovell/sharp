@@ -268,6 +268,10 @@ Most versions of libheif support only the patent-encumbered HEVC compression for
 
 Returns **Sharp** 
 
+**Meta**
+
+-   **since**: 0.23.0
+
 ## raw
 
 Force output to be raw, uncompressed uint8 pixel data.

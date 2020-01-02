@@ -1,88 +1,72 @@
 matrix:
   include:
-    - name: "Linux (glibc) - Node 8"
+    - name: "Linux (glibc 2.17+) - Node.js 10"
       os: linux
-      dist: trusty
-      sudo: false
-      language: node_js
-      node_js: "8"
-    - name: "Linux (glibc) - Node 10"
-      os: linux
-      dist: trusty
-      sudo: false
+      dist: xenial
       language: node_js
       node_js: "10"
-    - name: "Linux (glibc) - Node 12"
+    - name: "Linux (glibc 2.17+) - Node.js 12"
       os: linux
-      dist: trusty
-      sudo: false
+      dist: xenial
       language: node_js
       node_js: "12"
-    - name: "Linux (glibc) - Node 13"
+    - name: "Linux (glibc 2.17+) - Node.js 13"
       os: linux
-      dist: trusty
-      sudo: false
+      dist: xenial
       language: node_js
       node_js: "13"
       after_success:
         - npm install coveralls
         - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
-    - name: "Linux (musl) - Node 8"
+    - name: "Linux (musl 1.1.20+) - Node.js 10"
       os: linux
-      dist: trusty
-      sudo: true
+      dist: bionic
       language: minimal
       before_install:
-        - sudo docker run -dit --name sharp --env CI --env PREBUILD_TOKEN --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:8-alpine
+        - sudo docker run -dit --name sharp --env CI --env PREBUILD_TOKEN --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10.17.0-alpine3.9 # https://github.com/nodejs/docker-node/issues/1158
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
-    - name: "Linux (musl) - Node 10"
+    - name: "Linux (musl 1.1.20+) - Node.js 12"
       os: linux
-      dist: trusty
-      sudo: true
-      language: minimal
-      before_install:
-        - sudo docker run -dit --name sharp --env CI --env PREBUILD_TOKEN --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10-alpine
-        - sudo docker exec sharp apk add build-base git python2 --update-cache
-      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
-    - name: "Linux (musl) - Node 12"
-      os: linux
-      dist: trusty
-      sudo: true
+      dist: bionic
       language: minimal
       before_install:
         - sudo docker run -dit --name sharp --env CI --env PREBUILD_TOKEN --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:12.0-alpine
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
-    - name: "Linux (musl) - Node 13"
+    - name: "Linux (musl 1.1.20+) - Node.js 13"
       os: linux
-      dist: trusty
-      sudo: true
+      dist: bionic
       language: minimal
       before_install:
         - sudo docker run -dit --name sharp --env CI --env PREBUILD_TOKEN --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:13.0-alpine
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
-    - name: "OS X - Node 8"
-      os: osx
-      osx_image: xcode9.2
-      language: node_js
-      node_js: "8"
-    - name: "OS X - Node 10"
+    - name: "Linux ARM64v8 (glibc 2.29+) - Node.js 10"
+      arch: arm64
+      os: linux
+      dist: bionic
+      language: minimal
+      before_install:
+        - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
+        - sudo docker exec sharp apt-get update
+        - sudo docker exec sharp apt-get install -y build-essential git python2 nodejs npm
+      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+      script: sudo docker exec sharp sh -c "npm test"
+    - name: "OS X (10.12+) - Node.js 10"
       os: osx
       osx_image: xcode9.2
       language: node_js
       node_js: "10"
-    - name: "OS X - Node 12"
+    - name: "OS X (10.12+) - Node.js 12"
       os: osx
       osx_image: xcode9.2
       language: node_js
       node_js: "12"
-    - name: "OS X - Node 13"
+    - name: "OS X (10.12+) - Node.js 13"
       os: osx
       osx_image: xcode10
       language: node_js

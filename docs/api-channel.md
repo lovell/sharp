@@ -32,6 +32,10 @@ sharp('rgb.jpg')
 
 Returns **Sharp** 
 
+**Meta**
+
+-   **since**: 0.21.2
+
 ## extractChannel
 
 Extract a single channel from a multi-channel image.
