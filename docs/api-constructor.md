@@ -67,42 +67,24 @@ sharp({
 
 Returns **[Sharp][8]** 
 
-### format
+## clone
 
-An Object containing nested boolean values representing the available input and output formats/methods.
-
-#### Examples
-
-```javascript
-console.log(sharp.format);
-```
-
-Returns **[Object][3]** 
-
-### versions
-
-An Object containing the version numbers of libvips and its dependencies.
-
-#### Examples
-
-```javascript
-console.log(sharp.versions);
-```
-
-## queue
-
-An EventEmitter that emits a `change` event when a task is either:
-
--   queued, waiting for _libuv_ to provide a worker thread
--   complete
+Take a "snapshot" of the Sharp instance, returning a new instance.
+Cloned instances inherit the input of their parent instance.
+This allows multiple output Streams and therefore multiple processing pipelines to share a single input Stream.
 
 ### Examples
 
 ```javascript
-sharp.queue.on('change', function(queueLength) {
-  console.log('Queue contains ' + queueLength + ' task(s)');
-});
+const pipeline = sharp().rotate();
+pipeline.clone().resize(800, 600).pipe(firstWritableStream);
+pipeline.clone().extract({ left: 20, top: 20, width: 100, height: 100 }).pipe(secondWritableStream);
+readableStream.pipe(pipeline);
+// firstWritableStream receives auto-rotated, resized readableStream
+// secondWritableStream receives auto-rotated, extracted region of readableStream
 ```
+
+Returns **[Sharp][8]** 
 
 [1]: https://nodejs.org/api/buffer.html
 

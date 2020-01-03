@@ -112,6 +112,28 @@ sharp('input.jpg')
 
 Returns **Sharp** 
 
+## toFormat
+
+Force output to a given format.
+
+### Parameters
+
+-   `format` **([String][2] \| [Object][6])** as a String or an Object with an 'id' attribute
+-   `options` **[Object][6]** output options
+
+### Examples
+
+```javascript
+// Convert any input to PNG output
+const data = await sharp(input)
+  .toFormat('png')
+  .toBuffer();
+```
+
+-   Throws **[Error][4]** unsupported format or options
+
+Returns **Sharp** 
+
 ## jpeg
 
 Use these JPEG options for output image.
@@ -284,28 +306,6 @@ const { data, info } = await sharp('input.jpg')
   .raw()
   .toBuffer({ resolveWithObject: true });
 ```
-
-Returns **Sharp** 
-
-## toFormat
-
-Force output to a given format.
-
-### Parameters
-
--   `format` **([String][2] \| [Object][6])** as a String or an Object with an 'id' attribute
--   `options` **[Object][6]** output options
-
-### Examples
-
-```javascript
-// Convert any input to PNG output
-const data = await sharp(input)
-  .toFormat('png')
-  .toBuffer();
-```
-
--   Throws **[Error][4]** unsupported format or options
 
 Returns **Sharp** 
 

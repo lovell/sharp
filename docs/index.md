@@ -34,15 +34,14 @@ A single input Stream can be split into multiple processing pipelines and output
 
 Deep Zoom image pyramids can be generated,
 suitable for use with "slippy map" tile viewers like
-[OpenSeadragon](https://github.com/openseadragon/openseadragon)
-and [Leaflet](https://github.com/turban/Leaflet.Zoomify).
+[OpenSeadragon](https://github.com/openseadragon/openseadragon).
 
 ### Fast
 
 This module is powered by the blazingly fast
 [libvips](https://github.com/libvips/libvips) image processing library,
 originally created in 1989 at Birkbeck College
-and currently maintained by
+and currently maintained by a small team led by
 [John Cupitt](https://github.com/jcupitt).
 
 Only small regions of uncompressed image data
