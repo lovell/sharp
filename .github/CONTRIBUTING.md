@@ -71,7 +71,7 @@ The public API is documented with [JSDoc](http://usejsdoc.org/) annotated commen
 
 These can be converted to Markdown by running:
 ```sh
-npm run docs
+npm run docs-build
 ```
 
 Please include documentation updates in any Pull Request that modifies the public API.

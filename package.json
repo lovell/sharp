@@ -74,13 +74,13 @@
     "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;MIT\"",
     "test-coverage": "./test/coverage/report.sh",
     "test-leak": "./test/leak/leak.sh",
-    "docs": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md --markdown-toc=false lib/$m.js >docs/api-$m.md; done"
+    "docs-build": "for m in constructor input resize composite operation colour channel output utility; do documentation build --shallow --format=md --markdown-toc=false lib/$m.js >docs/api-$m.md; done",
+    "docs-serve": "cd docs && npx serve",
+    "docs-publish": "cd docs && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
   },
   "main": "lib/index.js",
   "files": [
     "binding.gyp",
-    "docs/**",
-    "!docs/css/**",
     "install/**",
     "lib/**",
     "src/**"
