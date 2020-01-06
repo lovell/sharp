@@ -64,7 +64,8 @@
     "Ilya Ovdin <iovdin@gmail.com>",
     "Andargor <andargor@yahoo.com>",
     "Paul Neave <paul.neave@gmail.com>",
-    "Brendan Kennedy <brenwken@gmail.com>"
+    "Brendan Kennedy <brenwken@gmail.com>",
+    "Brychan Bennett-Odlum <git@brychan.io>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
