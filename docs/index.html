@@ -4,8 +4,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>sharp - High performance Node.js image processing</title>
+  <link rel="icon" type="image/png" href="https://pixel.plumbing/px/32x32/sharp-logo.svg">
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://pixel.plumbing/px/152x152/sharp-logo.svg">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://pixel.plumbing/px/144x144/sharp-logo.svg">
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="https://pixel.plumbing/px/120x120/sharp-logo.svg">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://pixel.plumbing/px/114x114/sharp-logo.svg">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://pixel.plumbing/px/72x72/sharp-logo.svg">
+  <link rel="apple-touch-icon-precomposed" href="https://pixel.plumbing/px/57x57/sharp-logo.svg">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docute@4/dist/docute.min.css">
+  <title>sharp - High performance Node.js image processing</title>
 </head>
 
 <body>
@@ -32,7 +39,11 @@
     };
     new Docute({
       router: { mode: 'history' },
-      logo: '<div><strong>sharp</strong> <span style="opacity:0.8">- High performance Node.js image processing</span></div>',
+      logo: '<div style="display:flex;align-items:center">'
+        + '<strong>sharp</strong> '
+        + '<img src="https://pixel.plumbing/px/16x16/sharp-logo.svg" style="padding:8px" alt="#"> '
+        + '<span style="opacity:0.8">High performance Node.js image processing</span> '
+        + '</div>',
       darkThemeToggler: true,
       detectSystemDarkTheme: true,
       footer: '<a href="https://pixelplumbing.com/" target="_blank">pixelplumbing.com<a>',
