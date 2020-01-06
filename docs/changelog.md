@@ -1,10 +1,10 @@
 # Changelog
 
-### v0.24 - "*wit*"
+## v0.24 - "*wit*"
 
 Requires libvips v8.9.0.
 
-#### v0.24.0 - TBD
+### v0.24.0 - TBD
 
 * Drop support for Node.js 8.
   [#1910](https://github.com/lovell/sharp/issues/1910)
@@ -12,11 +12,11 @@ Requires libvips v8.9.0.
 * Ensure correct colour output for 16-bit, 2-channel PNG input with ICC profile.
   [#2013](https://github.com/lovell/sharp/issues/2013)
 
-### v0.23 - "*vision*"
+## v0.23 - "*vision*"
 
 Requires libvips v8.8.1.
 
-#### v0.23.4 - 5<sup>th</sup> December 2019
+### v0.23.4 - 5<sup>th</sup> December 2019
 
 * Handle zero-length Buffer objects when using Node.js v13.2.0+.
 
@@ -26,7 +26,7 @@ Requires libvips v8.8.1.
 * Improve thread safety by using copy-on-write when updating metadata.
   [#1986](https://github.com/lovell/sharp/issues/1986)
 
-#### v0.23.3 - 17<sup>th</sup> November 2019
+### v0.23.3 - 17<sup>th</sup> November 2019
 
 * Ensure `trim` operation supports images contained in the alpha channel.
   [#1597](https://github.com/lovell/sharp/issues/1597)
@@ -42,7 +42,7 @@ Requires libvips v8.8.1.
 * Ensure `modulate` and other colour-based operations can co-exist.
   [#1958](https://github.com/lovell/sharp/issues/1958)
 
-#### v0.23.2 - 28<sup>th</sup> October 2019
+### v0.23.2 - 28<sup>th</sup> October 2019
 
 * Add `background` option to tile output operation.
   [#1924](https://github.com/lovell/sharp/pull/1924)
@@ -52,7 +52,7 @@ Requires libvips v8.8.1.
   [#1932](https://github.com/lovell/sharp/pull/1932)
   [@MayhemYDG](https://github.com/MayhemYDG)
 
-#### v0.23.1 - 26<sup>th</sup> September 2019
+### v0.23.1 - 26<sup>th</sup> September 2019
 
 * Ensure `sharp.format.vips` is present and correct (filesystem only).
   [#1813](https://github.com/lovell/sharp/issues/1813)
@@ -74,7 +74,7 @@ Requires libvips v8.8.1.
 
 * Ensure image is at least 3x3 pixels before attempting trim operation.
 
-#### v0.23.0 - 29<sup>th</sup> July 2019
+### v0.23.0 - 29<sup>th</sup> July 2019
 
 * Remove `overlayWith` previously deprecated in v0.22.0.
 
@@ -104,11 +104,11 @@ Requires libvips v8.8.1.
   [#1755](https://github.com/lovell/sharp/pull/1755)
   [@iovdin](https://github.com/iovdin)
 
-### v0.22 - "*uptake*"
+## v0.22 - "*uptake*"
 
 Requires libvips v8.7.4.
 
-#### v0.22.1 - 25<sup>th</sup> April 2019
+### v0.22.1 - 25<sup>th</sup> April 2019
 
 * Add `modulate` operation for brightness, saturation and hue.
   [#1601](https://github.com/lovell/sharp/pull/1601)
@@ -121,7 +121,7 @@ Requires libvips v8.7.4.
 * Add support for Node 12.
   [#1668](https://github.com/lovell/sharp/issues/1668)
 
-#### v0.22.0 - 18<sup>th</sup> March 2019
+### v0.22.0 - 18<sup>th</sup> March 2019
 
 * Remove functions previously deprecated in v0.21.0:
     `background`, `crop`, `embed`, `ignoreAspectRatio`, `max`, `min` and `withoutEnlargement`.
@@ -139,18 +139,18 @@ Requires libvips v8.7.4.
   [#1595](https://github.com/lovell/sharp/pull/1595)
   [@ramiel](https://github.com/ramiel)
 
-### v0.21 - "*teeth*"
+## v0.21 - "*teeth*"
 
 Requires libvips v8.7.0.
 
-#### v0.21.3 - 19<sup>th</sup> January 2019
+### v0.21.3 - 19<sup>th</sup> January 2019
 
 * Input image decoding now fails fast, set `failOnError` to change this behaviour.
 
 * Failed filesystem-based input now separates missing file and invalid format errors.
   [#1542](https://github.com/lovell/sharp/issues/1542)
 
-#### v0.21.2 - 13<sup>th</sup> January 2019
+### v0.21.2 - 13<sup>th</sup> January 2019
 
 * Ensure all metadata is removed from PNG output unless `withMetadata` used.
 
@@ -175,7 +175,7 @@ Requires libvips v8.7.0.
 * Ensure forced output format applied correctly when output chaining.
   [#1528](https://github.com/lovell/sharp/issues/1528)
 
-#### v0.21.1 - 7<sup>th</sup> December 2018
+### v0.21.1 - 7<sup>th</sup> December 2018
 
 * Install: support `sharp_dist_base_url` npm config, like existing `SHARP_DIST_BASE_URL`.
   [#1422](https://github.com/lovell/sharp/pull/1422)
@@ -204,7 +204,7 @@ Requires libvips v8.7.0.
   [#1483](https://github.com/lovell/sharp/pull/1483)
   [@mbklein](https://github.com/mbklein)
 
-#### v0.21.0 - 4<sup>th</sup> October 2018
+### v0.21.0 - 4<sup>th</sup> October 2018
 
 * Deprecate the following resize-related functions:
     `crop`, `embed`, `ignoreAspectRatio`, `max`, `min` and `withoutEnlargement`.
@@ -241,11 +241,11 @@ Requires libvips v8.7.0.
   [#1385](https://github.com/lovell/sharp/pull/1385)
   [@freezy](https://github.com/freezy)
 
-### v0.20 - "*prebuild*"
+## v0.20 - "*prebuild*"
 
 Requires libvips v8.6.1.
 
-#### v0.20.8 - 5<sup>th</sup> September 2018
+### v0.20.8 - 5<sup>th</sup> September 2018
 
 * Avoid race conditions when creating directories during installation.
   [#1358](https://github.com/lovell/sharp/pull/1358)
@@ -255,12 +255,12 @@ Requires libvips v8.6.1.
   [#1362](https://github.com/lovell/sharp/pull/1362)
   [@aeirola](https://github.com/aeirola)
 
-#### v0.20.7 - 21<sup>st</sup> August 2018
+### v0.20.7 - 21<sup>st</sup> August 2018
 
 * Use copy+unlink if rename operation fails during installation.
   [#1345](https://github.com/lovell/sharp/issues/1345)
 
-#### v0.20.6 - 20<sup>th</sup> August 2018
+### v0.20.6 - 20<sup>th</sup> August 2018
 
 * Add removeAlpha operation to remove alpha channel, if any.
   [#1248](https://github.com/lovell/sharp/issues/1248)
@@ -291,13 +291,13 @@ Requires libvips v8.6.1.
 
 * Add experimental entropy field to stats response.
 
-#### v0.20.5 - 27<sup>th</sup> June 2018
+### v0.20.5 - 27<sup>th</sup> June 2018
 
 * Expose libjpeg optimize_coding flag.
   [#1265](https://github.com/lovell/sharp/pull/1265)
   [@tomlokhorst](https://github.com/tomlokhorst)
 
-#### v0.20.4 - 20<sup>th</sup> June 2018
+### v0.20.4 - 20<sup>th</sup> June 2018
 
 * Prevent possible rounding error when using shrink-on-load and 90/270 degree rotation.
   [#1241](https://github.com/lovell/sharp/issues/1241)
@@ -307,13 +307,13 @@ Requires libvips v8.6.1.
   [#1257](https://github.com/lovell/sharp/issues/1257)
   [@jeremychone](https://github.com/jeremychone)
 
-#### v0.20.3 - 29<sup>th</sup> May 2018
+### v0.20.3 - 29<sup>th</sup> May 2018
 
 * Fix tint operation by ensuring LAB interpretation and allowing negative values.
   [#1235](https://github.com/lovell/sharp/issues/1235)
   [@wezside](https://github.com/wezside)
 
-#### v0.20.2 - 28<sup>th</sup> April 2018
+### v0.20.2 - 28<sup>th</sup> April 2018
 
 * Add tint operation to set image chroma.
   [#825](https://github.com/lovell/sharp/pull/825)
@@ -331,7 +331,7 @@ Requires libvips v8.6.1.
   [#1208](https://github.com/lovell/sharp/pull/1208)
   [@woolite64](https://github.com/woolite64)
 
-#### v0.20.1 - 17<sup>th</sup> March 2018
+### v0.20.1 - 17<sup>th</sup> March 2018
 
 * Improve installation experience when a globally-installed libvips below the minimum required version is found.
   [#1148](https://github.com/lovell/sharp/issues/1148)
@@ -344,16 +344,16 @@ Requires libvips v8.6.1.
   [#1161](https://github.com/lovell/sharp/pull/1161)
   [@BiancoA](https://github.com/BiancoA)
 
-#### v0.20.0 - 5<sup>th</sup> March 2018
+### v0.20.0 - 5<sup>th</sup> March 2018
 
 * Add support for prebuilt sharp binaries on common platforms.
   [#186](https://github.com/lovell/sharp/issues/186)
 
-### v0.19 - "*suit*"
+## v0.19 - "*suit*"
 
 Requires libvips v8.6.1.
 
-#### v0.19.1 - 24<sup>th</sup> February 2018
+### v0.19.1 - 24<sup>th</sup> February 2018
 
 * Expose libvips' linear transform feature.
   [#1024](https://github.com/lovell/sharp/pull/1024)
@@ -367,7 +367,7 @@ Requires libvips v8.6.1.
   [#1134](https://github.com/lovell/sharp/issues/1134)
   [@pieh](https://github.com/pieh)
 
-#### v0.19.0 - 11<sup>th</sup> January 2018
+### v0.19.0 - 11<sup>th</sup> January 2018
 
 * Expose offset coordinates of strategy-based crop.
   [#868](https://github.com/lovell/sharp/issues/868)
@@ -411,17 +411,17 @@ Requires libvips v8.6.1.
 
 * TIFF output: switch default predictor from 'none' to 'horizontal' to match libvips' behaviour.
 
-### v0.18 - "*ridge*"
+## v0.18 - "*ridge*"
 
 Requires libvips v8.5.5.
 
-#### v0.18.4 - 18<sup>th</sup> September 2017
+### v0.18.4 - 18<sup>th</sup> September 2017
 
 * Ensure input Buffer really is marked as Persistent, prevents mark-sweep GC.
   [#950](https://github.com/lovell/sharp/issues/950)
   [@lfdoherty](https://github.com/lfdoherty)
 
-#### v0.18.3 - 13<sup>th</sup> September 2017
+### v0.18.3 - 13<sup>th</sup> September 2017
 
 * Skip shrink-on-load when trimming.
   [#888](https://github.com/lovell/sharp/pull/888)
@@ -431,7 +431,7 @@ Requires libvips v8.5.5.
   [#945](https://github.com/lovell/sharp/pull/945)
   [@pbomb](https://github.com/pbomb)
 
-#### v0.18.2 - 1<sup>st</sup> July 2017
+### v0.18.2 - 1<sup>st</sup> July 2017
 
 * Expose libvips' xres and yres properties for TIFF output.
   [#828](https://github.com/lovell/sharp/pull/828)
@@ -448,13 +448,13 @@ Requires libvips v8.5.5.
   [#857](https://github.com/lovell/sharp/pull/857)
   [@ekremkaraca](https://github.com/ekremkaraca)
 
-#### v0.18.1 - 30<sup>th</sup> May 2017
+### v0.18.1 - 30<sup>th</sup> May 2017
 
 * Remove regression from #781 that could cause incorrect shrink calculation.
   [#831](https://github.com/lovell/sharp/issues/831)
   [@suprMax](https://github.com/suprMax)
 
-#### v0.18.0 - 30<sup>th</sup> May 2017
+### v0.18.0 - 30<sup>th</sup> May 2017
 
 * Remove the previously-deprecated output format "option" functions:
     quality, progressive, compressionLevel, withoutAdaptiveFiltering,
@@ -512,11 +512,11 @@ Requires libvips v8.5.5.
   [#814](https://github.com/lovell/sharp/pull/814)
   [@jingsam](https://github.com/jingsam)
 
-### v0.17 - "*quill*"
+## v0.17 - "*quill*"
 
 Requires libvips v8.4.2.
 
-#### v0.17.3 - 1<sup>st</sup> April 2017
+### v0.17.3 - 1<sup>st</sup> April 2017
 
 * Allow toBuffer to optionally resolve a Promise with both info and data.
   [#143](https://github.com/lovell/sharp/issues/143)
@@ -534,7 +534,7 @@ Requires libvips v8.4.2.
   [#738](https://github.com/lovell/sharp/pull/738)
   [@kristojorg](https://github.com/kristojorg)
 
-#### v0.17.2 - 11<sup>th</sup> February 2017
+### v0.17.2 - 11<sup>th</sup> February 2017
 
 * Ensure Readable side of Stream can start flowing after Writable side has finished.
   [#671](https://github.com/lovell/sharp/issues/671)
@@ -544,7 +544,7 @@ Requires libvips v8.4.2.
   [#685](https://github.com/lovell/sharp/pull/685)
   [@rnanwani](https://github.com/rnanwani)
 
-#### v0.17.1 - 15<sup>th</sup> January 2017
+### v0.17.1 - 15<sup>th</sup> January 2017
 
 * Improve error messages for invalid parameters.
   [@spikeon](https://github.com/spikeon)
@@ -557,7 +557,7 @@ Requires libvips v8.4.2.
   [@wangzhiwei1888](https://github.com/wangzhiwei1888)
   [#679](https://github.com/lovell/sharp/issues/679)
 
-#### v0.17.0 - 11<sup>th</sup> December 2016
+### v0.17.0 - 11<sup>th</sup> December 2016
 
 * Drop support for versions of Node prior to v4.
 
@@ -594,17 +594,17 @@ Requires libvips v8.4.2.
   [#646](https://github.com/lovell/sharp/issues/646)
   [@DaGaMs](https://github.com/DaGaMs)
 
-### v0.16 - "*pencil*"
+## v0.16 - "*pencil*"
 
 Requires libvips v8.3.3
 
-#### v0.16.2 - 22<sup>nd</sup> October 2016
+### v0.16.2 - 22<sup>nd</sup> October 2016
 
 * Restrict readelf usage to Linux only when detecting global libvips version.
   [#602](https://github.com/lovell/sharp/issues/602)
   [@caoko](https://github.com/caoko)
 
-#### v0.16.1 - 13<sup>th</sup> October 2016
+### v0.16.1 - 13<sup>th</sup> October 2016
 
 * C++11 ABI version is now auto-detected, remove sharp-cxx11 installation flag.
 
@@ -623,7 +623,7 @@ Requires libvips v8.3.3
   [#566](https://github.com/lovell/sharp/issues/566)
   [@Nateowami](https://github.com/Nateowami)
 
-#### v0.16.0 - 18<sup>th</sup> August 2016
+### v0.16.0 - 18<sup>th</sup> August 2016
 
 * Add pre-compiled libvips for OS X, ARMv7 and ARMv8.
   [#312](https://github.com/lovell/sharp/issues/312)
@@ -663,11 +663,11 @@ Requires libvips v8.3.3
 * Remove deprecated interpolateWith method - use resize(w, h, { interpolator: ... })
   [#310](https://github.com/lovell/sharp/issues/310)
 
-### v0.15 - "*outfit*"
+## v0.15 - "*outfit*"
 
 Requires libvips v8.3.1
 
-#### v0.15.1 - 12<sup>th</sup> July 2016
+### v0.15.1 - 12<sup>th</sup> July 2016
 
 * Concat Stream-based input in single operation for ~+3% perf and less GC.
   [#429](https://github.com/lovell/sharp/issues/429)
@@ -733,7 +733,7 @@ Requires libvips v8.3.1
   [#501](https://github.com/lovell/sharp/pull/501)
   [@mhirsch](https://github.com/mhirsch)
 
-#### v0.15.0 - 21<sup>st</sup> May 2016
+### v0.15.0 - 21<sup>st</sup> May 2016
 
 * Use libvips' new Lanczos 3 kernel as default for image reduction.
   Deprecate interpolateWith method, now provided as a resize option.
@@ -751,11 +751,11 @@ Requires libvips v8.3.1
   [#413](https://github.com/lovell/sharp/issues/413)
   [@jardakotesovec](https://github.com/jardakotesovec)
 
-### v0.14 - "*needle*"
+## v0.14 - "*needle*"
 
 Requires libvips v8.2.3
 
-#### v0.14.1 - 16<sup>th</sup> April 2016
+### v0.14.1 - 16<sup>th</sup> April 2016
 
 * Allow removal of limitation on input pixel count via limitInputPixels. Use with care.
   [#250](https://github.com/lovell/sharp/issues/250)
@@ -779,7 +779,7 @@ Requires libvips v8.2.3
   [#412](https://github.com/lovell/sharp/issues/412)
   [@nouh](https://github.com/nouh)
 
-#### v0.14.0 - 2<sup>nd</sup> April 2016
+### v0.14.0 - 2<sup>nd</sup> April 2016
 
 * Add ability to extend (pad) the edges of an image.
   [#128](https://github.com/lovell/sharp/issues/128)
@@ -816,17 +816,17 @@ Requires libvips v8.2.3
 * Remove deprecated style of calling extract API. Breaks calls using positional arguments.
   [#276](https://github.com/lovell/sharp/issues/276)
 
-### v0.13 - "*mind*"
+## v0.13 - "*mind*"
 
 Requires libvips v8.2.2
 
-#### v0.13.1 - 27<sup>th</sup> February 2016
+### v0.13.1 - 27<sup>th</sup> February 2016
 
 * Fix embedding onto transparent backgrounds; regression introduced in v0.13.0.
   [#366](https://github.com/lovell/sharp/issues/366)
   [@diegocsandrim](https://github.com/diegocsandrim)
 
-#### v0.13.0 - 15<sup>th</sup> February 2016
+### v0.13.0 - 15<sup>th</sup> February 2016
 
 * Improve vector image support by allowing control of density/DPI.
   Switch pre-built libs from Imagemagick to Graphicsmagick.
@@ -871,11 +871,11 @@ Requires libvips v8.2.2
 
 * Add support for gamma correction of images with an alpha channel.
 
-### v0.12 - "*look*"
+## v0.12 - "*look*"
 
 Requires libvips v8.2.0
 
-#### v0.12.2 - 16<sup>th</sup> January 2016
+### v0.12.2 - 16<sup>th</sup> January 2016
 
 * Upgrade libvips to v8.2.0 for improved vips_shrink.
 
@@ -893,7 +893,7 @@ Requires libvips v8.2.0
   [#331](https://github.com/lovell/sharp/issues/331)
   [@dtoubelis](https://github.com/dtoubelis)
 
-#### v0.12.1 - 12<sup>th</sup> December 2015
+### v0.12.1 - 12<sup>th</sup> December 2015
 
 * Allow use of SIMD vector instructions (via liborc) to be toggled on/off.
   [#172](https://github.com/lovell/sharp/issues/172)
@@ -906,7 +906,7 @@ Requires libvips v8.2.0
 
 * Use the NPM-configured HTTPS proxy, if any, for binary downloads.
 
-#### v0.12.0 - 23<sup>rd</sup> November 2015
+### v0.12.0 - 23<sup>rd</sup> November 2015
 
 * Bundle pre-compiled libvips and its dependencies for 64-bit Linux and Windows.
   [#42](https://github.com/lovell/sharp/issues/42)
@@ -942,9 +942,9 @@ Requires libvips v8.2.0
   [#309](https://github.com/lovell/sharp/pull/309)
   [@papandreou](https://github.com/papandreou)
 
-### v0.11 - "*knife*"
+## v0.11 - "*knife*"
 
-#### v0.11.4 - 5<sup>th</sup> November 2015
+### v0.11.4 - 5<sup>th</sup> November 2015
 
 * Add corners, e.g. `northeast`, to existing `gravity` option.
   [#291](https://github.com/lovell/sharp/pull/291)
@@ -958,13 +958,13 @@ Requires libvips v8.2.0
   [#287](https://github.com/lovell/sharp/pull/287)
   [@vlapo](https://github.com/vlapo)
 
-#### v0.11.3 - 8<sup>th</sup> September 2015
+### v0.11.3 - 8<sup>th</sup> September 2015
 
 * Intrepret blurSigma, sharpenFlat, and sharpenJagged as double precision.
   [#263](https://github.com/lovell/sharp/pull/263)
   [@chrisriley](https://github.com/chrisriley)
 
-#### v0.11.2 - 28<sup>th</sup> August 2015
+### v0.11.2 - 28<sup>th</sup> August 2015
 
 * Allow crop gravity to be provided as a String.
   [#255](https://github.com/lovell/sharp/pull/255)
@@ -972,7 +972,7 @@ Requires libvips v8.2.0
 * Add support for io.js v3 and Node v4.
   [#246](https://github.com/lovell/sharp/issues/246)
 
-#### v0.11.1 - 12<sup>th</sup> August 2015
+### v0.11.1 - 12<sup>th</sup> August 2015
 
 * Silence MSVC warning: "C4530: C++ exception handler used, but unwind semantics are not enabled".
   [#244](https://github.com/lovell/sharp/pull/244)
@@ -982,7 +982,7 @@ Requires libvips v8.2.0
   [#249](https://github.com/lovell/sharp/issues/249)
   [@compeak](https://github.com/compeak)
 
-#### v0.11.0 - 15<sup>th</sup> July 2015
+### v0.11.0 - 15<sup>th</sup> July 2015
 
 * Allow alpha transparency compositing via new `overlayWith` method.
   [#97](https://github.com/lovell/sharp/issues/97)
@@ -1010,9 +1010,9 @@ Requires libvips v8.2.0
   [#238](https://github.com/lovell/sharp/issues/238)
   [@richardadjogah](https://github.com/richardadjogah)
 
-### v0.10 - "*judgment*"
+## v0.10 - "*judgment*"
 
-#### v0.10.1 - 1<sup>st</sup> June 2015
+### v0.10.1 - 1<sup>st</sup> June 2015
 
 * Allow embed of image with alpha transparency onto non-transparent background.
   [#204](https://github.com/lovell/sharp/issues/204)
@@ -1022,7 +1022,7 @@ Requires libvips v8.2.0
   [#228](https://github.com/lovell/sharp/issues/228)
   [@doggan](https://github.com/doggan)
 
-#### v0.10.0 - 23<sup>rd</sup> April 2015
+### v0.10.0 - 23<sup>rd</sup> April 2015
 
 * Add support for Windows (x86).
   [#19](https://github.com/lovell/sharp/issues/19)

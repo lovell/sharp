@@ -1,12 +1,8 @@
 # Performance
 
-### Test environment
+A test to benchmark the performance of this module relative to alternatives.
 
-* AWS EC2 eu-west-1 [c5.large](https://aws.amazon.com/ec2/instance-types/c5/) (2x Xeon Platinum 8124M CPU @ 3.00GHz)
-* Ubuntu 18.04 (hvm-ssd/ubuntu-bionic-18.04-amd64-server-20180912 ami-00035f41c82244dab)
-* Node.js v12.10.0
-
-### The contenders
+## The contenders
 
 * [jimp](https://www.npmjs.com/package/jimp) v0.8.4 - Image processing in pure JavaScript. Provides bicubic interpolation.
 * [mapnik](https://www.npmjs.org/package/mapnik) v4.3.1 - Whilst primarily a map renderer, Mapnik contains bitmap image utilities.
@@ -14,13 +10,19 @@
 * [gm](https://www.npmjs.com/package/gm) v1.23.1 - Fully featured wrapper around GraphicsMagick's `gm` command line utility.
 * sharp v0.23.1 / libvips v8.8.1 - Caching within libvips disabled to ensure a fair comparison.
 
-### The task
+## The task
 
 Decompress a 2725x2225 JPEG image,
 resize to 720x588 using Lanczos 3 resampling (where available),
 then compress to JPEG at a "quality" setting of 80.
 
-### Results
+## Test environment
+
+* AWS EC2 eu-west-1 [c5.large](https://aws.amazon.com/ec2/instance-types/c5/) (2x Xeon Platinum 8124M CPU @ 3.00GHz)
+* Ubuntu 18.04 (hvm-ssd/ubuntu-bionic-18.04-amd64-server-20180912 ami-00035f41c82244dab)
+* Node.js v12.10.0
+
+## Results
 
 | Module             | Input  | Output | Ops/sec | Speed-up |
 | :----------------- | :----- | :----- | ------: | -------: |
@@ -38,7 +40,7 @@ and using 8+ core machines, especially those with larger L1/L2 CPU caches.
 
 The I/O limits of the relevant (de)compression library will generally determine maximum throughput.
 
-### Benchmark test prerequisites
+## Running the benchmark test
 
 Requires _ImageMagick_, _GraphicsMagick_ and _Mapnik_:
 
@@ -55,8 +57,6 @@ sudo apt-get install imagemagick libmagick++-dev graphicsmagick libmapnik-dev
 ```sh
 sudo yum install ImageMagick-devel ImageMagick-c++-devel GraphicsMagick mapnik-devel
 ```
-
-### Running the benchmark test
 
 ```sh
 git clone https://github.com/lovell/sharp.git
