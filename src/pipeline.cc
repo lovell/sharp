@@ -134,6 +134,17 @@ class PipelineWorker : public Nan::AsyncWorker {
         std::swap(inputWidth, inputHeight);
       }
 
+      // If withoutEnlargement is specified,
+      // Override target width and height if exceeds respective value from input file
+      if (baton->withoutEnlargement) {
+        if (baton->width > inputWidth) {
+          baton->width = inputWidth;
+        }
+        if (baton->height > inputHeight) {
+          baton->height = inputHeight;
+        }
+      }
+
       // Scaling calculations
       double xfactor = 1.0;
       double yfactor = 1.0;
@@ -220,21 +231,6 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Calculate residual float affine transformation
       double xresidual = static_cast<double>(xshrink) / xfactor;
       double yresidual = static_cast<double>(yshrink) / yfactor;
-
-      // Do not enlarge the output if the input width *or* height
-      // are already less than the required dimensions
-      if (baton->withoutEnlargement) {
-        if (inputWidth < baton->width || inputHeight < baton->height) {
-          xfactor = 1.0;
-          yfactor = 1.0;
-          xshrink = 1;
-          yshrink = 1;
-          xresidual = 1.0;
-          yresidual = 1.0;
-          baton->width = inputWidth;
-          baton->height = inputHeight;
-        }
-      }
 
       // If integral x and y shrink are equal, try to use shrink-on-load for JPEG and WebP,
       // but not when applying gamma correction, pre-resize extract or trim
