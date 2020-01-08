@@ -16,7 +16,7 @@ Lanczos resampling ensures quality is not sacrificed for speed.
 As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
-Most modern 64-bit OS X, Windows and Linux systems running
+Most modern 64-bit macOS, Windows and Linux systems running
 Node versions 10, 12 and 13
 do not require any additional install or runtime dependencies.
 
@@ -136,7 +136,7 @@ Thank you!
 
 ### Licensing
 
-Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019 Lovell Fuller and contributors.
+Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
