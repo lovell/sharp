@@ -51,24 +51,24 @@ matrix:
       dist: bionic
       language: minimal
       before_install:
-        - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
+        - sudo docker run -dit --name sharp --env CI --env PREBUILD_TOKEN --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
         - sudo docker exec sharp apt-get update
         - sudo docker exec sharp apt-get install -y build-essential git python2 nodejs npm
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
-    - name: "OS X (10.12+) - Node.js 10"
+    - name: "macOS (10.13+) - Node.js 10"
       os: osx
-      osx_image: xcode9.2
+      osx_image: xcode10.1
       language: node_js
       node_js: "10"
-    - name: "OS X (10.12+) - Node.js 12"
+    - name: "macOS (10.13+) - Node.js 12"
       os: osx
-      osx_image: xcode9.2
+      osx_image: xcode10.1
       language: node_js
       node_js: "12"
-    - name: "OS X (10.12+) - Node.js 13"
+    - name: "macOS (10.13+) - Node.js 13"
       os: osx
-      osx_image: xcode10
+      osx_image: xcode10.1
       language: node_js
       node_js: "13"
 cache:
