@@ -130,6 +130,7 @@ the help and code contributions of the following people:
 * [Nicolas Stepien](https://github.com/MayhemYDG)
 * [Paul Neave](https://github.com/neave)
 * [Brendan Kennedy](https://github.com/rustyguts)
+* [Brychan Bennett-Odlum](https://github.com/BrychanOdlum)
 
 Thank you!
 
