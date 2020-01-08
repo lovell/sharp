@@ -12,6 +12,16 @@
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://pixel.plumbing/px/72x72/sharp-logo.svg">
   <link rel="apple-touch-icon-precomposed" href="https://pixel.plumbing/px/57x57/sharp-logo.svg">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docute@4/dist/docute.min.css">
+  <style>
+  @media (max-width: 576px) {
+    .shorten-strapline {
+      display: none;
+    }
+  }
+  img[alt='sharp logo'] {
+    margin: 0 0 16px 16px;
+  }
+  </style>
   <title>sharp - High performance Node.js image processing</title>
 </head>
 
@@ -42,7 +52,8 @@
       logo: '<div style="display:flex;align-items:center">'
         + '<strong>sharp</strong> '
         + '<img src="https://pixel.plumbing/px/16x16/sharp-logo.svg" style="padding:8px" alt="#"> '
-        + '<span style="opacity:0.8">High performance Node.js image processing</span> '
+        + '<span style="opacity:0.8;white-space:pre" class="shorten-strapline">High performance </span> '
+        + '<span style="opacity:0.8">Node.js image processing</span> '
         + '</div>',
       darkThemeToggler: true,
       detectSystemDarkTheme: true,
@@ -51,7 +62,7 @@
         docuteGoogleAnalytics('UA-13034748-12'),
         docuteApiTitlePlugin
       ],
-      sourcePath: 'https://cdn.jsdelivr.net/gh/lovell/sharp@wit/docs',
+      sourcePath: 'https://cdn.jsdelivr.net/gh/lovell/sharp@4b8cc13/docs',
       nav: [
         {
           title: 'Funding',

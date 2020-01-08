@@ -14,7 +14,7 @@ yarn add sharp
 
 ## Prebuilt binaries
 
-Ready-to-use binaries for sharp and libvips are provided for use with
+Ready-compiled sharp and libvips binaries are provided for use with
 Node.js versions 10, 12 and 13 on the most common platforms:
 
 * macOS x64 (>= 10.13)
