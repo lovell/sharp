@@ -125,7 +125,7 @@
     "exif-reader": "^1.0.3",
     "icc": "^1.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^6.2.2",
+    "mocha": "^7.0.0",
     "mock-fs": "^4.10.4",
     "nyc": "^15.0.0",
     "prebuild": "^9.1.1",
@@ -135,7 +135,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.9.0-rc4"
+    "libvips": "8.9.0"
   },
   "engines": {
     "node": ">=10.13.0"
