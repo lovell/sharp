@@ -12,16 +12,67 @@ yarn add sharp
 
 * Node.js v10.13.0+
 
-### Building from source
+## Prebuilt binaries
 
-Pre-compiled binaries for sharp are provided for use with
-Node versions 10, 12 and 13 on
-64-bit Windows, OS X and Linux platforms.
+Ready-to-use binaries for sharp and libvips are provided for use with
+Node.js versions 10, 12 and 13 on the most common platforms:
 
-Sharp will be built from source at install time when:
+* macOS x64 (>= 10.13)
+* Linux x64 (glibc >= 2.17, musl >= 1.1.24)
+* Linux ARM64 (glibc >= 2.29)
+* Windows x64 with 64-bit `node.exe`
 
-* a globally-installed libvips is detected,
-* pre-compiled binaries do not exist for the current platform and Node version, or
+A ~10MB tarball containing libvips and its most commonly used dependencies
+is downloaded via HTTPS and stored within `node_modules/sharp/vendor` during `npm install`.
+
+This provides support for the
+JPEG, PNG, WebP, TIFF, GIF (input) and SVG (input) image formats.
+
+The following platforms have prebuilt libvips but not sharp:
+
+* Linux ARMv6
+* Linux ARMv7
+
+The following platforms require compilation of both libvips and sharp from source:
+
+* Linux x86
+* Linux x64 (glibc <= 2.16, includes RHEL/CentOS 6)
+* Linux ARM64 (glibc <= 2.28, musl)
+* Linux PowerPC
+* FreeBSD
+* OpenBSD
+
+The following platforms are completely unsupported:
+
+* Windows x86
+* Windows x64 with 32-bit `node.exe`
+
+## Common problems
+
+The platform and major version of Node.js used for `npm install`
+must be the same as the platform and major version of Node.js used at runtime.
+
+The `npm install --unsafe-perm` flag must be used when installing as `root` or a `sudo` user.
+
+Check the output of running `npm install --verbose sharp` for useful error messages.
+
+## Custom libvips
+
+To use a custom, globally-installed version of libvips instead of the provided binaries,
+make sure it is at least the version listed under `config.libvips` in the `package.json` file
+and that it can be located using `pkg-config --modversion vips-cpp`.
+
+For help compiling libvips from source, please see
+[https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball](https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball).
+
+The use of a globally-installed libvips is unsupported on Windows.
+
+## Building from source
+
+This module will be compiled from source at `npm install` time when:
+
+* a globally-installed libvips is detected (set the `SHARP_IGNORE_GLOBAL_LIBVIPS` environment variable to skip this),
+* prebuilt binaries do not exist for the current platform and Node.js version, or
 * when the `npm install --build-from-source` flag is used.
 
 Building from source requires:
@@ -29,88 +80,32 @@ Building from source requires:
 * C++11 compatible compiler such as gcc 4.8+, clang 3.0+ or MSVC 2013+
 * [node-gyp](https://github.com/nodejs/node-gyp#installation) and its dependencies (includes Python 2.7)
 
-## libvips
+## Custom prebuilt binaries
 
-### Linux
+This is an advanced approach that most people will not require.
 
-[![Ubuntu 16.04 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
+To install the prebuilt libvips binaries from a custom URL,
+set the `sharp_dist_base_url` npm config option
+or the `SHARP_DIST_BASE_URL` environment variable.
 
-libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 10MB.
-
-Most Linux-based (glibc, musl) operating systems running on x64 and ARMv6+ CPUs should "just work", e.g.:
-
-* Debian 8+
-* Ubuntu 14.04+
-* Red Hat Enterprise 7+
-* CentOS 7+
-* Alpine 3.10+
-* Fedora 21+
-* openSUSE 13.2+
-* Archlinux
-* Raspbian Jessie
-* Amazon Linux
-* Solus
-
-To use a globally-installed version of libvips instead of the provided binaries,
-make sure it is at least the version listed under `config.libvips` in the `package.json` file
-and that it can be located using `pkg-config --modversion vips-cpp`.
-
-If you are using non-standard paths (anything other than `/usr` or `/usr/local`),
-you might need to set `PKG_CONFIG_PATH` during `npm install`
-and `LD_LIBRARY_PATH` at runtime.
-
-This allows the use of newer versions of libvips with older versions of sharp.
-
-For 32-bit Intel CPUs and older Linux-based operating systems such as
-those based on Red Hat Enterprise 6 (e.g. CentOS 6)
-compiling libvips from source is recommended.
-
-[https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball](https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball)
-
-#### Alpine Linux
-
-libvips is available in the
-[community repository](https://pkgs.alpinelinux.org/packages?name=vips-dev):
+For example, both of the following will result in an attempt to download the file located at
+`https://hostname/path/libvips-x.y.z-platform.tar.gz`.
 
 ```sh
-apk add --upgrade --no-cache vips-dev build-base \
-  --repository https://alpine.global.ssl.fastly.net/alpine/v3.10/community/
+npm config set sharp_dist_base_url "https://hostname/path/"
+npm install sharp
 ```
 
-The smaller stack size of musl libc means
-libvips may need to be used without a cache
-via `sharp.cache(false)` to avoid a stack overflow.
+```sh
+SHARP_DIST_BASE_URL="https://hostname/path/" npm install sharp
+```
 
-### Mac OS
+To install the prebuilt sharp binaries from a custom URL, please see
+[https://github.com/prebuild/prebuild-install#custom-binaries](https://github.com/prebuild/prebuild-install#custom-binaries)
 
-[![OS X 10.12 Build Status](https://travis-ci.org/lovell/sharp.png?branch=master)](https://travis-ci.org/lovell/sharp)
+## FreeBSD
 
-libvips and its dependencies are fetched and stored within `node_modules/sharp/vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 8MB.
-
-To use your own version of libvips instead of the provided binaries, make sure it is
-at least the version listed under `config.libvips` in the `package.json` file and
-that it can be located using `pkg-config --modversion vips-cpp`.
-
-### Windows x64
-
-[![Windows x64 Build Status](https://ci.appveyor.com/api/projects/status/pgtul704nkhhg6sg)](https://ci.appveyor.com/project/lovell/sharp)
-
-libvips and its dependencies are fetched and stored within `node_modules\sharp\vendor` during `npm install`.
-This involves an automated HTTPS download of approximately 10MB.
-If you are having issues during installation consider removing the directory
-`C:\Users\[user]\AppData\Roaming\npm-cache\_libvips`.
-
-Only 64-bit (x64) `node.exe` is supported.
-
-### FreeBSD
-
-[![FreeBSD Build Status](https://api.cirrus-ci.com/github/lovell/sharp.svg)](https://cirrus-ci.com/github/lovell/sharp)
-
-libvips must be installed before `npm install` is run.
-
-This can be achieved via package or ports:
+The `vips` package must be installed before `npm install` is run.
 
 ```sh
 pkg install -y pkgconf vips
@@ -120,26 +115,25 @@ pkg install -y pkgconf vips
 cd /usr/ports/graphics/vips/ && make install clean
 ```
 
-FreeBSD's gcc v4 and v5 need `CXXFLAGS=-D_GLIBCXX_USE_C99` set for C++11 support due to
-https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=193528
+## Heroku
 
-### Heroku
+Add the
+[jemalloc buildpack](https://github.com/gaffneyc/heroku-buildpack-jemalloc)
+to reduce the effects of memory fragmentation.
 
-Set [NODE_MODULES_CACHE](https://devcenter.heroku.com/articles/nodejs-support#cache-behavior)
+Set
+[NODE_MODULES_CACHE](https://devcenter.heroku.com/articles/nodejs-support#cache-behavior)
 to `false` when using the `yarn` package manager.
 
-To reduce the effects of memory fragmentation, add the
-[jemalloc buildpack](https://github.com/gaffneyc/heroku-buildpack-jemalloc).
-
-### AWS Lambda
+## AWS Lambda
 
 Set the Lambda runtime to `nodejs10.x`.
 
 The binaries in the `node_modules` directory of the
 [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html)
-must be for the Linux x64 platform/architecture.
+must be for the Linux x64 platform.
 
-On non-Linux machines such as OS X and Windows run the following:
+On machines other than Linux x64, such as macOS and Windows, run the following:
 
 ```sh
 rm -rf node_modules/sharp
@@ -155,117 +149,3 @@ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs10.x npm install sharp
 
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
-
-### NW.js
-
-Run the `nw-gyp` tool after installation.
-
-```sh
-cd node-modules/sharp
-nw-gyp rebuild --arch=x64 --target=[your nw version]
-node node_modules/sharp/install/dll-copy
-```
-
-[http://docs.nwjs.io/en/latest/For%20Users/Advanced/Use%20Native%20Node%20Modules/](http://docs.nwjs.io/en/latest/For%20Users/Advanced/Use%20Native%20Node%20Modules/)
-
-### Build tools
-
-* [gulp-responsive](https://www.npmjs.com/package/gulp-responsive)
-* [grunt-sharp](https://www.npmjs.com/package/grunt-sharp)
-
-### Coding tools
-
-* [Sharp TypeScript Types](https://www.npmjs.com/package/@types/sharp)
-
-### CLI tools
-
-* [sharp-cli](https://www.npmjs.com/package/sharp-cli)
-
-### Security
-
-Many users of this module process untrusted, user-supplied images,
-but there are aspects of security to consider when doing so.
-
-It is possible to compile libvips with support for various third-party image loaders.
-Each of these libraries has undergone differing levels of security testing.
-
-Whilst tools such as [American Fuzzy Lop](http://lcamtuf.coredump.cx/afl/)
-and [Valgrind](http://valgrind.org/) have been used to test
-the most popular web-based formats, as well as libvips itself,
-you are advised to perform your own testing and sandboxing.
-
-### Pre-compiled libvips binaries
-
-This module will attempt to download a pre-compiled bundle of libvips
-and its dependencies on Linux and Windows machines under either of these
-conditions:
-
-1. If a global installation of libvips that meets the
-minimum version requirement cannot be found;
-1. If `SHARP_IGNORE_GLOBAL_LIBVIPS` environment variable is set.
-
-```sh
-SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install sharp
-```
-
-Should you need to manually download and inspect these files,
-you can do so via
-[https://github.com/lovell/sharp-libvips/releases](https://github.com/lovell/sharp-libvips/releases)
-
-Should you wish to install these from your own location,
-set the `sharp_dist_base_url` npm config option, e.g.
-
-```sh
-npm config set sharp_dist_base_url "https://hostname/path/"
-npm install sharp
-```
-
-or set the `SHARP_DIST_BASE_URL` environment variable, e.g.
-
-```sh
-SHARP_DIST_BASE_URL="https://hostname/path/" npm install sharp
-```
-
-to use `https://hostname/path/libvips-x.y.z-platform.tar.gz`.
-
-To install the prebuilt sharp binaries from a custom URL, please see
-[https://github.com/prebuild/prebuild-install#custom-binaries](https://github.com/prebuild/prebuild-install#custom-binaries)
-
-### Licences
-
-This module is licensed under the terms of the
-[Apache 2.0 Licence](https://github.com/lovell/sharp/blob/master/LICENSE).
-
-The libraries downloaded and used by this module
-are done so under the terms of the following licences,
-all of which are compatible with the Apache 2.0 Licence.
-
-Use of libraries under the terms of the LGPLv3 is via the
-"any later version" clause of the LGPLv2 or LGPLv2.1.
-
-| Library       | Used under the terms of                                                                                  |
-|---------------|----------------------------------------------------------------------------------------------------------|
-| cairo         | Mozilla Public License 2.0                                                                               |
-| expat         | MIT Licence                                                                                              |
-| fontconfig    | [fontconfig Licence](https://cgit.freedesktop.org/fontconfig/tree/COPYING) (BSD-like)                    |
-| freetype      | [freetype Licence](http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT) (BSD-like) |
-| fribidi       | LGPLv3                                                                                                   |
-| gettext       | LGPLv3                                                                                                   |
-| giflib        | MIT Licence                                                                                              |
-| glib          | LGPLv3                                                                                                   |
-| harfbuzz      | MIT Licence                                                                                              |
-| lcms          | MIT Licence                                                                                              |
-| libcroco      | LGPLv3                                                                                                   |
-| libexif       | LGPLv3                                                                                                   |
-| libffi        | MIT Licence                                                                                              |
-| libgsf        | LGPLv3                                                                                                   |
-| libjpeg-turbo | [zlib License, IJG License](https://github.com/libjpeg-turbo/libjpeg-turbo/blob/master/LICENSE.md)       |
-| libpng        | [libpng License](http://www.libpng.org/pub/png/src/libpng-LICENSE.txt)                                   |
-| librsvg       | LGPLv3                                                                                                   |
-| libtiff       | [libtiff License](http://www.libtiff.org/misc.html) (BSD-like)                                           |
-| libvips       | LGPLv3                                                                                                   |
-| libwebp       | New BSD License                                                                                          |
-| libxml2       | MIT Licence                                                                                              |
-| pango         | LGPLv3                                                                                                   |
-| pixman        | MIT Licence                                                                                              |
-| zlib          | [zlib Licence](https://github.com/madler/zlib/blob/master/zlib.h)                                        |
