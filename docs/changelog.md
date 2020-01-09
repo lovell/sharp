@@ -9,6 +9,9 @@ Requires libvips v8.9.0.
 * Drop support for Node.js 8.
   [#1910](https://github.com/lovell/sharp/issues/1910)
 
+* Expose `delay` and `loop` metadata for animated images.
+  [#1905](https://github.com/lovell/sharp/issues/1905)
+
 * Ensure correct colour output for 16-bit, 2-channel PNG input with ICC profile.
   [#2013](https://github.com/lovell/sharp/issues/2013)
 

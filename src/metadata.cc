@@ -77,6 +77,12 @@ class MetadataWorker : public Nan::AsyncWorker {
       if (image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
         baton->pageHeight = image.get_int(VIPS_META_PAGE_HEIGHT);
       }
+      if (image.get_typeof("loop") == G_TYPE_INT) {
+        baton->loop = image.get_int("loop");
+      }
+      if (image.get_typeof("delay") == VIPS_TYPE_ARRAY_INT) {
+        baton->delay = image.get_array_int("delay");
+      }
       if (image.get_typeof("heif-primary") == G_TYPE_INT) {
         baton->pagePrimary = image.get_int("heif-primary");
       }
@@ -168,6 +174,17 @@ class MetadataWorker : public Nan::AsyncWorker {
       }
       if (baton->pageHeight > 0) {
         Set(info, New("pageHeight").ToLocalChecked(), New<v8::Uint32>(baton->pageHeight));
+      }
+      if (baton->loop >= 0) {
+        Set(info, New("loop").ToLocalChecked(), New<v8::Uint32>(baton->loop));
+      }
+      if (!baton->delay.empty()) {
+        int i = 0;
+        v8::Local<v8::Array> delay = New<v8::Array>(baton->delay.size());
+        for (int const d : baton->delay) {
+          Set(delay, i++, New<v8::Number>(d));
+        }
+        Set(info, New("delay").ToLocalChecked(), delay);
       }
       if (baton->pagePrimary > -1) {
         Set(info, New("pagePrimary").ToLocalChecked(), New<v8::Uint32>(baton->pagePrimary));

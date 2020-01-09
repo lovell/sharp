@@ -36,6 +36,8 @@ struct MetadataBaton {
   int paletteBitDepth;
   int pages;
   int pageHeight;
+  int loop;
+  std::vector<int> delay;
   int pagePrimary;
   bool hasProfile;
   bool hasAlpha;
@@ -62,6 +64,7 @@ struct MetadataBaton {
     paletteBitDepth(0),
     pages(0),
     pageHeight(0),
+    loop(-1),
     pagePrimary(-1),
     hasProfile(false),
     hasAlpha(false),

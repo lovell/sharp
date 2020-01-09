@@ -232,6 +232,55 @@ describe('Image metadata', function () {
       done();
     });
   });
+
+  it('Animated GIF', () =>
+    sharp(fixtures.inputGifAnimated)
+      .metadata()
+      .then(({
+        format, width, height, space, channels, depth,
+        isProgressive, pages, pageHeight, loop, delay,
+        hasProfile, hasAlpha
+      }) => {
+        assert.strictEqual(format, 'gif');
+        assert.strictEqual(width, 80);
+        assert.strictEqual(height, 80);
+        assert.strictEqual(space, 'srgb');
+        assert.strictEqual(channels, 4);
+        assert.strictEqual(depth, 'uchar');
+        assert.strictEqual(isProgressive, false);
+        assert.strictEqual(pages, 30);
+        assert.strictEqual(pageHeight, 80);
+        assert.strictEqual(loop, 0);
+        assert.deepStrictEqual(delay, Array(30).fill(30));
+        assert.strictEqual(hasProfile, false);
+        assert.strictEqual(hasAlpha, true);
+      })
+  );
+
+  it('Animated GIF with limited looping', () =>
+    sharp(fixtures.inputGifAnimatedLoop3)
+      .metadata()
+      .then(({
+        format, width, height, space, channels, depth,
+        isProgressive, pages, pageHeight, loop, delay,
+        hasProfile, hasAlpha
+      }) => {
+        assert.strictEqual(format, 'gif');
+        assert.strictEqual(width, 370);
+        assert.strictEqual(height, 285);
+        assert.strictEqual(space, 'srgb');
+        assert.strictEqual(channels, 4);
+        assert.strictEqual(depth, 'uchar');
+        assert.strictEqual(isProgressive, false);
+        assert.strictEqual(pages, 10);
+        assert.strictEqual(pageHeight, 285);
+        assert.strictEqual(loop, 3);
+        assert.deepStrictEqual(delay, [...Array(9).fill(3000), 15000]);
+        assert.strictEqual(hasProfile, false);
+        assert.strictEqual(hasAlpha, true);
+      })
+  );
+
   it('vips', () =>
     sharp(fixtures.inputV)
       .metadata()
