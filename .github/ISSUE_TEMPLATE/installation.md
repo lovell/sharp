@@ -13,6 +13,8 @@ Have you ensured the platform and version of Node.js used for `npm install` is t
 
 If you are installing as a `root` or `sudo` user, have you tried with the `npm install --unsafe-perm` flag?
 
+If you are using the `ignore-scripts` feature of `npm`, have you tried with the `npm install --ignore-scripts=false` flag?
+
 What is the complete output of running `npm install --verbose sharp`? Have you checked this output for useful error messages?
 
 What is the output of running `npx envinfo --binaries --languages --system --utilities`?

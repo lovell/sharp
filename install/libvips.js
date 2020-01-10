@@ -23,7 +23,7 @@ const fail = function (err) {
     npmLog.info('sharp', 'Are you trying to install as a root or sudo user? Try again with the --unsafe-perm flag');
   }
   npmLog.info('sharp', 'Attempting to build from source via node-gyp but this may fail due to the above error');
-  npmLog.info('sharp', 'Please see https://sharp.pixelplumbing.com/page/install for required dependencies');
+  npmLog.info('sharp', 'Please see https://sharp.pixelplumbing.com/install for required dependencies');
   process.exit(1);
 };
 
