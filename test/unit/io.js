@@ -635,27 +635,40 @@ describe('Input/output', function () {
   });
 
   describe('Input options', function () {
+    it('Option-less', function () {
+      sharp();
+    });
+    it('Ignore unknown attribute', function () {
+      sharp({ unknown: true });
+    });
+    it('undefined with options fails', function () {
+      assert.throws(function () {
+        sharp(undefined, {});
+      }, /Unsupported input 'undefined' of type undefined when also providing options of type object/);
+    });
+    it('null with options fails', function () {
+      assert.throws(function () {
+        sharp(null, {});
+      }, /Unsupported input 'null' of type object when also providing options of type object/);
+    });
     it('Non-Object options fails', function () {
       assert.throws(function () {
-        sharp(null, 'zoinks');
-      });
+        sharp('test', 'zoinks');
+      }, /Invalid input options zoinks/);
     });
     it('Invalid density: string', function () {
       assert.throws(function () {
-        sharp(null, { density: 'zoinks' });
-      });
-    });
-    it('Ignore unknown attribute', function () {
-      sharp(null, { unknown: true });
+        sharp({ density: 'zoinks' });
+      }, /Expected number between 1 and 2400 for density but received zoinks of type string/);
     });
     it('Invalid page property throws', function () {
       assert.throws(function () {
-        sharp(null, { page: -1 });
+        sharp({ page: -1 });
       }, /Expected integer between 0 and 100000 for page but received -1 of type number/);
     });
     it('Invalid pages property throws', function () {
       assert.throws(function () {
-        sharp(null, { pages: '1' });
+        sharp({ pages: '1' });
       }, /Expected integer between -1 and 100000 for pages but received 1 of type string/);
     });
   });
@@ -749,7 +762,7 @@ describe('Input/output', function () {
         assert.strictEqual(472, info.height);
         assert.strictEqual(3, info.channels);
       });
-    const badPipeline = sharp(null, { raw: { width: 840, height: 500, channels: 3 } })
+    const badPipeline = sharp({ raw: { width: 840, height: 500, channels: 3 } })
       .toFormat('jpeg')
       .toBuffer(function (err, data, info) {
         assert.strictEqual(err.message.indexOf('memory area too small') > 0, true);
@@ -757,7 +770,7 @@ describe('Input/output', function () {
         const inPipeline = sharp()
           .resize(840, 472)
           .raw();
-        const goodPipeline = sharp(null, { raw: { width: 840, height: 472, channels: 3 } })
+        const goodPipeline = sharp({ raw: { width: 840, height: 472, channels: 3 } })
           .toFormat('jpeg')
           .toBuffer(function (err, data, info) {
             if (err) throw err;

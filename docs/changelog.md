@@ -9,6 +9,9 @@ Requires libvips v8.9.0.
 * Drop support for Node.js 8.
   [#1910](https://github.com/lovell/sharp/issues/1910)
 
+* Drop support for undefined input where options also provided.
+  [#1768](https://github.com/lovell/sharp/issues/1768)
+
 * Expose `delay` and `loop` metadata for animated images.
   [#1905](https://github.com/lovell/sharp/issues/1905)
 
