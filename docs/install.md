@@ -19,7 +19,6 @@ Node.js versions 10, 12 and 13 on the most common platforms:
 
 * macOS x64 (>= 10.13)
 * Linux x64 (glibc >= 2.17, musl >= 1.1.24)
-* Linux ARM64 (glibc >= 2.29)
 * Windows x64 with 64-bit `node.exe`
 
 A ~10MB tarball containing libvips and its most commonly used dependencies
@@ -32,6 +31,7 @@ The following platforms have prebuilt libvips but not sharp:
 
 * Linux ARMv6
 * Linux ARMv7
+* Linux ARM64 (glibc >= 2.29)
 
 The following platforms require compilation of both libvips and sharp from source:
 
@@ -149,3 +149,17 @@ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs10.x npm install sharp
 
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
+
+## Electron
+
+Electron provides versions of the V8 JavaScript engine
+that are incompatible with Node.js.
+To ensure the correct binaries are used, run the following:
+
+```sh
+npm install
+npx electron-rebuild
+```
+
+Further help can be found at
+[https://electronjs.org/docs/tutorial/using-native-node-modules](https://electronjs.org/docs/tutorial/using-native-node-modules)

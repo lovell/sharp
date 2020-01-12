@@ -51,7 +51,7 @@ matrix:
       dist: bionic
       language: minimal
       before_install:
-        - sudo docker run -dit --name sharp --env CI --env PREBUILD_TOKEN --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
+        - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
         - sudo docker exec sharp apt-get update
         - sudo docker exec sharp apt-get install -y build-essential git python2 nodejs npm
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
