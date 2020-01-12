@@ -46,7 +46,7 @@ class MetadataWorker : public Nan::AsyncWorker {
     vips::VImage image;
     sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
     try {
-      std::tie(image, imageType) = OpenInput(baton->input, VIPS_ACCESS_SEQUENTIAL);
+      std::tie(image, imageType) = OpenInput(baton->input);
     } catch (vips::VError const &err) {
       (baton->err).append(err.what());
     }

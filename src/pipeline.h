@@ -55,7 +55,6 @@ struct Composite {
 
 struct PipelineBaton {
   sharp::InputDescriptor *input;
-  int limitInputPixels;
   std::string formatOut;
   std::string fileOut;
   void *bufferOut;
@@ -119,7 +118,6 @@ struct PipelineBaton {
   int extendRight;
   std::vector<double> extendBackground;
   bool withoutEnlargement;
-  VipsAccess accessMethod;
   int jpegQuality;
   bool jpegProgressive;
   std::string jpegChromaSubsampling;
@@ -182,7 +180,6 @@ struct PipelineBaton {
 
   PipelineBaton():
     input(nullptr),
-    limitInputPixels(0),
     bufferOutLength(0),
     topOffsetPre(-1),
     topOffsetPost(-1),

@@ -62,7 +62,7 @@ class StatsWorker : public Nan::AsyncWorker {
     sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
 
     try {
-      std::tie(image, imageType) = OpenInput(baton->input, baton->accessMethod);
+      std::tie(image, imageType) = OpenInput(baton->input);
     } catch (vips::VError const &err) {
       (baton->err).append(err.what());
     }
@@ -178,7 +178,6 @@ NAN_METHOD(stats) {
 
   // Input
   baton->input = sharp::CreateInputDescriptor(sharp::AttrAs<v8::Object>(options, "input"), buffersToPersist);
-  baton->accessMethod = AttrTo<bool>(options, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
 
   // Function to notify of libvips warnings
   Nan::Callback *debuglog = new Nan::Callback(sharp::AttrAs<v8::Function>(options, "debuglog"));

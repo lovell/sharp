@@ -88,34 +88,6 @@ image
 
 Returns **[Promise][5]&lt;[Object][6]>** 
 
-## limitInputPixels
-
-Do not process input images where the number of pixels (width x height) exceeds this limit.
-Assumes image dimensions contained in the input metadata can be trusted.
-The default limit is 268402689 (0x3FFF x 0x3FFF) pixels.
-
-### Parameters
-
--   `limit` **([Number][7] \| [Boolean][8])** an integral Number of pixels, zero or false to remove limit, true to use default limit.
-
-
--   Throws **[Error][9]** Invalid limit
-
-Returns **Sharp** 
-
-## sequentialRead
-
-An advanced setting that switches the libvips access method to `VIPS_ACCESS_SEQUENTIAL`.
-This will reduce memory usage and can improve performance on some systems.
-
-The default behaviour _before_ function call is `false`, meaning the libvips access method is not sequential.
-
-### Parameters
-
--   `sequentialRead` **[Boolean][8]**  (optional, default `true`)
-
-Returns **Sharp** 
-
 [1]: https://github.com/libvips/libvips/blob/master/libvips/iofuncs/enumtypes.c#L636
 
 [2]: https://github.com/libvips/libvips/blob/master/libvips/iofuncs/enumtypes.c#L672
@@ -127,9 +99,3 @@ Returns **Sharp**
 [5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
 
 [6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
-
-[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
-
-[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error

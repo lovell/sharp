@@ -460,8 +460,7 @@ async.series({
     }).add('sharp-sequentialRead', {
       defer: true,
       fn: function (deferred) {
-        sharp(inputJpgBuffer)
-          .sequentialRead()
+        sharp(inputJpgBuffer, { sequentialRead: true })
           .resize(width, height)
           .toBuffer(function (err, buffer) {
             if (err) {

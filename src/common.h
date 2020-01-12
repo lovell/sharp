@@ -48,6 +48,8 @@ namespace sharp {
     std::string file;
     char *buffer;
     bool failOnError;
+    int limitInputPixels;
+    VipsAccess access;
     size_t bufferLength;
     bool isBuffer;
     double density;
@@ -64,6 +66,8 @@ namespace sharp {
     InputDescriptor():
       buffer(nullptr),
       failOnError(TRUE),
+      limitInputPixels(0x3FFF * 0x3FFF),
+      access(VIPS_ACCESS_RANDOM),
       bufferLength(0),
       isBuffer(FALSE),
       density(72.0),
@@ -156,7 +160,7 @@ namespace sharp {
   /*
     Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
   */
-  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor, VipsAccess accessMethod);
+  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor);
 
   /*
     Does this image have an embedded profile?

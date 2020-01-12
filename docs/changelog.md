@@ -12,6 +12,8 @@ Requires libvips v8.9.0.
 * Drop support for undefined input where options also provided.
   [#1768](https://github.com/lovell/sharp/issues/1768)
 
+* Move `limitInputPixels` and `sequentialRead` to input options, deprecating functions of the same name.
+
 * Expose `delay` and `loop` metadata for animated images.
   [#1905](https://github.com/lovell/sharp/issues/1905)
 

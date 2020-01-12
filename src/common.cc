@@ -86,6 +86,10 @@ namespace sharp {
       descriptor->createHeight = AttrTo<uint32_t>(input, "createHeight");
       descriptor->createBackground = AttrAsRgba(input, "createBackground");
     }
+    // Limit input images to a given number of pixels, where pixels = width * height
+    descriptor->limitInputPixels = AttrTo<uint32_t>(input, "limitInputPixels");
+    // Allow switch from random to sequential access
+    descriptor->access = AttrTo<bool>(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
     return descriptor;
   }
 
@@ -244,7 +248,7 @@ namespace sharp {
   /*
     Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
   */
-  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor, VipsAccess accessMethod) {
+  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor) {
     VImage image;
     ImageType imageType;
     if (descriptor->isBuffer) {
@@ -264,7 +268,7 @@ namespace sharp {
         if (imageType != ImageType::UNKNOWN) {
           try {
             vips::VOption *option = VImage::option()
-              ->set("access", accessMethod)
+              ->set("access", descriptor->access)
               ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
@@ -310,7 +314,7 @@ namespace sharp {
         if (imageType != ImageType::UNKNOWN) {
           try {
             vips::VOption *option = VImage::option()
-              ->set("access", accessMethod)
+              ->set("access", descriptor->access)
               ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
@@ -333,6 +337,11 @@ namespace sharp {
           throw vips::VError("Input file contains unsupported image format");
         }
       }
+    }
+    // Limit input images to a given number of pixels, where pixels = width * height
+    if (descriptor->limitInputPixels > 0 &&
+      static_cast<uint64_t>(image.width() * image.height()) > static_cast<uint64_t>(descriptor->limitInputPixels)) {
+      throw vips::VError("Input image exceeds pixel limit");
     }
     return std::make_tuple(image, imageType);
   }

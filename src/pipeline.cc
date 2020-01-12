@@ -77,15 +77,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Open input
       vips::VImage image;
       ImageType inputImageType;
-      std::tie(image, inputImageType) = sharp::OpenInput(baton->input, baton->accessMethod);
-
-      // Limit input images to a given number of pixels, where pixels = width * height
-      // Ignore if 0
-      if (baton->limitInputPixels > 0 &&
-        static_cast<uint64_t>(image.width() * image.height()) > static_cast<uint64_t>(baton->limitInputPixels)) {
-        (baton->err).append("Input image exceeds pixel limit");
-        return Error();
-      }
+      std::tie(image, inputImageType) = sharp::OpenInput(baton->input);
 
       // Calculate angle of rotation
       VipsAngle rotation;
@@ -270,7 +262,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (shrink_on_load > 1) {
         // Reload input using shrink-on-load
         vips::VOption *option = VImage::option()
-          ->set("access", baton->accessMethod)
+          ->set("access", baton->input->access)
           ->set("shrink", shrink_on_load)
           ->set("fail", baton->input->failOnError);
         if (baton->input->buffer != nullptr) {
@@ -426,7 +418,7 @@ class PipelineWorker : public Nan::AsyncWorker {
         ImageType joinImageType = ImageType::UNKNOWN;
 
         for (unsigned int i = 0; i < baton->joinChannelIn.size(); i++) {
-          std::tie(joinImage, joinImageType) = sharp::OpenInput(baton->joinChannelIn[i], baton->accessMethod);
+          std::tie(joinImage, joinImageType) = sharp::OpenInput(baton->joinChannelIn[i]);
           image = image.bandjoin(joinImage);
         }
         image = image.copy(VImage::option()->set("interpretation", baton->colourspace));
@@ -479,7 +471,7 @@ class PipelineWorker : public Nan::AsyncWorker {
               baton->height = image.height();
             }
             image = image.tilecache(VImage::option()
-              ->set("access", baton->accessMethod)
+              ->set("access", VIPS_ACCESS_RANDOM)
               ->set("threaded", TRUE));
             image = image.smartcrop(baton->width, baton->height, VImage::option()
               ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
@@ -556,7 +548,7 @@ class PipelineWorker : public Nan::AsyncWorker {
         for (Composite *composite : baton->composite) {
           VImage compositeImage;
           ImageType compositeImageType = ImageType::UNKNOWN;
-          std::tie(compositeImage, compositeImageType) = OpenInput(composite->input, baton->accessMethod);
+          std::tie(compositeImage, compositeImageType) = OpenInput(composite->input);
           // Verify within current dimensions
           if (compositeImage.width() > image.width() || compositeImage.height() > image.height()) {
             throw vips::VError("Image to composite must have same dimensions or smaller");
@@ -646,7 +638,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (baton->boolean != nullptr) {
         VImage booleanImage;
         ImageType booleanImageType = ImageType::UNKNOWN;
-        std::tie(booleanImage, booleanImageType) = sharp::OpenInput(baton->boolean, baton->accessMethod);
+        std::tie(booleanImage, booleanImageType) = sharp::OpenInput(baton->boolean);
         image = sharp::Boolean(image, booleanImage, baton->booleanOp);
       }
 
@@ -1193,10 +1185,6 @@ NAN_METHOD(pipeline) {
 
   // Input
   baton->input = CreateInputDescriptor(AttrAs<v8::Object>(options, "input"), buffersToPersist);
-  baton->accessMethod = AttrTo<bool>(options, "sequentialRead") ?
-    VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
-  // Limit input images to a given number of pixels, where pixels = width * height
-  baton->limitInputPixels = AttrTo<int32_t>(options, "limitInputPixels");
   // Extract image options
   baton->topOffsetPre = AttrTo<int32_t>(options, "topOffsetPre");
   baton->leftOffsetPre = AttrTo<int32_t>(options, "leftOffsetPre");
@@ -1408,11 +1396,12 @@ NAN_METHOD(pipeline) {
     // signal that we do not want to pass any value to dzSave
     baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_LAST;
   }
+
   // Force random access for certain operations
-  if (baton->accessMethod == VIPS_ACCESS_SEQUENTIAL && (
-    baton->trimThreshold > 0.0 || baton->normalise ||
-    baton->position == 16 || baton->position == 17)) {
-    baton->accessMethod = VIPS_ACCESS_RANDOM;
+  if (baton->input->access == VIPS_ACCESS_SEQUENTIAL) {
+    if (baton->trimThreshold > 0.0 || baton->normalise || baton->position == 16 || baton->position == 17) {
+      baton->input->access = VIPS_ACCESS_RANDOM;
+    }
   }
 
   // Function to notify of libvips warnings
