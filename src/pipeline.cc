@@ -1399,7 +1399,12 @@ NAN_METHOD(pipeline) {
 
   // Force random access for certain operations
   if (baton->input->access == VIPS_ACCESS_SEQUENTIAL) {
-    if (baton->trimThreshold > 0.0 || baton->normalise || baton->position == 16 || baton->position == 17) {
+    if (
+      baton->trimThreshold > 0.0 ||
+      baton->normalise ||
+      baton->position == 16 || baton->position == 17 ||
+      baton->angle != 0 || baton->rotationAngle != 0.0
+    ) {
       baton->input->access = VIPS_ACCESS_RANDOM;
     }
   }

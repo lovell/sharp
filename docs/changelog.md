@@ -20,6 +20,9 @@ Requires libvips v8.9.0.
 * Ensure correct colour output for 16-bit, 2-channel PNG input with ICC profile.
   [#2013](https://github.com/lovell/sharp/issues/2013)
 
+* Prevent use of sequentialRead for rotate operations.
+  [#2016](https://github.com/lovell/sharp/issues/2016)
+
 * Correctly bind max width and height values when using withoutEnlargement.
   [#2024](https://github.com/lovell/sharp/pull/2024)
   [@BrychanOdlum](https://github.com/BrychanOdlum)
