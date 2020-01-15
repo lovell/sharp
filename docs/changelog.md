@@ -27,6 +27,9 @@ Requires libvips v8.9.0.
   [#2024](https://github.com/lovell/sharp/pull/2024)
   [@BrychanOdlum](https://github.com/BrychanOdlum)
 
+* Add support for input with 16-bit RGB profile.
+  [#2037](https://github.com/lovell/sharp/issues/2037)
+
 ## v0.23 - "*vision*"
 
 Requires libvips v8.8.1.

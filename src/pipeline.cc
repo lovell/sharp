@@ -308,6 +308,7 @@ class PipelineWorker : public Nan::AsyncWorker {
         try {
           image = image.icc_transform("srgb", VImage::option()
             ->set("embedded", TRUE)
+            ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
           // Ignore failure of embedded profile
