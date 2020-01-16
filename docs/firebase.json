@@ -21,7 +21,12 @@
     ],
     "redirects": [
       {
-        "source": "**/install**",
+        "source": "**/install/**",
+        "destination": "/install",
+        "type": 301
+      },
+      {
+        "source": "/page/install",
         "destination": "/install",
         "type": 301
       },
@@ -71,17 +76,27 @@
         "type": 301
       },
       {
-        "source": "**/api**",
+        "source": "/page/api",
         "destination": "/api-constructor",
         "type": 301
       },
       {
-        "source": "**/performance**",
+        "source": "**/performance/**",
         "destination": "/performance",
         "type": 301
       },
       {
-        "source": "**/changelog**",
+        "source": "/page/performance",
+        "destination": "/performance",
+        "type": 301
+      },
+      {
+        "source": "**/changelog/**",
+        "destination": "/changelog",
+        "type": 301
+      },
+      {
+        "source": "/page/changelog",
         "destination": "/changelog",
         "type": 301
       },
