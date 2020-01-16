@@ -4,7 +4,7 @@
 
 Requires libvips v8.9.0.
 
-### v0.24.0 - TBD
+### v0.24.0 - 16<sup>th</sup> January 2020
 
 * Drop support for Node.js 8.
   [#1910](https://github.com/lovell/sharp/issues/1910)
