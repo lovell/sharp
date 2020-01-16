@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-Did you see the [documentation relating to installation](https://sharp.pixelplumbing.com/en/stable/install/)?
+Did you see the [documentation relating to installation](https://sharp.pixelplumbing.com/install)?
 
 Have you ensured the platform and version of Node.js used for `npm install` is the same as the platform and version of Node.js used at runtime?
 
