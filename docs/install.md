@@ -54,6 +54,8 @@ must be the same as the platform and major version of Node.js used at runtime.
 
 The `npm install --unsafe-perm` flag must be used when installing as `root` or a `sudo` user.
 
+The `npm install --ignore-scripts=false` flag must be used when `npm` has been configured to ignore installation scripts.
+
 Check the output of running `npm install --verbose sharp` for useful error messages.
 
 ## Custom libvips
