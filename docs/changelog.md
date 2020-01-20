@@ -4,6 +4,11 @@
 
 Requires libvips v8.9.0.
 
+### v0.24.1 - TBD
+
+* Prevent use of sequentialRead for EXIF-based rotate operation.
+  [#2042](https://github.com/lovell/sharp/issues/2042)
+
 ### v0.24.0 - 16<sup>th</sup> January 2020
 
 * Drop support for Node.js 8.

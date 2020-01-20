@@ -1404,7 +1404,9 @@ NAN_METHOD(pipeline) {
       baton->trimThreshold > 0.0 ||
       baton->normalise ||
       baton->position == 16 || baton->position == 17 ||
-      baton->angle != 0 || baton->rotationAngle != 0.0
+      baton->angle % 360 != 0 ||
+      fmod(baton->rotationAngle, 360.0) != 0.0 ||
+      baton->useExifOrientation
     ) {
       baton->input->access = VIPS_ACCESS_RANDOM;
     }
