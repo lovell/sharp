@@ -85,6 +85,7 @@ namespace sharp {
 
   // Convenience methods to access the attributes of a Napi::Object
   bool HasAttr(Napi::Object obj, std::string attr);
+  bool IsUndefined(Napi::Object obj, std::string attr);
   std::string AttrAsStr(Napi::Object obj, std::string attr);
   uint32_t AttrAsUint32(Napi::Object obj, std::string attr);
   int32_t AttrAsInt32(Napi::Object obj, std::string attr);
