@@ -569,7 +569,7 @@ class PipelineWorker : public Nan::AsyncWorker {
               int left;
               int top;
               compositeImage = compositeImage.replicate(across, down);
-              if (composite->left >= 0 && composite->top >= 0) {
+              if (composite->left != 0 || composite->top != 0) {
                 std::tie(left, top) = sharp::CalculateCrop(
                   compositeImage.width(), compositeImage.height(), image.width(), image.height(),
                   composite->left, composite->top);
@@ -591,7 +591,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           // Calculate position
           int left;
           int top;
-          if (composite->left >= 0 && composite->top >= 0) {
+          if (composite->left != 0 || composite->top != 0) {
             // Composite image at given offsets
             std::tie(left, top) = sharp::CalculateCrop(image.width(), image.height(),
               compositeImage.width(), compositeImage.height(), composite->left, composite->top);

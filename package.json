@@ -65,7 +65,8 @@
     "Andargor <andargor@yahoo.com>",
     "Paul Neave <paul.neave@gmail.com>",
     "Brendan Kennedy <brenwken@gmail.com>",
-    "Brychan Bennett-Odlum <git@brychan.io>"
+    "Brychan Bennett-Odlum <git@brychan.io>",
+    "Christian Flintrup <chr@gigahost.dk>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
