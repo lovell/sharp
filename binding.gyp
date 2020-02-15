@@ -45,6 +45,7 @@
   }, {
     'target_name': 'sharp',
     'dependencies': [
+      '<!(node -p "require(\'node-addon-api\').gyp")',
       'libvips-cpp'
     ],
     'variables': {
@@ -65,11 +66,11 @@
       'src/stats.cc',
       'src/operations.cc',
       'src/pipeline.cc',
-      'src/sharp.cc',
-      'src/utilities.cc'
+      'src/utilities.cc',
+      'src/sharp.cc'
     ],
     'include_dirs': [
-      '<!(node -e "require(\'nan\')")'
+      '<!@(node -p "require(\'node-addon-api\').include")',
     ],
     'conditions': [
       ['use_global_libvips == "true"', {

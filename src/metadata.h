@@ -16,7 +16,7 @@
 #define SRC_METADATA_H_
 
 #include <string>
-#include <nan.h>
+#include <napi.h>
 
 #include "./common.h"
 
@@ -81,6 +81,6 @@ struct MetadataBaton {
     tifftagPhotoshopLength(0) {}
 };
 
-NAN_METHOD(metadata);
+Napi::Value metadata(const Napi::CallbackInfo& info);
 
 #endif  // SRC_METADATA_H_

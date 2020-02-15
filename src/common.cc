@@ -19,9 +19,7 @@
 #include <queue>
 #include <mutex>  // NOLINT(build/c++11)
 
-#include <node.h>
-#include <node_buffer.h>
-#include <nan.h>
+#include <napi.h>
 #include <vips/vips8>
 
 #include "common.h"
@@ -30,66 +28,77 @@ using vips::VImage;
 
 namespace sharp {
 
-  // Convenience methods to access the attributes of a v8::Object
-  bool HasAttr(v8::Local<v8::Object> obj, std::string attr) {
-    return Nan::Has(obj, Nan::New(attr).ToLocalChecked()).FromJust();
+  // Convenience methods to access the attributes of a Napi::Object
+  bool HasAttr(Napi::Object obj, std::string attr) {
+    return obj.Has(attr);
   }
-  std::string AttrAsStr(v8::Local<v8::Object> obj, std::string attr) {
-    return *Nan::Utf8String(Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked());
+  std::string AttrAsStr(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::String>();
   }
-  std::vector<double> AttrAsRgba(v8::Local<v8::Object> obj, std::string attr) {
-    v8::Local<v8::Object> background = AttrAs<v8::Object>(obj, attr);
-    std::vector<double> rgba(4);
-    for (unsigned int i = 0; i < 4; i++) {
-      rgba[i] = AttrTo<double>(background, i);
+  uint32_t AttrAsUint32(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::Number>().Uint32Value();
+  }
+  int32_t AttrAsInt32(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::Number>().Int32Value();
+  }
+  double AttrAsDouble(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::Number>().DoubleValue();
+  }
+  double AttrAsDouble(Napi::Object obj, unsigned int const attr) {
+    return obj.Get(attr).As<Napi::Number>().DoubleValue();
+  }
+  bool AttrAsBool(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::Boolean>().Value();
+  }
+  std::vector<double> AttrAsRgba(Napi::Object obj, std::string attr) {
+    Napi::Array background = obj.Get(attr).As<Napi::Array>();
+    std::vector<double> rgba(background.Length());
+    for (unsigned int i = 0; i < background.Length(); i++) {
+      rgba[i] = AttrAsDouble(background, i);
     }
     return rgba;
   }
 
-  // Create an InputDescriptor instance from a v8::Object describing an input image
-  InputDescriptor* CreateInputDescriptor(
-    v8::Local<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist
-  ) {
-    Nan::HandleScope();
+  // Create an InputDescriptor instance from a Napi::Object describing an input image
+  InputDescriptor* CreateInputDescriptor(Napi::Object input) {
     InputDescriptor *descriptor = new InputDescriptor;
     if (HasAttr(input, "file")) {
       descriptor->file = AttrAsStr(input, "file");
     } else if (HasAttr(input, "buffer")) {
-      v8::Local<v8::Object> buffer = AttrAs<v8::Object>(input, "buffer");
-      descriptor->bufferLength = node::Buffer::Length(buffer);
-      descriptor->buffer = node::Buffer::Data(buffer);
+      Napi::Buffer<char> buffer = input.Get("buffer").As<Napi::Buffer<char>>();
+      descriptor->bufferLength = buffer.Length();
+      descriptor->buffer = buffer.Data();
       descriptor->isBuffer = TRUE;
-      buffersToPersist.push_back(buffer);
     }
-    descriptor->failOnError = AttrTo<bool>(input, "failOnError");
+    descriptor->failOnError = AttrAsBool(input, "failOnError");
     // Density for vector-based input
     if (HasAttr(input, "density")) {
-      descriptor->density = AttrTo<double>(input, "density");
+      descriptor->density = AttrAsDouble(input, "density");
     }
     // Raw pixel input
     if (HasAttr(input, "rawChannels")) {
-      descriptor->rawChannels = AttrTo<uint32_t>(input, "rawChannels");
-      descriptor->rawWidth = AttrTo<uint32_t>(input, "rawWidth");
-      descriptor->rawHeight = AttrTo<uint32_t>(input, "rawHeight");
+      descriptor->rawChannels = AttrAsUint32(input, "rawChannels");
+      descriptor->rawWidth = AttrAsUint32(input, "rawWidth");
+      descriptor->rawHeight = AttrAsUint32(input, "rawHeight");
     }
     // Multi-page input (GIF, TIFF, PDF)
     if (HasAttr(input, "pages")) {
-      descriptor->pages = AttrTo<int32_t>(input, "pages");
+      descriptor->pages = AttrAsInt32(input, "pages");
     }
     if (HasAttr(input, "page")) {
-      descriptor->page = AttrTo<uint32_t>(input, "page");
+      descriptor->page = AttrAsUint32(input, "page");
     }
     // Create new image
     if (HasAttr(input, "createChannels")) {
-      descriptor->createChannels = AttrTo<uint32_t>(input, "createChannels");
-      descriptor->createWidth = AttrTo<uint32_t>(input, "createWidth");
-      descriptor->createHeight = AttrTo<uint32_t>(input, "createHeight");
+      descriptor->createChannels = AttrAsUint32(input, "createChannels");
+      descriptor->createWidth = AttrAsUint32(input, "createWidth");
+      descriptor->createHeight = AttrAsUint32(input, "createHeight");
       descriptor->createBackground = AttrAsRgba(input, "createBackground");
     }
     // Limit input images to a given number of pixels, where pixels = width * height
-    descriptor->limitInputPixels = AttrTo<uint32_t>(input, "limitInputPixels");
+    descriptor->limitInputPixels = AttrAsUint32(input, "limitInputPixels");
     // Allow switch from random to sequential access
-    descriptor->access = AttrTo<bool>(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
+    descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
     return descriptor;
   }
 
@@ -439,11 +448,9 @@ namespace sharp {
   /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
-  void FreeCallback(char* data, void* hint) {
-    if (data != nullptr) {
-      g_free(data);
-    }
-  }
+  std::function<void(void*, char*)> FreeCallback = [](void*, char* data) {
+    g_free(data);
+  };
 
   /*
     Temporary buffer of warnings

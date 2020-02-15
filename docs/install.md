@@ -10,12 +10,12 @@ yarn add sharp
 
 ## Prerequisites
 
-* Node.js v10.13.0+
+* Node.js v10.16.0+
 
 ## Prebuilt binaries
 
 Ready-compiled sharp and libvips binaries are provided for use with
-Node.js versions 10, 12 and 13 on the most common platforms:
+Node.js v10.16.0+ (N-API v4) on the most common platforms:
 
 * macOS x64 (>= 10.13)
 * Linux x64 (glibc >= 2.17, musl >= 1.1.24)

@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.25 - *yield*
+
+Requires libvips TBD
+
+### v0.25.0 - TBD
+
+* Migrate internals to N-API.
+  [#1282](https://github.com/lovell/sharp/issues/1282)
+
 ## v0.24 - "*wit*"
 
 Requires libvips v8.9.0.

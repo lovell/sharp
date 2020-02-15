@@ -15,28 +15,16 @@
 #include <numeric>
 #include <vector>
 
-#include <node.h>
-#include <nan.h>
+#include <napi.h>
 #include <vips/vips8>
 
 #include "common.h"
 #include "metadata.h"
 
-class MetadataWorker : public Nan::AsyncWorker {
+class MetadataWorker : public Napi::AsyncWorker {
  public:
-  MetadataWorker(
-    Nan::Callback *callback, MetadataBaton *baton, Nan::Callback *debuglog,
-    std::vector<v8::Local<v8::Object>> const buffersToPersist) :
-    Nan::AsyncWorker(callback, "sharp:MetadataWorker"),
-    baton(baton), debuglog(debuglog),
-    buffersToPersist(buffersToPersist) {
-    // Protect Buffer objects from GC, keyed on index
-    std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
-      [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
-        SaveToPersistent(index, buffer);
-        return index + 1;
-      });
-  }
+  MetadataWorker(Napi::Function callback, MetadataBaton *baton, Napi::Function debuglog) :
+    Napi::AsyncWorker(callback), baton(baton), debuglog(Napi::Persistent(debuglog)) {}
   ~MetadataWorker() {}
 
   void Execute() {
@@ -137,140 +125,114 @@ class MetadataWorker : public Nan::AsyncWorker {
     vips_thread_shutdown();
   }
 
-  void HandleOKCallback() {
-    using Nan::New;
-    using Nan::Set;
-    Nan::HandleScope();
-
-    v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::Null() };
-    if (!baton->err.empty()) {
-      argv[0] = Nan::Error(baton->err.data());
-    } else {
-      // Metadata Object
-      v8::Local<v8::Object> info = New<v8::Object>();
-      Set(info, New("format").ToLocalChecked(), New<v8::String>(baton->format).ToLocalChecked());
-      if (baton->input->bufferLength > 0) {
-        Set(info, New("size").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->input->bufferLength)));
-      }
-      Set(info, New("width").ToLocalChecked(), New<v8::Uint32>(baton->width));
-      Set(info, New("height").ToLocalChecked(), New<v8::Uint32>(baton->height));
-      Set(info, New("space").ToLocalChecked(), New<v8::String>(baton->space).ToLocalChecked());
-      Set(info, New("channels").ToLocalChecked(), New<v8::Uint32>(baton->channels));
-      Set(info, New("depth").ToLocalChecked(), New<v8::String>(baton->depth).ToLocalChecked());
-      if (baton->density > 0) {
-        Set(info, New("density").ToLocalChecked(), New<v8::Uint32>(baton->density));
-      }
-      if (!baton->chromaSubsampling.empty()) {
-        Set(info,
-          New("chromaSubsampling").ToLocalChecked(),
-          New<v8::String>(baton->chromaSubsampling).ToLocalChecked());
-      }
-      Set(info, New("isProgressive").ToLocalChecked(), New<v8::Boolean>(baton->isProgressive));
-      if (baton->paletteBitDepth > 0) {
-        Set(info, New("paletteBitDepth").ToLocalChecked(), New<v8::Uint32>(baton->paletteBitDepth));
-      }
-      if (baton->pages > 0) {
-        Set(info, New("pages").ToLocalChecked(), New<v8::Uint32>(baton->pages));
-      }
-      if (baton->pageHeight > 0) {
-        Set(info, New("pageHeight").ToLocalChecked(), New<v8::Uint32>(baton->pageHeight));
-      }
-      if (baton->loop >= 0) {
-        Set(info, New("loop").ToLocalChecked(), New<v8::Uint32>(baton->loop));
-      }
-      if (!baton->delay.empty()) {
-        int i = 0;
-        v8::Local<v8::Array> delay = New<v8::Array>(baton->delay.size());
-        for (int const d : baton->delay) {
-          Set(delay, i++, New<v8::Number>(d));
-        }
-        Set(info, New("delay").ToLocalChecked(), delay);
-      }
-      if (baton->pagePrimary > -1) {
-        Set(info, New("pagePrimary").ToLocalChecked(), New<v8::Uint32>(baton->pagePrimary));
-      }
-      Set(info, New("hasProfile").ToLocalChecked(), New<v8::Boolean>(baton->hasProfile));
-      Set(info, New("hasAlpha").ToLocalChecked(), New<v8::Boolean>(baton->hasAlpha));
-      if (baton->orientation > 0) {
-        Set(info, New("orientation").ToLocalChecked(), New<v8::Uint32>(baton->orientation));
-      }
-      if (baton->exifLength > 0) {
-        Set(info,
-          New("exif").ToLocalChecked(),
-          Nan::NewBuffer(baton->exif, baton->exifLength, sharp::FreeCallback, nullptr).ToLocalChecked());
-      }
-      if (baton->iccLength > 0) {
-        Set(info,
-          New("icc").ToLocalChecked(),
-          Nan::NewBuffer(baton->icc, baton->iccLength, sharp::FreeCallback, nullptr).ToLocalChecked());
-      }
-      if (baton->iptcLength > 0) {
-        Set(info,
-          New("iptc").ToLocalChecked(),
-          Nan::NewBuffer(baton->iptc, baton->iptcLength, sharp::FreeCallback, nullptr).ToLocalChecked());
-      }
-      if (baton->xmpLength > 0) {
-        Set(info,
-          New("xmp").ToLocalChecked(),
-          Nan::NewBuffer(baton->xmp, baton->xmpLength, sharp::FreeCallback, nullptr).ToLocalChecked());
-      }
-      if (baton->tifftagPhotoshopLength > 0) {
-        Set(info,
-          New("tifftagPhotoshop").ToLocalChecked(),
-          Nan::NewBuffer(baton->tifftagPhotoshop, baton->tifftagPhotoshopLength, sharp::FreeCallback, nullptr)
-            .ToLocalChecked());
-      }
-      argv[1] = info;
-    }
-
-    // Dispose of Persistent wrapper around input Buffers so they can be garbage collected
-    std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
-      [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
-        GetFromPersistent(index);
-        return index + 1;
-      });
-    delete baton->input;
-    delete baton;
+  void OnOK() {
+    Napi::Env env = Env();
+    Napi::HandleScope scope(env);
 
     // Handle warnings
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
-      v8::Local<v8::Value> message[1] = { New(warning).ToLocalChecked() };
-      debuglog->Call(1, message, async_resource);
+      debuglog.Call({ Napi::String::New(env, warning) });
       warning = sharp::VipsWarningPop();
     }
 
-    // Return to JavaScript
-    callback->Call(2, argv, async_resource);
+    if (baton->err.empty()) {
+      Napi::Object info = Napi::Object::New(env);
+      info.Set("format", baton->format);
+      if (baton->input->bufferLength > 0) {
+        info.Set("size", baton->input->bufferLength);
+      }
+      info.Set("width", baton->width);
+      info.Set("height", baton->height);
+      info.Set("space", baton->space);
+      info.Set("channels", baton->channels);
+      info.Set("depth", baton->depth);
+      if (baton->density > 0) {
+        info.Set("density", baton->density);
+      }
+      if (!baton->chromaSubsampling.empty()) {
+        info.Set("chromaSubsampling", baton->chromaSubsampling);
+      }
+      info.Set("isProgressive", baton->isProgressive);
+      if (baton->paletteBitDepth > 0) {
+        info.Set("paletteBitDepth", baton->paletteBitDepth);
+      }
+      if (baton->pages > 0) {
+        info.Set("pages", baton->pages);
+      }
+      if (baton->pageHeight > 0) {
+        info.Set("pageHeight", baton->pageHeight);
+      }
+      if (baton->loop >= 0) {
+        info.Set("loop", baton->loop);
+      }
+      if (!baton->delay.empty()) {
+        int i = 0;
+        Napi::Array delay = Napi::Array::New(env, static_cast<size_t>(baton->delay.size()));
+        for (int const d : baton->delay) {
+          delay.Set(i++, d);
+        }
+        info.Set("delay", delay);
+      }
+      if (baton->pagePrimary > -1) {
+        info.Set("pagePrimary", baton->pagePrimary);
+      }
+      info.Set("hasProfile", baton->hasProfile);
+      info.Set("hasAlpha", baton->hasAlpha);
+      if (baton->orientation > 0) {
+        info.Set("orientation", baton->orientation);
+      }
+      if (baton->exifLength > 0) {
+        info.Set("exif", Napi::Buffer<char>::New(env, baton->exif, baton->exifLength, sharp::FreeCallback));
+      }
+      if (baton->iccLength > 0) {
+        info.Set("icc", Napi::Buffer<char>::New(env, baton->icc, baton->iccLength, sharp::FreeCallback));
+      }
+      if (baton->iptcLength > 0) {
+        info.Set("iptc", Napi::Buffer<char>::New(env, baton->iptc, baton->iptcLength, sharp::FreeCallback));
+      }
+      if (baton->xmpLength > 0) {
+        info.Set("xmp", Napi::Buffer<char>::New(env, baton->xmp, baton->xmpLength, sharp::FreeCallback));
+      }
+      if (baton->tifftagPhotoshopLength > 0) {
+        info.Set("tifftagPhotoshop",
+          Napi::Buffer<char>::New(env, baton->tifftagPhotoshop, baton->tifftagPhotoshopLength, sharp::FreeCallback));
+      }
+      Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
+    } else {
+      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
+    }
+
+    delete baton->input;
+    delete baton;
   }
 
  private:
   MetadataBaton* baton;
-  Nan::Callback *debuglog;
-  std::vector<v8::Local<v8::Object>> buffersToPersist;
+  Napi::FunctionReference debuglog;
 };
 
 /*
   metadata(options, callback)
 */
-NAN_METHOD(metadata) {
-  // Input Buffers must not undergo GC compaction during processing
-  std::vector<v8::Local<v8::Object>> buffersToPersist;
-
+Napi::Value metadata(const Napi::CallbackInfo& info) {
   // V8 objects are converted to non-V8 types held in the baton struct
   MetadataBaton *baton = new MetadataBaton;
-  v8::Local<v8::Object> options = info[0].As<v8::Object>();
+  Napi::Object options = info[0].As<Napi::Object>();
 
   // Input
-  baton->input = sharp::CreateInputDescriptor(sharp::AttrAs<v8::Object>(options, "input"), buffersToPersist);
+  baton->input = sharp::CreateInputDescriptor(options.Get("input").As<Napi::Object>());
 
   // Function to notify of libvips warnings
-  Nan::Callback *debuglog = new Nan::Callback(sharp::AttrAs<v8::Function>(options, "debuglog"));
+  Napi::Function debuglog = options.Get("debuglog").As<Napi::Function>();
 
   // Join queue for worker thread
-  Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
-  Nan::AsyncQueueWorker(new MetadataWorker(callback, baton, debuglog, buffersToPersist));
+  Napi::Function callback = info[1].As<Napi::Function>();
+  MetadataWorker *worker = new MetadataWorker(callback, baton, debuglog);
+  worker->Queue();
 
   // Increment queued task counter
   g_atomic_int_inc(&sharp::counterQueue);
+
+  return info.Env().Undefined();
 }

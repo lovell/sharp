@@ -19,12 +19,12 @@
 #include <string>
 #include <vector>
 
-#include <nan.h>
+#include <napi.h>
 #include <vips/vips8>
 
 #include "./common.h"
 
-NAN_METHOD(pipeline);
+Napi::Value pipeline(const Napi::CallbackInfo& info);
 
 enum class Canvas {
   CROP,

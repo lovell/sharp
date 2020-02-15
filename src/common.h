@@ -19,8 +19,7 @@
 #include <tuple>
 #include <vector>
 
-#include <node.h>
-#include <nan.h>
+#include <napi.h>
 #include <vips/vips8>
 
 // Verify platform and compiler compatibility
@@ -82,23 +81,18 @@ namespace sharp {
       createBackground{ 0.0, 0.0, 0.0, 255.0 } {}
   };
 
-  // Convenience methods to access the attributes of a v8::Object
-  bool HasAttr(v8::Local<v8::Object> obj, std::string attr);
-  std::string AttrAsStr(v8::Local<v8::Object> obj, std::string attr);
-  std::vector<double> AttrAsRgba(v8::Local<v8::Object> obj, std::string attr);
-  template<typename T> v8::Local<T> AttrAs(v8::Local<v8::Object> obj, std::string attr) {
-    return Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked().As<T>();
-  }
-  template<typename T> T AttrTo(v8::Local<v8::Object> obj, std::string attr) {
-    return Nan::To<T>(Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked()).FromJust();
-  }
-  template<typename T> T AttrTo(v8::Local<v8::Object> obj, int attr) {
-    return Nan::To<T>(Nan::Get(obj, attr).ToLocalChecked()).FromJust();
-  }
+  // Convenience methods to access the attributes of a Napi::Object
+  bool HasAttr(Napi::Object obj, std::string attr);
+  std::string AttrAsStr(Napi::Object obj, std::string attr);
+  uint32_t AttrAsUint32(Napi::Object obj, std::string attr);
+  int32_t AttrAsInt32(Napi::Object obj, std::string attr);
+  double AttrAsDouble(Napi::Object obj, std::string attr);
+  double AttrAsDouble(Napi::Object obj, unsigned int const attr);
+  bool AttrAsBool(Napi::Object obj, std::string attr);
+  std::vector<double> AttrAsRgba(Napi::Object obj, std::string attr);
 
-  // Create an InputDescriptor instance from a v8::Object describing an input image
-  InputDescriptor* CreateInputDescriptor(
-    v8::Local<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist);  // NOLINT(runtime/references)
+  // Create an InputDescriptor instance from a Napi::Object describing an input image
+  InputDescriptor* CreateInputDescriptor(Napi::Object input);
 
   enum class ImageType {
     JPEG,
@@ -211,7 +205,7 @@ namespace sharp {
   /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
-  void FreeCallback(char* data, void* hint);
+  extern std::function<void(void*, char*)> FreeCallback;
 
   /*
     Called with warnings from the glib-registered "VIPS" domain

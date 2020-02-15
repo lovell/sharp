@@ -578,11 +578,14 @@
   fun:_ZN4node20BackgroundTaskRunnerC1Ei
 }
 {
-  leak_nan_FunctionCallbackInfo
+  leak_napi_module_register
   Memcheck:Leak
   match-leak-kinds: definite
   ...
-  fun:_ZN3Nan3impL23FunctionCallbackWrapperERKN2v820FunctionCallbackInfoINS1_5ValueEEE
+  fun:napi_module_register
+  fun:call_init.part.0
+  fun:call_init
+  fun:_dl_init
 }
 {
   leak_v8_FunctionCallbackInfo

@@ -25,8 +25,7 @@
 #include <sys/stat.h>
 
 #include <vips/vips8>
-#include <node.h>
-#include <nan.h>
+#include <napi.h>
 
 #include "common.h"
 #include "operations.h"
@@ -46,28 +45,18 @@
 #define STAT64_FUNCTION stat64
 #endif
 
-class PipelineWorker : public Nan::AsyncWorker {
+class PipelineWorker : public Napi::AsyncWorker {
  public:
-  PipelineWorker(
-    Nan::Callback *callback, PipelineBaton *baton, Nan::Callback *debuglog, Nan::Callback *queueListener,
-    std::vector<v8::Local<v8::Object>> const buffersToPersist) :
-    Nan::AsyncWorker(callback, "sharp:PipelineWorker"),
-    baton(baton), debuglog(debuglog), queueListener(queueListener),
-    buffersToPersist(buffersToPersist) {
-    // Protect Buffer objects from GC, keyed on index
-    std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
-      [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
-        SaveToPersistent(index, buffer);
-        return index + 1;
-      });
-  }
+  PipelineWorker(Napi::Function callback, PipelineBaton *baton,
+    Napi::Function debuglog, Napi::Function queueListener) :
+    Napi::AsyncWorker(callback),
+    baton(baton),
+    debuglog(Napi::Persistent(debuglog)),
+    queueListener(Napi::Persistent(queueListener)) {}
   ~PipelineWorker() {}
 
   // libuv worker
   void Execute() {
-    using sharp::HasAlpha;
-    using sharp::ImageType;
-
     // Decrement queued task counter
     g_atomic_int_dec_and_test(&sharp::counterQueue);
     // Increment processing task counter
@@ -76,7 +65,7 @@ class PipelineWorker : public Nan::AsyncWorker {
     try {
       // Open input
       vips::VImage image;
-      ImageType inputImageType;
+      sharp::ImageType inputImageType;
       std::tie(image, inputImageType) = sharp::OpenInput(baton->input);
 
       // Calculate angle of rotation
@@ -236,7 +225,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
       if (
         xshrink == yshrink && xshrink >= 2 * shrink_on_load_factor &&
-        (inputImageType == ImageType::JPEG || inputImageType == ImageType::WEBP) &&
+        (inputImageType == sharp::ImageType::JPEG || inputImageType == sharp::ImageType::WEBP) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold == 0.0
       ) {
         if (xshrink >= 8 * shrink_on_load_factor) {
@@ -267,7 +256,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           ->set("fail", baton->input->failOnError);
         if (baton->input->buffer != nullptr) {
           VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
-          if (inputImageType == ImageType::JPEG) {
+          if (inputImageType == sharp::ImageType::JPEG) {
             // Reload JPEG buffer
             image = VImage::jpegload_buffer(blob, option);
           } else {
@@ -276,7 +265,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           }
           vips_area_unref(reinterpret_cast<VipsArea*>(blob));
         } else {
-          if (inputImageType == ImageType::JPEG) {
+          if (inputImageType == sharp::ImageType::JPEG) {
             // Reload JPEG file
             image = VImage::jpegload(const_cast<char*>(baton->input->file.data()), option);
           } else {
@@ -320,7 +309,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       }
 
       // Flatten image to remove alpha channel
-      if (baton->flatten && HasAlpha(image)) {
+      if (baton->flatten && sharp::HasAlpha(image)) {
         // Scale up 8-bit values to match 16-bit input image
         double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
         // Background colour
@@ -356,11 +345,11 @@ class PipelineWorker : public Nan::AsyncWorker {
       bool const shouldComposite = !baton->composite.empty();
       bool const shouldModulate = baton->brightness != 1.0 || baton->saturation != 1.0 || baton->hue != 0.0;
 
-      if (shouldComposite && !HasAlpha(image)) {
+      if (shouldComposite && !sharp::HasAlpha(image)) {
         image = sharp::EnsureAlpha(image);
       }
 
-      bool const shouldPremultiplyAlpha = HasAlpha(image) &&
+      bool const shouldPremultiplyAlpha = sharp::HasAlpha(image) &&
         (shouldResize || shouldBlur || shouldConv || shouldSharpen || shouldComposite);
 
       // Premultiply image alpha channel before all transformations to avoid
@@ -416,7 +405,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Join additional color channels to the image
       if (baton->joinChannelIn.size() > 0) {
         VImage joinImage;
-        ImageType joinImageType = ImageType::UNKNOWN;
+        sharp::ImageType joinImageType = sharp::ImageType::UNKNOWN;
 
         for (unsigned int i = 0; i < baton->joinChannelIn.size(); i++) {
           std::tie(joinImage, joinImageType) = sharp::OpenInput(baton->joinChannelIn[i]);
@@ -548,7 +537,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (shouldComposite) {
         for (Composite *composite : baton->composite) {
           VImage compositeImage;
-          ImageType compositeImageType = ImageType::UNKNOWN;
+          sharp::ImageType compositeImageType = sharp::ImageType::UNKNOWN;
           std::tie(compositeImage, compositeImageType) = OpenInput(composite->input);
           // Verify within current dimensions
           if (compositeImage.width() > image.width() || compositeImage.height() > image.height()) {
@@ -584,7 +573,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           }
           // Ensure image to composite is sRGB with premultiplied alpha
           compositeImage = compositeImage.colourspace(VIPS_INTERPRETATION_sRGB);
-          if (!HasAlpha(compositeImage)) {
+          if (!sharp::HasAlpha(compositeImage)) {
             compositeImage = sharp::EnsureAlpha(compositeImage);
           }
           if (!composite->premultiplied) compositeImage = compositeImage.premultiply();
@@ -638,7 +627,7 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Apply bitwise boolean operation between images
       if (baton->boolean != nullptr) {
         VImage booleanImage;
-        ImageType booleanImageType = ImageType::UNKNOWN;
+        sharp::ImageType booleanImageType = sharp::ImageType::UNKNOWN;
         std::tie(booleanImage, booleanImageType) = sharp::OpenInput(baton->boolean);
         image = sharp::Boolean(image, booleanImage, baton->booleanOp);
       }
@@ -703,9 +692,9 @@ class PipelineWorker : public Nan::AsyncWorker {
       // Output
       if (baton->fileOut.empty()) {
         // Buffer output
-        if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == ImageType::JPEG)) {
+        if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == sharp::ImageType::JPEG)) {
           // Write JPEG to buffer
-          sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
           VipsArea *area = VIPS_AREA(image.jpegsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->jpegQuality)
@@ -727,9 +716,10 @@ class PipelineWorker : public Nan::AsyncWorker {
             baton->channels = std::min(baton->channels, 3);
           }
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" &&
-          (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
+          (inputImageType == sharp::ImageType::PNG || inputImageType == sharp::ImageType::GIF ||
+            inputImageType == sharp::ImageType::SVG))) {
           // Write PNG to buffer
-          sharp::AssertImageTypeDimensions(image, ImageType::PNG);
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::PNG);
           VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("interlace", baton->pngProgressive)
@@ -744,9 +734,10 @@ class PipelineWorker : public Nan::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "png";
-        } else if (baton->formatOut == "webp" || (baton->formatOut == "input" && inputImageType == ImageType::WEBP)) {
+        } else if (baton->formatOut == "webp" ||
+          (baton->formatOut == "input" && inputImageType == sharp::ImageType::WEBP)) {
           // Write WEBP to buffer
-          sharp::AssertImageTypeDimensions(image, ImageType::WEBP);
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::WEBP);
           VipsArea *area = VIPS_AREA(image.webpsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->webpQuality)
@@ -760,10 +751,11 @@ class PipelineWorker : public Nan::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "webp";
-        } else if (baton->formatOut == "tiff" || (baton->formatOut == "input" && inputImageType == ImageType::TIFF)) {
+        } else if (baton->formatOut == "tiff" ||
+          (baton->formatOut == "input" && inputImageType == sharp::ImageType::TIFF)) {
           // Write TIFF to buffer
           if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
-            sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
+            sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
             baton->channels = std::min(baton->channels, 3);
           }
           // Cast pixel values to float, if required
@@ -787,7 +779,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "tiff";
-        } else if (baton->formatOut == "heif" || (baton->formatOut == "input" && inputImageType == ImageType::HEIF)) {
+        } else if (baton->formatOut == "heif" ||
+          (baton->formatOut == "input" && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to buffer
           VipsArea *area = VIPS_AREA(image.heifsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
@@ -799,7 +792,8 @@ class PipelineWorker : public Nan::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "heif";
-        } else if (baton->formatOut == "raw" || (baton->formatOut == "input" && inputImageType == ImageType::RAW)) {
+        } else if (baton->formatOut == "raw" ||
+          (baton->formatOut == "input" && inputImageType == sharp::ImageType::RAW)) {
           // Write raw, uncompressed image data to buffer
           if (baton->greyscale || image.interpretation() == VIPS_INTERPRETATION_B_W) {
             // Extract first band for greyscale image
@@ -840,9 +834,9 @@ class PipelineWorker : public Nan::AsyncWorker {
         bool const mightMatchInput = baton->formatOut == "input";
         bool const willMatchInput = mightMatchInput && !(isJpeg || isPng || isWebp || isTiff || isDz || isDzZip || isV);
         if (baton->formatOut == "jpeg" || (mightMatchInput && isJpeg) ||
-          (willMatchInput && inputImageType == ImageType::JPEG)) {
+          (willMatchInput && inputImageType == sharp::ImageType::JPEG)) {
           // Write JPEG to file
-          sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->jpegQuality)
@@ -856,9 +850,10 @@ class PipelineWorker : public Nan::AsyncWorker {
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || (mightMatchInput && isPng) || (willMatchInput &&
-          (inputImageType == ImageType::PNG || inputImageType == ImageType::GIF || inputImageType == ImageType::SVG))) {
+          (inputImageType == sharp::ImageType::PNG || inputImageType == sharp::ImageType::GIF ||
+            inputImageType == sharp::ImageType::SVG))) {
           // Write PNG to file
-          sharp::AssertImageTypeDimensions(image, ImageType::PNG);
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::PNG);
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("interlace", baton->pngProgressive)
@@ -870,9 +865,9 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("dither", baton->pngDither));
           baton->formatOut = "png";
         } else if (baton->formatOut == "webp" || (mightMatchInput && isWebp) ||
-          (willMatchInput && inputImageType == ImageType::WEBP)) {
+          (willMatchInput && inputImageType == sharp::ImageType::WEBP)) {
           // Write WEBP to file
-          sharp::AssertImageTypeDimensions(image, ImageType::WEBP);
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::WEBP);
           image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->webpQuality)
@@ -883,10 +878,10 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
         } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
-          (willMatchInput && inputImageType == ImageType::TIFF)) {
+          (willMatchInput && inputImageType == sharp::ImageType::TIFF)) {
           // Write TIFF to file
           if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
-            sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
+            sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
             baton->channels = std::min(baton->channels, 3);
           }
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -903,7 +898,7 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("yres", baton->tiffYres));
           baton->formatOut = "tiff";
         } else if (baton->formatOut == "heif" || (mightMatchInput && isHeif) ||
-          (willMatchInput && inputImageType == ImageType::HEIF)) {
+          (willMatchInput && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to file
           if (sharp::IsAvif(baton->fileOut)) {
             baton->heifCompression = VIPS_FOREIGN_HEIF_COMPRESSION_AV1;
@@ -954,7 +949,7 @@ class PipelineWorker : public Nan::AsyncWorker {
             suffix = AssembleSuffixString(extname, options);
           }
           // Remove alpha channel from tile background if image does not contain an alpha channel
-          if (!HasAlpha(image)) {
+          if (!sharp::HasAlpha(image)) {
             baton->tileBackground.pop_back();
           }
           // Write DZ to file
@@ -976,7 +971,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           image.dzsave(const_cast<char*>(baton->fileOut.data()), options);
           baton->formatOut = "dz";
         } else if (baton->formatOut == "v" || (mightMatchInput && isV) ||
-          (willMatchInput && inputImageType == ImageType::VIPS)) {
+          (willMatchInput && inputImageType == sharp::ImageType::VIPS)) {
           // Write V to file
           image.vipssave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata));
@@ -1000,16 +995,18 @@ class PipelineWorker : public Nan::AsyncWorker {
     vips_thread_shutdown();
   }
 
-  void HandleOKCallback() {
-    using Nan::New;
-    using Nan::Set;
-    Nan::HandleScope();
+  void OnOK() {
+    Napi::Env env = Env();
+    Napi::HandleScope scope(env);
 
-    v8::Local<v8::Value> argv[3] = { Nan::Null(), Nan::Null(), Nan::Null() };
-    if (!baton->err.empty()) {
-      // Error
-      argv[0] = Nan::Error(baton->err.data());
-    } else {
+    // Handle warnings
+    std::string warning = sharp::VipsWarningPop();
+    while (!warning.empty()) {
+      debuglog.Call({ Napi::String::New(env, warning) });
+      warning = sharp::VipsWarningPop();
+    }
+
+    if (baton->err.empty()) {
       int width = baton->width;
       int height = baton->height;
       if (baton->topOffsetPre != -1 && (baton->width == -1 || baton->height == -1)) {
@@ -1021,49 +1018,39 @@ class PipelineWorker : public Nan::AsyncWorker {
         height = baton->heightPost;
       }
       // Info Object
-      v8::Local<v8::Object> info = New<v8::Object>();
-      Set(info, New("format").ToLocalChecked(), New<v8::String>(baton->formatOut).ToLocalChecked());
-      Set(info, New("width").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(width)));
-      Set(info, New("height").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(height)));
-      Set(info, New("channels").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->channels)));
-      Set(info, New("premultiplied").ToLocalChecked(), New<v8::Boolean>(baton->premultiplied));
+      Napi::Object info = Napi::Object::New(env);
+      info.Set("format", baton->formatOut);
+      info.Set("width", static_cast<uint32_t>(width));
+      info.Set("height", static_cast<uint32_t>(height));
+      info.Set("channels", static_cast<uint32_t>(baton->channels));
+      info.Set("premultiplied", baton->premultiplied);
       if (baton->hasCropOffset) {
-        Set(info, New("cropOffsetLeft").ToLocalChecked(),
-          New<v8::Int32>(static_cast<int32_t>(baton->cropOffsetLeft)));
-        Set(info, New("cropOffsetTop").ToLocalChecked(),
-          New<v8::Int32>(static_cast<int32_t>(baton->cropOffsetTop)));
+        info.Set("cropOffsetLeft", static_cast<int32_t>(baton->cropOffsetLeft));
+        info.Set("cropOffsetTop", static_cast<int32_t>(baton->cropOffsetTop));
       }
       if (baton->trimThreshold > 0.0) {
-        Set(info, New("trimOffsetLeft").ToLocalChecked(),
-          New<v8::Int32>(static_cast<int32_t>(baton->trimOffsetLeft)));
-        Set(info, New("trimOffsetTop").ToLocalChecked(),
-          New<v8::Int32>(static_cast<int32_t>(baton->trimOffsetTop)));
+        info.Set("trimOffsetLeft", static_cast<int32_t>(baton->trimOffsetLeft));
+        info.Set("trimOffsetTop", static_cast<int32_t>(baton->trimOffsetTop));
       }
 
       if (baton->bufferOutLength > 0) {
-        // Pass ownership of output data to Buffer instance
-        argv[1] = Nan::NewBuffer(
-          static_cast<char*>(baton->bufferOut), baton->bufferOutLength, sharp::FreeCallback, nullptr)
-          .ToLocalChecked();
         // Add buffer size to info
-        Set(info, New("size").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(baton->bufferOutLength)));
-        argv[2] = info;
+        info.Set("size", static_cast<uint32_t>(baton->bufferOutLength));
+        // Pass ownership of output data to Buffer instance
+        Napi::Buffer<char> data = Napi::Buffer<char>::New(env, static_cast<char*>(baton->bufferOut),
+          baton->bufferOutLength, sharp::FreeCallback);
+        Callback().MakeCallback(Receiver().Value(), { env.Null(), data, info });
       } else {
         // Add file size to info
         struct STAT64_STRUCT st;
         if (STAT64_FUNCTION(baton->fileOut.data(), &st) == 0) {
-          Set(info, New("size").ToLocalChecked(), New<v8::Uint32>(static_cast<uint32_t>(st.st_size)));
+          info.Set("size", static_cast<uint32_t>(st.st_size));
         }
-        argv[1] = info;
+        Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
       }
+    } else {
+      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
     }
-
-    // Dispose of Persistent wrapper around input Buffers so they can be garbage collected
-    std::accumulate(buffersToPersist.begin(), buffersToPersist.end(), 0,
-      [this](uint32_t index, v8::Local<v8::Object> const buffer) -> uint32_t {
-        GetFromPersistent(index);
-        return index + 1;
-      });
 
     // Delete baton
     delete baton->input;
@@ -1077,29 +1064,16 @@ class PipelineWorker : public Nan::AsyncWorker {
     }
     delete baton;
 
-    // Handle warnings
-    std::string warning = sharp::VipsWarningPop();
-    while (!warning.empty()) {
-      v8::Local<v8::Value> message[1] = { New(warning).ToLocalChecked() };
-      debuglog->Call(1, message, async_resource);
-      warning = sharp::VipsWarningPop();
-    }
-
     // Decrement processing task counter
     g_atomic_int_dec_and_test(&sharp::counterProcess);
-    v8::Local<v8::Value> queueLength[1] = { New<v8::Uint32>(sharp::counterQueue) };
-    queueListener->Call(1, queueLength, async_resource);
-    delete queueListener;
-
-    // Return to JavaScript
-    callback->Call(3, argv, async_resource);
+    Napi::Number queueLength = Napi::Number::New(env, static_cast<double>(sharp::counterQueue));
+    queueListener.Call(Receiver().Value(), { queueLength });
   }
 
  private:
   PipelineBaton *baton;
-  Nan::Callback *debuglog;
-  Nan::Callback *queueListener;
-  std::vector<v8::Local<v8::Object>> buffersToPersist;
+  Napi::FunctionReference debuglog;
+  Napi::FunctionReference queueListener;
 
   /*
     Calculate the angle of rotation and need-to-flip for the given Exif orientation
@@ -1169,37 +1143,27 @@ class PipelineWorker : public Nan::AsyncWorker {
 /*
   pipeline(options, output, callback)
 */
-NAN_METHOD(pipeline) {
-  using sharp::HasAttr;
-  using sharp::AttrTo;
-  using sharp::AttrAs;
-  using sharp::AttrAsStr;
-  using sharp::AttrAsRgba;
-  using sharp::CreateInputDescriptor;
-
-  // Input Buffers must not undergo GC compaction during processing
-  std::vector<v8::Local<v8::Object>> buffersToPersist;
-
+Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // V8 objects are converted to non-V8 types held in the baton struct
   PipelineBaton *baton = new PipelineBaton;
-  v8::Local<v8::Object> options = info[0].As<v8::Object>();
+  Napi::Object options = info[0].As<Napi::Object>();
 
   // Input
-  baton->input = CreateInputDescriptor(AttrAs<v8::Object>(options, "input"), buffersToPersist);
+  baton->input = sharp::CreateInputDescriptor(options.Get("input").As<Napi::Object>());
   // Extract image options
-  baton->topOffsetPre = AttrTo<int32_t>(options, "topOffsetPre");
-  baton->leftOffsetPre = AttrTo<int32_t>(options, "leftOffsetPre");
-  baton->widthPre = AttrTo<int32_t>(options, "widthPre");
-  baton->heightPre = AttrTo<int32_t>(options, "heightPre");
-  baton->topOffsetPost = AttrTo<int32_t>(options, "topOffsetPost");
-  baton->leftOffsetPost = AttrTo<int32_t>(options, "leftOffsetPost");
-  baton->widthPost = AttrTo<int32_t>(options, "widthPost");
-  baton->heightPost = AttrTo<int32_t>(options, "heightPost");
+  baton->topOffsetPre = sharp::AttrAsInt32(options, "topOffsetPre");
+  baton->leftOffsetPre = sharp::AttrAsInt32(options, "leftOffsetPre");
+  baton->widthPre = sharp::AttrAsInt32(options, "widthPre");
+  baton->heightPre = sharp::AttrAsInt32(options, "heightPre");
+  baton->topOffsetPost = sharp::AttrAsInt32(options, "topOffsetPost");
+  baton->leftOffsetPost = sharp::AttrAsInt32(options, "leftOffsetPost");
+  baton->widthPost = sharp::AttrAsInt32(options, "widthPost");
+  baton->heightPost = sharp::AttrAsInt32(options, "heightPost");
   // Output image dimensions
-  baton->width = AttrTo<int32_t>(options, "width");
-  baton->height = AttrTo<int32_t>(options, "height");
+  baton->width = sharp::AttrAsInt32(options, "width");
+  baton->height = sharp::AttrAsInt32(options, "height");
   // Canvas option
-  std::string canvas = AttrAsStr(options, "canvas");
+  std::string canvas = sharp::AttrAsStr(options, "canvas");
   if (canvas == "crop") {
     baton->canvas = Canvas::CROP;
   } else if (canvas == "embed") {
@@ -1212,172 +1176,165 @@ NAN_METHOD(pipeline) {
     baton->canvas = Canvas::IGNORE_ASPECT;
   }
   // Tint chroma
-  baton->tintA = AttrTo<double>(options, "tintA");
-  baton->tintB = AttrTo<double>(options, "tintB");
+  baton->tintA = sharp::AttrAsDouble(options, "tintA");
+  baton->tintB = sharp::AttrAsDouble(options, "tintB");
   // Composite
-  v8::Local<v8::Array> compositeArray = Nan::Get(options, Nan::New("composite").ToLocalChecked())
-    .ToLocalChecked().As<v8::Array>();
-  int const compositeArrayLength = AttrTo<uint32_t>(compositeArray, "length");
-  for (int i = 0; i < compositeArrayLength; i++) {
-    v8::Local<v8::Object> compositeObject = Nan::Get(compositeArray, i).ToLocalChecked().As<v8::Object>();
+  Napi::Array compositeArray = options.Get("composite").As<Napi::Array>();
+  for (unsigned int i = 0; i < compositeArray.Length(); i++) {
+    Napi::Object compositeObject = compositeArray.Get(i).As<Napi::Object>();
     Composite *composite = new Composite;
-    composite->input = CreateInputDescriptor(AttrAs<v8::Object>(compositeObject, "input"), buffersToPersist);
+    composite->input = sharp::CreateInputDescriptor(compositeObject.Get("input").As<Napi::Object>());
     composite->mode = static_cast<VipsBlendMode>(
-      vips_enum_from_nick(nullptr, VIPS_TYPE_BLEND_MODE, AttrAsStr(compositeObject, "blend").data()));
-    composite->gravity = AttrTo<uint32_t>(compositeObject, "gravity");
-    composite->left = AttrTo<int32_t>(compositeObject, "left");
-    composite->top = AttrTo<int32_t>(compositeObject, "top");
-    composite->tile = AttrTo<bool>(compositeObject, "tile");
-    composite->premultiplied = AttrTo<bool>(compositeObject, "premultiplied");
+      vips_enum_from_nick(nullptr, VIPS_TYPE_BLEND_MODE, sharp::AttrAsStr(compositeObject, "blend").data()));
+    composite->gravity = sharp::AttrAsUint32(compositeObject, "gravity");
+    composite->left = sharp::AttrAsInt32(compositeObject, "left");
+    composite->top = sharp::AttrAsInt32(compositeObject, "top");
+    composite->tile = sharp::AttrAsBool(compositeObject, "tile");
+    composite->premultiplied = sharp::AttrAsBool(compositeObject, "premultiplied");
     baton->composite.push_back(composite);
   }
   // Resize options
-  baton->withoutEnlargement = AttrTo<bool>(options, "withoutEnlargement");
-  baton->position = AttrTo<int32_t>(options, "position");
-  baton->resizeBackground = AttrAsRgba(options, "resizeBackground");
-  baton->kernel = AttrAsStr(options, "kernel");
-  baton->fastShrinkOnLoad = AttrTo<bool>(options, "fastShrinkOnLoad");
+  baton->withoutEnlargement = sharp::AttrAsBool(options, "withoutEnlargement");
+  baton->position = sharp::AttrAsInt32(options, "position");
+  baton->resizeBackground = sharp::AttrAsRgba(options, "resizeBackground");
+  baton->kernel = sharp::AttrAsStr(options, "kernel");
+  baton->fastShrinkOnLoad = sharp::AttrAsBool(options, "fastShrinkOnLoad");
   // Join Channel Options
-  if (HasAttr(options, "joinChannelIn")) {
-    v8::Local<v8::Object> joinChannelObject = Nan::Get(options, Nan::New("joinChannelIn").ToLocalChecked())
-      .ToLocalChecked().As<v8::Object>();
-    v8::Local<v8::Array> joinChannelArray = joinChannelObject.As<v8::Array>();
-    int joinChannelArrayLength = AttrTo<int32_t>(joinChannelObject, "length");
-    for (int i = 0; i < joinChannelArrayLength; i++) {
+  if (options.Has("joinChannelIn")) {
+    Napi::Array joinChannelArray = options.Get("joinChannelIn").As<Napi::Array>();
+    for (unsigned int i = 0; i < joinChannelArray.Length(); i++) {
       baton->joinChannelIn.push_back(
-        CreateInputDescriptor(
-          Nan::Get(joinChannelArray, i).ToLocalChecked().As<v8::Object>(),
-          buffersToPersist));
+        sharp::CreateInputDescriptor(joinChannelArray.Get(i).As<Napi::Object>()));
     }
   }
   // Operators
-  baton->flatten = AttrTo<bool>(options, "flatten");
-  baton->flattenBackground = AttrAsRgba(options, "flattenBackground");
-  baton->negate = AttrTo<bool>(options, "negate");
-  baton->blurSigma = AttrTo<double>(options, "blurSigma");
-  baton->brightness = AttrTo<double>(options, "brightness");
-  baton->saturation = AttrTo<double>(options, "saturation");
-  baton->hue = AttrTo<int32_t>(options, "hue");
-  baton->medianSize = AttrTo<uint32_t>(options, "medianSize");
-  baton->sharpenSigma = AttrTo<double>(options, "sharpenSigma");
-  baton->sharpenFlat = AttrTo<double>(options, "sharpenFlat");
-  baton->sharpenJagged = AttrTo<double>(options, "sharpenJagged");
-  baton->threshold = AttrTo<int32_t>(options, "threshold");
-  baton->thresholdGrayscale = AttrTo<bool>(options, "thresholdGrayscale");
-  baton->trimThreshold = AttrTo<double>(options, "trimThreshold");
-  baton->gamma = AttrTo<double>(options, "gamma");
-  baton->gammaOut = AttrTo<double>(options, "gammaOut");
-  baton->linearA = AttrTo<double>(options, "linearA");
-  baton->linearB = AttrTo<double>(options, "linearB");
-  baton->greyscale = AttrTo<bool>(options, "greyscale");
-  baton->normalise = AttrTo<bool>(options, "normalise");
-  baton->useExifOrientation = AttrTo<bool>(options, "useExifOrientation");
-  baton->angle = AttrTo<int32_t>(options, "angle");
-  baton->rotationAngle = AttrTo<double>(options, "rotationAngle");
-  baton->rotationBackground = AttrAsRgba(options, "rotationBackground");
-  baton->rotateBeforePreExtract = AttrTo<bool>(options, "rotateBeforePreExtract");
-  baton->flip = AttrTo<bool>(options, "flip");
-  baton->flop = AttrTo<bool>(options, "flop");
-  baton->extendTop = AttrTo<int32_t>(options, "extendTop");
-  baton->extendBottom = AttrTo<int32_t>(options, "extendBottom");
-  baton->extendLeft = AttrTo<int32_t>(options, "extendLeft");
-  baton->extendRight = AttrTo<int32_t>(options, "extendRight");
-  baton->extendBackground = AttrAsRgba(options, "extendBackground");
-  baton->extractChannel = AttrTo<int32_t>(options, "extractChannel");
+  baton->flatten = sharp::AttrAsBool(options, "flatten");
+  baton->flattenBackground = sharp::AttrAsRgba(options, "flattenBackground");
+  baton->negate = sharp::AttrAsBool(options, "negate");
+  baton->blurSigma = sharp::AttrAsDouble(options, "blurSigma");
+  baton->brightness = sharp::AttrAsDouble(options, "brightness");
+  baton->saturation = sharp::AttrAsDouble(options, "saturation");
+  baton->hue = sharp::AttrAsInt32(options, "hue");
+  baton->medianSize = sharp::AttrAsUint32(options, "medianSize");
+  baton->sharpenSigma = sharp::AttrAsDouble(options, "sharpenSigma");
+  baton->sharpenFlat = sharp::AttrAsDouble(options, "sharpenFlat");
+  baton->sharpenJagged = sharp::AttrAsDouble(options, "sharpenJagged");
+  baton->threshold = sharp::AttrAsInt32(options, "threshold");
+  baton->thresholdGrayscale = sharp::AttrAsBool(options, "thresholdGrayscale");
+  baton->trimThreshold = sharp::AttrAsDouble(options, "trimThreshold");
+  baton->gamma = sharp::AttrAsDouble(options, "gamma");
+  baton->gammaOut = sharp::AttrAsDouble(options, "gammaOut");
+  baton->linearA = sharp::AttrAsDouble(options, "linearA");
+  baton->linearB = sharp::AttrAsDouble(options, "linearB");
+  baton->greyscale = sharp::AttrAsBool(options, "greyscale");
+  baton->normalise = sharp::AttrAsBool(options, "normalise");
+  baton->useExifOrientation = sharp::AttrAsBool(options, "useExifOrientation");
+  baton->angle = sharp::AttrAsInt32(options, "angle");
+  baton->rotationAngle = sharp::AttrAsDouble(options, "rotationAngle");
+  baton->rotationBackground = sharp::AttrAsRgba(options, "rotationBackground");
+  baton->rotateBeforePreExtract = sharp::AttrAsBool(options, "rotateBeforePreExtract");
+  baton->flip = sharp::AttrAsBool(options, "flip");
+  baton->flop = sharp::AttrAsBool(options, "flop");
+  baton->extendTop = sharp::AttrAsInt32(options, "extendTop");
+  baton->extendBottom = sharp::AttrAsInt32(options, "extendBottom");
+  baton->extendLeft = sharp::AttrAsInt32(options, "extendLeft");
+  baton->extendRight = sharp::AttrAsInt32(options, "extendRight");
+  baton->extendBackground = sharp::AttrAsRgba(options, "extendBackground");
+  baton->extractChannel = sharp::AttrAsInt32(options, "extractChannel");
 
-  baton->removeAlpha = AttrTo<bool>(options, "removeAlpha");
-  baton->ensureAlpha = AttrTo<bool>(options, "ensureAlpha");
-  if (HasAttr(options, "boolean")) {
-    baton->boolean = CreateInputDescriptor(AttrAs<v8::Object>(options, "boolean"), buffersToPersist);
-    baton->booleanOp = sharp::GetBooleanOperation(AttrAsStr(options, "booleanOp"));
+  baton->removeAlpha = sharp::AttrAsBool(options, "removeAlpha");
+  baton->ensureAlpha = sharp::AttrAsBool(options, "ensureAlpha");
+  if (options.Has("boolean")) {
+    baton->boolean = sharp::CreateInputDescriptor(options.Get("boolean").As<Napi::Object>());
+    baton->booleanOp = sharp::GetBooleanOperation(sharp::AttrAsStr(options, "booleanOp"));
   }
-  if (HasAttr(options, "bandBoolOp")) {
-    baton->bandBoolOp = sharp::GetBooleanOperation(AttrAsStr(options, "bandBoolOp"));
+  if (options.Has("bandBoolOp")) {
+    baton->bandBoolOp = sharp::GetBooleanOperation(sharp::AttrAsStr(options, "bandBoolOp"));
   }
-  if (HasAttr(options, "convKernel")) {
-    v8::Local<v8::Object> kernel = AttrAs<v8::Object>(options, "convKernel");
-    baton->convKernelWidth = AttrTo<uint32_t>(kernel, "width");
-    baton->convKernelHeight = AttrTo<uint32_t>(kernel, "height");
-    baton->convKernelScale = AttrTo<double>(kernel, "scale");
-    baton->convKernelOffset = AttrTo<double>(kernel, "offset");
+  if (options.Has("convKernel")) {
+    Napi::Object kernel = options.Get("convKernel").As<Napi::Object>();
+    baton->convKernelWidth = sharp::AttrAsUint32(kernel, "width");
+    baton->convKernelHeight = sharp::AttrAsUint32(kernel, "height");
+    baton->convKernelScale = sharp::AttrAsDouble(kernel, "scale");
+    baton->convKernelOffset = sharp::AttrAsDouble(kernel, "offset");
     size_t const kernelSize = static_cast<size_t>(baton->convKernelWidth * baton->convKernelHeight);
     baton->convKernel = std::unique_ptr<double[]>(new double[kernelSize]);
-    v8::Local<v8::Array> kdata = AttrAs<v8::Array>(kernel, "kernel");
+    Napi::Array kdata = kernel.Get("kernel").As<Napi::Array>();
     for (unsigned int i = 0; i < kernelSize; i++) {
-      baton->convKernel[i] = AttrTo<double>(kdata, i);
+      baton->convKernel[i] = sharp::AttrAsDouble(kdata, i);
     }
   }
-  if (HasAttr(options, "recombMatrix")) {
+  if (options.Has("recombMatrix")) {
     baton->recombMatrix = std::unique_ptr<double[]>(new double[9]);
-    v8::Local<v8::Array> recombMatrix = AttrAs<v8::Array>(options, "recombMatrix");
+    Napi::Array recombMatrix = options.Get("recombMatrix").As<Napi::Array>();
     for (unsigned int i = 0; i < 9; i++) {
-       baton->recombMatrix[i] = AttrTo<double>(recombMatrix, i);
+       baton->recombMatrix[i] = sharp::AttrAsDouble(recombMatrix, i);
     }
   }
-  baton->colourspace = sharp::GetInterpretation(AttrAsStr(options, "colourspace"));
+  baton->colourspace = sharp::GetInterpretation(sharp::AttrAsStr(options, "colourspace"));
   if (baton->colourspace == VIPS_INTERPRETATION_ERROR) {
     baton->colourspace = VIPS_INTERPRETATION_sRGB;
   }
   // Output
-  baton->formatOut = AttrAsStr(options, "formatOut");
-  baton->fileOut = AttrAsStr(options, "fileOut");
-  baton->withMetadata = AttrTo<bool>(options, "withMetadata");
-  baton->withMetadataOrientation = AttrTo<uint32_t>(options, "withMetadataOrientation");
+  baton->formatOut = sharp::AttrAsStr(options, "formatOut");
+  baton->fileOut = sharp::AttrAsStr(options, "fileOut");
+  baton->withMetadata = sharp::AttrAsBool(options, "withMetadata");
+  baton->withMetadataOrientation = sharp::AttrAsUint32(options, "withMetadataOrientation");
   // Format-specific
-  baton->jpegQuality = AttrTo<uint32_t>(options, "jpegQuality");
-  baton->jpegProgressive = AttrTo<bool>(options, "jpegProgressive");
-  baton->jpegChromaSubsampling = AttrAsStr(options, "jpegChromaSubsampling");
-  baton->jpegTrellisQuantisation = AttrTo<bool>(options, "jpegTrellisQuantisation");
-  baton->jpegQuantisationTable = AttrTo<uint32_t>(options, "jpegQuantisationTable");
-  baton->jpegOvershootDeringing = AttrTo<bool>(options, "jpegOvershootDeringing");
-  baton->jpegOptimiseScans = AttrTo<bool>(options, "jpegOptimiseScans");
-  baton->jpegOptimiseCoding = AttrTo<bool>(options, "jpegOptimiseCoding");
-  baton->pngProgressive = AttrTo<bool>(options, "pngProgressive");
-  baton->pngCompressionLevel = AttrTo<uint32_t>(options, "pngCompressionLevel");
-  baton->pngAdaptiveFiltering = AttrTo<bool>(options, "pngAdaptiveFiltering");
-  baton->pngPalette = AttrTo<bool>(options, "pngPalette");
-  baton->pngQuality = AttrTo<uint32_t>(options, "pngQuality");
-  baton->pngColours = AttrTo<uint32_t>(options, "pngColours");
-  baton->pngDither = AttrTo<double>(options, "pngDither");
-  baton->webpQuality = AttrTo<uint32_t>(options, "webpQuality");
-  baton->webpAlphaQuality = AttrTo<uint32_t>(options, "webpAlphaQuality");
-  baton->webpLossless = AttrTo<bool>(options, "webpLossless");
-  baton->webpNearLossless = AttrTo<bool>(options, "webpNearLossless");
-  baton->webpSmartSubsample = AttrTo<bool>(options, "webpSmartSubsample");
-  baton->webpReductionEffort = AttrTo<uint32_t>(options, "webpReductionEffort");
-  baton->tiffQuality = AttrTo<uint32_t>(options, "tiffQuality");
-  baton->tiffPyramid = AttrTo<bool>(options, "tiffPyramid");
-  baton->tiffSquash = AttrTo<bool>(options, "tiffSquash");
-  baton->tiffTile = AttrTo<bool>(options, "tiffTile");
-  baton->tiffTileWidth = AttrTo<uint32_t>(options, "tiffTileWidth");
-  baton->tiffTileHeight = AttrTo<uint32_t>(options, "tiffTileHeight");
-  baton->tiffXres = AttrTo<double>(options, "tiffXres");
-  baton->tiffYres = AttrTo<double>(options, "tiffYres");
+  baton->jpegQuality = sharp::AttrAsUint32(options, "jpegQuality");
+  baton->jpegProgressive = sharp::AttrAsBool(options, "jpegProgressive");
+  baton->jpegChromaSubsampling = sharp::AttrAsStr(options, "jpegChromaSubsampling");
+  baton->jpegTrellisQuantisation = sharp::AttrAsBool(options, "jpegTrellisQuantisation");
+  baton->jpegQuantisationTable = sharp::AttrAsUint32(options, "jpegQuantisationTable");
+  baton->jpegOvershootDeringing = sharp::AttrAsBool(options, "jpegOvershootDeringing");
+  baton->jpegOptimiseScans = sharp::AttrAsBool(options, "jpegOptimiseScans");
+  baton->jpegOptimiseCoding = sharp::AttrAsBool(options, "jpegOptimiseCoding");
+  baton->pngProgressive = sharp::AttrAsBool(options, "pngProgressive");
+  baton->pngCompressionLevel = sharp::AttrAsUint32(options, "pngCompressionLevel");
+  baton->pngAdaptiveFiltering = sharp::AttrAsBool(options, "pngAdaptiveFiltering");
+  baton->pngPalette = sharp::AttrAsBool(options, "pngPalette");
+  baton->pngQuality = sharp::AttrAsUint32(options, "pngQuality");
+  baton->pngColours = sharp::AttrAsUint32(options, "pngColours");
+  baton->pngDither = sharp::AttrAsDouble(options, "pngDither");
+  baton->webpQuality = sharp::AttrAsUint32(options, "webpQuality");
+  baton->webpAlphaQuality = sharp::AttrAsUint32(options, "webpAlphaQuality");
+  baton->webpLossless = sharp::AttrAsBool(options, "webpLossless");
+  baton->webpNearLossless = sharp::AttrAsBool(options, "webpNearLossless");
+  baton->webpSmartSubsample = sharp::AttrAsBool(options, "webpSmartSubsample");
+  baton->webpReductionEffort = sharp::AttrAsUint32(options, "webpReductionEffort");
+  baton->tiffQuality = sharp::AttrAsUint32(options, "tiffQuality");
+  baton->tiffPyramid = sharp::AttrAsBool(options, "tiffPyramid");
+  baton->tiffSquash = sharp::AttrAsBool(options, "tiffSquash");
+  baton->tiffTile = sharp::AttrAsBool(options, "tiffTile");
+  baton->tiffTileWidth = sharp::AttrAsUint32(options, "tiffTileWidth");
+  baton->tiffTileHeight = sharp::AttrAsUint32(options, "tiffTileHeight");
+  baton->tiffXres = sharp::AttrAsDouble(options, "tiffXres");
+  baton->tiffYres = sharp::AttrAsDouble(options, "tiffYres");
   // tiff compression options
   baton->tiffCompression = static_cast<VipsForeignTiffCompression>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_COMPRESSION,
-    AttrAsStr(options, "tiffCompression").data()));
+    sharp::AttrAsStr(options, "tiffCompression").data()));
   baton->tiffPredictor = static_cast<VipsForeignTiffPredictor>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_PREDICTOR,
-    AttrAsStr(options, "tiffPredictor").data()));
-  baton->heifQuality = AttrTo<uint32_t>(options, "heifQuality");
-  baton->heifLossless = AttrTo<bool>(options, "heifLossless");
+    sharp::AttrAsStr(options, "tiffPredictor").data()));
+  baton->heifQuality = sharp::AttrAsUint32(options, "heifQuality");
+  baton->heifLossless = sharp::AttrAsBool(options, "heifLossless");
   baton->heifCompression = static_cast<VipsForeignHeifCompression>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
-    AttrAsStr(options, "heifCompression").data()));
+    sharp::AttrAsStr(options, "heifCompression").data()));
   // Tile output
-  baton->tileSize = AttrTo<uint32_t>(options, "tileSize");
-  baton->tileOverlap = AttrTo<uint32_t>(options, "tileOverlap");
-  std::string tileContainer = AttrAsStr(options, "tileContainer");
-  baton->tileAngle = AttrTo<int32_t>(options, "tileAngle");
-  baton->tileBackground = AttrAsRgba(options, "tileBackground");
-  baton->tileSkipBlanks = AttrTo<int32_t>(options, "tileSkipBlanks");
+  baton->tileSize = sharp::AttrAsUint32(options, "tileSize");
+  baton->tileOverlap = sharp::AttrAsUint32(options, "tileOverlap");
+  baton->tileAngle = sharp::AttrAsInt32(options, "tileAngle");
+  baton->tileBackground = sharp::AttrAsRgba(options, "tileBackground");
+  baton->tileSkipBlanks = sharp::AttrAsInt32(options, "tileSkipBlanks");
+  std::string tileContainer = sharp::AttrAsStr(options, "tileContainer");
   if (tileContainer == "zip") {
     baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
   } else {
     baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_FS;
   }
-  std::string tileLayout = AttrAsStr(options, "tileLayout");
+  std::string tileLayout = sharp::AttrAsStr(options, "tileLayout");
   if (tileLayout == "google") {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_GOOGLE;
   } else if (tileLayout == "zoomify") {
@@ -1385,8 +1342,8 @@ NAN_METHOD(pipeline) {
   } else {
     baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
   }
-  baton->tileFormat = AttrAsStr(options, "tileFormat");
-  std::string tileDepth = AttrAsStr(options, "tileDepth");
+  baton->tileFormat = sharp::AttrAsStr(options, "tileFormat");
+  std::string tileDepth = sharp::AttrAsStr(options, "tileDepth");
   if (tileDepth == "onetile") {
     baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_ONETILE;
   } else if (tileDepth == "one") {
@@ -1413,18 +1370,20 @@ NAN_METHOD(pipeline) {
   }
 
   // Function to notify of libvips warnings
-  Nan::Callback *debuglog = new Nan::Callback(AttrAs<v8::Function>(options, "debuglog"));
+  Napi::Function debuglog = options.Get("debuglog").As<Napi::Function>();
 
   // Function to notify of queue length changes
-  Nan::Callback *queueListener = new Nan::Callback(AttrAs<v8::Function>(options, "queueListener"));
+  Napi::Function queueListener = options.Get("queueListener").As<Napi::Function>();
 
   // Join queue for worker thread
-  Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
-  Nan::AsyncQueueWorker(new PipelineWorker(callback, baton, debuglog, queueListener, buffersToPersist));
+  Napi::Function callback = info[1].As<Napi::Function>();
+  PipelineWorker *worker = new PipelineWorker(callback, baton, debuglog, queueListener);
+  worker->Queue();
 
   // Increment queued task counter
   g_atomic_int_inc(&sharp::counterQueue);
-  v8::Local<v8::Value> queueLength[1] = { Nan::New<v8::Uint32>(sharp::counterQueue) };
-  v8::Local<v8::Object> recv = Nan::New<v8::Object>();
-  Nan::Call(*queueListener, recv, 1, queueLength);
+  Napi::Number queueLength = Napi::Number::New(info.Env(), static_cast<double>(sharp::counterQueue));
+  queueListener.Call(info.This(), { queueLength });
+
+  return info.Env().Undefined();
 }
