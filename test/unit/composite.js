@@ -141,7 +141,7 @@ describe('composite', () => {
 
   it('zero offset', done => {
     sharp(fixtures.inputJpg)
-      .resize(400)
+      .resize(80)
       .composite([{
         input: fixtures.inputPngWithTransparency16bit,
         top: 0,
@@ -157,7 +157,7 @@ describe('composite', () => {
 
   it('offset and gravity', done => {
     sharp(fixtures.inputJpg)
-      .resize(400)
+      .resize(80)
       .composite([{
         input: fixtures.inputPngWithTransparency16bit,
         left: 10,
@@ -174,7 +174,7 @@ describe('composite', () => {
 
   it('offset, gravity and tile', done => {
     sharp(fixtures.inputJpg)
-      .resize(400)
+      .resize(80)
       .composite([{
         input: fixtures.inputPngWithTransparency16bit,
         left: 10,
@@ -192,7 +192,7 @@ describe('composite', () => {
 
   it('offset and tile', done => {
     sharp(fixtures.inputJpg)
-      .resize(400)
+      .resize(80)
       .composite([{
         input: fixtures.inputPngWithTransparency16bit,
         left: 10,
