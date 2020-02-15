@@ -6,6 +6,8 @@ Requires libvips TBD
 
 ### v0.25.0 - TBD
 
+* Remove `limitInputPixels` and `sequentialRead` previously deprecated in v0.24.0.
+
 * Migrate internals to N-API.
   [#1282](https://github.com/lovell/sharp/issues/1282)
 

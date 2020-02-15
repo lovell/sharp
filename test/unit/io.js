@@ -234,22 +234,6 @@ describe('Input/output', function () {
       })
   );
 
-  it('Sequential read, force JPEG - deprecated', function (done) {
-    sharp(fixtures.inputJpg)
-      .sequentialRead()
-      .resize(320, 240)
-      .toFormat(sharp.format.jpeg)
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
-  });
-
   it('Not sequential read, force JPEG', () =>
     sharp(fixtures.inputJpg, { sequentialRead: false })
       .resize(320, 240)
@@ -263,22 +247,6 @@ describe('Input/output', function () {
         assert.strictEqual(info.height, 240);
       })
   );
-
-  it('Not sequential read, force JPEG - deprecated', function (done) {
-    sharp(fixtures.inputJpg)
-      .sequentialRead(false)
-      .resize(320, 240)
-      .toFormat('jpeg')
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
-  });
 
   it('Support output to jpg format', function (done) {
     sharp(fixtures.inputPng)
@@ -651,81 +619,6 @@ describe('Input/output', function () {
             })
         )
     );
-  });
-
-  describe('Limit pixel count of input image - deprecated', function () {
-    it('Invalid fails - negative', function (done) {
-      let isValid = false;
-      try {
-        sharp().limitInputPixels(-1);
-        isValid = true;
-      } catch (e) {}
-      assert(!isValid);
-      done();
-    });
-
-    it('Invalid fails - float', function (done) {
-      let isValid = false;
-      try {
-        sharp().limitInputPixels(12.3);
-        isValid = true;
-      } catch (e) {}
-      assert(!isValid);
-      done();
-    });
-
-    it('Invalid fails - string', function (done) {
-      let isValid = false;
-      try {
-        sharp().limitInputPixels('fail');
-        isValid = true;
-      } catch (e) {}
-      assert(!isValid);
-      done();
-    });
-
-    it('Same size as input works', function (done) {
-      sharp(fixtures.inputJpg).metadata(function (err, metadata) {
-        if (err) throw err;
-        sharp(fixtures.inputJpg)
-          .limitInputPixels(metadata.width * metadata.height)
-          .toBuffer(function (err) {
-            assert.strictEqual(true, !err);
-            done();
-          });
-      });
-    });
-
-    it('Disabling limit works', function (done) {
-      sharp(fixtures.inputJpgLarge)
-        .limitInputPixels(false)
-        .resize(2)
-        .toBuffer(function (err) {
-          assert.strictEqual(true, !err);
-          done();
-        });
-    });
-
-    it('Enabling default limit works and fails with a large image', function (done) {
-      sharp(fixtures.inputJpgLarge)
-        .limitInputPixels(true)
-        .toBuffer(function (err) {
-          assert.strictEqual(true, !!err);
-          done();
-        });
-    });
-
-    it('Smaller than input fails', function (done) {
-      sharp(fixtures.inputJpg).metadata(function (err, metadata) {
-        if (err) throw err;
-        sharp(fixtures.inputJpg)
-          .limitInputPixels((metadata.width * metadata.height) - 1)
-          .toBuffer(function (err) {
-            assert.strictEqual(true, !!err);
-            done();
-          });
-      });
-    });
   });
 
   describe('Input options', function () {
