@@ -88,9 +88,9 @@ image
 
 Returns **[Promise][5]&lt;[Object][6]>** 
 
-[1]: https://github.com/libvips/libvips/blob/master/libvips/iofuncs/enumtypes.c#L636
+[1]: https://libvips.github.io/libvips/API/current/VipsImage.html#VipsInterpretation
 
-[2]: https://github.com/libvips/libvips/blob/master/libvips/iofuncs/enumtypes.c#L672
+[2]: https://libvips.github.io/libvips/API/current/VipsImage.html#VipsBandFormat
 
 [3]: https://www.npmjs.com/package/icc
 
