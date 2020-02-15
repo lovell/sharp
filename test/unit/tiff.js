@@ -208,10 +208,47 @@ describe('TIFF', function () {
       .toFile(fixtures.outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
+        assert.strictEqual(3, info.channels);
         assert(info.size < startSize);
         rimraf(fixtures.outputTiff, done);
       });
   });
+
+  it('TIFF LZW RGBA toFile', () =>
+    sharp({
+      create: {
+        width: 1,
+        height: 1,
+        channels: 4,
+        background: 'red'
+      }
+    })
+      .tiff({
+        compression: 'lzw'
+      })
+      .toFile(fixtures.outputTiff)
+      .then(info => {
+        assert.strictEqual(4, info.channels);
+      })
+  );
+
+  it('TIFF LZW RGBA toBuffer', () =>
+    sharp({
+      create: {
+        width: 1,
+        height: 1,
+        channels: 4,
+        background: 'red'
+      }
+    })
+      .tiff({
+        compression: 'lzw'
+      })
+      .toBuffer({ resolveWithObject: true })
+      .then(({ info }) => {
+        assert.strictEqual(4, info.channels);
+      })
+  );
 
   it('TIFF ccittfax4 compression shrinks b-w test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiff).size;

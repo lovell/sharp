@@ -764,6 +764,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           // Write TIFF to buffer
           if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
             sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
+            baton->channels = std::min(baton->channels, 3);
           }
           // Cast pixel values to float, if required
           if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
@@ -786,7 +787,6 @@ class PipelineWorker : public Nan::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "tiff";
-          baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "heif" || (baton->formatOut == "input" && inputImageType == ImageType::HEIF)) {
           // Write HEIF to buffer
           VipsArea *area = VIPS_AREA(image.heifsave_buffer(VImage::option()
@@ -887,6 +887,7 @@ class PipelineWorker : public Nan::AsyncWorker {
           // Write TIFF to file
           if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
             sharp::AssertImageTypeDimensions(image, ImageType::JPEG);
+            baton->channels = std::min(baton->channels, 3);
           }
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
@@ -901,7 +902,6 @@ class PipelineWorker : public Nan::AsyncWorker {
             ->set("xres", baton->tiffXres)
             ->set("yres", baton->tiffYres));
           baton->formatOut = "tiff";
-          baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "heif" || (mightMatchInput && isHeif) ||
           (willMatchInput && inputImageType == ImageType::HEIF)) {
           // Write HEIF to file
