@@ -1320,7 +1320,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->heifQuality = sharp::AttrAsUint32(options, "heifQuality");
   baton->heifLossless = sharp::AttrAsBool(options, "heifLossless");
   baton->heifCompression = static_cast<VipsForeignHeifCompression>(
-  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
+    vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
     sharp::AttrAsStr(options, "heifCompression").data()));
   // Tile output
   baton->tileSize = sharp::AttrAsUint32(options, "tileSize");

@@ -2,7 +2,7 @@
 
 ## v0.25 - *yield*
 
-Requires libvips TBD
+Requires libvips v8.9.1
 
 ### v0.25.0 - TBD
 
