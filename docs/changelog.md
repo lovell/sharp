@@ -11,6 +11,9 @@ Requires libvips v8.9.1
 * Migrate internals to N-API.
   [#1282](https://github.com/lovell/sharp/issues/1282)
 
+* Add support for 32-bit Windows.
+  [#2088](https://github.com/lovell/sharp/issues/2088)
+
 ## v0.24 - "*wit*"
 
 Requires libvips v8.9.0.

@@ -1,15 +1,22 @@
 os: Visual Studio 2017
 version: "{build}"
 build: off
-platform: x64
 environment:
   matrix:
   - nodejs_version: "10"
+    platform: x86
+  - nodejs_version: "10"
+    platform: x64
   - nodejs_version: "12"
+    platform: x86
+  - nodejs_version: "12"
+    platform: x64
   - nodejs_version: "13"
+    platform: x86
+  - nodejs_version: "13"
+    platform: x64
 install:
-  - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) x64
-  - npm install -g npm@6
+  - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) $env:platform
   - npm install
 test_script:
   - npm test

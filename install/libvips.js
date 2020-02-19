@@ -57,10 +57,7 @@ try {
     // Is this arch/platform supported?
     const arch = process.env.npm_config_arch || process.arch;
     const platformAndArch = platform();
-    if (platformAndArch === 'win32-ia32') {
-      throw new Error('Windows x86 (32-bit) node.exe is not supported');
-    }
-    if (arch === 'ia32') {
+    if (arch === 'ia32' && !platformAndArch.startsWith('win32')) {
       throw new Error(`Intel Architecture 32-bit systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
     if (platformAndArch === 'freebsd-x64' || platformAndArch === 'openbsd-x64' || platformAndArch === 'sunos-x64') {

@@ -19,7 +19,7 @@ Node.js v10.16.0+ (N-API v4) on the most common platforms:
 
 * macOS x64 (>= 10.13)
 * Linux x64 (glibc >= 2.17, musl >= 1.1.24)
-* Windows x64 with 64-bit `node.exe`
+* Windows
 
 A ~10MB tarball containing libvips and its most commonly used dependencies
 is downloaded via HTTPS and stored within `node_modules/sharp/vendor` during `npm install`.
