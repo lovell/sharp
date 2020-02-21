@@ -1,5 +1,5 @@
 {
-  "name": "sharp",
+  "name": "@edsilv/sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
   "version": "0.24.1",
   "author": "Lovell Fuller <npm@lovell.info>",
@@ -135,7 +135,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.9.0"
+    "libvips": "8.9.1"
   },
   "engines": {
     "node": ">=10.13.0"
