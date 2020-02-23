@@ -14,6 +14,9 @@ Requires libvips v8.9.1
 * Add support for 32-bit Windows.
   [#2088](https://github.com/lovell/sharp/issues/2088)
 
+* Ensure correct ordering of rotate-then-trim operations.
+  [#2087](https://github.com/lovell/sharp/issues/2087)
+
 ## v0.24 - "*wit*"
 
 Requires libvips v8.9.0.
