@@ -1,5 +1,5 @@
 {
-  "name": "@edsilv/sharp",
+  "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
   "version": "0.25.1",
   "author": "Lovell Fuller <npm@lovell.info>",
