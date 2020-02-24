@@ -17,6 +17,9 @@ Requires libvips v8.9.1
 * Ensure correct ordering of rotate-then-trim operations.
   [#2087](https://github.com/lovell/sharp/issues/2087)
 
+* Ensure composite accepts `limitInputPixels` and `sequentialRead` input options.
+  [#2099](https://github.com/lovell/sharp/issues/2099)
+
 ## v0.24 - "*wit*"
 
 Requires libvips v8.9.0.
