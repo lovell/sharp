@@ -65,6 +65,62 @@ The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
 Returns **Sharp** 
 
+## affine
+
+Perform an affine transform on an image. This operation will always occur after resizing, extraction and rotation, if any.
+
+You must provide a 2x2 affine transformation matrix.
+By default, new pixels are filled with a black background. You can provide a background color with the `background` option.
+A particular interpolator may also be specified. Set the `interpolator` option to an attribute of the `sharp.interpolator` Object e.g. `sharp.interpolator.nohalo`.
+
+The transform is:
+
+-   X = `matrix[0, 0]` \* (x + `idx`) + `matrix[0, 1]` \* (y + `idy`) + `odx`
+-   Y = `matrix[1, 0]` \* (x + `idx`) + `matrix[1, 1]` \* (y + `idy`) + `ody`
+
+where:
+
+-   x and y are the coordinates in input image.
+-   X and Y are the coordinates in output image.
+-   (0,0) is the upper left corner.
+
+### Parameters
+
+-   `matrix` **[Array][7]&lt;[Array][7]&lt;[number][1]>>** 2x2 affine transformation matrix
+-   `options` **[Object][2]?** if present, is an Object with optional attributes.
+    -   `options.background` **([String][3] \| [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
+    -   `options.idx` **[Number][1]** input horizontal offset (optional, default `0`)
+    -   `options.idy` **[Number][1]** input vertical offset (optional, default `0`)
+    -   `options.odx` **[Number][1]** output horizontal offset (optional, default `0`)
+    -   `options.ody` **[Number][1]** output vertical offset (optional, default `0`)
+    -   `options.interpolator` **[String][3]** interpolator (optional, default `sharp.interpolators.bicubic`)
+
+### Examples
+
+```javascript
+const pipeline = sharp()
+  .affine([[1, 0.3], [0.1, 0.7]], {
+     background: 'white',
+     interpolate: sharp.interpolators.nohalo
+  })
+  .toBuffer((err, outputBuffer, info) => {
+     // outputBuffer contains the transformed image
+     // info.width and info.height contain the new dimensions
+  });
+
+inputStream
+  .pipe(pipeline)
+  .pipe(outputStream);
+```
+
+-   Throws **[Error][5]** Invalid parameters
+
+Returns **Sharp** 
+
+**Meta**
+
+-   **since**: TBD
+
 ## sharpen
 
 Sharpen the image.

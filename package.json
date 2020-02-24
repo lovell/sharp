@@ -67,7 +67,8 @@
     "Brendan Kennedy <brenwken@gmail.com>",
     "Brychan Bennett-Odlum <git@brychan.io>",
     "Edward Silverton <e.silverton@gmail.com>",
-    "Roman Malieiev <aromaleev@gmail.com>"
+    "Roman Malieiev <aromaleev@gmail.com>",
+    "Guillermo Alfonso Varela Chouciño <guillevch@gmail.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
