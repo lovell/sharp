@@ -92,7 +92,7 @@ namespace sharp {
   double AttrAsDouble(Napi::Object obj, std::string attr);
   double AttrAsDouble(Napi::Object obj, unsigned int const attr);
   bool AttrAsBool(Napi::Object obj, std::string attr);
-  std::vector<double> AttrAsRgba(Napi::Object obj, std::string attr);
+  std::vector<double> AttrAsVectorOfDouble(Napi::Object obj, std::string attr);
   std::vector<int32_t> AttrAsInt32Vector(Napi::Object obj, std::string attr);
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image

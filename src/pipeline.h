@@ -118,6 +118,14 @@ struct PipelineBaton {
   int extendRight;
   std::vector<double> extendBackground;
   bool withoutEnlargement;
+  bool affine;
+  std::vector<double> affineMatrix;
+  std::vector<double> affineBackground;
+  double affineIdx;
+  double affineIdy;
+  double affineOdx;
+  double affineOdy;
+  vips::VInterpolate affineInterpolator;
   int jpegQuality;
   bool jpegProgressive;
   std::string jpegChromaSubsampling;
@@ -230,6 +238,14 @@ struct PipelineBaton {
     extendRight(0),
     extendBackground{ 0.0, 0.0, 0.0, 255.0 },
     withoutEnlargement(false),
+    affine(false),
+    affineMatrix{ 1.0, 0.0, 0.0, 1.0 },
+    affineBackground{ 0.0, 0.0, 0.0, 255.0 },
+    affineIdx(0),
+    affineIdy(0),
+    affineOdx(0),
+    affineOdy(0),
+    affineInterpolator(vips::VInterpolate::new_from_name("bicubic")),
     jpegQuality(80),
     jpegProgressive(false),
     jpegChromaSubsampling("4:2:0"),

@@ -69,7 +69,8 @@
     "Edward Silverton <e.silverton@gmail.com>",
     "Roman Malieiev <aromaleev@gmail.com>",
     "Tomas Szabo <tomas.szabo@deftomat.com>",
-    "Robert O'Rourke <robert@o-rourke.org>"
+    "Robert O'Rourke <robert@o-rourke.org>",
+    "Guillermo Alfonso Varela Chouciño <guillevch@gmail.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",

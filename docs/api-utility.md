@@ -12,6 +12,36 @@ console.log(sharp.format);
 
 Returns **[Object][1]** 
 
+## interpolators
+
+An Object containing the available interpolators and their proper values
+
+Type: [string][2]
+
+### nearest
+
+[Nearest neighbour interpolation][3]. Suitable for image enlargement only.
+
+### bilinear
+
+[Bilinear interpolation][4]. Faster than bicubic but with less smooth results.
+
+### bicubic
+
+[Bicubic interpolation][5] (the default).
+
+### locallyBoundedBicubic
+
+[LBB interpolation][6]. Prevents some "[acutance][7]" but typically reduces performance by a factor of 2.
+
+### nohalo
+
+[Nohalo interpolation][8]. Prevents acutance but typically reduces performance by a factor of 3.
+
+### vertexSplitQuadraticBasisSpline
+
+[VSQBS interpolation][9]. Prevents "staircasing" when enlarging.
+
 ## versions
 
 An Object containing the version numbers of libvips and its dependencies.
@@ -31,10 +61,10 @@ useful for determining how much working memory is required for a particular task
 
 ### Parameters
 
--   `options` **([Object][1] \| [boolean][2])** Object with the following attributes, or boolean where true uses default cache settings and false removes all caching (optional, default `true`)
-    -   `options.memory` **[number][3]** is the maximum memory in MB to use for this cache (optional, default `50`)
-    -   `options.files` **[number][3]** is the maximum number of files to hold open (optional, default `20`)
-    -   `options.items` **[number][3]** is the maximum number of operations to cache (optional, default `100`)
+-   `options` **([Object][1] \| [boolean][10])** Object with the following attributes, or boolean where true uses default cache settings and false removes all caching (optional, default `true`)
+    -   `options.memory` **[number][11]** is the maximum memory in MB to use for this cache (optional, default `50`)
+    -   `options.files` **[number][11]** is the maximum number of files to hold open (optional, default `20`)
+    -   `options.items` **[number][11]** is the maximum number of operations to cache (optional, default `100`)
 
 ### Examples
 
@@ -64,7 +94,7 @@ This method always returns the current concurrency.
 
 ### Parameters
 
--   `concurrency` **[number][3]?** 
+-   `concurrency` **[number][11]?** 
 
 ### Examples
 
@@ -74,7 +104,7 @@ sharp.concurrency(2); // 2
 sharp.concurrency(0); // 4
 ```
 
-Returns **[number][3]** concurrency
+Returns **[number][11]** concurrency
 
 ## queue
 
@@ -116,7 +146,7 @@ by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM N
 
 ### Parameters
 
--   `simd` **[boolean][2]**  (optional, default `true`)
+-   `simd` **[boolean][10]**  (optional, default `true`)
 
 ### Examples
 
@@ -130,10 +160,26 @@ const simd = sharp.simd(false);
 // prevent libvips from using liborc at runtime
 ```
 
-Returns **[boolean][2]** 
+Returns **[boolean][10]** 
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[3]: http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation
+
+[4]: http://en.wikipedia.org/wiki/Bilinear_interpolation
+
+[5]: http://en.wikipedia.org/wiki/Bicubic_interpolation
+
+[6]: https://github.com/jcupitt/libvips/blob/master/libvips/resample/lbb.cpp#L100
+
+[7]: http://en.wikipedia.org/wiki/Acutance
+
+[8]: http://eprints.soton.ac.uk/268086/
+
+[9]: https://github.com/jcupitt/libvips/blob/master/libvips/resample/vsqbs.cpp#L48
+
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
