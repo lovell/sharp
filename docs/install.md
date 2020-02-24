@@ -129,24 +129,24 @@ to `false` when using the `yarn` package manager.
 
 ## AWS Lambda
 
-Set the Lambda runtime to `nodejs10.x`.
+Set the Lambda runtime to `nodejs12.x`.
 
 The binaries in the `node_modules` directory of the
-[deployment package](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html)
+[deployment package](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-package.html)
 must be for the Linux x64 platform.
 
 On machines other than Linux x64, such as macOS and Windows, run the following:
 
 ```sh
 rm -rf node_modules/sharp
-npm install --arch=x64 --platform=linux --target=10.15.0 sharp
+npm install --arch=x64 --platform=linux --target=12.0.0 sharp
 ```
 
 Alternatively a Docker container closely matching the Lambda runtime can be used:
 
 ```sh
 rm -rf node_modules/sharp
-docker run -v "$PWD":/var/task lambci/lambda:build-nodejs10.x npm install sharp
+docker run -v "$PWD":/var/task lambci/lambda:build-nodejs12.x npm install sharp
 ```
 
 To get the best performance select the largest memory available.
