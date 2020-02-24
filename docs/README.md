@@ -19,8 +19,6 @@ rotation, extraction, compositing and gamma correction are available.
 Most modern macOS, Windows and Linux systems running Node.js v10.16.0+
 do not require any additional install or runtime dependencies.
 
-[![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.png?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
-
 ### Formats
 
 This module supports reading JPEG, PNG, WebP, TIFF, GIF and SVG images.
@@ -65,73 +63,6 @@ as [pngcrush](https://pmt.sourceforge.io/pngcrush/).
 
 A [guide for contributors](https://github.com/lovell/sharp/blob/master/.github/CONTRIBUTING.md)
 covers reporting bugs, requesting features and submitting code changes.
-
-### Credits
-
-This module would never have been possible without
-the help and code contributions of the following people:
-
-* [John Cupitt](https://github.com/jcupitt)
-* [Pierre Inglebert](https://github.com/pierreinglebert)
-* [Jonathan Ong](https://github.com/jonathanong)
-* [Chanon Sajjamanochai](https://github.com/chanon)
-* [Juliano Julio](https://github.com/julianojulio)
-* [Daniel Gasienica](https://github.com/gasi)
-* [Julian Walker](https://github.com/julianwa)
-* [Amit Pitaru](https://github.com/apitaru)
-* [Brandon Aaron](https://github.com/brandonaaron)
-* [Andreas Lind](https://github.com/papandreou)
-* [Maurus Cuelenaere](https://github.com/mcuelenaere)
-* [Linus Unnebäck](https://github.com/LinusU)
-* [Victor Mateevitsi](https://github.com/mvictoras)
-* [Alaric Holloway](https://github.com/skedastik)
-* [Bernhard K. Weisshuhn](https://github.com/bkw)
-* [David A. Carley](https://github.com/dacarley)
-* [John Tobin](https://github.com/jtobinisaniceguy)
-* [Kenton Gray](https://github.com/kentongray)
-* [Felix Bünemann](https://github.com/felixbuenemann)
-* [Samy Al Zahrani](https://github.com/salzhrani)
-* [Chintan Thakkar](https://github.com/lemnisk8)
-* [F. Orlando Galashan](https://github.com/frulo)
-* [Kleis Auke Wolthuizen](https://github.com/kleisauke)
-* [Matt Hirsch](https://github.com/mhirsch)
-* [Rahul Nanwani](https://github.com/rnanwani)
-* [Matthias Thoemmes](https://github.com/cmtt)
-* [Patrick Paskaris](https://github.com/ppaskaris)
-* [Jérémy Lal](https://github.com/kapouer)
-* [Alice Monday](https://github.com/alice0meta)
-* [Kristo Jorgenson](https://github.com/kristojorg)
-* [Yves Bos](https://github.com/YvesBos)
-* [Nicolas Coden](https://github.com/ncoden)
-* [Matt Parrish](https://github.com/pbomb)
-* [Matthew McEachen](https://github.com/mceachen)
-* [Jarda Kotěšovec](https://github.com/jardakotesovec)
-* [Kenric D'Souza](https://github.com/AzureByte)
-* [Oleh Aleinyk](https://github.com/oaleynik)
-* [Marcel Bretschneider](https://github.com/3epnm)
-* [Andrea Bianco](https://github.com/BiancoA)
-* [Rik Heywood](https://github.com/rikh42)
-* [Thomas Parisot](https://github.com/oncletom)
-* [Nathan Graves](https://github.com/woolite64)
-* [Tom Lokhorst](https://github.com/tomlokhorst)
-* [Espen Hovlandsdal](https://github.com/rexxars)
-* [Sylvain Dumont](https://github.com/sylvaindumont)
-* [Alun Davies](https://github.com/alundavies)
-* [Aidan Hoolachan](https://github.com/ajhool)
-* [Axel Eirola](https://github.com/aeirola)
-* [Freezy](https://github.com/freezy)
-* [Julian Aubourg](https://github.com/jaubourg)
-* [Keith Belovay](https://github.com/fromkeith)
-* [Michael B. Klein](https://github.com/mbklein)
-* [Jakub Michálek](https://github.com/Goues)
-* [Ilya Ovdin](https://github.com/iovdin)
-* [Andargor](https://github.com/Andargor)
-* [Nicolas Stepien](https://github.com/MayhemYDG)
-* [Paul Neave](https://github.com/neave)
-* [Brendan Kennedy](https://github.com/rustyguts)
-* [Brychan Bennett-Odlum](https://github.com/BrychanOdlum)
-
-Thank you!
 
 ### Licensing
 

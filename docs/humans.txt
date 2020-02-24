@@ -1,0 +1,178 @@
+/* THANKS */
+
+Name: John Cupitt
+GitHub: https://github.com/jcupitt
+
+Name: Pierre Inglebert
+GitHub: https://github.com/pierreinglebert
+
+Name: Jonathan Ong
+GitHub: https://github.com/jonathanong
+
+Name: Chanon Sajjamanochai
+GitHub: https://github.com/chanon
+
+Name: Juliano Julio
+GitHub: https://github.com/julianojulio
+
+Name: Daniel Gasienica
+GitHub: https://github.com/gasi
+
+Name: Julian Walker
+GitHub: https://github.com/julianwa
+
+Name: Amit Pitaru
+GitHub: https://github.com/apitaru
+
+Name: Brandon Aaron
+GitHub: https://github.com/brandonaaron
+
+Name: Andreas Lind
+GitHub: https://github.com/papandreouGitHub:
+
+Name: Maurus Cuelenaere
+GitHub: https://github.com/mcuelenaere
+
+Name: Linus Unnebäck
+GitHub: https://github.com/LinusU
+
+Name: Victor Mateevitsi
+GitHub: https://github.com/mvictoras
+
+Name: Alaric Holloway
+GitHub: https://github.com/skedastik
+
+Name: Bernhard K. Weisshuhn
+GitHub: https://github.com/bkw
+
+Name: David A. Carley
+GitHub: https://github.com/dacarley
+
+Name: John Tobin
+GitHub: https://github.com/jtobinisaniceguy
+
+Name: Kenton Gray
+GitHub: https://github.com/kentongray
+
+Name: Felix Bünemann
+GitHub: https://github.com/felixbuenemann
+
+Name: Samy Al Zahrani
+GitHub: https://github.com/salzhrani
+
+Name: Chintan Thakkar
+GitHub: https://github.com/lemnisk8
+
+Name: F. Orlando Galashan
+GitHub: https://github.com/frulo
+
+Name: Kleis Auke Wolthuizen
+GitHub: https://github.com/kleisauke
+
+Name: Matt Hirsch
+GitHub: https://github.com/mhirsch
+
+Name: Rahul Nanwani
+GitHub: https://github.com/rnanwani
+
+Name: Matthias Thoemmes
+GitHub: https://github.com/cmtt
+
+Name: Patrick Paskaris
+GitHub: https://github.com/ppaskaris
+
+Name: Jérémy Lal
+GitHub: https://github.com/kapouer
+
+Name: Alice Monday
+GitHub: https://github.com/alice0meta
+
+Name: Kristo Jorgenson
+GitHub: https://github.com/kristojorg
+
+Name: Yves Bos
+GitHub: https://github.com/YvesBos
+
+Name: Nicolas Coden
+GitHub: https://github.com/ncoden
+
+Name: Matt Parrish
+GitHub: https://github.com/pbomb
+
+Name: Matthew McEachen
+GitHub: https://github.com/mceachen
+
+Name: Jarda Kotěšovec
+GitHub: https://github.com/jardakotesovec
+
+Name: Kenric D'Souza
+GitHub: https://github.com/AzureByte
+
+Name: Oleh Aleinyk
+GitHub: https://github.com/oaleynik
+
+Name: Marcel Bretschneider
+GitHub: https://github.com/3epnm
+
+Name: Andrea Bianco
+GitHub: https://github.com/BiancoA
+
+Name: Rik Heywood
+GitHub: https://github.com/rikh42
+
+Name: Thomas Parisot
+GitHub: https://github.com/oncletom
+
+Name: Nathan Graves
+GitHub: https://github.com/woolite64
+
+Name: Tom Lokhorst
+GitHub: https://github.com/tomlokhorst
+
+Name: Espen Hovlandsdal
+GitHub: https://github.com/rexxars
+
+Name: Sylvain Dumont
+GitHub: https://github.com/sylvaindumont
+
+Name: Alun Davies
+GitHub: https://github.com/alundavies
+
+Name: Aidan Hoolachan
+GitHub: https://github.com/ajhool
+
+Name: Axel Eirola
+GitHub: https://github.com/aeirola
+
+Name: Freezy
+GitHub: https://github.com/freezy
+
+Name: Julian Aubourg
+GitHub: https://github.com/jaubourg
+
+Name: Keith Belovay
+GitHub: https://github.com/fromkeith
+
+Name: Michael B. Klein
+GitHub: https://github.com/mbklein
+
+Name: Jakub Michálek
+GitHub: https://github.com/Goues
+
+Name: Ilya Ovdin
+GitHub: https://github.com/iovdin
+
+Name: Andargor
+GitHub: https://github.com/Andargor
+
+Name: Nicolas Stepien
+GitHub: https://github.com/MayhemYDG
+
+Name: Paul Neave
+GitHub: https://github.com/neave
+
+Name: Brendan Kennedy
+GitHub: https://github.com/rustyguts
+
+Name: Brychan Bennett-Odlum
+GitHub: https://github.com/BrychanOdlum
