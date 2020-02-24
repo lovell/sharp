@@ -68,7 +68,7 @@ A `Promise` is returned when `callback` is not provided.
     -   `minY` (y-coordinate of one of the pixel where the minimum lies)
     -   `maxX` (x-coordinate of one of the pixel where the maximum lies)
     -   `maxY` (y-coordinate of one of the pixel where the maximum lies)
--   `isOpaque`: Value to identify if the image is opaque or transparent, based on the presence and use of alpha channel
+-   `isOpaque`: Is the image fully opaque? Will be `true` if the image has no alpha channel or if every pixel is fully opaque.
 -   `entropy`: Histogram-based estimation of greyscale entropy, discarding alpha channel if any (experimental)
 
 ### Parameters
