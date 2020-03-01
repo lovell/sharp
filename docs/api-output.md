@@ -296,7 +296,9 @@ Returns **Sharp**
 
 ## raw
 
-Force output to be raw, uncompressed uint8 pixel data.
+Force output to be raw, uncompressed, 8-bit unsigned integer (unit8) pixel data.
+Pixel ordering is left-to-right, top-to-bottom, without padding.
+Channel ordering will be RGB or RGBA for non-greyscale colourspaces.
 
 ### Examples
 
@@ -305,6 +307,16 @@ Force output to be raw, uncompressed uint8 pixel data.
 const { data, info } = await sharp('input.jpg')
   .raw()
   .toBuffer({ resolveWithObject: true });
+```
+
+```javascript
+// Extract alpha channel as raw pixel data from PNG input
+const data = await sharp('input.png')
+  .ensureAlpha()
+  .extractChannel(3)
+  .colourspace('b-w')
+  .raw()
+  .toBuffer();
 ```
 
 Returns **Sharp** 

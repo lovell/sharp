@@ -168,5 +168,19 @@ describe('Raw pixel data', function () {
           done();
         });
     });
+
+    it('extract A from RGBA', () =>
+      sharp(fixtures.inputPngWithTransparency)
+        .resize(32, 24)
+        .extractChannel(3)
+        .toColourspace('b-w')
+        .raw()
+        .toBuffer({ resolveWithObject: true })
+        .then(({ info }) => {
+          assert.strictEqual('raw', info.format);
+          assert.strictEqual(1, info.channels);
+          assert.strictEqual(32 * 24, info.size);
+        })
+    );
   });
 });

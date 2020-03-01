@@ -49,9 +49,10 @@ Extract a single channel from a multi-channel image.
 ```javascript
 sharp(input)
   .extractChannel('green')
-  .toFile('input_green.jpg', function(err, info) {
+  .toColourspace('b-w')
+  .toFile('green.jpg', function(err, info) {
     // info.channels === 1
-    // input_green.jpg contains the green channel of the input image
+    // green.jpg is a greyscale image containing the green channel of the input
    });
 ```
 
