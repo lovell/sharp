@@ -86,7 +86,23 @@ Building from source requires:
 
 This is an advanced approach that most people will not require.
 
-To install the prebuilt libvips binaries from a custom URL,
+To install the prebuilt libvips binaries from a GitHub releases mirror,
+set the `sharp_libvips_binary_host` npm config option
+or the `SHARP_LIBVIPS_BINARY_HOST` environment variable.
+
+For example, both of the following will result in an attempt to download the file located at
+`https://hostname/path/vx.y.z/libvips-x.y.z-platform.tar.gz`
+
+```sh
+npm config set sharp_libvips_binary_host "https://hostname/path"
+npm install sharp
+```
+
+```sh
+SHARP_LIBVIPS_BINARY_HOST="https://hostname/path" npm install sharp
+```
+
+To install the prebuilt libvips binaries from another custom URL,
 set the `sharp_dist_base_url` npm config option
 or the `SHARP_DIST_BASE_URL` environment variable.
 

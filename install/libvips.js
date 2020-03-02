@@ -15,7 +15,11 @@ const libvips = require('../lib/libvips');
 const platform = require('../lib/platform');
 
 const minimumLibvipsVersion = libvips.minimumLibvipsVersion;
-const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SHARP_DIST_BASE_URL || `https://github.com/lovell/sharp-libvips/releases/download/v${minimumLibvipsVersion}/`;
+const distBaseUrl = (process.env.npm_config_sharp_libvips_binary_host ? `${process.env.npm_config_sharp_libvips_binary_host}/v${minimumLibvipsVersion}/` : '') ||
+                    (process.env.SHARP_LIBVIPS_BINARY_HOST ? `${process.env.SHARP_LIBVIPS_BINARY_HOST}/v${minimumLibvipsVersion}/` : '') ||
+                    process.env.npm_config_sharp_dist_base_url ||
+                    process.env.SHARP_DIST_BASE_URL ||
+                    `https://github.com/lovell/sharp-libvips/releases/download/v${minimumLibvipsVersion}/`;
 
 const fail = function (err) {
   npmLog.error('sharp', err.message);
