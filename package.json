@@ -118,15 +118,15 @@
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
-    "async": "^3.1.1",
+    "async": "^3.2.0",
     "cc": "^2.0.1",
     "decompress-zip": "^0.3.2",
     "documentation": "^12.1.4",
     "exif-reader": "^1.0.3",
     "icc": "^1.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^7.0.1",
-    "mock-fs": "^4.10.4",
+    "mocha": "^7.1.0",
+    "mock-fs": "^4.11.0",
     "nyc": "^15.0.0",
     "prebuild": "^10.0.0",
     "prebuild-ci": "^3.1.0",
@@ -135,7 +135,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.9.1-alpha1"
+    "libvips": "8.9.1-alpha2"
   },
   "engines": {
     "node": ">=10.16.0"

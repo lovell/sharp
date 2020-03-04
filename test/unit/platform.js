@@ -43,7 +43,10 @@ describe('Platform-detection', function () {
 
   it('Defaults to ARMv6 for 32-bit', function () {
     process.env.npm_config_arch = 'arm';
+    const armVersion = process.config.variables.arm_version;
+    delete process.config.variables.arm_version;
     assert.strictEqual('armv6', platform().split('-')[1]);
+    process.config.variables.arm_version = armVersion;
     delete process.env.npm_config_arch;
   });
 

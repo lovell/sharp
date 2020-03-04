@@ -193,6 +193,11 @@
               '-Wno-cast-function-type'
             ]
           }],
+          ['target_arch == "arm"', {
+            'cflags_cc': [
+              '-Wno-psabi'
+            ]
+          }],
           ['OS == "win"', {
             'msvs_settings': {
               'VCCLCompilerTool': {

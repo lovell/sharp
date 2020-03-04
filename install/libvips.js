@@ -14,6 +14,12 @@ const agent = require('../lib/agent');
 const libvips = require('../lib/libvips');
 const platform = require('../lib/platform');
 
+const minimumGlibcVersionByArch = {
+  arm: '2.28',
+  arm64: '2.29',
+  x64: '2.17'
+};
+
 const { minimumLibvipsVersion, minimumLibvipsVersionLabelled } = libvips;
 const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SHARP_DIST_BASE_URL || `https://github.com/lovell/sharp-libvips/releases/download/v${minimumLibvipsVersionLabelled}/`;
 
@@ -64,8 +70,7 @@ try {
       throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
     if (detectLibc.family === detectLibc.GLIBC && detectLibc.version) {
-      const minimumGlibcVersion = arch === 'arm64' ? '2.29.0' : '2.17.0';
-      if (semver.lt(`${detectLibc.version}.0`, minimumGlibcVersion)) {
+      if (semver.lt(`${detectLibc.version}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
         throw new Error(`Use with glibc ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
       }
     }
