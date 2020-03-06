@@ -30,7 +30,7 @@ JPEG, PNG, WebP, TIFF, GIF (input) and SVG (input) image formats.
 The following platforms have prebuilt libvips but not sharp:
 
 * Linux ARMv6
-* Linux ARMv7
+* Linux ARMv7 (glibc >= 2.28)
 * Linux ARM64 (glibc >= 2.29)
 
 The following platforms require compilation of both libvips and sharp from source:
@@ -42,15 +42,10 @@ The following platforms require compilation of both libvips and sharp from sourc
 * FreeBSD
 * OpenBSD
 
-The following platforms are completely unsupported:
-
-* Windows x86
-* Windows x64 with 32-bit `node.exe`
-
 ## Common problems
 
-The platform and major version of Node.js used for `npm install`
-must be the same as the platform and major version of Node.js used at runtime.
+The architecture and platform of Node.js used for `npm install`
+must be the same as the architecture and platform of Node.js used at runtime.
 
 The `npm install --unsafe-perm` flag must be used when installing as `root` or a `sudo` user.
 
@@ -79,8 +74,8 @@ This module will be compiled from source at `npm install` time when:
 
 Building from source requires:
 
-* C++11 compatible compiler such as gcc 4.8+, clang 3.0+ or MSVC 2013+
-* [node-gyp](https://github.com/nodejs/node-gyp#installation) and its dependencies (includes Python 2.7)
+* C++11 compiler
+* [node-gyp](https://github.com/nodejs/node-gyp#installation) and its dependencies
 
 ## Custom prebuilt binaries
 
