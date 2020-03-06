@@ -1,9 +1,7 @@
 ---
 name: Installation
 about: Something went wrong **installing** sharp
-title: ''
 labels: installation
-assignees: ''
 
 ---
 
@@ -11,10 +9,12 @@ Did you see the [documentation relating to installation](https://sharp.pixelplum
 
 Have you ensured the platform and version of Node.js used for `npm install` is the same as the platform and version of Node.js used at runtime?
 
+Are you using the latest version? Is the version currently in use as reported by `npm ls sharp` the same as the latest version as reported by `npm view sharp dist-tags.latest`?
+
 If you are installing as a `root` or `sudo` user, have you tried with the `npm install --unsafe-perm` flag?
 
 If you are using the `ignore-scripts` feature of `npm`, have you tried with the `npm install --ignore-scripts=false` flag?
 
 What is the complete output of running `npm install --verbose sharp`? Have you checked this output for useful error messages?
 
-What is the output of running `npx envinfo --binaries --languages --system --utilities`?
+What is the output of running `npx envinfo --binaries --system`?
