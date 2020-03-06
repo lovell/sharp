@@ -1328,32 +1328,16 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->tileAngle = sharp::AttrAsInt32(options, "tileAngle");
   baton->tileBackground = sharp::AttrAsRgba(options, "tileBackground");
   baton->tileSkipBlanks = sharp::AttrAsInt32(options, "tileSkipBlanks");
-  std::string tileContainer = sharp::AttrAsStr(options, "tileContainer");
-  if (tileContainer == "zip") {
-    baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
-  } else {
-    baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_FS;
-  }
-  std::string tileLayout = sharp::AttrAsStr(options, "tileLayout");
-  if (tileLayout == "google") {
-    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_GOOGLE;
-  } else if (tileLayout == "zoomify") {
-    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY;
-  } else {
-    baton->tileLayout = VIPS_FOREIGN_DZ_LAYOUT_DZ;
-  }
+  baton->tileContainer = static_cast<VipsForeignDzContainer>(
+    vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_DZ_CONTAINER,
+    sharp::AttrAsStr(options, "tileContainer").data()));
+  baton->tileLayout = static_cast<VipsForeignDzLayout>(
+    vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_DZ_LAYOUT,
+    sharp::AttrAsStr(options, "tileLayout").data()));
   baton->tileFormat = sharp::AttrAsStr(options, "tileFormat");
-  std::string tileDepth = sharp::AttrAsStr(options, "tileDepth");
-  if (tileDepth == "onetile") {
-    baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_ONETILE;
-  } else if (tileDepth == "one") {
-    baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_ONE;
-  } else if (tileDepth == "onepixel") {
-    baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_ONEPIXEL;
-  } else {
-    // signal that we do not want to pass any value to dzSave
-    baton->tileDepth = VIPS_FOREIGN_DZ_DEPTH_LAST;
-  }
+  baton->tileDepth = static_cast<VipsForeignDzDepth>(
+    vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_DZ_DEPTH,
+    sharp::AttrAsStr(options, "tileDepth").data()));
 
   // Force random access for certain operations
   if (baton->input->access == VIPS_ACCESS_SEQUENTIAL) {
