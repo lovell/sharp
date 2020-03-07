@@ -6,7 +6,7 @@ Requires libvips v8.9.1
 
 ### v0.25.1 - 7th March 2020
 
-* Ensure prebuilt binaries use N-API v4.
+* Ensure prebuilt binaries are fetched based on N-API version.
   [#2117](https://github.com/lovell/sharp/issues/2117)
 
 ### v0.25.0 - 7th March 2020

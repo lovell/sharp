@@ -48,7 +48,7 @@
   }, {
     'target_name': 'sharp',
     'defines': [
-      'NAPI_VERSION=4'
+      'NAPI_VERSION=3'
     ],
     'dependencies': [
       '<!(node -p "require(\'node-addon-api\').gyp")',

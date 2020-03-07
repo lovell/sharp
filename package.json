@@ -1,7 +1,7 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
-  "version": "0.25.1",
+  "version": "0.25.1-beta",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://github.com/lovell/sharp",
   "contributors": [
@@ -68,7 +68,7 @@
     "Brychan Bennett-Odlum <git@brychan.io>"
   ],
   "scripts": {
-    "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
+    "install": "(node install/libvips && node install/dll-copy && prebuild-install --runtime=napi) || (node-gyp rebuild && node install/dll-copy)",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "semistandard && cpplint && npm run test-unit && npm run test-licensing && prebuild-ci",
     "test-unit": "nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
@@ -138,14 +138,14 @@
     "libvips": "8.9.1"
   },
   "engines": {
-    "node": ">=10.16.0"
+    "node": ">=10"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"
   },
   "binary": {
     "napi_versions": [
-      4
+      3
     ]
   },
   "semistandard": {
