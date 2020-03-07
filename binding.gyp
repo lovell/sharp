@@ -47,6 +47,9 @@
     ]
   }, {
     'target_name': 'sharp',
+    'defines': [
+      'NAPI_VERSION=4'
+    ],
     'dependencies': [
       '<!(node -p "require(\'node-addon-api\').gyp")',
       'libvips-cpp'
