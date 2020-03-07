@@ -44,7 +44,6 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.25.0 | yield      |
 | v0.26.0 | zoom       |
 
 Please squash your changes into a single commit using a command like `git rebase -i upstream/<wip-branch>`.

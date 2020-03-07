@@ -4,7 +4,7 @@
 
 Requires libvips v8.9.1
 
-### v0.25.0 - TBD
+### v0.25.0 - 7th March 2020
 
 * Remove `limitInputPixels` and `sequentialRead` previously deprecated in v0.24.0.
 
