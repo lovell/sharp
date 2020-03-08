@@ -91,6 +91,40 @@ const assertGoogleTiles = function (directory, expectedTileSize, expectedLevels,
   });
 };
 
+// const assertIIIFTiles = function (directory, expectedSize, expectedLevels, done) {
+//   // Get levels
+//   const levels = fs.readdirSync(directory);
+//   assert.strictEqual(expectedLevels, levels.length);
+//   // Get tiles
+//   const tiles = [];
+//   levels.forEach(function (level) {
+//     // Verify level directory name
+//     assert.strictEqual(true, /^[0-9]+$/.test(level));
+//     fs.readdirSync(path.join(directory, level)).forEach(function (tile) {
+//       // Verify tile file name
+//       assert.strictEqual(true, /^[0-9]+_[0-9]+\.jpeg$/.test(tile));
+//       tiles.push(path.join(directory, level, tile));
+//     });
+//   });
+//   // Verify each tile is <= expectedSize
+//   eachLimit(tiles, 8, function (tile, done) {
+//     sharp(tile).metadata(function (err, metadata) {
+//       if (err) {
+//         done(err);
+//       } else {
+//         assert.strictEqual('jpeg', metadata.format);
+//         assert.strictEqual('srgb', metadata.space);
+//         assert.strictEqual(3, metadata.channels);
+//         assert.strictEqual(false, metadata.hasProfile);
+//         assert.strictEqual(false, metadata.hasAlpha);
+//         assert.strictEqual(true, metadata.width <= expectedSize);
+//         assert.strictEqual(true, metadata.height <= expectedSize);
+//         done();
+//       }
+//     });
+//   }, done);
+// };
+
 // Verifies tiles at specified level in a given output directory are > size+overlap
 const assertTileOverlap = function (directory, tileSize, done) {
   // Get sorted levels
@@ -761,6 +795,30 @@ describe('Tile', function () {
           assert.strictEqual('number', typeof info.size);
 
           assertGoogleTiles(directory, 256, 5, done);
+        });
+    });
+  });
+
+  it('IIIF layout', function (done) {
+    const directory = fixtures.path('output.iiif.info');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          layout: 'iiif'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          // assert.strictEqual('dz', info.format);
+          // assert.strictEqual(2725, info.width);
+          // assert.strictEqual(2225, info.height);
+          // assert.strictEqual(3, info.channels);
+          // assert.strictEqual('number', typeof info.size);
+          // fs.stat(path.join(directory, '0', '0', '0.jpg'), function (err, stat) {
+          //   if (err) throw err;
+          //   assert.strictEqual(true, stat.isFile());
+          //   assert.strictEqual(true, stat.size > 0);
+          //   done();
+          // });
         });
     });
   });
