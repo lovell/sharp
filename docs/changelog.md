@@ -4,6 +4,11 @@
 
 Requires libvips v8.9.1
 
+### v0.25.2 - TBD
+
+* Ensure input options are consistently and correctly detected.
+  [#2118](https://github.com/lovell/sharp/issues/2118)
+
 ### v0.25.1 - 7th March 2020
 
 * Ensure prebuilt binaries are fetched based on N-API version.
