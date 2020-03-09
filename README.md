@@ -85,6 +85,7 @@ readableStream
 ```
 
 [![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.svg?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
+![N-API v3 Badge](https://img.shields.io/badge/N--API-v3-green.svg)
 
 ### Documentation
 
