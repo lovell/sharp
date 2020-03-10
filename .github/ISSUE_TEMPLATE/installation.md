@@ -1,6 +1,6 @@
 ---
 name: Installation
-about: Something went wrong **installing** sharp
+about: Something went wrong during either 'npm install sharp' or 'require("sharp")'
 labels: installation
 
 ---
