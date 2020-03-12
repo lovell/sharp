@@ -31,7 +31,8 @@ enum class Canvas {
   EMBED,
   MAX,
   MIN,
-  IGNORE_ASPECT
+  IGNORE_ASPECT,
+  SCALE_DOWN
 };
 
 struct Composite {

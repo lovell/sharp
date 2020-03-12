@@ -275,6 +275,32 @@ describe('Resize dimensions', function () {
       });
   });
 
+  it('fit=scaledown, greater', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 320, { fit: sharp.fit.scaledown })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(261, info.height);
+        done();
+      });
+  });
+
+  it('fit=scaledown, lesser', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(3000, 3000, { fit: sharp.fit.scaledown })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(2725, info.width);
+        assert.strictEqual(2225, info.height);
+        done();
+      });
+  });
+
   it('Do not enlarge when input width is already less than output width', function (done) {
     sharp(fixtures.inputJpg)
       .resize({

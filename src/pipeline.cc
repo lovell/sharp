@@ -178,6 +178,19 @@ class PipelineWorker : public Napi::AsyncWorker {
               std::swap(xfactor, yfactor);
             }
             break;
+          case Canvas::SCALE_DOWN:
+            if (xfactor <= 1.0 && yfactor <= 1.0) {
+              // Identity transform
+              baton->width = inputWidth;
+              baton->height = inputHeight;
+            } else if (xfactor > yfactor) {
+              targetResizeHeight = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
+              yfactor = xfactor;
+            } else {
+              targetResizeWidth = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
+              xfactor = yfactor;
+            }
+            break;
         }
       } else if (baton->width > 0) {
         // Fixed width
@@ -1174,6 +1187,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     baton->canvas = Canvas::MIN;
   } else if (canvas == "ignore_aspect") {
     baton->canvas = Canvas::IGNORE_ASPECT;
+  } else if (canvas == "scale_down") {
+    baton->canvas = Canvas::SCALE_DOWN;
   }
   // Tint chroma
   baton->tintA = sharp::AttrAsDouble(options, "tintA");
