@@ -933,9 +933,6 @@ class PipelineWorker : public Napi::AsyncWorker {
             };
             suffix = AssembleSuffixString(".webp", options);
           } else {
-            std::string extname = baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_GOOGLE
-              || baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_ZOOMIFY
-                ? ".jpg" : ".jpeg";
             std::vector<std::pair<std::string, std::string>> options {
               {"Q", std::to_string(baton->jpegQuality)},
               {"interlace", baton->jpegProgressive ? "TRUE" : "FALSE"},
@@ -946,6 +943,7 @@ class PipelineWorker : public Napi::AsyncWorker {
               {"optimize_scans", baton->jpegOptimiseScans ? "TRUE": "FALSE"},
               {"optimize_coding", baton->jpegOptimiseCoding ? "TRUE": "FALSE"}
             };
+            std::string extname = baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_DZ ? ".jpeg" : ".jpg";
             suffix = AssembleSuffixString(extname, options);
           }
           // Remove alpha channel from tile background if image does not contain an alpha channel

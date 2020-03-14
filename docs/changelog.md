@@ -4,6 +4,16 @@
 
 Requires libvips v8.9.1
 
+### v0.25.2 - TBD
+
+* Provide prebuilt binaries for Linux ARM64v8.
+
+* Ensure input options are consistently and correctly detected.
+  [#2118](https://github.com/lovell/sharp/issues/2118)
+
+* Ensure N-API prebuilt binaries work on RHEL7 and its derivatives.
+  [#2119](https://github.com/lovell/sharp/issues/2119)
+
 ### v0.25.1 - 7th March 2020
 
 * Ensure prebuilt binaries are fetched based on N-API version.

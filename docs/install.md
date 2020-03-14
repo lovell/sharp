@@ -19,6 +19,7 @@ Node.js v10+ on the most common platforms:
 
 * macOS x64 (>= 10.13)
 * Linux x64 (glibc >= 2.17, musl >= 1.1.24)
+* Linux ARM64 (glibc >= 2.29)
 * Windows
 
 A ~10MB tarball containing libvips and its most commonly used dependencies
@@ -31,7 +32,6 @@ The following platforms have prebuilt libvips but not sharp:
 
 * Linux ARMv6
 * Linux ARMv7 (glibc >= 2.28)
-* Linux ARM64 (glibc >= 2.29)
 
 The following platforms require compilation of both libvips and sharp from source:
 

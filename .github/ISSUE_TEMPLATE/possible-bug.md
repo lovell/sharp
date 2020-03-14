@@ -1,6 +1,6 @@
 ---
 name: Possible bug
-about: Something unexpected occurred **using** sharp
+about: Installation of sharp was successful but then something unexpected occurred using one of its features
 labels: triage
 
 ---
