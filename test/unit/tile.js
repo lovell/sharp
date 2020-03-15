@@ -808,6 +808,7 @@ describe('Tile', function () {
         })
         .toFile(directory, function (err, info) {
           if (err) throw err;
+          done();
           // assert.strictEqual('dz', info.format);
           // assert.strictEqual(2725, info.width);
           // assert.strictEqual(2225, info.height);
