@@ -808,18 +808,17 @@ describe('Tile', function () {
         })
         .toFile(directory, function (err, info) {
           if (err) throw err;
-          done();
-          // assert.strictEqual('dz', info.format);
-          // assert.strictEqual(2725, info.width);
-          // assert.strictEqual(2225, info.height);
-          // assert.strictEqual(3, info.channels);
-          // assert.strictEqual('number', typeof info.size);
-          // fs.stat(path.join(directory, '0', '0', '0.jpg'), function (err, stat) {
-          //   if (err) throw err;
-          //   assert.strictEqual(true, stat.isFile());
-          //   assert.strictEqual(true, stat.size > 0);
-          //   done();
-          // });
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          fs.stat(path.join(directory, '0,0,256,256', '256,', '0', 'default.jpg'), function (err, stat) {
+            if (err) throw err;
+            assert.strictEqual(true, stat.isFile());
+            assert.strictEqual(true, stat.size > 0);
+            done();
+          });
         });
     });
   });
