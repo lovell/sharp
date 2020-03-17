@@ -134,7 +134,7 @@ On machines other than Linux x64, such as macOS and Windows, run the following:
 
 ```sh
 rm -rf node_modules/sharp
-npm install --arch=x64 --platform=linux --target=12.0.0 sharp
+npm install --arch=x64 --platform=linux sharp
 ```
 
 Alternatively a Docker container closely matching the Lambda runtime can be used:
