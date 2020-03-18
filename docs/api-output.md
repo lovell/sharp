@@ -339,7 +339,7 @@ Warning: multiple sharp instances concurrently producing tile output can expose 
     -   `options.depth` **[String][2]?** how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout.
     -   `options.skipBlanks` **[Number][9]** threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images (optional, default `-1`)
     -   `options.container` **[String][2]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
-    -   `options.layout` **[String][2]** filesystem layout, possible values are `dz`, `zoomify` or `google`. (optional, default `'dz'`)
+    -   `options.layout` **[String][2]** filesystem layout, possible values are `dz`, `iiif`, `zoomify` or `google`. (optional, default `'dz'`)
 
 ### Examples
 

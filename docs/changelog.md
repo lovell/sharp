@@ -8,6 +8,10 @@ Requires libvips v8.9.1
 
 * Provide prebuilt binaries for Linux ARM64v8.
 
+* Add IIIF layout support to tile-based output.
+  [#2098](https://github.com/lovell/sharp/pull/2098)
+  [@edsilv](https://github.com/edsilv)
+
 * Ensure input options are consistently and correctly detected.
   [#2118](https://github.com/lovell/sharp/issues/2118)
 

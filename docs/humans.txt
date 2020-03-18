@@ -176,3 +176,6 @@ GitHub: https://github.com/rustyguts
 
 Name: Brychan Bennett-Odlum
 GitHub: https://github.com/BrychanOdlum
+
+Name: Edward Silverton
+GitHub: https://github.com/edsilv
