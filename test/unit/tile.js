@@ -91,40 +91,6 @@ const assertGoogleTiles = function (directory, expectedTileSize, expectedLevels,
   });
 };
 
-// const assertIIIFTiles = function (directory, expectedSize, expectedLevels, done) {
-//   // Get levels
-//   const levels = fs.readdirSync(directory);
-//   assert.strictEqual(expectedLevels, levels.length);
-//   // Get tiles
-//   const tiles = [];
-//   levels.forEach(function (level) {
-//     // Verify level directory name
-//     assert.strictEqual(true, /^[0-9]+$/.test(level));
-//     fs.readdirSync(path.join(directory, level)).forEach(function (tile) {
-//       // Verify tile file name
-//       assert.strictEqual(true, /^[0-9]+_[0-9]+\.jpeg$/.test(tile));
-//       tiles.push(path.join(directory, level, tile));
-//     });
-//   });
-//   // Verify each tile is <= expectedSize
-//   eachLimit(tiles, 8, function (tile, done) {
-//     sharp(tile).metadata(function (err, metadata) {
-//       if (err) {
-//         done(err);
-//       } else {
-//         assert.strictEqual('jpeg', metadata.format);
-//         assert.strictEqual('srgb', metadata.space);
-//         assert.strictEqual(3, metadata.channels);
-//         assert.strictEqual(false, metadata.hasProfile);
-//         assert.strictEqual(false, metadata.hasAlpha);
-//         assert.strictEqual(true, metadata.width <= expectedSize);
-//         assert.strictEqual(true, metadata.height <= expectedSize);
-//         done();
-//       }
-//     });
-//   }, done);
-// };
-
 // Verifies tiles at specified level in a given output directory are > size+overlap
 const assertTileOverlap = function (directory, tileSize, done) {
   // Get sorted levels
