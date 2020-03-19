@@ -229,6 +229,7 @@ Napi::Value metadata(const Napi::CallbackInfo& info) {
   // Join queue for worker thread
   Napi::Function callback = info[1].As<Napi::Function>();
   MetadataWorker *worker = new MetadataWorker(callback, baton, debuglog);
+  worker->Receiver().Set("options", options);
   worker->Queue();
 
   // Increment queued task counter

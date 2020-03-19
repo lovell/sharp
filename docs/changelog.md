@@ -18,6 +18,9 @@ Requires libvips v8.9.1
 * Ensure N-API prebuilt binaries work on RHEL7 and its derivatives.
   [#2119](https://github.com/lovell/sharp/issues/2119)
 
+* Ensure AsyncWorker options are persisted.
+  [#2130](https://github.com/lovell/sharp/issues/2130)
+
 ### v0.25.1 - 7th March 2020
 
 * Ensure prebuilt binaries are fetched based on N-API version.

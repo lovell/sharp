@@ -154,6 +154,7 @@ Napi::Value stats(const Napi::CallbackInfo& info) {
   // Join queue for worker thread
   Napi::Function callback = info[1].As<Napi::Function>();
   StatsWorker *worker = new StatsWorker(callback, baton, debuglog);
+  worker->Receiver().Set("options", options);
   worker->Queue();
 
   // Increment queued task counter

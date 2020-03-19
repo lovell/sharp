@@ -1360,6 +1360,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // Join queue for worker thread
   Napi::Function callback = info[1].As<Napi::Function>();
   PipelineWorker *worker = new PipelineWorker(callback, baton, debuglog, queueListener);
+  worker->Receiver().Set("options", options);
   worker->Queue();
 
   // Increment queued task counter
