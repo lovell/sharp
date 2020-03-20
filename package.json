@@ -1,7 +1,7 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP and TIFF images",
-  "version": "0.25.1",
+  "version": "0.25.2",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://github.com/lovell/sharp",
   "contributors": [
@@ -126,7 +126,7 @@
     "exif-reader": "^1.0.3",
     "icc": "^1.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^7.1.0",
+    "mocha": "^7.1.1",
     "mock-fs": "^4.11.0",
     "nyc": "^15.0.0",
     "prebuild": "^10.0.0",
