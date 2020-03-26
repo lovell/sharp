@@ -143,7 +143,7 @@ Use these JPEG options for output image.
 -   `options` **[Object][6]?** output options
     -   `options.quality` **[Number][9]** quality, integer 1-100 (optional, default `80`)
     -   `options.progressive` **[Boolean][7]** use progressive (interlace) scan (optional, default `false`)
-    -   `options.chromaSubsampling` **[String][2]** set to '4:4:4' to prevent chroma subsampling when quality &lt;= 90 (optional, default `'4:2:0'`)
+    -   `options.chromaSubsampling` **[String][2]** for quality &lt; 90, set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' (use chroma subsampling); for quality >= 90 chroma is never subsampled (optional, default `'4:2:0'`)
     -   `options.trellisQuantisation` **[Boolean][7]** apply trellis quantisation, requires libvips compiled with support for mozjpeg (optional, default `false`)
     -   `options.overshootDeringing` **[Boolean][7]** apply overshoot deringing, requires libvips compiled with support for mozjpeg (optional, default `false`)
     -   `options.optimiseScans` **[Boolean][7]** optimise progressive scans, forces progressive, requires libvips compiled with support for mozjpeg (optional, default `false`)
