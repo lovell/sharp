@@ -21,8 +21,14 @@
 #include "utilities.h"
 #include "stats.h"
 
-Napi::Object init(Napi::Env env, Napi::Object exports) {
+static void* sharp_vips_init(void*) {
   vips_init("sharp");
+  return nullptr;
+}
+
+Napi::Object init(Napi::Env env, Napi::Object exports) {
+  static GOnce sharp_vips_init_once = G_ONCE_INIT;
+  g_once(&sharp_vips_init_once, static_cast<GThreadFunc>(sharp_vips_init), nullptr);
 
   g_log_set_handler("VIPS", static_cast<GLogLevelFlags>(G_LOG_LEVEL_WARNING),
     static_cast<GLogFunc>(sharp::VipsWarningCallback), nullptr);

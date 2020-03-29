@@ -4,6 +4,11 @@
 
 Requires libvips v8.9.1
 
+### v0.25.3 - TBD
+
+* Ensure libvips is initialised only once, improves worker thread safety.
+  [#2143](https://github.com/lovell/sharp/issues/2143)
+
 ### v0.25.2 - 20th March 2020
 
 * Provide prebuilt binaries for Linux ARM64v8.
