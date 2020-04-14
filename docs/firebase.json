@@ -4,9 +4,10 @@
     "public": ".",
     "ignore": [
       ".*",
-      "*.json",
+      "firebase.json",
       "*.md",
-      "image/**"
+      "image/**",
+      "search-index/**"
     ],
     "headers": [
       {
