@@ -166,7 +166,7 @@ Returns **Sharp**
 
 ## extract
 
-Extract a region of the image.
+Extract/crop a region of the image.
 
 -   Use `extract` before `resize` for pre-resize extraction.
 -   Use `extract` after `resize` for post-resize extraction.
