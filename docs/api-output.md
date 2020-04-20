@@ -314,7 +314,7 @@ const { data, info } = await sharp('input.jpg')
 const data = await sharp('input.png')
   .ensureAlpha()
   .extractChannel(3)
-  .colourspace('b-w')
+  .toColourspace('b-w')
   .raw()
   .toBuffer();
 ```
