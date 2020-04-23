@@ -1,12 +1,11 @@
 freebsd_instance:
-  image_family: freebsd-12-0
+  image_family: freebsd-13-0-snap
 
 task:
   prerequisites_script:
-    - sed -i '' 's/quarterly/latest/g' /etc/pkg/FreeBSD.conf
     - pkg update -f
     - pkg upgrade -y
-    - pkg install -y pkgconf vips libnghttp2 node npm
+    - pkg install -y pkgconf vips node npm
   install_script:
     - npm install --unsafe-perm
   test_script:
