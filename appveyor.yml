@@ -15,6 +15,10 @@ environment:
     platform: x86
   - nodejs_version: "13"
     platform: x64
+  - nodejs_version: "14"
+    platform: x86
+  - nodejs_version: "14"
+    platform: x64
 install:
   - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) $env:platform
   - npm install
