@@ -79,6 +79,7 @@ module.exports = {
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),
   inputPngWithOneColor: getPath('2x2_fdcce6.png'),
   inputPngWithTransparency16bit: getPath('tbgn2c16.png'), // http://www.schaik.com/pngsuite/tbgn2c16.png
+  inputPng16BitGreyAlpha: getPath('16-bit-grey-alpha.png'), // CC-BY-NC-SA florc http://www.colourlovers.com/pattern/50713/pat
   inputPngOverlayLayer0: getPath('alpha-layer-0-background.png'),
   inputPngOverlayLayer1: getPath('alpha-layer-1-fill.png'),
   inputPngAlphaPremultiplicationSmall: getPath('alpha-premultiply-1024x768-paper.png'),
@@ -101,6 +102,7 @@ module.exports = {
   inputGif: getPath('Crash_test.gif'), // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
   inputGifGreyPlusAlpha: getPath('grey-plus-alpha.gif'), // http://i.imgur.com/gZ5jlmE.gif
   inputGifAnimated: getPath('rotating-squares.gif'), // CC0 https://loading.io/spinner/blocks/-rotating-squares-preloader-gif
+  inputGifAnimatedLoop3: getPath('animated-loop-3.gif'), // CC-BY-SA-4.0 Petrus3743 https://commons.wikimedia.org/wiki/File:01-Goldener_Schnitt_Formel-Animation.gif
   inputSvg: getPath('check.svg'), // http://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg
   inputSvgWithEmbeddedImages: getPath('struct-image-04-t.svg'), // https://dev.w3.org/SVG/profiles/1.2T/test/svg/struct-image-04-t.svg
 

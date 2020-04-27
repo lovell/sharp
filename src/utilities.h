@@ -1,4 +1,4 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019 Lovell Fuller and contributors.
+// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
 #ifndef SRC_UTILITIES_H_
 #define SRC_UTILITIES_H_
 
-#include <nan.h>
+#include <napi.h>
 
-NAN_METHOD(cache);
-NAN_METHOD(concurrency);
-NAN_METHOD(counters);
-NAN_METHOD(simd);
-NAN_METHOD(libvipsVersion);
-NAN_METHOD(format);
-NAN_METHOD(_maxColourDistance);
+Napi::Value cache(const Napi::CallbackInfo& info);
+Napi::Value concurrency(const Napi::CallbackInfo& info);
+Napi::Value counters(const Napi::CallbackInfo& info);
+Napi::Value simd(const Napi::CallbackInfo& info);
+Napi::Value libvipsVersion(const Napi::CallbackInfo& info);
+Napi::Value format(const Napi::CallbackInfo& info);
+Napi::Value _maxColourDistance(const Napi::CallbackInfo& info);
 
 #endif  // SRC_UTILITIES_H_

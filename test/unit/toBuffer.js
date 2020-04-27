@@ -10,8 +10,8 @@ describe('toBuffer', () => {
     const image = sharp(fixtures.inputJpg);
     image.toBuffer({ resolveWithObject: true }).then((obj) => {
       image.toBuffer().then((buff) => {
-        assert.strict.equal(Buffer.isBuffer(buff), true);
-        assert.strict.equal(typeof obj, 'object');
+        assert.strictEqual(Buffer.isBuffer(buff), true);
+        assert.strictEqual(typeof obj, 'object');
         done();
       });
     });

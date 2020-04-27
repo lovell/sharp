@@ -1,4 +1,4 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019 Lovell Fuller and contributors.
+// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,23 +19,22 @@
 #include <tuple>
 #include <vector>
 
-#include <node.h>
-#include <nan.h>
+#include <napi.h>
 #include <vips/vips8>
 
 // Verify platform and compiler compatibility
 
-#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 8))
-#error libvips version 8.8.0+ is required - see sharp.pixelplumbing.com/page/install
+#if (VIPS_MAJOR_VERSION < 8 || (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 9))
+#error "libvips version 8.9.1+ is required - please see https://sharp.pixelplumbing.com/install"
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
-#error GCC version 4.6+ is required for C++11 features - see sharp.pixelplumbing.com/page/install#prerequisites
+#error "GCC version 4.6+ is required for C++11 features - please see https://sharp.pixelplumbing.com/install"
 #endif
 
 #if (defined(__clang__) && defined(__has_feature))
 #if (!__has_feature(cxx_range_for))
-#error clang version 3.0+ is required for C++11 features - see sharp.pixelplumbing.com/page/install#prerequisites
+#error "clang version 3.0+ is required for C++11 features - please see https://sharp.pixelplumbing.com/install"
 #endif
 #endif
 
@@ -48,6 +47,8 @@ namespace sharp {
     std::string file;
     char *buffer;
     bool failOnError;
+    int limitInputPixels;
+    VipsAccess access;
     size_t bufferLength;
     bool isBuffer;
     double density;
@@ -64,6 +65,8 @@ namespace sharp {
     InputDescriptor():
       buffer(nullptr),
       failOnError(TRUE),
+      limitInputPixels(0x3FFF * 0x3FFF),
+      access(VIPS_ACCESS_RANDOM),
       bufferLength(0),
       isBuffer(FALSE),
       density(72.0),
@@ -78,23 +81,19 @@ namespace sharp {
       createBackground{ 0.0, 0.0, 0.0, 255.0 } {}
   };
 
-  // Convenience methods to access the attributes of a v8::Object
-  bool HasAttr(v8::Local<v8::Object> obj, std::string attr);
-  std::string AttrAsStr(v8::Local<v8::Object> obj, std::string attr);
-  std::vector<double> AttrAsRgba(v8::Local<v8::Object> obj, std::string attr);
-  template<typename T> v8::Local<T> AttrAs(v8::Local<v8::Object> obj, std::string attr) {
-    return Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked().As<T>();
-  }
-  template<typename T> T AttrTo(v8::Local<v8::Object> obj, std::string attr) {
-    return Nan::To<T>(Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked()).FromJust();
-  }
-  template<typename T> T AttrTo(v8::Local<v8::Object> obj, int attr) {
-    return Nan::To<T>(Nan::Get(obj, attr).ToLocalChecked()).FromJust();
-  }
+  // Convenience methods to access the attributes of a Napi::Object
+  bool HasAttr(Napi::Object obj, std::string attr);
+  std::string AttrAsStr(Napi::Object obj, std::string attr);
+  uint32_t AttrAsUint32(Napi::Object obj, std::string attr);
+  int32_t AttrAsInt32(Napi::Object obj, std::string attr);
+  int32_t AttrAsInt32(Napi::Object obj, unsigned int const attr);
+  double AttrAsDouble(Napi::Object obj, std::string attr);
+  double AttrAsDouble(Napi::Object obj, unsigned int const attr);
+  bool AttrAsBool(Napi::Object obj, std::string attr);
+  std::vector<double> AttrAsRgba(Napi::Object obj, std::string attr);
 
-  // Create an InputDescriptor instance from a v8::Object describing an input image
-  InputDescriptor* CreateInputDescriptor(
-    v8::Local<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist);  // NOLINT(runtime/references)
+  // Create an InputDescriptor instance from a Napi::Object describing an input image
+  InputDescriptor* CreateInputDescriptor(Napi::Object input);
 
   enum class ImageType {
     JPEG,
@@ -157,7 +156,7 @@ namespace sharp {
   /*
     Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
   */
-  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor, VipsAccess accessMethod);
+  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor);
 
   /*
     Does this image have an embedded profile?
@@ -214,7 +213,7 @@ namespace sharp {
   /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
-  void FreeCallback(char* data, void* hint);
+  extern std::function<void(void*, char*)> FreeCallback;
 
   /*
     Called with warnings from the glib-registered "VIPS" domain

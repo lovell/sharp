@@ -196,6 +196,18 @@
   ...
   fun:FcInitLoadConfigAndFonts
 }
+{
+  leak_fontconfig_doContent
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:malloc
+  ...
+  fun:doContent
+  fun:doProlog
+  fun:prologInitProcessor
+  fun:XML_ParseBuffer
+  obj:*/libfontconfig.so.*
+}
 
 # libvips
 {
@@ -341,6 +353,12 @@
   write(buf)
   ...
   obj:/usr/bin/iojs
+}
+{
+  value_node_invoke_params
+  Memcheck:Value8
+  ...
+  fun:_ZN2v88internal12_GLOBAL__N_16InvokeEPNS0_7IsolateERKNS1_12InvokeParamsE
 }
 {
   leak_nodejs_ImmutableAsciiSource_CreateFromLiteral
@@ -539,6 +557,13 @@
   fun:_ZN4node9inspector5Agent5StartERKSsSt10shared_ptrINS_12DebugOptionsEEb
 }
 {
+  leak_nodejs_debug_host_port
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node9inspector5Agent5StartERKSsRKNS_12DebugOptionsESt10shared_ptrINS_8HostPortEEb
+}
+{
   leak_nodejs_start
   Memcheck:Leak
   match-leak-kinds: definite
@@ -553,11 +578,14 @@
   fun:_ZN4node20BackgroundTaskRunnerC1Ei
 }
 {
-  leak_nan_FunctionCallbackInfo
+  leak_napi_module_register
   Memcheck:Leak
   match-leak-kinds: definite
   ...
-  fun:_ZN3Nan3impL23FunctionCallbackWrapperERKN2v820FunctionCallbackInfoINS1_5ValueEEE
+  fun:napi_module_register
+  fun:call_init.part.0
+  fun:call_init
+  fun:_dl_init
 }
 {
   leak_v8_FunctionCallbackInfo

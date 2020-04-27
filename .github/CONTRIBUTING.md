@@ -44,8 +44,7 @@ Any change that modifies the existing public API should be added to the relevant
 
 | Release | WIP branch |
 | ------: | :--------- |
-| v0.24.0 | wit        |
-| v0.25.0 | yield      |
+| v0.26.0 | zoom       |
 
 Please squash your changes into a single commit using a command like `git rebase -i upstream/<wip-branch>`.
 
@@ -71,7 +70,7 @@ The public API is documented with [JSDoc](http://usejsdoc.org/) annotated commen
 
 These can be converted to Markdown by running:
 ```sh
-npm run docs
+npm run docs-build
 ```
 
 Please include documentation updates in any Pull Request that modifies the public API.

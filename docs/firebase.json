@@ -1,0 +1,117 @@
+{
+  "hosting": {
+    "site": "pixelplumbing-sharp",
+    "public": ".",
+    "ignore": [
+      ".*",
+      "firebase.json",
+      "*.md",
+      "image/**",
+      "search-index/**"
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=86400"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "**/install/**",
+        "destination": "/install",
+        "type": 301
+      },
+      {
+        "source": "/page/install",
+        "destination": "/install",
+        "type": 301
+      },
+      {
+        "source": "**/api-constructor/**",
+        "destination": "/api-constructor",
+        "type": 301
+      },
+      {
+        "source": "**/api-input/**",
+        "destination": "/api-input",
+        "type": 301
+      },
+      {
+        "source": "**/api-output/**",
+        "destination": "/api-output",
+        "type": 301
+      },
+      {
+        "source": "**/api-resize/**",
+        "destination": "/api-resize",
+        "type": 301
+      },
+      {
+        "source": "**/api-compsite/**",
+        "destination": "/api-compsite",
+        "type": 301
+      },
+      {
+        "source": "**/api-operation/**",
+        "destination": "/api-operation",
+        "type": 301
+      },
+      {
+        "source": "**/api-colour/**",
+        "destination": "/api-colour",
+        "type": 301
+      },
+      {
+        "source": "**/api-channel/**",
+        "destination": "/api-channel",
+        "type": 301
+      },
+      {
+        "source": "**/api-utility/**",
+        "destination": "/api-utility",
+        "type": 301
+      },
+      {
+        "source": "/page/api",
+        "destination": "/api-constructor",
+        "type": 301
+      },
+      {
+        "source": "**/performance/**",
+        "destination": "/performance",
+        "type": 301
+      },
+      {
+        "source": "/page/performance",
+        "destination": "/performance",
+        "type": 301
+      },
+      {
+        "source": "**/changelog/**",
+        "destination": "/changelog",
+        "type": 301
+      },
+      {
+        "source": "/page/changelog",
+        "destination": "/changelog",
+        "type": 301
+      },
+      {
+        "source": "/en/**",
+        "destination": "/",
+        "type": 301
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

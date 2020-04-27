@@ -61,6 +61,10 @@ sharp('input.png')
 
 Returns **Sharp** 
 
+**Meta**
+
+-   **since**: 0.22.0
+
 [1]: https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
 
 [2]: https://www.cairographics.org/operators/

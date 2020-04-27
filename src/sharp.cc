@@ -1,4 +1,4 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019 Lovell Fuller and contributors.
+// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <node.h>
-#include <nan.h>
+#include <napi.h>
 #include <vips/vips8>
 
 #include "common.h"
@@ -22,33 +21,30 @@
 #include "utilities.h"
 #include "stats.h"
 
-NAN_MODULE_INIT(init) {
+static void* sharp_vips_init(void*) {
   vips_init("sharp");
+  return nullptr;
+}
+
+Napi::Object init(Napi::Env env, Napi::Object exports) {
+  static GOnce sharp_vips_init_once = G_ONCE_INIT;
+  g_once(&sharp_vips_init_once, static_cast<GThreadFunc>(sharp_vips_init), nullptr);
 
   g_log_set_handler("VIPS", static_cast<GLogLevelFlags>(G_LOG_LEVEL_WARNING),
     static_cast<GLogFunc>(sharp::VipsWarningCallback), nullptr);
 
   // Methods available to JavaScript
-  Nan::Set(target, Nan::New("metadata").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(metadata)).ToLocalChecked());
-  Nan::Set(target, Nan::New("pipeline").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(pipeline)).ToLocalChecked());
-  Nan::Set(target, Nan::New("cache").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(cache)).ToLocalChecked());
-  Nan::Set(target, Nan::New("concurrency").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(concurrency)).ToLocalChecked());
-  Nan::Set(target, Nan::New("counters").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(counters)).ToLocalChecked());
-  Nan::Set(target, Nan::New("simd").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(simd)).ToLocalChecked());
-  Nan::Set(target, Nan::New("libvipsVersion").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(libvipsVersion)).ToLocalChecked());
-  Nan::Set(target, Nan::New("format").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(format)).ToLocalChecked());
-  Nan::Set(target, Nan::New("_maxColourDistance").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(_maxColourDistance)).ToLocalChecked());
-  Nan::Set(target, Nan::New("stats").ToLocalChecked(),
-    Nan::GetFunction(Nan::New<v8::FunctionTemplate>(stats)).ToLocalChecked());
+  exports.Set("metadata", Napi::Function::New(env, metadata));
+  exports.Set("pipeline", Napi::Function::New(env, pipeline));
+  exports.Set("cache", Napi::Function::New(env, cache));
+  exports.Set("concurrency", Napi::Function::New(env, concurrency));
+  exports.Set("counters", Napi::Function::New(env, counters));
+  exports.Set("simd", Napi::Function::New(env, simd));
+  exports.Set("libvipsVersion", Napi::Function::New(env, libvipsVersion));
+  exports.Set("format", Napi::Function::New(env, format));
+  exports.Set("_maxColourDistance", Napi::Function::New(env, _maxColourDistance));
+  exports.Set("stats", Napi::Function::New(env, stats));
+  return exports;
 }
 
-NAN_MODULE_WORKER_ENABLED(sharp, init)
+NODE_API_MODULE(sharp, init)

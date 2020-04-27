@@ -112,6 +112,28 @@ sharp('input.jpg')
 
 Returns **Sharp** 
 
+## toFormat
+
+Force output to a given format.
+
+### Parameters
+
+-   `format` **([String][2] \| [Object][6])** as a String or an Object with an 'id' attribute
+-   `options` **[Object][6]** output options
+
+### Examples
+
+```javascript
+// Convert any input to PNG output
+const data = await sharp(input)
+  .toFormat('png')
+  .toBuffer();
+```
+
+-   Throws **[Error][4]** unsupported format or options
+
+Returns **Sharp** 
+
 ## jpeg
 
 Use these JPEG options for output image.
@@ -121,7 +143,7 @@ Use these JPEG options for output image.
 -   `options` **[Object][6]?** output options
     -   `options.quality` **[Number][9]** quality, integer 1-100 (optional, default `80`)
     -   `options.progressive` **[Boolean][7]** use progressive (interlace) scan (optional, default `false`)
-    -   `options.chromaSubsampling` **[String][2]** set to '4:4:4' to prevent chroma subsampling when quality &lt;= 90 (optional, default `'4:2:0'`)
+    -   `options.chromaSubsampling` **[String][2]** for quality &lt; 90, set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' (use chroma subsampling); for quality >= 90 chroma is never subsampled (optional, default `'4:2:0'`)
     -   `options.trellisQuantisation` **[Boolean][7]** apply trellis quantisation, requires libvips compiled with support for mozjpeg (optional, default `false`)
     -   `options.overshootDeringing` **[Boolean][7]** apply overshoot deringing, requires libvips compiled with support for mozjpeg (optional, default `false`)
     -   `options.optimiseScans` **[Boolean][7]** optimise progressive scans, forces progressive, requires libvips compiled with support for mozjpeg (optional, default `false`)
@@ -268,9 +290,15 @@ Most versions of libheif support only the patent-encumbered HEVC compression for
 
 Returns **Sharp** 
 
+**Meta**
+
+-   **since**: 0.23.0
+
 ## raw
 
-Force output to be raw, uncompressed uint8 pixel data.
+Force output to be raw, uncompressed, 8-bit unsigned integer (unit8) pixel data.
+Pixel ordering is left-to-right, top-to-bottom, without padding.
+Channel ordering will be RGB or RGBA for non-greyscale colourspaces.
 
 ### Examples
 
@@ -281,27 +309,15 @@ const { data, info } = await sharp('input.jpg')
   .toBuffer({ resolveWithObject: true });
 ```
 
-Returns **Sharp** 
-
-## toFormat
-
-Force output to a given format.
-
-### Parameters
-
--   `format` **([String][2] \| [Object][6])** as a String or an Object with an 'id' attribute
--   `options` **[Object][6]** output options
-
-### Examples
-
 ```javascript
-// Convert any input to PNG output
-const data = await sharp(input)
-  .toFormat('png')
+// Extract alpha channel as raw pixel data from PNG input
+const data = await sharp('input.png')
+  .ensureAlpha()
+  .extractChannel(3)
+  .toColourspace('b-w')
+  .raw()
   .toBuffer();
 ```
-
--   Throws **[Error][4]** unsupported format or options
 
 Returns **Sharp** 
 
@@ -323,7 +339,7 @@ Warning: multiple sharp instances concurrently producing tile output can expose 
     -   `options.depth` **[String][2]?** how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout.
     -   `options.skipBlanks` **[Number][9]** threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images (optional, default `-1`)
     -   `options.container` **[String][2]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
-    -   `options.layout` **[String][2]** filesystem layout, possible values are `dz`, `zoomify` or `google`. (optional, default `'dz'`)
+    -   `options.layout` **[String][2]** filesystem layout, possible values are `dz`, `iiif`, `zoomify` or `google`. (optional, default `'dz'`)
 
 ### Examples
 

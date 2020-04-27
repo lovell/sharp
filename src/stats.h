@@ -1,4 +1,4 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019 Lovell Fuller and contributors.
+// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 #define SRC_STATS_H_
 
 #include <string>
-#include <nan.h>
+#include <napi.h>
 
 #include "./common.h"
 
@@ -33,12 +33,8 @@ struct ChannelStats {
   int maxX;
   int maxY;
 
-  ChannelStats():
-    min(0), max(0), sum(0), squaresSum(0), mean(0), stdev(0)
-    , minX(0), minY(0), maxX(0), maxY(0) {}
-
-    ChannelStats(int minVal, int maxVal, double sumVal, double squaresSumVal,
-                  double meanVal, double stdevVal, int minXVal, int minYVal, int maxXVal, int maxYVal):
+  ChannelStats(int minVal, int maxVal, double sumVal, double squaresSumVal,
+    double meanVal, double stdevVal, int minXVal, int minYVal, int maxXVal, int maxYVal):
     min(minVal), max(maxVal), sum(sumVal), squaresSum(squaresSumVal),
     mean(meanVal), stdev(stdevVal), minX(minXVal), minY(minYVal), maxX(maxXVal), maxY(maxYVal) {}
 };
@@ -46,7 +42,6 @@ struct ChannelStats {
 struct StatsBaton {
   // Input
   sharp::InputDescriptor *input;
-  VipsAccess accessMethod;
 
   // Output
   std::vector<ChannelStats> channelStats;
@@ -62,6 +57,6 @@ struct StatsBaton {
     {}
 };
 
-NAN_METHOD(stats);
+Napi::Value stats(const Napi::CallbackInfo& info);
 
 #endif  // SRC_STATS_H_

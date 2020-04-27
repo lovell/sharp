@@ -5,7 +5,10 @@ const sharp = require('../../');
 
 const usingCache = detectLibc.family !== detectLibc.MUSL;
 const usingSimd = !process.env.G_DEBUG;
-const concurrency = detectLibc.family === detectLibc.MUSL ? 1 : undefined;
+const concurrency =
+  detectLibc.family === detectLibc.MUSL || process.arch === 'arm'
+    ? 1
+    : undefined;
 
 beforeEach(function () {
   sharp.cache(usingCache);

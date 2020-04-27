@@ -1,4 +1,4 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019 Lovell Fuller and contributors.
+// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@
 #include <queue>
 #include <mutex>  // NOLINT(build/c++11)
 
-#include <node.h>
-#include <node_buffer.h>
-#include <nan.h>
+#include <napi.h>
 #include <vips/vips8>
 
 #include "common.h"
@@ -30,62 +28,80 @@ using vips::VImage;
 
 namespace sharp {
 
-  // Convenience methods to access the attributes of a v8::Object
-  bool HasAttr(v8::Local<v8::Object> obj, std::string attr) {
-    return Nan::Has(obj, Nan::New(attr).ToLocalChecked()).FromJust();
+  // Convenience methods to access the attributes of a Napi::Object
+  bool HasAttr(Napi::Object obj, std::string attr) {
+    return obj.Has(attr);
   }
-  std::string AttrAsStr(v8::Local<v8::Object> obj, std::string attr) {
-    return *Nan::Utf8String(Nan::Get(obj, Nan::New(attr).ToLocalChecked()).ToLocalChecked());
+  std::string AttrAsStr(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::String>();
   }
-  std::vector<double> AttrAsRgba(v8::Local<v8::Object> obj, std::string attr) {
-    v8::Local<v8::Object> background = AttrAs<v8::Object>(obj, attr);
-    std::vector<double> rgba(4);
-    for (unsigned int i = 0; i < 4; i++) {
-      rgba[i] = AttrTo<double>(background, i);
+  uint32_t AttrAsUint32(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::Number>().Uint32Value();
+  }
+  int32_t AttrAsInt32(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::Number>().Int32Value();
+  }
+  int32_t AttrAsInt32(Napi::Object obj, unsigned int const attr) {
+    return obj.Get(attr).As<Napi::Number>().Int32Value();
+  }
+  double AttrAsDouble(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::Number>().DoubleValue();
+  }
+  double AttrAsDouble(Napi::Object obj, unsigned int const attr) {
+    return obj.Get(attr).As<Napi::Number>().DoubleValue();
+  }
+  bool AttrAsBool(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::Boolean>().Value();
+  }
+  std::vector<double> AttrAsRgba(Napi::Object obj, std::string attr) {
+    Napi::Array background = obj.Get(attr).As<Napi::Array>();
+    std::vector<double> rgba(background.Length());
+    for (unsigned int i = 0; i < background.Length(); i++) {
+      rgba[i] = AttrAsDouble(background, i);
     }
     return rgba;
   }
 
-  // Create an InputDescriptor instance from a v8::Object describing an input image
-  InputDescriptor* CreateInputDescriptor(
-    v8::Local<v8::Object> input, std::vector<v8::Local<v8::Object>> &buffersToPersist
-  ) {
-    Nan::HandleScope();
+  // Create an InputDescriptor instance from a Napi::Object describing an input image
+  InputDescriptor* CreateInputDescriptor(Napi::Object input) {
     InputDescriptor *descriptor = new InputDescriptor;
     if (HasAttr(input, "file")) {
       descriptor->file = AttrAsStr(input, "file");
     } else if (HasAttr(input, "buffer")) {
-      v8::Local<v8::Object> buffer = AttrAs<v8::Object>(input, "buffer");
-      descriptor->bufferLength = node::Buffer::Length(buffer);
-      descriptor->buffer = node::Buffer::Data(buffer);
+      Napi::Buffer<char> buffer = input.Get("buffer").As<Napi::Buffer<char>>();
+      descriptor->bufferLength = buffer.Length();
+      descriptor->buffer = buffer.Data();
       descriptor->isBuffer = TRUE;
-      buffersToPersist.push_back(buffer);
     }
-    descriptor->failOnError = AttrTo<bool>(input, "failOnError");
+    descriptor->failOnError = AttrAsBool(input, "failOnError");
     // Density for vector-based input
     if (HasAttr(input, "density")) {
-      descriptor->density = AttrTo<double>(input, "density");
+      descriptor->density = AttrAsDouble(input, "density");
     }
     // Raw pixel input
     if (HasAttr(input, "rawChannels")) {
-      descriptor->rawChannels = AttrTo<uint32_t>(input, "rawChannels");
-      descriptor->rawWidth = AttrTo<uint32_t>(input, "rawWidth");
-      descriptor->rawHeight = AttrTo<uint32_t>(input, "rawHeight");
+      descriptor->rawChannels = AttrAsUint32(input, "rawChannels");
+      descriptor->rawWidth = AttrAsUint32(input, "rawWidth");
+      descriptor->rawHeight = AttrAsUint32(input, "rawHeight");
     }
     // Multi-page input (GIF, TIFF, PDF)
     if (HasAttr(input, "pages")) {
-      descriptor->pages = AttrTo<int32_t>(input, "pages");
+      descriptor->pages = AttrAsInt32(input, "pages");
     }
     if (HasAttr(input, "page")) {
-      descriptor->page = AttrTo<uint32_t>(input, "page");
+      descriptor->page = AttrAsUint32(input, "page");
     }
     // Create new image
     if (HasAttr(input, "createChannels")) {
-      descriptor->createChannels = AttrTo<uint32_t>(input, "createChannels");
-      descriptor->createWidth = AttrTo<uint32_t>(input, "createWidth");
-      descriptor->createHeight = AttrTo<uint32_t>(input, "createHeight");
+      descriptor->createChannels = AttrAsUint32(input, "createChannels");
+      descriptor->createWidth = AttrAsUint32(input, "createWidth");
+      descriptor->createHeight = AttrAsUint32(input, "createHeight");
       descriptor->createBackground = AttrAsRgba(input, "createBackground");
     }
+    // Limit input images to a given number of pixels, where pixels = width * height
+    descriptor->limitInputPixels = AttrAsUint32(input, "limitInputPixels");
+    // Allow switch from random to sequential access
+    descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
     return descriptor;
   }
 
@@ -200,7 +216,7 @@ namespace sharp {
       std::string const loader = load;
       if (EndsWith(loader, "JpegFile")) {
         imageType = ImageType::JPEG;
-      } else if (EndsWith(loader, "Png")) {
+      } else if (EndsWith(loader, "PngFile")) {
         imageType = ImageType::PNG;
       } else if (EndsWith(loader, "WebpFile")) {
         imageType = ImageType::WEBP;
@@ -248,7 +264,7 @@ namespace sharp {
   /*
     Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
   */
-  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor, VipsAccess accessMethod) {
+  std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor) {
     VImage image;
     ImageType imageType;
     if (descriptor->isBuffer) {
@@ -268,7 +284,7 @@ namespace sharp {
         if (imageType != ImageType::UNKNOWN) {
           try {
             vips::VOption *option = VImage::option()
-              ->set("access", accessMethod)
+              ->set("access", descriptor->access)
               ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
@@ -314,7 +330,7 @@ namespace sharp {
         if (imageType != ImageType::UNKNOWN) {
           try {
             vips::VOption *option = VImage::option()
-              ->set("access", accessMethod)
+              ->set("access", descriptor->access)
               ->set("fail", descriptor->failOnError);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
@@ -337,6 +353,11 @@ namespace sharp {
           throw vips::VError("Input file contains unsupported image format");
         }
       }
+    }
+    // Limit input images to a given number of pixels, where pixels = width * height
+    if (descriptor->limitInputPixels > 0 &&
+      static_cast<uint64_t>(image.width() * image.height()) > static_cast<uint64_t>(descriptor->limitInputPixels)) {
+      throw vips::VError("Input image exceeds pixel limit");
     }
     return std::make_tuple(image, imageType);
   }
@@ -409,6 +430,7 @@ namespace sharp {
 
     if (*pageHeight == 0) return image;
 
+    // It is necessary to create the copy as otherwise, pageHeight will be ignored!
     VImage copy = image.copy();
 
     copy.set(VIPS_META_PAGE_HEIGHT, *pageHeight);
@@ -466,11 +488,9 @@ namespace sharp {
   /*
     Called when a Buffer undergoes GC, required to support mixed runtime libraries in Windows
   */
-  void FreeCallback(char* data, void* hint) {
-    if (data != nullptr) {
-      g_free(data);
-    }
-  }
+  std::function<void(void*, char*)> FreeCallback = [](void*, char* data) {
+    g_free(data);
+  };
 
   /*
     Temporary buffer of warnings

@@ -1,5 +1,5 @@
 // bodies for vips operations
-// Wed Apr 24 15:50:21 CEST 2019
+// Wed 01 Jan 2020 12:22:12 PM CET
 // this file is generated automatically, do not edit!
 
 VImage VImage::CMC2LCh( VOption *options ) const
@@ -487,6 +487,19 @@ VImage VImage::canny( VOption *options ) const
         (options ? options : VImage::option())->
             set( "in", *this )->
             set( "out", &out ) );
+
+    return( out );
+}
+
+VImage VImage::case_image( std::vector<VImage> cases, VOption *options ) const
+{
+    VImage out;
+
+    call( "case",
+        (options ? options : VImage::option())->
+            set( "index", *this )->
+            set( "out", &out )->
+            set( "cases", cases ) );
 
     return( out );
 }
@@ -1615,6 +1628,18 @@ VImage VImage::jpegload_buffer( VipsBlob *buffer, VOption *options )
     return( out );
 }
 
+VImage VImage::jpegload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "jpegload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
 void VImage::jpegsave( const char *filename, VOption *options ) const
 {
     call( "jpegsave",
@@ -1640,6 +1665,14 @@ void VImage::jpegsave_mime( VOption *options ) const
     call( "jpegsave_mime",
         (options ? options : VImage::option())->
             set( "in", *this ) );
+}
+
+void VImage::jpegsave_target( VTarget target, VOption *options ) const
+{
+    call( "jpegsave_target",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "target", target ) );
 }
 
 VImage VImage::labelregions( VOption *options ) const
@@ -2286,6 +2319,18 @@ VImage VImage::pngload_buffer( VipsBlob *buffer, VOption *options )
     return( out );
 }
 
+VImage VImage::pngload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "pngload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
 void VImage::pngsave( const char *filename, VOption *options ) const
 {
     call( "pngsave",
@@ -2304,6 +2349,14 @@ VipsBlob *VImage::pngsave_buffer( VOption *options ) const
             set( "buffer", &buffer ) );
 
     return( buffer );
+}
+
+void VImage::pngsave_target( VTarget target, VOption *options ) const
+{
+    call( "pngsave_target",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "target", target ) );
 }
 
 VImage VImage::ppmload( const char *filename, VOption *options )
@@ -2413,6 +2466,30 @@ VImage VImage::radload( const char *filename, VOption *options )
     return( out );
 }
 
+VImage VImage::radload_buffer( VipsBlob *buffer, VOption *options )
+{
+    VImage out;
+
+    call( "radload_buffer",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "buffer", buffer ) );
+
+    return( out );
+}
+
+VImage VImage::radload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "radload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
 void VImage::radsave( const char *filename, VOption *options ) const
 {
     call( "radsave",
@@ -2431,6 +2508,14 @@ VipsBlob *VImage::radsave_buffer( VOption *options ) const
             set( "buffer", &buffer ) );
 
     return( buffer );
+}
+
+void VImage::radsave_target( VTarget target, VOption *options ) const
+{
+    call( "radsave_target",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "target", target ) );
 }
 
 VImage VImage::rank( int width, int height, int index, VOption *options ) const
@@ -2977,6 +3062,30 @@ VImage VImage::svgload_buffer( VipsBlob *buffer, VOption *options )
     return( out );
 }
 
+VImage VImage::svgload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "svgload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
+VImage VImage::switch_image( std::vector<VImage> tests, VOption *options )
+{
+    VImage out;
+
+    call( "switch",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "tests", tests ) );
+
+    return( out );
+}
+
 void VImage::system( const char *cmd_format, VOption *options )
 {
     call( "system",
@@ -3035,6 +3144,19 @@ VImage VImage::thumbnail_image( int width, VOption *options ) const
     return( out );
 }
 
+VImage VImage::thumbnail_source( VSource source, int width, VOption *options )
+{
+    VImage out;
+
+    call( "thumbnail_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source )->
+            set( "width", width ) );
+
+    return( out );
+}
+
 VImage VImage::tiffload( const char *filename, VOption *options )
 {
     VImage out;
@@ -3055,6 +3177,18 @@ VImage VImage::tiffload_buffer( VipsBlob *buffer, VOption *options )
         (options ? options : VImage::option())->
             set( "out", &out )->
             set( "buffer", buffer ) );
+
+    return( out );
+}
+
+VImage VImage::tiffload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "tiffload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
 
     return( out );
 }
@@ -3170,6 +3304,18 @@ VImage VImage::webpload_buffer( VipsBlob *buffer, VOption *options )
     return( out );
 }
 
+VImage VImage::webpload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "webpload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
 void VImage::webpsave( const char *filename, VOption *options ) const
 {
     call( "webpsave",
@@ -3188,6 +3334,14 @@ VipsBlob *VImage::webpsave_buffer( VOption *options ) const
             set( "buffer", &buffer ) );
 
     return( buffer );
+}
+
+void VImage::webpsave_target( VTarget target, VOption *options ) const
+{
+    call( "webpsave_target",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "target", target ) );
 }
 
 VImage VImage::worley( int width, int height, VOption *options )

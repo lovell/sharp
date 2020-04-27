@@ -11,6 +11,7 @@
         ],
         'sources': [
           'src/libvips/cplusplus/VError.cpp',
+          'src/libvips/cplusplus/VConnection.cpp',
           'src/libvips/cplusplus/VInterpolate.cpp',
           'src/libvips/cplusplus/VImage.cpp'
         ],
@@ -29,6 +30,9 @@
             'msvs_settings': {
               'VCCLCompilerTool': {
                 'ExceptionHandling': 1
+              },
+              'VCLinkerTool': {
+                'ImageHasSafeExceptionHandlers': 'false'
               }
             },
             'msvs_disabled_warnings': [
@@ -43,7 +47,11 @@
     ]
   }, {
     'target_name': 'sharp',
+    'defines': [
+      'NAPI_VERSION=3'
+    ],
     'dependencies': [
+      '<!(node -p "require(\'node-addon-api\').gyp")',
       'libvips-cpp'
     ],
     'variables': {
@@ -64,11 +72,11 @@
       'src/stats.cc',
       'src/operations.cc',
       'src/pipeline.cc',
-      'src/sharp.cc',
-      'src/utilities.cc'
+      'src/utilities.cc',
+      'src/sharp.cc'
     ],
     'include_dirs': [
-      '<!(node -e "require(\'nan\')")'
+      '<!@(node -p "require(\'node-addon-api\').include")',
     ],
     'conditions': [
       ['use_global_libvips == "true"', {
@@ -127,7 +135,6 @@
               '../vendor/lib/libgobject-2.0.so',
               # Dependencies of dependencies, included for openSUSE support
               '../vendor/lib/libcairo.so',
-              '../vendor/lib/libcroco-0.6.so',
               '../vendor/lib/libexif.so',
               '../vendor/lib/libexpat.so',
               '../vendor/lib/libffi.so',
@@ -189,10 +196,18 @@
               '-Wno-cast-function-type'
             ]
           }],
+          ['target_arch == "arm"', {
+            'cflags_cc': [
+              '-Wno-psabi'
+            ]
+          }],
           ['OS == "win"', {
             'msvs_settings': {
               'VCCLCompilerTool': {
                 'ExceptionHandling': 1
+              },
+              'VCLinkerTool': {
+                'ImageHasSafeExceptionHandlers': 'false'
               }
             },
             'msvs_disabled_warnings': [

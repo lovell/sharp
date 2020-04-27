@@ -1,4 +1,4 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019 Lovell Fuller and contributors.
+// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
 #include <cmath>
 #include <string>
 
-#include <node.h>
-#include <nan.h>
+#include <napi.h>
 #include <vips/vips8>
 #include <vips/vector.h>
 
@@ -24,183 +23,145 @@
 #include "operations.h"
 #include "utilities.h"
 
-using v8::Boolean;
-using v8::Integer;
-using v8::Local;
-using v8::Number;
-using v8::Object;
-using v8::String;
-
-using Nan::HandleScope;
-using Nan::New;
-using Nan::Set;
-using Nan::ThrowError;
-using Nan::To;
-using Nan::Utf8String;
-
 /*
   Get and set cache limits
 */
-NAN_METHOD(cache) {
-  HandleScope();
+Napi::Value cache(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
 
   // Set memory limit
-  if (info[0]->IsInt32()) {
-    vips_cache_set_max_mem(To<int32_t>(info[0]).FromJust() * 1048576);
+  if (info[0].IsNumber()) {
+    vips_cache_set_max_mem(info[0].As<Napi::Number>().Int32Value() * 1048576);
   }
   // Set file limit
-  if (info[1]->IsInt32()) {
-    vips_cache_set_max_files(To<int32_t>(info[1]).FromJust());
+  if (info[1].IsNumber()) {
+    vips_cache_set_max_files(info[1].As<Napi::Number>().Int32Value());
   }
   // Set items limit
-  if (info[2]->IsInt32()) {
-    vips_cache_set_max(To<int32_t>(info[2]).FromJust());
+  if (info[2].IsNumber()) {
+    vips_cache_set_max(info[2].As<Napi::Number>().Int32Value());
   }
 
   // Get memory stats
-  Local<Object> memory = New<Object>();
-  Set(memory, New("current").ToLocalChecked(),
-    New<Integer>(static_cast<int>(round(vips_tracked_get_mem() / 1048576))));
-  Set(memory, New("high").ToLocalChecked(),
-    New<Integer>(static_cast<int>(round(vips_tracked_get_mem_highwater() / 1048576))));
-  Set(memory, New("max").ToLocalChecked(),
-    New<Integer>(static_cast<int>(round(vips_cache_get_max_mem() / 1048576))));
+  Napi::Object memory = Napi::Object::New(env);
+  memory.Set("current", round(vips_tracked_get_mem() / 1048576));
+  memory.Set("high", round(vips_tracked_get_mem_highwater() / 1048576));
+  memory.Set("max", round(vips_cache_get_max_mem() / 1048576));
   // Get file stats
-  Local<Object> files = New<Object>();
-  Set(files, New("current").ToLocalChecked(), New<Integer>(vips_tracked_get_files()));
-  Set(files, New("max").ToLocalChecked(), New<Integer>(vips_cache_get_max_files()));
+  Napi::Object files = Napi::Object::New(env);
+  files.Set("current", vips_tracked_get_files());
+  files.Set("max", vips_cache_get_max_files());
 
   // Get item stats
-  Local<Object> items = New<Object>();
-  Set(items, New("current").ToLocalChecked(), New<Integer>(vips_cache_get_size()));
-  Set(items, New("max").ToLocalChecked(), New<Integer>(vips_cache_get_max()));
+  Napi::Object items = Napi::Object::New(env);
+  items.Set("current", vips_cache_get_size());
+  items.Set("max", vips_cache_get_max());
 
-  Local<Object> cache = New<Object>();
-  Set(cache, New("memory").ToLocalChecked(), memory);
-  Set(cache, New("files").ToLocalChecked(), files);
-  Set(cache, New("items").ToLocalChecked(), items);
-  info.GetReturnValue().Set(cache);
+  Napi::Object cache = Napi::Object::New(env);
+  cache.Set("memory", memory);
+  cache.Set("files", files);
+  cache.Set("items", items);
+  return cache;
 }
 
 /*
   Get and set size of thread pool
 */
-NAN_METHOD(concurrency) {
-  HandleScope();
-
+Napi::Value concurrency(const Napi::CallbackInfo& info) {
   // Set concurrency
-  if (info[0]->IsInt32()) {
-    vips_concurrency_set(To<int32_t>(info[0]).FromJust());
+  if (info[0].IsNumber()) {
+    vips_concurrency_set(info[0].As<Napi::Number>().Int32Value());
   }
   // Get concurrency
-  info.GetReturnValue().Set(New<Integer>(vips_concurrency_get()));
+  return Napi::Number::New(info.Env(), vips_concurrency_get());
 }
 
 /*
   Get internal counters (queued tasks, processing tasks)
 */
-NAN_METHOD(counters) {
-  using sharp::counterProcess;
-  using sharp::counterQueue;
-
-  HandleScope();
-  Local<Object> counters = New<Object>();
-  Set(counters, New("queue").ToLocalChecked(), New<Integer>(counterQueue));
-  Set(counters, New("process").ToLocalChecked(), New<Integer>(counterProcess));
-  info.GetReturnValue().Set(counters);
+Napi::Value counters(const Napi::CallbackInfo& info) {
+  Napi::Object counters = Napi::Object::New(info.Env());
+  counters.Set("queue", sharp::counterQueue);
+  counters.Set("process", sharp::counterProcess);
+  return counters;
 }
 
 /*
   Get and set use of SIMD vector unit instructions
 */
-NAN_METHOD(simd) {
-  HandleScope();
-
+Napi::Value simd(const Napi::CallbackInfo& info) {
   // Set state
-  if (info[0]->IsBoolean()) {
-    vips_vector_set_enabled(To<bool>(info[0]).FromJust());
+  if (info[0].IsBoolean()) {
+    vips_vector_set_enabled(info[0].As<Napi::Boolean>().Value());
   }
   // Get state
-  info.GetReturnValue().Set(New<Boolean>(vips_vector_isenabled()));
+  return Napi::Boolean::New(info.Env(), vips_vector_isenabled());
 }
 
 /*
   Get libvips version
 */
-NAN_METHOD(libvipsVersion) {
-  HandleScope();
+Napi::Value libvipsVersion(const Napi::CallbackInfo& info) {
   char version[9];
   g_snprintf(version, sizeof(version), "%d.%d.%d", vips_version(0), vips_version(1), vips_version(2));
-  info.GetReturnValue().Set(New(version).ToLocalChecked());
+  return Napi::String::New(info.Env(), version);
 }
 
 /*
   Get available input/output file/buffer/stream formats
 */
-NAN_METHOD(format) {
-  HandleScope();
-
-  // Attribute names
-  Local<String> attrId = New("id").ToLocalChecked();
-  Local<String> attrInput = New("input").ToLocalChecked();
-  Local<String> attrOutput = New("output").ToLocalChecked();
-  Local<String> attrFile = New("file").ToLocalChecked();
-  Local<String> attrBuffer = New("buffer").ToLocalChecked();
-  Local<String> attrStream = New("stream").ToLocalChecked();
-
-  // Which load/save operations are available for each compressed format?
-  Local<Object> format = New<Object>();
+Napi::Value format(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  Napi::Object format = Napi::Object::New(env);
   for (std::string const f : {
     "jpeg", "png", "webp", "tiff", "magick", "openslide", "dz",
     "ppm", "fits", "gif", "svg", "heif", "pdf", "vips"
   }) {
     // Input
-    Local<Boolean> hasInputFile =
-      New<Boolean>(vips_type_find("VipsOperation", (f + "load").c_str()));
-    Local<Boolean> hasInputBuffer =
-      New<Boolean>(vips_type_find("VipsOperation", (f + "load_buffer").c_str()));
-    Local<Object> input = New<Object>();
-    Set(input, attrFile, hasInputFile);
-    Set(input, attrBuffer, hasInputBuffer);
-    Set(input, attrStream, hasInputBuffer);
+    Napi::Boolean hasInputFile =
+      Napi::Boolean::New(env, vips_type_find("VipsOperation", (f + "load").c_str()));
+    Napi::Boolean hasInputBuffer =
+      Napi::Boolean::New(env, vips_type_find("VipsOperation", (f + "load_buffer").c_str()));
+    Napi::Object input = Napi::Object::New(env);
+    input.Set("file", hasInputFile);
+    input.Set("buffer", hasInputBuffer);
+    input.Set("stream", hasInputBuffer);
     // Output
-    Local<Boolean> hasOutputFile =
-      New<Boolean>(vips_type_find("VipsOperation", (f + "save").c_str()));
-    Local<Boolean> hasOutputBuffer =
-      New<Boolean>(vips_type_find("VipsOperation", (f + "save_buffer").c_str()));
-    Local<Object> output = New<Object>();
-    Set(output, attrFile, hasOutputFile);
-    Set(output, attrBuffer, hasOutputBuffer);
-    Set(output, attrStream, hasOutputBuffer);
+    Napi::Boolean hasOutputFile =
+      Napi::Boolean::New(env, vips_type_find("VipsOperation", (f + "save").c_str()));
+    Napi::Boolean hasOutputBuffer =
+      Napi::Boolean::New(env, vips_type_find("VipsOperation", (f + "save_buffer").c_str()));
+    Napi::Object output = Napi::Object::New(env);
+    output.Set("file", hasOutputFile);
+    output.Set("buffer", hasOutputBuffer);
+    output.Set("stream", hasOutputBuffer);
     // Other attributes
-    Local<Object> container = New<Object>();
-    Local<String> formatId = New(f).ToLocalChecked();
-    Set(container, attrId, formatId);
-    Set(container, attrInput, input);
-    Set(container, attrOutput, output);
+    Napi::Object container = Napi::Object::New(env);
+    container.Set("id", f);
+    container.Set("input", input);
+    container.Set("output", output);
     // Add to set of formats
-    Set(format, formatId, container);
+    format.Set(f, container);
   }
 
   // Raw, uncompressed data
-  Local<Object> raw = New<Object>();
-  Local<String> rawId = New("raw").ToLocalChecked();
-  Set(raw, attrId, rawId);
-  Set(format, rawId, raw);
-  Local<Boolean> supported = New<Boolean>(true);
-  Local<Boolean> unsupported = New<Boolean>(false);
-  Local<Object> rawInput = New<Object>();
-  Set(rawInput, attrFile, unsupported);
-  Set(rawInput, attrBuffer, supported);
-  Set(rawInput, attrStream, supported);
-  Set(raw, attrInput, rawInput);
-  Local<Object> rawOutput = New<Object>();
-  Set(rawOutput, attrFile, unsupported);
-  Set(rawOutput, attrBuffer, supported);
-  Set(rawOutput, attrStream, supported);
-  Set(raw, attrOutput, rawOutput);
+  Napi::Boolean supported = Napi::Boolean::New(env, true);
+  Napi::Boolean unsupported = Napi::Boolean::New(env, false);
+  Napi::Object rawInput = Napi::Object::New(env);
+  rawInput.Set("file", unsupported);
+  rawInput.Set("buffer", supported);
+  rawInput.Set("stream", supported);
+  Napi::Object rawOutput = Napi::Object::New(env);
+  rawOutput.Set("file", unsupported);
+  rawOutput.Set("buffer", supported);
+  rawOutput.Set("stream", supported);
+  Napi::Object raw = Napi::Object::New(env);
+  raw.Set("id", "raw");
+  raw.Set("input", rawInput);
+  raw.Set("output", rawOutput);
+  format.Set("raw", raw);
 
-  info.GetReturnValue().Set(format);
+  return format;
 }
 
 /*
@@ -208,65 +169,59 @@ NAN_METHOD(format) {
   Calculates the maximum colour distance using the DE2000 algorithm
   between two images of the same dimensions and number of channels.
 */
-NAN_METHOD(_maxColourDistance) {
-  using vips::VImage;
-  using vips::VError;
-  using sharp::DetermineImageType;
-  using sharp::ImageType;
-  using sharp::HasAlpha;
-
-  HandleScope();
+Napi::Value _maxColourDistance(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
 
   // Open input files
   VImage image1;
-  ImageType imageType1 = DetermineImageType(*Utf8String(info[0]));
-  if (imageType1 != ImageType::UNKNOWN) {
+  sharp::ImageType imageType1 = sharp::DetermineImageType(info[0].As<Napi::String>().Utf8Value().data());
+  if (imageType1 != sharp::ImageType::UNKNOWN) {
     try {
-      image1 = VImage::new_from_file(*Utf8String(info[0]));
+      image1 = VImage::new_from_file(info[0].As<Napi::String>().Utf8Value().c_str());
     } catch (...) {
-      return ThrowError("Input file 1 has corrupt header");
+      throw Napi::Error::New(env, "Input file 1 has corrupt header");
     }
   } else {
-    return ThrowError("Input file 1 is of an unsupported image format");
+    throw Napi::Error::New(env, "Input file 1 is of an unsupported image format");
   }
   VImage image2;
-  ImageType imageType2 = DetermineImageType(*Utf8String(info[1]));
-  if (imageType2 != ImageType::UNKNOWN) {
+  sharp::ImageType imageType2 = sharp::DetermineImageType(info[1].As<Napi::String>().Utf8Value().data());
+  if (imageType2 != sharp::ImageType::UNKNOWN) {
     try {
-      image2 = VImage::new_from_file(*Utf8String(info[1]));
+      image2 = VImage::new_from_file(info[1].As<Napi::String>().Utf8Value().c_str());
     } catch (...) {
-      return ThrowError("Input file 2 has corrupt header");
+      throw Napi::Error::New(env, "Input file 2 has corrupt header");
     }
   } else {
-    return ThrowError("Input file 2 is of an unsupported image format");
+    throw Napi::Error::New(env, "Input file 2 is of an unsupported image format");
   }
   // Ensure same number of channels
   if (image1.bands() != image2.bands()) {
-    return ThrowError("mismatchedBands");
+    throw Napi::Error::New(env, "mismatchedBands");
   }
   // Ensure same dimensions
   if (image1.width() != image2.width() || image1.height() != image2.height()) {
-    return ThrowError("mismatchedDimensions");
+    throw Napi::Error::New(env, "mismatchedDimensions");
   }
 
   double maxColourDistance;
   try {
     // Premultiply and remove alpha
-    if (HasAlpha(image1)) {
+    if (sharp::HasAlpha(image1)) {
       image1 = image1.premultiply().extract_band(1, VImage::option()->set("n", image1.bands() - 1));
     }
-    if (HasAlpha(image2)) {
+    if (sharp::HasAlpha(image2)) {
       image2 = image2.premultiply().extract_band(1, VImage::option()->set("n", image2.bands() - 1));
     }
     // Calculate colour distance
     maxColourDistance = image1.dE00(image2).max();
-  } catch (VError const &err) {
-    return ThrowError(err.what());
+  } catch (vips::VError const &err) {
+    throw Napi::Error::New(env, err.what());
   }
 
   // Clean up libvips' per-request data and threads
   vips_error_clear();
   vips_thread_shutdown();
 
-  info.GetReturnValue().Set(New<Number>(maxColourDistance));
+  return Napi::Number::New(env, maxColourDistance);
 }

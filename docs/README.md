@@ -2,10 +2,6 @@
 
 <img src="https://raw.githubusercontent.com/lovell/sharp/master/docs/image/sharp-logo.svg?sanitize=true" width="160" height="160" alt="sharp logo" align="right">
 
-```sh
-npm install sharp
-```
-
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
@@ -23,76 +19,45 @@ rotation, extraction, compositing and gamma correction are available.
 Most modern macOS, Windows and Linux systems running Node.js v10+
 do not require any additional install or runtime dependencies.
 
-## Examples
+### Formats
 
-```javascript
-const sharp = require('sharp');
-```
+This module supports reading JPEG, PNG, WebP, TIFF, GIF and SVG images.
 
-### Callback
+Output images can be in JPEG, PNG, WebP and TIFF formats as well as uncompressed raw pixel data.
 
-```javascript
-sharp(inputBuffer)
-  .resize(320, 240)
-  .toFile('output.webp', (err, info) => { ... });
-```
+Streams, Buffer objects and the filesystem can be used for input and output.
 
-### Promise
+A single input Stream can be split into multiple processing pipelines and output Streams.
 
-```javascript
-sharp('input.jpg')
-  .rotate()
-  .resize(200)
-  .toBuffer()
-  .then( data => { ... })
-  .catch( err => { ... });
-```
+Deep Zoom image pyramids can be generated,
+suitable for use with "slippy map" tile viewers like
+[OpenSeadragon](https://github.com/openseadragon/openseadragon).
 
-### Async/await
+### Fast
 
-```javascript
-const semiTransparentRedPng = await sharp({
-  create: {
-    width: 48,
-    height: 48,
-    channels: 4,
-    background: { r: 255, g: 0, b: 0, alpha: 0.5 }
-  }
-})
-  .png()
-  .toBuffer();
-```
+This module is powered by the blazingly fast
+[libvips](https://github.com/libvips/libvips) image processing library,
+originally created in 1989 at Birkbeck College
+and currently maintained by a small team led by
+[John Cupitt](https://github.com/jcupitt).
 
-### Stream
+Only small regions of uncompressed image data
+are held in memory and processed at a time,
+taking full advantage of multiple CPU cores and L1/L2/L3 cache.
 
-```javascript
-const roundedCorners = Buffer.from(
-  '<svg><rect x="0" y="0" width="200" height="200" rx="50" ry="50"/></svg>'
-);
+Everything remains non-blocking thanks to _libuv_,
+no child processes are spawned and Promises/async/await are supported.
 
-const roundedCornerResizer =
-  sharp()
-    .resize(200, 200)
-    .composite([{
-      input: roundedCorners,
-      blend: 'dest-in'
-    }])
-    .png();
+### Optimal
 
-readableStream
-  .pipe(roundedCornerResizer)
-  .pipe(writableStream);
-```
+Huffman tables are optimised when generating JPEG output images
+without having to use separate command line tools like
+[jpegoptim](https://github.com/tjko/jpegoptim) and
+[jpegtran](http://jpegclub.org/jpegtran/).
 
-[![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.svg?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
-
-### Documentation
-
-Visit [sharp.pixelplumbing.com](https://sharp.pixelplumbing.com/) for complete
-[installation instructions](https://sharp.pixelplumbing.com/install),
-[API documentation](https://sharp.pixelplumbing.com/api-constructor),
-[benchmark tests](https://sharp.pixelplumbing.com/performance) and
-[changelog](https://sharp.pixelplumbing.com/changelog).
+PNG filtering is disabled by default,
+which for diagrams and line art often produces the same result
+as [pngcrush](https://pmt.sourceforge.io/pngcrush/).
 
 ### Contributing
 

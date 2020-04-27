@@ -94,6 +94,32 @@ describe('Trim borders', function () {
       .catch(done);
   });
 
+  it('should rotate before trim', () =>
+    sharp({
+      create: {
+        width: 20,
+        height: 30,
+        channels: 3,
+        background: 'white'
+      }
+    })
+      .rotate(30)
+      .png()
+      .toBuffer()
+      .then(rotated30 =>
+        sharp(rotated30)
+          .rotate(-30)
+          .trim(128)
+          .toBuffer({ resolveWithObject: true })
+          .then(({ info }) => {
+            assert.strictEqual(20, info.width);
+            assert.strictEqual(31, info.height);
+            assert.strictEqual(-8, info.trimOffsetTop);
+            assert.strictEqual(-13, info.trimOffsetLeft);
+          })
+      )
+  );
+
   describe('Invalid thresholds', function () {
     [-1, 'fail', {}].forEach(function (threshold) {
       it(JSON.stringify(threshold), function () {

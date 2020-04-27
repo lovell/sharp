@@ -287,6 +287,10 @@ sharp(input)
 
 Returns **Sharp** 
 
+**Meta**
+
+-   **since**: 0.21.1
+
 ## modulate
 
 Transforms the image using brightness, saturation and hue rotation.
@@ -321,6 +325,10 @@ sharp(input)
 ```
 
 Returns **Sharp** 
+
+**Meta**
+
+-   **since**: 0.22.1
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
