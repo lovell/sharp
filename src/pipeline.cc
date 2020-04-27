@@ -694,8 +694,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         image,
         &baton->pageHeight,
         baton->delay,
-        &baton->loop
-      );
+        &baton->loop);
 
       // Output
       if (baton->fileOut.empty()) {
@@ -852,7 +851,9 @@ class PipelineWorker : public Napi::AsyncWorker {
         bool const isDzZip = sharp::IsDzZip(baton->fileOut);
         bool const isV = sharp::IsV(baton->fileOut);
         bool const mightMatchInput = baton->formatOut == "input";
-        bool const willMatchInput = mightMatchInput && !(isJpeg || isPng || isWebp || isGif || isTiff || isDz || isDzZip || isV);
+        bool const willMatchInput = mightMatchInput &&
+         !(isJpeg || isPng || isWebp || isGif || isTiff || isDz || isDzZip || isV);
+
         if (baton->formatOut == "jpeg" || (mightMatchInput && isJpeg) ||
           (willMatchInput && inputImageType == sharp::ImageType::JPEG)) {
           // Write JPEG to file
