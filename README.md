@@ -1,6 +1,6 @@
 # sharp
 
-<img src="https://raw.githubusercontent.com/lovell/sharp/master/docs/image/sharp-logo.svg?sanitize=true" width="160" height="160" alt="sharp logo" align="right">
+<img src="https://cdn.jsdelivr.net/gh/lovell/sharp@master/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
 
 ```sh
 npm install sharp
