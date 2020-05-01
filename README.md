@@ -2,10 +2,6 @@
 
 <img src="https://cdn.jsdelivr.net/gh/lovell/sharp@master/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
 
-```sh
-npm install sharp
-```
-
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
 smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
@@ -24,6 +20,10 @@ Most modern macOS, Windows and Linux systems running Node.js v10+
 do not require any additional install or runtime dependencies.
 
 ## Examples
+
+```sh
+npm install sharp
+```
 
 ```javascript
 const sharp = require('sharp');
