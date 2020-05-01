@@ -179,3 +179,6 @@ GitHub: https://github.com/BrychanOdlum
 
 Name: Edward Silverton
 GitHub: https://github.com/edsilv
+
+Name: Dumitru Deveatii
+GitHub: https://github.com/dimadeveatii

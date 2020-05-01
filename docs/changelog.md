@@ -9,6 +9,10 @@ Requires libvips v8.9.1
 * Ensure libvips is initialised only once, improves worker thread safety.
   [#2143](https://github.com/lovell/sharp/issues/2143)
 
+* Ensure npm platform flag is respected when copying DLLs.
+  [#2188](https://github.com/lovell/sharp/pull/2188)
+  [@dimadeveatii](https://github.com/dimadeveatii)
+
 ### v0.25.2 - 20th March 2020
 
 * Provide prebuilt binaries for Linux ARM64v8.
