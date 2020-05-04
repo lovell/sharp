@@ -61,6 +61,14 @@ namespace sharp {
     }
     return rgba;
   }
+  std::vector<int32_t> AttrAsInt32Vector(Napi::Object obj, std::string attr) {
+    Napi::Array array = obj.Get(attr).As<Napi::Array>();
+    std::vector<int32_t> vector(array.Length());
+    for (unsigned int i = 0; i < array.Length(); i++) {
+      vector[i] = AttrAsInt32(array, i);
+    }
+    return vector;
+  }
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image
   InputDescriptor* CreateInputDescriptor(Napi::Object input) {
@@ -416,12 +424,15 @@ namespace sharp {
     Non-provided properties will be loaded from image and propagated back to caller.
   */
   VImage SetAnimationProperties(VImage image, int *pageHeight, std::vector<int> *delay, int *loop) {
+    bool hasDelay = delay->size() != 1 || delay->front() != -1;
+
     if (*pageHeight == 0 && image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
       *pageHeight = image.get_int(VIPS_META_PAGE_HEIGHT);
     }
 
-    if (delay == nullptr && image.get_typeof("delay") == VIPS_TYPE_ARRAY_INT) {
-      delay = new std::vector<int>(image.get_array_int("delay"));
+    if (!hasDelay && image.get_typeof("delay") == VIPS_TYPE_ARRAY_INT) {
+      *delay = image.get_array_int("delay");
+      hasDelay = true;
     }
 
     if (*loop == -1 && image.get_typeof("loop") == G_TYPE_INT) {
@@ -434,7 +445,7 @@ namespace sharp {
     VImage copy = image.copy();
 
     copy.set(VIPS_META_PAGE_HEIGHT, *pageHeight);
-    if (delay != nullptr) copy.set("delay", *delay);
+    if (hasDelay) copy.set("delay", *delay);
     if (*loop != -1) copy.set("loop", *loop);
 
     return copy;

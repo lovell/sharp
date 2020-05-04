@@ -168,7 +168,7 @@ struct PipelineBaton {
   bool ensureAlpha;
   VipsInterpretation colourspace;
   int pageHeight;
-  std::vector<int> *delay;
+  std::vector<int> delay;
   int loop;
   int tileSize;
   int tileOverlap;
@@ -277,7 +277,7 @@ struct PipelineBaton {
     ensureAlpha(false),
     colourspace(VIPS_INTERPRETATION_LAST),
     pageHeight(0),
-    delay(nullptr),
+    delay{-1},
     loop(-1),
     tileSize(256),
     tileOverlap(0),

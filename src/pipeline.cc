@@ -690,10 +690,12 @@ class PipelineWorker : public Napi::AsyncWorker {
       baton->width = image.width();
       baton->height = image.height();
 
+      bool const supportsGifOutput = false;
+
       image = sharp::SetAnimationProperties(
         image,
         &baton->pageHeight,
-        baton->delay,
+        &baton->delay,
         &baton->loop);
 
       // Output
@@ -723,7 +725,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             baton->channels = std::min(baton->channels, 3);
           }
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" &&
-          (inputImageType == sharp::ImageType::PNG || inputImageType == sharp::ImageType::SVG))) {
+          (inputImageType == sharp::ImageType::PNG || (inputImageType == sharp::ImageType::GIF && !supportsGifOutput) ||
+           inputImageType == sharp::ImageType::SVG))) {
           // Write PNG to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::PNG);
           VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
@@ -758,7 +761,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           vips_area_unref(area);
           baton->formatOut = "webp";
         } else if (baton->formatOut == "gif" ||
-          (baton->formatOut == "input" && inputImageType == sharp::ImageType::GIF)) {
+          (baton->formatOut == "input" && inputImageType == sharp::ImageType::GIF && supportsGifOutput)) {
           // Write GIF to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::GIF);
           VipsArea *area = VIPS_AREA(image.magicksave_buffer(VImage::option()
@@ -871,7 +874,8 @@ class PipelineWorker : public Napi::AsyncWorker {
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "png" || (mightMatchInput && isPng) || (willMatchInput &&
-          (inputImageType == sharp::ImageType::PNG || inputImageType == sharp::ImageType::SVG))) {
+          (inputImageType == sharp::ImageType::PNG || (inputImageType == sharp::ImageType::GIF && !supportsGifOutput) ||
+           inputImageType == sharp::ImageType::SVG))) {
           // Write PNG to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::PNG);
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -898,7 +902,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
         } else if (baton->formatOut == "gif" || (mightMatchInput && isGif) ||
-          (willMatchInput && inputImageType == sharp::ImageType::GIF)) {
+          (willMatchInput && inputImageType == sharp::ImageType::GIF && supportsGifOutput)) {
           // Write GIF to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::GIF);
           image.magicksave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -1357,13 +1361,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     baton->loop = sharp::AttrAsUint32(options, "loop");
   }
   if (sharp::HasAttr(options, "delay")) {
-    Napi::Array delay = options.Get("delay").As<Napi::Array>();
-    unsigned int delayLength = delay.Length();
-    baton->delay = new std::vector<int>(delayLength);
-
-    for (unsigned int i = 0; i < delayLength; i++) {
-      (*baton->delay)[i] = sharp::AttrAsInt32(delay, i);
-    }
+    baton->delay = sharp::AttrAsInt32Vector(options, "delay");
   }
 
   // Tile output
