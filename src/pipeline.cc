@@ -690,7 +690,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       baton->width = image.width();
       baton->height = image.height();
 
-      bool const supportsGifOutput = false;
+      bool const supportsGifOutput = vips_type_find("VipsOperation", "magicksave") != 0 &&
+       vips_type_find("VipsOperation", "magicksave_buffer") != 0;
 
       image = sharp::SetAnimationProperties(
         image,
