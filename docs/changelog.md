@@ -13,6 +13,9 @@ Requires libvips v8.9.1
   [#2188](https://github.com/lovell/sharp/pull/2188)
   [@dimadeveatii](https://github.com/dimadeveatii)
 
+* Allow SVG input with large inline images to be parsed.
+  [#2195](https://github.com/lovell/sharp/issues/2195)
+
 ### v0.25.2 - 20th March 2020
 
 * Provide prebuilt binaries for Linux ARM64v8.

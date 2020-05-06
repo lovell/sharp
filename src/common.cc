@@ -279,6 +279,9 @@ namespace sharp {
             vips::VOption *option = VImage::option()
               ->set("access", descriptor->access)
               ->set("fail", descriptor->failOnError);
+            if (imageType == ImageType::SVG) {
+              option->set("unlimited", TRUE);
+            }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
             }
@@ -325,6 +328,9 @@ namespace sharp {
             vips::VOption *option = VImage::option()
               ->set("access", descriptor->access)
               ->set("fail", descriptor->failOnError);
+            if (imageType == ImageType::SVG) {
+              option->set("unlimited", TRUE);
+            }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
             }
