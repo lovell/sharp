@@ -91,8 +91,10 @@ Returns **[Promise][5]&lt;[Buffer][8]>** when no callback is provided
 ## withMetadata
 
 Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
-The default behaviour, when `withMetadata` is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
 This will also convert to and add a web-friendly sRGB ICC profile.
+
+The default behaviour, when `withMetadata` is not used, is to convert to the device-independent
+sRGB colour space and strip all metadata, including the removal of any ICC profile.
 
 ### Parameters
 
