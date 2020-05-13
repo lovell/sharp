@@ -2,6 +2,8 @@ freebsd_instance:
   image_family: freebsd-13-0-snap
 
 task:
+  env:
+    IGNORE_OSVERSION: yes
   prerequisites_script:
     - pkg update -f
     - pkg upgrade -y
