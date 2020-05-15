@@ -302,6 +302,7 @@ describe('Input/output', function () {
   });
 
   it('Fail when input is empty Buffer', function (done) {
+    if (process.platform === 'freebsd') return this.skip(); // can be removed with libvips 8.10.0+
     sharp(Buffer.alloc(0)).toBuffer().then(function () {
       assert(false);
       done();
