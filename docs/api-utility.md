@@ -31,10 +31,10 @@ useful for determining how much working memory is required for a particular task
 
 ### Parameters
 
--   `options` **([Object][1] \| [Boolean][2])** Object with the following attributes, or Boolean where true uses default cache settings and false removes all caching (optional, default `true`)
-    -   `options.memory` **[Number][3]** is the maximum memory in MB to use for this cache (optional, default `50`)
-    -   `options.files` **[Number][3]** is the maximum number of files to hold open (optional, default `20`)
-    -   `options.items` **[Number][3]** is the maximum number of operations to cache (optional, default `100`)
+-   `options` **([Object][1] \| [boolean][2])** Object with the following attributes, or boolean where true uses default cache settings and false removes all caching (optional, default `true`)
+    -   `options.memory` **[number][3]** is the maximum memory in MB to use for this cache (optional, default `50`)
+    -   `options.files` **[number][3]** is the maximum number of files to hold open (optional, default `20`)
+    -   `options.items` **[number][3]** is the maximum number of operations to cache (optional, default `100`)
 
 ### Examples
 
@@ -64,7 +64,7 @@ This method always returns the current concurrency.
 
 ### Parameters
 
--   `concurrency` **[Number][3]?** 
+-   `concurrency` **[number][3]?** 
 
 ### Examples
 
@@ -74,7 +74,7 @@ sharp.concurrency(2); // 2
 sharp.concurrency(0); // 4
 ```
 
-Returns **[Number][3]** concurrency
+Returns **[number][3]** concurrency
 
 ## queue
 
@@ -116,7 +116,7 @@ by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM N
 
 ### Parameters
 
--   `simd` **[Boolean][2]**  (optional, default `true`)
+-   `simd` **[boolean][2]**  (optional, default `true`)
 
 ### Examples
 
@@ -130,7 +130,7 @@ const simd = sharp.simd(false);
 // prevent libvips from using liborc at runtime
 ```
 
-Returns **[Boolean][2]** 
+Returns **[boolean][2]** 
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 

@@ -38,8 +38,8 @@ Possible interpolation kernels are:
 
 ### Parameters
 
--   `width` **[Number][8]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
--   `height` **[Number][8]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
+-   `width` **[number][8]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
+-   `height` **[number][8]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
 -   `options` **[Object][9]?** 
     -   `options.width` **[String][10]?** alternative means of specifying `width`. If both are present this take priority.
     -   `options.height` **[String][10]?** alternative means of specifying `height`. If both are present this take priority.
@@ -136,11 +136,11 @@ This operation will always occur after resizing and extraction, if any.
 
 ### Parameters
 
--   `extend` **([Number][8] \| [Object][9])** single pixel count to add to all edges or an Object with per-edge counts
-    -   `extend.top` **[Number][8]?** 
-    -   `extend.left` **[Number][8]?** 
-    -   `extend.bottom` **[Number][8]?** 
-    -   `extend.right` **[Number][8]?** 
+-   `extend` **([number][8] \| [Object][9])** single pixel count to add to all edges or an Object with per-edge counts
+    -   `extend.top` **[number][8]?** 
+    -   `extend.left` **[number][8]?** 
+    -   `extend.bottom` **[number][8]?** 
+    -   `extend.right` **[number][8]?** 
     -   `extend.background` **([String][10] \| [Object][9])** background colour, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
 
 ### Examples
@@ -175,10 +175,10 @@ Extract/crop a region of the image.
 ### Parameters
 
 -   `options` **[Object][9]** describes the region to extract using integral pixel values
-    -   `options.left` **[Number][8]** zero-indexed offset from left edge
-    -   `options.top` **[Number][8]** zero-indexed offset from top edge
-    -   `options.width` **[Number][8]** width of region to extract
-    -   `options.height` **[Number][8]** height of region to extract
+    -   `options.left` **[number][8]** zero-indexed offset from left edge
+    -   `options.top` **[number][8]** zero-indexed offset from top edge
+    -   `options.width` **[number][8]** width of region to extract
+    -   `options.height` **[number][8]** height of region to extract
 
 ### Examples
 
@@ -213,7 +213,7 @@ The `info` response Object will contain `trimOffsetLeft` and `trimOffsetTop` pro
 
 ### Parameters
 
--   `threshold` **[Number][8]** the allowed difference from the top-left pixel, a number greater than zero. (optional, default `10`)
+-   `threshold` **[number][8]** the allowed difference from the top-left pixel, a number greater than zero. (optional, default `10`)
 
 
 -   Throws **[Error][13]** Invalid parameters

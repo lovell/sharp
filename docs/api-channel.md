@@ -42,7 +42,7 @@ Extract a single channel from a multi-channel image.
 
 ### Parameters
 
--   `channel` **([Number][1] \| [String][2])** zero-indexed band number to extract, or `red`, `green` or `blue` as alternative to `0`, `1` or `2` respectively.
+-   `channel` **([number][1] \| [string][2])** zero-indexed band number to extract, or `red`, `green` or `blue` as alternative to `0`, `1` or `2` respectively.
 
 ### Examples
 
@@ -75,7 +75,7 @@ For raw pixel input, the `options` object should contain a `raw` attribute, whic
 
 ### Parameters
 
--   `images` **([Array][4]&lt;([String][2] \| [Buffer][5])> | [String][2] \| [Buffer][5])** one or more images (file paths, Buffers).
+-   `images` **([Array][4]&lt;([string][2] \| [Buffer][5])> | [string][2] \| [Buffer][5])** one or more images (file paths, Buffers).
 -   `options` **[Object][6]** image options, see `sharp()` constructor.
 
 
@@ -89,7 +89,7 @@ Perform a bitwise boolean operation on all input image channels (bands) to produ
 
 ### Parameters
 
--   `boolOp` **[String][2]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+-   `boolOp` **[string][2]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
 
 ### Examples
 
