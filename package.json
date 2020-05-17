@@ -110,11 +110,11 @@
   "dependencies": {
     "color": "^3.1.2",
     "detect-libc": "^1.0.3",
-    "node-addon-api": "^2.0.0",
+    "node-addon-api": "^3.0.0",
     "npmlog": "^4.1.2",
     "prebuild-install": "^5.3.3",
     "semver": "^7.3.2",
-    "simple-get": "^3.1.0",
+    "simple-get": "^4.0.0",
     "tar": "^6.0.2",
     "tunnel-agent": "^0.6.0"
   },
