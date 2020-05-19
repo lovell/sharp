@@ -140,20 +140,22 @@ Returns **Sharp**
 
 Use these JPEG options for output image.
 
+Some of these options require the use of a globally-installed libvips compiled with support for mozjpeg.
+
 ### Parameters
 
 -   `options` **[Object][6]?** output options
     -   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `80`)
     -   `options.progressive` **[boolean][7]** use progressive (interlace) scan (optional, default `false`)
     -   `options.chromaSubsampling` **[string][2]** for quality &lt; 90, set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' (use chroma subsampling); for quality >= 90 chroma is never subsampled (optional, default `'4:2:0'`)
+    -   `options.optimiseCoding` **[boolean][7]** optimise Huffman coding tables (optional, default `true`)
+    -   `options.optimizeCoding` **[boolean][7]** alternative spelling of optimiseCoding (optional, default `true`)
     -   `options.trellisQuantisation` **[boolean][7]** apply trellis quantisation, requires libvips compiled with support for mozjpeg (optional, default `false`)
     -   `options.overshootDeringing` **[boolean][7]** apply overshoot deringing, requires libvips compiled with support for mozjpeg (optional, default `false`)
     -   `options.optimiseScans` **[boolean][7]** optimise progressive scans, forces progressive, requires libvips compiled with support for mozjpeg (optional, default `false`)
-    -   `options.optimizeScans` **[boolean][7]** alternative spelling of optimiseScans (optional, default `false`)
-    -   `options.optimiseCoding` **[boolean][7]** optimise Huffman coding tables (optional, default `true`)
-    -   `options.optimizeCoding` **[boolean][7]** alternative spelling of optimiseCoding (optional, default `true`)
+    -   `options.optimizeScans` **[boolean][7]** alternative spelling of optimiseScans, requires libvips compiled with support for mozjpeg (optional, default `false`)
     -   `options.quantisationTable` **[number][9]** quantization table to use, integer 0-8, requires libvips compiled with support for mozjpeg (optional, default `0`)
-    -   `options.quantizationTable` **[number][9]** alternative spelling of quantisationTable (optional, default `0`)
+    -   `options.quantizationTable` **[number][9]** alternative spelling of quantisationTable, requires libvips compiled with support for mozjpeg (optional, default `0`)
     -   `options.force` **[boolean][7]** force JPEG output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
@@ -178,6 +180,8 @@ Use these PNG options for output image.
 
 PNG output is always full colour at 8 or 16 bits per pixel.
 Indexed PNG input at 1, 2 or 4 bits per pixel is converted to 8 bits per pixel.
+
+Some of these options require the use of a globally-installed libvips compiled with support for libimagequant (GPL).
 
 ### Parameters
 
