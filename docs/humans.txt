@@ -182,3 +182,6 @@ GitHub: https://github.com/edsilv
 
 Name: Dumitru Deveatii
 GitHub: https://github.com/dimadeveatii
+
+Name: Roland Asmann
+GitHub: https://github.com/malice00

@@ -81,24 +81,41 @@ Building from source requires:
 
 This is an advanced approach that most people will not require.
 
-To install the prebuilt libvips binaries from a custom URL,
-set the `sharp_dist_base_url` npm config option
-or the `SHARP_DIST_BASE_URL` environment variable.
+To install the prebuilt sharp binaries from a custom URL,
+set the `sharp_binary_host` npm config option
+or the `npm_config_sharp_binary_host` environment variable.
 
-For example, both of the following will result in an attempt to download the file located at
-`https://hostname/path/libvips-x.y.z-platform.tar.gz`.
+To install the prebuilt libvips binaries from a custom URL,
+set the `sharp_libvips_binary_host` npm config option
+or the `npm_config_sharp_libvips_binary_host` environment variable.
+
+The version subpath and file name are appended to these.
+
+For example, if `sharp_libvips_binary_host` is set to `https://hostname/path`
+and the libvips version is `1.2.3` then the resultant URL will be
+`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.gz`.
+
+See the Chinese mirror below for a further example.
+
+## Chinese mirror
+
+Alibaba provide a mirror site based in China containing binaries for both sharp and libvips.
+
+To use this either set the following configuration:
 
 ```sh
-npm config set sharp_dist_base_url "https://hostname/path/"
+npm config set sharp_binary_host "https://npm.taobao.org/mirrors/sharp"
+npm config set sharp_libvips_binary_host "https://npm.taobao.org/mirrors/sharp-libvips"
 npm install sharp
 ```
 
-```sh
-SHARP_DIST_BASE_URL="https://hostname/path/" npm install sharp
-```
+or set the following environment variables:
 
-To install the prebuilt sharp binaries from a custom URL, please see
-[https://github.com/prebuild/prebuild-install#custom-binaries](https://github.com/prebuild/prebuild-install#custom-binaries)
+```sh
+npm_config_sharp_binary_host="https://npm.taobao.org/mirrors/sharp" \
+  npm_config_sharp_libvips_binary_host "https://npm.taobao.org/mirrors/sharp-libvips" \
+  npm install sharp
+```
 
 ## FreeBSD
 

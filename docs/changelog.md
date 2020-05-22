@@ -4,6 +4,12 @@
 
 Requires libvips v8.9.1
 
+### v0.25.4 - TBD
+
+* Allow libvips binary location override where version is appended.
+  [#2217](https://github.com/lovell/sharp/pull/2217)
+  [@malice00](https://github.com/malice00)
+
 ### v0.25.3 - 17th May 2020
 
 * Ensure libvips is initialised only once, improves worker thread safety.
