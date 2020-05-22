@@ -29,10 +29,22 @@
           'Release': {
             'msvs_settings': {
               'VCCLCompilerTool': {
-                'ExceptionHandling': 1
+                'ExceptionHandling': 1,
+                'WholeProgramOptimization': 'true'
+              },
+              'VCLibrarianTool': {
+                'AdditionalOptions': [
+                  '/LTCG:INCREMENTAL'
+                ]
               },
               'VCLinkerTool': {
-                'ImageHasSafeExceptionHandlers': 'false'
+                'ImageHasSafeExceptionHandlers': 'false',
+                'OptimizeReferences': 2,
+                'EnableCOMDATFolding': 2,
+                'LinkIncremental': 1,
+                'AdditionalOptions': [
+                  '/LTCG:INCREMENTAL'
+                ]
               }
             },
             'msvs_disabled_warnings': [
@@ -121,7 +133,7 @@
               '../vendor/lib/libglib-2.0.0.dylib',
               '../vendor/lib/libgobject-2.0.0.dylib',
               # Ensure runtime linking is relative to sharp.node
-              '-rpath \'@loader_path/../../vendor/lib\''
+              '-Wl,-s -rpath \'@loader_path/../../vendor/lib\''
             ]
           }],
           ['OS == "linux"', {
@@ -164,7 +176,7 @@
               '../vendor/lib/libxml2.so',
               '../vendor/lib/libz.so',
               # Ensure runtime linking is relative to sharp.node
-              '-Wl,--disable-new-dtags -Wl,-rpath=\'$${ORIGIN}/../../vendor/lib\''
+              '-Wl,-s -Wl,--disable-new-dtags -Wl,-rpath=\'$${ORIGIN}/../../vendor/lib\''
             ]
           }]
         ]
@@ -204,10 +216,22 @@
           ['OS == "win"', {
             'msvs_settings': {
               'VCCLCompilerTool': {
-                'ExceptionHandling': 1
+                'ExceptionHandling': 1,
+                'WholeProgramOptimization': 'true'
+              },
+              'VCLibrarianTool': {
+                'AdditionalOptions': [
+                  '/LTCG:INCREMENTAL'
+                ]
               },
               'VCLinkerTool': {
-                'ImageHasSafeExceptionHandlers': 'false'
+                'ImageHasSafeExceptionHandlers': 'false',
+                'OptimizeReferences': 2,
+                'EnableCOMDATFolding': 2,
+                'LinkIncremental': 1,
+                'AdditionalOptions': [
+                  '/LTCG:INCREMENTAL'
+                ]
               }
             },
             'msvs_disabled_warnings': [
