@@ -137,7 +137,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.9.1"
+    "libvips": "8.9.2-alpha2"
   },
   "engines": {
     "node": ">=10"
