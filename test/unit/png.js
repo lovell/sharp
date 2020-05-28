@@ -127,8 +127,8 @@ describe('PNG', function () {
   it('Valid PNG libimagequant quality value produces image of same size or smaller', function () {
     const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     return Promise.all([
-      sharp(inputPngBuffer).resize(10).png({ palette: true, quality: 80 }).toBuffer(),
-      sharp(inputPngBuffer).resize(10).png({ palette: true, quality: 100 }).toBuffer()
+      sharp(inputPngBuffer).resize(10).png({ quality: 80 }).toBuffer(),
+      sharp(inputPngBuffer).resize(10).png({ quality: 100 }).toBuffer()
     ]).then(function (data) {
       assert.strictEqual(true, data[0].length <= data[1].length);
     });
@@ -136,15 +136,15 @@ describe('PNG', function () {
 
   it('Invalid PNG libimagequant quality value throws error', function () {
     assert.throws(function () {
-      sharp().png({ palette: true, quality: 101 });
+      sharp().png({ quality: 101 });
     });
   });
 
   it('Valid PNG libimagequant colours value produces image of same size or smaller', function () {
     const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     return Promise.all([
-      sharp(inputPngBuffer).resize(10).png({ palette: true, colours: 100 }).toBuffer(),
-      sharp(inputPngBuffer).resize(10).png({ palette: true, colours: 200 }).toBuffer()
+      sharp(inputPngBuffer).resize(10).png({ colours: 100 }).toBuffer(),
+      sharp(inputPngBuffer).resize(10).png({ colours: 200 }).toBuffer()
     ]).then(function (data) {
       assert.strictEqual(true, data[0].length <= data[1].length);
     });
@@ -152,21 +152,21 @@ describe('PNG', function () {
 
   it('Invalid PNG libimagequant colours value throws error', function () {
     assert.throws(function () {
-      sharp().png({ palette: true, colours: -1 });
+      sharp().png({ colours: -1 });
     });
   });
 
   it('Invalid PNG libimagequant colors value throws error', function () {
     assert.throws(function () {
-      sharp().png({ palette: true, colors: 0.1 });
+      sharp().png({ colors: 0.1 });
     });
   });
 
   it('Valid PNG libimagequant dither value produces image of same size or smaller', function () {
     const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     return Promise.all([
-      sharp(inputPngBuffer).resize(10).png({ palette: true, dither: 0.1 }).toBuffer(),
-      sharp(inputPngBuffer).resize(10).png({ palette: true, dither: 0.9 }).toBuffer()
+      sharp(inputPngBuffer).resize(10).png({ dither: 0.1 }).toBuffer(),
+      sharp(inputPngBuffer).resize(10).png({ dither: 0.9 }).toBuffer()
     ]).then(function (data) {
       assert.strictEqual(true, data[0].length <= data[1].length);
     });
@@ -174,7 +174,7 @@ describe('PNG', function () {
 
   it('Invalid PNG libimagequant dither value throws error', function () {
     assert.throws(function () {
-      sharp().png({ palette: true, dither: 'fail' });
+      sharp().png({ dither: 'fail' });
     });
   });
 });
