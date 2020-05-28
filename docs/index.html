@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://pixel.plumbing/px/114x114/sharp-logo.svg">
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://pixel.plumbing/px/72x72/sharp-logo.svg">
   <link rel="apple-touch-icon-precomposed" href="https://pixel.plumbing/px/57x57/sharp-logo.svg">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docute@4/dist/docute.min.css">
+  <style>/* https://cdn.jsdelivr.net/npm/docute@4/dist/docute.min.css */ body{margin:0;color:var(--text-color);background:var(--page-background);text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;font:16px/1.7 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif}*{box-sizing:border-box}a{color:var(--link-color);text-decoration:none}.page-content>:first-child{margin-top:0}.page-content.has-page-title>h2:first-child{margin-top:7rem}.page-content h2,.page-content h3{font-weight:300;line-height:1.2}.page-content h2{font-size:2rem;border-bottom:1px solid var(--border-color);margin-top:7rem;padding-bottom:5px}.page-content h3{font-size:1.7rem;margin:40px 0 30px}.page-content code{font-family:var(--code-font);font-size:90%;background:var(--inline-code-background);border-radius:4px;padding:3px 5px;color:var(--inline-code-color)}.page-content>ul{padding-left:20px;margin:1rem 0}.page-content img{max-width:100%}@-webkit-keyframes blink-data-v-4f620c69{to{opacity:.2}}@keyframes blink-data-v-4f620c69{0%{opacity:.2}20%{opacity:1}to{opacity:.2}}</style>
   <link rel="author" href="/humans.txt" type="text/plain">
   <link rel="preload" href="https://cdn.jsdelivr.net/gh/lovell/sharp@v0.25.3/docs/README.md" as="fetch" type="text/markdown" crossorigin>
   <link rel="preload" href="https://cdn.jsdelivr.net/gh/lovell/sharp@master/docs/image/sharp-logo.svg" as="image" type="image/svg+xml" crossorigin>
@@ -66,8 +66,8 @@
 <body>
   <div id="docute"></div>
   <script src="https://cdn.jsdelivr.net/npm/docute@4/dist/docute.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docute-google-analytics@1/dist/index.min.js"></script>
   <script>
+    /* https://cdn.jsdelivr.net/npm/docute-google-analytics@1/dist/index.min.js */ !function(e,n){"object"==typeof exports&&"undefined"!=typeof module?module.exports=n():"function"==typeof define&&define.amd?define(n):(e=e||self).docuteGoogleAnalytics=n()}(this,function(){"use strict";function e(e){var n;window.ga||((n=document.createElement("script")).async=!0,n.src="https://www.google-analytics.com/analytics.js",document.body.appendChild(n),window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=Number(new Date),ga("create",e,"auto"))}function n(n,t){e(t),ga("set","page",n),ga("send","pageview")}return function(e){return{name:"@google-analytics",extend:function(t){!function(e,t){"function"==typeof e?e(function(e){n(e,t)}):e.afterEach(function(e){n(e.fullPath,t)})}(t.router,e)}}}});
     const docuteApiTitlePlugin = {
       name: 'apiTitle',
       extend(api) {
