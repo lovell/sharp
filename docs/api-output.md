@@ -190,10 +190,10 @@ Some of these options require the use of a globally-installed libvips compiled w
     -   `options.compressionLevel` **[number][9]** zlib compression level, 0-9 (optional, default `9`)
     -   `options.adaptiveFiltering` **[boolean][7]** use adaptive row filtering (optional, default `false`)
     -   `options.palette` **[boolean][7]** quantise to a palette-based image with alpha transparency support, requires libvips compiled with support for libimagequant (optional, default `false`)
-    -   `options.quality` **[number][9]** use the lowest number of colours needed to achieve given quality, requires libvips compiled with support for libimagequant (optional, default `100`)
-    -   `options.colours` **[number][9]** maximum number of palette entries, requires libvips compiled with support for libimagequant (optional, default `256`)
-    -   `options.colors` **[number][9]** alternative spelling of `options.colours`, requires libvips compiled with support for libimagequant (optional, default `256`)
-    -   `options.dither` **[number][9]** level of Floyd-Steinberg error diffusion, requires libvips compiled with support for libimagequant (optional, default `1.0`)
+    -   `options.quality` **[number][9]** use the lowest number of colours needed to achieve given quality, sets `palette` to `true`, requires libvips compiled with support for libimagequant (optional, default `100`)
+    -   `options.colours` **[number][9]** maximum number of palette entries, sets `palette` to `true`, requires libvips compiled with support for libimagequant (optional, default `256`)
+    -   `options.colors` **[number][9]** alternative spelling of `options.colours`, sets `palette` to `true`, requires libvips compiled with support for libimagequant (optional, default `256`)
+    -   `options.dither` **[number][9]** level of Floyd-Steinberg error diffusion, sets `palette` to `true`, requires libvips compiled with support for libimagequant (optional, default `1.0`)
     -   `options.force` **[boolean][7]** force PNG output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples

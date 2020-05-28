@@ -10,6 +10,10 @@ Requires libvips v8.9.1
   [#2217](https://github.com/lovell/sharp/pull/2217)
   [@malice00](https://github.com/malice00)
 
+* Enable PNG palette when setting quality, colours, colors or dither.
+  [#2226](https://github.com/lovell/sharp/pull/2226)
+  [@romaleev](https://github.com/romaleev)
+
 ### v0.25.3 - 17th May 2020
 
 * Ensure libvips is initialised only once, improves worker thread safety.
