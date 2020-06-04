@@ -20,6 +20,7 @@ A `Promise` is returned when `callback` is not provided.
 -   `loop`: Number of times to loop an animated image, zero refers to a continuous loop.
 -   `delay`: Delay in ms between each page in an animated image, provided as an array of integers.
 -   `pagePrimary`: Number of the primary page in a HEIF image
+-   `levels`: Details of each level in a multi-level image provided as an array of objects, requires libvips compiled with support for OpenSlide
 -   `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 -   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 -   `orientation`: Number value of the EXIF Orientation header, if present

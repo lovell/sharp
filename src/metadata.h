@@ -39,6 +39,7 @@ struct MetadataBaton {
   int loop;
   std::vector<int> delay;
   int pagePrimary;
+  std::vector<std::pair<int, int>> levels;
   bool hasProfile;
   bool hasAlpha;
   int orientation;

@@ -74,6 +74,15 @@ class MetadataWorker : public Napi::AsyncWorker {
       if (image.get_typeof("heif-primary") == G_TYPE_INT) {
         baton->pagePrimary = image.get_int("heif-primary");
       }
+      if (image.get_typeof("openslide.level-count") == VIPS_TYPE_REF_STRING) {
+        int const levels = std::stoi(image.get_string("openslide.level-count"));
+        for (int l = 0; l < levels; l++) {
+          std::string prefix = "openslide.level[" + std::to_string(l) + "].";
+          int const width = std::stoi(image.get_string((prefix + "width").data()));
+          int const height = std::stoi(image.get_string((prefix + "height").data()));
+          baton->levels.push_back(std::pair<int, int>(width, height));
+        }
+      }
       baton->hasProfile = sharp::HasProfile(image);
       // Derived attributes
       baton->hasAlpha = sharp::HasAlpha(image);
@@ -176,6 +185,17 @@ class MetadataWorker : public Napi::AsyncWorker {
       }
       if (baton->pagePrimary > -1) {
         info.Set("pagePrimary", baton->pagePrimary);
+      }
+      if (!baton->levels.empty()) {
+        int i = 0;
+        Napi::Array levels = Napi::Array::New(env, static_cast<size_t>(baton->levels.size()));
+        for (std::pair<int, int> const l : baton->levels) {
+          Napi::Object level = Napi::Object::New(env);
+          level.Set("width", l.first);
+          level.Set("height", l.second);
+          levels.Set(i++, level);
+        }
+        info.Set("levels", levels);
       }
       info.Set("hasProfile", baton->hasProfile);
       info.Set("hasAlpha", baton->hasAlpha);
