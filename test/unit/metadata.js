@@ -19,7 +19,7 @@ describe('Image metadata', function () {
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
       assert.strictEqual('4:2:0', metadata.chromaSubsampling);
       assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
@@ -311,7 +311,7 @@ describe('Image metadata', function () {
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
       assert.strictEqual('4:2:0', metadata.chromaSubsampling);
       assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
@@ -343,7 +343,7 @@ describe('Image metadata', function () {
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
       assert.strictEqual('4:2:0', metadata.chromaSubsampling);
       assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
@@ -381,7 +381,7 @@ describe('Image metadata', function () {
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
       assert.strictEqual('4:2:0', metadata.chromaSubsampling);
       assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
@@ -405,7 +405,7 @@ describe('Image metadata', function () {
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual('undefined', typeof metadata.density);
+      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
       assert.strictEqual('4:2:0', metadata.chromaSubsampling);
       assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
