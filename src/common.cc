@@ -88,6 +88,10 @@ namespace sharp {
     if (HasAttr(input, "page")) {
       descriptor->page = AttrAsUint32(input, "page");
     }
+    // Multi-level input (OpenSlide)
+    if (HasAttr(input, "level")) {
+      descriptor->level = AttrAsUint32(input, "level");
+    }
     // Create new image
     if (HasAttr(input, "createChannels")) {
       descriptor->createChannels = AttrAsUint32(input, "createChannels");
@@ -292,6 +296,9 @@ namespace sharp {
               option->set("n", descriptor->pages);
               option->set("page", descriptor->page);
             }
+            if (imageType == ImageType::OPENSLIDE) {
+              option->set("level", descriptor->level);
+            }
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
@@ -340,6 +347,9 @@ namespace sharp {
             if (ImageTypeSupportsPage(imageType)) {
               option->set("n", descriptor->pages);
               option->set("page", descriptor->page);
+            }
+            if (imageType == ImageType::OPENSLIDE) {
+              option->set("level", descriptor->level);
             }
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {

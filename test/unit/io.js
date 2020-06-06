@@ -659,6 +659,19 @@ describe('Input/output', function () {
         sharp({ pages: '1' });
       }, /Expected integer between -1 and 100000 for pages but received 1 of type string/);
     });
+    it('Valid level property', function () {
+      sharp({ level: 1 });
+    });
+    it('Invalid level property (string) throws', function () {
+      assert.throws(function () {
+        sharp({ level: '1' });
+      }, /Expected integer between 0 and 256 for level but received 1 of type string/);
+    });
+    it('Invalid level property (negative) throws', function () {
+      assert.throws(function () {
+        sharp({ level: -1 });
+      }, /Expected integer between 0 and 256 for level but received -1 of type number/);
+    });
   });
 
   describe('create new image', function () {

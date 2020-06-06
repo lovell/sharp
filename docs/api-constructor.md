@@ -4,30 +4,31 @@
 
 ### Parameters
 
--   `input` **([Buffer][1] \| [String][2])?** if present, can be
+-   `input` **([Buffer][1] \| [string][2])?** if present, can be
      a Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
      a String containing the filesystem path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
      JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
 -   `options` **[Object][3]?** if present, is an Object with optional attributes.
-    -   `options.failOnError` **[Boolean][4]** by default halt processing and raise an error when loading invalid images.
+    -   `options.failOnError` **[boolean][4]** by default halt processing and raise an error when loading invalid images.
          Set this flag to `false` if you'd rather apply a "best effort" to decode images, even if the data is corrupt or invalid. (optional, default `true`)
-    -   `options.limitInputPixels` **([Number][5] \| [Boolean][4])** Do not process input images where the number of pixels
+    -   `options.limitInputPixels` **([number][5] \| [boolean][4])** Do not process input images where the number of pixels
          (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.
          An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). (optional, default `268402689`)
-    -   `options.sequentialRead` **[Boolean][4]** Set this to `true` to use sequential rather than random access where possible.
+    -   `options.sequentialRead` **[boolean][4]** Set this to `true` to use sequential rather than random access where possible.
          This can reduce memory usage and might improve performance on some systems. (optional, default `false`)
-    -   `options.density` **[Number][5]** number representing the DPI for vector images. (optional, default `72`)
-    -   `options.pages` **[Number][5]** number of pages to extract for multi-page input (GIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
-    -   `options.page` **[Number][5]** page number to start extracting from for multi-page input (GIF, TIFF, PDF), zero based. (optional, default `0`)
+    -   `options.density` **[number][5]** number representing the DPI for vector images. (optional, default `72`)
+    -   `options.pages` **[number][5]** number of pages to extract for multi-page input (GIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
+    -   `options.page` **[number][5]** page number to start extracting from for multi-page input (GIF, TIFF, PDF), zero based. (optional, default `0`)
+    -   `options.level` **[number][5]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
     -   `options.raw` **[Object][3]?** describes raw pixel input image data. See `raw()` for pixel ordering.
-        -   `options.raw.width` **[Number][5]?** 
-        -   `options.raw.height` **[Number][5]?** 
-        -   `options.raw.channels` **[Number][5]?** 1-4
+        -   `options.raw.width` **[number][5]?** 
+        -   `options.raw.height` **[number][5]?** 
+        -   `options.raw.channels` **[number][5]?** 1-4
     -   `options.create` **[Object][3]?** describes a new image to be created.
-        -   `options.create.width` **[Number][5]?** 
-        -   `options.create.height` **[Number][5]?** 
-        -   `options.create.channels` **[Number][5]?** 3-4
-        -   `options.create.background` **([String][2] \| [Object][3])?** parsed by the [color][6] module to extract values for red, green, blue and alpha.
+        -   `options.create.width` **[number][5]?** 
+        -   `options.create.height` **[number][5]?** 
+        -   `options.create.channels` **[number][5]?** 3-4
+        -   `options.create.background` **([string][2] \| [Object][3])?** parsed by the [color][6] module to extract values for red, green, blue and alpha.
 
 ### Examples
 

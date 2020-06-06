@@ -14,7 +14,8 @@ Requires libvips v8.9.1
   [#2226](https://github.com/lovell/sharp/pull/2226)
   [@romaleev](https://github.com/romaleev)
 
-* Expose `levels` metadata for multi-level images.
+* Add `level` constructor option to use a specific level of a multi-level image.
+  Expose `levels` metadata for multi-level images.
   [#2222](https://github.com/lovell/sharp/issues/2222)
 
 ### v0.25.3 - 17th May 2020
