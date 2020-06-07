@@ -42,7 +42,7 @@ Extract a single channel from a multi-channel image.
 
 ### Parameters
 
--   `channel` **([number][1] \| [string][2])** zero-indexed band number to extract, or `red`, `green` or `blue` as alternative to `0`, `1` or `2` respectively.
+-   `channel` **([number][1] \| [string][2])** zero-indexed channel/band number to extract, or `red`, `green`, `blue` or `alpha`.
 
 ### Examples
 

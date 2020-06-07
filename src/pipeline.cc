@@ -645,8 +645,12 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Extract an image channel (aka vips band)
       if (baton->extractChannel > -1) {
         if (baton->extractChannel >= image.bands()) {
-          (baton->err).append("Cannot extract channel from image. Too few channels in image.");
-          return Error();
+          if (baton->extractChannel == 3 && sharp::HasAlpha(image)) {
+            baton->extractChannel = image.bands() - 1;
+          } else {
+            (baton->err).append("Cannot extract channel from image. Too few channels in image.");
+            return Error();
+          }
         }
         VipsInterpretation const interpretation = sharp::Is16Bit(image.interpretation())
           ? VIPS_INTERPRETATION_GREY16

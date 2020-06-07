@@ -18,6 +18,9 @@ Requires libvips v8.9.1
   Expose `levels` metadata for multi-level images.
   [#2222](https://github.com/lovell/sharp/issues/2222)
 
+* Add support for named `alpha` channel to `extractChannel` operation.
+  [#2138](https://github.com/lovell/sharp/issues/2138)
+
 ### v0.25.3 - 17th May 2020
 
 * Ensure libvips is initialised only once, improves worker thread safety.
