@@ -47,13 +47,15 @@ struct StatsBaton {
   std::vector<ChannelStats> channelStats;
   bool isOpaque;
   double entropy;
+  double sharpness;
 
   std::string err;
 
   StatsBaton():
     input(nullptr),
     isOpaque(true),
-    entropy(0.0)
+    entropy(0.0),
+    sharpness(0.0)
     {}
 };
 

@@ -71,6 +71,7 @@ A `Promise` is returned when `callback` is not provided.
     -   `maxY` (y-coordinate of one of the pixel where the maximum lies)
 -   `isOpaque`: Is the image fully opaque? Will be `true` if the image has no alpha channel or if every pixel is fully opaque.
 -   `entropy`: Histogram-based estimation of greyscale entropy, discarding alpha channel if any (experimental)
+-   `sharpness`: Estimation of greyscale sharpness based on the standard deviation of a Laplacian convolution, discarding alpha channel if any (experimental)
 
 ### Parameters
 
@@ -85,6 +86,10 @@ image
   .then(function(stats) {
      // stats contains the channel-wise statistics array and the isOpaque value
   });
+```
+
+```javascript
+const { entropy, sharpness } = await sharp(input).stats();
 ```
 
 Returns **[Promise][5]&lt;[Object][6]>** 

@@ -21,6 +21,9 @@ Requires libvips v8.9.1
 * Add support for named `alpha` channel to `extractChannel` operation.
   [#2138](https://github.com/lovell/sharp/issues/2138)
 
+* Add experimental `sharpness` calculation to `stats()` response.
+  [#2251](https://github.com/lovell/sharp/issues/2251)
+
 ### v0.25.3 - 17th May 2020
 
 * Ensure libvips is initialised only once, improves worker thread safety.
