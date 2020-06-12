@@ -4,7 +4,7 @@
 
 Requires libvips v8.9.1
 
-### v0.25.4 - TBD
+### v0.25.4 - 12th June 2020
 
 * Allow libvips binary location override where version is appended.
   [#2217](https://github.com/lovell/sharp/pull/2217)
