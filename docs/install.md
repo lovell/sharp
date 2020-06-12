@@ -113,7 +113,7 @@ or set the following environment variables:
 
 ```sh
 npm_config_sharp_binary_host="https://npm.taobao.org/mirrors/sharp" \
-  npm_config_sharp_libvips_binary_host "https://npm.taobao.org/mirrors/sharp-libvips" \
+  npm_config_sharp_libvips_binary_host="https://npm.taobao.org/mirrors/sharp-libvips" \
   npm install sharp
 ```
 
