@@ -197,7 +197,8 @@ namespace sharp {
         imageType = ImageType::HEIF;
       } else if (EndsWith(loader, "PdfBuffer")) {
         imageType = ImageType::PDF;
-      } else if (EndsWith(loader, "MagickBuffer")) {
+      } else if (EndsWith(loader, "MagickBuffer") ||
+                 EndsWith(loader, "Magick7Buffer")) {
         imageType = ImageType::MAGICK;
       }
     }
@@ -236,7 +237,9 @@ namespace sharp {
         imageType = ImageType::FITS;
       } else if (EndsWith(loader, "Vips")) {
         imageType = ImageType::VIPS;
-      } else if (EndsWith(loader, "Magick") || EndsWith(loader, "MagickFile")) {
+      } else if (EndsWith(loader, "Magick") ||
+                 EndsWith(loader, "MagickFile") ||
+                 EndsWith(loader, "Magick7File")) {
         imageType = ImageType::MAGICK;
       }
     } else {
