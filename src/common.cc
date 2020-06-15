@@ -255,6 +255,7 @@ namespace sharp {
   */
   bool ImageTypeSupportsPage(ImageType imageType) {
     return
+      imageType == ImageType::MAGICK ||
       imageType == ImageType::GIF ||
       imageType == ImageType::TIFF ||
       imageType == ImageType::HEIF ||
