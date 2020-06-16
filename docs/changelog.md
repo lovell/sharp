@@ -10,7 +10,7 @@ Requires libvips v8.9.1
   [#2258](https://github.com/lovell/sharp/pull/2258)
   [@vouillon](https://github.com/vouillon)
 
-* Allow multi-page input via *magick.
+* Allow multi-page input via \*magick.
   [#2259](https://github.com/lovell/sharp/pull/2259)
   [@vouillon](https://github.com/vouillon)
 
