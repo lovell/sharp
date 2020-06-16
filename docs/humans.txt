@@ -188,3 +188,6 @@ GitHub: https://github.com/malice00
 
 Name: Roman Malieiev
 GitHub: https://github.com/romaleev
+
+Name: Jerome Vouillon
+GitHub: https://github.com/vouillon
