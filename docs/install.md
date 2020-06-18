@@ -177,3 +177,10 @@ npx electron-rebuild
 
 Further help can be found at
 [https://electronjs.org/docs/tutorial/using-native-node-modules](https://electronjs.org/docs/tutorial/using-native-node-modules)
+
+## Worker threads
+
+The main thread must call `require('sharp')`
+before worker threads are created
+to ensure shared libraries remain loaded in memory
+until after all threads are complete.
