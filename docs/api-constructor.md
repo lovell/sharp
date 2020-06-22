@@ -2,32 +2,42 @@
 
 ## Sharp
 
+Constructor factory to create an instance of `sharp`, to which further methods are chained.
+
+JPEG, PNG, WebP or TIFF format image data can be streamed out from this object.
+When using Stream based output, derived attributes are available from the `info` event.
+
+Non-critical problems encountered during processing are emitted as `warning` events.
+
+Implements the [stream.Duplex][1] class.
+
 ### Parameters
 
--   `input` **([Buffer][1] \| [String][2])?** if present, can be
+-   `input` **([Buffer][2] \| [string][3])?** if present, can be
      a Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
      a String containing the filesystem path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
      JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
--   `options` **[Object][3]?** if present, is an Object with optional attributes.
-    -   `options.failOnError` **[Boolean][4]** by default halt processing and raise an error when loading invalid images.
+-   `options` **[Object][4]?** if present, is an Object with optional attributes.
+    -   `options.failOnError` **[boolean][5]** by default halt processing and raise an error when loading invalid images.
          Set this flag to `false` if you'd rather apply a "best effort" to decode images, even if the data is corrupt or invalid. (optional, default `true`)
-    -   `options.limitInputPixels` **([Number][5] \| [Boolean][4])** Do not process input images where the number of pixels
+    -   `options.limitInputPixels` **([number][6] \| [boolean][5])** Do not process input images where the number of pixels
          (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.
          An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). (optional, default `268402689`)
-    -   `options.sequentialRead` **[Boolean][4]** Set this to `true` to use sequential rather than random access where possible.
+    -   `options.sequentialRead` **[boolean][5]** Set this to `true` to use sequential rather than random access where possible.
          This can reduce memory usage and might improve performance on some systems. (optional, default `false`)
-    -   `options.density` **[Number][5]** number representing the DPI for vector images. (optional, default `72`)
-    -   `options.pages` **[Number][5]** number of pages to extract for multi-page input (GIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
-    -   `options.page` **[Number][5]** page number to start extracting from for multi-page input (GIF, TIFF, PDF), zero based. (optional, default `0`)
-    -   `options.raw` **[Object][3]?** describes raw pixel input image data. See `raw()` for pixel ordering.
-        -   `options.raw.width` **[Number][5]?** 
-        -   `options.raw.height` **[Number][5]?** 
-        -   `options.raw.channels` **[Number][5]?** 1-4
-    -   `options.create` **[Object][3]?** describes a new image to be created.
-        -   `options.create.width` **[Number][5]?** 
-        -   `options.create.height` **[Number][5]?** 
-        -   `options.create.channels` **[Number][5]?** 3-4
-        -   `options.create.background` **([String][2] \| [Object][3])?** parsed by the [color][6] module to extract values for red, green, blue and alpha.
+    -   `options.density` **[number][6]** number representing the DPI for vector images. (optional, default `72`)
+    -   `options.pages` **[number][6]** number of pages to extract for multi-page input (GIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
+    -   `options.page` **[number][6]** page number to start extracting from for multi-page input (GIF, TIFF, PDF), zero based. (optional, default `0`)
+    -   `options.level` **[number][6]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
+    -   `options.raw` **[Object][4]?** describes raw pixel input image data. See `raw()` for pixel ordering.
+        -   `options.raw.width` **[number][6]?** 
+        -   `options.raw.height` **[number][6]?** 
+        -   `options.raw.channels` **[number][6]?** 1-4
+    -   `options.create` **[Object][4]?** describes a new image to be created.
+        -   `options.create.width` **[number][6]?** 
+        -   `options.create.height` **[number][6]?** 
+        -   `options.create.channels` **[number][6]?** 3-4
+        -   `options.create.background` **([string][3] \| [Object][4])?** parsed by the [color][7] module to extract values for red, green, blue and alpha.
 
 ### Examples
 
@@ -68,9 +78,9 @@ sharp({
 .then( ... );
 ```
 
--   Throws **[Error][7]** Invalid parameters
+-   Throws **[Error][8]** Invalid parameters
 
-Returns **[Sharp][8]** 
+Returns **[Sharp][9]** 
 
 ## clone
 
@@ -138,20 +148,22 @@ Promise.all(promises)
   });
 ```
 
-Returns **[Sharp][8]** 
+Returns **[Sharp][9]** 
 
-[1]: https://nodejs.org/api/buffer.html
+[1]: http://nodejs.org/api/stream.html#stream_class_stream_duplex
 
-[2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[2]: https://nodejs.org/api/buffer.html
 
-[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[6]: https://www.npmjs.org/package/color
+[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[7]: https://www.npmjs.org/package/color
 
-[8]: #sharp
+[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[9]: #sharp

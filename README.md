@@ -1,10 +1,6 @@
 # sharp
 
-<img src="https://raw.githubusercontent.com/lovell/sharp/master/docs/image/sharp-logo.svg?sanitize=true" width="160" height="160" alt="sharp logo" align="right">
-
-```sh
-npm install sharp
-```
+<img src="https://cdn.jsdelivr.net/gh/lovell/sharp@master/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
 
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
@@ -24,6 +20,10 @@ Most modern macOS, Windows and Linux systems running Node.js v10+
 do not require any additional install or runtime dependencies.
 
 ## Examples
+
+```sh
+npm install sharp
+```
 
 ```javascript
 const sharp = require('sharp');
@@ -85,6 +85,7 @@ readableStream
 ```
 
 [![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.svg?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
+[![N-API v3](https://img.shields.io/badge/N--API-v3-green.svg)](https://nodejs.org/dist/latest/docs/api/n-api.html#n_api_n_api_version_matrix)
 
 ### Documentation
 

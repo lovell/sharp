@@ -7,7 +7,7 @@ An alpha channel may be present and will be unchanged by the operation.
 
 ### Parameters
 
--   `rgb` **([String][1] \| [Object][2])** parsed by the [color][3] module to extract chroma values.
+-   `rgb` **([string][1] \| [Object][2])** parsed by the [color][3] module to extract chroma values.
 
 
 -   Throws **[Error][4]** Invalid parameter
@@ -46,7 +46,7 @@ By default output image will be web-friendly sRGB, with additional channels inte
 
 ### Parameters
 
--   `colourspace` **[String][1]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][6]
+-   `colourspace` **[string][1]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][6]
 
 
 -   Throws **[Error][4]** Invalid parameters
@@ -59,7 +59,7 @@ Alternative spelling of `toColourspace`.
 
 ### Parameters
 
--   `colorspace` **[String][1]?** output colorspace.
+-   `colorspace` **[string][1]?** output colorspace.
 
 
 -   Throws **[Error][4]** Invalid parameters

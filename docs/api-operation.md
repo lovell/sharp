@@ -21,9 +21,9 @@ for example `rotate(x).extract(y)` will produce a different result to `extract(y
 
 ### Parameters
 
--   `angle` **[Number][1]** angle of rotation. (optional, default `auto`)
+-   `angle` **[number][1]** angle of rotation. (optional, default `auto`)
 -   `options` **[Object][2]?** if present, is an Object with optional attributes.
-    -   `options.background` **([String][3] \| [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
+    -   `options.background` **([string][3] \| [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
 
 ### Examples
 
@@ -74,9 +74,9 @@ Separate control over the level of sharpening in "flat" and "jagged" areas is av
 
 ### Parameters
 
--   `sigma` **[Number][1]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
--   `flat` **[Number][1]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
--   `jagged` **[Number][1]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
+-   `sigma` **[number][1]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
+-   `flat` **[number][1]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
+-   `jagged` **[number][1]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
 
 
 -   Throws **[Error][5]** Invalid parameters
@@ -90,7 +90,7 @@ When used without parameters the default window is 3x3.
 
 ### Parameters
 
--   `size` **[Number][1]** square mask size: size x size (optional, default `3`)
+-   `size` **[number][1]** square mask size: size x size (optional, default `3`)
 
 
 -   Throws **[Error][5]** Invalid parameters
@@ -105,7 +105,7 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 
 ### Parameters
 
--   `sigma` **[Number][1]?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
+-   `sigma` **[number][1]?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
 
 
 -   Throws **[Error][5]** Invalid parameters
@@ -119,7 +119,7 @@ Merge alpha transparency channel, if any, with a background.
 ### Parameters
 
 -   `options` **[Object][2]?** 
-    -   `options.background` **([String][3] \| [Object][2])** background colour, parsed by the [color][4] module, defaults to black. (optional, default `{r:0,g:0,b:0}`)
+    -   `options.background` **([string][3] \| [Object][2])** background colour, parsed by the [color][4] module, defaults to black. (optional, default `{r:0,g:0,b:0}`)
 
 Returns **Sharp** 
 
@@ -135,8 +135,8 @@ Supply a second argument to use a different output gamma value, otherwise the fi
 
 ### Parameters
 
--   `gamma` **[Number][1]** value between 1.0 and 3.0. (optional, default `2.2`)
--   `gammaOut` **[Number][1]?** value between 1.0 and 3.0. (optional, defaults to same as `gamma`)
+-   `gamma` **[number][1]** value between 1.0 and 3.0. (optional, default `2.2`)
+-   `gammaOut` **[number][1]?** value between 1.0 and 3.0. (optional, defaults to same as `gamma`)
 
 
 -   Throws **[Error][5]** Invalid parameters
@@ -180,11 +180,11 @@ Convolve the image with the specified kernel.
 ### Parameters
 
 -   `kernel` **[Object][2]** 
-    -   `kernel.width` **[Number][1]** width of the kernel in pixels.
-    -   `kernel.height` **[Number][1]** width of the kernel in pixels.
-    -   `kernel.kernel` **[Array][7]&lt;[Number][1]>** Array of length `width*height` containing the kernel values.
-    -   `kernel.scale` **[Number][1]** the scale of the kernel in pixels. (optional, default `sum`)
-    -   `kernel.offset` **[Number][1]** the offset of the kernel in pixels. (optional, default `0`)
+    -   `kernel.width` **[number][1]** width of the kernel in pixels.
+    -   `kernel.height` **[number][1]** width of the kernel in pixels.
+    -   `kernel.kernel` **[Array][7]&lt;[number][1]>** Array of length `width*height` containing the kernel values.
+    -   `kernel.scale` **[number][1]** the scale of the kernel in pixels. (optional, default `sum`)
+    -   `kernel.offset` **[number][1]** the offset of the kernel in pixels. (optional, default `0`)
 
 ### Examples
 
@@ -212,7 +212,7 @@ Any pixel value greather than or equal to the threshold value will be set to 255
 
 ### Parameters
 
--   `threshold` **[Number][1]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
+-   `threshold` **[number][1]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
 -   `options` **[Object][2]?** 
     -   `options.greyscale` **[Boolean][6]** convert to single channel greyscale. (optional, default `true`)
     -   `options.grayscale` **[Boolean][6]** alternative spelling for greyscale. (optional, default `true`)
@@ -231,13 +231,13 @@ the selected bitwise boolean `operation` between the corresponding pixels of the
 
 ### Parameters
 
--   `operand` **([Buffer][8] \| [String][3])** Buffer containing image data or String containing the path to an image file.
--   `operator` **[String][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+-   `operand` **([Buffer][8] \| [string][3])** Buffer containing image data or string containing the path to an image file.
+-   `operator` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
 -   `options` **[Object][2]?** 
     -   `options.raw` **[Object][2]?** describes operand when using raw pixel data.
-        -   `options.raw.width` **[Number][1]?** 
-        -   `options.raw.height` **[Number][1]?** 
-        -   `options.raw.channels` **[Number][1]?** 
+        -   `options.raw.width` **[number][1]?** 
+        -   `options.raw.height` **[number][1]?** 
+        -   `options.raw.channels` **[number][1]?** 
 
 
 -   Throws **[Error][5]** Invalid parameters
@@ -250,8 +250,8 @@ Apply the linear formula a \* input + b to the image (levels adjustment)
 
 ### Parameters
 
--   `a` **[Number][1]** multiplier (optional, default `1.0`)
--   `b` **[Number][1]** offset (optional, default `0.0`)
+-   `a` **[number][1]** multiplier (optional, default `1.0`)
+-   `b` **[number][1]** offset (optional, default `0.0`)
 
 
 -   Throws **[Error][5]** Invalid parameters
@@ -264,8 +264,7 @@ Recomb the image with the specified matrix.
 
 ### Parameters
 
--   `inputMatrix`  
--   `3x3` **[Array][7]&lt;[Array][7]&lt;[Number][1]>>** Recombination matrix
+-   `inputMatrix` **[Array][7]&lt;[Array][7]&lt;[number][1]>>** 3x3 Recombination matrix
 
 ### Examples
 
@@ -298,9 +297,9 @@ Transforms the image using brightness, saturation and hue rotation.
 ### Parameters
 
 -   `options` **[Object][2]?** 
-    -   `options.brightness` **[Number][1]?** Brightness multiplier
-    -   `options.saturation` **[Number][1]?** Saturation multiplier
-    -   `options.hue` **[Number][1]?** Degrees for hue rotation
+    -   `options.brightness` **[number][1]?** Brightness multiplier
+    -   `options.saturation` **[number][1]?** Saturation multiplier
+    -   `options.hue` **[number][1]?** Degrees for hue rotation
 
 ### Examples
 

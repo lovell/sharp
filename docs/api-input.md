@@ -20,6 +20,7 @@ A `Promise` is returned when `callback` is not provided.
 -   `loop`: Number of times to loop an animated image, zero refers to a continuous loop.
 -   `delay`: Delay in ms between each page in an animated image, provided as an array of integers.
 -   `pagePrimary`: Number of the primary page in a HEIF image
+-   `levels`: Details of each level in a multi-level image provided as an array of objects, requires libvips compiled with support for OpenSlide
 -   `hasProfile`: Boolean indicating the presence of an embedded ICC profile
 -   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 -   `orientation`: Number value of the EXIF Orientation header, if present
@@ -70,6 +71,7 @@ A `Promise` is returned when `callback` is not provided.
     -   `maxY` (y-coordinate of one of the pixel where the maximum lies)
 -   `isOpaque`: Is the image fully opaque? Will be `true` if the image has no alpha channel or if every pixel is fully opaque.
 -   `entropy`: Histogram-based estimation of greyscale entropy, discarding alpha channel if any (experimental)
+-   `sharpness`: Estimation of greyscale sharpness based on the standard deviation of a Laplacian convolution, discarding alpha channel if any (experimental)
 
 ### Parameters
 
@@ -84,6 +86,10 @@ image
   .then(function(stats) {
      // stats contains the channel-wise statistics array and the isOpaque value
   });
+```
+
+```javascript
+const { entropy, sharpness } = await sharp(input).stats();
 ```
 
 Returns **[Promise][5]&lt;[Object][6]>** 

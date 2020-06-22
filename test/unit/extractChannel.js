@@ -80,6 +80,19 @@ describe('Image channel extraction', function () {
       });
   });
 
+  it('Alpha from 2-channel input', function (done) {
+    const output = fixtures.path('output.extract-alpha-2-channel.png');
+    sharp(fixtures.inputPngWithGreyAlpha)
+      .extractChannel('alpha')
+      .toColourspace('b-w')
+      .toFile(output, function (err, info) {
+        if (err) throw err;
+        assert.strictEqual(1, info.channels);
+        fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-2-channel.png'));
+        done();
+      });
+  });
+
   it('Invalid channel number', function () {
     assert.throws(function () {
       sharp(fixtures.inputJpg)

@@ -302,6 +302,7 @@ describe('Input/output', function () {
   });
 
   it('Fail when input is empty Buffer', function (done) {
+    if (sharp.format.magick.input.buffer) return this.skip(); // can be removed with libvips 8.10.0+
     sharp(Buffer.alloc(0)).toBuffer().then(function () {
       assert(false);
       done();
@@ -657,6 +658,19 @@ describe('Input/output', function () {
       assert.throws(function () {
         sharp({ pages: '1' });
       }, /Expected integer between -1 and 100000 for pages but received 1 of type string/);
+    });
+    it('Valid level property', function () {
+      sharp({ level: 1 });
+    });
+    it('Invalid level property (string) throws', function () {
+      assert.throws(function () {
+        sharp({ level: '1' });
+      }, /Expected integer between 0 and 256 for level but received 1 of type string/);
+    });
+    it('Invalid level property (negative) throws', function () {
+      assert.throws(function () {
+        sharp({ level: -1 });
+      }, /Expected integer between 0 and 256 for level but received -1 of type number/);
     });
   });
 

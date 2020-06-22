@@ -75,8 +75,17 @@ class StatsWorker : public Napi::AsyncWorker {
             baton->isOpaque = false;
           }
         }
+        // Convert to greyscale
+        vips::VImage greyscale = image.colourspace(VIPS_INTERPRETATION_B_W)[0];
         // Estimate entropy via histogram of greyscale value frequency
-        baton->entropy = std::abs(image.colourspace(VIPS_INTERPRETATION_B_W)[0].hist_find().hist_entropy());
+        baton->entropy = std::abs(greyscale.hist_find().hist_entropy());
+        // Estimate sharpness via standard deviation of greyscale laplacian
+        VImage laplacian = VImage::new_matrixv(3, 3,
+          0.0,  1.0, 0.0,
+          1.0, -4.0, 1.0,
+          0.0,  1.0, 0.0);
+        laplacian.set("scale", 9.0);
+        baton->sharpness = greyscale.conv(laplacian).deviate();
       } catch (vips::VError const &err) {
         (baton->err).append(err.what());
       }
@@ -123,6 +132,7 @@ class StatsWorker : public Napi::AsyncWorker {
       info.Set("channels", channels);
       info.Set("isOpaque", baton->isOpaque);
       info.Set("entropy", baton->entropy);
+      info.Set("sharpness", baton->sharpness);
       Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
     } else {
       Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });

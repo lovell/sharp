@@ -1,6 +1,6 @@
 # sharp
 
-<img src="https://raw.githubusercontent.com/lovell/sharp/master/docs/image/sharp-logo.svg?sanitize=true" width="160" height="160" alt="sharp logo" align="right">
+<img src="https://cdn.jsdelivr.net/gh/lovell/sharp@master/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
 
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to

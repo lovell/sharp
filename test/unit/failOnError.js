@@ -19,11 +19,17 @@ describe('failOnError', function () {
       });
   });
 
-  it('handles truncated PNG', function (done) {
+  it('handles truncated PNG, emits warnings', function (done) {
+    let isWarningEmitted = false;
     sharp(fixtures.inputPngTruncated, { failOnError: false })
+      .on('warning', function (warning) {
+        assert.strictEqual('not enough data', warning);
+        isWarningEmitted = true;
+      })
       .resize(320, 240)
       .toBuffer(function (err, data, info) {
         if (err) throw err;
+        assert.strictEqual(true, isWarningEmitted);
         assert.strictEqual('png', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);

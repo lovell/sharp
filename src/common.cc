@@ -99,6 +99,10 @@ namespace sharp {
     if (HasAttr(input, "page")) {
       descriptor->page = AttrAsUint32(input, "page");
     }
+    // Multi-level input (OpenSlide)
+    if (HasAttr(input, "level")) {
+      descriptor->level = AttrAsUint32(input, "level");
+    }
     // Create new image
     if (HasAttr(input, "createChannels")) {
       descriptor->createChannels = AttrAsUint32(input, "createChannels");
@@ -207,7 +211,8 @@ namespace sharp {
         imageType = ImageType::HEIF;
       } else if (EndsWith(loader, "PdfBuffer")) {
         imageType = ImageType::PDF;
-      } else if (EndsWith(loader, "MagickBuffer")) {
+      } else if (EndsWith(loader, "MagickBuffer") ||
+                 EndsWith(loader, "Magick7Buffer")) {
         imageType = ImageType::MAGICK;
       }
     }
@@ -246,7 +251,9 @@ namespace sharp {
         imageType = ImageType::FITS;
       } else if (EndsWith(loader, "Vips")) {
         imageType = ImageType::VIPS;
-      } else if (EndsWith(loader, "Magick") || EndsWith(loader, "MagickFile")) {
+      } else if (EndsWith(loader, "Magick") ||
+                 EndsWith(loader, "MagickFile") ||
+                 EndsWith(loader, "Magick7File")) {
         imageType = ImageType::MAGICK;
       }
     } else {
@@ -263,6 +270,7 @@ namespace sharp {
   bool ImageTypeSupportsPage(ImageType imageType) {
     return
       imageType == ImageType::WEBP ||
+      imageType == ImageType::MAGICK ||
       imageType == ImageType::GIF ||
       imageType == ImageType::TIFF ||
       imageType == ImageType::HEIF ||
@@ -294,6 +302,9 @@ namespace sharp {
             vips::VOption *option = VImage::option()
               ->set("access", descriptor->access)
               ->set("fail", descriptor->failOnError);
+            if (imageType == ImageType::SVG) {
+              option->set("unlimited", TRUE);
+            }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
             }
@@ -303,6 +314,9 @@ namespace sharp {
             if (ImageTypeSupportsPage(imageType)) {
               option->set("n", descriptor->pages);
               option->set("page", descriptor->page);
+            }
+            if (imageType == ImageType::OPENSLIDE) {
+              option->set("level", descriptor->level);
             }
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
@@ -340,6 +354,9 @@ namespace sharp {
             vips::VOption *option = VImage::option()
               ->set("access", descriptor->access)
               ->set("fail", descriptor->failOnError);
+            if (imageType == ImageType::SVG) {
+              option->set("unlimited", TRUE);
+            }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
             }
@@ -349,6 +366,9 @@ namespace sharp {
             if (ImageTypeSupportsPage(imageType)) {
               option->set("n", descriptor->pages);
               option->set("page", descriptor->page);
+            }
+            if (imageType == ImageType::OPENSLIDE) {
+              option->set("level", descriptor->level);
             }
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {

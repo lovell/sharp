@@ -4,10 +4,50 @@
 
 Requires libvips v8.9.1
 
-### v0.25.3 - TBD
+### v0.25.5 - TBD
+
+* Add support for libvips ImageMagick v7 loaders.
+  [#2258](https://github.com/lovell/sharp/pull/2258)
+  [@vouillon](https://github.com/vouillon)
+
+* Allow multi-page input via \*magick.
+  [#2259](https://github.com/lovell/sharp/pull/2259)
+  [@vouillon](https://github.com/vouillon)
+
+### v0.25.4 - 12th June 2020
+
+* Allow libvips binary location override where version is appended.
+  [#2217](https://github.com/lovell/sharp/pull/2217)
+  [@malice00](https://github.com/malice00)
+
+* Enable PNG palette when setting quality, colours, colors or dither.
+  [#2226](https://github.com/lovell/sharp/pull/2226)
+  [@romaleev](https://github.com/romaleev)
+
+* Add `level` constructor option to use a specific level of a multi-level image.
+  Expose `levels` metadata for multi-level images.
+  [#2222](https://github.com/lovell/sharp/issues/2222)
+
+* Add support for named `alpha` channel to `extractChannel` operation.
+  [#2138](https://github.com/lovell/sharp/issues/2138)
+
+* Add experimental `sharpness` calculation to `stats()` response.
+  [#2251](https://github.com/lovell/sharp/issues/2251)
+
+* Emit `warning` event for non-critical processing problems.
+  [#2032](https://github.com/lovell/sharp/issues/2032)
+
+### v0.25.3 - 17th May 2020
 
 * Ensure libvips is initialised only once, improves worker thread safety.
   [#2143](https://github.com/lovell/sharp/issues/2143)
+
+* Ensure npm platform flag is respected when copying DLLs.
+  [#2188](https://github.com/lovell/sharp/pull/2188)
+  [@dimadeveatii](https://github.com/dimadeveatii)
+
+* Allow SVG input with large inline images to be parsed.
+  [#2195](https://github.com/lovell/sharp/issues/2195)
 
 ### v0.25.2 - 20th March 2020
 

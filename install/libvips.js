@@ -21,7 +21,8 @@ const minimumGlibcVersionByArch = {
 };
 
 const { minimumLibvipsVersion, minimumLibvipsVersionLabelled } = libvips;
-const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SHARP_DIST_BASE_URL || `https://github.com/lovell/sharp-libvips/releases/download/v${minimumLibvipsVersionLabelled}/`;
+const distHost = process.env.npm_config_sharp_libvips_binary_host || 'https://github.com/lovell/sharp-libvips/releases/download';
+const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SHARP_DIST_BASE_URL || `${distHost}/v${minimumLibvipsVersionLabelled}/`;
 
 const fail = function (err) {
   npmLog.error('sharp', err.message);

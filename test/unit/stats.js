@@ -25,6 +25,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.7883011147075762));
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -84,6 +85,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0.3409031108021736));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 9.111356137722868));
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -110,6 +112,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(false, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0.06778064835816622));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 2.522916068931278));
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -185,6 +188,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(false, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0));
 
       // alpha channel
       assert.strictEqual(0, stats.channels[3].min);
@@ -212,6 +216,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0.3851250782608986));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 10.312521863719589));
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -239,6 +244,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.51758075132966));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 9.959951636662941));
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -298,6 +304,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 6.087309412541799));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 2.9250574456255682));
 
       // red channel
       assert.strictEqual(35, stats.channels[0].min);
@@ -357,6 +364,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(false, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 1));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 15.870619016486861));
 
       // gray channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -410,6 +418,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -472,6 +481,7 @@ describe('Image Stats', function () {
     return pipeline.stats().then(function (stats) {
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -529,6 +539,7 @@ describe('Image Stats', function () {
     return sharp(fixtures.inputJpg).stats().then(function (stats) {
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -580,6 +591,18 @@ describe('Image Stats', function () {
     }).catch(function (err) {
       throw err;
     });
+  });
+
+  it('Blurred image has lower sharpness than original', () => {
+    const original = sharp(fixtures.inputJpg).stats();
+    const blurred = sharp(fixtures.inputJpg).blur().toBuffer().then(blur => sharp(blur).stats());
+
+    return Promise
+      .all([original, blurred])
+      .then(([original, blurred]) => {
+        assert.strictEqual(true, isInAcceptableRange(original.sharpness, 0.7883011147075476));
+        assert.strictEqual(true, isInAcceptableRange(blurred.sharpness, 0.4791559805997398));
+      });
   });
 
   it('File input with corrupt header fails gracefully', function (done) {
