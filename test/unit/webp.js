@@ -131,21 +131,21 @@ describe('WebP', function () {
     const updated = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
       .webp({ pageHeight: original.pageHeight / 2 })
       .toBuffer()
-      .then(data => sharp(data, { pages: -1 }).metadata())
+      .then(data => sharp(data, { pages: -1 }).metadata());
 
     assert.strictEqual(updated.pages, original.pages * 2);
     assert.strictEqual(updated.pageHeight, original.pageHeight / 2);
     assert.deepStrictEqual(updated.delay, [...original.delay, ...Array(9).fill(120)]);
-  })
+  });
 
   it('should limit animation loop', async () => {
     const updated = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
       .webp({ loop: 3 })
       .toBuffer()
-      .then(data => sharp(data, { pages: -1 }).metadata())
+      .then(data => sharp(data, { pages: -1 }).metadata());
 
     assert.strictEqual(updated.loop, 3);
-  })
+  });
 
   it('should change delay between frames', async () => {
     const original = await sharp(fixtures.inputWebPAnimated, { pages: -1 }).metadata();
@@ -154,8 +154,8 @@ describe('WebP', function () {
     const updated = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
       .webp({ delay: expectedDelay })
       .toBuffer()
-      .then(data => sharp(data, { pages: -1 }).metadata())
+      .then(data => sharp(data, { pages: -1 }).metadata());
 
     assert.deepStrictEqual(updated.delay, expectedDelay);
-  })
+  });
 });

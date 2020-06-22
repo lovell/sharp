@@ -214,7 +214,7 @@ describe('Image metadata', function () {
         assert.strictEqual(hasProfile, false);
         assert.strictEqual(hasAlpha, true);
       })
-    );
+  );
 
   it('Animated WebP with limited looping', () =>
     sharp(fixtures.inputWebPAnimatedLoop3)

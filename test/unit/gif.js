@@ -61,4 +61,13 @@ describe('GIF input', () => {
         assert.strictEqual(4, info.channels);
       })
   );
+
+  it('Animated GIF output should fail due to missing ImageMagick', () =>
+    assert.rejects(() =>
+      sharp(fixtures.inputGifAnimated, { pages: -1 })
+        .gif({ loop: 2, delay: [...Array(10).fill(100)], pageHeigh: 10 })
+        .toBuffer(),
+    /VipsOperation: class "magicksave_buffer" not found/
+    )
+  );
 });
