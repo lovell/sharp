@@ -126,6 +126,32 @@ describe('WebP', function () {
     });
   });
 
+  it('invalid pageHeight throws', () => {
+    assert.throws(() => {
+      sharp().webp({ pageHeight: 0 });
+    });
+  });
+
+  it('invalid loop throws', () => {
+    assert.throws(() => {
+      sharp().webp({ loop: -1 });
+    });
+
+    assert.throws(() => {
+      sharp().webp({ loop: 65536 });
+    });
+  });
+
+  it('invalid delay throws', () => {
+    assert.throws(() => {
+      sharp().webp({ delay: [-1] });
+    });
+
+    assert.throws(() => {
+      sharp().webp({ delay: [65536] });
+    });
+  });
+
   it('should double the number of frames with default delay', async () => {
     const original = await sharp(fixtures.inputWebPAnimated, { pages: -1 }).metadata();
     const updated = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
