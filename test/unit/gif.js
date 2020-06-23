@@ -89,11 +89,11 @@ describe('GIF input', () => {
 
   it('invalid delay throws', () => {
     assert.throws(() => {
-      sharp().webp({ delay: [-1] });
+      sharp().gif({ delay: [-1] });
     });
 
     assert.throws(() => {
-      sharp().webp({ delay: [65536] });
+      sharp().gif({ delay: [65536] });
     });
   });
 });
