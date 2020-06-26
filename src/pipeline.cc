@@ -689,8 +689,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.icc_transform(
           const_cast<char*>(baton->withMetadataProfile.data()),
           VImage::option()
-          ->set("embedded", TRUE)
-          ->set("intent", VIPS_INTENT_PERCEPTUAL)));
+          ->set("input_profile", "srgb")
+          ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
 
       // Override EXIF Orientation tag
