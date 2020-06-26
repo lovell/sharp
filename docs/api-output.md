@@ -91,7 +91,8 @@ Returns **[Promise][5]&lt;[Buffer][8]>** when no callback is provided
 ## withMetadata
 
 Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
-This will also convert to and add a web-friendly sRGB ICC profile.
+This will also convert to and add a web-friendly sRGB ICC profile unless a custom
+output profile is provided.
 
 The default behaviour, when `withMetadata` is not used, is to convert to the device-independent
 sRGB colour space and strip all metadata, including the removal of any ICC profile.
@@ -100,6 +101,7 @@ sRGB colour space and strip all metadata, including the removal of any ICC profi
 
 -   `options` **[Object][6]?** 
     -   `options.orientation` **[number][9]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
+    -   `options.icc` **[string][2]?** filesystem path to output ICC profile, defaults to sRGB.
 
 ### Examples
 

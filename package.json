@@ -68,7 +68,8 @@
     "Brychan Bennett-Odlum <git@brychan.io>",
     "Edward Silverton <e.silverton@gmail.com>",
     "Roman Malieiev <aromaleev@gmail.com>",
-    "Tomas Szabo <tomas.szabo@deftomat.com>"
+    "Tomas Szabo <tomas.szabo@deftomat.com>",
+    "Robert O'Rourke <robert@o-rourke.org>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",

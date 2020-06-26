@@ -501,6 +501,42 @@ describe('Image metadata', function () {
       });
   });
 
+  it('Apply CMYK output ICC profile', function (done) {
+    const output = fixtures.path('output.icc-cmyk.jpg');
+    sharp(fixtures.inputJpg)
+      .withMetadata({ icc: 'cmyk' })
+      .toFile(output, function (err, info) {
+        if (err) throw err;
+        sharp(output).metadata(function (err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(true, metadata.hasProfile);
+          assert.strictEqual('cmyk', metadata.space);
+          assert.strictEqual(4, metadata.channels);
+          // ICC
+          assert.strictEqual('object', typeof metadata.icc);
+          assert.strictEqual(true, metadata.icc instanceof Buffer);
+          const profile = icc.parse(metadata.icc);
+          assert.strictEqual('object', typeof profile);
+          assert.strictEqual('CMYK', profile.colorSpace);
+          assert.strictEqual('Relative', profile.intent);
+          assert.strictEqual('Printer', profile.deviceClass);
+        });
+        fixtures.assertSimilar(output, fixtures.path('expected/icc-cmyk.jpg'), { threshold: 0 }, done);
+      });
+  });
+
+  it('Apply custom output ICC profile', function (done) {
+    const output = fixtures.path('output.hilutite.jpg');
+    sharp(fixtures.inputJpg)
+      .withMetadata({ icc: fixtures.path('hilutite.icm') })
+      .toFile(output, function (err, info) {
+        if (err) throw err;
+        fixtures.assertMaxColourDistance(output, fixtures.path('expected/hilutite.jpg'), 0);
+        fixtures.assertMaxColourDistance(output, fixtures.inputJpg, 16.5);
+        done();
+      });
+  });
+
   it('Include metadata in output, enabled via empty object', () =>
     sharp(fixtures.inputJpgWithExif)
       .withMetadata({})
@@ -673,6 +709,11 @@ describe('Image metadata', function () {
     it('Too large orientation', function () {
       assert.throws(function () {
         sharp().withMetadata({ orientation: 9 });
+      });
+    });
+    it('Non string icc', function () {
+      assert.throws(function () {
+        sharp().withMetadata({ icc: true });
       });
     });
   });

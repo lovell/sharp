@@ -684,6 +684,15 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       }
 
+      // Apply output ICC profile
+      if (!baton->withMetadataIcc.empty()) {
+        image = image.icc_transform(
+          const_cast<char*>(baton->withMetadataIcc.data()),
+          VImage::option()
+            ->set("input_profile", "srgb")
+            ->set("intent", VIPS_INTENT_PERCEPTUAL));
+      }
+
       // Override EXIF Orientation tag
       if (baton->withMetadata && baton->withMetadataOrientation != -1) {
         image = sharp::SetExifOrientation(image, baton->withMetadataOrientation);
@@ -1319,6 +1328,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->fileOut = sharp::AttrAsStr(options, "fileOut");
   baton->withMetadata = sharp::AttrAsBool(options, "withMetadata");
   baton->withMetadataOrientation = sharp::AttrAsUint32(options, "withMetadataOrientation");
+  baton->withMetadataIcc = sharp::AttrAsStr(options, "withMetadataIcc");
   // Format-specific
   baton->jpegQuality = sharp::AttrAsUint32(options, "jpegQuality");
   baton->jpegProgressive = sharp::AttrAsBool(options, "jpegProgressive");

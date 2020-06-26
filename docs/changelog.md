@@ -27,6 +27,10 @@ Requires libvips v8.10.0
   [#2259](https://github.com/lovell/sharp/pull/2259)
   [@vouillon](https://github.com/vouillon)
 
+* Add support to `withMetadata` for custom ICC profile.
+  [#2271](https://github.com/lovell/sharp/pull/2271)
+  [@roborourke](https://github.com/roborourke)
+
 * Ensure prebuilt binaries for ARM default to v7 when using Electron.
   [#2292](https://github.com/lovell/sharp/pull/2292)
   [@diegodev3](https://github.com/diegodev3)
