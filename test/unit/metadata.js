@@ -465,7 +465,6 @@ describe('Image metadata', function () {
           assert.strictEqual('object', typeof metadata.icc);
           assert.strictEqual(true, metadata.icc instanceof Buffer);
           const profile = icc.parse(metadata.icc);
-          console.log(profile);
           assert.strictEqual('object', typeof profile);
           assert.strictEqual('RGB', profile.colorSpace);
           assert.strictEqual('Perceptual', profile.intent);
