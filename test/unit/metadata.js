@@ -453,6 +453,27 @@ describe('Image metadata', function () {
       });
   });
 
+  it('Applies custom output ICC profile', function (done) {
+    sharp(fixtures.inputJpg)
+      .withMetadata({ profile: fixtures.path('hilutite.icm') })
+      .toBuffer(function (err, buffer) {
+        if (err) throw err;
+        sharp(buffer).metadata(function (err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(true, metadata.hasProfile);
+          // ICC
+          assert.strictEqual('object', typeof metadata.icc);
+          assert.strictEqual(true, metadata.icc instanceof Buffer);
+          const profile = icc.parse(metadata.icc);
+          console.log(profile);
+          assert.strictEqual('object', typeof profile);
+          assert.strictEqual('RGB', profile.colorSpace);
+          assert.strictEqual('Perceptual', profile.intent);
+        });
+        fixtures.assertSimilar(fixtures.path('expected/hilutite.jpg'), fixtures.inputJpg, { threshold: 1 }, done);
+      });
+  });
+
   it('Include metadata in output, enabled via empty object', () =>
     sharp(fixtures.inputJpgWithExif)
       .withMetadata({})
