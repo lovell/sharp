@@ -61,9 +61,9 @@ A `Promise` is returned when `callback` is not provided.
 
 ### Parameters
 
--   `options` **[Object][6]?** 
+-   `options` **[Object][6]?**
     -   `options.resolveWithObject` **[boolean][7]?** Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`.
--   `callback` **[Function][3]?** 
+-   `callback` **[Function][3]?**
 
 ### Examples
 
@@ -93,13 +93,16 @@ Returns **[Promise][5]&lt;[Buffer][8]>** when no callback is provided
 Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
 This will also convert to and add a web-friendly sRGB ICC profile.
 
+An optional output ICC profile can be specified to replace the default sRGB ICC profile.
+
 The default behaviour, when `withMetadata` is not used, is to convert to the device-independent
 sRGB colour space and strip all metadata, including the removal of any ICC profile.
 
 ### Parameters
 
--   `options` **[Object][6]?** 
+-   `options` **[Object][6]?**
     -   `options.orientation` **[number][9]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
+    -   `options.profile` **[string][2]?** path to an ICC profile file
 
 ### Examples
 
@@ -112,7 +115,7 @@ sharp('input.jpg')
 
 -   Throws **[Error][4]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**
 
 ## toFormat
 
@@ -134,7 +137,7 @@ const data = await sharp(input)
 
 -   Throws **[Error][4]** unsupported format or options
 
-Returns **Sharp** 
+Returns **Sharp**
 
 ## jpeg
 
@@ -172,7 +175,7 @@ const data = await sharp(input)
 
 -   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**
 
 ## png
 
@@ -185,7 +188,7 @@ Some of these options require the use of a globally-installed libvips compiled w
 
 ### Parameters
 
--   `options` **[Object][6]?** 
+-   `options` **[Object][6]?**
     -   `options.progressive` **[boolean][7]** use progressive (interlace) scan (optional, default `false`)
     -   `options.compressionLevel` **[number][9]** zlib compression level, 0-9 (optional, default `9`)
     -   `options.adaptiveFiltering` **[boolean][7]** use adaptive row filtering (optional, default `false`)
@@ -207,7 +210,7 @@ const data = await sharp(input)
 
 -   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**
 
 ## webp
 
@@ -235,7 +238,7 @@ const data = await sharp(input)
 
 -   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**
 
 ## tiff
 
@@ -271,7 +274,7 @@ sharp('input.svg')
 
 -   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**
 
 ## heif
 
@@ -294,7 +297,7 @@ Most versions of libheif support only the patent-encumbered HEVC compression for
 
 -   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**
 
 **Meta**
 
@@ -325,7 +328,7 @@ const data = await sharp('input.png')
   .toBuffer();
 ```
 
-Returns **Sharp** 
+Returns **Sharp**
 
 ## tile
 
@@ -337,7 +340,7 @@ Warning: multiple sharp instances concurrently producing tile output can expose 
 
 ### Parameters
 
--   `options` **[Object][6]?** 
+-   `options` **[Object][6]?**
     -   `options.size` **[number][9]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
     -   `options.overlap` **[number][9]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
     -   `options.angle` **[number][9]** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
@@ -363,7 +366,7 @@ sharp('input.tiff')
 
 -   Throws **[Error][4]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**
 
 [1]: #withmetadata
 
