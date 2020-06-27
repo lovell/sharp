@@ -15,7 +15,7 @@ environment:
     platform: x86
   - nodejs_version: "13"
     platform: x64
-  - nodejs_version: "14"
+  - nodejs_version: "14.2.0"
     platform: x86
   - nodejs_version: "14"
     platform: x64
