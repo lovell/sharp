@@ -133,7 +133,7 @@
               '../vendor/lib/libglib-2.0.0.dylib',
               '../vendor/lib/libgobject-2.0.0.dylib',
               # Ensure runtime linking is relative to sharp.node
-              '-Wl,-s -rpath \'@loader_path/../../vendor/lib\''
+              '-rpath \'@loader_path/../../vendor/lib\''
             ]
           }],
           ['OS == "linux"', {
