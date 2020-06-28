@@ -1,6 +1,6 @@
 {
   'variables': {
-    'vips_version': '8.9.2',
+    'vips_version': '<!(node -p "require(\'./lib/libvips\').minimumLibvipsVersion")',
     'sharp_vendor_dir': '<(module_root_dir)/vendor/<(vips_version)'
   },
   'targets': [{
@@ -77,8 +77,8 @@
       'runtime_link%': 'shared',
       'conditions': [
         ['OS != "win"', {
-          'pkg_config_path': '<!(node -e "console.log(require(\'./lib/libvips\').pkgConfigPath())")',
-          'use_global_libvips': '<!(node -e "console.log(Boolean(require(\'./lib/libvips\').useGlobalLibvips()).toString())")'
+          'pkg_config_path': '<!(node -p "require(\'./lib/libvips\').pkgConfigPath()")',
+          'use_global_libvips': '<!(node -p "Boolean(require(\'./lib/libvips\').useGlobalLibvips()).toString()")'
         }, {
           'pkg_config_path': '',
           'use_global_libvips': ''
