@@ -37,10 +37,12 @@ const fail = function (err) {
 const extractTarball = function (tarPath) {
   const vendorPath = path.join(__dirname, '..', 'vendor');
   libvips.mkdirSync(vendorPath);
+  const versionedVendorPath = path.join(vendorPath, minimumLibvipsVersion);
+  libvips.mkdirSync(versionedVendorPath);
   tar
     .extract({
       file: tarPath,
-      cwd: vendorPath,
+      cwd: versionedVendorPath,
       strict: true
     })
     .catch(function (err) {
