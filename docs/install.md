@@ -10,19 +10,19 @@ yarn add sharp
 
 ## Prerequisites
 
-* Node.js v10+
+* Node.js v10.16.0+
 
 ## Prebuilt binaries
 
 Ready-compiled sharp and libvips binaries are provided for use with
-Node.js v10+ on the most common platforms:
+Node.js v10.16.0+ on the most common platforms:
 
 * macOS x64 (>= 10.13)
 * Linux x64 (glibc >= 2.17, musl >= 1.1.24)
 * Linux ARM64 (glibc >= 2.29)
 * Windows
 
-A ~10MB tarball containing libvips and its most commonly used dependencies
+A ~7MB tarball containing libvips and its most commonly used dependencies
 is downloaded via HTTPS and stored within `node_modules/sharp/vendor` during `npm install`.
 
 This provides support for the
@@ -93,7 +93,7 @@ The version subpath and file name are appended to these.
 
 For example, if `sharp_libvips_binary_host` is set to `https://hostname/path`
 and the libvips version is `1.2.3` then the resultant URL will be
-`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.gz`.
+`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.br`.
 
 See the Chinese mirror below for a further example.
 

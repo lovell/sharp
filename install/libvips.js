@@ -3,12 +3,14 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const stream = require('stream');
+const zlib = require('zlib');
 
 const detectLibc = require('detect-libc');
 const npmLog = require('npmlog');
 const semver = require('semver');
 const simpleGet = require('simple-get');
-const tar = require('tar');
+const tarFs = require('tar-fs');
 
 const agent = require('../lib/agent');
 const libvips = require('../lib/libvips');
@@ -39,18 +41,19 @@ const extractTarball = function (tarPath) {
   libvips.mkdirSync(vendorPath);
   const versionedVendorPath = path.join(vendorPath, minimumLibvipsVersion);
   libvips.mkdirSync(versionedVendorPath);
-  tar
-    .extract({
-      file: tarPath,
-      cwd: versionedVendorPath,
-      strict: true
-    })
-    .catch(function (err) {
-      if (/unexpected end of file/.test(err.message)) {
-        npmLog.error('sharp', `Please delete ${tarPath} as it is not a valid tarball`);
+  stream.pipeline(
+    fs.createReadStream(tarPath),
+    new zlib.BrotliDecompress(),
+    tarFs.extract(versionedVendorPath),
+    function (err) {
+      if (err) {
+        if (/unexpected end of file/.test(err.message)) {
+          npmLog.error('sharp', `Please delete ${tarPath} as it is not a valid tarball`);
+        }
+        fail(err);
       }
-      fail(err);
-    });
+    }
+  );
 };
 
 try {
@@ -78,7 +81,7 @@ try {
       }
     }
     // Download to per-process temporary file
-    const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.gz';
+    const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.br';
     const tarPathCache = path.join(libvips.cachePath(), tarFilename);
     if (fs.existsSync(tarPathCache)) {
       npmLog.info('sharp', `Using cached ${tarPathCache}`);

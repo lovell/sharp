@@ -116,7 +116,7 @@
     "prebuild-install": "^5.3.4",
     "semver": "^7.3.2",
     "simple-get": "^4.0.0",
-    "tar": "^6.0.2",
+    "tar-fs": "^2.1.0",
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
@@ -137,10 +137,10 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.9.2-alpha2"
+    "libvips": "8.9.2-alpha5"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=10.16.0"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"
