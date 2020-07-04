@@ -160,6 +160,8 @@ struct PipelineBaton {
   int convKernelHeight;
   double convKernelScale;
   double convKernelOffset;
+  sharp::InputDescriptor *correlation;
+  bool corrFast;
   sharp::InputDescriptor *boolean;
   VipsOperationBoolean booleanOp;
   VipsOperationBoolean bandBoolOp;
@@ -266,6 +268,8 @@ struct PipelineBaton {
     convKernelHeight(0),
     convKernelScale(0.0),
     convKernelOffset(0.0),
+    correlation(nullptr),
+    corrFast(false),
     boolean(nullptr),
     booleanOp(VIPS_OPERATION_BOOLEAN_LAST),
     bandBoolOp(VIPS_OPERATION_BOOLEAN_LAST),

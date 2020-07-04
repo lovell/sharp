@@ -637,6 +637,13 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Bandbool(image, baton->bandBoolOp);
       }
 
+      if (baton->correlation != nullptr) {
+        VImage corrImage;
+        sharp::ImageType corrImageType = sharp::ImageType::UNKNOWN;
+        std::tie(corrImage, corrImageType) = sharp::OpenInput(baton->correlation);
+        image = sharp::Correlate(image, corrImage, baton->corrFast);
+      }
+
       // Tint the image
       if (baton->tintA < 128.0 || baton->tintB < 128.0) {
         image = sharp::Tint(image, baton->tintA, baton->tintB);
@@ -1246,12 +1253,17 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
 
   baton->removeAlpha = sharp::AttrAsBool(options, "removeAlpha");
   baton->ensureAlpha = sharp::AttrAsBool(options, "ensureAlpha");
+
   if (options.Has("boolean")) {
     baton->boolean = sharp::CreateInputDescriptor(options.Get("boolean").As<Napi::Object>());
     baton->booleanOp = sharp::GetBooleanOperation(sharp::AttrAsStr(options, "booleanOp"));
   }
   if (options.Has("bandBoolOp")) {
     baton->bandBoolOp = sharp::GetBooleanOperation(sharp::AttrAsStr(options, "bandBoolOp"));
+  }
+  if (options.Has("correlation") && options.Has("corrFast")) {
+    baton->correlation = sharp::CreateInputDescriptor(options.Get("correlation").As<Napi::Object>());
+    baton->corrFast = sharp::AttrAsBool(options, "corrFast");
   }
   if (options.Has("convKernel")) {
     Napi::Object kernel = options.Get("convKernel").As<Napi::Object>();

@@ -167,6 +167,16 @@ namespace sharp {
   }
 
   /*
+   * Calculate a correlation surface.
+   */
+  VImage Correlate(VImage image, VImage imageR, bool const fast) {
+    if (fast) {
+      return image.fastcor(imageR);
+    }
+    return image.spcor(imageR);
+  }
+
+  /*
    * Recomb with a Matrix of the given bands/channel size.
    * Eg. RGB will be a 3x3 matrix.
    */

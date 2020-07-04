@@ -8,7 +8,7 @@ const maxColourDistance = require('../../build/Release/sharp')._maxColourDistanc
 const getPath = function (filename) {
   return path.join(__dirname, filename);
 };
-
+// TODO: this is the culprit
 // Generates a 64-bit-as-binary-string image fingerprint
 // Based on the dHash gradient method - see http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html
 const fingerprint = function (image, callback) {
@@ -72,6 +72,7 @@ module.exports = {
   inputJpgRandom: getPath('random.jpg'), // convert -size 200x200 xc:   +noise Random   random.jpg
   inputJpgThRandom: getPath('thRandom.jpg'), // convert random.jpg  -channel G -threshold 5% -separate +channel -negate thRandom.jpg
   inputJpgLossless: getPath('testimgl.jpg'), // Lossless JPEG from ftp://ftp.fu-berlin.de/unix/X11/graphics/ImageMagick/delegates/ljpeg-6b.tar.gz
+  inputJpgFlowerCroppedFromLandscape1: getPath('Landscape_1_flower.jpg'),
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
