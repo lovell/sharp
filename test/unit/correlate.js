@@ -1,15 +1,11 @@
 'use strict';
 
-const fs = require('fs');
 const assert = require('assert');
 
 const fixtures = require('../fixtures');
 const sharp = require('../../');
 
 describe('Correlate operation between two images', function () {
-  const landscape1 = fs.readFileSync(fixtures.inputJpgWithLandscapeExif1);
-  const landscape1Flower = fs.readFileSync(fixtures.inputJpgFlowerCroppedFromLandscape1);
-
   it('spcor correlation', function (done) {
     sharp(fixtures.inputJpgWithLandscapeExif1)
       .correlate(fixtures.inputJpgFlowerCroppedFromLandscape1)
@@ -22,7 +18,7 @@ describe('Correlate operation between two images', function () {
 
   it('fastcor correlation', function (done) {
     sharp(fixtures.inputJpgWithLandscapeExif1)
-      .correlate(fixtures.inputJpgFlowerCroppedFromLandscape1, {fast: true})
+      .correlate(fixtures.inputJpgFlowerCroppedFromLandscape1, { fast: true })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(450, info.height);
@@ -32,7 +28,7 @@ describe('Correlate operation between two images', function () {
 
   it('fast is not boolean throws', function () {
     assert.throws(function () {
-      sharp().correlate(fixtures.inputJpgFlowerCroppedFromLandscape1, {fast: 123});
+      sharp().correlate(fixtures.inputJpgFlowerCroppedFromLandscape1, { fast: 123 });
     });
   });
 
@@ -42,4 +38,3 @@ describe('Correlate operation between two images', function () {
     });
   });
 });
-
