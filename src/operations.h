@@ -62,12 +62,6 @@ namespace sharp {
     double const scale, double const offset, std::unique_ptr<double[]> const &kernel_v);
 
   /*
-   * Calculate a correlation surface. If fast is true, calculates a fast correlation
-   * surface. 
-   */
-  VImage Correlate(VImage image, VImage imageR, bool const fast);
-
-  /*
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
    */
   VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged);

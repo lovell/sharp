@@ -20,6 +20,7 @@
 #include "pipeline.h"
 #include "utilities.h"
 #include "stats.h"
+#include "match_template.h"
 
 static void* sharp_vips_init(void*) {
   vips_init("sharp");
@@ -44,6 +45,7 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
   exports.Set("format", Napi::Function::New(env, format));
   exports.Set("_maxColourDistance", Napi::Function::New(env, _maxColourDistance));
   exports.Set("stats", Napi::Function::New(env, stats));
+  exports.Set("matchTemplate", Napi::Function::New(env, matchTemplate));
   return exports;
 }
 

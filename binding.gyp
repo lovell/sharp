@@ -81,11 +81,12 @@
     'sources': [
       'src/common.cc',
       'src/metadata.cc',
+      'src/match_template.cc',
       'src/stats.cc',
       'src/operations.cc',
       'src/pipeline.cc',
       'src/utilities.cc',
-      'src/sharp.cc'
+      'src/sharp.cc',
     ],
     'include_dirs': [
       '<!@(node -p "require(\'node-addon-api\').include")',
