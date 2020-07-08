@@ -15,6 +15,7 @@
 #include <numeric>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 #include <math.h>
 
 #include <napi.h>
@@ -29,7 +30,6 @@ class MatchTemplateWorker : public Napi::AsyncWorker {
     Napi::AsyncWorker(callback), baton(baton), debuglog(Napi::Persistent(debuglog)) {}
   ~MatchTemplateWorker() {}
 
-  const int STAT_SUM_INDEX = 2;
   const int STAT_SQ_SUM_INDEX = 3;
 
   void Execute() {
@@ -62,14 +62,49 @@ class MatchTemplateWorker : public Napi::AsyncWorker {
         correlation.minpos(option);
         baton->min = correlation.min();
 
+        // Add reference image area.
+        int refWidth = referenceImage.width();
+        int refHeight = referenceImage.height();
+        baton->referenceArea = refWidth * refHeight;
+
         // In order calculate normalized match, need to get sum of squares.
+        // This replicate this equation CV_TM_SQDIFF_NORMED:
+        // https://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/template_matching/template_matching.html
         vips::VImage refStats = referenceImage.stats();
         int const refBands = referenceImage.bands();
         for (int b = 1; b <= refBands; b++) {
-            baton->referenceSumSquares += refStats.getpoint(STAT_SQ_SUM_INDEX, b).front();
+          baton->referenceSumSquares += refStats.getpoint(STAT_SQ_SUM_INDEX, b).front();
+        }
+        // This is because the numerator is only based on a single band (the one with minimum match).
+        baton->referenceSumSquares = baton->referenceSumSquares / refBands;
+
+        if (refWidth % 2 != 0) {
+          refWidth = refWidth - 1;
+        }
+        if (refHeight % 2 != 0) {
+          refHeight = refHeight - 1;
+        }
+        vips::VImage imageExtended = image.embed(baton->minX + (refWidth / 2), baton->minY + (refHeight / 2), refWidth + image.width(), refHeight + image.height(), VImage::option()->set("extend", VIPS_EXTEND_COPY));
+        vips::VImage bestMatchImg = imageExtended.extract_area(baton->minX, baton->minY, refWidth, refHeight);
+        vips::VImage bestMatchStats = bestMatchImg.stats();
+        int const imgBands = image.bands();
+        for (int b = 1; b <= imgBands; b++) {
+          baton->bestMatchSumSquares += bestMatchStats.getpoint(STAT_SQ_SUM_INDEX, b).front();
+        }
+        // This is because the numerator is only based on a single band (the one with minimum match).
+        baton->bestMatchSumSquares = baton->bestMatchSumSquares / imgBands;
+
+        // Handle all black images, which otherwise result in divide by zero error.
+        if (baton->referenceSumSquares == 0 && baton->bestMatchSumSquares == 0) {
+          baton->score = 1.0;
+        } else if (baton->referenceSumSquares == 0) {
+          baton->score = 1.0 - ((double)(baton->min) / (double)(baton->bestMatchSumSquares));
+        } else if (baton->bestMatchSumSquares == 0) {
+          baton->score = 1.0 - ((double)(baton->min) / (double)(baton->referenceSumSquares));
+        } else {
+          baton->score = 1.0 - ((double)(baton->min) / std::sqrt((double)(baton->referenceSumSquares) * (double)(baton->bestMatchSumSquares)));
         }
 
-        baton->score = 1.0 - ((double)(baton->min) / (double)(baton->referenceSumSquares));
       } catch (vips::VError const &err) {
         (baton->err).append(err.what());
       }

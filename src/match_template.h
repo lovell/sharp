@@ -30,6 +30,8 @@ struct MatchTemplateBaton {
   int minX;
   int minY;
   int referenceSumSquares;
+  int referenceArea;
+  int bestMatchSumSquares;
   double score;
   std::string err;
 
@@ -40,6 +42,8 @@ struct MatchTemplateBaton {
     minX(0),
     minY(0),
     referenceSumSquares(0),
+    referenceArea(0),
+    bestMatchSumSquares(0),
     score(0.0)
     {}
 };

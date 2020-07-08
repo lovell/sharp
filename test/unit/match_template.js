@@ -11,11 +11,11 @@ describe('Match template operation', function () {
         assert.strictEqual(61597, results.min);
         assert.strictEqual(209, results.minX);
         assert.strictEqual(321, results.minY);
-        assert.strictEqual(84815952, results.referenceSumSquares);
-        assert.strictEqual(0.999273756898938, results.score);
+        assert.strictEqual(28271984, results.referenceSumSquares);
+        assert.strictEqual(0.9959734250784057, results.score);
         done();
       });
-  })
+  });
 
   it('Ref image does not appear in image', function (done) {
     sharp(fixtures.inputJpg320x240)
@@ -23,11 +23,11 @@ describe('Match template operation', function () {
         assert.strictEqual(14667082, results.min);
         assert.strictEqual(0, results.minX);
         assert.strictEqual(239, results.minY);
-        assert.strictEqual(84815952, results.referenceSumSquares);
-        assert.strictEqual(0.8270716574636809, results.score);
+        assert.strictEqual(28271984, results.referenceSumSquares);
+        assert.strictEqual(0.6360911144067776, results.score);
         done();
       });
-  })
+  });
 
   it('Missing input throws', function () {
     assert.throws(function () {
