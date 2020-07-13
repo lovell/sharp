@@ -55,4 +55,12 @@ describe('Platform-detection', function () {
     assert.strictEqual('arm64v8', platform().split('-')[1]);
     delete process.env.npm_config_arch;
   });
+
+  it('Can ensure version ARMv7 if electron version is present', function () {
+    process.env.npm_config_arch = 'arm';
+    process.versions.electron = 'test';
+    assert.strictEqual('armv7', platform().split('-')[1]);
+    delete process.env.npm_config_arch;
+    delete process.versions.electron;
+  });
 });

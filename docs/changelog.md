@@ -23,6 +23,10 @@ Requires libvips v8.10.0
   [#2259](https://github.com/lovell/sharp/pull/2259)
   [@vouillon](https://github.com/vouillon)
 
+* Ensure prebuilt binaries for ARM default to v7 when using Electron.
+  [#2292](https://github.com/lovell/sharp/pull/2292)
+  [@diegodev3](https://github.com/diegodev3)
+
 ## v0.25 - *yield*
 
 Requires libvips v8.9.1
