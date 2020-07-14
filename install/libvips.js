@@ -81,7 +81,7 @@ try {
       }
     }
     // Download to per-process temporary file
-    const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.br';
+    const tarFilename = ['libvips', minimumLibvipsVersionLabelled, platformAndArch].join('-') + '.tar.br';
     const tarPathCache = path.join(libvips.cachePath(), tarFilename);
     if (fs.existsSync(tarPathCache)) {
       npmLog.info('sharp', `Using cached ${tarPathCache}`);

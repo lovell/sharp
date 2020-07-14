@@ -116,7 +116,7 @@ describe('TIFF', function () {
     sharp(fixtures.inputTiff8BitDepth)
       .toColourspace('b-w') // can only squash 1 band uchar images
       .tiff({
-        squash: false,
+        bitdepth: 8,
         compression: 'none',
         predictor: 'none'
       })
@@ -133,7 +133,7 @@ describe('TIFF', function () {
     sharp(fixtures.inputTiff8BitDepth)
       .toColourspace('b-w') // can only squash 1 band uchar images
       .tiff({
-        squash: true,
+        bitdepth: 1,
         compression: 'none',
         predictor: 'none'
       })
@@ -145,10 +145,10 @@ describe('TIFF', function () {
       });
   });
 
-  it('Invalid TIFF squash value throws error', function () {
+  it('Invalid TIFF bitdepth value throws error', function () {
     assert.throws(function () {
-      sharp().tiff({ squash: 'true' });
-    });
+      sharp().tiff({ bitdepth: 3 });
+    }, /Error: Expected 1, 2, 4 or 8 for bitdepth but received 3 of type number/);
   });
 
   it('TIFF setting xres and yres on file', () =>
@@ -255,7 +255,7 @@ describe('TIFF', function () {
     sharp(fixtures.inputTiff)
       .toColourspace('b-w')
       .tiff({
-        squash: true,
+        bitdepth: 1,
         compression: 'ccittfax4'
       })
       .toFile(fixtures.outputTiff, (err, info) => {

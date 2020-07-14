@@ -703,7 +703,9 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->jpegQuality)
             ->set("interlace", baton->jpegProgressive)
-            ->set("no_subsample", baton->jpegChromaSubsampling == "4:4:4")
+            ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
+              ? VIPS_FOREIGN_JPEG_SUBSAMPLE_OFF
+              : VIPS_FOREIGN_JPEG_SUBSAMPLE_ON)
             ->set("trellis_quant", baton->jpegTrellisQuantisation)
             ->set("quant_table", baton->jpegQuantisationTable)
             ->set("overshoot_deringing", baton->jpegOvershootDeringing)
@@ -769,7 +771,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           VipsArea *area = VIPS_AREA(image.tiffsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
-            ->set("squash", baton->tiffSquash)
+            ->set("bitdepth", baton->tiffBitdepth)
             ->set("compression", baton->tiffCompression)
             ->set("predictor", baton->tiffPredictor)
             ->set("pyramid", baton->tiffPyramid)
@@ -845,7 +847,9 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->jpegQuality)
             ->set("interlace", baton->jpegProgressive)
-            ->set("no_subsample", baton->jpegChromaSubsampling == "4:4:4")
+            ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
+              ? VIPS_FOREIGN_JPEG_SUBSAMPLE_OFF
+              : VIPS_FOREIGN_JPEG_SUBSAMPLE_ON)
             ->set("trellis_quant", baton->jpegTrellisQuantisation)
             ->set("quant_table", baton->jpegQuantisationTable)
             ->set("overshoot_deringing", baton->jpegOvershootDeringing)
@@ -891,7 +895,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
-            ->set("squash", baton->tiffSquash)
+            ->set("bitdepth", baton->tiffBitdepth)
             ->set("compression", baton->tiffCompression)
             ->set("predictor", baton->tiffPredictor)
             ->set("pyramid", baton->tiffPyramid)
@@ -940,7 +944,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             std::vector<std::pair<std::string, std::string>> options {
               {"Q", std::to_string(baton->jpegQuality)},
               {"interlace", baton->jpegProgressive ? "TRUE" : "FALSE"},
-              {"no_subsample", baton->jpegChromaSubsampling == "4:4:4" ? "TRUE": "FALSE"},
+              {"subsample_mode", baton->jpegChromaSubsampling == "4:4:4" ? "off" : "on"},
               {"trellis_quant", baton->jpegTrellisQuantisation ? "TRUE" : "FALSE"},
               {"quant_table", std::to_string(baton->jpegQuantisationTable)},
               {"overshoot_deringing", baton->jpegOvershootDeringing ? "TRUE": "FALSE"},
@@ -1306,7 +1310,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->webpReductionEffort = sharp::AttrAsUint32(options, "webpReductionEffort");
   baton->tiffQuality = sharp::AttrAsUint32(options, "tiffQuality");
   baton->tiffPyramid = sharp::AttrAsBool(options, "tiffPyramid");
-  baton->tiffSquash = sharp::AttrAsBool(options, "tiffSquash");
+  baton->tiffBitdepth = sharp::AttrAsUint32(options, "tiffBitdepth");
   baton->tiffTile = sharp::AttrAsBool(options, "tiffTile");
   baton->tiffTileWidth = sharp::AttrAsUint32(options, "tiffTileWidth");
   baton->tiffTileHeight = sharp::AttrAsUint32(options, "tiffTileHeight");

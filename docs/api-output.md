@@ -147,7 +147,7 @@ Some of these options require the use of a globally-installed libvips compiled w
 -   `options` **[Object][6]?** output options
     -   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `80`)
     -   `options.progressive` **[boolean][7]** use progressive (interlace) scan (optional, default `false`)
-    -   `options.chromaSubsampling` **[string][2]** for quality &lt; 90, set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' (use chroma subsampling); for quality >= 90 chroma is never subsampled (optional, default `'4:2:0'`)
+    -   `options.chromaSubsampling` **[string][2]** set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' chroma subsampling (optional, default `'4:2:0'`)
     -   `options.optimiseCoding` **[boolean][7]** optimise Huffman coding tables (optional, default `true`)
     -   `options.optimizeCoding` **[boolean][7]** alternative spelling of optimiseCoding (optional, default `true`)
     -   `options.trellisQuantisation` **[boolean][7]** apply trellis quantisation, requires libvips compiled with support for mozjpeg (optional, default `false`)
@@ -254,7 +254,7 @@ Use these TIFF options for output image.
     -   `options.tileHeight` **[boolean][7]** vertical tile size (optional, default `256`)
     -   `options.xres` **[number][9]** horizontal resolution in pixels/mm (optional, default `1.0`)
     -   `options.yres` **[number][9]** vertical resolution in pixels/mm (optional, default `1.0`)
-    -   `options.squash` **[boolean][7]** squash 8-bit images down to 1 bit (optional, default `false`)
+    -   `options.bitdepth` **[boolean][7]** reduce bitdepth to 1, 2 or 4 bit (optional, default `8`)
 
 ### Examples
 
@@ -263,7 +263,7 @@ Use these TIFF options for output image.
 sharp('input.svg')
   .tiff({
     compression: 'lzw',
-    squash: true
+    bitdepth: 1
   })
   .toFile('1-bpp-output.tiff')
   .then(info => { ... });

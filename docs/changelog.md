@@ -2,11 +2,15 @@
 
 ## v0.26 - *zoom*
 
-Requires libvips v8.9.2
+Requires libvips v8.10.0
 
 ### v0.26.0 - TBD
 
 * Prebuilt libvips binaries are now statically-linked and Brotli-compressed, requiring Node.js 10.16.0+.
+
+* TIFF output `squash` is replaced by `bitdepth` to reduce to 1, 2 or 4 bit.
+
+* JPEG output `quality` >= 90 no longer automatically sets `chromaSubsampling` to `4:4:4`.
 
 ## v0.25 - *yield*
 

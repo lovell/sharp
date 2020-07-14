@@ -111,9 +111,9 @@
   "dependencies": {
     "color": "^3.1.2",
     "detect-libc": "^1.0.3",
-    "node-addon-api": "^3.0.0",
+    "node-addon-api": "^3.0.1",
     "npmlog": "^4.1.2",
-    "prebuild-install": "^5.3.4",
+    "prebuild-install": "^5.3.5",
     "semver": "^7.3.2",
     "simple-get": "^4.0.0",
     "tar-fs": "^2.1.0",
@@ -123,9 +123,9 @@
     "async": "^3.2.0",
     "cc": "^2.0.1",
     "decompress-zip": "^0.3.2",
-    "documentation": "^13.0.1",
+    "documentation": "^13.0.2",
     "exif-reader": "^1.0.3",
-    "icc": "^1.0.0",
+    "icc": "^2.0.0",
     "license-checker": "^25.0.1",
     "mocha": "^8.0.1",
     "mock-fs": "^4.12.0",
@@ -137,7 +137,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.9.2-alpha5"
+    "libvips": "8.10.0-beta2"
   },
   "engines": {
     "node": ">=10.16.0"

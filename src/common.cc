@@ -243,7 +243,7 @@ namespace sharp {
         imageType = ImageType::MAGICK;
       }
     } else {
-      if (EndsWith(vips::VError().what(), " not found\n")) {
+      if (EndsWith(vips::VError().what(), " does not exist\n")) {
         imageType = ImageType::MISSING;
       }
     }

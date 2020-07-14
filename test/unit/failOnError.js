@@ -23,7 +23,7 @@ describe('failOnError', function () {
     let isWarningEmitted = false;
     sharp(fixtures.inputPngTruncated, { failOnError: false })
       .on('warning', function (warning) {
-        assert.strictEqual('not enough data', warning);
+        assert.ok(warning.includes('not enough data') || warning.includes('end of stream'));
         isWarningEmitted = true;
       })
       .resize(320, 240)
@@ -62,7 +62,7 @@ describe('failOnError', function () {
 
   it('returns errors to callback for truncated PNG', function (done) {
     sharp(fixtures.inputPngTruncated).toBuffer(function (err, data, info) {
-      assert.ok(err.message.includes('vipspng: libpng read error'), err);
+      assert.ok(err.message.includes('read error'), err);
       assert.strictEqual(data, undefined);
       assert.strictEqual(info, undefined);
       done();
