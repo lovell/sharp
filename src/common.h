@@ -271,6 +271,16 @@ namespace sharp {
    */
   std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, std::vector<double> colour);
 
+  /*
+    Removes alpha channel, if any.
+  */
+  VImage RemoveAlpha(VImage image);
+
+  /*
+    Ensures alpha channel, if missing.
+  */
+  VImage EnsureAlpha(VImage image);
+
 }  // namespace sharp
 
 #endif  // SRC_COMMON_H_

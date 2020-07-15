@@ -12,6 +12,9 @@ Requires libvips v8.10.0
 
 * JPEG output `quality` >= 90 no longer automatically sets `chromaSubsampling` to `4:4:4`.
 
+* Add most `dominant` colour to image `stats`.
+  [#640](https://github.com/lovell/sharp/issues/640)
+
 ## v0.25 - *yield*
 
 Requires libvips v8.9.1

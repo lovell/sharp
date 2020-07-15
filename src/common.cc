@@ -724,4 +724,25 @@ namespace sharp {
     return std::make_tuple(image, alphaColour);
   }
 
+  /*
+    Removes alpha channel, if any.
+  */
+  VImage RemoveAlpha(VImage image) {
+    if (HasAlpha(image)) {
+      image = image.extract_band(0, VImage::option()->set("n", image.bands() - 1));
+    }
+    return image;
+  }
+
+  /*
+    Ensures alpha channel, if missing.
+  */
+  VImage EnsureAlpha(VImage image) {
+    if (!HasAlpha(image)) {
+      std::vector<double> alpha;
+      alpha.push_back(sharp::MaximumImageAlpha(image.interpretation()));
+      image = image.bandjoin_const(alpha);
+    }
+    return image;
+  }
 }  // namespace sharp

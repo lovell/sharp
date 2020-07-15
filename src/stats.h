@@ -48,6 +48,9 @@ struct StatsBaton {
   bool isOpaque;
   double entropy;
   double sharpness;
+  int dominantRed;
+  int dominantGreen;
+  int dominantBlue;
 
   std::string err;
 
@@ -55,7 +58,10 @@ struct StatsBaton {
     input(nullptr),
     isOpaque(true),
     entropy(0.0),
-    sharpness(0.0)
+    sharpness(0.0),
+    dominantRed(0),
+    dominantGreen(0),
+    dominantBlue(0)
     {}
 };
 

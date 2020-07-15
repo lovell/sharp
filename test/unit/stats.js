@@ -27,6 +27,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.7883011147075762));
 
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(40, r);
+      assert.strictEqual(40, g);
+      assert.strictEqual(40, b);
+
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
       assert.strictEqual(255, stats.channels[0].max);
@@ -87,6 +92,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0.3409031108021736));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 9.111356137722868));
 
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(248, r);
+      assert.strictEqual(248, g);
+      assert.strictEqual(248, b);
+
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
       assert.strictEqual(255, stats.channels[0].max);
@@ -113,6 +123,11 @@ describe('Image Stats', function () {
       assert.strictEqual(false, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0.06778064835816622));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 2.522916068931278));
+
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(248, r);
+      assert.strictEqual(248, g);
+      assert.strictEqual(248, b);
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -190,6 +205,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0));
 
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(72, r);
+      assert.strictEqual(104, g);
+      assert.strictEqual(72, b);
+
       // alpha channel
       assert.strictEqual(0, stats.channels[3].min);
       assert.strictEqual(0, stats.channels[3].max);
@@ -218,6 +238,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 0.3851250782608986));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 10.312521863719589));
 
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(248, r);
+      assert.strictEqual(248, g);
+      assert.strictEqual(248, b);
+
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
       assert.strictEqual(255, stats.channels[0].max);
@@ -245,6 +270,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.51758075132966));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 9.959951636662941));
+
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(40, r);
+      assert.strictEqual(136, g);
+      assert.strictEqual(200, b);
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -306,6 +336,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 6.087309412541799));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 2.9250574456255682));
 
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(120, r);
+      assert.strictEqual(136, g);
+      assert.strictEqual(88, b);
+
       // red channel
       assert.strictEqual(35, stats.channels[0].min);
       assert.strictEqual(254, stats.channels[0].max);
@@ -366,6 +401,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 1));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 15.870619016486861));
 
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(8, r);
+      assert.strictEqual(8, g);
+      assert.strictEqual(8, b);
+
       // gray channel
       assert.strictEqual(0, stats.channels[0].min);
       assert.strictEqual(101, stats.channels[0].max);
@@ -411,6 +451,17 @@ describe('Image Stats', function () {
       })
   );
 
+  it('Dominant colour', () =>
+    sharp(fixtures.inputJpgBooleanTest)
+      .stats()
+      .then(({ dominant }) => {
+        const { r, g, b } = dominant;
+        assert.strictEqual(r, 8);
+        assert.strictEqual(g, 136);
+        assert.strictEqual(b, 248);
+      })
+  );
+
   it('Stream in, Callback out', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp().stats(function (err, stats) {
@@ -419,6 +470,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
+
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(40, r);
+      assert.strictEqual(40, g);
+      assert.strictEqual(40, b);
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
@@ -483,6 +539,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
 
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(40, r);
+      assert.strictEqual(40, g);
+      assert.strictEqual(40, b);
+
       // red channel
       assert.strictEqual(0, stats.channels[0].min);
       assert.strictEqual(255, stats.channels[0].max);
@@ -540,6 +601,11 @@ describe('Image Stats', function () {
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
+
+      const { r, g, b } = stats.dominant;
+      assert.strictEqual(40, r);
+      assert.strictEqual(40, g);
+      assert.strictEqual(40, b);
 
       // red channel
       assert.strictEqual(0, stats.channels[0].min);

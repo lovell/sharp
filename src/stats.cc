@@ -86,6 +86,18 @@ class StatsWorker : public Napi::AsyncWorker {
           0.0,  1.0, 0.0);
         laplacian.set("scale", 9.0);
         baton->sharpness = greyscale.conv(laplacian).deviate();
+        // Most dominant sRGB colour via 4096-bin 3D histogram
+        vips::VImage hist = sharp::RemoveAlpha(image)
+          .colourspace(VIPS_INTERPRETATION_sRGB)
+          .hist_find_ndim(VImage::option()->set("bins", 16));
+        std::complex<double> maxpos = hist.maxpos();
+        int const dx = static_cast<int>(std::real(maxpos));
+        int const dy = static_cast<int>(std::imag(maxpos));
+        std::vector<double> pel = hist(dx, dy);
+        int const dz = std::distance(pel.begin(), std::find(pel.begin(), pel.end(), hist.max()));
+        baton->dominantRed = dx * 16 + 8;
+        baton->dominantGreen = dy * 16 + 8;
+        baton->dominantBlue = dz * 16 + 8;
       } catch (vips::VError const &err) {
         (baton->err).append(err.what());
       }
@@ -133,6 +145,11 @@ class StatsWorker : public Napi::AsyncWorker {
       info.Set("isOpaque", baton->isOpaque);
       info.Set("entropy", baton->entropy);
       info.Set("sharpness", baton->sharpness);
+      Napi::Object dominant = Napi::Object::New(env);
+      dominant.Set("r", baton->dominantRed);
+      dominant.Set("g", baton->dominantGreen);
+      dominant.Set("b", baton->dominantBlue);
+      info.Set("dominant", dominant);
       Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
     } else {
       Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });

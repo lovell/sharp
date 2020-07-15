@@ -26,16 +26,6 @@ using vips::VImage;
 namespace sharp {
 
   /*
-    Removes alpha channel, if any.
-  */
-  VImage RemoveAlpha(VImage image);
-
-  /*
-    Ensures alpha channel, if missing.
-  */
-  VImage EnsureAlpha(VImage image);
-
-  /*
    * Tint an image using the specified chroma, preserving the original image luminance
    */
   VImage Tint(VImage image, double const a, double const b);

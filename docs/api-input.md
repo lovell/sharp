@@ -72,6 +72,7 @@ A `Promise` is returned when `callback` is not provided.
 -   `isOpaque`: Is the image fully opaque? Will be `true` if the image has no alpha channel or if every pixel is fully opaque.
 -   `entropy`: Histogram-based estimation of greyscale entropy, discarding alpha channel if any (experimental)
 -   `sharpness`: Estimation of greyscale sharpness based on the standard deviation of a Laplacian convolution, discarding alpha channel if any (experimental)
+-   `dominant`: Object containing most dominant sRGB colour based on a 4096-bin 3D histogram (experimental)
 
 ### Parameters
 
@@ -89,7 +90,8 @@ image
 ```
 
 ```javascript
-const { entropy, sharpness } = await sharp(input).stats();
+const { entropy, sharpness, dominant } = await sharp(input).stats();
+const { r, g, b } = dominant;
 ```
 
 Returns **[Promise][5]&lt;[Object][6]>** 
