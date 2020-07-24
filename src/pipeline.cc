@@ -685,9 +685,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Apply output ICC profile
-      if (!baton->withMetadataProfile.empty()) {
+      if (!baton->withMetadataICC.empty()) {
         image = image.icc_transform(
-          const_cast<char*>(baton->withMetadataProfile.data()),
+          const_cast<char*>(baton->withMetadataICC.data()),
           VImage::option()
           ->set("input_profile", "srgb")
           ->set("intent", VIPS_INTENT_PERCEPTUAL));
@@ -1291,7 +1291,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->fileOut = sharp::AttrAsStr(options, "fileOut");
   baton->withMetadata = sharp::AttrAsBool(options, "withMetadata");
   baton->withMetadataOrientation = sharp::AttrAsUint32(options, "withMetadataOrientation");
-  baton->withMetadataProfile = sharp::AttrAsStr(options, "withMetadataProfile");
+  baton->withMetadataICC = sharp::AttrAsStr(options, "withMetadataICC");
   // Format-specific
   baton->jpegQuality = sharp::AttrAsUint32(options, "jpegQuality");
   baton->jpegProgressive = sharp::AttrAsBool(options, "jpegProgressive");

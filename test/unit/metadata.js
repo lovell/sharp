@@ -647,5 +647,10 @@ describe('Image metadata', function () {
         sharp().withMetadata({ orientation: 9 });
       });
     });
+    it('Non string icc', function () {
+      assert.throws(function () {
+        sharp().withMetadata({ icc: true });
+      });
+    });
   });
 });

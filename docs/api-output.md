@@ -102,7 +102,7 @@ sRGB colour space and strip all metadata, including the removal of any ICC profi
 
 -   `options` **[Object][6]?**
     -   `options.orientation` **[number][9]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
-    -   `options.profile` **[string][2]?** path to an ICC profile file
+    -   `options.icc` **[string][2]?** path to an ICC profile file
 
 ### Examples
 

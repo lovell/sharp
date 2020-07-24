@@ -155,7 +155,7 @@ struct PipelineBaton {
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
-  std::string withMetadataProfile;
+  std::string withMetadataICC;
   std::unique_ptr<double[]> convKernel;
   int convKernelWidth;
   int convKernelHeight;
