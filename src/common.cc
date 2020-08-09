@@ -17,6 +17,7 @@
 #include <string.h>
 #include <vector>
 #include <queue>
+#include <map>
 #include <mutex>  // NOLINT(build/c++11)
 
 #include <napi.h>
@@ -173,33 +174,42 @@ namespace sharp {
     return id;
   }
 
+  std::map<std::string, ImageType> loaderToType = {
+    { "jpegload", ImageType::JPEG },
+    { "jpegload_buffer", ImageType::JPEG },
+    { "pngload", ImageType::PNG },
+    { "pngload_buffer", ImageType::PNG },
+    { "webpload", ImageType::WEBP },
+    { "webpload_buffer", ImageType::WEBP },
+    { "tiffload", ImageType::TIFF },
+    { "tiffload_buffer", ImageType::TIFF },
+    { "gifload", ImageType::GIF },
+    { "gifload_buffer", ImageType::GIF },
+    { "svgload", ImageType::SVG },
+    { "svgload_buffer", ImageType::SVG },
+    { "heifload", ImageType::HEIF },
+    { "heifload_buffer", ImageType::HEIF },
+    { "pdfload", ImageType::PDF },
+    { "pdfload_buffer", ImageType::PDF },
+    { "magickload", ImageType::MAGICK },
+    { "magickload_buffer", ImageType::MAGICK },
+    { "openslideload", ImageType::OPENSLIDE },
+    { "ppmload", ImageType::PPM },
+    { "fitsload", ImageType::FITS },
+    { "vipsload", ImageType::VIPS },
+    { "rawload", ImageType::RAW }
+  };
+
   /*
     Determine image format of a buffer.
   */
   ImageType DetermineImageType(void *buffer, size_t const length) {
     ImageType imageType = ImageType::UNKNOWN;
     char const *load = vips_foreign_find_load_buffer(buffer, length);
-    if (load != NULL) {
-      std::string const loader = load;
-      if (EndsWith(loader, "JpegBuffer")) {
-        imageType = ImageType::JPEG;
-      } else if (EndsWith(loader, "PngBuffer")) {
-        imageType = ImageType::PNG;
-      } else if (EndsWith(loader, "WebpBuffer")) {
-        imageType = ImageType::WEBP;
-      } else if (EndsWith(loader, "TiffBuffer")) {
-        imageType = ImageType::TIFF;
-      } else if (EndsWith(loader, "GifBuffer")) {
-        imageType = ImageType::GIF;
-      } else if (EndsWith(loader, "SvgBuffer")) {
-        imageType = ImageType::SVG;
-      } else if (EndsWith(loader, "HeifBuffer")) {
-        imageType = ImageType::HEIF;
-      } else if (EndsWith(loader, "PdfBuffer")) {
-        imageType = ImageType::PDF;
-      } else if (EndsWith(loader, "MagickBuffer") ||
-                 EndsWith(loader, "Magick7Buffer")) {
-        imageType = ImageType::MAGICK;
+    if (load != nullptr) {
+      auto it = loaderToType.find(vips_nickname_find(g_type_from_name(load)));
+      if (it != loaderToType.end()) {
+        imageType = it->second;
       }
     }
     return imageType;
@@ -212,35 +222,9 @@ namespace sharp {
     ImageType imageType = ImageType::UNKNOWN;
     char const *load = vips_foreign_find_load(file);
     if (load != nullptr) {
-      std::string const loader = load;
-      if (EndsWith(loader, "JpegFile")) {
-        imageType = ImageType::JPEG;
-      } else if (EndsWith(loader, "PngFile")) {
-        imageType = ImageType::PNG;
-      } else if (EndsWith(loader, "WebpFile")) {
-        imageType = ImageType::WEBP;
-      } else if (EndsWith(loader, "Openslide")) {
-        imageType = ImageType::OPENSLIDE;
-      } else if (EndsWith(loader, "TiffFile")) {
-        imageType = ImageType::TIFF;
-      } else if (EndsWith(loader, "GifFile")) {
-        imageType = ImageType::GIF;
-      } else if (EndsWith(loader, "SvgFile")) {
-        imageType = ImageType::SVG;
-      } else if (EndsWith(loader, "HeifFile")) {
-        imageType = ImageType::HEIF;
-      } else if (EndsWith(loader, "PdfFile")) {
-        imageType = ImageType::PDF;
-      } else if (EndsWith(loader, "Ppm")) {
-        imageType = ImageType::PPM;
-      } else if (EndsWith(loader, "Fits")) {
-        imageType = ImageType::FITS;
-      } else if (EndsWith(loader, "Vips")) {
-        imageType = ImageType::VIPS;
-      } else if (EndsWith(loader, "Magick") ||
-                 EndsWith(loader, "MagickFile") ||
-                 EndsWith(loader, "Magick7File")) {
-        imageType = ImageType::MAGICK;
+      auto it = loaderToType.find(vips_nickname_find(g_type_from_name(load)));
+      if (it != loaderToType.end()) {
+        imageType = it->second;
       }
     } else {
       if (EndsWith(vips::VError().what(), " does not exist\n")) {
