@@ -94,7 +94,7 @@ jobs:
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y build-essential git python2 curl"
         - sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_10.x buster main' >/etc/apt/sources.list.d/nodesource.list"
-        - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
+        - sudo docker exec sharp sh -c "apt-get update && apt-get install -y -t nodesource nodejs"
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
 
