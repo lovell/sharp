@@ -15,12 +15,6 @@ Requires libvips v8.10.0
 * Add most `dominant` colour to image `stats`.
   [#640](https://github.com/lovell/sharp/issues/640)
 
-## v0.25 - *yield*
-
-Requires libvips v8.9.1
-
-### v0.25.5 - TBD
-
 * Add support for libvips ImageMagick v7 loaders.
   [#2258](https://github.com/lovell/sharp/pull/2258)
   [@vouillon](https://github.com/vouillon)
@@ -28,6 +22,10 @@ Requires libvips v8.9.1
 * Allow multi-page input via \*magick.
   [#2259](https://github.com/lovell/sharp/pull/2259)
   [@vouillon](https://github.com/vouillon)
+
+## v0.25 - *yield*
+
+Requires libvips v8.9.1
 
 ### v0.25.4 - 12th June 2020
 
