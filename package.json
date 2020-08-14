@@ -111,7 +111,7 @@
   "dependencies": {
     "color": "^3.1.2",
     "detect-libc": "^1.0.3",
-    "node-addon-api": "^3.0.1",
+    "node-addon-api": "^3.0.0",
     "npmlog": "^4.1.2",
     "prebuild-install": "^5.3.5",
     "semver": "^7.3.2",
@@ -127,13 +127,13 @@
     "exif-reader": "^1.0.3",
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^8.0.1",
+    "mocha": "^8.1.1",
     "mock-fs": "^4.12.0",
     "nyc": "^15.1.0",
     "prebuild": "^10.0.0",
     "prebuild-ci": "^3.1.0",
     "rimraf": "^3.0.2",
-    "semistandard": "^14.2.0"
+    "semistandard": "^14.2.3"
   },
   "license": "Apache-2.0",
   "config": {
