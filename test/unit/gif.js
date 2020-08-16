@@ -62,14 +62,16 @@ describe('GIF input', () => {
       })
   );
 
-  it('Animated GIF output should fail due to missing ImageMagick', () =>
-    assert.rejects(() =>
-      sharp(fixtures.inputGifAnimated, { pages: -1 })
-        .gif({ loop: 2, delay: [...Array(10).fill(100)], pageHeight: 10 })
-        .toBuffer(),
-    /VipsOperation: class "magicksave_buffer" not found/
-    )
-  );
+  if (!sharp.format.magick.input.buffer) {
+    it('Animated GIF output should fail due to missing ImageMagick', () =>
+      assert.rejects(() =>
+        sharp(fixtures.inputGifAnimated, { pages: -1 })
+          .gif({ loop: 2, delay: [...Array(10).fill(100)], pageHeight: 10 })
+          .toBuffer(),
+      /VipsOperation: class "magicksave_buffer" not found/
+      )
+    );
+  }
 
   it('invalid pageHeight throws', () => {
     assert.throws(() => {

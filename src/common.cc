@@ -441,32 +441,32 @@ namespace sharp {
 
   /*
     Set animation properties if necessary.
-    Non-provided properties will be loaded from image and propagated back to caller.
+    Non-provided properties will be loaded from image.
   */
-  VImage SetAnimationProperties(VImage image, int *pageHeight, std::vector<int> *delay, int *loop) {
-    bool hasDelay = delay->size() != 1 || delay->front() != -1;
+  VImage SetAnimationProperties(VImage image, int pageHeight, std::vector<int> delay, int loop) {
+    bool hasDelay = delay.size() != 1 || delay.front() != -1;
 
-    if (*pageHeight == 0 && image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
-      *pageHeight = image.get_int(VIPS_META_PAGE_HEIGHT);
+    if (pageHeight == 0 && image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
+      pageHeight = image.get_int(VIPS_META_PAGE_HEIGHT);
     }
 
     if (!hasDelay && image.get_typeof("delay") == VIPS_TYPE_ARRAY_INT) {
-      *delay = image.get_array_int("delay");
+      delay = image.get_array_int("delay");
       hasDelay = true;
     }
 
-    if (*loop == -1 && image.get_typeof("loop") == G_TYPE_INT) {
-      *loop = image.get_int("loop");
+    if (loop == -1 && image.get_typeof("loop") == G_TYPE_INT) {
+      loop = image.get_int("loop");
     }
 
-    if (*pageHeight == 0) return image;
+    if (pageHeight == 0) return image;
 
     // It is necessary to create the copy as otherwise, pageHeight will be ignored!
     VImage copy = image.copy();
 
-    copy.set(VIPS_META_PAGE_HEIGHT, *pageHeight);
-    if (hasDelay) copy.set("delay", *delay);
-    if (*loop != -1) copy.set("loop", *loop);
+    copy.set(VIPS_META_PAGE_HEIGHT, pageHeight);
+    if (hasDelay) copy.set("delay", delay);
+    if (loop != -1) copy.set("loop", loop);
 
     return copy;
   }
@@ -510,7 +510,8 @@ namespace sharp {
         throw vips::VError("Processed image is too large for the WebP format");
       }
     } else if (imageType == ImageType::GIF) {
-      if (image.width() > 65535 || image.height() > 65535) {
+      const int height = image.get_typeof("pageHeight") == G_TYPE_INT ? image.get_int("pageHeight") : image.height();
+      if (image.width() > 65535 || height > 65535) {
         throw vips::VError("Processed image is too large for the GIF format");
       }
     }

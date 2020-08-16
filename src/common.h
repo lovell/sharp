@@ -189,9 +189,9 @@ namespace sharp {
 
   /*
     Set animation properties if necessary.
-    Non-provided properties will be loaded from image and propagated back to caller.
+    Non-provided properties will be loaded from image.
   */
-  VImage SetAnimationProperties(VImage image, int *pageHeight, std::vector<int> *delay, int *loop);
+  VImage SetAnimationProperties(VImage image, int pageHeight, std::vector<int> delay, int loop);
 
   /*
     Does this image have a non-default density?

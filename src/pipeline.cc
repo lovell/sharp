@@ -699,9 +699,9 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       image = sharp::SetAnimationProperties(
         image,
-        &baton->pageHeight,
-        &baton->delay,
-        &baton->loop);
+        baton->pageHeight,
+        baton->delay,
+        baton->loop);
 
       // Output
       if (baton->fileOut.empty()) {
