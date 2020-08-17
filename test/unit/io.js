@@ -470,7 +470,7 @@ describe('Input/output', function () {
         .toFile(fixtures.outputZoinks, function (err, info) {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
-          assert.strictEqual('png', info.format);
+          assert.strictEqual(sharp.format.magick.input.buffer ? 'gif' : 'png', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
           rimraf(fixtures.outputZoinks, done);

@@ -42,7 +42,7 @@ describe('GIF input', () => {
       .then(({ data, info }) => {
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
-        assert.strictEqual('png', info.format);
+        assert.strictEqual(sharp.format.magick.input.buffer ? 'gif' : 'png', info.format);
         assert.strictEqual(80, info.width);
         assert.strictEqual(80, info.height);
         assert.strictEqual(4, info.channels);
@@ -55,22 +55,22 @@ describe('GIF input', () => {
       .then(({ data, info }) => {
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
-        assert.strictEqual('png', info.format);
+        assert.strictEqual(sharp.format.magick.input.buffer ? 'gif' : 'png', info.format);
         assert.strictEqual(80, info.width);
         assert.strictEqual(2400, info.height);
         assert.strictEqual(4, info.channels);
       })
   );
 
-  if (!sharp.format.magick.input.buffer) {
-    it('Animated GIF output should fail due to missing ImageMagick', () =>
-      assert.rejects(() =>
-        sharp(fixtures.inputGifAnimated, { pages: -1 })
-          .gif({ loop: 2, delay: [...Array(10).fill(100)], pageHeight: 10 })
-          .toBuffer(),
-      /VipsOperation: class "magicksave_buffer" not found/
-      )
-    );
+  if (!sharp.format.magick.output.buffer) {
+    it('GIF output should fail due to missing ImageMagick', () => {
+      assert.throws(
+        () => {
+          sharp().gif();
+        },
+        /The gif operation requires libvips to have been installed with support for ImageMagick/
+      );
+    });
   }
 
   it('invalid pageHeight throws', () => {

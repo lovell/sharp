@@ -15,6 +15,10 @@ Requires libvips v8.10.0
 * Add most `dominant` colour to image `stats`.
   [#640](https://github.com/lovell/sharp/issues/640)
 
+* Add support for animated GIF (requires \*magick) and WebP output.
+  [#2012](https://github.com/lovell/sharp/pull/2012)
+  [@deftomat](https://github.com/deftomat)
+
 * Add support for libvips ImageMagick v7 loaders.
   [#2258](https://github.com/lovell/sharp/pull/2258)
   [@vouillon](https://github.com/vouillon)

@@ -485,16 +485,18 @@ namespace sharp {
     Check the proposed format supports the current dimensions.
   */
   void AssertImageTypeDimensions(VImage image, ImageType const imageType) {
+    const int height = image.get_typeof("pageHeight") == G_TYPE_INT
+      ? image.get_int("pageHeight")
+      : image.height();
     if (imageType == ImageType::JPEG) {
-      if (image.width() > 65535 || image.height() > 65535) {
+      if (image.width() > 65535 || height > 65535) {
         throw vips::VError("Processed image is too large for the JPEG format");
       }
     } else if (imageType == ImageType::WEBP) {
-      if (image.width() > 16383 || image.height() > 16383) {
+      if (image.width() > 16383 || height > 16383) {
         throw vips::VError("Processed image is too large for the WebP format");
       }
     } else if (imageType == ImageType::GIF) {
-      const int height = image.get_typeof("pageHeight") == G_TYPE_INT ? image.get_int("pageHeight") : image.height();
       if (image.width() > 65535 || height > 65535) {
         throw vips::VError("Processed image is too large for the GIF format");
       }

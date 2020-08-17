@@ -222,6 +222,9 @@ Use these WebP options for output image.
     -   `options.nearLossless` **[boolean][7]** use near_lossless compression mode (optional, default `false`)
     -   `options.smartSubsample` **[boolean][7]** use high quality chroma subsampling (optional, default `false`)
     -   `options.reductionEffort` **[number][9]** level of CPU effort to reduce file size, integer 0-6 (optional, default `4`)
+    -   `options.pageHeight` **[number][9]?** page height for animated output
+    -   `options.loop` **[number][9]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
+    -   `options.delay` **[Array][10]&lt;[number][9]>?** list of delays between animation frames (in milliseconds)
     -   `options.force` **[boolean][7]** force WebP output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
@@ -232,6 +235,27 @@ const data = await sharp(input)
   .webp({ lossless: true })
   .toBuffer();
 ```
+
+-   Throws **[Error][4]** Invalid options
+
+Returns **Sharp** 
+
+## gif
+
+Use these GIF options for output image.
+
+Requires libvips compiled with support for ImageMagick or GraphicsMagick.
+The prebuilt binaries do not include this - see
+[installing a custom libvips][11].
+
+### Parameters
+
+-   `options` **[Object][6]?** output options
+    -   `options.pageHeight` **[number][9]?** page height for animated output
+    -   `options.loop` **[number][9]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
+    -   `options.delay` **[Array][10]&lt;[number][9]>?** list of delays between animation frames (in milliseconds)
+    -   `options.force` **[boolean][7]** force GIF output, otherwise attempt to use input format (optional, default `true`)
+
 
 -   Throws **[Error][4]** Invalid options
 
@@ -341,7 +365,7 @@ Warning: multiple sharp instances concurrently producing tile output can expose 
     -   `options.size` **[number][9]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
     -   `options.overlap` **[number][9]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
     -   `options.angle` **[number][9]** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
-    -   `options.background` **([string][2] \| [Object][6])** background colour, parsed by the [color][10] module, defaults to white without transparency. (optional, default `{r:255,g:255,b:255,alpha:1}`)
+    -   `options.background` **([string][2] \| [Object][6])** background colour, parsed by the [color][12] module, defaults to white without transparency. (optional, default `{r:255,g:255,b:255,alpha:1}`)
     -   `options.depth` **[string][2]?** how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout.
     -   `options.skipBlanks` **[number][9]** threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images (optional, default `-1`)
     -   `options.container` **[string][2]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
@@ -383,4 +407,8 @@ Returns **Sharp**
 
 [9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[10]: https://www.npmjs.org/package/color
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[11]: https://sharp.pixelplumbing.com/install#custom-libvips
+
+[12]: https://www.npmjs.org/package/color

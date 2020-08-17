@@ -191,3 +191,6 @@ GitHub: https://github.com/romaleev
 
 Name: Jerome Vouillon
 GitHub: https://github.com/vouillon
+
+Name: Tomáš Szabo
+GitHub: https://github.com/deftomat
