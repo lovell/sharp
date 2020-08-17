@@ -61,4 +61,41 @@ describe('GIF input', () => {
         assert.strictEqual(4, info.channels);
       })
   );
+
+  if (!sharp.format.magick.input.buffer) {
+    it('Animated GIF output should fail due to missing ImageMagick', () =>
+      assert.rejects(() =>
+        sharp(fixtures.inputGifAnimated, { pages: -1 })
+          .gif({ loop: 2, delay: [...Array(10).fill(100)], pageHeight: 10 })
+          .toBuffer(),
+      /VipsOperation: class "magicksave_buffer" not found/
+      )
+    );
+  }
+
+  it('invalid pageHeight throws', () => {
+    assert.throws(() => {
+      sharp().gif({ pageHeight: 0 });
+    });
+  });
+
+  it('invalid loop throws', () => {
+    assert.throws(() => {
+      sharp().gif({ loop: -1 });
+    });
+
+    assert.throws(() => {
+      sharp().gif({ loop: 65536 });
+    });
+  });
+
+  it('invalid delay throws', () => {
+    assert.throws(() => {
+      sharp().gif({ delay: [-1] });
+    });
+
+    assert.throws(() => {
+      sharp().gif({ delay: [65536] });
+    });
+  });
 });

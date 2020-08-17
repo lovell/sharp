@@ -42,6 +42,9 @@ namespace sharp {
   int32_t AttrAsInt32(Napi::Object obj, std::string attr) {
     return obj.Get(attr).As<Napi::Number>().Int32Value();
   }
+  int32_t AttrAsInt32(Napi::Object obj, unsigned int const attr) {
+    return obj.Get(attr).As<Napi::Number>().Int32Value();
+  }
   double AttrAsDouble(Napi::Object obj, std::string attr) {
     return obj.Get(attr).As<Napi::Number>().DoubleValue();
   }
@@ -58,6 +61,14 @@ namespace sharp {
       rgba[i] = AttrAsDouble(background, i);
     }
     return rgba;
+  }
+  std::vector<int32_t> AttrAsInt32Vector(Napi::Object obj, std::string attr) {
+    Napi::Array array = obj.Get(attr).As<Napi::Array>();
+    std::vector<int32_t> vector(array.Length());
+    for (unsigned int i = 0; i < array.Length(); i++) {
+      vector[i] = AttrAsInt32(array, i);
+    }
+    return vector;
   }
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image
@@ -125,6 +136,9 @@ namespace sharp {
   }
   bool IsWebp(std::string const &str) {
     return EndsWith(str, ".webp") || EndsWith(str, ".WEBP");
+  }
+  bool IsGif(std::string const &str) {
+    return EndsWith(str, ".gif") || EndsWith(str, ".GIF");
   }
   bool IsTiff(std::string const &str) {
     return EndsWith(str, ".tif") || EndsWith(str, ".tiff") || EndsWith(str, ".TIF") || EndsWith(str, ".TIFF");
@@ -239,6 +253,7 @@ namespace sharp {
   */
   bool ImageTypeSupportsPage(ImageType imageType) {
     return
+      imageType == ImageType::WEBP ||
       imageType == ImageType::MAGICK ||
       imageType == ImageType::GIF ||
       imageType == ImageType::TIFF ||
@@ -409,6 +424,38 @@ namespace sharp {
   }
 
   /*
+    Set animation properties if necessary.
+    Non-provided properties will be loaded from image.
+  */
+  VImage SetAnimationProperties(VImage image, int pageHeight, std::vector<int> delay, int loop) {
+    bool hasDelay = delay.size() != 1 || delay.front() != -1;
+
+    if (pageHeight == 0 && image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
+      pageHeight = image.get_int(VIPS_META_PAGE_HEIGHT);
+    }
+
+    if (!hasDelay && image.get_typeof("delay") == VIPS_TYPE_ARRAY_INT) {
+      delay = image.get_array_int("delay");
+      hasDelay = true;
+    }
+
+    if (loop == -1 && image.get_typeof("loop") == G_TYPE_INT) {
+      loop = image.get_int("loop");
+    }
+
+    if (pageHeight == 0) return image;
+
+    // It is necessary to create the copy as otherwise, pageHeight will be ignored!
+    VImage copy = image.copy();
+
+    copy.set(VIPS_META_PAGE_HEIGHT, pageHeight);
+    if (hasDelay) copy.set("delay", delay);
+    if (loop != -1) copy.set("loop", loop);
+
+    return copy;
+  }
+
+  /*
     Does this image have a non-default density?
   */
   bool HasDensity(VImage image) {
@@ -445,6 +492,11 @@ namespace sharp {
     } else if (imageType == ImageType::WEBP) {
       if (image.width() > 16383 || image.height() > 16383) {
         throw vips::VError("Processed image is too large for the WebP format");
+      }
+    } else if (imageType == ImageType::GIF) {
+      const int height = image.get_typeof("pageHeight") == G_TYPE_INT ? image.get_int("pageHeight") : image.height();
+      if (image.width() > 65535 || height > 65535) {
+        throw vips::VError("Processed image is too large for the GIF format");
       }
     }
   }

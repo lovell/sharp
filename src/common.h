@@ -88,10 +88,12 @@ namespace sharp {
   std::string AttrAsStr(Napi::Object obj, std::string attr);
   uint32_t AttrAsUint32(Napi::Object obj, std::string attr);
   int32_t AttrAsInt32(Napi::Object obj, std::string attr);
+  int32_t AttrAsInt32(Napi::Object obj, unsigned int const attr);
   double AttrAsDouble(Napi::Object obj, std::string attr);
   double AttrAsDouble(Napi::Object obj, unsigned int const attr);
   bool AttrAsBool(Napi::Object obj, std::string attr);
   std::vector<double> AttrAsRgba(Napi::Object obj, std::string attr);
+  std::vector<int32_t> AttrAsInt32Vector(Napi::Object obj, std::string attr);
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image
   InputDescriptor* CreateInputDescriptor(Napi::Object input);
@@ -125,6 +127,7 @@ namespace sharp {
   bool IsJpeg(std::string const &str);
   bool IsPng(std::string const &str);
   bool IsWebp(std::string const &str);
+  bool IsGif(std::string const &str);
   bool IsTiff(std::string const &str);
   bool IsHeic(std::string const &str);
   bool IsHeif(std::string const &str);
@@ -183,6 +186,12 @@ namespace sharp {
     Remove EXIF Orientation from image.
   */
   VImage RemoveExifOrientation(VImage image);
+
+  /*
+    Set animation properties if necessary.
+    Non-provided properties will be loaded from image.
+  */
+  VImage SetAnimationProperties(VImage image, int pageHeight, std::vector<int> delay, int loop);
 
   /*
     Does this image have a non-default density?
