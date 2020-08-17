@@ -73,7 +73,7 @@
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
-    "test": "semistandard && cpplint && npm run test-unit && npm run test-licensing && prebuild-ci",
+    "test": "semistandard && cpplint && npm run test-unit && npm run test-licensing && node install/prebuild-ci",
     "test-unit": "nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
     "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;MIT\"",
     "test-coverage": "./test/coverage/report.sh",
@@ -86,6 +86,7 @@
   "files": [
     "binding.gyp",
     "install/**",
+    "!install/prebuild-ci.js",
     "lib/**",
     "src/**"
   ],
@@ -132,7 +133,6 @@
     "mock-fs": "^4.12.0",
     "nyc": "^15.1.0",
     "prebuild": "^10.0.0",
-    "prebuild-ci": "^3.1.0",
     "rimraf": "^3.0.2",
     "semistandard": "^14.2.3"
   },
