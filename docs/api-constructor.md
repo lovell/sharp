@@ -29,6 +29,7 @@ Implements the [stream.Duplex][1] class.
     -   `options.pages` **[number][6]** number of pages to extract for multi-page input (GIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
     -   `options.page` **[number][6]** page number to start extracting from for multi-page input (GIF, TIFF, PDF), zero based. (optional, default `0`)
     -   `options.level` **[number][6]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
+    -   `options.animated` **[boolean][5]** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default `false`)
     -   `options.raw` **[Object][4]?** describes raw pixel input image data. See `raw()` for pixel ordering.
         -   `options.raw.width` **[number][6]?** 
         -   `options.raw.height` **[number][6]?** 
@@ -76,6 +77,11 @@ sharp({
 .png()
 .toBuffer()
 .then( ... );
+```
+
+```javascript
+// Convert an animated GIF to an animated WebP
+await sharp('in.gif', { animated: true }).toFile('out.webp');
 ```
 
 -   Throws **[Error][8]** Invalid parameters

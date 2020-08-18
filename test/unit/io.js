@@ -649,6 +649,15 @@ describe('Input/output', function () {
         sharp({ density: 'zoinks' });
       }, /Expected number between 1 and 2400 for density but received zoinks of type string/);
     });
+    it('Setting animated property updates pages property', function () {
+      assert.strictEqual(sharp({ animated: false }).options.input.pages, 1);
+      assert.strictEqual(sharp({ animated: true }).options.input.pages, -1);
+    });
+    it('Invalid animated property throws', function () {
+      assert.throws(function () {
+        sharp({ animated: -1 });
+      }, /Expected boolean for animated but received -1 of type number/);
+    });
     it('Invalid page property throws', function () {
       assert.throws(function () {
         sharp({ page: -1 });
