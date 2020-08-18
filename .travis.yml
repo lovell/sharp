@@ -5,7 +5,7 @@ jobs:
       dist: bionic
       language: shell
       before_install:
-        - sudo docker run -dit --name sharp --env CI --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp centos:7
+        - sudo docker run -dit --name sharp --env CI --env TRAVIS_TAG --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp centos:7
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_10.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
       install: sudo docker exec sharp bash -c "npm install --unsafe-perm"
@@ -38,7 +38,7 @@ jobs:
       dist: bionic
       language: shell
       before_install:
-        - sudo docker run -dit --name sharp --env CI --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10.17.0-alpine3.9 # https://github.com/nodejs/docker-node/issues/1158
+        - sudo docker run -dit --name sharp --env CI --env TRAVIS_TAG --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10.17.0-alpine3.9 # https://github.com/nodejs/docker-node/issues/1158
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
@@ -69,7 +69,7 @@ jobs:
       dist: bionic
       language: shell
       before_install:
-        - sudo docker run -dit --name sharp --env CI --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
+        - sudo docker run -dit --name sharp --env CI --env TRAVIS_TAG --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y build-essential git python2 curl"
         - sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_10.x buster main' >/etc/apt/sources.list.d/nodesource.list"
