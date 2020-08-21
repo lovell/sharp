@@ -564,8 +564,9 @@ async.series({
   },
   // PNG
   png: function (callback) {
-    const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
+    const inputPngBuffer = fs.readFileSync(fixtures.inputPngAlphaPremultiplicationLarge);
     const pngSuite = new Benchmark.Suite('png');
+    const minSamples = 64;
     // jimp
     pngSuite.add('jimp-buffer-buffer', {
       defer: true,
@@ -576,6 +577,8 @@ async.series({
           } else {
             image
               .resize(width, height)
+              .deflateLevel(6)
+              .filterType(0)
               .getBuffer(jimp.MIME_PNG, function (err) {
                 if (err) {
                   throw err;
@@ -589,12 +592,14 @@ async.series({
     }).add('jimp-file-file', {
       defer: true,
       fn: function (deferred) {
-        jimp.read(fixtures.inputPng, function (err, image) {
+        jimp.read(fixtures.inputPngAlphaPremultiplicationLarge, function (err, image) {
           if (err) {
             throw err;
           } else {
             image
               .resize(width, height)
+              .deflateLevel(6)
+              .filterType(0)
               .write(fixtures.outputPng, function (err) {
                 if (err) {
                   throw err;
@@ -610,7 +615,7 @@ async.series({
     pngSuite.add('mapnik-file-file', {
       defer: true,
       fn: function (deferred) {
-        mapnik.Image.open(fixtures.inputPng, function (err, img) {
+        mapnik.Image.open(fixtures.inputPngAlphaPremultiplicationLarge, function (err, img) {
           if (err) throw err;
           img.premultiply(function (err, img) {
             if (err) throw err;
@@ -657,11 +662,15 @@ async.series({
       defer: true,
       fn: function (deferred) {
         imagemagick.resize({
-          srcPath: fixtures.inputPng,
+          srcPath: fixtures.inputPngAlphaPremultiplicationLarge,
           dstPath: fixtures.outputPng,
           width: width,
           height: height,
-          filter: 'Lanczos'
+          filter: 'Lanczos',
+          customArgs: [
+            '-define', 'PNG:compression-level=6',
+            '-define', 'PNG:compression-filter=0'
+          ]
         }, function (err) {
           if (err) {
             throw err;
@@ -675,9 +684,11 @@ async.series({
     pngSuite.add('gm-file-file', {
       defer: true,
       fn: function (deferred) {
-        gm(fixtures.inputPng)
+        gm(fixtures.inputPngAlphaPremultiplicationLarge)
           .filter('Lanczos')
           .resize(width, height)
+          .define('PNG:compression-level=6')
+          .define('PNG:compression-filter=0')
           .write(fixtures.outputPng, function (err) {
             if (err) {
               throw err;
@@ -689,9 +700,11 @@ async.series({
     }).add('gm-file-buffer', {
       defer: true,
       fn: function (deferred) {
-        gm(fixtures.inputPng)
+        gm(fixtures.inputPngAlphaPremultiplicationLarge)
           .filter('Lanczos')
           .resize(width, height)
+          .define('PNG:compression-level=6')
+          .define('PNG:compression-filter=0')
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -705,9 +718,11 @@ async.series({
     // sharp
     pngSuite.add('sharp-buffer-file', {
       defer: true,
+      minSamples,
       fn: function (deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
+          .png({ compressionLevel: 6 })
           .toFile(fixtures.outputPng, function (err) {
             if (err) {
               throw err;
@@ -718,9 +733,11 @@ async.series({
       }
     }).add('sharp-buffer-buffer', {
       defer: true,
+      minSamples,
       fn: function (deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
+          .png({ compressionLevel: 6 })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -732,9 +749,11 @@ async.series({
       }
     }).add('sharp-file-file', {
       defer: true,
+      minSamples,
       fn: function (deferred) {
-        sharp(fixtures.inputPng)
+        sharp(fixtures.inputPngAlphaPremultiplicationLarge)
           .resize(width, height)
+          .png({ compressionLevel: 6 })
           .toFile(fixtures.outputPng, function (err) {
             if (err) {
               throw err;
@@ -745,9 +764,11 @@ async.series({
       }
     }).add('sharp-file-buffer', {
       defer: true,
+      minSamples,
       fn: function (deferred) {
-        sharp(fixtures.inputPng)
+        sharp(fixtures.inputPngAlphaPremultiplicationLarge)
           .resize(width, height)
+          .png({ compressionLevel: 6 })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -759,10 +780,11 @@ async.series({
       }
     }).add('sharp-progressive', {
       defer: true,
+      minSamples,
       fn: function (deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
-          .png({ progressive: true })
+          .png({ compressionLevel: 6, progressive: true })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
@@ -774,10 +796,27 @@ async.series({
       }
     }).add('sharp-adaptiveFiltering', {
       defer: true,
+      minSamples,
       fn: function (deferred) {
         sharp(inputPngBuffer)
           .resize(width, height)
-          .png({ adaptiveFiltering: true })
+          .png({ adaptiveFiltering: true, compressionLevel: 6 })
+          .toBuffer(function (err, buffer) {
+            if (err) {
+              throw err;
+            } else {
+              assert.notStrictEqual(null, buffer);
+              deferred.resolve();
+            }
+          });
+      }
+    }).add('sharp-compressionLevel=9', {
+      defer: true,
+      minSamples,
+      fn: function (deferred) {
+        sharp(inputPngBuffer)
+          .resize(width, height)
+          .png({ compressionLevel: 9 })
           .toBuffer(function (err, buffer) {
             if (err) {
               throw err;
