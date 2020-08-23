@@ -161,9 +161,7 @@ describe('TIFF', function () {
       .then(() => sharp(fixtures.outputTiff)
         .metadata()
         .then(({ density }) => {
-          assert.strictEqual(true,
-            density === 2540 || // libvips <= 8.8.2
-            density === 25400); // libvips >= 8.8.3
+          assert.strictEqual(25400, density);
           return promisify(rimraf)(fixtures.outputTiff);
         })
       )
@@ -179,9 +177,7 @@ describe('TIFF', function () {
       .then(data => sharp(data)
         .metadata()
         .then(({ density }) => {
-          assert.strictEqual(true,
-            density === 2540 || // libvips <= 8.8.2
-            density === 25400); // libvips >= 8.8.3
+          assert.strictEqual(25400, density);
         })
       )
   );
