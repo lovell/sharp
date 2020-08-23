@@ -131,15 +131,15 @@
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
     "mocha": "^8.1.1",
-    "mock-fs": "^4.12.0",
+    "mock-fs": "^4.13.0",
     "nyc": "^15.1.0",
-    "prebuild": "^10.0.0",
+    "prebuild": "^10.0.1",
     "rimraf": "^3.0.2",
     "semistandard": "^14.2.3"
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.10.0-rc4",
+    "libvips": "8.10.0",
     "runtime": "napi",
     "target": 3
   },
