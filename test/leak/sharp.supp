@@ -40,6 +40,16 @@
   obj:*/libjpeg.so*
 }
 {
+  value_jpeg_obj_static
+  Memcheck:Value8
+  obj:*/libvips.so*
+}
+{
+  cond_jpeg_obj_static
+  Memcheck:Cond
+  obj:*/libvips.so*
+}
+{
   param_jpeg_jpeg_finish_compress
   Memcheck:Param
   write(buf)
@@ -417,6 +427,13 @@
   match-leak-kinds: possible
   ...
   fun:_ZN4node17CreateEnvironmentEPN2v87IsolateEP9uv_loop_sNS0_5LocalINS0_7ContextEEEiPKPKciSB_
+}
+{
+  leak_nodejs_CreateEnvironment_IsolateData
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node17CreateEnvironmentEPNS_11IsolateDataEN2v85LocalINS2_7ContextEEERKSt6vectorISsSaISsEESA_NS_16EnvironmentFlags5FlagsENS_8ThreadIdESt10unique_ptrINS_21InspectorParentHandleESt14default_deleteISF_EE
 }
 {
   leak_nodejs_Environment_Start
