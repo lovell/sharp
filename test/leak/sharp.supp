@@ -314,6 +314,16 @@
   ...
   fun:vips__init
 }
+{
+  leak_rsvg_static_data
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:malloc
+  ...
+  fun:rsvg_rust_handle_new_from_stream_sync
+  ...
+  fun:vips_object_build
+}
 
 # libuv warnings
 {
