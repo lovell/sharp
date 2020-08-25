@@ -4,7 +4,7 @@
 
 Requires libvips v8.10.0
 
-### v0.26.0 - TBD
+### v0.26.0 - 25th August 2020
 
 * Prebuilt libvips binaries are now statically-linked and Brotli-compressed, requiring Node.js 10.16.0+.
 
