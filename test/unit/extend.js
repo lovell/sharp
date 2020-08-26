@@ -41,7 +41,6 @@ describe('Extend', function () {
       .resize(120)
       .extend({
         top: 50,
-        bottom: 0,
         left: 10,
         right: 35,
         background: { r: 0, g: 0, b: 0, alpha: 0 }
@@ -64,18 +63,31 @@ describe('Extend', function () {
       sharp().extend(-1);
     });
   });
+  it('null object property fails', function () {
+    assert.throws(function () {
+      sharp().extend({ top: null });
+    });
+  });
   it('string object property fails', function () {
     assert.throws(function () {
-      sharp().extend({ top: 1, bottom: '5' });
+      sharp().extend({ bottom: '5' });
+    });
+  });
+  it('empty array object property fails', function () {
+    assert.throws(function () {
+      sharp().extend({ left: [] });
+    });
+  });
+  it('negative object property fails', function () {
+    assert.throws(function () {
+      sharp().extend({ right: -3 });
     });
   });
 
   it('should add alpha channel before extending with a transparent Background', function (done) {
     sharp(fixtures.inputJpgWithLandscapeExif1)
       .extend({
-        top: 0,
         bottom: 10,
-        left: 0,
         right: 10,
         background: { r: 0, g: 0, b: 0, alpha: 0 }
       })
@@ -93,7 +105,6 @@ describe('Extend', function () {
       .extend({
         top: 0,
         bottom: 20,
-        left: 0,
         right: 20,
         background: 'transparent'
       })
