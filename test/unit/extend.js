@@ -64,9 +64,9 @@ describe('Extend', function () {
       sharp().extend(-1);
     });
   });
-  it('partial object fails', function () {
+  it('string object property fails', function () {
     assert.throws(function () {
-      sharp().extend({ top: 1 });
+      sharp().extend({ top: 1, bottom: "5" });
     });
   });
 
