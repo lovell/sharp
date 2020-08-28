@@ -7,7 +7,7 @@ labels: installation
 
 Did you see the [documentation relating to installation](https://sharp.pixelplumbing.com/install)?
 
-Have you ensured the platform and version of Node.js used for `npm install` is the same as the platform and version of Node.js used at runtime?
+Have you ensured the architecture and platform of Node.js used for `npm install` is the same as the architecture and platform of Node.js used at runtime?
 
 Are you using the latest version? Is the version currently in use as reported by `npm ls sharp` the same as the latest version as reported by `npm view sharp dist-tags.latest`?
 
