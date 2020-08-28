@@ -95,6 +95,7 @@ module.exports = {
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp
   inputWebPAnimated: getPath('rotating-squares.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp
   inputWebPAnimatedLoop3: getPath('animated-loop-3.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp
+  inputWebPAnimatedBigHeight: getPath('big-height.webp'),
   inputTiff: getPath('G31D.TIF'), // http://www.fileformat.info/format/tiff/sample/e6c9a6e5253348f4aef6d17b534360ab/index.htm
   inputTiffMultipage: getPath('G31D_MULTI.TIF'), // gm convert G31D.TIF -resize 50% G31D_2.TIF ; tiffcp G31D.TIF G31D_2.TIF G31D_MULTI.TIF
   inputTiffCielab: getPath('cielab-dagams.tiff'), // https://github.com/lovell/sharp/issues/646
