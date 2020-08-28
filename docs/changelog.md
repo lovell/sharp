@@ -4,6 +4,12 @@
 
 Requires libvips v8.10.0
 
+### v0.26.1 - TBD
+
+* Ensure correct pageHeight when verifying multi-page image dimensions.
+  [#2343](https://github.com/lovell/sharp/pull/2343)
+  [@derom](https://github.com/derom)
+
 ### v0.26.0 - 25th August 2020
 
 * Prebuilt libvips binaries are now statically-linked and Brotli-compressed, requiring Node.js 10.16.0+.
