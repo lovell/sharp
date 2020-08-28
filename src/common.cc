@@ -485,8 +485,8 @@ namespace sharp {
     Check the proposed format supports the current dimensions.
   */
   void AssertImageTypeDimensions(VImage image, ImageType const imageType) {
-    const int height = image.get_typeof("pageHeight") == G_TYPE_INT
-      ? image.get_int("pageHeight")
+    const int height = image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT
+      ? image.get_int(VIPS_META_PAGE_HEIGHT)
       : image.height();
     if (imageType == ImageType::JPEG) {
       if (image.width() > 65535 || height > 65535) {

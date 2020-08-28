@@ -16,4 +16,12 @@ describe('toBuffer', () => {
       });
     });
   });
+
+  it('correctly process animated webp with height > 16383', (done) => {
+    const image = sharp(fixtures.inputWebPAnimatedBigHeight, { animated: true });
+    image.toBuffer().then((buff) => {
+      assert.strictEqual(Buffer.isBuffer(buff), true);
+      done();
+    });
+  });
 });
