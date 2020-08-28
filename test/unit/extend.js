@@ -84,6 +84,17 @@ describe('Extend', function () {
     });
   });
 
+  it('it should do nothing to the image with an empty options object passed', function (done) {
+    sharp(fixtures.inputJpg)
+      .extend({})
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(2725, info.width);
+        assert.strictEqual(2225, info.height);
+        fixtures.assertSimilar(fixtures.expected('2569067123_aca715a2ee_o.jpg'), data, done);
+      });
+  });
+
   it('should add alpha channel before extending with a transparent Background', function (done) {
     sharp(fixtures.inputJpgWithLandscapeExif1)
       .extend({
