@@ -48,6 +48,31 @@ describe('SVG input', function () {
       });
   });
 
+  it('Convert SVG to PNG at DPI larger than 2400', function (done) {
+    const size = 1024;
+    sharp(fixtures.inputSvgSmallViewBox).metadata(function (err, metadata) {
+      if (err) throw err;
+      const density = (size / Math.max(metadata.width, metadata.height)) * metadata.density;
+      sharp(fixtures.inputSvgSmallViewBox, { density })
+        .resize(size)
+        .toFormat('png')
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(size, info.width);
+          assert.strictEqual(size, info.height);
+          fixtures.assertSimilar(fixtures.expected('circle.png'), data, function (err) {
+            if (err) throw err;
+            sharp(data).metadata(function (err, info) {
+              if (err) throw err;
+              assert.strictEqual(9216, info.density);
+              done();
+            });
+          });
+        });
+    });
+  });
+
   it('Convert SVG to PNG at 14.4DPI', function (done) {
     sharp(fixtures.inputSvg, { density: 14.4 })
       .toFormat('png')
