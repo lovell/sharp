@@ -80,6 +80,9 @@ try {
         throw new Error(`Use with glibc ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
       }
     }
+    if (!semver.satisfies(process.versions.node, process.env.npm_package_engines_node)) {
+      throw new Error(`Expected Node.js version ${process.env.npm_package_engines_node} but found ${process.versions.node}`);
+    }
     // Download to per-process temporary file
     const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.br';
     const tarPathCache = path.join(libvips.cachePath(), tarFilename);
