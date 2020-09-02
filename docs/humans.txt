@@ -197,3 +197,9 @@ GitHub: https://github.com/deftomat
 
 Name: Robert O'Rourke
 GitHub: https://github.com/roborourke
+
+Name: Denis Soldatov
+GitHub: https://github.com/derom
+
+Name: Stefan Probst
+GitHub: https://github.com/stefanprobst

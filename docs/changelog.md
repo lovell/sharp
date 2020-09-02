@@ -10,6 +10,10 @@ Requires libvips v8.10.0
   [#2343](https://github.com/lovell/sharp/pull/2343)
   [@derom](https://github.com/derom)
 
+* Allow input density range up to 100000 DPI.
+  [#2348](https://github.com/lovell/sharp/pull/2348)
+  [@stefanprobst](https://github.com/stefanprobst)
+
 ### v0.26.0 - 25th August 2020
 
 * Prebuilt libvips binaries are now statically-linked and Brotli-compressed, requiring Node.js 10.16.0+.

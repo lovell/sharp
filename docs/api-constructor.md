@@ -25,7 +25,7 @@ Implements the [stream.Duplex][1] class.
          An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). (optional, default `268402689`)
     -   `options.sequentialRead` **[boolean][5]** Set this to `true` to use sequential rather than random access where possible.
          This can reduce memory usage and might improve performance on some systems. (optional, default `false`)
-    -   `options.density` **[number][6]** number representing the DPI for vector images. (optional, default `72`)
+    -   `options.density` **[number][6]** number representing the DPI for vector images in the range 1 to 100000. (optional, default `72`)
     -   `options.pages` **[number][6]** number of pages to extract for multi-page input (GIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
     -   `options.page` **[number][6]** page number to start extracting from for multi-page input (GIF, TIFF, PDF), zero based. (optional, default `0`)
     -   `options.level` **[number][6]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
