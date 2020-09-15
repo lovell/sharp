@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const assert = require('assert');
 
 const sharp = require('../../');
@@ -183,5 +184,29 @@ describe('WebP', function () {
       .then(data => sharp(data, { pages: -1 }).metadata());
 
     assert.deepStrictEqual(updated.delay, expectedDelay);
+  });
+
+  it('should work with streams when only animated is set', function (done) {
+    fs.createReadStream(fixtures.inputWebPAnimated)
+      .pipe(sharp({ animated: true }))
+      .webp({ lossless: true })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('webp', info.format);
+        fixtures.assertSimilar(fixtures.inputWebPAnimated, data, done);
+      });
+  });
+
+  it('should work with streams when only pages is set', function (done) {
+    fs.createReadStream(fixtures.inputWebPAnimated)
+      .pipe(sharp({ pages: -1 }))
+      .webp({ lossless: true })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('webp', info.format);
+        fixtures.assertSimilar(fixtures.inputWebPAnimated, data, done);
+      });
   });
 });

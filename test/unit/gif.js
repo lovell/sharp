@@ -98,4 +98,36 @@ describe('GIF input', () => {
       sharp().gif({ delay: [65536] });
     });
   });
+
+  it('should work with streams when only animated is set', function (done) {
+    if (sharp.format.magick.output.buffer) {
+      fs.createReadStream(fixtures.inputGifAnimated)
+        .pipe(sharp({ animated: true }))
+        .gif()
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('gif', info.format);
+          fixtures.assertSimilar(fixtures.inputGifAnimated, data, done);
+        });
+    } else {
+      done();
+    }
+  });
+
+  it('should work with streams when only pages is set', function (done) {
+    if (sharp.format.magick.output.buffer) {
+      fs.createReadStream(fixtures.inputGifAnimated)
+        .pipe(sharp({ pages: -1 }))
+        .gif()
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('gif', info.format);
+          fixtures.assertSimilar(fixtures.inputGifAnimated, data, done);
+        });
+    } else {
+      done();
+    }
+  });
 });
