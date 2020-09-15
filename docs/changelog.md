@@ -14,6 +14,10 @@ Requires libvips v8.10.0
   [#2348](https://github.com/lovell/sharp/pull/2348)
   [@stefanprobst](https://github.com/stefanprobst)
 
+* Ensure animation-related properties can be set for Stream-based input.
+  [#2369](https://github.com/lovell/sharp/pull/2369)
+  [@AcrylicShrimp](https://github.com/AcrylicShrimp)
+
 ### v0.26.0 - 25th August 2020
 
 * Prebuilt libvips binaries are now statically-linked and Brotli-compressed, requiring Node.js 10.16.0+.
