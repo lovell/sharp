@@ -2,6 +2,7 @@ freebsd_instance:
   image_family: freebsd-13-0-snap
 
 task:
+  name: FreeBSD 13.0
   env:
     IGNORE_OSVERSION: yes
   prerequisites_script:
