@@ -80,12 +80,14 @@ class StatsWorker : public Napi::AsyncWorker {
         // Estimate entropy via histogram of greyscale value frequency
         baton->entropy = std::abs(greyscale.hist_find().hist_entropy());
         // Estimate sharpness via standard deviation of greyscale laplacian
-        VImage laplacian = VImage::new_matrixv(3, 3,
-          0.0,  1.0, 0.0,
-          1.0, -4.0, 1.0,
-          0.0,  1.0, 0.0);
-        laplacian.set("scale", 9.0);
-        baton->sharpness = greyscale.conv(laplacian).deviate();
+        if (image.width() > 1 || image.height() > 1) {
+          VImage laplacian = VImage::new_matrixv(3, 3,
+            0.0,  1.0, 0.0,
+            1.0, -4.0, 1.0,
+            0.0,  1.0, 0.0);
+          laplacian.set("scale", 9.0);
+          baton->sharpness = greyscale.conv(laplacian).deviate();
+        }
         // Most dominant sRGB colour via 4096-bin 3D histogram
         vips::VImage hist = sharp::RemoveAlpha(image)
           .colourspace(VIPS_INTERPRETATION_sRGB)

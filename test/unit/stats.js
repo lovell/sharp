@@ -462,6 +462,19 @@ describe('Image Stats', function () {
       })
   );
 
+  it('Entropy and sharpness of 1x1 input are zero', async () => {
+    const { entropy, sharpness } = await sharp({
+      create: {
+        width: 1,
+        height: 1,
+        channels: 3,
+        background: 'red'
+      }
+    }).stats();
+    assert.strictEqual(entropy, 0);
+    assert.strictEqual(sharpness, 0);
+  });
+
   it('Stream in, Callback out', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp().stats(function (err, stats) {

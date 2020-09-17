@@ -18,6 +18,9 @@ Requires libvips v8.10.0
   [#2369](https://github.com/lovell/sharp/pull/2369)
   [@AcrylicShrimp](https://github.com/AcrylicShrimp)
 
+* Ensure `stats` can be calculated for 1x1 input.
+  [#2372](https://github.com/lovell/sharp/issues/2372)
+
 ### v0.26.0 - 25th August 2020
 
 * Prebuilt libvips binaries are now statically-linked and Brotli-compressed, requiring Node.js 10.16.0+.
