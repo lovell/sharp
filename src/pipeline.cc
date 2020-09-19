@@ -782,6 +782,8 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::GIF);
           VipsArea *area = VIPS_AREA(image.magicksave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
+            ->set("optimize_gif_frames", TRUE)
+            ->set("optimize_gif_transparency", TRUE)
             ->set("format", "gif")));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -925,6 +927,8 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::GIF);
           image.magicksave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
+            ->set("optimize_gif_frames", TRUE)
+            ->set("optimize_gif_transparency", TRUE)
             ->set("format", "gif"));
           baton->formatOut = "gif";
         } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||

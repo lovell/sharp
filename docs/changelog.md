@@ -21,6 +21,9 @@ Requires libvips v8.10.0
 * Ensure `stats` can be calculated for 1x1 input.
   [#2372](https://github.com/lovell/sharp/issues/2372)
 
+* Ensure animated GIF output is optimised.
+  [#2376](https://github.com/lovell/sharp/issues/2376)
+
 ### v0.26.0 - 25th August 2020
 
 * Prebuilt libvips binaries are now statically-linked and Brotli-compressed, requiring Node.js 10.16.0+.
