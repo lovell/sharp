@@ -42,10 +42,6 @@ You deserve to add your details to the [list of contributors](https://github.com
 
 Any change that modifies the existing public API should be added to the relevant work-in-progress branch for inclusion in the next major release.
 
-| Release | WIP branch |
-| ------: | :--------- |
-| v0.26.0 | zoom       |
-
 Please squash your changes into a single commit using a command like `git rebase -i upstream/<wip-branch>`.
 
 ### Add a new public method

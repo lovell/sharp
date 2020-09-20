@@ -4,7 +4,7 @@
 
 Requires libvips v8.10.0
 
-### v0.26.1 - TBD
+### v0.26.1 - 20th September 2020
 
 * Ensure correct pageHeight when verifying multi-page image dimensions.
   [#2343](https://github.com/lovell/sharp/pull/2343)
