@@ -1,0 +1,21 @@
+version = 1
+
+test_patterns = [
+    "test/bench/**",
+    "test/unit/**",
+    "test/saliency/**"
+]
+
+exclude_patterns = [
+    ".github/**",
+    "docs/**",
+    "src/**"
+]
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]
+  environment = ["nodejs"]
+  style_guide = "airbnb"
