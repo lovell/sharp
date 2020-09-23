@@ -80,10 +80,8 @@ try {
         throw new Error(`Use with glibc ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
       }
     }
+
     const supportedNodeVersion = process.env.npm_package_engines_node || require('../package.json').engines.node;
-    if (!supportedNodeVersion) {
-      throw new Error('Couldn\'t read the package\'s supported Node version');
-    }
     if (!semver.satisfies(process.versions.node, supportedNodeVersion)) {
       throw new Error(`Expected Node.js version ${supportedNodeVersion} but found ${process.versions.node}`);
     }
