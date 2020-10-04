@@ -1407,7 +1407,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
 
   if (sharp::HasAttr(options, "centre")) {
     baton->centre = sharp::AttrAsBool(options, "centre");
-  } 
+  }
 
   // Force random access for certain operations
   if (baton->input->access == VIPS_ACCESS_SEQUENTIAL) {
