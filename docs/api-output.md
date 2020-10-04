@@ -372,6 +372,7 @@ Warning: multiple sharp instances concurrently producing tile output can expose 
     -   `options.skipBlanks` **[number][9]** threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images (optional, default `-1`)
     -   `options.container` **[string][2]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
     -   `options.layout` **[string][2]** filesystem layout, possible values are `dz`, `iiif`, `zoomify` or `google`. (optional, default `'dz'`)
+    -   `options.centre|center` **[boolean][7]** center image in tile (optional, default `false`)
 
 ### Examples
 
