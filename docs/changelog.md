@@ -4,6 +4,12 @@
 
 Requires libvips v8.10.0
 
+### v0.26.2 - TBD
+
+* Ensure support for yarn v2.
+  [#2379](https://github.com/lovell/sharp/pull/2379)
+  [@jalovatt](https://github.com/jalovatt)
+
 ### v0.26.1 - 20th September 2020
 
 * Ensure correct pageHeight when verifying multi-page image dimensions.
