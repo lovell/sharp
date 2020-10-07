@@ -180,6 +180,7 @@ namespace sharp {
       case ImageType::OPENSLIDE: id = "openslide"; break;
       case ImageType::PPM: id = "ppm"; break;
       case ImageType::FITS: id = "fits"; break;
+      case ImageType::EXR: id = "exr"; break;
       case ImageType::VIPS: id = "vips"; break;
       case ImageType::RAW: id = "raw"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
@@ -210,6 +211,7 @@ namespace sharp {
     { "openslideload", ImageType::OPENSLIDE },
     { "ppmload", ImageType::PPM },
     { "fitsload", ImageType::FITS },
+    { "openexrload", ImageType::EXR },
     { "vipsload", ImageType::VIPS },
     { "rawload", ImageType::RAW }
   };

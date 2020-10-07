@@ -111,6 +111,7 @@ namespace sharp {
     OPENSLIDE,
     PPM,
     FITS,
+    EXR,
     VIPS,
     RAW,
     UNKNOWN,

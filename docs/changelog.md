@@ -6,6 +6,9 @@ Requires libvips v8.10.0
 
 ### v0.26.2 - TBD
 
+* Add support for EXR input. Requires libvips compiled with OpenEXR.
+  [#698](https://github.com/lovell/sharp/issues/698)
+
 * Ensure support for yarn v2.
   [#2379](https://github.com/lovell/sharp/pull/2379)
   [@jalovatt](https://github.com/jalovatt)
