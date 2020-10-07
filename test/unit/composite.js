@@ -352,24 +352,24 @@ describe('composite', () => {
       assert.throws(() => {
         sharp().composite([{ input: 'test', left: 0.5 }]);
       }, /Expected integer for left but received 0.5 of type number/);
-    });
-
-    it('invalid top', () => {
-      assert.throws(() => {
-        sharp().composite([{ input: 'test', top: 'invalid' }]);
-      }, /Expected integer for top but received invalid of type string/);
-      assert.throws(() => {
-        sharp().composite([{ input: 'test', top: 'invalid', left: 10 }]);
-      }, /Expected integer for top but received invalid of type string/);
-    });
-
-    it('invalid left', () => {
       assert.throws(() => {
         sharp().composite([{ input: 'test', left: 'invalid' }]);
       }, /Expected integer for left but received invalid of type string/);
       assert.throws(() => {
         sharp().composite([{ input: 'test', left: 'invalid', top: 10 }]);
       }, /Expected integer for left but received invalid of type string/);
+    });
+
+    it('invalid top', () => {
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', top: 0.5 }]);
+      }, /Expected integer for top but received 0.5 of type number/);
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', top: 'invalid' }]);
+      }, /Expected integer for top but received invalid of type string/);
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', top: 'invalid', left: 10 }]);
+      }, /Expected integer for top but received invalid of type string/);
     });
 
     it('left but no top', () => {
