@@ -33,9 +33,6 @@ namespace sharp {
   bool HasAttr(Napi::Object obj, std::string attr) {
     return obj.Has(attr);
   }
-  bool IsUndefined(Napi::Object obj, std::string attr) {
-    return obj.Get(attr).IsUndefined();
-  }
   std::string AttrAsStr(Napi::Object obj, std::string attr) {
     return obj.Get(attr).As<Napi::String>();
   }

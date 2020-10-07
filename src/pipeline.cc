@@ -558,7 +558,7 @@ class PipelineWorker : public Napi::AsyncWorker {
               int left;
               int top;
               compositeImage = compositeImage.replicate(across, down);
-              if (composite->left != INT_MIN && composite->top != INT_MIN) {
+              if (composite->hasOffset) {
                 std::tie(left, top) = sharp::CalculateCrop(
                   compositeImage.width(), compositeImage.height(), image.width(), image.height(),
                   composite->left, composite->top);
@@ -580,7 +580,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Calculate position
           int left;
           int top;
-          if (composite->left != INT_MIN && composite->top != INT_MIN) {
+          if (composite->hasOffset) {
             // Composite image at given offsets
             std::tie(left, top) = sharp::CalculateCrop(image.width(), image.height(),
               compositeImage.width(), compositeImage.height(), composite->left, composite->top);
@@ -1239,12 +1239,9 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     composite->mode = static_cast<VipsBlendMode>(
       vips_enum_from_nick(nullptr, VIPS_TYPE_BLEND_MODE, sharp::AttrAsStr(compositeObject, "blend").data()));
     composite->gravity = sharp::AttrAsUint32(compositeObject, "gravity");
-    if (!sharp::IsUndefined(compositeObject, "left")) {
-      composite->left = sharp::AttrAsInt32(compositeObject, "left");
-    }
-    if (!sharp::IsUndefined(compositeObject, "top")) {
-      composite->top = sharp::AttrAsInt32(compositeObject, "top");
-    }
+    composite->left = sharp::AttrAsInt32(compositeObject, "left");
+    composite->top = sharp::AttrAsInt32(compositeObject, "top");
+    composite->hasOffset = sharp::AttrAsBool(compositeObject, "hasOffset");
     composite->tile = sharp::AttrAsBool(compositeObject, "tile");
     composite->premultiplied = sharp::AttrAsBool(compositeObject, "premultiplied");
     baton->composite.push_back(composite);

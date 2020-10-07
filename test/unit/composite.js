@@ -358,6 +358,30 @@ describe('composite', () => {
       assert.throws(() => {
         sharp().composite([{ input: 'test', top: 'invalid' }]);
       }, /Expected integer for top but received invalid of type string/);
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', top: 'invalid', left: 10 }]);
+      }, /Expected integer for top but received invalid of type string/);
+    });
+
+    it('invalid left', () => {
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', left: 'invalid' }]);
+      }, /Expected integer for left but received invalid of type string/);
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', left: 'invalid', top: 10 }]);
+      }, /Expected integer for left but received invalid of type string/);
+    });
+
+    it('left but no top', () => {
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', left: 1 }]);
+      }, /Expected both left and top to be set/);
+    });
+
+    it('top but no left', () => {
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', top: 1 }]);
+      }, /Expected both left and top to be set/);
     });
 
     it('invalid gravity', () => {
