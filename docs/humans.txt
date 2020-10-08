@@ -203,3 +203,6 @@ GitHub: https://github.com/derom
 
 Name: Stefan Probst
 GitHub: https://github.com/stefanprobst
+
+Name: Thomas Beiganz
+GitHub: https://github.com/beig

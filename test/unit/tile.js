@@ -292,7 +292,7 @@ describe('Tile', function () {
   it('Invalid center parameter value fail', function () {
     assert.throws(function () {
       sharp().tile({
-        center: 'true'
+        centre: 'true'
       });
     });
   });

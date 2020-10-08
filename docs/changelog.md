@@ -13,6 +13,10 @@ Requires libvips v8.10.0
   [#2379](https://github.com/lovell/sharp/pull/2379)
   [@jalovatt](https://github.com/jalovatt)
 
+* Add centre/center option to tile-based output.
+  [#2397](https://github.com/lovell/sharp/pull/2397)
+  [@beig](https://github.com/beig)
+
 ### v0.26.1 - 20th September 2020
 
 * Ensure correct pageHeight when verifying multi-page image dimensions.
