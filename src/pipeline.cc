@@ -1014,6 +1014,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("suffix", const_cast<char*>(suffix.data()))
             ->set("angle", CalculateAngleRotation(baton->tileAngle))
             ->set("background", baton->tileBackground)
+            ->set("centre", baton->tileCentre)
             ->set("skip_blanks", baton->tileSkipBlanks);
           // libvips chooses a default depth based on layout. Instead of replicating that logic here by
           // not passing anything - libvips will handle choice
@@ -1403,6 +1404,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->tileDepth = static_cast<VipsForeignDzDepth>(
     vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_DZ_DEPTH,
     sharp::AttrAsStr(options, "tileDepth").data()));
+  baton->tileCentre = sharp::AttrAsBool(options, "tileCentre");
 
   // Force random access for certain operations
   if (baton->input->access == VIPS_ACCESS_SEQUENTIAL) {
