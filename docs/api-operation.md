@@ -69,11 +69,11 @@ Returns **Sharp**
 
 Perform an affine transform on an image. This operation will always occur after resizing, extraction and rotation, if any.
 
-You must provide a 2x2 affine transformation matrix.
+You must provide an array of length 4 or a 2x2 affine transformation matrix.
 By default, new pixels are filled with a black background. You can provide a background color with the `background` option.
 A particular interpolator may also be specified. Set the `interpolator` option to an attribute of the `sharp.interpolator` Object e.g. `sharp.interpolator.nohalo`.
 
-The transform is:
+In the case of a 2x2 matrix, the transform is:
 
 -   X = `matrix[0, 0]` \* (x + `idx`) + `matrix[0, 1]` \* (y + `idy`) + `odx`
 -   Y = `matrix[1, 0]` \* (x + `idx`) + `matrix[1, 1]` \* (y + `idy`) + `ody`
@@ -86,7 +86,7 @@ where:
 
 ### Parameters
 
--   `matrix` **[Array][7]&lt;[Array][7]&lt;[number][1]>>** 2x2 affine transformation matrix
+-   `matrix` **([Array][7]&lt;[Array][7]&lt;[number][1]>> | [Array][7]&lt;[number][1]>)** affine transformation matrix
 -   `options` **[Object][2]?** if present, is an Object with optional attributes.
     -   `options.background` **([String][3] \| [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
     -   `options.idx` **[Number][1]** input horizontal offset (optional, default `0`)

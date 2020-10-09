@@ -13,10 +13,16 @@ describe('Affine transform', () => {
           .affine();
       });
     });
-    it('Invalid matrix', () => {
+    it('Invalid 1d matrix', () => {
       assert.throws(() => {
         sharp(fixtures.inputJpg)
-          .affine([123, 123, 123, 123]);
+          .affine(['123', 123, 123, 123]);
+      });
+    });
+    it('Invalid 2d matrix', () => {
+      assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[123, 123], [null, 123]]);
       });
     });
     it('Invalid options parameter type', () => {
@@ -28,7 +34,7 @@ describe('Affine transform', () => {
     it('Invalid background color', () => {
       assert.throws(() => {
         sharp(fixtures.inputJpg)
-          .affine([[4, 4], [4, 4]], { background: 'not a color' });
+          .affine([4, 4, 4, 4], { background: 'not a color' });
       });
     });
     it('Invalid idx offset type', () => {
@@ -40,7 +46,7 @@ describe('Affine transform', () => {
     it('Invalid idy offset type', () => {
       assert.throws(() => {
         sharp(fixtures.inputJpg)
-          .affine([[4, 4], [4, 4]], { idy: 'invalid idy type' });
+          .affine([4, 4, 4, 4], { idy: 'invalid idy type' });
       });
     });
     it('Invalid odx offset type', () => {
@@ -97,7 +103,7 @@ describe('Affine transform', () => {
   it('Extracts and applies affine transform', done => {
     sharp(fixtures.inputJpg)
       .extract({ left: 300, top: 300, width: 600, height: 600 })
-      .affine([[0.3, 0], [-0.5, 0.3]])
+      .affine([0.3, 0, -0.5, 0.3])
       .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(data, fixtures.expected('affine-extract-expected.jpg'), done);
