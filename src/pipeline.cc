@@ -486,7 +486,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Affine transform
-      if (baton->affine) {
+      if (baton->affineMatrix.size() > 0) {
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground);
         image = image.affine(baton->affineMatrix, VImage::option()->set("background", background)
@@ -1301,7 +1301,6 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->extendRight = sharp::AttrAsInt32(options, "extendRight");
   baton->extendBackground = sharp::AttrAsVectorOfDouble(options, "extendBackground");
   baton->extractChannel = sharp::AttrAsInt32(options, "extractChannel");
-  baton->affine = sharp::AttrAsBool(options, "affine");
   baton->affineMatrix = sharp::AttrAsVectorOfDouble(options, "affineMatrix");
   baton->affineBackground = sharp::AttrAsVectorOfDouble(options, "affineBackground");
   baton->affineIdx = sharp::AttrAsDouble(options, "affineIdx");
