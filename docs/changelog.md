@@ -4,7 +4,7 @@
 
 Requires libvips v8.10.0
 
-### v0.26.2 - TBD
+### v0.26.2 - 14th October 2020
 
 * Add support for EXR input. Requires libvips compiled with OpenEXR.
   [#698](https://github.com/lovell/sharp/issues/698)
