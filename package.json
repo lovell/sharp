@@ -113,6 +113,7 @@
     "vips"
   ],
   "dependencies": {
+    "array-flatten": "^3.0.0",
     "color": "^3.1.2",
     "detect-libc": "^1.0.3",
     "node-addon-api": "^3.0.0",
