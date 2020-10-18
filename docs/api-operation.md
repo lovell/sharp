@@ -109,8 +109,7 @@ const pipeline = sharp()
   });
 
 inputStream
-  .pipe(pipeline)
-  .pipe(outputStream);
+  .pipe(pipeline);
 ```
 
 -   Throws **[Error][5]** Invalid parameters
@@ -119,7 +118,7 @@ Returns **Sharp**
 
 **Meta**
 
--   **since**: TBD
+-   **since**: 0.27.0
 
 ## sharpen
 
