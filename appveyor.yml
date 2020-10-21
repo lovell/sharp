@@ -1,4 +1,4 @@
-os: Visual Studio 2017
+os: Visual Studio 2019
 version: "{build}"
 build: off
 environment:
@@ -17,6 +17,12 @@ environment:
     platform: x86
     prebuild_upload: ""
   - nodejs_version: "14"
+    platform: x64
+    prebuild_upload: ""
+  - nodejs_version: "15"
+    platform: x86
+    prebuild_upload: ""
+  - nodejs_version: "15"
     platform: x64
     prebuild_upload: ""
 install:
