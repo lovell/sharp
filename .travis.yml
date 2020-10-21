@@ -38,6 +38,7 @@ jobs:
       dist: bionic
       language: shell
       before_install:
+        - sudo chown 0.0 ${PWD}
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp centos:7
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_15.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
@@ -79,6 +80,7 @@ jobs:
       dist: bionic
       language: shell
       before_install:
+        - sudo chown 0.0 ${PWD}
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:15.0-alpine
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
@@ -132,6 +134,7 @@ jobs:
       dist: bionic
       language: shell
       before_install:
+        - sudo chown 0.0 ${PWD}
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y build-essential git python2 curl"
         - sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
