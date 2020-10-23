@@ -1,0 +1,115 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  Test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+        node: [10, 12, 14, 15]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node }}
+    - name: Install dependencies
+      run: npm install
+    - name: Unit tests
+      run: npm run test-unit
+    - name: Prebuild
+      if: matrix.node == 10 && env.prebuild_upload != '' && startsWith(github.ref, 'refs/tags/')
+      run: npx prebuild --runtime napi --target 3
+
+  CentOS:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [10, 12, 14, 15]
+    steps:
+    - uses: actions/checkout@v2
+    - name: chown
+      if: matrix.node == 15
+      run: sudo chown 0.0 ${PWD}
+    - name: Docker setup
+      run: |
+        sudo docker run -dit --name sharp --env CI --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp centos:7
+        sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_${{ matrix.node }}.x | bash -"
+        sudo docker exec sharp yum install -y gcc-c++ make git nodejs
+    - name: Install dependencies
+      run: sudo docker exec sharp bash -c "npm install --unsafe-perm"
+    - name: Unit tests
+      run: sudo docker exec sharp bash -c "npm run test-unit"
+    - name: Prebuild
+      if: matrix.node == 10 && env.prebuild_upload != '' && startsWith(github.ref, 'refs/tags/')
+      run: sudo docker exec sharp bash -c "npx prebuild --runtime napi --target 3"
+
+  Alpine:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # https://github.com/nodejs/docker-node/issues/1158
+        node:
+        - 10.17.0-alpine3.9
+        - 12.0-alpine
+        - 14.0-alpine
+        - 15.0-alpine
+    steps:
+    - uses: actions/checkout@v2
+    - name: chown
+      if: matrix.node == '15.0-alpine'
+      run: sudo chown 0.0 ${PWD}
+    - name: Docker setup
+      run: |
+        sudo docker run -dit --name sharp --env CI --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:${{ matrix.node }}
+        sudo docker exec sharp apk add build-base git python2 --update-cache
+    - name: Install dependencies
+      run: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+    - name: Unit tests
+      run: sudo docker exec sharp sh -c "npm run test-unit"
+    - name: Prebuild
+      if: matrix.node == '10.17.0-alpine3.9' && env.prebuild_upload != '' && startsWith(github.ref, 'refs/tags/')
+      run: sudo docker exec sharp sh -c "npx prebuild --runtime napi --target 3"
+
+  Debian:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [10, 12, 14, 15]
+    steps:
+    - uses: actions/checkout@v2
+    - name: chown
+      if: matrix.node == 15
+      run: sudo chown 0.0 ${PWD}
+    - name: Docker setup
+      run: |
+        sudo docker run -dit --name sharp --env CI --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
+        sudo docker exec sharp sh -c "apt-get update && apt-get install -y build-essential git python2 curl"
+        sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
+        sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_${{ matrix.node }}.x sid main' >/etc/apt/sources.list.d/nodesource.list"
+        sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
+    - name: Install dependencies
+      run: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+    - name: Unit tests
+      run: sudo docker exec sharp sh -c "npm run test-unit"
+    - name: Prebuild
+      if: matrix.node == 10 && env.prebuild_upload != '' && startsWith(github.ref, 'refs/tags/')
+      run: sudo docker exec sharp sh -c "npx prebuild --runtime napi --target 3"
+
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+    - name: Install dependencies
+      run: npm install
+    - name: semistandard
+      run: npx semistandard
+    - name: cpplint
+      run: npx cpplint
+    - name: test-licensing
+      run: npm run test-licensing
