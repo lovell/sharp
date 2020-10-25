@@ -29,5 +29,5 @@ install:
   - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) $env:platform
   - npm install
 test_script:
-  - npm test-unit
+  - npm run test-unit
   - node install/prebuild-ci.js
