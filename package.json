@@ -87,6 +87,7 @@
   "files": [
     "binding.gyp",
     "install/**",
+    "!install/prebuild-ci.js",
     "lib/**",
     "src/**"
   ],
