@@ -9,7 +9,9 @@ jobs:
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_10.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
       install: sudo docker exec sharp bash -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp bash -c "npm test"
+      script:
+        - sudo docker exec sharp bash -c "npm test-unit"
+        - sudo docker exec sharp bash -c "node install/prebuild-ci.js"
 
     - name: "Linux x64 (CentOS 7, glibc 2.17) - Node.js 12"
       os: linux
@@ -20,7 +22,7 @@ jobs:
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_12.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
       install: sudo docker exec sharp bash -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp bash -c "npm test"
+      script: sudo docker exec sharp bash -c "npm test-unit"
 
     - name: "Linux x64 (CentOS 7, glibc 2.17) - Node.js 14"
       os: linux
@@ -31,7 +33,7 @@ jobs:
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_14.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
       install: sudo docker exec sharp bash -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp bash -c "npm test"
+      script: sudo docker exec sharp bash -c "npm test-unit"
 
     - name: "Linux x64 (CentOS 7, glibc 2.17) - Node.js 15"
       os: linux
@@ -43,7 +45,7 @@ jobs:
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_15.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
       install: sudo docker exec sharp bash -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp bash -c "npm test"
+      script: sudo docker exec sharp bash -c "npm test-unit"
 
     - name: "Linux x64 (Alpine 3.9, musl 1.1.20) - Node.js 10"
       os: linux
@@ -53,7 +55,9 @@ jobs:
         - sudo docker run -dit --name sharp --env CI --env TRAVIS_TAG --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10.17.0-alpine3.9 # https://github.com/nodejs/docker-node/issues/1158
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
+      script:
+        - sudo docker exec sharp sh -c "npm test-unit"
+        - sudo docker exec sharp sh -c "node install/prebuild-ci.js"
 
     - name: "Linux x64 (Alpine 3.11, musl 1.1.20) - Node.js 12"
       os: linux
@@ -63,7 +67,7 @@ jobs:
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:12.0-alpine
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
+      script: sudo docker exec sharp sh -c "npm test-unit"
 
     - name: "Linux x64 (Alpine 3.11, musl 1.1.20) - Node.js 14"
       os: linux
@@ -73,7 +77,7 @@ jobs:
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:14.0-alpine
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
+      script: sudo docker exec sharp sh -c "npm test-unit"
 
     - name: "Linux x64 (Alpine 3.11, musl 1.1.20) - Node.js 15"
       os: linux
@@ -84,7 +88,7 @@ jobs:
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:15.0-alpine
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
+      script: sudo docker exec sharp sh -c "npm test-unit"
 
     - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 10"
       arch: arm64
@@ -98,7 +102,9 @@ jobs:
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_10.x sid main' >/etc/apt/sources.list.d/nodesource.list"
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs=10.*"
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
+      script:
+        - sudo docker exec sharp sh -c "npm test-unit"
+        - sudo docker exec sharp sh -c "node install/prebuild-ci.js"
 
     - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 12"
       arch: arm64
@@ -112,7 +118,7 @@ jobs:
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_12.x sid main' >/etc/apt/sources.list.d/nodesource.list"
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
+      script: sudo docker exec sharp sh -c "npm test-unit"
 
     - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 14"
       arch: arm64
@@ -126,7 +132,7 @@ jobs:
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_14.x sid main' >/etc/apt/sources.list.d/nodesource.list"
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
+      script: sudo docker exec sharp sh -c "npm test-unit"
 
     - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 15"
       arch: arm64
@@ -141,34 +147,7 @@ jobs:
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_15.x sid main' >/etc/apt/sources.list.d/nodesource.list"
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
       install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
-
-    - name: "macOS (10.13) - Node.js 10"
-      os: osx
-      osx_image: xcode10.1
-      language: node_js
-      node_js: "10"
-
-    - name: "macOS (10.13) - Node.js 12"
-      os: osx
-      osx_image: xcode10.1
-      language: node_js
-      node_js: "12"
-      before_install: unset prebuild_upload
-
-    - name: "macOS (10.13) - Node.js 14"
-      os: osx
-      osx_image: xcode10.1
-      language: node_js
-      node_js: "14"
-      before_install: unset prebuild_upload
-
-    - name: "macOS (10.13) - Node.js 15"
-      os: osx
-      osx_image: xcode10.1
-      language: node_js
-      node_js: "15"
-      before_install: unset prebuild_upload
+      script: sudo docker exec sharp sh -c "npm test-unit"
 
     - name: "Unit test coverage report"
       os: linux
