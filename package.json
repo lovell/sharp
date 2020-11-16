@@ -116,7 +116,7 @@
     "detect-libc": "^1.0.3",
     "node-addon-api": "^3.0.2",
     "npmlog": "^4.1.2",
-    "prebuild-install": "^5.3.5",
+    "prebuild-install": "^6.0.0",
     "semver": "^7.3.2",
     "simple-get": "^4.0.0",
     "tar-fs": "^2.1.0",
