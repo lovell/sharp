@@ -121,23 +121,23 @@
     "prebuild-install": "^6.0.0",
     "semver": "^7.3.2",
     "simple-get": "^4.0.0",
-    "tar-fs": "^2.1.0",
+    "tar-fs": "^2.1.1",
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
     "async": "^3.2.0",
     "cc": "^2.0.1",
     "decompress-zip": "^0.3.2",
-    "documentation": "^13.0.2",
+    "documentation": "^13.1.0",
     "exif-reader": "^1.0.3",
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^8.1.1",
+    "mocha": "^8.2.1",
     "mock-fs": "^4.13.0",
     "nyc": "^15.1.0",
     "prebuild": "^10.0.1",
     "rimraf": "^3.0.2",
-    "semistandard": "^14.2.3"
+    "semistandard": "^16.0.0"
   },
   "license": "Apache-2.0",
   "config": {
