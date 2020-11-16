@@ -485,6 +485,18 @@ class PipelineWorker : public Napi::AsyncWorker {
           baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost);
       }
 
+      // Affine transform
+      if (baton->affineMatrix.size() > 0) {
+        std::vector<double> background;
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground);
+        image = image.affine(baton->affineMatrix, VImage::option()->set("background", background)
+          ->set("idx", baton->affineIdx)
+          ->set("idy", baton->affineIdy)
+          ->set("odx", baton->affineOdx)
+          ->set("ody", baton->affineOdy)
+          ->set("interpolate", baton->affineInterpolator));
+      }
+
       // Extend edges
       if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
         std::vector<double> background;
@@ -1249,7 +1261,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // Resize options
   baton->withoutEnlargement = sharp::AttrAsBool(options, "withoutEnlargement");
   baton->position = sharp::AttrAsInt32(options, "position");
-  baton->resizeBackground = sharp::AttrAsRgba(options, "resizeBackground");
+  baton->resizeBackground = sharp::AttrAsVectorOfDouble(options, "resizeBackground");
   baton->kernel = sharp::AttrAsStr(options, "kernel");
   baton->fastShrinkOnLoad = sharp::AttrAsBool(options, "fastShrinkOnLoad");
   // Join Channel Options
@@ -1262,7 +1274,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   }
   // Operators
   baton->flatten = sharp::AttrAsBool(options, "flatten");
-  baton->flattenBackground = sharp::AttrAsRgba(options, "flattenBackground");
+  baton->flattenBackground = sharp::AttrAsVectorOfDouble(options, "flattenBackground");
   baton->negate = sharp::AttrAsBool(options, "negate");
   baton->blurSigma = sharp::AttrAsDouble(options, "blurSigma");
   baton->brightness = sharp::AttrAsDouble(options, "brightness");
@@ -1284,7 +1296,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->useExifOrientation = sharp::AttrAsBool(options, "useExifOrientation");
   baton->angle = sharp::AttrAsInt32(options, "angle");
   baton->rotationAngle = sharp::AttrAsDouble(options, "rotationAngle");
-  baton->rotationBackground = sharp::AttrAsRgba(options, "rotationBackground");
+  baton->rotationBackground = sharp::AttrAsVectorOfDouble(options, "rotationBackground");
   baton->rotateBeforePreExtract = sharp::AttrAsBool(options, "rotateBeforePreExtract");
   baton->flip = sharp::AttrAsBool(options, "flip");
   baton->flop = sharp::AttrAsBool(options, "flop");
@@ -1292,8 +1304,15 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->extendBottom = sharp::AttrAsInt32(options, "extendBottom");
   baton->extendLeft = sharp::AttrAsInt32(options, "extendLeft");
   baton->extendRight = sharp::AttrAsInt32(options, "extendRight");
-  baton->extendBackground = sharp::AttrAsRgba(options, "extendBackground");
+  baton->extendBackground = sharp::AttrAsVectorOfDouble(options, "extendBackground");
   baton->extractChannel = sharp::AttrAsInt32(options, "extractChannel");
+  baton->affineMatrix = sharp::AttrAsVectorOfDouble(options, "affineMatrix");
+  baton->affineBackground = sharp::AttrAsVectorOfDouble(options, "affineBackground");
+  baton->affineIdx = sharp::AttrAsDouble(options, "affineIdx");
+  baton->affineIdy = sharp::AttrAsDouble(options, "affineIdy");
+  baton->affineOdx = sharp::AttrAsDouble(options, "affineOdx");
+  baton->affineOdy = sharp::AttrAsDouble(options, "affineOdy");
+  baton->affineInterpolator = vips::VInterpolate::new_from_name(sharp::AttrAsStr(options, "affineInterpolator").data());
 
   baton->removeAlpha = sharp::AttrAsBool(options, "removeAlpha");
   baton->ensureAlpha = sharp::AttrAsBool(options, "ensureAlpha");
@@ -1392,7 +1411,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->tileSize = sharp::AttrAsUint32(options, "tileSize");
   baton->tileOverlap = sharp::AttrAsUint32(options, "tileOverlap");
   baton->tileAngle = sharp::AttrAsInt32(options, "tileAngle");
-  baton->tileBackground = sharp::AttrAsRgba(options, "tileBackground");
+  baton->tileBackground = sharp::AttrAsVectorOfDouble(options, "tileBackground");
   baton->tileSkipBlanks = sharp::AttrAsInt32(options, "tileSkipBlanks");
   baton->tileContainer = static_cast<VipsForeignDzContainer>(
     vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_DZ_CONTAINER,
