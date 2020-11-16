@@ -8,7 +8,7 @@ jobs:
         - sudo docker run -dit --name sharp --env CI --env TRAVIS_TAG --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp centos:7
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_10.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
-      install: sudo docker exec sharp bash -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp bash -c "npm install --build-from-source --unsafe-perm"
       script:
         - sudo docker exec sharp bash -c "npm run test-unit"
         - sudo docker exec sharp bash -c "node install/prebuild-ci.js"
@@ -21,7 +21,7 @@ jobs:
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp centos:7
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_12.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
-      install: sudo docker exec sharp bash -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp bash -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp bash -c "npm run test-unit"
 
     - name: "Linux x64 (CentOS 7, glibc 2.17) - Node.js 14"
@@ -32,7 +32,7 @@ jobs:
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp centos:7
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_14.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
-      install: sudo docker exec sharp bash -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp bash -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp bash -c "npm run test-unit"
 
     - name: "Linux x64 (CentOS 7, glibc 2.17) - Node.js 15"
@@ -44,7 +44,7 @@ jobs:
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp centos:7
         - sudo docker exec sharp bash -c "curl -sL https://rpm.nodesource.com/setup_15.x | bash -"
         - sudo docker exec sharp yum install -y gcc-c++ make git nodejs
-      install: sudo docker exec sharp bash -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp bash -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp bash -c "npm run test-unit"
 
     - name: "Linux x64 (Alpine 3.9, musl 1.1.20) - Node.js 10"
@@ -54,7 +54,7 @@ jobs:
       before_install:
         - sudo docker run -dit --name sharp --env CI --env TRAVIS_TAG --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10.17.0-alpine3.9 # https://github.com/nodejs/docker-node/issues/1158
         - sudo docker exec sharp apk add build-base git python2 --update-cache
-      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script:
         - sudo docker exec sharp sh -c "npm run test-unit"
         - sudo docker exec sharp sh -c "node install/prebuild-ci.js"
@@ -66,7 +66,7 @@ jobs:
       before_install:
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:12.0-alpine
         - sudo docker exec sharp apk add build-base git python2 --update-cache
-      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm run test-unit"
 
     - name: "Linux x64 (Alpine 3.11, musl 1.1.20) - Node.js 14"
@@ -76,7 +76,7 @@ jobs:
       before_install:
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:14.0-alpine
         - sudo docker exec sharp apk add build-base git python2 --update-cache
-      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm run test-unit"
 
     - name: "Linux x64 (Alpine 3.11, musl 1.1.20) - Node.js 15"
@@ -87,7 +87,7 @@ jobs:
         - sudo chown 0.0 ${PWD}
         - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:15.0-alpine
         - sudo docker exec sharp apk add build-base git python2 --update-cache
-      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm run test-unit"
 
     - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 10"
@@ -101,7 +101,7 @@ jobs:
         - sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_10.x sid main' >/etc/apt/sources.list.d/nodesource.list"
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs=10.*"
-      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script:
         - sudo docker exec sharp sh -c "npm run test-unit"
         - sudo docker exec sharp sh -c "node install/prebuild-ci.js"
@@ -117,7 +117,7 @@ jobs:
         - sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_12.x sid main' >/etc/apt/sources.list.d/nodesource.list"
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
-      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm run test-unit"
 
     - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 14"
@@ -131,7 +131,7 @@ jobs:
         - sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_14.x sid main' >/etc/apt/sources.list.d/nodesource.list"
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
-      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm run test-unit"
 
     - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 15"
@@ -146,15 +146,16 @@ jobs:
         - sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
         - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_15.x sid main' >/etc/apt/sources.list.d/nodesource.list"
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
-      install: sudo docker exec sharp sh -c "npm install --unsafe-perm"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm run test-unit"
 
     - name: "Unit test coverage report"
       os: linux
       dist: bionic
       language: node_js
-      node_js: "13"
+      node_js: "14"
       before_install: unset prebuild_upload
+      install: npm install --build-from-source
       after_success:
         - npm install coveralls
         - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js

@@ -1,12 +1,13 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const { extractDescription, extractKeywords } = require('./extract');
 
 const searchIndex = [];
 
 // Install
-const contents = fs.readFileSync(`${__dirname}/../install.md`, 'utf8');
+const contents = fs.readFileSync(path.join(__dirname, '..', 'install.md'), 'utf8');
 const matches = contents.matchAll(
   /## (?<title>[A-Za-z ]+)\n\n(?<body>[^#]+)/gs
 );
@@ -34,7 +35,7 @@ for (const match of matches) {
   'colour',
   'utility'
 ].forEach((section) => {
-  const contents = fs.readFileSync(`${__dirname}/../api-${section}.md`, 'utf8');
+  const contents = fs.readFileSync(path.join(__dirname, '..', `api-${section}.md`), 'utf8');
   const matches = contents.matchAll(
     /\n## (?<title>[A-Za-z]+)\n\n(?<firstparagraph>.+?)\n\n/gs
   );
@@ -54,6 +55,6 @@ for (const match of matches) {
 });
 
 fs.writeFileSync(
-  `${__dirname}/../search-index.json`,
+  path.join(__dirname, '..', 'search-index.json'),
   JSON.stringify(searchIndex)
 );

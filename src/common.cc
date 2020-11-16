@@ -54,13 +54,13 @@ namespace sharp {
   bool AttrAsBool(Napi::Object obj, std::string attr) {
     return obj.Get(attr).As<Napi::Boolean>().Value();
   }
-  std::vector<double> AttrAsRgba(Napi::Object obj, std::string attr) {
-    Napi::Array background = obj.Get(attr).As<Napi::Array>();
-    std::vector<double> rgba(background.Length());
-    for (unsigned int i = 0; i < background.Length(); i++) {
-      rgba[i] = AttrAsDouble(background, i);
+  std::vector<double> AttrAsVectorOfDouble(Napi::Object obj, std::string attr) {
+    Napi::Array napiArray = obj.Get(attr).As<Napi::Array>();
+    std::vector<double> vectorOfDouble(napiArray.Length());
+    for (unsigned int i = 0; i < napiArray.Length(); i++) {
+      vectorOfDouble[i] = AttrAsDouble(napiArray, i);
     }
-    return rgba;
+    return vectorOfDouble;
   }
   std::vector<int32_t> AttrAsInt32Vector(Napi::Object obj, std::string attr) {
     Napi::Array array = obj.Get(attr).As<Napi::Array>();
@@ -109,7 +109,7 @@ namespace sharp {
       descriptor->createChannels = AttrAsUint32(input, "createChannels");
       descriptor->createWidth = AttrAsUint32(input, "createWidth");
       descriptor->createHeight = AttrAsUint32(input, "createHeight");
-      descriptor->createBackground = AttrAsRgba(input, "createBackground");
+      descriptor->createBackground = AttrAsVectorOfDouble(input, "createBackground");
     }
     // Limit input images to a given number of pixels, where pixels = width * height
     descriptor->limitInputPixels = AttrAsUint32(input, "limitInputPixels");

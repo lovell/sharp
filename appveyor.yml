@@ -27,7 +27,7 @@ environment:
     prebuild_upload: ""
 install:
   - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) $env:platform
-  - npm install
+  - npm install --build-from-source
 test_script:
   - npm run test-unit
   - node install/prebuild-ci.js

@@ -69,7 +69,8 @@
     "Edward Silverton <e.silverton@gmail.com>",
     "Roman Malieiev <aromaleev@gmail.com>",
     "Tomas Szabo <tomas.szabo@deftomat.com>",
-    "Robert O'Rourke <robert@o-rourke.org>"
+    "Robert O'Rourke <robert@o-rourke.org>",
+    "Guillermo Alfonso Varela Chouciño <guillevch@gmail.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
@@ -112,30 +113,31 @@
     "vips"
   ],
   "dependencies": {
+    "array-flatten": "^3.0.0",
     "color": "^3.1.2",
     "detect-libc": "^1.0.3",
     "node-addon-api": "^3.0.2",
     "npmlog": "^4.1.2",
-    "prebuild-install": "^5.3.5",
+    "prebuild-install": "^6.0.0",
     "semver": "^7.3.2",
     "simple-get": "^4.0.0",
-    "tar-fs": "^2.1.0",
+    "tar-fs": "^2.1.1",
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
     "async": "^3.2.0",
     "cc": "^2.0.1",
     "decompress-zip": "^0.3.2",
-    "documentation": "^13.0.2",
+    "documentation": "^13.1.0",
     "exif-reader": "^1.0.3",
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^8.1.1",
+    "mocha": "^8.2.1",
     "mock-fs": "^4.13.0",
     "nyc": "^15.1.0",
     "prebuild": "^10.0.1",
     "rimraf": "^3.0.2",
-    "semistandard": "^14.2.3"
+    "semistandard": "^16.0.0"
   },
   "license": "Apache-2.0",
   "config": {
