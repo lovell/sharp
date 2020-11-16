@@ -10,6 +10,10 @@ Requires libvips v8.10.0
   [#2336](https://github.com/lovell/sharp/pull/2336)
   [@guillevc](https://github.com/guillevc)
 
+* Fallback to tar.gz for prebuilt libvips when Brotli not available.
+  [#2412](https://github.com/lovell/sharp/pull/2412)
+  [@ascorbic](https://github.com/ascorbic)
+
 ### v0.26.2 - 14th October 2020
 
 * Add support for EXR input. Requires libvips compiled with OpenEXR.
