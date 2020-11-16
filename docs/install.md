@@ -147,10 +147,18 @@ The binaries in the `node_modules` directory of the
 [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-package.html)
 must be for the Linux x64 platform.
 
-On machines other than Linux x64, such as macOS and Windows, run the following:
+When building your deployment package on machines other than Linux x64 (glibc),
+run the following commands:
 
+macOS:
 ```sh
 rm -rf node_modules/sharp
+SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp
+```
+
+Windows:
+```sh
+rmdir /s /q node_modules/sharp
 npm install --arch=x64 --platform=linux sharp
 ```
 
@@ -163,20 +171,6 @@ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs12.x npm install sharp
 
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
-
-## Electron
-
-Electron provides versions of the V8 JavaScript engine
-that are incompatible with Node.js.
-To ensure the correct binaries are used, run the following:
-
-```sh
-npm install
-npx electron-rebuild
-```
-
-Further help can be found at
-[https://electronjs.org/docs/tutorial/using-native-node-modules](https://electronjs.org/docs/tutorial/using-native-node-modules)
 
 ## Worker threads
 
