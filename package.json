@@ -146,7 +146,7 @@
     "target": 3
   },
   "engines": {
-    "node": ">=10.16.0"
+    "node": ">=10"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"
