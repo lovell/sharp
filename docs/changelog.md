@@ -4,7 +4,7 @@
 
 Requires libvips v8.10.0
 
-### v0.26.3 - TBD
+### v0.26.3 - 16th November 2020
 
 * Expose libvips' affine operation.
   [#2336](https://github.com/lovell/sharp/pull/2336)
