@@ -4,6 +4,12 @@
 
 Requires libvips v8.10.0
 
+### v0.26.3 - TBD
+
+* Expose libvips' affine operation.
+  [#2336](https://github.com/lovell/sharp/pull/2336)
+  [@guillevc](https://github.com/guillevc)
+
 ### v0.26.2 - 14th October 2020
 
 * Add support for EXR input. Requires libvips compiled with OpenEXR.
