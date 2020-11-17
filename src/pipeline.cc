@@ -837,6 +837,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("compression", baton->heifCompression)
             ->set("Q", baton->heifQuality)
+            ->set("speed", baton->heifSpeed)
             ->set("lossless", baton->heifLossless)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -885,7 +886,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         bool const isV = sharp::IsV(baton->fileOut);
         bool const mightMatchInput = baton->formatOut == "input";
         bool const willMatchInput = mightMatchInput &&
-         !(isJpeg || isPng || isWebp || isGif || isTiff || isDz || isDzZip || isV);
+         !(isJpeg || isPng || isWebp || isGif || isTiff || isHeif || isDz || isDzZip || isV);
 
         if (baton->formatOut == "jpeg" || (mightMatchInput && isJpeg) ||
           (willMatchInput && inputImageType == sharp::ImageType::JPEG)) {
@@ -966,13 +967,11 @@ class PipelineWorker : public Napi::AsyncWorker {
         } else if (baton->formatOut == "heif" || (mightMatchInput && isHeif) ||
           (willMatchInput && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to file
-          if (sharp::IsAvif(baton->fileOut)) {
-            baton->heifCompression = VIPS_FOREIGN_HEIF_COMPRESSION_AV1;
-          }
           image.heifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
+            ->set("speed", baton->heifSpeed)
             ->set("lossless", baton->heifLossless));
           baton->formatOut = "heif";
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
@@ -1395,6 +1394,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->heifCompression = static_cast<VipsForeignHeifCompression>(
     vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
     sharp::AttrAsStr(options, "heifCompression").data()));
+  baton->heifSpeed = sharp::AttrAsUint32(options, "heifSpeed");
 
   // Animated output
   if (sharp::HasAttr(options, "pageHeight")) {

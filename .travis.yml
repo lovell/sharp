@@ -45,43 +45,43 @@ jobs:
       install: sudo docker exec sharp bash -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp bash -c "npm test"
 
-    - name: "Linux x64 (Alpine 3.9, musl 1.1.20) - Node.js 10"
+    - name: "Linux x64 (Alpine 3.11, musl 1.1.24) - Node.js 10"
       os: linux
       dist: bionic
       language: shell
       before_install:
-        - sudo docker run -dit --name sharp --env CI --env TRAVIS_TAG --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10.17.0-alpine3.9 # https://github.com/nodejs/docker-node/issues/1158
+        - sudo docker run -dit --name sharp --env CI --env TRAVIS_TAG --env prebuild_upload --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10-alpine3.11
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
 
-    - name: "Linux x64 (Alpine 3.11, musl 1.1.20) - Node.js 12"
+    - name: "Linux x64 (Alpine 3.11, musl 1.1.24) - Node.js 12"
       os: linux
       dist: bionic
       language: shell
       before_install:
-        - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:12.0-alpine
+        - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:12-alpine3.11
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
 
-    - name: "Linux x64 (Alpine 3.11, musl 1.1.20) - Node.js 14"
+    - name: "Linux x64 (Alpine 3.11, musl 1.1.24) - Node.js 14"
       os: linux
       dist: bionic
       language: shell
       before_install:
-        - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:14.0-alpine
+        - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:14-alpine3.11
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
 
-    - name: "Linux x64 (Alpine 3.11, musl 1.1.20) - Node.js 15"
+    - name: "Linux x64 (Alpine 3.11, musl 1.1.24) - Node.js 15"
       os: linux
       dist: bionic
       language: shell
       before_install:
         - sudo chown 0.0 ${PWD}
-        - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:15.0-alpine
+        - sudo docker run -dit --name sharp --env CI --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:15-alpine3.11
         - sudo docker exec sharp apk add build-base git python2 --update-cache
       install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"

@@ -299,23 +299,40 @@ sharp('input.svg')
 
 Returns **Sharp** 
 
-## heif
+## avif
 
-Use these HEIF options for output image.
-
-Support for HEIF (HEIC/AVIF) is experimental.
-Do not use this in production systems.
-
-Requires a custom, globally-installed libvips compiled with support for libheif.
-
-Most versions of libheif support only the patent-encumbered HEVC compression format.
+Use these AVIF options for output image.
 
 ### Parameters
 
 -   `options` **[Object][6]?** output options
-    -   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `80`)
-    -   `options.compression` **[boolean][7]** compression format: hevc, avc, jpeg, av1 (optional, default `'hevc'`)
+    -   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `50`)
     -   `options.lossless` **[boolean][7]** use lossless compression (optional, default `false`)
+    -   `options.speed` **[boolean][7]** CPU effort vs file size, 0 (slowest/smallest) to 8 (fastest/largest) (optional, default `5`)
+
+
+-   Throws **[Error][4]** Invalid options
+
+Returns **Sharp** 
+
+**Meta**
+
+-   **since**: 0.27.0
+
+## heif
+
+Use these HEIF options for output image.
+
+Support for patent-encumbered HEIC images requires the use of a
+globally-installed libvips compiled with support for libheif, libde265 and x265.
+
+### Parameters
+
+-   `options` **[Object][6]?** output options
+    -   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `50`)
+    -   `options.compression` **[boolean][7]** compression format: av1, hevc (optional, default `'av1'`)
+    -   `options.lossless` **[boolean][7]** use lossless compression (optional, default `false`)
+    -   `options.speed` **[boolean][7]** CPU effort vs file size, 0 (slowest/smallest) to 8 (fastest/largest) (optional, default `5`)
 
 
 -   Throws **[Error][4]** Invalid options

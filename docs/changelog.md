@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.27 - *avif*
+
+Requires libvips v8.10.5
+
+### v0.27.0 - TBD
+
+* Add support for AVIF to prebuilt binaries.
+
+* Remove experimental status from `heif` output, defaults are now AVIF-centric.
+
 ## v0.26 - *zoom*
 
 Requires libvips v8.10.0
