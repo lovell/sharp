@@ -8,8 +8,8 @@ const fixtures = require('../fixtures');
 describe('Rotation', function () {
   ['Landscape', 'Portrait'].forEach(function (orientation) {
     [1, 2, 3, 4, 5, 6, 7, 8].forEach(function (exifTag) {
-      it('Input image has Orientation EXIF tag value of (' + exifTag + '), auto-rotate', function (done) {
-        sharp(fixtures['inputJpgWith' + orientation + 'Exif' + exifTag])
+      it(`Input image has Orientation EXIF tag value of (${  exifTag  }), auto-rotate`, function (done) {
+        sharp(fixtures[`inputJpgWith${  orientation  }Exif${  exifTag}`])
           .rotate()
           .resize(320)
           .toBuffer(function (err, data, info) {
@@ -17,7 +17,7 @@ describe('Rotation', function () {
             assert.strictEqual('jpeg', info.format);
             assert.strictEqual(320, info.width);
             assert.strictEqual(orientation === 'Landscape' ? 240 : 427, info.height);
-            fixtures.assertSimilar(fixtures.expected(orientation + '_' + exifTag + '-out.jpg'), data, done);
+            fixtures.assertSimilar(fixtures.expected(`${orientation  }_${  exifTag  }-out.jpg`), data, done);
           });
       });
     });
@@ -73,7 +73,7 @@ describe('Rotation', function () {
   });
 
   [-3690, -450, -90, 90, 450, 3690].forEach(function (angle) {
-    it('Rotate by any 90-multiple angle (' + angle + 'deg)', function (done) {
+    it(`Rotate by any 90-multiple angle (${  angle  }deg)`, function (done) {
       sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(240, info.width);
@@ -84,7 +84,7 @@ describe('Rotation', function () {
   });
 
   [-3750, -510, -150, 30, 390, 3630].forEach(function (angle) {
-    it('Rotate by any 30-multiple angle (' + angle + 'deg)', function (done) {
+    it(`Rotate by any 30-multiple angle (${  angle  }deg)`, function (done) {
       sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(397, info.width);
@@ -95,7 +95,7 @@ describe('Rotation', function () {
   });
 
   [-3780, -540, 0, 180, 540, 3780].forEach(function (angle) {
-    it('Rotate by any 180-multiple angle (' + angle + 'deg)', function (done) {
+    it(`Rotate by any 180-multiple angle (${  angle  }deg)`, function (done) {
       sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(320, info.width);

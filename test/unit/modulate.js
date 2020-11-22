@@ -30,7 +30,7 @@ describe('Modulate', function () {
 
   it('should be able to hue-rotate', function () {
     const base = 'modulate-hue-120.jpg';
-    const actual = fixtures.path('output.' + base);
+    const actual = fixtures.path(`output.${  base}`);
     const expected = fixtures.expected(base);
 
     return sharp(fixtures.inputJpg)
@@ -43,7 +43,7 @@ describe('Modulate', function () {
 
   it('should be able to brighten', function () {
     const base = 'modulate-brightness-2.jpg';
-    const actual = fixtures.path('output.' + base);
+    const actual = fixtures.path(`output.${  base}`);
     const expected = fixtures.expected(base);
 
     return sharp(fixtures.inputJpg)
@@ -56,7 +56,7 @@ describe('Modulate', function () {
 
   it('should be able to unbrighten', function () {
     const base = 'modulate-brightness-0-5.jpg';
-    const actual = fixtures.path('output.' + base);
+    const actual = fixtures.path(`output.${  base}`);
     const expected = fixtures.expected(base);
 
     return sharp(fixtures.inputJpg)
@@ -69,7 +69,7 @@ describe('Modulate', function () {
 
   it('should be able to saturate', function () {
     const base = 'modulate-saturation-2.jpg';
-    const actual = fixtures.path('output.' + base);
+    const actual = fixtures.path(`output.${  base}`);
     const expected = fixtures.expected(base);
 
     return sharp(fixtures.inputJpg)
@@ -82,7 +82,7 @@ describe('Modulate', function () {
 
   it('should be able to desaturate', function () {
     const base = 'modulate-saturation-0.5.jpg';
-    const actual = fixtures.path('output.' + base);
+    const actual = fixtures.path(`output.${  base}`);
     const expected = fixtures.expected(base);
 
     return sharp(fixtures.inputJpg)
@@ -95,7 +95,7 @@ describe('Modulate', function () {
 
   it('should be able to modulate all channels', function () {
     const base = 'modulate-all.jpg';
-    const actual = fixtures.path('output.' + base);
+    const actual = fixtures.path(`output.${  base}`);
     const expected = fixtures.expected(base);
 
     return sharp(fixtures.inputJpg)
@@ -108,9 +108,9 @@ describe('Modulate', function () {
 
   describe('hue-rotate', function (done) {
     [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360].forEach(function (angle) {
-      it('should properly hue rotate by ' + angle + 'deg', function () {
-        const base = 'modulate-hue-angle-' + angle + '.png';
-        const actual = fixtures.path('output.' + base);
+      it(`should properly hue rotate by ${  angle  }deg`, function () {
+        const base = `modulate-hue-angle-${  angle  }.png`;
+        const actual = fixtures.path(`output.${  base}`);
         const expected = fixtures.expected(base);
 
         return sharp(fixtures.testPattern)
@@ -125,7 +125,7 @@ describe('Modulate', function () {
 
   it('should be able to use linear and modulate together', function () {
     const base = 'modulate-linear.jpg';
-    const actual = fixtures.path('output.' + base);
+    const actual = fixtures.path(`output.${  base}`);
     const expected = fixtures.expected(base);
 
     const contrast = 1.5;

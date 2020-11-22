@@ -266,7 +266,7 @@ async.series({
           });
       }
     }).on('cycle', function (event) {
-      console.log('jpeg ' + String(event.target));
+      console.log(`jpeg ${  String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -506,7 +506,7 @@ async.series({
           });
       }
     }).on('cycle', function (event) {
-      console.log('operations ' + String(event.target));
+      console.log(`operations ${  String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -557,7 +557,7 @@ async.series({
           });
       }
     }).on('cycle', function (event) {
-      console.log('kernels ' + String(event.target));
+      console.log(`kernels ${  String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -828,7 +828,7 @@ async.series({
       }
     });
     pngSuite.on('cycle', function (event) {
-      console.log(' png ' + String(event.target));
+      console.log(` png ${  String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -891,7 +891,7 @@ async.series({
           });
       }
     }).on('cycle', function (event) {
-      console.log('webp ' + String(event.target));
+      console.log(`webp ${  String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -900,7 +900,7 @@ async.series({
   assert(!err, err);
   Object.keys(results).forEach(function (format) {
     if (results[format].toString().substr(0, 5) !== 'sharp') {
-      console.log('sharp was slower than ' + results[format] + ' for ' + format);
+      console.log(`sharp was slower than ${  results[format]  } for ${  format}`);
     }
   });
   console.dir(sharp.cache());

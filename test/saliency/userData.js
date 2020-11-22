@@ -27,7 +27,7 @@ fs.readdirSync(userDataDir).forEach(function (file) {
   const entries = parseInt(lines[0], 10);
   // Verify number of entries
   if (entries !== 500) {
-    throw new Error('Expecting 500 images in ' + file + ', found ' + entries);
+    throw new Error(`Expecting 500 images in ${  file  }, found ${  entries}`);
   }
   // Keep track of which line we're on
   let linePos = 2;
@@ -67,5 +67,5 @@ if (imageCount === 5000) {
   // Write output
   fs.writeFileSync('userData.json', JSON.stringify(images, null, 2));
 } else {
-  throw new Error('Expecting 5000 images, found ' + imageCount);
+  throw new Error(`Expecting 5000 images, found ${  imageCount}`);
 }
