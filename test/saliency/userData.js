@@ -14,9 +14,9 @@ const median = function (values) {
   const half = Math.floor(values.length / 2);
   if (values.length % 2) {
     return values[half];
-  } else {
+  } 
     return Math.floor((values[half - 1] + values[half]) / 2);
-  }
+  
 };
 
 // List of files
