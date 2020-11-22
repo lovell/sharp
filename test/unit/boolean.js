@@ -15,7 +15,7 @@ describe('Boolean operation between two images', function () {
     sharp.bool.eor
   ]
     .forEach(function (op) {
-      it(op + ' operation, file', function (done) {
+      it(`${op  } operation, file`, function (done) {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .boolean(fixtures.inputJpgBooleanTest, op)
@@ -23,11 +23,11 @@ describe('Boolean operation between two images', function () {
             if (err) throw err;
             assert.strictEqual(320, info.width);
             assert.strictEqual(240, info.height);
-            fixtures.assertSimilar(fixtures.expected('boolean_' + op + '_result.jpg'), data, done);
+            fixtures.assertSimilar(fixtures.expected(`boolean_${  op  }_result.jpg`), data, done);
           });
       });
 
-      it(op + ' operation, buffer', function (done) {
+      it(`${op  } operation, buffer`, function (done) {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .boolean(inputJpgBooleanTestBuffer, op)
@@ -35,11 +35,11 @@ describe('Boolean operation between two images', function () {
             if (err) throw err;
             assert.strictEqual(320, info.width);
             assert.strictEqual(240, info.height);
-            fixtures.assertSimilar(fixtures.expected('boolean_' + op + '_result.jpg'), data, done);
+            fixtures.assertSimilar(fixtures.expected(`boolean_${  op  }_result.jpg`), data, done);
           });
       });
 
-      it(op + ' operation, raw', function (done) {
+      it(`${op  } operation, raw`, function (done) {
         sharp(fixtures.inputJpgBooleanTest)
           .raw()
           .toBuffer(function (err, data, info) {
@@ -51,7 +51,7 @@ describe('Boolean operation between two images', function () {
                 if (err) throw err;
                 assert.strictEqual(320, info.width);
                 assert.strictEqual(240, info.height);
-                fixtures.assertSimilar(fixtures.expected('boolean_' + op + '_result.jpg'), data, done);
+                fixtures.assertSimilar(fixtures.expected(`boolean_${  op  }_result.jpg`), data, done);
               });
           });
       });

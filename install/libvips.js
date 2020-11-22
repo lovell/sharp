@@ -84,7 +84,7 @@ try {
       throw new Error(`Expected Node.js version ${process.env.npm_package_engines_node} but found ${process.versions.node}`);
     }
     // Download to per-process temporary file
-    const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.br';
+    const tarFilename = `${['libvips', minimumLibvipsVersion, platformAndArch].join('-')  }.tar.br`;
     const tarPathCache = path.join(libvips.cachePath(), tarFilename);
     if (fs.existsSync(tarPathCache)) {
       npmLog.info('sharp', `Using cached ${tarPathCache}`);

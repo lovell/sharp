@@ -11,7 +11,7 @@ describe('Bandbool per-channel boolean operations', function () {
     sharp.bool.eor
   ]
     .forEach(function (op) {
-      it(op + ' operation', function (done) {
+      it(`${op  } operation`, function (done) {
         sharp(fixtures.inputPngBooleanNoAlpha)
           .bandbool(op)
           .toColourspace('b-w')
@@ -20,7 +20,7 @@ describe('Bandbool per-channel boolean operations', function () {
             assert.strictEqual(200, info.width);
             assert.strictEqual(200, info.height);
             assert.strictEqual(1, info.channels);
-            fixtures.assertSimilar(fixtures.expected('bandbool_' + op + '_result.png'), data, done);
+            fixtures.assertSimilar(fixtures.expected(`bandbool_${  op  }_result.png`), data, done);
           });
       });
     });

@@ -173,7 +173,7 @@ module.exports = {
         }
 
         if (distance > options.threshold) {
-          return callback(new Error('Expected maximum similarity distance: ' + options.threshold + '. Actual: ' + distance + '.'));
+          return callback(new Error(`Expected maximum similarity distance: ${  options.threshold  }. Actual: ${  distance  }.`));
         }
 
         callback();
@@ -183,10 +183,10 @@ module.exports = {
 
   assertMaxColourDistance: function (actualImagePath, expectedImagePath, acceptedDistance) {
     if (typeof actualImagePath !== 'string') {
-      throw new TypeError('`actualImagePath` must be a string; got ' + actualImagePath);
+      throw new TypeError(`\`actualImagePath\` must be a string; got ${  actualImagePath}`);
     }
     if (typeof expectedImagePath !== 'string') {
-      throw new TypeError('`expectedImagePath` must be a string; got ' + expectedImagePath);
+      throw new TypeError(`\`expectedImagePath\` must be a string; got ${  expectedImagePath}`);
     }
     if (typeof acceptedDistance !== 'number') {
       // Default threshold
@@ -194,7 +194,7 @@ module.exports = {
     }
     const distance = maxColourDistance(actualImagePath, expectedImagePath);
     if (distance > acceptedDistance) {
-      throw new Error('Expected maximum absolute distance of ' + acceptedDistance + ', actual ' + distance);
+      throw new Error(`Expected maximum absolute distance of ${  acceptedDistance  }, actual ${  distance}`);
     }
   }
 
