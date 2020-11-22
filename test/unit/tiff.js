@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const assert = require('assert');
-const promisify = require('util').promisify;
+const {promisify} = require('util');
 const rimraf = require('rimraf');
 
 const sharp = require('../../');
