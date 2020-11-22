@@ -10,6 +10,6 @@ task:
     - pkg upgrade -y
     - pkg install -y pkgconf vips node npm
   install_script:
-    - npm install --unsafe-perm
+    - npm install --build-from-source --unsafe-perm
   test_script:
     - npm test

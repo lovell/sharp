@@ -289,6 +289,14 @@ describe('Tile', function () {
     });
   });
 
+  it('Invalid center parameter value fail', function () {
+    assert.throws(function () {
+      sharp().tile({
+        centre: 'true'
+      });
+    });
+  });
+
   it('Deep Zoom layout', function (done) {
     const directory = fixtures.path('output.dzi_files');
     rimraf(directory, function () {
@@ -761,6 +769,46 @@ describe('Tile', function () {
           assert.strictEqual('number', typeof info.size);
 
           assertGoogleTiles(directory, 256, 5, done);
+        });
+    });
+  });
+
+  it('Google layout with center image in tile', function (done) {
+    const directory = fixtures.path('output.google_center.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          center: true,
+          layout: 'google'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          fixtures.assertSimilar(fixtures.expected('tile_centered.jpg'), fs.readFileSync(path.join(directory, '0', '0', '0.jpg')), done);
+        });
+    });
+  });
+
+  it('Google layout with center image in tile centre', function (done) {
+    const directory = fixtures.path('output.google_center.dzi');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({
+          centre: true,
+          layout: 'google'
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          fixtures.assertSimilar(fixtures.expected('tile_centered.jpg'), fs.readFileSync(path.join(directory, '0', '0', '0.jpg')), done);
         });
     });
   });

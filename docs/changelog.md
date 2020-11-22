@@ -4,6 +4,29 @@
 
 Requires libvips v8.10.0
 
+### v0.26.3 - 16th November 2020
+
+* Expose libvips' affine operation.
+  [#2336](https://github.com/lovell/sharp/pull/2336)
+  [@guillevc](https://github.com/guillevc)
+
+* Fallback to tar.gz for prebuilt libvips when Brotli not available.
+  [#2412](https://github.com/lovell/sharp/pull/2412)
+  [@ascorbic](https://github.com/ascorbic)
+
+### v0.26.2 - 14th October 2020
+
+* Add support for EXR input. Requires libvips compiled with OpenEXR.
+  [#698](https://github.com/lovell/sharp/issues/698)
+
+* Ensure support for yarn v2.
+  [#2379](https://github.com/lovell/sharp/pull/2379)
+  [@jalovatt](https://github.com/jalovatt)
+
+* Add centre/center option to tile-based output.
+  [#2397](https://github.com/lovell/sharp/pull/2397)
+  [@beig](https://github.com/beig)
+
 ### v0.26.1 - 20th September 2020
 
 * Ensure correct pageHeight when verifying multi-page image dimensions.

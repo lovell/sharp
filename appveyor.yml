@@ -1,4 +1,4 @@
-os: Visual Studio 2017
+os: Visual Studio 2019
 version: "{build}"
 build: off
 environment:
@@ -19,8 +19,14 @@ environment:
   - nodejs_version: "14"
     platform: x64
     prebuild_upload: ""
+  - nodejs_version: "15"
+    platform: x86
+    prebuild_upload: ""
+  - nodejs_version: "15"
+    platform: x64
+    prebuild_upload: ""
 install:
   - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) $env:platform
-  - npm install
+  - npm install --build-from-source
 test_script:
   - npm test

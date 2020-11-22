@@ -10,19 +10,19 @@ yarn add sharp
 
 ## Prerequisites
 
-* Node.js v10.16.0+
+* Node.js v10+
 
 ## Prebuilt binaries
 
 Ready-compiled sharp and libvips binaries are provided for use with
-Node.js v10.16.0+ on the most common platforms:
+Node.js v10+ on the most common platforms:
 
 * macOS x64 (>= 10.13)
 * Linux x64 (glibc >= 2.17, musl >= 1.1.24)
 * Linux ARM64 (glibc >= 2.29)
 * Windows
 
-A ~7MB tarball containing libvips and its most commonly used dependencies
+A 7-8MB tarball containing libvips and its most commonly used dependencies
 is downloaded via HTTPS and stored within `node_modules/sharp/vendor` during `npm install`.
 
 This provides support for the
@@ -89,11 +89,14 @@ To install the prebuilt libvips binaries from a custom URL,
 set the `sharp_libvips_binary_host` npm config option
 or the `npm_config_sharp_libvips_binary_host` environment variable.
 
-The version subpath and file name are appended to these.
+The version subpath and file name are appended to these. There should be tarballs available
+that are compressed with both gzip and Brotli, as the format downloaded will vary depending
+on whether the user's version of Node supports Brotli decompression (Node.js v10.16.0+)
 
 For example, if `sharp_libvips_binary_host` is set to `https://hostname/path`
 and the libvips version is `1.2.3` then the resultant URL will be
-`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.br`.
+`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.br` or 
+`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.gz`.
 
 See the Chinese mirror below for a further example.
 
@@ -147,10 +150,18 @@ The binaries in the `node_modules` directory of the
 [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-package.html)
 must be for the Linux x64 platform.
 
-On machines other than Linux x64, such as macOS and Windows, run the following:
+When building your deployment package on machines other than Linux x64 (glibc),
+run the following commands:
 
+macOS:
 ```sh
 rm -rf node_modules/sharp
+SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp
+```
+
+Windows:
+```sh
+rmdir /s /q node_modules/sharp
 npm install --arch=x64 --platform=linux sharp
 ```
 
@@ -163,20 +174,6 @@ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs12.x npm install sharp
 
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
-
-## Electron
-
-Electron provides versions of the V8 JavaScript engine
-that are incompatible with Node.js.
-To ensure the correct binaries are used, run the following:
-
-```sh
-npm install
-npx electron-rebuild
-```
-
-Further help can be found at
-[https://electronjs.org/docs/tutorial/using-native-node-modules](https://electronjs.org/docs/tutorial/using-native-node-modules)
 
 ## Worker threads
 
