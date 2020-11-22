@@ -7,7 +7,7 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 // Test Helpers
-let threshold = 0.001;
+const threshold = 0.001;
 function isInAcceptableRange (actual, expected) {
   return actual >= ((1 - threshold) * expected) && actual <= ((1 + threshold) * expected);
 }
