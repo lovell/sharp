@@ -6,7 +6,7 @@ const path = require('path');
 const libvips = require('../lib/libvips');
 const npmLog = require('npmlog');
 
-const minimumLibvipsVersion = libvips.minimumLibvipsVersion;
+const {minimumLibvipsVersion} = libvips;
 
 const platform = process.env.npm_config_platform || process.platform;
 if (platform === 'win32') {

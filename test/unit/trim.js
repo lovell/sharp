@@ -3,7 +3,7 @@
 const assert = require('assert');
 
 const sharp = require('../../');
-const inRange = require('../../lib/is').inRange;
+const {inRange} = require('../../lib/is');
 const fixtures = require('../fixtures');
 
 describe('Trim borders', function () {

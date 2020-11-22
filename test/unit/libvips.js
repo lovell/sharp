@@ -52,7 +52,7 @@ describe('libvips binaries', function () {
 
   describe('platform agnostic', function () {
     it('minimumLibvipsVersion returns a valid semver', function () {
-      const minimumLibvipsVersion = libvips.minimumLibvipsVersion;
+      const {minimumLibvipsVersion} = libvips;
       assert.strictEqual('string', typeof minimumLibvipsVersion);
       assert.notStrictEqual(null, semver.valid(minimumLibvipsVersion));
     });
