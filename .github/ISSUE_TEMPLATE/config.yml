@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://sharp.pixelplumbing.com/
+    about: Installation instructions, complete API documentation with examples, changelog
