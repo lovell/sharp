@@ -1,0 +1,85 @@
+on:
+  - push
+  - pull_request
+jobs:
+  CI:
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            container: centos:7
+            nodejs_version: 10
+            coverage: true
+            prebuild: true
+          - os: ubuntu-20.04
+            container: centos:7
+            nodejs_version: 12
+          - os: ubuntu-20.04
+            container: centos:7
+            nodejs_version: 14
+          - os: ubuntu-20.04
+            container: centos:7
+            nodejs_version: 15
+          - os: ubuntu-20.04
+            container: node:10-alpine3.11
+            prebuild: true
+          - os: ubuntu-20.04
+            container: node:12-alpine3.11
+          - os: ubuntu-20.04
+            container: node:14-alpine3.11
+          - os: ubuntu-20.04
+            container: node:15-alpine3.11
+          - os: macos-10.15
+            nodejs_version: 10
+            prebuild: true
+          - os: macos-10.15
+            nodejs_version: 12
+          - os: macos-10.15
+            nodejs_version: 14
+          - os: macos-10.15
+            nodejs_version: 15
+          - os: windows-2019
+            nodejs_version: 10
+            prebuild: true
+          - os: windows-2019
+            nodejs_version: 12
+          - os: windows-2019
+            nodejs_version: 14
+          - os: windows-2019
+            nodejs_version: 15
+    steps:
+      - name: Dependencies (Linux glibc)
+        if: contains(matrix.container, 'centos')
+        run: |
+          curl -sL https://rpm.nodesource.com/setup_${{ matrix.nodejs_version }}.x | bash -
+          yum install -y gcc-c++ make git python3 nodejs
+      - name: Dependencies (Linux musl)
+        if: contains(matrix.container, 'alpine')
+        run: apk add build-base git python3 --update-cache
+      - name: Dependencies (macOS, Windows)
+        if: contains(matrix.os, 'macos') || contains(matrix.os, 'windows')
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.nodejs_version }}
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Fix working directory ownership
+        if: matrix.container
+        run: chown root.root .
+      - name: Install
+        run: npm install --build-from-source --unsafe-perm
+      - name: Test
+        run: npm test
+      - name: Coverage
+        if: matrix.coverage
+        uses: coverallsapp/github-action@v1.1.2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prebuild
+        if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
+        env:
+          prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
+        run: npx prebuild --runtime napi --target 3
