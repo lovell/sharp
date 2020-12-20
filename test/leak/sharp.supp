@@ -218,6 +218,73 @@
   fun:XML_ParseBuffer
   obj:*/libfontconfig.so.*
 }
+# heif
+{
+  cond_heif_encode_image
+  Memcheck:Cond
+  ...
+  fun:heif_context_encode_image
+}
+{
+  value8_heif_encode_image
+  Memcheck:Value8
+  ...
+  fun:heif_context_encode_image
+}
+{
+  cond_heif_aom_codec_encode
+  Memcheck:Cond
+  ...
+  fun:aom_codec_encode
+}
+{
+  value8_heif_aom_codec_encode
+  Memcheck:Value8
+  ...
+  fun:aom_codec_encode
+}
+{
+  value1_heif_aom_codec_encode
+  Memcheck:Value1
+  ...
+  fun:aom_codec_encode
+}
+{
+  cond_heif_av1_encode_frame
+  Memcheck:Cond
+  ...
+  fun:av1_encode_frame
+}
+{
+  value8_heif_av1_encode_frame
+  Memcheck:Value8
+  ...
+  fun:av1_encode_frame
+}
+{
+  cond_heif_context_write
+  Memcheck:Cond
+  ...
+  fun:heif_context_write
+}
+{
+  value8_heif_context_write
+  Memcheck:Value8
+  ...
+  fun:heif_context_write
+}
+{
+  cond_heif_context_read
+  Memcheck:Cond
+  ...
+  fun:heif_context_read_from_reader
+}
+{
+  value8_heif_context_read
+  Memcheck:Value8
+  ...
+  fun:heif_context_read_from_reader
+}
 
 # libvips
 {
@@ -307,6 +374,30 @@
   fun:start_thread
 }
 {
+  cond_libvips_source_read
+  Memcheck:Cond
+  ...
+  fun:vips_source_read
+}
+{
+  value8_libvips_source_read
+  Memcheck:Value8
+  ...
+  fun:vips_source_read
+}
+{
+  cond_libvips_target_finish
+  Memcheck:Cond
+  ...
+  fun:vips_target_finish
+}
+{
+  value8_libvips_target_finish
+  Memcheck:Value8
+  ...
+  fun:vips_target_finish
+}
+{
   leak_libvips_init
   Memcheck:Leak
   match-leak-kinds: reachable
@@ -321,8 +412,16 @@
   fun:malloc
   ...
   fun:rsvg_rust_handle_new_from_stream_sync
+}
+{
+  leak_rsvg_xmlParseElement
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:malloc
   ...
-  fun:vips_object_build
+  fun:xmlParseElement
+  ...
+  fun:rsvg_rust_handle_new_from_stream_sync
 }
 
 # libuv warnings
@@ -690,4 +789,28 @@
   match-leak-kinds: possible
   ...
   fun:_ZN12v8_inspector10toString16ERKNS_10StringViewE
+}
+{
+  cond_v8_Builtins_InterpreterEntryTrampoline
+  Memcheck:Cond
+  ...
+  fun:Builtins_InterpreterEntryTrampoline
+}
+{
+  cond_v8_ZN2v88internal18ArrayBufferSweeper9SweepFullEv
+  Memcheck:Cond
+  ...
+  fun:_ZN2v88internal18ArrayBufferSweeper9SweepFullEv
+}
+{
+  cond_v8_ZN4node11Environment27RunAndClearNativeImmediatesEb
+  Memcheck:Cond
+  ...
+  fun:_ZN4node11Environment27RunAndClearNativeImmediatesEb
+}
+{
+  cond_v8_ZN2v88internal18ArrayBufferSweeper10ReleaseAllEv
+  Memcheck:Cond
+  ...
+  fun:_ZN2v88internal18ArrayBufferSweeper10ReleaseAllEv
 }
