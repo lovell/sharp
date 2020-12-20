@@ -172,6 +172,24 @@ describe('composite', () => {
       });
   });
 
+  it('negative offset and gravity', done => {
+    sharp(fixtures.inputJpg)
+      .resize(400)
+      .composite([{
+        input: fixtures.inputPngWithTransparency16bit,
+        left: -10,
+        top: -10,
+        gravity: 4
+      }])
+      .toBuffer((err, data, info) => {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(3, info.channels);
+        fixtures.assertSimilar(
+          fixtures.expected('overlay-negative-offset-with-gravity.jpg'), data, done);
+      });
+  });
+
   it('offset, gravity and tile', done => {
     sharp(fixtures.inputJpg)
       .resize(80)
@@ -333,13 +351,25 @@ describe('composite', () => {
     it('invalid left', () => {
       assert.throws(() => {
         sharp().composite([{ input: 'test', left: 0.5 }]);
-      }, /Expected positive integer for left but received 0.5 of type number/);
+      }, /Expected integer for left but received 0.5 of type number/);
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', left: 'invalid' }]);
+      }, /Expected integer for left but received invalid of type string/);
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', left: 'invalid', top: 10 }]);
+      }, /Expected integer for left but received invalid of type string/);
     });
 
     it('invalid top', () => {
       assert.throws(() => {
-        sharp().composite([{ input: 'test', top: -1 }]);
-      }, /Expected positive integer for top but received -1 of type number/);
+        sharp().composite([{ input: 'test', top: 0.5 }]);
+      }, /Expected integer for top but received 0.5 of type number/);
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', top: 'invalid' }]);
+      }, /Expected integer for top but received invalid of type string/);
+      assert.throws(() => {
+        sharp().composite([{ input: 'test', top: 'invalid', left: 10 }]);
+      }, /Expected integer for top but received invalid of type string/);
     });
 
     it('left but no top', () => {

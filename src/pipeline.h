@@ -40,6 +40,7 @@ struct Composite {
   int gravity;
   int left;
   int top;
+  bool hasOffset;
   bool tile;
   bool premultiplied;
 
@@ -47,8 +48,9 @@ struct Composite {
     input(nullptr),
     mode(VIPS_BLEND_MODE_OVER),
     gravity(0),
-    left(-1),
-    top(-1),
+    left(0),
+    top(0),
+    hasOffset(false),
     tile(false),
     premultiplied(false) {}
 };

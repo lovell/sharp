@@ -658,24 +658,16 @@ namespace sharp {
     int top = 0;
 
     // assign only if valid
-    if (x >= 0 && x < (inWidth - outWidth)) {
+    if (x < (inWidth - outWidth)) {
       left = x;
     } else if (x >= (inWidth - outWidth)) {
       left = inWidth - outWidth;
     }
 
-    if (y >= 0 && y < (inHeight - outHeight)) {
+    if (y < (inHeight - outHeight)) {
       top = y;
     } else if (y >= (inHeight - outHeight)) {
       top = inHeight - outHeight;
-    }
-
-    // the resulting left and top could have been outside the image after calculation from bottom/right edges
-    if (left < 0) {
-      left = 0;
-    }
-    if (top < 0) {
-      top = 0;
     }
 
     return std::make_tuple(left, top);
