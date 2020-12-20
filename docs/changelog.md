@@ -10,6 +10,9 @@ Requires libvips v8.10.5
 
 * Remove experimental status from `heif` output, defaults are now AVIF-centric.
 
+* Ensure all platforms use fontconfig for font rendering.
+  [#2399](https://github.com/lovell/sharp/issues/2399)
+
 ## v0.26 - *zoom*
 
 Requires libvips v8.10.0
