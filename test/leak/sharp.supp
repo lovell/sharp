@@ -189,6 +189,24 @@
   ...
   fun:gsf_output_write
 }
+{
+  param_gsf_new_do_write
+  Memcheck:Param
+  write(buf)
+  ...
+  fun:new_do_write
+  ...
+  fun:gsf_output_close
+}
+{
+  param_gsf_output_write
+  Memcheck:Param
+  write(buf)
+  ...
+  fun:new_do_write
+  ...
+  fun:gsf_output_write
+}
 
 # fontconfig
 {
@@ -218,6 +236,17 @@
   fun:XML_ParseBuffer
   obj:*/libfontconfig.so.*
 }
+{
+  leak_fontconfig_FcInitLoadConfigAndFonts
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:malloc
+  ...
+  fun:XML_ParseBuffer
+  ...
+  fun:FcInitLoadConfigAndFonts
+}
+
 # heif
 {
   cond_heif_encode_image
@@ -414,7 +443,15 @@
   fun:rsvg_rust_handle_new_from_stream_sync
 }
 {
-  leak_rsvg_xmlParseElement
+  leak_rsvg_rsvg_rust_handle_new_from_gfile_sync
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:malloc
+  ...
+  fun:rsvg_rust_handle_new_from_gfile_sync
+}
+{
+  leak_rsvg_rust_handle_new_from_stream_sync
   Memcheck:Leak
   match-leak-kinds: possible
   fun:malloc
@@ -422,6 +459,16 @@
   fun:xmlParseElement
   ...
   fun:rsvg_rust_handle_new_from_stream_sync
+}
+{
+  leak_rsvg_rust_handle_new_from_gfile_sync
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:malloc
+  ...
+  fun:xmlParseElement
+  ...
+  fun:rsvg_rust_handle_new_from_gfile_sync
 }
 
 # libuv warnings
