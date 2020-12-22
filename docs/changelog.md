@@ -4,7 +4,7 @@
 
 Requires libvips v8.10.5
 
-### v0.27.0 - TBD
+### v0.27.0 - 22nd December 2020
 
 * Add support for AVIF to prebuilt binaries.
 
