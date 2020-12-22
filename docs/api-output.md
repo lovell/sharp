@@ -5,7 +5,7 @@
 Write output image data to a file.
 
 If an explicit output format is not selected, it will be inferred from the extension,
-with JPEG, PNG, WebP, TIFF, DZI, and libvips' V format supported.
+with JPEG, PNG, WebP, AVIF, TIFF, DZI, and libvips' V format supported.
 Note that raw pixel data is only supported for buffer output.
 
 By default all metadata will be removed, which includes EXIF-based orientation.
@@ -42,7 +42,7 @@ Returns **[Promise][5]&lt;[Object][6]>** when no callback is provided
 ## toBuffer
 
 Write output to a Buffer.
-JPEG, PNG, WebP, TIFF and RAW output are supported.
+JPEG, PNG, WebP, AVIF, TIFF and raw pixel data output are supported.
 
 If no explicit format is set, the output format will match the input image, except GIF and SVG input which become PNG output.
 

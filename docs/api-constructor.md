@@ -4,7 +4,7 @@
 
 Constructor factory to create an instance of `sharp`, to which further methods are chained.
 
-JPEG, PNG, WebP or TIFF format image data can be streamed out from this object.
+JPEG, PNG, WebP, AVIF or TIFF format image data can be streamed out from this object.
 When using Stream based output, derived attributes are available from the `info` event.
 
 Non-critical problems encountered during processing are emitted as `warning` events.
@@ -14,9 +14,9 @@ Implements the [stream.Duplex][1] class.
 ### Parameters
 
 -   `input` **([Buffer][2] \| [string][3])?** if present, can be
-     a Buffer containing JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data, or
-     a String containing the filesystem path to an JPEG, PNG, WebP, GIF, SVG or TIFF image file.
-     JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
+     a Buffer containing JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data, or
+     a String containing the filesystem path to an JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image file.
+     JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
 -   `options` **[Object][4]?** if present, is an Object with optional attributes.
     -   `options.failOnError` **[boolean][5]** by default halt processing and raise an error when loading invalid images.
          Set this flag to `false` if you'd rather apply a "best effort" to decode images, even if the data is corrupt or invalid. (optional, default `true`)
@@ -26,8 +26,8 @@ Implements the [stream.Duplex][1] class.
     -   `options.sequentialRead` **[boolean][5]** Set this to `true` to use sequential rather than random access where possible.
          This can reduce memory usage and might improve performance on some systems. (optional, default `false`)
     -   `options.density` **[number][6]** number representing the DPI for vector images in the range 1 to 100000. (optional, default `72`)
-    -   `options.pages` **[number][6]** number of pages to extract for multi-page input (GIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
-    -   `options.page` **[number][6]** page number to start extracting from for multi-page input (GIF, TIFF, PDF), zero based. (optional, default `0`)
+    -   `options.pages` **[number][6]** number of pages to extract for multi-page input (GIF, WebP, AVIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
+    -   `options.page` **[number][6]** page number to start extracting from for multi-page input (GIF, WebP, AVIF, TIFF, PDF), zero based. (optional, default `0`)
     -   `options.level` **[number][6]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
     -   `options.animated` **[boolean][5]** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default `false`)
     -   `options.raw` **[Object][4]?** describes raw pixel input image data. See `raw()` for pixel ordering.

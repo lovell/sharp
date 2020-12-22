@@ -4,7 +4,7 @@
 
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
-smaller, web-friendly JPEG, PNG and WebP images of varying dimensions.
+smaller, web-friendly JPEG, PNG, WebP and AVIF images of varying dimensions.
 
 Resizing an image is typically 4x-5x faster than using the
 quickest ImageMagick and GraphicsMagick settings

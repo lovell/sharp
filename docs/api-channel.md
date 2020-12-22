@@ -70,7 +70,7 @@ Channel ordering follows vips convention:
 -   sRGB: 0: Red, 1: Green, 2: Blue, 3: Alpha.
 -   CMYK: 0: Magenta, 1: Cyan, 2: Yellow, 3: Black, 4: Alpha.
 
-Buffers may be any of the image formats supported by sharp: JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data.
+Buffers may be any of the image formats supported by sharp.
 For raw pixel input, the `options` object should contain a `raw` attribute, which follows the format of the attribute of the same name in the `sharp()` constructor.
 
 ### Parameters
