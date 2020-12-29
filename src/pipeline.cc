@@ -951,6 +951,10 @@ class PipelineWorker : public Napi::AsyncWorker {
             sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
             baton->channels = std::min(baton->channels, 3);
           }
+          // Cast pixel values to float, if required
+          if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
+            image = image.cast(VIPS_FORMAT_FLOAT);
+          }
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
