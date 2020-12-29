@@ -277,7 +277,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF deflate compression with float predictor shrinks test file', function (done) {
+  it('TIFF deflate compression of integral input with float predictor increases file size', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -287,7 +287,7 @@ describe('TIFF', function () {
       .toFile(fixtures.outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
-        assert(info.size < startSize);
+        assert(info.size > startSize);
         rimraf(fixtures.outputTiff, done);
       });
   });
