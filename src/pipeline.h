@@ -273,7 +273,7 @@ struct PipelineBaton {
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
     tiffPyramid(false),
-    tiffBitdepth(8),
+    tiffBitdepth(4),
     tiffTile(false),
     tiffTileHeight(256),
     tiffTileWidth(256),
