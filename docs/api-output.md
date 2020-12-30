@@ -287,15 +287,15 @@ Use these TIFF options for output image.
 -   `options` **[Object][6]?** output options
     -   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `80`)
     -   `options.force` **[boolean][7]** force TIFF output, otherwise attempt to use input format (optional, default `true`)
-    -   `options.compression` **[boolean][7]** compression options: lzw, deflate, jpeg, ccittfax4 (optional, default `'jpeg'`)
-    -   `options.predictor` **[boolean][7]** compression predictor options: none, horizontal, float (optional, default `'horizontal'`)
+    -   `options.compression` **[string][2]** compression options: lzw, deflate, jpeg, ccittfax4 (optional, default `'jpeg'`)
+    -   `options.predictor` **[string][2]** compression predictor options: none, horizontal, float (optional, default `'horizontal'`)
     -   `options.pyramid` **[boolean][7]** write an image pyramid (optional, default `false`)
     -   `options.tile` **[boolean][7]** write a tiled tiff (optional, default `false`)
-    -   `options.tileWidth` **[boolean][7]** horizontal tile size (optional, default `256`)
-    -   `options.tileHeight` **[boolean][7]** vertical tile size (optional, default `256`)
+    -   `options.tileWidth` **[number][9]** horizontal tile size (optional, default `256`)
+    -   `options.tileHeight` **[number][9]** vertical tile size (optional, default `256`)
     -   `options.xres` **[number][9]** horizontal resolution in pixels/mm (optional, default `1.0`)
     -   `options.yres` **[number][9]** vertical resolution in pixels/mm (optional, default `1.0`)
-    -   `options.bitdepth` **[boolean][7]** reduce bitdepth to 1, 2 or 4 bit (optional, default `8`)
+    -   `options.bitdepth` **[number][9]** reduce bitdepth to 1, 2 or 4 bit (optional, default `8`)
 
 ### Examples
 
@@ -349,9 +349,9 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
 
 -   `options` **[Object][6]?** output options
     -   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `50`)
-    -   `options.compression` **[boolean][7]** compression format: av1, hevc (optional, default `'av1'`)
+    -   `options.compression` **[string][2]** compression format: av1, hevc (optional, default `'av1'`)
     -   `options.lossless` **[boolean][7]** use lossless compression (optional, default `false`)
-    -   `options.speed` **[boolean][7]** CPU effort vs file size, 0 (slowest/smallest) to 8 (fastest/largest) (optional, default `5`)
+    -   `options.speed` **[number][9]** CPU effort vs file size, 0 (slowest/smallest) to 8 (fastest/largest) (optional, default `5`)
     -   `options.chromaSubsampling` **[string][2]** set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' chroma subsampling, requires libvips v8.11.0 (optional, default `'4:2:0'`)
 
 
