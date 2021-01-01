@@ -31,13 +31,13 @@ Implements the [stream.Duplex][1] class.
     -   `options.level` **[number][6]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
     -   `options.animated` **[boolean][5]** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default `false`)
     -   `options.raw` **[Object][4]?** describes raw pixel input image data. See `raw()` for pixel ordering.
-        -   `options.raw.width` **[number][6]?** 
-        -   `options.raw.height` **[number][6]?** 
-        -   `options.raw.channels` **[number][6]?** 1-4
+        -   `options.raw.width` **[number][6]?** integral number of pixels wide.
+        -   `options.raw.height` **[number][6]?** integral number of pixels high.
+        -   `options.raw.channels` **[number][6]?** integral number of channels, between 1 and 4.
     -   `options.create` **[Object][4]?** describes a new image to be created.
-        -   `options.create.width` **[number][6]?** 
-        -   `options.create.height` **[number][6]?** 
-        -   `options.create.channels` **[number][6]?** 3-4
+        -   `options.create.width` **[number][6]?** integral number of pixels wide.
+        -   `options.create.height` **[number][6]?** integral number of pixels high.
+        -   `options.create.channels` **[number][6]?** integral number of channels, either 3 (RGB) or 4 (RGBA).
         -   `options.create.background` **([string][3] \| [Object][4])?** parsed by the [color][7] module to extract values for red, green, blue and alpha.
 
 ### Examples
