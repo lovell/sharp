@@ -4,6 +4,7 @@
     "public": ".",
     "ignore": [
       ".*",
+      "build.js",
       "firebase.json",
       "*.md",
       "image/**",
