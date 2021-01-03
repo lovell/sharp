@@ -88,6 +88,52 @@ sharp(input)
 
 Returns **[Promise][5]&lt;[Buffer][8]>** when no callback is provided
 
+## toUint8Array
+
+Write output to a Uint8Array.
+
+Works the same as toBuffer(), but gets the underlying Uint8Array.
+Is usually combined with `.raw()` to get underlying pixels as a array of each pixels channel data.
+
+By default all metadata will be removed, which includes EXIF-based orientation.
+See [withMetadata][1] for control over this.
+
+`callback`, if present, gets three arguments `(err, data, info)` where:
+
+-   `err` is an error, if any.
+-   `data` is the output Uint8Array data.
+-   `info` contains the output image `format`, `size` (bytes), `width`, `height`,
+    `channels` and `premultiplied` (indicating if premultiplication was used).
+    When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
+
+A `Promise` is returned when `callback` is not provided.
+
+### Parameters
+
+-   `options` **[Object][6]?** 
+    -   `options.resolveWithObject` **[boolean][7]?** Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`.
+-   `callback` **[Function][3]?** 
+
+### Examples
+
+```javascript
+const input = Uint8Array.from([1, 1, 1, 2, 2, 2]); // or Uint8ClampedArray
+const image = sharp(input, {
+  raw: {
+    width: 2,
+    height: 1,
+    channels: 3
+  }
+});
+image.toUint8Array().then((output) => {
+  assert.deepStrictEqual(input, output);
+});
+```
+
+Returns **[Promise][5]&lt;[Uint8Array][8]>** when no callback is provided
+
+
+
 ## withMetadata
 
 Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
