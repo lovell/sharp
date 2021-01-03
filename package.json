@@ -72,7 +72,8 @@
     "Robert O'Rourke <robert@o-rourke.org>",
     "Guillermo Alfonso Varela Chouciño <guillevch@gmail.com>",
     "Christian Flintrup <chr@gigahost.dk>",
-    "Manan Jadhav <manan@motionden.com>"
+    "Manan Jadhav <manan@motionden.com>",
+    "Leon Radley <leon@radley.se>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
