@@ -106,7 +106,7 @@ describe('Modulate', function () {
       });
   });
 
-  describe('hue-rotate', function (done) {
+  describe('hue-rotate', function () {
     [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360].forEach(function (angle) {
       it('should properly hue rotate by ' + angle + 'deg', function () {
         const base = 'modulate-hue-angle-' + angle + '.png';

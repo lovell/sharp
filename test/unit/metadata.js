@@ -19,7 +19,10 @@ describe('Image metadata', function () {
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
+      assert.strictEqual(
+        true,
+        ['undefined', 'number'].includes(typeof metadata.density)
+      );
       assert.strictEqual('4:2:0', metadata.chromaSubsampling);
       assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
@@ -76,7 +79,10 @@ describe('Image metadata', function () {
       assert.strictEqual('object', typeof metadata.xmp);
       assert.strictEqual(true, metadata.xmp instanceof Buffer);
       assert.strictEqual(12466, metadata.xmp.byteLength);
-      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('<?xpacket begin="')), 0);
+      assert.strictEqual(
+        metadata.xmp.indexOf(Buffer.from('<?xpacket begin="')),
+        0
+      );
       done();
     });
   });
@@ -192,53 +198,43 @@ describe('Image metadata', function () {
     });
   });
 
-  it('Animated WebP', () =>
-    sharp(fixtures.inputWebPAnimated)
-      .metadata()
-      .then(({
-        format, width, height, space, channels, depth,
-        isProgressive, pages, pageHeight, loop, delay,
-        hasProfile, hasAlpha
-      }) => {
-        assert.strictEqual(format, 'webp');
-        assert.strictEqual(width, 80);
-        assert.strictEqual(height, 80);
-        assert.strictEqual(space, 'srgb');
-        assert.strictEqual(channels, 4);
-        assert.strictEqual(depth, 'uchar');
-        assert.strictEqual(isProgressive, false);
-        assert.strictEqual(pages, 9);
-        assert.strictEqual(pageHeight, 80);
-        assert.strictEqual(loop, 0);
-        assert.deepStrictEqual(delay, [120, 120, 90, 120, 120, 90, 120, 90, 30]);
-        assert.strictEqual(hasProfile, false);
-        assert.strictEqual(hasAlpha, true);
-      })
-  );
+  it('Animated WebP', async () => {
+    const metadata = await sharp(fixtures.inputWebPAnimated).metadata();
+    expect(metadata).toEqual({
+      channels: 4,
+      delay: [120, 120, 90, 120, 120, 90, 120, 90, 30],
+      depth: 'uchar',
+      format: 'webp',
+      hasAlpha: true,
+      hasProfile: false,
+      height: 80,
+      isProgressive: false,
+      loop: 0,
+      pageHeight: 80,
+      pages: 9,
+      space: 'srgb',
+      width: 80
+    });
+  });
 
-  it('Animated WebP with limited looping', () =>
-    sharp(fixtures.inputWebPAnimatedLoop3)
-      .metadata()
-      .then(({
-        format, width, height, space, channels, depth,
-        isProgressive, pages, pageHeight, loop, delay,
-        hasProfile, hasAlpha
-      }) => {
-        assert.strictEqual(format, 'webp');
-        assert.strictEqual(width, 370);
-        assert.strictEqual(height, 285);
-        assert.strictEqual(space, 'srgb');
-        assert.strictEqual(channels, 4);
-        assert.strictEqual(depth, 'uchar');
-        assert.strictEqual(isProgressive, false);
-        assert.strictEqual(pages, 10);
-        assert.strictEqual(pageHeight, 285);
-        assert.strictEqual(loop, 3);
-        assert.deepStrictEqual(delay, [...Array(9).fill(3000), 15000]);
-        assert.strictEqual(hasProfile, false);
-        assert.strictEqual(hasAlpha, true);
-      })
-  );
+  it('Animated WebP with limited looping', async () => {
+    const metadata = await sharp(fixtures.inputWebPAnimatedLoop3).metadata();
+    expect(metadata).toEqual({
+      channels: 4,
+      delay: [3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 15000],
+      depth: 'uchar',
+      format: 'webp',
+      hasAlpha: true,
+      hasProfile: false,
+      height: 285,
+      isProgressive: false,
+      loop: 3,
+      pageHeight: 285,
+      pages: 10,
+      space: 'srgb',
+      width: 370
+    });
+  });
 
   it('GIF via giflib', function (done) {
     sharp(fixtures.inputGif).metadata(function (err, metadata) {
@@ -281,58 +277,79 @@ describe('Image metadata', function () {
     });
   });
 
-  it('Animated GIF', () =>
-    sharp(fixtures.inputGifAnimated)
-      .metadata()
-      .then(({
-        format, width, height, space, channels, depth,
-        isProgressive, pages, pageHeight, loop, delay,
-        hasProfile, hasAlpha
-      }) => {
-        assert.strictEqual(format, 'gif');
-        assert.strictEqual(width, 80);
-        assert.strictEqual(height, 80);
-        assert.strictEqual(space, 'srgb');
-        assert.strictEqual(channels, 4);
-        assert.strictEqual(depth, 'uchar');
-        assert.strictEqual(isProgressive, false);
-        assert.strictEqual(pages, 30);
-        assert.strictEqual(pageHeight, 80);
-        assert.strictEqual(loop, 0);
-        assert.deepStrictEqual(delay, Array(30).fill(30));
-        assert.strictEqual(hasProfile, false);
-        assert.strictEqual(hasAlpha, true);
-      })
-  );
+  it('Animated GIF', async () => {
+    const metadata = await sharp(fixtures.inputGifAnimated).metadata();
+    expect(metadata).toEqual({
+      channels: 4,
+      delay: [
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30
+      ],
+      depth: 'uchar',
+      format: 'gif',
+      hasAlpha: true,
+      hasProfile: false,
+      height: 80,
+      isProgressive: false,
+      loop: 0,
+      pageHeight: 80,
+      pages: 30,
+      space: 'srgb',
+      width: 80
+    });
+  });
 
-  it('Animated GIF with limited looping', () =>
-    sharp(fixtures.inputGifAnimatedLoop3)
-      .metadata()
-      .then(({
-        format, width, height, space, channels, depth,
-        isProgressive, pages, pageHeight, loop, delay,
-        hasProfile, hasAlpha
-      }) => {
-        assert.strictEqual(format, 'gif');
-        assert.strictEqual(width, 370);
-        assert.strictEqual(height, 285);
-        assert.strictEqual(space, 'srgb');
-        assert.strictEqual(channels, 4);
-        assert.strictEqual(depth, 'uchar');
-        assert.strictEqual(isProgressive, false);
-        assert.strictEqual(pages, 10);
-        assert.strictEqual(pageHeight, 285);
-        assert.strictEqual(loop, 3);
-        assert.deepStrictEqual(delay, [...Array(9).fill(3000), 15000]);
-        assert.strictEqual(hasProfile, false);
-        assert.strictEqual(hasAlpha, true);
-      })
-  );
+  it('Animated GIF with limited looping', async () => {
+    const metadata = await sharp(fixtures.inputGifAnimatedLoop3).metadata();
+    expect(metadata).toEqual({
+      channels: 4,
+      delay: [3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 15000],
+      depth: 'uchar',
+      format: 'gif',
+      hasAlpha: true,
+      hasProfile: false,
+      height: 285,
+      isProgressive: false,
+      loop: 3,
+      pageHeight: 285,
+      pages: 10,
+      space: 'srgb',
+      width: 370
+    });
+  });
 
   it('vips', () =>
     sharp(fixtures.inputV)
       .metadata()
-      .then(metadata => {
+      .then((metadata) => {
         assert.strictEqual('vips', metadata.format);
         assert.strictEqual('undefined', typeof metadata.size);
         assert.strictEqual(70, metadata.width);
@@ -347,75 +364,90 @@ describe('Image metadata', function () {
         assert.strictEqual('undefined', typeof metadata.orientation);
         assert.strictEqual('undefined', typeof metadata.exif);
         assert.strictEqual('undefined', typeof metadata.icc);
-      })
-  );
+      }));
 
   it('File in, Promise out', function (done) {
-    sharp(fixtures.inputJpg).metadata().then(function (metadata) {
-      assert.strictEqual('jpeg', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(2725, metadata.width);
-      assert.strictEqual(2225, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
-      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
-    });
+    sharp(fixtures.inputJpg)
+      .metadata()
+      .then(function (metadata) {
+        assert.strictEqual('jpeg', metadata.format);
+        assert.strictEqual('undefined', typeof metadata.size);
+        assert.strictEqual(2725, metadata.width);
+        assert.strictEqual(2225, metadata.height);
+        assert.strictEqual('srgb', metadata.space);
+        assert.strictEqual(3, metadata.channels);
+        assert.strictEqual('uchar', metadata.depth);
+        assert.strictEqual(
+          true,
+          ['undefined', 'number'].includes(typeof metadata.density)
+        );
+        assert.strictEqual('4:2:0', metadata.chromaSubsampling);
+        assert.strictEqual(false, metadata.isProgressive);
+        assert.strictEqual(false, metadata.hasProfile);
+        assert.strictEqual(false, metadata.hasAlpha);
+        assert.strictEqual('undefined', typeof metadata.orientation);
+        assert.strictEqual('undefined', typeof metadata.exif);
+        assert.strictEqual('undefined', typeof metadata.icc);
+        done();
+      });
   });
 
   it('Non-existent file in, Promise out', function (done) {
-    sharp('fail').metadata().then(function (metadata) {
-      throw new Error('Non-existent file');
-    }, function (err) {
-      assert.ok(!!err);
-      done();
-    });
+    sharp('fail')
+      .metadata()
+      .then(
+        function (metadata) {
+          throw new Error('Non-existent file');
+        },
+        function (err) {
+          assert.ok(!!err);
+          done();
+        }
+      );
   });
 
   it('Stream in, Promise out', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp();
-    pipeline.metadata().then(function (metadata) {
-      assert.strictEqual('jpeg', metadata.format);
-      assert.strictEqual(829183, metadata.size);
-      assert.strictEqual(2725, metadata.width);
-      assert.strictEqual(2225, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
-      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
-    }).catch(done);
+    pipeline
+      .metadata()
+      .then(function (metadata) {
+        assert.strictEqual('jpeg', metadata.format);
+        assert.strictEqual(829183, metadata.size);
+        assert.strictEqual(2725, metadata.width);
+        assert.strictEqual(2225, metadata.height);
+        assert.strictEqual('srgb', metadata.space);
+        assert.strictEqual(3, metadata.channels);
+        assert.strictEqual('uchar', metadata.depth);
+        assert.strictEqual(
+          true,
+          ['undefined', 'number'].includes(typeof metadata.density)
+        );
+        assert.strictEqual('4:2:0', metadata.chromaSubsampling);
+        assert.strictEqual(false, metadata.isProgressive);
+        assert.strictEqual(false, metadata.hasProfile);
+        assert.strictEqual(false, metadata.hasAlpha);
+        assert.strictEqual('undefined', typeof metadata.orientation);
+        assert.strictEqual('undefined', typeof metadata.exif);
+        assert.strictEqual('undefined', typeof metadata.icc);
+        done();
+      })
+      .catch(done);
     readable.pipe(pipeline);
   });
 
   it('Stream in, rejected Promise out', () => {
     const pipeline = sharp();
-    fs
-      .createReadStream(__filename)
-      .pipe(pipeline);
+    fs.createReadStream(__filename).pipe(pipeline);
 
-    return pipeline
-      .metadata()
-      .then(
-        () => Promise.reject(new Error('Expected metadata to reject')),
-        err => assert.strictEqual(err.message, 'Input buffer contains unsupported image format')
-      );
+    return pipeline.metadata().then(
+      () => Promise.reject(new Error('Expected metadata to reject')),
+      (err) =>
+        assert.strictEqual(
+          err.message,
+          'Input buffer contains unsupported image format'
+        )
+    );
   });
 
   it('Stream', function (done) {
@@ -429,7 +461,10 @@ describe('Image metadata', function () {
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
+      assert.strictEqual(
+        true,
+        ['undefined', 'number'].includes(typeof metadata.density)
+      );
       assert.strictEqual('4:2:0', metadata.chromaSubsampling);
       assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
@@ -453,7 +488,10 @@ describe('Image metadata', function () {
       assert.strictEqual('srgb', metadata.space);
       assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
+      assert.strictEqual(
+        true,
+        ['undefined', 'number'].includes(typeof metadata.density)
+      );
       assert.strictEqual('4:2:0', metadata.chromaSubsampling);
       assert.strictEqual(false, metadata.isProgressive);
       assert.strictEqual(false, metadata.hasProfile);
@@ -461,13 +499,15 @@ describe('Image metadata', function () {
       assert.strictEqual('undefined', typeof metadata.orientation);
       assert.strictEqual('undefined', typeof metadata.exif);
       assert.strictEqual('undefined', typeof metadata.icc);
-      image.resize(Math.floor(metadata.width / 2)).toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(1362, info.width);
-        assert.strictEqual(1112, info.height);
-        done();
-      });
+      image
+        .resize(Math.floor(metadata.width / 2))
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual(1362, info.width);
+          assert.strictEqual(1112, info.height);
+          done();
+        });
     });
   });
 
@@ -521,7 +561,12 @@ describe('Image metadata', function () {
           assert.strictEqual('Relative', profile.intent);
           assert.strictEqual('Printer', profile.deviceClass);
         });
-        fixtures.assertSimilar(output, fixtures.path('expected/icc-cmyk.jpg'), { threshold: 0 }, done);
+        fixtures.assertSimilar(
+          output,
+          fixtures.path('expected/icc-cmyk.jpg'),
+          { threshold: 0 },
+          done
+        );
       });
   });
 
@@ -531,7 +576,11 @@ describe('Image metadata', function () {
       .withMetadata({ icc: fixtures.path('hilutite.icm') })
       .toFile(output, function (err, info) {
         if (err) throw err;
-        fixtures.assertMaxColourDistance(output, fixtures.path('expected/hilutite.jpg'), 0);
+        fixtures.assertMaxColourDistance(
+          output,
+          fixtures.path('expected/hilutite.jpg'),
+          0
+        );
         fixtures.assertMaxColourDistance(output, fixtures.inputJpg, 16.5);
         done();
       });
@@ -541,29 +590,29 @@ describe('Image metadata', function () {
     sharp(fixtures.inputJpgWithExif)
       .withMetadata({})
       .toBuffer()
-      .then((buffer) => sharp(buffer)
-        .metadata()
-        .then(metadata => {
-          assert.strictEqual(true, metadata.hasProfile);
-          assert.strictEqual(8, metadata.orientation);
-          assert.strictEqual('object', typeof metadata.exif);
-          assert.strictEqual(true, metadata.exif instanceof Buffer);
-          // EXIF
-          const exif = exifReader(metadata.exif);
-          assert.strictEqual('object', typeof exif);
-          assert.strictEqual('object', typeof exif.image);
-          assert.strictEqual('number', typeof exif.image.XResolution);
-          // ICC
-          assert.strictEqual('object', typeof metadata.icc);
-          assert.strictEqual(true, metadata.icc instanceof Buffer);
-          const profile = icc.parse(metadata.icc);
-          assert.strictEqual('object', typeof profile);
-          assert.strictEqual('RGB', profile.colorSpace);
-          assert.strictEqual('Perceptual', profile.intent);
-          assert.strictEqual('Monitor', profile.deviceClass);
-        })
-      )
-  );
+      .then((buffer) =>
+        sharp(buffer)
+          .metadata()
+          .then((metadata) => {
+            assert.strictEqual(true, metadata.hasProfile);
+            assert.strictEqual(8, metadata.orientation);
+            assert.strictEqual('object', typeof metadata.exif);
+            assert.strictEqual(true, metadata.exif instanceof Buffer);
+            // EXIF
+            const exif = exifReader(metadata.exif);
+            assert.strictEqual('object', typeof exif);
+            assert.strictEqual('object', typeof exif.image);
+            assert.strictEqual('number', typeof exif.image.XResolution);
+            // ICC
+            assert.strictEqual('object', typeof metadata.icc);
+            assert.strictEqual(true, metadata.icc instanceof Buffer);
+            const profile = icc.parse(metadata.icc);
+            assert.strictEqual('object', typeof profile);
+            assert.strictEqual('RGB', profile.colorSpace);
+            assert.strictEqual('Perceptual', profile.intent);
+            assert.strictEqual('Monitor', profile.deviceClass);
+          })
+      ));
 
   it('Remove EXIF metadata after a resize', function (done) {
     sharp(fixtures.inputJpgWithExif)
@@ -651,7 +700,7 @@ describe('Image metadata', function () {
   it('16-bit TIFF with TIFFTAG_PHOTOSHOP metadata', () =>
     sharp(fixtures.inputTifftagPhotoshop)
       .metadata()
-      .then(metadata => {
+      .then((metadata) => {
         assert.strictEqual(metadata.format, 'tiff');
         assert.strictEqual(metadata.width, 317);
         assert.strictEqual(metadata.height, 211);
@@ -660,34 +709,47 @@ describe('Image metadata', function () {
         assert.strictEqual(typeof metadata.tifftagPhotoshop, 'object');
         assert.strictEqual(metadata.tifftagPhotoshop instanceof Buffer, true);
         assert.strictEqual(metadata.tifftagPhotoshop.length, 6634);
-      })
-  );
+      }));
 
   it('File input with corrupt header fails gracefully', function (done) {
-    sharp(fixtures.inputJpgWithCorruptHeader)
-      .metadata(function (err) {
-        assert.strictEqual(true, !!err);
-        assert.strictEqual(true, /Input file has corrupt header: VipsJpeg: Premature end of JPEG file/.test(err.message));
-        done();
-      });
+    sharp(fixtures.inputJpgWithCorruptHeader).metadata(function (err) {
+      assert.strictEqual(true, !!err);
+      assert.strictEqual(
+        true,
+        /Input file has corrupt header: VipsJpeg: Premature end of JPEG file/.test(
+          err.message
+        )
+      );
+      done();
+    });
   });
 
   it('Buffer input with corrupt header fails gracefully', function (done) {
-    sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
-      .metadata(function (err) {
+    sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader)).metadata(
+      function (err) {
         assert.strictEqual(true, !!err);
-        assert.strictEqual(true, /Input buffer has corrupt header: VipsJpeg: Premature end of JPEG file/.test(err.message));
+        assert.strictEqual(
+          true,
+          /Input buffer has corrupt header: VipsJpeg: Premature end of JPEG file/.test(
+            err.message
+          )
+        );
         done();
-      });
+      }
+    );
   });
 
   it('Unsupported lossless JPEG passes underlying error message', function (done) {
-    sharp(fixtures.inputJpgLossless)
-      .metadata(function (err) {
-        assert.strictEqual(true, !!err);
-        assert.strictEqual(true, /Input file has corrupt header: VipsJpeg: Unsupported JPEG process: SOF type 0xc3/.test(err.message));
-        done();
-      });
+    sharp(fixtures.inputJpgLossless).metadata(function (err) {
+      assert.strictEqual(true, !!err);
+      assert.strictEqual(
+        true,
+        /Input file has corrupt header: VipsJpeg: Unsupported JPEG process: SOF type 0xc3/.test(
+          err.message
+        )
+      );
+      done();
+    });
   });
 
   describe('Invalid withMetadata parameters', function () {

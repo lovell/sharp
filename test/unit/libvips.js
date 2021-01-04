@@ -18,8 +18,8 @@ const restorePlatform = function () {
 
 describe('libvips binaries', function () {
   describe('Windows platform', function () {
-    before(function () { setPlatform('win32'); });
-    after(restorePlatform);
+    beforeEach(function () { setPlatform('win32'); });
+    afterEach(restorePlatform);
 
     it('pkgConfigPath returns empty string', function () {
       assert.strictEqual('', libvips.pkgConfigPath());
@@ -33,8 +33,8 @@ describe('libvips binaries', function () {
   });
 
   describe('non-Windows platforms', function () {
-    before(function () { setPlatform('linux'); });
-    after(restorePlatform);
+    beforeEach(function () { setPlatform('linux'); });
+    afterEach(restorePlatform);
 
     it('pkgConfigPath returns a string', function () {
       const pkgConfigPath = libvips.pkgConfigPath();
@@ -77,7 +77,7 @@ describe('libvips binaries', function () {
   });
 
   describe('safe directory creation', function () {
-    before(function () {
+    beforeEach(function () {
       mockFS({
         exampleDirA: {
           exampleDirB: {
@@ -86,7 +86,7 @@ describe('libvips binaries', function () {
         }
       });
     });
-    after(function () { mockFS.restore(); });
+    afterEach(function () { mockFS.restore(); });
 
     it('mkdirSync creates a directory', function () {
       const dirPath = 'createdDir';

@@ -107,12 +107,12 @@ describe('Image channel extraction', function () {
     });
   });
 
-  it('Non-existant channel', function (done) {
-    sharp(fixtures.inputPng)
-      .extractChannel(1)
-      .toBuffer(function (err) {
-        assert(err instanceof Error);
-        done();
-      });
+  it('Non-existant channel', () => {
+    expect.assertions(1);
+    return expect(
+      sharp(fixtures.inputPng)
+        .extractChannel(1)
+        .toBuffer()
+    ).rejects.toThrowError('Cannot extract channel from image. Too few channels in image.');
   });
 });

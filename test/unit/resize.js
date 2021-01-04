@@ -99,26 +99,23 @@ describe('Resize dimensions', function () {
     }, /Expected positive integer for height but received 1.5 of type number/);
   });
 
-  it('Invalid width - too large', function (done) {
-    sharp(fixtures.inputJpg)
-      .resize(0x4000, 1)
-      .webp()
-      .toBuffer(function (err) {
-        assert.strictEqual(true, err instanceof Error);
-        assert.strictEqual('Processed image is too large for the WebP format', err.message);
-        done();
-      });
+  it('Invalid width - too large', () => {
+    expect.assertions(1);
+    return expect(
+      sharp(fixtures.inputJpg)
+        .resize(0x4000, 1)
+        .webp()
+        .toBuffer()
+    ).rejects.toThrowError('Processed image is too large for the WebP format');
   });
 
-  it('Invalid height - too large', function (done) {
-    sharp(fixtures.inputJpg)
+  it('Invalid height - too large', () => {
+    expect.assertions(1);
+    return expect(sharp(fixtures.inputJpg)
       .resize(1, 0x4000)
       .webp()
-      .toBuffer(function (err) {
-        assert.strictEqual(true, err instanceof Error);
-        assert.strictEqual('Processed image is too large for the WebP format', err.message);
-        done();
-      });
+      .toBuffer()
+    ).rejects.toThrowError('Processed image is too large for the WebP format');
   });
 
   it('WebP shrink-on-load rounds to zero, ensure recalculation is correct', function (done) {

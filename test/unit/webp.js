@@ -160,9 +160,9 @@ describe('WebP', function () {
       .toBuffer()
       .then(data => sharp(data, { pages: -1 }).metadata());
 
-    assert.strictEqual(updated.pages, original.pages * 2);
-    assert.strictEqual(updated.pageHeight, original.pageHeight / 2);
-    assert.deepStrictEqual(updated.delay, [...original.delay, ...Array(9).fill(120)]);
+    expect(updated.pages).toBe(original.pages * 2);
+    expect(updated.pageHeight).toBe(original.pageHeight / 2);
+    expect(updated.delay).toEqual([...original.delay, ...Array(9).fill(120)]);
   });
 
   it('should limit animation loop', async () => {
@@ -183,7 +183,7 @@ describe('WebP', function () {
       .toBuffer()
       .then(data => sharp(data, { pages: -1 }).metadata());
 
-    assert.deepStrictEqual(updated.delay, expectedDelay);
+    expect(updated.delay).toEqual(expectedDelay);
   });
 
   it('should work with streams when only animated is set', function (done) {

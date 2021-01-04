@@ -263,31 +263,25 @@ describe('Input/output', function () {
       });
   });
 
-  it('Fail when output File is input File', function (done) {
-    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, function (err) {
-      assert(err instanceof Error);
-      assert.strictEqual('Cannot use same file for input and output', err.message);
-      done();
-    });
+  it('Fail when output File is input File', () => {
+    expect.assertions(1);
+    return expect(
+      sharp(fixtures.inputJpg).toFile(fixtures.inputJpg)
+    ).rejects.toThrowError('Cannot use same file for input and output');
   });
 
-  it('Fail when output File is input File via Promise', function (done) {
-    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg).then(function (data) {
-      assert(false);
-      done();
-    }).catch(function (err) {
-      assert(err instanceof Error);
-      assert.strictEqual('Cannot use same file for input and output', err.message);
-      done();
-    });
+  it('Fail when output File is input File via Promise', () => {
+    expect.assertions(1);
+    return expect(
+      sharp(fixtures.inputJpg).toFile(fixtures.inputJpg)
+    ).rejects.toThrowError('Cannot use same file for input and output');
   });
 
-  it('Fail when output File is empty', function (done) {
-    sharp(fixtures.inputJpg).toFile('', function (err) {
-      assert(err instanceof Error);
-      assert.strictEqual('Missing output file path', err.message);
-      done();
-    });
+  it('Fail when output File is empty', () => {
+    expect.assertions(1);
+    return expect(
+      sharp(fixtures.inputJpg).toFile('')
+    ).rejects.toThrowError('Missing output file path');
   });
 
   it('Fail when output File is empty via Promise', function (done) {
@@ -301,37 +295,25 @@ describe('Input/output', function () {
     });
   });
 
-  it('Fail when input is empty Buffer', function (done) {
-    sharp(Buffer.alloc(0)).toBuffer().then(function () {
-      assert(false);
-      done();
-    }).catch(function (err) {
-      assert(err instanceof Error);
-      assert.strictEqual('Input buffer contains unsupported image format', err.message);
-      done();
-    });
+  it('Fail when input is empty Buffer', () => {
+    expect.assertions(1);
+    return expect(
+      sharp(Buffer.alloc(0)).toBuffer()
+    ).rejects.toThrowError('Input buffer contains unsupported image format');
   });
 
-  it('Fail when input is invalid Buffer', function (done) {
-    sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
-      assert(false);
-      done();
-    }).catch(function (err) {
-      assert(err instanceof Error);
-      assert.strictEqual('Input buffer contains unsupported image format', err.message);
-      done();
-    });
+  it('Fail when input is invalid Buffer', () => {
+    expect.assertions(1);
+    return expect(
+      sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer()
+    ).rejects.toThrowError('Input buffer contains unsupported image format');
   });
 
-  it('Fail when input file path is missing', function (done) {
-    sharp('does-not-exist').toBuffer().then(function () {
-      assert(false);
-      done();
-    }).catch(function (err) {
-      assert(err instanceof Error);
-      assert.strictEqual('Input file is missing', err.message);
-      done();
-    });
+  it('Fail when input file path is missing', () => {
+    expect.assertions(1);
+    return expect(
+      sharp('does-not-exist').toBuffer()
+    ).rejects.toThrowError('Input file is missing');
   });
 
   describe('Fail for unsupported input', function () {
