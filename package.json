@@ -72,13 +72,14 @@
     "Robert O'Rourke <robert@o-rourke.org>",
     "Guillermo Alfonso Varela Chouciño <guillevch@gmail.com>",
     "Christian Flintrup <chr@gigahost.dk>",
-    "Manan Jadhav <manan@motionden.com>"
+    "Manan Jadhav <manan@motionden.com>",
+    "Leon Radley <leon@radley.se>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "semistandard && cpplint && npm run test-unit && npm run test-licensing",
-    "test-unit": "nyc --reporter=lcov --branches=99 mocha --slow=5000 --timeout=60000 ./test/unit/*.js",
+    "test-unit": "jest",
     "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;MIT\"",
     "test-coverage": "./test/coverage/report.sh",
     "test-leak": "./test/leak/leak.sh",
@@ -127,16 +128,16 @@
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.19",
     "async": "^3.2.0",
     "cc": "^3.0.1",
     "decompress-zip": "^0.3.2",
     "documentation": "^13.1.0",
     "exif-reader": "^1.0.3",
     "icc": "^2.0.0",
+    "jest": "^26.6.3",
     "license-checker": "^25.0.1",
-    "mocha": "^8.2.1",
     "mock-fs": "^4.13.0",
-    "nyc": "^15.1.0",
     "prebuild": "^10.0.1",
     "rimraf": "^3.0.2",
     "semistandard": "^16.0.0"
@@ -160,7 +161,7 @@
   },
   "semistandard": {
     "env": [
-      "mocha"
+      "jest"
     ]
   },
   "cc": {

@@ -13,6 +13,5 @@ vendor
 .DS_Store
 .nyc_output
 .vscode/
-package-lock.json
 .idea
 .firebase
