@@ -147,6 +147,38 @@ describe('Input/output', function () {
     readable.pipe(pipeline).pipe(writable);
   });
 
+  it('Read from Uint8Array and write to Buffer', async () => {
+    const uint8array = Uint8Array.from([255, 255, 255, 0, 0, 0]);
+    const { data, info } = await sharp(uint8array, {
+      raw: {
+        width: 2,
+        height: 1,
+        channels: 3
+      }
+    }).toBuffer({ resolveWithObject: true });
+
+    assert.deepStrictEqual(uint8array, new Uint8Array(data));
+    assert.strictEqual(info.width, 2);
+    assert.strictEqual(info.height, 1);
+  });
+
+  it('Read from Uint8ClampedArray and output to Buffer', async () => {
+    // since a Uint8ClampedArray is the same as Uint8Array but clamps the values
+    // between 0-255 it seemed good to add this also
+    const uint8array = Uint8ClampedArray.from([255, 255, 255, 0, 0, 0]);
+    const { data, info } = await sharp(uint8array, {
+      raw: {
+        width: 2,
+        height: 1,
+        channels: 3
+      }
+    }).toBuffer({ resolveWithObject: true });
+
+    assert.deepStrictEqual(uint8array, new Uint8ClampedArray(data));
+    assert.strictEqual(info.width, 2);
+    assert.strictEqual(info.height, 1);
+  });
+
   it('Stream should emit info event', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const writable = fs.createWriteStream(fixtures.outputJpg);
