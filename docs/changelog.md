@@ -4,6 +4,12 @@
 
 Requires libvips v8.10.5
 
+### v0.27.1 - TBD
+
+* Add support for Uint8Array and Uint8ClampedArray input.
+  [#2511](https://github.com/lovell/sharp/pull/2511)
+  [@leon](https://github.com/leon)
+
 ### v0.27.0 - 22nd December 2020
 
 * Add support for AVIF to prebuilt binaries.
