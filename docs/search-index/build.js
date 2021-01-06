@@ -9,7 +9,7 @@ const searchIndex = [];
 // Install
 const contents = fs.readFileSync(path.join(__dirname, '..', 'install.md'), 'utf8');
 const matches = contents.matchAll(
-  /## (?<title>[A-Za-z ]+)\n\n(?<body>[^#]+)/gs
+  /## (?<title>[A-Za-z0-9 ]+)\n\n(?<body>[^#]+)/gs
 );
 for (const match of matches) {
   const { title, body } = match.groups;

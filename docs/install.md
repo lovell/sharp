@@ -56,6 +56,18 @@ The `npm install --ignore-scripts=false` flag must be used when `npm` has been c
 
 Check the output of running `npm install --verbose sharp` for useful error messages.
 
+## Apple M1
+
+libvips must currently be installed via Homebrew before installing sharp.
+
+```sh
+brew install vips
+```
+
+When this new ARM64 CPU is made freely available
+to open source projects via a CI service
+then prebuilt binaries can be provided.
+
 ## Custom libvips
 
 To use a custom, globally-installed version of libvips instead of the provided binaries,
