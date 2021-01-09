@@ -124,6 +124,17 @@ namespace sharp {
   }
 
   /*
+   * Gaussian noise.
+   */
+  VImage Noise(VImage image, double const mean, double const sigma) {
+    return image.gaussnoise(
+      image.width(),
+      image.height(),
+      VImage::option()->set("mean", mean)->set("sigma", sigma)
+    );
+  }
+
+  /*
    * Convolution with a kernel.
    */
   VImage Convolve(VImage image, int const width, int const height,

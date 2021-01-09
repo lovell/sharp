@@ -167,6 +167,21 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 
 Returns **Sharp** 
 
+## noise
+
+Apply Gaussian noise to the image.
+
+### Parameters
+
+-   `mean` **[number][1]** mean of pixels in generated image. (optional, default `128.0`)
+
+-   `sigma` **[number][1]** standard deviation of pixels in generated image. (optional, default `30.0`)
+
+
+-   Throws **[Error][5]** Invalid parameters
+
+Returns **Sharp** 
+
 ## flatten
 
 Merge alpha transparency channel, if any, with a background.

@@ -46,6 +46,11 @@ namespace sharp {
   VImage Blur(VImage image, double const sigma);
 
   /*
+   * Gaussian noise.
+   */
+  VImage Noise(VImage image, double const mean, double const sigma);
+
+  /*
    * Convolution with a kernel.
    */
   VImage Convolve(VImage image, int const width, int const height,

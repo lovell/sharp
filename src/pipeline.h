@@ -90,6 +90,8 @@ struct PipelineBaton {
   std::vector<double> flattenBackground;
   bool negate;
   double blurSigma;
+  double noiseMean;
+  double noiseSigma;
   double brightness;
   double saturation;
   int hue;
@@ -212,6 +214,8 @@ struct PipelineBaton {
     flattenBackground{ 0.0, 0.0, 0.0 },
     negate(false),
     blurSigma(0.0),
+    noiseMean(0.0),
+    noiseSigma(0.0),
     brightness(1.0),
     saturation(1.0),
     hue(0),

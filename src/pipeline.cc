@@ -339,6 +339,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       bool const shouldResize = xfactor != 1.0 || yfactor != 1.0;
       bool const shouldBlur = baton->blurSigma != 0.0;
+      bool const shouldApplyNoise = baton->noiseMean != 0.0 || baton->noiseSigma != 0.0;
       bool const shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
       bool const shouldApplyMedian = baton->medianSize > 0;
@@ -521,6 +522,11 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Blur
       if (shouldBlur) {
         image = sharp::Blur(image, baton->blurSigma);
+      }
+
+      // Noise
+      if (shouldApplyNoise) {
+        image = sharp::Noise(image, baton->noiseMean, baton->noiseSigma);
       }
 
       // Convolve
@@ -1277,6 +1283,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->flattenBackground = sharp::AttrAsVectorOfDouble(options, "flattenBackground");
   baton->negate = sharp::AttrAsBool(options, "negate");
   baton->blurSigma = sharp::AttrAsDouble(options, "blurSigma");
+  baton->noiseMean = sharp::AttrAsDouble(options, "noiseMean");
+  baton->noiseSigma = sharp::AttrAsDouble(options, "noiseSigma");
   baton->brightness = sharp::AttrAsDouble(options, "brightness");
   baton->saturation = sharp::AttrAsDouble(options, "saturation");
   baton->hue = sharp::AttrAsInt32(options, "hue");
