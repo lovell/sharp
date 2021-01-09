@@ -130,8 +130,7 @@ namespace sharp {
     return image.gaussnoise(
       image.width(),
       image.height(),
-      VImage::option()->set("mean", mean)->set("sigma", sigma)
-    );
+      VImage::option()->set("mean", mean)->set("sigma", sigma));
   }
 
   /*
