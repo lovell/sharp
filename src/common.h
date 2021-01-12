@@ -64,6 +64,9 @@ namespace sharp {
     int createWidth;
     int createHeight;
     std::vector<double> createBackground;
+    std::string createNoiseType;
+    double createNoiseMean;
+    double createNoiseSigma;
 
     InputDescriptor():
       buffer(nullptr),
@@ -82,7 +85,9 @@ namespace sharp {
       createChannels(0),
       createWidth(0),
       createHeight(0),
-      createBackground{ 0.0, 0.0, 0.0, 255.0 } {}
+      createBackground{ 0.0, 0.0, 0.0, 255.0 },
+      createNoiseMean(0.0),
+      createNoiseSigma(0.0) {}
   };
 
   // Convenience methods to access the attributes of a Napi::Object
