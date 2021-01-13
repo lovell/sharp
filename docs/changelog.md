@@ -10,6 +10,9 @@ Requires libvips v8.10.5
   [#2511](https://github.com/lovell/sharp/pull/2511)
   [@leon](https://github.com/leon)
 
+* Revert: ensure all platforms use fontconfig for font rendering.
+  [#2515](https://github.com/lovell/sharp/issues/2515)
+
 ### v0.27.0 - 22nd December 2020
 
 * Add support for AVIF to prebuilt binaries.
