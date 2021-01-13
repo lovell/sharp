@@ -130,7 +130,7 @@
   "devDependencies": {
     "async": "^3.2.0",
     "cc": "^3.0.1",
-    "decompress-zip": "^0.3.2",
+    "decompress-zip": "^0.3.3",
     "documentation": "^13.1.0",
     "exif-reader": "^1.0.3",
     "icc": "^2.0.0",
