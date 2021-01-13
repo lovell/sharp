@@ -730,7 +730,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == sharp::ImageType::JPEG)) {
           // Write JPEG to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
-          VipsArea *area = VIPS_AREA(image.jpegsave_buffer(VImage::option()
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.jpegsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->jpegQuality)
             ->set("interlace", baton->jpegProgressive)
@@ -757,7 +757,7 @@ class PipelineWorker : public Napi::AsyncWorker {
            inputImageType == sharp::ImageType::SVG))) {
           // Write PNG to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::PNG);
-          VipsArea *area = VIPS_AREA(image.pngsave_buffer(VImage::option()
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.pngsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("interlace", baton->pngProgressive)
             ->set("compression", baton->pngCompressionLevel)
@@ -775,7 +775,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           (baton->formatOut == "input" && inputImageType == sharp::ImageType::WEBP)) {
           // Write WEBP to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::WEBP);
-          VipsArea *area = VIPS_AREA(image.webpsave_buffer(VImage::option()
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.webpsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->webpQuality)
             ->set("lossless", baton->webpLossless)
@@ -792,7 +792,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           (baton->formatOut == "input" && inputImageType == sharp::ImageType::GIF && supportsGifOutput)) {
           // Write GIF to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::GIF);
-          VipsArea *area = VIPS_AREA(image.magicksave_buffer(VImage::option()
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.magicksave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("optimize_gif_frames", TRUE)
             ->set("optimize_gif_transparency", TRUE)
@@ -813,7 +813,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
             image = image.cast(VIPS_FORMAT_FLOAT);
           }
-          VipsArea *area = VIPS_AREA(image.tiffsave_buffer(VImage::option()
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.tiffsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->tiffQuality)
             ->set("bitdepth", baton->tiffBitdepth)
@@ -833,7 +833,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         } else if (baton->formatOut == "heif" ||
           (baton->formatOut == "input" && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to buffer
-          VipsArea *area = VIPS_AREA(image.heifsave_buffer(VImage::option()
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.heifsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("compression", baton->heifCompression)
             ->set("Q", baton->heifQuality)
