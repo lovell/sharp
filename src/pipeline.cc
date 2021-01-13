@@ -838,7 +838,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("compression", baton->heifCompression)
             ->set("Q", baton->heifQuality)
             ->set("speed", baton->heifSpeed)
-#ifdef VIPS_TYPE_FOREIGN_SUBSAMPLE
+#if defined(VIPS_TYPE_FOREIGN_SUBSAMPLE)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
 #endif
@@ -976,7 +976,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
             ->set("speed", baton->heifSpeed)
-#ifdef VIPS_TYPE_FOREIGN_SUBSAMPLE
+#if defined(VIPS_TYPE_FOREIGN_SUBSAMPLE)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
 #endif
