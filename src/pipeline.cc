@@ -838,6 +838,10 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("compression", baton->heifCompression)
             ->set("Q", baton->heifQuality)
             ->set("speed", baton->heifSpeed)
+#ifdef VIPS_TYPE_FOREIGN_SUBSAMPLE
+            ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
+              ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
+#endif
             ->set("lossless", baton->heifLossless)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -972,6 +976,10 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
             ->set("speed", baton->heifSpeed)
+#ifdef VIPS_TYPE_FOREIGN_SUBSAMPLE
+            ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
+              ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
+#endif
             ->set("lossless", baton->heifLossless));
           baton->formatOut = "heif";
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
@@ -1396,6 +1404,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
     sharp::AttrAsStr(options, "heifCompression").data()));
   baton->heifSpeed = sharp::AttrAsUint32(options, "heifSpeed");
+  baton->heifChromaSubsampling = sharp::AttrAsStr(options, "heifChromaSubsampling");
 
   // Animated output
   if (sharp::HasAttr(options, "pageHeight")) {

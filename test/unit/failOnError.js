@@ -53,7 +53,7 @@ describe('failOnError', function () {
 
   it('returns errors to callback for truncated JPEG', function (done) {
     sharp(fixtures.inputJpgTruncated).toBuffer(function (err, data, info) {
-      assert.ok(err.message.includes('VipsJpeg: Premature end of JPEG file'), err);
+      assert.ok(err.message.includes('VipsJpeg: Premature end of'), err);
       assert.strictEqual(data, undefined);
       assert.strictEqual(info, undefined);
       done();
@@ -76,7 +76,7 @@ describe('failOnError', function () {
         throw new Error('Expected rejection');
       })
       .catch(err => {
-        done(err.message.includes('VipsJpeg: Premature end of JPEG file') ? undefined : err);
+        done(err.message.includes('VipsJpeg: Premature end of') ? undefined : err);
       });
   });
 

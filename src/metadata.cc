@@ -74,6 +74,9 @@ class MetadataWorker : public Napi::AsyncWorker {
       if (image.get_typeof("heif-primary") == G_TYPE_INT) {
         baton->pagePrimary = image.get_int("heif-primary");
       }
+      if (image.get_typeof("heif-compression") == VIPS_TYPE_REF_STRING) {
+        baton->compression = image.get_string("heif-compression");
+      }
       if (image.get_typeof("openslide.level-count") == VIPS_TYPE_REF_STRING) {
         int const levels = std::stoi(image.get_string("openslide.level-count"));
         for (int l = 0; l < levels; l++) {
@@ -185,6 +188,9 @@ class MetadataWorker : public Napi::AsyncWorker {
       }
       if (baton->pagePrimary > -1) {
         info.Set("pagePrimary", baton->pagePrimary);
+      }
+      if (!baton->compression.empty()) {
+        info.Set("compression", baton->compression);
       }
       if (!baton->levels.empty()) {
         int i = 0;

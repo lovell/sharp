@@ -18,7 +18,7 @@ describe('AVIF', () => {
       .toBuffer();
     const metadata = await sharp(data)
       .metadata();
-    const { size, ...metadataWithoutSize } = metadata;
+    const { compression, size, ...metadataWithoutSize } = metadata;
     assert.deepStrictEqual(metadataWithoutSize, {
       channels: 3,
       depth: 'uchar',
@@ -42,7 +42,7 @@ describe('AVIF', () => {
       .toBuffer();
     const metadata = await sharp(data)
       .metadata();
-    const { size, ...metadataWithoutSize } = metadata;
+    const { compression, size, ...metadataWithoutSize } = metadata;
     assert.deepStrictEqual(metadataWithoutSize, {
       channels: 3,
       chromaSubsampling: '4:2:0',
@@ -65,7 +65,7 @@ describe('AVIF', () => {
       .toBuffer();
     const metadata = await sharp(data)
       .metadata();
-    const { size, ...metadataWithoutSize } = metadata;
+    const { compression, size, ...metadataWithoutSize } = metadata;
     assert.deepStrictEqual(metadataWithoutSize, {
       channels: 3,
       depth: 'uchar',

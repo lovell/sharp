@@ -162,6 +162,7 @@ struct PipelineBaton {
   int heifQuality;
   VipsForeignHeifCompression heifCompression;
   int heifSpeed;
+  std::string heifChromaSubsampling;
   bool heifLossless;
   std::string err;
   bool withMetadata;
@@ -282,6 +283,7 @@ struct PipelineBaton {
     heifQuality(50),
     heifCompression(VIPS_FOREIGN_HEIF_COMPRESSION_AV1),
     heifSpeed(5),
+    heifChromaSubsampling("4:2:0"),
     heifLossless(false),
     withMetadata(false),
     withMetadataOrientation(-1),

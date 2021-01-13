@@ -65,4 +65,14 @@ describe('HEIF', () => {
       sharp().heif({ compression: 'fail' });
     });
   });
+  it('invalid chromaSubsampling should throw an error', () => {
+    assert.throws(() => {
+      sharp().heif({ chromaSubsampling: 'fail' });
+    });
+  });
+  it('valid chromaSubsampling does not throw an error', () => {
+    assert.doesNotThrow(() => {
+      sharp().heif({ chromaSubsampling: '4:4:4' });
+    });
+  });
 });
