@@ -165,7 +165,7 @@ describe('Gaussian noise', function () {
                   done();
                 });
               });
-          })
+          });
       });
   });
 
