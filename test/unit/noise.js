@@ -260,4 +260,3 @@ describe('Gaussian noise', function () {
     });
   });
 });
-
