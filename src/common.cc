@@ -325,16 +325,23 @@ namespace sharp {
       if (descriptor->createChannels > 0) {
         // Create new image
         if (descriptor->createNoiseType == "gaussian") {
+          int const channels = descriptor->createChannels;
           image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight);
           std::vector<VImage> bands = {};
-          bands.reserve(descriptor->createChannels);
-          for (int _band = 0; _band < descriptor->createChannels; _band++) {
+          bands.reserve(channels);
+          for (int _band = 0; _band < channels; _band++) {
             bands.push_back(image.gaussnoise(
               descriptor->createWidth,
               descriptor->createHeight,
               VImage::option()->set("mean", descriptor->createNoiseMean)->set("sigma", descriptor->createNoiseSigma)));
           }
-          image = image.bandjoin(bands).colourspace(VIPS_INTERPRETATION_sRGB).cast(VipsBandFormat::VIPS_FORMAT_UCHAR);
+          image = image.bandjoin(bands);
+          image = image.cast(VipsBandFormat::VIPS_FORMAT_UCHAR);
+          if (channels < 3) {
+            image = image.colourspace(VIPS_INTERPRETATION_B_W);
+          } else {
+            image = image.colourspace(VIPS_INTERPRETATION_sRGB);
+          }
         } else {
           std::vector<double> background = {
             descriptor->createBackground[0],
