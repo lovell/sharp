@@ -169,14 +169,10 @@ describe('Gaussian noise', function () {
       });
   });
 
-  it('no noise object specified', function () {
+  it('no create object properties specified', function () {
     assert.throws(function () {
       sharp({
-        create: {
-          width: 100,
-          height: 100,
-          channels: 3
-        }
+        create: {}
       });
     });
   });
