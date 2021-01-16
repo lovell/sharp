@@ -109,7 +109,13 @@ namespace sharp {
       descriptor->createChannels = AttrAsUint32(input, "createChannels");
       descriptor->createWidth = AttrAsUint32(input, "createWidth");
       descriptor->createHeight = AttrAsUint32(input, "createHeight");
-      descriptor->createBackground = AttrAsVectorOfDouble(input, "createBackground");
+      if (HasAttr(input, "createNoiseType")) {
+        descriptor->createNoiseType = AttrAsStr(input, "createNoiseType");
+        descriptor->createNoiseMean = AttrAsDouble(input, "createNoiseMean");
+        descriptor->createNoiseSigma = AttrAsDouble(input, "createNoiseSigma");
+      } else {
+        descriptor->createBackground = AttrAsVectorOfDouble(input, "createBackground");
+      }
     }
     // Limit input images to a given number of pixels, where pixels = width * height
     descriptor->limitInputPixels = AttrAsUint32(input, "limitInputPixels");
@@ -318,15 +324,35 @@ namespace sharp {
     } else {
       if (descriptor->createChannels > 0) {
         // Create new image
-        std::vector<double> background = {
-          descriptor->createBackground[0],
-          descriptor->createBackground[1],
-          descriptor->createBackground[2]
-        };
-        if (descriptor->createChannels == 4) {
-          background.push_back(descriptor->createBackground[3]);
+        if (descriptor->createNoiseType == "gaussian") {
+          int const channels = descriptor->createChannels;
+          image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight);
+          std::vector<VImage> bands = {};
+          bands.reserve(channels);
+          for (int _band = 0; _band < channels; _band++) {
+            bands.push_back(image.gaussnoise(
+              descriptor->createWidth,
+              descriptor->createHeight,
+              VImage::option()->set("mean", descriptor->createNoiseMean)->set("sigma", descriptor->createNoiseSigma)));
+          }
+          image = image.bandjoin(bands);
+          image = image.cast(VipsBandFormat::VIPS_FORMAT_UCHAR);
+          if (channels < 3) {
+            image = image.colourspace(VIPS_INTERPRETATION_B_W);
+          } else {
+            image = image.colourspace(VIPS_INTERPRETATION_sRGB);
+          }
+        } else {
+          std::vector<double> background = {
+            descriptor->createBackground[0],
+            descriptor->createBackground[1],
+            descriptor->createBackground[2]
+          };
+          if (descriptor->createChannels == 4) {
+            background.push_back(descriptor->createBackground[3]);
+          }
+          image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight).new_from_image(background);
         }
-        image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight).new_from_image(background);
         image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
         imageType = ImageType::RAW;
       } else {
