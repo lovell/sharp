@@ -38,11 +38,11 @@ Implements the [stream.Duplex][1] class.
         -   `options.create.width` **[number][8]?** integral number of pixels wide.
         -   `options.create.height` **[number][8]?** integral number of pixels high.
         -   `options.create.channels` **[number][8]?** integral number of channels, either 3 (RGB) or 4 (RGBA).
-        -   `options.create.noise` **[Object][6]?** describes a noise to be created.
-            -    `options.create.noise.type` **[string][5]?** type of generated noise. (supported: `gaussian`)
-            -    `options.create.noise.mean` **[number][8]?** mean of pixels in generated image.
-            -    `options.create.noise.sigma` **[number][8]?** standard deviation of pixels in generated image.
         -   `options.create.background` **([string][5] \| [Object][6])?** parsed by the [color][9] module to extract values for red, green, blue and alpha.
+        -   `options.create.noise` **[Object][6]?** describes a noise to be created.
+            -   `options.create.noise.type` **[string][5]?** type of generated noise, currently only `gaussian` is supported.
+            -   `options.create.noise.mean` **[number][8]?** mean of pixels in generated noise.
+            -   `options.create.noise.sigma` **[number][8]?** standard deviation of pixels in generated noise.
 
 ### Examples
 
@@ -101,6 +101,22 @@ const image = sharp(input, {
   }
 });
 await image.toFile('my-two-pixels.png');
+```
+
+```javascript
+// Generate RGB Gaussian noise
+await sharp({
+  create: {
+    width: 300,
+    height: 200,
+    channels: 3,
+    noise: {
+      type: 'gaussian',
+      mean: 128,
+      sigma: 30
+    }
+ }
+}.toFile('noise.png');
 ```
 
 -   Throws **[Error][10]** Invalid parameters
