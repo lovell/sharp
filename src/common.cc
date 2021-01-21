@@ -195,31 +195,38 @@ namespace sharp {
     return id;
   }
 
+  /**
+   * Regenerate this table with something like:
+   *
+   * $ vips -l foreign | grep -i load | awk '{ print $2, $1; }'
+   *
+   * Plus a bit of editing.
+   */
   std::map<std::string, ImageType> loaderToType = {
-    { "jpegload", ImageType::JPEG },
-    { "jpegload_buffer", ImageType::JPEG },
-    { "pngload", ImageType::PNG },
-    { "pngload_buffer", ImageType::PNG },
-    { "webpload", ImageType::WEBP },
-    { "webpload_buffer", ImageType::WEBP },
-    { "tiffload", ImageType::TIFF },
-    { "tiffload_buffer", ImageType::TIFF },
-    { "gifload", ImageType::GIF },
-    { "gifload_buffer", ImageType::GIF },
-    { "svgload", ImageType::SVG },
-    { "svgload_buffer", ImageType::SVG },
-    { "heifload", ImageType::HEIF },
-    { "heifload_buffer", ImageType::HEIF },
-    { "pdfload", ImageType::PDF },
-    { "pdfload_buffer", ImageType::PDF },
-    { "magickload", ImageType::MAGICK },
-    { "magickload_buffer", ImageType::MAGICK },
-    { "openslideload", ImageType::OPENSLIDE },
-    { "ppmload", ImageType::PPM },
-    { "fitsload", ImageType::FITS },
-    { "openexrload", ImageType::EXR },
-    { "vipsload", ImageType::VIPS },
-    { "rawload", ImageType::RAW }
+    { "VipsForeignLoadJpegFile", ImageType::JPEG },
+    { "VipsForeignLoadJpegBuffer", ImageType::JPEG },
+    { "VipsForeignLoadPngFile", ImageType::PNG },
+    { "VipsForeignLoadPngBuffer", ImageType::PNG },
+    { "VipsForeignLoadWebpFile", ImageType::WEBP },
+    { "VipsForeignLoadWebpBuffer", ImageType::WEBP },
+    { "VipsForeignLoadTiffFile", ImageType::TIFF },
+    { "VipsForeignLoadTiffBuffer", ImageType::TIFF },
+    { "VipsForeignLoadGifFile", ImageType::GIF },
+    { "VipsForeignLoadGifBuffer", ImageType::GIF },
+    { "VipsForeignLoadSvgFile", ImageType::SVG },
+    { "VipsForeignLoadSvgBuffer", ImageType::SVG },
+    { "VipsForeignLoadHeifFile", ImageType::HEIF },
+    { "VipsForeignLoadHeifBuffer", ImageType::HEIF },
+    { "VipsForeignLoadPdfFile", ImageType::PDF },
+    { "VipsForeignLoadPdfBuffer", ImageType::PDF },
+    { "VipsForeignLoadMagickFile", ImageType::MAGICK },
+    { "VipsForeignLoadMagickBuffer", ImageType::MAGICK },
+    { "VipsForeignLoadOpenslide", ImageType::OPENSLIDE },
+    { "VipsForeignLoadPpmFile", ImageType::PPM },
+    { "VipsForeignLoadFits", ImageType::FITS },
+    { "VipsForeignLoadOpenexr", ImageType::EXR },
+    { "VipsForeignLoadVips", ImageType::VIPS },
+    { "VipsForeignLoadRaw", ImageType::RAW }
   };
 
   /*
@@ -229,7 +236,7 @@ namespace sharp {
     ImageType imageType = ImageType::UNKNOWN;
     char const *load = vips_foreign_find_load_buffer(buffer, length);
     if (load != nullptr) {
-      auto it = loaderToType.find(vips_nickname_find(g_type_from_name(load)));
+      auto it = loaderToType.find(load);
       if (it != loaderToType.end()) {
         imageType = it->second;
       }
@@ -244,7 +251,7 @@ namespace sharp {
     ImageType imageType = ImageType::UNKNOWN;
     char const *load = vips_foreign_find_load(file);
     if (load != nullptr) {
-      auto it = loaderToType.find(vips_nickname_find(g_type_from_name(load)));
+      auto it = loaderToType.find(load);
       if (it != loaderToType.end()) {
         imageType = it->second;
       }
