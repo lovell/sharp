@@ -198,3 +198,32 @@ The main thread must call `require('sharp')`
 before worker threads are created
 to ensure shared libraries remain loaded in memory
 until after all threads are complete.
+
+## Known conflicts
+
+### Electron and Linux
+
+The prebuilt binaries provided by Electron for Linux depend on many shared system libraries.
+
+One of these, `libgobject-2.0.so`,
+is known to conflict with the statically-linked binaries provided by sharp
+and the following error can occur:
+```
+basic_string::_S_construct null not valid
+```
+
+To workaround this, set the `LD_PRELOAD` environment variable before the `electron` binary is run.
+```sh
+LD_PRELOAD=node_modules/sharp/vendor/8.10.5/lib/libvips.so.42 electron script.js
+```
+
+### Canvas and Windows
+
+The prebuilt binaries provided by `canvas` for Windows depend on the unmaintained GTK 2, last updated in 2011.
+
+These conflict with the modern, up-to-date binaries provided by sharp.
+
+If both modules are used in the same Windows process, the following error will occur:
+```
+The specified procedure could not be found.
+```
