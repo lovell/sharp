@@ -50,7 +50,9 @@ The following platforms require compilation of both libvips and sharp from sourc
 The architecture and platform of Node.js used for `npm install`
 must be the same as the architecture and platform of Node.js used at runtime.
 
-The `npm install --unsafe-perm` flag must be used when installing as `root` or a `sudo` user.
+When using npm v6 or earlier, the `npm install --unsafe-perm` flag must be used when installing as `root` or a `sudo` user.
+
+When using npm v7, the user running `npm install` must own the directory it is run in.
 
 The `npm install --ignore-scripts=false` flag must be used when `npm` has been configured to ignore installation scripts.
 
