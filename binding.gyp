@@ -140,8 +140,7 @@
             'link_settings': {
               'library_dirs': ['<(sharp_vendor_dir)/lib'],
               'libraries': [
-                'libvips-cpp.42.dylib',
-                'libvips.42.dylib'
+                'libvips-cpp.42.dylib'
               ]
             },
             'xcode_settings': {
@@ -158,8 +157,7 @@
             'link_settings': {
               'library_dirs': ['<(sharp_vendor_dir)/lib'],
               'libraries': [
-                '-l:libvips-cpp.so.42',
-                '-l:libvips.so.42'
+                '-l:libvips-cpp.so.42'
               ],
               'ldflags': [
                 # Ensure runtime linking is relative to sharp.node
