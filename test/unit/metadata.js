@@ -504,6 +504,7 @@ describe('Image metadata', function () {
   it('Apply CMYK output ICC profile', function (done) {
     const output = fixtures.path('output.icc-cmyk.jpg');
     sharp(fixtures.inputJpg)
+      .resize(64)
       .withMetadata({ icc: 'cmyk' })
       .toFile(output, function (err, info) {
         if (err) throw err;
@@ -528,11 +529,11 @@ describe('Image metadata', function () {
   it('Apply custom output ICC profile', function (done) {
     const output = fixtures.path('output.hilutite.jpg');
     sharp(fixtures.inputJpg)
+      .resize(64)
       .withMetadata({ icc: fixtures.path('hilutite.icm') })
       .toFile(output, function (err, info) {
         if (err) throw err;
         fixtures.assertMaxColourDistance(output, fixtures.path('expected/hilutite.jpg'), 0);
-        fixtures.assertMaxColourDistance(output, fixtures.inputJpg, 16.5);
         done();
       });
   });
