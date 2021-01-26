@@ -533,7 +533,7 @@ describe('Image metadata', function () {
       .withMetadata({ icc: fixtures.path('hilutite.icm') })
       .toFile(output, function (err, info) {
         if (err) throw err;
-        fixtures.assertMaxColourDistance(output, fixtures.path('expected/hilutite.jpg'), 0);
+        fixtures.assertMaxColourDistance(output, fixtures.path('expected/hilutite.jpg'), 9);
         done();
       });
   });
