@@ -48,6 +48,14 @@ By default output image will be web-friendly sRGB, with additional channels inte
 
 -   `colourspace` **[string][1]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][6]
 
+### Examples
+
+```javascript
+// Output 16 bits per pixel RGB
+await sharp(input)
+ .toColourspace('rgb16')
+ .toFile('16-bpp.png')
+```
 
 -   Throws **[Error][4]** Invalid parameters
 
