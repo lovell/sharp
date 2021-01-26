@@ -8,6 +8,8 @@ const rimraf = require('rimraf');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
+const outputTiff = fixtures.path('output.tiff');
+
 describe('TIFF', function () {
   it('Load TIFF from Buffer', function (done) {
     const inputTiffBuffer = fs.readFileSync(fixtures.inputTiff);
@@ -120,11 +122,11 @@ describe('TIFF', function () {
         compression: 'none',
         predictor: 'none'
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
+      .toFile(outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert.strictEqual(startSize, info.size);
-        rimraf(fixtures.outputTiff, done);
+        rimraf(outputTiff, done);
       });
   });
 
@@ -137,11 +139,11 @@ describe('TIFF', function () {
         compression: 'none',
         predictor: 'none'
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
+      .toFile(outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < (startSize / 2));
-        rimraf(fixtures.outputTiff, done);
+        rimraf(outputTiff, done);
       });
   });
 
@@ -157,12 +159,12 @@ describe('TIFF', function () {
         xres: 1000,
         yres: 1000
       })
-      .toFile(fixtures.outputTiff)
-      .then(() => sharp(fixtures.outputTiff)
+      .toFile(outputTiff)
+      .then(() => sharp(outputTiff)
         .metadata()
         .then(({ density }) => {
           assert.strictEqual(25400, density);
-          return promisify(rimraf)(fixtures.outputTiff);
+          return promisify(rimraf)(outputTiff);
         })
       )
   );
@@ -201,12 +203,12 @@ describe('TIFF', function () {
         compression: 'lzw',
         predictor: 'horizontal'
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
+      .toFile(outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert.strictEqual(3, info.channels);
         assert(info.size < startSize);
-        rimraf(fixtures.outputTiff, done);
+        rimraf(outputTiff, done);
       });
   });
 
@@ -222,7 +224,7 @@ describe('TIFF', function () {
       .tiff({
         compression: 'lzw'
       })
-      .toFile(fixtures.outputTiff)
+      .toFile(outputTiff)
       .then(info => {
         assert.strictEqual(4, info.channels);
       })
@@ -254,11 +256,11 @@ describe('TIFF', function () {
         bitdepth: 1,
         compression: 'ccittfax4'
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
+      .toFile(outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        rimraf(fixtures.outputTiff, done);
+        rimraf(outputTiff, done);
       });
   });
 
@@ -269,11 +271,11 @@ describe('TIFF', function () {
         compression: 'deflate',
         predictor: 'horizontal'
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
+      .toFile(outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        rimraf(fixtures.outputTiff, done);
+        rimraf(outputTiff, done);
       });
   });
 
@@ -284,11 +286,11 @@ describe('TIFF', function () {
         compression: 'deflate',
         predictor: 'float'
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
+      .toFile(outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size > startSize);
-        rimraf(fixtures.outputTiff, done);
+        rimraf(outputTiff, done);
       });
   });
 
@@ -299,11 +301,11 @@ describe('TIFF', function () {
         compression: 'deflate',
         predictor: 'none'
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
+      .toFile(outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        rimraf(fixtures.outputTiff, done);
+        rimraf(outputTiff, done);
       });
   });
 
@@ -313,11 +315,11 @@ describe('TIFF', function () {
       .tiff({
         compression: 'jpeg'
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
+      .toFile(outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        rimraf(fixtures.outputTiff, done);
+        rimraf(outputTiff, done);
       });
   });
 
@@ -385,11 +387,11 @@ describe('TIFF', function () {
         tileHeight: 256,
         tileWidth: 256
       })
-      .toFile(fixtures.outputTiff, (err, info) => {
+      .toFile(outputTiff, (err, info) => {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size > startSize);
-        rimraf(fixtures.outputTiff, done);
+        rimraf(outputTiff, done);
       });
   });
 

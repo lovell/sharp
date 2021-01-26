@@ -120,13 +120,6 @@ module.exports = {
 
   inputV: getPath('vfile.v'),
 
-  outputJpg: getPath('output.jpg'),
-  outputPng: getPath('output.png'),
-  outputWebP: getPath('output.webp'),
-  outputV: getPath('output.v'),
-  outputTiff: getPath('output.tiff'),
-  outputZoinks: getPath('output.zoinks'), // an 'unknown' file extension
-
   testPattern: getPath('test-pattern.png'),
 
   // Path for tests requiring human inspection

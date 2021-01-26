@@ -15,6 +15,10 @@ const jimp = require('jimp');
 
 const fixtures = require('../fixtures');
 
+const outputJpg = fixtures.path('output.jpg');
+const outputPng = fixtures.path('output.png');
+const outputWebP = fixtures.path('output.webp');
+
 const width = 720;
 const height = 588;
 
@@ -56,7 +60,7 @@ async.series({
             image
               .resize(width, height, jimp.RESIZE_BICUBIC)
               .quality(80)
-              .write(fixtures.outputJpg, function (err) {
+              .write(outputJpg, function (err) {
                 if (err) {
                   throw err;
                 } else {
@@ -77,7 +81,7 @@ async.series({
             .resize(width, height, {
               scaling_method: mapnik.imageScaling.lanczos
             })
-            .save(fixtures.outputJpg, 'jpeg:quality=80', function (err) {
+            .save(outputJpg, 'jpeg:quality=80', function (err) {
               if (err) throw err;
               deferred.resolve();
             });
@@ -105,7 +109,7 @@ async.series({
       fn: function (deferred) {
         imagemagick.resize({
           srcPath: fixtures.inputJpg,
-          dstPath: fixtures.outputJpg,
+          dstPath: outputJpg,
           quality: 0.8,
           width: width,
           height: height,
@@ -128,7 +132,7 @@ async.series({
           .filter('Lanczos')
           .resize(width, height)
           .quality(80)
-          .write(fixtures.outputJpg, function (err) {
+          .write(outputJpg, function (err) {
             if (err) {
               throw err;
             } else {
@@ -159,7 +163,7 @@ async.series({
           .filter('Lanczos')
           .resize(width, height)
           .quality(80)
-          .write(fixtures.outputJpg, function (err) {
+          .write(outputJpg, function (err) {
             if (err) {
               throw err;
             } else {
@@ -190,7 +194,7 @@ async.series({
       fn: function (deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .toFile(fixtures.outputJpg, function (err) {
+          .toFile(outputJpg, function (err) {
             if (err) {
               throw err;
             } else {
@@ -217,7 +221,7 @@ async.series({
       fn: function (deferred) {
         sharp(fixtures.inputJpg)
           .resize(width, height)
-          .toFile(fixtures.outputJpg, function (err) {
+          .toFile(outputJpg, function (err) {
             if (err) {
               throw err;
             } else {
@@ -229,7 +233,7 @@ async.series({
       defer: true,
       fn: function (deferred) {
         const readable = fs.createReadStream(fixtures.inputJpg);
-        const writable = fs.createWriteStream(fixtures.outputJpg);
+        const writable = fs.createWriteStream(outputJpg);
         writable.on('finish', function () {
           deferred.resolve();
         });
@@ -600,7 +604,7 @@ async.series({
               .resize(width, height)
               .deflateLevel(6)
               .filterType(0)
-              .write(fixtures.outputPng, function (err) {
+              .write(outputPng, function (err) {
                 if (err) {
                   throw err;
                 } else {
@@ -625,7 +629,7 @@ async.series({
               if (err) throw err;
               img.demultiply(function (err, img) {
                 if (err) throw err;
-                img.save(fixtures.outputPng, 'png', function (err) {
+                img.save(outputPng, 'png', function (err) {
                   if (err) throw err;
                   deferred.resolve();
                 });
@@ -663,7 +667,7 @@ async.series({
       fn: function (deferred) {
         imagemagick.resize({
           srcPath: fixtures.inputPngAlphaPremultiplicationLarge,
-          dstPath: fixtures.outputPng,
+          dstPath: outputPng,
           width: width,
           height: height,
           filter: 'Lanczos',
@@ -689,7 +693,7 @@ async.series({
           .resize(width, height)
           .define('PNG:compression-level=6')
           .define('PNG:compression-filter=0')
-          .write(fixtures.outputPng, function (err) {
+          .write(outputPng, function (err) {
             if (err) {
               throw err;
             } else {
@@ -723,7 +727,7 @@ async.series({
         sharp(inputPngBuffer)
           .resize(width, height)
           .png({ compressionLevel: 6 })
-          .toFile(fixtures.outputPng, function (err) {
+          .toFile(outputPng, function (err) {
             if (err) {
               throw err;
             } else {
@@ -754,7 +758,7 @@ async.series({
         sharp(fixtures.inputPngAlphaPremultiplicationLarge)
           .resize(width, height)
           .png({ compressionLevel: 6 })
-          .toFile(fixtures.outputPng, function (err) {
+          .toFile(outputPng, function (err) {
             if (err) {
               throw err;
             } else {
@@ -841,7 +845,7 @@ async.series({
       fn: function (deferred) {
         sharp(inputWebPBuffer)
           .resize(width, height)
-          .toFile(fixtures.outputWebP, function (err) {
+          .toFile(outputWebP, function (err) {
             if (err) {
               throw err;
             } else {
@@ -868,7 +872,7 @@ async.series({
       fn: function (deferred) {
         sharp(fixtures.inputWebP)
           .resize(width, height)
-          .toFile(fixtures.outputWebP, function (err) {
+          .toFile(outputWebP, function (err) {
             if (err) {
               throw err;
             } else {

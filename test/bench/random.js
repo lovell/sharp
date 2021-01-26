@@ -23,7 +23,7 @@ new Benchmark.Suite('random').add('imagemagick', {
   fn: function (deferred) {
     imagemagick.resize({
       srcPath: fixtures.inputJpg,
-      dstPath: fixtures.outputJpg,
+      dstPath: fixtures.path('output.jpg'),
       quality: 0.8,
       width: randomDimension(),
       height: randomDimension(),

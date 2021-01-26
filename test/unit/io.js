@@ -7,6 +7,8 @@ const rimraf = require('rimraf');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
+const outputJpg = fixtures.path('output.jpg');
+
 describe('Input/output', function () {
   beforeEach(function () {
     sharp.cache(false);
@@ -16,16 +18,16 @@ describe('Input/output', function () {
   });
 
   it('Read from File and write to Stream', function (done) {
-    const writable = fs.createWriteStream(fixtures.outputJpg);
+    const writable = fs.createWriteStream(outputJpg);
     writable.on('close', function () {
-      sharp(fixtures.outputJpg).toBuffer(function (err, data, info) {
+      sharp(outputJpg).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        rimraf(fixtures.outputJpg, done);
+        rimraf(outputJpg, done);
       });
     });
     sharp(fixtures.inputJpg).resize(320, 240).pipe(writable);
@@ -33,16 +35,16 @@ describe('Input/output', function () {
 
   it('Read from Buffer and write to Stream', function (done) {
     const inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
-    const writable = fs.createWriteStream(fixtures.outputJpg);
+    const writable = fs.createWriteStream(outputJpg);
     writable.on('close', function () {
-      sharp(fixtures.outputJpg).toBuffer(function (err, data, info) {
+      sharp(outputJpg).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        rimraf(fixtures.outputJpg, done);
+        rimraf(outputJpg, done);
       });
     });
     sharp(inputJpgBuffer).resize(320, 240).pipe(writable);
@@ -50,13 +52,13 @@ describe('Input/output', function () {
 
   it('Read from Stream and write to File', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
-    const pipeline = sharp().resize(320, 240).toFile(fixtures.outputJpg, function (err, info) {
+    const pipeline = sharp().resize(320, 240).toFile(outputJpg, function (err, info) {
       if (err) throw err;
       assert.strictEqual(true, info.size > 0);
       assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
-      rimraf(fixtures.outputJpg, done);
+      rimraf(outputJpg, done);
     });
     readable.pipe(pipeline);
   });
@@ -131,16 +133,16 @@ describe('Input/output', function () {
 
   it('Read from Stream and write to Stream', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
-    const writable = fs.createWriteStream(fixtures.outputJpg);
+    const writable = fs.createWriteStream(outputJpg);
     writable.on('close', function () {
-      sharp(fixtures.outputJpg).toBuffer(function (err, data, info) {
+      sharp(outputJpg).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        rimraf(fixtures.outputJpg, done);
+        rimraf(outputJpg, done);
       });
     });
     const pipeline = sharp().resize(320, 240);
@@ -181,7 +183,7 @@ describe('Input/output', function () {
 
   it('Stream should emit info event', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
-    const writable = fs.createWriteStream(fixtures.outputJpg);
+    const writable = fs.createWriteStream(outputJpg);
     const pipeline = sharp().resize(320, 240);
     let infoEventEmitted = false;
     pipeline.on('info', function (info) {
@@ -193,7 +195,7 @@ describe('Input/output', function () {
     });
     writable.on('close', function () {
       assert.strictEqual(true, infoEventEmitted);
-      rimraf(fixtures.outputJpg, done);
+      rimraf(outputJpg, done);
     });
     readable.pipe(pipeline).pipe(writable);
   });
@@ -205,10 +207,10 @@ describe('Input/output', function () {
       anErrorWasEmitted = !!err;
     }).on('end', function () {
       assert(anErrorWasEmitted);
-      rimraf(fixtures.outputJpg, done);
+      rimraf(outputJpg, done);
     });
     const readableButNotAnImage = fs.createReadStream(__filename);
-    const writable = fs.createWriteStream(fixtures.outputJpg);
+    const writable = fs.createWriteStream(outputJpg);
     readableButNotAnImage.pipe(pipeline).pipe(writable);
   });
 
@@ -219,24 +221,24 @@ describe('Input/output', function () {
       anErrorWasEmitted = !!err;
     }).on('end', function () {
       assert(anErrorWasEmitted);
-      rimraf(fixtures.outputJpg, done);
+      rimraf(outputJpg, done);
     });
-    const writable = fs.createWriteStream(fixtures.outputJpg);
+    const writable = fs.createWriteStream(outputJpg);
     readableButNotAnImage.pipe(writable);
   });
 
   it('Readable side of Stream can start flowing after Writable side has finished', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
-    const writable = fs.createWriteStream(fixtures.outputJpg);
+    const writable = fs.createWriteStream(outputJpg);
     writable.on('close', function () {
-      sharp(fixtures.outputJpg).toBuffer(function (err, data, info) {
+      sharp(outputJpg).toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        rimraf(fixtures.outputJpg, done);
+        rimraf(outputJpg, done);
       });
     });
     const pipeline = sharp().resize(320, 240);
@@ -443,68 +445,70 @@ describe('Input/output', function () {
   });
 
   describe('Output filename with unknown extension', function () {
+    const outputZoinks = fixtures.path('output.zoinks');
+
     it('Match JPEG input', function (done) {
       sharp(fixtures.inputJpg)
         .resize(320, 80)
-        .toFile(fixtures.outputZoinks, function (err, info) {
+        .toFile(outputZoinks, function (err, info) {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(fixtures.outputZoinks, done);
+          rimraf(outputZoinks, done);
         });
     });
 
     it('Match PNG input', function (done) {
       sharp(fixtures.inputPng)
         .resize(320, 80)
-        .toFile(fixtures.outputZoinks, function (err, info) {
+        .toFile(outputZoinks, function (err, info) {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('png', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(fixtures.outputZoinks, done);
+          rimraf(outputZoinks, done);
         });
     });
 
     it('Match WebP input', function (done) {
       sharp(fixtures.inputWebP)
         .resize(320, 80)
-        .toFile(fixtures.outputZoinks, function (err, info) {
+        .toFile(outputZoinks, function (err, info) {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('webp', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(fixtures.outputZoinks, done);
+          rimraf(outputZoinks, done);
         });
     });
 
     it('Match TIFF input', function (done) {
       sharp(fixtures.inputTiff)
         .resize(320, 80)
-        .toFile(fixtures.outputZoinks, function (err, info) {
+        .toFile(outputZoinks, function (err, info) {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('tiff', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(fixtures.outputZoinks, done);
+          rimraf(outputZoinks, done);
         });
     });
 
     it('Autoconvert GIF input to PNG output', function (done) {
       sharp(fixtures.inputGif)
         .resize(320, 80)
-        .toFile(fixtures.outputZoinks, function (err, info) {
+        .toFile(outputZoinks, function (err, info) {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual(sharp.format.magick.input.buffer ? 'gif' : 'png', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(fixtures.outputZoinks, done);
+          rimraf(outputZoinks, done);
         });
     });
 
@@ -512,13 +516,13 @@ describe('Input/output', function () {
       sharp(fixtures.inputPng)
         .resize(320, 80)
         .jpeg()
-        .toFile(fixtures.outputZoinks, function (err, info) {
+        .toFile(outputZoinks, function (err, info) {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(fixtures.outputZoinks, done);
+          rimraf(outputZoinks, done);
         });
     });
   });
@@ -548,19 +552,20 @@ describe('Input/output', function () {
   });
 
   it('toFormat=JPEG takes precedence over WebP extension', function (done) {
+    const outputWebP = fixtures.path('output.webp');
     sharp(fixtures.inputPng)
       .jpeg()
-      .toFile(fixtures.outputWebP, function (err, info) {
+      .toFile(outputWebP, function (err, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
-        done();
+        rimraf(outputWebP, done);
       });
   });
 
   it('toFormat=WebP takes precedence over JPEG extension', function (done) {
     sharp(fixtures.inputPng)
       .webp()
-      .toFile(fixtures.outputJpg, function (err, info) {
+      .toFile(outputJpg, function (err, info) {
         if (err) throw err;
         assert.strictEqual('webp', info.format);
         done();
@@ -581,15 +586,16 @@ describe('Input/output', function () {
   });
 
   it('Save Vips V file', function (done) {
+    const outputV = fixtures.path('output.v');
     sharp(fixtures.inputJpg)
       .extract({ left: 910, top: 1105, width: 70, height: 60 })
-      .toFile(fixtures.outputV, function (err, info) {
+      .toFile(outputV, function (err, info) {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
         assert.strictEqual('v', info.format);
         assert.strictEqual(70, info.width);
         assert.strictEqual(60, info.height);
-        rimraf(fixtures.outputV, done);
+        rimraf(outputV, done);
       });
   });
 
