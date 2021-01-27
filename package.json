@@ -132,7 +132,7 @@
     "async": "^3.2.0",
     "cc": "^3.0.1",
     "decompress-zip": "^0.3.3",
-    "documentation": "^13.1.0",
+    "documentation": "^13.1.1",
     "exif-reader": "^1.0.3",
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
