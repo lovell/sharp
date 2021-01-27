@@ -4,7 +4,7 @@
 
 Requires libvips v8.10.5
 
-### v0.27.1 - TBD
+### v0.27.1 - 27th January 2021
 
 * Ensure TIFF is cast when using float predictor.
   [#2502](https://github.com/lovell/sharp/pull/2502)
