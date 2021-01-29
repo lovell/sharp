@@ -17,7 +17,7 @@ const extractKeywords = (str) =>
       str
         .split(/[ -/]/)
         .map((word) => word.toLowerCase().replace(/[^a-z]/g, ''))
-        .filter((word) => word.length > 2 && !stopWords.includes(word))
+        .filter((word) => word.length > 2 && word.length < 15 && !stopWords.includes(word))
     )
   ].join(' ');
 
