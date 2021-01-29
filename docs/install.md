@@ -192,6 +192,18 @@ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs12.x npm install sharp
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
+## Webpack
+
+Ensure sharp is added to the
+[externals](https://webpack.js.org/configuration/externals/)
+configuration.
+
+```js
+externals: {
+  'sharp': 'commonjs sharp'
+}
+```
+
 ## Worker threads
 
 The main thread must call `require('sharp')`
