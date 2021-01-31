@@ -116,7 +116,7 @@ await sharp({
       sigma: 30
     }
  }
-}.toFile('noise.png');
+}).toFile('noise.png');
 ```
 
 -   Throws **[Error][10]** Invalid parameters
