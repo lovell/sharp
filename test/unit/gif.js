@@ -63,12 +63,17 @@ describe('GIF input', () => {
   );
 
   if (!sharp.format.magick.output.buffer) {
-    it('GIF output should fail due to missing ImageMagick', () => {
+    it('GIF buffer output should fail due to missing ImageMagick', () => {
       assert.throws(
-        () => {
-          sharp().gif();
-        },
-        /The gif operation requires libvips to have been installed with support for ImageMagick/
+        () => sharp().gif(),
+        /GIF output requires libvips with support for ImageMagick/
+      );
+    });
+
+    it('GIF file output should fail due to missing ImageMagick', () => {
+      assert.rejects(
+        async () => await sharp().toFile('test.gif'),
+        /GIF output requires libvips with support for ImageMagick/
       );
     });
   }
