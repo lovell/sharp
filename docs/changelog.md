@@ -10,6 +10,9 @@ Requires libvips v8.10.5
   [#2581](https://github.com/lovell/sharp/pull/2581)
   [@florian-busch](https://github.com/florian-busch)
 
+* Allow use of `recomb` operation with single channel input.
+  [#2584](https://github.com/lovell/sharp/issues/2584)
+
 ### v0.27.1 - 27th January 2021
 
 * Ensure TIFF is cast when using float predictor.

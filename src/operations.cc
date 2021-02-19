@@ -149,8 +149,8 @@ namespace sharp {
    */
   VImage Recomb(VImage image, std::unique_ptr<double[]> const &matrix) {
     double *m = matrix.get();
+    image = image.colourspace(VIPS_INTERPRETATION_sRGB);
     return image
-      .colourspace(VIPS_INTERPRETATION_sRGB)
       .recomb(image.bands() == 3
         ? VImage::new_from_memory(
           m, 9 * sizeof(double), 3, 3, 1, VIPS_FORMAT_DOUBLE
