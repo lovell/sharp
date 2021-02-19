@@ -206,3 +206,6 @@ GitHub: https://github.com/stefanprobst
 
 Name: Thomas Beiganz
 GitHub: https://github.com/beig
+
+Name: Florian Busch
+GitHub: https://github.com/florian-busch

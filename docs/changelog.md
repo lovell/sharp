@@ -4,6 +4,12 @@
 
 Requires libvips v8.10.5
 
+### v0.27.2 - TBD
+
+* Allow the use of non lower case extensions with `toFormat`.
+  [#2581](https://github.com/lovell/sharp/pull/2581)
+  [@florian-busch](https://github.com/florian-busch)
+
 ### v0.27.1 - 27th January 2021
 
 * Ensure TIFF is cast when using float predictor.
