@@ -18,7 +18,7 @@ Ready-compiled sharp and libvips binaries are provided for use with
 Node.js v10+ on the most common platforms:
 
 * macOS x64 (>= 10.13)
-* Linux x64 (glibc >= 2.17, musl >= 1.1.24)
+* Linux x64 (glibc >= 2.17, musl >=1.1.24 <1.2.0)
 * Linux ARM64 (glibc >= 2.29)
 * Windows x64
 * Windows x86
