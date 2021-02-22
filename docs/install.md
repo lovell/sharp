@@ -60,7 +60,13 @@ Check the output of running `npm install --verbose sharp` for useful error messa
 
 ## Apple M1
 
-libvips must currently be installed via Homebrew before installing sharp.
+If you are using ARM64 Node.js, which can be checked using:
+
+```sh
+node -p "process.arch === 'arm64'"
+```
+
+then libvips must currently be installed via Homebrew before installing sharp.
 
 ```sh
 brew install vips

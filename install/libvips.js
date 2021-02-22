@@ -74,6 +74,9 @@ try {
     if (arch === 'ia32' && !platformAndArch.startsWith('win32')) {
       throw new Error(`Intel Architecture 32-bit systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
+    if (platformAndArch === 'darwin-arm64') {
+      throw new Error("Please run 'brew install vips' to install libvips on Apple M1 (ARM64) systems");
+    }
     if (platformAndArch === 'freebsd-x64' || platformAndArch === 'openbsd-x64' || platformAndArch === 'sunos-x64') {
       throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
