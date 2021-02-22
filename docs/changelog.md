@@ -4,7 +4,13 @@
 
 Requires libvips v8.10.5
 
-### v0.27.2 - TBD
+### v0.27.2 - 22nd February 2021
+
+* macOS: Prevent use of globally-installed ARM64 libvips with Rosetta x64 emulation.
+  [#2460](https://github.com/lovell/sharp/issues/2460)
+
+* Linux (musl): Prevent use of prebuilt linuxmusl-x64 binaries with musl >= 1.2.0.
+  [#2570](https://github.com/lovell/sharp/issues/2570)
 
 * Improve 16-bit grey+alpha support by using libvips' `has_alpha` detection.
   [#2569](https://github.com/lovell/sharp/issues/2569)
