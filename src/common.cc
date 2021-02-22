@@ -421,12 +421,7 @@ namespace sharp {
     Uses colour space interpretation with number of channels to guess this.
   */
   bool HasAlpha(VImage image) {
-    int const bands = image.bands();
-    VipsInterpretation const interpretation = image.interpretation();
-    return (
-      (bands == 2 && interpretation == VIPS_INTERPRETATION_B_W) ||
-      (bands == 4 && interpretation != VIPS_INTERPRETATION_CMYK) ||
-      (bands == 5 && interpretation == VIPS_INTERPRETATION_CMYK));
+    return image.has_alpha();
   }
 
   /*

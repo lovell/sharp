@@ -6,6 +6,9 @@ Requires libvips v8.10.5
 
 ### v0.27.2 - TBD
 
+* Improve 16-bit grey+alpha support by using libvips' `has_alpha` detection.
+  [#2569](https://github.com/lovell/sharp/issues/2569)
+
 * Allow the use of non lower case extensions with `toFormat`.
   [#2581](https://github.com/lovell/sharp/pull/2581)
   [@florian-busch](https://github.com/florian-busch)
