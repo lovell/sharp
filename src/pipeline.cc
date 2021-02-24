@@ -602,8 +602,13 @@ class PipelineWorker : public Napi::AsyncWorker {
           int top;
           if (composite->hasOffset) {
             // Composite image at given offsets
-            std::tie(left, top) = sharp::CalculateCrop(image.width(), image.height(),
-              compositeImage.width(), compositeImage.height(), composite->left, composite->top);
+            if (composite->tile) {
+              std::tie(left, top) = sharp::CalculateCrop(image.width(), image.height(),
+                compositeImage.width(), compositeImage.height(), composite->left, composite->top);
+            } else {
+              left = composite->left;
+              top = composite->top;
+            }
           } else {
             // Composite image with given gravity
             std::tie(left, top) = sharp::CalculateCrop(image.width(), image.height(),
