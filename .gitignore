@@ -16,3 +16,4 @@ vendor
 package-lock.json
 .idea
 .firebase
+/.vs
