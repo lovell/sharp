@@ -7,7 +7,6 @@ const stream = require('stream');
 const zlib = require('zlib');
 
 const detectLibc = require('detect-libc');
-const npmLog = require('npmlog');
 const semver = require('semver');
 const simpleGet = require('simple-get');
 const tarFs = require('tar-fs');
@@ -37,12 +36,12 @@ const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SH
 const supportsBrotli = ('BrotliDecompress' in zlib);
 
 const fail = function (err) {
-  npmLog.error('sharp', err.message);
+  libvips.log(err);
   if (err.code === 'EACCES') {
-    npmLog.info('sharp', 'Are you trying to install as a root or sudo user? Try again with the --unsafe-perm flag');
+    libvips.log('Are you trying to install as a root or sudo user? Try again with the --unsafe-perm flag');
   }
-  npmLog.info('sharp', 'Attempting to build from source via node-gyp but this may fail due to the above error');
-  npmLog.info('sharp', 'Please see https://sharp.pixelplumbing.com/install for required dependencies');
+  libvips.log('Attempting to build from source via node-gyp but this may fail due to the above error');
+  libvips.log('Please see https://sharp.pixelplumbing.com/install for required dependencies');
   process.exit(1);
 };
 
@@ -64,7 +63,7 @@ const extractTarball = function (tarPath, platformAndArch) {
     function (err) {
       if (err) {
         if (/unexpected end of file/.test(err.message)) {
-          npmLog.error('sharp', `Please delete ${tarPath} as it is not a valid tarball`);
+          fail(new Error(`Please delete ${tarPath} as it is not a valid tarball`));
         }
         fail(err);
       }
@@ -77,11 +76,11 @@ try {
 
   if (useGlobalLibvips) {
     const globalLibvipsVersion = libvips.globalLibvipsVersion();
-    npmLog.info('sharp', `Detected globally-installed libvips v${globalLibvipsVersion}`);
-    npmLog.info('sharp', 'Building from source via node-gyp');
+    libvips.log(`Detected globally-installed libvips v${globalLibvipsVersion}`);
+    libvips.log('Building from source via node-gyp');
     process.exit(1);
   } else if (libvips.hasVendoredLibvips()) {
-    npmLog.info('sharp', `Using existing vendored libvips v${minimumLibvipsVersion}`);
+    libvips.log(`Using existing vendored libvips v${minimumLibvipsVersion}`);
   } else {
     // Is this arch/platform supported?
     const arch = process.env.npm_config_arch || process.arch;
@@ -117,11 +116,11 @@ try {
     const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.' + extension;
     const tarPathCache = path.join(libvips.cachePath(), tarFilename);
     if (fs.existsSync(tarPathCache)) {
-      npmLog.info('sharp', `Using cached ${tarPathCache}`);
+      libvips.log(`Using cached ${tarPathCache}`);
       extractTarball(tarPathCache, platformAndArch);
     } else {
       const url = distBaseUrl + tarFilename;
-      npmLog.info('sharp', `Downloading ${url}`);
+      libvips.log(`Downloading ${url}`);
       simpleGet({ url: url, agent: agent() }, function (err, response) {
         if (err) {
           fail(err);

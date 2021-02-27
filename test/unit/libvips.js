@@ -105,4 +105,30 @@ describe('libvips binaries', function () {
       assert.strictEqual(true, fs.existsSync(nestedDirPath));
     });
   });
+
+  describe('logger', function () {
+    const consoleLog = console.log;
+    const consoleError = console.error;
+
+    after(function () {
+      console.log = consoleLog;
+      console.error = consoleError;
+    });
+
+    it('logs an info message', function (done) {
+      console.log = function (msg) {
+        assert.strictEqual(msg, 'sharp: progress');
+        done();
+      };
+      libvips.log('progress');
+    });
+
+    it('logs an error message', function (done) {
+      console.error = function (msg) {
+        assert.strictEqual(msg, 'sharp: problem');
+        done();
+      };
+      libvips.log(new Error('problem'));
+    });
+  });
 });
