@@ -123,7 +123,7 @@
     "npmlog": "^4.1.2",
     "prebuild-install": "^6.0.1",
     "semver": "^7.3.4",
-    "simple-get": "^4.0.0",
+    "simple-get": "^3.1.0",
     "tar-fs": "^2.1.1",
     "tunnel-agent": "^0.6.0"
   },
