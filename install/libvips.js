@@ -22,6 +22,15 @@ const minimumGlibcVersionByArch = {
   x64: '2.17'
 };
 
+const hasSharpPrebuild = [
+  'darwin-x64',
+  'linux-arm64',
+  'linux-x64',
+  'linuxmusl-x64',
+  'win32-ia32',
+  'win32-x64'
+];
+
 const { minimumLibvipsVersion, minimumLibvipsVersionLabelled } = libvips;
 const distHost = process.env.npm_config_sharp_libvips_binary_host || 'https://github.com/lovell/sharp-libvips/releases/download';
 const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SHARP_DIST_BASE_URL || `${distHost}/v${minimumLibvipsVersionLabelled}/`;
@@ -37,15 +46,21 @@ const fail = function (err) {
   process.exit(1);
 };
 
-const extractTarball = function (tarPath) {
+const extractTarball = function (tarPath, platformAndArch) {
   const vendorPath = path.join(__dirname, '..', 'vendor');
   libvips.mkdirSync(vendorPath);
   const versionedVendorPath = path.join(vendorPath, minimumLibvipsVersion);
   libvips.mkdirSync(versionedVendorPath);
+
+  const ignoreVendorInclude = hasSharpPrebuild.includes(platformAndArch) && !process.env.npm_config_build_from_source;
+  const ignore = function (name) {
+    return ignoreVendorInclude && name.includes('include/');
+  };
+
   stream.pipeline(
     fs.createReadStream(tarPath),
     supportsBrotli ? new zlib.BrotliDecompress() : new zlib.Gunzip(),
-    tarFs.extract(versionedVendorPath),
+    tarFs.extract(versionedVendorPath, { ignore }),
     function (err) {
       if (err) {
         if (/unexpected end of file/.test(err.message)) {
@@ -103,7 +118,7 @@ try {
     const tarPathCache = path.join(libvips.cachePath(), tarFilename);
     if (fs.existsSync(tarPathCache)) {
       npmLog.info('sharp', `Using cached ${tarPathCache}`);
-      extractTarball(tarPathCache);
+      extractTarball(tarPathCache, platformAndArch);
     } else {
       const url = distBaseUrl + tarFilename;
       npmLog.info('sharp', `Downloading ${url}`);
