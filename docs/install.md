@@ -130,7 +130,6 @@ Alibaba provide a mirror site based in China containing binaries for both sharp 
 To use this either set the following configuration:
 
 ```sh
-npm config set sharp_binary_host "https://npm.taobao.org/mirrors/sharp"
 npm config set sharp_libvips_binary_host "https://npm.taobao.org/mirrors/sharp-libvips"
 npm install sharp
 ```
@@ -138,9 +137,8 @@ npm install sharp
 or set the following environment variables:
 
 ```sh
-npm_config_sharp_binary_host="https://npm.taobao.org/mirrors/sharp" \
-  npm_config_sharp_libvips_binary_host="https://npm.taobao.org/mirrors/sharp-libvips" \
-  npm install sharp
+npm_config_sharp_libvips_binary_host="https://npm.taobao.org/mirrors/sharp-libvips" \
+npm install sharp
 ```
 
 ## FreeBSD
