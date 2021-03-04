@@ -105,8 +105,6 @@ try {
       npmLog.info('sharp', `Using cached ${tarPathCache}`);
       extractTarball(tarPathCache);
     } else {
-      const tarPathTemp = path.join(os.tmpdir(), `${process.pid}-${tarFilename}`);
-      const tmpFile = fs.createWriteStream(tarPathTemp);
       const url = distBaseUrl + tarFilename;
       npmLog.info('sharp', `Downloading ${url}`);
       simpleGet({ url: url, agent: agent() }, function (err, response) {
@@ -117,24 +115,37 @@ try {
         } else if (response.statusCode !== 200) {
           fail(new Error(`Status ${response.statusCode} ${response.statusMessage}`));
         } else {
+          const tarPathTemp = path.join(os.tmpdir(), `${process.pid}-${tarFilename}`);
+          const tmpFileStream = fs.createWriteStream(tarPathTemp);
           response
-            .on('error', fail)
-            .pipe(tmpFile);
+            .on('error', function (err) {
+              tmpFileStream.destroy(err);
+            })
+            .on('close', function () {
+              if (!response.complete) {
+                tmpFileStream.destroy(new Error('Download incomplete (connection was terminated)'));
+              }
+            })
+            .pipe(tmpFileStream);
+          tmpFileStream
+            .on('error', function (err) {
+              // Clean up temporary file
+              fs.unlinkSync(tarPathTemp);
+              fail(err);
+            })
+            .on('close', function () {
+              try {
+                // Attempt to rename
+                fs.renameSync(tarPathTemp, tarPathCache);
+              } catch (err) {
+                // Fall back to copy and unlink
+                fs.copyFileSync(tarPathTemp, tarPathCache);
+                fs.unlinkSync(tarPathTemp);
+              }
+              extractTarball(tarPathCache);
+            });
         }
       });
-      tmpFile
-        .on('error', fail)
-        .on('close', function () {
-          try {
-            // Attempt to rename
-            fs.renameSync(tarPathTemp, tarPathCache);
-          } catch (err) {
-            // Fall back to copy and unlink
-            fs.copyFileSync(tarPathTemp, tarPathCache);
-            fs.unlinkSync(tarPathTemp);
-          }
-          extractTarball(tarPathCache);
-        });
     }
   }
 } catch (err) {
