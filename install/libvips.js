@@ -26,6 +26,7 @@ const hasSharpPrebuild = [
   'linux-arm64',
   'linux-x64',
   'linuxmusl-x64',
+  'linuxmusl-arm64',
   'win32-ia32',
   'win32-x64'
 ];

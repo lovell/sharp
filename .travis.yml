@@ -58,5 +58,51 @@ jobs:
       install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
 
+    - name: "Linux ARM64v8 (Alpine 3.11, musl 1.1.24) - Node.js 10"
+      arch: arm64
+      os: linux
+      dist: focal
+      language: shell
+      before_install:
+        - sudo docker run -dit --name sharp --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10-alpine3.11
+        - sudo docker exec sharp sh -c "apk add build-base git python3 --update-cache"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
+      script: sudo docker exec sharp sh -c "npm test"
+      after_success: "[[ -n $TRAVIS_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"npx prebuild --runtime napi --target 3\""
+
+    - name: "Linux ARM64v8 (Alpine 3.11, musl 1.1.24) - Node.js 12"
+      arch: arm64
+      os: linux
+      dist: focal
+      language: shell
+      before_install:
+        - sudo docker run -dit --name sharp --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:12-alpine3.11
+        - sudo docker exec sharp sh -c "apk add build-base git python3 --update-cache"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
+      script: sudo docker exec sharp sh -c "npm test"
+
+    - name: "Linux ARM64v8 (Alpine 3.11, musl 1.1.24) - Node.js 14"
+      arch: arm64
+      os: linux
+      dist: focal
+      language: shell
+      before_install:
+        - sudo docker run -dit --name sharp --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:14-alpine3.11
+        - sudo docker exec sharp sh -c "apk add build-base git python3 --update-cache"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
+      script: sudo docker exec sharp sh -c "npm test"
+
+    - name: "Linux ARM64v8 (Alpine 3.11, musl 1.1.24) - Node.js 15"
+      arch: arm64
+      os: linux
+      dist: focal
+      language: shell
+      before_install:
+        - sudo chown 0.0 ${PWD}
+        - sudo docker run -dit --name sharp --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:15-alpine3.11
+        - sudo docker exec sharp sh -c "apk add build-base git python3 --update-cache"
+      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
+      script: sudo docker exec sharp sh -c "npm test"
+
 cache:
   npm: false
