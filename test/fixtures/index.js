@@ -109,7 +109,7 @@ module.exports = {
   inputSvg: getPath('check.svg'), // http://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg
   inputSvgSmallViewBox: getPath('circle.svg'),
   inputSvgWithEmbeddedImages: getPath('struct-image-04-t.svg'), // https://dev.w3.org/SVG/profiles/1.2T/test/svg/struct-image-04-t.svg
-  inputAvif: getPath('cosmos_frame12924_yuv420_10bpc_bt2020_pq_q50.avif'), // CC by-nc-nd https://github.com/AOMediaCodec/av1-avif/tree/master/testFiles/Netflix
+  inputAvif: getPath('sdr_cosmos12920_cicp1-13-6_yuv444_full_qp10.avif'), // CC by-nc-nd https://github.com/AOMediaCodec/av1-avif/tree/master/testFiles/Netflix
 
   inputJPGBig: getPath('flowers.jpeg'),
 

@@ -258,7 +258,7 @@ struct PipelineBaton {
     jpegOptimiseScans(false),
     jpegOptimiseCoding(true),
     pngProgressive(false),
-    pngCompressionLevel(9),
+    pngCompressionLevel(6),
     pngAdaptiveFiltering(false),
     pngPalette(false),
     pngQuality(100),

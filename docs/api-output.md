@@ -157,8 +157,6 @@ Returns **Sharp**
 
 Use these JPEG options for output image.
 
-Some of these options require the use of a globally-installed libvips compiled with support for mozjpeg.
-
 ### Parameters
 
 -   `options` **[Object][6]?** output options
@@ -167,12 +165,13 @@ Some of these options require the use of a globally-installed libvips compiled w
     -   `options.chromaSubsampling` **[string][2]** set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' chroma subsampling (optional, default `'4:2:0'`)
     -   `options.optimiseCoding` **[boolean][7]** optimise Huffman coding tables (optional, default `true`)
     -   `options.optimizeCoding` **[boolean][7]** alternative spelling of optimiseCoding (optional, default `true`)
-    -   `options.trellisQuantisation` **[boolean][7]** apply trellis quantisation, requires libvips compiled with support for mozjpeg (optional, default `false`)
-    -   `options.overshootDeringing` **[boolean][7]** apply overshoot deringing, requires libvips compiled with support for mozjpeg (optional, default `false`)
-    -   `options.optimiseScans` **[boolean][7]** optimise progressive scans, forces progressive, requires libvips compiled with support for mozjpeg (optional, default `false`)
-    -   `options.optimizeScans` **[boolean][7]** alternative spelling of optimiseScans, requires libvips compiled with support for mozjpeg (optional, default `false`)
-    -   `options.quantisationTable` **[number][9]** quantization table to use, integer 0-8, requires libvips compiled with support for mozjpeg (optional, default `0`)
-    -   `options.quantizationTable` **[number][9]** alternative spelling of quantisationTable, requires libvips compiled with support for mozjpeg (optional, default `0`)
+    -   `options.mozjpeg` **[boolean][7]** use mozjpeg defaults, equivalent to `{ trellisQuantisation: true, overshootDeringing: true, optimiseScans: true, quantisationTable: 3 }` (optional, default `false`)
+    -   `options.trellisQuantisation` **[boolean][7]** apply trellis quantisation (optional, default `false`)
+    -   `options.overshootDeringing` **[boolean][7]** apply overshoot deringing (optional, default `false`)
+    -   `options.optimiseScans` **[boolean][7]** optimise progressive scans, forces progressive (optional, default `false`)
+    -   `options.optimizeScans` **[boolean][7]** alternative spelling of optimiseScans (optional, default `false`)
+    -   `options.quantisationTable` **[number][9]** quantization table to use, integer 0-8 (optional, default `0`)
+    -   `options.quantizationTable` **[number][9]** alternative spelling of quantisationTable (optional, default `0`)
     -   `options.force` **[boolean][7]** force JPEG output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
@@ -187,6 +186,13 @@ const data = await sharp(input)
   .toBuffer();
 ```
 
+```javascript
+// Use mozjpeg to reduce output JPEG file size (slower)
+const data = await sharp(input)
+  .jpeg({ mozjpeg: true })
+  .toBuffer();
+```
+
 -   Throws **[Error][4]** Invalid options
 
 Returns **Sharp** 
@@ -195,30 +201,36 @@ Returns **Sharp**
 
 Use these PNG options for output image.
 
-PNG output is always full colour at 8 or 16 bits per pixel.
+By default, PNG output is full colour at 8 or 16 bits per pixel.
 Indexed PNG input at 1, 2 or 4 bits per pixel is converted to 8 bits per pixel.
-
-Some of these options require the use of a globally-installed libvips compiled with support for libimagequant (GPL).
+Set `palette` to `true` for slower, indexed PNG output.
 
 ### Parameters
 
 -   `options` **[Object][6]?** 
     -   `options.progressive` **[boolean][7]** use progressive (interlace) scan (optional, default `false`)
-    -   `options.compressionLevel` **[number][9]** zlib compression level, 0-9 (optional, default `9`)
+    -   `options.compressionLevel` **[number][9]** zlib compression level, 0 (fastest, largest) to 9 (slowest, smallest) (optional, default `6`)
     -   `options.adaptiveFiltering` **[boolean][7]** use adaptive row filtering (optional, default `false`)
-    -   `options.palette` **[boolean][7]** quantise to a palette-based image with alpha transparency support, requires libvips compiled with support for libimagequant (optional, default `false`)
-    -   `options.quality` **[number][9]** use the lowest number of colours needed to achieve given quality, sets `palette` to `true`, requires libvips compiled with support for libimagequant (optional, default `100`)
-    -   `options.colours` **[number][9]** maximum number of palette entries, sets `palette` to `true`, requires libvips compiled with support for libimagequant (optional, default `256`)
-    -   `options.colors` **[number][9]** alternative spelling of `options.colours`, sets `palette` to `true`, requires libvips compiled with support for libimagequant (optional, default `256`)
-    -   `options.dither` **[number][9]** level of Floyd-Steinberg error diffusion, sets `palette` to `true`, requires libvips compiled with support for libimagequant (optional, default `1.0`)
+    -   `options.palette` **[boolean][7]** quantise to a palette-based image with alpha transparency support (optional, default `false`)
+    -   `options.quality` **[number][9]** use the lowest number of colours needed to achieve given quality, sets `palette` to `true` (optional, default `100`)
+    -   `options.colours` **[number][9]** maximum number of palette entries, sets `palette` to `true` (optional, default `256`)
+    -   `options.colors` **[number][9]** alternative spelling of `options.colours`, sets `palette` to `true` (optional, default `256`)
+    -   `options.dither` **[number][9]** level of Floyd-Steinberg error diffusion, sets `palette` to `true` (optional, default `1.0`)
     -   `options.force` **[boolean][7]** force PNG output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
 
 ```javascript
-// Convert any input to PNG output
+// Convert any input to full colour PNG output
 const data = await sharp(input)
   .png()
+  .toBuffer();
+```
+
+```javascript
+// Convert any input to indexed PNG output (slower)
+const data = await sharp(input)
+  .png({ palette: true })
   .toBuffer();
 ```
 

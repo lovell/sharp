@@ -20,10 +20,11 @@ Node.js v10+ on the most common platforms:
 * macOS x64 (>= 10.13)
 * Linux x64 (glibc >= 2.17, musl >=1.1.24 <1.2.0)
 * Linux ARM64 (glibc >= 2.29)
+* Linux ARM64 (musl >= 1.1.24)
 * Windows x64
 * Windows x86
 
-A ~9MB tarball containing libvips and its most commonly used dependencies
+An ~8MB tarball containing libvips and its most commonly used dependencies
 is downloaded via HTTPS and stored within `node_modules/sharp/vendor` during `npm install`.
 
 This provides support for the
@@ -31,16 +32,16 @@ JPEG, PNG, WebP, AVIF, TIFF, GIF (input) and SVG (input) image formats.
 
 The following platforms have prebuilt libvips but not sharp:
 
+* macOS ARM64
 * Linux ARMv6
 * Linux ARMv7 (glibc >= 2.28)
 * Windows ARM64
 
 The following platforms require compilation of both libvips and sharp from source:
 
-* macOS ARM64
 * Linux x86
 * Linux x64 (glibc <= 2.16, includes RHEL/CentOS 6)
-* Linux ARM64 (glibc <= 2.28, musl)
+* Linux ARM64 (glibc <= 2.28)
 * Linux PowerPC
 * FreeBSD
 * OpenBSD

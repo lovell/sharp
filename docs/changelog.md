@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.28 - *bijou*
+
+Requires libvips v8.10.6
+
+### v0.28.0 - TBD
+
+* Prebuilt binaries now include mozjpeg and libimagequant (BSD 2-Clause).
+
+* Prebuilt binaries limit AVIF support to the most common 8-bit depth.
+
+* Add `mozjpeg` option to `jpeg` method, sets mozjpeg defaults.
+
+* Reduce the default PNG `compressionLevel` to the more commonly used 6.
+
 ## v0.27 - *avif*
 
 Requires libvips v8.10.5

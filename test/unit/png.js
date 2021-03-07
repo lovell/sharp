@@ -19,7 +19,7 @@ describe('PNG', function () {
     });
   });
 
-  it('default compressionLevel generates smaller file than compressionLevel=6', function (done) {
+  it('default compressionLevel generates smaller file than compressionLevel=0', function (done) {
     // First generate with default compressionLevel
     sharp(fixtures.inputPng)
       .resize(320, 240)
@@ -31,7 +31,7 @@ describe('PNG', function () {
         // Then generate with compressionLevel=6
         sharp(fixtures.inputPng)
           .resize(320, 240)
-          .png({ compressionLevel: 6 })
+          .png({ compressionLevel: 0 })
           .toBuffer(function (err, largerData, largerInfo) {
             if (err) throw err;
             assert.strictEqual(true, largerData.length > 0);
