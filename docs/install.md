@@ -19,8 +19,7 @@ Node.js v10+ on the most common platforms:
 
 * macOS x64 (>= 10.13)
 * Linux x64 (glibc >= 2.17, musl >= 1.1.24)
-* Linux ARM64 (glibc >= 2.29)
-* Linux ARM64 (musl >= 1.1.24)
+* Linux ARM64 (glibc >= 2.29, musl >= 1.1.24)
 * Windows x64
 * Windows x86
 
@@ -61,21 +60,15 @@ Check the output of running `npm install --verbose sharp` for useful error messa
 
 ## Apple M1
 
-If you are using ARM64 Node.js, which can be checked using:
+Prebuilt libvips binaries are provided for macOS on ARM64 (since sharp v0.28.0).
 
-```sh
-node -p "process.arch === 'arm64'"
-```
-
-then libvips must currently be installed via Homebrew before installing sharp.
-
-```sh
-brew install vips
-```
+During `npm install` sharp will be built locally,
+which requires Xcode and Python - see
+[building from source](#building-from-source).
 
 When this new ARM64 CPU is made freely available
 to open source projects via a CI service
-then prebuilt binaries can be provided.
+then prebuilt sharp binaries can also be provided.
 
 ## Custom libvips
 
@@ -219,22 +212,6 @@ to ensure shared libraries remain loaded in memory
 until after all threads are complete.
 
 ## Known conflicts
-
-### Electron and Linux
-
-The prebuilt binaries provided by Electron for Linux depend on many shared system libraries.
-
-One of these, `libgobject-2.0.so`,
-is known to conflict with the statically-linked binaries provided by sharp
-and the following error can occur:
-```
-basic_string::_S_construct null not valid
-```
-
-To workaround this, set the `LD_PRELOAD` environment variable before the `electron` binary is run.
-```sh
-LD_PRELOAD=node_modules/sharp/vendor/8.10.5/lib/libvips.so.42 electron script.js
-```
 
 ### Canvas and Windows
 
