@@ -152,7 +152,7 @@
           }],
           ['OS == "linux"', {
             'defines': [
-              '_GLIBCXX_USE_CXX11_ABI=0'
+              '_GLIBCXX_USE_CXX11_ABI=1'
             ],
             'link_settings': {
               'library_dirs': ['<(sharp_vendor_dir)/lib'],
