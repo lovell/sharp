@@ -101,7 +101,7 @@ try {
       }
     }
     if (detectLibc.family === detectLibc.MUSL && detectLibc.version) {
-      if (!semver.satisfies(detectLibc.version, '>=1.1.24 <1.2.0')) {
+      if (semver.lt(detectLibc.version, '1.1.24')) {
         throw new Error(`Use with musl ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
       }
     }

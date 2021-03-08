@@ -31,6 +31,8 @@ jobs:
           - os: ubuntu-20.04
             container: node:14-alpine3.11
           - os: ubuntu-20.04
+            container: node:14-alpine3.13
+          - os: ubuntu-20.04
             container: node:15-alpine3.11
           - os: macos-10.15
             nodejs_version: 10
