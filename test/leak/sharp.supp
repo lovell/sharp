@@ -427,6 +427,16 @@
   fun:vips_target_finish
 }
 {
+  value8_libvips_static
+  Memcheck:Value8
+  obj:*/libvips-cpp.so.*
+}
+{
+  cond_libvips_static
+  Memcheck:Cond
+  obj:*/libvips-cpp.so.*
+}
+{
   leak_libvips_init
   Memcheck:Leak
   match-leak-kinds: reachable
@@ -440,7 +450,7 @@
   match-leak-kinds: definite
   fun:malloc
   ...
-  fun:rsvg_rust_handle_new_from_stream_sync
+  fun:rsvg_handle_new_from_stream_sync
 }
 {
   leak_rsvg_rsvg_rust_handle_new_from_gfile_sync
@@ -448,7 +458,7 @@
   match-leak-kinds: definite
   fun:malloc
   ...
-  fun:rsvg_rust_handle_new_from_gfile_sync
+  fun:rsvg_handle_new_from_gfile_sync
 }
 {
   leak_rsvg_rust_handle_new_from_stream_sync
@@ -458,7 +468,7 @@
   ...
   fun:xmlParseElement
   ...
-  fun:rsvg_rust_handle_new_from_stream_sync
+  fun:rsvg_handle_new_from_stream_sync
 }
 {
   leak_rsvg_rust_handle_new_from_gfile_sync
@@ -468,7 +478,7 @@
   ...
   fun:xmlParseElement
   ...
-  fun:rsvg_rust_handle_new_from_gfile_sync
+  fun:rsvg_handle_new_from_gfile_sync
 }
 
 # libuv warnings
