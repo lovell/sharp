@@ -12,29 +12,6 @@ describe('AVIF', () => {
     });
   });
 
-  it('can passthrough AVIF', async () => {
-    const data = await sharp(inputAvif)
-      .resize(32)
-      .toBuffer();
-    const metadata = await sharp(data)
-      .metadata();
-    const { compression, size, ...metadataWithoutSize } = metadata;
-    assert.deepStrictEqual(metadataWithoutSize, {
-      channels: 3,
-      depth: 'uchar',
-      format: 'heif',
-      hasAlpha: false,
-      hasProfile: false,
-      height: 12,
-      isProgressive: false,
-      pageHeight: 12,
-      pagePrimary: 0,
-      pages: 1,
-      space: 'srgb',
-      width: 32
-    });
-  });
-
   it('can convert AVIF to JPEG', async () => {
     const data = await sharp(inputAvif)
       .resize(32)
@@ -75,6 +52,29 @@ describe('AVIF', () => {
       height: 26,
       isProgressive: false,
       pageHeight: 26,
+      pagePrimary: 0,
+      pages: 1,
+      space: 'srgb',
+      width: 32
+    });
+  });
+
+  it('can passthrough AVIF', async () => {
+    const data = await sharp(inputAvif)
+      .resize(32)
+      .toBuffer();
+    const metadata = await sharp(data)
+      .metadata();
+    const { compression, size, ...metadataWithoutSize } = metadata;
+    assert.deepStrictEqual(metadataWithoutSize, {
+      channels: 3,
+      depth: 'uchar',
+      format: 'heif',
+      hasAlpha: false,
+      hasProfile: false,
+      height: 12,
+      isProgressive: false,
+      pageHeight: 12,
       pagePrimary: 0,
       pages: 1,
       space: 'srgb',
