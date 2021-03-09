@@ -3,8 +3,6 @@
 const assert = require('assert');
 const sharp = require('../../');
 
-const defaultConcurrency = sharp.concurrency();
-
 describe('Utilities', function () {
   describe('Cache', function () {
     it('Can be disabled', function () {
@@ -60,10 +58,10 @@ describe('Utilities', function () {
     });
     it('Can be reset to default', function () {
       sharp.concurrency(0);
-      assert.strictEqual(defaultConcurrency, sharp.concurrency());
+      assert.strictEqual(true, sharp.concurrency() > 0);
     });
     it('Ignores invalid values', function () {
-      sharp.concurrency(0);
+      const defaultConcurrency = sharp.concurrency();
       sharp.concurrency('spoons');
       assert.strictEqual(defaultConcurrency, sharp.concurrency());
     });

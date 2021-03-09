@@ -24,5 +24,6 @@ Napi::Value simd(const Napi::CallbackInfo& info);
 Napi::Value libvipsVersion(const Napi::CallbackInfo& info);
 Napi::Value format(const Napi::CallbackInfo& info);
 Napi::Value _maxColourDistance(const Napi::CallbackInfo& info);
+Napi::Value _isUsingJemalloc(const Napi::CallbackInfo& info);
 
 #endif  // SRC_UTILITIES_H_

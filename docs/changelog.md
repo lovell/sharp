@@ -14,6 +14,8 @@ Requires libvips v8.10.6
 
 * Reduce the default PNG `compressionLevel` to the more commonly used 6.
 
+* Reduce concurrency on glibc-based Linux when using the default memory allocator to help prevent fragmentation.
+
 ## v0.27 - *avif*
 
 Requires libvips v8.10.5
