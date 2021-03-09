@@ -613,7 +613,7 @@ describe('Tile', function () {
     rimraf(directory, function () {
       sharp(fixtures.inputJpg)
         .png({
-          compressionLevel: 1
+          compressionLevel: 0
         })
         .tile({
           layout: 'google'
@@ -650,7 +650,8 @@ describe('Tile', function () {
     rimraf(directory, function () {
       sharp(fixtures.inputJpg)
         .webp({
-          quality: 1
+          quality: 1,
+          reductionEffort: 0
         })
         .tile({
           layout: 'google'
