@@ -192,6 +192,7 @@ struct PipelineBaton {
   std::vector<double> tileBackground;
   int tileSkipBlanks;
   VipsForeignDzDepth tileDepth;
+  std::string tileId;
   std::unique_ptr<double[]> recombMatrix;
 
   PipelineBaton():

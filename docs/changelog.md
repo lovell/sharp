@@ -16,6 +16,10 @@ Requires libvips v8.10.6
 
 * Reduce concurrency on glibc-based Linux when using the default memory allocator to help prevent fragmentation.
 
+* Ensure `@id` attribute can be set for IIIF tile-based output.
+  [#2612](https://github.com/lovell/sharp/issues/2612)
+  [@edsilv](https://github.com/edsilv)
+
 ## v0.27 - *avif*
 
 Requires libvips v8.10.5

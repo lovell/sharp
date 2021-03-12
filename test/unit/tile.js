@@ -297,6 +297,22 @@ describe('Tile', function () {
     });
   });
 
+  it('Valid id parameter value passes', function () {
+    assert.doesNotThrow(function () {
+      sharp().tile({
+        id: 'test'
+      });
+    });
+  });
+
+  it('Invalid id parameter value fails', function () {
+    assert.throws(function () {
+      sharp().tile({
+        id: true
+      });
+    });
+  });
+
   it('Deep Zoom layout', function (done) {
     const directory = fixtures.path('output.dzi_files');
     rimraf(directory, function () {
@@ -815,11 +831,14 @@ describe('Tile', function () {
   });
 
   it('IIIF layout', function (done) {
-    const directory = fixtures.path('output.iiif.info');
+    const name = 'output.iiif.info';
+    const directory = fixtures.path(name);
     rimraf(directory, function () {
+      const id = 'https://sharp.test.com/iiif';
       sharp(fixtures.inputJpg)
         .tile({
-          layout: 'iiif'
+          layout: 'iiif',
+          id
         })
         .toFile(directory, function (err, info) {
           if (err) throw err;
@@ -828,6 +847,8 @@ describe('Tile', function () {
           assert.strictEqual(2225, info.height);
           assert.strictEqual(3, info.channels);
           assert.strictEqual('number', typeof info.size);
+          const infoJson = require(path.join(directory, 'info.json'));
+          assert.strictEqual(`${id}/${name}`, infoJson['@id']);
           fs.stat(path.join(directory, '0,0,256,256', '256,', '0', 'default.jpg'), function (err, stat) {
             if (err) throw err;
             assert.strictEqual(true, stat.isFile());
