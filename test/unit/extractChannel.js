@@ -107,7 +107,7 @@ describe('Image channel extraction', function () {
     });
   });
 
-  it('Non-existant channel', function (done) {
+  it('Non-existent channel', function (done) {
     sharp(fixtures.inputPng)
       .extractChannel(1)
       .toBuffer(function (err) {
