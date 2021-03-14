@@ -1,5 +1,6 @@
 'use strict';
 
+const os = require('os');
 const fs = require('fs');
 
 const async = require('async');
@@ -24,6 +25,9 @@ const height = 588;
 
 // Disable libvips cache to ensure tests are as fair as they can be
 sharp.cache(false);
+
+// Spawn one thread per CPU
+sharp.concurrency(os.cpus().length);
 
 async.series({
   jpeg: function (callback) {
