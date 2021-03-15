@@ -90,9 +90,11 @@ describe('TIFF', function () {
 
   it('Increasing TIFF quality increases file size', () =>
     sharp(fixtures.inputJpgWithLandscapeExif1)
+      .resize(320, 240)
       .tiff({ quality: 40 })
       .toBuffer()
       .then(tiff40 => sharp(fixtures.inputJpgWithLandscapeExif1)
+        .resize(320, 240)
         .tiff({ quality: 90 })
         .toBuffer()
         .then(tiff90 =>
@@ -155,6 +157,7 @@ describe('TIFF', function () {
 
   it('TIFF setting xres and yres on file', () =>
     sharp(fixtures.inputTiff)
+      .resize(8, 8)
       .tiff({
         xres: 1000,
         yres: 1000
@@ -171,6 +174,7 @@ describe('TIFF', function () {
 
   it('TIFF setting xres and yres on buffer', () =>
     sharp(fixtures.inputTiff)
+      .resize(8, 8)
       .tiff({
         xres: 1000,
         yres: 1000

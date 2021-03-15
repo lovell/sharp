@@ -28,32 +28,28 @@ describe('Partial image extraction', function () {
       });
   });
 
-  if (sharp.format.webp.output.file) {
-    it('WebP', function (done) {
-      sharp(fixtures.inputWebP)
-        .extract({ left: 100, top: 50, width: 125, height: 200 })
-        .toBuffer(function (err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(125, info.width);
-          assert.strictEqual(200, info.height);
-          fixtures.assertSimilar(fixtures.expected('extract.webp'), data, done);
-        });
-    });
-  }
+  it('WebP', function (done) {
+    sharp(fixtures.inputWebP)
+      .extract({ left: 100, top: 50, width: 125, height: 200 })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(125, info.width);
+        assert.strictEqual(200, info.height);
+        fixtures.assertSimilar(fixtures.expected('extract.webp'), data, done);
+      });
+  });
 
-  if (sharp.format.tiff.output.file) {
-    it('TIFF', function (done) {
-      sharp(fixtures.inputTiff)
-        .extract({ left: 34, top: 63, width: 341, height: 529 })
-        .jpeg()
-        .toBuffer(function (err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(341, info.width);
-          assert.strictEqual(529, info.height);
-          fixtures.assertSimilar(fixtures.expected('extract.tiff'), data, done);
-        });
-    });
-  }
+  it('TIFF', function (done) {
+    sharp(fixtures.inputTiff)
+      .extract({ left: 34, top: 63, width: 341, height: 529 })
+      .jpeg()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(341, info.width);
+        assert.strictEqual(529, info.height);
+        fixtures.assertSimilar(fixtures.expected('extract.tiff'), data, done);
+      });
+  });
 
   it('Before resize', function (done) {
     sharp(fixtures.inputJpg)

@@ -54,6 +54,7 @@ describe('Normalization', function () {
 
   it('keeps an existing alpha channel', function (done) {
     sharp(fixtures.inputPngWithTransparency)
+      .resize(8, 8)
       .normalize()
       .toBuffer(function (err, data) {
         if (err) throw err;
@@ -69,6 +70,7 @@ describe('Normalization', function () {
 
   it('keeps the alpha channel of greyscale images intact', function (done) {
     sharp(fixtures.inputPngWithGreyAlpha)
+      .resize(8, 8)
       .normalise()
       .toBuffer(function (err, data) {
         if (err) throw err;

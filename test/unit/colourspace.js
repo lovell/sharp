@@ -42,18 +42,15 @@ describe('Colour space conversion', function () {
       });
   });
 
-  if (sharp.format.tiff.input.file && sharp.format.webp.output.buffer) {
-    it('From 1-bit TIFF to sRGB WebP [slow]', function (done) {
-      sharp(fixtures.inputTiff)
-        .webp()
-        .toBuffer(function (err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(true, data.length > 0);
-          assert.strictEqual('webp', info.format);
-          done();
-        });
-    });
-  }
+  it('From 1-bit TIFF to sRGB WebP', async () => {
+    const data = await sharp(fixtures.inputTiff)
+      .resize(8, 8)
+      .webp()
+      .toBuffer();
+
+    const { format } = await sharp(data).metadata();
+    assert.strictEqual(format, 'webp');
+  });
 
   it('From CMYK to sRGB', function (done) {
     sharp(fixtures.inputJpgWithCmykProfile)
