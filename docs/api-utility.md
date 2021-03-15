@@ -84,8 +84,12 @@ Returns **[Object][1]**
 
 Gets or, when a concurrency is provided, sets
 the number of threads _libvips'_ should create to process each image.
-The default value is the number of CPU cores.
-A value of `0` will reset to this default.
+
+The default value is the number of CPU cores,
+except when using glibc-based Linux without jemalloc,
+where the default is `1` to help reduce memory fragmentation.
+
+A value of `0` will reset this to the number of CPU cores.
 
 The maximum number of images that can be processed in parallel
 is limited by libuv's `UV_THREADPOOL_SIZE` environment variable.

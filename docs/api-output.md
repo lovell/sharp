@@ -423,6 +423,7 @@ Warning: multiple sharp instances concurrently producing tile output can expose 
     -   `options.layout` **[string][2]** filesystem layout, possible values are `dz`, `iiif`, `zoomify` or `google`. (optional, default `'dz'`)
     -   `options.centre` **[boolean][7]** centre image in tile. (optional, default `false`)
     -   `options.center` **[boolean][7]** alternative spelling of centre. (optional, default `false`)
+    -   `options.id` **[string][2]** when `layout` is `iiif`, sets the `@id` attribute of `info.json` (optional, default `'https://example.com/iiif'`)
 
 ### Examples
 
