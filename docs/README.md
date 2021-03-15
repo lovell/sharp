@@ -50,6 +50,10 @@ no child processes are spawned and Promises/async/await are supported.
 
 ### Optimal
 
+The features of `mozjpeg` and `pngquant` can be used
+to optimise the file size of JPEG and PNG images respectively,
+without having to invoke separate `imagemin` processes.
+
 Huffman tables are optimised when generating JPEG output images
 without having to use separate command line tools like
 [jpegoptim](https://github.com/tjko/jpegoptim) and

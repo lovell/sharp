@@ -19,6 +19,14 @@ rotation, extraction, compositing and gamma correction are available.
 Most modern macOS, Windows and Linux systems running Node.js v10+
 do not require any additional install or runtime dependencies.
 
+## Documentation
+
+Visit [sharp.pixelplumbing.com](https://sharp.pixelplumbing.com/) for complete
+[installation instructions](https://sharp.pixelplumbing.com/install),
+[API documentation](https://sharp.pixelplumbing.com/api-constructor),
+[benchmark tests](https://sharp.pixelplumbing.com/performance) and
+[changelog](https://sharp.pixelplumbing.com/changelog).
+
 ## Examples
 
 ```sh
@@ -43,6 +51,7 @@ sharp(inputBuffer)
 sharp('input.jpg')
   .rotate()
   .resize(200)
+  .jpeg({ mozjpeg: true })
   .toBuffer()
   .then( data => { ... })
   .catch( err => { ... });
@@ -84,23 +93,15 @@ readableStream
   .pipe(writableStream);
 ```
 
-[![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.svg?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
-[![N-API v3](https://img.shields.io/badge/N--API-v3-green.svg)](https://nodejs.org/dist/latest/docs/api/n-api.html#n_api_n_api_version_matrix)
-
-### Documentation
-
-Visit [sharp.pixelplumbing.com](https://sharp.pixelplumbing.com/) for complete
-[installation instructions](https://sharp.pixelplumbing.com/install),
-[API documentation](https://sharp.pixelplumbing.com/api-constructor),
-[benchmark tests](https://sharp.pixelplumbing.com/performance) and
-[changelog](https://sharp.pixelplumbing.com/changelog).
-
-### Contributing
+## Contributing
 
 A [guide for contributors](https://github.com/lovell/sharp/blob/master/.github/CONTRIBUTING.md)
 covers reporting bugs, requesting features and submitting code changes.
 
-### Licensing
+[![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.svg?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
+[![N-API v3](https://img.shields.io/badge/N--API-v3-green.svg)](https://nodejs.org/dist/latest/docs/api/n-api.html#n_api_n_api_version_matrix)
+
+## Licensing
 
 Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Lovell Fuller and contributors.
 
