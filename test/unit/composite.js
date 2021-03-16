@@ -390,4 +390,20 @@ describe('composite', () => {
       }, /Expected valid gravity for gravity but received invalid of type string/);
     });
   });
+
+  it('Allow offset beyond bottom/right edge', async () => {
+    const red = { r: 255, g: 0, b: 0 };
+    const blue = { r: 0, g: 0, b: 255 };
+
+    const [r, g, b] = await sharp({ create: { width: 2, height: 2, channels: 4, background: red } })
+      .composite([{
+        input: { create: { width: 2, height: 2, channels: 4, background: blue } },
+        top: 1,
+        left: 1
+      }])
+      .raw()
+      .toBuffer();
+
+    assert.deepStrictEqual(red, { r, g, b });
+  });
 });
