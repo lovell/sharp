@@ -149,6 +149,23 @@ pkg install -y pkgconf vips
 cd /usr/ports/graphics/vips/ && make install clean
 ```
 
+## Linux memory allocator
+
+The default memory allocator on most glibc-based Linux systems
+(e.g. Debian, Red Hat) is unsuitable for long-running, multi-threaded
+processes that involve lots of small memory allocations.
+
+For this reason, by default, sharp will limit the use of thread-based
+[concurrency](api-utility#concurrency) when the glibc allocator is
+detected at runtime.
+
+To help avoid fragmentation and improve performance on these systems,
+the use of an alternative memory allocator such as
+[jemalloc](https://github.com/jemalloc/jemalloc) is recommended.
+
+Those using musl-based Linux (e.g. Alpine) and non-Linux systems are
+unaffected.
+
 ## Heroku
 
 Add the
