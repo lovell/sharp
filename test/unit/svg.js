@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const assert = require('assert');
 
 const sharp = require('../../');
@@ -98,5 +99,19 @@ describe('SVG input', function () {
         assert.strictEqual(4, info.channels);
         fixtures.assertSimilar(fixtures.expected('svg-embedded.png'), data, done);
       });
+  });
+
+  it('Converts SVG with truncated embedded PNG', async () => {
+    const truncatedPng = fs.readFileSync(fixtures.inputPngTruncated).toString('base64');
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
+      <svg width="294" height="240" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <image width="294" height="240" xlink:href="data:image/png;base64,${truncatedPng}"/>
+      </svg>`;
+
+    const { info } = await sharp(Buffer.from(svg)).toBuffer({ resolveWithObject: true });
+    assert.strictEqual(info.format, 'png');
+    assert.strictEqual(info.width, 294);
+    assert.strictEqual(info.height, 240);
+    assert.strictEqual(info.channels, 4);
   });
 });
