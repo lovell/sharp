@@ -562,9 +562,17 @@ class PipelineWorker : public Napi::AsyncWorker {
             // Use gravity in overlay
             if (compositeImage.width() <= baton->width) {
               across = static_cast<int>(ceil(static_cast<double>(image.width()) / compositeImage.width()));
+              // Ensure odd number of tiles across when gravity is centre, north or south
+              if (composite->gravity == 0 || composite->gravity == 1 || composite->gravity == 3) {
+                across |= 1;
+              }
             }
             if (compositeImage.height() <= baton->height) {
               down = static_cast<int>(ceil(static_cast<double>(image.height()) / compositeImage.height()));
+              // Ensure odd number of tiles down when gravity is centre, east or west
+              if (composite->gravity == 0 || composite->gravity == 2 || composite->gravity == 4) {
+                down |= 1;
+              }
             }
             if (across != 0 || down != 0) {
               int left;

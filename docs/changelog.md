@@ -20,6 +20,9 @@ Requires libvips v8.10.6
   [#2612](https://github.com/lovell/sharp/issues/2612)
   [@edsilv](https://github.com/edsilv)
 
+* Ensure composite replicates the correct number of tiles for centred gravities.
+  [#2626](https://github.com/lovell/sharp/issues/2626)
+
 ## v0.27 - *avif*
 
 Requires libvips v8.10.5

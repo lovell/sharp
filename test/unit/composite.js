@@ -225,6 +225,24 @@ describe('composite', () => {
       });
   });
 
+  it('centre gravity should replicate correct number of tiles', async () => {
+    const red = { r: 255, g: 0, b: 0 };
+    const [r, g, b] = await sharp({
+      create: {
+        width: 40, height: 40, channels: 4, background: red
+      }
+    })
+      .composite([{
+        input: fixtures.inputPngWithTransparency16bit,
+        gravity: 'centre',
+        tile: true
+      }])
+      .raw()
+      .toBuffer();
+
+    assert.deepStrictEqual({ r, g, b }, red);
+  });
+
   it('cutout via dest-in', done => {
     sharp(fixtures.inputJpg)
       .resize(300, 300)
