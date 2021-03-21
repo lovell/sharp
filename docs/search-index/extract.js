@@ -8,7 +8,7 @@ const extractDescription = (str) =>
     .replace(/\s+/g, ' ')
     .replace(/[^A-Za-z0-9_/\-,. ]/g, '')
     .replace(/\s+/g, ' ')
-    .substr(0, 140)
+    .substr(0, 180)
     .trim();
 
 const extractKeywords = (str) =>
