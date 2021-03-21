@@ -263,7 +263,7 @@ Returns **Sharp**
 
 ## threshold
 
-Any pixel value greather than or equal to the threshold value will be set to 255, otherwise it will be set to 0.
+Any pixel value greater than or equal to the threshold value will be set to 255, otherwise it will be set to 0.
 
 ### Parameters
 
