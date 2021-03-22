@@ -16,6 +16,14 @@ Requires libvips v8.10.6
 
 * Reduce concurrency on glibc-based Linux when using the default memory allocator to help prevent fragmentation.
 
+* Ensure composite does not clip top and left offsets.
+  [#2594](https://github.com/lovell/sharp/pull/2594)
+  [@SHG42](https://github.com/SHG42)
+
+* Improve error handling of network failure at install time.
+  [#2608](https://github.com/lovell/sharp/pull/2608)
+  [@abradley](https://github.com/abradley)
+
 * Ensure `@id` attribute can be set for IIIF tile-based output.
   [#2612](https://github.com/lovell/sharp/issues/2612)
   [@edsilv](https://github.com/edsilv)
