@@ -169,12 +169,20 @@ Returns **Sharp**
 
 ## flatten
 
-Merge alpha transparency channel, if any, with a background.
+Merge alpha transparency channel, if any, with a background, then remove the alpha channel.
 
 ### Parameters
 
 -   `options` **[Object][2]?** 
     -   `options.background` **([string][3] \| [Object][2])** background colour, parsed by the [color][4] module, defaults to black. (optional, default `{r:0,g:0,b:0}`)
+
+### Examples
+
+```javascript
+await sharp(rgbaInput)
+  .flatten('#F0A703')
+  .toBuffer();
+```
 
 Returns **Sharp** 
 
