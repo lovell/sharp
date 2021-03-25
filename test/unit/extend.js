@@ -41,7 +41,6 @@ describe('Extend', function () {
       .resize(120)
       .extend({
         top: 50,
-        bottom: 0,
         left: 10,
         right: 35,
         background: { r: 0, g: 0, b: 0, alpha: 0 }
@@ -64,18 +63,38 @@ describe('Extend', function () {
       sharp().extend(-1);
     });
   });
-  it('partial object fails', function () {
-    assert.throws(function () {
-      sharp().extend({ top: 1 });
-    });
+  it('invalid top fails', () => {
+    assert.throws(
+      () => sharp().extend({ top: 'fail' }),
+      /Expected positive integer for top but received fail of type string/
+    );
+  });
+  it('invalid bottom fails', () => {
+    assert.throws(
+      () => sharp().extend({ bottom: -1 }),
+      /Expected positive integer for bottom but received -1 of type number/
+    );
+  });
+  it('invalid left fails', () => {
+    assert.throws(
+      () => sharp().extend({ left: 0.1 }),
+      /Expected positive integer for left but received 0.1 of type number/
+    );
+  });
+  it('invalid right fails', () => {
+    assert.throws(
+      () => sharp().extend({ right: {} }),
+      /Expected positive integer for right but received \[object Object\] of type object/
+    );
+  });
+  it('can set all edges apart from right', () => {
+    assert.doesNotThrow(() => sharp().extend({ top: 1, left: 2, bottom: 3 }));
   });
 
   it('should add alpha channel before extending with a transparent Background', function (done) {
     sharp(fixtures.inputJpgWithLandscapeExif1)
       .extend({
-        top: 0,
         bottom: 10,
-        left: 0,
         right: 10,
         background: { r: 0, g: 0, b: 0, alpha: 0 }
       })
@@ -91,9 +110,7 @@ describe('Extend', function () {
   it('PNG with 2 channels', function (done) {
     sharp(fixtures.inputPngWithGreyAlpha)
       .extend({
-        top: 0,
         bottom: 20,
-        left: 0,
         right: 20,
         background: 'transparent'
       })

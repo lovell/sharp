@@ -137,10 +137,10 @@ This operation will always occur after resizing and extraction, if any.
 ### Parameters
 
 -   `extend` **([number][8] \| [Object][9])** single pixel count to add to all edges or an Object with per-edge counts
-    -   `extend.top` **[number][8]?** 
-    -   `extend.left` **[number][8]?** 
-    -   `extend.bottom` **[number][8]?** 
-    -   `extend.right` **[number][8]?** 
+    -   `extend.top` **[number][8]**  (optional, default `0`)
+    -   `extend.left` **[number][8]**  (optional, default `0`)
+    -   `extend.bottom` **[number][8]**  (optional, default `0`)
+    -   `extend.right` **[number][8]**  (optional, default `0`)
     -   `extend.background` **([String][10] \| [Object][9])** background colour, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
 
 ### Examples
@@ -156,6 +156,16 @@ sharp(input)
     left: 10,
     right: 10,
     background: { r: 0, g: 0, b: 0, alpha: 0 }
+  })
+  ...
+```
+
+```javascript
+// Add a row of 10 red pixels to the bottom
+sharp(input)
+  .extend({
+    bottom: 10,
+    background: 'red'
   })
   ...
 ```

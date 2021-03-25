@@ -16,6 +16,9 @@ Requires libvips v8.10.6
 
 * Reduce concurrency on glibc-based Linux when using the default memory allocator to help prevent fragmentation.
 
+* Default missing edge properties of extend operation to zero.
+  [#2578](https://github.com/lovell/sharp/issues/2578)
+
 * Ensure composite does not clip top and left offsets.
   [#2594](https://github.com/lovell/sharp/pull/2594)
   [@SHG42](https://github.com/SHG42)
