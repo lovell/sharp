@@ -340,7 +340,7 @@ most web browsers do not display these properly.
 -   `options` **[Object][6]?** output options
     -   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `50`)
     -   `options.lossless` **[boolean][7]** use lossless compression (optional, default `false`)
-    -   `options.speed` **[number][9]** CPU effort vs file size, 0 (slowest/smallest) to 8 (fastest/largest) (optional, default `5`)
+    -   `options.speed` **[number][9]** CPU effort vs file size, 0 (slowest/smallest) to 9 (fastest/largest) (optional, default `5`)
     -   `options.chromaSubsampling` **[string][2]** set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' chroma subsampling, requires libvips v8.11.0 (optional, default `'4:2:0'`)
 
 
@@ -365,7 +365,7 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
     -   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `50`)
     -   `options.compression` **[string][2]** compression format: av1, hevc (optional, default `'av1'`)
     -   `options.lossless` **[boolean][7]** use lossless compression (optional, default `false`)
-    -   `options.speed` **[number][9]** CPU effort vs file size, 0 (slowest/smallest) to 8 (fastest/largest) (optional, default `5`)
+    -   `options.speed` **[number][9]** CPU effort vs file size, 0 (slowest/smallest) to 9 (fastest/largest) (optional, default `5`)
     -   `options.chromaSubsampling` **[string][2]** set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' chroma subsampling, requires libvips v8.11.0 (optional, default `'4:2:0'`)
 
 
