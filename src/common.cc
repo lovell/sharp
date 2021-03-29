@@ -213,6 +213,8 @@ namespace sharp {
     { "VipsForeignLoadTiffBuffer", ImageType::TIFF },
     { "VipsForeignLoadGifFile", ImageType::GIF },
     { "VipsForeignLoadGifBuffer", ImageType::GIF },
+    { "VipsForeignLoadNsgifFile", ImageType::GIF },
+    { "VipsForeignLoadNsgifBuffer", ImageType::GIF },
     { "VipsForeignLoadSvgFile", ImageType::SVG },
     { "VipsForeignLoadSvgBuffer", ImageType::SVG },
     { "VipsForeignLoadHeifFile", ImageType::HEIF },
