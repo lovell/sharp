@@ -23,7 +23,7 @@ Node.js v10+ on the most common platforms:
 * Windows x64
 * Windows x86
 
-An ~8MB tarball containing libvips and its most commonly used dependencies
+An ~7.5MB tarball containing libvips and its most commonly used dependencies
 is downloaded via HTTPS and stored within `node_modules/sharp/vendor` during `npm install`.
 
 This provides support for the
