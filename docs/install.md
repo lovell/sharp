@@ -178,8 +178,6 @@ to `false` when using the `yarn` package manager.
 
 ## AWS Lambda
 
-Set the Lambda runtime to `nodejs12.x`.
-
 The binaries in the `node_modules` directory of the
 [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-package.html)
 must be for the Linux x64 platform.
