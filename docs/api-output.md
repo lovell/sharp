@@ -267,6 +267,13 @@ const data = await sharp(input)
   .toBuffer();
 ```
 
+```javascript
+// Optimise the file size of an animated WebP
+const outputWebp = await sharp(inputWebp, { animated: true })
+  .webp({ reductionEffort: 6 })
+  .toBuffer();
+```
+
 -   Throws **[Error][4]** Invalid options
 
 Returns **Sharp** 
