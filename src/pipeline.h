@@ -178,7 +178,7 @@ struct PipelineBaton {
   VipsOperationBoolean bandBoolOp;
   int extractChannel;
   bool removeAlpha;
-  bool ensureAlpha;
+  double ensureAlpha;
   VipsInterpretation colourspace;
   int pageHeight;
   std::vector<int> delay;
@@ -297,7 +297,7 @@ struct PipelineBaton {
     bandBoolOp(VIPS_OPERATION_BOOLEAN_LAST),
     extractChannel(-1),
     removeAlpha(false),
-    ensureAlpha(false),
+    ensureAlpha(-1.0),
     colourspace(VIPS_INTERPRETATION_LAST),
     pageHeight(0),
     delay{-1},

@@ -296,7 +296,7 @@ namespace sharp {
   /*
     Ensures alpha channel, if missing.
   */
-  VImage EnsureAlpha(VImage image);
+  VImage EnsureAlpha(VImage image, double const value);
 
 }  // namespace sharp
 

@@ -155,4 +155,27 @@ describe('Alpha transparency', function () {
         });
     }));
   });
+
+  it('Valid ensureAlpha value used for alpha channel', async () => {
+    const background = { r: 255, g: 0, b: 0 };
+    const [r, g, b, alpha] = await sharp({
+      create: {
+        width: 8,
+        height: 8,
+        channels: 3,
+        background
+      }
+    })
+      .ensureAlpha(0.5)
+      .raw()
+      .toBuffer();
+
+    assert.deepStrictEqual({ r, g, b, alpha }, { ...background, alpha: 127 });
+  });
+
+  it('Invalid ensureAlpha value throws', async () => {
+    assert.throws(() => {
+      sharp().ensureAlpha('fail');
+    });
+  });
 });

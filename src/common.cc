@@ -799,10 +799,10 @@ namespace sharp {
   /*
     Ensures alpha channel, if missing.
   */
-  VImage EnsureAlpha(VImage image) {
+  VImage EnsureAlpha(VImage image, double const value) {
     if (!HasAlpha(image)) {
       std::vector<double> alpha;
-      alpha.push_back(sharp::MaximumImageAlpha(image.interpretation()));
+      alpha.push_back(value * sharp::MaximumImageAlpha(image.interpretation()));
       image = image.bandjoin_const(alpha);
     }
     return image;

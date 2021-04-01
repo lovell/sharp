@@ -8,6 +8,9 @@ Requires libvips v8.10.6
 
 * Ensure all installation errors are logged with a more obvious prefix.
 
+* Allow `ensureAlpha` to set the alpha transparency level.
+ [#2634](https://github.com/lovell/sharp/issues/2634)
+
 ### v0.28.0 - 29th March 2021
 
 * Prebuilt binaries now include mozjpeg and libimagequant (BSD 2-Clause).

@@ -346,7 +346,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       bool const shouldModulate = baton->brightness != 1.0 || baton->saturation != 1.0 || baton->hue != 0.0;
 
       if (shouldComposite && !sharp::HasAlpha(image)) {
-        image = sharp::EnsureAlpha(image);
+        image = sharp::EnsureAlpha(image, 1);
       }
 
       bool const shouldPremultiplyAlpha = sharp::HasAlpha(image) &&
@@ -594,7 +594,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Ensure image to composite is sRGB with premultiplied alpha
           compositeImage = compositeImage.colourspace(VIPS_INTERPRETATION_sRGB);
           if (!sharp::HasAlpha(compositeImage)) {
-            compositeImage = sharp::EnsureAlpha(compositeImage);
+            compositeImage = sharp::EnsureAlpha(compositeImage, 1);
           }
           if (!composite->premultiplied) compositeImage = compositeImage.premultiply();
           // Calculate position
@@ -691,8 +691,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Ensure alpha channel, if missing
-      if (baton->ensureAlpha) {
-        image = sharp::EnsureAlpha(image);
+      if (baton->ensureAlpha != -1) {
+        image = sharp::EnsureAlpha(image, baton->ensureAlpha);
       }
 
       // Convert image to sRGB, if not already
@@ -1341,7 +1341,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->affineInterpolator = vips::VInterpolate::new_from_name(sharp::AttrAsStr(options, "affineInterpolator").data());
 
   baton->removeAlpha = sharp::AttrAsBool(options, "removeAlpha");
-  baton->ensureAlpha = sharp::AttrAsBool(options, "ensureAlpha");
+  baton->ensureAlpha = sharp::AttrAsDouble(options, "ensureAlpha");
   if (options.Has("boolean")) {
     baton->boolean = sharp::CreateInputDescriptor(options.Get("boolean").As<Napi::Object>());
     baton->booleanOp = sharp::GetBooleanOperation(sharp::AttrAsStr(options, "booleanOp"));

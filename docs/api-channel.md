@@ -18,17 +18,32 @@ Returns **Sharp**
 
 ## ensureAlpha
 
-Ensure alpha channel, if missing. The added alpha channel will be fully opaque. This is a no-op if the image already has an alpha channel.
+Ensure the output image has an alpha transparency channel.
+If missing, the added alpha channel will have the specified
+transparency level, defaulting to fully-opaque (1).
+This is a no-op if the image already has an alpha channel.
+
+### Parameters
+
+-   `alpha` **[number][1]** alpha transparency level (0=fully-transparent, 1=fully-opaque) (optional, default `1`)
 
 ### Examples
 
 ```javascript
-sharp('rgb.jpg')
+// rgba.png will be a 4 channel image with a fully-opaque alpha channel
+await sharp('rgb.jpg')
   .ensureAlpha()
-  .toFile('rgba.png', function(err, info) {
-    // rgba.png is a 4 channel image with a fully opaque alpha channel
-  });
+  .toFile('rgba.png')
 ```
+
+```javascript
+// rgba is a 4 channel image with a fully-transparent alpha channel
+const rgba = await sharp(rgb)
+  .ensureAlpha(0)
+  .toBuffer();
+```
+
+-   Throws **[Error][2]** Invalid alpha transparency level
 
 Returns **Sharp** 
 
@@ -42,7 +57,7 @@ Extract a single channel from a multi-channel image.
 
 ### Parameters
 
--   `channel` **([number][1] \| [string][2])** zero-indexed channel/band number to extract, or `red`, `green`, `blue` or `alpha`.
+-   `channel` **([number][1] \| [string][3])** zero-indexed channel/band number to extract, or `red`, `green`, `blue` or `alpha`.
 
 ### Examples
 
@@ -56,7 +71,7 @@ sharp(input)
    });
 ```
 
--   Throws **[Error][3]** Invalid channel
+-   Throws **[Error][2]** Invalid channel
 
 Returns **Sharp** 
 
@@ -75,11 +90,11 @@ For raw pixel input, the `options` object should contain a `raw` attribute, whic
 
 ### Parameters
 
--   `images` **([Array][4]&lt;([string][2] \| [Buffer][5])> | [string][2] \| [Buffer][5])** one or more images (file paths, Buffers).
+-   `images` **([Array][4]&lt;([string][3] \| [Buffer][5])> | [string][3] \| [Buffer][5])** one or more images (file paths, Buffers).
 -   `options` **[Object][6]** image options, see `sharp()` constructor.
 
 
--   Throws **[Error][3]** Invalid parameters
+-   Throws **[Error][2]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -89,7 +104,7 @@ Perform a bitwise boolean operation on all input image channels (bands) to produ
 
 ### Parameters
 
--   `boolOp` **[string][2]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+-   `boolOp` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
 
 ### Examples
 
@@ -103,15 +118,15 @@ sharp('3-channel-rgb-input.png')
   });
 ```
 
--   Throws **[Error][3]** Invalid parameters
+-   Throws **[Error][2]** Invalid parameters
 
 Returns **Sharp** 
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
 
-[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
 [4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
