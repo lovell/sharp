@@ -125,7 +125,7 @@ describe('libvips binaries', function () {
 
     it('logs an error message', function (done) {
       console.error = function (msg) {
-        assert.strictEqual(msg, 'sharp: problem');
+        assert.strictEqual(msg, 'sharp: Installation error: problem');
         done();
       };
       libvips.log(new Error('problem'));

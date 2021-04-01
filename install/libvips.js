@@ -145,7 +145,9 @@ try {
           tmpFileStream
             .on('error', function (err) {
               // Clean up temporary file
-              fs.unlinkSync(tarPathTemp);
+              try {
+                fs.unlinkSync(tarPathTemp);
+              } catch (e) {}
               fail(err);
             })
             .on('close', function () {
@@ -157,7 +159,7 @@ try {
                 fs.copyFileSync(tarPathTemp, tarPathCache);
                 fs.unlinkSync(tarPathTemp);
               }
-              extractTarball(tarPathCache);
+              extractTarball(tarPathCache, platformAndArch);
             });
         }
       });

@@ -4,6 +4,10 @@
 
 Requires libvips v8.10.6
 
+### v0.28.1 - TBD
+
+* Ensure all installation errors are logged with a more obvious prefix.
+
 ### v0.28.0 - 29th March 2021
 
 * Prebuilt binaries now include mozjpeg and libimagequant (BSD 2-Clause).
