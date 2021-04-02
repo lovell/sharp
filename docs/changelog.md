@@ -8,8 +8,11 @@ Requires libvips v8.10.6
 
 * Ensure all installation errors are logged with a more obvious prefix.
 
+* Add support for OME-TIFF Sub Image File Directories (subIFD).
+  [#2557](https://github.com/lovell/sharp/issues/2557)
+
 * Allow `ensureAlpha` to set the alpha transparency level.
- [#2634](https://github.com/lovell/sharp/issues/2634)
+  [#2634](https://github.com/lovell/sharp/issues/2634)
 
 ### v0.28.0 - 29th March 2021
 

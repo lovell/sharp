@@ -28,6 +28,7 @@ Implements the [stream.Duplex][1] class.
     -   `options.density` **[number][8]** number representing the DPI for vector images in the range 1 to 100000. (optional, default `72`)
     -   `options.pages` **[number][8]** number of pages to extract for multi-page input (GIF, WebP, AVIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
     -   `options.page` **[number][8]** page number to start extracting from for multi-page input (GIF, WebP, AVIF, TIFF, PDF), zero based. (optional, default `0`)
+    -   `options.subifd` **[number][8]** subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. (optional, default `-1`)
     -   `options.level` **[number][8]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
     -   `options.animated` **[boolean][7]** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default `false`)
     -   `options.raw` **[Object][6]?** describes raw pixel input image data. See `raw()` for pixel ordering.

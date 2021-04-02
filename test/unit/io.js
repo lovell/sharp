@@ -718,6 +718,19 @@ describe('Input/output', function () {
         sharp({ level: -1 });
       }, /Expected integer between 0 and 256 for level but received -1 of type number/);
     });
+    it('Valid subifd property', function () {
+      sharp({ subifd: 1 });
+    });
+    it('Invalid subifd property (string) throws', function () {
+      assert.throws(function () {
+        sharp({ subifd: '1' });
+      }, /Expected integer between -1 and 100000 for subifd but received 1 of type string/);
+    });
+    it('Invalid subifd property (float) throws', function () {
+      assert.throws(function () {
+        sharp({ subifd: 1.2 });
+      }, /Expected integer between -1 and 100000 for subifd but received 1.2 of type number/);
+    });
   });
 
   describe('create new image', function () {

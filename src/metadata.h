@@ -41,6 +41,7 @@ struct MetadataBaton {
   int pagePrimary;
   std::string compression;
   std::vector<std::pair<int, int>> levels;
+  int subifds;
   bool hasProfile;
   bool hasAlpha;
   int orientation;
@@ -68,6 +69,7 @@ struct MetadataBaton {
     pageHeight(0),
     loop(-1),
     pagePrimary(-1),
+    subifds(0),
     hasProfile(false),
     hasAlpha(false),
     orientation(0),

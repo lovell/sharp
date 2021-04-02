@@ -104,6 +104,10 @@ namespace sharp {
     if (HasAttr(input, "level")) {
       descriptor->level = AttrAsUint32(input, "level");
     }
+    // subIFD (OME-TIFF)
+    if (HasAttr(input, "subifd")) {
+      descriptor->subifd = AttrAsInt32(input, "subifd");
+    }
     // Create new image
     if (HasAttr(input, "createChannels")) {
       descriptor->createChannels = AttrAsUint32(input, "createChannels");
@@ -319,6 +323,9 @@ namespace sharp {
             if (imageType == ImageType::OPENSLIDE) {
               option->set("level", descriptor->level);
             }
+            if (imageType == ImageType::TIFF) {
+              option->set("subifd", descriptor->subifd);
+            }
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
@@ -390,6 +397,9 @@ namespace sharp {
             }
             if (imageType == ImageType::OPENSLIDE) {
               option->set("level", descriptor->level);
+            }
+            if (imageType == ImageType::TIFF) {
+              option->set("subifd", descriptor->subifd);
             }
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {

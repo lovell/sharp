@@ -86,6 +86,9 @@ class MetadataWorker : public Napi::AsyncWorker {
           baton->levels.push_back(std::pair<int, int>(width, height));
         }
       }
+      if (image.get_typeof(VIPS_META_N_SUBIFDS) == G_TYPE_INT) {
+        baton->subifds = image.get_int(VIPS_META_N_SUBIFDS);
+      }
       baton->hasProfile = sharp::HasProfile(image);
       // Derived attributes
       baton->hasAlpha = sharp::HasAlpha(image);
@@ -202,6 +205,9 @@ class MetadataWorker : public Napi::AsyncWorker {
           levels.Set(i++, level);
         }
         info.Set("levels", levels);
+      }
+      if (baton->subifds > 0) {
+        info.Set("subifds", baton->subifds);
       }
       info.Set("hasProfile", baton->hasProfile);
       info.Set("hasAlpha", baton->hasAlpha);
