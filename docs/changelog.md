@@ -4,7 +4,7 @@
 
 Requires libvips v8.10.6
 
-### v0.28.1 - TBD
+### v0.28.1 - 5th April 2021
 
 * Ensure all installation errors are logged with a more obvious prefix.
 
