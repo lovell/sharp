@@ -102,6 +102,10 @@ To install the prebuilt sharp binaries from a custom URL,
 set the `sharp_binary_host` npm config option
 or the `npm_config_sharp_binary_host` environment variable.
 
+To install the prebuilt sharp binaries from a directory on the local filesystem,
+set the `sharp_local_prebuilds` npm config option
+or the `npm_config_sharp_local_prebuilds` environment variable.
+
 To install the prebuilt libvips binaries from a custom URL,
 set the `sharp_libvips_binary_host` npm config option
 or the `npm_config_sharp_libvips_binary_host` environment variable.
