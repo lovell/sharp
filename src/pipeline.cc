@@ -717,10 +717,16 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("input_profile", "srgb")
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
-
       // Override EXIF Orientation tag
       if (baton->withMetadata && baton->withMetadataOrientation != -1) {
         image = sharp::SetExifOrientation(image, baton->withMetadataOrientation);
+      }
+      // Metadata key/value pairs, e.g. EXIF
+      if (!baton->withMetadataStrs.empty()) {
+        image = image.copy();
+        for (const auto& s : baton->withMetadataStrs) {
+          image.set(s.first.data(), s.second.data());
+        }
       }
 
       // Number of channels used in output image
@@ -1379,6 +1385,12 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->withMetadata = sharp::AttrAsBool(options, "withMetadata");
   baton->withMetadataOrientation = sharp::AttrAsUint32(options, "withMetadataOrientation");
   baton->withMetadataIcc = sharp::AttrAsStr(options, "withMetadataIcc");
+  Napi::Object mdStrs = options.Get("withMetadataStrs").As<Napi::Object>();
+  Napi::Array mdStrKeys = mdStrs.GetPropertyNames();
+  for (unsigned int i = 0; i < mdStrKeys.Length(); i++) {
+    std::string k = sharp::AttrAsStr(mdStrKeys, i);
+    baton->withMetadataStrs.insert(std::make_pair(k, sharp::AttrAsStr(mdStrs, k)));
+  }
   // Format-specific
   baton->jpegQuality = sharp::AttrAsUint32(options, "jpegQuality");
   baton->jpegProgressive = sharp::AttrAsBool(options, "jpegProgressive");

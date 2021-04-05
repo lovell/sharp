@@ -36,6 +36,9 @@ namespace sharp {
   std::string AttrAsStr(Napi::Object obj, std::string attr) {
     return obj.Get(attr).As<Napi::String>();
   }
+  std::string AttrAsStr(Napi::Object obj, unsigned int const attr) {
+    return obj.Get(attr).As<Napi::String>();
+  }
   uint32_t AttrAsUint32(Napi::Object obj, std::string attr) {
     return obj.Get(attr).As<Napi::Number>().Uint32Value();
   }

@@ -119,6 +119,7 @@ sRGB colour space and strip all metadata, including the removal of any ICC profi
 -   `options` **[Object][6]?** 
     -   `options.orientation` **[number][9]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
     -   `options.icc` **[string][2]?** filesystem path to output ICC profile, defaults to sRGB.
+    -   `options.exif` **[Object][6]&lt;[Object][6]>** Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data. (optional, default `{}`)
 
 ### Examples
 
@@ -127,6 +128,19 @@ sharp('input.jpg')
   .withMetadata()
   .toFile('output-with-metadata.jpg')
   .then(info => { ... });
+```
+
+```javascript
+// Set "IFD0-Copyright" in output EXIF metadata
+await sharp(input)
+  .withMetadata({
+    exif: {
+      IFD0: {
+        Copyright: 'Wernham Hogg'
+      }
+    }
+  })
+  .toBuffer();
 ```
 
 -   Throws **[Error][4]** Invalid parameters

@@ -599,6 +599,30 @@ describe('Image metadata', function () {
       });
   });
 
+  it('Add EXIF metadata to JPEG', async () => {
+    const data = await sharp({
+      create: {
+        width: 8,
+        height: 8,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .jpeg()
+      .withMetadata({
+        exif: {
+          IFD0: { Software: 'sharp' },
+          IFD2: { ExposureTime: '0.2' }
+        }
+      })
+      .toBuffer();
+
+    const { exif } = await sharp(data).metadata();
+    const parsedExif = exifReader(exif);
+    assert.strictEqual(parsedExif.image.Software, 'sharp');
+    assert.strictEqual(parsedExif.exif.ExposureTime, 0.2);
+  });
+
   it('chromaSubsampling 4:4:4:4 CMYK JPEG', function () {
     return sharp(fixtures.inputJpgWithCmykProfile)
       .metadata()
@@ -715,6 +739,21 @@ describe('Image metadata', function () {
     it('Non string icc', function () {
       assert.throws(function () {
         sharp().withMetadata({ icc: true });
+      });
+    });
+    it('Non object exif', function () {
+      assert.throws(function () {
+        sharp().withMetadata({ exif: false });
+      });
+    });
+    it('Non string value in object exif', function () {
+      assert.throws(function () {
+        sharp().withMetadata({ exif: { ifd0: false } });
+      });
+    });
+    it('Non string value in nested object exif', function () {
+      assert.throws(function () {
+        sharp().withMetadata({ exif: { ifd0: { fail: false } } });
       });
     });
   });

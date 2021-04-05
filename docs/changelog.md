@@ -8,6 +8,9 @@ Requires libvips v8.10.6
 
 * Ensure all installation errors are logged with a more obvious prefix.
 
+* Allow `withMetadata` to set and update EXIF metadata.
+  [#650](https://github.com/lovell/sharp/issues/650)
+
 * Add support for OME-TIFF Sub Image File Directories (subIFD).
   [#2557](https://github.com/lovell/sharp/issues/2557)
 

@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include <napi.h>
 #include <vips/vips8>
@@ -168,6 +169,7 @@ struct PipelineBaton {
   bool withMetadata;
   int withMetadataOrientation;
   std::string withMetadataIcc;
+  std::unordered_map<std::string, std::string> withMetadataStrs;
   std::unique_ptr<double[]> convKernel;
   int convKernelWidth;
   int convKernelHeight;
