@@ -180,7 +180,7 @@ Merge alpha transparency channel, if any, with a background, then remove the alp
 
 ```javascript
 await sharp(rgbaInput)
-  .flatten('#F0A703')
+  .flatten({background: '#F0A703' })
   .toBuffer();
 ```
 
