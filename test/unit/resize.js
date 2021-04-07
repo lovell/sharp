@@ -605,6 +605,26 @@ describe('Resize dimensions', function () {
       });
   });
 
+  it('Skip shrink-on-load where one dimension <4px', async () => {
+    const jpeg = await sharp({
+      create: {
+        width: 100,
+        height: 3,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .jpeg()
+      .toBuffer();
+
+    const { info } = await sharp(jpeg)
+      .resize(8)
+      .toBuffer({ resolveWithObject: true });
+
+    assert.strictEqual(info.width, 8);
+    assert.strictEqual(info.height, 1);
+  });
+
   it('unknown kernel throws', function () {
     assert.throws(function () {
       sharp().resize(null, null, { kernel: 'unknown' });

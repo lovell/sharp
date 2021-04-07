@@ -4,6 +4,11 @@
 
 Requires libvips v8.10.6
 
+### v0.28.2 - TBD
+
+* Skip shrink-on-load where one dimension <4px.
+  [#2653](https://github.com/lovell/sharp/issues/2653)
+
 ### v0.28.1 - 5th April 2021
 
 * Ensure all installation errors are logged with a more obvious prefix.
