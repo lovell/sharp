@@ -120,6 +120,7 @@ sRGB colour space and strip all metadata, including the removal of any ICC profi
     -   `options.orientation` **[number][9]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
     -   `options.icc` **[string][2]?** filesystem path to output ICC profile, defaults to sRGB.
     -   `options.exif` **[Object][6]&lt;[Object][6]>** Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data. (optional, default `{}`)
+    -   `options.density` **[number][9]?** Number of pixels per inch (DPI).
 
 ### Examples
 
@@ -132,7 +133,7 @@ sharp('input.jpg')
 
 ```javascript
 // Set "IFD0-Copyright" in output EXIF metadata
-await sharp(input)
+const data = await sharp(input)
   .withMetadata({
     exif: {
       IFD0: {
@@ -140,6 +141,12 @@ await sharp(input)
       }
     }
   })
+  .toBuffer();
+
+ * @example
+// Set output metadata to 96 DPI
+const data = await sharp(input)
+  .withMetadata({ density: 96 })
   .toBuffer();
 ```
 

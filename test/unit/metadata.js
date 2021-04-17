@@ -623,6 +623,44 @@ describe('Image metadata', function () {
     assert.strictEqual(parsedExif.exif.ExposureTime, 0.2);
   });
 
+  it('Set density of JPEG', async () => {
+    const data = await sharp({
+      create: {
+        width: 8,
+        height: 8,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .withMetadata({
+        density: 300
+      })
+      .jpeg()
+      .toBuffer();
+
+    const { density } = await sharp(data).metadata();
+    assert.strictEqual(density, 300);
+  });
+
+  it('Set density of PNG', async () => {
+    const data = await sharp({
+      create: {
+        width: 8,
+        height: 8,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .withMetadata({
+        density: 96
+      })
+      .png()
+      .toBuffer();
+
+    const { density } = await sharp(data).metadata();
+    assert.strictEqual(density, 96);
+  });
+
   it('chromaSubsampling 4:4:4:4 CMYK JPEG', function () {
     return sharp(fixtures.inputJpgWithCmykProfile)
       .metadata()
@@ -734,6 +772,16 @@ describe('Image metadata', function () {
     it('Too large orientation', function () {
       assert.throws(function () {
         sharp().withMetadata({ orientation: 9 });
+      });
+    });
+    it('Non-numeric density', function () {
+      assert.throws(function () {
+        sharp().withMetadata({ density: '1' });
+      });
+    });
+    it('Negative density', function () {
+      assert.throws(function () {
+        sharp().withMetadata({ density: -1 });
       });
     });
     it('Non string icc', function () {

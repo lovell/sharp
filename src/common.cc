@@ -520,9 +520,8 @@ namespace sharp {
   VImage SetDensity(VImage image, const double density) {
     const double pixelsPerMm = density / 25.4;
     VImage copy = image.copy();
-    copy.set("Xres", pixelsPerMm);
-    copy.set("Yres", pixelsPerMm);
-    copy.set(VIPS_META_RESOLUTION_UNIT, "in");
+    copy.get_image()->Xres = pixelsPerMm;
+    copy.get_image()->Yres = pixelsPerMm;
     return copy;
   }
 

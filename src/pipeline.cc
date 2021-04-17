@@ -722,6 +722,10 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->withMetadata && baton->withMetadataOrientation != -1) {
         image = sharp::SetExifOrientation(image, baton->withMetadataOrientation);
       }
+      // Override pixel density
+      if (baton->withMetadataDensity > 0) {
+        image = sharp::SetDensity(image, baton->withMetadataDensity);
+      }
       // Metadata key/value pairs, e.g. EXIF
       if (!baton->withMetadataStrs.empty()) {
         image = image.copy();
@@ -1385,6 +1389,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->fileOut = sharp::AttrAsStr(options, "fileOut");
   baton->withMetadata = sharp::AttrAsBool(options, "withMetadata");
   baton->withMetadataOrientation = sharp::AttrAsUint32(options, "withMetadataOrientation");
+  baton->withMetadataDensity = sharp::AttrAsDouble(options, "withMetadataDensity");
   baton->withMetadataIcc = sharp::AttrAsStr(options, "withMetadataIcc");
   Napi::Object mdStrs = options.Get("withMetadataStrs").As<Napi::Object>();
   Napi::Array mdStrKeys = mdStrs.GetPropertyNames();

@@ -6,6 +6,9 @@ Requires libvips v8.10.6
 
 ### v0.28.2 - TBD
 
+* Allow `withMetadata` to set `density`.
+  [#967](https://github.com/lovell/sharp/issues/967)
+
 * Skip shrink-on-load where one dimension <4px.
   [#2653](https://github.com/lovell/sharp/issues/2653)
 
