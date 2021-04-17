@@ -209,3 +209,6 @@ GitHub: https://github.com/beig
 
 Name: Florian Busch
 GitHub: https://github.com/florian-busch
+
+Name: Matthieu Salettes
+GitHub: https://github.com/msalettes
