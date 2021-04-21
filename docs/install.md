@@ -123,7 +123,7 @@ See the Chinese mirror below for a further example.
 
 ## Chinese mirror
 
-Alibaba provides a mirror site based in China containing binaries for both sharp and libvips.
+A mirror site based in China, provided by Alibaba, contains binaries for both sharp and libvips.
 
 To use this either set the following configuration:
 
