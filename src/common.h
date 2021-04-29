@@ -57,6 +57,7 @@ namespace sharp {
     int rawChannels;
     int rawWidth;
     int rawHeight;
+    bool rawPremultiplied;
     int pages;
     int page;
     int level;
@@ -80,6 +81,7 @@ namespace sharp {
       rawChannels(0),
       rawWidth(0),
       rawHeight(0),
+      rawPremultiplied(false),
       pages(1),
       page(0),
       level(0),

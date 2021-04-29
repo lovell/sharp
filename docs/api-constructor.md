@@ -37,6 +37,8 @@ Implements the [stream.Duplex][1] class.
         *   `options.raw.width` **[number][8]?** integral number of pixels wide.
         *   `options.raw.height` **[number][8]?** integral number of pixels high.
         *   `options.raw.channels` **[number][8]?** integral number of channels, between 1 and 4.
+        *   `options.raw.premultiplied` **[boolean][7]?** specifies that the raw input has already been premultiplied, set to `true`
+            to avoid sharp premultiplying the image. (optional, default `false`)
     *   `options.create` **[Object][6]?** describes a new image to be created.
 
         *   `options.create.width` **[number][8]?** integral number of pixels wide.
