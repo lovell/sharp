@@ -335,17 +335,6 @@ describe('Input/output', function () {
     });
   });
 
-  it('Fail when input is empty Buffer', function (done) {
-    sharp(Buffer.alloc(0)).toBuffer().then(function () {
-      assert(false);
-      done();
-    }).catch(function (err) {
-      assert(err instanceof Error);
-      assert.strictEqual('Input buffer contains unsupported image format', err.message);
-      done();
-    });
-  });
-
   it('Fail when input is invalid Buffer', function (done) {
     sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
       assert(false);

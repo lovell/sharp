@@ -7,6 +7,21 @@ const fixtures = require('../fixtures');
 
 describe('Raw pixel data', function () {
   describe('Raw pixel input', function () {
+    it('Empty data', function () {
+      assert.throws(function() {
+        sharp('');
+      });
+      assert.throws(function() {
+        sharp(Buffer.from(''));
+      });
+      assert.throws(function() {
+        sharp(new Uint8Array(0));
+      });
+      assert.throws(function() {
+        sharp(new Uint8ClampedArray(0));
+      });
+    });
+
     it('Missing options', function () {
       assert.throws(function () {
         sharp({ raw: {} });
