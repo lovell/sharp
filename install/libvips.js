@@ -7,7 +7,8 @@ const stream = require('stream');
 const zlib = require('zlib');
 
 const detectLibc = require('detect-libc');
-const semver = require('semver');
+const semverLessThan = require('semver/functions/lt');
+const semverSatisfies = require('semver/functions/satisfies');
 const simpleGet = require('simple-get');
 const tarFs = require('tar-fs');
 
@@ -96,18 +97,18 @@ try {
       throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
     if (detectLibc.family === detectLibc.GLIBC && detectLibc.version) {
-      if (semver.lt(`${detectLibc.version}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
+      if (semverLessThan(`${detectLibc.version}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
         throw new Error(`Use with glibc ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
       }
     }
     if (detectLibc.family === detectLibc.MUSL && detectLibc.version) {
-      if (semver.lt(detectLibc.version, '1.1.24')) {
+      if (semverLessThan(detectLibc.version, '1.1.24')) {
         throw new Error(`Use with musl ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
       }
     }
 
     const supportedNodeVersion = process.env.npm_package_engines_node || require('../package.json').engines.node;
-    if (!semver.satisfies(process.versions.node, supportedNodeVersion)) {
+    if (!semverSatisfies(process.versions.node, supportedNodeVersion)) {
       throw new Error(`Expected Node.js version ${supportedNodeVersion} but found ${process.versions.node}`);
     }
 
