@@ -22,7 +22,7 @@ jobs:
             nodejs_version: 14
           - os: ubuntu-20.04
             container: centos:7
-            nodejs_version: 15
+            nodejs_version: 16
           - os: ubuntu-20.04
             container: node:10-alpine3.11
             prebuild: true
@@ -33,7 +33,7 @@ jobs:
           - os: ubuntu-20.04
             container: node:14-alpine3.13
           - os: ubuntu-20.04
-            container: node:15-alpine3.11
+            container: node:16-alpine3.11
           - os: macos-10.15
             nodejs_version: 10
             prebuild: true
@@ -42,7 +42,7 @@ jobs:
           - os: macos-10.15
             nodejs_version: 14
           - os: macos-10.15
-            nodejs_version: 15
+            nodejs_version: 16
           - os: windows-2019
             nodejs_version: 10
             prebuild: true
@@ -51,7 +51,7 @@ jobs:
           - os: windows-2019
             nodejs_version: 14
           - os: windows-2019
-            nodejs_version: 15
+            nodejs_version: 16
     steps:
       - name: Dependencies (Linux glibc)
         if: contains(matrix.container, 'centos')
