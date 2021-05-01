@@ -235,6 +235,7 @@ namespace sharp {
     { "VipsForeignLoadFits", ImageType::FITS },
     { "VipsForeignLoadOpenexr", ImageType::EXR },
     { "VipsForeignLoadVips", ImageType::VIPS },
+    { "VipsForeignLoadVipsFile", ImageType::VIPS },
     { "VipsForeignLoadRaw", ImageType::RAW }
   };
 
