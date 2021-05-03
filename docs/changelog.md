@@ -16,6 +16,10 @@ Requires libvips v8.10.6
   [#2664](https://github.com/lovell/sharp/pull/2664)
   [@msalettes](https://github.com/msalettes)
 
+* Add `premultiplied` flag for raw pixel data input.
+  [#2685](https://github.com/lovell/sharp/pull/2685)
+  [@mnutt](https://github.com/mnutt)
+
 * Detect empty input and throw a helpful error.
   [#2687](https://github.com/lovell/sharp/pull/2687)
   [@JakobJingleheimer](https://github.com/JakobJingleheimer)
