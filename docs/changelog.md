@@ -16,6 +16,10 @@ Requires libvips v8.10.6
   [#2664](https://github.com/lovell/sharp/pull/2664)
   [@msalettes](https://github.com/msalettes)
 
+* Detect empty input and throw a helpful error.
+  [#2687](https://github.com/lovell/sharp/pull/2687)
+  [@JakobJingleheimer](https://github.com/JakobJingleheimer)
+
 ### v0.28.1 - 5th April 2021
 
 * Ensure all installation errors are logged with a more obvious prefix.
