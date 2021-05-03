@@ -95,6 +95,7 @@ namespace sharp {
       descriptor->rawChannels = AttrAsUint32(input, "rawChannels");
       descriptor->rawWidth = AttrAsUint32(input, "rawWidth");
       descriptor->rawHeight = AttrAsUint32(input, "rawHeight");
+      descriptor->rawPremultiplied = AttrAsBool(input, "rawPremultiplied");
     }
     // Multi-page input (GIF, TIFF, PDF)
     if (HasAttr(input, "pages")) {
@@ -301,6 +302,9 @@ namespace sharp {
           image.get_image()->Type = VIPS_INTERPRETATION_B_W;
         } else {
           image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+        }
+        if (descriptor->rawPremultiplied) {
+          image = image.unpremultiply();
         }
         imageType = ImageType::RAW;
       } else {

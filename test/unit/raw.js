@@ -107,6 +107,52 @@ describe('Raw pixel data', function () {
         });
     });
 
+    it('RGBA premultiplied', function (done) {
+      // Convert to raw pixel data
+      sharp(fixtures.inputPngSolidAlpha)
+        .resize(256)
+        .raw()
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(256, info.width);
+          assert.strictEqual(192, info.height);
+          assert.strictEqual(4, info.channels);
+
+          const originalData = Buffer.from(data);
+
+          // Premultiply image data
+          for (let i = 0; i < data.length; i += 4) {
+            const alpha = data[i + 3];
+            const norm = alpha / 255;
+
+            if (alpha < 255) {
+              data[i] = Math.round(data[i] * norm);
+              data[i + 1] = Math.round(data[i + 1] * norm);
+              data[i + 2] = Math.round(data[i + 2] * norm);
+            }
+          }
+
+          // Convert back to PNG
+          sharp(data, {
+            raw: {
+              width: info.width,
+              height: info.height,
+              channels: info.channels,
+              premultiplied: true
+            }
+          })
+            .raw()
+            .toBuffer(function (err, data, info) {
+              if (err) throw err;
+              assert.strictEqual(256, info.width);
+              assert.strictEqual(192, info.height);
+              assert.strictEqual(4, info.channels);
+              assert.equal(data.compare(originalData), 0, 'output buffer matches unpremultiplied input buffer');
+              done();
+            });
+        });
+    });
+
     it('JPEG to raw Stream and back again', function (done) {
       const width = 32;
       const height = 24;
