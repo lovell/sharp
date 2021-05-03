@@ -25,7 +25,7 @@ This is a no-op if the image already has an alpha channel.
 
 ### Parameters
 
--   `alpha` **[number][1]** alpha transparency level (0=fully-transparent, 1=fully-opaque) (optional, default `1`)
+*   `alpha` **[number][1]** alpha transparency level (0=fully-transparent, 1=fully-opaque) (optional, default `1`)
 
 ### Examples
 
@@ -43,13 +43,13 @@ const rgba = await sharp(rgb)
   .toBuffer();
 ```
 
--   Throws **[Error][2]** Invalid alpha transparency level
+*   Throws **[Error][2]** Invalid alpha transparency level
 
 Returns **Sharp** 
 
 **Meta**
 
--   **since**: 0.21.2
+*   **since**: 0.21.2
 
 ## extractChannel
 
@@ -57,7 +57,7 @@ Extract a single channel from a multi-channel image.
 
 ### Parameters
 
--   `channel` **([number][1] \| [string][3])** zero-indexed channel/band number to extract, or `red`, `green`, `blue` or `alpha`.
+*   `channel` **([number][1] | [string][3])** zero-indexed channel/band number to extract, or `red`, `green`, `blue` or `alpha`.
 
 ### Examples
 
@@ -71,7 +71,7 @@ sharp(input)
    });
 ```
 
--   Throws **[Error][2]** Invalid channel
+*   Throws **[Error][2]** Invalid channel
 
 Returns **Sharp** 
 
@@ -82,19 +82,20 @@ The meaning of the added channels depends on the output colourspace, set with `t
 By default the output image will be web-friendly sRGB, with additional channels interpreted as alpha channels.
 Channel ordering follows vips convention:
 
--   sRGB: 0: Red, 1: Green, 2: Blue, 3: Alpha.
--   CMYK: 0: Magenta, 1: Cyan, 2: Yellow, 3: Black, 4: Alpha.
+*   sRGB: 0: Red, 1: Green, 2: Blue, 3: Alpha.
+*   CMYK: 0: Magenta, 1: Cyan, 2: Yellow, 3: Black, 4: Alpha.
 
 Buffers may be any of the image formats supported by sharp.
 For raw pixel input, the `options` object should contain a `raw` attribute, which follows the format of the attribute of the same name in the `sharp()` constructor.
 
 ### Parameters
 
--   `images` **([Array][4]&lt;([string][3] \| [Buffer][5])> | [string][3] \| [Buffer][5])** one or more images (file paths, Buffers).
--   `options` **[Object][6]** image options, see `sharp()` constructor.
+*   `images` **([Array][4]<([string][3] | [Buffer][5])> | [string][3] | [Buffer][5])** one or more images (file paths, Buffers).
+*   `options` **[Object][6]** image options, see `sharp()` constructor.
 
+<!---->
 
--   Throws **[Error][2]** Invalid parameters
+*   Throws **[Error][2]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -104,7 +105,7 @@ Perform a bitwise boolean operation on all input image channels (bands) to produ
 
 ### Parameters
 
--   `boolOp` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+*   `boolOp` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
 
 ### Examples
 
@@ -118,7 +119,7 @@ sharp('3-channel-rgb-input.png')
   });
 ```
 
--   Throws **[Error][2]** Invalid parameters
+*   Throws **[Error][2]** Invalid parameters
 
 Returns **Sharp** 
 

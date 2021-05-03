@@ -21,9 +21,10 @@ for example `rotate(x).extract(y)` will produce a different result to `extract(y
 
 ### Parameters
 
--   `angle` **[number][1]** angle of rotation. (optional, default `auto`)
--   `options` **[Object][2]?** if present, is an Object with optional attributes.
-    -   `options.background` **([string][3] \| [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
+*   `angle` **[number][1]** angle of rotation. (optional, default `auto`)
+*   `options` **[Object][2]?** if present, is an Object with optional attributes.
+
+    *   `options.background` **([string][3] | [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
 
 ### Examples
 
@@ -39,7 +40,7 @@ const pipeline = sharp()
 readableStream.pipe(pipeline);
 ```
 
--   Throws **[Error][5]** Invalid parameters
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -50,7 +51,7 @@ The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 
 ### Parameters
 
--   `flip` **[Boolean][6]**  (optional, default `true`)
+*   `flip` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -61,7 +62,7 @@ The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
 ### Parameters
 
--   `flop` **[Boolean][6]**  (optional, default `true`)
+*   `flop` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -75,25 +76,26 @@ A particular interpolator may also be specified. Set the `interpolator` option t
 
 In the case of a 2x2 matrix, the transform is:
 
--   X = `matrix[0, 0]` \* (x + `idx`) + `matrix[0, 1]` \* (y + `idy`) + `odx`
--   Y = `matrix[1, 0]` \* (x + `idx`) + `matrix[1, 1]` \* (y + `idy`) + `ody`
+*   X = `matrix[0, 0]` \* (x + `idx`) + `matrix[0, 1]` \* (y + `idy`) + `odx`
+*   Y = `matrix[1, 0]` \* (x + `idx`) + `matrix[1, 1]` \* (y + `idy`) + `ody`
 
 where:
 
--   x and y are the coordinates in input image.
--   X and Y are the coordinates in output image.
--   (0,0) is the upper left corner.
+*   x and y are the coordinates in input image.
+*   X and Y are the coordinates in output image.
+*   (0,0) is the upper left corner.
 
 ### Parameters
 
--   `matrix` **([Array][7]&lt;[Array][7]&lt;[number][1]>> | [Array][7]&lt;[number][1]>)** affine transformation matrix
--   `options` **[Object][2]?** if present, is an Object with optional attributes.
-    -   `options.background` **([String][3] \| [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
-    -   `options.idx` **[Number][1]** input horizontal offset (optional, default `0`)
-    -   `options.idy` **[Number][1]** input vertical offset (optional, default `0`)
-    -   `options.odx` **[Number][1]** output horizontal offset (optional, default `0`)
-    -   `options.ody` **[Number][1]** output vertical offset (optional, default `0`)
-    -   `options.interpolator` **[String][3]** interpolator (optional, default `sharp.interpolators.bicubic`)
+*   `matrix` **([Array][7]<[Array][7]<[number][1]>> | [Array][7]<[number][1]>)** affine transformation matrix
+*   `options` **[Object][2]?** if present, is an Object with optional attributes.
+
+    *   `options.background` **([String][3] | [Object][2])** parsed by the [color][4] module to extract values for red, green, blue and alpha. (optional, default `"#000000"`)
+    *   `options.idx` **[Number][1]** input horizontal offset (optional, default `0`)
+    *   `options.idy` **[Number][1]** input vertical offset (optional, default `0`)
+    *   `options.odx` **[Number][1]** output horizontal offset (optional, default `0`)
+    *   `options.ody` **[Number][1]** output vertical offset (optional, default `0`)
+    *   `options.interpolator` **[String][3]** interpolator (optional, default `sharp.interpolators.bicubic`)
 
 ### Examples
 
@@ -112,13 +114,13 @@ inputStream
   .pipe(pipeline);
 ```
 
--   Throws **[Error][5]** Invalid parameters
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
 **Meta**
 
--   **since**: 0.27.0
+*   **since**: 0.27.0
 
 ## sharpen
 
@@ -129,12 +131,13 @@ Separate control over the level of sharpening in "flat" and "jagged" areas is av
 
 ### Parameters
 
--   `sigma` **[number][1]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
--   `flat` **[number][1]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
--   `jagged` **[number][1]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
+*   `sigma` **[number][1]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
+*   `flat` **[number][1]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
+*   `jagged` **[number][1]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
 
+<!---->
 
--   Throws **[Error][5]** Invalid parameters
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -145,10 +148,11 @@ When used without parameters the default window is 3x3.
 
 ### Parameters
 
--   `size` **[number][1]** square mask size: size x size (optional, default `3`)
+*   `size` **[number][1]** square mask size: size x size (optional, default `3`)
 
+<!---->
 
--   Throws **[Error][5]** Invalid parameters
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -160,10 +164,11 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 
 ### Parameters
 
--   `sigma` **[number][1]?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
+*   `sigma` **[number][1]?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
 
+<!---->
 
--   Throws **[Error][5]** Invalid parameters
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -173,8 +178,9 @@ Merge alpha transparency channel, if any, with a background, then remove the alp
 
 ### Parameters
 
--   `options` **[Object][2]?** 
-    -   `options.background` **([string][3] \| [Object][2])** background colour, parsed by the [color][4] module, defaults to black. (optional, default `{r:0,g:0,b:0}`)
+*   `options` **[Object][2]?** 
+
+    *   `options.background` **([string][3] | [Object][2])** background colour, parsed by the [color][4] module, defaults to black. (optional, default `{r:0,g:0,b:0}`)
 
 ### Examples
 
@@ -198,11 +204,12 @@ Supply a second argument to use a different output gamma value, otherwise the fi
 
 ### Parameters
 
--   `gamma` **[number][1]** value between 1.0 and 3.0. (optional, default `2.2`)
--   `gammaOut` **[number][1]?** value between 1.0 and 3.0. (optional, defaults to same as `gamma`)
+*   `gamma` **[number][1]** value between 1.0 and 3.0. (optional, default `2.2`)
+*   `gammaOut` **[number][1]?** value between 1.0 and 3.0. (optional, defaults to same as `gamma`)
 
+<!---->
 
--   Throws **[Error][5]** Invalid parameters
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -212,7 +219,7 @@ Produce the "negative" of the image.
 
 ### Parameters
 
--   `negate` **[Boolean][6]**  (optional, default `true`)
+*   `negate` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -222,7 +229,7 @@ Enhance output image contrast by stretching its luminance to cover the full dyna
 
 ### Parameters
 
--   `normalise` **[Boolean][6]**  (optional, default `true`)
+*   `normalise` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -232,7 +239,7 @@ Alternative spelling of normalise.
 
 ### Parameters
 
--   `normalize` **[Boolean][6]**  (optional, default `true`)
+*   `normalize` **[Boolean][6]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -242,12 +249,13 @@ Convolve the image with the specified kernel.
 
 ### Parameters
 
--   `kernel` **[Object][2]** 
-    -   `kernel.width` **[number][1]** width of the kernel in pixels.
-    -   `kernel.height` **[number][1]** width of the kernel in pixels.
-    -   `kernel.kernel` **[Array][7]&lt;[number][1]>** Array of length `width*height` containing the kernel values.
-    -   `kernel.scale` **[number][1]** the scale of the kernel in pixels. (optional, default `sum`)
-    -   `kernel.offset` **[number][1]** the offset of the kernel in pixels. (optional, default `0`)
+*   `kernel` **[Object][2]** 
+
+    *   `kernel.width` **[number][1]** width of the kernel in pixels.
+    *   `kernel.height` **[number][1]** width of the kernel in pixels.
+    *   `kernel.kernel` **[Array][7]<[number][1]>** Array of length `width*height` containing the kernel values.
+    *   `kernel.scale` **[number][1]** the scale of the kernel in pixels. (optional, default `sum`)
+    *   `kernel.offset` **[number][1]** the offset of the kernel in pixels. (optional, default `0`)
 
 ### Examples
 
@@ -265,7 +273,7 @@ sharp(input)
   });
 ```
 
--   Throws **[Error][5]** Invalid parameters
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -275,13 +283,15 @@ Any pixel value greater than or equal to the threshold value will be set to 255,
 
 ### Parameters
 
--   `threshold` **[number][1]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
--   `options` **[Object][2]?** 
-    -   `options.greyscale` **[Boolean][6]** convert to single channel greyscale. (optional, default `true`)
-    -   `options.grayscale` **[Boolean][6]** alternative spelling for greyscale. (optional, default `true`)
+*   `threshold` **[number][1]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
+*   `options` **[Object][2]?** 
 
+    *   `options.greyscale` **[Boolean][6]** convert to single channel greyscale. (optional, default `true`)
+    *   `options.grayscale` **[Boolean][6]** alternative spelling for greyscale. (optional, default `true`)
 
--   Throws **[Error][5]** Invalid parameters
+<!---->
+
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -294,16 +304,19 @@ the selected bitwise boolean `operation` between the corresponding pixels of the
 
 ### Parameters
 
--   `operand` **([Buffer][8] \| [string][3])** Buffer containing image data or string containing the path to an image file.
--   `operator` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
--   `options` **[Object][2]?** 
-    -   `options.raw` **[Object][2]?** describes operand when using raw pixel data.
-        -   `options.raw.width` **[number][1]?** 
-        -   `options.raw.height` **[number][1]?** 
-        -   `options.raw.channels` **[number][1]?** 
+*   `operand` **([Buffer][8] | [string][3])** Buffer containing image data or string containing the path to an image file.
+*   `operator` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+*   `options` **[Object][2]?** 
 
+    *   `options.raw` **[Object][2]?** describes operand when using raw pixel data.
 
--   Throws **[Error][5]** Invalid parameters
+        *   `options.raw.width` **[number][1]?** 
+        *   `options.raw.height` **[number][1]?** 
+        *   `options.raw.channels` **[number][1]?** 
+
+<!---->
+
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -313,11 +326,12 @@ Apply the linear formula a \* input + b to the image (levels adjustment)
 
 ### Parameters
 
--   `a` **[number][1]** multiplier (optional, default `1.0`)
--   `b` **[number][1]** offset (optional, default `0.0`)
+*   `a` **[number][1]** multiplier (optional, default `1.0`)
+*   `b` **[number][1]** offset (optional, default `0.0`)
 
+<!---->
 
--   Throws **[Error][5]** Invalid parameters
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -327,7 +341,7 @@ Recomb the image with the specified matrix.
 
 ### Parameters
 
--   `inputMatrix` **[Array][7]&lt;[Array][7]&lt;[number][1]>>** 3x3 Recombination matrix
+*   `inputMatrix` **[Array][7]<[Array][7]<[number][1]>>** 3x3 Recombination matrix
 
 ### Examples
 
@@ -345,13 +359,13 @@ sharp(input)
   });
 ```
 
--   Throws **[Error][5]** Invalid parameters
+*   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
 **Meta**
 
--   **since**: 0.21.1
+*   **since**: 0.21.1
 
 ## modulate
 
@@ -359,10 +373,11 @@ Transforms the image using brightness, saturation and hue rotation.
 
 ### Parameters
 
--   `options` **[Object][2]?** 
-    -   `options.brightness` **[number][1]?** Brightness multiplier
-    -   `options.saturation` **[number][1]?** Saturation multiplier
-    -   `options.hue` **[number][1]?** Degrees for hue rotation
+*   `options` **[Object][2]?** 
+
+    *   `options.brightness` **[number][1]?** Brightness multiplier
+    *   `options.saturation` **[number][1]?** Saturation multiplier
+    *   `options.hue` **[number][1]?** Degrees for hue rotation
 
 ### Examples
 
@@ -390,7 +405,7 @@ Returns **Sharp**
 
 **Meta**
 
--   **since**: 0.22.1
+*   **since**: 0.22.1
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 

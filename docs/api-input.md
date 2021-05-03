@@ -5,35 +5,35 @@
 Fast access to (uncached) image metadata without decoding any compressed image data.
 A `Promise` is returned when `callback` is not provided.
 
--   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
--   `size`: Total size of image in bytes, for Stream and Buffer input only
--   `width`: Number of pixels wide (EXIF orientation is not taken into consideration)
--   `height`: Number of pixels high (EXIF orientation is not taken into consideration)
--   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][1]
--   `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
--   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][2]
--   `density`: Number of pixels per inch (DPI), if present
--   `chromaSubsampling`: String containing JPEG chroma subsampling, `4:2:0` or `4:4:4` for RGB, `4:2:0:4` or `4:4:4:4` for CMYK
--   `isProgressive`: Boolean indicating whether the image is interlaced using a progressive scan
--   `pages`: Number of pages/frames contained within the image, with support for TIFF, HEIF, PDF, animated GIF and animated WebP
--   `pageHeight`: Number of pixels high each page in a multi-page image will be.
--   `loop`: Number of times to loop an animated image, zero refers to a continuous loop.
--   `delay`: Delay in ms between each page in an animated image, provided as an array of integers.
--   `pagePrimary`: Number of the primary page in a HEIF image
--   `levels`: Details of each level in a multi-level image provided as an array of objects, requires libvips compiled with support for OpenSlide
--   `subifds`: Number of Sub Image File Directories in an OME-TIFF image
--   `hasProfile`: Boolean indicating the presence of an embedded ICC profile
--   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
--   `orientation`: Number value of the EXIF Orientation header, if present
--   `exif`: Buffer containing raw EXIF data, if present
--   `icc`: Buffer containing raw [ICC][3] profile data, if present
--   `iptc`: Buffer containing raw IPTC data, if present
--   `xmp`: Buffer containing raw XMP data, if present
--   `tifftagPhotoshop`: Buffer containing raw TIFFTAG_PHOTOSHOP data, if present
+*   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
+*   `size`: Total size of image in bytes, for Stream and Buffer input only
+*   `width`: Number of pixels wide (EXIF orientation is not taken into consideration)
+*   `height`: Number of pixels high (EXIF orientation is not taken into consideration)
+*   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][1]
+*   `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
+*   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][2]
+*   `density`: Number of pixels per inch (DPI), if present
+*   `chromaSubsampling`: String containing JPEG chroma subsampling, `4:2:0` or `4:4:4` for RGB, `4:2:0:4` or `4:4:4:4` for CMYK
+*   `isProgressive`: Boolean indicating whether the image is interlaced using a progressive scan
+*   `pages`: Number of pages/frames contained within the image, with support for TIFF, HEIF, PDF, animated GIF and animated WebP
+*   `pageHeight`: Number of pixels high each page in a multi-page image will be.
+*   `loop`: Number of times to loop an animated image, zero refers to a continuous loop.
+*   `delay`: Delay in ms between each page in an animated image, provided as an array of integers.
+*   `pagePrimary`: Number of the primary page in a HEIF image
+*   `levels`: Details of each level in a multi-level image provided as an array of objects, requires libvips compiled with support for OpenSlide
+*   `subifds`: Number of Sub Image File Directories in an OME-TIFF image
+*   `hasProfile`: Boolean indicating the presence of an embedded ICC profile
+*   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
+*   `orientation`: Number value of the EXIF Orientation header, if present
+*   `exif`: Buffer containing raw EXIF data, if present
+*   `icc`: Buffer containing raw [ICC][3] profile data, if present
+*   `iptc`: Buffer containing raw IPTC data, if present
+*   `xmp`: Buffer containing raw XMP data, if present
+*   `tifftagPhotoshop`: Buffer containing raw TIFFTAG_PHOTOSHOP data, if present
 
 ### Parameters
 
--   `callback` **[Function][4]?** called with the arguments `(err, metadata)`
+*   `callback` **[Function][4]?** called with the arguments `(err, metadata)`
 
 ### Examples
 
@@ -52,32 +52,32 @@ image
   });
 ```
 
-Returns **([Promise][5]&lt;[Object][6]> | Sharp)** 
+Returns **([Promise][5]<[Object][6]> | Sharp)** 
 
 ## stats
 
 Access to pixel-derived image statistics for every channel in the image.
 A `Promise` is returned when `callback` is not provided.
 
--   `channels`: Array of channel statistics for each channel in the image. Each channel statistic contains
-    -   `min` (minimum value in the channel)
-    -   `max` (maximum value in the channel)
-    -   `sum` (sum of all values in a channel)
-    -   `squaresSum` (sum of squared values in a channel)
-    -   `mean` (mean of the values in a channel)
-    -   `stdev` (standard deviation for the values in a channel)
-    -   `minX` (x-coordinate of one of the pixel where the minimum lies)
-    -   `minY` (y-coordinate of one of the pixel where the minimum lies)
-    -   `maxX` (x-coordinate of one of the pixel where the maximum lies)
-    -   `maxY` (y-coordinate of one of the pixel where the maximum lies)
--   `isOpaque`: Is the image fully opaque? Will be `true` if the image has no alpha channel or if every pixel is fully opaque.
--   `entropy`: Histogram-based estimation of greyscale entropy, discarding alpha channel if any (experimental)
--   `sharpness`: Estimation of greyscale sharpness based on the standard deviation of a Laplacian convolution, discarding alpha channel if any (experimental)
--   `dominant`: Object containing most dominant sRGB colour based on a 4096-bin 3D histogram (experimental)
+*   `channels`: Array of channel statistics for each channel in the image. Each channel statistic contains
+    *   `min` (minimum value in the channel)
+    *   `max` (maximum value in the channel)
+    *   `sum` (sum of all values in a channel)
+    *   `squaresSum` (sum of squared values in a channel)
+    *   `mean` (mean of the values in a channel)
+    *   `stdev` (standard deviation for the values in a channel)
+    *   `minX` (x-coordinate of one of the pixel where the minimum lies)
+    *   `minY` (y-coordinate of one of the pixel where the minimum lies)
+    *   `maxX` (x-coordinate of one of the pixel where the maximum lies)
+    *   `maxY` (y-coordinate of one of the pixel where the maximum lies)
+*   `isOpaque`: Is the image fully opaque? Will be `true` if the image has no alpha channel or if every pixel is fully opaque.
+*   `entropy`: Histogram-based estimation of greyscale entropy, discarding alpha channel if any (experimental)
+*   `sharpness`: Estimation of greyscale sharpness based on the standard deviation of a Laplacian convolution, discarding alpha channel if any (experimental)
+*   `dominant`: Object containing most dominant sRGB colour based on a 4096-bin 3D histogram (experimental)
 
 ### Parameters
 
--   `callback` **[Function][4]?** called with the arguments `(err, stats)`
+*   `callback` **[Function][4]?** called with the arguments `(err, stats)`
 
 ### Examples
 
@@ -95,7 +95,7 @@ const { entropy, sharpness, dominant } = await sharp(input).stats();
 const { r, g, b } = dominant;
 ```
 
-Returns **[Promise][5]&lt;[Object][6]>** 
+Returns **[Promise][5]<[Object][6]>** 
 
 [1]: https://libvips.github.io/libvips/API/current/VipsImage.html#VipsInterpretation
 

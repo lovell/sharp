@@ -6,49 +6,50 @@ Resize image to `width`, `height` or `width x height`.
 
 When both a `width` and `height` are provided, the possible methods by which the image should **fit** these are:
 
--   `cover`: (default) Preserving aspect ratio, ensure the image covers both provided dimensions by cropping/clipping to fit.
--   `contain`: Preserving aspect ratio, contain within both provided dimensions using "letterboxing" where necessary.
--   `fill`: Ignore the aspect ratio of the input and stretch to both provided dimensions.
--   `inside`: Preserving aspect ratio, resize the image to be as large as possible while ensuring its dimensions are less than or equal to both those specified.
--   `outside`: Preserving aspect ratio, resize the image to be as small as possible while ensuring its dimensions are greater than or equal to both those specified.
+*   `cover`: (default) Preserving aspect ratio, ensure the image covers both provided dimensions by cropping/clipping to fit.
+*   `contain`: Preserving aspect ratio, contain within both provided dimensions using "letterboxing" where necessary.
+*   `fill`: Ignore the aspect ratio of the input and stretch to both provided dimensions.
+*   `inside`: Preserving aspect ratio, resize the image to be as large as possible while ensuring its dimensions are less than or equal to both those specified.
+*   `outside`: Preserving aspect ratio, resize the image to be as small as possible while ensuring its dimensions are greater than or equal to both those specified.
 
 Some of these values are based on the [object-fit][1] CSS property.
 
 When using a `fit` of `cover` or `contain`, the default **position** is `centre`. Other options are:
 
--   `sharp.position`: `top`, `right top`, `right`, `right bottom`, `bottom`, `left bottom`, `left`, `left top`.
--   `sharp.gravity`: `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` or `centre`.
--   `sharp.strategy`: `cover` only, dynamically crop using either the `entropy` or `attention` strategy.
+*   `sharp.position`: `top`, `right top`, `right`, `right bottom`, `bottom`, `left bottom`, `left`, `left top`.
+*   `sharp.gravity`: `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` or `centre`.
+*   `sharp.strategy`: `cover` only, dynamically crop using either the `entropy` or `attention` strategy.
 
 Some of these values are based on the [object-position][2] CSS property.
 
 The experimental strategy-based approach resizes so one dimension is at its target length
 then repeatedly ranks edge regions, discarding the edge with the lowest score based on the selected strategy.
 
--   `entropy`: focus on the region with the highest [Shannon entropy][3].
--   `attention`: focus on the region with the highest luminance frequency, colour saturation and presence of skin tones.
+*   `entropy`: focus on the region with the highest [Shannon entropy][3].
+*   `attention`: focus on the region with the highest luminance frequency, colour saturation and presence of skin tones.
 
 Possible interpolation kernels are:
 
--   `nearest`: Use [nearest neighbour interpolation][4].
--   `cubic`: Use a [Catmull-Rom spline][5].
--   `mitchell`: Use a [Mitchell-Netravali spline][6].
--   `lanczos2`: Use a [Lanczos kernel][7] with `a=2`.
--   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
+*   `nearest`: Use [nearest neighbour interpolation][4].
+*   `cubic`: Use a [Catmull-Rom spline][5].
+*   `mitchell`: Use a [Mitchell-Netravali spline][6].
+*   `lanczos2`: Use a [Lanczos kernel][7] with `a=2`.
+*   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
 
 ### Parameters
 
--   `width` **[number][8]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
--   `height` **[number][8]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
--   `options` **[Object][9]?** 
-    -   `options.width` **[String][10]?** alternative means of specifying `width`. If both are present this take priority.
-    -   `options.height` **[String][10]?** alternative means of specifying `height`. If both are present this take priority.
-    -   `options.fit` **[String][10]** how the image should be resized to fit both provided dimensions, one of `cover`, `contain`, `fill`, `inside` or `outside`. (optional, default `'cover'`)
-    -   `options.position` **[String][10]** position, gravity or strategy to use when `fit` is `cover` or `contain`. (optional, default `'centre'`)
-    -   `options.background` **([String][10] \| [Object][9])** background colour when using a `fit` of `contain`, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
-    -   `options.kernel` **[String][10]** the kernel to use for image reduction. (optional, default `'lanczos3'`)
-    -   `options.withoutEnlargement` **[Boolean][12]** do not enlarge if the width _or_ height are already less than the specified dimensions, equivalent to GraphicsMagick's `>` geometry option. (optional, default `false`)
-    -   `options.fastShrinkOnLoad` **[Boolean][12]** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
+*   `width` **[number][8]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
+*   `height` **[number][8]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
+*   `options` **[Object][9]?** 
+
+    *   `options.width` **[String][10]?** alternative means of specifying `width`. If both are present this take priority.
+    *   `options.height` **[String][10]?** alternative means of specifying `height`. If both are present this take priority.
+    *   `options.fit` **[String][10]** how the image should be resized to fit both provided dimensions, one of `cover`, `contain`, `fill`, `inside` or `outside`. (optional, default `'cover'`)
+    *   `options.position` **[String][10]** position, gravity or strategy to use when `fit` is `cover` or `contain`. (optional, default `'centre'`)
+    *   `options.background` **([String][10] | [Object][9])** background colour when using a `fit` of `contain`, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
+    *   `options.kernel` **[String][10]** the kernel to use for image reduction. (optional, default `'lanczos3'`)
+    *   `options.withoutEnlargement` **[Boolean][12]** do not enlarge if the width *or* height are already less than the specified dimensions, equivalent to GraphicsMagick's `>` geometry option. (optional, default `false`)
+    *   `options.fastShrinkOnLoad` **[Boolean][12]** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
 
 ### Examples
 
@@ -125,7 +126,7 @@ const scaleByHalf = await sharp(input)
   );
 ```
 
--   Throws **[Error][13]** Invalid parameters
+*   Throws **[Error][13]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -136,12 +137,13 @@ This operation will always occur after resizing and extraction, if any.
 
 ### Parameters
 
--   `extend` **([number][8] \| [Object][9])** single pixel count to add to all edges or an Object with per-edge counts
-    -   `extend.top` **[number][8]**  (optional, default `0`)
-    -   `extend.left` **[number][8]**  (optional, default `0`)
-    -   `extend.bottom` **[number][8]**  (optional, default `0`)
-    -   `extend.right` **[number][8]**  (optional, default `0`)
-    -   `extend.background` **([String][10] \| [Object][9])** background colour, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
+*   `extend` **([number][8] | [Object][9])** single pixel count to add to all edges or an Object with per-edge counts
+
+    *   `extend.top` **[number][8]**  (optional, default `0`)
+    *   `extend.left` **[number][8]**  (optional, default `0`)
+    *   `extend.bottom` **[number][8]**  (optional, default `0`)
+    *   `extend.right` **[number][8]**  (optional, default `0`)
+    *   `extend.background` **([String][10] | [Object][9])** background colour, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
 
 ### Examples
 
@@ -170,7 +172,7 @@ sharp(input)
   ...
 ```
 
--   Throws **[Error][13]** Invalid parameters
+*   Throws **[Error][13]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -178,17 +180,18 @@ Returns **Sharp**
 
 Extract/crop a region of the image.
 
--   Use `extract` before `resize` for pre-resize extraction.
--   Use `extract` after `resize` for post-resize extraction.
--   Use `extract` before and after for both.
+*   Use `extract` before `resize` for pre-resize extraction.
+*   Use `extract` after `resize` for post-resize extraction.
+*   Use `extract` before and after for both.
 
 ### Parameters
 
--   `options` **[Object][9]** describes the region to extract using integral pixel values
-    -   `options.left` **[number][8]** zero-indexed offset from left edge
-    -   `options.top` **[number][8]** zero-indexed offset from top edge
-    -   `options.width` **[number][8]** width of region to extract
-    -   `options.height` **[number][8]** height of region to extract
+*   `options` **[Object][9]** describes the region to extract using integral pixel values
+
+    *   `options.left` **[number][8]** zero-indexed offset from left edge
+    *   `options.top` **[number][8]** zero-indexed offset from top edge
+    *   `options.width` **[number][8]** width of region to extract
+    *   `options.height` **[number][8]** height of region to extract
 
 ### Examples
 
@@ -210,7 +213,7 @@ sharp(input)
   });
 ```
 
--   Throws **[Error][13]** Invalid parameters
+*   Throws **[Error][13]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -224,10 +227,11 @@ will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
 ### Parameters
 
--   `threshold` **[number][8]** the allowed difference from the top-left pixel, a number greater than zero. (optional, default `10`)
+*   `threshold` **[number][8]** the allowed difference from the top-left pixel, a number greater than zero. (optional, default `10`)
 
+<!---->
 
--   Throws **[Error][13]** Invalid parameters
+*   Throws **[Error][13]** Invalid parameters
 
 Returns **Sharp** 
 

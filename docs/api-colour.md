@@ -7,10 +7,11 @@ An alpha channel may be present and will be unchanged by the operation.
 
 ### Parameters
 
--   `rgb` **([string][1] \| [Object][2])** parsed by the [color][3] module to extract chroma values.
+*   `rgb` **([string][1] | [Object][2])** parsed by the [color][3] module to extract chroma values.
 
+<!---->
 
--   Throws **[Error][4]** Invalid parameter
+*   Throws **[Error][4]** Invalid parameter
 
 Returns **Sharp** 
 
@@ -25,7 +26,7 @@ An alpha channel may be present, and will be unchanged by the operation.
 
 ### Parameters
 
--   `greyscale` **[Boolean][5]**  (optional, default `true`)
+*   `greyscale` **[Boolean][5]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -35,7 +36,7 @@ Alternative spelling of `greyscale`.
 
 ### Parameters
 
--   `grayscale` **[Boolean][5]**  (optional, default `true`)
+*   `grayscale` **[Boolean][5]**  (optional, default `true`)
 
 Returns **Sharp** 
 
@@ -46,7 +47,7 @@ By default output image will be web-friendly sRGB, with additional channels inte
 
 ### Parameters
 
--   `colourspace` **[string][1]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][6]
+*   `colourspace` **[string][1]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][6]
 
 ### Examples
 
@@ -57,7 +58,7 @@ await sharp(input)
  .toFile('16-bpp.png')
 ```
 
--   Throws **[Error][4]** Invalid parameters
+*   Throws **[Error][4]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -67,10 +68,11 @@ Alternative spelling of `toColourspace`.
 
 ### Parameters
 
--   `colorspace` **[string][1]?** output colorspace.
+*   `colorspace` **[string][1]?** output colorspace.
 
+<!---->
 
--   Throws **[Error][4]** Invalid parameters
+*   Throws **[Error][4]** Invalid parameters
 
 Returns **Sharp** 
 

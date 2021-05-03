@@ -54,17 +54,18 @@ console.log(sharp.versions);
 
 ## cache
 
-Gets or, when options are provided, sets the limits of _libvips'_ operation cache.
+Gets or, when options are provided, sets the limits of *libvips'* operation cache.
 Existing entries in the cache will be trimmed after any change in limits.
 This method always returns cache statistics,
 useful for determining how much working memory is required for a particular task.
 
 ### Parameters
 
--   `options` **([Object][1] \| [boolean][10])** Object with the following attributes, or boolean where true uses default cache settings and false removes all caching (optional, default `true`)
-    -   `options.memory` **[number][11]** is the maximum memory in MB to use for this cache (optional, default `50`)
-    -   `options.files` **[number][11]** is the maximum number of files to hold open (optional, default `20`)
-    -   `options.items` **[number][11]** is the maximum number of operations to cache (optional, default `100`)
+*   `options` **([Object][1] | [boolean][10])** Object with the following attributes, or boolean where true uses default cache settings and false removes all caching (optional, default `true`)
+
+    *   `options.memory` **[number][11]** is the maximum memory in MB to use for this cache (optional, default `50`)
+    *   `options.files` **[number][11]** is the maximum number of files to hold open (optional, default `20`)
+    *   `options.items` **[number][11]** is the maximum number of operations to cache (optional, default `100`)
 
 ### Examples
 
@@ -83,7 +84,7 @@ Returns **[Object][1]**
 ## concurrency
 
 Gets or, when a concurrency is provided, sets
-the number of threads _libvips'_ should create to process each image.
+the number of threads *libvips'* should create to process each image.
 
 The default value is the number of CPU cores,
 except when using glibc-based Linux without jemalloc,
@@ -98,7 +99,7 @@ This method always returns the current concurrency.
 
 ### Parameters
 
--   `concurrency` **[number][11]?** 
+*   `concurrency` **[number][11]?** 
 
 ### Examples
 
@@ -114,8 +115,8 @@ Returns **[number][11]** concurrency
 
 An EventEmitter that emits a `change` event when a task is either:
 
--   queued, waiting for _libuv_ to provide a worker thread
--   complete
+*   queued, waiting for *libuv* to provide a worker thread
+*   complete
 
 ### Examples
 
@@ -129,8 +130,8 @@ sharp.queue.on('change', function(queueLength) {
 
 Provides access to internal task counters.
 
--   queue is the number of tasks this module has queued waiting for _libuv_ to provide a worker thread from its pool.
--   process is the number of resize tasks currently being processed.
+*   queue is the number of tasks this module has queued waiting for *libuv* to provide a worker thread from its pool.
+*   process is the number of resize tasks currently being processed.
 
 ### Examples
 
@@ -150,7 +151,7 @@ by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM N
 
 ### Parameters
 
--   `simd` **[boolean][10]**  (optional, default `true`)
+*   `simd` **[boolean][10]**  (optional, default `true`)
 
 ### Examples
 
