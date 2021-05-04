@@ -36,6 +36,7 @@ const { minimumLibvipsVersion, minimumLibvipsVersionLabelled } = libvips;
 const distHost = process.env.npm_config_sharp_libvips_binary_host || 'https://github.com/lovell/sharp-libvips/releases/download';
 const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SHARP_DIST_BASE_URL || `${distHost}/v${minimumLibvipsVersionLabelled}/`;
 const supportsBrotli = ('BrotliDecompress' in zlib);
+const installationForced = !!(process.env.npm_config_sharp_install_force || process.env.SHARP_INSTALL_FORCE);
 
 const fail = function (err) {
   libvips.log(err);
@@ -45,6 +46,14 @@ const fail = function (err) {
   libvips.log('Attempting to build from source via node-gyp but this may fail due to the above error');
   libvips.log('Please see https://sharp.pixelplumbing.com/install for required dependencies');
   process.exit(1);
+};
+
+const handleError = function (err) {
+  if (installationForced) {
+    console.warn(`${err.message}. Continue due forced installation`);
+  } else {
+    throw err;
+  }
 };
 
 const extractTarball = function (tarPath, platformAndArch) {
@@ -98,18 +107,18 @@ try {
     }
     if (detectLibc.family === detectLibc.GLIBC && detectLibc.version) {
       if (semverLessThan(`${detectLibc.version}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
-        throw new Error(`Use with glibc ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
+        handleError(new Error(`Use with glibc ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
       }
     }
     if (detectLibc.family === detectLibc.MUSL && detectLibc.version) {
       if (semverLessThan(detectLibc.version, '1.1.24')) {
-        throw new Error(`Use with musl ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`);
+        handleError(new Error(`Use with musl ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
       }
     }
 
     const supportedNodeVersion = process.env.npm_package_engines_node || require('../package.json').engines.node;
     if (!semverSatisfies(process.versions.node, supportedNodeVersion)) {
-      throw new Error(`Expected Node.js version ${supportedNodeVersion} but found ${process.versions.node}`);
+      handleError(new Error(`Expected Node.js version ${supportedNodeVersion} but found ${process.versions.node}`));
     }
 
     const extension = supportsBrotli ? 'br' : 'gz';
