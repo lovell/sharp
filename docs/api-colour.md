@@ -40,6 +40,51 @@ Alternative spelling of `greyscale`.
 
 Returns **Sharp** 
 
+## pipelineColourspace
+
+Set the pipeline colourspace.
+
+The input image will be converted to the provided colourspace at the start of the pipeline.
+All operations will use this colourspace before converting to the output colourspace, as defined by [toColourspace][6].
+
+This feature is experimental and has not yet been fully-tested with all operations.
+
+### Parameters
+
+*   `colourspace` **[string][1]?** pipeline colourspace e.g. `rgb16`, `scrgb`, `lab`, `grey16` [...][7]
+
+### Examples
+
+```javascript
+// Run pipeline in 16 bits per channel RGB while converting final result to 8 bits per channel sRGB.
+await sharp(input)
+ .pipelineColourspace('rgb16')
+ .toColourspace('srgb')
+ .toFile('16bpc-pipeline-to-8bpc-output.png')
+```
+
+*   Throws **[Error][4]** Invalid parameters
+
+Returns **Sharp** 
+
+**Meta**
+
+*   **since**: 0.29.0
+
+## pipelineColorspace
+
+Alternative spelling of `pipelineColourspace`.
+
+### Parameters
+
+*   `colorspace` **[string][1]?** pipeline colorspace.
+
+<!---->
+
+*   Throws **[Error][4]** Invalid parameters
+
+Returns **Sharp** 
+
 ## toColourspace
 
 Set the output colourspace.
@@ -47,7 +92,7 @@ By default output image will be web-friendly sRGB, with additional channels inte
 
 ### Parameters
 
-*   `colourspace` **[string][1]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][6]
+*   `colourspace` **[string][1]?** output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][8]
 
 ### Examples
 
@@ -86,4 +131,8 @@ Returns **Sharp**
 
 [5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[6]: https://github.com/libvips/libvips/blob/3c0bfdf74ce1dc37a6429bed47fa76f16e2cd70a/libvips/iofuncs/enumtypes.c#L777-L794
+[6]: #tocolourspace
+
+[7]: https://github.com/libvips/libvips/blob/41cff4e9d0838498487a00623462204eb10ee5b8/libvips/iofuncs/enumtypes.c#L774
+
+[8]: https://github.com/libvips/libvips/blob/3c0bfdf74ce1dc37a6429bed47fa76f16e2cd70a/libvips/iofuncs/enumtypes.c#L777-L794

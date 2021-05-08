@@ -68,6 +68,13 @@ class PipelineWorker : public Napi::AsyncWorker {
       sharp::ImageType inputImageType;
       std::tie(image, inputImageType) = sharp::OpenInput(baton->input);
 
+      if (baton->colourspaceInput != VIPS_INTERPRETATION_LAST) {
+        if (image.interpretation() != baton->colourspaceInput) {
+          image = image.colourspace(baton->colourspaceInput,
+            VImage::option()->set("source_space", image.interpretation()));
+        }
+      }
+
       // Calculate angle of rotation
       VipsAngle rotation;
       if (baton->useExifOrientation) {
@@ -214,7 +221,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       double yresidual = static_cast<double>(yshrink) / yfactor;
 
       // If integral x and y shrink are equal, try to use shrink-on-load for JPEG and WebP,
-      // but not when applying gamma correction, pre-resize extract or trim
+      // but not when applying gamma correction, pre-resize extract, trim or input colourspace
       int shrink_on_load = 1;
 
       int shrink_on_load_factor = 1;
@@ -227,6 +234,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         xshrink == yshrink && xshrink >= 2 * shrink_on_load_factor &&
         (inputImageType == sharp::ImageType::JPEG || inputImageType == sharp::ImageType::WEBP) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold == 0.0 &&
+        baton->colourspaceInput == VIPS_INTERPRETATION_LAST &&
         image.width() > 3 && image.height() > 3 && baton->input->pages == 1
       ) {
         if (xshrink >= 8 * shrink_on_load_factor) {
@@ -1384,6 +1392,10 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     for (unsigned int i = 0; i < 9; i++) {
        baton->recombMatrix[i] = sharp::AttrAsDouble(recombMatrix, i);
     }
+  }
+  baton->colourspaceInput = sharp::GetInterpretation(sharp::AttrAsStr(options, "colourspaceInput"));
+  if (baton->colourspaceInput == VIPS_INTERPRETATION_ERROR) {
+    baton->colourspaceInput = VIPS_INTERPRETATION_LAST;
   }
   baton->colourspace = sharp::GetInterpretation(sharp::AttrAsStr(options, "colourspace"));
   if (baton->colourspace == VIPS_INTERPRETATION_ERROR) {

@@ -90,7 +90,29 @@ describe('Colour space conversion', function () {
       });
   });
 
-  it('Invalid input', function () {
+  it('From sRGB with RGB16 pipeline, resize with gamma, to sRGB', function (done) {
+    sharp(fixtures.inputPngGradients)
+      .pipelineColourspace('rgb16')
+      .resize(320)
+      .gamma()
+      .toColourspace('srgb')
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(320, info.width);
+        fixtures.assertSimilar(fixtures.expected('colourspace-gradients-gamma-resize.png'), data, {
+          threshold: 0
+        }, done);
+      });
+  });
+
+  it('Invalid pipelineColourspace input', function () {
+    assert.throws(function () {
+      sharp(fixtures.inputJpg)
+        .pipelineColorspace(null);
+    }, /Expected string for colourspace but received null of type object/);
+  });
+
+  it('Invalid toColourspace input', function () {
     assert.throws(function () {
       sharp(fixtures.inputJpg)
         .toColourspace(null);

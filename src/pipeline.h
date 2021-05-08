@@ -185,6 +185,7 @@ struct PipelineBaton {
   int extractChannel;
   bool removeAlpha;
   double ensureAlpha;
+  VipsInterpretation colourspaceInput;
   VipsInterpretation colourspace;
   int pageHeight;
   std::vector<int> delay;
@@ -308,6 +309,7 @@ struct PipelineBaton {
     extractChannel(-1),
     removeAlpha(false),
     ensureAlpha(-1.0),
+    colourspaceInput(VIPS_INTERPRETATION_LAST),
     colourspace(VIPS_INTERPRETATION_LAST),
     pageHeight(0),
     delay{-1},
