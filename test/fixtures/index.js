@@ -74,6 +74,7 @@ module.exports = {
   inputJpgLossless: getPath('testimgl.jpg'), // Lossless JPEG from ftp://ftp.fu-berlin.de/unix/X11/graphics/ImageMagick/delegates/ljpeg-6b.tar.gz
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
+  inputPngGradients: getPath('gradients-rgb8.png'),
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
   inputPngCompleteTransparency: getPath('full-transparent.png'),
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),
