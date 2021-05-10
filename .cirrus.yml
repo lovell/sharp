@@ -5,6 +5,7 @@ task:
   name: FreeBSD 13.0
   env:
     IGNORE_OSVERSION: yes
+  skip_notifications: true
   prerequisites_script:
     - pkg update -f
     - pkg upgrade -y
