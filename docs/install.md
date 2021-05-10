@@ -54,6 +54,8 @@ When using npm v6 or earlier, the `npm install --unsafe-perm` flag must be used 
 
 When using npm v7, the user running `npm install` must own the directory it is run in.
 
+When installing cross platform prebuilts on linux hosts an installation can be forced by `--sharp-install-force` flag or by setting `SHARP_INSTALL_FORCE` env variable.
+
 The `npm install --ignore-scripts=false` flag must be used when `npm` has been configured to ignore installation scripts.
 
 Check the output of running `npm install --verbose sharp` for useful error messages.
