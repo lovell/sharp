@@ -4,7 +4,7 @@
 
 Requires libvips v8.10.6
 
-### v0.28.2 - TBD
+### v0.28.2 - 10th May 2021
 
 * Allow `withMetadata` to set `density`.
   [#967](https://github.com/lovell/sharp/issues/967)
