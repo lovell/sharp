@@ -50,7 +50,7 @@ const fail = function (err) {
 
 const handleError = function (err) {
   if (installationForced) {
-    console.warn(`${err.message}. Continue due forced installation`);
+    libvips.log(`Installation warning: ${err.message}`);
   } else {
     throw err;
   }
@@ -105,7 +105,8 @@ try {
     if (platformAndArch === 'freebsd-x64' || platformAndArch === 'openbsd-x64' || platformAndArch === 'sunos-x64') {
       throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
-    if (detectLibc.family === detectLibc.GLIBC && detectLibc.version) {
+    // Linux libc version check
+    if (detectLibc.family === detectLibc.GLIBC && detectLibc.version && minimumGlibcVersionByArch[arch]) {
       if (semverLessThan(`${detectLibc.version}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
         handleError(new Error(`Use with glibc ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
       }
@@ -115,7 +116,7 @@ try {
         handleError(new Error(`Use with musl ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
       }
     }
-
+    // Node.js minimum version check
     const supportedNodeVersion = process.env.npm_package_engines_node || require('../package.json').engines.node;
     if (!semverSatisfies(process.versions.node, supportedNodeVersion)) {
       handleError(new Error(`Expected Node.js version ${supportedNodeVersion} but found ${process.versions.node}`));

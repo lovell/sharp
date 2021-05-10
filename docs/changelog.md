@@ -24,6 +24,10 @@ Requires libvips v8.10.6
   [#2687](https://github.com/lovell/sharp/pull/2687)
   [@JakobJingleheimer](https://github.com/JakobJingleheimer)
 
+* Add install-time flag to skip version compatibility checks.
+  [#2692](https://github.com/lovell/sharp/pull/2692)
+  [@xemle](https://github.com/xemle)
+
 ### v0.28.1 - 5th April 2021
 
 * Ensure all installation errors are logged with a more obvious prefix.
