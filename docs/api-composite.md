@@ -41,6 +41,8 @@ and [https://www.cairographics.org/operators/][2]
         *   `images[].raw.width` **[Number][7]?** 
         *   `images[].raw.height` **[Number][7]?** 
         *   `images[].raw.channels` **[Number][7]?** 
+    *   `images[].failOnError` **[boolean][9]** @see [constructor parameters][10] (optional, default `true`)
+    *   `images[].limitInputPixels` **([number][7] | [boolean][9])** @see [constructor parameters][10] (optional, default `268402689`)
 
 ### Examples
 
@@ -61,7 +63,7 @@ sharp('input.png')
   });
 ```
 
-*   Throws **[Error][10]** Invalid parameters
+*   Throws **[Error][11]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -87,4 +89,6 @@ Returns **Sharp**
 
 [9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[10]: /api-constructor#parameters
+
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
