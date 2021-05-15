@@ -227,7 +227,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         xshrink == yshrink && xshrink >= 2 * shrink_on_load_factor &&
         (inputImageType == sharp::ImageType::JPEG || inputImageType == sharp::ImageType::WEBP) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold == 0.0 &&
-        image.width() > 3 && image.height() > 3
+        image.width() > 3 && image.height() > 3 && baton->input->pages == 1
       ) {
         if (xshrink >= 8 * shrink_on_load_factor) {
           xfactor = xfactor / 8;

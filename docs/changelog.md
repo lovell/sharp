@@ -4,6 +4,11 @@
 
 Requires libvips v8.10.6
 
+### v0.28.3 - TBD
+
+* Skip shrink-on-load for multi-page WebP.
+  [#2714](https://github.com/lovell/sharp/issues/2714)
+
 ### v0.28.2 - 10th May 2021
 
 * Allow `withMetadata` to set `density`.
