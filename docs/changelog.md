@@ -6,6 +6,8 @@ Requires libvips v8.10.6
 
 ### v0.28.3 - TBD
 
+* Ensure presence of libvips, vendored or global, before invoking node-gyp.
+
 * Skip shrink-on-load for multi-page WebP.
   [#2714](https://github.com/lovell/sharp/issues/2714)
 

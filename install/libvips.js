@@ -43,7 +43,6 @@ const fail = function (err) {
   if (err.code === 'EACCES') {
     libvips.log('Are you trying to install as a root or sudo user? Try again with the --unsafe-perm flag');
   }
-  libvips.log('Attempting to build from source via node-gyp but this may fail due to the above error');
   libvips.log('Please see https://sharp.pixelplumbing.com/install for required dependencies');
   process.exit(1);
 };
