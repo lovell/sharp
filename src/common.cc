@@ -557,6 +557,14 @@ namespace sharp {
   }
 
   /*
+    Multi-page images can have a page height. Fetch it, and sanity check it.
+    If page-height is not set, it defaults to the image height
+  */
+  int GetPageHeight(VImage image) {
+    return vips_image_get_page_height(image.get_image());
+  }
+
+  /*
     Check the proposed format supports the current dimensions.
   */
   void AssertImageTypeDimensions(VImage image, ImageType const imageType) {
@@ -880,6 +888,76 @@ namespace sharp {
       image = image.bandjoin_const(alpha);
     }
     return image;
+  }
+
+  std::pair<double, double> ResolveShrink(int width, int height, int targetWidth, int targetHeight,
+    Canvas canvas, bool swap, bool withoutEnlargement) {
+    if (swap) {
+      // Swap input width and height when requested.
+      std::swap(width, height);
+    }
+
+    double hshrink = 1.0;
+    double vshrink = 1.0;
+
+    if (targetWidth > 0 && targetHeight > 0) {
+      // Fixed width and height
+      hshrink = static_cast<double>(width) / targetWidth;
+      vshrink = static_cast<double>(height) / targetHeight;
+
+      switch (canvas) {
+        case Canvas::CROP:
+        case Canvas::MIN:
+          if (hshrink < vshrink) {
+            vshrink = hshrink;
+          } else {
+            hshrink = vshrink;
+          }
+          break;
+        case Canvas::EMBED:
+        case Canvas::MAX:
+          if (hshrink > vshrink) {
+            vshrink = hshrink;
+          } else {
+            hshrink = vshrink;
+          }
+          break;
+        case Canvas::IGNORE_ASPECT:
+          if (swap) {
+            std::swap(hshrink, vshrink);
+          }
+          break;
+      }
+    } else if (targetWidth > 0) {
+      // Fixed width
+      hshrink = static_cast<double>(width) / targetWidth;
+
+      if (canvas != Canvas::IGNORE_ASPECT) {
+        // Auto height
+        vshrink = hshrink;
+      }
+    } else if (targetHeight > 0) {
+      // Fixed height
+      vshrink = static_cast<double>(height) / targetHeight;
+
+      if (canvas != Canvas::IGNORE_ASPECT) {
+        // Auto width
+        hshrink = vshrink;
+      }
+    }
+
+    // We should not enlarge (oversample) the output image,
+    // if withoutEnlargement is specified.
+    if (withoutEnlargement) {
+      hshrink = std::max(1.0, hshrink);
+      vshrink = std::max(1.0, vshrink);
+    }
+
+    // We don't want to shrink so much that we send an axis to 0
+    hshrink = std::min(hshrink, static_cast<double>(width));
+    vshrink = std::min(vshrink, static_cast<double>(height));
+
+    return std::make_pair(hshrink, vshrink);
   }
 
 }  // namespace sharp
