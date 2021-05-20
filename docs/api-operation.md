@@ -276,7 +276,7 @@ Convolve the image with the specified kernel.
 *   `kernel` **[Object][2]** 
 
     *   `kernel.width` **[number][1]** width of the kernel in pixels.
-    *   `kernel.height` **[number][1]** width of the kernel in pixels.
+    *   `kernel.height` **[number][1]** height of the kernel in pixels.
     *   `kernel.kernel` **[Array][7]<[number][1]>** Array of length `width*height` containing the kernel values.
     *   `kernel.scale` **[number][1]** the scale of the kernel in pixels. (optional, default `sum`)
     *   `kernel.offset` **[number][1]** the offset of the kernel in pixels. (optional, default `0`)
