@@ -36,6 +36,11 @@ namespace sharp {
   VImage Normalise(VImage image);
 
   /*
+   * Contrast limiting adapative histogram equalization (CLAHE)
+   */
+  VImage Clahe(VImage image, int const width, int const height, int const maxSlope);
+
+  /*
    * Gamma encoding/decoding
    */
   VImage Gamma(VImage image, double const exponent);

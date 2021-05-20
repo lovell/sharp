@@ -109,6 +109,9 @@ struct PipelineBaton {
   double gammaOut;
   bool greyscale;
   bool normalise;
+  int claheWidth;
+  int claheHeight;
+  int claheMaxSlope;
   bool useExifOrientation;
   int angle;
   double rotationAngle;
@@ -234,6 +237,9 @@ struct PipelineBaton {
     gamma(0.0),
     greyscale(false),
     normalise(false),
+    claheWidth(0),
+    claheHeight(0),
+    claheMaxSlope(3),
     useExifOrientation(false),
     angle(0),
     rotationAngle(0.0),

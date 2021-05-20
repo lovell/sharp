@@ -76,7 +76,8 @@
     "Leon Radley <leon@radley.se>",
     "alza54 <alza54@thiocod.in>",
     "Jacob Smith <jacob@frende.me>",
-    "Michael Nutt <michael@nutt.im>"
+    "Michael Nutt <michael@nutt.im>",
+    "Brad Parham <baparham@gmail.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
