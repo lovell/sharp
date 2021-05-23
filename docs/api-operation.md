@@ -248,7 +248,7 @@ Returns **Sharp**
 ## clahe
 
 Perform contrast limiting adaptive histogram equalization
-({@link [https://en.wikipedia.org/wiki/Adaptive_histogram_equalization#Contrast_Limited_AHE|CLAHE}][9]).
+[CLAHE][9].
 
 This will, in general, enhance the clarity of the image by bringing out darker details.
 
@@ -452,6 +452,6 @@ Returns **Sharp**
 
 [8]: /api-channel#removealpha
 
-[9]: https://en.wikipedia.org/wiki/Adaptive_histogram_equalization#Contrast_Limited_AHE|CLAHE}
+[9]: https://en.wikipedia.org/wiki/Adaptive_histogram_equalization#Contrast_Limited_AHE
 
 [10]: https://nodejs.org/api/buffer.html
