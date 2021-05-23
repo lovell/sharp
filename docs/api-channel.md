@@ -4,6 +4,8 @@
 
 Remove alpha channel, if any. This is a no-op if the image does not have an alpha channel.
 
+See also [flatten][1].
+
 ### Examples
 
 ```javascript
@@ -25,7 +27,7 @@ This is a no-op if the image already has an alpha channel.
 
 ### Parameters
 
-*   `alpha` **[number][1]** alpha transparency level (0=fully-transparent, 1=fully-opaque) (optional, default `1`)
+*   `alpha` **[number][2]** alpha transparency level (0=fully-transparent, 1=fully-opaque) (optional, default `1`)
 
 ### Examples
 
@@ -43,7 +45,7 @@ const rgba = await sharp(rgb)
   .toBuffer();
 ```
 
-*   Throws **[Error][2]** Invalid alpha transparency level
+*   Throws **[Error][3]** Invalid alpha transparency level
 
 Returns **Sharp** 
 
@@ -57,7 +59,7 @@ Extract a single channel from a multi-channel image.
 
 ### Parameters
 
-*   `channel` **([number][1] | [string][3])** zero-indexed channel/band number to extract, or `red`, `green`, `blue` or `alpha`.
+*   `channel` **([number][2] | [string][4])** zero-indexed channel/band number to extract, or `red`, `green`, `blue` or `alpha`.
 
 ### Examples
 
@@ -71,7 +73,7 @@ sharp(input)
    });
 ```
 
-*   Throws **[Error][2]** Invalid channel
+*   Throws **[Error][3]** Invalid channel
 
 Returns **Sharp** 
 
@@ -90,12 +92,12 @@ For raw pixel input, the `options` object should contain a `raw` attribute, whic
 
 ### Parameters
 
-*   `images` **([Array][4]<([string][3] | [Buffer][5])> | [string][3] | [Buffer][5])** one or more images (file paths, Buffers).
-*   `options` **[Object][6]** image options, see `sharp()` constructor.
+*   `images` **([Array][5]<([string][4] | [Buffer][6])> | [string][4] | [Buffer][6])** one or more images (file paths, Buffers).
+*   `options` **[Object][7]** image options, see `sharp()` constructor.
 
 <!---->
 
-*   Throws **[Error][2]** Invalid parameters
+*   Throws **[Error][3]** Invalid parameters
 
 Returns **Sharp** 
 
@@ -105,7 +107,7 @@ Perform a bitwise boolean operation on all input image channels (bands) to produ
 
 ### Parameters
 
-*   `boolOp` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
+*   `boolOp` **[string][4]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
 
 ### Examples
 
@@ -119,18 +121,20 @@ sharp('3-channel-rgb-input.png')
   });
 ```
 
-*   Throws **[Error][2]** Invalid parameters
+*   Throws **[Error][3]** Invalid parameters
 
 Returns **Sharp** 
 
-[1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[1]: /api-operation#flatten
 
-[2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[5]: https://nodejs.org/api/buffer.html
+[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[6]: https://nodejs.org/api/buffer.html
+
+[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object

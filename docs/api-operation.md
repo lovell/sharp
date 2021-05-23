@@ -176,6 +176,8 @@ Returns **Sharp**
 
 Merge alpha transparency channel, if any, with a background, then remove the alpha channel.
 
+See also [removeAlpha][8].
+
 ### Parameters
 
 *   `options` **[Object][2]?** 
@@ -186,7 +188,7 @@ Merge alpha transparency channel, if any, with a background, then remove the alp
 
 ```javascript
 await sharp(rgbaInput)
-  .flatten({background: '#F0A703' })
+  .flatten({ background: '#F0A703' })
   .toBuffer();
 ```
 
@@ -245,11 +247,10 @@ Returns **Sharp**
 
 ## clahe
 
-Perform contrast limiting adaptive histogram equalization (CLAHE)
+Perform contrast limiting adaptive histogram equalization
+({@link [https://en.wikipedia.org/wiki/Adaptive_histogram_equalization#Contrast_Limited_AHE|CLAHE}][9]).
 
-This will, in general, enhance the clarity of the image by bringing out
-darker details. Please read more about CLAHE here:
-[https://en.wikipedia.org/wiki/Adaptive_histogram_equalization#Contrast_Limited_AHE][8]
+This will, in general, enhance the clarity of the image by bringing out darker details.
 
 ### Parameters
 
@@ -332,7 +333,7 @@ the selected bitwise boolean `operation` between the corresponding pixels of the
 
 ### Parameters
 
-*   `operand` **([Buffer][9] | [string][3])** Buffer containing image data or string containing the path to an image file.
+*   `operand` **([Buffer][10] | [string][3])** Buffer containing image data or string containing the path to an image file.
 *   `operator` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
 *   `options` **[Object][2]?** 
 
@@ -449,6 +450,8 @@ Returns **Sharp**
 
 [7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-[8]: https://en.wikipedia.org/wiki/Adaptive_histogram_equalization#Contrast_Limited_AHE
+[8]: /api-channel#removealpha
 
-[9]: https://nodejs.org/api/buffer.html
+[9]: https://en.wikipedia.org/wiki/Adaptive_histogram_equalization#Contrast_Limited_AHE|CLAHE}
+
+[10]: https://nodejs.org/api/buffer.html
