@@ -11,6 +11,10 @@ Requires libvips v8.10.6
 * Skip shrink-on-load for multi-page WebP.
   [#2714](https://github.com/lovell/sharp/issues/2714)
 
+* Add contrast limiting adaptive histogram equalization (CLAHE) operator.
+  [#2726](https://github.com/lovell/sharp/pull/2726)
+  [@baparham](https://github.com/baparham)
+
 ### v0.28.2 - 10th May 2021
 
 * Allow `withMetadata` to set `density`.

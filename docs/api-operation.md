@@ -267,6 +267,10 @@ darker details. Please read more about CLAHE here:
 
 Returns **Sharp** 
 
+**Meta**
+
+*   **since**: 0.28.3
+
 ## convolve
 
 Convolve the image with the specified kernel.
