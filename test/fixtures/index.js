@@ -121,6 +121,8 @@ module.exports = {
 
   inputV: getPath('vfile.v'),
 
+  inputJpgClahe: getPath('concert.jpg'), // public domain - https://www.flickr.com/photos/mars_/14389236779/
+
   testPattern: getPath('test-pattern.png'),
 
   // Path for tests requiring human inspection

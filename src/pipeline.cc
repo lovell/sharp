@@ -345,6 +345,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       bool const shouldApplyMedian = baton->medianSize > 0;
       bool const shouldComposite = !baton->composite.empty();
       bool const shouldModulate = baton->brightness != 1.0 || baton->saturation != 1.0 || baton->hue != 0.0;
+      bool const shouldApplyClahe = baton->claheWidth != 0 && baton->claheHeight != 0;
 
       if (shouldComposite && !sharp::HasAlpha(image)) {
         image = sharp::EnsureAlpha(image, 1);
@@ -648,6 +649,11 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Apply normalisation - stretch luminance to cover full dynamic range
       if (baton->normalise) {
         image = sharp::Normalise(image);
+      }
+
+      // Apply contrast limiting adaptive histogram equalization (CLAHE)
+      if (shouldApplyClahe) {
+        image = sharp::Clahe(image, baton->claheWidth, baton->claheHeight, baton->claheMaxSlope);
       }
 
       // Apply bitwise boolean operation between images
@@ -1330,6 +1336,9 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->linearB = sharp::AttrAsDouble(options, "linearB");
   baton->greyscale = sharp::AttrAsBool(options, "greyscale");
   baton->normalise = sharp::AttrAsBool(options, "normalise");
+  baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");
+  baton->claheHeight = sharp::AttrAsUint32(options, "claheHeight");
+  baton->claheMaxSlope = sharp::AttrAsUint32(options, "claheMaxSlope");
   baton->useExifOrientation = sharp::AttrAsBool(options, "useExifOrientation");
   baton->angle = sharp::AttrAsInt32(options, "angle");
   baton->rotationAngle = sharp::AttrAsDouble(options, "rotationAngle");
