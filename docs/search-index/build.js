@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { extractDescription, extractKeywords } = require('./extract');
+const { extractDescription, extractKeywords, extractParameters } = require('./extract');
 
 const searchIndex = [];
 
@@ -37,18 +37,19 @@ for (const match of matches) {
 ].forEach((section) => {
   const contents = fs.readFileSync(path.join(__dirname, '..', `api-${section}.md`), 'utf8');
   const matches = contents.matchAll(
-    /\n## (?<title>[A-Za-z]+)\n\n(?<firstparagraph>.+?)\n\n/gs
+    /\n## (?<title>[A-Za-z]+)\n\n(?<firstparagraph>.+?)\n\n(?<parameters>### Parameters*.+?)#/gs
   );
   for (const match of matches) {
-    const { title, firstparagraph } = match.groups;
+    const { title, firstparagraph, parameters } = match.groups;
     const description = firstparagraph.startsWith('###')
       ? 'Constructor'
       : extractDescription(firstparagraph);
+    const parameterNames = extractParameters(parameters);
 
     searchIndex.push({
       t: title,
       d: description,
-      k: extractKeywords(`${title} ${description}`),
+      k: extractKeywords(`${title} ${description} ${parameterNames}`),
       l: `/api-${section}#${title.toLowerCase()}`
     });
   }

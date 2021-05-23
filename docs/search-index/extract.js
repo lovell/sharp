@@ -4,12 +4,18 @@ const stopWords = require('./stop-words');
 
 const extractDescription = (str) =>
   str
+    .replace(/### Examples.*/sg, '')
     .replace(/\(http[^)]+/g, '')
     .replace(/\s+/g, ' ')
     .replace(/[^A-Za-z0-9_/\-,. ]/g, '')
     .replace(/\s+/g, ' ')
     .substr(0, 180)
     .trim();
+
+const extractParameters = (str) =>
+  [...str.matchAll(/options\.(?<name>[^.`]+)/gs)]
+    .map((match) => match.groups.name)
+    .join(' ');
 
 const extractKeywords = (str) =>
   [
@@ -21,4 +27,4 @@ const extractKeywords = (str) =>
     )
   ].join(' ');
 
-module.exports = { extractDescription, extractKeywords };
+module.exports = { extractDescription, extractKeywords, extractParameters };
