@@ -4,7 +4,7 @@
 
 Requires libvips v8.10.6
 
-### v0.28.3 - TBD
+### v0.28.3 - 24th May 2021
 
 * Ensure presence of libvips, vendored or global, before invoking node-gyp.
 
