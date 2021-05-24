@@ -37,14 +37,14 @@ for (const match of matches) {
 ].forEach((section) => {
   const contents = fs.readFileSync(path.join(__dirname, '..', `api-${section}.md`), 'utf8');
   const matches = contents.matchAll(
-    /\n## (?<title>[A-Za-z]+)\n\n(?<firstparagraph>.+?)\n\n(?<parameters>### Parameters*.+?)#/gs
+    /\n## (?<title>[A-Za-z]+)\n\n(?<firstparagraph>.+?)\n\n(?<parameters>### Parameters.+?Returns)?/gs
   );
   for (const match of matches) {
     const { title, firstparagraph, parameters } = match.groups;
     const description = firstparagraph.startsWith('###')
       ? 'Constructor'
       : extractDescription(firstparagraph);
-    const parameterNames = extractParameters(parameters);
+    const parameterNames = parameters ? extractParameters(parameters) : '';
 
     searchIndex.push({
       t: title,
