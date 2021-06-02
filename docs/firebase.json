@@ -14,10 +14,9 @@
       {
         "source": "**",
         "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=86400"
-          }
+          { "key": "Cache-Control", "value": "max-age=86400" },
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
         ]
       }
     ],
