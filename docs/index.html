@@ -105,7 +105,7 @@
                 .then(function (entries) {
                   const results = [];
                   entries.forEach(function (entry) {
-                    if (entry.k.includes(keyword)) {
+                    if (entry.k.includes(keyword.trim().toLowerCase())) {
                       results.push({
                         title: entry.t,
                         link: entry.l,
