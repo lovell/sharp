@@ -57,7 +57,9 @@ jobs:
         if: contains(matrix.container, 'centos')
         run: |
           curl -sL https://rpm.nodesource.com/setup_${{ matrix.nodejs_version }}.x | bash -
-          yum install -y gcc-c++ make git python3 nodejs
+          yum install -y centos-release-scl
+          yum install -y devtoolset-10-gcc-c++ make git python3 nodejs
+          echo "/opt/rh/devtoolset-10/root/usr/bin" >> $GITHUB_PATH
       - name: Dependencies (Linux musl)
         if: contains(matrix.container, 'alpine')
         run: apk add build-base git python3 --update-cache
