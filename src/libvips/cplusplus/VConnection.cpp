@@ -110,19 +110,6 @@ VSource::new_from_options( const char *options )
 	return( out ); 
 }
 
-VOption *
-VOption::set( const char *name, const VSource value )
-{
-	Pair *pair = new Pair( name );
-
-	pair->input = true;
-	g_value_init( &pair->value, VIPS_TYPE_SOURCE );
-	g_value_set_object( &pair->value, value.get_source() );
-	options.push_back( pair );
-
-	return( this );
-}
-
 VTarget 
 VTarget::new_to_descriptor( int descriptor )
 {
@@ -160,19 +147,6 @@ VTarget::new_to_memory()
 	VTarget out( output ); 
 
 	return( out ); 
-}
-
-VOption *
-VOption::set( const char *name, const VTarget value )
-{
-	Pair *pair = new Pair( name );
-
-	pair->input = true;
-	g_value_init( &pair->value, VIPS_TYPE_TARGET );
-	g_value_set_object( &pair->value, value.get_target() );
-	options.push_back( pair );
-
-	return( this );
 }
 
 VIPS_NAMESPACE_END

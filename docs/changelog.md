@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.28 - *circle*
+
+Requires libvips v8.11.0
+
+### v0.29.0 - TBD
+
 ## v0.28 - *bijou*
 
 Requires libvips v8.10.6

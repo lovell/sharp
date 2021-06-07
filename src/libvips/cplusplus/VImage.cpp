@@ -51,6 +51,12 @@
 
 VIPS_NAMESPACE_START
 
+/**
+ * \namespace vips
+ *
+ * General docs for the vips namespace.
+ */
+
 std::vector<double>
 to_vectorv( int n, ... )
 {
@@ -140,6 +146,20 @@ VOption::set( const char *name, int value )
 	return( this );
 }
 
+// input guint64
+VOption *
+VOption::set( const char *name, guint64 value )
+{
+	Pair *pair = new Pair( name );
+
+	pair->input = true;
+	g_value_init( &pair->value, G_TYPE_UINT64 );
+	g_value_set_uint64( &pair->value, value );
+	options.push_back( pair );
+
+	return( this );
+}
+
 // input double
 VOption *
 VOption::set( const char *name, double value )
@@ -167,39 +187,17 @@ VOption::set( const char *name, const char *value )
 	return( this );
 }
 
-// input image
+// input vips object (image, source, target, etc. etc.)
 VOption *
-VOption::set( const char *name, const VImage value )
+VOption::set( const char *name, const VObject value )
 {
 	Pair *pair = new Pair( name );
+	VipsObject *object = value.get_object();
+	GType type = G_OBJECT_TYPE( object );
 
 	pair->input = true;
-	g_value_init( &pair->value, VIPS_TYPE_IMAGE );
-	g_value_set_object( &pair->value, value.get_image() );
-	options.push_back( pair );
-
-	return( this );
-}
-
-// input double array
-VOption *
-VOption::set( const char *name, std::vector<double> value )
-{
-	Pair *pair = new Pair( name );
-
-	double *array;
-	unsigned int i;
-
-	pair->input = true;
-
-	g_value_init( &pair->value, VIPS_TYPE_ARRAY_DOUBLE );
-	vips_value_set_array_double( &pair->value, NULL,
-		static_cast< int >( value.size() ) );
-	array = vips_value_get_array_double( &pair->value, NULL );
-
-	for( i = 0; i < value.size(); i++ ) 
-		array[i] = value[i];
-
+	g_value_init( &pair->value, type );
+	g_value_set_object( &pair->value, object );
 	options.push_back( pair );
 
 	return( this );
@@ -220,6 +218,30 @@ VOption::set( const char *name, std::vector<int> value )
 	vips_value_set_array_int( &pair->value, NULL,
 		static_cast< int >( value.size() ) );
 	array = vips_value_get_array_int( &pair->value, NULL );
+
+	for( i = 0; i < value.size(); i++ ) 
+		array[i] = value[i];
+
+	options.push_back( pair );
+
+	return( this );
+}
+
+// input double array
+VOption *
+VOption::set( const char *name, std::vector<double> value )
+{
+	Pair *pair = new Pair( name );
+
+	double *array;
+	unsigned int i;
+
+	pair->input = true;
+
+	g_value_init( &pair->value, VIPS_TYPE_ARRAY_DOUBLE );
+	vips_value_set_array_double( &pair->value, NULL,
+		static_cast< int >( value.size() ) );
+	array = vips_value_get_array_double( &pair->value, NULL );
 
 	for( i = 0; i < value.size(); i++ ) 
 		array[i] = value[i];
@@ -617,6 +639,22 @@ VImage::new_from_source( VSource source, const char *option_string,
 	call_option_string( operation_name, option_string, options );
 
 	return( out );
+}
+
+VImage 
+VImage::new_from_memory_steal( void *data, size_t size,
+	int width, int height, int bands, VipsBandFormat format )
+{
+	VipsImage *image;
+
+	if( !(image = vips_image_new_from_memory( data, size, 
+		width, height, bands, format )) )
+		throw( VError() );
+
+	g_signal_connect( image, "postclose",
+		G_CALLBACK( vips_image_free_buffer ), data);
+
+	return( VImage( image ) ); 
 }
 
 VImage

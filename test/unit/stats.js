@@ -423,20 +423,20 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInRange(stats.channels[0].maxY, 0, 1));
 
       // alpha channel
-      assert.strictEqual(0, stats.channels[1].min);
-      assert.strictEqual(255, stats.channels[1].max);
-      assert.strictEqual(true, isInAcceptableRange(stats.channels[1].sum, 255));
-      assert.strictEqual(true, isInAcceptableRange(stats.channels[1].squaresSum, 65025));
-      assert.strictEqual(true, isInAcceptableRange(stats.channels[1].mean, 127.5));
-      assert.strictEqual(true, isInAcceptableRange(stats.channels[1].stdev, 180.31222920256963));
-      assert.strictEqual(true, isInteger(stats.channels[1].minX));
-      assert.strictEqual(true, isInRange(stats.channels[1].minX, 0, 2));
-      assert.strictEqual(true, isInteger(stats.channels[1].minY));
-      assert.strictEqual(true, isInRange(stats.channels[1].minY, 0, 1));
-      assert.strictEqual(true, isInteger(stats.channels[1].maxX));
-      assert.strictEqual(true, isInRange(stats.channels[1].maxX, 0, 2));
-      assert.strictEqual(true, isInteger(stats.channels[1].maxY));
-      assert.strictEqual(true, isInRange(stats.channels[1].maxY, 0, 1));
+      assert.strictEqual(0, stats.channels[3].min);
+      assert.strictEqual(255, stats.channels[3].max);
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[3].sum, 255));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[3].squaresSum, 65025));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[3].mean, 127.5));
+      assert.strictEqual(true, isInAcceptableRange(stats.channels[3].stdev, 180.31222920256963));
+      assert.strictEqual(true, isInteger(stats.channels[3].minX));
+      assert.strictEqual(true, isInRange(stats.channels[3].minX, 0, 2));
+      assert.strictEqual(true, isInteger(stats.channels[3].minY));
+      assert.strictEqual(true, isInRange(stats.channels[3].minY, 0, 1));
+      assert.strictEqual(true, isInteger(stats.channels[3].maxX));
+      assert.strictEqual(true, isInRange(stats.channels[3].maxX, 0, 2));
+      assert.strictEqual(true, isInteger(stats.channels[3].maxY));
+      assert.strictEqual(true, isInRange(stats.channels[3].maxY, 0, 1));
 
       done();
     });

@@ -60,17 +60,4 @@ VInterpolate::new_from_name( const char *name, VOption *options )
 	return( out ); 
 }
 
-VOption *
-VOption::set( const char *name, const VInterpolate value )
-{
-	Pair *pair = new Pair( name );
-
-	pair->input = true;
-	g_value_init( &pair->value, VIPS_TYPE_INTERPOLATE );
-	g_value_set_object( &pair->value, value.get_interpolate() );
-	options.push_back( pair );
-
-	return( this );
-}
-
 VIPS_NAMESPACE_END

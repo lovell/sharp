@@ -1,5 +1,5 @@
 // bodies for vips operations
-// Sun  5 Jul 22:36:37 BST 2020
+// Wed May 12 11:30:00 AM CEST 2021
 // this file is generated automatically, do not edit!
 
 VImage VImage::CMC2LCh( VOption *options ) const
@@ -1065,6 +1065,18 @@ VImage VImage::fitsload( const char *filename, VOption *options )
     return( out );
 }
 
+VImage VImage::fitsload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "fitsload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
 void VImage::fitssave( const char *filename, VOption *options ) const
 {
     call( "fitssave",
@@ -1656,6 +1668,70 @@ VImage VImage::join( VImage in2, VipsDirection direction, VOption *options ) con
     return( out );
 }
 
+VImage VImage::jp2kload( const char *filename, VOption *options )
+{
+    VImage out;
+
+    call( "jp2kload",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "filename", filename ) );
+
+    return( out );
+}
+
+VImage VImage::jp2kload_buffer( VipsBlob *buffer, VOption *options )
+{
+    VImage out;
+
+    call( "jp2kload_buffer",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "buffer", buffer ) );
+
+    return( out );
+}
+
+VImage VImage::jp2kload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "jp2kload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
+void VImage::jp2ksave( const char *filename, VOption *options ) const
+{
+    call( "jp2ksave",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "filename", filename ) );
+}
+
+VipsBlob *VImage::jp2ksave_buffer( VOption *options ) const
+{
+    VipsBlob *buffer;
+
+    call( "jp2ksave_buffer",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "buffer", &buffer ) );
+
+    return( buffer );
+}
+
+void VImage::jp2ksave_target( VTarget target, VOption *options ) const
+{
+    call( "jp2ksave_target",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "target", target ) );
+}
+
 VImage VImage::jpegload( const char *filename, VOption *options )
 {
     VImage out;
@@ -1722,6 +1798,70 @@ void VImage::jpegsave_mime( VOption *options ) const
 void VImage::jpegsave_target( VTarget target, VOption *options ) const
 {
     call( "jpegsave_target",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "target", target ) );
+}
+
+VImage VImage::jxlload( const char *filename, VOption *options )
+{
+    VImage out;
+
+    call( "jxlload",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "filename", filename ) );
+
+    return( out );
+}
+
+VImage VImage::jxlload_buffer( VipsBlob *buffer, VOption *options )
+{
+    VImage out;
+
+    call( "jxlload_buffer",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "buffer", buffer ) );
+
+    return( out );
+}
+
+VImage VImage::jxlload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "jxlload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
+void VImage::jxlsave( const char *filename, VOption *options ) const
+{
+    call( "jxlsave",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "filename", filename ) );
+}
+
+VipsBlob *VImage::jxlsave_buffer( VOption *options ) const
+{
+    VipsBlob *buffer;
+
+    call( "jxlsave_buffer",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "buffer", &buffer ) );
+
+    return( buffer );
+}
+
+void VImage::jxlsave_target( VTarget target, VOption *options ) const
+{
+    call( "jxlsave_target",
         (options ? options : VImage::option())->
             set( "in", *this )->
             set( "target", target ) );
@@ -2284,6 +2424,18 @@ VImage VImage::niftiload( const char *filename, VOption *options )
     return( out );
 }
 
+VImage VImage::niftiload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "niftiload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
 void VImage::niftisave( const char *filename, VOption *options ) const
 {
     call( "niftisave",
@@ -2312,6 +2464,18 @@ VImage VImage::openslideload( const char *filename, VOption *options )
         (options ? options : VImage::option())->
             set( "out", &out )->
             set( "filename", filename ) );
+
+    return( out );
+}
+
+VImage VImage::openslideload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "openslideload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
 
     return( out );
 }
@@ -3388,12 +3552,32 @@ VImage VImage::vipsload( const char *filename, VOption *options )
     return( out );
 }
 
+VImage VImage::vipsload_source( VSource source, VOption *options )
+{
+    VImage out;
+
+    call( "vipsload_source",
+        (options ? options : VImage::option())->
+            set( "out", &out )->
+            set( "source", source ) );
+
+    return( out );
+}
+
 void VImage::vipssave( const char *filename, VOption *options ) const
 {
     call( "vipssave",
         (options ? options : VImage::option())->
             set( "in", *this )->
             set( "filename", filename ) );
+}
+
+void VImage::vipssave_target( VTarget target, VOption *options ) const
+{
+    call( "vipssave_target",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "target", target ) );
 }
 
 VImage VImage::webpload( const char *filename, VOption *options )
