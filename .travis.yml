@@ -1,20 +1,5 @@
 jobs:
   include:
-    - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 10"
-      arch: arm64
-      os: linux
-      dist: bionic
-      language: shell
-      before_install:
-        - sudo docker run -dit --name sharp --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
-        - sudo docker exec sharp sh -c "apt-get update && apt-get install -y build-essential git python3 curl"
-        - sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
-        - sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_10.x sid main' >/etc/apt/sources.list.d/nodesource.list"
-        - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs=10.*"
-      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
-      after_success: "[[ -n $TRAVIS_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"npx prebuild --runtime napi --target 3\""
-
     - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 12"
       arch: arm64
       os: linux
@@ -28,6 +13,7 @@ jobs:
         - sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
       install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
+      after_success: "[[ -n $TRAVIS_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"npx prebuild --runtime napi --target 5\""
 
     - name: "Linux ARM64v8 (Debian 11, glibc 2.29) - Node.js 14"
       arch: arm64
@@ -58,18 +44,6 @@ jobs:
       install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
 
-    - name: "Linux ARM64v8 (Alpine 3.11, musl 1.1.24) - Node.js 10"
-      arch: arm64
-      os: linux
-      dist: focal
-      language: shell
-      before_install:
-        - sudo docker run -dit --name sharp --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:10-alpine3.11
-        - sudo docker exec sharp sh -c "apk add build-base git python3 --update-cache"
-      install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
-      script: sudo docker exec sharp sh -c "npm test"
-      after_success: "[[ -n $TRAVIS_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"npx prebuild --runtime napi --target 3\""
-
     - name: "Linux ARM64v8 (Alpine 3.11, musl 1.1.24) - Node.js 12"
       arch: arm64
       os: linux
@@ -80,6 +54,7 @@ jobs:
         - sudo docker exec sharp sh -c "apk add build-base git python3 --update-cache"
       install: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       script: sudo docker exec sharp sh -c "npm test"
+      after_success: "[[ -n $TRAVIS_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"npx prebuild --runtime napi --target 5\""
 
     - name: "Linux ARM64v8 (Alpine 3.11, musl 1.1.24) - Node.js 14"
       arch: arm64

@@ -37,6 +37,7 @@
             'msvs_settings': {
               'VCCLCompilerTool': {
                 'ExceptionHandling': 1,
+                'Optimization': 1,
                 'WholeProgramOptimization': 'true'
               },
               'VCLibrarianTool': {
@@ -67,7 +68,7 @@
   }, {
     'target_name': 'sharp',
     'defines': [
-      'NAPI_VERSION=3'
+      'NAPI_VERSION=5'
     ],
     'dependencies': [
       '<!(node -p "require(\'node-addon-api\').gyp")',
@@ -172,7 +173,7 @@
       '-std=c++0x',
       '-fexceptions',
       '-Wall',
-      '-O3'
+      '-Os'
     ],
     'xcode_settings': {
       'CLANG_CXX_LANGUAGE_STANDARD': 'c++11',
@@ -182,7 +183,7 @@
       'OTHER_CPLUSPLUSFLAGS': [
         '-fexceptions',
         '-Wall',
-        '-O3'
+        '-Oz'
       ]
     },
     'configurations': {
@@ -202,6 +203,7 @@
             'msvs_settings': {
               'VCCLCompilerTool': {
                 'ExceptionHandling': 1,
+                'Optimization': 1,
                 'WholeProgramOptimization': 'true'
               },
               'VCLibrarianTool': {

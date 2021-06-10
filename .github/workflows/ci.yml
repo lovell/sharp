@@ -11,12 +11,9 @@ jobs:
         include:
           - os: ubuntu-20.04
             container: centos:7
-            nodejs_version: 10
+            nodejs_version: 12
             coverage: true
             prebuild: true
-          - os: ubuntu-20.04
-            container: centos:7
-            nodejs_version: 12
           - os: ubuntu-20.04
             container: centos:7
             nodejs_version: 14
@@ -24,10 +21,8 @@ jobs:
             container: centos:7
             nodejs_version: 16
           - os: ubuntu-20.04
-            container: node:10-alpine3.11
-            prebuild: true
-          - os: ubuntu-20.04
             container: node:12-alpine3.11
+            prebuild: true
           - os: ubuntu-20.04
             container: node:14-alpine3.11
           - os: ubuntu-20.04
@@ -35,19 +30,15 @@ jobs:
           - os: ubuntu-20.04
             container: node:16-alpine3.11
           - os: macos-10.15
-            nodejs_version: 10
-            prebuild: true
-          - os: macos-10.15
             nodejs_version: 12
+            prebuild: true
           - os: macos-10.15
             nodejs_version: 14
           - os: macos-10.15
             nodejs_version: 16
           - os: windows-2019
-            nodejs_version: 10
-            prebuild: true
-          - os: windows-2019
             nodejs_version: 12
+            prebuild: true
           - os: windows-2019
             nodejs_version: 14
           - os: windows-2019
@@ -86,4 +77,4 @@ jobs:
         if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
         env:
           prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
-        run: npx prebuild --runtime napi --target 3
+        run: npx prebuild --runtime napi --target 5

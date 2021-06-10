@@ -4,9 +4,8 @@ build: off
 platform: x86
 environment:
   matrix:
-  - nodejs_version: "10"
-    prebuild: true
   - nodejs_version: "12"
+    prebuild: true
   - nodejs_version: "14"
   - nodejs_version: "16"
 install:
@@ -15,4 +14,4 @@ install:
 test_script:
   - npm test
 on_success:
-  - if [%prebuild%] == [true] if [%APPVEYOR_REPO_TAG%] == [true] npx prebuild --runtime napi --target 3
+  - if [%prebuild%] == [true] if [%APPVEYOR_REPO_TAG%] == [true] npx prebuild --runtime napi --target 5

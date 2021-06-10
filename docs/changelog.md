@@ -1,10 +1,12 @@
 # Changelog
 
-## v0.28 - *circle*
+## v0.29 - *circle*
 
 Requires libvips v8.11.0
 
 ### v0.29.0 - TBD
+
+* Drop support for Node.js 10, now requires Node.js >= 12.13.0.
 
 ## v0.28 - *bijou*
 
