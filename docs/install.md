@@ -138,14 +138,10 @@ To install the prebuilt libvips binaries from a custom URL,
 set the `sharp_libvips_binary_host` npm config option
 or the `npm_config_sharp_libvips_binary_host` environment variable.
 
-The version subpath and file name are appended to these. There should be tarballs available
-that are compressed with both gzip and Brotli, as the format downloaded will vary depending
-on whether the user's version of Node supports Brotli decompression (Node.js v10.16.0+)
-
+The version subpath and file name are appended to these.
 For example, if `sharp_libvips_binary_host` is set to `https://hostname/path`
 and the libvips version is `1.2.3` then the resultant URL will be
-`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.br` or 
-`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.gz`.
+`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.br`.
 
 See the Chinese mirror below for a further example.
 

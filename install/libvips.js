@@ -35,7 +35,6 @@ const hasSharpPrebuild = [
 const { minimumLibvipsVersion, minimumLibvipsVersionLabelled } = libvips;
 const distHost = process.env.npm_config_sharp_libvips_binary_host || 'https://github.com/lovell/sharp-libvips/releases/download';
 const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SHARP_DIST_BASE_URL || `${distHost}/v${minimumLibvipsVersionLabelled}/`;
-const supportsBrotli = ('BrotliDecompress' in zlib);
 const installationForced = !!(process.env.npm_config_sharp_install_force || process.env.SHARP_INSTALL_FORCE);
 
 const fail = function (err) {
@@ -68,7 +67,7 @@ const extractTarball = function (tarPath, platformAndArch) {
 
   stream.pipeline(
     fs.createReadStream(tarPath),
-    supportsBrotli ? new zlib.BrotliDecompress() : new zlib.Gunzip(),
+    new zlib.BrotliDecompress(),
     tarFs.extract(versionedVendorPath, { ignore }),
     function (err) {
       if (err) {
@@ -121,10 +120,8 @@ try {
       handleError(new Error(`Expected Node.js version ${supportedNodeVersion} but found ${process.versions.node}`));
     }
 
-    const extension = supportsBrotli ? 'br' : 'gz';
-
     // Download to per-process temporary file
-    const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.' + extension;
+    const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.br';
     const tarPathCache = path.join(libvips.cachePath(), tarFilename);
     if (fs.existsSync(tarPathCache)) {
       libvips.log(`Using cached ${tarPathCache}`);
