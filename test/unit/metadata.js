@@ -724,6 +724,25 @@ describe('Image metadata', function () {
       })
   );
 
+  it('AVIF', async () => {
+    const metadata = await sharp(fixtures.inputAvif).metadata();
+    assert.deepStrictEqual(metadata, {
+      format: 'heif',
+      width: 2048,
+      height: 858,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      isProgressive: false,
+      pages: 1,
+      pageHeight: 858,
+      pagePrimary: 0,
+      compression: 'av1',
+      hasProfile: false,
+      hasAlpha: false
+    });
+  });
+
   it('File input with corrupt header fails gracefully', function (done) {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .metadata(function (err) {
