@@ -765,8 +765,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("Q", baton->jpegQuality)
             ->set("interlace", baton->jpegProgressive)
             ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
-              ? VIPS_FOREIGN_JPEG_SUBSAMPLE_OFF
-              : VIPS_FOREIGN_JPEG_SUBSAMPLE_ON)
+              ? VIPS_FOREIGN_SUBSAMPLE_OFF
+              : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("trellis_quant", baton->jpegTrellisQuantisation)
             ->set("quant_table", baton->jpegQuantisationTable)
             ->set("overshoot_deringing", baton->jpegOvershootDeringing)
@@ -865,13 +865,11 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write HEIF to buffer
           VipsArea *area = reinterpret_cast<VipsArea*>(image.heifsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
-            ->set("compression", baton->heifCompression)
             ->set("Q", baton->heifQuality)
+            ->set("compression", baton->heifCompression)
             ->set("speed", baton->heifSpeed)
-#if defined(VIPS_TYPE_FOREIGN_SUBSAMPLE)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
-#endif
             ->set("lossless", baton->heifLossless)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -931,8 +929,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("Q", baton->jpegQuality)
             ->set("interlace", baton->jpegProgressive)
             ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
-              ? VIPS_FOREIGN_JPEG_SUBSAMPLE_OFF
-              : VIPS_FOREIGN_JPEG_SUBSAMPLE_ON)
+              ? VIPS_FOREIGN_SUBSAMPLE_OFF
+              : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("trellis_quant", baton->jpegTrellisQuantisation)
             ->set("quant_table", baton->jpegQuantisationTable)
             ->set("overshoot_deringing", baton->jpegOvershootDeringing)
@@ -1010,10 +1008,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
             ->set("speed", baton->heifSpeed)
-#if defined(VIPS_TYPE_FOREIGN_SUBSAMPLE)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
-#endif
             ->set("lossless", baton->heifLossless));
           baton->formatOut = "heif";
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {

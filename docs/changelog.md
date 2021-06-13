@@ -8,6 +8,9 @@ Requires libvips v8.11.0
 
 * Drop support for Node.js 10, now requires Node.js >= 12.13.0.
 
+* AVIF encoding now defaults to `4:4:4` chroma subsampling.
+  [#2562](https://github.com/lovell/sharp/issues/2562)
+
 * Allow multiple platform-arch binaries in same `node_modules` installation tree.
   [#2575](https://github.com/lovell/sharp/issues/2575)
 

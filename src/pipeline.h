@@ -293,7 +293,7 @@ struct PipelineBaton {
     heifQuality(50),
     heifCompression(VIPS_FOREIGN_HEIF_COMPRESSION_AV1),
     heifSpeed(5),
-    heifChromaSubsampling("4:2:0"),
+    heifChromaSubsampling("4:4:4"),
     heifLossless(false),
     withMetadata(false),
     withMetadataOrientation(-1),
