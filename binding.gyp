@@ -1,7 +1,8 @@
 {
   'variables': {
     'vips_version': '<!(node -p "require(\'./lib/libvips\').minimumLibvipsVersion")',
-    'sharp_vendor_dir': '<(module_root_dir)/vendor/<(vips_version)'
+    'platform_and_arch': '<!(node -p "require(\'./lib/platform\')()")',
+    'sharp_vendor_dir': '<(module_root_dir)/vendor/<(vips_version)/<(platform_and_arch)'
   },
   'targets': [{
     'target_name': 'libvips-cpp',
@@ -66,7 +67,7 @@
       }]
     ]
   }, {
-    'target_name': 'sharp',
+    'target_name': 'sharp-<(platform_and_arch)',
     'defines': [
       'NAPI_VERSION=5'
     ],
@@ -147,7 +148,7 @@
             'xcode_settings': {
               'OTHER_LDFLAGS': [
                 # Ensure runtime linking is relative to sharp.node
-                '-Wl,-rpath,\'@loader_path/../../vendor/<(vips_version)/lib\''
+                '-Wl,-rpath,\'@loader_path/../../vendor/<(vips_version)/<(platform_and_arch)/lib\''
               ]
             }
           }],
@@ -162,7 +163,7 @@
               ],
               'ldflags': [
                 # Ensure runtime linking is relative to sharp.node
-                '-Wl,-s -Wl,--disable-new-dtags -Wl,-rpath=\'$$ORIGIN/../../vendor/<(vips_version)/lib\''
+                '-Wl,-s -Wl,--disable-new-dtags -Wl,-rpath=\'$$ORIGIN/../../vendor/<(vips_version)/<(platform_and_arch)/lib\''
               ]
             }
           }]

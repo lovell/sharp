@@ -206,30 +206,16 @@ to `false` when using the `yarn` package manager.
 
 ## AWS Lambda
 
-The binaries in the `node_modules` directory of the
+The `node_modules` directory of the
 [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-package.html)
-must be for the Linux x64 platform.
+must include binaries for the Linux x64 platform.
 
 When building your deployment package on machines other than Linux x64 (glibc),
-run the following commands:
+run the following additional command after `npm install`:
 
-macOS:
 ```sh
-rm -rf node_modules/sharp
+npm install
 SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp
-```
-
-Windows:
-```sh
-rmdir /s /q node_modules/sharp
-npm install --arch=x64 --platform=linux sharp
-```
-
-Alternatively a Docker container closely matching the Lambda runtime can be used:
-
-```sh
-rm -rf node_modules/sharp
-docker run -v "$PWD":/var/task lambci/lambda:build-nodejs12.x npm install sharp
 ```
 
 To get the best performance select the largest memory available.

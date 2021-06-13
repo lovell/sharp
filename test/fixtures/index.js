@@ -2,7 +2,7 @@
 
 const path = require('path');
 const sharp = require('../../');
-const maxColourDistance = require('../../build/Release/sharp')._maxColourDistance;
+const maxColourDistance = require('../../lib/sharp')._maxColourDistance;
 
 // Helpers
 const getPath = function (filename) {

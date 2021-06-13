@@ -8,6 +8,9 @@ Requires libvips v8.11.0
 
 * Drop support for Node.js 10, now requires Node.js >= 12.13.0.
 
+* Allow multiple platform-arch binaries in same `node_modules` installation tree.
+  [#2575](https://github.com/lovell/sharp/issues/2575)
+
 ## v0.28 - *bijou*
 
 Requires libvips v8.10.6
