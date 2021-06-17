@@ -57,8 +57,8 @@ describe('Image channel extraction', function () {
   it('With colorspace conversion', function (done) {
     const output = fixtures.path('output.extract-lch.jpg');
     sharp(fixtures.inputJpg)
-      .toColourspace('lch')
       .extractChannel(1)
+      .toColourspace('lch')
       .resize(320, 240, { fastShrinkOnLoad: false })
       .toFile(output, function (err, info) {
         if (err) throw err;
@@ -70,12 +70,13 @@ describe('Image channel extraction', function () {
   });
 
   it('Alpha from 16-bit PNG', function (done) {
-    const output = fixtures.path('output.extract-alpha-16bit.jpg');
+    const output = fixtures.path('output.extract-alpha-16bit.png');
     sharp(fixtures.inputPngWithTransparency16bit)
+      .resize(16)
       .extractChannel(3)
-      .toFile(output, function (err, info) {
+      .toFile(output, function (err) {
         if (err) throw err;
-        fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-16bit.jpg'));
+        fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-16bit.png'));
         done();
       });
   });

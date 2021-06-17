@@ -64,13 +64,18 @@ Extract a single channel from a multi-channel image.
 ### Examples
 
 ```javascript
-sharp(input)
+// green.jpg is a greyscale image containing the green channel of the input
+await sharp(input)
   .extractChannel('green')
-  .toColourspace('b-w')
-  .toFile('green.jpg', function(err, info) {
-    // info.channels === 1
-    // green.jpg is a greyscale image containing the green channel of the input
-   });
+  .toFile('green.jpg');
+```
+
+```javascript
+// red1 is the red value of the first pixel, red2 the second pixel etc.
+const [red1, red2, ...] = await sharp(input)
+  .extractChannel(0)
+  .raw()
+  .toBuffer();
 ```
 
 *   Throws **[Error][3]** Invalid channel
