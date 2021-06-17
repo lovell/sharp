@@ -35,7 +35,7 @@ describe('WebP', function () {
 
   it('should work for webp alpha quality', function (done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-      .webp({ alphaQuality: 80 })
+      .webp({ alphaQuality: 80, reductionEffort: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -46,7 +46,7 @@ describe('WebP', function () {
 
   it('should work for webp lossless', function (done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-      .webp({ lossless: true })
+      .webp({ lossless: true, reductionEffort: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -57,7 +57,7 @@ describe('WebP', function () {
 
   it('should work for webp near-lossless', function (done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-      .webp({ nearLossless: true, quality: 50 })
+      .webp({ nearLossless: true, quality: 50, reductionEffort: 0 })
       .toBuffer(function (err50, data50, info50) {
         if (err50) throw err50;
         assert.strictEqual(true, data50.length > 0);
@@ -68,7 +68,7 @@ describe('WebP', function () {
 
   it('should use near-lossless when both lossless and nearLossless are specified', function (done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-      .webp({ nearLossless: true, quality: 50, lossless: true })
+      .webp({ nearLossless: true, quality: 50, lossless: true, reductionEffort: 0 })
       .toBuffer(function (err50, data50, info50) {
         if (err50) throw err50;
         assert.strictEqual(true, data50.length > 0);
@@ -189,7 +189,7 @@ describe('WebP', function () {
   it('should work with streams when only animated is set', function (done) {
     fs.createReadStream(fixtures.inputWebPAnimated)
       .pipe(sharp({ animated: true }))
-      .webp({ lossless: true })
+      .webp({ lossless: true, reductionEffort: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -201,7 +201,7 @@ describe('WebP', function () {
   it('should work with streams when only pages is set', function (done) {
     fs.createReadStream(fixtures.inputWebPAnimated)
       .pipe(sharp({ pages: -1 }))
-      .webp({ lossless: true })
+      .webp({ lossless: true, reductionEffort: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
