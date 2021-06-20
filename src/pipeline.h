@@ -168,6 +168,7 @@ struct PipelineBaton {
   int heifSpeed;
   std::string heifChromaSubsampling;
   bool heifLossless;
+  VipsBandFormat rawDepth;
   std::string err;
   bool withMetadata;
   int withMetadataOrientation;
@@ -295,6 +296,7 @@ struct PipelineBaton {
     heifSpeed(5),
     heifChromaSubsampling("4:2:0"),
     heifLossless(false),
+    rawDepth(VIPS_FORMAT_UCHAR),
     withMetadata(false),
     withMetadataOrientation(-1),
     withMetadataDensity(0.0),
