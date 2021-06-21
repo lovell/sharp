@@ -6,7 +6,6 @@
       ".*",
       "build.js",
       "firebase.json",
-      "*.md",
       "image/**",
       "search-index/**"
     ],
