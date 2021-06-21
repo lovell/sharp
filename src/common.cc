@@ -92,6 +92,9 @@ namespace sharp {
     }
     // Raw pixel input
     if (HasAttr(input, "rawChannels")) {
+      descriptor->rawDepth = static_cast<VipsBandFormat>(
+        vips_enum_from_nick(nullptr, VIPS_TYPE_BAND_FORMAT,
+        AttrAsStr(input, "rawDepth").data()));
       descriptor->rawChannels = AttrAsUint32(input, "rawChannels");
       descriptor->rawWidth = AttrAsUint32(input, "rawWidth");
       descriptor->rawHeight = AttrAsUint32(input, "rawHeight");
@@ -297,7 +300,7 @@ namespace sharp {
       if (descriptor->rawChannels > 0) {
         // Raw, uncompressed pixel data
         image = VImage::new_from_memory(descriptor->buffer, descriptor->bufferLength,
-          descriptor->rawWidth, descriptor->rawHeight, descriptor->rawChannels, VIPS_FORMAT_UCHAR);
+          descriptor->rawWidth, descriptor->rawHeight, descriptor->rawChannels, descriptor->rawDepth);
         if (descriptor->rawChannels < 3) {
           image.get_image()->Type = VIPS_INTERPRETATION_B_W;
         } else {
