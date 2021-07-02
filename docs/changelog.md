@@ -20,6 +20,9 @@ Requires libvips v8.11.0
 * Default to single-channel `b-w` space when `extractChannel` is used.
   [#2658](https://github.com/lovell/sharp/issues/2658)
 
+* Allow installation directory to contain spaces (regression in v0.26.0).
+  [#2777](https://github.com/lovell/sharp/issues/2777)
+
 ## v0.28 - *bijou*
 
 Requires libvips v8.10.6
