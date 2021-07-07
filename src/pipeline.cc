@@ -68,6 +68,44 @@ class PipelineWorker : public Napi::AsyncWorker {
       sharp::ImageType inputImageType;
       std::tie(image, inputImageType) = sharp::OpenInput(baton->input);
 
+      // Get rendered image width and height
+      int inputWidth = image.width();
+      int inputHeight = image.height();
+
+      // Store the resize values
+      int targetResizeWidth = baton->width;
+      int targetResizeHeight = baton->height;
+
+      // Determine the vector image scaling for proper image quality when the
+      // original vector image dimensions are lower than the resize dimensions
+      if (inputImageType == sharp::ImageType::SVG || inputImageType == sharp::ImageType::PDF) {
+        double scale = 1.0;
+
+        if (inputWidth < targetResizeWidth) {
+          scale = 1.0 * targetResizeWidth / inputWidth;
+          inputWidth = targetResizeWidth;
+          inputHeight = static_cast<int>(round(scale * inputHeight));
+        }
+        if (inputHeight < targetResizeHeight) {
+          scale = 1.0 * targetResizeHeight / inputHeight;
+          inputHeight = targetResizeHeight;
+          inputWidth = static_cast<int>(round(scale * inputWidth));
+        }
+
+        // If the scale is higher than 1.0, the image that was rendered is in
+        // too low resolution because of the vector image dimensions. Since it
+        // is a vector image, we can render the source image in higher
+        // resolution using the scale option. This requires re-rendering the
+        // image but will result in a better output quality allowing resizing
+        // the vector images up.
+        if (scale > 1.0) {
+          double originalScale = baton->input->scale;
+          baton->input->scale = scale;
+          image = std::get<0>(sharp::OpenInput(baton->input));
+          baton->input->scale = originalScale;
+        }
+      }
+
       // Calculate angle of rotation
       VipsAngle rotation;
       if (baton->useExifOrientation) {
@@ -106,9 +144,9 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
       }
 
-      // Get pre-resize image width and height
-      int inputWidth = image.width();
-      int inputHeight = image.height();
+      // Get pre-resize image width and height after trim and extraction
+      inputWidth = image.width();
+      inputHeight = image.height();
       if (!baton->rotateBeforePreExtract &&
         (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
         // Swap input output width and height when rotating by 90 or 270 degrees
@@ -120,17 +158,17 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->withoutEnlargement) {
         if (baton->width > inputWidth) {
           baton->width = inputWidth;
+          targetResizeWidth = inputWidth;
         }
         if (baton->height > inputHeight) {
           baton->height = inputHeight;
+          targetResizeHeight = inputHeight;
         }
       }
 
       // Scaling calculations
       double xfactor = 1.0;
       double yfactor = 1.0;
-      int targetResizeWidth = baton->width;
-      int targetResizeHeight = baton->height;
       if (baton->width > 0 && baton->height > 0) {
         // Fixed width and height
         xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);

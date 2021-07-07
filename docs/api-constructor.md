@@ -27,6 +27,7 @@ Implements the [stream.Duplex][1] class.
     *   `options.sequentialRead` **[boolean][7]** Set this to `true` to use sequential rather than random access where possible.
         This can reduce memory usage and might improve performance on some systems. (optional, default `false`)
     *   `options.density` **[number][8]** number representing the DPI for vector images in the range 1 to 100000. (optional, default `72`)
+    *   `options.scale` **[number][8]** number representing the render scale for vector images. (optional, default `1.0`)
     *   `options.pages` **[number][8]** number of pages to extract for multi-page input (GIF, WebP, AVIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
     *   `options.page` **[number][8]** page number to start extracting from for multi-page input (GIF, WebP, AVIF, TIFF, PDF), zero based. (optional, default `0`)
     *   `options.subifd` **[number][8]** subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. (optional, default `-1`)

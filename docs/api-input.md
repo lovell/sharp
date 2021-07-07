@@ -13,6 +13,7 @@ A `Promise` is returned when `callback` is not provided.
 *   `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
 *   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][2]
 *   `density`: Number of pixels per inch (DPI), if present
+*   `scale`: Rendering scale for vector images (SVG, PDF), if present
 *   `chromaSubsampling`: String containing JPEG chroma subsampling, `4:2:0` or `4:4:4` for RGB, `4:2:0:4` or `4:4:4:4` for CMYK
 *   `isProgressive`: Boolean indicating whether the image is interlaced using a progressive scan
 *   `pages`: Number of pages/frames contained within the image, with support for TIFF, HEIF, PDF, animated GIF and animated WebP

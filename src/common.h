@@ -54,6 +54,7 @@ namespace sharp {
     size_t bufferLength;
     bool isBuffer;
     double density;
+    double scale;
     int rawChannels;
     int rawWidth;
     int rawHeight;
@@ -78,6 +79,7 @@ namespace sharp {
       bufferLength(0),
       isBuffer(FALSE),
       density(72.0),
+      scale(1.0),
       rawChannels(0),
       rawWidth(0),
       rawHeight(0),
