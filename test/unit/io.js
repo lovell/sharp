@@ -675,6 +675,11 @@ describe('Input/output', function () {
         sharp({ density: 'zoinks' });
       }, /Expected number between 1 and 100000 for density but received zoinks of type string/);
     });
+    it('Invalid scale: string', function () {
+      assert.throws(function () {
+        sharp({ scale: 'zoinks' });
+      }, /Expected number for scale but received zoinks of type string/);
+    });
     it('Setting animated property updates pages property', function () {
       assert.strictEqual(sharp({ animated: false }).options.input.pages, 1);
       assert.strictEqual(sharp({ animated: true }).options.input.pages, -1);

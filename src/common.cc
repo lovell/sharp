@@ -125,6 +125,10 @@ namespace sharp {
         descriptor->createBackground = AttrAsVectorOfDouble(input, "createBackground");
       }
     }
+    // Vector graphics input
+    if (HasAttr(input, "scale")) {
+      descriptor->scale = AttrAsDouble(input, "scale");
+    }
     // Limit input images to a given number of pixels, where pixels = width * height
     descriptor->limitInputPixels = AttrAsUint32(input, "limitInputPixels");
     // Allow switch from random to sequential access
@@ -320,6 +324,7 @@ namespace sharp {
             }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
+              option->set("scale", descriptor->scale);
             }
             if (imageType == ImageType::MAGICK) {
               option->set("density", std::to_string(descriptor->density).data());
@@ -395,6 +400,7 @@ namespace sharp {
             }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
+              option->set("scale", descriptor->scale);
             }
             if (imageType == ImageType::MAGICK) {
               option->set("density", std::to_string(descriptor->density).data());

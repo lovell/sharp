@@ -74,6 +74,48 @@ describe('SVG input', function () {
     });
   });
 
+  it('Convert SVG to PNG with automatic render scaling', function (done) {
+    const size = 1024;
+    sharp(fixtures.inputSvgSmallViewBox)
+      .resize(size)
+      .toFormat('png')
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(size, info.width);
+        assert.strictEqual(size, info.height);
+        fixtures.assertSimilar(fixtures.expected('circle.png'), data, function (err) {
+          if (err) throw err;
+          sharp(data).metadata(function (err, info) {
+            if (err) throw err;
+            assert.strictEqual(72, info.density);
+            done();
+          });
+        });
+      });
+  });
+
+  it('Convert SVG to PNG with scale option', function (done) {
+    const size = 1024;
+    const scale = size / 8; // 8x8px => 1024x1024px
+    sharp(fixtures.inputSvgSmallViewBox, { scale })
+      .toFormat('png')
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(size, info.width);
+        assert.strictEqual(size, info.height);
+        fixtures.assertSimilar(fixtures.expected('circle.png'), data, function (err) {
+          if (err) throw err;
+          sharp(data).metadata(function (err, info) {
+            if (err) throw err;
+            assert.strictEqual(72, info.density);
+            done();
+          });
+        });
+      });
+  });
+
   it('Convert SVG to PNG at 14.4DPI', function (done) {
     sharp(fixtures.inputSvg, { density: 14.4 })
       .toFormat('png')
