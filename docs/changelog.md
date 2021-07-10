@@ -23,6 +23,10 @@ Requires libvips v8.11.0
 * Allow installation directory to contain spaces (regression in v0.26.0).
   [#2777](https://github.com/lovell/sharp/issues/2777)
 
+* Add `pipelineColourspace` operator to set the processing space.
+  [#2704](https://github.com/lovell/sharp/pull/2704)
+  [@Daiz](https://github.com/Daiz)
+
 ## v0.28 - *bijou*
 
 Requires libvips v8.10.6

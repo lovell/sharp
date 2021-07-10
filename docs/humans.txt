@@ -212,3 +212,6 @@ GitHub: https://github.com/florian-busch
 
 Name: Matthieu Salettes
 GitHub: https://github.com/msalettes
+
+Name: Taneli Vatanen
+GitHub: https://github.com/Daiz
