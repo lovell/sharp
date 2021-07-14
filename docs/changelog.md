@@ -2,7 +2,7 @@
 
 ## v0.29 - *circle*
 
-Requires libvips v8.11.0
+Requires libvips v8.11.2
 
 ### v0.29.0 - TBD
 

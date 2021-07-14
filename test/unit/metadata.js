@@ -247,7 +247,7 @@ describe('Image metadata', function () {
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(800, metadata.width);
       assert.strictEqual(533, metadata.height);
-      assert.strictEqual(4, metadata.channels);
+      assert.strictEqual(3, metadata.channels);
       assert.strictEqual('uchar', metadata.depth);
       assert.strictEqual('undefined', typeof metadata.density);
       assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
