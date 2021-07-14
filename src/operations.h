@@ -97,6 +97,11 @@ namespace sharp {
    */
   VImage Modulate(VImage image, double const brightness, double const saturation, int const hue);
 
+  /*
+   * Ensure the image is in a given colourspace
+   */
+  VImage EnsureColourspace(VImage image, VipsInterpretation colourspace);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

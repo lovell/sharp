@@ -282,4 +282,16 @@ namespace sharp {
       return image.linear(a, b);
     }
   }
+
+  /*
+   * Ensure the image is in a given colourspace
+   */
+  VImage EnsureColourspace(VImage image, VipsInterpretation colourspace) {
+    if (colourspace != VIPS_INTERPRETATION_LAST && image.interpretation() != colourspace) {
+      image = image.colourspace(colourspace,
+        VImage::option()->set("source_space", image.interpretation()));
+    }
+    return image;
+  }
+
 }  // namespace sharp
