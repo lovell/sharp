@@ -77,6 +77,9 @@ A `Promise` is returned when `callback` is not provided.
 *   `sharpness`: Estimation of greyscale sharpness based on the standard deviation of a Laplacian convolution, discarding alpha channel if any (experimental)
 *   `dominant`: Object containing most dominant sRGB colour based on a 4096-bin 3D histogram (experimental)
 
+**Note**: Statistics are derived from the original input image. Any operations performed on the image must first be
+written to a buffer in order to run `stats` on the result (see third example).
+
 ### Parameters
 
 *   `callback` **[Function][4]?** called with the arguments `(err, stats)`
@@ -95,6 +98,14 @@ image
 ```javascript
 const { entropy, sharpness, dominant } = await sharp(input).stats();
 const { r, g, b } = dominant;
+```
+
+```javascript
+const image = sharp(input);
+// store intermediate result
+const part = await image.extract(region).toBuffer();
+// create new instance to obtain statistics of extracted region
+const stats = await sharp(part).stats();
 ```
 
 Returns **[Promise][5]<[Object][6]>** 
