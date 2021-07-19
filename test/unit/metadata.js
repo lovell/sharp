@@ -256,6 +256,7 @@ describe('Image metadata', function () {
       assert.strictEqual('undefined', typeof metadata.orientation);
       assert.strictEqual('undefined', typeof metadata.exif);
       assert.strictEqual('undefined', typeof metadata.icc);
+      assert.deepStrictEqual(metadata.background, { r: 138, g: 148, b: 102 });
       done();
     });
   });
@@ -285,7 +286,7 @@ describe('Image metadata', function () {
       .then(({
         format, width, height, space, channels, depth,
         isProgressive, pages, pageHeight, loop, delay,
-        hasProfile, hasAlpha
+        background, hasProfile, hasAlpha
       }) => {
         assert.strictEqual(format, 'gif');
         assert.strictEqual(width, 80);
@@ -298,6 +299,7 @@ describe('Image metadata', function () {
         assert.strictEqual(pageHeight, 80);
         assert.strictEqual(loop, 0);
         assert.deepStrictEqual(delay, Array(30).fill(30));
+        assert.deepStrictEqual(background, { r: 0, g: 0, b: 0 });
         assert.strictEqual(hasProfile, false);
         assert.strictEqual(hasAlpha, true);
       })

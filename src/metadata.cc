@@ -90,6 +90,9 @@ class MetadataWorker : public Napi::AsyncWorker {
         baton->subifds = image.get_int(VIPS_META_N_SUBIFDS);
       }
       baton->hasProfile = sharp::HasProfile(image);
+      if (image.get_typeof("background") == VIPS_TYPE_ARRAY_DOUBLE) {
+        baton->background = image.get_array_double("background");
+      }
       // Derived attributes
       baton->hasAlpha = sharp::HasAlpha(image);
       baton->orientation = sharp::ExifOrientation(image);
@@ -208,6 +211,17 @@ class MetadataWorker : public Napi::AsyncWorker {
       }
       if (baton->subifds > 0) {
         info.Set("subifds", baton->subifds);
+      }
+      if (!baton->background.empty()) {
+        if (baton->background.size() == 3) {
+          Napi::Object background = Napi::Object::New(env);
+          background.Set("r", baton->background[0]);
+          background.Set("g", baton->background[1]);
+          background.Set("b", baton->background[2]);
+          info.Set("background", background);
+        } else {
+          info.Set("background", baton->background[0]);
+        }
       }
       info.Set("hasProfile", baton->hasProfile);
       info.Set("hasAlpha", baton->hasAlpha);

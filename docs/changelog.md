@@ -8,6 +8,8 @@ Requires libvips v8.11.2
 
 * Drop support for Node.js 10, now requires Node.js >= 12.13.0.
 
+* Add `background` property to PNG and GIF image metadata.
+
 * Add `compression` property to HEIF image metadata.
   [#2504](https://github.com/lovell/sharp/issues/2504)
 

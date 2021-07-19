@@ -42,6 +42,7 @@ struct MetadataBaton {
   std::string compression;
   std::vector<std::pair<int, int>> levels;
   int subifds;
+  std::vector<double> background;
   bool hasProfile;
   bool hasAlpha;
   int orientation;
