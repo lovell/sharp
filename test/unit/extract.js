@@ -42,7 +42,6 @@ describe('Partial image extraction', function () {
   it('TIFF', function (done) {
     sharp(fixtures.inputTiff)
       .extract({ left: 34, top: 63, width: 341, height: 529 })
-      .jpeg()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(341, info.width);

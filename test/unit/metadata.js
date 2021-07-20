@@ -522,7 +522,7 @@ describe('Image metadata', function () {
           assert.strictEqual('Relative', profile.intent);
           assert.strictEqual('Printer', profile.deviceClass);
         });
-        fixtures.assertSimilar(output, fixtures.path('expected/icc-cmyk.jpg'), { threshold: 0 }, done);
+        fixtures.assertSimilar(output, fixtures.expected('icc-cmyk.jpg'), { threshold: 0 }, done);
       });
   });
 
@@ -533,7 +533,7 @@ describe('Image metadata', function () {
       .withMetadata({ icc: fixtures.path('hilutite.icm') })
       .toFile(output, function (err, info) {
         if (err) throw err;
-        fixtures.assertMaxColourDistance(output, fixtures.path('expected/hilutite.jpg'), 9);
+        fixtures.assertMaxColourDistance(output, fixtures.expected('hilutite.jpg'), 9);
         done();
       });
   });
