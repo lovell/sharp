@@ -112,6 +112,19 @@ namespace sharp {
     }
   }
 
+  /**
+   * Produce the "negative" of the image.
+   */
+  VImage Negate(VImage image, bool const negateAlpha) {
+    if (HasAlpha(image) && !negateAlpha) {
+      // Separate alpha channel
+      VImage alpha = image[image.bands() - 1];
+      return RemoveAlpha(image).invert().bandjoin(alpha);
+    } else {
+      return image.invert();
+    }
+  }
+
   /*
    * Gaussian blur. Use sigma of -1.0 for fast blur.
    */

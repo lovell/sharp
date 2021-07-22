@@ -107,4 +107,88 @@ describe('Negate', function () {
         done();
       });
   });
+
+  it('negate ({alpha: true})', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .negate({ alpha: true })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('negate.jpg'), data, done);
+      });
+  });
+
+  it('negate non-alpha channels (png)', function (done) {
+    sharp(fixtures.inputPng)
+      .resize(320, 240)
+      .negate({ alpha: false })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha.png'), data, done);
+      });
+  });
+
+  it('negate non-alpha channels (png, trans)', function (done) {
+    sharp(fixtures.inputPngWithTransparency)
+      .resize(320, 240)
+      .negate({ alpha: false })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha-trans.png'), data, done);
+      });
+  });
+
+  it('negate non-alpha channels (png, alpha)', function (done) {
+    sharp(fixtures.inputPngWithGreyAlpha)
+      .resize(320, 240)
+      .negate({ alpha: false })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha-grey.png'), data, done);
+      });
+  });
+
+  it('negate non-alpha channels (webp)', function (done) {
+    sharp(fixtures.inputWebP)
+      .resize(320, 240)
+      .negate({ alpha: false })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('webp', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha.webp'), data, done);
+      });
+  });
+
+  it('negate non-alpha channels (webp, trans)', function (done) {
+    sharp(fixtures.inputWebPWithTransparency)
+      .resize(320, 240)
+      .negate({ alpha: false })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('webp', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha-trans.webp'), data, done);
+      });
+  });
+
+  it('invalid alpha value', function () {
+    assert.throws(function () {
+      sharp(fixtures.inputWebPWithTransparency).negate({ alpha: 'non-bool' });
+    });
+  });
 });
