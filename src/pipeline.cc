@@ -327,7 +327,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Negate the colours in the image
       if (baton->negate) {
-        image = image.invert();
+        image = sharp::Negate(image, baton->negateAlpha);
       }
 
       // Gamma encoding (darken)
@@ -1320,6 +1320,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->flatten = sharp::AttrAsBool(options, "flatten");
   baton->flattenBackground = sharp::AttrAsVectorOfDouble(options, "flattenBackground");
   baton->negate = sharp::AttrAsBool(options, "negate");
+  baton->negateAlpha = sharp::AttrAsBool(options, "negateAlpha");
   baton->blurSigma = sharp::AttrAsDouble(options, "blurSigma");
   baton->brightness = sharp::AttrAsDouble(options, "brightness");
   baton->saturation = sharp::AttrAsDouble(options, "saturation");

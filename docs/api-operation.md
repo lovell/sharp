@@ -221,7 +221,9 @@ Produce the "negative" of the image.
 
 ### Parameters
 
-*   `negate` **[Boolean][6]**  (optional, default `true`)
+*   `options` **[Object][2]?** 
+
+    *   `options.alpha` **[Boolean][6]** Whether or not to negate any alpha channel (optional, default `true`)
 
 Returns **Sharp** 
 

@@ -46,6 +46,11 @@ namespace sharp {
   VImage Gamma(VImage image, double const exponent);
 
   /*
+   * Produce the "negative" of the image.
+   */
+  VImage Negate(VImage image, bool const negateAlpha);
+
+  /*
    * Gaussian blur. Use sigma of -1.0 for fast blur.
    */
   VImage Blur(VImage image, double const sigma);
