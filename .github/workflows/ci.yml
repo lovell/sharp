@@ -1,3 +1,4 @@
+name: CI (GitHub)
 on:
   - push
   - pull_request

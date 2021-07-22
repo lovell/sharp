@@ -24,6 +24,7 @@ const minimumGlibcVersionByArch = {
 
 const hasSharpPrebuild = [
   'darwin-x64',
+  'darwin-arm64',
   'linux-arm64',
   'linux-x64',
   'linuxmusl-x64',

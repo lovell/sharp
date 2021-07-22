@@ -18,12 +18,13 @@ Ready-compiled sharp and libvips binaries are provided for use with
 Node.js v10+ on the most common platforms:
 
 * macOS x64 (>= 10.13)
+* macOS ARM64
 * Linux x64 (glibc >= 2.17, musl >= 1.1.24)
 * Linux ARM64 (glibc >= 2.29, musl >= 1.1.24)
 * Windows x64
 * Windows x86
 
-An ~7.5MB tarball containing libvips and its most commonly used dependencies
+An ~7MB tarball containing libvips and its most commonly used dependencies
 is downloaded via HTTPS and stored within `node_modules/sharp/vendor` during `npm install`.
 
 This provides support for the
@@ -31,7 +32,6 @@ JPEG, PNG, WebP, AVIF, TIFF, GIF (input) and SVG (input) image formats.
 
 The following platforms have prebuilt libvips but not sharp:
 
-* macOS ARM64
 * Linux ARMv6
 * Linux ARMv7 (glibc >= 2.28)
 * Windows ARM64
