@@ -889,9 +889,9 @@ class PipelineWorker : public Napi::AsyncWorker {
             image = image[0];
             baton->channels = 1;
           }
-          if (image.format() != VIPS_FORMAT_UCHAR) {
-            // Cast pixels to uint8 (unsigned char)
-            image = image.cast(VIPS_FORMAT_UCHAR);
+          if (image.format() != baton->rawDepth) {
+            // Cast pixels to requested format
+            image = image.cast(baton->rawDepth);
           }
           // Get raw image data
           baton->bufferOut = static_cast<char*>(image.write_to_memory(&baton->bufferOutLength));
@@ -1131,6 +1131,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       info.Set("width", static_cast<uint32_t>(width));
       info.Set("height", static_cast<uint32_t>(height));
       info.Set("channels", static_cast<uint32_t>(baton->channels));
+      if (baton->formatOut == "raw") {
+        info.Set("depth", vips_enum_nick(VIPS_TYPE_BAND_FORMAT, baton->rawDepth));
+      }
       info.Set("premultiplied", baton->premultiplied);
       if (baton->hasCropOffset) {
         info.Set("cropOffsetLeft", static_cast<int32_t>(baton->cropOffsetLeft));
@@ -1455,6 +1458,11 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     sharp::AttrAsStr(options, "heifCompression").data()));
   baton->heifSpeed = sharp::AttrAsUint32(options, "heifSpeed");
   baton->heifChromaSubsampling = sharp::AttrAsStr(options, "heifChromaSubsampling");
+
+  // Raw output
+  baton->rawDepth = static_cast<VipsBandFormat>(
+    vips_enum_from_nick(nullptr, VIPS_TYPE_BAND_FORMAT,
+    sharp::AttrAsStr(options, "rawDepth").data()));
 
   // Animated output
   if (sharp::HasAttr(options, "pageHeight")) {
