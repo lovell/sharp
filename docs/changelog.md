@@ -29,6 +29,10 @@ Requires libvips v8.11.2
   [#2704](https://github.com/lovell/sharp/pull/2704)
   [@Daiz](https://github.com/Daiz)
 
+* Allow `negate` to act only on non-alpha channels.
+  [#2808](https://github.com/lovell/sharp/pull/2808)
+  [@rexxars](https://github.com/rexxars)
+
 ## v0.28 - *bijou*
 
 Requires libvips v8.10.6
