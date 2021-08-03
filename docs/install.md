@@ -10,12 +10,11 @@ yarn add sharp
 
 ## Prerequisites
 
-* Node.js v10+
+* Node.js >= 12.13.0
 
 ## Prebuilt binaries
 
-Ready-compiled sharp and libvips binaries are provided for use with
-Node.js v10+ on the most common platforms:
+Ready-compiled sharp and libvips binaries are provided for use on the most common platforms:
 
 * macOS x64 (>= 10.13)
 * macOS ARM64
@@ -61,15 +60,9 @@ Check the output of running `npm install --verbose sharp` for useful error messa
 
 ## Apple M1
 
-Prebuilt libvips binaries are provided for macOS on ARM64 (since sharp v0.28.0).
+Prebuilt sharp and libvips binaries are provided for macOS on ARM64 from sharp v0.29.0.
 
-During `npm install` sharp will be built locally,
-which requires Xcode and Python - see
-[building from source](#building-from-source).
-
-When this new ARM64 CPU is made freely available
-to open source projects via a CI service
-then prebuilt sharp binaries can also be provided.
+Prebuilt libvips binaries were provided for macOS on ARM64 from sharp v0.28.0.
 
 ## Cross-platform
 
