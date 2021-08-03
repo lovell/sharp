@@ -179,7 +179,7 @@ describe('Raw pixel data', function () {
     });
   });
 
-  describe('Ouput raw, uncompressed image data', function () {
+  describe('Output raw, uncompressed image data', function () {
     it('1 channel greyscale image', function (done) {
       sharp(fixtures.inputJpg)
         .greyscale()
@@ -227,7 +227,7 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('extract A from RGBA', () =>
+    it('Extract A from RGBA', () =>
       sharp(fixtures.inputPngWithTransparency)
         .resize(32, 24)
         .extractChannel(3)
@@ -240,5 +240,42 @@ describe('Raw pixel data', function () {
           assert.strictEqual(32 * 24, info.size);
         })
     );
+  });
+
+  describe('Raw pixel depths', function () {
+    it('Invalid depth', function () {
+      assert.throws(function () {
+        sharp(Buffer.alloc(3), { raw: { width: 1, height: 1, channels: 3 } })
+          .raw({ depth: 'zoinks' });
+      });
+    });
+
+    for (const { constructor, depth, bits } of [
+      { constructor: Uint8Array, depth: undefined, bits: 8 },
+      { constructor: Uint8Array, depth: 'uchar', bits: 8 },
+      { constructor: Uint8ClampedArray, depth: 'uchar', bits: 8 },
+      { constructor: Int8Array, depth: 'char', bits: 8 },
+      { constructor: Uint16Array, depth: 'ushort', bits: 16 },
+      { constructor: Int16Array, depth: 'short', bits: 16 },
+      { constructor: Uint32Array, depth: 'uint', bits: 32 },
+      { constructor: Int32Array, depth: 'int', bits: 32 },
+      { constructor: Float32Array, depth: 'float', bits: 32 },
+      { constructor: Float64Array, depth: 'double', bits: 64 }
+    ]) {
+      it(constructor.name, () =>
+        sharp(new constructor(3), { raw: { width: 1, height: 1, channels: 3 } })
+          .raw({ depth })
+          .toBuffer({ resolveWithObject: true })
+          .then(({ data, info }) => {
+            assert.strictEqual(1, info.width);
+            assert.strictEqual(1, info.height);
+            assert.strictEqual(3, info.channels);
+            if (depth !== undefined) {
+              assert.strictEqual(depth, info.depth);
+            }
+            assert.strictEqual(data.length / 3, bits / 8);
+          })
+      );
+    }
   });
 });
