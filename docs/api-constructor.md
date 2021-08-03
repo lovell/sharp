@@ -13,43 +13,44 @@ Implements the [stream.Duplex][1] class.
 
 ### Parameters
 
-*   `input` **([Buffer][2] | [Uint8Array][3] | [Uint8ClampedArray][4] | [string][5])?** if present, can be
-    a Buffer / Uint8Array / Uint8ClampedArray containing JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data, or
+*   `input` **([Buffer][2] | [Uint8Array][3] | [Uint8ClampedArray][4] | [Int8Array][5] | [Uint16Array][6] | [Int16Array][7] | [Uint32Array][8] | [Int32Array][9] | [Float32Array][10] | [Float64Array][11] | [string][12])?** if present, can be
+    a Buffer / Uint8Array / Uint8ClampedArray containing JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image data, or
+    a TypedArray containing raw pixel image data, or
     a String containing the filesystem path to an JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image file.
     JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
-*   `options` **[Object][6]?** if present, is an Object with optional attributes.
+*   `options` **[Object][13]?** if present, is an Object with optional attributes.
 
-    *   `options.failOnError` **[boolean][7]** by default halt processing and raise an error when loading invalid images.
+    *   `options.failOnError` **[boolean][14]** by default halt processing and raise an error when loading invalid images.
         Set this flag to `false` if you'd rather apply a "best effort" to decode images, even if the data is corrupt or invalid. (optional, default `true`)
-    *   `options.limitInputPixels` **([number][8] | [boolean][7])** Do not process input images where the number of pixels
+    *   `options.limitInputPixels` **([number][15] | [boolean][14])** Do not process input images where the number of pixels
         (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.
         An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). (optional, default `268402689`)
-    *   `options.sequentialRead` **[boolean][7]** Set this to `true` to use sequential rather than random access where possible.
+    *   `options.sequentialRead` **[boolean][14]** Set this to `true` to use sequential rather than random access where possible.
         This can reduce memory usage and might improve performance on some systems. (optional, default `false`)
-    *   `options.density` **[number][8]** number representing the DPI for vector images in the range 1 to 100000. (optional, default `72`)
-    *   `options.pages` **[number][8]** number of pages to extract for multi-page input (GIF, WebP, AVIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
-    *   `options.page` **[number][8]** page number to start extracting from for multi-page input (GIF, WebP, AVIF, TIFF, PDF), zero based. (optional, default `0`)
-    *   `options.subifd` **[number][8]** subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. (optional, default `-1`)
-    *   `options.level` **[number][8]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
-    *   `options.animated` **[boolean][7]** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default `false`)
-    *   `options.raw` **[Object][6]?** describes raw pixel input image data. See `raw()` for pixel ordering.
+    *   `options.density` **[number][15]** number representing the DPI for vector images in the range 1 to 100000. (optional, default `72`)
+    *   `options.pages` **[number][15]** number of pages to extract for multi-page input (GIF, WebP, AVIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
+    *   `options.page` **[number][15]** page number to start extracting from for multi-page input (GIF, WebP, AVIF, TIFF, PDF), zero based. (optional, default `0`)
+    *   `options.subifd` **[number][15]** subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. (optional, default `-1`)
+    *   `options.level` **[number][15]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
+    *   `options.animated` **[boolean][14]** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default `false`)
+    *   `options.raw` **[Object][13]?** describes raw pixel input image data. See `raw()` for pixel ordering.
 
-        *   `options.raw.width` **[number][8]?** integral number of pixels wide.
-        *   `options.raw.height` **[number][8]?** integral number of pixels high.
-        *   `options.raw.channels` **[number][8]?** integral number of channels, between 1 and 4.
-        *   `options.raw.premultiplied` **[boolean][7]?** specifies that the raw input has already been premultiplied, set to `true`
+        *   `options.raw.width` **[number][15]?** integral number of pixels wide.
+        *   `options.raw.height` **[number][15]?** integral number of pixels high.
+        *   `options.raw.channels` **[number][15]?** integral number of channels, between 1 and 4.
+        *   `options.raw.premultiplied` **[boolean][14]?** specifies that the raw input has already been premultiplied, set to `true`
             to avoid sharp premultiplying the image. (optional, default `false`)
-    *   `options.create` **[Object][6]?** describes a new image to be created.
+    *   `options.create` **[Object][13]?** describes a new image to be created.
 
-        *   `options.create.width` **[number][8]?** integral number of pixels wide.
-        *   `options.create.height` **[number][8]?** integral number of pixels high.
-        *   `options.create.channels` **[number][8]?** integral number of channels, either 3 (RGB) or 4 (RGBA).
-        *   `options.create.background` **([string][5] | [Object][6])?** parsed by the [color][9] module to extract values for red, green, blue and alpha.
-        *   `options.create.noise` **[Object][6]?** describes a noise to be created.
+        *   `options.create.width` **[number][15]?** integral number of pixels wide.
+        *   `options.create.height` **[number][15]?** integral number of pixels high.
+        *   `options.create.channels` **[number][15]?** integral number of channels, either 3 (RGB) or 4 (RGBA).
+        *   `options.create.background` **([string][12] | [Object][13])?** parsed by the [color][16] module to extract values for red, green, blue and alpha.
+        *   `options.create.noise` **[Object][13]?** describes a noise to be created.
 
-            *   `options.create.noise.type` **[string][5]?** type of generated noise, currently only `gaussian` is supported.
-            *   `options.create.noise.mean` **[number][8]?** mean of pixels in generated noise.
-            *   `options.create.noise.sigma` **[number][8]?** standard deviation of pixels in generated noise.
+            *   `options.create.noise.type` **[string][12]?** type of generated noise, currently only `gaussian` is supported.
+            *   `options.create.noise.mean` **[number][15]?** mean of pixels in generated noise.
+            *   `options.create.noise.sigma` **[number][15]?** standard deviation of pixels in generated noise.
 
 ### Examples
 
@@ -126,9 +127,9 @@ await sharp({
 }).toFile('noise.png');
 ```
 
-*   Throws **[Error][10]** Invalid parameters
+*   Throws **[Error][17]** Invalid parameters
 
-Returns **[Sharp][11]** 
+Returns **[Sharp][18]** 
 
 ## clone
 
@@ -196,7 +197,7 @@ Promise.all(promises)
   });
 ```
 
-Returns **[Sharp][11]** 
+Returns **[Sharp][18]** 
 
 [1]: http://nodejs.org/api/stream.html#stream_class_stream_duplex
 
@@ -206,16 +207,30 @@ Returns **[Sharp][11]**
 
 [4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Int8Array
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Int16Array
 
-[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array
 
-[9]: https://www.npmjs.org/package/color
+[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Int32Array
 
-[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Float32Array
 
-[11]: #sharp
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Float64Array
+
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[16]: https://www.npmjs.org/package/color
+
+[17]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[18]: #sharp

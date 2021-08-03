@@ -29,6 +29,10 @@ Requires libvips v8.11.2
   [#2704](https://github.com/lovell/sharp/pull/2704)
   [@Daiz](https://github.com/Daiz)
 
+* Allow bit depth to be set when using raw input and output.
+  [#2762](https://github.com/lovell/sharp/pull/2762)
+  [@mart-jansink](https://github.com/mart-jansink)
+
 * Allow `negate` to act only on non-alpha channels.
   [#2808](https://github.com/lovell/sharp/pull/2808)
   [@rexxars](https://github.com/rexxars)

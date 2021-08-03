@@ -420,30 +420,36 @@ Returns **Sharp**
 
 ## raw
 
-Force output to be raw, uncompressed, 8-bit unsigned integer (unit8) pixel data.
+Force output to be raw, uncompressed pixel data.
 Pixel ordering is left-to-right, top-to-bottom, without padding.
 Channel ordering will be RGB or RGBA for non-greyscale colourspaces.
+
+### Parameters
+
+*   `options` **[Object][6]?** output options
+
+    *   `options.depth` **[string][2]** bit depth, one of: char, uchar (default), short, ushort, int, uint, float, complex, double, dpcomplex (optional, default `'uchar'`)
 
 ### Examples
 
 ```javascript
-// Extract raw RGB pixel data from JPEG input
+// Extract raw, unsigned 8-bit RGB pixel data from JPEG input
 const { data, info } = await sharp('input.jpg')
   .raw()
   .toBuffer({ resolveWithObject: true });
 ```
 
 ```javascript
-// Extract alpha channel as raw pixel data from PNG input
+// Extract alpha channel as raw, unsigned 16-bit pixel data from PNG input
 const data = await sharp('input.png')
   .ensureAlpha()
   .extractChannel(3)
   .toColourspace('b-w')
-  .raw()
+  .raw({ depth: 'ushort' })
   .toBuffer();
 ```
 
-Returns **Sharp** 
+*   Throws **[Error][4]** Invalid options
 
 ## tile
 
