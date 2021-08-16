@@ -8,6 +8,8 @@
     "test": "node perf && node random && node parallel"
   },
   "devDependencies": {
+    "@squoosh/cli": "0.7.2",
+    "@squoosh/lib": "0.4.0",
     "async": "3.2.1",
     "benchmark": "2.1.4",
     "gm": "1.23.1",
@@ -18,6 +20,6 @@
   },
   "license": "Apache-2.0",
   "engines": {
-    "node": "14"
+    "node": "16"
   }
 }

@@ -2,6 +2,7 @@
 
 const os = require('os');
 const fs = require('fs');
+const { exec } = require('child_process');
 
 const async = require('async');
 const assert = require('assert');
@@ -13,6 +14,7 @@ const gm = require('gm');
 const imagemagick = require('imagemagick');
 const mapnik = require('mapnik');
 const jimp = require('jimp');
+const squoosh = require('@squoosh/lib');
 
 const fixtures = require('../fixtures');
 
@@ -73,6 +75,65 @@ async.series({
               });
           }
         });
+      }
+    });
+    // squoosh-cli
+    jpegSuite.add('squoosh-cli-file-file', {
+      defer: true,
+      fn: function (deferred) {
+        exec(`./node_modules/.bin/squoosh-cli \
+          --output-dir ${os.tmpdir()} \
+          --resize '{"enabled":true,"width":${width},"height":${height},"method":"lanczos3","premultiply":false,"linearRGB":false}' \
+          --mozjpeg '{"quality":80,"progressive":false,"optimize_coding":true,"quant_table":0,"trellis_multipass":false,"chroma_subsample":2,"separate_chroma_quality":false}' \
+          "${fixtures.inputJpg}"`, function (err) {
+          if (err) {
+            throw err;
+          }
+          deferred.resolve();
+        });
+      }
+    });
+    // squoosh-lib (GPLv3)
+    jpegSuite.add('squoosh-lib-buffer-buffer', {
+      defer: true,
+      fn: function (deferred) {
+        const pool = new squoosh.ImagePool();
+        const image = pool.ingestImage(inputJpgBuffer);
+        image.decoded
+          .then(function () {
+            return image.preprocess({
+              resize: {
+                enabled: true,
+                width,
+                height,
+                method: 'lanczos3',
+                premultiply: false,
+                linearRGB: false
+              }
+            });
+          })
+          .then(function () {
+            return image.encode({
+              mozjpeg: {
+                quality: 80,
+                progressive: false,
+                optimize_coding: true,
+                quant_table: 0,
+                trellis_multipass: false,
+                chroma_subsample: 2,
+                separate_chroma_quality: false
+              }
+            });
+          })
+          .then(function () {
+            return pool.close();
+          })
+          .then(function () {
+            return image.encodedWith.mozjpeg;
+          })
+          .then(function () {
+            deferred.resolve();
+          });
       }
     });
     // mapnik
