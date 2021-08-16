@@ -445,6 +445,22 @@
   fun:vips__init
 }
 {
+  leak_libvips_thread_pool_new
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:calloc
+  ...
+  fun:g_system_thread_new
+}
+{
+  leak_libvips_thread_pool_push
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:calloc
+  ...
+  fun:g_thread_pool_push
+}
+{
   leak_rsvg_static_data
   Memcheck:Leak
   match-leak-kinds: definite
@@ -479,6 +495,14 @@
   fun:xmlParseElement
   ...
   fun:rsvg_handle_new_from_gfile_sync
+}
+{
+  leak_rsvg_rust_280_bytes_static_regex
+  Memcheck:Leak
+  match-leak-kinds: possible
+  fun:malloc
+  ...
+  fun:rsvg_handle_get_dimensions_sub
 }
 
 # libuv warnings
@@ -870,4 +894,13 @@
   Memcheck:Cond
   ...
   fun:_ZN2v88internal18ArrayBufferSweeper10ReleaseAllEv
+}
+{
+  addr_v8_ZN2v88internal12_GLOBAL__N_119HandleApiCallHelperILb0EEENS0
+  Memcheck:Addr8
+  fun:strncmp
+  ...
+  fun:_ZZN4node7binding6DLOpenERKN2v820FunctionCallbackInfoINS1_5ValueEEEENKUlPNS0_4DLibEE_clES8_
+  fun:_ZN4node7binding6DLOpenERKN2v820FunctionCallbackInfoINS1_5ValueEEE
+  fun:_ZN2v88internal12_GLOBAL__N_119HandleApiCallHelperILb0EEENS0_11MaybeHandleINS0_6ObjectEEEPNS0_7IsolateENS0_6HandleINS0_10HeapObjectEEESA_NS8_INS0_20FunctionTemplateInfoEEENS8_IS4_EENS0_16BuiltinArgumentsE
 }
