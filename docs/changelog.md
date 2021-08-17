@@ -4,7 +4,7 @@
 
 Requires libvips v8.11.3
 
-### v0.29.0 - TBD
+### v0.29.0 - 17th August 2021
 
 * Drop support for Node.js 10, now requires Node.js >= 12.13.0.
 
