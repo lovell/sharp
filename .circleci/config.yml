@@ -35,7 +35,7 @@ jobs:
           sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
       - run: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
       - run: sudo docker exec sharp sh -c "npm test"
-      - run: "[[ -n $CIRCLE_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"npx prebuild --runtime napi --target 5\" || true"
+      - run: "[[ -n $CIRCLE_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"npx prebuild --runtime napi --target 5 --upload=$prebuild_upload\" || true"
   linux-arm64-glibc-node-16:
     resource_class: arm.medium
     machine:
