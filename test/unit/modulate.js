@@ -108,6 +108,22 @@ describe('Modulate', function () {
     assert.deepStrictEqual({ r: 127, g: 83, b: 81 }, { r, g, b });
   });
 
+  it('should be able to lighten', async () => {
+    const [r, g, b] = await sharp({
+      create: {
+        width: 1,
+        height: 1,
+        channels: 3,
+        background: { r: 153, g: 68, b: 68 }
+      }
+    })
+      .modulate({ lightness: 10 })
+      .raw()
+      .toBuffer();
+
+    assert.deepStrictEqual({ r: 182, g: 93, b: 92 }, { r, g, b });
+  });
+
   it('should be able to modulate all channels', async () => {
     const [r, g, b] = await sharp({
       create: {
