@@ -347,7 +347,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
       bool const shouldApplyMedian = baton->medianSize > 0;
       bool const shouldComposite = !baton->composite.empty();
-      bool const shouldModulate = baton->brightness != 1.0 || baton->saturation != 1.0 || baton->hue != 0.0;
+      bool const shouldModulate = baton->brightness != 1.0 || baton->saturation != 1.0 ||
+                                  baton->hue != 0.0 || baton->lightness != 0.0;
       bool const shouldApplyClahe = baton->claheWidth != 0 && baton->claheHeight != 0;
 
       if (shouldComposite && !sharp::HasAlpha(image)) {
@@ -543,7 +544,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       if (shouldModulate) {
-        image = sharp::Modulate(image, baton->brightness, baton->saturation, baton->hue);
+        image = sharp::Modulate(image, baton->brightness, baton->saturation, baton->hue, baton->lightness);
       }
 
       // Sharpen
@@ -1331,6 +1332,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->brightness = sharp::AttrAsDouble(options, "brightness");
   baton->saturation = sharp::AttrAsDouble(options, "saturation");
   baton->hue = sharp::AttrAsInt32(options, "hue");
+  baton->lightness = sharp::AttrAsDouble(options, "lightness");
   baton->medianSize = sharp::AttrAsUint32(options, "medianSize");
   baton->sharpenSigma = sharp::AttrAsDouble(options, "sharpenSigma");
   baton->sharpenFlat = sharp::AttrAsDouble(options, "sharpenFlat");

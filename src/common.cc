@@ -833,4 +833,5 @@ namespace sharp {
     }
     return image;
   }
+
 }  // namespace sharp

@@ -182,7 +182,8 @@ namespace sharp {
           0.0, 0.0, 0.0, 1.0));
   }
 
-  VImage Modulate(VImage image, double const brightness, double const saturation, int const hue) {
+  VImage Modulate(VImage image, double const brightness, double const saturation,
+                  int const hue, double const lightness) {
     if (HasAlpha(image)) {
       // Separate alpha channel
       VImage alpha = image[image.bands() - 1];
@@ -190,7 +191,7 @@ namespace sharp {
         .colourspace(VIPS_INTERPRETATION_LCH)
         .linear(
           { brightness, saturation, 1},
-          { 0.0, 0.0, static_cast<double>(hue) }
+          { lightness, 0.0, static_cast<double>(hue) }
         )
         .colourspace(VIPS_INTERPRETATION_sRGB)
         .bandjoin(alpha);
@@ -199,7 +200,7 @@ namespace sharp {
         .colourspace(VIPS_INTERPRETATION_LCH)
         .linear(
           { brightness, saturation, 1 },
-          { 0.0, 0.0, static_cast<double>(hue) }
+          { lightness, 0.0, static_cast<double>(hue) }
         )
         .colourspace(VIPS_INTERPRETATION_sRGB);
     }

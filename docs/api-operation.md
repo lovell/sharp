@@ -400,7 +400,9 @@ Returns **Sharp**
 
 ## modulate
 
-Transforms the image using brightness, saturation and hue rotation.
+Transforms the image using brightness, saturation, hue rotation, and lightness.
+Brightness and lightness both operate on luminance, with the difference being that
+brightness is multiplicative whereas lightness is additive.
 
 ### Parameters
 
@@ -409,18 +411,24 @@ Transforms the image using brightness, saturation and hue rotation.
     *   `options.brightness` **[number][1]?** Brightness multiplier
     *   `options.saturation` **[number][1]?** Saturation multiplier
     *   `options.hue` **[number][1]?** Degrees for hue rotation
+    *   `options.lightness` **[number][1]?** Lightness addend
 
 ### Examples
 
 ```javascript
 sharp(input)
   .modulate({
-    brightness: 2 // increase lightness by a factor of 2
+    brightness: 2 // increase brightness by a factor of 2
   });
 
 sharp(input)
   .modulate({
     hue: 180 // hue-rotate by 180 degrees
+  });
+
+sharp(input)
+  .modulate({
+    lightness: 50 // increase lightness by +50
   });
 
 // decreate brightness and saturation while also hue-rotating by 90 degrees
