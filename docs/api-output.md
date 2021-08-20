@@ -11,6 +11,8 @@ Note that raw pixel data is only supported for buffer output.
 By default all metadata will be removed, which includes EXIF-based orientation.
 See [withMetadata][1] for control over this.
 
+The caller is responsible for ensuring directory structures and permissions exist.
+
 A `Promise` is returned when `callback` is not provided.
 
 ### Parameters
