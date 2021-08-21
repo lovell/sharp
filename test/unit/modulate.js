@@ -18,7 +18,9 @@ describe('Modulate', function () {
       { saturation: null },
       { hue: '50deg' },
       { hue: 1.5 },
-      { hue: null }
+      { hue: null },
+      { lightness: '+50' },
+      { lightness: null }
     ].forEach(function (options) {
       it('should throw', function () {
         assert.throws(function () {

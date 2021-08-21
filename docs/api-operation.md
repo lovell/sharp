@@ -399,6 +399,8 @@ Returns **Sharp**
 ## modulate
 
 Transforms the image using brightness, saturation, hue rotation, and lightness.
+Brightness and lightness both operate on luminance, with the difference being that
+brightness is multiplicative whereas lightness is additive.
 
 ### Parameters
 
@@ -407,7 +409,7 @@ Transforms the image using brightness, saturation, hue rotation, and lightness.
     *   `options.brightness` **[number][1]?** Brightness multiplier
     *   `options.saturation` **[number][1]?** Saturation multiplier
     *   `options.hue` **[number][1]?** Degrees for hue rotation
-    *   `options.lightness` **[number][1]?** Amount of lightness
+    *   `options.lightness` **[number][1]?** Lightness addend
 
 ### Examples
 
