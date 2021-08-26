@@ -799,7 +799,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)
             ->set("palette", baton->pngPalette)
             ->set("Q", baton->pngQuality)
-            ->set("colours", baton->pngColours)
+            ->set("bitdepth", baton->pngBitdepth)
             ->set("dither", baton->pngDither)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -955,7 +955,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)
             ->set("palette", baton->pngPalette)
             ->set("Q", baton->pngQuality)
-            ->set("colours", baton->pngColours)
+            ->set("bitdepth", baton->pngBitdepth)
             ->set("dither", baton->pngDither));
           baton->formatOut = "png";
         } else if (baton->formatOut == "webp" || (mightMatchInput && isWebp) ||
@@ -1429,7 +1429,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->pngAdaptiveFiltering = sharp::AttrAsBool(options, "pngAdaptiveFiltering");
   baton->pngPalette = sharp::AttrAsBool(options, "pngPalette");
   baton->pngQuality = sharp::AttrAsUint32(options, "pngQuality");
-  baton->pngColours = sharp::AttrAsUint32(options, "pngColours");
+  baton->pngBitdepth = sharp::AttrAsUint32(options, "pngBitdepth");
   baton->pngDither = sharp::AttrAsDouble(options, "pngDither");
   baton->webpQuality = sharp::AttrAsUint32(options, "webpQuality");
   baton->webpAlphaQuality = sharp::AttrAsUint32(options, "webpAlphaQuality");
