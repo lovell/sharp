@@ -267,12 +267,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         vshrink = static_cast<double>(thumbHeight) / targetHeight;
       }
 
-      // Only set page-height if we have more than one page, or this could
-      // accidentally turn into an animated image later.
-      if (nPages > 1) {
-        image = image.copy();
-        image.set(VIPS_META_PAGE_HEIGHT, targetPageHeight);
-      }
       // Remove animation properties from single page images
       if (baton->input->pages == 1) {
         image = sharp::RemoveAnimationProperties(image);
@@ -743,10 +737,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       baton->height = image.height();
 
       image = sharp::SetAnimationProperties(
-        image,
-        baton->pageHeight,
-        baton->delay,
-        baton->loop);
+        image, nPages, targetPageHeight, baton->delay, baton->loop);
 
       // Output
       sharp::SetTimeout(image, baton->timeoutSeconds);
@@ -1500,10 +1491,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     vips_enum_from_nick(nullptr, VIPS_TYPE_BAND_FORMAT,
     sharp::AttrAsStr(options, "rawDepth").data()));
 
-  // Animated output
-  if (sharp::HasAttr(options, "pageHeight")) {
-    baton->pageHeight = sharp::AttrAsUint32(options, "pageHeight");
-  }
+  // Animated output properties
   if (sharp::HasAttr(options, "loop")) {
     baton->loop = sharp::AttrAsUint32(options, "loop");
   }

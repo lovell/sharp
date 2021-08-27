@@ -133,12 +133,6 @@ describe('WebP', function () {
     });
   });
 
-  it('invalid pageHeight throws', () => {
-    assert.throws(() => {
-      sharp().webp({ pageHeight: 0 });
-    });
-  });
-
   it('invalid loop throws', () => {
     assert.throws(() => {
       sharp().webp({ loop: -1 });
@@ -151,7 +145,7 @@ describe('WebP', function () {
 
   it('invalid delay throws', () => {
     assert.throws(() => {
-      sharp().webp({ delay: [-1] });
+      sharp().webp({ delay: -1 });
     });
 
     assert.throws(() => {
@@ -159,16 +153,13 @@ describe('WebP', function () {
     });
   });
 
-  it('should double the number of frames with default delay', async () => {
-    const original = await sharp(fixtures.inputWebPAnimated, { pages: -1 }).metadata();
+  it('should repeat a single delay for all frames', async () => {
     const updated = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
-      .webp({ pageHeight: original.pageHeight / 2 })
+      .webp({ delay: 100 })
       .toBuffer()
       .then(data => sharp(data, { pages: -1 }).metadata());
 
-    assert.strictEqual(updated.pages, original.pages * 2);
-    assert.strictEqual(updated.pageHeight, original.pageHeight / 2);
-    assert.deepStrictEqual(updated.delay, [...original.delay, ...Array(9).fill(120)]);
+    assert.deepStrictEqual(updated.delay, Array(updated.pages).fill(100));
   });
 
   it('should limit animation loop', async () => {

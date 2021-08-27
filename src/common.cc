@@ -490,30 +490,24 @@ namespace sharp {
 
   /*
     Set animation properties if necessary.
-    Non-provided properties will be loaded from image.
   */
-  VImage SetAnimationProperties(VImage image, int pageHeight, std::vector<int> delay, int loop) {
-    bool hasDelay = delay.size() != 1 || delay.front() != -1;
+  VImage SetAnimationProperties(VImage image, int nPages, int pageHeight, std::vector<int> delay, int loop) {
+    bool hasDelay = !delay.empty();
 
-    if (pageHeight == 0 && image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
-      pageHeight = image.get_int(VIPS_META_PAGE_HEIGHT);
+    // Avoid a copy if none of the animation properties are needed.
+    if (nPages == 1 && !hasDelay && loop == -1) return image;
+
+    if (delay.size() == 1) {
+      // We have just one delay, repeat that value for all frames.
+      delay.insert(delay.end(), nPages - 1, delay[0]);
     }
 
-    if (!hasDelay && image.get_typeof("delay") == VIPS_TYPE_ARRAY_INT) {
-      delay = image.get_array_int("delay");
-      hasDelay = true;
-    }
-
-    if (loop == -1 && image.get_typeof("loop") == G_TYPE_INT) {
-      loop = image.get_int("loop");
-    }
-
-    if (pageHeight == 0) return image;
-
-    // It is necessary to create the copy as otherwise, pageHeight will be ignored!
+    // Attaching metadata, need to copy the image.
     VImage copy = image.copy();
 
-    copy.set(VIPS_META_PAGE_HEIGHT, pageHeight);
+    // Only set page-height if we have more than one page, or this could
+    // accidentally turn into an animated image later.
+    if (nPages > 1) copy.set(VIPS_META_PAGE_HEIGHT, pageHeight);
     if (hasDelay) copy.set("delay", delay);
     if (loop != -1) copy.set("loop", loop);
 

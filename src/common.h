@@ -216,9 +216,8 @@ namespace sharp {
 
   /*
     Set animation properties if necessary.
-    Non-provided properties will be loaded from image.
   */
-  VImage SetAnimationProperties(VImage image, int pageHeight, std::vector<int> delay, int loop);
+  VImage SetAnimationProperties(VImage image, int nPages, int pageHeight, std::vector<int> delay, int loop);
 
   /*
     Remove animation properties from image.
