@@ -234,6 +234,8 @@ namespace sharp {
     { "VipsForeignLoadPdfBuffer", ImageType::PDF },
     { "VipsForeignLoadMagickFile", ImageType::MAGICK },
     { "VipsForeignLoadMagickBuffer", ImageType::MAGICK },
+    { "VipsForeignLoadMagick7File", ImageType::MAGICK },
+    { "VipsForeignLoadMagick7Buffer", ImageType::MAGICK },
     { "VipsForeignLoadOpenslide", ImageType::OPENSLIDE },
     { "VipsForeignLoadPpmFile", ImageType::PPM },
     { "VipsForeignLoadFits", ImageType::FITS },
