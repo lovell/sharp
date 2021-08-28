@@ -787,6 +787,22 @@ class PipelineWorker : public Napi::AsyncWorker {
           } else {
             baton->channels = std::min(baton->channels, 3);
           }
+        } else if (baton->formatOut == "jp2" || (baton->formatOut == "input"
+          && inputImageType == sharp::ImageType::JP2)) {
+          // Write JP2 to Buffer
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::JP2);
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.jp2ksave_buffer(VImage::option()
+            ->set("Q", baton->jp2Quality)
+            ->set("lossless", baton->jp2Lossless)
+            ->set("subsample_mode", baton->jp2ChromaSubsampling == "4:4:4"
+                          ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
+            ->set("tile_height", baton->jp2TileHeight)
+            ->set("tile_width", baton->jp2TileWidth)));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "jp2";
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" &&
           (inputImageType == sharp::ImageType::PNG || (inputImageType == sharp::ImageType::GIF && !supportsGifOutput) ||
            inputImageType == sharp::ImageType::SVG))) {
@@ -917,13 +933,14 @@ class PipelineWorker : public Napi::AsyncWorker {
         bool const isWebp = sharp::IsWebp(baton->fileOut);
         bool const isGif = sharp::IsGif(baton->fileOut);
         bool const isTiff = sharp::IsTiff(baton->fileOut);
+        bool const isJp2 = sharp::IsJp2(baton->fileOut);
         bool const isHeif = sharp::IsHeif(baton->fileOut);
         bool const isDz = sharp::IsDz(baton->fileOut);
         bool const isDzZip = sharp::IsDzZip(baton->fileOut);
         bool const isV = sharp::IsV(baton->fileOut);
         bool const mightMatchInput = baton->formatOut == "input";
         bool const willMatchInput = mightMatchInput &&
-         !(isJpeg || isPng || isWebp || isGif || isTiff || isHeif || isDz || isDzZip || isV);
+         !(isJpeg || isPng || isWebp || isGif || isTiff || isJp2 || isHeif || isDz || isDzZip || isV);
 
         if (baton->formatOut == "jpeg" || (mightMatchInput && isJpeg) ||
           (willMatchInput && inputImageType == sharp::ImageType::JPEG)) {
@@ -943,6 +960,18 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("optimize_coding", baton->jpegOptimiseCoding));
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
+        } else if (baton->formatOut == "jp2" || (mightMatchInput && isJp2) ||
+          (willMatchInput && (inputImageType == sharp::ImageType::JP2))) {
+          // Write JP2 to file
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::JP2);
+          image.jp2ksave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("Q", baton->jp2Quality)
+            ->set("lossless", baton->jp2Lossless)
+            ->set("subsample_mode", baton->jp2ChromaSubsampling == "4:4:4"
+                          ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
+            ->set("tile_height", baton->jp2TileHeight)
+            ->set("tile_width", baton->jp2TileWidth));
+            baton->formatOut = "jp2";
         } else if (baton->formatOut == "png" || (mightMatchInput && isPng) || (willMatchInput &&
           (inputImageType == sharp::ImageType::PNG || (inputImageType == sharp::ImageType::GIF && !supportsGifOutput) ||
            inputImageType == sharp::ImageType::SVG))) {
@@ -1431,6 +1460,11 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->pngQuality = sharp::AttrAsUint32(options, "pngQuality");
   baton->pngBitdepth = sharp::AttrAsUint32(options, "pngBitdepth");
   baton->pngDither = sharp::AttrAsDouble(options, "pngDither");
+  baton->jp2Quality = sharp::AttrAsUint32(options, "jp2Quality");
+  baton->jp2Lossless = sharp::AttrAsBool(options, "jp2Lossless");
+  baton->jp2TileHeight = sharp::AttrAsUint32(options, "jp2TileHeight");
+  baton->jp2TileWidth = sharp::AttrAsUint32(options, "jp2TileWidth");
+  baton->jp2ChromaSubsampling = sharp::AttrAsStr(options, "jp2ChromaSubsampling");
   baton->webpQuality = sharp::AttrAsUint32(options, "webpQuality");
   baton->webpAlphaQuality = sharp::AttrAsUint32(options, "webpAlphaQuality");
   baton->webpLossless = sharp::AttrAsBool(options, "webpLossless");

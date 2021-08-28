@@ -78,7 +78,8 @@
     "Jacob Smith <jacob@frende.me>",
     "Michael Nutt <michael@nutt.im>",
     "Brad Parham <baparham@gmail.com>",
-    "Taneli Vatanen <taneli.vatanen@gmail.com>"
+    "Taneli Vatanen <taneli.vatanen@gmail.com>",
+    "Joris Dugué <zaruike10@gmail.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
@@ -112,6 +113,7 @@
     "tiff",
     "gif",
     "svg",
+    "jp2",
     "dzi",
     "image",
     "resize",
