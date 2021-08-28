@@ -149,6 +149,11 @@ struct PipelineBaton {
   int pngQuality;
   int pngBitdepth;
   double pngDither;
+  int jp2Quality;
+  bool jp2Lossless;
+  int jp2TileHeight;
+  int jp2TileWidth;
+  std::string jp2ChromaSubsampling;
   int webpQuality;
   int webpAlphaQuality;
   bool webpNearLossless;
@@ -280,6 +285,11 @@ struct PipelineBaton {
     pngQuality(100),
     pngBitdepth(8),
     pngDither(1.0),
+    jp2Quality(80),
+    jp2Lossless(false),
+    jp2TileHeight(512),
+    jp2TileWidth(512),
+    jp2ChromaSubsampling("4:4:4"),
     webpQuality(80),
     webpAlphaQuality(100),
     webpNearLossless(false),

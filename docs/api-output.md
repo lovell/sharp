@@ -330,6 +330,47 @@ The prebuilt binaries do not include this - see
 
 Returns **Sharp** 
 
+## jp2
+
+Use these JP2 options for output image.
+
+Requires libvips compiled with support for OpenJPEG.
+The prebuilt binaries do not include this - see
+[installing a custom libvips][11].
+
+### Parameters
+
+*   `options` **[Object][6]?** output options
+
+    *   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `80`)
+    *   `options.lossless` **[boolean][7]** use lossless compression mode (optional, default `false`)
+    *   `options.tileWidth` **[number][9]** horizontal tile size (optional, default `512`)
+    *   `options.tileHeight` **[number][9]** vertical tile size (optional, default `512`)
+    *   `options.chromaSubsampling` **[string][2]** set to '4:2:0' to use chroma subsampling (optional, default `'4:4:4'`)
+
+### Examples
+
+```javascript
+// Convert any input to lossless JP2 output
+const data = await sharp(input)
+  .jp2({ lossless: true })
+  .toBuffer();
+```
+
+```javascript
+// Convert any input to very high quality JP2 output
+const data = await sharp(input)
+  .jp2({
+    quality: 100,
+    chromaSubsampling: '4:4:4'
+  })
+  .toBuffer();
+```
+
+*   Throws **[Error][4]** Invalid options
+
+Returns **Sharp** 
+
 ## tiff
 
 Use these TIFF options for output image.

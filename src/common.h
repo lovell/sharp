@@ -116,6 +116,7 @@ namespace sharp {
     JPEG,
     PNG,
     WEBP,
+    JP2,
     TIFF,
     GIF,
     SVG,
@@ -142,6 +143,7 @@ namespace sharp {
   bool IsJpeg(std::string const &str);
   bool IsPng(std::string const &str);
   bool IsWebp(std::string const &str);
+  bool IsJp2(std::string const &str);
   bool IsGif(std::string const &str);
   bool IsTiff(std::string const &str);
   bool IsHeic(std::string const &str);

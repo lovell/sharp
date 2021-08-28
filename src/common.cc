@@ -157,6 +157,10 @@ namespace sharp {
   bool IsGif(std::string const &str) {
     return EndsWith(str, ".gif") || EndsWith(str, ".GIF");
   }
+  bool IsJp2(std::string const &str) {
+    return EndsWith(str, ".jp2") || EndsWith(str, ".jpx") || EndsWith(str, ".j2k") || EndsWith(str, ".j2c")
+      || EndsWith(str, ".JP2") || EndsWith(str, ".JPX") || EndsWith(str, ".J2K") || EndsWith(str, ".J2C");
+  }
   bool IsTiff(std::string const &str) {
     return EndsWith(str, ".tif") || EndsWith(str, ".tiff") || EndsWith(str, ".TIF") || EndsWith(str, ".TIFF");
   }
@@ -190,6 +194,7 @@ namespace sharp {
       case ImageType::WEBP: id = "webp"; break;
       case ImageType::TIFF: id = "tiff"; break;
       case ImageType::GIF: id = "gif"; break;
+      case ImageType::JP2: id = "jp2"; break;
       case ImageType::SVG: id = "svg"; break;
       case ImageType::HEIF: id = "heif"; break;
       case ImageType::PDF: id = "pdf"; break;
@@ -226,6 +231,8 @@ namespace sharp {
     { "VipsForeignLoadGifBuffer", ImageType::GIF },
     { "VipsForeignLoadNsgifFile", ImageType::GIF },
     { "VipsForeignLoadNsgifBuffer", ImageType::GIF },
+    { "VipsForeignLoadJp2kBuffer", ImageType::JP2 },
+    { "VipsForeignLoadJp2kFile", ImageType::JP2 },
     { "VipsForeignLoadSvgFile", ImageType::SVG },
     { "VipsForeignLoadSvgBuffer", ImageType::SVG },
     { "VipsForeignLoadHeifFile", ImageType::HEIF },
@@ -287,6 +294,7 @@ namespace sharp {
       imageType == ImageType::WEBP ||
       imageType == ImageType::MAGICK ||
       imageType == ImageType::GIF ||
+      imageType == ImageType::JP2 ||
       imageType == ImageType::TIFF ||
       imageType == ImageType::HEIF ||
       imageType == ImageType::PDF;
