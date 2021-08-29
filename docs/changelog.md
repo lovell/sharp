@@ -9,6 +9,9 @@ Requires libvips v8.11.3
 * Ensure correct PNG bitdepth is set based on number of colours.
   [#2855](https://github.com/lovell/sharp/issues/2855)
 
+* Ensure background is always premultiplied when compositing.
+  [#2858](https://github.com/lovell/sharp/issues/2858)
+
 ### v0.29.0 - 17th August 2021
 
 * Drop support for Node.js 10, now requires Node.js >= 12.13.0.

@@ -288,12 +288,13 @@ namespace sharp {
   /*
     Convert RGBA value to another colourspace
   */
-  std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba, VipsInterpretation const interpretation);
+  std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba,
+    VipsInterpretation const interpretation, bool premultiply);
 
   /*
     Apply the alpha channel to a given colour
    */
-  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, std::vector<double> colour);
+  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, std::vector<double> colour, bool premultiply);
 
   /*
     Removes alpha channel, if any.

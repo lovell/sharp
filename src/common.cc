@@ -759,23 +759,27 @@ namespace sharp {
   /*
     Convert RGBA value to another colourspace
   */
-  std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba, VipsInterpretation const interpretation) {
+  std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba,
+    VipsInterpretation const interpretation, bool premultiply) {
     int const bands = static_cast<int>(rgba.size());
-    if (bands < 3 || interpretation == VIPS_INTERPRETATION_sRGB || interpretation == VIPS_INTERPRETATION_RGB) {
+    if (bands < 3) {
       return rgba;
-    } else {
-      VImage pixel = VImage::new_matrix(1, 1);
-      pixel.set("bands", bands);
-      pixel = pixel.new_from_image(rgba);
-      pixel = pixel.colourspace(interpretation, VImage::option()->set("source_space", VIPS_INTERPRETATION_sRGB));
-      return pixel(0, 0);
     }
+    VImage pixel = VImage::new_matrix(1, 1);
+    pixel.set("bands", bands);
+    pixel = pixel
+      .new_from_image(rgba)
+      .colourspace(interpretation, VImage::option()->set("source_space", VIPS_INTERPRETATION_sRGB));
+    if (premultiply) {
+      pixel = pixel.premultiply();
+    }
+    return pixel(0, 0);
   }
 
   /*
     Apply the alpha channel to a given colour
   */
-  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, std::vector<double> colour) {
+  std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, std::vector<double> colour, bool premultiply) {
     // Scale up 8-bit values to match 16-bit input image
     double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
     // Create alphaColour colour
@@ -799,7 +803,7 @@ namespace sharp {
       alphaColour.push_back(colour[3] * multiplier);
     }
     // Ensure alphaColour colour uses correct colourspace
-    alphaColour = sharp::GetRgbaAsColourspace(alphaColour, image.interpretation());
+    alphaColour = sharp::GetRgbaAsColourspace(alphaColour, image.interpretation(), premultiply);
     // Add non-transparent alpha channel, if required
     if (colour[3] < 255.0 && !HasAlpha(image)) {
       image = image.bandjoin(

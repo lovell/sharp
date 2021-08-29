@@ -124,4 +124,30 @@ describe('Extend', function () {
         fixtures.assertSimilar(fixtures.expected('extend-2channel.png'), data, done);
       });
   });
+
+  it('Premultiply background when compositing', async () => {
+    const background = '#bf1942cc';
+    const data = await sharp({
+      create: {
+        width: 1, height: 1, channels: 4, background: '#fff0'
+      }
+    })
+      .composite([{
+        input: {
+          create: {
+            width: 1, height: 1, channels: 4, background
+          }
+        }
+      }])
+      .extend({
+        left: 1, background
+      })
+      .raw()
+      .toBuffer();
+    const [r1, g1, b1, a1, r2, g2, b2, a2] = data;
+    assert.strictEqual(true, Math.abs(r2 - r1) < 2);
+    assert.strictEqual(true, Math.abs(g2 - g1) < 2);
+    assert.strictEqual(true, Math.abs(b2 - b1) < 2);
+    assert.strictEqual(true, Math.abs(a2 - a1) < 2);
+  });
 });

@@ -90,7 +90,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
         if (baton->rotationAngle != 0.0) {
           std::vector<double> background;
-          std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground);
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, FALSE);
           image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
         }
       }
@@ -423,7 +423,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (image.width() != baton->width || image.height() != baton->height) {
         if (baton->canvas == Canvas::EMBED) {
           std::vector<double> background;
-          std::tie(image, background) = sharp::ApplyAlpha(image, baton->resizeBackground);
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->resizeBackground, shouldPremultiplyAlpha);
 
           // Embed
 
@@ -480,7 +480,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Rotate post-extract non-90 angle
       if (!baton->rotateBeforePreExtract && baton->rotationAngle != 0.0) {
         std::vector<double> background;
-        std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground);
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, shouldPremultiplyAlpha);
         image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
       }
 
@@ -493,7 +493,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Affine transform
       if (baton->affineMatrix.size() > 0) {
         std::vector<double> background;
-        std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground);
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
         image = image.affine(baton->affineMatrix, VImage::option()->set("background", background)
           ->set("idx", baton->affineIdx)
           ->set("idy", baton->affineIdy)
@@ -505,7 +505,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Extend edges
       if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
         std::vector<double> background;
-        std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground);
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
 
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
