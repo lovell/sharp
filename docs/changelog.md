@@ -6,6 +6,9 @@ Requires libvips v8.11.3
 
 ### v0.29.1 - TBD
 
+* Add `lightness` option to `modulate` operation.
+  [#2846](https://github.com/lovell/sharp/pull/2846)
+
 * Ensure correct PNG bitdepth is set based on number of colours.
   [#2855](https://github.com/lovell/sharp/issues/2855)
 
