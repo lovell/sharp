@@ -12,6 +12,9 @@ Requires libvips v8.11.3
 * Ensure background is always premultiplied when compositing.
   [#2858](https://github.com/lovell/sharp/issues/2858)
 
+* Ensure images with P3 profiles retain full gamut.
+  [#2862](https://github.com/lovell/sharp/issues/2862)
+
 ### v0.29.0 - 17th August 2021
 
 * Drop support for Node.js 10, now requires Node.js >= 12.13.0.

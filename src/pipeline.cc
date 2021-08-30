@@ -291,14 +291,15 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Ensure we're using a device-independent colour space
+      char const *processingProfile = image.interpretation() == VIPS_INTERPRETATION_RGB16 ? "p3" : "srgb";
       if (
         sharp::HasProfile(image) &&
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
         image.interpretation() != VIPS_INTERPRETATION_GREY16
       ) {
-        // Convert to sRGB using embedded profile
+        // Convert to sRGB/P3 using embedded profile
         try {
-          image = image.icc_transform("srgb", VImage::option()
+          image = image.icc_transform(processingProfile, VImage::option()
             ->set("embedded", TRUE)
             ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
@@ -306,7 +307,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Ignore failure of embedded profile
         }
       } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
-        image = image.icc_transform("srgb", VImage::option()
+        image = image.icc_transform(processingProfile, VImage::option()
           ->set("input_profile", "cmyk")
           ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
@@ -715,9 +716,10 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         // Transform colours from embedded profile to output profile
-        if (baton->withMetadata && sharp::HasProfile(image)) {
-          image = image.icc_transform(vips_enum_nick(VIPS_TYPE_INTERPRETATION, baton->colourspace),
-            VImage::option()->set("embedded", TRUE));
+        if (baton->withMetadata && sharp::HasProfile(image) && baton->withMetadataIcc.empty()) {
+          image = image.icc_transform("srgb", VImage::option()
+            ->set("embedded", TRUE)
+            ->set("intent", VIPS_INTENT_PERCEPTUAL));
         }
       }
 
@@ -726,7 +728,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.icc_transform(
           const_cast<char*>(baton->withMetadataIcc.data()),
           VImage::option()
-            ->set("input_profile", "srgb")
+            ->set("input_profile", processingProfile)
+            ->set("embedded", TRUE)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
       // Override EXIF Orientation tag
