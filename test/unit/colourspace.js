@@ -105,6 +105,25 @@ describe('Colour space conversion', function () {
       });
   });
 
+  it('Convert P3 to sRGB', async () => {
+    const [r, g, b] = await sharp(fixtures.inputPngP3)
+      .raw()
+      .toBuffer();
+    assert.strictEqual(r, 255);
+    assert.strictEqual(g, 0);
+    assert.strictEqual(b, 0);
+  });
+
+  it('Passthrough P3', async () => {
+    const [r, g, b] = await sharp(fixtures.inputPngP3)
+      .withMetadata({ icc: 'p3' })
+      .raw()
+      .toBuffer();
+    assert.strictEqual(r, 234);
+    assert.strictEqual(g, 51);
+    assert.strictEqual(b, 34);
+  });
+
   it('Invalid pipelineColourspace input', function () {
     assert.throws(function () {
       sharp(fixtures.inputJpg)

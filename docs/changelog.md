@@ -6,8 +6,17 @@ Requires libvips v8.11.3
 
 ### v0.29.1 - TBD
 
+* Add `lightness` option to `modulate` operation.
+  [#2846](https://github.com/lovell/sharp/pull/2846)
+
 * Ensure correct PNG bitdepth is set based on number of colours.
   [#2855](https://github.com/lovell/sharp/issues/2855)
+
+* Ensure background is always premultiplied when compositing.
+  [#2858](https://github.com/lovell/sharp/issues/2858)
+
+* Ensure images with P3 profiles retain full gamut.
+  [#2862](https://github.com/lovell/sharp/issues/2862)
 
 ### v0.29.0 - 17th August 2021
 

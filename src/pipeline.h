@@ -95,6 +95,7 @@ struct PipelineBaton {
   double brightness;
   double saturation;
   int hue;
+  double lightness;
   int medianSize;
   double sharpenSigma;
   double sharpenFlat;
@@ -232,6 +233,7 @@ struct PipelineBaton {
     brightness(1.0),
     saturation(1.0),
     hue(0),
+    lightness(0),
     medianSize(0),
     sharpenSigma(0.0),
     sharpenFlat(1.0),

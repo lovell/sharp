@@ -90,7 +90,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
         if (baton->rotationAngle != 0.0) {
           std::vector<double> background;
-          std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground);
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, FALSE);
           image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
         }
       }
@@ -291,14 +291,15 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Ensure we're using a device-independent colour space
+      char const *processingProfile = image.interpretation() == VIPS_INTERPRETATION_RGB16 ? "p3" : "srgb";
       if (
         sharp::HasProfile(image) &&
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
         image.interpretation() != VIPS_INTERPRETATION_GREY16
       ) {
-        // Convert to sRGB using embedded profile
+        // Convert to sRGB/P3 using embedded profile
         try {
-          image = image.icc_transform("srgb", VImage::option()
+          image = image.icc_transform(processingProfile, VImage::option()
             ->set("embedded", TRUE)
             ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
@@ -306,7 +307,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Ignore failure of embedded profile
         }
       } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
-        image = image.icc_transform("srgb", VImage::option()
+        image = image.icc_transform(processingProfile, VImage::option()
           ->set("input_profile", "cmyk")
           ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
@@ -346,7 +347,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
       bool const shouldApplyMedian = baton->medianSize > 0;
       bool const shouldComposite = !baton->composite.empty();
-      bool const shouldModulate = baton->brightness != 1.0 || baton->saturation != 1.0 || baton->hue != 0.0;
+      bool const shouldModulate = baton->brightness != 1.0 || baton->saturation != 1.0 ||
+                                  baton->hue != 0.0 || baton->lightness != 0.0;
       bool const shouldApplyClahe = baton->claheWidth != 0 && baton->claheHeight != 0;
 
       if (shouldComposite && !sharp::HasAlpha(image)) {
@@ -423,7 +425,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (image.width() != baton->width || image.height() != baton->height) {
         if (baton->canvas == Canvas::EMBED) {
           std::vector<double> background;
-          std::tie(image, background) = sharp::ApplyAlpha(image, baton->resizeBackground);
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->resizeBackground, shouldPremultiplyAlpha);
 
           // Embed
 
@@ -480,7 +482,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Rotate post-extract non-90 angle
       if (!baton->rotateBeforePreExtract && baton->rotationAngle != 0.0) {
         std::vector<double> background;
-        std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground);
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, shouldPremultiplyAlpha);
         image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
       }
 
@@ -493,7 +495,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Affine transform
       if (baton->affineMatrix.size() > 0) {
         std::vector<double> background;
-        std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground);
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
         image = image.affine(baton->affineMatrix, VImage::option()->set("background", background)
           ->set("idx", baton->affineIdx)
           ->set("idy", baton->affineIdy)
@@ -505,7 +507,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Extend edges
       if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
         std::vector<double> background;
-        std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground);
+        std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
 
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
@@ -542,7 +544,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       if (shouldModulate) {
-        image = sharp::Modulate(image, baton->brightness, baton->saturation, baton->hue);
+        image = sharp::Modulate(image, baton->brightness, baton->saturation, baton->hue, baton->lightness);
       }
 
       // Sharpen
@@ -715,9 +717,10 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         // Transform colours from embedded profile to output profile
-        if (baton->withMetadata && sharp::HasProfile(image)) {
-          image = image.icc_transform(vips_enum_nick(VIPS_TYPE_INTERPRETATION, baton->colourspace),
-            VImage::option()->set("embedded", TRUE));
+        if (baton->withMetadata && sharp::HasProfile(image) && baton->withMetadataIcc.empty()) {
+          image = image.icc_transform("srgb", VImage::option()
+            ->set("embedded", TRUE)
+            ->set("intent", VIPS_INTENT_PERCEPTUAL));
         }
       }
 
@@ -726,7 +729,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.icc_transform(
           const_cast<char*>(baton->withMetadataIcc.data()),
           VImage::option()
-            ->set("input_profile", "srgb")
+            ->set("input_profile", processingProfile)
+            ->set("embedded", TRUE)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
       // Override EXIF Orientation tag
@@ -1357,6 +1361,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->brightness = sharp::AttrAsDouble(options, "brightness");
   baton->saturation = sharp::AttrAsDouble(options, "saturation");
   baton->hue = sharp::AttrAsInt32(options, "hue");
+  baton->lightness = sharp::AttrAsDouble(options, "lightness");
   baton->medianSize = sharp::AttrAsUint32(options, "medianSize");
   baton->sharpenSigma = sharp::AttrAsDouble(options, "sharpenSigma");
   baton->sharpenFlat = sharp::AttrAsDouble(options, "sharpenFlat");
