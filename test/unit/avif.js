@@ -3,7 +3,7 @@
 const assert = require('assert');
 
 const sharp = require('../../');
-const { inputAvif, inputJpg } = require('../fixtures');
+const { inputAvif, inputJpg, inputGifAnimated } = require('../fixtures');
 
 describe('AVIF', () => {
   it('called without options does not throw an error', () => {
@@ -79,6 +79,31 @@ describe('AVIF', () => {
       pages: 1,
       space: 'srgb',
       width: 32
+    });
+  });
+
+  it('can convert animated GIF to non-animated AVIF', async () => {
+    const data = await sharp(inputGifAnimated, { animated: true })
+      .resize(10)
+      .avif({ speed: 8 })
+      .toBuffer();
+    const metadata = await sharp(data)
+      .metadata();
+    const { size, ...metadataWithoutSize } = metadata;
+    assert.deepStrictEqual(metadataWithoutSize, {
+      channels: 4,
+      compression: 'av1',
+      depth: 'uchar',
+      format: 'heif',
+      hasAlpha: true,
+      hasProfile: false,
+      height: 300,
+      isProgressive: false,
+      pageHeight: 300,
+      pagePrimary: 0,
+      pages: 1,
+      space: 'srgb',
+      width: 10
     });
   });
 });

@@ -511,6 +511,17 @@ namespace sharp {
   }
 
   /*
+    Remove animation properties from image.
+  */
+  VImage RemoveAnimationProperties(VImage image) {
+    VImage copy = image.copy();
+    copy.remove(VIPS_META_PAGE_HEIGHT);
+    copy.remove("delay");
+    copy.remove("loop");
+    return copy;
+  }
+
+  /*
     Does this image have a non-default density?
   */
   bool HasDensity(VImage image) {

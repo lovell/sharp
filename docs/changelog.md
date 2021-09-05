@@ -18,6 +18,9 @@ Requires libvips v8.11.3
 * Ensure images with P3 profiles retain full gamut.
   [#2862](https://github.com/lovell/sharp/issues/2862)
 
+* Remove unsupported animation properties from AVIF output.
+  [#2870](https://github.com/lovell/sharp/issues/2870)
+
 ### v0.29.0 - 17th August 2021
 
 * Drop support for Node.js 10, now requires Node.js >= 12.13.0.

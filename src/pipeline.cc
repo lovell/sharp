@@ -872,6 +872,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         } else if (baton->formatOut == "heif" ||
           (baton->formatOut == "input" && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to buffer
+          image = sharp::RemoveAnimationProperties(image);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.heifsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->heifQuality)
@@ -1012,6 +1013,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         } else if (baton->formatOut == "heif" || (mightMatchInput && isHeif) ||
           (willMatchInput && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to file
+          image = sharp::RemoveAnimationProperties(image);
           image.heifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->heifQuality)

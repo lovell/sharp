@@ -374,6 +374,8 @@ Use these AVIF options for output image.
 Whilst it is possible to create AVIF images smaller than 16x16 pixels,
 most web browsers do not display these properly.
 
+AVIF image sequences are not supported.
+
 ### Parameters
 
 *   `options` **[Object][6]?** output options

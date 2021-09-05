@@ -209,6 +209,11 @@ namespace sharp {
   VImage SetAnimationProperties(VImage image, int pageHeight, std::vector<int> delay, int loop);
 
   /*
+    Remove animation properties from image.
+  */
+  VImage RemoveAnimationProperties(VImage image);
+
+  /*
     Does this image have a non-default density?
   */
   bool HasDensity(VImage image);
