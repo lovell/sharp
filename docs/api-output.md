@@ -371,6 +371,10 @@ const data = await sharp(input)
 
 Returns **Sharp** 
 
+**Meta**
+
+*   **since**: 0.29.1
+
 ## tiff
 
 Use these TIFF options for output image.

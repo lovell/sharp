@@ -18,6 +18,9 @@ Requires libvips v8.11.3
 * Ensure images with P3 profiles retain full gamut.
   [#2862](https://github.com/lovell/sharp/issues/2862)
 
+* Add support for libvips compiled with OpenJPEG.
+  [#2868](https://github.com/lovell/sharp/pull/2868)
+
 * Remove unsupported animation properties from AVIF output.
   [#2870](https://github.com/lovell/sharp/issues/2870)
 
