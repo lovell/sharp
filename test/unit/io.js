@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const assert = require('assert');
 const rimraf = require('rimraf');
 
@@ -307,6 +308,48 @@ describe('Input/output', function () {
 
   it('Fail when output File is input File via Promise', function (done) {
     sharp(fixtures.inputJpg).toFile(fixtures.inputJpg).then(function (data) {
+      assert(false);
+      done();
+    }).catch(function (err) {
+      assert(err instanceof Error);
+      assert.strictEqual('Cannot use same file for input and output', err.message);
+      done();
+    });
+  });
+
+  it('Fail when output File is input File (relative output, absolute input)', function (done) {
+    const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
+    sharp(fixtures.inputJpg).toFile(relativePath, function (err) {
+      assert(err instanceof Error);
+      assert.strictEqual('Cannot use same file for input and output', err.message);
+      done();
+    });
+  });
+
+  it('Fail when output File is input File via Promise (relative output, absolute input)', function (done) {
+    const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
+    sharp(fixtures.inputJpg).toFile(relativePath).then(function (data) {
+      assert(false);
+      done();
+    }).catch(function (err) {
+      assert(err instanceof Error);
+      assert.strictEqual('Cannot use same file for input and output', err.message);
+      done();
+    });
+  });
+
+  it('Fail when output File is input File (relative input, absolute output)', function (done) {
+    const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
+    sharp(relativePath).toFile(fixtures.inputJpg, function (err) {
+      assert(err instanceof Error);
+      assert.strictEqual('Cannot use same file for input and output', err.message);
+      done();
+    });
+  });
+
+  it('Fail when output File is input File via Promise (relative input, absolute output)', function (done) {
+    const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
+    sharp(relativePath).toFile(fixtures.inputJpg).then(function (data) {
       assert(false);
       done();
     }).catch(function (err) {
