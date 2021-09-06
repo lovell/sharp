@@ -24,6 +24,14 @@ Requires libvips v8.11.3
 * Remove unsupported animation properties from AVIF output.
   [#2870](https://github.com/lovell/sharp/issues/2870)
 
+* Resolve paths before comparing input/output filenames.
+  [#2878](https://github.com/lovell/sharp/pull/2878)
+  [@rexxars](https://github.com/rexxars)
+
+* Allow use of speed 9 (fastest) for HEIF encoding.
+  [#2879](https://github.com/lovell/sharp/pull/2879)
+  [@rexxars](https://github.com/rexxars)
+
 ### v0.29.0 - 17th August 2021
 
 * Drop support for Node.js 10, now requires Node.js >= 12.13.0.
