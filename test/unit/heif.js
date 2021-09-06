@@ -57,7 +57,7 @@ describe('HEIF', () => {
   });
   it('out of range speed should throw an error', () => {
     assert.throws(() => {
-      sharp().heif({ speed: 9 });
+      sharp().heif({ speed: 10 });
     });
   });
   it('invalid speed should throw an error', () => {
