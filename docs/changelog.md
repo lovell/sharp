@@ -4,7 +4,7 @@
 
 Requires libvips v8.11.3
 
-### v0.29.1 - TBD
+### v0.29.1 - 7th September 2021
 
 * Add `lightness` option to `modulate` operation.
   [#2846](https://github.com/lovell/sharp/pull/2846)
