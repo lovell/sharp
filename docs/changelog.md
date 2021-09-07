@@ -4,6 +4,10 @@
 
 Requires libvips v8.11.3
 
+### v0.29.2 - TBD
+
+* Ensure `sharp.versions` is populated from vendored libvips.
+
 ### v0.29.1 - 7th September 2021
 
 * Add `lightness` option to `modulate` operation.
