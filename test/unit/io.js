@@ -298,6 +298,21 @@ describe('Input/output', function () {
       });
   });
 
+  it('Support output to tif format', function (done) {
+    sharp(fixtures.inputTiff)
+      .resize(320, 240)
+      .toFormat('tif')
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual(data.length, info.size);
+        assert.strictEqual('tiff', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
+  });
+
   it('Fail when output File is input File', function (done) {
     sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, function (err) {
       assert(err instanceof Error);
