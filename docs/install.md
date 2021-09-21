@@ -31,8 +31,8 @@ JPEG, PNG, WebP, AVIF, TIFF, GIF (input) and SVG (input) image formats.
 
 The following platforms have prebuilt libvips but not sharp:
 
-* Linux ARMv6
 * Linux ARMv7 (glibc >= 2.28)
+* Linux ARMv6 (glibc >= 2.28)
 * Windows ARM64
 
 The following platforms require compilation of both libvips and sharp from source:
@@ -40,6 +40,8 @@ The following platforms require compilation of both libvips and sharp from sourc
 * Linux x86
 * Linux x64 (glibc <= 2.16, includes RHEL/CentOS 6)
 * Linux ARM64 (glibc <= 2.28)
+* Linux ARMv7 (glibc <= 2.27, musl)
+* Linux ARMv6 (glibc <= 2.27, musl)
 * Linux PowerPC
 * FreeBSD
 * OpenBSD
