@@ -8,6 +8,10 @@ Requires libvips v8.11.3
 
 * Ensure `sharp.versions` is populated from vendored libvips.
 
+* Allow use of 'tif' to select TIFF output.
+  [#2893](https://github.com/lovell/sharp/pull/2893)
+  [@erf](https://github.com/erf)
+
 ### v0.29.1 - 7th September 2021
 
 * Add `lightness` option to `modulate` operation.

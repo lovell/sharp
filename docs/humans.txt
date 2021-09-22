@@ -223,4 +223,7 @@ Name: Tenpi
 GitHub: https://github.com/Tenpi
 
 Name: Zaruike
-https://github.com/Zaruike
+GitHub: https://github.com/Zaruike
+
+Name: Erlend F
+GitHub: https://github.com/erf
