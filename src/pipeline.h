@@ -182,6 +182,7 @@ struct PipelineBaton {
   double withMetadataDensity;
   std::string withMetadataIcc;
   std::unordered_map<std::string, std::string> withMetadataStrs;
+  int timeoutSeconds;
   std::unique_ptr<double[]> convKernel;
   int convKernelWidth;
   int convKernelHeight;
@@ -315,6 +316,7 @@ struct PipelineBaton {
     withMetadata(false),
     withMetadataOrientation(-1),
     withMetadataDensity(0.0),
+    timeoutSeconds(0),
     convKernelWidth(0),
     convKernelHeight(0),
     convKernelScale(0.0),

@@ -251,6 +251,16 @@ namespace sharp {
   std::string VipsWarningPop();
 
   /*
+    Attach an event listener for progress updates, used to detect timeout
+  */
+  void SetTimeout(VImage image, int const timeoutSeconds);
+
+  /*
+    Event listener for progress updates, used to detect timeout
+  */
+  void VipsProgressCallBack(VipsImage *image, VipsProgress *progress, int *timeoutSeconds);
+
+  /*
     Calculate the (left, top) coordinates of the output image
     within the input image, applying the given gravity during an embed.
   */

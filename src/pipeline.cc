@@ -764,6 +764,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         baton->loop);
 
       // Output
+      sharp::SetTimeout(image, baton->timeoutSeconds);
       if (baton->fileOut.empty()) {
         // Buffer output
         if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == sharp::ImageType::JPEG)) {
@@ -1451,6 +1452,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     std::string k = sharp::AttrAsStr(mdStrKeys, i);
     baton->withMetadataStrs.insert(std::make_pair(k, sharp::AttrAsStr(mdStrs, k)));
   }
+  baton->timeoutSeconds = sharp::AttrAsUint32(options, "timeoutSeconds");
   // Format-specific
   baton->jpegQuality = sharp::AttrAsUint32(options, "jpegQuality");
   baton->jpegProgressive = sharp::AttrAsBool(options, "jpegProgressive");

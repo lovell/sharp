@@ -6,6 +6,8 @@ Requires libvips v8.11.3
 
 ### v0.29.2 - TBD
 
+* Add `timeout` function to limit processing time.
+
 * Ensure `sharp.versions` is populated from vendored libvips.
 
 * Allow use of 'tif' to select TIFF output.

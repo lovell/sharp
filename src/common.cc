@@ -611,6 +611,33 @@ namespace sharp {
   }
 
   /*
+    Attach an event listener for progress updates, used to detect timeout
+  */
+  void SetTimeout(VImage image, int const seconds) {
+    if (seconds > 0) {
+      VipsImage *im = image.get_image();
+      if (im->progress_signal == NULL) {
+        int *timeout = VIPS_NEW(im, int);
+        *timeout = seconds;
+        g_signal_connect(im, "eval", G_CALLBACK(VipsProgressCallBack), timeout);
+        vips_image_set_progress(im, TRUE);
+      }
+    }
+  }
+
+  /*
+    Event listener for progress updates, used to detect timeout
+  */
+  void VipsProgressCallBack(VipsImage *im, VipsProgress *progress, int *timeout) {
+    // printf("VipsProgressCallBack progress=%d run=%d timeout=%d\n", progress->percent, progress->run, *timeout);
+    if (*timeout > 0 && progress->run >= *timeout) {
+      vips_image_set_kill(im, TRUE);
+      vips_error("timeout", "%d%% complete", progress->percent);
+      *timeout = 0;
+    }
+  }
+
+  /*
     Calculate the (left, top) coordinates of the output image
     within the input image, applying the given gravity during an embed.
 

@@ -542,6 +542,26 @@ sharp('input.tiff')
 
 Returns **Sharp** 
 
+## timeout
+
+Set a timeout for processing, in seconds.
+Use a value of zero to continue processing indefinitely, the default behaviour.
+
+The clock starts when libvips opens an input image for processing.
+Time spent waiting for a libuv thread to become available is not included.
+
+### Parameters
+
+*   `options` **[Object][6]** 
+
+    *   `options.seconds` **[number][9]** Number of seconds after which processing will be stopped
+
+Returns **Sharp** 
+
+**Meta**
+
+*   **since**: 0.29.2
+
 [1]: #withmetadata
 
 [2]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
