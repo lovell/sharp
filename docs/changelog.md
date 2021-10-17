@@ -14,6 +14,10 @@ Requires libvips v8.11.3
   [#2893](https://github.com/lovell/sharp/pull/2893)
   [@erf](https://github.com/erf)
 
+* Improve error message on Windows for version conflict.
+  [#2918](https://github.com/lovell/sharp/pull/2918)
+  [@dkrnl](https://github.com/dkrnl)
+
 ### v0.29.1 - 7th September 2021
 
 * Add `lightness` option to `modulate` operation.
