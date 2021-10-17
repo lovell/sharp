@@ -18,6 +18,9 @@ Requires libvips v8.11.3
   [#2918](https://github.com/lovell/sharp/pull/2918)
   [@dkrnl](https://github.com/dkrnl)
 
+* Throw error rather than exit when invalid binaries detected.
+  [#2931](https://github.com/lovell/sharp/issues/2931)
+
 ### v0.29.1 - 7th September 2021
 
 * Add `lightness` option to `modulate` operation.
