@@ -209,4 +209,24 @@ describe('WebP', function () {
         fixtures.assertSimilar(fixtures.inputWebPAnimated, data, done);
       });
   });
+
+  it('should remove animation properties when loading single page', async () => {
+    const data = await sharp(fixtures.inputGifAnimatedLoop3)
+      .resize({ height: 570 })
+      .webp({ reductionEffort: 0 })
+      .toBuffer();
+    const metadata = await sharp(data).metadata();
+    assert.deepStrictEqual(metadata, {
+      format: 'webp',
+      size: 2580,
+      width: 740,
+      height: 570,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false
+    });
+  });
 });

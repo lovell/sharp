@@ -10,6 +10,9 @@ Requires libvips v8.11.3
 
 * Ensure `sharp.versions` is populated from vendored libvips.
 
+* Remove animation properties from single page images.
+  [#2890](https://github.com/lovell/sharp/issues/2890)
+
 * Allow use of 'tif' to select TIFF output.
   [#2893](https://github.com/lovell/sharp/pull/2893)
   [@erf](https://github.com/erf)
