@@ -4,7 +4,7 @@
 
 Requires libvips v8.11.3
 
-### v0.29.2 - TBD
+### v0.29.2 - 21st October 2021
 
 * Add `timeout` function to limit processing time.
 
