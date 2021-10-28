@@ -188,6 +188,26 @@ describe('TIFF', function () {
       )
   );
 
+  it('TIFF imputes xres and yres from withMetadataDensity if not explicitly provided', async () => {
+    const data = await sharp(fixtures.inputTiff)
+      .resize(8, 8)
+      .tiff()
+      .withMetadata({ density: 600 })
+      .toBuffer();
+    const { density } = await sharp(data).metadata();
+    assert.strictEqual(600, density);
+  });
+
+  it('TIFF uses xres and yres over withMetadataDensity if explicitly provided', async () => {
+    const data = await sharp(fixtures.inputTiff)
+      .resize(8, 8)
+      .tiff({ xres: 1000, yres: 1000 })
+      .withMetadata({ density: 600 })
+      .toBuffer();
+    const { density } = await sharp(data).metadata();
+    assert.strictEqual(25400, density);
+  });
+
   it('TIFF invalid xres value should throw an error', function () {
     assert.throws(function () {
       sharp().tiff({ xres: '1000.0' });

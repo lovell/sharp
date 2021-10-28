@@ -125,7 +125,7 @@ sRGB colour space and strip all metadata, including the removal of any ICC profi
     *   `options.orientation` **[number][9]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
     *   `options.icc` **[string][2]?** filesystem path to output ICC profile, defaults to sRGB.
     *   `options.exif` **[Object][6]<[Object][6]>** Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data. (optional, default `{}`)
-    *   `options.density` **[number][9]?** Number of pixels per inch (DPI).
+    *   `options.density` **[number][9]?** Number of pixels per inch (DPI). (If the output format is TIFF, this value will only apply if the TIFF options _do not_ explicitly specify a non-default `xres` and/or `yres`.)
 
 ### Examples
 
