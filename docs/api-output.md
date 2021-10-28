@@ -379,6 +379,8 @@ Returns **Sharp**
 
 Use these TIFF options for output image.
 
+The `density` can be set in pixels/inch via [withMetadata][1] instead of providing `xres` and `yres` in pixels/mm.
+
 ### Parameters
 
 *   `options` **[Object][6]?** output options

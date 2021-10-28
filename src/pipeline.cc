@@ -1496,6 +1496,9 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->tiffTileHeight = sharp::AttrAsUint32(options, "tiffTileHeight");
   baton->tiffXres = sharp::AttrAsDouble(options, "tiffXres");
   baton->tiffYres = sharp::AttrAsDouble(options, "tiffYres");
+  if (baton->tiffXres == 1.0 && baton->tiffYres == 1.0 && baton->withMetadataDensity > 0) {
+    baton->tiffXres = baton->tiffYres = baton->withMetadataDensity / 25.4;
+  }
   // tiff compression options
   baton->tiffCompression = static_cast<VipsForeignTiffCompression>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_COMPRESSION,
