@@ -116,6 +116,27 @@ describe('Resize fit=contain', function () {
       });
   });
 
+  it("16-bit PNG to and from buffer should retain 16-bit stats", async function () {
+    const img = sharp(fixtures.inputPng16BitGreyAlpha);
+
+    const { newImg } = await new Promise((resolve, reject) => {
+      img
+        .png({ pngBitdepth: 16 })
+        .toColourspace('grey16')
+        .toBuffer(async function (err, data, info) {
+          if (err) throw err;
+
+          const imgFromBuffer = sharp(data);
+          resolve({
+            newMeta: await imgFromBuffer.metadata(),
+            newImg: imgFromBuffer,
+          });
+        });
+    });
+
+    assert.deepStrictEqual((await newImg.stats()).channels[1], (await img.stats()).channels[1]);
+  });
+
   it('TIFF in LAB colourspace onto RGBA background', function (done) {
     sharp(fixtures.inputTiffCielab)
       .resize(64, 128, {
