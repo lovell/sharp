@@ -4,15 +4,25 @@
 
 Requires libvips v8.11.3
 
-### v0.29.2 - TBD
+### v0.29.2 - 21st October 2021
 
 * Add `timeout` function to limit processing time.
 
 * Ensure `sharp.versions` is populated from vendored libvips.
 
+* Remove animation properties from single page images.
+  [#2890](https://github.com/lovell/sharp/issues/2890)
+
 * Allow use of 'tif' to select TIFF output.
   [#2893](https://github.com/lovell/sharp/pull/2893)
   [@erf](https://github.com/erf)
+
+* Improve error message on Windows for version conflict.
+  [#2918](https://github.com/lovell/sharp/pull/2918)
+  [@dkrnl](https://github.com/dkrnl)
+
+* Throw error rather than exit when invalid binaries detected.
+  [#2931](https://github.com/lovell/sharp/issues/2931)
 
 ### v0.29.1 - 7th September 2021
 
