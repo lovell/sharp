@@ -112,6 +112,18 @@ describe('PNG', function () {
       });
   });
 
+  it('16-bit grey+alpha PNG roundtrip', async () => {
+    const after = await sharp(fixtures.inputPng16BitGreyAlpha)
+      .toColourspace('grey16')
+      .toBuffer();
+
+    const [statsBefore, statsAfter] = await Promise.all([
+      sharp(fixtures.inputPng16BitGreyAlpha).stats(),
+      sharp(after).stats()
+    ]);
+    assert.deepStrictEqual(statsAfter.channels[1], statsBefore.channels[1]);
+  });
+
   it('Valid PNG libimagequant palette value does not throw error', function () {
     assert.doesNotThrow(function () {
       sharp().png({ palette: false });
