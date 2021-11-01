@@ -267,11 +267,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         vshrink = static_cast<double>(thumbHeight) / targetHeight;
       }
 
-      // Remove animation properties from single page images
-      if (baton->input->pages == 1) {
-        image = sharp::RemoveAnimationProperties(image);
-      }
-
       // Ensure we're using a device-independent colour space
       char const *processingProfile = image.interpretation() == VIPS_INTERPRETATION_RGB16 ? "p3" : "srgb";
       if (
