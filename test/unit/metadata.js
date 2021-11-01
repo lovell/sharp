@@ -197,8 +197,8 @@ describe('Image metadata', function () {
       .metadata()
       .then(({
         format, width, height, space, channels, depth,
-        isProgressive, pages, pageHeight, loop, delay,
-        hasProfile, hasAlpha
+        isProgressive, pages, loop, delay, hasProfile,
+        hasAlpha
       }) => {
         assert.strictEqual(format, 'webp');
         assert.strictEqual(width, 80);
@@ -208,7 +208,6 @@ describe('Image metadata', function () {
         assert.strictEqual(depth, 'uchar');
         assert.strictEqual(isProgressive, false);
         assert.strictEqual(pages, 9);
-        assert.strictEqual(pageHeight, 80);
         assert.strictEqual(loop, 0);
         assert.deepStrictEqual(delay, [120, 120, 90, 120, 120, 90, 120, 90, 30]);
         assert.strictEqual(hasProfile, false);
@@ -221,8 +220,8 @@ describe('Image metadata', function () {
       .metadata()
       .then(({
         format, width, height, space, channels, depth,
-        isProgressive, pages, pageHeight, loop, delay,
-        hasProfile, hasAlpha
+        isProgressive, pages, loop, delay, hasProfile,
+        hasAlpha
       }) => {
         assert.strictEqual(format, 'webp');
         assert.strictEqual(width, 370);
@@ -232,7 +231,6 @@ describe('Image metadata', function () {
         assert.strictEqual(depth, 'uchar');
         assert.strictEqual(isProgressive, false);
         assert.strictEqual(pages, 10);
-        assert.strictEqual(pageHeight, 285);
         assert.strictEqual(loop, 3);
         assert.deepStrictEqual(delay, [...Array(9).fill(3000), 15000]);
         assert.strictEqual(hasProfile, false);
@@ -285,8 +283,8 @@ describe('Image metadata', function () {
       .metadata()
       .then(({
         format, width, height, space, channels, depth,
-        isProgressive, pages, pageHeight, loop, delay,
-        background, hasProfile, hasAlpha
+        isProgressive, pages, loop, delay, background,
+        hasProfile, hasAlpha
       }) => {
         assert.strictEqual(format, 'gif');
         assert.strictEqual(width, 80);
@@ -296,7 +294,6 @@ describe('Image metadata', function () {
         assert.strictEqual(depth, 'uchar');
         assert.strictEqual(isProgressive, false);
         assert.strictEqual(pages, 30);
-        assert.strictEqual(pageHeight, 80);
         assert.strictEqual(loop, 0);
         assert.deepStrictEqual(delay, Array(30).fill(30));
         assert.deepStrictEqual(background, { r: 0, g: 0, b: 0 });
@@ -310,8 +307,8 @@ describe('Image metadata', function () {
       .metadata()
       .then(({
         format, width, height, space, channels, depth,
-        isProgressive, pages, pageHeight, loop, delay,
-        hasProfile, hasAlpha
+        isProgressive, pages, loop, delay, hasProfile,
+        hasAlpha
       }) => {
         assert.strictEqual(format, 'gif');
         assert.strictEqual(width, 370);
@@ -321,7 +318,6 @@ describe('Image metadata', function () {
         assert.strictEqual(depth, 'uchar');
         assert.strictEqual(isProgressive, false);
         assert.strictEqual(pages, 10);
-        assert.strictEqual(pageHeight, 285);
         assert.strictEqual(loop, 2);
         assert.deepStrictEqual(delay, [...Array(9).fill(3000), 15000]);
         assert.strictEqual(hasProfile, false);
@@ -737,7 +733,6 @@ describe('Image metadata', function () {
       depth: 'uchar',
       isProgressive: false,
       pages: 1,
-      pageHeight: 858,
       pagePrimary: 0,
       compression: 'av1',
       hasProfile: false,

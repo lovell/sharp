@@ -207,7 +207,7 @@ describe('WebP', function () {
       });
   });
 
-  it('should remove animation properties when loading single page', async () => {
+  it('should only set the page height for multi-page images', async () => {
     const data = await sharp(fixtures.inputGifAnimatedLoop3)
       .resize({ height: 570 })
       .webp({ effort: 0 })
