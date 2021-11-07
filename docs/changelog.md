@@ -4,6 +4,11 @@
 
 Requires libvips v8.11.3
 
+### v0.29.3 - TBD
+
+* Ensure correct dimensions when containing image resized to 1px.
+  [#2951](https://github.com/lovell/sharp/issues/2951)
+
 ### v0.29.2 - 21st October 2021
 
 * Add `timeout` function to limit processing time.
