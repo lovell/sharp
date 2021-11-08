@@ -9,6 +9,10 @@ Requires libvips v8.11.3
 * Ensure correct dimensions when containing image resized to 1px.
   [#2951](https://github.com/lovell/sharp/issues/2951)
 
+* Impute TIFF `xres`/`yres` from `density` provided to `withMetadata`.
+  [#2952](https://github.com/lovell/sharp/pull/2952)
+  [@mbklein](https://github.com/mbklein)
+
 ### v0.29.2 - 21st October 2021
 
 * Add `timeout` function to limit processing time.
