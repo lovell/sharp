@@ -227,6 +227,3 @@ GitHub: https://github.com/Zaruike
 
 Name: Erlend F
 GitHub: https://github.com/erf
-
-Name: Michael B. Klein
-GitHub: https://github.com/mbklein
