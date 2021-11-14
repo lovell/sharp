@@ -4,7 +4,7 @@
 
 Requires libvips v8.11.3
 
-### v0.29.3 - TBD
+### v0.29.3 - 14th November 2021
 
 * Ensure correct dimensions when containing image resized to 1px.
   [#2951](https://github.com/lovell/sharp/issues/2951)
