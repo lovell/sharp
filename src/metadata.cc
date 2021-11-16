@@ -180,6 +180,8 @@ class MetadataWorker : public Napi::AsyncWorker {
       }
       if (baton->pageHeight > 0) {
         info.Set("pageHeight", baton->pageHeight);
+      } else if (baton->pages > 0) {
+        info.Set("pageHeight", baton->height);
       }
       if (baton->loop >= 0) {
         info.Set("loop", baton->loop);

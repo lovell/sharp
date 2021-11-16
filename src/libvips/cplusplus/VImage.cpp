@@ -93,7 +93,7 @@ negate( std::vector<double> vector )
 {
 	std::vector<double> new_vector( vector.size() );
 
-	for( unsigned int i = 0; i < vector.size(); i++ )
+	for( std::vector<double>::size_type i = 0; i < vector.size(); i++ )
 		new_vector[i] = vector[i] * -1;
 
 	return( new_vector );
@@ -104,7 +104,7 @@ invert( std::vector<double> vector )
 {
 	std::vector<double> new_vector( vector.size() );
 
-	for( unsigned int i = 0; i < vector.size(); i++ )
+	for( std::vector<double>::size_type i = 0; i < vector.size(); i++ )
 		new_vector[i] = 1.0 / vector[i];
 
 	return( new_vector );
@@ -210,7 +210,6 @@ VOption::set( const char *name, std::vector<int> value )
 	Pair *pair = new Pair( name );
 
 	int *array;
-	unsigned int i;
 
 	pair->input = true;
 
@@ -219,7 +218,7 @@ VOption::set( const char *name, std::vector<int> value )
 		static_cast< int >( value.size() ) );
 	array = vips_value_get_array_int( &pair->value, NULL );
 
-	for( i = 0; i < value.size(); i++ ) 
+	for( std::vector<double>::size_type i = 0; i < value.size(); i++ ) 
 		array[i] = value[i];
 
 	options.push_back( pair );
@@ -234,7 +233,6 @@ VOption::set( const char *name, std::vector<double> value )
 	Pair *pair = new Pair( name );
 
 	double *array;
-	unsigned int i;
 
 	pair->input = true;
 
@@ -243,7 +241,7 @@ VOption::set( const char *name, std::vector<double> value )
 		static_cast< int >( value.size() ) );
 	array = vips_value_get_array_double( &pair->value, NULL );
 
-	for( i = 0; i < value.size(); i++ ) 
+	for( std::vector<double>::size_type i = 0; i < value.size(); i++ ) 
 		array[i] = value[i];
 
 	options.push_back( pair );
@@ -258,7 +256,6 @@ VOption::set( const char *name, std::vector<VImage> value )
 	Pair *pair = new Pair( name );
 
 	VipsImage **array;
-	unsigned int i;
 
 	pair->input = true;
 
@@ -267,7 +264,7 @@ VOption::set( const char *name, std::vector<VImage> value )
 		static_cast< int >( value.size() ) );
 	array = vips_value_get_array_image( &pair->value, NULL );
 
-	for( i = 0; i < value.size(); i++ ) {
+	for( std::vector<double>::size_type i = 0; i < value.size(); i++ ) {
 		VipsImage *vips_image = value[i].get_image();
 
 		array[i] = vips_image;
@@ -488,10 +485,9 @@ VOption::get_operation( VipsOperation *operation )
 				double *array =
 					vips_value_get_array_double( value,
 					&length );
-				int j;
 
 				((*i)->vvector)->resize( length );
-				for( j = 0; j < length; j++ )
+				for( int j = 0; j < length; j++ )
 					(*((*i)->vvector))[j] = array[j];
 			}
 			else if( type == VIPS_TYPE_BLOB ) {
@@ -718,16 +714,37 @@ VImage::write_to_buffer( const char *suffix, void **buf, size_t *size,
 	const char *operation_name;
 	VipsBlob *blob;
 
+	/* Save with the new target API if we can. Fall back to the older
+	 * mechanism in case the saver we need has not been converted yet.
+	 *
+	 * We need to hide any errors from this first phase.
+	 */
 	vips__filename_split8( suffix, filename, option_string );
-	if( !(operation_name = vips_foreign_find_save_buffer( filename )) ) {
+
+	vips_error_freeze();
+	operation_name = vips_foreign_find_save_target( filename );
+	vips_error_thaw();
+
+	if( operation_name ) {
+		VTarget target = VTarget::new_to_memory();
+
+		call_option_string( operation_name, option_string,
+			(options ? options : VImage::option())->
+				set( "in", *this )->
+				set( "target", target ) );
+
+		g_object_get( target.get_target(), "blob", &blob, NULL );
+	}
+	else if( (operation_name = vips_foreign_find_save_buffer( filename )) ) {
+		call_option_string( operation_name, option_string,
+			(options ? options : VImage::option())->
+				set( "in", *this )->
+				set( "buffer", &blob ) );
+	}
+	else {
 		delete options;
 		throw VError();
 	}
-
-	call_option_string( operation_name, option_string,
-		(options ? options : VImage::option())->
-			set( "in", *this )->
-			set( "buffer", &blob ) );
 
 	if( blob ) {
 		if( buf ) {
@@ -767,6 +784,7 @@ std::vector<VImage>
 VImage::bandsplit( VOption *options ) const
 {
 	std::vector<VImage> b;
+	b.reserve(bands());
 
 	for( int i = 0; i < bands(); i++ )
 		b.push_back( extract_band( i ) );

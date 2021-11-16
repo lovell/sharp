@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.30 - *dresser*
+
+Requires libvips v8.12.0
+
+### v0.30.0 - TBD
+
+* Reduce minimum Linux ARM64v8 glibc requirement to 2.17.
+
 ## v0.29 - *circle*
 
 Requires libvips v8.11.3

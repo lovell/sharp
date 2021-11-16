@@ -18,7 +18,7 @@ const platform = require('../lib/platform');
 
 const minimumGlibcVersionByArch = {
   arm: '2.28',
-  arm64: '2.29',
+  arm64: '2.17',
   x64: '2.17'
 };
 
@@ -120,7 +120,7 @@ try {
     }
 
     // Download to per-process temporary file
-    const tarFilename = ['libvips', minimumLibvipsVersion, platformAndArch].join('-') + '.tar.br';
+    const tarFilename = ['libvips', minimumLibvipsVersionLabelled, platformAndArch].join('-') + '.tar.br';
     const tarPathCache = path.join(libvips.cachePath(), tarFilename);
     if (fs.existsSync(tarPathCache)) {
       libvips.log(`Using cached ${tarPathCache}`);

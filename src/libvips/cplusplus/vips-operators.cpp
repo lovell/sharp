@@ -1,5 +1,5 @@
 // bodies for vips operations
-// Wed May 12 11:30:00 AM CEST 2021
+// Mon Nov  1 03:31:09 PM CET 2021
 // this file is generated automatically, do not edit!
 
 VImage VImage::CMC2LCh( VOption *options ) const
@@ -1260,6 +1260,34 @@ VImage VImage::gifload_source( VSource source, VOption *options )
             set( "source", source ) );
 
     return( out );
+}
+
+void VImage::gifsave( const char *filename, VOption *options ) const
+{
+    call( "gifsave",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "filename", filename ) );
+}
+
+VipsBlob *VImage::gifsave_buffer( VOption *options ) const
+{
+    VipsBlob *buffer;
+
+    call( "gifsave_buffer",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "buffer", &buffer ) );
+
+    return( buffer );
+}
+
+void VImage::gifsave_target( VTarget target, VOption *options ) const
+{
+    call( "gifsave_target",
+        (options ? options : VImage::option())->
+            set( "in", *this )->
+            set( "target", target ) );
 }
 
 VImage VImage::globalbalance( VOption *options ) const
