@@ -35,7 +35,7 @@ describe('Median filter', () => {
 
   it('default window (3x3)', async () => {
     const [r, g, b] = await sharp(fixtures.inputSvgSmallViewBox)
-      .median(3)
+      .median()
       .raw()
       .toBuffer();
 
