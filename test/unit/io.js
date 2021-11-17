@@ -201,6 +201,21 @@ describe('Input/output', function () {
     readable.pipe(pipeline).pipe(writable);
   });
 
+  it('Stream should emit close event', function (done) {
+    const readable = fs.createReadStream(fixtures.inputJpg);
+    const writable = fs.createWriteStream(outputJpg);
+    const pipeline = sharp().resize(320, 240);
+    let closeEventEmitted = false;
+    pipeline.on('close', function () {
+      closeEventEmitted = true;
+    });
+    writable.on('close', function () {
+      assert.strictEqual(true, closeEventEmitted);
+      rimraf(outputJpg, done);
+    });
+    readable.pipe(pipeline).pipe(writable);
+  });
+
   it('Handle Stream to Stream error ', function (done) {
     const pipeline = sharp().resize(320, 240);
     let anErrorWasEmitted = false;
