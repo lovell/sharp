@@ -147,16 +147,16 @@ A mirror site based in China, provided by Alibaba, contains binaries for both sh
 To use this either set the following configuration:
 
 ```sh
-npm config set sharp_binary_host "https://npm.taobao.org/mirrors/sharp"
-npm config set sharp_libvips_binary_host "https://npm.taobao.org/mirrors/sharp-libvips"
+npm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp"
+npm config set sharp_libvips_binary_host "https://npmmirror.com/mirrors/sharp-libvips"
 npm install sharp
 ```
 
 or set the following environment variables:
 
 ```sh
-npm_config_sharp_binary_host="https://npm.taobao.org/mirrors/sharp" \
-  npm_config_sharp_libvips_binary_host="https://npm.taobao.org/mirrors/sharp-libvips" \
+npm_config_sharp_binary_host="https://npmmirror.com/mirrors/sharp" \
+  npm_config_sharp_libvips_binary_host="https://npmmirror.com/mirrors/sharp-libvips" \
   npm install sharp
 ```
 
