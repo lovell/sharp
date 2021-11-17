@@ -8,6 +8,10 @@ Requires libvips v8.12.0
 
 * Reduce minimum Linux ARM64v8 glibc requirement to 2.17.
 
+* Properly emit close events for duplex streams.
+  [#2976](https://github.com/lovell/sharp/pull/2976)
+  [@driannaude](https://github.com/driannaude)
+
 ## v0.29 - *circle*
 
 Requires libvips v8.11.3
