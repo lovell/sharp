@@ -160,6 +160,9 @@ struct PipelineBaton {
   bool webpLossless;
   bool webpSmartSubsample;
   int webpReductionEffort;
+  int gifBitdepth;
+  int gifEffort;
+  double gifDither;
   int tiffQuality;
   VipsForeignTiffCompression tiffCompression;
   VipsForeignTiffPredictor tiffPredictor;

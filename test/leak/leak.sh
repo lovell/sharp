@@ -8,7 +8,7 @@ fi
 curl -s -o ./test/leak/libvips.supp https://raw.githubusercontent.com/libvips/libvips/master/suppressions/valgrind.supp
 
 for test in ./test/unit/*.js; do
-  G_SLICE=always-malloc G_DEBUG=gc-friendly valgrind \
+  G_SLICE=always-malloc G_DEBUG=gc-friendly VIPS_LEAK=1 valgrind \
     --suppressions=test/leak/libvips.supp \
     --suppressions=test/leak/sharp.supp \
     --gen-suppressions=yes \

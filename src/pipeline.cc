@@ -762,9 +762,6 @@ class PipelineWorker : public Napi::AsyncWorker {
       baton->width = image.width();
       baton->height = image.height();
 
-      bool const supportsGifOutput = vips_type_find("VipsOperation", "magicksave") != 0 &&
-       vips_type_find("VipsOperation", "magicksave_buffer") != 0;
-
       image = sharp::SetAnimationProperties(
         image,
         baton->pageHeight,
@@ -817,8 +814,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           vips_area_unref(area);
           baton->formatOut = "jp2";
         } else if (baton->formatOut == "png" || (baton->formatOut == "input" &&
-          (inputImageType == sharp::ImageType::PNG || (inputImageType == sharp::ImageType::GIF && !supportsGifOutput) ||
-           inputImageType == sharp::ImageType::SVG))) {
+          (inputImageType == sharp::ImageType::PNG || inputImageType == sharp::ImageType::SVG))) {
           // Write PNG to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::PNG);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.pngsave_buffer(VImage::option()
@@ -853,14 +849,14 @@ class PipelineWorker : public Napi::AsyncWorker {
           vips_area_unref(area);
           baton->formatOut = "webp";
         } else if (baton->formatOut == "gif" ||
-          (baton->formatOut == "input" && inputImageType == sharp::ImageType::GIF && supportsGifOutput)) {
+          (baton->formatOut == "input" && inputImageType == sharp::ImageType::GIF)) {
           // Write GIF to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::GIF);
-          VipsArea *area = reinterpret_cast<VipsArea*>(image.magicksave_buffer(VImage::option()
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.gifsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
-            ->set("optimize_gif_frames", TRUE)
-            ->set("optimize_gif_transparency", TRUE)
-            ->set("format", "gif")));
+            ->set("bitdepth", baton->gifBitdepth)
+            ->set("effort", baton->gifEffort)
+            ->set("dither", baton->gifDither)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
           area->free_fn = nullptr;
@@ -987,8 +983,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("tile_width", baton->jp2TileWidth));
             baton->formatOut = "jp2";
         } else if (baton->formatOut == "png" || (mightMatchInput && isPng) || (willMatchInput &&
-          (inputImageType == sharp::ImageType::PNG || (inputImageType == sharp::ImageType::GIF && !supportsGifOutput) ||
-           inputImageType == sharp::ImageType::SVG))) {
+          (inputImageType == sharp::ImageType::PNG || inputImageType == sharp::ImageType::SVG))) {
           // Write PNG to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::PNG);
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -1015,14 +1010,14 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
         } else if (baton->formatOut == "gif" || (mightMatchInput && isGif) ||
-          (willMatchInput && inputImageType == sharp::ImageType::GIF && supportsGifOutput)) {
+          (willMatchInput && inputImageType == sharp::ImageType::GIF)) {
           // Write GIF to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::GIF);
-          image.magicksave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+          image.gifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
-            ->set("optimize_gif_frames", TRUE)
-            ->set("optimize_gif_transparency", TRUE)
-            ->set("format", "gif"));
+            ->set("bitdepth", baton->gifBitdepth)
+            ->set("effort", baton->gifEffort)
+            ->set("dither", baton->gifDither));
           baton->formatOut = "gif";
         } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
           (willMatchInput && inputImageType == sharp::ImageType::TIFF)) {
@@ -1488,6 +1483,9 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->webpNearLossless = sharp::AttrAsBool(options, "webpNearLossless");
   baton->webpSmartSubsample = sharp::AttrAsBool(options, "webpSmartSubsample");
   baton->webpReductionEffort = sharp::AttrAsUint32(options, "webpReductionEffort");
+  baton->gifBitdepth = sharp::AttrAsUint32(options, "gifBitdepth");
+  baton->gifEffort = sharp::AttrAsUint32(options, "gifEffort");
+  baton->gifDither = sharp::AttrAsDouble(options, "gifDither");
   baton->tiffQuality = sharp::AttrAsUint32(options, "tiffQuality");
   baton->tiffPyramid = sharp::AttrAsBool(options, "tiffPyramid");
   baton->tiffBitdepth = sharp::AttrAsUint32(options, "tiffBitdepth");

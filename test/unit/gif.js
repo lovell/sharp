@@ -42,7 +42,7 @@ describe('GIF input', () => {
       .then(({ data, info }) => {
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
-        assert.strictEqual(sharp.format.magick.input.buffer ? 'gif' : 'png', info.format);
+        assert.strictEqual('gif', info.format);
         assert.strictEqual(80, info.width);
         assert.strictEqual(80, info.height);
         assert.strictEqual(4, info.channels);
@@ -55,28 +55,30 @@ describe('GIF input', () => {
       .then(({ data, info }) => {
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
-        assert.strictEqual(sharp.format.magick.input.buffer ? 'gif' : 'png', info.format);
+        assert.strictEqual('gif', info.format);
         assert.strictEqual(80, info.width);
         assert.strictEqual(2400, info.height);
         assert.strictEqual(4, info.channels);
       })
   );
 
-  if (!sharp.format.magick.output.buffer) {
-    it('GIF buffer output should fail due to missing ImageMagick', () => {
-      assert.throws(
-        () => sharp().gif(),
-        /GIF output requires libvips with support for ImageMagick/
-      );
-    });
+  it('GIF with reduced colours, no dither, low effort reduces file size', async () => {
+    const original = await sharp(fixtures.inputJpg)
+      .resize(120, 80)
+      .gif()
+      .toBuffer();
 
-    it('GIF file output should fail due to missing ImageMagick', () => {
-      assert.rejects(
-        async () => await sharp().toFile('test.gif'),
-        /GIF output requires libvips with support for ImageMagick/
-      );
-    });
-  }
+    const reduced = await sharp(fixtures.inputJpg)
+      .resize(120, 80)
+      .gif({
+        colours: 128,
+        dither: 0,
+        effort: 1
+      })
+      .toBuffer();
+
+    assert.strictEqual(true, reduced.length < original.length);
+  });
 
   it('invalid pageHeight throws', () => {
     assert.throws(() => {
@@ -88,7 +90,6 @@ describe('GIF input', () => {
     assert.throws(() => {
       sharp().gif({ loop: -1 });
     });
-
     assert.throws(() => {
       sharp().gif({ loop: 65536 });
     });
@@ -98,41 +99,59 @@ describe('GIF input', () => {
     assert.throws(() => {
       sharp().gif({ delay: [-1] });
     });
-
     assert.throws(() => {
       sharp().gif({ delay: [65536] });
     });
   });
 
+  it('invalid colour throws', () => {
+    assert.throws(() => {
+      sharp().gif({ colours: 1 });
+    });
+    assert.throws(() => {
+      sharp().gif({ colours: 'fail' });
+    });
+  });
+
+  it('invalid effort throws', () => {
+    assert.throws(() => {
+      sharp().gif({ effort: 0 });
+    });
+    assert.throws(() => {
+      sharp().gif({ effort: 'fail' });
+    });
+  });
+
+  it('invalid dither throws', () => {
+    assert.throws(() => {
+      sharp().gif({ dither: 1.1 });
+    });
+    assert.throws(() => {
+      sharp().gif({ effort: 'fail' });
+    });
+  });
+
   it('should work with streams when only animated is set', function (done) {
-    if (sharp.format.magick.output.buffer) {
-      fs.createReadStream(fixtures.inputGifAnimated)
-        .pipe(sharp({ animated: true }))
-        .gif()
-        .toBuffer(function (err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(true, data.length > 0);
-          assert.strictEqual('gif', info.format);
-          fixtures.assertSimilar(fixtures.inputGifAnimated, data, done);
-        });
-    } else {
-      done();
-    }
+    fs.createReadStream(fixtures.inputGifAnimated)
+      .pipe(sharp({ animated: true }))
+      .gif()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('gif', info.format);
+        fixtures.assertSimilar(fixtures.inputGifAnimated, data, done);
+      });
   });
 
   it('should work with streams when only pages is set', function (done) {
-    if (sharp.format.magick.output.buffer) {
-      fs.createReadStream(fixtures.inputGifAnimated)
-        .pipe(sharp({ pages: -1 }))
-        .gif()
-        .toBuffer(function (err, data, info) {
-          if (err) throw err;
-          assert.strictEqual(true, data.length > 0);
-          assert.strictEqual('gif', info.format);
-          fixtures.assertSimilar(fixtures.inputGifAnimated, data, done);
-        });
-    } else {
-      done();
-    }
+    fs.createReadStream(fixtures.inputGifAnimated)
+      .pipe(sharp({ pages: -1 }))
+      .gif()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('gif', info.format);
+        fixtures.assertSimilar(fixtures.inputGifAnimated, data, done);
+      });
   });
 });

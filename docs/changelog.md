@@ -6,6 +6,8 @@ Requires libvips v8.12.0
 
 ### v0.30.0 - TBD
 
+* Add support for GIF output to prebuilt binaries.
+
 * Reduce minimum Linux ARM64v8 glibc requirement to 2.17.
 
 * Properly emit close events for duplex streams.

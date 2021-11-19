@@ -225,14 +225,10 @@
   fun:FcInitLoadConfigAndFonts
 }
 {
-  leak_fontconfig_doContent
+  leak_fontconfig_XML_ParseBuffer
   Memcheck:Leak
   match-leak-kinds: definite
-  fun:malloc
   ...
-  fun:doContent
-  fun:doProlog
-  fun:prologInitProcessor
   fun:XML_ParseBuffer
   obj:*/libfontconfig.so.*
 }

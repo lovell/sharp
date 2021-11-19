@@ -561,19 +561,6 @@ describe('Input/output', function () {
         });
     });
 
-    it('Autoconvert GIF input to PNG output', function (done) {
-      sharp(fixtures.inputGif)
-        .resize(320, 80)
-        .toFile(outputZoinks, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual(true, info.size > 0);
-          assert.strictEqual(sharp.format.magick.input.buffer ? 'gif' : 'png', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          rimraf(outputZoinks, done);
-        });
-    });
-
     it('Force JPEG format for PNG input', function (done) {
       sharp(fixtures.inputPng)
         .resize(320, 80)
