@@ -828,7 +828,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)
             ->set("palette", baton->pngPalette)
             ->set("Q", baton->pngQuality)
-            ->set("bitdepth", baton->pngBitdepth)
+            ->set("bitdepth", sharp::Is16Bit(image.interpretation()) ? 16 : baton->pngBitdepth)
             ->set("dither", baton->pngDither)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -998,7 +998,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)
             ->set("palette", baton->pngPalette)
             ->set("Q", baton->pngQuality)
-            ->set("bitdepth", baton->pngBitdepth)
+            ->set("bitdepth", sharp::Is16Bit(image.interpretation()) ? 16 : baton->pngBitdepth)
             ->set("dither", baton->pngDither));
           baton->formatOut = "png";
         } else if (baton->formatOut == "webp" || (mightMatchInput && isWebp) ||
