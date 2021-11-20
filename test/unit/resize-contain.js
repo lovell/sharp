@@ -121,7 +121,6 @@ describe('Resize fit=contain', function () {
 
     const { newImg } = await new Promise((resolve, reject) => {
       img
-        .png({ pngBitdepth: 16 })
         .toColourspace('grey16')
         .toBuffer(async function (err, data, info) {
           if (err) throw err;
