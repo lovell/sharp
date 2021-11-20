@@ -382,11 +382,15 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Ensure shortest edge is at least 1 pixel
         if (image.width() / xfactor < 0.5) {
           xfactor = 2 * image.width();
-          baton->width = 1;
+          if (baton->canvas != Canvas::EMBED) {
+            baton->width = 1;
+          }
         }
         if (image.height() / yfactor < 0.5) {
           yfactor = 2 * image.height();
-          baton->height = 1;
+          if (baton->canvas != Canvas::EMBED) {
+            baton->height = 1;
+          }
         }
         image = image.resize(1.0 / xfactor, VImage::option()
           ->set("vscale", 1.0 / yfactor)
@@ -1492,6 +1496,9 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->tiffTileHeight = sharp::AttrAsUint32(options, "tiffTileHeight");
   baton->tiffXres = sharp::AttrAsDouble(options, "tiffXres");
   baton->tiffYres = sharp::AttrAsDouble(options, "tiffYres");
+  if (baton->tiffXres == 1.0 && baton->tiffYres == 1.0 && baton->withMetadataDensity > 0) {
+    baton->tiffXres = baton->tiffYres = baton->withMetadataDensity / 25.4;
+  }
   // tiff compression options
   baton->tiffCompression = static_cast<VipsForeignTiffCompression>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_COMPRESSION,

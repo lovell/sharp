@@ -605,6 +605,40 @@ describe('Resize dimensions', function () {
       });
   });
 
+  it('Ensure embedded shortest edge (height) is at least 1 pixel', function () {
+    return sharp({
+      create: {
+        width: 200,
+        height: 1,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .resize({ width: 50, height: 50, fit: sharp.fit.contain })
+      .toBuffer({ resolveWithObject: true })
+      .then(function (output) {
+        assert.strictEqual(50, output.info.width);
+        assert.strictEqual(50, output.info.height);
+      });
+  });
+
+  it('Ensure embedded shortest edge (width) is at least 1 pixel', function () {
+    return sharp({
+      create: {
+        width: 1,
+        height: 200,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .resize({ width: 50, height: 50, fit: sharp.fit.contain })
+      .toBuffer({ resolveWithObject: true })
+      .then(function (output) {
+        assert.strictEqual(50, output.info.width);
+        assert.strictEqual(50, output.info.height);
+      });
+  });
+
   it('Skip shrink-on-load where one dimension <4px', async () => {
     const jpeg = await sharp({
       create: {
