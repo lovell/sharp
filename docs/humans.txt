@@ -230,3 +230,6 @@ GitHub: https://github.com/erf
 
 Name: Drian Naude
 GitHub: https://github.com/driannaude
+
+Name: Max Gordon
+GitHub: https://github.com/gforge
