@@ -117,11 +117,15 @@ describe('PNG', function () {
       .toColourspace('grey16')
       .toBuffer();
 
-    const [statsBefore, statsAfter] = await Promise.all([
-      sharp(fixtures.inputPng16BitGreyAlpha).stats(),
-      sharp(after).stats()
-    ]);
-    assert.deepStrictEqual(statsAfter.channels[1], statsBefore.channels[1]);
+    const [alphaMeanBefore, alphaMeanAfter] = (
+      await Promise.all([
+        sharp(fixtures.inputPng16BitGreyAlpha).stats(),
+        sharp(after).stats()
+      ])
+    )
+      .map(stats => stats.channels[1].mean);
+
+    assert.strictEqual(alphaMeanAfter, alphaMeanBefore);
   });
 
   it('Valid PNG libimagequant palette value does not throw error', function () {
