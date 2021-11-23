@@ -128,6 +128,12 @@ describe('PNG', function () {
     assert.strictEqual(alphaMeanAfter, alphaMeanBefore);
   });
 
+  it('palette decode/encode roundtrip', () =>
+    sharp(fixtures.inputPngPalette)
+      .png({ effort: 1, palette: true })
+      .toBuffer()
+  );
+
   it('Valid PNG libimagequant palette value does not throw error', function () {
     assert.doesNotThrow(function () {
       sharp().png({ palette: false });

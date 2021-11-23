@@ -93,6 +93,7 @@ module.exports = {
   inputPngImageInAlpha: getPath('image-in-alpha.png'), // https://github.com/lovell/sharp/issues/1597
   inputPngSolidAlpha: getPath('with-alpha.png'), // https://github.com/lovell/sharp/issues/1599
   inputPngP3: getPath('p3.png'), // https://github.com/lovell/sharp/issues/2862
+  inputPngPalette: getPath('swiss.png'), // https://github.com/randy408/libspng/issues/188
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp
