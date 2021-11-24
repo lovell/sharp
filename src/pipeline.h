@@ -160,7 +160,7 @@ struct PipelineBaton {
   bool webpNearLossless;
   bool webpLossless;
   bool webpSmartSubsample;
-  int webpReductionEffort;
+  int webpEffort;
   int gifBitdepth;
   int gifEffort;
   double gifDither;
@@ -301,7 +301,7 @@ struct PipelineBaton {
     webpNearLossless(false),
     webpLossless(false),
     webpSmartSubsample(false),
-    webpReductionEffort(4),
+    webpEffort(4),
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),

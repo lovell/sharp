@@ -842,7 +842,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
             ->set("smart_subsample", baton->webpSmartSubsample)
-            ->set("reduction_effort", baton->webpReductionEffort)
+            ->set("effort", baton->webpEffort)
             ->set("alpha_q", baton->webpAlphaQuality)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -1008,7 +1008,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
             ->set("smart_subsample", baton->webpSmartSubsample)
-            ->set("reduction_effort", baton->webpReductionEffort)
+            ->set("effort", baton->webpEffort)
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
         } else if (baton->formatOut == "gif" || (mightMatchInput && isGif) ||
@@ -1078,7 +1078,7 @@ class PipelineWorker : public Napi::AsyncWorker {
               {"lossless", baton->webpLossless ? "TRUE" : "FALSE"},
               {"near_lossless", baton->webpNearLossless ? "TRUE" : "FALSE"},
               {"smart_subsample", baton->webpSmartSubsample ? "TRUE" : "FALSE"},
-              {"reduction_effort", std::to_string(baton->webpReductionEffort)}
+              {"effort", std::to_string(baton->webpEffort)}
             };
             suffix = AssembleSuffixString(".webp", options);
           } else {
@@ -1485,7 +1485,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->webpLossless = sharp::AttrAsBool(options, "webpLossless");
   baton->webpNearLossless = sharp::AttrAsBool(options, "webpNearLossless");
   baton->webpSmartSubsample = sharp::AttrAsBool(options, "webpSmartSubsample");
-  baton->webpReductionEffort = sharp::AttrAsUint32(options, "webpReductionEffort");
+  baton->webpEffort = sharp::AttrAsUint32(options, "webpEffort");
   baton->gifBitdepth = sharp::AttrAsUint32(options, "gifBitdepth");
   baton->gifEffort = sharp::AttrAsUint32(options, "gifEffort");
   baton->gifDither = sharp::AttrAsDouble(options, "gifDither");

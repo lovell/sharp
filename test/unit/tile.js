@@ -667,7 +667,7 @@ describe('Tile', function () {
       sharp(fixtures.inputJpg)
         .webp({
           quality: 1,
-          reductionEffort: 0
+          effort: 0
         })
         .tile({
           layout: 'google'

@@ -282,7 +282,7 @@ Use these WebP options for output image.
     *   `options.lossless` **[boolean][7]** use lossless compression mode (optional, default `false`)
     *   `options.nearLossless` **[boolean][7]** use near_lossless compression mode (optional, default `false`)
     *   `options.smartSubsample` **[boolean][7]** use high quality chroma subsampling (optional, default `false`)
-    *   `options.reductionEffort` **[number][9]** level of CPU effort to reduce file size, integer 0-6 (optional, default `4`)
+    *   `options.effort` **[number][9]** level of CPU effort to reduce file size, integer 0-6 (optional, default `4`)
     *   `options.pageHeight` **[number][9]?** page height for animated output
     *   `options.loop` **[number][9]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
     *   `options.delay` **[Array][10]<[number][9]>?** list of delays between animation frames (in milliseconds)
@@ -300,7 +300,7 @@ const data = await sharp(input)
 ```javascript
 // Optimise the file size of an animated WebP
 const outputWebp = await sharp(inputWebp, { animated: true })
-  .webp({ reductionEffort: 6 })
+  .webp({ effort: 6 })
   .toBuffer();
 ```
 

@@ -10,6 +10,8 @@ Requires libvips v8.12.0
 
 * Reduce minimum Linux ARM64v8 glibc requirement to 2.17.
 
+* Standardise WebP `effort` option name, deprecate `reductionEffort`.
+
 * Expose control over CPU effort for palette-based PNG output.
   [#2541](https://github.com/lovell/sharp/issues/2541)
 

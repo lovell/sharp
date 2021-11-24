@@ -35,7 +35,7 @@ describe('WebP', function () {
 
   it('should work for webp alpha quality', function (done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-      .webp({ alphaQuality: 80, reductionEffort: 0 })
+      .webp({ alphaQuality: 80, effort: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -46,7 +46,7 @@ describe('WebP', function () {
 
   it('should work for webp lossless', function (done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-      .webp({ lossless: true, reductionEffort: 0 })
+      .webp({ lossless: true, effort: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -57,7 +57,7 @@ describe('WebP', function () {
 
   it('should work for webp near-lossless', function (done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-      .webp({ nearLossless: true, quality: 50, reductionEffort: 0 })
+      .webp({ nearLossless: true, quality: 50, effort: 0 })
       .toBuffer(function (err50, data50, info50) {
         if (err50) throw err50;
         assert.strictEqual(true, data50.length > 0);
@@ -68,7 +68,7 @@ describe('WebP', function () {
 
   it('should use near-lossless when both lossless and nearLossless are specified', function (done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
-      .webp({ nearLossless: true, quality: 50, lossless: true, reductionEffort: 0 })
+      .webp({ nearLossless: true, quality: 50, lossless: true, effort: 0 })
       .toBuffer(function (err50, data50, info50) {
         if (err50) throw err50;
         assert.strictEqual(true, data50.length > 0);
@@ -99,31 +99,37 @@ describe('WebP', function () {
     });
   });
 
-  it('should produce a smaller file size with increased reductionEffort', () =>
+  it('should produce a smaller file size with increased effort', () =>
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .webp()
       .toBuffer()
-      .then(reductionEffort4 =>
+      .then(effort4 =>
         sharp(fixtures.inputJpg)
           .resize(320, 240)
-          .webp({ reductionEffort: 6 })
+          .webp({ effort: 6 })
           .toBuffer()
-          .then(reductionEffort6 => {
-            assert.strictEqual(true, reductionEffort4.length > reductionEffort6.length);
+          .then(effort6 => {
+            assert.strictEqual(true, effort4.length > effort6.length);
           })
       )
   );
 
-  it('invalid reductionEffort throws', () => {
+  it('invalid effort throws', () => {
+    assert.throws(() => {
+      sharp().webp({ effort: true });
+    });
+  });
+
+  it('invalid reductionEffort (deprecated) throws', () => {
     assert.throws(() => {
       sharp().webp({ reductionEffort: true });
     });
   });
 
-  it('out of range reductionEffort throws', () => {
+  it('out of range effort throws', () => {
     assert.throws(() => {
-      sharp().webp({ reductionEffort: -1 });
+      sharp().webp({ effort: -1 });
     });
   });
 
@@ -189,7 +195,7 @@ describe('WebP', function () {
   it('should work with streams when only animated is set', function (done) {
     fs.createReadStream(fixtures.inputWebPAnimated)
       .pipe(sharp({ animated: true }))
-      .webp({ lossless: true, reductionEffort: 0 })
+      .webp({ lossless: true, effort: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -201,7 +207,7 @@ describe('WebP', function () {
   it('should work with streams when only pages is set', function (done) {
     fs.createReadStream(fixtures.inputWebPAnimated)
       .pipe(sharp({ pages: -1 }))
-      .webp({ lossless: true, reductionEffort: 0 })
+      .webp({ lossless: true, effort: 0 })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -213,12 +219,11 @@ describe('WebP', function () {
   it('should remove animation properties when loading single page', async () => {
     const data = await sharp(fixtures.inputGifAnimatedLoop3)
       .resize({ height: 570 })
-      .webp({ reductionEffort: 0 })
+      .webp({ effort: 0 })
       .toBuffer();
-    const metadata = await sharp(data).metadata();
+    const { size, ...metadata } = await sharp(data).metadata();
     assert.deepStrictEqual(metadata, {
       format: 'webp',
-      size: 2580,
       width: 740,
       height: 570,
       space: 'srgb',
