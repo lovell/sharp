@@ -12,6 +12,8 @@ Requires libvips v8.12.0
 
 * Standardise WebP `effort` option name, deprecate `reductionEffort`.
 
+* Standardise HEIF `effort` option name, deprecate `speed`.
+
 * Expose control over CPU effort for palette-based PNG output.
   [#2541](https://github.com/lovell/sharp/issues/2541)
 

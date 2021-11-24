@@ -176,7 +176,7 @@ struct PipelineBaton {
   double tiffYres;
   int heifQuality;
   VipsForeignHeifCompression heifCompression;
-  int heifSpeed;
+  int heifEffort;
   std::string heifChromaSubsampling;
   bool heifLossless;
   VipsBandFormat rawDepth;
@@ -314,7 +314,7 @@ struct PipelineBaton {
     tiffYres(1.0),
     heifQuality(50),
     heifCompression(VIPS_FOREIGN_HEIF_COMPRESSION_AV1),
-    heifSpeed(5),
+    heifEffort(4),
     heifChromaSubsampling("4:4:4"),
     heifLossless(false),
     rawDepth(VIPS_FORMAT_UCHAR),

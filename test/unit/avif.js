@@ -17,10 +17,9 @@ describe('AVIF', () => {
       .resize(32)
       .jpeg()
       .toBuffer();
-    const metadata = await sharp(data)
+    const { size, ...metadata } = await sharp(data)
       .metadata();
-    const { compression, size, ...metadataWithoutSize } = metadata;
-    assert.deepStrictEqual(metadataWithoutSize, {
+    assert.deepStrictEqual(metadata, {
       channels: 3,
       chromaSubsampling: '4:2:0',
       density: 72,
@@ -38,13 +37,13 @@ describe('AVIF', () => {
   it('can convert JPEG to AVIF', async () => {
     const data = await sharp(inputJpg)
       .resize(32)
-      .avif()
+      .avif({ effort: 0 })
       .toBuffer();
-    const metadata = await sharp(data)
+    const { size, ...metadata } = await sharp(data)
       .metadata();
-    const { compression, size, ...metadataWithoutSize } = metadata;
-    assert.deepStrictEqual(metadataWithoutSize, {
+    assert.deepStrictEqual(metadata, {
       channels: 3,
+      compression: 'av1',
       depth: 'uchar',
       format: 'heif',
       hasAlpha: false,
@@ -63,11 +62,11 @@ describe('AVIF', () => {
     const data = await sharp(inputAvif)
       .resize(32)
       .toBuffer();
-    const metadata = await sharp(data)
+    const { size, ...metadata } = await sharp(data)
       .metadata();
-    const { compression, size, ...metadataWithoutSize } = metadata;
-    assert.deepStrictEqual(metadataWithoutSize, {
+    assert.deepStrictEqual(metadata, {
       channels: 3,
+      compression: 'av1',
       depth: 'uchar',
       format: 'heif',
       hasAlpha: false,
@@ -85,12 +84,11 @@ describe('AVIF', () => {
   it('can convert animated GIF to non-animated AVIF', async () => {
     const data = await sharp(inputGifAnimated, { animated: true })
       .resize(10)
-      .avif({ speed: 8 })
+      .avif({ effort: 0 })
       .toBuffer();
-    const metadata = await sharp(data)
+    const { size, ...metadata } = await sharp(data)
       .metadata();
-    const { size, ...metadataWithoutSize } = metadata;
-    assert.deepStrictEqual(metadataWithoutSize, {
+    assert.deepStrictEqual(metadata, {
       channels: 4,
       compression: 'av1',
       depth: 'uchar',

@@ -282,7 +282,7 @@ Use these WebP options for output image.
     *   `options.lossless` **[boolean][7]** use lossless compression mode (optional, default `false`)
     *   `options.nearLossless` **[boolean][7]** use near_lossless compression mode (optional, default `false`)
     *   `options.smartSubsample` **[boolean][7]** use high quality chroma subsampling (optional, default `false`)
-    *   `options.effort` **[number][9]** level of CPU effort to reduce file size, integer 0-6 (optional, default `4`)
+    *   `options.effort` **[number][9]** CPU effort, between 0 (fastest) and 6 (slowest) (optional, default `4`)
     *   `options.pageHeight` **[number][9]?** page height for animated output
     *   `options.loop` **[number][9]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
     *   `options.delay` **[Array][10]<[number][9]>?** list of delays between animation frames (in milliseconds)
@@ -460,7 +460,7 @@ AVIF image sequences are not supported.
 
     *   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `50`)
     *   `options.lossless` **[boolean][7]** use lossless compression (optional, default `false`)
-    *   `options.speed` **[number][9]** CPU effort vs file size, 0 (slowest/smallest) to 9 (fastest/largest) (optional, default `5`)
+    *   `options.effort` **[number][9]** CPU effort, between 0 (fastest) and 9 (slowest) (optional, default `4`)
     *   `options.chromaSubsampling` **[string][2]** set to '4:2:0' to use chroma subsampling (optional, default `'4:4:4'`)
 
 <!---->
@@ -487,7 +487,7 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
     *   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `50`)
     *   `options.compression` **[string][2]** compression format: av1, hevc (optional, default `'av1'`)
     *   `options.lossless` **[boolean][7]** use lossless compression (optional, default `false`)
-    *   `options.speed` **[number][9]** CPU effort vs file size, 0 (slowest/smallest) to 9 (fastest/largest) (optional, default `5`)
+    *   `options.effort` **[number][9]** CPU effort, between 0 (fastest) and 9 (slowest) (optional, default `4`)
     *   `options.chromaSubsampling` **[string][2]** set to '4:2:0' to use chroma subsampling (optional, default `'4:4:4'`)
 
 <!---->

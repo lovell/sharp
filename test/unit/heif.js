@@ -50,6 +50,21 @@ describe('HEIF', () => {
       sharp().heif({ compression: 1 });
     });
   });
+  it('valid effort does not throw an error', () => {
+    assert.doesNotThrow(() => {
+      sharp().heif({ speed: 6 });
+    });
+  });
+  it('out of range effort should throw an error', () => {
+    assert.throws(() => {
+      sharp().heif({ effort: 10 });
+    });
+  });
+  it('invalid effort should throw an error', () => {
+    assert.throws(() => {
+      sharp().heif({ effort: 'fail' });
+    });
+  });
   it('valid speed does not throw an error', () => {
     assert.doesNotThrow(() => {
       sharp().heif({ speed: 6 });
@@ -62,7 +77,7 @@ describe('HEIF', () => {
   });
   it('invalid speed should throw an error', () => {
     assert.throws(() => {
-      sharp().heif({ compression: 'fail' });
+      sharp().heif({ speed: 'fail' });
     });
   });
   it('invalid chromaSubsampling should throw an error', () => {

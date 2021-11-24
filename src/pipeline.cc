@@ -899,7 +899,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
-            ->set("speed", baton->heifSpeed)
+            ->set("effort", baton->heifEffort)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("lossless", baton->heifLossless)));
@@ -1053,7 +1053,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
-            ->set("speed", baton->heifSpeed)
+            ->set("effort", baton->heifEffort)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("lossless", baton->heifLossless));
@@ -1512,7 +1512,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->heifCompression = static_cast<VipsForeignHeifCompression>(
     vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
     sharp::AttrAsStr(options, "heifCompression").data()));
-  baton->heifSpeed = sharp::AttrAsUint32(options, "heifSpeed");
+  baton->heifEffort = sharp::AttrAsUint32(options, "heifEffort");
   baton->heifChromaSubsampling = sharp::AttrAsStr(options, "heifChromaSubsampling");
 
   // Raw output
