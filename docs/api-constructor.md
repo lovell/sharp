@@ -4,7 +4,7 @@
 
 Constructor factory to create an instance of `sharp`, to which further methods are chained.
 
-JPEG, PNG, WebP, AVIF or TIFF format image data can be streamed out from this object.
+JPEG, PNG, WebP, GIF, AVIF or TIFF format image data can be streamed out from this object.
 When using Stream based output, derived attributes are available from the `info` event.
 
 Non-critical problems encountered during processing are emitted as `warning` events.
@@ -25,6 +25,7 @@ Implements the [stream.Duplex][1] class.
     *   `options.limitInputPixels` **([number][15] | [boolean][14])** Do not process input images where the number of pixels
         (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.
         An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). (optional, default `268402689`)
+    *   `options.unlimited` **[boolean][14]** Set this to `true` to remove safety features that help prevent memory exhaustion (SVG, PNG). (optional, default `false`)
     *   `options.sequentialRead` **[boolean][14]** Set this to `true` to use sequential rather than random access where possible.
         This can reduce memory usage and might improve performance on some systems. (optional, default `false`)
     *   `options.density` **[number][15]** number representing the DPI for vector images in the range 1 to 100000. (optional, default `72`)

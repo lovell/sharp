@@ -5,7 +5,7 @@
 Write output image data to a file.
 
 If an explicit output format is not selected, it will be inferred from the extension,
-with JPEG, PNG, WebP, AVIF, TIFF, DZI, and libvips' V format supported.
+with JPEG, PNG, WebP, AVIF, TIFF, GIF, DZI, and libvips' V format supported.
 Note that raw pixel data is only supported for buffer output.
 
 By default all metadata will be removed, which includes EXIF-based orientation.
@@ -44,9 +44,9 @@ Returns **[Promise][5]<[Object][6]>** when no callback is provided
 ## toBuffer
 
 Write output to a Buffer.
-JPEG, PNG, WebP, AVIF, TIFF and raw pixel data output are supported.
+JPEG, PNG, WebP, AVIF, TIFF, GIF and raw pixel data output are supported.
 
-If no explicit format is set, the output format will match the input image, except GIF and SVG input which become PNG output.
+If no explicit format is set, the output format will match the input image, except SVG input which becomes PNG output.
 
 By default all metadata will be removed, which includes EXIF-based orientation.
 See [withMetadata][1] for control over this.
@@ -309,22 +309,52 @@ Returns **Sharp**
 
 ## gif
 
-Use these GIF options for output image.
+Use these GIF options for the output image.
 
-Requires libvips compiled with support for ImageMagick or GraphicsMagick.
-The prebuilt binaries do not include this - see
-[installing a custom libvips][11].
+The first entry in the palette is reserved for transparency.
 
 ### Parameters
 
 *   `options` **[Object][6]?** output options
 
+    *   `options.colours` **[number][9]** maximum number of palette entries, including transparency, between 2 and 256 (optional, default `256`)
+    *   `options.colors` **[number][9]** alternative spelling of `options.colours` (optional, default `256`)
+    *   `options.effort` **[number][9]** CPU effort, between 1 (fastest) and 10 (slowest) (optional, default `7`)
+    *   `options.dither` **[number][9]** level of Floyd-Steinberg error diffusion, between 0 (least) and 1 (most) (optional, default `1.0`)
     *   `options.pageHeight` **[number][9]?** page height for animated output
     *   `options.loop` **[number][9]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
     *   `options.delay` **[Array][10]<[number][9]>?** list of delays between animation frames (in milliseconds)
     *   `options.force` **[boolean][7]** force GIF output, otherwise attempt to use input format (optional, default `true`)
 
-<!---->
+### Examples
+
+```javascript
+// Convert PNG to GIF
+await sharp(pngBuffer)
+  .gif()
+  .toBuffer());
+```
+
+```javascript
+// Convert animated WebP to animated GIF
+await sharp('animated.webp', { animated: true })
+  .toFile('animated.gif');
+```
+
+```javascript
+// Create 128x128, non-dithered thumbnail of an animated GIF
+const { pages } = await sharp('animated.gif').metadata();
+const gif = await sharp('animated.gif', { animated: true })
+  .resize({
+    width: 128,
+    height: 128 * pages
+  })
+  .gif({
+    pageHeight: 128,
+    dither: 0
+  })
+  .toBuffer();
+```
 
 *   Throws **[Error][4]** Invalid options
 
