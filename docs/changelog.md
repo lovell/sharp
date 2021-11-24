@@ -18,6 +18,9 @@ Requires libvips v8.12.0
   [#2976](https://github.com/lovell/sharp/pull/2976)
   [@driannaude](https://github.com/driannaude)
 
+* Expose `unlimited` option for SVG and PNG input, switches off safety features.
+  [#2984](https://github.com/lovell/sharp/issues/2984)
+
 ## v0.29 - *circle*
 
 Requires libvips v8.11.3

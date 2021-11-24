@@ -648,6 +648,19 @@ describe('Input/output', function () {
       });
   });
 
+  describe('Switch off safety limits for PNG/SVG input', () => {
+    it('Valid', () => {
+      assert.doesNotThrow(() => {
+        sharp({ unlimited: true });
+      });
+    });
+    it('Invalid', () => {
+      assert.throws(() => {
+        sharp({ unlimited: -1 });
+      }, /Expected boolean for unlimited but received -1 of type number/);
+    });
+  });
+
   describe('Limit pixel count of input image', () => {
     it('Invalid fails - negative', () => {
       assert.throws(() => {
@@ -671,7 +684,9 @@ describe('Input/output', function () {
       sharp(fixtures.inputJpg)
         .metadata()
         .then(({ width, height }) =>
-          sharp(fixtures.inputJpg, { limitInputPixels: width * height }).toBuffer()
+          sharp(fixtures.inputJpg, { limitInputPixels: width * height })
+            .resize(2)
+            .toBuffer()
         )
     );
 

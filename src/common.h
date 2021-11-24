@@ -50,6 +50,7 @@ namespace sharp {
     char *buffer;
     bool failOnError;
     int limitInputPixels;
+    bool unlimited;
     VipsAccess access;
     size_t bufferLength;
     bool isBuffer;
@@ -75,6 +76,7 @@ namespace sharp {
       buffer(nullptr),
       failOnError(TRUE),
       limitInputPixels(0x3FFF * 0x3FFF),
+      unlimited(FALSE),
       access(VIPS_ACCESS_RANDOM),
       bufferLength(0),
       isBuffer(FALSE),
