@@ -147,6 +147,7 @@ struct PipelineBaton {
   bool pngAdaptiveFiltering;
   bool pngPalette;
   int pngQuality;
+  int pngEffort;
   int pngBitdepth;
   double pngDither;
   int jp2Quality;
@@ -287,6 +288,7 @@ struct PipelineBaton {
     pngAdaptiveFiltering(false),
     pngPalette(false),
     pngQuality(100),
+    pngEffort(7),
     pngBitdepth(8),
     pngDither(1.0),
     jp2Quality(80),

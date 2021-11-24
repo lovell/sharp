@@ -143,8 +143,8 @@ describe('PNG', function () {
   it('Valid PNG libimagequant quality value produces image of same size or smaller', function () {
     const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     return Promise.all([
-      sharp(inputPngBuffer).resize(10).png({ quality: 80 }).toBuffer(),
-      sharp(inputPngBuffer).resize(10).png({ quality: 100 }).toBuffer()
+      sharp(inputPngBuffer).resize(10).png({ effort: 1, quality: 80 }).toBuffer(),
+      sharp(inputPngBuffer).resize(10).png({ effort: 1, quality: 100 }).toBuffer()
     ]).then(function (data) {
       assert.strictEqual(true, data[0].length <= data[1].length);
     });
@@ -153,6 +153,12 @@ describe('PNG', function () {
   it('Invalid PNG libimagequant quality value throws error', function () {
     assert.throws(function () {
       sharp().png({ quality: 101 });
+    });
+  });
+
+  it('Invalid effort value throws error', () => {
+    assert.throws(() => {
+      sharp().png({ effort: 0.1 });
     });
   });
 

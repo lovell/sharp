@@ -243,6 +243,7 @@ Set `palette` to `true` for slower, indexed PNG output.
     *   `options.adaptiveFiltering` **[boolean][7]** use adaptive row filtering (optional, default `false`)
     *   `options.palette` **[boolean][7]** quantise to a palette-based image with alpha transparency support (optional, default `false`)
     *   `options.quality` **[number][9]** use the lowest number of colours needed to achieve given quality, sets `palette` to `true` (optional, default `100`)
+    *   `options.effort` **[number][9]** CPU effort, between 1 (fastest) and 10 (slowest), sets `palette` to `true` (optional, default `7`)
     *   `options.colours` **[number][9]** maximum number of palette entries, sets `palette` to `true` (optional, default `256`)
     *   `options.colors` **[number][9]** alternative spelling of `options.colours`, sets `palette` to `true` (optional, default `256`)
     *   `options.dither` **[number][9]** level of Floyd-Steinberg error diffusion, sets `palette` to `true` (optional, default `1.0`)
