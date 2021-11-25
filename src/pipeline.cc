@@ -390,7 +390,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       inputWidth = image.width();
-      inputHeight = image.height();
+      inputHeight = nPages > 1 ? targetPageHeight : image.height();
 
       // Resolve dimensions
       if (baton->width <= 0) {
@@ -420,10 +420,12 @@ class PipelineWorker : public Napi::AsyncWorker {
           std::tie(left, top) = sharp::CalculateEmbedPosition(
             inputWidth, inputHeight, baton->width, baton->height, baton->position);
 
-          image = image.embed(left, top, width, height, VImage::option()
-            ->set("extend", VIPS_EXTEND_BACKGROUND)
-            ->set("background", background));
-
+          image = nPages > 1
+            ? sharp::EmbedMultiPage(image,
+                left, top, width, height, background, nPages, &targetPageHeight)
+            : image.embed(left, top, width, height, VImage::option()
+              ->set("extend", VIPS_EXTEND_BACKGROUND)
+              ->set("background", background));
         } else if (baton->canvas == sharp::Canvas::CROP) {
           if (baton->width > inputWidth) {
             baton->width = inputWidth;
@@ -441,8 +443,12 @@ class PipelineWorker : public Napi::AsyncWorker {
               inputWidth, inputHeight, baton->width, baton->height, baton->position);
             int width = std::min(inputWidth, baton->width);
             int height = std::min(inputHeight, baton->height);
-            image = image.extract_area(left, top, width, height);
-          } else {
+
+            image = nPages > 1
+              ? sharp::CropMultiPage(image,
+                  left, top, width, height, nPages, &targetPageHeight)
+              : image.extract_area(left, top, width, height);
+          } else if (nPages == 1) {  // Skip smart crop for multi-page images
             // Attention-based or Entropy-based crop
             image = image.tilecache(VImage::option()
               ->set("access", VIPS_ACCESS_RANDOM)
@@ -465,8 +471,12 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Post extraction
       if (baton->topOffsetPost != -1) {
-        image = image.extract_area(
-          baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost);
+        image = nPages > 1
+          ? sharp::CropMultiPage(image,
+              baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost,
+              nPages, &targetPageHeight)
+          : image.extract_area(
+              baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost);
       }
 
       // Affine transform
@@ -490,8 +500,11 @@ class PipelineWorker : public Napi::AsyncWorker {
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
         baton->height = image.height() + baton->extendTop + baton->extendBottom;
 
-        image = image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
-          VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
+        image = nPages > 1
+          ? sharp::EmbedMultiPage(image,
+              baton->extendLeft, baton->extendTop, baton->width, baton->height, background, nPages, &targetPageHeight)
+          : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
+              VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
       }
       // Median - must happen before blurring, due to the utility of blurring after thresholding
       if (shouldApplyMedian) {

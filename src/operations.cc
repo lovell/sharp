@@ -308,4 +308,59 @@ namespace sharp {
     return image;
   }
 
+  /*
+   * Split and crop each frame, reassemble, and update pageHeight.
+   */
+  VImage CropMultiPage(VImage image, int left, int top, int width, int height,
+                       int nPages, int *pageHeight) {
+    std::vector<VImage> pages;
+    pages.reserve(nPages);
+
+    // Split the image into cropped frames
+    for (int i = 0; i < nPages; i++) {
+      pages.push_back(
+        image.extract_area(left, *pageHeight * i + top, width, height));
+    }
+
+    // Reassemble the frames into a tall, thin image
+    VImage assembled = VImage::arrayjoin(pages,
+      VImage::option()->set("across", 1));
+
+    // Update the page height
+    *pageHeight = height;
+
+    return assembled;
+  }
+
+  /*
+   * Split into frames, embed each frame, reassemble, and update pageHeight.
+   */
+  VImage EmbedMultiPage(VImage image, int left, int top, int width, int height,
+                        std::vector<double> background, int nPages, int *pageHeight) {
+    std::vector<VImage> pages;
+    pages.reserve(nPages);
+
+    // Split the image into frames
+    for (int i = 0; i < nPages; i++) {
+      pages.push_back(
+        image.extract_area(0, *pageHeight * i, image.width(), *pageHeight));
+    }
+
+    // Embed each frame in the target size
+    for (int i = 0; i < nPages; i++) {
+      pages[i] = pages[i].embed(left, top, width, height, VImage::option()
+        ->set("extend", VIPS_EXTEND_BACKGROUND)
+        ->set("background", background));
+    }
+
+    // Reassemble the frames into a tall, thin image
+    VImage assembled = VImage::arrayjoin(pages,
+      VImage::option()->set("across", 1));
+
+    // Update the page height
+    *pageHeight = height;
+
+    return assembled;
+  }
+
 }  // namespace sharp

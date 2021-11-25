@@ -108,6 +108,18 @@ namespace sharp {
    */
   VImage EnsureColourspace(VImage image, VipsInterpretation colourspace);
 
+  /*
+   * Split and crop each frame, reassemble, and update pageHeight.
+   */
+  VImage CropMultiPage(VImage image, int left, int top, int width, int height,
+                       int nPages, int *pageHeight);
+
+  /*
+   * Split into frames, embed each frame, reassemble, and update pageHeight.
+   */
+  VImage EmbedMultiPage(VImage image, int left, int top, int width, int height,
+                        std::vector<double> background, int nPages, int *pageHeight);
+
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_
