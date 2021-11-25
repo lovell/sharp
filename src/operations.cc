@@ -337,30 +337,64 @@ namespace sharp {
    */
   VImage EmbedMultiPage(VImage image, int left, int top, int width, int height,
                         std::vector<double> background, int nPages, int *pageHeight) {
-    std::vector<VImage> pages;
-    pages.reserve(nPages);
-
-    // Split the image into frames
-    for (int i = 0; i < nPages; i++) {
-      pages.push_back(
-        image.extract_area(0, *pageHeight * i, image.width(), *pageHeight));
-    }
-
-    // Embed each frame in the target size
-    for (int i = 0; i < nPages; i++) {
-      pages[i] = pages[i].embed(left, top, width, height, VImage::option()
+    if (top == 0 && height == *pageHeight) {
+      // Fast path; no need to adjust the height of the multi-page image
+      return image.embed(left, 0, width, image.height(), VImage::option()
         ->set("extend", VIPS_EXTEND_BACKGROUND)
         ->set("background", background));
+    } else if (left == 0 && width == image.width()) {
+      // Fast path; no need to adjust the width of the multi-page image
+      std::vector<VImage> pages;
+      pages.reserve(nPages);
+
+      // Rearrange the tall image into a vertical grid
+      image = image.grid(*pageHeight, nPages, 1);
+
+      // Do the embed on the wide image
+      image = image.embed(0, top, image.width(), height, VImage::option()
+        ->set("extend", VIPS_EXTEND_BACKGROUND)
+        ->set("background", background));
+
+      // Split the wide image into frames
+      for (int i = 0; i < nPages; i++) {
+        pages.push_back(
+          image.extract_area(width * i, 0, width, height));
+      }
+
+      // Reassemble the frames into a tall, thin image
+      VImage assembled = VImage::arrayjoin(pages,
+        VImage::option()->set("across", 1));
+
+      // Update the page height
+      *pageHeight = height;
+
+      return assembled;
+    } else {
+      std::vector<VImage> pages;
+      pages.reserve(nPages);
+
+      // Split the image into frames
+      for (int i = 0; i < nPages; i++) {
+        pages.push_back(
+          image.extract_area(0, *pageHeight * i, image.width(), *pageHeight));
+      }
+
+      // Embed each frame in the target size
+      for (int i = 0; i < nPages; i++) {
+        pages[i] = pages[i].embed(left, top, width, height, VImage::option()
+          ->set("extend", VIPS_EXTEND_BACKGROUND)
+          ->set("background", background));
+      }
+
+      // Reassemble the frames into a tall, thin image
+      VImage assembled = VImage::arrayjoin(pages,
+        VImage::option()->set("across", 1));
+
+      // Update the page height
+      *pageHeight = height;
+
+      return assembled;
     }
-
-    // Reassemble the frames into a tall, thin image
-    VImage assembled = VImage::arrayjoin(pages,
-      VImage::option()->set("across", 1));
-
-    // Update the page height
-    *pageHeight = height;
-
-    return assembled;
   }
 
 }  // namespace sharp
