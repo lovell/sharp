@@ -313,23 +313,28 @@ namespace sharp {
    */
   VImage CropMultiPage(VImage image, int left, int top, int width, int height,
                        int nPages, int *pageHeight) {
-    std::vector<VImage> pages;
-    pages.reserve(nPages);
+    if (top == 0 && height == *pageHeight) {
+      // Fast path; no need to adjust the height of the multi-page image
+      return image.extract_area(left, 0, width, image.height());
+    } else {
+      std::vector<VImage> pages;
+      pages.reserve(nPages);
 
-    // Split the image into cropped frames
-    for (int i = 0; i < nPages; i++) {
-      pages.push_back(
-        image.extract_area(left, *pageHeight * i + top, width, height));
+      // Split the image into cropped frames
+      for (int i = 0; i < nPages; i++) {
+        pages.push_back(
+          image.extract_area(left, *pageHeight * i + top, width, height));
+      }
+
+      // Reassemble the frames into a tall, thin image
+      VImage assembled = VImage::arrayjoin(pages,
+        VImage::option()->set("across", 1));
+
+      // Update the page height
+      *pageHeight = height;
+
+      return assembled;
     }
-
-    // Reassemble the frames into a tall, thin image
-    VImage assembled = VImage::arrayjoin(pages,
-      VImage::option()->set("across", 1));
-
-    // Update the page height
-    *pageHeight = height;
-
-    return assembled;
   }
 
   /*
