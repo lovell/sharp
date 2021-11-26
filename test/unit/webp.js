@@ -207,22 +207,14 @@ describe('WebP', function () {
       });
   });
 
-  it('should only set the page height for multi-page images', async () => {
-    const data = await sharp(fixtures.inputGifAnimatedLoop3)
+  it('should resize animated image to page height', async () => {
+    const updated = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
       .resize({ height: 570 })
       .webp({ effort: 0 })
-      .toBuffer();
-    const { size, ...metadata } = await sharp(data).metadata();
-    assert.deepStrictEqual(metadata, {
-      format: 'webp',
-      width: 740,
-      height: 570,
-      space: 'srgb',
-      channels: 3,
-      depth: 'uchar',
-      isProgressive: false,
-      hasProfile: false,
-      hasAlpha: false
-    });
+      .toBuffer()
+      .then(data => sharp(data, { pages: -1 }).metadata());
+
+    assert.strictEqual(updated.height, 570 * 9);
+    assert.strictEqual(updated.pageHeight, 570);
   });
 });

@@ -498,7 +498,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
-        baton->height = image.height() + baton->extendTop + baton->extendBottom;
+        baton->height = (nPages > 1 ? targetPageHeight : image.height()) + baton->extendTop + baton->extendBottom;
 
         image = nPages > 1
           ? sharp::EmbedMultiPage(image,

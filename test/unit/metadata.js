@@ -215,6 +215,30 @@ describe('Image metadata', function () {
       })
   );
 
+  it('Animated WebP with all pages', () =>
+    sharp(fixtures.inputWebPAnimated, { pages: -1 })
+      .metadata()
+      .then(({
+        format, width, height, space, channels, depth,
+        isProgressive, pages, pageHeight, loop, delay,
+        hasProfile, hasAlpha
+      }) => {
+        assert.strictEqual(format, 'webp');
+        assert.strictEqual(width, 80);
+        assert.strictEqual(height, 720);
+        assert.strictEqual(space, 'srgb');
+        assert.strictEqual(channels, 4);
+        assert.strictEqual(depth, 'uchar');
+        assert.strictEqual(isProgressive, false);
+        assert.strictEqual(pages, 9);
+        assert.strictEqual(pageHeight, 80);
+        assert.strictEqual(loop, 0);
+        assert.deepStrictEqual(delay, [120, 120, 90, 120, 120, 90, 120, 90, 30]);
+        assert.strictEqual(hasProfile, false);
+        assert.strictEqual(hasAlpha, true);
+      })
+  );
+
   it('Animated WebP with limited looping', () =>
     sharp(fixtures.inputWebPAnimatedLoop3)
       .metadata()
