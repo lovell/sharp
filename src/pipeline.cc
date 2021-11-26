@@ -196,7 +196,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             image = VImage::webpload(const_cast<char*>(baton->input->file.data()), option);
           }
         } else if (inputImageType == sharp::ImageType::SVG) {
-          option->set("unlimited", TRUE);
+          option->set("unlimited", baton->input->unlimited);
           option->set("dpi", baton->input->density);
 
           if (baton->input->buffer != nullptr) {
