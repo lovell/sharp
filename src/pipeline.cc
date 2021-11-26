@@ -69,6 +69,15 @@ class PipelineWorker : public Napi::AsyncWorker {
       std::tie(image, inputImageType) = sharp::OpenInput(baton->input);
       image = sharp::EnsureColourspace(image, baton->colourspaceInput);
 
+      int nPages = baton->input->pages;
+      if (nPages == -1) {
+        // Resolve the number of pages if we need to render until the end of the document
+        nPages = image.get_typeof(VIPS_META_N_PAGES) != 0 ? image.get_int(VIPS_META_N_PAGES) : 1;
+      }
+
+      // Get pre-resize page height
+      int pageHeight = sharp::GetPageHeight(image);
+
       // Calculate angle of rotation
       VipsAngle rotation;
       if (baton->useExifOrientation) {
@@ -104,13 +113,20 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Pre extraction
       if (baton->topOffsetPre != -1) {
-        image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
+        image = nPages > 1
+          ? sharp::CropMultiPage(image,
+              baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre, nPages, &pageHeight)
+          : image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
       }
 
-      // Get pre-resize image width, height and page height
+      // Get pre-resize image width and height
       int inputWidth = image.width();
       int inputHeight = image.height();
-      int pageHeight = sharp::GetPageHeight(image);
+
+      // Is there just one page? Shrink to inputHeight instead
+      if (nPages == 1) {
+        pageHeight = inputHeight;
+      }
 
       // Scaling calculations
       double hshrink;
@@ -118,12 +134,13 @@ class PipelineWorker : public Napi::AsyncWorker {
       int targetResizeWidth = baton->width;
       int targetResizeHeight = baton->height;
 
-      // Swap input output width and height when rotating by 90 or 270 degrees.
+      // Swap input output width and height when rotating by 90 or 270 degrees
       bool swap = !baton->rotateBeforePreExtract && (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270);
 
-      // Shrink to pageHeight, so we work for multi-page images.
-      std::tie(hshrink, vshrink) = sharp::ResolveShrink(inputWidth, pageHeight, targetResizeWidth, targetResizeHeight,
-                                                        baton->canvas, swap, baton->withoutEnlargement);
+      // Shrink to pageHeight, so we work for multi-page images
+      std::tie(hshrink, vshrink) = sharp::ResolveShrink(
+        inputWidth, pageHeight, targetResizeWidth, targetResizeHeight,
+        baton->canvas, swap, baton->withoutEnlargement);
 
       // The jpeg preload shrink.
       int jpegShrinkOnLoad = 1;
@@ -132,19 +149,21 @@ class PipelineWorker : public Napi::AsyncWorker {
       double scale = 1.0;
 
       // Try to reload input using shrink-on-load for JPEG, WebP, SVG and PDF, when:
-      //  - the width or height parameters are specified.
-      //  - gamma correction doesn't need to be applied.
-      //  - trimming or pre-resize extract isn't required.
-      //  - input colourspace is not specified.
-      if ((targetResizeWidth > 0 || targetResizeHeight > 0) &&
-          baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold == 0.0 &&
-          baton->colourspaceInput == VIPS_INTERPRETATION_LAST) {
-        // The common part of the shrink: the bit by which both axes must be shrunk.
+      //  - the width or height parameters are specified;
+      //  - gamma correction doesn't need to be applied;
+      //  - trimming or pre-resize extract isn't required;
+      //  - input colourspace is not specified;
+      bool const shouldPreShrink = (targetResizeWidth > 0 || targetResizeHeight > 0) &&
+        baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold == 0.0 &&
+        baton->colourspaceInput == VIPS_INTERPRETATION_LAST;
+
+      if (shouldPreShrink) {
+        // The common part of the shrink: the bit by which both axes must be shrunk
         double shrink = std::min(hshrink, vshrink);
 
         if (inputImageType == sharp::ImageType::JPEG) {
           // Leave at least a factor of two for the final resize step, when fastShrinkOnLoad: false
-          // for more consistent results and avoid occasional small image shifting.
+          // for more consistent results and avoid occasional small image shifting
           int factor = baton->fastShrinkOnLoad ? 1 : 2;
           if (shrink >= 8 * factor) {
             jpegShrinkOnLoad = 8;
@@ -162,7 +181,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Reload input using shrink-on-load, it'll be an integer shrink
       // factor for jpegload*, a double scale factor for webpload*,
-      // pdfload* and svgload*.
+      // pdfload* and svgload*
       if (jpegShrinkOnLoad > 1) {
         vips::VOption *option = VImage::option()
           ->set("access", baton->input->access)
@@ -229,39 +248,33 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       }
 
-      // Any pre-shrinking may already have been done.
+      // Any pre-shrinking may already have been done
       int thumbWidth = image.width();
       int thumbHeight = image.height();
 
-      // After pre-shrink, but before the main shrink stage.
-      int preshrunkPageHeight = sharp::GetPageHeight(image);
+      // After pre-shrink, but before the main shrink stage
+      // Reuse the initial pageHeight if we didn't pre-shrink
+      int preshrunkPageHeight = shouldPreShrink ? sharp::GetPageHeight(image) : pageHeight;
 
       if (baton->fastShrinkOnLoad && jpegShrinkOnLoad > 1) {
         // JPEG shrink-on-load rounds the output dimensions down, which
-        // may cause incorrect dimensions when fastShrinkOnLoad is enabled.
+        // may cause incorrect dimensions when fastShrinkOnLoad is enabled
         // Just recalculate vshrink / hshrink on the main image instead of
-        // the pre-shrunk image when this is the case.
+        // the pre-shrunk image when this is the case
         hshrink = static_cast<double>(thumbWidth) / (static_cast<double>(inputWidth) / hshrink);
         vshrink = static_cast<double>(preshrunkPageHeight) / (static_cast<double>(pageHeight) / vshrink);
       } else {
-        // Shrink to preshrunkPageHeight, so we work for multi-page images.
+        // Shrink to preshrunkPageHeight, so we work for multi-page images
         std::tie(hshrink, vshrink) = sharp::ResolveShrink(
-                thumbWidth, preshrunkPageHeight, targetResizeWidth, targetResizeHeight,
-                baton->canvas, swap, baton->withoutEnlargement);
-      }
-
-      int nPages = baton->input->pages;
-      if (nPages == -1) {
-        // Resolve the number of pages if we need to render until
-        // the end of the document.
-        nPages = image.get_typeof(VIPS_META_N_PAGES) != 0 ? image.get_int(VIPS_META_N_PAGES) : 1;
+          thumbWidth, preshrunkPageHeight, targetResizeWidth, targetResizeHeight,
+          baton->canvas, swap, baton->withoutEnlargement);
       }
 
       int targetHeight = static_cast<int>(std::rint(static_cast<double>(preshrunkPageHeight) / vshrink));
       int targetPageHeight = targetHeight;
 
       // In toilet-roll mode, we must adjust vshrink so that we exactly hit
-      // preshrunkPageHeight or we'll have pixels straddling pixel boundaries.
+      // preshrunkPageHeight or we'll have pixels straddling pixel boundaries
       if (thumbHeight > preshrunkPageHeight) {
         targetHeight *= nPages;
         vshrink = static_cast<double>(thumbHeight) / targetHeight;
@@ -471,12 +484,17 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Post extraction
       if (baton->topOffsetPost != -1) {
-        image = nPages > 1
-          ? sharp::CropMultiPage(image,
-              baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost,
-              nPages, &targetPageHeight)
-          : image.extract_area(
-              baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost);
+        if (nPages > 1) {
+          image = sharp::CropMultiPage(image,
+            baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost,
+            nPages, &targetPageHeight);
+
+          // heightPost is used in the info object, so update to reflect the number of pages
+          baton->heightPost *= nPages;
+        } else {
+          image = image.extract_area(
+            baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost);
+        }
       }
 
       // Affine transform
