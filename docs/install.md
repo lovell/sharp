@@ -199,6 +199,16 @@ Set
 [NODE_MODULES_CACHE](https://devcenter.heroku.com/articles/nodejs-support#cache-behavior)
 to `false` when using the `yarn` package manager.
 
+If you are using https://github.com/brandoncc/heroku-buildpack-vips to install VIPS, you may also need the following packages:
+
+- libglib2.0-0
+- libglib2.0-dev
+- libpoppler-glib8
+- libpoppler-glib-dev
+- libheif-dev
+- libfftw3-dev
+- libwebp-dev
+
 ## AWS Lambda
 
 The `node_modules` directory of the
