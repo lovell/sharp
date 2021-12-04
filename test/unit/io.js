@@ -797,6 +797,19 @@ describe('Input/output', function () {
     });
   });
 
+  it('Fails when writing to missing directory', async () => {
+    const create = {
+      width: 8,
+      height: 8,
+      channels: 3,
+      background: { r: 0, g: 0, b: 0 }
+    };
+    await assert.rejects(
+      () => sharp({ create }).toFile('does-not-exist/out.jpg'),
+      /unable to open for write/
+    );
+  });
+
   describe('create new image', function () {
     it('RGB', function (done) {
       const create = {
