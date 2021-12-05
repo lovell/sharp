@@ -39,6 +39,7 @@
               'VCCLCompilerTool': {
                 'ExceptionHandling': 1,
                 'Optimization': 1,
+                'RuntimeLibrary': '2', # /MD
                 'WholeProgramOptimization': 'true'
               },
               'VCLibrarianTool': {
@@ -205,6 +206,7 @@
               'VCCLCompilerTool': {
                 'ExceptionHandling': 1,
                 'Optimization': 1,
+                'RuntimeLibrary': '2', # /MD
                 'WholeProgramOptimization': 'true'
               },
               'VCLibrarianTool': {
