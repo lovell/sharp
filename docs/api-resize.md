@@ -49,6 +49,7 @@ Possible interpolation kernels are:
     *   `options.background` **([String][10] | [Object][9])** background colour when using a `fit` of `contain`, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
     *   `options.kernel` **[String][10]** the kernel to use for image reduction. (optional, default `'lanczos3'`)
     *   `options.withoutEnlargement` **[Boolean][12]** do not enlarge if the width *or* height are already less than the specified dimensions, equivalent to GraphicsMagick's `>` geometry option. (optional, default `false`)
+    *   `options.withoutReduction` **[Boolean][12]** do not reduce if the width *or* height are already greater than the specified dimensions, equivalent to GraphicsMagick's `<` geometry option. (optional, default `false`)
     *   `options.fastShrinkOnLoad` **[Boolean][12]** take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default `true`)
 
 ### Examples
@@ -114,6 +115,21 @@ sharp(input)
     // outputBuffer contains JPEG image data
     // no wider and no higher than 200 pixels
     // and no larger than the input image
+  });
+```
+
+```javascript
+sharp(input)
+  .resize(200, 200, {
+    fit: sharp.fit.outside,
+    withoutReduction: true
+  })
+  .toFormat('jpeg')
+  .toBuffer()
+  .then(function(outputBuffer) {
+    // outputBuffer contains JPEG image data
+    // of at least 200 pixels wide and 200 pixels high while maintaining aspect ratio
+    // and no smaller than the input image
   });
 ```
 

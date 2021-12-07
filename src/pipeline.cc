@@ -127,6 +127,17 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       }
 
+      // If withoutReduction is specified,
+      // Override target width and height if less than respective value from input file
+       if (baton->withoutReduction) {
+          if (baton->width < inputWidth) {
+            baton->width = inputWidth;
+          }
+          if (baton->height < inputHeight) {
+            baton->height = inputHeight;
+          }
+      }
+
       // Scaling calculations
       double xfactor = 1.0;
       double yfactor = 1.0;
@@ -1351,6 +1362,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   }
   // Resize options
   baton->withoutEnlargement = sharp::AttrAsBool(options, "withoutEnlargement");
+  baton->withoutReduction = sharp::AttrAsBool(options, "withoutReduction");
   baton->position = sharp::AttrAsInt32(options, "position");
   baton->resizeBackground = sharp::AttrAsVectorOfDouble(options, "resizeBackground");
   baton->kernel = sharp::AttrAsStr(options, "kernel");
