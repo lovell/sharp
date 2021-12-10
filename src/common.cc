@@ -490,30 +490,24 @@ namespace sharp {
 
   /*
     Set animation properties if necessary.
-    Non-provided properties will be loaded from image.
   */
-  VImage SetAnimationProperties(VImage image, int pageHeight, std::vector<int> delay, int loop) {
-    bool hasDelay = delay.size() != 1 || delay.front() != -1;
+  VImage SetAnimationProperties(VImage image, int nPages, int pageHeight, std::vector<int> delay, int loop) {
+    bool hasDelay = !delay.empty();
 
-    if (pageHeight == 0 && image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
-      pageHeight = image.get_int(VIPS_META_PAGE_HEIGHT);
+    // Avoid a copy if none of the animation properties are needed.
+    if (nPages == 1 && !hasDelay && loop == -1) return image;
+
+    if (delay.size() == 1) {
+      // We have just one delay, repeat that value for all frames.
+      delay.insert(delay.end(), nPages - 1, delay[0]);
     }
 
-    if (!hasDelay && image.get_typeof("delay") == VIPS_TYPE_ARRAY_INT) {
-      delay = image.get_array_int("delay");
-      hasDelay = true;
-    }
-
-    if (loop == -1 && image.get_typeof("loop") == G_TYPE_INT) {
-      loop = image.get_int("loop");
-    }
-
-    if (pageHeight == 0) return image;
-
-    // It is necessary to create the copy as otherwise, pageHeight will be ignored!
+    // Attaching metadata, need to copy the image.
     VImage copy = image.copy();
 
-    copy.set(VIPS_META_PAGE_HEIGHT, pageHeight);
+    // Only set page-height if we have more than one page, or this could
+    // accidentally turn into an animated image later.
+    if (nPages > 1) copy.set(VIPS_META_PAGE_HEIGHT, pageHeight);
     if (hasDelay) copy.set("delay", delay);
     if (loop != -1) copy.set("loop", loop);
 
@@ -554,6 +548,14 @@ namespace sharp {
     copy.get_image()->Xres = pixelsPerMm;
     copy.get_image()->Yres = pixelsPerMm;
     return copy;
+  }
+
+  /*
+    Multi-page images can have a page height. Fetch it, and sanity check it.
+    If page-height is not set, it defaults to the image height
+  */
+  int GetPageHeight(VImage image) {
+    return vips_image_get_page_height(image.get_image());
   }
 
   /*
@@ -880,6 +882,76 @@ namespace sharp {
       image = image.bandjoin_const(alpha);
     }
     return image;
+  }
+
+  std::pair<double, double> ResolveShrink(int width, int height, int targetWidth, int targetHeight,
+    Canvas canvas, bool swap, bool withoutEnlargement) {
+    if (swap) {
+      // Swap input width and height when requested.
+      std::swap(width, height);
+    }
+
+    double hshrink = 1.0;
+    double vshrink = 1.0;
+
+    if (targetWidth > 0 && targetHeight > 0) {
+      // Fixed width and height
+      hshrink = static_cast<double>(width) / targetWidth;
+      vshrink = static_cast<double>(height) / targetHeight;
+
+      switch (canvas) {
+        case Canvas::CROP:
+        case Canvas::MIN:
+          if (hshrink < vshrink) {
+            vshrink = hshrink;
+          } else {
+            hshrink = vshrink;
+          }
+          break;
+        case Canvas::EMBED:
+        case Canvas::MAX:
+          if (hshrink > vshrink) {
+            vshrink = hshrink;
+          } else {
+            hshrink = vshrink;
+          }
+          break;
+        case Canvas::IGNORE_ASPECT:
+          if (swap) {
+            std::swap(hshrink, vshrink);
+          }
+          break;
+      }
+    } else if (targetWidth > 0) {
+      // Fixed width
+      hshrink = static_cast<double>(width) / targetWidth;
+
+      if (canvas != Canvas::IGNORE_ASPECT) {
+        // Auto height
+        vshrink = hshrink;
+      }
+    } else if (targetHeight > 0) {
+      // Fixed height
+      vshrink = static_cast<double>(height) / targetHeight;
+
+      if (canvas != Canvas::IGNORE_ASPECT) {
+        // Auto width
+        hshrink = vshrink;
+      }
+    }
+
+    // We should not enlarge (oversample) the output image,
+    // if withoutEnlargement is specified.
+    if (withoutEnlargement) {
+      hshrink = std::max(1.0, hshrink);
+      vshrink = std::max(1.0, vshrink);
+    }
+
+    // We don't want to shrink so much that we send an axis to 0
+    hshrink = std::min(hshrink, static_cast<double>(width));
+    vshrink = std::min(vshrink, static_cast<double>(height));
+
+    return std::make_pair(hshrink, vshrink);
   }
 
 }  // namespace sharp

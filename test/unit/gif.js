@@ -80,12 +80,6 @@ describe('GIF input', () => {
     assert.strictEqual(true, reduced.length < original.length);
   });
 
-  it('invalid pageHeight throws', () => {
-    assert.throws(() => {
-      sharp().gif({ pageHeight: 0 });
-    });
-  });
-
   it('invalid loop throws', () => {
     assert.throws(() => {
       sharp().gif({ loop: -1 });
@@ -97,7 +91,7 @@ describe('GIF input', () => {
 
   it('invalid delay throws', () => {
     assert.throws(() => {
-      sharp().gif({ delay: [-1] });
+      sharp().gif({ delay: -1 });
     });
     assert.throws(() => {
       sharp().gif({ delay: [65536] });

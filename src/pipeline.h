@@ -27,14 +27,6 @@
 
 Napi::Value pipeline(const Napi::CallbackInfo& info);
 
-enum class Canvas {
-  CROP,
-  EMBED,
-  MAX,
-  MIN,
-  IGNORE_ASPECT
-};
-
 struct Composite {
   sharp::InputDescriptor *input;
   VipsBlendMode mode;
@@ -75,7 +67,7 @@ struct PipelineBaton {
   int width;
   int height;
   int channels;
-  Canvas canvas;
+  sharp::Canvas canvas;
   int position;
   std::vector<double> resizeBackground;
   bool hasCropOffset;
@@ -200,7 +192,6 @@ struct PipelineBaton {
   double ensureAlpha;
   VipsInterpretation colourspaceInput;
   VipsInterpretation colourspace;
-  int pageHeight;
   std::vector<int> delay;
   int loop;
   int tileSize;
@@ -221,7 +212,7 @@ struct PipelineBaton {
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),
-    canvas(Canvas::CROP),
+    canvas(sharp::Canvas::CROP),
     position(0),
     resizeBackground{ 0.0, 0.0, 0.0, 255.0 },
     hasCropOffset(false),
@@ -334,7 +325,6 @@ struct PipelineBaton {
     ensureAlpha(-1.0),
     colourspaceInput(VIPS_INTERPRETATION_LAST),
     colourspace(VIPS_INTERPRETATION_LAST),
-    pageHeight(0),
     delay{-1},
     loop(-1),
     tileSize(256),

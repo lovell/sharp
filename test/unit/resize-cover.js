@@ -269,6 +269,30 @@ describe('Resize fit=cover', function () {
       });
   });
 
+  describe('Animated WebP', function () {
+    it('Width only', function (done) {
+      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+        .resize(80, 320, { fit: sharp.fit.cover })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(80, info.width);
+          assert.strictEqual(320 * 9, info.height);
+          fixtures.assertSimilar(fixtures.expected('gravity-center-width.webp'), data, done);
+        });
+    });
+
+    it('Height only', function (done) {
+      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+        .resize(320, 80, { fit: sharp.fit.cover })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80 * 9, info.height);
+          fixtures.assertSimilar(fixtures.expected('gravity-center-height.webp'), data, done);
+        });
+    });
+  });
+
   describe('Entropy-based strategy', function () {
     it('JPEG', function (done) {
       sharp(fixtures.inputJpg)

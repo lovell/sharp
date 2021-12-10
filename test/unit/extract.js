@@ -39,10 +39,35 @@ describe('Partial image extraction', function () {
       });
   });
 
+  describe('Animated WebP', function () {
+    it('Before resize', function (done) {
+      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+        .extract({ left: 0, top: 30, width: 80, height: 20 })
+        .resize(320, 80)
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80 * 9, info.height);
+          fixtures.assertSimilar(fixtures.expected('gravity-center-height.webp'), data, done);
+        });
+    });
+
+    it('After resize', function (done) {
+      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+        .resize(320, 320)
+        .extract({ left: 0, top: 120, width: 320, height: 80 })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80 * 9, info.height);
+          fixtures.assertSimilar(fixtures.expected('gravity-center-height.webp'), data, done);
+        });
+    });
+  });
+
   it('TIFF', function (done) {
     sharp(fixtures.inputTiff)
       .extract({ left: 34, top: 63, width: 341, height: 529 })
-      .jpeg()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(341, info.width);

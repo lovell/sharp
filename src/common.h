@@ -135,6 +135,14 @@ namespace sharp {
     MISSING
   };
 
+  enum class Canvas {
+      CROP,
+      EMBED,
+      MAX,
+      MIN,
+      IGNORE_ASPECT
+  };
+
   // How many tasks are in the queue?
   extern volatile int counterQueue;
 
@@ -208,9 +216,8 @@ namespace sharp {
 
   /*
     Set animation properties if necessary.
-    Non-provided properties will be loaded from image.
   */
-  VImage SetAnimationProperties(VImage image, int pageHeight, std::vector<int> delay, int loop);
+  VImage SetAnimationProperties(VImage image, int nPages, int pageHeight, std::vector<int> delay, int loop);
 
   /*
     Remove animation properties from image.
@@ -231,6 +238,12 @@ namespace sharp {
     Set pixels/mm resolution based on a pixels/inch density.
   */
   VImage SetDensity(VImage image, const double density);
+
+  /*
+    Multi-page images can have a page height. Fetch it, and sanity check it.
+    If page-height is not set, it defaults to the image height
+  */
+  int GetPageHeight(VImage image);
 
   /*
     Check the proposed format supports the current dimensions.
@@ -324,6 +337,15 @@ namespace sharp {
     Ensures alpha channel, if missing.
   */
   VImage EnsureAlpha(VImage image, double const value);
+
+  /*
+    Calculate the shrink factor, taking into account auto-rotate, the canvas
+    mode, and so on. The hshrink/vshrink are the amount to shrink the input
+    image axes by in order for the output axes (ie. after rotation) to match
+    the required thumbnail width/height and canvas mode.
+  */
+  std::pair<double, double> ResolveShrink(int width, int height, int targetWidth, int targetHeight,
+    Canvas canvas, bool swap, bool withoutEnlargement);
 
 }  // namespace sharp
 

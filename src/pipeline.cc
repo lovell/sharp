@@ -69,6 +69,15 @@ class PipelineWorker : public Napi::AsyncWorker {
       std::tie(image, inputImageType) = sharp::OpenInput(baton->input);
       image = sharp::EnsureColourspace(image, baton->colourspaceInput);
 
+      int nPages = baton->input->pages;
+      if (nPages == -1) {
+        // Resolve the number of pages if we need to render until the end of the document
+        nPages = image.get_typeof(VIPS_META_N_PAGES) != 0 ? image.get_int(VIPS_META_N_PAGES) : 1;
+      }
+
+      // Get pre-resize page height
+      int pageHeight = sharp::GetPageHeight(image);
+
       // Calculate angle of rotation
       VipsAngle rotation;
       if (baton->useExifOrientation) {
@@ -104,194 +113,171 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Pre extraction
       if (baton->topOffsetPre != -1) {
-        image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
+        image = nPages > 1
+          ? sharp::CropMultiPage(image,
+              baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre, nPages, &pageHeight)
+          : image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
       }
 
       // Get pre-resize image width and height
       int inputWidth = image.width();
       int inputHeight = image.height();
-      if (!baton->rotateBeforePreExtract &&
-        (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
-        // Swap input output width and height when rotating by 90 or 270 degrees
-        std::swap(inputWidth, inputHeight);
-      }
 
-      // If withoutEnlargement is specified,
-      // Override target width and height if exceeds respective value from input file
-      if (baton->withoutEnlargement) {
-        if (baton->width > inputWidth) {
-          baton->width = inputWidth;
-        }
-        if (baton->height > inputHeight) {
-          baton->height = inputHeight;
-        }
+      // Is there just one page? Shrink to inputHeight instead
+      if (nPages == 1) {
+        pageHeight = inputHeight;
       }
 
       // Scaling calculations
-      double xfactor = 1.0;
-      double yfactor = 1.0;
+      double hshrink;
+      double vshrink;
       int targetResizeWidth = baton->width;
       int targetResizeHeight = baton->height;
-      if (baton->width > 0 && baton->height > 0) {
-        // Fixed width and height
-        xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
-        yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
-        switch (baton->canvas) {
-          case Canvas::CROP:
-            if (xfactor < yfactor) {
-              targetResizeHeight = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
-              yfactor = xfactor;
-            } else {
-              targetResizeWidth = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
-              xfactor = yfactor;
-            }
-            break;
-          case Canvas::EMBED:
-            if (xfactor > yfactor) {
-              targetResizeHeight = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
-              yfactor = xfactor;
-            } else {
-              targetResizeWidth = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
-              xfactor = yfactor;
-            }
-            break;
-          case Canvas::MAX:
-            if (xfactor > yfactor) {
-              targetResizeHeight = baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
-              yfactor = xfactor;
-            } else {
-              targetResizeWidth = baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
-              xfactor = yfactor;
-            }
-            break;
-          case Canvas::MIN:
-            if (xfactor < yfactor) {
-              targetResizeHeight = baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / xfactor));
-              yfactor = xfactor;
-            } else {
-              targetResizeWidth = baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / yfactor));
-              xfactor = yfactor;
-            }
-            break;
-          case Canvas::IGNORE_ASPECT:
-            if (!baton->rotateBeforePreExtract &&
-              (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
-              std::swap(xfactor, yfactor);
-            }
-            break;
-        }
-      } else if (baton->width > 0) {
-        // Fixed width
-        xfactor = static_cast<double>(inputWidth) / static_cast<double>(baton->width);
-        if (baton->canvas == Canvas::IGNORE_ASPECT) {
-          targetResizeHeight = baton->height = inputHeight;
-        } else {
-          // Auto height
-          yfactor = xfactor;
-          targetResizeHeight = baton->height = static_cast<int>(round(static_cast<double>(inputHeight) / yfactor));
-        }
-      } else if (baton->height > 0) {
-        // Fixed height
-        yfactor = static_cast<double>(inputHeight) / static_cast<double>(baton->height);
-        if (baton->canvas == Canvas::IGNORE_ASPECT) {
-          targetResizeWidth = baton->width = inputWidth;
-        } else {
-          // Auto width
-          xfactor = yfactor;
-          targetResizeWidth = baton->width = static_cast<int>(round(static_cast<double>(inputWidth) / xfactor));
-        }
-      } else {
-        // Identity transform
-        baton->width = inputWidth;
-        baton->height = inputHeight;
-      }
 
-      // Calculate integral box shrink
-      int xshrink = std::max(1, static_cast<int>(floor(xfactor)));
-      int yshrink = std::max(1, static_cast<int>(floor(yfactor)));
+      // Swap input output width and height when rotating by 90 or 270 degrees
+      bool swap = !baton->rotateBeforePreExtract && (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270);
 
-      // Calculate residual float affine transformation
-      double xresidual = static_cast<double>(xshrink) / xfactor;
-      double yresidual = static_cast<double>(yshrink) / yfactor;
+      // Shrink to pageHeight, so we work for multi-page images
+      std::tie(hshrink, vshrink) = sharp::ResolveShrink(
+        inputWidth, pageHeight, targetResizeWidth, targetResizeHeight,
+        baton->canvas, swap, baton->withoutEnlargement);
 
-      // If integral x and y shrink are equal, try to use shrink-on-load for JPEG and WebP,
-      // but not when applying gamma correction, pre-resize extract, trim or input colourspace
-      int shrink_on_load = 1;
+      // The jpeg preload shrink.
+      int jpegShrinkOnLoad = 1;
 
-      int shrink_on_load_factor = 1;
-      // Leave at least a factor of two for the final resize step, when fastShrinkOnLoad: false
-      // for more consistent results and avoid occasional small image shifting
-      if (!baton->fastShrinkOnLoad) {
-        shrink_on_load_factor = 2;
-      }
-      if (
-        xshrink == yshrink && xshrink >= 2 * shrink_on_load_factor &&
-        (inputImageType == sharp::ImageType::JPEG || inputImageType == sharp::ImageType::WEBP) &&
+      // WebP, PDF, SVG scale
+      double scale = 1.0;
+
+      // Try to reload input using shrink-on-load for JPEG, WebP, SVG and PDF, when:
+      //  - the width or height parameters are specified;
+      //  - gamma correction doesn't need to be applied;
+      //  - trimming or pre-resize extract isn't required;
+      //  - input colourspace is not specified;
+      bool const shouldPreShrink = (targetResizeWidth > 0 || targetResizeHeight > 0) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold == 0.0 &&
-        baton->colourspaceInput == VIPS_INTERPRETATION_LAST &&
-        image.width() > 3 && image.height() > 3 && baton->input->pages == 1
-      ) {
-        if (xshrink >= 8 * shrink_on_load_factor) {
-          xfactor = xfactor / 8;
-          yfactor = yfactor / 8;
-          shrink_on_load = 8;
-        } else if (xshrink >= 4 * shrink_on_load_factor) {
-          xfactor = xfactor / 4;
-          yfactor = yfactor / 4;
-          shrink_on_load = 4;
-        } else if (xshrink >= 2 * shrink_on_load_factor) {
-          xfactor = xfactor / 2;
-          yfactor = yfactor / 2;
-          shrink_on_load = 2;
+        baton->colourspaceInput == VIPS_INTERPRETATION_LAST;
+
+      if (shouldPreShrink) {
+        // The common part of the shrink: the bit by which both axes must be shrunk
+        double shrink = std::min(hshrink, vshrink);
+
+        if (inputImageType == sharp::ImageType::JPEG) {
+          // Leave at least a factor of two for the final resize step, when fastShrinkOnLoad: false
+          // for more consistent results and avoid occasional small image shifting
+          int factor = baton->fastShrinkOnLoad ? 1 : 2;
+          if (shrink >= 8 * factor) {
+            jpegShrinkOnLoad = 8;
+          } else if (shrink >= 4 * factor) {
+            jpegShrinkOnLoad = 4;
+          } else if (shrink >= 2 * factor) {
+            jpegShrinkOnLoad = 2;
+          }
+        } else if (inputImageType == sharp::ImageType::WEBP ||
+                   inputImageType == sharp::ImageType::SVG ||
+                   inputImageType == sharp::ImageType::PDF) {
+          scale = 1.0 / shrink;
         }
       }
-      // Help ensure a final kernel-based reduction to prevent shrink aliasing
-      if (shrink_on_load > 1 && (xresidual == 1.0 || yresidual == 1.0)) {
-        shrink_on_load = shrink_on_load / 2;
-        xfactor = xfactor * 2;
-        yfactor = yfactor * 2;
-      }
-      if (shrink_on_load > 1) {
-        // Reload input using shrink-on-load
+
+      // Reload input using shrink-on-load, it'll be an integer shrink
+      // factor for jpegload*, a double scale factor for webpload*,
+      // pdfload* and svgload*
+      if (jpegShrinkOnLoad > 1) {
         vips::VOption *option = VImage::option()
           ->set("access", baton->input->access)
-          ->set("shrink", shrink_on_load)
+          ->set("shrink", jpegShrinkOnLoad)
           ->set("fail", baton->input->failOnError);
         if (baton->input->buffer != nullptr) {
+          // Reload JPEG buffer
           VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
-          if (inputImageType == sharp::ImageType::JPEG) {
-            // Reload JPEG buffer
-            image = VImage::jpegload_buffer(blob, option);
-          } else {
-            // Reload WebP buffer
-            image = VImage::webpload_buffer(blob, option);
-          }
+          image = VImage::jpegload_buffer(blob, option);
           vips_area_unref(reinterpret_cast<VipsArea*>(blob));
         } else {
-          if (inputImageType == sharp::ImageType::JPEG) {
-            // Reload JPEG file
-            image = VImage::jpegload(const_cast<char*>(baton->input->file.data()), option);
+          // Reload JPEG file
+          image = VImage::jpegload(const_cast<char*>(baton->input->file.data()), option);
+        }
+      } else if (scale != 1.0) {
+        vips::VOption *option = VImage::option()
+          ->set("access", baton->input->access)
+          ->set("scale", scale)
+          ->set("fail", baton->input->failOnError);
+        if (inputImageType == sharp::ImageType::WEBP) {
+          option->set("n", baton->input->pages);
+          option->set("page", baton->input->page);
+
+          if (baton->input->buffer != nullptr) {
+            // Reload WebP buffer
+            VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
+            image = VImage::webpload_buffer(blob, option);
+            vips_area_unref(reinterpret_cast<VipsArea*>(blob));
           } else {
             // Reload WebP file
             image = VImage::webpload(const_cast<char*>(baton->input->file.data()), option);
           }
-        }
-        // Recalculate integral shrink and double residual
-        int const shrunkOnLoadWidth = image.width();
-        int const shrunkOnLoadHeight = image.height();
-        if (!baton->rotateBeforePreExtract &&
-          (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270)) {
-          // Swap when rotating by 90 or 270 degrees
-          xfactor = static_cast<double>(shrunkOnLoadWidth) / static_cast<double>(targetResizeHeight);
-          yfactor = static_cast<double>(shrunkOnLoadHeight) / static_cast<double>(targetResizeWidth);
-        } else {
-          xfactor = static_cast<double>(shrunkOnLoadWidth) / static_cast<double>(targetResizeWidth);
-          yfactor = static_cast<double>(shrunkOnLoadHeight) / static_cast<double>(targetResizeHeight);
+        } else if (inputImageType == sharp::ImageType::SVG) {
+          option->set("unlimited", baton->input->unlimited);
+          option->set("dpi", baton->input->density);
+
+          if (baton->input->buffer != nullptr) {
+            // Reload SVG buffer
+            VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
+            image = VImage::svgload_buffer(blob, option);
+            vips_area_unref(reinterpret_cast<VipsArea*>(blob));
+          } else {
+            // Reload SVG file
+            image = VImage::svgload(const_cast<char*>(baton->input->file.data()), option);
+          }
+
+          sharp::SetDensity(image, baton->input->density);
+        } else if (inputImageType == sharp::ImageType::PDF) {
+          option->set("n", baton->input->pages);
+          option->set("page", baton->input->page);
+          option->set("dpi", baton->input->density);
+
+          if (baton->input->buffer != nullptr) {
+            // Reload PDF buffer
+            VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
+            image = VImage::pdfload_buffer(blob, option);
+            vips_area_unref(reinterpret_cast<VipsArea*>(blob));
+          } else {
+            // Reload PDF file
+            image = VImage::pdfload(const_cast<char*>(baton->input->file.data()), option);
+          }
+
+          sharp::SetDensity(image, baton->input->density);
         }
       }
-      // Remove animation properties from single page images
-      if (baton->input->pages == 1) {
-        image = sharp::RemoveAnimationProperties(image);
+
+      // Any pre-shrinking may already have been done
+      int thumbWidth = image.width();
+      int thumbHeight = image.height();
+
+      // After pre-shrink, but before the main shrink stage
+      // Reuse the initial pageHeight if we didn't pre-shrink
+      int preshrunkPageHeight = shouldPreShrink ? sharp::GetPageHeight(image) : pageHeight;
+
+      if (baton->fastShrinkOnLoad && jpegShrinkOnLoad > 1) {
+        // JPEG shrink-on-load rounds the output dimensions down, which
+        // may cause incorrect dimensions when fastShrinkOnLoad is enabled
+        // Just recalculate vshrink / hshrink on the main image instead of
+        // the pre-shrunk image when this is the case
+        hshrink = static_cast<double>(thumbWidth) / (static_cast<double>(inputWidth) / hshrink);
+        vshrink = static_cast<double>(preshrunkPageHeight) / (static_cast<double>(pageHeight) / vshrink);
+      } else {
+        // Shrink to preshrunkPageHeight, so we work for multi-page images
+        std::tie(hshrink, vshrink) = sharp::ResolveShrink(
+          thumbWidth, preshrunkPageHeight, targetResizeWidth, targetResizeHeight,
+          baton->canvas, swap, baton->withoutEnlargement);
+      }
+
+      int targetHeight = static_cast<int>(std::rint(static_cast<double>(preshrunkPageHeight) / vshrink));
+      int targetPageHeight = targetHeight;
+
+      // In toilet-roll mode, we must adjust vshrink so that we exactly hit
+      // preshrunkPageHeight or we'll have pixels straddling pixel boundaries
+      if (thumbHeight > preshrunkPageHeight) {
+        targetHeight *= nPages;
+        vshrink = static_cast<double>(thumbHeight) / targetHeight;
       }
 
       // Ensure we're using a device-independent colour space
@@ -345,7 +331,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.colourspace(VIPS_INTERPRETATION_B_W);
       }
 
-      bool const shouldResize = xfactor != 1.0 || yfactor != 1.0;
+      bool const shouldResize = hshrink != 1.0 || vshrink != 1.0;
       bool const shouldBlur = baton->blurSigma != 0.0;
       bool const shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
@@ -379,21 +365,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         ) {
           throw vips::VError("Unknown kernel");
         }
-        // Ensure shortest edge is at least 1 pixel
-        if (image.width() / xfactor < 0.5) {
-          xfactor = 2 * image.width();
-          if (baton->canvas != Canvas::EMBED) {
-            baton->width = 1;
-          }
-        }
-        if (image.height() / yfactor < 0.5) {
-          yfactor = 2 * image.height();
-          if (baton->canvas != Canvas::EMBED) {
-            baton->height = 1;
-          }
-        }
-        image = image.resize(1.0 / xfactor, VImage::option()
-          ->set("vscale", 1.0 / yfactor)
+        image = image.resize(1.0 / hshrink, VImage::option()
+          ->set("vscale", 1.0 / vshrink)
           ->set("kernel", kernel));
       }
 
@@ -429,52 +402,67 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.copy(VImage::option()->set("interpretation", baton->colourspace));
       }
 
+      inputWidth = image.width();
+      inputHeight = nPages > 1 ? targetPageHeight : image.height();
+
+      // Resolve dimensions
+      if (baton->width <= 0) {
+        baton->width = inputWidth;
+      }
+      if (baton->height <= 0) {
+        baton->height = inputHeight;
+      }
+
       // Crop/embed
-      if (image.width() != baton->width || image.height() != baton->height) {
-        if (baton->canvas == Canvas::EMBED) {
+      if (inputWidth != baton->width || inputHeight != baton->height) {
+        if (baton->canvas == sharp::Canvas::EMBED) {
           std::vector<double> background;
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->resizeBackground, shouldPremultiplyAlpha);
 
           // Embed
 
-          // Calculate where to position the embeded image if gravity specified, else center.
+          // Calculate where to position the embedded image if gravity specified, else center.
           int left;
           int top;
 
-          left = static_cast<int>(round((baton->width - image.width()) / 2));
-          top = static_cast<int>(round((baton->height - image.height()) / 2));
+          left = static_cast<int>(round((baton->width - inputWidth) / 2));
+          top = static_cast<int>(round((baton->height - inputHeight) / 2));
 
-          int width = std::max(image.width(), baton->width);
-          int height = std::max(image.height(), baton->height);
+          int width = std::max(inputWidth, baton->width);
+          int height = std::max(inputHeight, baton->height);
           std::tie(left, top) = sharp::CalculateEmbedPosition(
-            image.width(), image.height(), baton->width, baton->height, baton->position);
+            inputWidth, inputHeight, baton->width, baton->height, baton->position);
 
-          image = image.embed(left, top, width, height, VImage::option()
-            ->set("extend", VIPS_EXTEND_BACKGROUND)
-            ->set("background", background));
+          image = nPages > 1
+            ? sharp::EmbedMultiPage(image,
+                left, top, width, height, background, nPages, &targetPageHeight)
+            : image.embed(left, top, width, height, VImage::option()
+              ->set("extend", VIPS_EXTEND_BACKGROUND)
+              ->set("background", background));
+        } else if (baton->canvas == sharp::Canvas::CROP) {
+          if (baton->width > inputWidth) {
+            baton->width = inputWidth;
+          }
+          if (baton->height > inputHeight) {
+            baton->height = inputHeight;
+          }
 
-        } else if (
-          baton->canvas != Canvas::IGNORE_ASPECT &&
-          (image.width() > baton->width || image.height() > baton->height)
-        ) {
-          // Crop/max/min
+          // Crop
           if (baton->position < 9) {
             // Gravity-based crop
             int left;
             int top;
             std::tie(left, top) = sharp::CalculateCrop(
-              image.width(), image.height(), baton->width, baton->height, baton->position);
-            int width = std::min(image.width(), baton->width);
-            int height = std::min(image.height(), baton->height);
-            image = image.extract_area(left, top, width, height);
-          } else {
+              inputWidth, inputHeight, baton->width, baton->height, baton->position);
+            int width = std::min(inputWidth, baton->width);
+            int height = std::min(inputHeight, baton->height);
+
+            image = nPages > 1
+              ? sharp::CropMultiPage(image,
+                  left, top, width, height, nPages, &targetPageHeight)
+              : image.extract_area(left, top, width, height);
+          } else if (nPages == 1) {  // Skip smart crop for multi-page images
             // Attention-based or Entropy-based crop
-            if (baton->width > image.width()) {
-              baton->width = image.width();
-            }
-            if (baton->height > image.height()) {
-              baton->height = image.height();
-            }
             image = image.tilecache(VImage::option()
               ->set("access", VIPS_ACCESS_RANDOM)
               ->set("threaded", TRUE));
@@ -496,8 +484,17 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Post extraction
       if (baton->topOffsetPost != -1) {
-        image = image.extract_area(
-          baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost);
+        if (nPages > 1) {
+          image = sharp::CropMultiPage(image,
+            baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost,
+            nPages, &targetPageHeight);
+
+          // heightPost is used in the info object, so update to reflect the number of pages
+          baton->heightPost *= nPages;
+        } else {
+          image = image.extract_area(
+            baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost);
+        }
       }
 
       // Affine transform
@@ -519,10 +516,13 @@ class PipelineWorker : public Napi::AsyncWorker {
 
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
-        baton->height = image.height() + baton->extendTop + baton->extendBottom;
+        baton->height = (nPages > 1 ? targetPageHeight : image.height()) + baton->extendTop + baton->extendBottom;
 
-        image = image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
-          VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
+        image = nPages > 1
+          ? sharp::EmbedMultiPage(image,
+              baton->extendLeft, baton->extendTop, baton->width, baton->height, background, nPages, &targetPageHeight)
+          : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
+              VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
       }
       // Median - must happen before blurring, due to the utility of blurring after thresholding
       if (shouldApplyMedian) {
@@ -763,10 +763,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       baton->height = image.height();
 
       image = sharp::SetAnimationProperties(
-        image,
-        baton->pageHeight,
-        baton->delay,
-        baton->loop);
+        image, nPages, targetPageHeight, baton->delay, baton->loop);
 
       // Output
       sharp::SetTimeout(image, baton->timeoutSeconds);
@@ -1317,15 +1314,15 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // Canvas option
   std::string canvas = sharp::AttrAsStr(options, "canvas");
   if (canvas == "crop") {
-    baton->canvas = Canvas::CROP;
+    baton->canvas = sharp::Canvas::CROP;
   } else if (canvas == "embed") {
-    baton->canvas = Canvas::EMBED;
+    baton->canvas = sharp::Canvas::EMBED;
   } else if (canvas == "max") {
-    baton->canvas = Canvas::MAX;
+    baton->canvas = sharp::Canvas::MAX;
   } else if (canvas == "min") {
-    baton->canvas = Canvas::MIN;
+    baton->canvas = sharp::Canvas::MIN;
   } else if (canvas == "ignore_aspect") {
-    baton->canvas = Canvas::IGNORE_ASPECT;
+    baton->canvas = sharp::Canvas::IGNORE_ASPECT;
   }
   // Tint chroma
   baton->tintA = sharp::AttrAsDouble(options, "tintA");
@@ -1520,10 +1517,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     vips_enum_from_nick(nullptr, VIPS_TYPE_BAND_FORMAT,
     sharp::AttrAsStr(options, "rawDepth").data()));
 
-  // Animated output
-  if (sharp::HasAttr(options, "pageHeight")) {
-    baton->pageHeight = sharp::AttrAsUint32(options, "pageHeight");
-  }
+  // Animated output properties
   if (sharp::HasAttr(options, "loop")) {
     baton->loop = sharp::AttrAsUint32(options, "loop");
   }

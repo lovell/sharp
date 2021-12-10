@@ -133,12 +133,6 @@ describe('WebP', function () {
     });
   });
 
-  it('invalid pageHeight throws', () => {
-    assert.throws(() => {
-      sharp().webp({ pageHeight: 0 });
-    });
-  });
-
   it('invalid loop throws', () => {
     assert.throws(() => {
       sharp().webp({ loop: -1 });
@@ -151,7 +145,7 @@ describe('WebP', function () {
 
   it('invalid delay throws', () => {
     assert.throws(() => {
-      sharp().webp({ delay: [-1] });
+      sharp().webp({ delay: -1 });
     });
 
     assert.throws(() => {
@@ -159,16 +153,13 @@ describe('WebP', function () {
     });
   });
 
-  it('should double the number of frames with default delay', async () => {
-    const original = await sharp(fixtures.inputWebPAnimated, { pages: -1 }).metadata();
+  it('should repeat a single delay for all frames', async () => {
     const updated = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
-      .webp({ pageHeight: original.pageHeight / 2 })
+      .webp({ delay: 100 })
       .toBuffer()
       .then(data => sharp(data, { pages: -1 }).metadata());
 
-    assert.strictEqual(updated.pages, original.pages * 2);
-    assert.strictEqual(updated.pageHeight, original.pageHeight / 2);
-    assert.deepStrictEqual(updated.delay, [...original.delay, ...Array(9).fill(120)]);
+    assert.deepStrictEqual(updated.delay, Array(updated.pages).fill(100));
   });
 
   it('should limit animation loop', async () => {
@@ -216,22 +207,14 @@ describe('WebP', function () {
       });
   });
 
-  it('should remove animation properties when loading single page', async () => {
-    const data = await sharp(fixtures.inputGifAnimatedLoop3)
+  it('should resize animated image to page height', async () => {
+    const updated = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
       .resize({ height: 570 })
       .webp({ effort: 0 })
-      .toBuffer();
-    const { size, ...metadata } = await sharp(data).metadata();
-    assert.deepStrictEqual(metadata, {
-      format: 'webp',
-      width: 740,
-      height: 570,
-      space: 'srgb',
-      channels: 3,
-      depth: 'uchar',
-      isProgressive: false,
-      hasProfile: false,
-      hasAlpha: false
-    });
+      .toBuffer()
+      .then(data => sharp(data, { pages: -1 }).metadata());
+
+    assert.strictEqual(updated.height, 570 * 9);
+    assert.strictEqual(updated.pageHeight, 570);
   });
 });

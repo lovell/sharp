@@ -6,16 +6,30 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Extend', function () {
-  it('extend all sides equally via a single value', function (done) {
-    sharp(fixtures.inputJpg)
-      .resize(120)
-      .extend(10)
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(140, info.width);
-        assert.strictEqual(118, info.height);
-        fixtures.assertSimilar(fixtures.expected('extend-equal-single.jpg'), data, done);
-      });
+  describe('extend all sides equally via a single value', function () {
+    it('JPEG', function (done) {
+      sharp(fixtures.inputJpg)
+        .resize(120)
+        .extend(10)
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(140, info.width);
+          assert.strictEqual(118, info.height);
+          fixtures.assertSimilar(fixtures.expected('extend-equal-single.jpg'), data, done);
+        });
+    });
+
+    it('Animated WebP', function (done) {
+      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+        .resize(120)
+        .extend(10)
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(140, info.width);
+          assert.strictEqual(140 * 9, info.height);
+          fixtures.assertSimilar(fixtures.expected('extend-equal-single.webp'), data, done);
+        });
+    });
   });
 
   it('extend all sides equally with RGB', function (done) {

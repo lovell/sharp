@@ -148,6 +148,42 @@ describe('Resize fit=contain', function () {
       });
   });
 
+  describe('Animated WebP', function () {
+    it('Width only', function (done) {
+      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+        .resize(320, 240, {
+          fit: 'contain',
+          background: { r: 255, g: 0, b: 0 }
+        })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('webp', info.format);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(240 * 9, info.height);
+          assert.strictEqual(4, info.channels);
+          fixtures.assertSimilar(fixtures.expected('embed-animated-width.webp'), data, done);
+        });
+    });
+
+    it('Height only', function (done) {
+      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+        .resize(240, 320, {
+          fit: 'contain',
+          background: { r: 255, g: 0, b: 0 }
+        })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('webp', info.format);
+          assert.strictEqual(240, info.width);
+          assert.strictEqual(320 * 9, info.height);
+          assert.strictEqual(4, info.channels);
+          fixtures.assertSimilar(fixtures.expected('embed-animated-height.webp'), data, done);
+        });
+    });
+  });
+
   it('Invalid position values should fail', function () {
     [-1, 8.1, 9, 1000000, false, 'vallejo'].forEach(function (position) {
       assert.throws(function () {
