@@ -283,9 +283,8 @@ Use these WebP options for output image.
     *   `options.nearLossless` **[boolean][7]** use near_lossless compression mode (optional, default `false`)
     *   `options.smartSubsample` **[boolean][7]** use high quality chroma subsampling (optional, default `false`)
     *   `options.effort` **[number][9]** CPU effort, between 0 (fastest) and 6 (slowest) (optional, default `4`)
-    *   `options.pageHeight` **[number][9]?** page height for animated output
     *   `options.loop` **[number][9]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
-    *   `options.delay` **[Array][10]<[number][9]>?** list of delays between animation frames (in milliseconds)
+    *   `options.delay` **([number][9] | [Array][10]<[number][9]>)?** delay(s) between animation frames (in milliseconds)
     *   `options.force` **[boolean][7]** force WebP output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
@@ -322,9 +321,8 @@ The first entry in the palette is reserved for transparency.
     *   `options.colors` **[number][9]** alternative spelling of `options.colours` (optional, default `256`)
     *   `options.effort` **[number][9]** CPU effort, between 1 (fastest) and 10 (slowest) (optional, default `7`)
     *   `options.dither` **[number][9]** level of Floyd-Steinberg error diffusion, between 0 (least) and 1 (most) (optional, default `1.0`)
-    *   `options.pageHeight` **[number][9]?** page height for animated output
     *   `options.loop` **[number][9]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
-    *   `options.delay` **[Array][10]<[number][9]>?** list of delays between animation frames (in milliseconds)
+    *   `options.delay` **([number][9] | [Array][10]<[number][9]>)?** delay(s) between animation frames (in milliseconds)
     *   `options.force` **[boolean][7]** force GIF output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
@@ -350,16 +348,17 @@ const gif = await sharp('animated.gif', { animated: true })
     width: 128,
     height: 128 * pages
   })
-  .gif({
-    pageHeight: 128,
-    dither: 0
-  })
+  .gif({ dither: 0 })
   .toBuffer();
 ```
 
 *   Throws **[Error][4]** Invalid options
 
 Returns **Sharp** 
+
+**Meta**
+
+*   **since**: 0.30.0
 
 ## jp2
 

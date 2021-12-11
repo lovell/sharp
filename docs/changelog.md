@@ -17,6 +17,10 @@ Requires libvips v8.12.1
 * Expose control over CPU effort for palette-based PNG output.
   [#2541](https://github.com/lovell/sharp/issues/2541)
 
+* Improve animated (multi-page) image resize and extract.
+  [#2789](https://github.com/lovell/sharp/pull/2789)
+  [@kleisauke](https://github.com/kleisauke)
+
 * Ensure 16-bit PNG output uses correct bitdepth.
   [#2958](https://github.com/lovell/sharp/pull/2958)
   [@gforge](https://github.com/gforge)
