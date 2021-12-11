@@ -120,6 +120,14 @@ describe('Trim borders', function () {
       )
   );
 
+  it('Animated image rejects', () =>
+    assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+      .trim()
+      .toBuffer(),
+    /Trim is not supported for multi-page images/
+    )
+  );
+
   describe('Invalid thresholds', function () {
     [-1, 'fail', {}].forEach(function (threshold) {
       it(JSON.stringify(threshold), function () {

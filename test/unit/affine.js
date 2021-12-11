@@ -155,6 +155,15 @@ describe('Affine transform', () => {
         fixtures.assertSimilar(fixtures.expected('affine-background-all-offsets-expected.jpg'), data, done);
       });
   });
+
+  it('Animated image rejects', () =>
+    assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+      .affine([1, 1, 1, 1])
+      .toBuffer(),
+    /Affine is not supported for multi-page images/
+    )
+  );
+
   describe('Interpolations', () => {
     const input = fixtures.inputJpg320x240;
     const inputWidth = 320;
