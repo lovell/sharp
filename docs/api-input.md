@@ -2,7 +2,11 @@
 
 ## metadata
 
-Fast access to (uncached) image metadata without decoding any compressed image data.
+Fast access to (uncached) image metadata without decoding any compressed pixel data.
+
+This is taken from the header of the input image.
+It does not include operations, such as resize, to be applied to the output image.
+
 A `Promise` is returned when `callback` is not provided.
 
 *   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
@@ -38,6 +42,10 @@ A `Promise` is returned when `callback` is not provided.
 *   `callback` **[Function][4]?** called with the arguments `(err, metadata)`
 
 ### Examples
+
+```javascript
+const metadata = await sharp(input).metadata();
+```
 
 ```javascript
 const image = sharp(inputJpg);
