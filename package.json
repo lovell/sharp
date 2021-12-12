@@ -79,7 +79,8 @@
     "Michael Nutt <michael@nutt.im>",
     "Brad Parham <baparham@gmail.com>",
     "Taneli Vatanen <taneli.vatanen@gmail.com>",
-    "Joris Dugué <zaruike10@gmail.com>"
+    "Joris Dugué <zaruike10@gmail.com>",
+    "Chris Banks <christopher.bradley.banks@gmail.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
