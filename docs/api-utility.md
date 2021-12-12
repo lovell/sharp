@@ -52,6 +52,17 @@ An Object containing the version numbers of libvips and its dependencies.
 console.log(sharp.versions);
 ```
 
+## vendor
+
+An Object containing information about the platform and architecture
+of the current and installed vendored binaries.
+
+### Examples
+
+```javascript
+console.log(sharp.vendor);
+```
+
 ## cache
 
 Gets or, when options are provided, sets the limits of *libvips'* operation cache.

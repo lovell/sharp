@@ -131,4 +131,13 @@ describe('Utilities', function () {
       assert.strictEqual('string', typeof sharp.versions.vips);
     });
   });
+
+  describe('Vendor', function () {
+    it('Contains expected attributes', function () {
+      assert.strictEqual('object', typeof sharp.vendor);
+      assert.strictEqual('string', typeof sharp.vendor.current);
+      assert.strictEqual(true, Array.isArray(sharp.vendor.installed));
+      assert.strictEqual(true, sharp.vendor.installed.length > 0);
+    });
+  });
 });

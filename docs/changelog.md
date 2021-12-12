@@ -21,6 +21,9 @@ Requires libvips v8.12.1
   [#2789](https://github.com/lovell/sharp/pull/2789)
   [@kleisauke](https://github.com/kleisauke)
 
+* Expose platform and architecture of vendored binaries as `sharp.vendor`.
+  [#2928](https://github.com/lovell/sharp/issues/2928)
+
 * Ensure 16-bit PNG output uses correct bitdepth.
   [#2958](https://github.com/lovell/sharp/pull/2958)
   [@gforge](https://github.com/gforge)
