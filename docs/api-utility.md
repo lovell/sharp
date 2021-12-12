@@ -54,7 +54,7 @@ console.log(sharp.versions);
 
 ## vendor
 
-An Object containing information about the platform and architecture
+An Object containing the platform and architecture
 of the current and installed vendored binaries.
 
 ### Examples
