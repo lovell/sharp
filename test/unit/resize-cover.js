@@ -347,6 +347,18 @@ describe('Resize fit=cover', function () {
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
+
+    it('Animated image rejects', () =>
+      assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+        .resize({
+          width: 100,
+          height: 8,
+          position: sharp.strategy.entropy
+        })
+        .toBuffer(),
+      /Resize strategy is not supported for multi-page images/
+      )
+    );
   });
 
   describe('Attention strategy', function () {
@@ -403,5 +415,17 @@ describe('Resize fit=cover', function () {
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
         });
     });
+
+    it('Animated image rejects', () =>
+      assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+        .resize({
+          width: 100,
+          height: 8,
+          position: sharp.strategy.attention
+        })
+        .toBuffer(),
+      /Resize strategy is not supported for multi-page images/
+      )
+    );
   });
 });

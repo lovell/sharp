@@ -98,6 +98,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           image = sharp::RemoveExifOrientation(image);
         }
         if (baton->rotationAngle != 0.0) {
+          MultiPageUnsupported(nPages, "Rotate");
           std::vector<double> background;
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, FALSE);
           image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
@@ -106,6 +107,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Trim
       if (baton->trimThreshold > 0.0) {
+        MultiPageUnsupported(nPages, "Trim");
         image = sharp::Trim(image, baton->trimThreshold);
         baton->trimOffsetLeft = image.xoffset();
         baton->trimOffsetTop = image.yoffset();
@@ -461,8 +463,9 @@ class PipelineWorker : public Napi::AsyncWorker {
               ? sharp::CropMultiPage(image,
                   left, top, width, height, nPages, &targetPageHeight)
               : image.extract_area(left, top, width, height);
-          } else if (nPages == 1) {  // Skip smart crop for multi-page images
+          } else {
             // Attention-based or Entropy-based crop
+            MultiPageUnsupported(nPages, "Resize strategy");
             image = image.tilecache(VImage::option()
               ->set("access", VIPS_ACCESS_RANDOM)
               ->set("threaded", TRUE));
@@ -477,6 +480,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Rotate post-extract non-90 angle
       if (!baton->rotateBeforePreExtract && baton->rotationAngle != 0.0) {
+        MultiPageUnsupported(nPages, "Rotate");
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, shouldPremultiplyAlpha);
         image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
@@ -499,6 +503,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Affine transform
       if (baton->affineMatrix.size() > 0) {
+        MultiPageUnsupported(nPages, "Affine");
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
         image = image.affine(baton->affineMatrix, VImage::option()->set("background", background)
@@ -1223,6 +1228,12 @@ class PipelineWorker : public Napi::AsyncWorker {
   PipelineBaton *baton;
   Napi::FunctionReference debuglog;
   Napi::FunctionReference queueListener;
+
+  void MultiPageUnsupported(int const pages, std::string op) {
+    if (pages > 1) {
+      throw vips::VError(op + " is not supported for multi-page images");
+    }
+  }
 
   /*
     Calculate the angle of rotation and need-to-flip for the given Exif orientation

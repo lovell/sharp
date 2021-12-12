@@ -272,6 +272,34 @@ describe('Rotation', function () {
     });
   });
 
+  it('Animated image rotate-then-extract rejects', () =>
+    assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+      .rotate(1)
+      .extract({
+        top: 1,
+        left: 1,
+        width: 10,
+        height: 10
+      })
+      .toBuffer(),
+    /Rotate is not supported for multi-page images/
+    )
+  );
+
+  it('Animated image extract-then-rotate rejects', () =>
+    assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+      .extract({
+        top: 1,
+        left: 1,
+        width: 10,
+        height: 10
+      })
+      .rotate(1)
+      .toBuffer(),
+    /Rotate is not supported for multi-page images/
+    )
+  );
+
   it('Flip - vertical', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320)
