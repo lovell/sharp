@@ -10,6 +10,8 @@ Requires libvips v8.12.1
 
 * Reduce minimum Linux ARM64v8 glibc requirement to 2.17.
 
+* Verify prebuilt binaries with a Subresource Integrity check.
+
 * Standardise WebP `effort` option name, deprecate `reductionEffort`.
 
 * Standardise HEIF `effort` option name, deprecate `speed`.

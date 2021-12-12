@@ -76,6 +76,27 @@ describe('libvips binaries', function () {
     });
   });
 
+  describe('integrity', function () {
+    it('reads value from environment variable', function () {
+      const prev = process.env.npm_package_config_integrity_platform_arch;
+      process.env.npm_package_config_integrity_platform_arch = 'sha512-test';
+
+      const integrity = libvips.integrity('platform-arch');
+      assert.strictEqual('sha512-test', integrity);
+
+      process.env.npm_package_config_integrity_platform_arch = prev;
+    });
+    it('reads value from package.json', function () {
+      const prev = process.env.npm_package_config_integrity_linux_x64;
+      delete process.env.npm_package_config_integrity_linux_x64;
+
+      const integrity = libvips.integrity('linux-x64');
+      assert.strictEqual('sha512-', integrity.substr(0, 7));
+
+      process.env.npm_package_config_integrity_linux_x64 = prev;
+    });
+  });
+
   describe('safe directory creation', function () {
     before(function () {
       mockFS({

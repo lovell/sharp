@@ -23,8 +23,9 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 * Windows x64
 * Windows x86
 
-An ~7MB tarball containing libvips and its most commonly used dependencies
-is downloaded via HTTPS and stored within `node_modules/sharp/vendor` during `npm install`.
+A ~7MB tarball containing libvips and its most commonly used dependencies
+is downloaded via HTTPS, verified via Subresource Integrity
+and decompressed into `node_modules/sharp/vendor` during `npm install`.
 
 This provides support for the
 JPEG, PNG, WebP, AVIF, TIFF, GIF and SVG (input) image formats.
@@ -78,7 +79,7 @@ npm install --platform=... --arch=... --arm-version=... sharp
 * `--platform`: one of `linux`, `linuxmusl`, `darwin` or `win32`.
 * `--arch`: one of `x64`, `ia32`, `arm` or `arm64`.
 * `--arm-version`: one of `6`, `7` or `8` (`arm` defaults to `6`, `arm64` defaults to `8`).
-* `--sharp-install-force`: skip version compatibility checks.
+* `--sharp-install-force`: skip version compatibility and Subresource Integrity checks.
 
 These values can also be set via environment variables,
 `npm_config_platform`, `npm_config_arch`, `npm_config_arm_version`
