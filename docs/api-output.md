@@ -341,13 +341,9 @@ await sharp('animated.webp', { animated: true })
 ```
 
 ```javascript
-// Create 128x128, non-dithered thumbnail of an animated GIF
-const { pages } = await sharp('animated.gif').metadata();
-const gif = await sharp('animated.gif', { animated: true })
-  .resize({
-    width: 128,
-    height: 128 * pages
-  })
+// Create a 128x128, cropped, non-dithered, animated thumbnail of an animated GIF
+const out = await sharp('in.gif', { animated: true })
+  .resize({ width: 128, height: 128 })
   .gif({ dither: 0 })
   .toBuffer();
 ```
