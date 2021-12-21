@@ -147,8 +147,9 @@ const data = await sharp(input)
     }
   })
   .toBuffer();
+```
 
- * @example
+```javascript
 // Set output metadata to 96 DPI
 const data = await sharp(input)
   .withMetadata({ density: 96 })
@@ -533,8 +534,6 @@ const data = await sharp('input.png')
 Use tile-based deep zoom (image pyramid) output.
 Set the format and options for tile images via the `toFormat`, `jpeg`, `png` or `webp` functions.
 Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed archive file format.
-
-Warning: multiple sharp instances concurrently producing tile output can expose a possible race condition in some versions of libgsf.
 
 ### Parameters
 
