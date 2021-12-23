@@ -99,6 +99,7 @@ describe('Image metadata', function () {
       assert.strictEqual(1, metadata.orientation);
       assert.strictEqual('undefined', typeof metadata.exif);
       assert.strictEqual('undefined', typeof metadata.icc);
+      assert.strictEqual('inch', metadata.resolutionUnit);
       done();
     });
   });

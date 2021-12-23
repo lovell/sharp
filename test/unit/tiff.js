@@ -288,6 +288,30 @@ describe('TIFF', function () {
       });
   });
 
+  it('TIFF resolutionUnit of inch (default)', async () => {
+    const data = await sharp({ create: { width: 8, height: 8, channels: 3, background: 'red' } })
+      .tiff()
+      .toBuffer();
+    const { resolutionUnit } = await sharp(data).metadata();
+    assert.strictEqual(resolutionUnit, 'inch');
+  });
+
+  it('TIFF resolutionUnit of inch', async () => {
+    const data = await sharp({ create: { width: 8, height: 8, channels: 3, background: 'red' } })
+      .tiff({ resolutionUnit: 'inch' })
+      .toBuffer();
+    const { resolutionUnit } = await sharp(data).metadata();
+    assert.strictEqual(resolutionUnit, 'inch');
+  });
+
+  it('TIFF resolutionUnit of cm', async () => {
+    const data = await sharp({ create: { width: 8, height: 8, channels: 3, background: 'red' } })
+      .tiff({ resolutionUnit: 'cm' })
+      .toBuffer();
+    const { resolutionUnit } = await sharp(data).metadata();
+    assert.strictEqual(resolutionUnit, 'cm');
+  });
+
   it('TIFF deflate compression with horizontal predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
@@ -380,6 +404,12 @@ describe('TIFF', function () {
   it('TIFF invalid predictor option throws', function () {
     assert.throws(function () {
       sharp().tiff({ predictor: 'a' });
+    });
+  });
+
+  it('TIFF invalid resolutionUnit option throws', function () {
+    assert.throws(function () {
+      sharp().tiff({ resolutionUnit: 'none' });
     });
   });
 
