@@ -308,7 +308,7 @@ struct PipelineBaton {
     tiffTileWidth(256),
     tiffXres(1.0),
     tiffYres(1.0),
-    tiffResolutionUnit(VIPS_FOREIGN_TIFF_RESUNIT_INCH)
+    tiffResolutionUnit(VIPS_FOREIGN_TIFF_RESUNIT_INCH),
     heifQuality(50),
     heifCompression(VIPS_FOREIGN_HEIF_COMPRESSION_AV1),
     heifSpeed(5),
