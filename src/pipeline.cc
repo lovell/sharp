@@ -888,7 +888,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("tile_height", baton->tiffTileHeight)
             ->set("tile_width", baton->tiffTileWidth)
             ->set("xres", baton->tiffXres)
-            ->set("yres", baton->tiffYres)));
+            ->set("yres", baton->tiffYres)
+            ->set("resunit", baton->tiffResolutionUnit)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
           area->free_fn = nullptr;
@@ -1046,7 +1047,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("tile_height", baton->tiffTileHeight)
             ->set("tile_width", baton->tiffTileWidth)
             ->set("xres", baton->tiffXres)
-            ->set("yres", baton->tiffYres));
+            ->set("yres", baton->tiffYres)
+            ->set("resunit", baton->tiffResolutionUnit));
           baton->formatOut = "tiff";
         } else if (baton->formatOut == "heif" || (mightMatchInput && isHeif) ||
           (willMatchInput && inputImageType == sharp::ImageType::HEIF)) {
@@ -1506,6 +1508,11 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->tiffPredictor = static_cast<VipsForeignTiffPredictor>(
   vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_PREDICTOR,
     sharp::AttrAsStr(options, "tiffPredictor").data()));
+  // tiff resolution unit options
+  baton->tiffResolutionUnit = static_cast<VipsForeignTiffResunit>(
+  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_RESUNIT,
+  sharp::AttrAsStr(options, "tiffResolutionUnit").data()));
+
   baton->heifQuality = sharp::AttrAsUint32(options, "heifQuality");
   baton->heifLossless = sharp::AttrAsBool(options, "heifLossless");
   baton->heifCompression = static_cast<VipsForeignHeifCompression>(
@@ -1513,6 +1520,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     sharp::AttrAsStr(options, "heifCompression").data()));
   baton->heifSpeed = sharp::AttrAsUint32(options, "heifSpeed");
   baton->heifChromaSubsampling = sharp::AttrAsStr(options, "heifChromaSubsampling");
+
 
   // Raw output
   baton->rawDepth = static_cast<VipsBandFormat>(

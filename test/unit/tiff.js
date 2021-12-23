@@ -288,6 +288,37 @@ describe('TIFF', function () {
       });
   });
 
+  it('TTIFF ccittfax4 compression with inch resolutionUnit test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiff).size;
+    sharp(fixtures.inputTiff)
+      .toColourspace('b-w')
+      .tiff({
+        bitdepth: 1,
+        compression: 'ccittfax4',
+        resolutionUnit: 'inch'
+      })
+      .toFile(outputTiff, (err, info) => {
+        if (err) throw err;
+        console.log('info', info);
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        rimraf(outputTiff, done);
+      });
+  });
+
+  it('TTIFF deflate compression without resolutionUnit test file', function (done) {
+    const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
+    sharp(fixtures.inputTiffUncompressed)
+      .tiff({
+        compression: 'deflate'
+      }).toFile(outputTiff, (err, info) => {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert(info.size < startSize);
+        rimraf(outputTiff, done);
+      });
+  });
+
   it('TIFF deflate compression with horizontal predictor shrinks test file', function (done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
@@ -380,6 +411,12 @@ describe('TIFF', function () {
   it('TIFF invalid predictor option throws', function () {
     assert.throws(function () {
       sharp().tiff({ predictor: 'a' });
+    });
+  });
+
+  it('TIFF invalid resolutionUnit option throws', function () {
+    assert.throws(function () {
+      sharp().tiff({ resolutionUnit: 'none' });
     });
   });
 
