@@ -299,7 +299,6 @@ describe('TIFF', function () {
       })
       .toFile(outputTiff, (err, info) => {
         if (err) throw err;
-        console.log('info', info);
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
         rimraf(outputTiff, done);
@@ -313,10 +312,18 @@ describe('TIFF', function () {
         compression: 'deflate'
       }).toFile(outputTiff, (err, info) => {
         if (err) throw err;
+        console.log(info);
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
         rimraf(outputTiff, done);
       });
+  });
+
+  it('TIFF setting resolution unit(cm)', async () => {
+    const data = await sharp(fixtures.inputTiff)
+      .tiff({ resolutionUnit: 'cm' })
+      .withMetadata({ density: 300 });
+    assert.strictEqual('cm', data.options.tiffResolutionUnit);
   });
 
   it('TIFF deflate compression with horizontal predictor shrinks test file', function (done) {
