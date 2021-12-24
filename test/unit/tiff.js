@@ -312,7 +312,6 @@ describe('TIFF', function () {
         compression: 'deflate'
       }).toFile(outputTiff, (err, info) => {
         if (err) throw err;
-        console.log(info);
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
         rimraf(outputTiff, done);
