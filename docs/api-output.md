@@ -546,10 +546,10 @@ Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed arc
     *   `options.depth` **[string][2]?** how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout.
     *   `options.skipBlanks` **[number][9]** threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images (optional, default `-1`)
     *   `options.container` **[string][2]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
-    *   `options.layout` **[string][2]** filesystem layout, possible values are `dz`, `iiif`, `zoomify` or `google`. (optional, default `'dz'`)
+    *   `options.layout` **[string][2]** filesystem layout, possible values are `dz`, `iiif`, `iiif3`, `zoomify` or `google`. (optional, default `'dz'`)
     *   `options.centre` **[boolean][7]** centre image in tile. (optional, default `false`)
     *   `options.center` **[boolean][7]** alternative spelling of centre. (optional, default `false`)
-    *   `options.id` **[string][2]** when `layout` is `iiif`, sets the `@id` attribute of `info.json` (optional, default `'https://example.com/iiif'`)
+    *   `options.id` **[string][2]** when `layout` is `iiif`/`iiif3`, sets the `@id`/`id` attribute of `info.json` (optional, default `'https://example.com/iiif'`)
 
 ### Examples
 

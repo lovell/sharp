@@ -830,7 +830,7 @@ describe('Tile', function () {
     });
   });
 
-  it('IIIF layout', function (done) {
+  it('IIIFv2 layout', function (done) {
     const name = 'output.iiif.info';
     const directory = fixtures.path(name);
     rimraf(directory, function () {
@@ -848,8 +848,40 @@ describe('Tile', function () {
           assert.strictEqual(3, info.channels);
           assert.strictEqual('number', typeof info.size);
           const infoJson = require(path.join(directory, 'info.json'));
+          assert.strictEqual('http://iiif.io/api/image/2/context.json', infoJson['@context']);
           assert.strictEqual(`${id}/${name}`, infoJson['@id']);
           fs.stat(path.join(directory, '0,0,256,256', '256,', '0', 'default.jpg'), function (err, stat) {
+            if (err) throw err;
+            assert.strictEqual(true, stat.isFile());
+            assert.strictEqual(true, stat.size > 0);
+            done();
+          });
+        });
+    });
+  });
+
+  it('IIIFv3 layout', function (done) {
+    const name = 'output.iiif3.info';
+    const directory = fixtures.path(name);
+    rimraf(directory, function () {
+      const id = 'https://sharp.test.com/iiif3';
+      sharp(fixtures.inputJpg)
+        .tile({
+          layout: 'iiif3',
+          id
+        })
+        .toFile(directory, function (err, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          const infoJson = require(path.join(directory, 'info.json'));
+          assert.strictEqual('http://iiif.io/api/image/3/context.json', infoJson['@context']);
+          assert.strictEqual('ImageService3', infoJson.type);
+          assert.strictEqual(`${id}/${name}`, infoJson.id);
+          fs.stat(path.join(directory, '0,0,256,256', '256,256,', '0', 'default.jpg'), function (err, stat) {
             if (err) throw err;
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);

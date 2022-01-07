@@ -16,6 +16,8 @@ Requires libvips v8.12.1
 
 * Standardise HEIF `effort` option name, deprecate `speed`.
 
+* Add support for IIIF v3 tile-based output.
+
 * Expose control over CPU effort for palette-based PNG output.
   [#2541](https://github.com/lovell/sharp/issues/2541)
 
