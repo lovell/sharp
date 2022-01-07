@@ -7,6 +7,7 @@ const rimraf = require('rimraf');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
+const exifReader = require('exif-reader');
 
 const outputTiff = fixtures.path('output.tiff');
 
@@ -323,6 +324,23 @@ describe('TIFF', function () {
       .tiff({ resolutionUnit: 'cm' })
       .withMetadata({ density: 300 });
     assert.strictEqual('cm', data.options.tiffResolutionUnit);
+  });
+
+  it('TIFF setting resolution unit(inch)', async () => {
+    await sharp(fixtures.inputJpgWithExif)
+      .tiff({ resolutionUnit: 'inch' })
+      .metadata(function (err, metadata) {
+        if (err) throw err;
+        // EXIF
+        assert.strictEqual('object', typeof metadata.exif);
+        assert.strictEqual(true, metadata.exif instanceof Buffer);
+        const exif = exifReader(metadata.exif);
+        assert.strictEqual('object', typeof exif);
+        assert.strictEqual('object', typeof exif.image);
+        assert.strictEqual('number', typeof exif.image.XResolution);
+        assert.strictEqual('number', typeof exif.image.ResolutionUnit);
+        assert.strictEqual(2, exif.image.ResolutionUnit);
+      });
   });
 
   it('TIFF deflate compression with horizontal predictor shrinks test file', function (done) {
