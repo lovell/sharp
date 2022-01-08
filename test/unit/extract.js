@@ -168,6 +168,16 @@ describe('Partial image extraction', function () {
       });
   });
 
+  it('Rotate with EXIF mirroring then extract', function (done) {
+    sharp(fixtures.inputJpgWithLandscapeExif7)
+      .rotate()
+      .extract({ left: 0, top: 208, width: 60, height: 40 })
+      .toBuffer(function (err, data) {
+        if (err) throw err;
+        fixtures.assertSimilar(fixtures.expected('rotate-mirror-extract.jpg'), data, done);
+      });
+  });
+
   describe('Invalid parameters', function () {
     describe('using the legacy extract(top,left,width,height) syntax', function () {
       it('String top', function () {

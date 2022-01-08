@@ -80,13 +80,11 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Calculate angle of rotation
       VipsAngle rotation;
+      bool flip = FALSE;
+      bool flop = FALSE;
       if (baton->useExifOrientation) {
         // Rotate and flip image according to Exif orientation
-        bool flip;
-        bool flop;
         std::tie(rotation, flip, flop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
-        baton->flip = baton->flip || flip;
-        baton->flop = baton->flop || flop;
       } else {
         rotation = CalculateAngleRotation(baton->angle);
       }
@@ -95,6 +93,14 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->rotateBeforePreExtract) {
         if (rotation != VIPS_ANGLE_D0) {
           image = image.rot(rotation);
+          if (flip) {
+            image = image.flip(VIPS_DIRECTION_VERTICAL);
+            flip = FALSE;
+          }
+          if (flop) {
+            image = image.flip(VIPS_DIRECTION_HORIZONTAL);
+            flop = FALSE;
+          }
           image = sharp::RemoveExifOrientation(image);
         }
         if (baton->rotationAngle != 0.0) {
@@ -384,20 +390,27 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Rotate post-extract 90-angle
-      if (!baton->rotateBeforePreExtract &&  rotation != VIPS_ANGLE_D0) {
-          image = image.rot(rotation);
-          image = sharp::RemoveExifOrientation(image);
+      if (!baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
+        image = image.rot(rotation);
+        if (flip) {
+          image = image.flip(VIPS_DIRECTION_VERTICAL);
+          flip = FALSE;
+        }
+        if (flop) {
+          image = image.flip(VIPS_DIRECTION_HORIZONTAL);
+          flop = FALSE;
+        }
+        image = sharp::RemoveExifOrientation(image);
       }
 
-
       // Flip (mirror about Y axis)
-      if (baton->flip) {
+      if (baton->flip || flip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
         image = sharp::RemoveExifOrientation(image);
       }
 
       // Flop (mirror about X axis)
-      if (baton->flop) {
+      if (baton->flop || flop) {
         image = image.flip(VIPS_DIRECTION_HORIZONTAL);
         image = sharp::RemoveExifOrientation(image);
       }
