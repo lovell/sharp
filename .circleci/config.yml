@@ -43,13 +43,14 @@ jobs:
     steps:
       - checkout
       - run: |
-          sudo chown 0.0 ${PWD}
-          sudo docker run -dit --name sharp --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp arm64v8/debian:bullseye
+          sudo docker run -dit --name sharp --workdir /mnt/sharp arm64v8/debian:bullseye
           sudo docker exec sharp sh -c "apt-get update && apt-get install -y build-essential git python3 curl"
           sudo docker exec sharp sh -c "curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -"
           sudo docker exec sharp sh -c "echo 'deb https://deb.nodesource.com/node_16.x sid main' >/etc/apt/sources.list.d/nodesource.list"
           sudo docker exec sharp sh -c "apt-get update && apt-get install -y nodejs"
-      - run: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
+          sudo docker exec sharp sh -c "mkdir -p /mnt/sharp"
+          sudo docker cp . sharp:/mnt/sharp/.
+      - run: sudo docker exec sharp sh -c "npm install --build-from-source"
       - run: sudo docker exec sharp sh -c "npm test"
   linux-arm64-musl-node-12:
     resource_class: arm.medium
@@ -70,8 +71,9 @@ jobs:
     steps:
       - checkout
       - run: |
-          sudo chown 0.0 ${PWD}
-          sudo docker run -dit --name sharp --volume "${PWD}:/mnt/sharp" --workdir /mnt/sharp node:16-alpine3.11
+          sudo docker run -dit --name sharp --workdir /mnt/sharp node:16-alpine3.11
           sudo docker exec sharp sh -c "apk add build-base git python3 --update-cache"
-      - run: sudo docker exec sharp sh -c "npm install --build-from-source --unsafe-perm"
+          sudo docker exec sharp sh -c "mkdir -p /mnt/sharp"
+          sudo docker cp . sharp:/mnt/sharp/.
+      - run: sudo docker exec sharp sh -c "npm install --build-from-source"
       - run: sudo docker exec sharp sh -c "npm test"
