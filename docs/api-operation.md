@@ -159,14 +159,28 @@ Returns **Sharp**
 ## blur
 
 Blur the image.
-When used without parameters, performs a fast, mild blur of the output image.
+
+When used without parameters, performs a fast 3x3 box blur (equivalent to a box linear filter).
+
 When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 
 ### Parameters
 
 *   `sigma` **[number][1]?** a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
 
-<!---->
+### Examples
+
+```javascript
+const boxBlurred = await sharp(input)
+  .blur()
+  .toBuffer();
+```
+
+```javascript
+const gaussianBlurred = await sharp(input)
+  .blur(5)
+  .toBuffer();
+```
 
 *   Throws **[Error][5]** Invalid parameters
 
