@@ -132,14 +132,16 @@ try {
       throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
     // Linux libc version check
-    if (detectLibc.family === detectLibc.GLIBC && detectLibc.version && minimumGlibcVersionByArch[arch]) {
-      if (semverLessThan(`${detectLibc.version}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
-        handleError(new Error(`Use with glibc ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
+    const libcFamily = detectLibc.familySync();
+    const libcVersion = detectLibc.versionSync();
+    if (libcFamily === detectLibc.GLIBC && libcVersion && minimumGlibcVersionByArch[arch]) {
+      if (semverLessThan(`${libcVersion}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
+        handleError(new Error(`Use with glibc ${libcVersion} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
       }
     }
-    if (detectLibc.family === detectLibc.MUSL && detectLibc.version) {
-      if (semverLessThan(detectLibc.version, '1.1.24')) {
-        handleError(new Error(`Use with musl ${detectLibc.version} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
+    if (libcFamily === detectLibc.MUSL && libcVersion) {
+      if (semverLessThan(libcVersion, '1.1.24')) {
+        handleError(new Error(`Use with musl ${libcVersion} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
       }
     }
     // Node.js minimum version check
