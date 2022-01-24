@@ -18,7 +18,7 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 
 * macOS x64 (>= 10.13)
 * macOS ARM64
-* Linux x64 (glibc >= 2.17, musl >= 1.1.24)
+* Linux x64 (glibc >= 2.17, musl >= 1.1.24, CPU with SSE4.2)
 * Linux ARM64 (glibc >= 2.17, musl >= 1.1.24)
 * Windows x64
 * Windows x86
