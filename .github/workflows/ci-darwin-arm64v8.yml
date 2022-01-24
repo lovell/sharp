@@ -5,6 +5,15 @@ on:
 jobs:
   CI:
     runs-on: macos-m1
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nodejs_version: 12
+            nodejs_architecture: x64
+          - nodejs_version: 16
+            nodejs_architecture: arm64
+            prebuild: true
     defaults:
       run:
         shell: /usr/bin/arch -arch arm64e /bin/bash -l {0}
@@ -12,8 +21,8 @@ jobs:
       - name: Dependencies
         uses: actions/setup-node@v2
         with:
-          node-version: 16
-          architecture: arm64
+          node-version: ${{ matrix.nodejs_version }}
+          architecture: ${{ matrix.nodejs_architecture }}
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install
@@ -21,7 +30,7 @@ jobs:
       - name: Test
         run: npm test
       - name: Prebuild
-        if: startsWith(github.ref, 'refs/tags/')
+        if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
         env:
           prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
         run: npx prebuild --runtime napi --target 5
