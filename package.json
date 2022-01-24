@@ -127,7 +127,7 @@
   "dependencies": {
     "color": "^4.2.0",
     "detect-libc": "^2.0.0",
-    "node-addon-api": "^4.2.0",
+    "node-addon-api": "^4.3.0",
     "prebuild-install": "^7.0.0",
     "semver": "^7.3.5",
     "simple-get": "^4.0.0",
@@ -142,7 +142,7 @@
     "exif-reader": "^1.0.3",
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^9.1.4",
+    "mocha": "^9.2.0",
     "mock-fs": "^5.1.2",
     "nyc": "^15.1.0",
     "prebuild": "^11.0.1",
