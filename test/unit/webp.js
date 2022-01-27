@@ -217,4 +217,15 @@ describe('WebP', function () {
     assert.strictEqual(updated.height, 570 * 9);
     assert.strictEqual(updated.pageHeight, 570);
   });
+
+  it('should take page parameter into account when animated is set', async () => {
+    const updated = await sharp(fixtures.inputWebPAnimated, { animated: true, page: 2 })
+      .resize({ height: 570 })
+      .webp({ effort: 0 })
+      .toBuffer()
+      .then(data => sharp(data, { pages: -1 }).metadata());
+
+    assert.strictEqual(updated.height, 570 * 7);
+    assert.strictEqual(updated.pageHeight, 570);
+  });
 });

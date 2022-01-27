@@ -72,7 +72,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       int nPages = baton->input->pages;
       if (nPages == -1) {
         // Resolve the number of pages if we need to render until the end of the document
-        nPages = image.get_typeof(VIPS_META_N_PAGES) != 0 ? image.get_int(VIPS_META_N_PAGES) : 1;
+        nPages = image.get_typeof(VIPS_META_N_PAGES) != 0
+          ? image.get_int(VIPS_META_N_PAGES) - baton->input->page
+          : 1;
       }
 
       // Get pre-resize page height
