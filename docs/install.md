@@ -53,7 +53,7 @@ See the [cross-platform](#cross-platform) section if this is not the case.
 
 When using npm v6 or earlier, the `npm install --unsafe-perm` flag must be used when installing as `root` or a `sudo` user.
 
-When using npm v7, the user running `npm install` must own the directory it is run in.
+When using npm v7 or later, the user running `npm install` must own the directory it is run in.
 
 The `npm install --ignore-scripts=false` flag must be used when `npm` has been configured to ignore installation scripts.
 
@@ -61,9 +61,7 @@ Check the output of running `npm install --verbose sharp` for useful error messa
 
 ## Apple M1
 
-Prebuilt sharp and libvips binaries are provided for macOS on ARM64 from sharp v0.29.0.
-
-Prebuilt libvips binaries were provided for macOS on ARM64 from sharp v0.28.0.
+Prebuilt sharp and libvips binaries have been provided for macOS on ARM64 since sharp v0.29.0.
 
 ## Cross-platform
 
