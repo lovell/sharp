@@ -183,6 +183,15 @@ describe('WebP', function () {
     assert.deepStrictEqual(updated.delay, expectedDelay);
   });
 
+  it('should preserve delay between frames', async () => {
+    const updated = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
+      .webp()
+      .toBuffer()
+      .then(data => sharp(data, { pages: -1 }).metadata());
+
+    assert.deepStrictEqual(updated.delay, [120, 120, 90, 120, 120, 90, 120, 90, 30]);
+  });
+
   it('should work with streams when only animated is set', function (done) {
     fs.createReadStream(fixtures.inputWebPAnimated)
       .pipe(sharp({ animated: true }))

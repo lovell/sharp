@@ -327,7 +327,6 @@ struct PipelineBaton {
     ensureAlpha(-1.0),
     colourspaceInput(VIPS_INTERPRETATION_LAST),
     colourspace(VIPS_INTERPRETATION_LAST),
-    delay{-1},
     loop(-1),
     tileSize(256),
     tileOverlap(0),
