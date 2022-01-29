@@ -43,6 +43,10 @@ Requires libvips v8.12.1
   [#3006](https://github.com/lovell/sharp/pull/3006)
   [@christopherbradleybanks](https://github.com/christopherbradleybanks)
 
+* Add `resolutionUnit` as `tiff` option and expose in metadata.
+  [#3023](https://github.com/lovell/sharp/pull/3023)
+  [@ompal-sisodiya](https://github.com/ompal-sisodiya)
+
 * Ensure rotate-then-extract works with EXIF mirroring.
   [#3024](https://github.com/lovell/sharp/issues/3024)
 

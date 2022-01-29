@@ -422,6 +422,7 @@ The `density` can be set in pixels/inch via [withMetadata][1] instead of providi
     *   `options.tileHeight` **[number][9]** vertical tile size (optional, default `256`)
     *   `options.xres` **[number][9]** horizontal resolution in pixels/mm (optional, default `1.0`)
     *   `options.yres` **[number][9]** vertical resolution in pixels/mm (optional, default `1.0`)
+    *   `options.resolutionUnit` **[string][2]** resolution unit options: inch, cm (optional, default `'inch'`)
     *   `options.bitdepth` **[number][9]** reduce bitdepth to 1, 2 or 4 bit (optional, default `8`)
 
 ### Examples
