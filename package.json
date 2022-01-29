@@ -129,7 +129,7 @@
     "color": "^4.2.0",
     "detect-libc": "^2.0.0",
     "node-addon-api": "^4.3.0",
-    "prebuild-install": "^7.0.0",
+    "prebuild-install": "^7.0.1",
     "semver": "^7.3.5",
     "simple-get": "^4.0.1",
     "tar-fs": "^2.1.1",
@@ -146,7 +146,7 @@
     "mocha": "^9.2.0",
     "mock-fs": "^5.1.2",
     "nyc": "^15.1.0",
-    "prebuild": "^11.0.1",
+    "prebuild": "^11.0.2",
     "rimraf": "^3.0.2",
     "semistandard": "^16.0.1"
   },
