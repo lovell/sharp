@@ -881,7 +881,7 @@ describe('Tile', function () {
           assert.strictEqual('http://iiif.io/api/image/3/context.json', infoJson['@context']);
           assert.strictEqual('ImageService3', infoJson.type);
           assert.strictEqual(`${id}/${name}`, infoJson.id);
-          fs.stat(path.join(directory, '0,0,256,256', '256,256,', '0', 'default.jpg'), function (err, stat) {
+          fs.stat(path.join(directory, '0,0,256,256', '256,256', '0', 'default.jpg'), function (err, stat) {
             if (err) throw err;
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);
