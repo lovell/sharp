@@ -1443,7 +1443,6 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->affineOdx = sharp::AttrAsDouble(options, "affineOdx");
   baton->affineOdy = sharp::AttrAsDouble(options, "affineOdy");
   baton->affineInterpolator = vips::VInterpolate::new_from_name(sharp::AttrAsStr(options, "affineInterpolator").data());
-
   baton->removeAlpha = sharp::AttrAsBool(options, "removeAlpha");
   baton->ensureAlpha = sharp::AttrAsDouble(options, "ensureAlpha");
   if (options.Has("boolean")) {
@@ -1555,13 +1554,10 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     sharp::AttrAsStr(options, "heifCompression").data()));
   baton->heifEffort = sharp::AttrAsUint32(options, "heifEffort");
   baton->heifChromaSubsampling = sharp::AttrAsStr(options, "heifChromaSubsampling");
-
-
   // Raw output
   baton->rawDepth = static_cast<VipsBandFormat>(
     vips_enum_from_nick(nullptr, VIPS_TYPE_BAND_FORMAT,
     sharp::AttrAsStr(options, "rawDepth").data()));
-
   // Animated output properties
   if (sharp::HasAttr(options, "loop")) {
     baton->loop = sharp::AttrAsUint32(options, "loop");
@@ -1569,7 +1565,6 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   if (sharp::HasAttr(options, "delay")) {
     baton->delay = sharp::AttrAsInt32Vector(options, "delay");
   }
-
   // Tile output
   baton->tileSize = sharp::AttrAsUint32(options, "tileSize");
   baton->tileOverlap = sharp::AttrAsUint32(options, "tileOverlap");
