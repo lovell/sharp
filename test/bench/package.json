@@ -10,12 +10,12 @@
   "devDependencies": {
     "@squoosh/cli": "0.7.2",
     "@squoosh/lib": "0.4.0",
-    "async": "3.2.1",
+    "async": "3.2.3",
     "benchmark": "2.1.4",
     "gm": "1.23.1",
     "imagemagick": "0.1.3",
     "jimp": "0.16.1",
-    "mapnik": "4.5.8",
+    "mapnik": "4.5.9",
     "semver": "7.3.5"
   },
   "license": "Apache-2.0",
