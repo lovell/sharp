@@ -154,17 +154,17 @@
   "config": {
     "libvips": "8.12.2",
     "integrity": {
-      "darwin-arm64v8": "sha512-Rw/1STuWoUuNoY4Hz8eJYUeSxO/aY6yGG8QWqNlNmD58qIxb636/x0B+XJ7pVAYApdf1MOwbBnjkV0xQOa8jyQ==",
-      "darwin-x64": "sha512-98ODQLziBAkPdlWt/7B7mdbZGrh1wNZsaKp0UVBOaPen+vppQJpo9dN5sJTZtrSpOJk5kIs7wCIAvBb81jS0hg==",
-      "linux-arm64v8": "sha512-+I5igvs41NFp1cteyKvh/R46GKlGzL1pFG4GTOPCCjsX33lHn1CWBtPbRLkKXxFRbqnFtXdPHTwcW107Mvyr6w==",
-      "linux-armv6": "sha512-K6XnwK8rwVmd4XqcQcAvZ+MNnwxwCkS2WhoE+c5i2zyHZ7uXxJ8aE3gH0kPP7xF1thNoiXHDZFwwZZ1uQoHlGQ==",
-      "linux-armv7": "sha512-O3IEguBdxnbeZUgcvF/Axgph59B1Qph4/aUpFS7thq1Ta/QPfUdJwIXUTIsapLBr2H9xz0DjvxcAVGyuOIgvqA==",
-      "linux-x64": "sha512-/Ct6NLG08nCYmZGB+B40Vu4v4PXSEHGW68zO+ktg7poYhlzS6QyJ5HNAJauNM0r+vV19MyQqUkP2BB9uBv1mXg==",
-      "linuxmusl-arm64v8": "sha512-+z8+pS1F8TkOrygtyKz1mTfbEDfcvpoliPTidira1ZBQo/tcdMg62/2sE4Azx0A4ArjXp+Snf3Djv462ouP0cg==",
-      "linuxmusl-x64": "sha512-fznclDnd3PhRG0LBCSQFCVqhtSI8t2N/m3yBQqEKnPbvZUbud27+iOs9L/e609Zf64+65krGE3DP63H3vKW8kQ==",
-      "win32-arm64v8": "sha512-a4d7uVb+NaY0j0KjlJaZ8GOJHYFxxYR4Lg572O7HItT08I5pXzMBsqlFquVW/6/3w5WJ5RTZBQNr8CuUh5VFdQ==",
-      "win32-ia32": "sha512-B19rzTTnMZemlwEcxkLkunMy6EU2vu2VsYSzlMyojRrKS1WDz6b3H8d7pKO8Ks793yoZQBEWAnThqldHxt9YoA==",
-      "win32-x64": "sha512-5FW9zeH+6AY23PKfOpOJW+PjbRrGQwdrrtOEkCD+2bcWMvdhcfzpVBA4c9Dd97aN7ob25E+KdCqoKKgQSg8MaQ=="
+      "darwin-arm64v8": "sha512-p46s/bbJAjkOXzPISZt9HUpG9GWjwQkYnLLRLKzsBJHLtB3X6C6Y/zXI5Hd0DOojcFkks9a0kTN+uDQ/XJY19g==",
+      "darwin-x64": "sha512-6vOHVZnvXwe6EXRsy29jdkUzBE6ElNpXUwd+m8vV7qy32AnXu7B9YemHsZ44vWviIwPZeXF6Nhd9EFLM0wWohw==",
+      "linux-arm64v8": "sha512-XwZdS63yhqLtbFtx/0eoLF/Agf5qtTrI11FMnMRpuBJWd4jHB60RAH+uzYUgoChCmKIS+AeXYMLm4d8Ns2QX8w==",
+      "linux-armv6": "sha512-Rh0Q0kqwPG2MjXWOkPCuPEyiUKFgKJYWLgS835D4MrXgdKr8Tft/eVrc2iGIxt2re30VpDiZ1h0Rby1aCZt2zw==",
+      "linux-armv7": "sha512-heTS/MsmRvu4JljINxP+vDiS9ZZfuGhr3IStb5F7Gc0/QLRhllYAg4rcO8L1eTK9sIIzG5ARvI19+YUZe7WbzA==",
+      "linux-x64": "sha512-SSWAwBFi0hx8V/h/v82tTFGKWTFv9FiCK3Timz5OExuI+sX1Ngrd0PVQaWXOThGNdel/fcD3Bz9YjSt4feBR1g==",
+      "linuxmusl-arm64v8": "sha512-Rhks+5C7p7aO6AucLT1uvzo8ohlqcqCUPgZmN+LZjsPWob/Iix3MfiDYtv/+gTvdeEfXxbCU6/YuPBwHQ7/crA==",
+      "linuxmusl-x64": "sha512-IOyjSQqpWVntqOUpCHVWuQwACwmmjdi15H8Pc+Ma1JkhPogTfVsFQWyL7DuOTD3Yr23EuYGzovUX00duOtfy/g==",
+      "win32-arm64v8": "sha512-A+Qe8Ipewtvw9ldvF6nWed2J8kphzrUE04nFeKCtNx6pfGQ/MAlCKMjt/U8VgUKNjB01zJDUW9XE0+FhGZ/UpQ==",
+      "win32-ia32": "sha512-cMrAvwFdDeAVnLJt0IPMPRKaIFhyXYGTprsM0DND9VUHE8F7dJMR44tS5YkXsGh1QNDtjKT6YuxAVUglmiXtpA==",
+      "win32-x64": "sha512-vLFIfw6aW2zABa8jpgzWDhljnE6glktrddErVyazAIoHl6BFFe/Da+LK1DbXvIYHz7fyOoKhSfCJHCiJG1Vg6w=="
     },
     "runtime": "napi",
     "target": 5

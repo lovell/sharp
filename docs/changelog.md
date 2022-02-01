@@ -2,7 +2,7 @@
 
 ## v0.30 - *dresser*
 
-Requires libvips v8.12.1
+Requires libvips v8.12.2
 
 ### v0.30.0 - TBD
 

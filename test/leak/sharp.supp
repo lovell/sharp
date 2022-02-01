@@ -643,6 +643,13 @@
   fun:_ZN4node9inspector5Agent5StartEPNS_12NodePlatformEPKcRKNS_12DebugOptionsE
 }
 {
+  leak_nodejs_node9inspector5Agent5StartERKSsRKNS
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:_ZN4node9inspector5Agent5StartERKSsRKNS_12DebugOptionsESt10shared_ptrINS_15ExclusiveAccessINS_8HostPortENS_9MutexBaseINS_16LibuvMutexTraitsEEEEEEb
+}
+{
   leak_nodejs_node12NodePlatform_TracingController
   Memcheck:Leak
   match-leak-kinds: possible
