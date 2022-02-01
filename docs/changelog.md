@@ -4,7 +4,7 @@
 
 Requires libvips v8.12.2
 
-### v0.30.0 - TBD
+### v0.30.0 - 1st February 2022
 
 * Add support for GIF output to prebuilt binaries.
 
