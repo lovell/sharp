@@ -328,6 +328,20 @@ describe('Input/output', function () {
       });
   });
 
+  it('Allow use of toBuffer and toFile with same instance', async () => {
+    const instance = sharp({
+      create: {
+        width: 8,
+        height: 8,
+        channels: 3,
+        background: 'red'
+      }
+    });
+    await instance.toFile(fixtures.path('output.jpg'));
+    const data = await instance.toBuffer();
+    assert.strictEqual(Buffer.isBuffer(data), true);
+  });
+
   it('Fail when output File is input File', function (done) {
     sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, function (err) {
       assert(err instanceof Error);

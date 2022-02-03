@@ -6,6 +6,9 @@ Requires libvips v8.12.2
 
 ### v0.30.1 - TBD
 
+* Allow use of `toBuffer` and `toFile` on the same instance.
+  [#3044](https://github.com/lovell/sharp/issues/3044)
+
 * Skip shrink-on-load for known libjpeg rounding errors.
   [#3066](https://github.com/lovell/sharp/issues/3066)
 
