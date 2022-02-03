@@ -4,6 +4,11 @@
 
 Requires libvips v8.12.2
 
+### v0.30.1 - TBD
+
+* Skip shrink-on-load for known libjpeg rounding errors.
+  [#3066](https://github.com/lovell/sharp/issues/3066)
+
 ### v0.30.0 - 1st February 2022
 
 * Add support for GIF output to prebuilt binaries.

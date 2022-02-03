@@ -193,6 +193,10 @@ class PipelineWorker : public Napi::AsyncWorker {
           } else if (shrink >= 2 * factor) {
             jpegShrinkOnLoad = 2;
           }
+          // Skip shrink-on-load for known libjpeg rounding errors
+          if (jpegShrinkOnLoad > 1 && shrink == jpegShrinkOnLoad) {
+            jpegShrinkOnLoad /= 2;
+          }
         } else if (inputImageType == sharp::ImageType::WEBP ||
                    inputImageType == sharp::ImageType::SVG ||
                    inputImageType == sharp::ImageType::PDF) {

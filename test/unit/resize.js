@@ -780,6 +780,27 @@ describe('Resize dimensions', function () {
     assert.strictEqual(info.height, 1);
   });
 
+  it('Skip JPEG shrink-on-load for known libjpeg rounding errors', async () => {
+    const input = await sharp({
+      create: {
+        width: 1000,
+        height: 667,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .jpeg()
+      .toBuffer();
+
+    const output = await sharp(input)
+      .resize({ width: 500 })
+      .toBuffer();
+
+    const { width, height } = await sharp(output).metadata();
+    assert.strictEqual(width, 500);
+    assert.strictEqual(height, 334);
+  });
+
   it('unknown kernel throws', function () {
     assert.throws(function () {
       sharp().resize(null, null, { kernel: 'unknown' });
