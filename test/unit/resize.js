@@ -368,7 +368,7 @@ describe('Resize dimensions', function () {
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(2800, info.width);
-        assert.strictEqual(2225, info.height);
+        assert.strictEqual(2286, info.height);
         done();
       });
   });
@@ -383,42 +383,8 @@ describe('Resize dimensions', function () {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
+        assert.strictEqual(2817, info.width);
         assert.strictEqual(2300, info.height);
-        done();
-      });
-  });
-
-  it('Do not crop when fit = cover and withoutReduction = true and width >= outputWidth, and height < outputHeight', function (done) {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 3000,
-        height: 1000,
-        withoutReduction: true
-      })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(3000, info.width);
-        assert.strictEqual(2225, info.height);
-        done();
-      });
-  });
-
-  it('Do not crop when fit = cover and withoutReduction = true and width < outputWidth, and height >= outputHeight', function (done) {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 1500,
-        height: 2226,
-        withoutReduction: true
-      })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
-        assert.strictEqual(2226, info.height);
         done();
       });
   });

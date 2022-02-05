@@ -885,7 +885,7 @@ namespace sharp {
   }
 
   std::pair<double, double> ResolveShrink(int width, int height, int targetWidth, int targetHeight,
-    Canvas canvas, bool swap, bool withoutEnlargement) {
+    Canvas canvas, bool swap, bool withoutEnlargement, bool withoutReduction) {
     if (swap) {
       // Swap input width and height when requested.
       std::swap(width, height);
@@ -940,9 +940,14 @@ namespace sharp {
       }
     }
 
-    // We should not enlarge (oversample) the output image,
-    // if withoutEnlargement is specified.
-    if (withoutEnlargement) {
+    // We should not reduce or enlarge the output image, if
+    // withoutReduction or withoutEnlargement is specified.
+    if (withoutReduction) {
+      // Equivalent of VIPS_SIZE_UP
+      hshrink = std::min(1.0, hshrink);
+      vshrink = std::min(1.0, vshrink);
+    } else if (withoutEnlargement) {
+      // Equivalent of VIPS_SIZE_DOWN
       hshrink = std::max(1.0, hshrink);
       vshrink = std::max(1.0, vshrink);
     }

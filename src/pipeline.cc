@@ -138,17 +138,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         pageHeight = inputHeight;
       }
 
-      // If withoutReduction is specified,
-      // Override target width and height if less than respective value from input file
-       if (baton->withoutReduction) {
-          if (baton->width < inputWidth) {
-            baton->width = inputWidth;
-          }
-          if (baton->height < inputHeight) {
-            baton->height = inputHeight;
-          }
-      }
-
       // Scaling calculations
       double hshrink;
       double vshrink;
@@ -161,7 +150,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Shrink to pageHeight, so we work for multi-page images
       std::tie(hshrink, vshrink) = sharp::ResolveShrink(
         inputWidth, pageHeight, targetResizeWidth, targetResizeHeight,
-        baton->canvas, swap, baton->withoutEnlargement);
+        baton->canvas, swap, baton->withoutEnlargement, baton->withoutReduction);
 
       // The jpeg preload shrink.
       int jpegShrinkOnLoad = 1;
@@ -286,7 +275,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Shrink to pageHeight, so we work for multi-page images
       std::tie(hshrink, vshrink) = sharp::ResolveShrink(
         inputWidth, pageHeight, targetResizeWidth, targetResizeHeight,
-        baton->canvas, swap, baton->withoutEnlargement);
+        baton->canvas, swap, baton->withoutEnlargement, baton->withoutReduction);
 
       int targetHeight = static_cast<int>(std::rint(static_cast<double>(pageHeight) / vshrink));
       int targetPageHeight = targetHeight;
