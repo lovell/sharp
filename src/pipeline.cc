@@ -194,7 +194,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             jpegShrinkOnLoad = 2;
           }
           // Skip shrink-on-load for known libjpeg rounding errors
-          if (jpegShrinkOnLoad > 1 && shrink == jpegShrinkOnLoad) {
+          if (jpegShrinkOnLoad > 1 && static_cast<int>(shrink) == jpegShrinkOnLoad) {
             jpegShrinkOnLoad /= 2;
           }
         } else if (inputImageType == sharp::ImageType::WEBP ||
@@ -274,35 +274,28 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Any pre-shrinking may already have been done
-      int thumbWidth = image.width();
-      int thumbHeight = image.height();
+      inputWidth = image.width();
+      inputHeight = image.height();
 
       // After pre-shrink, but before the main shrink stage
       // Reuse the initial pageHeight if we didn't pre-shrink
-      int preshrunkPageHeight = shouldPreShrink ? sharp::GetPageHeight(image) : pageHeight;
-
-      if (baton->fastShrinkOnLoad && jpegShrinkOnLoad > 1) {
-        // JPEG shrink-on-load rounds the output dimensions down, which
-        // may cause incorrect dimensions when fastShrinkOnLoad is enabled
-        // Just recalculate vshrink / hshrink on the main image instead of
-        // the pre-shrunk image when this is the case
-        hshrink = static_cast<double>(thumbWidth) / (static_cast<double>(inputWidth) / hshrink);
-        vshrink = static_cast<double>(preshrunkPageHeight) / (static_cast<double>(pageHeight) / vshrink);
-      } else {
-        // Shrink to preshrunkPageHeight, so we work for multi-page images
-        std::tie(hshrink, vshrink) = sharp::ResolveShrink(
-          thumbWidth, preshrunkPageHeight, targetResizeWidth, targetResizeHeight,
-          baton->canvas, swap, baton->withoutEnlargement);
+      if (shouldPreShrink) {
+        pageHeight = sharp::GetPageHeight(image);
       }
 
-      int targetHeight = static_cast<int>(std::rint(static_cast<double>(preshrunkPageHeight) / vshrink));
+      // Shrink to pageHeight, so we work for multi-page images
+      std::tie(hshrink, vshrink) = sharp::ResolveShrink(
+        inputWidth, pageHeight, targetResizeWidth, targetResizeHeight,
+        baton->canvas, swap, baton->withoutEnlargement);
+
+      int targetHeight = static_cast<int>(std::rint(static_cast<double>(pageHeight) / vshrink));
       int targetPageHeight = targetHeight;
 
       // In toilet-roll mode, we must adjust vshrink so that we exactly hit
-      // preshrunkPageHeight or we'll have pixels straddling pixel boundaries
-      if (thumbHeight > preshrunkPageHeight) {
+      // pageHeight or we'll have pixels straddling pixel boundaries
+      if (inputHeight > pageHeight) {
         targetHeight *= nPages;
-        vshrink = static_cast<double>(thumbHeight) / targetHeight;
+        vshrink = static_cast<double>(inputHeight) / targetHeight;
       }
 
       // Ensure we're using a device-independent colour space
