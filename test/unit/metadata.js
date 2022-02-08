@@ -527,7 +527,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputJpg)
       .resize(64)
       .withMetadata({ icc: 'cmyk' })
-      .toFile(output, function (err, info) {
+      .toFile(output, function (err) {
         if (err) throw err;
         sharp(output).metadata(function (err, metadata) {
           if (err) throw err;
@@ -543,7 +543,7 @@ describe('Image metadata', function () {
           assert.strictEqual('Relative', profile.intent);
           assert.strictEqual('Printer', profile.deviceClass);
         });
-        fixtures.assertSimilar(output, fixtures.expected('icc-cmyk.jpg'), { threshold: 0 }, done);
+        fixtures.assertSimilar(output, fixtures.expected('icc-cmyk.jpg'), { threshold: 1 }, done);
       });
   });
 
