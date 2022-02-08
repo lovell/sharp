@@ -345,7 +345,7 @@ namespace sharp {
     the required thumbnail width/height and canvas mode.
   */
   std::pair<double, double> ResolveShrink(int width, int height, int targetWidth, int targetHeight,
-    Canvas canvas, bool swap, bool withoutEnlargement);
+    Canvas canvas, bool swap, bool withoutEnlargement, bool withoutReduction);
 
 }  // namespace sharp
 
