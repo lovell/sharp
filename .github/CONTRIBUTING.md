@@ -23,22 +23,22 @@ the feature you need.
 
 Thank you! To prevent the problem occurring again, please add unit tests that would have failed.
 
-Please select the `master` branch as the destination for your Pull Request so your fix can be included in the next minor release.
+Please select the `main` branch as the destination for your Pull Request so your fix can be included in the next minor release.
 
-Please squash your changes into a single commit using a command like `git rebase -i upstream/master`.
+Please squash your changes into a single commit using a command like `git rebase -i upstream/main`.
 
 To test C++ changes, you can compile the module using `npm install --build-from-source` and then run the tests using `npm test`.
 
 ## Submit a Pull Request with a new feature
 
-Please add JavaScript [unit tests](https://github.com/lovell/sharp/tree/master/test/unit) to cover your new feature.
+Please add JavaScript [unit tests](https://github.com/lovell/sharp/tree/main/test/unit) to cover your new feature.
 A test coverage report for the JavaScript code is generated in the `coverage/lcov-report` directory.
 
 Where possible, the functional tests use gradient-based perceptual hashes
 based on [dHash](http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html)
 to compare expected vs actual images.
 
-You deserve to add your details to the [list of contributors](https://github.com/lovell/sharp/blob/master/package.json#L5).
+You deserve to add your details to the [list of contributors](https://github.com/lovell/sharp/blob/main/package.json#L5).
 
 Any change that modifies the existing public API should be added to the relevant work-in-progress branch for inclusion in the next major release.
 
@@ -93,5 +93,5 @@ Please feel free to ask any questions via a
 [new issue](https://github.com/lovell/sharp/issues/new).
 
 If you're unable to post details publicly, please
-[e-mail](https://github.com/lovell/sharp/blob/master/package.json#L5)
+[e-mail](https://github.com/lovell/sharp/blob/main/package.json#L5)
 for private, paid consulting.

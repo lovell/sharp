@@ -1,6 +1,6 @@
 # sharp
 
-<img src="https://cdn.jsdelivr.net/gh/lovell/sharp@master/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
+<img src="https://cdn.jsdelivr.net/gh/lovell/sharp@main/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
 
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
@@ -65,7 +65,7 @@ as [pngcrush](https://pmt.sourceforge.io/pngcrush/).
 
 ### Contributing
 
-A [guide for contributors](https://github.com/lovell/sharp/blob/master/.github/CONTRIBUTING.md)
+A [guide for contributors](https://github.com/lovell/sharp/blob/main/.github/CONTRIBUTING.md)
 covers reporting bugs, requesting features and submitting code changes.
 
 ### Licensing

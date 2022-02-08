@@ -5,6 +5,8 @@ labels: installation
 
 ---
 
+<!-- Please try to answer as many of these questions as possible. -->
+
 Did you see the [documentation relating to installation](https://sharp.pixelplumbing.com/install)?
 
 Have you ensured the architecture and platform of Node.js used for `npm install` is the same as the architecture and platform of Node.js used at runtime?

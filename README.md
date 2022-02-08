@@ -1,6 +1,6 @@
 # sharp
 
-<img src="https://cdn.jsdelivr.net/gh/lovell/sharp@master/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
+<img src="https://cdn.jsdelivr.net/gh/lovell/sharp@main/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
 
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
@@ -95,10 +95,10 @@ readableStream
 
 ## Contributing
 
-A [guide for contributors](https://github.com/lovell/sharp/blob/master/.github/CONTRIBUTING.md)
+A [guide for contributors](https://github.com/lovell/sharp/blob/main/.github/CONTRIBUTING.md)
 covers reporting bugs, requesting features and submitting code changes.
 
-[![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.svg?branch=master)](https://coveralls.io/r/lovell/sharp?branch=master)
+[![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.svg?branch=main)](https://coveralls.io/r/lovell/sharp?branch=main)
 [![Node-API v5](https://img.shields.io/badge/Node--API-v5-green.svg)](https://nodejs.org/dist/latest/docs/api/n-api.html#n_api_n_api_version_matrix)
 
 ## Licensing
