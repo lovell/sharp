@@ -13,7 +13,7 @@ Are you using the latest version? Is the version currently in use as reported by
 
 If you are using npm v6 or earlier and installing as a `root` or `sudo` user, have you tried with the `npm install --unsafe-perm` flag?
 
-If you are using npm v7, does the user running `npm install` own the directory it is run in?
+If you are using npm v7 or later, does the user running `npm install` own the directory it is run in?
 
 If you are using the `ignore-scripts` feature of `npm`, have you tried with the `npm install --ignore-scripts=false` flag?
 
