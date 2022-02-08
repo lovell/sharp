@@ -184,7 +184,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
         if (inputImageType == sharp::ImageType::JPEG) {
           // Leave at least a factor of two for the final resize step, when fastShrinkOnLoad: false
-          // for more consistent results and avoid occasional small image shifting
+          // for more consistent results and to avoid extra sharpness to the image
           int factor = baton->fastShrinkOnLoad ? 1 : 2;
           if (shrink >= 8 * factor) {
             jpegShrinkOnLoad = 8;
@@ -193,7 +193,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           } else if (shrink >= 2 * factor) {
             jpegShrinkOnLoad = 2;
           }
-          // Skip shrink-on-load for known libjpeg rounding errors
+          // Lower shrink-on-load for known libjpeg rounding errors
           if (jpegShrinkOnLoad > 1 && static_cast<int>(shrink) == jpegShrinkOnLoad) {
             jpegShrinkOnLoad /= 2;
           }
