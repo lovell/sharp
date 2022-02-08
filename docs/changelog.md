@@ -11,6 +11,11 @@ Requires libvips v8.12.2
 
 * Skip shrink-on-load for known libjpeg rounding errors.
   [#3066](https://github.com/lovell/sharp/issues/3066)
+  [@kleisauke](https://github.com/kleisauke)
+
+* Ensure withoutReduction does not interfere with contain/crop/embed.
+  [#3081](https://github.com/lovell/sharp/pull/3081)
+  [@kleisauke](https://github.com/kleisauke)
 
 ### v0.30.0 - 1st February 2022
 
