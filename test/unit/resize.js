@@ -637,28 +637,21 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fastShrinkOnLoad: false ensures image is not shifted', function (done) {
-    return sharp(fixtures.inputJpgCenteredImage)
-      .resize(9, 8, { fastShrinkOnLoad: false })
-      .png()
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(9, info.width);
-        assert.strictEqual(8, info.height);
-        fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load-false.png'), data, done);
-      });
-  });
-
-  it('fastShrinkOnLoad: true (default) might result in shifted image', function (done) {
-    return sharp(fixtures.inputJpgCenteredImage)
-      .resize(9, 8)
-      .png()
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(9, info.width);
-        assert.strictEqual(8, info.height);
-        fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load-true.png'), data, done);
-      });
+  [
+    true,
+    false
+  ].forEach(function (value) {
+    it(`fastShrinkOnLoad: ${value} does not causes image shifts`, function (done) {
+      sharp(fixtures.inputJpgCenteredImage)
+        .resize(9, 8, { fastShrinkOnLoad: value })
+        .png()
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(9, info.width);
+          assert.strictEqual(8, info.height);
+          fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load.png'), data, done);
+        });
+    });
   });
 
   [
