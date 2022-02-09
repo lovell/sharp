@@ -518,7 +518,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         MultiPageUnsupported(nPages, "Affine");
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
-        vips::VInterpolate interp = vips::VInterpolate::new_from_name(const_cast<char*>(baton->affineInterpolator.data()));
+        vips::VInterpolate interp = vips::VInterpolate::new_from_name(
+          const_cast<char*>(baton->affineInterpolator.data()));
         image = image.affine(baton->affineMatrix, VImage::option()->set("background", background)
           ->set("idx", baton->affineIdx)
           ->set("idy", baton->affineIdy)
