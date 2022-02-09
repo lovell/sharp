@@ -4,7 +4,7 @@
 
 Requires libvips v8.12.2
 
-### v0.30.1 - TBD
+### v0.30.1 - 9th February 2022
 
 * Allow use of `toBuffer` and `toFile` on the same instance.
   [#3044](https://github.com/lovell/sharp/issues/3044)
