@@ -188,13 +188,13 @@ Returns **[boolean][10]**
 
 [5]: http://en.wikipedia.org/wiki/Bicubic_interpolation
 
-[6]: https://github.com/jcupitt/libvips/blob/master/libvips/resample/lbb.cpp#L100
+[6]: https://github.com/libvips/libvips/blob/master/libvips/resample/lbb.cpp#L100
 
 [7]: http://en.wikipedia.org/wiki/Acutance
 
 [8]: http://eprints.soton.ac.uk/268086/
 
-[9]: https://github.com/jcupitt/libvips/blob/master/libvips/resample/vsqbs.cpp#L48
+[9]: https://github.com/libvips/libvips/blob/master/libvips/resample/vsqbs.cpp#L48
 
 [10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
