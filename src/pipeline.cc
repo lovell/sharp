@@ -518,12 +518,14 @@ class PipelineWorker : public Napi::AsyncWorker {
         MultiPageUnsupported(nPages, "Affine");
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
+        vips::VInterpolate interp = vips::VInterpolate::new_from_name(
+          const_cast<char*>(baton->affineInterpolator.data()));
         image = image.affine(baton->affineMatrix, VImage::option()->set("background", background)
           ->set("idx", baton->affineIdx)
           ->set("idy", baton->affineIdy)
           ->set("odx", baton->affineOdx)
           ->set("ody", baton->affineOdy)
-          ->set("interpolate", baton->affineInterpolator));
+          ->set("interpolate", interp));
       }
 
       // Extend edges
@@ -1428,7 +1430,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->affineIdy = sharp::AttrAsDouble(options, "affineIdy");
   baton->affineOdx = sharp::AttrAsDouble(options, "affineOdx");
   baton->affineOdy = sharp::AttrAsDouble(options, "affineOdy");
-  baton->affineInterpolator = vips::VInterpolate::new_from_name(sharp::AttrAsStr(options, "affineInterpolator").data());
+  baton->affineInterpolator = sharp::AttrAsStr(options, "affineInterpolator");
   baton->removeAlpha = sharp::AttrAsBool(options, "removeAlpha");
   baton->ensureAlpha = sharp::AttrAsDouble(options, "ensureAlpha");
   if (options.Has("boolean")) {
