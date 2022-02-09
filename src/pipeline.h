@@ -126,7 +126,7 @@ struct PipelineBaton {
   double affineIdy;
   double affineOdx;
   double affineOdy;
-  vips::VInterpolate affineInterpolator;
+  std::string affineInterpolator;
   int jpegQuality;
   bool jpegProgressive;
   std::string jpegChromaSubsampling;
@@ -268,7 +268,7 @@ struct PipelineBaton {
     affineIdy(0),
     affineOdx(0),
     affineOdy(0),
-    affineInterpolator(vips::VInterpolate::new_from_name("bicubic")),
+    affineInterpolator("bicubic"),
     jpegQuality(80),
     jpegProgressive(false),
     jpegChromaSubsampling("4:2:0"),
