@@ -17,6 +17,10 @@ Requires libvips v8.12.2
   [#3081](https://github.com/lovell/sharp/pull/3081)
   [@kleisauke](https://github.com/kleisauke)
 
+* Ensure affine interpolator is correctly finalised.
+  [#3083](https://github.com/lovell/sharp/pull/3083)
+  [@kleisauke](https://github.com/kleisauke)
+
 ### v0.30.0 - 1st February 2022
 
 * Add support for GIF output to prebuilt binaries.
