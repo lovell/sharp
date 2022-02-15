@@ -7,10 +7,20 @@ labels: question
 
 <!-- If this issue relates to installation, please use https://github.com/lovell/sharp/issues/new?labels=installation&template=installation.md instead. -->
 
-What are you trying to achieve?
+## Question about an existing feature
 
-Have you searched for similar questions?
+### What are you trying to achieve?
 
-Are you able to provide a minimal, standalone code sample that demonstrates this question?
+<!-- Please provide context here. -->
 
-Are you able to provide a sample image that helps explain the question?
+### When you searched for similar issues, what did you find that might be related?
+
+<!-- Please demonstrate your research here. -->
+
+### Please provide a minimal, standalone code sample, without other dependencies, that demonstrates this question
+
+<!-- Please provide either formatted code or a link to a repo/gist that helps someone else understand here. -->
+
+### Please provide sample image(s) that help explain this question
+
+<!-- Please provide links to one or more images here. -->
