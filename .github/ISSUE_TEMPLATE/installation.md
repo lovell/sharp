@@ -11,7 +11,7 @@ labels: installation
 
 <!-- Please place an [x] in the box to confirm. -->
 
-- [ ] I have read the [documentation relating to installation](https://sharp.pixelplumbing.com/install)?
+- [ ] I have read the [documentation relating to installation](https://sharp.pixelplumbing.com/install).
 - [ ] I have ensured that the architecture and platform of Node.js used for `npm install` is the same as the architecture and platform of Node.js used at runtime.
 
 ### Are you using the latest version of sharp?
@@ -35,9 +35,11 @@ If you are using the `ignore-scripts` feature of `npm`, have you tried with the 
 ### What is the complete output of running `npm install --verbose sharp`?
 
 <details>
-<!-- Please provide output of the above command here. -->
+
+<!-- Please provide output of `npm install --verbose sharp` here. -->
+
 </details>
 
 ### What is the output of running `npx envinfo --binaries --system --npmPackages=sharp --npmGlobalPackages=sharp`?
 
-<!-- Please provide output of the above command here. -->
+<!-- Please provide output of `npx envinfo --binaries --system --npmPackages=sharp --npmGlobalPackages=sharp` here. -->
