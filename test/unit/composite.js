@@ -45,22 +45,20 @@ const blends = [
 
 // Test
 describe('composite', () => {
-  it('blend', () => Promise.all(
-    blends.map(blend => {
+  blends.forEach(blend => {
+    it(`blend ${blend}`, async () => {
       const filename = `composite.blend.${blend}.png`;
       const actual = fixtures.path(`output.${filename}`);
       const expected = fixtures.expected(filename);
-      return sharp(redRect)
+      await sharp(redRect)
         .composite([{
           input: blueRect,
           blend
         }])
-        .toFile(actual)
-        .then(() => {
-          fixtures.assertMaxColourDistance(actual, expected);
-        });
-    })
-  ));
+        .toFile(actual);
+      fixtures.assertMaxColourDistance(actual, expected);
+    });
+  });
 
   it('premultiplied true', () => {
     const filename = 'composite.premultiplied.png';
@@ -121,11 +119,11 @@ describe('composite', () => {
       });
   });
 
-  it('multiple', () => {
+  it('multiple', async () => {
     const filename = 'composite-multiple.png';
     const actual = fixtures.path(`output.${filename}`);
     const expected = fixtures.expected(filename);
-    return sharp(redRect)
+    await sharp(redRect)
       .composite([{
         input: blueRect,
         gravity: 'northeast'
@@ -133,10 +131,8 @@ describe('composite', () => {
         input: greenRect,
         gravity: 'southwest'
       }])
-      .toFile(actual)
-      .then(() => {
-        fixtures.assertMaxColourDistance(actual, expected);
-      });
+      .toFile(actual);
+    fixtures.assertMaxColourDistance(actual, expected);
   });
 
   it('zero offset', done => {

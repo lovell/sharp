@@ -581,6 +581,8 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Composite
       if (shouldComposite) {
+        std::vector<VImage> images = { image };
+        std::vector<int> modes, xs, ys;
         for (Composite *composite : baton->composite) {
           VImage compositeImage;
           sharp::ImageType compositeImageType = sharp::ImageType::UNKNOWN;
@@ -626,12 +628,12 @@ class PipelineWorker : public Napi::AsyncWorker {
             // gravity was used for extract_area, set it back to its default value of 0
             composite->gravity = 0;
           }
-          // Ensure image to composite is sRGB with premultiplied alpha
+          // Ensure image to composite is sRGB with unpremultiplied alpha
           compositeImage = compositeImage.colourspace(VIPS_INTERPRETATION_sRGB);
           if (!sharp::HasAlpha(compositeImage)) {
             compositeImage = sharp::EnsureAlpha(compositeImage, 1);
           }
-          if (!composite->premultiplied) compositeImage = compositeImage.premultiply();
+          if (composite->premultiplied) compositeImage = compositeImage.unpremultiply();
           // Calculate position
           int left;
           int top;
@@ -649,12 +651,12 @@ class PipelineWorker : public Napi::AsyncWorker {
             std::tie(left, top) = sharp::CalculateCrop(image.width(), image.height(),
               compositeImage.width(), compositeImage.height(), composite->gravity);
           }
-          // Composite
-          image = image.composite2(compositeImage, composite->mode, VImage::option()
-            ->set("premultiplied", TRUE)
-            ->set("x", left)
-            ->set("y", top));
+          images.push_back(compositeImage);
+          modes.push_back(composite->mode);
+          xs.push_back(left);
+          ys.push_back(top);
         }
+        image = image.composite(images, modes, VImage::option()->set("x", xs)->set("y", ys));
       }
 
       // Reverse premultiplication after all transformations:

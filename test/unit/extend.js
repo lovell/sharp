@@ -140,7 +140,7 @@ describe('Extend', function () {
   });
 
   it('Premultiply background when compositing', async () => {
-    const background = '#bf1942cc';
+    const background = { r: 191, g: 25, b: 66, alpha: 0.8 };
     const data = await sharp({
       create: {
         width: 1, height: 1, channels: 4, background: '#fff0'
@@ -158,10 +158,6 @@ describe('Extend', function () {
       })
       .raw()
       .toBuffer();
-    const [r1, g1, b1, a1, r2, g2, b2, a2] = data;
-    assert.strictEqual(true, Math.abs(r2 - r1) < 2);
-    assert.strictEqual(true, Math.abs(g2 - g1) < 2);
-    assert.strictEqual(true, Math.abs(b2 - b1) < 2);
-    assert.strictEqual(true, Math.abs(a2 - a1) < 2);
+    assert.deepStrictEqual(Array.from(data), [191, 25, 65, 204, 238, 31, 82, 204]);
   });
 });

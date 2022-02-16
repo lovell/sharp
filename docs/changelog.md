@@ -4,6 +4,11 @@
 
 Requires libvips v8.12.2
 
+### v0.30.2 - TBD
+
+* Improve performance and accuracy when compositing multiple images.
+  [#2286](https://github.com/lovell/sharp/issues/2286)
+
 ### v0.30.1 - 9th February 2022
 
 * Allow use of `toBuffer` and `toFile` on the same instance.
