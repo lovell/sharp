@@ -9,6 +9,10 @@ Requires libvips v8.12.2
 * Improve performance and accuracy when compositing multiple images.
   [#2286](https://github.com/lovell/sharp/issues/2286)
 
+* Ensure Windows C++ runtime is linked statically (regression in 0.30.0).
+  [#3110](https://github.com/lovell/sharp/pull/3110)
+  [@kleisauke](https://github.com/kleisauke)
+
 ### v0.30.1 - 9th February 2022
 
 * Allow use of `toBuffer` and `toFile` on the same instance.
