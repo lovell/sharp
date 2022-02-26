@@ -143,7 +143,7 @@
     "exif-reader": "^1.0.3",
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^9.2.0",
+    "mocha": "^9.2.1",
     "mock-fs": "^5.1.2",
     "nyc": "^15.1.0",
     "prebuild": "^11.0.3",
