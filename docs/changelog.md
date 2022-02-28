@@ -16,6 +16,9 @@ Requires libvips v8.12.2
   [#3110](https://github.com/lovell/sharp/pull/3110)
   [@kleisauke](https://github.com/kleisauke)
 
+* Temporarily ignore greyscale ICC profiles to workaround lcms bug.
+  [#3112](https://github.com/lovell/sharp/issues/3112)
+
 ### v0.30.1 - 9th February 2022
 
 * Allow use of `toBuffer` and `toFile` on the same instance.

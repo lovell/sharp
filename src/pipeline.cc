@@ -292,7 +292,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (
         sharp::HasProfile(image) &&
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
-        image.interpretation() != VIPS_INTERPRETATION_GREY16
+        image.interpretation() != VIPS_INTERPRETATION_GREY16 &&
+        image.interpretation() != VIPS_INTERPRETATION_B_W
       ) {
         // Convert to sRGB/P3 using embedded profile
         try {
