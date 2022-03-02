@@ -398,6 +398,10 @@ namespace sharp {
         // From filesystem
         imageType = DetermineImageType(descriptor->file.data());
         if (imageType == ImageType::MISSING) {
+          if (descriptor->file.find("<svg") != std::string::npos) {
+            throw vips::VError("Input file is missing, did you mean "
+              "sharp(Buffer.from('" + descriptor->file.substr(0, 8) + "...')?");
+          }
           throw vips::VError("Input file is missing");
         }
         if (imageType != ImageType::UNKNOWN) {

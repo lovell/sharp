@@ -135,4 +135,11 @@ describe('SVG input', function () {
     assert.strictEqual(info.height, 240);
     assert.strictEqual(info.channels, 4);
   });
+
+  it('Detects SVG passed as a string', () =>
+    assert.rejects(
+      () => sharp('<svg></svg>').toBuffer(),
+      /Input file is missing, did you mean/
+    )
+  );
 });
