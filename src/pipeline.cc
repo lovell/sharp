@@ -354,7 +354,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       bool const shouldPremultiplyAlpha = sharp::HasAlpha(image) &&
-        (shouldResize || shouldBlur || shouldConv || shouldSharpen || shouldComposite);
+        (shouldResize || shouldBlur || shouldConv || shouldSharpen);
 
       // Premultiply image alpha channel before all transformations to avoid
       // dark fringing around bright pixels

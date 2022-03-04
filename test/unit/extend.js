@@ -158,6 +158,6 @@ describe('Extend', function () {
       })
       .raw()
       .toBuffer();
-    assert.deepStrictEqual(Array.from(data), [191, 25, 65, 204, 238, 31, 82, 204]);
+    assert.deepStrictEqual(Array.from(data), [191, 25, 66, 204, 191, 25, 66, 204]);
   });
 });

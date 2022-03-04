@@ -4,6 +4,11 @@
 
 Requires libvips v8.12.2
 
+### v0.30.3 - TBD
+
+* Prevent double unpremultiply with some composite blend modes (regression in 0.30.2).
+  [#3118](https://github.com/lovell/sharp/issues/3118)
+
 ### v0.30.2 - 2nd March 2022
 
 * Improve performance and accuracy when compositing multiple images.
