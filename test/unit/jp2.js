@@ -48,15 +48,8 @@ describe('JP2 output', () => {
             .resize(320, 240)
             .toBuffer(function (err, buffer80) {
               if (err) throw err;
-              sharp(fixtures.inputJp2)
-                .resize(320, 240)
-                .jp2({ quality: 90 })
-                .toBuffer(function (err, buffer90) {
-                  if (err) throw err;
-                  assert(buffer70.length < buffer80.length);
-                  assert(buffer80.length < buffer90.length);
-                  done();
-                });
+              assert(buffer70.length < buffer80.length);
+              done();
             });
         });
     });

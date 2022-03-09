@@ -68,10 +68,13 @@ describe('Utilities', function () {
   });
 
   describe('Counters', function () {
-    it('Have zero value at rest', function () {
-      const counters = sharp.counters();
-      assert.strictEqual(0, counters.queue);
-      assert.strictEqual(0, counters.process);
+    it('Have zero value at rest', (done) => {
+      queueMicrotask(() => {
+        const counters = sharp.counters();
+        assert.strictEqual(0, counters.queue);
+        assert.strictEqual(0, counters.process);
+        done();
+      });
     });
   });
 
