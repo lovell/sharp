@@ -11,8 +11,8 @@ A `Promise` is returned when `callback` is not provided.
 
 *   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
 *   `size`: Total size of image in bytes, for Stream and Buffer input only
-*   `width`: Number of pixels wide (EXIF orientation is not taken into consideration)
-*   `height`: Number of pixels high (EXIF orientation is not taken into consideration)
+*   `width`: Number of pixels wide (EXIF orientation is not taken into consideration, see example below)
+*   `height`: Number of pixels high (EXIF orientation is not taken into consideration, see example below)
 *   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][1]
 *   `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
 *   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][2]
@@ -61,6 +61,18 @@ image
   .then(function(data) {
     // data contains a WebP image half the width and height of the original JPEG
   });
+```
+
+```javascript
+// Based on EXIF rotation metadata, get the right-side-up width and height:
+
+const size = getNormalSize(await sharp(input).metadata());
+
+function getNormalSize({ width, height, orientation }) {
+  return orientation || 0 >= 5
+    ? { width: height, height: width }
+    : { width, height };
+}
 ```
 
 Returns **([Promise][5]<[Object][6]> | Sharp)** 
