@@ -577,7 +577,8 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Sharpen
       if (shouldSharpen) {
-        image = sharp::Sharpen(image, baton->sharpenSigma, baton->sharpenFlat, baton->sharpenJagged);
+        image = sharp::Sharpen(image, baton->sharpenSigma, baton->sharpenM1, baton->sharpenM2,
+          baton->sharpenX1, baton->sharpenY2, baton->sharpenY3);
       }
 
       // Composite
@@ -1400,8 +1401,11 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->lightness = sharp::AttrAsDouble(options, "lightness");
   baton->medianSize = sharp::AttrAsUint32(options, "medianSize");
   baton->sharpenSigma = sharp::AttrAsDouble(options, "sharpenSigma");
-  baton->sharpenFlat = sharp::AttrAsDouble(options, "sharpenFlat");
-  baton->sharpenJagged = sharp::AttrAsDouble(options, "sharpenJagged");
+  baton->sharpenM1 = sharp::AttrAsDouble(options, "sharpenM1");
+  baton->sharpenM2 = sharp::AttrAsDouble(options, "sharpenM2");
+  baton->sharpenX1 = sharp::AttrAsDouble(options, "sharpenX1");
+  baton->sharpenY2 = sharp::AttrAsDouble(options, "sharpenY2");
+  baton->sharpenY3 = sharp::AttrAsDouble(options, "sharpenY3");
   baton->threshold = sharp::AttrAsInt32(options, "threshold");
   baton->thresholdGrayscale = sharp::AttrAsBool(options, "thresholdGrayscale");
   baton->trimThreshold = sharp::AttrAsDouble(options, "trimThreshold");

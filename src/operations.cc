@@ -209,7 +209,8 @@ namespace sharp {
   /*
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
    */
-  VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged) {
+  VImage Sharpen(VImage image, double const sigma, double const m1, double const m2,
+    double const x1, double const y2, double const y3) {
     if (sigma == -1.0) {
       // Fast, mild sharpen
       VImage sharpen = VImage::new_matrixv(3, 3,
@@ -224,8 +225,14 @@ namespace sharp {
       if (colourspaceBeforeSharpen == VIPS_INTERPRETATION_RGB) {
         colourspaceBeforeSharpen = VIPS_INTERPRETATION_sRGB;
       }
-      return image.sharpen(
-        VImage::option()->set("sigma", sigma)->set("m1", flat)->set("m2", jagged))
+      return image
+        .sharpen(VImage::option()
+          ->set("sigma", sigma)
+          ->set("m1", m1)
+          ->set("m2", m2)
+          ->set("x1", x1)
+          ->set("y2", y2)
+          ->set("y3", y3))
         .colourspace(colourspaceBeforeSharpen);
     }
   }

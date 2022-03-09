@@ -64,7 +64,8 @@ namespace sharp {
   /*
    * Sharpen flat and jagged areas. Use sigma of -1.0 for fast sharpen.
    */
-  VImage Sharpen(VImage image, double const sigma, double const flat, double const jagged);
+  VImage Sharpen(VImage image, double const sigma, double const m1, double const m2,
+    double const x1, double const y2, double const y3);
 
   /*
     Threshold an image

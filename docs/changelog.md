@@ -6,6 +6,12 @@ Requires libvips v8.12.2
 
 ### v0.30.3 - TBD
 
+* Allow `sharpen` options to be provided more consistently as an Object.
+  [#2561](https://github.com/lovell/sharp/issues/2561)
+
+* Expose `x1`, `y2` and `y3` parameters of `sharpen` operation.
+  [#2935](https://github.com/lovell/sharp/issues/2935)
+
 * Prevent double unpremultiply with some composite blend modes (regression in 0.30.2).
   [#3118](https://github.com/lovell/sharp/issues/3118)
 

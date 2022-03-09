@@ -90,8 +90,11 @@ struct PipelineBaton {
   double lightness;
   int medianSize;
   double sharpenSigma;
-  double sharpenFlat;
-  double sharpenJagged;
+  double sharpenM1;
+  double sharpenM2;
+  double sharpenX1;
+  double sharpenY2;
+  double sharpenY3;
   int threshold;
   bool thresholdGrayscale;
   double trimThreshold;
@@ -234,8 +237,11 @@ struct PipelineBaton {
     lightness(0),
     medianSize(0),
     sharpenSigma(0.0),
-    sharpenFlat(1.0),
-    sharpenJagged(2.0),
+    sharpenM1(1.0),
+    sharpenM2(2.0),
+    sharpenX1(2.0),
+    sharpenY2(10.0),
+    sharpenY3(20.0),
     threshold(0),
     thresholdGrayscale(true),
     trimThreshold(0.0),

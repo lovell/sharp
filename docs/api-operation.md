@@ -129,13 +129,41 @@ When used without parameters, performs a fast, mild sharpen of the output image.
 When a `sigma` is provided, performs a slower, more accurate sharpen of the L channel in the LAB colour space.
 Separate control over the level of sharpening in "flat" and "jagged" areas is available.
 
+See [libvips sharpen][8] operation.
+
 ### Parameters
 
-*   `sigma` **[number][1]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
-*   `flat` **[number][1]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
-*   `jagged` **[number][1]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
+*   `options` **[Object][2]?** if present, is an Object with optional attributes.
 
-<!---->
+    *   `options.sigma` **[number][1]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
+    *   `options.m1` **[number][1]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
+    *   `options.m2` **[number][1]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
+    *   `options.x1` **[number][1]** threshold between "flat" and "jagged" (optional, default `2.0`)
+    *   `options.y2` **[number][1]** maximum amount of brightening. (optional, default `10.0`)
+    *   `options.y3` **[number][1]** maximum amount of darkening. (optional, default `20.0`)
+
+### Examples
+
+```javascript
+const data = await sharp(input).sharpen().toBuffer();
+```
+
+```javascript
+const data = await sharp(input).sharpen({ sigma: 2 }).toBuffer();
+```
+
+```javascript
+const data = await sharp(input)
+  .sharpen({
+    sigma: 2,
+    m1: 0
+    m2: 3,
+    x1: 3,
+    y2: 15,
+    y3: 15,
+  })
+  .toBuffer();
+```
 
 *   Throws **[Error][5]** Invalid parameters
 
@@ -190,7 +218,7 @@ Returns **Sharp**
 
 Merge alpha transparency channel, if any, with a background, then remove the alpha channel.
 
-See also [removeAlpha][8].
+See also [removeAlpha][9].
 
 ### Parameters
 
@@ -264,7 +292,7 @@ Returns **Sharp**
 ## clahe
 
 Perform contrast limiting adaptive histogram equalization
-[CLAHE][9].
+[CLAHE][10].
 
 This will, in general, enhance the clarity of the image by bringing out darker details.
 
@@ -349,7 +377,7 @@ the selected bitwise boolean `operation` between the corresponding pixels of the
 
 ### Parameters
 
-*   `operand` **([Buffer][10] | [string][3])** Buffer containing image data or string containing the path to an image file.
+*   `operand` **([Buffer][11] | [string][3])** Buffer containing image data or string containing the path to an image file.
 *   `operator` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
 *   `options` **[Object][2]?** 
 
@@ -474,8 +502,10 @@ Returns **Sharp**
 
 [7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-[8]: /api-channel#removealpha
+[8]: https://www.libvips.org/API/current/libvips-convolution.html#vips-sharpen
 
-[9]: https://en.wikipedia.org/wiki/Adaptive_histogram_equalization#Contrast_Limited_AHE
+[9]: /api-channel#removealpha
 
-[10]: https://nodejs.org/api/buffer.html
+[10]: https://en.wikipedia.org/wiki/Adaptive_histogram_equalization#Contrast_Limited_AHE
+
+[11]: https://nodejs.org/api/buffer.html
