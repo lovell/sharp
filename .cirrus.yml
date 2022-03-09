@@ -1,5 +1,5 @@
 freebsd_instance:
-  image_family: freebsd-13-0-snap
+  image_family: freebsd-14-0-snap
 
 task:
   name: FreeBSD 13.0
@@ -9,7 +9,7 @@ task:
   prerequisites_script:
     - pkg update -f
     - pkg upgrade -y
-    - pkg install -y pkgconf vips node npm
+    - pkg install -y devel/pkgconf graphics/vips www/node16 www/npm
   install_script:
     - npm install --build-from-source --unsafe-perm
   test_script:
