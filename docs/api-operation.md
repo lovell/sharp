@@ -53,6 +53,12 @@ The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 
 *   `flip` **[Boolean][6]**  (optional, default `true`)
 
+### Examples
+
+```javascript
+const output = await sharp(input).flip().toBuffer();
+```
+
 Returns **Sharp** 
 
 ## flop
@@ -63,6 +69,12 @@ The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 ### Parameters
 
 *   `flop` **[Boolean][6]**  (optional, default `true`)
+
+### Examples
+
+```javascript
+const output = await sharp(input).flop().toBuffer();
+```
 
 Returns **Sharp** 
 
@@ -178,7 +190,15 @@ When used without parameters the default window is 3x3.
 
 *   `size` **[number][1]** square mask size: size x size (optional, default `3`)
 
-<!---->
+### Examples
+
+```javascript
+const output = await sharp(input).median().toBuffer();
+```
+
+```javascript
+const output = await sharp(input).median(5).toBuffer();
+```
 
 *   Throws **[Error][5]** Invalid parameters
 
@@ -277,6 +297,12 @@ Enhance output image contrast by stretching its luminance to cover the full dyna
 
 *   `normalise` **[Boolean][6]**  (optional, default `true`)
 
+### Examples
+
+```javascript
+const output = await sharp(input).normalise().toBuffer();
+```
+
 Returns **Sharp** 
 
 ## normalize
@@ -286,6 +312,12 @@ Alternative spelling of normalise.
 ### Parameters
 
 *   `normalize` **[Boolean][6]**  (optional, default `true`)
+
+### Examples
+
+```javascript
+const output = await sharp(input).normalize().toBuffer();
+```
 
 Returns **Sharp** 
 
@@ -306,7 +338,16 @@ This will, in general, enhance the clarity of the image by bringing out darker d
         cumulative histogram. A value of 0 disables contrast limiting. Valid values
         are integers in the range 0-100 (inclusive) (optional, default `3`)
 
-<!---->
+### Examples
+
+```javascript
+const output = await sharp(input)
+  .clahe({
+    width: 3,
+    height: 3,
+  })
+  .toBuffer();
+```
 
 *   Throws **[Error][5]** Invalid parameters
 
@@ -458,28 +499,41 @@ brightness is multiplicative whereas lightness is additive.
 ### Examples
 
 ```javascript
-sharp(input)
+// increase brightness by a factor of 2
+const output = await sharp(input)
   .modulate({
-    brightness: 2 // increase brightness by a factor of 2
-  });
+    brightness: 2
+  })
+  .toBuffer();
+```
 
-sharp(input)
+```javascript
+// hue-rotate by 180 degrees
+const output = await sharp(input)
   .modulate({
-    hue: 180 // hue-rotate by 180 degrees
-  });
+    hue: 180
+  })
+  .toBuffer();
+```
 
-sharp(input)
+```javascript
+// increase lightness by +50
+const output = await sharp(input)
   .modulate({
-    lightness: 50 // increase lightness by +50
-  });
+    lightness: 50
+  })
+  .toBuffer();
+```
 
+```javascript
 // decreate brightness and saturation while also hue-rotating by 90 degrees
-sharp(input)
+const output = await sharp(input)
   .modulate({
     brightness: 0.5,
     saturation: 0.5,
-    hue: 90
-  });
+    hue: 90,
+  })
+  .toBuffer();
 ```
 
 Returns **Sharp** 
