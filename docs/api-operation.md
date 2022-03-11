@@ -145,7 +145,7 @@ See [libvips sharpen][8] operation.
 
 ### Parameters
 
-*   `options` **[Object][2]?** if present, is an Object with optional attributes.
+*   `options` **([Object][2] | [number][1])?** if present, is an Object with attributes or (deprecated) a number for `options.sigma`.
 
     *   `options.sigma` **[number][1]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
     *   `options.m1` **[number][1]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
@@ -153,6 +153,8 @@ See [libvips sharpen][8] operation.
     *   `options.x1` **[number][1]** threshold between "flat" and "jagged" (optional, default `2.0`)
     *   `options.y2` **[number][1]** maximum amount of brightening. (optional, default `10.0`)
     *   `options.y3` **[number][1]** maximum amount of darkening. (optional, default `20.0`)
+*   `flat` **[number][1]?** (deprecated) see `options.m1`.
+*   `jagged` **[number][1]?** (deprecated) see `options.m2`.
 
 ### Examples
 
