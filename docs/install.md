@@ -213,9 +213,11 @@ SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
-## Webpack
+## Bundlers
 
-Ensure sharp is added to the
+### webpack
+
+Ensure sharp is excluded from bundling via the
 [externals](https://webpack.js.org/configuration/externals/)
 configuration.
 
@@ -223,6 +225,25 @@ configuration.
 externals: {
   'sharp': 'commonjs sharp'
 }
+```
+
+### esbuild
+
+Ensure sharp is excluded from bundling via the
+[external](https://esbuild.github.io/api/#external)
+configuration.
+
+```js
+buildSync({
+  entryPoints: ['app.js'],
+  bundle: true,
+  platform: 'node',
+  external: ['sharp'],
+})
+```
+
+```sh
+esbuild app.js --bundle --platform=node --external:sharp
 ```
 
 ## Worker threads
