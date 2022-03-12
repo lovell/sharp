@@ -9,7 +9,13 @@ An alpha channel may be present and will be unchanged by the operation.
 
 *   `rgb` **([string][1] | [Object][2])** parsed by the [color][3] module to extract chroma values.
 
-<!---->
+### Examples
+
+```javascript
+const output = await sharp(input)
+  .tint({ r: 255, g: 240, b: 16 })
+  .toBuffer();
+```
 
 *   Throws **[Error][4]** Invalid parameter
 
@@ -27,6 +33,12 @@ An alpha channel may be present, and will be unchanged by the operation.
 ### Parameters
 
 *   `greyscale` **[Boolean][5]**  (optional, default `true`)
+
+### Examples
+
+```javascript
+const output = await sharp(input).greyscale().toBuffer();
+```
 
 Returns **Sharp** 
 

@@ -47,6 +47,23 @@ and [https://www.cairographics.org/operators/][2]
 ### Examples
 
 ```javascript
+await sharp(background)
+  .composite([
+    { input: layer1, gravity: 'northwest' },
+    { input: layer2, gravity: 'southeast' },
+  ])
+  .toFile('combined.png');
+```
+
+```javascript
+const output = await sharp('input.gif', { animated: true })
+  .composite([
+    { input: 'overlay.png', tile: true, blend: 'saturate' }
+  ])
+  .toBuffer();
+```
+
+```javascript
 sharp('input.png')
   .rotate(180)
   .resize(300)
