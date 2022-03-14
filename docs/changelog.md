@@ -4,7 +4,7 @@
 
 Requires libvips v8.12.2
 
-### v0.30.3 - TBD
+### v0.30.3 - 14th March 2022
 
 * Allow `sharpen` options to be provided more consistently as an Object.
   [#2561](https://github.com/lovell/sharp/issues/2561)
