@@ -375,12 +375,6 @@ namespace sharp {
               VImage::option()->set("mean", descriptor->createNoiseMean)->set("sigma", descriptor->createNoiseSigma)));
           }
           image = image.bandjoin(bands);
-          image = image.cast(VipsBandFormat::VIPS_FORMAT_UCHAR);
-          if (channels < 3) {
-            image = image.colourspace(VIPS_INTERPRETATION_B_W);
-          } else {
-            image = image.colourspace(VIPS_INTERPRETATION_sRGB);
-          }
         } else {
           std::vector<double> background = {
             descriptor->createBackground[0],
@@ -392,7 +386,8 @@ namespace sharp {
           }
           image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight).new_from_image(background);
         }
-        image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+        image.get_image()->Type = image.guess_interpretation();
+        image = image.cast(VIPS_FORMAT_UCHAR);
         imageType = ImageType::RAW;
       } else {
         // From filesystem

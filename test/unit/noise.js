@@ -19,7 +19,7 @@ describe('Gaussian noise', function () {
           sigma: 30
         }
       }
-    });
+    }).toColourspace('b-w');
     noise.toFile(output, function (err, info) {
       if (err) throw err;
       assert.strictEqual('png', info.format);
@@ -131,6 +131,7 @@ describe('Gaussian noise', function () {
       }
     });
     noise
+      .toColourspace('b-w')
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(1, info.channels);

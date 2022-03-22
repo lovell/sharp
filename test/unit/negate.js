@@ -186,6 +186,22 @@ describe('Negate', function () {
       });
   });
 
+  it('negate create', async () => {
+    const [r, g, b] = await sharp({
+      create: {
+        width: 1,
+        height: 1,
+        channels: 3,
+        background: { r: 10, g: 20, b: 30 }
+      }
+    })
+      .negate()
+      .raw()
+      .toBuffer();
+
+    assert.deepStrictEqual({ r, g, b }, { r: 245, g: 235, b: 225 });
+  });
+
   it('invalid alpha value', function () {
     assert.throws(function () {
       sharp(fixtures.inputWebPWithTransparency).negate({ alpha: 'non-bool' });

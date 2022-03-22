@@ -289,6 +289,20 @@ Produce the "negative" of the image.
 
     *   `options.alpha` **[Boolean][6]** Whether or not to negate any alpha channel (optional, default `true`)
 
+### Examples
+
+```javascript
+const output = await sharp(input)
+  .negate()
+  .toBuffer();
+```
+
+```javascript
+const output = await sharp(input)
+  .negate({ alpha: false })
+  .toBuffer();
+```
+
 Returns **Sharp** 
 
 ## normalise

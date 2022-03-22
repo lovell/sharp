@@ -4,6 +4,11 @@
 
 Requires libvips v8.12.2
 
+### v0.30.4 - TBD
+
+* Ensure `create` input image has correct bit depth and colour space.
+  [#3139](https://github.com/lovell/sharp/issues/3139)
+
 ### v0.30.3 - 14th March 2022
 
 * Allow `sharpen` options to be provided more consistently as an Object.
