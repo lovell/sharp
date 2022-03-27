@@ -182,6 +182,24 @@ describe('Input/output', function () {
     assert.strictEqual(info.height, 1);
   });
 
+  it('Read from Uint8ClampedArray with byteOffset and output to Buffer', async () => {
+    // since a Uint8ClampedArray is the same as Uint8Array but clamps the values
+    // between 0-255 it seemed good to add this also
+    const uint8array = Uint8ClampedArray.from([0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255]);
+    const uint8ArrayWithByteOffset = new Uint8ClampedArray(uint8array.buffer, 3, 6);
+    const { data, info } = await sharp(uint8ArrayWithByteOffset, {
+      raw: {
+        width: 2,
+        height: 1,
+        channels: 3
+      }
+    }).toBuffer({ resolveWithObject: true });
+
+    assert.deepStrictEqual(Uint8ClampedArray.from([255, 255, 255, 0, 0, 0]), new Uint8ClampedArray(data));
+    assert.strictEqual(info.width, 2);
+    assert.strictEqual(info.height, 1);
+  });
+
   it('Stream should emit info event', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const writable = fs.createWriteStream(outputJpg);
