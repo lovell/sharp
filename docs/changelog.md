@@ -9,6 +9,10 @@ Requires libvips v8.12.2
 * Ensure `create` input image has correct bit depth and colour space.
   [#3139](https://github.com/lovell/sharp/issues/3139)
 
+* Add support for `TypedArray` input with `byteOffset` and `length`.
+  [#3146](https://github.com/lovell/sharp/pull/3146)
+  [@codepage949](https://github.com/codepage949)
+
 ### v0.30.3 - 14th March 2022
 
 * Allow `sharpen` options to be provided more consistently as an Object.
