@@ -9,7 +9,7 @@ const extractDescription = (str) =>
     .replace(/\s+/g, ' ')
     .replace(/[^A-Za-z0-9_/\-,. ]/g, '')
     .replace(/\s+/g, ' ')
-    .substr(0, 180)
+    .substring(0, 200)
     .trim();
 
 const extractParameters = (str) =>

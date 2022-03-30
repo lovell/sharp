@@ -248,10 +248,16 @@ esbuild app.js --bundle --platform=node --external:sharp
 
 ## Worker threads
 
-The main thread must call `require('sharp')`
-before worker threads are created
-to ensure shared libraries remain loaded in memory
+On some platforms, including glibc-based Linux,
+the main thread must call `require('sharp')`
+_before_ worker threads are created.
+This is to ensure shared libraries remain loaded in memory
 until after all threads are complete.
+
+Without this, the following error may occur:
+```
+Module did not self-register
+```
 
 ## Known conflicts
 
