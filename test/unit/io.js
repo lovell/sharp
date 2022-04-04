@@ -457,7 +457,7 @@ describe('Input/output', function () {
       done();
     }).catch(function (err) {
       assert(err instanceof Error);
-      assert.strictEqual('Input file is missing', err.message);
+      assert.strictEqual('Input file is missing: does-not-exist', err.message);
       done();
     });
   });
