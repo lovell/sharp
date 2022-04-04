@@ -85,7 +85,9 @@ namespace sharp {
       descriptor->buffer = buffer.Data();
       descriptor->isBuffer = TRUE;
     }
-    descriptor->failOnError = AttrAsBool(input, "failOnError");
+    descriptor->failOn = static_cast<VipsFailOn>(
+      vips_enum_from_nick(nullptr, VIPS_TYPE_FAIL_ON,
+      AttrAsStr(input, "failOn").data()));
     // Density for vector-based input
     if (HasAttr(input, "density")) {
       descriptor->density = AttrAsDouble(input, "density");
@@ -329,7 +331,7 @@ namespace sharp {
           try {
             vips::VOption *option = VImage::option()
               ->set("access", descriptor->access)
-              ->set("fail", descriptor->failOnError);
+              ->set("fail_on", descriptor->failOn);
             if (descriptor->unlimited && (imageType == ImageType::SVG || imageType == ImageType::PNG)) {
               option->set("unlimited", TRUE);
             }
@@ -403,7 +405,7 @@ namespace sharp {
           try {
             vips::VOption *option = VImage::option()
               ->set("access", descriptor->access)
-              ->set("fail", descriptor->failOnError);
+              ->set("fail_on", descriptor->failOn);
             if (descriptor->unlimited && (imageType == ImageType::SVG || imageType == ImageType::PNG)) {
               option->set("unlimited", TRUE);
             }

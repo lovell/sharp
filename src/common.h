@@ -48,7 +48,7 @@ namespace sharp {
     std::string name;
     std::string file;
     char *buffer;
-    bool failOnError;
+    VipsFailOn failOn;
     int limitInputPixels;
     bool unlimited;
     VipsAccess access;
@@ -74,7 +74,7 @@ namespace sharp {
 
     InputDescriptor():
       buffer(nullptr),
-      failOnError(TRUE),
+      failOn(VIPS_FAIL_ON_WARNING),
       limitInputPixels(0x3FFF * 0x3FFF),
       unlimited(FALSE),
       access(VIPS_ACCESS_RANDOM),

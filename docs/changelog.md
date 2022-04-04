@@ -6,6 +6,8 @@ Requires libvips v8.12.2
 
 ### v0.30.4 - TBD
 
+* Increase control over sensitivity to invalid images via `failOn`, deprecate `failOnError` (equivalent to `failOn: 'warning'`).
+
 * Ensure `create` input image has correct bit depth and colour space.
   [#3139](https://github.com/lovell/sharp/issues/3139)
 

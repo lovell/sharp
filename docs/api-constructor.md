@@ -20,38 +20,37 @@ Implements the [stream.Duplex][1] class.
     JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
 *   `options` **[Object][13]?** if present, is an Object with optional attributes.
 
-    *   `options.failOnError` **[boolean][14]** by default halt processing and raise an error when loading invalid images.
-        Set this flag to `false` if you'd rather apply a "best effort" to decode images, even if the data is corrupt or invalid. (optional, default `true`)
-    *   `options.limitInputPixels` **([number][15] | [boolean][14])** Do not process input images where the number of pixels
+    *   `options.failOn` **[string][12]** level of sensitivity to invalid images, one of (in order of sensitivity): 'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels. (optional, default `'warning'`)
+    *   `options.limitInputPixels` **([number][14] | [boolean][15])** Do not process input images where the number of pixels
         (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.
         An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). (optional, default `268402689`)
-    *   `options.unlimited` **[boolean][14]** Set this to `true` to remove safety features that help prevent memory exhaustion (SVG, PNG). (optional, default `false`)
-    *   `options.sequentialRead` **[boolean][14]** Set this to `true` to use sequential rather than random access where possible.
+    *   `options.unlimited` **[boolean][15]** Set this to `true` to remove safety features that help prevent memory exhaustion (SVG, PNG). (optional, default `false`)
+    *   `options.sequentialRead` **[boolean][15]** Set this to `true` to use sequential rather than random access where possible.
         This can reduce memory usage and might improve performance on some systems. (optional, default `false`)
-    *   `options.density` **[number][15]** number representing the DPI for vector images in the range 1 to 100000. (optional, default `72`)
-    *   `options.pages` **[number][15]** number of pages to extract for multi-page input (GIF, WebP, AVIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
-    *   `options.page` **[number][15]** page number to start extracting from for multi-page input (GIF, WebP, AVIF, TIFF, PDF), zero based. (optional, default `0`)
-    *   `options.subifd` **[number][15]** subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. (optional, default `-1`)
-    *   `options.level` **[number][15]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
-    *   `options.animated` **[boolean][14]** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default `false`)
+    *   `options.density` **[number][14]** number representing the DPI for vector images in the range 1 to 100000. (optional, default `72`)
+    *   `options.pages` **[number][14]** number of pages to extract for multi-page input (GIF, WebP, AVIF, TIFF, PDF), use -1 for all pages. (optional, default `1`)
+    *   `options.page` **[number][14]** page number to start extracting from for multi-page input (GIF, WebP, AVIF, TIFF, PDF), zero based. (optional, default `0`)
+    *   `options.subifd` **[number][14]** subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. (optional, default `-1`)
+    *   `options.level` **[number][14]** level to extract from a multi-level input (OpenSlide), zero based. (optional, default `0`)
+    *   `options.animated` **[boolean][15]** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default `false`)
     *   `options.raw` **[Object][13]?** describes raw pixel input image data. See `raw()` for pixel ordering.
 
-        *   `options.raw.width` **[number][15]?** integral number of pixels wide.
-        *   `options.raw.height` **[number][15]?** integral number of pixels high.
-        *   `options.raw.channels` **[number][15]?** integral number of channels, between 1 and 4.
-        *   `options.raw.premultiplied` **[boolean][14]?** specifies that the raw input has already been premultiplied, set to `true`
+        *   `options.raw.width` **[number][14]?** integral number of pixels wide.
+        *   `options.raw.height` **[number][14]?** integral number of pixels high.
+        *   `options.raw.channels` **[number][14]?** integral number of channels, between 1 and 4.
+        *   `options.raw.premultiplied` **[boolean][15]?** specifies that the raw input has already been premultiplied, set to `true`
             to avoid sharp premultiplying the image. (optional, default `false`)
     *   `options.create` **[Object][13]?** describes a new image to be created.
 
-        *   `options.create.width` **[number][15]?** integral number of pixels wide.
-        *   `options.create.height` **[number][15]?** integral number of pixels high.
-        *   `options.create.channels` **[number][15]?** integral number of channels, either 3 (RGB) or 4 (RGBA).
+        *   `options.create.width` **[number][14]?** integral number of pixels wide.
+        *   `options.create.height` **[number][14]?** integral number of pixels high.
+        *   `options.create.channels` **[number][14]?** integral number of channels, either 3 (RGB) or 4 (RGBA).
         *   `options.create.background` **([string][12] | [Object][13])?** parsed by the [color][16] module to extract values for red, green, blue and alpha.
         *   `options.create.noise` **[Object][13]?** describes a noise to be created.
 
             *   `options.create.noise.type` **[string][12]?** type of generated noise, currently only `gaussian` is supported.
-            *   `options.create.noise.mean` **[number][15]?** mean of pixels in generated noise.
-            *   `options.create.noise.sigma` **[number][15]?** standard deviation of pixels in generated noise.
+            *   `options.create.noise.mean` **[number][14]?** mean of pixels in generated noise.
+            *   `options.create.noise.sigma` **[number][14]?** standard deviation of pixels in generated noise.
 
 ### Examples
 
@@ -154,9 +153,7 @@ readableStream.pipe(pipeline);
 // Using Promises to know when the pipeline is complete
 const fs = require("fs");
 const got = require("got");
-const sharpStream = sharp({
-  failOnError: false
-});
+const sharpStream = sharp({ failOn: 'none' });
 
 const promises = [];
 
@@ -226,9 +223,9 @@ Returns **[Sharp][18]**
 
 [13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
 [16]: https://www.npmjs.org/package/color
 

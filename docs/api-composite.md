@@ -42,7 +42,7 @@ and [https://www.cairographics.org/operators/][2]
         *   `images[].raw.height` **[Number][7]?** 
         *   `images[].raw.channels` **[Number][7]?** 
     *   `images[].animated` **[boolean][9]** Set to `true` to read all frames/pages of an animated image. (optional, default `false`)
-    *   `images[].failOnError` **[boolean][9]** @see [constructor parameters][10] (optional, default `true`)
+    *   `images[].failOn` **[string][6]** @see [constructor parameters][10] (optional, default `'warning'`)
     *   `images[].limitInputPixels` **([number][7] | [boolean][9])** @see [constructor parameters][10] (optional, default `268402689`)
 
 ### Examples

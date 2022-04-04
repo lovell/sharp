@@ -200,7 +200,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         vips::VOption *option = VImage::option()
           ->set("access", baton->input->access)
           ->set("shrink", jpegShrinkOnLoad)
-          ->set("fail", baton->input->failOnError);
+          ->set("fail_on", baton->input->failOn);
         if (baton->input->buffer != nullptr) {
           // Reload JPEG buffer
           VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
@@ -214,7 +214,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         vips::VOption *option = VImage::option()
           ->set("access", baton->input->access)
           ->set("scale", scale)
-          ->set("fail", baton->input->failOnError);
+          ->set("fail_on", baton->input->failOn);
         if (inputImageType == sharp::ImageType::WEBP) {
           option->set("n", baton->input->pages);
           option->set("page", baton->input->page);
