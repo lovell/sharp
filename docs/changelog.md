@@ -8,6 +8,9 @@ Requires libvips v8.12.2
 
 * Increase control over sensitivity to invalid images via `failOn`, deprecate `failOnError` (equivalent to `failOn: 'warning'`).
 
+* Improve error message when attempting to render SVG input greater than 32767x32767.
+  [#3167](https://github.com/lovell/sharp/issues/3167)
+
 * Ensure `create` input image has correct bit depth and colour space.
   [#3139](https://github.com/lovell/sharp/issues/3139)
 

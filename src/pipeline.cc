@@ -241,8 +241,10 @@ class PipelineWorker : public Napi::AsyncWorker {
             // Reload SVG file
             image = VImage::svgload(const_cast<char*>(baton->input->file.data()), option);
           }
-
           sharp::SetDensity(image, baton->input->density);
+          if (image.width() > 32767 || image.height() > 32767) {
+            throw vips::VError("Input SVG image will exceed 32767x32767 pixel limit when scaled");
+          }
         } else if (inputImageType == sharp::ImageType::PDF) {
           option->set("n", baton->input->pages);
           option->set("page", baton->input->page);
@@ -259,6 +261,10 @@ class PipelineWorker : public Napi::AsyncWorker {
           }
 
           sharp::SetDensity(image, baton->input->density);
+        }
+      } else {
+        if (inputImageType == sharp::ImageType::SVG && (image.width() > 32767 || image.height() > 32767)) {
+          throw vips::VError("Input SVG image exceeds 32767x32767 pixel limit");
         }
       }
 
