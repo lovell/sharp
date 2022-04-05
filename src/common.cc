@@ -399,7 +399,7 @@ namespace sharp {
             throw vips::VError("Input file is missing, did you mean "
               "sharp(Buffer.from('" + descriptor->file.substr(0, 8) + "...')?");
           }
-          throw vips::VError("Input file is missing");
+          throw vips::VError("Input file is missing: " + descriptor->file);
         }
         if (imageType != ImageType::UNKNOWN) {
           try {
