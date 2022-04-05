@@ -127,7 +127,7 @@
     "vips"
   ],
   "dependencies": {
-    "color": "^4.2.1",
+    "color": "^4.2.3",
     "detect-libc": "^2.0.1",
     "node-addon-api": "^4.3.0",
     "prebuild-install": "^7.0.1",
