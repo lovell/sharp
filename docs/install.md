@@ -118,6 +118,8 @@ Building from source requires:
 
 This is an advanced approach that most people will not require.
 
+### Prebuilt sharp binaries
+
 To install the prebuilt sharp binaries from a custom URL,
 set the `sharp_binary_host` npm config option
 or the `npm_config_sharp_binary_host` environment variable.
@@ -126,9 +128,15 @@ To install the prebuilt sharp binaries from a directory on the local filesystem,
 set the `sharp_local_prebuilds` npm config option
 or the `npm_config_sharp_local_prebuilds` environment variable.
 
+### Prebuilt libvips binaries
+
 To install the prebuilt libvips binaries from a custom URL,
 set the `sharp_libvips_binary_host` npm config option
 or the `npm_config_sharp_libvips_binary_host` environment variable.
+
+To install the prebuilt libvips binaries from a directory on the local filesystem,
+set the `sharp_local_libvips_dir` npm config option
+or the `npm_config_sharp_local_libvips_dir` environment variable.
 
 The version subpath and file name are appended to these.
 For example, if `sharp_libvips_binary_host` is set to `https://hostname/path`
