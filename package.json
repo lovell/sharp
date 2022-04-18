@@ -131,7 +131,7 @@
     "detect-libc": "^2.0.1",
     "node-addon-api": "^4.3.0",
     "prebuild-install": "^7.0.1",
-    "semver": "^7.3.5",
+    "semver": "^7.3.7",
     "simple-get": "^4.0.1",
     "tar-fs": "^2.1.1",
     "tunnel-agent": "^0.6.0"
