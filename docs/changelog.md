@@ -4,7 +4,7 @@
 
 Requires libvips v8.12.2
 
-### v0.30.4 - TBD
+### v0.30.4 - 18th April 2022
 
 * Increase control over sensitivity to invalid images via `failOn`, deprecate `failOnError` (equivalent to `failOn: 'warning'`).
 
