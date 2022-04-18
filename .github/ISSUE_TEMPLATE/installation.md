@@ -32,11 +32,11 @@ If you are using npm v7 or later, does the user running `npm install` own the di
 
 If you are using the `ignore-scripts` feature of `npm`, have you tried with the `npm install --ignore-scripts=false` flag?
 
-### What is the complete output of running `npm install --verbose sharp`?
+### What is the complete output of running `npm install --verbose --foreground-scripts sharp` in an empty directory?
 
 <details>
 
-<!-- Please provide output of `npm install --verbose sharp` here. -->
+<!-- Please provide output of `npm install --verbose --foreground-scripts sharp` in an empty directory here. -->
 
 </details>
 

@@ -57,7 +57,7 @@ When using npm v7 or later, the user running `npm install` must own the director
 
 The `npm install --ignore-scripts=false` flag must be used when `npm` has been configured to ignore installation scripts.
 
-Check the output of running `npm install --verbose sharp` for useful error messages.
+Check the output of running `npm install --verbose --foreground-scripts sharp` for useful error messages.
 
 ## Apple M1
 
