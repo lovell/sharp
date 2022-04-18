@@ -118,6 +118,8 @@ output profile is provided.
 The default behaviour, when `withMetadata` is not used, is to convert to the device-independent
 sRGB colour space and strip all metadata, including the removal of any ICC profile.
 
+EXIF metadata is unsupported for TIFF output.
+
 ### Parameters
 
 *   `options` **[Object][6]?** 
