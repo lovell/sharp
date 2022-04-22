@@ -334,7 +334,7 @@ The first entry in the palette is reserved for transparency.
 // Convert PNG to GIF
 await sharp(pngBuffer)
   .gif()
-  .toBuffer());
+  .toBuffer();
 ```
 
 ```javascript
