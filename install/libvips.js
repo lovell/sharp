@@ -158,14 +158,10 @@ try {
       libvips.log(`Using cached ${tarPathCache}`);
       extractTarball(tarPathCache, platformAndArch);
     } else if (localLibvipsDir) {
-      const tarPathLocal = path.join(path.resolve(localLibvipsDir), `v${minimumLibvipsVersionLabelled}`, tarFilename);
       // If localLibvipsDir is given try to use binaries from local directory
-      if (fs.existsSync(tarPathLocal)) {
-        console.log(`Using local libvips from ${tarPathLocal}`);
-        extractTarball(tarPathLocal, platformAndArch);
-      } else {
-        fail(new Error(`Unable to use local libvips from ${tarPathLocal}`));
-      }
+      const tarPathLocal = path.join(path.resolve(localLibvipsDir), `v${minimumLibvipsVersionLabelled}`, tarFilename);
+      libvips.log(`Using local libvips from ${tarPathLocal}`);
+      extractTarball(tarPathLocal, platformAndArch);
     } else {
       const url = distBaseUrl + tarFilename;
       libvips.log(`Downloading ${url}`);
