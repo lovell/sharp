@@ -130,7 +130,7 @@
     "color": "^4.2.3",
     "detect-libc": "^2.0.1",
     "node-addon-api": "^4.3.0",
-    "prebuild-install": "^7.0.1",
+    "prebuild-install": "^7.1.0",
     "semver": "^7.3.7",
     "simple-get": "^4.0.1",
     "tar-fs": "^2.1.1",

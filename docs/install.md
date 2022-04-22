@@ -74,20 +74,28 @@ The target platform and/or architecture can be manually selected using the follo
 npm install --platform=... --arch=... --arm-version=... sharp
 ```
 
-* `--platform`: one of `linux`, `linuxmusl`, `darwin` or `win32`.
+* `--platform`: one of `linux`, `darwin` or `win32`.
 * `--arch`: one of `x64`, `ia32`, `arm` or `arm64`.
 * `--arm-version`: one of `6`, `7` or `8` (`arm` defaults to `6`, `arm64` defaults to `8`).
+* `--libc`: one of `glibc` or `musl`. This option only works with platform `linux`, defaults to `glibc`
 * `--sharp-install-force`: skip version compatibility and Subresource Integrity checks.
 
 These values can also be set via environment variables,
-`npm_config_platform`, `npm_config_arch`, `npm_config_arm_version`
+`npm_config_platform`, `npm_config_arch`, `npm_config_arm_version`, `npm_config_libc`
 and `SHARP_INSTALL_FORCE` respectively.
 
 For example, if the target machine has a 64-bit ARM CPU and is running Alpine Linux,
 use the following flags:
 
 ```sh
-npm install --arch=arm64 --platform=linuxmusl sharp
+npm install --arch=arm64 --platform=linux --libc=musl sharp
+```
+
+If the current machine is Alpine Linux and the target machine is Debian Linux on x64 cpu,
+use the following flags:
+
+```sh
+npm install --arch=x64 --platform=linux --libc=glibc sharp
 ```
 
 ## Custom libvips
@@ -207,7 +215,8 @@ run the following additional command after `npm install`:
 
 ```sh
 npm install
-SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp
+rm -rf node_modules/sharp
+SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=glibc sharp
 ```
 
 To get the best performance select the largest memory available.
