@@ -35,6 +35,7 @@ const hasSharpPrebuild = [
 ];
 
 const { minimumLibvipsVersion, minimumLibvipsVersionLabelled } = libvips;
+const localLibvipsDir = process.env.npm_config_sharp_libvips_local_prebuilds || '';
 const distHost = process.env.npm_config_sharp_libvips_binary_host || 'https://github.com/lovell/sharp-libvips/releases/download';
 const distBaseUrl = process.env.npm_config_sharp_dist_base_url || process.env.SHARP_DIST_BASE_URL || `${distHost}/v${minimumLibvipsVersionLabelled}/`;
 const installationForced = !!(process.env.npm_config_sharp_install_force || process.env.SHARP_INSTALL_FORCE);
@@ -156,6 +157,11 @@ try {
     if (fs.existsSync(tarPathCache)) {
       libvips.log(`Using cached ${tarPathCache}`);
       extractTarball(tarPathCache, platformAndArch);
+    } else if (localLibvipsDir) {
+      // If localLibvipsDir is given try to use binaries from local directory
+      const tarPathLocal = path.join(path.resolve(localLibvipsDir), `v${minimumLibvipsVersionLabelled}`, tarFilename);
+      libvips.log(`Using local libvips from ${tarPathLocal}`);
+      extractTarball(tarPathLocal, platformAndArch);
     } else {
       const url = distBaseUrl + tarFilename;
       libvips.log(`Downloading ${url}`);
