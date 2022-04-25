@@ -4,6 +4,12 @@
 
 Requires libvips v8.12.2
 
+### v0.30.5 - TBD
+
+* Allow installation of prebuilt libvips binaries from filesystem.
+  [#3196](https://github.com/lovell/sharp/pull/3196)
+  [@ankurparihar](https://github.com/ankurparihar)
+
 ### v0.30.4 - 18th April 2022
 
 * Increase control over sensitivity to invalid images via `failOn`, deprecate `failOnError` (equivalent to `failOn: 'warning'`).
