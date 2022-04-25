@@ -46,6 +46,8 @@ Returns **[Promise][5]<[Object][6]>** when no callback is provided
 Write output to a Buffer.
 JPEG, PNG, WebP, AVIF, TIFF, GIF and raw pixel data output are supported.
 
+Use [toFormat][7] or one of the format-specific functions such as [jpeg][8], [png][9] etc. to set the output format.
+
 If no explicit format is set, the output format will match the input image, except SVG input which becomes PNG output.
 
 By default all metadata will be removed, which includes EXIF-based orientation.
@@ -66,7 +68,7 @@ A `Promise` is returned when `callback` is not provided.
 
 *   `options` **[Object][6]?** 
 
-    *   `options.resolveWithObject` **[boolean][7]?** Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`.
+    *   `options.resolveWithObject` **[boolean][10]?** Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`.
 *   `callback` **[Function][3]?** 
 
 ### Examples
@@ -85,6 +87,7 @@ sharp(input)
 
 ```javascript
 sharp(input)
+  .png()
   .toBuffer({ resolveWithObject: true })
   .then(({ data, info }) => { ... })
   .catch(err => { ... });
@@ -107,7 +110,7 @@ await sharp(pixelArray, { raw: { width, height, channels } })
   .toFile('my-changed-image.jpg');
 ```
 
-Returns **[Promise][5]<[Buffer][8]>** when no callback is provided
+Returns **[Promise][5]<[Buffer][11]>** when no callback is provided
 
 ## withMetadata
 
@@ -124,10 +127,10 @@ EXIF metadata is unsupported for TIFF output.
 
 *   `options` **[Object][6]?** 
 
-    *   `options.orientation` **[number][9]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
+    *   `options.orientation` **[number][12]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
     *   `options.icc` **[string][2]?** filesystem path to output ICC profile, defaults to sRGB.
     *   `options.exif` **[Object][6]<[Object][6]>** Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data. (optional, default `{}`)
-    *   `options.density` **[number][9]?** Number of pixels per inch (DPI).
+    *   `options.density` **[number][12]?** Number of pixels per inch (DPI).
 
 ### Examples
 
@@ -192,19 +195,19 @@ Use these JPEG options for output image.
 
 *   `options` **[Object][6]?** output options
 
-    *   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `80`)
-    *   `options.progressive` **[boolean][7]** use progressive (interlace) scan (optional, default `false`)
+    *   `options.quality` **[number][12]** quality, integer 1-100 (optional, default `80`)
+    *   `options.progressive` **[boolean][10]** use progressive (interlace) scan (optional, default `false`)
     *   `options.chromaSubsampling` **[string][2]** set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' chroma subsampling (optional, default `'4:2:0'`)
-    *   `options.optimiseCoding` **[boolean][7]** optimise Huffman coding tables (optional, default `true`)
-    *   `options.optimizeCoding` **[boolean][7]** alternative spelling of optimiseCoding (optional, default `true`)
-    *   `options.mozjpeg` **[boolean][7]** use mozjpeg defaults, equivalent to `{ trellisQuantisation: true, overshootDeringing: true, optimiseScans: true, quantisationTable: 3 }` (optional, default `false`)
-    *   `options.trellisQuantisation` **[boolean][7]** apply trellis quantisation (optional, default `false`)
-    *   `options.overshootDeringing` **[boolean][7]** apply overshoot deringing (optional, default `false`)
-    *   `options.optimiseScans` **[boolean][7]** optimise progressive scans, forces progressive (optional, default `false`)
-    *   `options.optimizeScans` **[boolean][7]** alternative spelling of optimiseScans (optional, default `false`)
-    *   `options.quantisationTable` **[number][9]** quantization table to use, integer 0-8 (optional, default `0`)
-    *   `options.quantizationTable` **[number][9]** alternative spelling of quantisationTable (optional, default `0`)
-    *   `options.force` **[boolean][7]** force JPEG output, otherwise attempt to use input format (optional, default `true`)
+    *   `options.optimiseCoding` **[boolean][10]** optimise Huffman coding tables (optional, default `true`)
+    *   `options.optimizeCoding` **[boolean][10]** alternative spelling of optimiseCoding (optional, default `true`)
+    *   `options.mozjpeg` **[boolean][10]** use mozjpeg defaults, equivalent to `{ trellisQuantisation: true, overshootDeringing: true, optimiseScans: true, quantisationTable: 3 }` (optional, default `false`)
+    *   `options.trellisQuantisation` **[boolean][10]** apply trellis quantisation (optional, default `false`)
+    *   `options.overshootDeringing` **[boolean][10]** apply overshoot deringing (optional, default `false`)
+    *   `options.optimiseScans` **[boolean][10]** optimise progressive scans, forces progressive (optional, default `false`)
+    *   `options.optimizeScans` **[boolean][10]** alternative spelling of optimiseScans (optional, default `false`)
+    *   `options.quantisationTable` **[number][12]** quantization table to use, integer 0-8 (optional, default `0`)
+    *   `options.quantizationTable` **[number][12]** alternative spelling of quantisationTable (optional, default `0`)
+    *   `options.force` **[boolean][10]** force JPEG output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
 
@@ -241,16 +244,16 @@ Set `palette` to `true` for slower, indexed PNG output.
 
 *   `options` **[Object][6]?** 
 
-    *   `options.progressive` **[boolean][7]** use progressive (interlace) scan (optional, default `false`)
-    *   `options.compressionLevel` **[number][9]** zlib compression level, 0 (fastest, largest) to 9 (slowest, smallest) (optional, default `6`)
-    *   `options.adaptiveFiltering` **[boolean][7]** use adaptive row filtering (optional, default `false`)
-    *   `options.palette` **[boolean][7]** quantise to a palette-based image with alpha transparency support (optional, default `false`)
-    *   `options.quality` **[number][9]** use the lowest number of colours needed to achieve given quality, sets `palette` to `true` (optional, default `100`)
-    *   `options.effort` **[number][9]** CPU effort, between 1 (fastest) and 10 (slowest), sets `palette` to `true` (optional, default `7`)
-    *   `options.colours` **[number][9]** maximum number of palette entries, sets `palette` to `true` (optional, default `256`)
-    *   `options.colors` **[number][9]** alternative spelling of `options.colours`, sets `palette` to `true` (optional, default `256`)
-    *   `options.dither` **[number][9]** level of Floyd-Steinberg error diffusion, sets `palette` to `true` (optional, default `1.0`)
-    *   `options.force` **[boolean][7]** force PNG output, otherwise attempt to use input format (optional, default `true`)
+    *   `options.progressive` **[boolean][10]** use progressive (interlace) scan (optional, default `false`)
+    *   `options.compressionLevel` **[number][12]** zlib compression level, 0 (fastest, largest) to 9 (slowest, smallest) (optional, default `6`)
+    *   `options.adaptiveFiltering` **[boolean][10]** use adaptive row filtering (optional, default `false`)
+    *   `options.palette` **[boolean][10]** quantise to a palette-based image with alpha transparency support (optional, default `false`)
+    *   `options.quality` **[number][12]** use the lowest number of colours needed to achieve given quality, sets `palette` to `true` (optional, default `100`)
+    *   `options.effort` **[number][12]** CPU effort, between 1 (fastest) and 10 (slowest), sets `palette` to `true` (optional, default `7`)
+    *   `options.colours` **[number][12]** maximum number of palette entries, sets `palette` to `true` (optional, default `256`)
+    *   `options.colors` **[number][12]** alternative spelling of `options.colours`, sets `palette` to `true` (optional, default `256`)
+    *   `options.dither` **[number][12]** level of Floyd-Steinberg error diffusion, sets `palette` to `true` (optional, default `1.0`)
+    *   `options.force` **[boolean][10]** force PNG output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
 
@@ -280,15 +283,15 @@ Use these WebP options for output image.
 
 *   `options` **[Object][6]?** output options
 
-    *   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `80`)
-    *   `options.alphaQuality` **[number][9]** quality of alpha layer, integer 0-100 (optional, default `100`)
-    *   `options.lossless` **[boolean][7]** use lossless compression mode (optional, default `false`)
-    *   `options.nearLossless` **[boolean][7]** use near_lossless compression mode (optional, default `false`)
-    *   `options.smartSubsample` **[boolean][7]** use high quality chroma subsampling (optional, default `false`)
-    *   `options.effort` **[number][9]** CPU effort, between 0 (fastest) and 6 (slowest) (optional, default `4`)
-    *   `options.loop` **[number][9]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
-    *   `options.delay` **([number][9] | [Array][10]<[number][9]>)?** delay(s) between animation frames (in milliseconds)
-    *   `options.force` **[boolean][7]** force WebP output, otherwise attempt to use input format (optional, default `true`)
+    *   `options.quality` **[number][12]** quality, integer 1-100 (optional, default `80`)
+    *   `options.alphaQuality` **[number][12]** quality of alpha layer, integer 0-100 (optional, default `100`)
+    *   `options.lossless` **[boolean][10]** use lossless compression mode (optional, default `false`)
+    *   `options.nearLossless` **[boolean][10]** use near_lossless compression mode (optional, default `false`)
+    *   `options.smartSubsample` **[boolean][10]** use high quality chroma subsampling (optional, default `false`)
+    *   `options.effort` **[number][12]** CPU effort, between 0 (fastest) and 6 (slowest) (optional, default `4`)
+    *   `options.loop` **[number][12]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
+    *   `options.delay` **([number][12] | [Array][13]<[number][12]>)?** delay(s) between animation frames (in milliseconds)
+    *   `options.force` **[boolean][10]** force WebP output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
 
@@ -320,13 +323,13 @@ The first entry in the palette is reserved for transparency.
 
 *   `options` **[Object][6]?** output options
 
-    *   `options.colours` **[number][9]** maximum number of palette entries, including transparency, between 2 and 256 (optional, default `256`)
-    *   `options.colors` **[number][9]** alternative spelling of `options.colours` (optional, default `256`)
-    *   `options.effort` **[number][9]** CPU effort, between 1 (fastest) and 10 (slowest) (optional, default `7`)
-    *   `options.dither` **[number][9]** level of Floyd-Steinberg error diffusion, between 0 (least) and 1 (most) (optional, default `1.0`)
-    *   `options.loop` **[number][9]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
-    *   `options.delay` **([number][9] | [Array][10]<[number][9]>)?** delay(s) between animation frames (in milliseconds)
-    *   `options.force` **[boolean][7]** force GIF output, otherwise attempt to use input format (optional, default `true`)
+    *   `options.colours` **[number][12]** maximum number of palette entries, including transparency, between 2 and 256 (optional, default `256`)
+    *   `options.colors` **[number][12]** alternative spelling of `options.colours` (optional, default `256`)
+    *   `options.effort` **[number][12]** CPU effort, between 1 (fastest) and 10 (slowest) (optional, default `7`)
+    *   `options.dither` **[number][12]** level of Floyd-Steinberg error diffusion, between 0 (least) and 1 (most) (optional, default `1.0`)
+    *   `options.loop` **[number][12]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
+    *   `options.delay` **([number][12] | [Array][13]<[number][12]>)?** delay(s) between animation frames (in milliseconds)
+    *   `options.force` **[boolean][10]** force GIF output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples
 
@@ -365,16 +368,16 @@ Use these JP2 options for output image.
 
 Requires libvips compiled with support for OpenJPEG.
 The prebuilt binaries do not include this - see
-[installing a custom libvips][11].
+[installing a custom libvips][14].
 
 ### Parameters
 
 *   `options` **[Object][6]?** output options
 
-    *   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `80`)
-    *   `options.lossless` **[boolean][7]** use lossless compression mode (optional, default `false`)
-    *   `options.tileWidth` **[number][9]** horizontal tile size (optional, default `512`)
-    *   `options.tileHeight` **[number][9]** vertical tile size (optional, default `512`)
+    *   `options.quality` **[number][12]** quality, integer 1-100 (optional, default `80`)
+    *   `options.lossless` **[boolean][10]** use lossless compression mode (optional, default `false`)
+    *   `options.tileWidth` **[number][12]** horizontal tile size (optional, default `512`)
+    *   `options.tileHeight` **[number][12]** vertical tile size (optional, default `512`)
     *   `options.chromaSubsampling` **[string][2]** set to '4:2:0' to use chroma subsampling (optional, default `'4:4:4'`)
 
 ### Examples
@@ -414,18 +417,18 @@ The `density` can be set in pixels/inch via [withMetadata][1] instead of providi
 
 *   `options` **[Object][6]?** output options
 
-    *   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `80`)
-    *   `options.force` **[boolean][7]** force TIFF output, otherwise attempt to use input format (optional, default `true`)
+    *   `options.quality` **[number][12]** quality, integer 1-100 (optional, default `80`)
+    *   `options.force` **[boolean][10]** force TIFF output, otherwise attempt to use input format (optional, default `true`)
     *   `options.compression` **[string][2]** compression options: lzw, deflate, jpeg, ccittfax4 (optional, default `'jpeg'`)
     *   `options.predictor` **[string][2]** compression predictor options: none, horizontal, float (optional, default `'horizontal'`)
-    *   `options.pyramid` **[boolean][7]** write an image pyramid (optional, default `false`)
-    *   `options.tile` **[boolean][7]** write a tiled tiff (optional, default `false`)
-    *   `options.tileWidth` **[number][9]** horizontal tile size (optional, default `256`)
-    *   `options.tileHeight` **[number][9]** vertical tile size (optional, default `256`)
-    *   `options.xres` **[number][9]** horizontal resolution in pixels/mm (optional, default `1.0`)
-    *   `options.yres` **[number][9]** vertical resolution in pixels/mm (optional, default `1.0`)
+    *   `options.pyramid` **[boolean][10]** write an image pyramid (optional, default `false`)
+    *   `options.tile` **[boolean][10]** write a tiled tiff (optional, default `false`)
+    *   `options.tileWidth` **[number][12]** horizontal tile size (optional, default `256`)
+    *   `options.tileHeight` **[number][12]** vertical tile size (optional, default `256`)
+    *   `options.xres` **[number][12]** horizontal resolution in pixels/mm (optional, default `1.0`)
+    *   `options.yres` **[number][12]** vertical resolution in pixels/mm (optional, default `1.0`)
     *   `options.resolutionUnit` **[string][2]** resolution unit options: inch, cm (optional, default `'inch'`)
-    *   `options.bitdepth` **[number][9]** reduce bitdepth to 1, 2 or 4 bit (optional, default `8`)
+    *   `options.bitdepth` **[number][12]** reduce bitdepth to 1, 2 or 4 bit (optional, default `8`)
 
 ### Examples
 
@@ -457,9 +460,9 @@ AVIF image sequences are not supported.
 
 *   `options` **[Object][6]?** output options
 
-    *   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `50`)
-    *   `options.lossless` **[boolean][7]** use lossless compression (optional, default `false`)
-    *   `options.effort` **[number][9]** CPU effort, between 0 (fastest) and 9 (slowest) (optional, default `4`)
+    *   `options.quality` **[number][12]** quality, integer 1-100 (optional, default `50`)
+    *   `options.lossless` **[boolean][10]** use lossless compression (optional, default `false`)
+    *   `options.effort` **[number][12]** CPU effort, between 0 (fastest) and 9 (slowest) (optional, default `4`)
     *   `options.chromaSubsampling` **[string][2]** set to '4:2:0' to use chroma subsampling (optional, default `'4:4:4'`)
 
 <!---->
@@ -483,10 +486,10 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
 
 *   `options` **[Object][6]?** output options
 
-    *   `options.quality` **[number][9]** quality, integer 1-100 (optional, default `50`)
+    *   `options.quality` **[number][12]** quality, integer 1-100 (optional, default `50`)
     *   `options.compression` **[string][2]** compression format: av1, hevc (optional, default `'av1'`)
-    *   `options.lossless` **[boolean][7]** use lossless compression (optional, default `false`)
-    *   `options.effort` **[number][9]** CPU effort, between 0 (fastest) and 9 (slowest) (optional, default `4`)
+    *   `options.lossless` **[boolean][10]** use lossless compression (optional, default `false`)
+    *   `options.effort` **[number][12]** CPU effort, between 0 (fastest) and 9 (slowest) (optional, default `4`)
     *   `options.chromaSubsampling` **[string][2]** set to '4:2:0' to use chroma subsampling (optional, default `'4:4:4'`)
 
 <!---->
@@ -542,16 +545,16 @@ Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed arc
 
 *   `options` **[Object][6]?** 
 
-    *   `options.size` **[number][9]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
-    *   `options.overlap` **[number][9]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
-    *   `options.angle` **[number][9]** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
-    *   `options.background` **([string][2] | [Object][6])** background colour, parsed by the [color][12] module, defaults to white without transparency. (optional, default `{r:255,g:255,b:255,alpha:1}`)
+    *   `options.size` **[number][12]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
+    *   `options.overlap` **[number][12]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
+    *   `options.angle` **[number][12]** tile angle of rotation, must be a multiple of 90. (optional, default `0`)
+    *   `options.background` **([string][2] | [Object][6])** background colour, parsed by the [color][15] module, defaults to white without transparency. (optional, default `{r:255,g:255,b:255,alpha:1}`)
     *   `options.depth` **[string][2]?** how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout.
-    *   `options.skipBlanks` **[number][9]** threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images (optional, default `-1`)
+    *   `options.skipBlanks` **[number][12]** threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images (optional, default `-1`)
     *   `options.container` **[string][2]** tile container, with value `fs` (filesystem) or `zip` (compressed file). (optional, default `'fs'`)
     *   `options.layout` **[string][2]** filesystem layout, possible values are `dz`, `iiif`, `iiif3`, `zoomify` or `google`. (optional, default `'dz'`)
-    *   `options.centre` **[boolean][7]** centre image in tile. (optional, default `false`)
-    *   `options.center` **[boolean][7]** alternative spelling of centre. (optional, default `false`)
+    *   `options.centre` **[boolean][10]** centre image in tile. (optional, default `false`)
+    *   `options.center` **[boolean][10]** alternative spelling of centre. (optional, default `false`)
     *   `options.id` **[string][2]** when `layout` is `iiif`/`iiif3`, sets the `@id`/`id` attribute of `info.json` (optional, default `'https://example.com/iiif'`)
 
 ### Examples
@@ -584,7 +587,7 @@ Time spent waiting for a libuv thread to become available is not included.
 
 *   `options` **[Object][6]** 
 
-    *   `options.seconds` **[number][9]** Number of seconds after which processing will be stopped
+    *   `options.seconds` **[number][12]** Number of seconds after which processing will be stopped
 
 Returns **Sharp** 
 
@@ -604,14 +607,20 @@ Returns **Sharp**
 
 [6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[7]: #toformat
 
-[8]: https://nodejs.org/api/buffer.html
+[8]: #jpeg
 
-[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[9]: #png
 
-[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[11]: https://sharp.pixelplumbing.com/install#custom-libvips
+[11]: https://nodejs.org/api/buffer.html
 
-[12]: https://www.npmjs.org/package/color
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[14]: https://sharp.pixelplumbing.com/install#custom-libvips
+
+[15]: https://www.npmjs.org/package/color
