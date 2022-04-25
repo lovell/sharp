@@ -95,7 +95,11 @@ Returns **[Object][1]**
 ## concurrency
 
 Gets or, when a concurrency is provided, sets
-the number of threads *libvips'* should create to process each image.
+the maximum number of threads *libvips* should use to process *each image*.
+These are from a thread pool managed by glib,
+which helps avoid the overhead of creating new threads.
+
+This method always returns the current concurrency.
 
 The default value is the number of CPU cores,
 except when using glibc-based Linux without jemalloc,
@@ -103,10 +107,19 @@ where the default is `1` to help reduce memory fragmentation.
 
 A value of `0` will reset this to the number of CPU cores.
 
-The maximum number of images that can be processed in parallel
-is limited by libuv's `UV_THREADPOOL_SIZE` environment variable.
+Some image format libraries spawn additional threads,
+e.g. libaom manages its own 4 threads when encoding AVIF images,
+and these are independent of the value set here.
 
-This method always returns the current concurrency.
+The maximum number of images that sharp can process in parallel
+is controlled by libuv's `UV_THREADPOOL_SIZE` environment variable,
+which defaults to 4.
+
+[https://nodejs.org/api/cli.html#uv_threadpool_sizesize][12]
+
+For example, by default, a machine with 8 CPU cores will process
+4 images in parallel and use up to 8 threads per image,
+so there will be up to 32 concurrent threads.
 
 ### Parameters
 
@@ -199,3 +212,5 @@ Returns **[boolean][10]**
 [10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
 [11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[12]: https://nodejs.org/api/cli.html#uv_threadpool_sizesize
