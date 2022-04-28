@@ -63,26 +63,26 @@ describe('Platform-detection', function () {
   });
 
   it('Can override libc if platform is linux', function () {
-    process.env.npm_config_platform = 'linux'
-    process.env.npm_config_libc = 'test'
-    assert.strictEqual('linuxtest', platform().split('-')[0])
-    delete process.env.npm_config_platform
-    delete process.env.npm_config_libc
-  })
+    process.env.npm_config_platform = 'linux';
+    process.env.npm_config_libc = 'test';
+    assert.strictEqual('linuxtest', platform().split('-')[0]);
+    delete process.env.npm_config_platform;
+    delete process.env.npm_config_libc;
+  });
 
   it('Handles libc value "glibc" as default linux', function () {
-    process.env.npm_config_platform = 'linux'
-    process.env.npm_config_libc = 'glibc'
-    assert.strictEqual('linux', platform().split('-')[0])
-    delete process.env.npm_config_platform
-    delete process.env.npm_config_libc
-  })
+    process.env.npm_config_platform = 'linux';
+    process.env.npm_config_libc = 'glibc';
+    assert.strictEqual('linux', platform().split('-')[0]);
+    delete process.env.npm_config_platform;
+    delete process.env.npm_config_libc;
+  });
 
   it('Discards libc value on non-linux platform', function () {
-    process.env.npm_config_platform = 'win32'
-    process.env.npm_config_libc = 'gnuwin32'
-    assert.strictEqual('win32', platform().split('-')[0])
-    delete process.env.npm_config_platform
-    delete process.env.npm_config_libc
-  })
+    process.env.npm_config_platform = 'win32';
+    process.env.npm_config_libc = 'gnuwin32';
+    assert.strictEqual('win32', platform().split('-')[0]);
+    delete process.env.npm_config_platform;
+    delete process.env.npm_config_libc;
+  });
 });
