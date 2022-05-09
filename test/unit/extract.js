@@ -168,14 +168,51 @@ describe('Partial image extraction', function () {
       });
   });
 
-  it('Rotate with EXIF mirroring then extract', function (done) {
-    sharp(fixtures.inputJpgWithLandscapeExif7)
-      .rotate()
-      .extract({ left: 0, top: 208, width: 60, height: 40 })
-      .toBuffer(function (err, data) {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('rotate-mirror-extract.jpg'), data, done);
+  describe('Apply exif orientation and mirroring then extract', () => {
+    [
+      {
+        name: 'EXIF-1',
+        image: fixtures.inputJpgWithLandscapeExif1
+      },
+      {
+        name: 'EXIF-2',
+        image: fixtures.inputJpgWithLandscapeExif2
+      },
+      {
+        name: 'EXIF-3',
+        image: fixtures.inputJpgWithLandscapeExif3
+      },
+      {
+        name: 'EXIF-4',
+        image: fixtures.inputJpgWithLandscapeExif4
+      },
+      {
+        name: 'EXIF-5',
+        image: fixtures.inputJpgWithLandscapeExif5
+      },
+      {
+        name: 'EXIF-6',
+        image: fixtures.inputJpgWithLandscapeExif6
+      },
+      {
+        name: 'EXIF-7',
+        image: fixtures.inputJpgWithLandscapeExif7
+      },
+      {
+        name: 'EXIF-8',
+        image: fixtures.inputJpgWithLandscapeExif8
+      }
+    ].forEach(({ name, image }) => {
+      it(name, function (done) {
+        sharp(image)
+          .rotate()
+          .extract({ left: 0, top: 208, width: 60, height: 40 })
+          .toBuffer(function (err, data) {
+            if (err) throw err;
+            fixtures.assertSimilar(fixtures.expected('rotate-mirror-extract.jpg'), data, done);
+          });
       });
+    });
   });
 
   describe('Invalid parameters', function () {

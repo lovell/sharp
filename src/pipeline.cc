@@ -95,16 +95,18 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->rotateBeforePreExtract) {
         if (rotation != VIPS_ANGLE_D0) {
           image = image.rot(rotation);
-          if (flip) {
-            image = image.flip(VIPS_DIRECTION_VERTICAL);
-            flip = FALSE;
-          }
-          if (flop) {
-            image = image.flip(VIPS_DIRECTION_HORIZONTAL);
-            flop = FALSE;
-          }
+        }
+        if (flip) {
+          image = image.flip(VIPS_DIRECTION_VERTICAL);
+        }
+        if (flop) {
+          image = image.flip(VIPS_DIRECTION_HORIZONTAL);
+        }
+        if (rotation != VIPS_ANGLE_D0 || flip || flop) {
           image = sharp::RemoveExifOrientation(image);
         }
+        flop = FALSE;
+        flip = FALSE;
         if (baton->rotationAngle != 0.0) {
           MultiPageUnsupported(nPages, "Rotate");
           std::vector<double> background;
