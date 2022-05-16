@@ -27,7 +27,7 @@ describe('AVIF', () => {
       format: 'jpeg',
       hasAlpha: false,
       hasProfile: false,
-      height: 14,
+      height: 13,
       isProgressive: false,
       space: 'srgb',
       width: 32
@@ -70,7 +70,7 @@ describe('AVIF', () => {
       format: 'heif',
       hasAlpha: false,
       hasProfile: false,
-      height: 14,
+      height: 12,
       isProgressive: false,
       pagePrimary: 0,
       pages: 1,
