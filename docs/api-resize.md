@@ -46,7 +46,7 @@ Possible interpolation kernels are:
     *   `options.height` **[String][10]?** alternative means of specifying `height`. If both are present this take priority.
     *   `options.fit` **[String][10]** how the image should be resized to fit both provided dimensions, one of `cover`, `contain`, `fill`, `inside` or `outside`. (optional, default `'cover'`)
     *   `options.position` **[String][10]** position, gravity or strategy to use when `fit` is `cover` or `contain`. (optional, default `'centre'`)
-    *   `options.background` **([String][10] | [Object][9])** background colour when using a `fit` of `contain`, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
+    *   `options.background` **([String][10] | [Object][9])** background colour when using a `fit` or `contain`, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
     *   `options.kernel` **[String][10]** the kernel to use for image reduction. (optional, default `'lanczos3'`)
     *   `options.withoutEnlargement` **[Boolean][12]** do not enlarge if the width *or* height are already less than the specified dimensions, equivalent to GraphicsMagick's `>` geometry option. (optional, default `false`)
     *   `options.withoutReduction` **[Boolean][12]** do not reduce if the width *or* height are already greater than the specified dimensions, equivalent to GraphicsMagick's `<` geometry option. (optional, default `false`)
