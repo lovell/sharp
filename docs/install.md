@@ -263,6 +263,22 @@ buildSync({
 esbuild app.js --bundle --platform=node --external:sharp
 ```
 
+### serverless-esbuild
+
+To deploy AWS Lambda using serverless, esbuild and serverless-esbuild, ensure sharp is excluded from bundling via the
+[exclude option](https://www.serverless.com/plugins/serverless-esbuild#options)
+configuration.
+Make changes inside `serverless.yml` under `esbuild` with the following.
+```
+esbuild:
+    # Keep existing changes
+    external:
+      - sharp
+    packagerOptions:
+      scripts:
+        - npm install --arch=x64 --platform=linux sharp
+```
+
 ## Worker threads
 
 On some platforms, including glibc-based Linux,
