@@ -14,7 +14,7 @@ The `blend` option can be one of `clear`, `source`, `over`, `in`, `out`, `atop`,
 `hard-light`, `soft-light`, `difference`, `exclusion`.
 
 More information about blend modes can be found at
-[https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode][1]
+[https://www.libvips.org/API/current/libvips-conversion.html#VipsBlendMode][1]
 and [https://www.cairographics.org/operators/][2]
 
 ### Parameters
@@ -89,7 +89,7 @@ Returns **Sharp**
 
 *   **since**: 0.22.0
 
-[1]: https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+[1]: https://www.libvips.org/API/current/libvips-conversion.html#VipsBlendMode
 
 [2]: https://www.cairographics.org/operators/
 

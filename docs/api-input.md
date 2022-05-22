@@ -131,9 +131,9 @@ const stats = await sharp(part).stats();
 
 Returns **[Promise][5]<[Object][6]>** 
 
-[1]: https://libvips.github.io/libvips/API/current/VipsImage.html#VipsInterpretation
+[1]: https://www.libvips.org/API/current/VipsImage.html#VipsInterpretation
 
-[2]: https://libvips.github.io/libvips/API/current/VipsImage.html#VipsBandFormat
+[2]: https://www.libvips.org/API/current/VipsImage.html#VipsBandFormat
 
 [3]: https://www.npmjs.com/package/icc
 
