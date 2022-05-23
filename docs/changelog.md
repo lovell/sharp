@@ -6,6 +6,9 @@ Requires libvips v8.12.2
 
 ### v0.30.5 - TBD
 
+* Install: pass `PKG_CONFIG_PATH` via env rather than substitution.
+  [@dwisiswant0](https://github.com/dwisiswant0)
+
 * Allow installation of prebuilt libvips binaries from filesystem.
   [#3196](https://github.com/lovell/sharp/pull/3196)
   [@ankurparihar](https://github.com/ankurparihar)
