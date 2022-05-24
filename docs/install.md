@@ -104,8 +104,8 @@ To use a custom, globally-installed version of libvips instead of the provided b
 make sure it is at least the version listed under `config.libvips` in the `package.json` file
 and that it can be located using `pkg-config --modversion vips-cpp`.
 
-For help compiling libvips from source, please see
-[https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball](https://libvips.github.io/libvips/install.html#building-libvips-from-a-source-tarball).
+For help compiling libvips and its dependencies, please see
+[building libvips from source](https://www.libvips.org/install.html#building-libvips-from-source).
 
 The use of a globally-installed libvips is unsupported on Windows.
 
