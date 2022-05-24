@@ -9,6 +9,10 @@ Requires libvips v8.12.2
 * Install: pass `PKG_CONFIG_PATH` via env rather than substitution.
   [@dwisiswant0](https://github.com/dwisiswant0)
 
+* Add support for `--libc` flag to improve cross-platform installation.
+  [#3160](https://github.com/lovell/sharp/pull/3160)
+  [@joonamo](https://github.com/joonamo)
+
 * Allow installation of prebuilt libvips binaries from filesystem.
   [#3196](https://github.com/lovell/sharp/pull/3196)
   [@ankurparihar](https://github.com/ankurparihar)

@@ -245,3 +245,6 @@ GitHub: https://github.com/Brodan
 
 Name: Ankur Parihar
 GitHub: https://github.com/ankurparihar
+
+Name: Joona Heinikoski
+GitHub: https://github.com/joonamo
