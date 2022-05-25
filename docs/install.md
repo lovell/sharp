@@ -281,7 +281,6 @@ buildSync({
 esbuild app.js --bundle --platform=node --external:sharp
 ```
 
-
 ## Worker threads
 
 On some platforms, including glibc-based Linux,
