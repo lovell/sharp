@@ -4,6 +4,11 @@
 
 Requires libvips v8.12.2
 
+### v0.30.6 - TBD
+
+* Ensure brew-installed `vips` can be detected (regression in 0.30.5).
+  [#3239](https://github.com/lovell/sharp/issues/3239)
+
 ### v0.30.5 - 23rd May 2022
 
 * Install: pass `PKG_CONFIG_PATH` via env rather than substitution.
