@@ -140,9 +140,9 @@
   "devDependencies": {
     "async": "^3.2.3",
     "cc": "^3.0.1",
-    "decompress-zip": "^0.3.3",
     "documentation": "^13.2.5",
     "exif-reader": "^1.0.3",
+    "extract-zip": "^2.0.1",
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
     "mocha": "^10.0.0",

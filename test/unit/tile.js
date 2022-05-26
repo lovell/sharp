@@ -6,7 +6,7 @@ const assert = require('assert');
 
 const eachLimit = require('async/eachLimit');
 const rimraf = require('rimraf');
-const DecompressZip = require('decompress-zip');
+const extractZip = require('extract-zip');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -912,14 +912,10 @@ describe('Tile', function () {
             if (err) throw err;
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);
-            new DecompressZip(container)
-              .on('extract', function () {
+            extractZip(container, { dir: path.dirname(extractTo) })
+              .then(() => {
                 assertDeepZoomTiles(directory, 256, 13, done);
-              })
-              .on('error', function (err) {
-                throw err;
-              })
-              .extract({ path: path.dirname(extractTo) });
+              });
           });
         });
     });
@@ -946,14 +942,10 @@ describe('Tile', function () {
             if (err) throw err;
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);
-            new DecompressZip(container)
-              .on('extract', function () {
+            extractZip(container, { dir: path.dirname(extractTo) })
+              .then(() => {
                 assertDeepZoomTiles(directory, 256, 13, done);
-              })
-              .on('error', function (err) {
-                throw err;
-              })
-              .extract({ path: path.dirname(extractTo) });
+              });
           });
         });
     });
