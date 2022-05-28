@@ -233,11 +233,13 @@ A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 ### serverless-esbuild
 
 To deploy AWS Lambda using serverless framework, esbuild and serverless-esbuild on machines other than Linux x64 (glibc), first ensure sharp is excluded from bundling via the
-[exclude option](https://www.serverless.com/plugins/serverless-esbuild#options)
+[external option](https://www.serverless.com/plugins/serverless-esbuild#options)
 configuration.
 Make changes inside `serverless.yml` under `esbuild` with the following.
 ```
-esbuild:
+custom:
+  # Keep existing changes
+  esbuild:
     # Keep existing changes
     external:
       - sharp
