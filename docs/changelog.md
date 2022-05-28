@@ -6,6 +6,9 @@ Requires libvips v8.12.2
 
 ### v0.30.6 - TBD
 
+* Allow values for `limitInputPixels` larger than 32-bit.
+  [#3238](https://github.com/lovell/sharp/issues/3238)
+
 * Ensure brew-installed `vips` can be detected (regression in 0.30.5).
   [#3239](https://github.com/lovell/sharp/issues/3239)
 

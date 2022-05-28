@@ -49,7 +49,7 @@ namespace sharp {
     std::string file;
     char *buffer;
     VipsFailOn failOn;
-    int limitInputPixels;
+    uint64_t limitInputPixels;
     bool unlimited;
     VipsAccess access;
     size_t bufferLength;

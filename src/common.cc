@@ -48,6 +48,9 @@ namespace sharp {
   int32_t AttrAsInt32(Napi::Object obj, unsigned int const attr) {
     return obj.Get(attr).As<Napi::Number>().Int32Value();
   }
+  int64_t AttrAsInt64(Napi::Object obj, std::string attr) {
+    return obj.Get(attr).As<Napi::Number>().Int64Value();
+  }
   double AttrAsDouble(Napi::Object obj, std::string attr) {
     return obj.Get(attr).As<Napi::Number>().DoubleValue();
   }
@@ -131,7 +134,7 @@ namespace sharp {
       }
     }
     // Limit input images to a given number of pixels, where pixels = width * height
-    descriptor->limitInputPixels = AttrAsUint32(input, "limitInputPixels");
+    descriptor->limitInputPixels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputPixels"));
     // Allow switch from random to sequential access
     descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
     // Remove safety features and allow unlimited SVG/PNG input
@@ -439,7 +442,7 @@ namespace sharp {
     }
     // Limit input images to a given number of pixels, where pixels = width * height
     if (descriptor->limitInputPixels > 0 &&
-      static_cast<uint64_t>(image.width() * image.height()) > static_cast<uint64_t>(descriptor->limitInputPixels)) {
+      static_cast<uint64_t>(image.width() * image.height()) > descriptor->limitInputPixels) {
       throw vips::VError("Input image exceeds pixel limit");
     }
     return std::make_tuple(image, imageType);
