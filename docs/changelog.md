@@ -4,7 +4,7 @@
 
 Requires libvips v8.12.2
 
-### v0.30.6 - TBD
+### v0.30.6 - 30th May 2022
 
 * Allow values for `limitInputPixels` larger than 32-bit.
   [#3238](https://github.com/lovell/sharp/issues/3238)
