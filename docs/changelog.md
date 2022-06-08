@@ -4,6 +4,11 @@
 
 Requires libvips v8.12.2
 
+### v0.30.7 - TBD
+
+* Ensure tiled composition always works with outside resizing.
+  [#3227](https://github.com/lovell/sharp/issues/3227)
+
 ### v0.30.6 - 30th May 2022
 
 * Allow values for `limitInputPixels` larger than 32-bit.
