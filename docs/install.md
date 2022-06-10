@@ -98,6 +98,14 @@ use the following flags:
 npm install --arch=x64 --platform=linux --libc=glibc sharp
 ```
 
+Multiple platforms and architectures can be supported within the same installation tree.
+The following example for macOS installs x64 binaries then adds (via a rebuild) arm64 binaries:
+
+```sh
+npm install --platform=darwin --arch=x64 sharp
+npm rebuild --platform=darwin --arch=arm64 sharp
+```
+
 ## Custom libvips
 
 To use a custom, globally-installed version of libvips instead of the provided binaries,
