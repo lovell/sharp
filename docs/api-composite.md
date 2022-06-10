@@ -29,6 +29,18 @@ and [https://www.cairographics.org/operators/][2]
             *   `images[].input.create.height` **[Number][7]?** 
             *   `images[].input.create.channels` **[Number][7]?** 3-4
             *   `images[].input.create.background` **([String][6] | [Object][4])?** parsed by the [color][8] module to extract values for red, green, blue and alpha.
+        *   `images[].input.text` **[Object][4]?** describes a new text image to be created.
+
+            *   `images[].input.text.text` **[string][6]?** text to render as a UTF-8 string. It can contain Pango markup, for example `<i>Le</i>Monde`.
+            *   `images[].input.text.font` **[string][6]?** font name to render with.
+            *   `images[].input.text.fontfile` **[string][6]?** absolute filesystem path to a font file that can be used by `font`.
+            *   `images[].input.text.width` **[number][7]** integral number of pixels to word-wrap at. Lines of text wider than this will be broken at word boundaries. (optional, default `0`)
+            *   `images[].input.text.height` **[number][7]** integral number of pixels high. When defined, `dpi` will be ignored and the text will automatically fit the pixel resolution defined by `width` and `height`. Will be ignored if `width` is not specified or set to 0. (optional, default `0`)
+            *   `images[].input.text.align` **[string][6]** text alignment (`'left'`, `'centre'`, `'center'`, `'right'`). (optional, default `'left'`)
+            *   `images[].input.text.justify` **[boolean][9]** set this to true to apply justification to the text. (optional, default `false`)
+            *   `images[].input.text.dpi` **[number][7]** the resolution (size) at which to render the text. Does not take effect if `height` is specified. (optional, default `72`)
+            *   `images[].input.text.rgba` **[boolean][9]** set this to true to enable RGBA output. This is useful for colour emoji rendering, or support for pango markup features like `<span foreground="red">Red!</span>`. (optional, default `false`)
+            *   `images[].input.text.spacing` **[number][7]** text line height in points. Will use the font line height if none is specified. (optional, default `0`)
     *   `images[].blend` **[String][6]** how to blend this image with the image below. (optional, default `'over'`)
     *   `images[].gravity` **[String][6]** gravity at which to place the overlay. (optional, default `'centre'`)
     *   `images[].top` **[Number][7]?** the pixel offset from the top edge.

@@ -51,6 +51,18 @@ Implements the [stream.Duplex][1] class.
             *   `options.create.noise.type` **[string][12]?** type of generated noise, currently only `gaussian` is supported.
             *   `options.create.noise.mean` **[number][14]?** mean of pixels in generated noise.
             *   `options.create.noise.sigma` **[number][14]?** standard deviation of pixels in generated noise.
+    *   `options.text` **[Object][13]?** describes a new text image to be created.
+
+        *   `options.text.text` **[string][12]?** text to render as a UTF-8 string. It can contain Pango markup, for example `<i>Le</i>Monde`.
+        *   `options.text.font` **[string][12]?** font name to render with.
+        *   `options.text.fontfile` **[string][12]?** absolute filesystem path to a font file that can be used by `font`.
+        *   `options.text.width` **[number][14]** integral number of pixels to word-wrap at. Lines of text wider than this will be broken at word boundaries. (optional, default `0`)
+        *   `options.text.height` **[number][14]** integral number of pixels high. When defined, `dpi` will be ignored and the text will automatically fit the pixel resolution defined by `width` and `height`. Will be ignored if `width` is not specified or set to 0. (optional, default `0`)
+        *   `options.text.align` **[string][12]** text alignment (`'left'`, `'centre'`, `'center'`, `'right'`). (optional, default `'left'`)
+        *   `options.text.justify` **[boolean][15]** set this to true to apply justification to the text. (optional, default `false`)
+        *   `options.text.dpi` **[number][14]** the resolution (size) at which to render the text. Does not take effect if `height` is specified. (optional, default `72`)
+        *   `options.text.rgba` **[boolean][15]** set this to true to enable RGBA output. This is useful for colour emoji rendering, or support for pango markup features like `<span foreground="red">Red!</span>`. (optional, default `false`)
+        *   `options.text.spacing` **[number][14]** text line height in points. Will use the font line height if none is specified. (optional, default `0`)
 
 ### Examples
 
