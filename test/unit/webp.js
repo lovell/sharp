@@ -133,6 +133,12 @@ describe('WebP', function () {
     });
   });
 
+  it('should set effort to 0', () => {
+    const effort = sharp().webp({ effort: 0 }).options.webpEffort;
+
+    assert.strictEqual(effort, 0);
+  });
+
   it('invalid loop throws', () => {
     assert.throws(() => {
       sharp().webp({ loop: -1 });
