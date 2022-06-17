@@ -217,7 +217,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           ->set("access", baton->input->access)
           ->set("scale", scale)
           ->set("fail_on", baton->input->failOn);
-        if (inputImageType == sharp::ImageType::WEBP) {
+        if (scale < 1.0 && inputImageType == sharp::ImageType::WEBP) {
           option->set("n", baton->input->pages);
           option->set("page", baton->input->page);
 
