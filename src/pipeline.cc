@@ -188,8 +188,10 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (jpegShrinkOnLoad > 1 && static_cast<int>(shrink) == jpegShrinkOnLoad) {
             jpegShrinkOnLoad /= 2;
           }
-        } else if (inputImageType == sharp::ImageType::WEBP ||
-                   inputImageType == sharp::ImageType::SVG ||
+        } else if (inputImageType == sharp::ImageType::WEBP && shrink > 1.0) {
+          // Avoid upscaling via webp
+          scale = 1.0 / shrink;
+        } else if (inputImageType == sharp::ImageType::SVG ||
                    inputImageType == sharp::ImageType::PDF) {
           scale = 1.0 / shrink;
         }
