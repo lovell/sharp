@@ -4,7 +4,7 @@
 
 Requires libvips v8.12.2
 
-### v0.30.7 - TBD
+### v0.30.7 - 22nd June 2022
 
 * Ensure tiled composition always works with outside resizing.
   [#3227](https://github.com/lovell/sharp/issues/3227)
