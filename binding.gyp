@@ -15,10 +15,11 @@
           '_ALLOW_KEYWORD_MACROS'
         ],
         'sources': [
-          'src/libvips/cplusplus/VError.cpp',
           'src/libvips/cplusplus/VConnection.cpp',
+          'src/libvips/cplusplus/VError.cpp',
+          'src/libvips/cplusplus/VImage.cpp',
           'src/libvips/cplusplus/VInterpolate.cpp',
-          'src/libvips/cplusplus/VImage.cpp'
+          'src/libvips/cplusplus/VRegion.cpp'
         ],
         'include_dirs': [
           '<(sharp_vendor_dir)/include',
