@@ -144,6 +144,16 @@ To install the prebuilt sharp binaries from a directory on the local filesystem,
 set the `sharp_local_prebuilds` npm config option
 or the `npm_config_sharp_local_prebuilds` environment variable.
 
+URL example:
+if `sharp_binary_host` is set to `https://hostname/path`
+and the sharp version is `1.2.3` then the resultant URL will be
+`https://hostname/path/sharp-v1.2.3-napi-v5-platform-arch.tar.gz`.
+
+Filename example:
+if `sharp_local_prebuilds` is set to `/path`
+and the sharp version is `1.2.3` then the resultant filename will be
+`/path/sharp-v1.2.3-napi-v5-platform-arch.tar.gz`.
+
 ### Prebuilt libvips binaries
 
 To install the prebuilt libvips binaries from a custom URL,
@@ -154,10 +164,17 @@ To install the prebuilt libvips binaries from a directory on the local filesyste
 set the `sharp_libvips_local_prebuilds` npm config option
 or the `npm_config_sharp_libvips_local_prebuilds` environment variable.
 
-The version subpath and file name are appended to these.
-For example, if `sharp_libvips_binary_host` is set to `https://hostname/path`
-and the libvips version is `1.2.3` then the resultant URL will be
-`https://hostname/path/v1.2.3/libvips-1.2.3-platform-arch.tar.br`.
+The version subpath and filename are appended to these.
+
+URL example:
+if `sharp_libvips_binary_host` is set to `https://hostname/path`
+and the libvips version is `4.5.6` then the resultant URL will be
+`https://hostname/path/v4.5.6/libvips-4.5.6-platform-arch.tar.br`.
+
+Filename example:
+if `sharp_libvips_local_prebuilds` is set to `/path`
+and the libvips version is `4.5.6` then the resultant filename will be
+`/path/v4.5.6/libvips-4.5.6-platform-arch.tar.br`.
 
 See the Chinese mirror below for a further example.
 
