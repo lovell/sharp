@@ -1,6 +1,8 @@
 {
   'variables': {
     'vips_version': '<!(node -p "require(\'./lib/libvips\').minimumLibvipsVersion")',
+    'vips_major': '<!(node -p "require(\'./lib/libvips\').minimumLibvipsVersion.split(\'.\')[0]")',
+    'vips_minor': '<!(node -p "require(\'./lib/libvips\').minimumLibvipsVersion.split(\'.\')[1]")',
     'platform_and_arch': '<!(node -p "require(\'./lib/platform\')()")',
     'sharp_vendor_dir': './vendor/<(vips_version)/<(platform_and_arch)'
   },
@@ -12,7 +14,8 @@
         'type': 'shared_library',
         'defines': [
           'VIPS_CPLUSPLUS_EXPORTS',
-          '_ALLOW_KEYWORD_MACROS'
+          '_ALLOW_KEYWORD_MACROS',
+          'GETTEXT_PACKAGE=vips<(vips_major).<(vips_minor)'
         ],
         'sources': [
           'src/libvips/cplusplus/VConnection.cpp',
