@@ -121,6 +121,20 @@ describe('Resize dimensions', function () {
       });
   });
 
+  it('Webp resize then extract large image', function (done) {
+    sharp(fixtures.inputWebP)
+      .resize(0x4000, 0x4000)
+      .extract({ top: 0x2000, left: 0x2000, width: 256, height: 256 })
+      .webp()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('webp', info.format);
+        assert.strictEqual(256, info.width);
+        assert.strictEqual(256, info.height);
+        done();
+      });
+  });
+
   it('WebP shrink-on-load rounds to zero, ensure recalculation is correct', function (done) {
     sharp(fixtures.inputJpg)
       .resize(1080, 607)

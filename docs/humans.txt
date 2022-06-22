@@ -248,3 +248,9 @@ GitHub: https://github.com/ankurparihar
 
 Name: Joona Heinikoski
 GitHub: https://github.com/joonamo
+
+Name: AlexanderTheGrey
+GitHub: https://github.com/AlexanderTheGrey
+
+Name: Blayne Chard
+GitHub: https://github.com/blacha

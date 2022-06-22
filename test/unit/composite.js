@@ -420,4 +420,31 @@ describe('composite', () => {
 
     assert.deepStrictEqual(red, { r, g, b });
   });
+
+  it('Ensure tiled composition works with resized fit=outside', async () => {
+    const { info } = await sharp({
+      create: {
+        width: 41, height: 41, channels: 3, background: 'red'
+      }
+    })
+      .resize({
+        width: 10,
+        height: 40,
+        fit: 'outside'
+      })
+      .composite([
+        {
+          input: {
+            create: {
+              width: 16, height: 16, channels: 3, background: 'green'
+            }
+          },
+          tile: true
+        }
+      ])
+      .toBuffer({ resolveWithObject: true });
+
+    assert.strictEqual(info.width, 40);
+    assert.strictEqual(info.height, 40);
+  });
 });
