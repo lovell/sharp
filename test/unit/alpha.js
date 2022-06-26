@@ -23,6 +23,7 @@ describe('Alpha transparency', function () {
       .flatten({
         background: { r: 255, g: 102, b: 0 }
       })
+      .jpeg({ chromaSubsampling: '4:4:4' })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(400, info.width);
@@ -35,6 +36,7 @@ describe('Alpha transparency', function () {
     sharp(fixtures.inputPngWithTransparency)
       .resize(400, 300)
       .flatten({ background: '#ff6600' })
+      .jpeg({ chromaSubsampling: '4:4:4' })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(400, info.width);

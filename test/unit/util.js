@@ -140,7 +140,6 @@ describe('Utilities', function () {
       assert.strictEqual('object', typeof sharp.vendor);
       assert.strictEqual('string', typeof sharp.vendor.current);
       assert.strictEqual(true, Array.isArray(sharp.vendor.installed));
-      assert.strictEqual(true, sharp.vendor.installed.length > 0);
     });
   });
 });

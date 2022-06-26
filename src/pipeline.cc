@@ -668,7 +668,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           xs.push_back(left);
           ys.push_back(top);
         }
-        image = image.composite(images, modes, VImage::option()->set("x", xs)->set("y", ys));
+        image = VImage::composite(images, modes, VImage::option()->set("x", xs)->set("y", ys));
       }
 
       // Reverse premultiplication after all transformations:

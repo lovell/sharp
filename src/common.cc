@@ -366,32 +366,33 @@ namespace sharp {
         }
       }
     } else {
-      if (descriptor->createChannels > 0) {
+      int const channels = descriptor->createChannels;
+      if (channels > 0) {
         // Create new image
         if (descriptor->createNoiseType == "gaussian") {
-          int const channels = descriptor->createChannels;
-          image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight);
           std::vector<VImage> bands = {};
           bands.reserve(channels);
           for (int _band = 0; _band < channels; _band++) {
-            bands.push_back(image.gaussnoise(
-              descriptor->createWidth,
-              descriptor->createHeight,
-              VImage::option()->set("mean", descriptor->createNoiseMean)->set("sigma", descriptor->createNoiseSigma)));
+            bands.push_back(VImage::gaussnoise(descriptor->createWidth, descriptor->createHeight, VImage::option()
+              ->set("mean", descriptor->createNoiseMean)
+              ->set("sigma", descriptor->createNoiseSigma)));
           }
-          image = image.bandjoin(bands);
+          image = VImage::bandjoin(bands).copy(VImage::option()->set("interpretation",
+            channels < 3 ? VIPS_INTERPRETATION_B_W: VIPS_INTERPRETATION_sRGB));
         } else {
           std::vector<double> background = {
             descriptor->createBackground[0],
             descriptor->createBackground[1],
             descriptor->createBackground[2]
           };
-          if (descriptor->createChannels == 4) {
+          if (channels == 4) {
             background.push_back(descriptor->createBackground[3]);
           }
-          image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight).new_from_image(background);
+          image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight)
+            .copy(VImage::option()->set("interpretation",
+              channels < 3 ? VIPS_INTERPRETATION_B_W : VIPS_INTERPRETATION_sRGB))
+            .new_from_image(background);
         }
-        image.get_image()->Type = image.guess_interpretation();
         image = image.cast(VIPS_FORMAT_UCHAR);
         imageType = ImageType::RAW;
       } else {

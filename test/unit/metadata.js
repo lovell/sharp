@@ -343,7 +343,7 @@ describe('Image metadata', function () {
         assert.strictEqual(depth, 'uchar');
         assert.strictEqual(isProgressive, false);
         assert.strictEqual(pages, 10);
-        assert.strictEqual(loop, 2);
+        assert.strictEqual(loop, 3);
         assert.deepStrictEqual(delay, [...Array(9).fill(3000), 15000]);
         assert.strictEqual(hasProfile, false);
         assert.strictEqual(hasAlpha, true);

@@ -6,7 +6,7 @@ const assert = require('assert');
 
 const eachLimit = require('async/eachLimit');
 const rimraf = require('rimraf');
-const DecompressZip = require('decompress-zip');
+const extractZip = require('extract-zip');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -14,7 +14,8 @@ const fixtures = require('../fixtures');
 // Verifies all tiles in a given dz output directory are <= size
 const assertDeepZoomTiles = function (directory, expectedSize, expectedLevels, done) {
   // Get levels
-  const levels = fs.readdirSync(directory);
+  const dirents = fs.readdirSync(directory, { withFileTypes: true });
+  const levels = dirents.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
   assert.strictEqual(expectedLevels, levels.length);
   // Get tiles
   const tiles = [];
@@ -67,8 +68,10 @@ const assertZoomifyTiles = function (directory, expectedTileSize, expectedLevels
 };
 
 const assertGoogleTiles = function (directory, expectedTileSize, expectedLevels, done) {
-  const levels = fs.readdirSync(directory);
-  assert.strictEqual(expectedLevels, levels.length - 1); // subtract one to account for default blank tile
+  // Get levels
+  const dirents = fs.readdirSync(directory, { withFileTypes: true });
+  const levels = dirents.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
+  assert.strictEqual(expectedLevels, levels.length);
 
   fs.stat(path.join(directory, 'blank.png'), function (err, stat) {
     if (err) throw err;
@@ -94,7 +97,8 @@ const assertGoogleTiles = function (directory, expectedTileSize, expectedLevels,
 // Verifies tiles at specified level in a given output directory are > size+overlap
 const assertTileOverlap = function (directory, tileSize, done) {
   // Get sorted levels
-  const levels = fs.readdirSync(directory).sort((a, b) => a - b);
+  const dirents = fs.readdirSync(directory, { withFileTypes: true });
+  const levels = dirents.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name).sort((a, b) => a - b);
   // Select the highest tile level
   const highestLevel = levels[levels.length - 1];
   // Get sorted tiles from greatest level
@@ -908,14 +912,10 @@ describe('Tile', function () {
             if (err) throw err;
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);
-            new DecompressZip(container)
-              .on('extract', function () {
+            extractZip(container, { dir: path.dirname(extractTo) })
+              .then(() => {
                 assertDeepZoomTiles(directory, 256, 13, done);
-              })
-              .on('error', function (err) {
-                throw err;
-              })
-              .extract({ path: path.dirname(extractTo) });
+              });
           });
         });
     });
@@ -942,14 +942,10 @@ describe('Tile', function () {
             if (err) throw err;
             assert.strictEqual(true, stat.isFile());
             assert.strictEqual(true, stat.size > 0);
-            new DecompressZip(container)
-              .on('extract', function () {
+            extractZip(container, { dir: path.dirname(extractTo) })
+              .then(() => {
                 assertDeepZoomTiles(directory, 256, 13, done);
-              })
-              .on('error', function (err) {
-                throw err;
-              })
-              .extract({ path: path.dirname(extractTo) });
+              });
           });
         });
     });

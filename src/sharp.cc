@@ -22,7 +22,6 @@
 #include "stats.h"
 
 static void* sharp_vips_init(void*) {
-  g_setenv("VIPS_MIN_STACK_SIZE", "2m", FALSE);
   vips_init("sharp");
   return nullptr;
 }
