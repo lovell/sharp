@@ -12,53 +12,53 @@ jobs:
         include:
           - os: ubuntu-20.04
             container: centos:7
-            nodejs_version: 12
+            nodejs_version: 14
             coverage: true
             prebuild: true
           - os: ubuntu-20.04
             container: centos:7
-            nodejs_version: 14
+            nodejs_version: 16
           - os: ubuntu-20.04
             container: centos:7
-            nodejs_version: 16
+            nodejs_version: 18
           - os: ubuntu-20.04
-            container: node:12-alpine3.11
+            container: node:14-alpine3.12
             prebuild: true
           - os: ubuntu-20.04
-            container: node:14-alpine3.11
+            container: node:16-alpine3.12
           - os: ubuntu-20.04
-            container: node:14-alpine3.13
+            container: node:18-alpine3.12
           - os: ubuntu-20.04
-            container: node:16-alpine3.11
-          - os: macos-10.15
-            nodejs_version: 12
-            prebuild: true
-            nodejs_arch: x64
+            container: node:18-alpine3.16
           - os: macos-10.15
             nodejs_version: 14
+            prebuild: true
             nodejs_arch: x64
           - os: macos-10.15
             nodejs_version: 16
             nodejs_arch: x64
-          - os: windows-2019
-            nodejs_version: 12
-            nodejs_arch: x86
-            prebuild: true
+          - os: macos-10.15
+            nodejs_version: 18
+            nodejs_arch: x64
           - os: windows-2019
             nodejs_version: 14
             nodejs_arch: x86
+            prebuild: true
           - os: windows-2019
             nodejs_version: 16
             nodejs_arch: x86
           - os: windows-2019
-            nodejs_version: 12
-            nodejs_arch: x64
-            prebuild: true
+            nodejs_version: 18
+            nodejs_arch: x86
           - os: windows-2019
             nodejs_version: 14
             nodejs_arch: x64
+            prebuild: true
           - os: windows-2019
             nodejs_version: 16
+            nodejs_arch: x64
+          - os: windows-2019
+            nodejs_version: 18
             nodejs_arch: x64
     steps:
       - name: Dependencies (Linux glibc)
@@ -66,8 +66,8 @@ jobs:
         run: |
           curl -sL https://rpm.nodesource.com/setup_${{ matrix.nodejs_version }}.x | bash -
           yum install -y centos-release-scl
-          yum install -y devtoolset-10-gcc-c++ make git python3 nodejs
-          echo "/opt/rh/devtoolset-10/root/usr/bin" >> $GITHUB_PATH
+          yum install -y devtoolset-11-gcc-c++ make git python3 nodejs
+          echo "/opt/rh/devtoolset-11/root/usr/bin" >> $GITHUB_PATH
       - name: Dependencies (Linux musl)
         if: contains(matrix.container, 'alpine')
         run: apk add build-base git python3 --update-cache

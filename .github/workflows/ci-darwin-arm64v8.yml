@@ -9,9 +9,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - nodejs_version: 12
+          - nodejs_version: 14
             nodejs_architecture: x64
-          - nodejs_version: 16
+          - nodejs_version: 18
             nodejs_architecture: arm64
             prebuild: true
     defaults:
