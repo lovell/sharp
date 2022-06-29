@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.31 - *eagle*
+
+Requires libvips v8.13.0
+
+### v0.31.0 - TBD
+
+* Drop support for Node.js 12, now requires Node.js >= 14.15.0.
+
 ## v0.30 - *dresser*
 
 Requires libvips v8.12.2

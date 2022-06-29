@@ -16,7 +16,7 @@ Lanczos resampling ensures quality is not sacrificed for speed.
 As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
-Most modern macOS, Windows and Linux systems running Node.js >= 12.13.0
+Most modern macOS, Windows and Linux systems running Node.js >= 14.15.0
 do not require any additional install or runtime dependencies.
 
 ## Documentation

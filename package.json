@@ -169,17 +169,17 @@
       "win32-x64": "sha512-5usGDnN1pmFoqfEuHmdvKF/35NbQLlnal5T2bMWDx9kvLIOy7WSahvSGAeDg9cXjHv9SONX/qdpKuJ55c6aD4g=="
     },
     "runtime": "napi",
-    "target": 5
+    "target": 7
   },
   "engines": {
-    "node": ">=12.13.0"
+    "node": ">=14.15.0"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"
   },
   "binary": {
     "napi_versions": [
-      5
+      7
     ]
   },
   "semistandard": {

@@ -70,7 +70,7 @@
   }, {
     'target_name': 'sharp-<(platform_and_arch)',
     'defines': [
-      'NAPI_VERSION=5'
+      'NAPI_VERSION=7'
     ],
     'dependencies': [
       '<!(node -p "require(\'node-addon-api\').gyp")',

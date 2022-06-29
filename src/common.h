@@ -25,9 +25,9 @@
 // Verify platform and compiler compatibility
 
 #if (VIPS_MAJOR_VERSION < 8) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 12) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 12 && VIPS_MICRO_VERSION < 2)
-#error "libvips version 8.12.2+ is required - please see https://sharp.pixelplumbing.com/install"
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 13) || \
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 13 && VIPS_MICRO_VERSION < 0)
+#error "libvips version 8.13.0+ is required - please see https://sharp.pixelplumbing.com/install"
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
