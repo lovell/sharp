@@ -419,7 +419,7 @@ The `density` can be set in pixels/inch via [withMetadata][1] instead of providi
 
     *   `options.quality` **[number][12]** quality, integer 1-100 (optional, default `80`)
     *   `options.force` **[boolean][10]** force TIFF output, otherwise attempt to use input format (optional, default `true`)
-    *   `options.compression` **[string][2]** compression options: lzw, deflate, jpeg, ccittfax4 (optional, default `'jpeg'`)
+    *   `options.compression` **[string][2]** compression options: none, jpeg, deflate, packbits, ccittfax4, lzw, webp, zstd, jp2k (optional, default `'jpeg'`)
     *   `options.predictor` **[string][2]** compression predictor options: none, horizontal, float (optional, default `'horizontal'`)
     *   `options.pyramid` **[boolean][10]** write an image pyramid (optional, default `false`)
     *   `options.tile` **[boolean][10]** write a tiled tiff (optional, default `false`)
