@@ -8,6 +8,9 @@ Requires libvips v8.13.0
 
 * Drop support for Node.js 12, now requires Node.js >= 14.15.0.
 
+* Re-introduce support for greyscale ICC profiles (temporarily removed in 0.30.2).
+  [#3114](https://github.com/lovell/sharp/issues/3114)
+
 * Add support for WebP and PackBits `compression` options with TIFF output.
   [#3198](https://github.com/lovell/sharp/issues/3198)
 
