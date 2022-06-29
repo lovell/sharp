@@ -71,6 +71,7 @@ jobs:
         run: |
           curl -sL https://rpm.nodesource.com/setup_${{ matrix.nodejs_version }}.x | bash -
           dnf install -y gcc-toolset-11-gcc-c++ make git python3 nodejs
+          echo "/opt/rh/devtoolset-11/root/usr/bin" >> $GITHUB_PATH
       - name: Dependencies (Linux musl)
         if: contains(matrix.container, 'alpine')
         run: apk add build-base git python3 --update-cache
