@@ -275,18 +275,30 @@ namespace sharp {
     left = image.find_trim(&top, &width, &height, VImage::option()
       ->set("background", background(0, 0))
       ->set("threshold", threshold));
+    if (HasAlpha(image)) {
+      // Search alpha channel (A)
+      int leftA, topA, widthA, heightA;
+      VImage alpha = image[image.bands() - 1];
+      VImage backgroundAlpha = alpha.extract_area(0, 0, 1, 1);
+      leftA = alpha.find_trim(&topA, &widthA, &heightA, VImage::option()
+        ->set("background", backgroundAlpha(0, 0))
+        ->set("threshold", threshold));
+      if (widthA > 0 && heightA > 0) {
+        if (width > 0 && height > 0) {
+          // Combined bounding box (B)
+          int const leftB = std::min(left, leftA);
+          int const topB = std::min(top, topA);
+          int const widthB = std::max(left + width, leftA + widthA) - leftB;
+          int const heightB = std::max(top + height, topA + heightA) - topB;
+          return image.extract_area(leftB, topB, widthB, heightB);
+        } else {
+          // Use alpha only
+          return image.extract_area(leftA, topA, widthA, heightA);
+        }
+      }
+    }
     if (width == 0 || height == 0) {
-      if (HasAlpha(image)) {
-        // Search alpha channel
-        VImage alpha = image[image.bands() - 1];
-        VImage backgroundAlpha = alpha.extract_area(0, 0, 1, 1);
-        left = alpha.find_trim(&top, &width, &height, VImage::option()
-          ->set("background", backgroundAlpha(0, 0))
-          ->set("threshold", threshold));
-      }
-      if (width == 0 || height == 0) {
-        throw VError("Unexpected error while trimming. Try to lower the tolerance");
-      }
+      throw VError("Unexpected error while trimming. Try to lower the tolerance");
     }
     return image.extract_area(left, top, width, height);
   }

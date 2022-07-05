@@ -128,6 +128,18 @@ describe('Trim borders', function () {
     )
   );
 
+  it('Ensure trim uses bounding box of alpha and non-alpha channels', async () => {
+    const { info } = await sharp(fixtures.inputPngTrimIncludeAlpha)
+      .trim()
+      .toBuffer({ resolveWithObject: true });
+
+    const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+    assert.strictEqual(width, 179);
+    assert.strictEqual(height, 123);
+    assert.strictEqual(trimOffsetTop, -44);
+    assert.strictEqual(trimOffsetLeft, -13);
+  });
+
   describe('Invalid thresholds', function () {
     [-1, 'fail', {}].forEach(function (threshold) {
       it(JSON.stringify(threshold), function () {
