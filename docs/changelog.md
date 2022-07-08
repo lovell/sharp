@@ -17,6 +17,9 @@ Requires libvips v8.13.0
 * Add support for WebP and PackBits `compression` options with TIFF output.
   [#3198](https://github.com/lovell/sharp/issues/3198)
 
+* Ensure OpenSlide and FITS input works with custom libvips.
+  [#3226](https://github.com/lovell/sharp/issues/3226)
+
 * Ensure `trim` operation is a no-op when it would reduce an image to nothing.
   [#3223](https://github.com/lovell/sharp/issues/3223)
 
