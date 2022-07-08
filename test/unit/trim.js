@@ -140,6 +140,25 @@ describe('Trim borders', function () {
     assert.strictEqual(trimOffsetLeft, -13);
   });
 
+  it('Ensure trim of image with all pixels same is no-op', async () => {
+    const { info } = await sharp({
+      create: {
+        width: 5,
+        height: 5,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .trim()
+      .toBuffer({ resolveWithObject: true });
+
+    const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+    assert.strictEqual(width, 5);
+    assert.strictEqual(height, 5);
+    assert.strictEqual(trimOffsetTop, 0);
+    assert.strictEqual(trimOffsetLeft, 0);
+  });
+
   describe('Invalid thresholds', function () {
     [-1, 'fail', {}].forEach(function (threshold) {
       it(JSON.stringify(threshold), function () {

@@ -297,10 +297,10 @@ namespace sharp {
         }
       }
     }
-    if (width == 0 || height == 0) {
-      throw VError("Unexpected error while trimming. Try to lower the tolerance");
+    if (width > 0 && height > 0) {
+      return image.extract_area(left, top, width, height);
     }
-    return image.extract_area(left, top, width, height);
+    return image;
   }
 
   /*

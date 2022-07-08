@@ -239,6 +239,8 @@ Trim "boring" pixels from all edges that contain values similar to the top-left 
 
 Images with an alpha channel will use the combined bounding box of alpha and non-alpha channels.
 
+If the result of this operation would trim an image to nothing then no change is made.
+
 The `info` response Object, obtained from callback of `.toFile()` or `.toBuffer()`,
 will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
