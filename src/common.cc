@@ -638,7 +638,6 @@ namespace sharp {
     Event listener for progress updates, used to detect timeout
   */
   void VipsProgressCallBack(VipsImage *im, VipsProgress *progress, int *timeout) {
-    // printf("VipsProgressCallBack progress=%d run=%d timeout=%d\n", progress->percent, progress->run, *timeout);
     if (*timeout > 0 && progress->run >= *timeout) {
       vips_image_set_kill(im, TRUE);
       vips_error("timeout", "%d%% complete", progress->percent);

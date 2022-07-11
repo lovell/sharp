@@ -589,6 +589,20 @@ Time spent waiting for a libuv thread to become available is not included.
 
     *   `options.seconds` **[number][12]** Number of seconds after which processing will be stopped
 
+### Examples
+
+```javascript
+// Ensure processing takes no longer than 3 seconds
+try {
+  const data = await sharp(input)
+    .blur(1000)
+    .timeout({ seconds: 3 })
+    .toBuffer();
+} catch (err) {
+  if (err.message.includes('timeout')) { ... }
+}
+```
+
 Returns **Sharp** 
 
 **Meta**
