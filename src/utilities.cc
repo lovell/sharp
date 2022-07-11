@@ -127,12 +127,15 @@ Napi::Value format(const Napi::CallbackInfo& info) {
     input.Set("buffer", hasInputBuffer);
     input.Set("stream", hasInputBuffer);
     if (hasInputFile) {
-      Napi::Array fileSuffix = Napi::Array::New(env);
-      const char **suffix = VIPS_FOREIGN_CLASS(oc)->suffs;
-      for (int i = 0; *suffix; i++, suffix++) {
-        fileSuffix.Set(i, Napi::String::New(env, *suffix));
+      const VipsForeignClass *fc = VIPS_FOREIGN_CLASS(oc);
+      if (fc->suffs) {
+        Napi::Array fileSuffix = Napi::Array::New(env);
+        const char **suffix = fc->suffs;
+        for (int i = 0; *suffix; i++, suffix++) {
+          fileSuffix.Set(i, Napi::String::New(env, *suffix));
+        }
+        input.Set("fileSuffix", fileSuffix);
       }
-      input.Set("fileSuffix", fileSuffix);
     }
     // Output
     Napi::Boolean hasOutputFile =
