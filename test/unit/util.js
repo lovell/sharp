@@ -102,7 +102,7 @@ describe('Utilities', function () {
         ['input', 'output'].forEach(function (direction) {
           assert.strictEqual(true, direction in sharp.format[format]);
           assert.strictEqual('object', typeof sharp.format[format][direction]);
-          assert.strictEqual(3, Object.keys(sharp.format[format][direction]).length);
+          assert.strictEqual(true, [3, 4].includes(Object.keys(sharp.format[format][direction]).length));
           assert.strictEqual(true, 'file' in sharp.format[format][direction]);
           assert.strictEqual(true, 'buffer' in sharp.format[format][direction]);
           assert.strictEqual(true, 'stream' in sharp.format[format][direction]);
@@ -125,6 +125,12 @@ describe('Utilities', function () {
         assert.strictEqual(false, sharp.format.vips[direction].buffer);
         assert.strictEqual(false, sharp.format.vips[direction].stream);
       });
+    });
+    it('input fileSuffix', function () {
+      assert.deepStrictEqual(['.jpg', '.jpeg', '.jpe'], sharp.format.jpeg.input.fileSuffix);
+    });
+    it('output alias', function () {
+      assert.deepStrictEqual(['jpe', 'jpg'], sharp.format.jpeg.output.alias);
     });
   });
 

@@ -11,6 +11,9 @@ Requires libvips v8.13.0
 * Use combined bounding box of alpha and non-alpha channels for `trim` operation.
   [#2166](https://github.com/lovell/sharp/issues/2166)
 
+* Add input `fileSuffix` and output `alias` to `format` information.
+  [#2642](https://github.com/lovell/sharp/issues/2642)
+
 * Re-introduce support for greyscale ICC profiles (temporarily removed in 0.30.2).
   [#3114](https://github.com/lovell/sharp/issues/3114)
 

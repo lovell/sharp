@@ -118,14 +118,22 @@ Napi::Value format(const Napi::CallbackInfo& info) {
     "ppm", "fits", "gif", "svg", "heif", "pdf", "vips", "jp2k"
   }) {
     // Input
-    Napi::Boolean hasInputFile =
-      Napi::Boolean::New(env, vips_type_find("VipsOperation", (f + "load").c_str()));
+    const VipsObjectClass *oc = vips_class_find("VipsOperation", (f + "load").c_str());
+    Napi::Boolean hasInputFile = Napi::Boolean::New(env, oc);
     Napi::Boolean hasInputBuffer =
       Napi::Boolean::New(env, vips_type_find("VipsOperation", (f + "load_buffer").c_str()));
     Napi::Object input = Napi::Object::New(env);
     input.Set("file", hasInputFile);
     input.Set("buffer", hasInputBuffer);
     input.Set("stream", hasInputBuffer);
+    if (hasInputFile) {
+      Napi::Array fileSuffix = Napi::Array::New(env);
+      const char **suffix = VIPS_FOREIGN_CLASS(oc)->suffs;
+      for (int i = 0; *suffix; i++, suffix++) {
+        fileSuffix.Set(i, Napi::String::New(env, *suffix));
+      }
+      input.Set("fileSuffix", fileSuffix);
+    }
     // Output
     Napi::Boolean hasOutputFile =
       Napi::Boolean::New(env, vips_type_find("VipsOperation", (f + "save").c_str()));
