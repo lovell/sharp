@@ -8,6 +8,8 @@ Requires libvips v8.13.0
 
 * Drop support for Node.js 12, now requires Node.js >= 14.15.0.
 
+* GIF output now re-uses input palette if possible. Use `reoptimise` option to generate a new palette.
+
 * Add WebP `minSize` and `mixed` options for greater control over animation frames.
 
 * Use combined bounding box of alpha and non-alpha channels for `trim` operation.

@@ -80,6 +80,22 @@ describe('GIF input', () => {
     assert.strictEqual(true, reduced.length < original.length);
   });
 
+  it('valid optimise', () => {
+    assert.doesNotThrow(() => sharp().gif({ reoptimise: true }));
+    assert.doesNotThrow(() => sharp().gif({ reoptimize: true }));
+  });
+
+  it('invalid reoptimise throws', () => {
+    assert.throws(
+      () => sharp().gif({ reoptimise: -1 }),
+      /Expected boolean for gifReoptimise but received -1 of type number/
+    );
+    assert.throws(
+      () => sharp().gif({ reoptimize: 'fail' }),
+      /Expected boolean for gifReoptimise but received fail of type string/
+    );
+  });
+
   it('invalid loop throws', () => {
     assert.throws(() => {
       sharp().gif({ loop: -1 });

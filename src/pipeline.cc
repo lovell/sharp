@@ -888,6 +888,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("bitdepth", baton->gifBitdepth)
             ->set("effort", baton->gifEffort)
+            ->set("reoptimise", baton->gifReoptimise)
             ->set("dither", baton->gifDither)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -1053,6 +1054,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("bitdepth", baton->gifBitdepth)
             ->set("effort", baton->gifEffort)
+            ->set("reoptimise", baton->gifReoptimise)
             ->set("dither", baton->gifDither));
           baton->formatOut = "gif";
         } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
@@ -1537,6 +1539,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->gifBitdepth = sharp::AttrAsUint32(options, "gifBitdepth");
   baton->gifEffort = sharp::AttrAsUint32(options, "gifEffort");
   baton->gifDither = sharp::AttrAsDouble(options, "gifDither");
+  baton->gifReoptimise = sharp::AttrAsBool(options, "gifReoptimise");
   baton->tiffQuality = sharp::AttrAsUint32(options, "tiffQuality");
   baton->tiffPyramid = sharp::AttrAsBool(options, "tiffPyramid");
   baton->tiffBitdepth = sharp::AttrAsUint32(options, "tiffBitdepth");
