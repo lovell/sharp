@@ -8,6 +8,8 @@ Requires libvips v8.13.0
 
 * Drop support for Node.js 12, now requires Node.js >= 14.15.0.
 
+* Add WebP `minSize` and `mixed` options for greater control over animation frames.
+
 * Use combined bounding box of alpha and non-alpha channels for `trim` operation.
   [#2166](https://github.com/lovell/sharp/issues/2166)
 

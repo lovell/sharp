@@ -291,6 +291,8 @@ Use these WebP options for output image.
     *   `options.effort` **[number][12]** CPU effort, between 0 (fastest) and 6 (slowest) (optional, default `4`)
     *   `options.loop` **[number][12]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
     *   `options.delay` **([number][12] | [Array][13]<[number][12]>)?** delay(s) between animation frames (in milliseconds)
+    *   `options.minSize` **[boolean][10]** prevent use of animation key frames to minimise file size (slow) (optional, default `false`)
+    *   `options.mixed` **[boolean][10]** allow mixture of lossy and lossless animation frames (slow) (optional, default `false`)
     *   `options.force` **[boolean][10]** force WebP output, otherwise attempt to use input format (optional, default `true`)
 
 ### Examples

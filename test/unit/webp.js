@@ -139,6 +139,28 @@ describe('WebP', function () {
     assert.strictEqual(effort, 0);
   });
 
+  it('valid minSize', () => {
+    assert.doesNotThrow(() => sharp().webp({ minSize: true }));
+  });
+
+  it('invalid minSize throws', () => {
+    assert.throws(
+      () => sharp().webp({ minSize: 1 }),
+      /Expected boolean for webpMinSize but received 1 of type number/
+    );
+  });
+
+  it('valid mixed', () => {
+    assert.doesNotThrow(() => sharp().webp({ mixed: true }));
+  });
+
+  it('invalid mixed throws', () => {
+    assert.throws(
+      () => sharp().webp({ mixed: 'fail' }),
+      /Expected boolean for webpMixed but received fail of type string/
+    );
+  });
+
   it('invalid loop throws', () => {
     assert.throws(() => {
       sharp().webp({ loop: -1 });
