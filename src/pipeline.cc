@@ -1503,7 +1503,9 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   Napi::Array mdStrKeys = mdStrs.GetPropertyNames();
   for (unsigned int i = 0; i < mdStrKeys.Length(); i++) {
     std::string k = sharp::AttrAsStr(mdStrKeys, i);
-    baton->withMetadataStrs.insert(std::make_pair(k, sharp::AttrAsStr(mdStrs, k)));
+    if (mdStrs.HasOwnProperty(k)) {
+      baton->withMetadataStrs.insert(std::make_pair(k, sharp::AttrAsStr(mdStrs, k)));
+    }
   }
   baton->timeoutSeconds = sharp::AttrAsUint32(options, "timeoutSeconds");
   // Format-specific
