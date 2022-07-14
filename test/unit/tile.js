@@ -915,7 +915,8 @@ describe('Tile', function () {
             extractZip(container, { dir: path.dirname(extractTo) })
               .then(() => {
                 assertDeepZoomTiles(directory, 256, 13, done);
-              });
+              })
+              .catch(done);
           });
         });
     });
@@ -945,7 +946,8 @@ describe('Tile', function () {
             extractZip(container, { dir: path.dirname(extractTo) })
               .then(() => {
                 assertDeepZoomTiles(directory, 256, 13, done);
-              });
+              })
+              .catch(done);
           });
         });
     });
