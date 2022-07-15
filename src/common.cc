@@ -142,9 +142,6 @@ namespace sharp {
       if (HasAttr(input, "textFontfile")) {
         descriptor->textFontfile = AttrAsStr(input, "textFontfile");
       }
-      if (HasAttr(input, "textFontfile")) {
-        descriptor->textFontfile = AttrAsStr(input, "textFontfile");
-      }
       if (HasAttr(input, "textWidth")) {
         descriptor->textWidth = AttrAsUint32(input, "textWidth");
       }
@@ -453,8 +450,10 @@ namespace sharp {
         if (descriptor->textFontfile.length() > 0) {
           textOptions->set("fontfile", const_cast<char*>(descriptor->textFontfile.data()));
         }
-        image = VImage::new_memory().text(const_cast<char *>(descriptor->textValue.data()), textOptions);
-        image.get_image()->Type = image.guess_interpretation();
+        image = VImage::text(const_cast<char *>(descriptor->textValue.data()), textOptions);
+        if (!descriptor->textRgba) {
+          image = image.copy(VImage::option()->set("interpretation", VIPS_INTERPRETATION_B_W));
+        }
         imageType = ImageType::RAW;
       } else {
         // From filesystem
