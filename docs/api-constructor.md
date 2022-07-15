@@ -139,6 +139,29 @@ await sharp({
 }).toFile('noise.png');
 ```
 
+```javascript
+// Generate an image from text
+await sharp({
+  text: {
+    text: 'Hello, world!',
+    width: 400, // max width
+    height: 300 // max height
+  }
+}).toFile('text_bw.png');
+```
+
+```javascript
+// Generate a color image from text using pango markup and font
+await sharp({
+  text: {
+    text: '<span foreground="red">Red!</span><span background="cyan">blue</span>',
+    font: 'sans'
+    rgba: true,
+    dpi: 300
+  }
+}).toFile('text_color.png');
+```
+
 *   Throws **[Error][17]** Invalid parameters
 
 Returns **[Sharp][18]** 
