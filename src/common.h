@@ -81,6 +81,7 @@ namespace sharp {
     int textDpi;
     bool textRgba;
     int textSpacing;
+    int autofitDpi;
 
     InputDescriptor():
       buffer(nullptr),

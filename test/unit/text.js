@@ -30,6 +30,7 @@ describe('Text to image', () => {
     assert.strictEqual(255, stats.channels[1].max);
     assert.strictEqual(0, stats.channels[2].min);
     assert.strictEqual(255, stats.channels[2].max);
+    assert.ok(info.autofitDpi > 0);
   });
 
   it('text with width and height', function (done) {
@@ -50,6 +51,7 @@ describe('Text to image', () => {
       assert.ok(info.width > 10 && info.width <= maxWidth);
       assert.ok(info.height > 10 && info.height <= maxHeight);
       assert.ok(Math.abs(info.width - maxWidth) < 50);
+      assert.ok(info.autofitDpi > 0);
       done();
     });
   });

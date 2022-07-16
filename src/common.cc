@@ -434,7 +434,8 @@ namespace sharp {
           ->set("align", descriptor->textAlign)
           ->set("justify", descriptor->textJustify)
           ->set("rgba", descriptor->textRgba)
-          ->set("spacing", descriptor->textSpacing);
+          ->set("spacing", descriptor->textSpacing)
+          ->set("autofit_dpi", &descriptor->autofitDpi);
         if (descriptor->textWidth > 0) {
           textOptions->set("width", descriptor->textWidth);
         }
