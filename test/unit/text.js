@@ -174,6 +174,16 @@ describe('Text to image', () => {
     });
   });
 
+  it('fontfile input', function () {
+    // Added for code coverage
+    sharp({
+      text: {
+        text: 'text',
+        fontfile: 'UnknownFont.ttf'
+      }
+    });
+  });
+
   it('bad font input', function () {
     assert.throws(function () {
       sharp({
@@ -224,6 +234,17 @@ describe('Text to image', () => {
         text: {
           text: 'text',
           align: 'unknown'
+        }
+      });
+    });
+  });
+
+  it('bad justify input', function () {
+    assert.throws(function () {
+      sharp({
+        text: {
+          text: 'text',
+          justify: 'unknown'
         }
       });
     });
