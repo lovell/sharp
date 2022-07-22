@@ -28,14 +28,14 @@ jobs:
             container: node:16-alpine3.12
           - os: ubuntu-20.04
             container: node:18-alpine3.14
-          - os: macos-10.15
+          - os: macos-11
             nodejs_version: 14
             prebuild: true
             nodejs_arch: x64
-          - os: macos-10.15
+          - os: macos-11
             nodejs_version: 16
             nodejs_arch: x64
-          - os: macos-10.15
+          - os: macos-11
             nodejs_version: 18
             nodejs_arch: x64
           - os: windows-2019
