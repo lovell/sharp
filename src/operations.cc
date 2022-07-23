@@ -317,6 +317,13 @@ namespace sharp {
   }
 
   /*
+   * Calculate (a * in + b)
+   */
+  VImage LinearVector(VImage image, std::vector<double> const a, std::vector<double> const b) {
+    return image.linear(a, b);
+  }
+
+  /*
    * Ensure the image is in a given colourspace
    */
   VImage EnsureColourspace(VImage image, VipsInterpretation colourspace) {

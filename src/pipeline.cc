@@ -692,6 +692,10 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Linear(image, baton->linearA, baton->linearB);
       }
 
+      if (!baton->linearVecA.empty() && !baton->linearVecB.empty()) {
+        image = sharp::LinearVector(image, baton->linearVecA, baton->linearVecB);
+      }
+
       // Apply normalisation - stretch luminance to cover full dynamic range
       if (baton->normalise) {
         image = sharp::Normalise(image);
@@ -1430,6 +1434,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->gammaOut = sharp::AttrAsDouble(options, "gammaOut");
   baton->linearA = sharp::AttrAsDouble(options, "linearA");
   baton->linearB = sharp::AttrAsDouble(options, "linearB");
+  baton->linearVecA = sharp::AttrAsVectorOfDouble(options, "linearVecA");
+  baton->linearVecB = sharp::AttrAsVectorOfDouble(options, "linearVecB");
   baton->greyscale = sharp::AttrAsBool(options, "greyscale");
   baton->normalise = sharp::AttrAsBool(options, "normalise");
   baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");
