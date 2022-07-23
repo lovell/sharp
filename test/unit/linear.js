@@ -65,6 +65,11 @@ describe('Linear adjustment', function () {
       });
   });
 
+  it('works', function(done) {
+    sharp(fixtures.inputWebP)
+      .linear([1, 1, 0.0], [0,0,0]).toFile('antonTest.jpg').then(() => done());
+  });
+
   it('Invalid linear arguments', function () {
     assert.throws(function () {
       sharp(fixtures.inputPngOverlayLayer1)
