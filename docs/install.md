@@ -288,6 +288,27 @@ buildSync({
 esbuild app.js --bundle --platform=node --external:sharp
 ```
 
+## Fonts
+
+When creating text images or rendering SVG images that contain text elements,
+`fontconfig` is used to find the relevant fonts.
+
+On Windows and macOS systems, all system fonts are available for use.
+
+On Linux systems, fonts that include the relevant
+[`fontconfig` configuration](https://www.freedesktop.org/software/fontconfig/fontconfig-user.html)
+when installed via package manager are available for use.
+
+If `fontconfig` configuration is not found, the following error will occur:
+```
+Fontconfig error: Cannot load default config file
+```
+
+In serverless environments where there is no control over font packages,
+use the `FONTCONFIG_PATH` environment variable to point to a custom location.
+
+Embedded SVG fonts are unsupported.
+
 ## Worker threads
 
 On some platforms, including glibc-based Linux,
