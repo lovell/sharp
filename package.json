@@ -148,7 +148,7 @@
     "mocha": "^10.0.0",
     "mock-fs": "^5.1.2",
     "nyc": "^15.1.0",
-    "prebuild": "^11.0.3",
+    "prebuild": "^11.0.4",
     "rimraf": "^3.0.2",
     "semistandard": "^16.0.1"
   },
