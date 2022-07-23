@@ -687,13 +687,15 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Gamma(image, baton->gammaOut);
       }
 
-      // Linear adjustment (a * in + b)
-      if (baton->linearA != 1.0 || baton->linearB != 0.0) {
-        image = sharp::Linear(image, baton->linearA, baton->linearB);
+      // Linear arg check
+      if (baton->linearA.size() != baton->linearB.size()) {
+        (baton->err).append("linearA and linearB are arrays of different lengths.");
+        return Error();
       }
-
-      if (!baton->linearVecA.empty() && !baton->linearVecB.empty()) {
-        image = sharp::LinearVector(image, baton->linearVecA, baton->linearVecB);
+      // Linear adjustment (a * in + b)
+      if (!baton->linearA.empty() &&
+          (baton->linearA.size() != 1 || baton->linearA[0] != 1.0 || baton->linearB[0] != 0.0)) {
+        image = sharp::Linear(image, baton->linearA, baton->linearB);
       }
 
       // Apply normalisation - stretch luminance to cover full dynamic range
@@ -1432,10 +1434,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->trimThreshold = sharp::AttrAsDouble(options, "trimThreshold");
   baton->gamma = sharp::AttrAsDouble(options, "gamma");
   baton->gammaOut = sharp::AttrAsDouble(options, "gammaOut");
-  baton->linearA = sharp::AttrAsDouble(options, "linearA");
-  baton->linearB = sharp::AttrAsDouble(options, "linearB");
-  baton->linearVecA = sharp::AttrAsVectorOfDouble(options, "linearVecA");
-  baton->linearVecB = sharp::AttrAsVectorOfDouble(options, "linearVecB");
+  baton->linearA = sharp::AttrAsVectorOfDouble(options, "linearA");
+  baton->linearB = sharp::AttrAsVectorOfDouble(options, "linearB");
   baton->greyscale = sharp::AttrAsBool(options, "greyscale");
   baton->normalise = sharp::AttrAsBool(options, "normalise");
   baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");

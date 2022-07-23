@@ -65,13 +65,13 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('Vectorized linear function', function(done) {
+  it('Vectorized linear function', function (done) {
     sharp(fixtures.inputWebP)
-      .linear([1, 1, 0.0], [0,0,0]).toBuffer(function(err, data, info) {
+      .linear([1, 1, 0.0], [0, 0, 0]).toBuffer(function (err, data, info) {
         if (err) throw err;
         // TODO: test the output
         done();
-    });
+      });
   });
 
   it('Invalid linear arguments', function () {

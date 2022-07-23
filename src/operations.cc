@@ -306,21 +306,25 @@ namespace sharp {
   /*
    * Calculate (a * in + b)
    */
-  VImage Linear(VImage image, double const a, double const b) {
-    if (HasAlpha(image)) {
+  VImage Linear(VImage image, std::vector<double> const a, std::vector<double> const b) {
+    // From libvips:
+    //   If the arrays of constants have just one element, that constant is used for all image bands.
+    //   If the arrays have more than one element and they have the same number of elements as there
+    //   are bands in the image, then one array element is used for each band.
+    //   If the arrays have more than one element and the image only has a single band,
+    //   the result is a many-band image where each band corresponds to one array element.
+
+    // To allow for alpha channel manipulation with linear, the alpha channel removal decision is a bit trickier now.
+    // Hopefully it does The Right Thing in most scenarios.
+    if (HasAlpha(image) &&
+        a.size() != image.bands() &&
+        (a.size() == 1 || a.size() == image.bands() - 1 || image.bands() - 1 == 1)) {
       // Separate alpha channel
       VImage alpha = image[image.bands() - 1];
       return RemoveAlpha(image).linear(a, b).bandjoin(alpha);
     } else {
       return image.linear(a, b);
     }
-  }
-
-  /*
-   * Calculate (a * in + b)
-   */
-  VImage LinearVector(VImage image, std::vector<double> const a, std::vector<double> const b) {
-    return image.linear(a, b);
   }
 
   /*

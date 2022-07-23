@@ -100,10 +100,8 @@ struct PipelineBaton {
   double trimThreshold;
   int trimOffsetLeft;
   int trimOffsetTop;
-  double linearA;
-  double linearB;
-  std::vector<double> linearVecA;
-  std::vector<double> linearVecB;
+  std::vector<double> linearA;
+  std::vector<double> linearB;
   double gamma;
   double gammaOut;
   bool greyscale;
@@ -252,10 +250,8 @@ struct PipelineBaton {
     trimThreshold(0.0),
     trimOffsetLeft(0),
     trimOffsetTop(0),
-    linearA(1.0),
-    linearB(0.0),
-    linearVecA{},
-    linearVecB{},
+    linearA{1.0},
+    linearB{0.0},
     gamma(0.0),
     greyscale(false),
     normalise(false),
