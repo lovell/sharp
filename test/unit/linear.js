@@ -65,15 +65,34 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('Invalid linear arguments', function () {
-    assert.throws(function () {
-      sharp(fixtures.inputPngOverlayLayer1)
-        .linear('foo');
-    });
+  it('per channel level adjustment', function (done) {
+    sharp(fixtures.inputWebP)
+      .linear([0.25, 0.5, 0.75], [150, 100, 50]).toBuffer(function (err, data, info) {
+        if (err) throw err;
+        fixtures.assertSimilar(fixtures.expected('linear-per-channel.jpg'), data, done);
+      });
+  });
 
-    assert.throws(function () {
-      sharp(fixtures.inputPngOverlayLayer1)
-        .linear(undefined, { bar: 'baz' });
-    });
+  it('Invalid linear arguments', function () {
+    assert.throws(
+      () => sharp().linear('foo'),
+      /Expected number or array of numbers for a but received foo of type string/
+    );
+    assert.throws(
+      () => sharp().linear(undefined, { bar: 'baz' }),
+      /Expected number or array of numbers for b but received \[object Object\] of type object/
+    );
+    assert.throws(
+      () => sharp().linear([], [1]),
+      /Expected number or array of numbers for a but received {2}of type object/
+    );
+    assert.throws(
+      () => sharp().linear([1, 2], [1]),
+      /Expected a and b to be arrays of the same length/
+    );
+    assert.throws(
+      () => sharp().linear([1]),
+      /Expected a and b to be arrays of the same length/
+    );
   });
 });

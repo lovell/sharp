@@ -466,14 +466,32 @@ Returns **Sharp**&#x20;
 
 ## linear
 
-Apply the linear formula a \* input + b to the image (levels adjustment)
+Apply the linear formula `a` \* input + `b` to the image to adjust image levels.
+
+When a single number is provided, it will be used for all image channels.
+When an array of numbers is provided, the array length must match the number of channels.
 
 ### Parameters
 
-*   `a` **[number][1]** multiplier (optional, default `1.0`)
-*   `b` **[number][1]** offset (optional, default `0.0`)
+*   `a` **([number][1] | [Array][7]<[number][1]>)** multiplier (optional, default `[]`)
+*   `b` **([number][1] | [Array][7]<[number][1]>)** offset (optional, default `[]`)
 
-<!---->
+### Examples
+
+```javascript
+await sharp(input)
+  .linear(0.5, 2)
+  .toBuffer();
+```
+
+```javascript
+await sharp(rgbInput)
+  .linear(
+    [0.25, 0.5, 0.75],
+    [150, 100, 50]
+  )
+  .toBuffer();
+```
 
 *   Throws **[Error][5]** Invalid parameters
 

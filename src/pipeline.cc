@@ -688,7 +688,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Linear adjustment (a * in + b)
-      if (baton->linearA != 1.0 || baton->linearB != 0.0) {
+      if (!baton->linearA.empty()) {
         image = sharp::Linear(image, baton->linearA, baton->linearB);
       }
 
@@ -1454,8 +1454,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->trimThreshold = sharp::AttrAsDouble(options, "trimThreshold");
   baton->gamma = sharp::AttrAsDouble(options, "gamma");
   baton->gammaOut = sharp::AttrAsDouble(options, "gammaOut");
-  baton->linearA = sharp::AttrAsDouble(options, "linearA");
-  baton->linearB = sharp::AttrAsDouble(options, "linearB");
+  baton->linearA = sharp::AttrAsVectorOfDouble(options, "linearA");
+  baton->linearB = sharp::AttrAsVectorOfDouble(options, "linearB");
   baton->greyscale = sharp::AttrAsBool(options, "greyscale");
   baton->normalise = sharp::AttrAsBool(options, "normalise");
   baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");

@@ -306,10 +306,14 @@ namespace sharp {
   /*
    * Calculate (a * in + b)
    */
-  VImage Linear(VImage image, double const a, double const b) {
-    if (HasAlpha(image)) {
+  VImage Linear(VImage image, std::vector<double> const a, std::vector<double> const b) {
+    size_t const bands = static_cast<size_t>(image.bands());
+    if (a.size() > bands) {
+      throw VError("Band expansion using linear is unsupported");
+    }
+    if (HasAlpha(image) && a.size() != bands && (a.size() == 1 || a.size() == bands - 1 || bands - 1 == 1)) {
       // Separate alpha channel
-      VImage alpha = image[image.bands() - 1];
+      VImage alpha = image[bands - 1];
       return RemoveAlpha(image).linear(a, b).bandjoin(alpha);
     } else {
       return image.linear(a, b);
