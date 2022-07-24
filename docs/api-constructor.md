@@ -151,15 +151,15 @@ await sharp({
 ```
 
 ```javascript
-// Generate a color image from text using pango markup and font
+// Generate an rgba image from text using pango markup and font
 await sharp({
   text: {
     text: '<span foreground="red">Red!</span><span background="cyan">blue</span>',
-    font: 'sans'
+    font: 'sans',
     rgba: true,
     dpi: 300
   }
-}).toFile('text_color.png');
+}).toFile('text_rgba.png');
 ```
 
 *   Throws **[Error][17]** Invalid parameters

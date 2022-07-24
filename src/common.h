@@ -81,7 +81,7 @@ namespace sharp {
     int textDpi;
     bool textRgba;
     int textSpacing;
-    int autofitDpi;
+    int textAutofitDpi;
 
     InputDescriptor():
       buffer(nullptr),
@@ -113,7 +113,8 @@ namespace sharp {
       textJustify(FALSE),
       textDpi(72),
       textRgba(FALSE),
-      textSpacing(0) {}
+      textSpacing(0),
+      textAutofitDpi(0) {}
   };
 
   // Convenience methods to access the attributes of a Napi::Object
