@@ -65,12 +65,11 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('Vectorized linear function', function (done) {
+  it('per channel level adjustment', function (done) {
     sharp(fixtures.inputWebP)
-      .linear([1, 1, 0.0], [0, 0, 0]).toBuffer(function (err, data, info) {
+      .linear([0.25, 0.5, 0.75], [150, 100, 50]).toBuffer(function (err, data, info) {
         if (err) throw err;
-        // TODO: test the output
-        done();
+        fixtures.assertSimilar(fixtures.expected('linear-per-channel.jpg'), data, done);
       });
   });
 

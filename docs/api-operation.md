@@ -170,7 +170,7 @@ const data = await sharp(input).sharpen({ sigma: 2 }).toBuffer();
 const data = await sharp(input)
   .sharpen({
     sigma: 2,
-    m1: 0
+    m1: 0,
     m2: 3,
     x1: 3,
     y2: 15,
@@ -456,8 +456,8 @@ Apply the linear formula a \* input + b to the image (levels adjustment)
 
 ### Parameters
 
-*   `a` **[number][1]** multiplier (optional, default `1.0`)
-*   `b` **[number][1]** offset (optional, default `0.0`)
+*   `a` **([number][1] | [Array][7]<[number][1]>)** multiplier (optional, default `1.0`)
+*   `b` **([number][1] | [Array][7]<[number][1]>)** offset (optional, default `0.0`)
 
 <!---->
 

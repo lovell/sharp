@@ -314,6 +314,10 @@ namespace sharp {
     //   If the arrays have more than one element and the image only has a single band,
     //   the result is a many-band image where each band corresponds to one array element.
 
+    if (a.size() > image.bands()) {
+      throw VError("Band expansion using linear() is not currently supported.");
+    }
+
     // To allow for alpha channel manipulation with linear, the alpha channel removal decision is a bit trickier now.
     // Hopefully it does The Right Thing in most scenarios.
     if (HasAlpha(image) &&
