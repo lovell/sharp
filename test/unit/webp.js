@@ -121,12 +121,6 @@ describe('WebP', function () {
     });
   });
 
-  it('invalid reductionEffort (deprecated) throws', () => {
-    assert.throws(() => {
-      sharp().webp({ reductionEffort: true });
-    });
-  });
-
   it('out of range effort throws', () => {
     assert.throws(() => {
       sharp().webp({ effort: -1 });

@@ -12,6 +12,8 @@ Requires libvips v8.13.0
 
 * Add WebP `minSize` and `mixed` options for greater control over animation frames.
 
+* Remove previously-deprecated WebP `reductionEffort` and HEIF `speed` options. Use `effort` to control these.
+
 * Use combined bounding box of alpha and non-alpha channels for `trim` operation.
   [#2166](https://github.com/lovell/sharp/issues/2166)
 
