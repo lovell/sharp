@@ -22,6 +22,7 @@ A `Promise` is returned when `callback` is not provided.
     `info` contains the output image `format`, `size` (bytes), `width`, `height`,
     `channels` and `premultiplied` (indicating if premultiplication was used).
     When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
+    May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text.
 
 ### Examples
 
@@ -61,6 +62,7 @@ See [withMetadata][1] for control over this.
 
 `channels` and `premultiplied` (indicating if premultiplication was used).
 When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
+May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text.
 
 A `Promise` is returned when `callback` is not provided.
 
