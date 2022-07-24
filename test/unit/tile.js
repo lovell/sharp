@@ -317,6 +317,14 @@ describe('Tile', function () {
     });
   });
 
+  it('Invalid basename parameter value fails', function () {
+    assert.throws(function () {
+      sharp().tile({
+        basename: true
+      });
+    });
+  });
+
   it('Deep Zoom layout', function (done) {
     const directory = fixtures.path('output.dzi_files');
     rimraf(directory, function () {
@@ -939,6 +947,35 @@ describe('Tile', function () {
           assert.strictEqual(2225, info.height);
           assert.strictEqual(3, info.channels);
           assert.strictEqual('number', typeof info.size);
+          fs.stat(container, function (err, stat) {
+            if (err) throw err;
+            assert.strictEqual(true, stat.isFile());
+            assert.strictEqual(true, stat.size > 0);
+            extractZip(container, { dir: path.dirname(extractTo) })
+              .then(() => {
+                assertDeepZoomTiles(directory, 256, 13, done);
+              })
+              .catch(done);
+          });
+        });
+    });
+  });
+
+  it('Write ZIP container to Buffer', function (done) {
+    const container = fixtures.path('output.dz.tiles.zip');
+    const extractTo = fixtures.path('output.dz.tiles');
+    const directory = path.join(extractTo, 'output.dz.tiles_files');
+    rimraf(directory, function () {
+      sharp(fixtures.inputJpg)
+        .tile({ basename: 'output.dz.tiles' })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('dz', info.format);
+          assert.strictEqual(2725, info.width);
+          assert.strictEqual(2225, info.height);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual('number', typeof info.size);
+          fs.writeFileSync(container, data);
           fs.stat(container, function (err, stat) {
             if (err) throw err;
             assert.strictEqual(true, stat.isFile());

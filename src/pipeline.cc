@@ -941,6 +941,19 @@ class PipelineWorker : public Napi::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "heif";
+        } else if (baton->formatOut == "dz") {
+          // Write DZ to buffer
+          baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
+          if (!sharp::HasAlpha(image)) {
+            baton->tileBackground.pop_back();
+          }
+          vips::VOption *options = BuildOptionsDZ(baton);
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.dzsave_buffer(options));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "dz";
         } else if (baton->formatOut == "raw" ||
           (baton->formatOut == "input" && inputImageType == sharp::ImageType::RAW)) {
           // Write raw, uncompressed image data to buffer
@@ -1096,66 +1109,14 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("lossless", baton->heifLossless));
           baton->formatOut = "heif";
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
+          // Write DZ to file
           if (isDzZip) {
             baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
           }
-          // Forward format options through suffix
-          std::string suffix;
-          if (baton->tileFormat == "png") {
-            std::vector<std::pair<std::string, std::string>> options {
-              {"interlace", baton->pngProgressive ? "TRUE" : "FALSE"},
-              {"compression", std::to_string(baton->pngCompressionLevel)},
-              {"filter", baton->pngAdaptiveFiltering ? "all" : "none"}
-            };
-            suffix = AssembleSuffixString(".png", options);
-          } else if (baton->tileFormat == "webp") {
-            std::vector<std::pair<std::string, std::string>> options {
-              {"Q", std::to_string(baton->webpQuality)},
-              {"alpha_q", std::to_string(baton->webpAlphaQuality)},
-              {"lossless", baton->webpLossless ? "TRUE" : "FALSE"},
-              {"near_lossless", baton->webpNearLossless ? "TRUE" : "FALSE"},
-              {"smart_subsample", baton->webpSmartSubsample ? "TRUE" : "FALSE"},
-              {"min_size", baton->webpMinSize ? "TRUE" : "FALSE"},
-              {"mixed", baton->webpMixed ? "TRUE" : "FALSE"},
-              {"effort", std::to_string(baton->webpEffort)}
-            };
-            suffix = AssembleSuffixString(".webp", options);
-          } else {
-            std::vector<std::pair<std::string, std::string>> options {
-              {"Q", std::to_string(baton->jpegQuality)},
-              {"interlace", baton->jpegProgressive ? "TRUE" : "FALSE"},
-              {"subsample_mode", baton->jpegChromaSubsampling == "4:4:4" ? "off" : "on"},
-              {"trellis_quant", baton->jpegTrellisQuantisation ? "TRUE" : "FALSE"},
-              {"quant_table", std::to_string(baton->jpegQuantisationTable)},
-              {"overshoot_deringing", baton->jpegOvershootDeringing ? "TRUE": "FALSE"},
-              {"optimize_scans", baton->jpegOptimiseScans ? "TRUE": "FALSE"},
-              {"optimize_coding", baton->jpegOptimiseCoding ? "TRUE": "FALSE"}
-            };
-            std::string extname = baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_DZ ? ".jpeg" : ".jpg";
-            suffix = AssembleSuffixString(extname, options);
-          }
-          // Remove alpha channel from tile background if image does not contain an alpha channel
           if (!sharp::HasAlpha(image)) {
             baton->tileBackground.pop_back();
           }
-          // Write DZ to file
-          vips::VOption *options = VImage::option()
-            ->set("strip", !baton->withMetadata)
-            ->set("tile_size", baton->tileSize)
-            ->set("overlap", baton->tileOverlap)
-            ->set("container", baton->tileContainer)
-            ->set("layout", baton->tileLayout)
-            ->set("suffix", const_cast<char*>(suffix.data()))
-            ->set("angle", CalculateAngleRotation(baton->tileAngle))
-            ->set("background", baton->tileBackground)
-            ->set("centre", baton->tileCentre)
-            ->set("id", const_cast<char*>(baton->tileId.data()))
-            ->set("skip_blanks", baton->tileSkipBlanks);
-          // libvips chooses a default depth based on layout. Instead of replicating that logic here by
-          // not passing anything - libvips will handle choice
-          if (baton->tileDepth < VIPS_FOREIGN_DZ_DEPTH_LAST) {
-            options->set("depth", baton->tileDepth);
-          }
+          vips::VOption *options = BuildOptionsDZ(baton);
           image.dzsave(const_cast<char*>(baton->fileOut.data()), options);
           baton->formatOut = "dz";
         } else if (baton->formatOut == "v" || (mightMatchInput && isV) ||
@@ -1312,7 +1273,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
   /*
     Assemble the suffix argument to dzsave, which is the format (by extname)
-    alongisde comma-separated arguments to the corresponding `formatsave` vips
+    alongside comma-separated arguments to the corresponding `formatsave` vips
     action.
   */
   std::string
@@ -1325,6 +1286,67 @@ class PipelineWorker : public Napi::AsyncWorker {
       argument += option.first + "=" + option.second;
     }
     return extname + "[" + argument + "]";
+  }
+
+  /*
+    Build VOption for dzsave
+  */
+  vips::VOption*
+  BuildOptionsDZ(PipelineBaton *baton) {
+    // Forward format options through suffix
+    std::string suffix;
+    if (baton->tileFormat == "png") {
+      std::vector<std::pair<std::string, std::string>> options {
+        {"interlace", baton->pngProgressive ? "TRUE" : "FALSE"},
+        {"compression", std::to_string(baton->pngCompressionLevel)},
+        {"filter", baton->pngAdaptiveFiltering ? "all" : "none"}
+      };
+      suffix = AssembleSuffixString(".png", options);
+    } else if (baton->tileFormat == "webp") {
+      std::vector<std::pair<std::string, std::string>> options {
+        {"Q", std::to_string(baton->webpQuality)},
+        {"alpha_q", std::to_string(baton->webpAlphaQuality)},
+        {"lossless", baton->webpLossless ? "TRUE" : "FALSE"},
+        {"near_lossless", baton->webpNearLossless ? "TRUE" : "FALSE"},
+        {"smart_subsample", baton->webpSmartSubsample ? "TRUE" : "FALSE"},
+        {"min_size", baton->webpMinSize ? "TRUE" : "FALSE"},
+        {"mixed", baton->webpMixed ? "TRUE" : "FALSE"},
+        {"effort", std::to_string(baton->webpEffort)}
+      };
+      suffix = AssembleSuffixString(".webp", options);
+    } else {
+      std::vector<std::pair<std::string, std::string>> options {
+        {"Q", std::to_string(baton->jpegQuality)},
+        {"interlace", baton->jpegProgressive ? "TRUE" : "FALSE"},
+        {"subsample_mode", baton->jpegChromaSubsampling == "4:4:4" ? "off" : "on"},
+        {"trellis_quant", baton->jpegTrellisQuantisation ? "TRUE" : "FALSE"},
+        {"quant_table", std::to_string(baton->jpegQuantisationTable)},
+        {"overshoot_deringing", baton->jpegOvershootDeringing ? "TRUE": "FALSE"},
+        {"optimize_scans", baton->jpegOptimiseScans ? "TRUE": "FALSE"},
+        {"optimize_coding", baton->jpegOptimiseCoding ? "TRUE": "FALSE"}
+      };
+      std::string extname = baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_DZ ? ".jpeg" : ".jpg";
+      suffix = AssembleSuffixString(extname, options);
+    }
+    vips::VOption *options = VImage::option()
+      ->set("strip", !baton->withMetadata)
+      ->set("tile_size", baton->tileSize)
+      ->set("overlap", baton->tileOverlap)
+      ->set("container", baton->tileContainer)
+      ->set("layout", baton->tileLayout)
+      ->set("suffix", const_cast<char*>(suffix.data()))
+      ->set("angle", CalculateAngleRotation(baton->tileAngle))
+      ->set("background", baton->tileBackground)
+      ->set("centre", baton->tileCentre)
+      ->set("id", const_cast<char*>(baton->tileId.data()))
+      ->set("skip_blanks", baton->tileSkipBlanks);
+    if (baton->tileDepth < VIPS_FOREIGN_DZ_DEPTH_LAST) {
+      options->set("depth", baton->tileDepth);
+    }
+    if (!baton->tileBasename.empty()) {
+      options->set("basename", const_cast<char*>(baton->tileBasename.data()));
+    }
+    return options;
   }
 
   /*
@@ -1600,6 +1622,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     sharp::AttrAsStr(options, "tileDepth").data()));
   baton->tileCentre = sharp::AttrAsBool(options, "tileCentre");
   baton->tileId = sharp::AttrAsStr(options, "tileId");
+  baton->tileBasename = sharp::AttrAsStr(options, "tileBasename");
 
   // Force random access for certain operations
   if (baton->input->access == VIPS_ACCESS_SEQUENTIAL) {

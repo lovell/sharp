@@ -15,6 +15,9 @@ Requires libvips v8.13.0
 * Use combined bounding box of alpha and non-alpha channels for `trim` operation.
   [#2166](https://github.com/lovell/sharp/issues/2166)
 
+* Add Buffer and Stream support to tile-based output.
+  [#2238](https://github.com/lovell/sharp/issues/2238)
+
 * Add input `fileSuffix` and output `alias` to `format` information.
   [#2642](https://github.com/lovell/sharp/issues/2642)
 

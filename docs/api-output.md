@@ -544,8 +544,11 @@ const data = await sharp('input.png')
 ## tile
 
 Use tile-based deep zoom (image pyramid) output.
+
 Set the format and options for tile images via the `toFormat`, `jpeg`, `png` or `webp` functions.
 Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed archive file format.
+
+The container will be set to `zip` when the output is a Buffer or Stream, otherwise it will default to `fs`.
 
 ### Parameters
 
@@ -562,6 +565,7 @@ Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed arc
     *   `options.centre` **[boolean][10]** centre image in tile. (optional, default `false`)
     *   `options.center` **[boolean][10]** alternative spelling of centre. (optional, default `false`)
     *   `options.id` **[string][2]** when `layout` is `iiif`/`iiif3`, sets the `@id`/`id` attribute of `info.json` (optional, default `'https://example.com/iiif'`)
+    *   `options.basename` **[string][2]?** the name of the directory within the zip file when container is `zip`.
 
 ### Examples
 
@@ -575,6 +579,19 @@ sharp('input.tiff')
     // output.dzi is the Deep Zoom XML definition
     // output_files contains 512x512 tiles grouped by zoom level
   });
+```
+
+```javascript
+const zipFileWithTiles = await sharp(input)
+  .tile({ basename: "tiles" })
+  .toBuffer();
+```
+
+```javascript
+const iiififier = sharp().tile({ layout: "iiif" });
+readableStream
+  .pipe(iiififier)
+  .pipe(writeableStream);
 ```
 
 *   Throws **[Error][4]** Invalid parameters
