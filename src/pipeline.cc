@@ -188,8 +188,10 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (jpegShrinkOnLoad > 1 && static_cast<int>(shrink) == jpegShrinkOnLoad) {
             jpegShrinkOnLoad /= 2;
           }
-        } else if (inputImageType == sharp::ImageType::WEBP ||
-                   inputImageType == sharp::ImageType::SVG ||
+        } else if (inputImageType == sharp::ImageType::WEBP && shrink > 1.0) {
+          // Avoid upscaling via webp
+          scale = 1.0 / shrink;
+        } else if (inputImageType == sharp::ImageType::SVG ||
                    inputImageType == sharp::ImageType::PDF) {
           scale = 1.0 / shrink;
         }
@@ -607,14 +609,14 @@ class PipelineWorker : public Napi::AsyncWorker {
             int across = 0;
             int down = 0;
             // Use gravity in overlay
-            if (compositeImage.width() <= baton->width) {
+            if (compositeImage.width() <= image.width()) {
               across = static_cast<int>(ceil(static_cast<double>(image.width()) / compositeImage.width()));
               // Ensure odd number of tiles across when gravity is centre, north or south
               if (composite->gravity == 0 || composite->gravity == 1 || composite->gravity == 3) {
                 across |= 1;
               }
             }
-            if (compositeImage.height() <= baton->height) {
+            if (compositeImage.height() <= image.height()) {
               down = static_cast<int>(ceil(static_cast<double>(image.height()) / compositeImage.height()));
               // Ensure odd number of tiles down when gravity is centre, east or west
               if (composite->gravity == 0 || composite->gravity == 2 || composite->gravity == 4) {

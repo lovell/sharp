@@ -4,10 +4,35 @@
 
 Requires libvips v8.12.2
 
+### v0.30.7 - 22nd June 2022
+
+* Ensure tiled composition always works with outside resizing.
+  [#3227](https://github.com/lovell/sharp/issues/3227)
+
+* Allow WebP encoding effort of 0.
+  [#3261](https://github.com/lovell/sharp/pull/3261)
+  [@AlexanderTheGrey](https://github.com/AlexanderTheGrey)
+
+* Prevent upsampling via libwebp.
+  [#3267](https://github.com/lovell/sharp/pull/3267)
+  [@blacha](https://github.com/blacha)
+
+### v0.30.6 - 30th May 2022
+
+* Allow values for `limitInputPixels` larger than 32-bit.
+  [#3238](https://github.com/lovell/sharp/issues/3238)
+
+* Ensure brew-installed `vips` can be detected (regression in 0.30.5).
+  [#3239](https://github.com/lovell/sharp/issues/3239)
+
 ### v0.30.5 - 23rd May 2022
 
 * Install: pass `PKG_CONFIG_PATH` via env rather than substitution.
   [@dwisiswant0](https://github.com/dwisiswant0)
+
+* Add support for `--libc` flag to improve cross-platform installation.
+  [#3160](https://github.com/lovell/sharp/pull/3160)
+  [@joonamo](https://github.com/joonamo)
 
 * Allow installation of prebuilt libvips binaries from filesystem.
   [#3196](https://github.com/lovell/sharp/pull/3196)

@@ -706,6 +706,12 @@ describe('Input/output', function () {
       });
     });
 
+    it('Invalid fails - integer overflow', () => {
+      assert.throws(() => {
+        sharp({ limitInputPixels: Number.MAX_SAFE_INTEGER + 1 });
+      });
+    });
+
     it('Invalid fails - string', () => {
       assert.throws(() => {
         sharp({ limitInputPixels: 'fail' });
