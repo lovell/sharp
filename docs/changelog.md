@@ -35,6 +35,10 @@ Requires libvips v8.13.0
 * Ensure `trim` operation is a no-op when it would reduce an image to nothing.
   [#3223](https://github.com/lovell/sharp/issues/3223)
 
+* Expose `vips_text` to create an image containing rendered text.
+  [#3252](https://github.com/lovell/sharp/pull/3252)
+  [@brahima](https://github.com/brahima)
+
 * Ensure only properties owned by the `withMetadata` EXIF Object are parsed.
   [#3292](https://github.com/lovell/sharp/issues/3292)
 
