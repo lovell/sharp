@@ -71,6 +71,17 @@ namespace sharp {
     std::string createNoiseType;
     double createNoiseMean;
     double createNoiseSigma;
+    std::string textValue;
+    std::string textFont;
+    std::string textFontfile;
+    int textWidth;
+    int textHeight;
+    VipsAlign textAlign;
+    bool textJustify;
+    int textDpi;
+    bool textRgba;
+    int textSpacing;
+    int textAutofitDpi;
 
     InputDescriptor():
       buffer(nullptr),
@@ -95,7 +106,15 @@ namespace sharp {
       createHeight(0),
       createBackground{ 0.0, 0.0, 0.0, 255.0 },
       createNoiseMean(0.0),
-      createNoiseSigma(0.0) {}
+      createNoiseSigma(0.0),
+      textWidth(0),
+      textHeight(0),
+      textAlign(VIPS_ALIGN_LOW),
+      textJustify(FALSE),
+      textDpi(72),
+      textRgba(FALSE),
+      textSpacing(0),
+      textAutofitDpi(0) {}
   };
 
   // Convenience methods to access the attributes of a Napi::Object

@@ -133,6 +133,39 @@ namespace sharp {
         descriptor->createBackground = AttrAsVectorOfDouble(input, "createBackground");
       }
     }
+    // Create new image with text
+    if (HasAttr(input, "textValue")) {
+      descriptor->textValue = AttrAsStr(input, "textValue");
+      if (HasAttr(input, "textFont")) {
+        descriptor->textFont = AttrAsStr(input, "textFont");
+      }
+      if (HasAttr(input, "textFontfile")) {
+        descriptor->textFontfile = AttrAsStr(input, "textFontfile");
+      }
+      if (HasAttr(input, "textWidth")) {
+        descriptor->textWidth = AttrAsUint32(input, "textWidth");
+      }
+      if (HasAttr(input, "textHeight")) {
+        descriptor->textHeight = AttrAsUint32(input, "textHeight");
+      }
+      if (HasAttr(input, "textAlign")) {
+        descriptor->textAlign = static_cast<VipsAlign>(
+          vips_enum_from_nick(nullptr, VIPS_TYPE_ALIGN,
+          AttrAsStr(input, "textAlign").data()));
+      }
+      if (HasAttr(input, "textJustify")) {
+        descriptor->textJustify = AttrAsBool(input, "textJustify");
+      }
+      if (HasAttr(input, "textDpi")) {
+        descriptor->textDpi = AttrAsUint32(input, "textDpi");
+      }
+      if (HasAttr(input, "textRgba")) {
+        descriptor->textRgba = AttrAsBool(input, "textRgba");
+      }
+      if (HasAttr(input, "textSpacing")) {
+        descriptor->textSpacing = AttrAsUint32(input, "textSpacing");
+      }
+    }
     // Limit input images to a given number of pixels, where pixels = width * height
     descriptor->limitInputPixels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputPixels"));
     // Allow switch from random to sequential access
@@ -394,6 +427,34 @@ namespace sharp {
             .new_from_image(background);
         }
         image = image.cast(VIPS_FORMAT_UCHAR);
+        imageType = ImageType::RAW;
+      } else if (descriptor->textValue.length() > 0) {
+        // Create a new image with text
+        vips::VOption *textOptions = VImage::option()
+          ->set("align", descriptor->textAlign)
+          ->set("justify", descriptor->textJustify)
+          ->set("rgba", descriptor->textRgba)
+          ->set("spacing", descriptor->textSpacing)
+          ->set("autofit_dpi", &descriptor->textAutofitDpi);
+        if (descriptor->textWidth > 0) {
+          textOptions->set("width", descriptor->textWidth);
+        }
+        // Ignore dpi if height is set
+        if (descriptor->textWidth > 0 && descriptor->textHeight > 0) {
+          textOptions->set("height", descriptor->textHeight);
+        } else if (descriptor->textDpi > 0) {
+          textOptions->set("dpi", descriptor->textDpi);
+        }
+        if (descriptor->textFont.length() > 0) {
+          textOptions->set("font", const_cast<char*>(descriptor->textFont.data()));
+        }
+        if (descriptor->textFontfile.length() > 0) {
+          textOptions->set("fontfile", const_cast<char*>(descriptor->textFontfile.data()));
+        }
+        image = VImage::text(const_cast<char *>(descriptor->textValue.data()), textOptions);
+        if (!descriptor->textRgba) {
+          image = image.copy(VImage::option()->set("interpretation", VIPS_INTERPRETATION_B_W));
+        }
         imageType = ImageType::RAW;
       } else {
         // From filesystem

@@ -1185,6 +1185,10 @@ class PipelineWorker : public Napi::AsyncWorker {
         info.Set("trimOffsetTop", static_cast<int32_t>(baton->trimOffsetTop));
       }
 
+      if (baton->input->textAutofitDpi) {
+        info.Set("textAutofitDpi", static_cast<uint32_t>(baton->input->textAutofitDpi));
+      }
+
       if (baton->bufferOutLength > 0) {
         // Add buffer size to info
         info.Set("size", static_cast<uint32_t>(baton->bufferOutLength));
