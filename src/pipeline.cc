@@ -687,14 +687,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Gamma(image, baton->gammaOut);
       }
 
-      // Linear arg check
-      if (baton->linearA.size() != baton->linearB.size()) {
-        (baton->err).append("linearA and linearB are arrays of different lengths.");
-        return Error();
-      }
       // Linear adjustment (a * in + b)
-      if (!baton->linearA.empty() &&
-          (baton->linearA.size() != 1 || baton->linearA[0] != 1.0 || baton->linearB[0] != 0.0)) {
+      if (!baton->linearA.empty()) {
         image = sharp::Linear(image, baton->linearA, baton->linearB);
       }
 

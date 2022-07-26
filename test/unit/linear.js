@@ -83,5 +83,10 @@ describe('Linear adjustment', function () {
       sharp(fixtures.inputPngOverlayLayer1)
         .linear(undefined, { bar: 'baz' });
     });
+
+    assert.throws(function () {
+      sharp(fixtures.inputPngOverlayLayer1)
+        .linear([], [1]);
+    });
   });
 });
