@@ -170,7 +170,7 @@ const data = await sharp(input).sharpen({ sigma: 2 }).toBuffer();
 const data = await sharp(input)
   .sharpen({
     sigma: 2,
-    m1: 0
+    m1: 0,
     m2: 3,
     x1: 3,
     y2: 15,
