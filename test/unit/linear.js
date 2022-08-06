@@ -22,7 +22,7 @@ describe('Linear adjustment', function () {
 
   it('applies slope level adjustment w/o alpha ch', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
-      .linear(a)
+      .linear([a])
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('low-contrast-slope.jpg'), data, done);
@@ -87,6 +87,11 @@ describe('Linear adjustment', function () {
     assert.throws(function () {
       sharp(fixtures.inputPngOverlayLayer1)
         .linear([], [1]);
+    });
+
+    assert.throws(function () {
+      sharp(fixtures.inputPngOverlayLayer1)
+        .linear([1, 2], [1]);
     });
   });
 });
