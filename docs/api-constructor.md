@@ -215,7 +215,7 @@ promises.push(
     .toFile("optimized-500.webp")
 );
 
-// https://github.com/sindresorhus/got#gotstreamurl-options
+// https://github.com/sindresorhus/got/blob/main/documentation/3-streams.md
 got.stream("https://www.example.com/some-file.jpg").pipe(sharpStream);
 
 Promise.all(promises)
