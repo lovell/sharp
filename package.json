@@ -152,6 +152,14 @@
     "rimraf": "^3.0.2",
     "semistandard": "^16.0.1"
   },
+  "peerDependencies": { 
+    "node-gyp": "*"
+  },
+  "peerDependenciesMeta": {
+    "node-gyp": {
+      "optional": true
+    }
+  },
   "license": "Apache-2.0",
   "config": {
     "libvips": "8.12.2",
