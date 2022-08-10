@@ -97,6 +97,7 @@ struct PipelineBaton {
   double sharpenY3;
   int threshold;
   bool thresholdGrayscale;
+  std::vector<double> trimBackground;
   double trimThreshold;
   int trimOffsetLeft;
   int trimOffsetTop;
@@ -248,6 +249,7 @@ struct PipelineBaton {
     sharpenY3(20.0),
     threshold(0),
     thresholdGrayscale(true),
+    trimBackground{},
     trimThreshold(0.0),
     trimOffsetLeft(0),
     trimOffsetTop(0),
