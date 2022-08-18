@@ -295,6 +295,10 @@ When creating text images or rendering SVG images that contain text elements,
 
 On Windows and macOS systems, all system fonts are available for use.
 
+On macOS systems using Homebrew, you may need to set the
+`PANGOCAIRO_BACKEND` environment variable to a value of `fontconfig`
+to ensure it is used for font discovery instead of Core Text.
+
 On Linux systems, fonts that include the relevant
 [`fontconfig` configuration](https://www.freedesktop.org/software/fontconfig/fontconfig-user.html)
 when installed via package manager are available for use.
