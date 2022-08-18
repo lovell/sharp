@@ -16,8 +16,11 @@ Mirroring is supported and may infer the use of a flip operation.
 
 The use of `rotate` implies the removal of the EXIF `Orientation` tag, if any.
 
-Method order is important when both rotating and extracting regions,
-for example `rotate(x).extract(y)` will produce a different result to `extract(y).rotate(x)`.
+Only one rotation can occur per pipeline.
+Previous calls to `rotate` in the same pipeline will be ignored.
+
+Method order is important when rotating, resizing and/or extracting regions,
+for example `.rotate(x).extract(y)` will produce a different result to `.extract(y).rotate(x)`.
 
 ### Parameters
 
@@ -40,13 +43,24 @@ const pipeline = sharp()
 readableStream.pipe(pipeline);
 ```
 
+```javascript
+const rotateThenResize = await sharp(input)
+  .rotate(90)
+  .resize({ width: 16, height: 8, fit: 'fill' })
+  .toBuffer();
+const resizeThenRotate = await sharp(input)
+  .resize({ width: 16, height: 8, fit: 'fill' })
+  .rotate(90)
+  .toBuffer();
+```
+
 *   Throws **[Error][5]** Invalid parameters
 
 Returns **Sharp** 
 
 ## flip
 
-Flip the image about the vertical Y axis. This always occurs after rotation, if any.
+Flip the image about the vertical Y axis. This always occurs before rotation, if any.
 The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 
 ### Parameters
@@ -63,7 +77,7 @@ Returns **Sharp**
 
 ## flop
 
-Flop the image about the horizontal X axis. This always occurs after rotation, if any.
+Flop the image about the horizontal X axis. This always occurs before rotation, if any.
 The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
 ### Parameters

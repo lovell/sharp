@@ -14,6 +14,8 @@ Requires libvips v8.13.0
 
 * Remove previously-deprecated WebP `reductionEffort` and HEIF `speed` options. Use `effort` to control these.
 
+* The `flip` and `flop` operations will now occur before the `rotate` operation.
+
 * Use combined bounding box of alpha and non-alpha channels for `trim` operation.
   [#2166](https://github.com/lovell/sharp/issues/2166)
 
@@ -41,6 +43,10 @@ Requires libvips v8.13.0
 
 * Ensure only properties owned by the `withMetadata` EXIF Object are parsed.
   [#3292](https://github.com/lovell/sharp/issues/3292)
+
+* Ensure the order of `rotate`, `resize` and `extend` operations is respected where possible.
+  Emit warnings when previous calls in the same pipeline will be ignored.
+  [#3319](https://github.com/lovell/sharp/issues/3319)
 
 ## v0.30 - *dresser*
 

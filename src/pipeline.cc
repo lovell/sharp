@@ -387,6 +387,18 @@ class PipelineWorker : public Napi::AsyncWorker {
           ->set("kernel", kernel));
       }
 
+      // Flip (mirror about Y axis)
+      if (baton->flip || flip) {
+        image = image.flip(VIPS_DIRECTION_VERTICAL);
+        image = sharp::RemoveExifOrientation(image);
+      }
+
+      // Flop (mirror about X axis)
+      if (baton->flop || flop) {
+        image = image.flip(VIPS_DIRECTION_HORIZONTAL);
+        image = sharp::RemoveExifOrientation(image);
+      }
+
       // Rotate post-extract 90-angle
       if (!baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
         image = image.rot(rotation);
@@ -398,18 +410,6 @@ class PipelineWorker : public Napi::AsyncWorker {
           image = image.flip(VIPS_DIRECTION_HORIZONTAL);
           flop = FALSE;
         }
-        image = sharp::RemoveExifOrientation(image);
-      }
-
-      // Flip (mirror about Y axis)
-      if (baton->flip || flip) {
-        image = image.flip(VIPS_DIRECTION_VERTICAL);
-        image = sharp::RemoveExifOrientation(image);
-      }
-
-      // Flop (mirror about X axis)
-      if (baton->flop || flop) {
-        image = image.flip(VIPS_DIRECTION_HORIZONTAL);
         image = sharp::RemoveExifOrientation(image);
       }
 

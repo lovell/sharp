@@ -791,4 +791,14 @@ describe('Resize dimensions', function () {
       sharp().resize(null, null, { position: 'unknown' });
     });
   });
+
+  it('Multiple resize emits warning', () => {
+    let warningMessage = '';
+    const s = sharp();
+    s.on('warning', function (msg) { warningMessage = msg; });
+    s.resize(1);
+    assert.strictEqual(warningMessage, '');
+    s.resize(2);
+    assert.strictEqual(warningMessage, 'ignoring previous resize options');
+  });
 });

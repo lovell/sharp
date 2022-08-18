@@ -25,8 +25,8 @@ describe('Rotation', function () {
 
   it('Rotate by 30 degrees with semi-transparent background', function (done) {
     sharp(fixtures.inputJpg)
-      .rotate(30, { background: { r: 255, g: 0, b: 0, alpha: 0.5 } })
       .resize(320)
+      .rotate(30, { background: { r: 255, g: 0, b: 0, alpha: 0.5 } })
       .png()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -39,8 +39,8 @@ describe('Rotation', function () {
 
   it('Rotate by 30 degrees with solid background', function (done) {
     sharp(fixtures.inputJpg)
-      .rotate(30, { background: { r: 255, g: 0, b: 0, alpha: 0.5 } })
       .resize(320)
+      .rotate(30, { background: { r: 255, g: 0, b: 0, alpha: 0.5 } })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
@@ -51,25 +51,31 @@ describe('Rotation', function () {
   });
 
   it('Rotate by 90 degrees, respecting output input size', function (done) {
-    sharp(fixtures.inputJpg).rotate(90).resize(320, 240).toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(240, info.height);
-      done();
-    });
+    sharp(fixtures.inputJpg)
+      .rotate(90)
+      .resize(320, 240)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        done();
+      });
   });
 
-  it('Rotate by 30 degrees, respecting output input size', function (done) {
-    sharp(fixtures.inputJpg).rotate(30).resize(320, 240).toBuffer(function (err, data, info) {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(397, info.width);
-      assert.strictEqual(368, info.height);
-      done();
-    });
+  it('Resize then rotate by 30 degrees, respecting output input size', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .rotate(30)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(true, data.length > 0);
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(397, info.width);
+        assert.strictEqual(368, info.height);
+        done();
+      });
   });
 
   [-3690, -450, -90, 90, 450, 3690].forEach(function (angle) {
@@ -141,8 +147,8 @@ describe('Rotation', function () {
 
   it('Rotate by 270 degrees, rectangular output ignoring aspect ratio', function (done) {
     sharp(fixtures.inputJpg)
-      .resize(320, 240, { fit: sharp.fit.fill })
       .rotate(270)
+      .resize(320, 240, { fit: sharp.fit.fill })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(320, info.width);
@@ -299,6 +305,16 @@ describe('Rotation', function () {
     /Rotate is not supported for multi-page images/
     )
   );
+
+  it('Multiple rotate emits warning', () => {
+    let warningMessage = '';
+    const s = sharp();
+    s.on('warning', function (msg) { warningMessage = msg; });
+    s.rotate();
+    assert.strictEqual(warningMessage, '');
+    s.rotate();
+    assert.strictEqual(warningMessage, 'ignoring previous rotate options');
+  });
 
   it('Flip - vertical', function (done) {
     sharp(fixtures.inputJpg)

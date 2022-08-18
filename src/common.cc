@@ -951,7 +951,7 @@ namespace sharp {
 
   std::pair<double, double> ResolveShrink(int width, int height, int targetWidth, int targetHeight,
     Canvas canvas, bool swap, bool withoutEnlargement, bool withoutReduction) {
-    if (swap) {
+    if (swap && canvas != Canvas::IGNORE_ASPECT) {
       // Swap input width and height when requested.
       std::swap(width, height);
     }
@@ -982,9 +982,6 @@ namespace sharp {
           }
           break;
         case Canvas::IGNORE_ASPECT:
-          if (swap) {
-            std::swap(hshrink, vshrink);
-          }
           break;
       }
     } else if (targetWidth > 0) {

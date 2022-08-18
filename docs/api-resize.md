@@ -36,6 +36,9 @@ Possible interpolation kernels are:
 *   `lanczos2`: Use a [Lanczos kernel][7] with `a=2`.
 *   `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
 
+Only one resize can occur per pipeline.
+Previous calls to `resize` in the same pipeline will be ignored.
+
 ### Parameters
 
 *   `width` **[number][8]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.

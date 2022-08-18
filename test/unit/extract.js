@@ -138,7 +138,20 @@ describe('Partial image extraction', function () {
         if (err) throw err;
         assert.strictEqual(280, info.width);
         assert.strictEqual(380, info.height);
-        fixtures.assertSimilar(fixtures.expected('rotate-extract.jpg'), data, { threshold: 7 }, done);
+        fixtures.assertSimilar(fixtures.expected('rotate-extract.jpg'), data, done);
+      });
+  });
+
+  it('Extract then rotate then extract', function (done) {
+    sharp(fixtures.inputPngWithGreyAlpha)
+      .extract({ left: 20, top: 10, width: 180, height: 280 })
+      .rotate(90)
+      .extract({ left: 20, top: 10, width: 200, height: 100 })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(200, info.width);
+        assert.strictEqual(100, info.height);
+        fixtures.assertSimilar(fixtures.expected('extract-rotate-extract.jpg'), data, done);
       });
   });
 
@@ -164,7 +177,7 @@ describe('Partial image extraction', function () {
         if (err) throw err;
         assert.strictEqual(380, info.width);
         assert.strictEqual(280, info.height);
-        fixtures.assertSimilar(fixtures.expected('rotate-extract-45.jpg'), data, { threshold: 7 }, done);
+        fixtures.assertSimilar(fixtures.expected('rotate-extract-45.jpg'), data, done);
       });
   });
 
@@ -280,6 +293,28 @@ describe('Partial image extraction', function () {
           assert.strictEqual(err.message, 'extract_area: bad extract area\n');
           done();
         });
+    });
+
+    it('Multiple extract emits warning', () => {
+      let warningMessage = '';
+      const s = sharp();
+      s.on('warning', function (msg) { warningMessage = msg; });
+      const options = { top: 0, left: 0, width: 1, height: 1 };
+      s.extract(options);
+      assert.strictEqual(warningMessage, '');
+      s.extract(options);
+      assert.strictEqual(warningMessage, 'ignoring previous extract options');
+    });
+
+    it('Multiple rotate+extract emits warning', () => {
+      let warningMessage = '';
+      const s = sharp().rotate();
+      s.on('warning', function (msg) { warningMessage = msg; });
+      const options = { top: 0, left: 0, width: 1, height: 1 };
+      s.extract(options);
+      assert.strictEqual(warningMessage, '');
+      s.extract(options);
+      assert.strictEqual(warningMessage, 'ignoring previous extract options');
     });
   });
 });
