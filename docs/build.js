@@ -2,7 +2,6 @@
 
 const fs = require('fs').promises;
 const path = require('path');
-const documentation = require('documentation');
 
 [
   'constructor',
@@ -15,6 +14,8 @@ const documentation = require('documentation');
   'output',
   'utility'
 ].forEach(async (m) => {
+  const documentation = await import('documentation');
+
   const input = path.join('lib', `${m}.js`);
   const output = path.join('docs', `api-${m}.md`);
 

@@ -36,7 +36,7 @@ A `Promise` is returned when `callback` is not provided.
 *   `icc`: Buffer containing raw [ICC][3] profile data, if present
 *   `iptc`: Buffer containing raw IPTC data, if present
 *   `xmp`: Buffer containing raw XMP data, if present
-*   `tifftagPhotoshop`: Buffer containing raw TIFFTAG_PHOTOSHOP data, if present
+*   `tifftagPhotoshop`: Buffer containing raw TIFFTAG\_PHOTOSHOP data, if present
 
 ### Parameters
 
@@ -75,7 +75,7 @@ function getNormalSize({ width, height, orientation }) {
 }
 ```
 
-Returns **([Promise][5]<[Object][6]> | Sharp)** 
+Returns **([Promise][5]<[Object][6]> | Sharp)**&#x20;
 
 ## stats
 
@@ -129,7 +129,7 @@ const part = await image.extract(region).toBuffer();
 const stats = await sharp(part).stats();
 ```
 
-Returns **[Promise][5]<[Object][6]>** 
+Returns **[Promise][5]<[Object][6]>**&#x20;
 
 [1]: https://www.libvips.org/API/current/VipsImage.html#VipsInterpretation
 

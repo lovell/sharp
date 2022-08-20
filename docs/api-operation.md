@@ -56,7 +56,7 @@ const resizeThenRotate = await sharp(input)
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## flip
 
@@ -73,7 +73,7 @@ The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
 const output = await sharp(input).flip().toBuffer();
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## flop
 
@@ -90,7 +90,7 @@ The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 const output = await sharp(input).flop().toBuffer();
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## affine
 
@@ -142,7 +142,7 @@ inputStream
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
@@ -195,7 +195,7 @@ const data = await sharp(input)
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## median
 
@@ -218,7 +218,7 @@ const output = await sharp(input).median(5).toBuffer();
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## blur
 
@@ -248,7 +248,7 @@ const gaussianBlurred = await sharp(input)
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## flatten
 
@@ -258,7 +258,7 @@ See also [removeAlpha][9].
 
 ### Parameters
 
-*   `options` **[Object][2]?** 
+*   `options` **[Object][2]?**&#x20;
 
     *   `options.background` **([string][3] | [Object][2])** background colour, parsed by the [color][4] module, defaults to black. (optional, default `{r:0,g:0,b:0}`)
 
@@ -270,7 +270,7 @@ await sharp(rgbaInput)
   .toBuffer();
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## gamma
 
@@ -291,7 +291,7 @@ Supply a second argument to use a different output gamma value, otherwise the fi
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## negate
 
@@ -299,7 +299,7 @@ Produce the "negative" of the image.
 
 ### Parameters
 
-*   `options` **[Object][2]?** 
+*   `options` **[Object][2]?**&#x20;
 
     *   `options.alpha` **[Boolean][6]** Whether or not to negate any alpha channel (optional, default `true`)
 
@@ -317,7 +317,7 @@ const output = await sharp(input)
   .toBuffer();
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## normalise
 
@@ -333,7 +333,7 @@ Enhance output image contrast by stretching its luminance to cover the full dyna
 const output = await sharp(input).normalise().toBuffer();
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## normalize
 
@@ -349,7 +349,7 @@ Alternative spelling of normalise.
 const output = await sharp(input).normalize().toBuffer();
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## clahe
 
@@ -360,7 +360,7 @@ This will, in general, enhance the clarity of the image by bringing out darker d
 
 ### Parameters
 
-*   `options` **[Object][2]** 
+*   `options` **[Object][2]**&#x20;
 
     *   `options.width` **[number][1]** integer width of the region in pixels.
     *   `options.height` **[number][1]** integer height of the region in pixels.
@@ -381,7 +381,7 @@ const output = await sharp(input)
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
@@ -393,7 +393,7 @@ Convolve the image with the specified kernel.
 
 ### Parameters
 
-*   `kernel` **[Object][2]** 
+*   `kernel` **[Object][2]**&#x20;
 
     *   `kernel.width` **[number][1]** width of the kernel in pixels.
     *   `kernel.height` **[number][1]** height of the kernel in pixels.
@@ -419,7 +419,7 @@ sharp(input)
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## threshold
 
@@ -428,7 +428,7 @@ Any pixel value greater than or equal to the threshold value will be set to 255,
 ### Parameters
 
 *   `threshold` **[number][1]** a value in the range 0-255 representing the level at which the threshold will be applied. (optional, default `128`)
-*   `options` **[Object][2]?** 
+*   `options` **[Object][2]?**&#x20;
 
     *   `options.greyscale` **[Boolean][6]** convert to single channel greyscale. (optional, default `true`)
     *   `options.grayscale` **[Boolean][6]** alternative spelling for greyscale. (optional, default `true`)
@@ -437,7 +437,7 @@ Any pixel value greater than or equal to the threshold value will be set to 255,
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## boolean
 
@@ -450,19 +450,19 @@ the selected bitwise boolean `operation` between the corresponding pixels of the
 
 *   `operand` **([Buffer][11] | [string][3])** Buffer containing image data or string containing the path to an image file.
 *   `operator` **[string][3]** one of `and`, `or` or `eor` to perform that bitwise operation, like the C logic operators `&`, `|` and `^` respectively.
-*   `options` **[Object][2]?** 
+*   `options` **[Object][2]?**&#x20;
 
     *   `options.raw` **[Object][2]?** describes operand when using raw pixel data.
 
-        *   `options.raw.width` **[number][1]?** 
-        *   `options.raw.height` **[number][1]?** 
-        *   `options.raw.channels` **[number][1]?** 
+        *   `options.raw.width` **[number][1]?**&#x20;
+        *   `options.raw.height` **[number][1]?**&#x20;
+        *   `options.raw.channels` **[number][1]?**&#x20;
 
 <!---->
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## linear
 
@@ -477,7 +477,7 @@ Apply the linear formula a \* input + b to the image (levels adjustment)
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## recomb
 
@@ -505,7 +505,7 @@ sharp(input)
 
 *   Throws **[Error][5]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
@@ -519,7 +519,7 @@ brightness is multiplicative whereas lightness is additive.
 
 ### Parameters
 
-*   `options` **[Object][2]?** 
+*   `options` **[Object][2]?**&#x20;
 
     *   `options.brightness` **[number][1]?** Brightness multiplier
     *   `options.saturation` **[number][1]?** Saturation multiplier
@@ -566,7 +566,7 @@ const output = await sharp(input)
   .toBuffer();
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 

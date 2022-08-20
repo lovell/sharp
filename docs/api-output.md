@@ -59,19 +59,18 @@ See [withMetadata][1] for control over this.
 *   `err` is an error, if any.
 *   `data` is the output image data.
 *   `info` contains the output image `format`, `size` (bytes), `width`, `height`,
-
-`channels` and `premultiplied` (indicating if premultiplication was used).
-When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
-May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text.
+    `channels` and `premultiplied` (indicating if premultiplication was used).
+    When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
+    May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text.
 
 A `Promise` is returned when `callback` is not provided.
 
 ### Parameters
 
-*   `options` **[Object][6]?** 
+*   `options` **[Object][6]?**&#x20;
 
     *   `options.resolveWithObject` **[boolean][10]?** Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`.
-*   `callback` **[Function][3]?** 
+*   `callback` **[Function][3]?**&#x20;
 
 ### Examples
 
@@ -127,7 +126,7 @@ EXIF metadata is unsupported for TIFF output.
 
 ### Parameters
 
-*   `options` **[Object][6]?** 
+*   `options` **[Object][6]?**&#x20;
 
     *   `options.orientation` **[number][12]?** value between 1 and 8, used to update the EXIF `Orientation` tag.
     *   `options.icc` **[string][2]?** filesystem path to output ICC profile, defaults to sRGB.
@@ -165,7 +164,7 @@ const data = await sharp(input)
 
 *   Throws **[Error][4]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## toFormat
 
@@ -187,7 +186,7 @@ const data = await sharp(input)
 
 *   Throws **[Error][4]** unsupported format or options
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## jpeg
 
@@ -232,7 +231,7 @@ const data = await sharp(input)
 
 *   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## png
 
@@ -244,7 +243,7 @@ Set `palette` to `true` for slower, indexed PNG output.
 
 ### Parameters
 
-*   `options` **[Object][6]?** 
+*   `options` **[Object][6]?**&#x20;
 
     *   `options.progressive` **[boolean][10]** use progressive (interlace) scan (optional, default `false`)
     *   `options.compressionLevel` **[number][12]** zlib compression level, 0 (fastest, largest) to 9 (slowest, smallest) (optional, default `6`)
@@ -275,7 +274,7 @@ const data = await sharp(input)
 
 *   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## webp
 
@@ -288,7 +287,7 @@ Use these WebP options for output image.
     *   `options.quality` **[number][12]** quality, integer 1-100 (optional, default `80`)
     *   `options.alphaQuality` **[number][12]** quality of alpha layer, integer 0-100 (optional, default `100`)
     *   `options.lossless` **[boolean][10]** use lossless compression mode (optional, default `false`)
-    *   `options.nearLossless` **[boolean][10]** use near_lossless compression mode (optional, default `false`)
+    *   `options.nearLossless` **[boolean][10]** use near\_lossless compression mode (optional, default `false`)
     *   `options.smartSubsample` **[boolean][10]** use high quality chroma subsampling (optional, default `false`)
     *   `options.effort` **[number][12]** CPU effort, between 0 (fastest) and 6 (slowest) (optional, default `4`)
     *   `options.loop` **[number][12]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
@@ -315,7 +314,7 @@ const outputWebp = await sharp(inputWebp, { animated: true })
 
 *   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## gif
 
@@ -364,7 +363,7 @@ const out = await sharp('in.gif', { animated: true })
 
 *   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
@@ -409,7 +408,7 @@ const data = await sharp(input)
 
 *   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
@@ -453,7 +452,7 @@ sharp('input.svg')
 
 *   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## avif
 
@@ -477,7 +476,7 @@ AVIF image sequences are not supported.
 
 *   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
@@ -504,7 +503,7 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
 
 *   Throws **[Error][4]** Invalid options
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
@@ -554,7 +553,7 @@ The container will be set to `zip` when the output is a Buffer or Stream, otherw
 
 ### Parameters
 
-*   `options` **[Object][6]?** 
+*   `options` **[Object][6]?**&#x20;
 
     *   `options.size` **[number][12]** tile size in pixels, a value between 1 and 8192. (optional, default `256`)
     *   `options.overlap` **[number][12]** tile overlap in pixels, a value between 0 and 8192. (optional, default `0`)
@@ -598,7 +597,7 @@ readableStream
 
 *   Throws **[Error][4]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## timeout
 
@@ -610,7 +609,7 @@ Time spent waiting for a libuv thread to become available is not included.
 
 ### Parameters
 
-*   `options` **[Object][6]** 
+*   `options` **[Object][6]**&#x20;
 
     *   `options.seconds` **[number][12]** Number of seconds after which processing will be stopped
 
@@ -628,7 +627,7 @@ try {
 }
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 

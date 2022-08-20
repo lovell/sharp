@@ -43,7 +43,7 @@ Previous calls to `resize` in the same pipeline will be ignored.
 
 *   `width` **[number][8]?** pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height.
 *   `height` **[number][8]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
-*   `options` **[Object][9]?** 
+*   `options` **[Object][9]?**&#x20;
 
     *   `options.width` **[String][10]?** alternative means of specifying `width`. If both are present this take priority.
     *   `options.height` **[String][10]?** alternative means of specifying `height`. If both are present this take priority.
@@ -147,7 +147,7 @@ const scaleByHalf = await sharp(input)
 
 *   Throws **[Error][13]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## extend
 
@@ -193,7 +193,7 @@ sharp(input)
 
 *   Throws **[Error][13]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## extract
 
@@ -234,7 +234,7 @@ sharp(input)
 
 *   Throws **[Error][13]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## trim
 
@@ -255,7 +255,7 @@ will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
 *   Throws **[Error][13]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 [1]: https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
 

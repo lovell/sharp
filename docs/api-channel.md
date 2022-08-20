@@ -16,7 +16,7 @@ sharp('rgba.png')
   });
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## ensureAlpha
 
@@ -47,7 +47,7 @@ const rgba = await sharp(rgb)
 
 *   Throws **[Error][3]** Invalid alpha transparency level
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
@@ -80,7 +80,7 @@ const [red1, red2, ...] = await sharp(input)
 
 *   Throws **[Error][3]** Invalid channel
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## joinChannel
 
@@ -104,7 +104,7 @@ For raw pixel input, the `options` object should contain a `raw` attribute, whic
 
 *   Throws **[Error][3]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## bandbool
 
@@ -128,7 +128,7 @@ sharp('3-channel-rgb-input.png')
 
 *   Throws **[Error][3]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 [1]: /api-operation#flatten
 

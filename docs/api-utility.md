@@ -10,7 +10,7 @@ An Object containing nested boolean values representing the available input and 
 console.log(sharp.format);
 ```
 
-Returns **[Object][1]** 
+Returns **[Object][1]**&#x20;
 
 ## interpolators
 
@@ -90,7 +90,7 @@ sharp.cache( { files: 0 } );
 sharp.cache(false);
 ```
 
-Returns **[Object][1]** 
+Returns **[Object][1]**&#x20;
 
 ## concurrency
 
@@ -115,7 +115,7 @@ The maximum number of images that sharp can process in parallel
 is controlled by libuv's `UV_THREADPOOL_SIZE` environment variable,
 which defaults to 4.
 
-[https://nodejs.org/api/cli.html#uv_threadpool_sizesize][12]
+[https://nodejs.org/api/cli.html#uv\_threadpool\_sizesize][12]
 
 For example, by default, a machine with 8 CPU cores will process
 4 images in parallel and use up to 8 threads per image,
@@ -123,7 +123,7 @@ so there will be up to 32 concurrent threads.
 
 ### Parameters
 
-*   `concurrency` **[number][11]?** 
+*   `concurrency` **[number][11]?**&#x20;
 
 ### Examples
 
@@ -163,7 +163,7 @@ Provides access to internal task counters.
 const counters = sharp.counters(); // { queue: 2, process: 4 }
 ```
 
-Returns **[Object][1]** 
+Returns **[Object][1]**&#x20;
 
 ## simd
 
@@ -189,7 +189,7 @@ const simd = sharp.simd(false);
 // prevent libvips from using liborc at runtime
 ```
 
-Returns **[boolean][10]** 
+Returns **[boolean][10]**&#x20;
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 

@@ -19,7 +19,7 @@ const output = await sharp(input)
 
 *   Throws **[Error][4]** Invalid parameter
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## greyscale
 
@@ -40,7 +40,7 @@ An alpha channel may be present, and will be unchanged by the operation.
 const output = await sharp(input).greyscale().toBuffer();
 ```
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## grayscale
 
@@ -50,7 +50,7 @@ Alternative spelling of `greyscale`.
 
 *   `grayscale` **[Boolean][5]**  (optional, default `true`)
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## pipelineColourspace
 
@@ -77,7 +77,7 @@ await sharp(input)
 
 *   Throws **[Error][4]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
@@ -95,7 +95,7 @@ Alternative spelling of `pipelineColourspace`.
 
 *   Throws **[Error][4]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## toColourspace
 
@@ -117,7 +117,7 @@ await sharp(input)
 
 *   Throws **[Error][4]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 ## toColorspace
 
@@ -131,7 +131,7 @@ Alternative spelling of `toColourspace`.
 
 *   Throws **[Error][4]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 

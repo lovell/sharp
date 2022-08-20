@@ -164,7 +164,7 @@ await sharp({
 
 *   Throws **[Error][17]** Invalid parameters
 
-Returns **[Sharp][18]** 
+Returns **[Sharp][18]**&#x20;
 
 ## clone
 
@@ -230,7 +230,7 @@ Promise.all(promises)
   });
 ```
 
-Returns **[Sharp][18]** 
+Returns **[Sharp][18]**&#x20;
 
 [1]: http://nodejs.org/api/stream.html#stream_class_stream_duplex
 

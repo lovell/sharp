@@ -25,8 +25,8 @@ and [https://www.cairographics.org/operators/][2]
 
         *   `images[].input.create` **[Object][4]?** describes a blank overlay to be created.
 
-            *   `images[].input.create.width` **[Number][7]?** 
-            *   `images[].input.create.height` **[Number][7]?** 
+            *   `images[].input.create.width` **[Number][7]?**&#x20;
+            *   `images[].input.create.height` **[Number][7]?**&#x20;
             *   `images[].input.create.channels` **[Number][7]?** 3-4
             *   `images[].input.create.background` **([String][6] | [Object][4])?** parsed by the [color][8] module to extract values for red, green, blue and alpha.
         *   `images[].input.text` **[Object][4]?** describes a new text image to be created.
@@ -50,9 +50,9 @@ and [https://www.cairographics.org/operators/][2]
     *   `images[].density` **[Number][7]** number representing the DPI for vector overlay image. (optional, default `72`)
     *   `images[].raw` **[Object][4]?** describes overlay when using raw pixel data.
 
-        *   `images[].raw.width` **[Number][7]?** 
-        *   `images[].raw.height` **[Number][7]?** 
-        *   `images[].raw.channels` **[Number][7]?** 
+        *   `images[].raw.width` **[Number][7]?**&#x20;
+        *   `images[].raw.height` **[Number][7]?**&#x20;
+        *   `images[].raw.channels` **[Number][7]?**&#x20;
     *   `images[].animated` **[boolean][9]** Set to `true` to read all frames/pages of an animated image. (optional, default `false`)
     *   `images[].failOn` **[string][6]** @see [constructor parameters][10] (optional, default `'warning'`)
     *   `images[].limitInputPixels` **([number][7] | [boolean][9])** @see [constructor parameters][10] (optional, default `268402689`)
@@ -95,7 +95,7 @@ sharp('input.png')
 
 *   Throws **[Error][11]** Invalid parameters
 
-Returns **Sharp** 
+Returns **Sharp**&#x20;
 
 **Meta**
 
