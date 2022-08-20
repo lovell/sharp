@@ -44,6 +44,10 @@ Requires libvips v8.13.0
 * Ensure only properties owned by the `withMetadata` EXIF Object are parsed.
   [#3292](https://github.com/lovell/sharp/issues/3292)
 
+* Expand `linear` operation to allow use of per-channel arrays.
+  [#3303](https://github.com/lovell/sharp/pull/3303)
+  [@antonmarsden](https://github.com/antonmarsden)
+
 * Ensure the order of `rotate`, `resize` and `extend` operations is respected where possible.
   Emit warnings when previous calls in the same pipeline will be ignored.
   [#3319](https://github.com/lovell/sharp/issues/3319)
