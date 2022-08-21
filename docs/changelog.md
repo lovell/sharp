@@ -52,6 +52,9 @@ Requires libvips v8.13.0
   Emit warnings when previous calls in the same pipeline will be ignored.
   [#3319](https://github.com/lovell/sharp/issues/3319)
 
+* Ensure resized image is unpremultiplied before composite.
+  [#3334](https://github.com/lovell/sharp/issues/3334)
+
 ## v0.30 - *dresser*
 
 Requires libvips v8.12.2

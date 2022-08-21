@@ -590,6 +590,18 @@ class PipelineWorker : public Napi::AsyncWorker {
           baton->sharpenX1, baton->sharpenY2, baton->sharpenY3);
       }
 
+      // Reverse premultiplication after all transformations
+      if (shouldPremultiplyAlpha) {
+        image = image.unpremultiply();
+        // Cast pixel values to integer
+        if (sharp::Is16Bit(image.interpretation())) {
+          image = image.cast(VIPS_FORMAT_USHORT);
+        } else {
+          image = image.cast(VIPS_FORMAT_UCHAR);
+        }
+      }
+      baton->premultiplied = shouldPremultiplyAlpha;
+
       // Composite
       if (shouldComposite) {
         std::vector<VImage> images = { image };
@@ -669,18 +681,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
         image = VImage::composite(images, modes, VImage::option()->set("x", xs)->set("y", ys));
       }
-
-      // Reverse premultiplication after all transformations:
-      if (shouldPremultiplyAlpha) {
-        image = image.unpremultiply();
-        // Cast pixel values to integer
-        if (sharp::Is16Bit(image.interpretation())) {
-          image = image.cast(VIPS_FORMAT_USHORT);
-        } else {
-          image = image.cast(VIPS_FORMAT_UCHAR);
-        }
-      }
-      baton->premultiplied = shouldPremultiplyAlpha;
 
       // Gamma decoding (brighten)
       if (baton->gammaOut >= 1 && baton->gammaOut <= 3) {

@@ -447,4 +447,26 @@ describe('composite', () => {
     assert.strictEqual(info.width, 40);
     assert.strictEqual(info.height, 40);
   });
+
+  it('Ensure implict unpremultiply after resize but before composite', async () => {
+    const [r, g, b, a] = await sharp({
+      create: {
+        width: 1, height: 1, channels: 4, background: 'saddlebrown'
+      }
+    })
+      .resize({ width: 8 })
+      .composite([{
+        input: Buffer.from([255, 255, 255, 128]),
+        raw: { width: 1, height: 1, channels: 4 },
+        tile: true,
+        blend: 'dest-in'
+      }])
+      .raw()
+      .toBuffer();
+
+    assert.strictEqual(r, 139);
+    assert.strictEqual(g, 69);
+    assert.strictEqual(b, 19);
+    assert.strictEqual(a, 128);
+  });
 });
