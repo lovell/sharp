@@ -190,6 +190,23 @@ describe('PNG', function () {
     });
   });
 
+  it('Can set bitdepth of PNG without palette', async () => {
+    const data = await sharp({
+      create: {
+        width: 8, height: 8, channels: 3, background: 'red'
+      }
+    })
+      .toColourspace('b-w')
+      .png({ colours: 2, palette: false })
+      .toBuffer();
+
+    const { channels, paletteBitDepth, size, space } = await sharp(data).metadata();
+    assert.strictEqual(channels, 1);
+    assert.strictEqual(paletteBitDepth, undefined);
+    assert.strictEqual(size, 90);
+    assert.strictEqual(space, 'b-w');
+  });
+
   it('Valid PNG libimagequant dither value produces image of same size or smaller', function () {
     const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     return Promise.all([

@@ -52,6 +52,9 @@ Requires libvips v8.13.0
   Emit warnings when previous calls in the same pipeline will be ignored.
   [#3319](https://github.com/lovell/sharp/issues/3319)
 
+* Ensure PNG bitdepth can be set for non-palette output.
+  [#3322](https://github.com/lovell/sharp/issues/3322)
+
 * Ensure resized image is unpremultiplied before composite.
   [#3334](https://github.com/lovell/sharp/issues/3334)
 
