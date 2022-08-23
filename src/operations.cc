@@ -262,26 +262,42 @@ namespace sharp {
   /*
     Trim an image
   */
-  VImage Trim(VImage image, double const threshold) {
+  VImage Trim(VImage image, std::vector<double> background, double threshold) {
     if (image.width() < 3 && image.height() < 3) {
       throw VError("Image to trim must be at least 3x3 pixels");
     }
-    // Top-left pixel provides the background colour
-    VImage background = image.extract_area(0, 0, 1, 1);
-    if (HasAlpha(background)) {
-      background = background.flatten();
+
+    // Scale up 8-bit values to match 16-bit input image
+    double multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
+    threshold *= multiplier;
+
+    std::vector<double> backgroundAlpha(1);
+    if (background.size() == 0) {
+      // Top-left pixel provides the default background colour if none is given
+      background = image.extract_area(0, 0, 1, 1)(0, 0);
+      multiplier = 1.0;
     }
+    if (background.size() == 4) {
+      // Just discard the alpha because flattening the background colour with
+      // itself (effectively what find_trim() does) gives the same result
+      backgroundAlpha[0] = background[3] * multiplier;
+    }
+    background = {
+      background[0] * multiplier,
+      background[1] * multiplier,
+      background[2] * multiplier
+    };
+
     int left, top, width, height;
     left = image.find_trim(&top, &width, &height, VImage::option()
-      ->set("background", background(0, 0))
+      ->set("background", background)
       ->set("threshold", threshold));
     if (HasAlpha(image)) {
       // Search alpha channel (A)
       int leftA, topA, widthA, heightA;
       VImage alpha = image[image.bands() - 1];
-      VImage backgroundAlpha = alpha.extract_area(0, 0, 1, 1);
       leftA = alpha.find_trim(&topA, &widthA, &heightA, VImage::option()
-        ->set("background", backgroundAlpha(0, 0))
+        ->set("background", backgroundAlpha)
         ->set("threshold", threshold));
       if (widthA > 0 && heightA > 0) {
         if (width > 0 && height > 0) {

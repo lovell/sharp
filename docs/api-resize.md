@@ -238,7 +238,7 @@ Returns **Sharp**&#x20;
 
 ## trim
 
-Trim "boring" pixels from all edges that contain values similar to the top-left pixel.
+Trim pixels from all edges that contain values similar to the given background colour, which defaults to that of the top-left pixel.
 
 Images with an alpha channel will use the combined bounding box of alpha and non-alpha channels.
 
@@ -249,9 +249,51 @@ will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
 ### Parameters
 
-*   `threshold` **[number][8]** the allowed difference from the top-left pixel, a number greater than zero. (optional, default `10`)
+*   `trim` **([string][10] | [number][8] | [Object][9])** the specific background colour to trim, the threshold for doing so or an Object with both.
 
-<!---->
+    *   `trim.background` **([string][10] | [Object][9])** background colour, parsed by the [color][11] module, defaults to that of the top-left pixel. (optional, default `'top-left pixel'`)
+    *   `trim.threshold` **[number][8]** the allowed difference from the above colour, a positive number. (optional, default `10`)
+
+### Examples
+
+```javascript
+// Trim pixels with a colour similar to that of the top-left pixel.
+sharp(input)
+  .trim()
+  .toFile(output, function(err, info) {
+    ...
+  });
+```
+
+```javascript
+// Trim pixels with the exact same colour as that of the top-left pixel.
+sharp(input)
+  .trim(0)
+  .toFile(output, function(err, info) {
+    ...
+  });
+```
+
+```javascript
+// Trim only pixels with a similar colour to red.
+sharp(input)
+  .trim("#FF0000")
+  .toFile(output, function(err, info) {
+    ...
+  });
+```
+
+```javascript
+// Trim all "yellow-ish" pixels, being more lenient with the higher threshold.
+sharp(input)
+  .trim({
+    background: "yellow",
+    threshold: 42,
+  })
+  .toFile(output, function(err, info) {
+    ...
+  });
+```
 
 *   Throws **[Error][13]** Invalid parameters
 

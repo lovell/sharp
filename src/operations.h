@@ -85,7 +85,7 @@ namespace sharp {
   /*
     Trim an image
   */
-  VImage Trim(VImage image, double const threshold);
+  VImage Trim(VImage image, std::vector<double> background, double const threshold);
 
   /*
    * Linear adjustment (a * in + b)

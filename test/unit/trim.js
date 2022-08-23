@@ -7,22 +7,6 @@ const inRange = require('../../lib/is').inRange;
 const fixtures = require('../fixtures');
 
 describe('Trim borders', function () {
-  it('Threshold default', function (done) {
-    const expected = fixtures.expected('alpha-layer-1-fill-trim-resize.png');
-    sharp(fixtures.inputPngOverlayLayer1)
-      .resize(450, 322)
-      .trim()
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(450, info.width);
-        assert.strictEqual(322, info.height);
-        assert.strictEqual(-204, info.trimOffsetLeft);
-        assert.strictEqual(0, info.trimOffsetTop);
-        fixtures.assertSimilar(expected, data, done);
-      });
-  });
-
   it('Skip shrink-on-load', function (done) {
     const expected = fixtures.expected('alpha-layer-2-trim-resize.jpg');
     sharp(fixtures.inputJpgOverlayLayer2)
@@ -41,7 +25,7 @@ describe('Trim borders', function () {
       });
   });
 
-  it('single colour PNG where alpha channel provides the image', () =>
+  it('Single colour PNG where alpha channel provides the image', () =>
     sharp(fixtures.inputPngImageInAlpha)
       .trim()
       .toBuffer({ resolveWithObject: true })
@@ -94,7 +78,7 @@ describe('Trim borders', function () {
       .catch(done);
   });
 
-  it('should rotate before trim', () =>
+  it('Should rotate before trim', () =>
     sharp({
       create: {
         width: 20,
@@ -159,13 +143,105 @@ describe('Trim borders', function () {
     assert.strictEqual(trimOffsetLeft, 0);
   });
 
-  describe('Invalid thresholds', function () {
-    [-1, 'fail', {}].forEach(function (threshold) {
-      it(JSON.stringify(threshold), function () {
+  describe('Valid parameters', function () {
+    const expected = fixtures.expected('alpha-layer-1-fill-trim-resize.png');
+    Object.entries({
+      'Background and threshold default': undefined,
+      'Background string': '#00000000',
+      'Background option': {
+        background: '#00000000'
+      },
+      'Threshold number': 10,
+      'Threshold option': {
+        threshold: 10
+      }
+    }).forEach(function ([description, parameter]) {
+      it(description, function (done) {
+        sharp(fixtures.inputPngOverlayLayer1)
+          .resize(450, 322)
+          .trim(parameter)
+          .toBuffer(function (err, data, info) {
+            if (err) throw err;
+            assert.strictEqual('png', info.format);
+            assert.strictEqual(450, info.width);
+            assert.strictEqual(322, info.height);
+            assert.strictEqual(-204, info.trimOffsetLeft);
+            assert.strictEqual(0, info.trimOffsetTop);
+            fixtures.assertSimilar(expected, data, done);
+          });
+      });
+    });
+  });
+
+  describe('Invalid parameters', function () {
+    Object.entries({
+      'Invalid background string': 'fail',
+      'Invalid background option': {
+        background: 'fail'
+      },
+
+      'Negative threshold number': -1,
+      'Negative threshold option': {
+        threshold: -1
+      },
+
+      Boolean: false
+    }).forEach(function ([description, parameter]) {
+      it(description, function () {
         assert.throws(function () {
-          sharp().trim(threshold);
+          sharp().trim(parameter);
         });
       });
+    });
+  });
+
+  describe('Specific background colour', function () {
+    it('Doesn\'t trim at all', async () => {
+      const { info } = await sharp(fixtures.inputPngTrimSpecificColour)
+        .trim('yellow')
+        .toBuffer({ resolveWithObject: true });
+
+      const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+      assert.strictEqual(width, 900);
+      assert.strictEqual(height, 600);
+      assert.strictEqual(trimOffsetTop, 0);
+      assert.strictEqual(trimOffsetLeft, 0);
+    });
+
+    it('Only trims the bottom', async () => {
+      const { info } = await sharp(fixtures.inputPngTrimSpecificColour)
+        .trim('#21468B')
+        .toBuffer({ resolveWithObject: true });
+
+      const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+      assert.strictEqual(width, 900);
+      assert.strictEqual(height, 401);
+      assert.strictEqual(trimOffsetTop, 0);
+      assert.strictEqual(trimOffsetLeft, 0);
+    });
+
+    it('Only trims the bottom, in 16-bit', async () => {
+      const { info } = await sharp(fixtures.inputPngTrimSpecificColour16bit)
+        .trim('#21468B')
+        .toBuffer({ resolveWithObject: true });
+
+      const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+      assert.strictEqual(width, 900);
+      assert.strictEqual(height, 401);
+      assert.strictEqual(trimOffsetTop, 0);
+      assert.strictEqual(trimOffsetLeft, 0);
+    });
+
+    it('Only trims the bottom, including alpha', async () => {
+      const { info } = await sharp(fixtures.inputPngTrimSpecificColourIncludeAlpha)
+        .trim('#21468B80')
+        .toBuffer({ resolveWithObject: true });
+
+      const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+      assert.strictEqual(width, 900);
+      assert.strictEqual(height, 401);
+      assert.strictEqual(trimOffsetTop, 0);
+      assert.strictEqual(trimOffsetLeft, 0);
     });
   });
 });

@@ -118,7 +118,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Trim
       if (baton->trimThreshold > 0.0) {
         MultiPageUnsupported(nPages, "Trim");
-        image = sharp::Trim(image, baton->trimThreshold);
+        image = sharp::Trim(image, baton->trimBackground, baton->trimThreshold);
         baton->trimOffsetLeft = image.xoffset();
         baton->trimOffsetTop = image.yoffset();
       }
@@ -1451,6 +1451,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->sharpenY3 = sharp::AttrAsDouble(options, "sharpenY3");
   baton->threshold = sharp::AttrAsInt32(options, "threshold");
   baton->thresholdGrayscale = sharp::AttrAsBool(options, "thresholdGrayscale");
+  baton->trimBackground = sharp::AttrAsVectorOfDouble(options, "trimBackground");
   baton->trimThreshold = sharp::AttrAsDouble(options, "trimThreshold");
   baton->gamma = sharp::AttrAsDouble(options, "gamma");
   baton->gammaOut = sharp::AttrAsDouble(options, "gammaOut");
