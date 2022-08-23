@@ -55,6 +55,10 @@ Requires libvips v8.13.0
 * Ensure PNG bitdepth can be set for non-palette output.
   [#3322](https://github.com/lovell/sharp/issues/3322)
 
+* Add trim option to provide a specific background colour.
+  [#3332](https://github.com/lovell/sharp/pull/3332)
+  [@mart-jansink](https://github.com/mart-jansink)
+
 * Ensure resized image is unpremultiplied before composite.
   [#3334](https://github.com/lovell/sharp/issues/3334)
 
