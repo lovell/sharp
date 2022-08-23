@@ -233,6 +233,14 @@
   obj:*/libfontconfig.so.*
 }
 {
+  leak_fontconfig_XML_ParseBuffer_indirect
+  Memcheck:Leak
+  match-leak-kinds: indirect
+  ...
+  fun:XML_ParseBuffer
+  obj:*/libfontconfig.so.*
+}
+{
   leak_fontconfig_FcInitLoadConfigAndFonts
   Memcheck:Leak
   match-leak-kinds: definite
@@ -241,6 +249,36 @@
   fun:XML_ParseBuffer
   ...
   fun:FcInitLoadConfigAndFonts
+}
+{
+  leak_fontconfig_FcDefaultSubstitute
+  Memcheck:Leak
+  match-leak-kinds: indirect
+  fun:calloc
+  ...
+  fun:FcDefaultSubstitute
+  ...
+  fun:pango_itemize_with_base_dir
+  ...
+  fun:pango_layout_get_pixel_extents
+  fun:vips_text_get_extents
+}
+{
+  leak_fontconfig_FcLangSetCreate
+  Memcheck:Leak
+  match-leak-kinds: indirect
+  fun:malloc
+  fun:FcLangSetCreate
+  fun:FcLangSetCopy
+  fun:FcValueSave
+  ...
+  fun:FcFontRenderPrepare
+  fun:FcFontMatch
+  ...
+  fun:pango_itemize_with_base_dir
+  ...
+  fun:pango_layout_get_pixel_extents
+  fun:vips_text_get_extents
 }
 
 # heif
