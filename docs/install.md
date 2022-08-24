@@ -255,26 +255,6 @@ SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=gli
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
-### serverless-esbuild
-
-To deploy AWS Lambda using serverless framework, esbuild and serverless-esbuild on machines other than Linux x64 (glibc), first ensure sharp is excluded from bundling via the
-[external option](https://www.serverless.com/plugins/serverless-esbuild#options)
-configuration.
-Make changes inside `serverless.yml` under `esbuild` with the following.
-```
-custom:
-  # Keep existing changes
-  esbuild:
-    # Keep existing changes
-    external:
-      - sharp
-    packagerOptions:
-      scripts:
-        - npm install --arch=x64 --platform=linux sharp
-```
-After successful deployment, comment out the scripts `- npm install --arch=x64 --platform=linux sharp` if you want to use `serverless-offline`
-
-
 ## Bundlers
 
 ### webpack
@@ -306,6 +286,19 @@ buildSync({
 
 ```sh
 esbuild app.js --bundle --platform=node --external:sharp
+```
+
+For `serverless-esbuild`, ensure platform-specific binaries are installed
+via the `serverless.yml` configuration.
+
+```yaml
+custom:
+  esbuild:
+    external:
+      - sharp
+    packagerOptions:
+      scripts:
+        - npm install --arch=x64 --platform=linux sharp
 ```
 
 ## Fonts
