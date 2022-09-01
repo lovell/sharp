@@ -46,27 +46,10 @@ The I/O limits of the relevant (de)compression library will generally determine 
 
 ## Running the benchmark test
 
-Requires _ImageMagick_, _GraphicsMagick_ and _Mapnik_:
-
-```sh
-brew install imagemagick
-brew install graphicsmagick
-brew install mapnik
-```
-
-```sh
-sudo apt-get install build-essential imagemagick libmagick++-dev graphicsmagick libmapnik-dev
-```
-
-```sh
-sudo yum install ImageMagick-devel ImageMagick-c++-devel GraphicsMagick mapnik-devel
-```
+Requires Docker.
 
 ```sh
 git clone https://github.com/lovell/sharp.git
-cd sharp
-npm install --build-from-source
-cd test/bench
-npm install
-npm test
+cd sharp/test/bench
+./run-with-docker.sh
 ```
