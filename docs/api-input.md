@@ -7,15 +7,18 @@ Fast access to (uncached) image metadata without decoding any compressed pixel d
 This is taken from the header of the input image.
 It does not include operations, such as resize, to be applied to the output image.
 
+Dimensions in the response will respect the `page` and `pages` properties of the
+[constructor parameters][1].
+
 A `Promise` is returned when `callback` is not provided.
 
 *   `format`: Name of decoder used to decompress image data e.g. `jpeg`, `png`, `webp`, `gif`, `svg`
 *   `size`: Total size of image in bytes, for Stream and Buffer input only
 *   `width`: Number of pixels wide (EXIF orientation is not taken into consideration, see example below)
 *   `height`: Number of pixels high (EXIF orientation is not taken into consideration, see example below)
-*   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][1]
+*   `space`: Name of colour space interpretation e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...][2]
 *   `channels`: Number of bands e.g. `3` for sRGB, `4` for CMYK
-*   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][2]
+*   `depth`: Name of pixel depth format e.g. `uchar`, `char`, `ushort`, `float` [...][3]
 *   `density`: Number of pixels per inch (DPI), if present
 *   `chromaSubsampling`: String containing JPEG chroma subsampling, `4:2:0` or `4:4:4` for RGB, `4:2:0:4` or `4:4:4:4` for CMYK
 *   `isProgressive`: Boolean indicating whether the image is interlaced using a progressive scan
@@ -33,14 +36,14 @@ A `Promise` is returned when `callback` is not provided.
 *   `hasAlpha`: Boolean indicating the presence of an alpha transparency channel
 *   `orientation`: Number value of the EXIF Orientation header, if present
 *   `exif`: Buffer containing raw EXIF data, if present
-*   `icc`: Buffer containing raw [ICC][3] profile data, if present
+*   `icc`: Buffer containing raw [ICC][4] profile data, if present
 *   `iptc`: Buffer containing raw IPTC data, if present
 *   `xmp`: Buffer containing raw XMP data, if present
 *   `tifftagPhotoshop`: Buffer containing raw TIFFTAG\_PHOTOSHOP data, if present
 
 ### Parameters
 
-*   `callback` **[Function][4]?** called with the arguments `(err, metadata)`
+*   `callback` **[Function][5]?** called with the arguments `(err, metadata)`
 
 ### Examples
 
@@ -75,7 +78,7 @@ function getNormalSize({ width, height, orientation }) {
 }
 ```
 
-Returns **([Promise][5]<[Object][6]> | Sharp)**&#x20;
+Returns **([Promise][6]<[Object][7]> | Sharp)**&#x20;
 
 ## stats
 
@@ -103,7 +106,7 @@ written to a buffer in order to run `stats` on the result (see third example).
 
 ### Parameters
 
-*   `callback` **[Function][4]?** called with the arguments `(err, stats)`
+*   `callback` **[Function][5]?** called with the arguments `(err, stats)`
 
 ### Examples
 
@@ -129,16 +132,18 @@ const part = await image.extract(region).toBuffer();
 const stats = await sharp(part).stats();
 ```
 
-Returns **[Promise][5]<[Object][6]>**&#x20;
+Returns **[Promise][6]<[Object][7]>**&#x20;
 
-[1]: https://www.libvips.org/API/current/VipsImage.html#VipsInterpretation
+[1]: /api-constructor#parameters
 
-[2]: https://www.libvips.org/API/current/VipsImage.html#VipsBandFormat
+[2]: https://www.libvips.org/API/current/VipsImage.html#VipsInterpretation
 
-[3]: https://www.npmjs.com/package/icc
+[3]: https://www.libvips.org/API/current/VipsImage.html#VipsBandFormat
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[4]: https://www.npmjs.com/package/icc
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
+[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
