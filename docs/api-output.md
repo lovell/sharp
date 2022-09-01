@@ -472,7 +472,19 @@ AVIF image sequences are not supported.
     *   `options.effort` **[number][12]** CPU effort, between 0 (fastest) and 9 (slowest) (optional, default `4`)
     *   `options.chromaSubsampling` **[string][2]** set to '4:2:0' to use chroma subsampling (optional, default `'4:4:4'`)
 
-<!---->
+### Examples
+
+```javascript
+const data = await sharp(input)
+  .avif({ effort: 2 })
+  .toBuffer();
+```
+
+```javascript
+const data = await sharp(input)
+  .avif({ lossless: true })
+  .toBuffer();
+```
 
 *   Throws **[Error][4]** Invalid options
 
@@ -486,7 +498,7 @@ Returns **Sharp**&#x20;
 
 Use these HEIF options for output image.
 
-Support for patent-encumbered HEIC images requires the use of a
+Support for patent-encumbered HEIC images using `hevc` compression requires the use of a
 globally-installed libvips compiled with support for libheif, libde265 and x265.
 
 ### Parameters
@@ -499,7 +511,13 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
     *   `options.effort` **[number][12]** CPU effort, between 0 (fastest) and 9 (slowest) (optional, default `4`)
     *   `options.chromaSubsampling` **[string][2]** set to '4:2:0' to use chroma subsampling (optional, default `'4:4:4'`)
 
-<!---->
+### Examples
+
+```javascript
+const data = await sharp(input)
+  .heif({ compression: 'hevc' })
+  .toBuffer();
+```
 
 *   Throws **[Error][4]** Invalid options
 
