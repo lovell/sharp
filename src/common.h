@@ -129,6 +129,10 @@ namespace sharp {
   bool AttrAsBool(Napi::Object obj, std::string attr);
   std::vector<double> AttrAsVectorOfDouble(Napi::Object obj, std::string attr);
   std::vector<int32_t> AttrAsInt32Vector(Napi::Object obj, std::string attr);
+  template <class T> T AttrAsEnum(Napi::Object obj, std::string attr, GType type) {
+    return static_cast<T>(
+      vips_enum_from_nick(nullptr, type, AttrAsStr(obj, attr).data()));
+  }
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image
   InputDescriptor* CreateInputDescriptor(Napi::Object input);
@@ -325,16 +329,6 @@ namespace sharp {
     images are 0 - 1 for image data, but the alpha is 0 - 255.
   */
   double MaximumImageAlpha(VipsInterpretation const interpretation);
-
-  /*
-    Get boolean operation type from string
-  */
-  VipsOperationBoolean GetBooleanOperation(std::string const opStr);
-
-  /*
-    Get interpretation type from string
-  */
-  VipsInterpretation GetInterpretation(std::string const typeStr);
 
   /*
     Convert RGBA value to another colourspace

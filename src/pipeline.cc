@@ -321,16 +321,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Flatten image to remove alpha channel
       if (baton->flatten && sharp::HasAlpha(image)) {
-        // Scale up 8-bit values to match 16-bit input image
-        double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
-        // Background colour
-        std::vector<double> background {
-          baton->flattenBackground[0] * multiplier,
-          baton->flattenBackground[1] * multiplier,
-          baton->flattenBackground[2] * multiplier
-        };
-        image = image.flatten(VImage::option()
-          ->set("background", background));
+        image = sharp::Flatten(image, baton->flattenBackground);
       }
 
       // Negate the colours in the image
@@ -352,11 +343,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       bool const shouldBlur = baton->blurSigma != 0.0;
       bool const shouldConv = baton->convKernelWidth * baton->convKernelHeight > 0;
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
-      bool const shouldApplyMedian = baton->medianSize > 0;
       bool const shouldComposite = !baton->composite.empty();
-      bool const shouldModulate = baton->brightness != 1.0 || baton->saturation != 1.0 ||
-                                  baton->hue != 0.0 || baton->lightness != 0.0;
-      bool const shouldApplyClahe = baton->claheWidth != 0 && baton->claheHeight != 0;
 
       if (shouldComposite && !sharp::HasAlpha(image)) {
         image = sharp::EnsureAlpha(image, 1);
@@ -365,26 +352,15 @@ class PipelineWorker : public Napi::AsyncWorker {
       bool const shouldPremultiplyAlpha = sharp::HasAlpha(image) &&
         (shouldResize || shouldBlur || shouldConv || shouldSharpen);
 
-      // Premultiply image alpha channel before all transformations to avoid
-      // dark fringing around bright pixels
-      // See: http://entropymine.com/imageworsener/resizealpha/
       if (shouldPremultiplyAlpha) {
         image = image.premultiply();
       }
 
       // Resize
       if (shouldResize) {
-        VipsKernel kernel = static_cast<VipsKernel>(
-          vips_enum_from_nick(nullptr, VIPS_TYPE_KERNEL, baton->kernel.data()));
-        if (
-          kernel != VIPS_KERNEL_NEAREST && kernel != VIPS_KERNEL_CUBIC && kernel != VIPS_KERNEL_LANCZOS2 &&
-          kernel != VIPS_KERNEL_LANCZOS3 && kernel != VIPS_KERNEL_MITCHELL
-        ) {
-          throw vips::VError("Unknown kernel");
-        }
         image = image.resize(1.0 / hshrink, VImage::option()
           ->set("vscale", 1.0 / vshrink)
-          ->set("kernel", kernel));
+          ->set("kernel", baton->kernel));
       }
 
       // Flip (mirror about Y axis)
@@ -444,18 +420,12 @@ class PipelineWorker : public Napi::AsyncWorker {
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->resizeBackground, shouldPremultiplyAlpha);
 
           // Embed
-
-          // Calculate where to position the embedded image if gravity specified, else center.
           int left;
           int top;
-
-          left = static_cast<int>(round((baton->width - inputWidth) / 2));
-          top = static_cast<int>(round((baton->height - inputHeight) / 2));
-
-          int width = std::max(inputWidth, baton->width);
-          int height = std::max(inputHeight, baton->height);
           std::tie(left, top) = sharp::CalculateEmbedPosition(
             inputWidth, inputHeight, baton->width, baton->height, baton->position);
+          int width = std::max(inputWidth, baton->width);
+          int height = std::max(inputHeight, baton->height);
 
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
@@ -554,7 +524,7 @@ class PipelineWorker : public Napi::AsyncWorker {
               VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
       }
       // Median - must happen before blurring, due to the utility of blurring after thresholding
-      if (shouldApplyMedian) {
+      if (baton->medianSize > 0) {
         image = image.median(baton->medianSize);
       }
       // Threshold - must happen before blurring, due to the utility of blurring after thresholding
@@ -580,7 +550,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Recomb(image, baton->recombMatrix);
       }
 
-      if (shouldModulate) {
+      // Modulate
+      if (baton->brightness != 1.0 || baton->saturation != 1.0 || baton->hue != 0.0 || baton->lightness != 0.0) {
         image = sharp::Modulate(image, baton->brightness, baton->saturation, baton->hue, baton->lightness);
       }
 
@@ -698,7 +669,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Apply contrast limiting adaptive histogram equalization (CLAHE)
-      if (shouldApplyClahe) {
+      if (baton->claheWidth != 0 && baton->claheHeight != 0) {
         image = sharp::Clahe(image, baton->claheWidth, baton->claheHeight, baton->claheMaxSlope);
       }
 
@@ -1398,17 +1369,13 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   } else if (canvas == "ignore_aspect") {
     baton->canvas = sharp::Canvas::IGNORE_ASPECT;
   }
-  // Tint chroma
-  baton->tintA = sharp::AttrAsDouble(options, "tintA");
-  baton->tintB = sharp::AttrAsDouble(options, "tintB");
   // Composite
   Napi::Array compositeArray = options.Get("composite").As<Napi::Array>();
   for (unsigned int i = 0; i < compositeArray.Length(); i++) {
     Napi::Object compositeObject = compositeArray.Get(i).As<Napi::Object>();
     Composite *composite = new Composite;
     composite->input = sharp::CreateInputDescriptor(compositeObject.Get("input").As<Napi::Object>());
-    composite->mode = static_cast<VipsBlendMode>(
-      vips_enum_from_nick(nullptr, VIPS_TYPE_BLEND_MODE, sharp::AttrAsStr(compositeObject, "blend").data()));
+    composite->mode = sharp::AttrAsEnum<VipsBlendMode>(compositeObject, "blend", VIPS_TYPE_BLEND_MODE);
     composite->gravity = sharp::AttrAsUint32(compositeObject, "gravity");
     composite->left = sharp::AttrAsInt32(compositeObject, "left");
     composite->top = sharp::AttrAsInt32(compositeObject, "top");
@@ -1422,7 +1389,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->withoutReduction = sharp::AttrAsBool(options, "withoutReduction");
   baton->position = sharp::AttrAsInt32(options, "position");
   baton->resizeBackground = sharp::AttrAsVectorOfDouble(options, "resizeBackground");
-  baton->kernel = sharp::AttrAsStr(options, "kernel");
+  baton->kernel = sharp::AttrAsEnum<VipsKernel>(options, "kernel", VIPS_TYPE_KERNEL);
   baton->fastShrinkOnLoad = sharp::AttrAsBool(options, "fastShrinkOnLoad");
   // Join Channel Options
   if (options.Has("joinChannelIn")) {
@@ -1459,6 +1426,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->linearB = sharp::AttrAsVectorOfDouble(options, "linearB");
   baton->greyscale = sharp::AttrAsBool(options, "greyscale");
   baton->normalise = sharp::AttrAsBool(options, "normalise");
+  baton->tintA = sharp::AttrAsDouble(options, "tintA");
+  baton->tintB = sharp::AttrAsDouble(options, "tintB");
   baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");
   baton->claheHeight = sharp::AttrAsUint32(options, "claheHeight");
   baton->claheMaxSlope = sharp::AttrAsUint32(options, "claheMaxSlope");
@@ -1486,10 +1455,10 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->ensureAlpha = sharp::AttrAsDouble(options, "ensureAlpha");
   if (options.Has("boolean")) {
     baton->boolean = sharp::CreateInputDescriptor(options.Get("boolean").As<Napi::Object>());
-    baton->booleanOp = sharp::GetBooleanOperation(sharp::AttrAsStr(options, "booleanOp"));
+    baton->booleanOp = sharp::AttrAsEnum<VipsOperationBoolean>(options, "booleanOp", VIPS_TYPE_OPERATION_BOOLEAN);
   }
   if (options.Has("bandBoolOp")) {
-    baton->bandBoolOp = sharp::GetBooleanOperation(sharp::AttrAsStr(options, "bandBoolOp"));
+    baton->bandBoolOp = sharp::AttrAsEnum<VipsOperationBoolean>(options, "bandBoolOp", VIPS_TYPE_OPERATION_BOOLEAN);
   }
   if (options.Has("convKernel")) {
     Napi::Object kernel = options.Get("convKernel").As<Napi::Object>();
@@ -1511,11 +1480,12 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
        baton->recombMatrix[i] = sharp::AttrAsDouble(recombMatrix, i);
     }
   }
-  baton->colourspaceInput = sharp::GetInterpretation(sharp::AttrAsStr(options, "colourspaceInput"));
+  baton->colourspaceInput = sharp::AttrAsEnum<VipsInterpretation>(
+    options, "colourspaceInput", VIPS_TYPE_INTERPRETATION);
   if (baton->colourspaceInput == VIPS_INTERPRETATION_ERROR) {
     baton->colourspaceInput = VIPS_INTERPRETATION_LAST;
   }
-  baton->colourspace = sharp::GetInterpretation(sharp::AttrAsStr(options, "colourspace"));
+  baton->colourspace = sharp::AttrAsEnum<VipsInterpretation>(options, "colourspace", VIPS_TYPE_INTERPRETATION);
   if (baton->colourspace == VIPS_INTERPRETATION_ERROR) {
     baton->colourspace = VIPS_INTERPRETATION_sRGB;
   }
@@ -1580,28 +1550,19 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   if (baton->tiffXres == 1.0 && baton->tiffYres == 1.0 && baton->withMetadataDensity > 0) {
     baton->tiffXres = baton->tiffYres = baton->withMetadataDensity / 25.4;
   }
-  // tiff compression options
-  baton->tiffCompression = static_cast<VipsForeignTiffCompression>(
-  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_COMPRESSION,
-    sharp::AttrAsStr(options, "tiffCompression").data()));
-  baton->tiffPredictor = static_cast<VipsForeignTiffPredictor>(
-  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_PREDICTOR,
-    sharp::AttrAsStr(options, "tiffPredictor").data()));
-  baton->tiffResolutionUnit = static_cast<VipsForeignTiffResunit>(
-  vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_TIFF_RESUNIT,
-    sharp::AttrAsStr(options, "tiffResolutionUnit").data()));
-
+  baton->tiffCompression = sharp::AttrAsEnum<VipsForeignTiffCompression>(
+    options, "tiffCompression", VIPS_TYPE_FOREIGN_TIFF_COMPRESSION);
+  baton->tiffPredictor = sharp::AttrAsEnum<VipsForeignTiffPredictor>(
+    options, "tiffPredictor", VIPS_TYPE_FOREIGN_TIFF_PREDICTOR);
+  baton->tiffResolutionUnit = sharp::AttrAsEnum<VipsForeignTiffResunit>(
+    options, "tiffResolutionUnit", VIPS_TYPE_FOREIGN_TIFF_RESUNIT);
   baton->heifQuality = sharp::AttrAsUint32(options, "heifQuality");
   baton->heifLossless = sharp::AttrAsBool(options, "heifLossless");
-  baton->heifCompression = static_cast<VipsForeignHeifCompression>(
-    vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_HEIF_COMPRESSION,
-    sharp::AttrAsStr(options, "heifCompression").data()));
+  baton->heifCompression = sharp::AttrAsEnum<VipsForeignHeifCompression>(
+    options, "heifCompression", VIPS_TYPE_FOREIGN_HEIF_COMPRESSION);
   baton->heifEffort = sharp::AttrAsUint32(options, "heifEffort");
   baton->heifChromaSubsampling = sharp::AttrAsStr(options, "heifChromaSubsampling");
-  // Raw output
-  baton->rawDepth = static_cast<VipsBandFormat>(
-    vips_enum_from_nick(nullptr, VIPS_TYPE_BAND_FORMAT,
-    sharp::AttrAsStr(options, "rawDepth").data()));
+  baton->rawDepth = sharp::AttrAsEnum<VipsBandFormat>(options, "rawDepth", VIPS_TYPE_BAND_FORMAT);
   // Animated output properties
   if (sharp::HasAttr(options, "loop")) {
     baton->loop = sharp::AttrAsUint32(options, "loop");
@@ -1609,22 +1570,16 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   if (sharp::HasAttr(options, "delay")) {
     baton->delay = sharp::AttrAsInt32Vector(options, "delay");
   }
-  // Tile output
   baton->tileSize = sharp::AttrAsUint32(options, "tileSize");
   baton->tileOverlap = sharp::AttrAsUint32(options, "tileOverlap");
   baton->tileAngle = sharp::AttrAsInt32(options, "tileAngle");
   baton->tileBackground = sharp::AttrAsVectorOfDouble(options, "tileBackground");
   baton->tileSkipBlanks = sharp::AttrAsInt32(options, "tileSkipBlanks");
-  baton->tileContainer = static_cast<VipsForeignDzContainer>(
-    vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_DZ_CONTAINER,
-    sharp::AttrAsStr(options, "tileContainer").data()));
-  baton->tileLayout = static_cast<VipsForeignDzLayout>(
-    vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_DZ_LAYOUT,
-    sharp::AttrAsStr(options, "tileLayout").data()));
+  baton->tileContainer = sharp::AttrAsEnum<VipsForeignDzContainer>(
+    options, "tileContainer", VIPS_TYPE_FOREIGN_DZ_CONTAINER);
+  baton->tileLayout = sharp::AttrAsEnum<VipsForeignDzLayout>(options, "tileLayout", VIPS_TYPE_FOREIGN_DZ_LAYOUT);
   baton->tileFormat = sharp::AttrAsStr(options, "tileFormat");
-  baton->tileDepth = static_cast<VipsForeignDzDepth>(
-    vips_enum_from_nick(nullptr, VIPS_TYPE_FOREIGN_DZ_DEPTH,
-    sharp::AttrAsStr(options, "tileDepth").data()));
+  baton->tileDepth = sharp::AttrAsEnum<VipsForeignDzDepth>(options, "tileDepth", VIPS_TYPE_FOREIGN_DZ_DEPTH);
   baton->tileCentre = sharp::AttrAsBool(options, "tileCentre");
   baton->tileId = sharp::AttrAsStr(options, "tileId");
   baton->tileBasename = sharp::AttrAsStr(options, "tileBasename");

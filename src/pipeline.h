@@ -67,6 +67,7 @@ struct PipelineBaton {
   int width;
   int height;
   int channels;
+  VipsKernel kernel;
   sharp::Canvas canvas;
   int position;
   std::vector<double> resizeBackground;
@@ -75,7 +76,6 @@ struct PipelineBaton {
   int cropOffsetTop;
   bool premultiplied;
   bool tileCentre;
-  std::string kernel;
   bool fastShrinkOnLoad;
   double tintA;
   double tintB;
@@ -222,6 +222,7 @@ struct PipelineBaton {
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),
+    kernel(VIPS_KERNEL_LANCZOS3),
     canvas(sharp::Canvas::CROP),
     position(0),
     resizeBackground{ 0.0, 0.0, 0.0, 255.0 },

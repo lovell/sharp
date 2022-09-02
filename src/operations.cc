@@ -112,6 +112,19 @@ namespace sharp {
     }
   }
 
+  /*
+   * Flatten image to remove alpha channel
+   */
+  VImage Flatten(VImage image, std::vector<double> flattenBackground) {
+    double const multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
+    std::vector<double> background {
+      flattenBackground[0] * multiplier,
+      flattenBackground[1] * multiplier,
+      flattenBackground[2] * multiplier
+    };
+    return image.flatten(VImage::option()->set("background", background));
+  }
+
   /**
    * Produce the "negative" of the image.
    */

@@ -88,18 +88,14 @@ namespace sharp {
       descriptor->buffer = buffer.Data();
       descriptor->isBuffer = TRUE;
     }
-    descriptor->failOn = static_cast<VipsFailOn>(
-      vips_enum_from_nick(nullptr, VIPS_TYPE_FAIL_ON,
-      AttrAsStr(input, "failOn").data()));
+    descriptor->failOn = AttrAsEnum<VipsFailOn>(input, "failOn", VIPS_TYPE_FAIL_ON);
     // Density for vector-based input
     if (HasAttr(input, "density")) {
       descriptor->density = AttrAsDouble(input, "density");
     }
     // Raw pixel input
     if (HasAttr(input, "rawChannels")) {
-      descriptor->rawDepth = static_cast<VipsBandFormat>(
-        vips_enum_from_nick(nullptr, VIPS_TYPE_BAND_FORMAT,
-        AttrAsStr(input, "rawDepth").data()));
+      descriptor->rawDepth = AttrAsEnum<VipsBandFormat>(input, "rawDepth", VIPS_TYPE_BAND_FORMAT);
       descriptor->rawChannels = AttrAsUint32(input, "rawChannels");
       descriptor->rawWidth = AttrAsUint32(input, "rawWidth");
       descriptor->rawHeight = AttrAsUint32(input, "rawHeight");
@@ -149,9 +145,7 @@ namespace sharp {
         descriptor->textHeight = AttrAsUint32(input, "textHeight");
       }
       if (HasAttr(input, "textAlign")) {
-        descriptor->textAlign = static_cast<VipsAlign>(
-          vips_enum_from_nick(nullptr, VIPS_TYPE_ALIGN,
-          AttrAsStr(input, "textAlign").data()));
+        descriptor->textAlign = AttrAsEnum<VipsAlign>(input, "textAlign", VIPS_TYPE_ALIGN);
       }
       if (HasAttr(input, "textJustify")) {
         descriptor->textJustify = AttrAsBool(input, "textJustify");
@@ -853,22 +847,6 @@ namespace sharp {
   */
   double MaximumImageAlpha(VipsInterpretation const interpretation) {
     return Is16Bit(interpretation) ? 65535.0 : 255.0;
-  }
-
-  /*
-    Get boolean operation type from string
-  */
-  VipsOperationBoolean GetBooleanOperation(std::string const opStr) {
-    return static_cast<VipsOperationBoolean>(
-      vips_enum_from_nick(nullptr, VIPS_TYPE_OPERATION_BOOLEAN, opStr.data()));
-  }
-
-  /*
-    Get interpretation type from string
-  */
-  VipsInterpretation GetInterpretation(std::string const typeStr) {
-    return static_cast<VipsInterpretation>(
-      vips_enum_from_nick(nullptr, VIPS_TYPE_INTERPRETATION, typeStr.data()));
   }
 
   /*

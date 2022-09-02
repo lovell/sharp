@@ -46,6 +46,11 @@ namespace sharp {
   VImage Gamma(VImage image, double const exponent);
 
   /*
+   * Flatten image to remove alpha channel
+   */
+  VImage Flatten(VImage image, std::vector<double> flattenBackground);
+
+  /*
    * Produce the "negative" of the image.
    */
   VImage Negate(VImage image, bool const negateAlpha);
