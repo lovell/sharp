@@ -10,7 +10,7 @@ A test to benchmark the performance of this module relative to alternatives.
 * [gm](https://www.npmjs.com/package/gm) v1.23.1 - Fully featured wrapper around GraphicsMagick's `gm` command line utility.
 * [@squoosh/lib](https://www.npmjs.com/package/@squoosh/lib) v0.4.0 - Image libraries transpiled to WebAssembly, includes GPLv3 code.
 * [@squoosh/cli](https://www.npmjs.com/package/@squoosh/cli) v0.7.2 - Command line wrapper around `@squoosh/lib`, avoids GPLv3 by spawning process.
-* sharp v0.30.0 / libvips v8.12.2 - Caching within libvips disabled to ensure a fair comparison.
+* sharp v0.31.0 / libvips v8.13.1 - Caching within libvips disabled to ensure a fair comparison.
 
 ## The task
 
@@ -20,24 +20,24 @@ then compress to JPEG at a "quality" setting of 80.
 
 ## Test environment
 
-* AWS EC2 eu-west-1 [c5ad.xlarge](https://aws.amazon.com/ec2/instance-types/c5/) (4x AMD EPYC 7R32)
-* Ubuntu 21.10 (ami-0258eeb71ddf238b3)
-* Node.js 16.13.2
+* AWS EC2 eu-west-1 [c6a.xlarge](https://aws.amazon.com/ec2/instance-types/c6a/) (4x AMD EPYC 7R13)
+* Ubuntu 22.04 (ami-051f7c00cb18501ee)
+* Node.js 16.17.0
 
 ## Results
 
 | Module             | Input  | Output | Ops/sec | Speed-up |
 | :----------------- | :----- | :----- | ------: | -------: |
-| jimp               | buffer | buffer |    0.84 |      1.0 |
-| squoosh-cli        | file   | file   |    1.08 |      1.3 |
-| squoosh-lib        | buffer | buffer |    1.85 |      2.2 |
-| mapnik             | buffer | buffer |    3.45 |      4.1 |
-| gm                 | buffer | buffer |    8.60 |     10.2 |
-| gm                 | file   | file   |    8.66 |     10.3 |
-| imagemagick        | file   | file   |    8.79 |     10.5 |
-| sharp              | stream | stream |   28.90 |     34.4 |
-| sharp              | file   | file   |   30.08 |     35.8 |
-| sharp              | buffer | buffer |   30.42 |     36.2 |
+| jimp               | buffer | buffer |    0.96 |      1.0 |
+| squoosh-cli        | file   | file   |    1.10 |      1.1 |
+| squoosh-lib        | buffer | buffer |    1.87 |      1.9 |
+| mapnik             | buffer | buffer |    3.48 |      3.6 |
+| gm                 | buffer | buffer |    8.53 |      8.9 |
+| gm                 | file   | file   |    8.60 |      9.0 |
+| imagemagick        | file   | file   |    9.30 |      9.7 |
+| sharp              | stream | stream |   32.86 |     34.2 |
+| sharp              | file   | file   |   34.82 |     36.3 |
+| sharp              | buffer | buffer |   35.41 |     36.9 |
 
 Greater libvips performance can be expected with caching enabled (default)
 and using 8+ core machines, especially those with larger L1/L2 CPU caches.
