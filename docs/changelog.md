@@ -2,7 +2,7 @@
 
 ## v0.31 - *eagle*
 
-Requires libvips v8.13.0
+Requires libvips v8.13.1
 
 ### v0.31.0 - TBD
 

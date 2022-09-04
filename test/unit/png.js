@@ -203,7 +203,7 @@ describe('PNG', function () {
     const { channels, paletteBitDepth, size, space } = await sharp(data).metadata();
     assert.strictEqual(channels, 1);
     assert.strictEqual(paletteBitDepth, undefined);
-    assert.strictEqual(size, 90);
+    assert.strictEqual(size, 89);
     assert.strictEqual(space, 'b-w');
   });
 

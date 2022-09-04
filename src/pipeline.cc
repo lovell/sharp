@@ -204,6 +204,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         vips::VOption *option = VImage::option()
           ->set("access", baton->input->access)
           ->set("shrink", jpegShrinkOnLoad)
+          ->set("unlimited", baton->input->unlimited)
           ->set("fail_on", baton->input->failOn);
         if (baton->input->buffer != nullptr) {
           // Reload JPEG buffer

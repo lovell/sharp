@@ -680,7 +680,7 @@ describe('Input/output', function () {
       });
   });
 
-  describe('Switch off safety limits for PNG/SVG input', () => {
+  describe('Switch off safety limits for PNG/SVG/JPEG input', () => {
     it('Valid', () => {
       assert.doesNotThrow(() => {
         sharp({ unlimited: true });

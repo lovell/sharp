@@ -72,11 +72,7 @@ describe('AVIF', () => {
       format: 'heif',
       hasAlpha: false,
       hasProfile: false,
-      // FIXME(kleisauke): https://github.com/strukturag/libheif/issues/365
-      // $ vips black x.avif 32 13
-      // $ vipsheader x.avif
-      // x.avif: 32x12 uchar, 3 bands, srgb, heifload
-      height: 12,
+      height: 13,
       isProgressive: false,
       pagePrimary: 0,
       pages: 1,

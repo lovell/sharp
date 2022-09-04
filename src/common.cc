@@ -164,7 +164,7 @@ namespace sharp {
     descriptor->limitInputPixels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputPixels"));
     // Allow switch from random to sequential access
     descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
-    // Remove safety features and allow unlimited SVG/PNG input
+    // Remove safety features and allow unlimited SVG/PNG/JPEG input
     descriptor->unlimited = AttrAsBool(input, "unlimited");
     return descriptor;
   }
@@ -362,7 +362,8 @@ namespace sharp {
             vips::VOption *option = VImage::option()
               ->set("access", descriptor->access)
               ->set("fail_on", descriptor->failOn);
-            if (descriptor->unlimited && (imageType == ImageType::SVG || imageType == ImageType::PNG)) {
+            if (descriptor->unlimited &&
+              (imageType == ImageType::SVG || imageType == ImageType::PNG || imageType == ImageType::JPEG)) {
               option->set("unlimited", TRUE);
             }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
@@ -465,7 +466,8 @@ namespace sharp {
             vips::VOption *option = VImage::option()
               ->set("access", descriptor->access)
               ->set("fail_on", descriptor->failOn);
-            if (descriptor->unlimited && (imageType == ImageType::SVG || imageType == ImageType::PNG)) {
+            if (descriptor->unlimited &&
+              (imageType == ImageType::SVG || imageType == ImageType::PNG || imageType == ImageType::JPEG)) {
               option->set("unlimited", TRUE);
             }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
