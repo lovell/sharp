@@ -23,7 +23,7 @@ describe('failOn', () => {
     let isWarningEmitted = false;
     sharp(fixtures.inputPngTruncated, { failOn: 'none' })
       .on('warning', function (warning) {
-        assert.ok(warning.includes('not enough data') || warning.includes('end of stream'));
+        assert.ok(['read gave 2 warnings', 'not enough data', 'end of stream'].includes(warning));
         isWarningEmitted = true;
       })
       .resize(32, 24)
