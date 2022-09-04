@@ -16,6 +16,9 @@ Requires libvips v8.13.0
 
 * The `flip` and `flop` operations will now occur before the `rotate` operation.
 
+* Improve `normalise` operation with use of histogram.
+  [#200](https://github.com/lovell/sharp/issues/200)
+
 * Use combined bounding box of alpha and non-alpha channels for `trim` operation.
   [#2166](https://github.com/lovell/sharp/issues/2166)
 

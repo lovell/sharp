@@ -68,10 +68,9 @@ namespace sharp {
     // Extract luminance
     VImage luminance = lab[0];
     // Find luminance range
-    VImage stats = luminance.stats();
-    double min = stats(0, 0)[0];
-    double max = stats(1, 0)[0];
-    if (min != max) {
+    int const min = luminance.percent(1);
+    int const max = luminance.percent(99);
+    if (std::abs(max - min) > 1) {
       // Extract chroma
       VImage chroma = lab.extract_band(1, VImage::option()->set("n", 2));
       // Calculate multiplication factor and addition

@@ -13,7 +13,7 @@ const assertNormalized = function (data) {
     max = Math.max(max, data[i]);
   }
   assert.strictEqual(0, min);
-  assert.strictEqual(255, max);
+  assert.ok([254, 255].includes(max));
 };
 
 describe('Normalization', function () {
@@ -30,7 +30,6 @@ describe('Normalization', function () {
 
   it('spreads grayscaled image values between 0 and 255', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
-      .gamma()
       .greyscale()
       .normalize(true)
       .raw()
