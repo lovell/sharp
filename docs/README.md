@@ -63,6 +63,10 @@ PNG filtering is disabled by default,
 which for diagrams and line art often produces the same result
 as [pngcrush](https://pmt.sourceforge.io/pngcrush/).
 
+The file size of animated GIF output is optimised
+without having to use separate command line tools such as
+[gifsicle](https://www.lcdf.org/gifsicle/).
+
 ### Contributing
 
 A [guide for contributors](https://github.com/lovell/sharp/blob/main/.github/CONTRIBUTING.md)
