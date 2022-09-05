@@ -4,7 +4,7 @@
 
 Requires libvips v8.13.1
 
-### v0.31.0 - TBD
+### v0.31.0 - 5th September 2022
 
 * Drop support for Node.js 12, now requires Node.js >= 14.15.0.
 
