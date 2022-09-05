@@ -207,6 +207,11 @@ namespace sharp {
   bool ImageTypeSupportsPage(ImageType imageType);
 
   /*
+    Does this image type support removal of safety limits?
+  */
+  bool ImageTypeSupportsUnlimited(ImageType imageType);
+
+  /*
     Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
   */
   std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor);
