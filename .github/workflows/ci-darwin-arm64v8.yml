@@ -33,4 +33,4 @@ jobs:
         if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
         env:
           prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
-        run: npx prebuild --runtime napi --target 5
+        run: npx prebuild --runtime napi --target 7
