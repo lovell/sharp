@@ -12,6 +12,8 @@ When both a `width` and `height` are provided, the possible methods by which the
 *   `inside`: Preserving aspect ratio, resize the image to be as large as possible while ensuring its dimensions are less than or equal to both those specified.
 *   `outside`: Preserving aspect ratio, resize the image to be as small as possible while ensuring its dimensions are greater than or equal to both those specified.
 
+![image](https://user-images.githubusercontent.com/25119847/188477841-22a9651c-993c-4735-a7bf-70c2828d3150.png)
+
 Some of these values are based on the [object-fit][1] CSS property.
 
 When using a `fit` of `cover` or `contain`, the default **position** is `centre`. Other options are:
