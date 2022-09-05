@@ -98,6 +98,7 @@ module.exports = {
   inputPngTrimSpecificColour: getPath('Flag_of_the_Netherlands.png'), // https://commons.wikimedia.org/wiki/File:Flag_of_the_Netherlands.svg
   inputPngTrimSpecificColour16bit: getPath('Flag_of_the_Netherlands-16bit.png'), // convert Flag_of_the_Netherlands.png -depth 16 Flag_of_the_Netherlands-16bit.png
   inputPngTrimSpecificColourIncludeAlpha: getPath('Flag_of_the_Netherlands-alpha.png'), // convert Flag_of_the_Netherlands.png -alpha set -background none -channel A -evaluate multiply 0.5 +channel Flag_of_the_Netherlands-alpha.png
+  inputPngUint32Limit: getPath('65536-uint32-limit.png'), // https://alexandre.alapetite.fr/doc-alex/large-image/
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp
