@@ -745,6 +745,17 @@ describe('Input/output', function () {
         })
     );
 
+    it('Enabling default limit works and fails for an image with resolution higher than uint32 limit', () =>
+      sharp(fixtures.inputPngUint32Limit, { limitInputPixels: true })
+        .toBuffer()
+        .then(() => {
+          assert.fail('Expected to fail');
+        })
+        .catch(err => {
+          assert.strictEqual(err.message, 'Input image exceeds pixel limit');
+        })
+    );
+
     it('Smaller than input fails', () =>
       sharp(fixtures.inputJpg)
         .metadata()

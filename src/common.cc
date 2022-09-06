@@ -507,9 +507,10 @@ namespace sharp {
         }
       }
     }
+
     // Limit input images to a given number of pixels, where pixels = width * height
     if (descriptor->limitInputPixels > 0 &&
-      static_cast<uint64_t>(image.width() * image.height()) > descriptor->limitInputPixels) {
+      static_cast<uint64_t>(image.width()) * image.height() > descriptor->limitInputPixels) {
       throw vips::VError("Input image exceeds pixel limit");
     }
     return std::make_tuple(image, imageType);
