@@ -92,7 +92,10 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Rotate pre-extract
-      if (baton->rotateBeforePreExtract) {
+      bool const shouldRotateBefore = baton->rotateBeforePreExtract &&
+        (rotation != VIPS_ANGLE_D0 || flip || flop || baton->rotationAngle != 0.0);
+
+      if (shouldRotateBefore) {
         if (rotation != VIPS_ANGLE_D0) {
           image = image.rot(rotation);
         }
@@ -167,7 +170,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       //  - input colourspace is not specified;
       bool const shouldPreShrink = (targetResizeWidth > 0 || targetResizeHeight > 0) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold == 0.0 &&
-        baton->colourspaceInput == VIPS_INTERPRETATION_LAST;
+        baton->colourspaceInput == VIPS_INTERPRETATION_LAST && !shouldRotateBefore;
 
       if (shouldPreShrink) {
         // The common part of the shrink: the bit by which both axes must be shrunk

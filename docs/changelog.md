@@ -10,6 +10,9 @@ Requires libvips v8.13.1
   [#3349](https://github.com/lovell/sharp/pull/3349)
   [@marcosc90](https://github.com/marcosc90)
 
+* Ensure auto-rotation works with shrink-on-load and extract (regression in 0.31.0).
+  [#3352](https://github.com/lovell/sharp/issues/3352)
+
 ### v0.31.0 - 5th September 2022
 
 * Drop support for Node.js 12, now requires Node.js >= 14.15.0.

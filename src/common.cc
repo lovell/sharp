@@ -557,6 +557,7 @@ namespace sharp {
   VImage RemoveExifOrientation(VImage image) {
     VImage copy = image.copy();
     copy.remove(VIPS_META_ORIENTATION);
+    copy.remove("exif-ifd0-Orientation");
     return copy;
   }
 

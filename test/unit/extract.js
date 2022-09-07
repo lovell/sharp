@@ -300,7 +300,7 @@ describe('Partial image extraction', function () {
       const s = sharp();
       s.on('warning', function (msg) { warningMessage = msg; });
       const options = { top: 0, left: 0, width: 1, height: 1 };
-      s.extract(options);
+      s.extract(options).extract(options);
       assert.strictEqual(warningMessage, '');
       s.extract(options);
       assert.strictEqual(warningMessage, 'ignoring previous extract options');
@@ -311,7 +311,7 @@ describe('Partial image extraction', function () {
       const s = sharp().rotate();
       s.on('warning', function (msg) { warningMessage = msg; });
       const options = { top: 0, left: 0, width: 1, height: 1 };
-      s.extract(options);
+      s.extract(options).extract(options);
       assert.strictEqual(warningMessage, '');
       s.extract(options);
       assert.strictEqual(warningMessage, 'ignoring previous extract options');

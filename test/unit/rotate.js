@@ -406,4 +406,16 @@ describe('Rotation', function () {
         fixtures.assertSimilar(fixtures.expected('rotate-and-flop.jpg'), data, done);
       });
   });
+
+  it('Auto-rotate and shrink-on-load', async () => {
+    const [r, g, b] = await sharp(fixtures.inputJpgWithLandscapeExif3)
+      .rotate()
+      .resize(8)
+      .raw()
+      .toBuffer();
+
+    assert.strictEqual(r, 60);
+    assert.strictEqual(g, 73);
+    assert.strictEqual(b, 52);
+  });
 });
