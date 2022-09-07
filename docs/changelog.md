@@ -4,6 +4,12 @@
 
 Requires libvips v8.13.1
 
+### v0.31.1 - TBD
+
+* Ensure `limitInputPixels` constructor option uses uint64.
+  [#3349](https://github.com/lovell/sharp/pull/3349)
+  [@marcosc90](https://github.com/marcosc90)
+
 ### v0.31.0 - 5th September 2022
 
 * Drop support for Node.js 12, now requires Node.js >= 14.15.0.
