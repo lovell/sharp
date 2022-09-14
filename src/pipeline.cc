@@ -902,12 +902,13 @@ class PipelineWorker : public Napi::AsyncWorker {
         } else if (baton->formatOut == "heif" ||
           (baton->formatOut == "input" && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to buffer
-          image = sharp::RemoveAnimationProperties(image);
+          image = sharp::RemoveAnimationProperties(image).cast(VIPS_FORMAT_UCHAR);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.heifsave_buffer(VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
             ->set("effort", baton->heifEffort)
+            ->set("bitdepth", 8)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("lossless", baton->heifLossless)));
@@ -1073,12 +1074,13 @@ class PipelineWorker : public Napi::AsyncWorker {
         } else if (baton->formatOut == "heif" || (mightMatchInput && isHeif) ||
           (willMatchInput && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to file
-          image = sharp::RemoveAnimationProperties(image);
+          image = sharp::RemoveAnimationProperties(image).cast(VIPS_FORMAT_UCHAR);
           image.heifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("strip", !baton->withMetadata)
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
             ->set("effort", baton->heifEffort)
+            ->set("bitdepth", 8)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("lossless", baton->heifLossless));

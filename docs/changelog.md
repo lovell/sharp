@@ -13,6 +13,9 @@ Requires libvips v8.13.1
 * Ensure auto-rotation works with shrink-on-load and extract (regression in 0.31.0).
   [#3352](https://github.com/lovell/sharp/issues/3352)
 
+* Ensure AVIF output is always 8-bit.
+  [#3358](https://github.com/lovell/sharp/issues/3358)
+
 ### v0.31.0 - 5th September 2022
 
 * Drop support for Node.js 12, now requires Node.js >= 14.15.0.

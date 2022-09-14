@@ -103,4 +103,28 @@ describe('AVIF', () => {
       width: 10
     });
   });
+
+  it('should cast to uchar', async () => {
+    const data = await sharp(inputJpg)
+      .resize(32)
+      .sharpen()
+      .avif({ effort: 0 })
+      .toBuffer();
+    const { size, ...metadata } = await sharp(data)
+      .metadata();
+    assert.deepStrictEqual(metadata, {
+      channels: 3,
+      compression: 'av1',
+      depth: 'uchar',
+      format: 'heif',
+      hasAlpha: false,
+      hasProfile: false,
+      height: 26,
+      isProgressive: false,
+      pagePrimary: 0,
+      pages: 1,
+      space: 'srgb',
+      width: 32
+    });
+  });
 });
