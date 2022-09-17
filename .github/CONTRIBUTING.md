@@ -33,6 +33,7 @@ To test C++ changes, you can compile the module using `npm install --build-from-
 
 Please add JavaScript [unit tests](https://github.com/lovell/sharp/tree/main/test/unit) to cover your new feature.
 A test coverage report for the JavaScript code is generated in the `coverage/lcov-report` directory.
+Please also update the [TypeScript definitions](https://github.com/lovell/sharp/tree/main/lib/index.d.ts), along with the [type definition tests](https://github.com/lovell/sharp/tree/main/test/types/sharp.test-d.ts).
 
 Where possible, the functional tests use gradient-based perceptual hashes
 based on [dHash](http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html)
