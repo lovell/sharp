@@ -139,6 +139,7 @@
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
+    "@types/node": "*",
     "async": "^3.2.4",
     "cc": "^3.0.1",
     "exif-reader": "^1.1.0",
