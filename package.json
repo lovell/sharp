@@ -90,16 +90,18 @@
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
-    "test": "npm run test-lint && npm run test-unit && npm run test-licensing",
+    "test": "npm run test-lint && npm run test-unit && npm run test-licensing && npm run test-types",
     "test-lint": "semistandard && cpplint",
     "test-unit": "nyc --reporter=lcov --reporter=text --check-coverage --branches=100 mocha",
     "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;MIT\"",
     "test-leak": "./test/leak/leak.sh",
+    "test-types": "tsd",
     "docs-build": "node docs/build && node docs/search-index/build",
     "docs-serve": "cd docs && npx serve",
     "docs-publish": "cd docs && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
   },
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "files": [
     "binding.gyp",
     "install/**",
@@ -152,7 +154,8 @@
     "nyc": "^15.1.0",
     "prebuild": "^11.0.4",
     "rimraf": "^3.0.2",
-    "semistandard": "^16.0.1"
+    "semistandard": "^16.0.1",
+    "tsd": "^0.24.1"
   },
   "license": "Apache-2.0",
   "config": {
@@ -194,5 +197,8 @@
     "filter": [
       "build/include"
     ]
+  },
+  "tsd": {
+    "directory": "test/types/"
   }
 }
