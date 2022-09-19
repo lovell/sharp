@@ -10,6 +10,7 @@
   "devDependencies": {
     "@squoosh/cli": "0.7.2",
     "@squoosh/lib": "0.4.0",
+    "@tensorflow/tfjs-node": "^3.20.0",
     "async": "3.2.4",
     "benchmark": "2.1.4",
     "gm": "1.23.1",

@@ -14,6 +14,8 @@ const imagemagick = require('imagemagick');
 const mapnik = require('mapnik');
 const jimp = require('jimp');
 const squoosh = require('@squoosh/lib');
+process.env.TF_CPP_MIN_LOG_LEVEL = 1;
+const tfjs = require('@tensorflow/tfjs-node');
 
 const fixtures = require('../fixtures');
 
@@ -247,6 +249,24 @@ async.series({
             } else {
               deferred.resolve();
             }
+          });
+      }
+    });
+    // tfjs
+    jpegSuite.add('tfjs-node-buffer-buffer', {
+      defer: true,
+      fn: function (deferred) {
+        const decoded = tfjs.node.decodeJpeg(inputJpgBuffer);
+        const resized = tfjs.image.resizeBilinear(decoded, [height, width]);
+        tfjs
+          .node
+          .encodeJpeg(resized, 'rgb', 80)
+          .then(function () {
+            deferred.resolve();
+            tfjs.disposeVariables();
+          })
+          .catch(function (err) {
+            throw err;
           });
       }
     });
