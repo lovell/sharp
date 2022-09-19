@@ -5,7 +5,6 @@ const fs = require('fs');
 const { exec } = require('child_process');
 
 const async = require('async');
-const assert = require('assert');
 const Benchmark = require('benchmark');
 
 // Contenders
@@ -212,11 +211,10 @@ async.series({
           .filter('Lanczos')
           .resize(width, height)
           .quality(80)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -243,11 +241,10 @@ async.series({
           .filter('Lanczos')
           .resize(width, height)
           .quality(80)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -272,11 +269,10 @@ async.series({
       fn: function (deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -311,11 +307,10 @@ async.series({
       fn: function (deferred) {
         sharp(fixtures.inputJpg)
           .resize(width, height)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -326,8 +321,7 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .toBuffer()
-          .then(function (buffer) {
-            assert.notStrictEqual(null, buffer);
+          .then(function () {
             deferred.resolve();
           })
           .catch(function (err) {
@@ -350,11 +344,10 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .sharpen()
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -365,11 +358,10 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .sharpen(3, 1, 3)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -380,11 +372,10 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .blur()
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -395,11 +386,10 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .blur(3)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -410,11 +400,10 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .gamma()
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -425,11 +414,10 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .normalise()
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -440,11 +428,10 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .greyscale()
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -456,11 +443,10 @@ async.series({
           .resize(width, height)
           .gamma()
           .greyscale()
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -471,11 +457,10 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .jpeg({ progressive: true })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -486,11 +471,10 @@ async.series({
         sharp(inputJpgBuffer)
           .resize(width, height)
           .jpeg({ chromaSubsampling: '4:4:4' })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -501,11 +485,10 @@ async.series({
         sharp(inputJpgBuffer)
           .rotate(90)
           .resize(width, height)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -516,12 +499,11 @@ async.series({
         sharp.simd(false);
         sharp(inputJpgBuffer)
           .resize(width, height)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             sharp.simd(true);
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -531,11 +513,10 @@ async.series({
       fn: function (deferred) {
         sharp(inputJpgBuffer, { sequentialRead: true })
           .resize(width, height)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -548,11 +529,10 @@ async.series({
             fit: 'cover',
             position: sharp.strategy.entropy
           })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -565,11 +545,10 @@ async.series({
             fit: 'cover',
             position: sharp.strategy.attention
           })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -588,11 +567,10 @@ async.series({
       fn: function (deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height, { kernel: 'cubic' })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -602,11 +580,10 @@ async.series({
       fn: function (deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height, { kernel: 'lanczos2' })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -616,11 +593,10 @@ async.series({
       fn: function (deferred) {
         sharp(inputJpgBuffer)
           .resize(width, height, { kernel: 'lanczos3' })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -774,11 +750,10 @@ async.series({
           .resize(width, height)
           .define('PNG:compression-level=6')
           .define('PNG:compression-filter=0')
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -807,11 +782,10 @@ async.series({
         sharp(inputPngBuffer)
           .resize(width, height)
           .png({ compressionLevel: 6 })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -838,11 +812,10 @@ async.series({
         sharp(fixtures.inputPngAlphaPremultiplicationLarge)
           .resize(width, height)
           .png({ compressionLevel: 6 })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -854,11 +827,10 @@ async.series({
         sharp(inputPngBuffer)
           .resize(width, height)
           .png({ compressionLevel: 6, progressive: true })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -870,11 +842,10 @@ async.series({
         sharp(inputPngBuffer)
           .resize(width, height)
           .png({ adaptiveFiltering: true, compressionLevel: 6 })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -886,11 +857,10 @@ async.series({
         sharp(inputPngBuffer)
           .resize(width, height)
           .png({ compressionLevel: 9 })
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -923,11 +893,10 @@ async.series({
       fn: function (deferred) {
         sharp(inputWebPBuffer)
           .resize(width, height)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -950,11 +919,10 @@ async.series({
       fn: function (deferred) {
         sharp(fixtures.inputWebP)
           .resize(width, height)
-          .toBuffer(function (err, buffer) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
-              assert.notStrictEqual(null, buffer);
               deferred.resolve();
             }
           });
@@ -966,7 +934,9 @@ async.series({
     }).run();
   }
 }, function (err, results) {
-  assert(!err, err);
+  if (err) {
+    throw err;
+  }
   Object.keys(results).forEach(function (format) {
     if (results[format].toString().substr(0, 5) !== 'sharp') {
       console.log('sharp was slower than ' + results[format] + ' for ' + format);
