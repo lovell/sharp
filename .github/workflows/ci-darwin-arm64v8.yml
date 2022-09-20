@@ -3,7 +3,7 @@ on:
   - push
   - pull_request
 permissions:
-  contents: read # to fetch code (actions/checkout)
+  contents: write # for npx prebuild to make release
 jobs:
   CI:
     runs-on: macos-m1
