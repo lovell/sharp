@@ -6,6 +6,9 @@ Requires libvips v8.13.1
 
 ### v0.31.1 - TBD
 
+* Ensure `close` event occurs after `end` event for Stream-based output.
+  [#3313](https://github.com/lovell/sharp/issues/3313)
+
 * Ensure `limitInputPixels` constructor option uses uint64.
   [#3349](https://github.com/lovell/sharp/pull/3349)
   [@marcosc90](https://github.com/marcosc90)
