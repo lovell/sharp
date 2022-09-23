@@ -2,10 +2,11 @@ name: CI (MacStadium)
 on:
   - push
   - pull_request
-permissions:
-  contents: write # for npx prebuild to make release
+permissions: {}
 jobs:
   CI:
+    permissions:
+      contents: write # for npx prebuild to make release
     runs-on: macos-m1
     strategy:
       fail-fast: false
