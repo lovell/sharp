@@ -124,6 +124,32 @@ describe('Trim borders', function () {
     assert.strictEqual(trimOffsetLeft, -13);
   });
 
+  it('Ensure greyscale image can be trimmed', async () => {
+    const greyscale = await sharp({
+      create: {
+        width: 16,
+        height: 8,
+        channels: 3,
+        background: 'silver'
+      }
+    })
+      .extend({ left: 12, right: 24, background: 'gray' })
+      .toColourspace('b-w')
+      .png({ compressionLevel: 0 })
+      .toBuffer();
+
+    const { info } = await sharp(greyscale)
+      .trim()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+    assert.strictEqual(width, 16);
+    assert.strictEqual(height, 8);
+    assert.strictEqual(trimOffsetTop, 0);
+    assert.strictEqual(trimOffsetLeft, -12);
+  });
+
   it('Ensure trim of image with all pixels same is no-op', async () => {
     const { info } = await sharp({
       create: {

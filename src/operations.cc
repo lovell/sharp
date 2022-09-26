@@ -289,17 +289,20 @@ namespace sharp {
       background = image.extract_area(0, 0, 1, 1)(0, 0);
       multiplier = 1.0;
     }
-    if (background.size() == 4) {
+    if (HasAlpha(image) && background.size() == 4) {
       // Just discard the alpha because flattening the background colour with
       // itself (effectively what find_trim() does) gives the same result
       backgroundAlpha[0] = background[3] * multiplier;
     }
-    background = {
-      background[0] * multiplier,
-      background[1] * multiplier,
-      background[2] * multiplier
-    };
-
+    if (image.bands() > 2) {
+      background = {
+        background[0] * multiplier,
+        background[1] * multiplier,
+        background[2] * multiplier
+      };
+    } else {
+      background[0] = background[0] * multiplier;
+    }
     int left, top, width, height;
     left = image.find_trim(&top, &width, &height, VImage::option()
       ->set("background", background)
