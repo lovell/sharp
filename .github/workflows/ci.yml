@@ -2,8 +2,13 @@ name: CI (GitHub)
 on:
   - push
   - pull_request
+permissions: {}
 jobs:
   CI:
+    permissions:
+      contents: write # for npx prebuild to make release
+      checks: write # to create new checks (coverallsapp/github-action)
+
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     strategy:
