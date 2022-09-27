@@ -8,30 +8,30 @@ jobs:
     permissions:
       contents: write # for npx prebuild to make release
       checks: write # to create new checks (coverallsapp/github-action)
-
+    name: ${{ matrix.container || matrix.os }} - Node.js ${{ matrix.nodejs_version }} ${{ matrix.nodejs_arch }} ${{ matrix.prebuild && '- prebuild' }}
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             container: centos:7
             nodejs_version: 14
             coverage: true
             prebuild: true
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             container: centos:7
             nodejs_version: 16
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             container: rockylinux:8
             nodejs_version: 18
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             container: node:14-alpine3.12
             prebuild: true
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             container: node:16-alpine3.12
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             container: node:18-alpine3.14
           - os: macos-11
             nodejs_version: 14
@@ -97,7 +97,7 @@ jobs:
         run: npm test
       - name: Coverage
         if: matrix.coverage
-        uses: coverallsapp/github-action@v1.1.2
+        uses: coverallsapp/github-action@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Prebuild
