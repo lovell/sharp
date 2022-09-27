@@ -7,25 +7,26 @@ jobs:
   CI:
     permissions:
       contents: write # for npx prebuild to make release
+    name: Node.js ${{ matrix.nodejs_version }} ${{ matrix.nodejs_arch }} ${{ matrix.prebuild && '- prebuild' }}
     runs-on: macos-m1
     strategy:
       fail-fast: false
       matrix:
         include:
           - nodejs_version: 14
-            nodejs_architecture: x64
+            nodejs_arch: x64
           - nodejs_version: 18
-            nodejs_architecture: arm64
+            nodejs_arch: arm64
             prebuild: true
     defaults:
       run:
         shell: /usr/bin/arch -arch arm64e /bin/bash -l {0}
     steps:
       - name: Dependencies
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.nodejs_version }}
-          architecture: ${{ matrix.nodejs_architecture }}
+          architecture: ${{ matrix.nodejs_arch }}
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install
