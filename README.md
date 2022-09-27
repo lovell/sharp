@@ -98,7 +98,6 @@ readableStream
 A [guide for contributors](https://github.com/lovell/sharp/blob/main/.github/CONTRIBUTING.md)
 covers reporting bugs, requesting features and submitting code changes.
 
-[![Test Coverage](https://coveralls.io/repos/lovell/sharp/badge.svg?branch=main)](https://coveralls.io/r/lovell/sharp?branch=main)
 [![Node-API v5](https://img.shields.io/badge/Node--API-v5-green.svg)](https://nodejs.org/dist/latest/docs/api/n-api.html#n_api_n_api_version_matrix)
 
 ## Licensing

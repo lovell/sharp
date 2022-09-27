@@ -175,12 +175,13 @@ describe('Text to image', () => {
   });
 
   it('fontfile input', function () {
-    // Added for code coverage
-    sharp({
-      text: {
-        text: 'text',
-        fontfile: 'UnknownFont.ttf'
-      }
+    assert.doesNotThrow(function () {
+      sharp({
+        text: {
+          text: 'text',
+          fontfile: 'UnknownFont.ttf'
+        }
+      });
     });
   });
 
