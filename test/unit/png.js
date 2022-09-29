@@ -128,11 +128,25 @@ describe('PNG', function () {
     assert.strictEqual(alphaMeanAfter, alphaMeanBefore);
   });
 
-  it('palette decode/encode roundtrip', () =>
-    sharp(fixtures.inputPngPalette)
+  it('palette decode/encode roundtrip', async () => {
+    const data = await sharp(fixtures.inputPngPalette)
       .png({ effort: 1, palette: true })
-      .toBuffer()
-  );
+      .toBuffer();
+
+    const { size, ...metadata } = await sharp(data).metadata();
+    assert.deepStrictEqual(metadata, {
+      format: 'png',
+      width: 68,
+      height: 68,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      isProgressive: false,
+      paletteBitDepth: 8,
+      hasProfile: false,
+      hasAlpha: false
+    });
+  });
 
   it('Valid PNG libimagequant palette value does not throw error', function () {
     assert.doesNotThrow(function () {
