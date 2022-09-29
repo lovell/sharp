@@ -2,9 +2,11 @@
 
 ## v0.31 - *eagle*
 
-Requires libvips v8.13.1
+Requires libvips v8.13.2
 
 ### v0.31.1 - TBD
+
+* Upgrade to libvips v8.13.2 for upstream bug fixes.
 
 * Ensure `close` event occurs after `end` event for Stream-based output.
   [#3313](https://github.com/lovell/sharp/issues/3313)
