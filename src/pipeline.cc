@@ -81,35 +81,47 @@ class PipelineWorker : public Napi::AsyncWorker {
       int pageHeight = sharp::GetPageHeight(image);
 
       // Calculate angle of rotation
-      VipsAngle rotation;
-      bool flip = FALSE;
-      bool flop = FALSE;
+      VipsAngle rotation = VIPS_ANGLE_D0;
+      VipsAngle autoRotation = VIPS_ANGLE_D0;
+      bool autoFlip = FALSE;
+      bool autoFlop = FALSE;
       if (baton->useExifOrientation) {
         // Rotate and flip image according to Exif orientation
-        std::tie(rotation, flip, flop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
+        std::tie(autoRotation, autoFlip, autoFlop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
+        image = sharp::RemoveExifOrientation(image);
       } else {
         rotation = CalculateAngleRotation(baton->angle);
       }
 
       // Rotate pre-extract
       bool const shouldRotateBefore = baton->rotateBeforePreExtract &&
-        (rotation != VIPS_ANGLE_D0 || flip || flop || baton->rotationAngle != 0.0);
+        (rotation != VIPS_ANGLE_D0 || autoRotation != VIPS_ANGLE_D0 ||
+          autoFlip || baton->flip || autoFlop || baton->flop ||
+          baton->rotationAngle != 0.0);
 
       if (shouldRotateBefore) {
+        if (autoRotation != VIPS_ANGLE_D0) {
+          image = image.rot(autoRotation);
+          autoRotation = VIPS_ANGLE_D0;
+        }
+        if (autoFlip) {
+          image = image.flip(VIPS_DIRECTION_VERTICAL);
+          autoFlip = FALSE;
+        } else if (baton->flip) {
+          image = image.flip(VIPS_DIRECTION_VERTICAL);
+          baton->flip = FALSE;
+        }
+        if (autoFlop) {
+          image = image.flip(VIPS_DIRECTION_HORIZONTAL);
+          autoFlop = FALSE;
+        } else if (baton->flop) {
+          image = image.flip(VIPS_DIRECTION_HORIZONTAL);
+          baton->flop = FALSE;
+        }
         if (rotation != VIPS_ANGLE_D0) {
           image = image.rot(rotation);
+          rotation = VIPS_ANGLE_D0;
         }
-        if (flip) {
-          image = image.flip(VIPS_DIRECTION_VERTICAL);
-        }
-        if (flop) {
-          image = image.flip(VIPS_DIRECTION_HORIZONTAL);
-        }
-        if (rotation != VIPS_ANGLE_D0 || flip || flop) {
-          image = sharp::RemoveExifOrientation(image);
-        }
-        flop = FALSE;
-        flip = FALSE;
         if (baton->rotationAngle != 0.0) {
           MultiPageUnsupported(nPages, "Rotate");
           std::vector<double> background;
@@ -368,29 +380,16 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Flip (mirror about Y axis)
-      if (baton->flip || flip) {
+      if (baton->flip || autoFlip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
-        image = sharp::RemoveExifOrientation(image);
       }
-
       // Flop (mirror about X axis)
-      if (baton->flop || flop) {
+      if (baton->flop || autoFlop) {
         image = image.flip(VIPS_DIRECTION_HORIZONTAL);
-        image = sharp::RemoveExifOrientation(image);
       }
-
       // Rotate post-extract 90-angle
       if (!baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
         image = image.rot(rotation);
-        if (flip) {
-          image = image.flip(VIPS_DIRECTION_VERTICAL);
-          flip = FALSE;
-        }
-        if (flop) {
-          image = image.flip(VIPS_DIRECTION_HORIZONTAL);
-          flop = FALSE;
-        }
-        image = sharp::RemoveExifOrientation(image);
       }
 
       // Join additional color channels to the image

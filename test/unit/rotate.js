@@ -418,4 +418,29 @@ describe('Rotation', function () {
     assert.strictEqual(g, 73);
     assert.strictEqual(b, 52);
   });
+
+  it('Flip and rotate ordering', async () => {
+    const [r, g, b] = await sharp(fixtures.inputJpgWithPortraitExif5)
+      .flip()
+      .rotate(90)
+      .raw()
+      .toBuffer();
+
+    assert.strictEqual(r, 55);
+    assert.strictEqual(g, 65);
+    assert.strictEqual(b, 31);
+  });
+
+  it('Flip, rotate and resize ordering', async () => {
+    const [r, g, b] = await sharp(fixtures.inputJpgWithPortraitExif5)
+      .flip()
+      .rotate(90)
+      .resize(449)
+      .raw()
+      .toBuffer();
+
+    assert.strictEqual(r, 54);
+    assert.strictEqual(g, 64);
+    assert.strictEqual(b, 30);
+  });
 });
