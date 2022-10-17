@@ -14,7 +14,7 @@ When both a `width` and `height` are provided, the possible methods by which the
 
 Some of these values are based on the [object-fit][1] CSS property.
 
-When using a `fit` of `cover` or `contain`, the default **position** is `centre`. Other options are:
+When using a **fit** of `cover` or `contain`, the default **position** is `centre`. Other options are:
 
 *   `sharp.position`: `top`, `right top`, `right`, `right bottom`, `bottom`, `left bottom`, `left`, `left top`.
 *   `sharp.gravity`: `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` or `centre`.
