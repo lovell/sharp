@@ -28,7 +28,7 @@ jobs:
           node-version: ${{ matrix.nodejs_version }}
           architecture: ${{ matrix.nodejs_arch }}
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install
         run: npm install --build-from-source --unsafe-perm
       - name: Test
