@@ -1,4 +1,7 @@
-build
+build/*
+!build/Release
+build/Release/*
+!build/Release/sharp-emscripten-wasm32.node.*
 node_modules
 /coverage
 test/bench/node_modules
@@ -16,3 +19,4 @@ vendor
 package-lock.json
 .idea
 .firebase
+/wasm-scripts/wasm-vips

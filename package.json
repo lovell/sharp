@@ -104,7 +104,8 @@
     "binding.gyp",
     "install/**",
     "lib/**",
-    "src/**"
+    "src/**",
+    "build/Release/sharp-emscripten-wasm*"
   ],
   "repository": {
     "type": "git",
@@ -139,6 +140,7 @@
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
+    "@tybys/emnapi": "^0.20.0",
     "async": "^3.2.4",
     "cc": "^3.0.1",
     "documentation": "^14.0.1",
@@ -186,12 +188,19 @@
   "semistandard": {
     "env": [
       "mocha"
+    ],
+    "ignore": [
+      "build",
+      "wasm-scripts/wasm-vips"
     ]
   },
   "cc": {
     "linelength": "120",
     "filter": [
       "build/include"
+    ],
+    "ignore": [
+      "wasm-scripts/wasm-vips"
     ]
   }
 }

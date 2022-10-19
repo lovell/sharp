@@ -1206,19 +1206,19 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Add buffer size to info
         info.Set("size", static_cast<uint32_t>(baton->bufferOutLength));
         // Pass ownership of output data to Buffer instance
-        Napi::Buffer<char> data = sharp::NewOrCopyBuffer(env, static_cast<char*>(baton->bufferOut),
+        auto data = sharp::NewOrCopyBuffer(env, static_cast<char*>(baton->bufferOut),
           baton->bufferOutLength);
-        Callback().MakeCallback(Receiver().Value(), { env.Null(), data, info });
+        Callback().Call(Receiver().Value(), { env.Null(), data, info });
       } else {
         // Add file size to info
         struct STAT64_STRUCT st;
         if (STAT64_FUNCTION(baton->fileOut.data(), &st) == 0) {
           info.Set("size", static_cast<uint32_t>(st.st_size));
         }
-        Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
+        Callback().Call(Receiver().Value(), { env.Null(), info });
       }
     } else {
-      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
+      Callback().Call(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
     }
 
     // Delete baton

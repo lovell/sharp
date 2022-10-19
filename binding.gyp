@@ -73,12 +73,15 @@
       'NAPI_VERSION=7'
     ],
     'dependencies': [
-      '<!(node -p "require(\'node-addon-api\').gyp")',
       'libvips-cpp'
     ],
     'variables': {
-      'runtime_link%': 'shared',
       'conditions': [
+        ['OS != "emscripten"', {
+          'runtime_link%': 'shared',
+        }, {
+          'runtime_link%': 'static',
+        }],
         ['OS != "win"', {
           'pkg_config_path': '<!(node -p "require(\'./lib/libvips\').pkgConfigPath()")',
           'use_global_libvips': '<!(node -p "Boolean(require(\'./lib/libvips\').useGlobalLibvips()).toString()")'
@@ -97,10 +100,52 @@
       'src/utilities.cc',
       'src/sharp.cc'
     ],
-    'include_dirs': [
-      '<!(node -p "require(\'node-addon-api\').include_dir")',
-    ],
     'conditions': [
+      ['OS == "emscripten"', {
+        # .js because that's how Emscripten knows what to build, and .node
+        # in front so that `require('[...].node')` would just work.
+        'product_extension': 'node.js',
+        'defines': [
+          # Limit to 1 async task to avoid stealing threads from the pool
+          # that are intended for libvips.
+          'EMNAPI_WORKER_POOL_SIZE=1',
+        ],
+        'cflags': ['-g2'],
+        'ldflags': [
+          '-g2',
+          '-fexceptions',
+          # We don't know in advance how large images will be, best to allow growth
+          # rather than overallocate in resource-constrained environments.
+          '-sALLOW_MEMORY_GROWTH',
+          # Building for Node.js, we want sync instantiation for compat with native
+          '-sWASM_ASYNC_COMPILATION=0',
+          # Re-export emnapi bindings as the main exports
+          '--pre-js=<!(node -p "require.resolve(\'./wasm-scripts/pre.js\')")',
+          # Using JS implementation of text decoder is actually faster when using pthreads.
+          '-sTEXTDECODER=0',
+          # Support 64-bit integers.
+          '-sWASM_BIGINT',
+          # CPU cores + 3 extra threads for libvips + 1 extra thread for an emnapi async task.
+          '-sPTHREAD_POOL_SIZE="vipsConcurrency+3+1"',
+          '-sPTHREAD_POOL_SIZE_STRICT=2',
+          # Don't wait for the pthread pool to keep initialization synchronous.
+          '-sPTHREAD_POOL_DELAY_LOAD',
+
+          # We're building only for Node.js for now
+          '-sENVIRONMENT=node',
+          # Propagate filesystem to Node.js.
+          '-sNODERAWFS',
+          # Exit helper
+          '-sEXPORTED_FUNCTIONS=["_vips_shutdown"]',
+        ],
+      }, {
+        'dependencies': [
+          '<!(node -p "require(\'node-addon-api\').gyp")',
+        ],
+        'include_dirs': [
+          '<!(node -p "require(\'node-addon-api\').include_dir")',
+        ],
+      }],
       ['use_global_libvips == "true"', {
         # Use pkg-config for include and lib
         'include_dirs': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --cflags-only-I vips-cpp vips glib-2.0 | sed s\/-I//g)'],

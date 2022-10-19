@@ -53,8 +53,12 @@ describe('Utilities', function () {
 
   describe('Concurrency', function () {
     it('Can be set to use 16 threads', function () {
-      sharp.concurrency(16);
-      assert.strictEqual(16, sharp.concurrency());
+      let expected = 16;
+      const actual = sharp.concurrency(expected);
+      if (process.env.npm_config_arch?.startsWith('wasm')) {
+        expected = Math.min(expected, require('os').cpus().length);
+      }
+      assert.strictEqual(actual, expected);
     });
     it('Can be reset to default', function () {
       sharp.concurrency(0);

@@ -6,7 +6,7 @@ const assert = require('assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('GIF input', () => {
+(sharp.format.gif.input.file ? describe : describe.skip)('GIF input', () => {
   it('GIF Buffer to JPEG Buffer', () =>
     sharp(fs.readFileSync(fixtures.inputGif))
       .resize(8, 4)

@@ -250,9 +250,9 @@ class MetadataWorker : public Napi::AsyncWorker {
         info.Set("tifftagPhotoshop",
           sharp::NewOrCopyBuffer(env, baton->tifftagPhotoshop, baton->tifftagPhotoshopLength));
       }
-      Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
+      Callback().Call(Receiver().Value(), { env.Null(), info });
     } else {
-      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
+      Callback().Call(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
     }
 
     delete baton->input;

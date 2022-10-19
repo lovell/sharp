@@ -7,7 +7,7 @@ const fixtures = require('../fixtures');
 
 describe('Median filter', () => {
   it('1x1 window', async () => {
-    const [r, g, b] = await sharp(fixtures.inputSvgSmallViewBox)
+    const [r, g, b] = await sharp(fixtures.inputPngSmallCircle)
       .median(1)
       .raw()
       .toBuffer();
@@ -16,7 +16,7 @@ describe('Median filter', () => {
   });
 
   it('3x3 window', async () => {
-    const [r, g, b] = await sharp(fixtures.inputSvgSmallViewBox)
+    const [r, g, b] = await sharp(fixtures.inputPngSmallCircle)
       .median(3)
       .raw()
       .toBuffer();
@@ -25,7 +25,7 @@ describe('Median filter', () => {
   });
 
   it('7x7 window', async () => {
-    const [r, g, b] = await sharp(fixtures.inputSvgSmallViewBox)
+    const [r, g, b] = await sharp(fixtures.inputPngSmallCircle)
       .median(7)
       .raw()
       .toBuffer();
@@ -34,7 +34,7 @@ describe('Median filter', () => {
   });
 
   it('default window (3x3)', async () => {
-    const [r, g, b] = await sharp(fixtures.inputSvgSmallViewBox)
+    const [r, g, b] = await sharp(fixtures.inputPngSmallCircle)
       .median()
       .raw()
       .toBuffer();

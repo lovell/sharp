@@ -152,9 +152,9 @@ class StatsWorker : public Napi::AsyncWorker {
       dominant.Set("g", baton->dominantGreen);
       dominant.Set("b", baton->dominantBlue);
       info.Set("dominant", dominant);
-      Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
+      Callback().Call(Receiver().Value(), { env.Null(), info });
     } else {
-      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
+      Callback().Call(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
     }
 
     delete baton->input;

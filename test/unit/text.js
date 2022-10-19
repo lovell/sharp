@@ -5,7 +5,7 @@ const assert = require('assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Text to image', () => {
+(!process.env.npm_config_arch?.startsWith('wasm') ? describe : describe.skip)('Text to image', () => {
   it('text with default values', async () => {
     const output = fixtures.path('output.text-default.png');
     const text = sharp({

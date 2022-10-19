@@ -17,7 +17,9 @@
 
 #include <napi.h>
 #include <vips/vips8>
+#ifndef __EMSCRIPTEN__
 #include <vips/vector.h>
+#endif
 
 #include "common.h"
 #include "operations.h"
@@ -90,12 +92,17 @@ Napi::Value counters(const Napi::CallbackInfo& info) {
   Get and set use of SIMD vector unit instructions
 */
 Napi::Value simd(const Napi::CallbackInfo& info) {
+#ifndef __EMSCRIPTEN__
   // Set state
   if (info[0].IsBoolean()) {
     vips_vector_set_enabled(info[0].As<Napi::Boolean>().Value());
   }
   // Get state
-  return Napi::Boolean::New(info.Env(), vips_vector_isenabled());
+  bool isEnabled = vips_vector_isenabled();
+#else
+  bool isEnabled = false;
+#endif
+  return Napi::Boolean::New(info.Env(), isEnabled);
 }
 
 /*

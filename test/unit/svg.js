@@ -6,7 +6,7 @@ const assert = require('assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('SVG input', function () {
+(sharp.format.svg.input.file ? describe : describe.skip)('SVG input', () => {
   it('Convert SVG to PNG at default 72DPI', function (done) {
     sharp(fixtures.inputSvg)
       .resize(1024)
