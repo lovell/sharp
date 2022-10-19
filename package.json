@@ -92,7 +92,7 @@
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run test-lint && npm run test-unit && npm run test-licensing",
     "test-lint": "semistandard && cpplint",
-    "test-unit": "nyc --reporter=lcov --reporter=text --check-coverage --branches=100 mocha --slow=1000 --timeout=30000 ./test/unit/*.js",
+    "test-unit": "nyc --reporter=lcov --reporter=text --check-coverage --branches=100 mocha --parallel --slow=1000 --timeout=30000 ./test/unit/*.js",
     "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;MIT\"",
     "test-leak": "./test/leak/leak.sh",
     "docs-build": "documentation lint lib && node docs/build && node docs/search-index/build",
@@ -139,6 +139,7 @@
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
+    "@tybys/emnapi": "^0.19.2",
     "async": "^3.2.4",
     "cc": "^3.0.1",
     "documentation": "^14.0.0",
