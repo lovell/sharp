@@ -9,6 +9,9 @@ Requires libvips v8.13.2
 * Ensure manual flip, rotate, resize operation ordering (regression in 0.31.1)
   [#3391](https://github.com/lovell/sharp/issues/3391)
 
+* Ensure auto-rotation works without resize (regression in 0.31.1)
+  [#3422](https://github.com/lovell/sharp/issues/3422)
+
 ### v0.31.1 - 29th September 2022
 
 * Upgrade to libvips v8.13.2 for upstream bug fixes.

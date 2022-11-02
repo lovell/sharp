@@ -162,7 +162,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       int targetResizeHeight = baton->height;
 
       // Swap input output width and height when rotating by 90 or 270 degrees
-      bool swap = !baton->rotateBeforePreExtract && (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270);
+      bool swap = !baton->rotateBeforePreExtract &&
+        (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270 ||
+          autoRotation == VIPS_ANGLE_D90 || autoRotation == VIPS_ANGLE_D270);
 
       // Shrink to pageHeight, so we work for multi-page images
       std::tie(hshrink, vshrink) = sharp::ResolveShrink(
@@ -379,6 +381,10 @@ class PipelineWorker : public Napi::AsyncWorker {
           ->set("kernel", baton->kernel));
       }
 
+      // Auto-rotate post-extract
+      if (autoRotation != VIPS_ANGLE_D0) {
+        image = image.rot(autoRotation);
+      }
       // Flip (mirror about Y axis)
       if (baton->flip || autoFlip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
@@ -388,7 +394,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.flip(VIPS_DIRECTION_HORIZONTAL);
       }
       // Rotate post-extract 90-angle
-      if (!baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
+      if (rotation != VIPS_ANGLE_D0) {
         image = image.rot(rotation);
       }
 

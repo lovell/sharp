@@ -8,16 +8,43 @@ const fixtures = require('../fixtures');
 describe('Rotation', function () {
   ['Landscape', 'Portrait'].forEach(function (orientation) {
     [1, 2, 3, 4, 5, 6, 7, 8].forEach(function (exifTag) {
-      it('Input image has Orientation EXIF tag value of (' + exifTag + '), auto-rotate', function (done) {
-        sharp(fixtures['inputJpgWith' + orientation + 'Exif' + exifTag])
+      const input = fixtures[`inputJpgWith${orientation}Exif${exifTag}`];
+      const expectedOutput = fixtures.expected(`${orientation}_${exifTag}-out.jpg`);
+      it(`Auto-rotate ${orientation} image with EXIF Orientation ${exifTag}`, function (done) {
+        const [expectedWidth, expectedHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
+        sharp(input)
           .rotate()
-          .resize(320)
           .toBuffer(function (err, data, info) {
             if (err) throw err;
-            assert.strictEqual('jpeg', info.format);
-            assert.strictEqual(320, info.width);
-            assert.strictEqual(orientation === 'Landscape' ? 240 : 427, info.height);
-            fixtures.assertSimilar(fixtures.expected(orientation + '_' + exifTag + '-out.jpg'), data, done);
+            assert.strictEqual(info.width, expectedWidth);
+            assert.strictEqual(info.height, expectedHeight);
+            fixtures.assertSimilar(expectedOutput, data, done);
+          });
+      });
+      it(`Auto-rotate then resize ${orientation} image with EXIF Orientation ${exifTag}`, function (done) {
+        const [expectedWidth, expectedHeight] = orientation === 'Landscape' ? [320, 240] : [320, 427];
+        sharp(input)
+          .rotate()
+          .resize({ width: 320 })
+          .toBuffer(function (err, data, info) {
+            if (err) throw err;
+            assert.strictEqual(info.width, expectedWidth);
+            assert.strictEqual(info.height, expectedHeight);
+            fixtures.assertSimilar(expectedOutput, data, done);
+          });
+      });
+      it(`Resize then auto-rotate ${orientation} image with EXIF Orientation ${exifTag}`, function (done) {
+        const [expectedWidth, expectedHeight] = orientation === 'Landscape'
+          ? (exifTag < 5) ? [320, 240] : [320, 240]
+          : [320, 427];
+        sharp(input)
+          .resize({ width: 320 })
+          .rotate()
+          .toBuffer(function (err, data, info) {
+            if (err) throw err;
+            assert.strictEqual(info.width, expectedWidth);
+            assert.strictEqual(info.height, expectedHeight);
+            fixtures.assertSimilar(expectedOutput, data, done);
           });
       });
     });
