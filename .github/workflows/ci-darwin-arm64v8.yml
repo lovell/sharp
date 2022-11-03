@@ -22,7 +22,11 @@ jobs:
       run:
         shell: /usr/bin/arch -arch arm64e /bin/bash -l {0}
     steps:
-      - name: Dependencies
+      - name: Dependencies (Python 3.10)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Dependencies (Node.js)
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.nodejs_version }}

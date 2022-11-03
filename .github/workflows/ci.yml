@@ -62,22 +62,26 @@ jobs:
             nodejs_version: 18
             nodejs_arch: x64
     steps:
+      - name: Dependencies (Python 3.10)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       - name: Dependencies (Linux glibc)
         if: contains(matrix.container, 'centos')
         run: |
           curl -sL https://rpm.nodesource.com/setup_${{ matrix.nodejs_version }}.x | bash -
           yum install -y centos-release-scl
-          yum install -y devtoolset-11-gcc-c++ make git python3 nodejs fontconfig google-noto-sans-fonts
+          yum install -y devtoolset-11-gcc-c++ make git nodejs fontconfig google-noto-sans-fonts
           echo "/opt/rh/devtoolset-11/root/usr/bin" >> $GITHUB_PATH
       - name: Dependencies (Rocky Linux glibc)
         if: contains(matrix.container, 'rockylinux')
         run: |
           curl -sL https://rpm.nodesource.com/setup_${{ matrix.nodejs_version }}.x | bash -
-          dnf install -y gcc-toolset-11-gcc-c++ make git python3 nodejs fontconfig google-noto-sans-fonts
+          dnf install -y gcc-toolset-11-gcc-c++ make git nodejs fontconfig google-noto-sans-fonts
           echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
       - name: Dependencies (Linux musl)
         if: contains(matrix.container, 'alpine')
-        run: apk add build-base git python3 font-noto --update-cache
+        run: apk add build-base git font-noto --update-cache
       - name: Dependencies (macOS, Windows)
         if: contains(matrix.os, 'macos') || contains(matrix.os, 'windows')
         uses: actions/setup-node@v3
