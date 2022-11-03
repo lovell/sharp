@@ -2,9 +2,11 @@
 
 ## v0.31 - *eagle*
 
-Requires libvips v8.13.2
+Requires libvips v8.13.3
 
 ### v0.31.2 - TBD
+
+* Upgrade to libvips v8.13.3 for upstream bug fixes.
 
 * Ensure manual flip, rotate, resize operation ordering (regression in 0.31.1)
   [#3391](https://github.com/lovell/sharp/issues/3391)

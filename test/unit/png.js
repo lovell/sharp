@@ -140,6 +140,7 @@ describe('PNG', function () {
       height: 68,
       space: 'srgb',
       channels: 3,
+      density: 72,
       depth: 'uchar',
       isProgressive: false,
       paletteBitDepth: 8,
