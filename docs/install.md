@@ -343,9 +343,12 @@ Module did not self-register
 
 ### Canvas and Windows
 
-The prebuilt binaries provided by `canvas` for Windows depend on the unmaintained GTK 2, last updated in 2011.
+The prebuilt binaries provided by `canvas` for Windows
+from v2.7.0 onwards depend on the Visual C++ Runtime (MSVCRT).
+These conflict with the binaries provided by sharp,
+which depend on the more modern Universal C Runtime (UCRT).
 
-These conflict with the modern, up-to-date binaries provided by sharp.
+See [Automattic/node-canvas#2155](https://github.com/Automattic/node-canvas/issues/2155).
 
 If both modules are used in the same Windows process, the following error will occur:
 ```
