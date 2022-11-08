@@ -8,20 +8,20 @@ const fixtures = require('../fixtures');
 
 describe('JP2 output', () => {
   if (!sharp.format.jp2k.input.buffer) {
-    it('JP2 output should fail due to missing OpenJPEG', () => {
-      assert.rejects(() =>
+    it('JP2 output should fail due to missing OpenJPEG', () =>
+      assert.rejects(async () =>
         sharp(fixtures.inputJpg)
           .jp2()
           .toBuffer(),
       /JP2 output requires libvips with support for OpenJPEG/
-      );
-    });
+      )
+    );
 
-    it('JP2 file output should fail due to missing OpenJPEG', () => {
-      assert.rejects(async () => await sharp().toFile('test.jp2'),
+    it('JP2 file output should fail due to missing OpenJPEG', () =>
+      assert.rejects(async () => sharp(fixtures.inputJpg).toFile('test.jp2'),
         /JP2 output requires libvips with support for OpenJPEG/
-      );
-    });
+      )
+    );
   } else {
     it('JP2 Buffer to PNG Buffer', () => {
       sharp(fs.readFileSync(fixtures.inputJp2))
