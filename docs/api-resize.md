@@ -45,8 +45,8 @@ Previous calls to `resize` in the same pipeline will be ignored.
 *   `height` **[number][8]?** pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width.
 *   `options` **[Object][9]?**&#x20;
 
-    *   `options.width` **[String][10]?** alternative means of specifying `width`. If both are present this take priority.
-    *   `options.height` **[String][10]?** alternative means of specifying `height`. If both are present this take priority.
+    *   `options.width` **[String][10]?** alternative means of specifying `width`. If both are present this takes priority.
+    *   `options.height` **[String][10]?** alternative means of specifying `height`. If both are present this takes priority.
     *   `options.fit` **[String][10]** how the image should be resized to fit both provided dimensions, one of `cover`, `contain`, `fill`, `inside` or `outside`. (optional, default `'cover'`)
     *   `options.position` **[String][10]** position, gravity or strategy to use when `fit` is `cover` or `contain`. (optional, default `'centre'`)
     *   `options.background` **([String][10] | [Object][9])** background colour when `fit` is `contain`, parsed by the [color][11] module, defaults to black without transparency. (optional, default `{r:0,g:0,b:0,alpha:1}`)
