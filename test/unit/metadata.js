@@ -443,13 +443,13 @@ describe('Image metadata', function () {
     const create = { width: 1, height: 1, channels: 3, background: 'red' };
     const image1 = sharp({ create }).png().pipe(sharp());
     const image2 = sharp({ create }).png().pipe(sharp());
-    process.nextTick(async () => {
+    setTimeout(async () => {
       const data1 = await image1.metadata();
       assert.strictEqual('png', data1.format);
       const data2 = await image2.metadata();
       assert.strictEqual('png', data2.format);
       done();
-    });
+    }, 500);
   });
 
   it('Stream', function (done) {
