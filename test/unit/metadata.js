@@ -439,6 +439,19 @@ describe('Image metadata', function () {
       );
   });
 
+  it('Stream in, finish event fires before metadata is requested', (done) => {
+    const create = { width: 1, height: 1, channels: 3, background: 'red' };
+    const image1 = sharp({ create }).png().pipe(sharp());
+    const image2 = sharp({ create }).png().pipe(sharp());
+    process.nextTick(async () => {
+      const data1 = await image1.metadata();
+      assert.strictEqual('png', data1.format);
+      const data2 = await image2.metadata();
+      assert.strictEqual('png', data2.format);
+      done();
+    });
+  });
+
   it('Stream', function (done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp().metadata(function (err, metadata) {
