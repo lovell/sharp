@@ -334,6 +334,8 @@ The palette of the input image will be re-used if possible.
     *   `options.colors` **[number][12]** alternative spelling of `options.colours` (optional, default `256`)
     *   `options.effort` **[number][12]** CPU effort, between 1 (fastest) and 10 (slowest) (optional, default `7`)
     *   `options.dither` **[number][12]** level of Floyd-Steinberg error diffusion, between 0 (least) and 1 (most) (optional, default `1.0`)
+    *   `options.interFrameMaxError` **[number][12]** maximum inter-frame error for transparency, between 0 (lossless) and 32 (optional, default `0`)
+    *   `options.interPaletteMaxError` **[number][12]** maximum inter-palette error for palette reuse, between 0 and 256 (optional, default `3`)
     *   `options.loop` **[number][12]** number of animation iterations, use 0 for infinite animation (optional, default `0`)
     *   `options.delay` **([number][12] | [Array][13]<[number][12]>)?** delay(s) between animation frames (in milliseconds)
     *   `options.force` **[boolean][10]** force GIF output, otherwise attempt to use input format (optional, default `true`)
@@ -359,6 +361,13 @@ const out = await sharp('in.gif', { animated: true })
   .resize({ width: 128, height: 128 })
   .gif({ dither: 0 })
   .toBuffer();
+```
+
+```javascript
+// Lossy file size reduction of animated GIF
+await sharp('in.gif', { animated: true })
+  .gif({ interFrameMaxError: 8 })
+  .toFile('optim.gif');
 ```
 
 *   Throws **[Error][4]** Invalid options

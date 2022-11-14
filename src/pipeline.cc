@@ -869,6 +869,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("bitdepth", baton->gifBitdepth)
             ->set("effort", baton->gifEffort)
             ->set("reoptimise", baton->gifReoptimise)
+            ->set("interframe_maxerror", baton->gifInterFrameMaxError)
+            ->set("interpalette_maxerror", baton->gifInterPaletteMaxError)
             ->set("dither", baton->gifDither)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -1549,6 +1551,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->gifBitdepth = sharp::AttrAsUint32(options, "gifBitdepth");
   baton->gifEffort = sharp::AttrAsUint32(options, "gifEffort");
   baton->gifDither = sharp::AttrAsDouble(options, "gifDither");
+  baton->gifInterFrameMaxError = sharp::AttrAsDouble(options, "gifInterFrameMaxError");
+  baton->gifInterPaletteMaxError = sharp::AttrAsDouble(options, "gifInterPaletteMaxError");
   baton->gifReoptimise = sharp::AttrAsBool(options, "gifReoptimise");
   baton->tiffQuality = sharp::AttrAsUint32(options, "tiffQuality");
   baton->tiffPyramid = sharp::AttrAsBool(options, "tiffPyramid");

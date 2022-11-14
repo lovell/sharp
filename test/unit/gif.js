@@ -141,6 +141,28 @@ describe('GIF input', () => {
     });
   });
 
+  it('invalid interFrameMaxError throws', () => {
+    assert.throws(
+      () => sharp().gif({ interFrameMaxError: 33 }),
+      /Expected number between 0.0 and 32.0 for interFrameMaxError but received 33 of type number/
+    );
+    assert.throws(
+      () => sharp().gif({ interFrameMaxError: 'fail' }),
+      /Expected number between 0.0 and 32.0 for interFrameMaxError but received fail of type string/
+    );
+  });
+
+  it('invalid interPaletteMaxError throws', () => {
+    assert.throws(
+      () => sharp().gif({ interPaletteMaxError: 257 }),
+      /Expected number between 0.0 and 256.0 for interPaletteMaxError but received 257 of type number/
+    );
+    assert.throws(
+      () => sharp().gif({ interPaletteMaxError: 'fail' }),
+      /Expected number between 0.0 and 256.0 for interPaletteMaxError but received fail of type string/
+    );
+  });
+
   it('should work with streams when only animated is set', function (done) {
     fs.createReadStream(fixtures.inputGifAnimated)
       .pipe(sharp({ animated: true }))
@@ -163,5 +185,19 @@ describe('GIF input', () => {
         assert.strictEqual('gif', info.format);
         fixtures.assertSimilar(fixtures.inputGifAnimated, data, done);
       });
+  });
+
+  it('should optimise file size via interFrameMaxError', async () => {
+    const input = sharp(fixtures.inputGifAnimated, { animated: true });
+    const before = await input.gif({ interFrameMaxError: 0 }).toBuffer();
+    const after = await input.gif({ interFrameMaxError: 10 }).toBuffer();
+    assert.strict(before.length > after.length);
+  });
+
+  it('should optimise file size via interPaletteMaxError', async () => {
+    const input = sharp(fixtures.inputGifAnimated, { animated: true });
+    const before = await input.gif({ interPaletteMaxError: 0 }).toBuffer();
+    const after = await input.gif({ interPaletteMaxError: 100 }).toBuffer();
+    assert.strict(before.length > after.length);
   });
 });

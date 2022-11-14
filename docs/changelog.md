@@ -6,6 +6,9 @@ Requires libvips v8.13.3
 
 ### v0.31.3 - TBD
 
+* Expose `interFrameMaxError` and `interPaletteMaxError` GIF optimisation properties.
+  [#3401](https://github.com/lovell/sharp/issues/3401)
+
 * Prevent possible race condition awaiting metadata of Stream-based input.
   [#3451](https://github.com/lovell/sharp/issues/3451)
 
