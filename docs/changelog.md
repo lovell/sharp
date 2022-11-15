@@ -12,6 +12,9 @@ Requires libvips v8.13.3
 * Prevent possible race condition awaiting metadata of Stream-based input.
   [#3451](https://github.com/lovell/sharp/issues/3451)
 
+* Improve `extractChannel` support for 16-bit output colourspaces.
+  [#3453](https://github.com/lovell/sharp/issues/3453)
+
 ### v0.31.2 - 4th November 2022
 
 * Upgrade to libvips v8.13.3 for upstream bug fixes.

@@ -701,24 +701,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Tint(image, baton->tintA, baton->tintB);
       }
 
-      // Extract an image channel (aka vips band)
-      if (baton->extractChannel > -1) {
-        if (baton->extractChannel >= image.bands()) {
-          if (baton->extractChannel == 3 && sharp::HasAlpha(image)) {
-            baton->extractChannel = image.bands() - 1;
-          } else {
-            (baton->err).append("Cannot extract channel from image. Too few channels in image.");
-            return Error();
-          }
-        }
-        VipsInterpretation const interpretation = sharp::Is16Bit(image.interpretation())
-          ? VIPS_INTERPRETATION_GREY16
-          : VIPS_INTERPRETATION_B_W;
-        image = image
-          .extract_band(baton->extractChannel)
-          .copy(VImage::option()->set("interpretation", interpretation));
-      }
-
       // Remove alpha channel, if any
       if (baton->removeAlpha) {
         image = sharp::RemoveAlpha(image);
@@ -742,6 +724,26 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("embedded", TRUE)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         }
+      }
+
+      // Extract channel
+      if (baton->extractChannel > -1) {
+        if (baton->extractChannel >= image.bands()) {
+          if (baton->extractChannel == 3 && sharp::HasAlpha(image)) {
+            baton->extractChannel = image.bands() - 1;
+          } else {
+            (baton->err)
+              .append("Cannot extract channel ").append(std::to_string(baton->extractChannel))
+              .append(" from image with channels 0-").append(std::to_string(image.bands() - 1));
+            return Error();
+          }
+        }
+        VipsInterpretation colourspace = sharp::Is16Bit(image.interpretation())
+          ? VIPS_INTERPRETATION_GREY16
+          : VIPS_INTERPRETATION_B_W;
+        image = image
+          .extract_band(baton->extractChannel)
+          .copy(VImage::option()->set("interpretation", colourspace));
       }
 
       // Apply output ICC profile
