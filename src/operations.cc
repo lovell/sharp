@@ -352,6 +352,31 @@ namespace sharp {
   }
 
   /*
+   * Unflatten
+   */
+  VImage Unflatten(VImage image, std::vector<double> const thresholds) {
+    if (HasAlpha(image)) {
+      throw VError("Cannot unflatten an image that already has an alpha channel");
+    }
+    size_t const bands = static_cast<size_t>(image.bands());
+    if (thresholds.size() != 1 && thresholds.size() != bands) {
+      throw VError("band / threshold count mismatch");
+    }
+    VImage alpha;
+    for (int i = 0; i < bands; i++) {
+      double threshold = i >= thresholds.size() ? thresholds[0] : thresholds[i];
+      VImage band = image[i];
+      VImage tmp = band.colourspace(VIPS_INTERPRETATION_B_W) < threshold;
+      if (i == 0) {
+        alpha = tmp;
+      } else {
+        alpha = alpha | tmp;
+      }
+    }
+    return image.bandjoin(alpha);
+  }
+
+  /*
    * Ensure the image is in a given colourspace
    */
   VImage EnsureColourspace(VImage image, VipsInterpretation colourspace) {

@@ -342,6 +342,11 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Flatten(image, baton->flattenBackground);
       }
 
+      // Unflatten the image
+      if (baton->unflatten && !sharp::HasAlpha(image)) {
+        image = sharp::Unflatten(image, baton->unflattenThresholds);
+      }
+
       // Negate the colours in the image
       if (baton->negate) {
         image = sharp::Negate(image, baton->negateAlpha);
@@ -1417,6 +1422,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // Operators
   baton->flatten = sharp::AttrAsBool(options, "flatten");
   baton->flattenBackground = sharp::AttrAsVectorOfDouble(options, "flattenBackground");
+  baton->unflatten = sharp::AttrAsBool(options, "unflatten");
+  baton->unflattenThresholds = sharp::AttrAsVectorOfDouble(options, "unflattenThresholds");
   baton->negate = sharp::AttrAsBool(options, "negate");
   baton->negateAlpha = sharp::AttrAsBool(options, "negateAlpha");
   baton->blurSigma = sharp::AttrAsDouble(options, "blurSigma");
