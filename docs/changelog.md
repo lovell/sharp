@@ -15,6 +15,9 @@ Requires libvips v8.13.3
 * Improve `extractChannel` support for 16-bit output colourspaces.
   [#3453](https://github.com/lovell/sharp/issues/3453)
 
+* Ignore `sequentialRead` option when calculating image statistics.
+  [#3462](https://github.com/lovell/sharp/issues/3462)
+
 ### v0.31.2 - 4th November 2022
 
 * Upgrade to libvips v8.13.3 for upstream bug fixes.

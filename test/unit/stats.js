@@ -730,4 +730,9 @@ describe('Image Stats', function () {
       done();
     });
   });
+
+  it('Sequential read option is ignored', async () => {
+    const { isOpaque } = await sharp(fixtures.inputJpg, { sequentialRead: true }).stats();
+    assert.strictEqual(isOpaque, true);
+  });
 });
