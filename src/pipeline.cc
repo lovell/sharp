@@ -456,6 +456,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             // Gravity-based crop
             int left;
             int top;
+
             std::tie(left, top) = sharp::CalculateCrop(
               inputWidth, inputHeight, baton->width, baton->height, baton->position);
             int width = std::min(inputWidth, baton->width);
@@ -466,16 +467,24 @@ class PipelineWorker : public Napi::AsyncWorker {
                   left, top, width, height, nPages, &targetPageHeight)
               : image.extract_area(left, top, width, height);
           } else {
+            int attention_x;
+            int attention_y;
+
             // Attention-based or Entropy-based crop
             MultiPageUnsupported(nPages, "Resize strategy");
             image = image.tilecache(VImage::option()
               ->set("access", VIPS_ACCESS_RANDOM)
               ->set("threaded", TRUE));
+
             image = image.smartcrop(baton->width, baton->height, VImage::option()
-              ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
+              ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION)
+              ->set("attention_x", &attention_x)
+              ->set("attention_y", &attention_y));
             baton->hasCropOffset = true;
             baton->cropOffsetLeft = static_cast<int>(image.xoffset());
             baton->cropOffsetTop = static_cast<int>(image.yoffset());
+            baton->attentionCenterX = static_cast<int>(attention_y);
+            baton->attentionCenterY = static_cast<int>(attention_y);
           }
         }
       }
@@ -1197,6 +1206,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->hasCropOffset) {
         info.Set("cropOffsetLeft", static_cast<int32_t>(baton->cropOffsetLeft));
         info.Set("cropOffsetTop", static_cast<int32_t>(baton->cropOffsetTop));
+        info.Set("attentionCenterX", static_cast<int32_t>(baton->attentionCenterX));
+        info.Set("attentionCenterY", static_cast<int32_t>(baton->attentionCenterY));
       }
       if (baton->trimThreshold > 0.0) {
         info.Set("trimOffsetLeft", static_cast<int32_t>(baton->trimOffsetLeft));
