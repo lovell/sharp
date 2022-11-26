@@ -376,8 +376,8 @@ describe('Resize fit=cover', function () {
           assert.strictEqual(320, info.height);
           assert.strictEqual(-107, info.cropOffsetLeft);
           assert.strictEqual(0, info.cropOffsetTop);
-          assert.strictEqual(160, info.attentionCenterX);
-          assert.strictEqual(160, info.attentionCenterY);
+          assert.strictEqual(588, info.attentionCenterX);
+          assert.strictEqual(640, info.attentionCenterY);
           fixtures.assertSimilar(fixtures.expected('crop-strategy-attention.jpg'), data, done);
         });
     });

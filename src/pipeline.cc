@@ -483,8 +483,9 @@ class PipelineWorker : public Napi::AsyncWorker {
             baton->hasCropOffset = true;
             baton->cropOffsetLeft = static_cast<int>(image.xoffset());
             baton->cropOffsetTop = static_cast<int>(image.yoffset());
-            baton->attentionCenterX = static_cast<int>(attention_y);
-            baton->attentionCenterY = static_cast<int>(attention_y);
+            baton->hasAttentionCenter = true;
+            baton->attentionCenterX = static_cast<int>(attention_x * jpegShrinkOnLoad);
+            baton->attentionCenterY = static_cast<int>(attention_y * jpegShrinkOnLoad);
           }
         }
       }
@@ -1206,6 +1207,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->hasCropOffset) {
         info.Set("cropOffsetLeft", static_cast<int32_t>(baton->cropOffsetLeft));
         info.Set("cropOffsetTop", static_cast<int32_t>(baton->cropOffsetTop));
+      }
+      if (baton->hasAttentionCenter) {
         info.Set("attentionCenterX", static_cast<int32_t>(baton->attentionCenterX));
         info.Set("attentionCenterY", static_cast<int32_t>(baton->attentionCenterY));
       }
