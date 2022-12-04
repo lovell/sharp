@@ -18,6 +18,9 @@ Requires libvips v8.13.3
 * Ignore `sequentialRead` option when calculating image statistics.
   [#3462](https://github.com/lovell/sharp/issues/3462)
 
+* Ensure integral output of `linear` operation.
+  [#3468](https://github.com/lovell/sharp/issues/3468)
+
 ### v0.31.2 - 4th November 2022
 
 * Upgrade to libvips v8.13.3 for upstream bug fixes.

@@ -345,9 +345,9 @@ namespace sharp {
     if (HasAlpha(image) && a.size() != bands && (a.size() == 1 || a.size() == bands - 1 || bands - 1 == 1)) {
       // Separate alpha channel
       VImage alpha = image[bands - 1];
-      return RemoveAlpha(image).linear(a, b).bandjoin(alpha);
+      return RemoveAlpha(image).linear(a, b, VImage::option()->set("uchar", TRUE)).bandjoin(alpha);
     } else {
-      return image.linear(a, b);
+      return image.linear(a, b, VImage::option()->set("uchar", TRUE));
     }
   }
 

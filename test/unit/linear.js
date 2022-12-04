@@ -73,6 +73,28 @@ describe('Linear adjustment', function () {
       });
   });
 
+  it('output is integer, not float, RGB', async () => {
+    const data = await sharp({ create: { width: 1, height: 1, channels: 3, background: 'red' } })
+      .linear(1, 0)
+      .tiff({ compression: 'none' })
+      .toBuffer();
+
+    const { channels, depth } = await sharp(data).metadata();
+    assert.strictEqual(channels, 3);
+    assert.strictEqual(depth, 'uchar');
+  });
+
+  it('output is integer, not float, RGBA', async () => {
+    const data = await sharp({ create: { width: 1, height: 1, channels: 4, background: '#ff000077' } })
+      .linear(1, 0)
+      .tiff({ compression: 'none' })
+      .toBuffer();
+
+    const { channels, depth } = await sharp(data).metadata();
+    assert.strictEqual(channels, 4);
+    assert.strictEqual(depth, 'uchar');
+  });
+
   it('Invalid linear arguments', function () {
     assert.throws(
       () => sharp().linear('foo'),
