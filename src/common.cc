@@ -913,7 +913,7 @@ namespace sharp {
     // Add non-transparent alpha channel, if required
     if (colour[3] < 255.0 && !HasAlpha(image)) {
       image = image.bandjoin(
-        VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier));
+        VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier).cast(image.format()));
     }
     return std::make_tuple(image, alphaColour);
   }

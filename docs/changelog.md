@@ -18,6 +18,9 @@ Requires libvips v8.13.3
 * Ignore `sequentialRead` option when calculating image statistics.
   [#3462](https://github.com/lovell/sharp/issues/3462)
 
+* Small performance improvement for operations that introduce a non-opaque background.
+  [#3465](https://github.com/lovell/sharp/issues/3465)
+
 * Ensure integral output of `linear` operation.
   [#3468](https://github.com/lovell/sharp/issues/3468)
 

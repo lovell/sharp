@@ -67,7 +67,7 @@ describe('Rotation', function () {
   it('Rotate by 30 degrees with solid background', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320)
-      .rotate(30, { background: { r: 255, g: 0, b: 0, alpha: 0.5 } })
+      .rotate(30, { background: { r: 255, g: 0, b: 0 } })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
