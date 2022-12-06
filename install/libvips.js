@@ -167,7 +167,7 @@ try {
     } else {
       const url = distBaseUrl + tarFilename;
       libvips.log(`Downloading ${url}`);
-      simpleGet({ url: url, agent: agent() }, function (err, response) {
+      simpleGet({ url: url, agent: agent(libvips.log) }, function (err, response) {
         if (err) {
           fail(err);
         } else if (response.statusCode === 404) {
