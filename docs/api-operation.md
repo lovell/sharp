@@ -151,22 +151,24 @@ Returns **Sharp**&#x20;
 ## sharpen
 
 Sharpen the image.
+
 When used without parameters, performs a fast, mild sharpen of the output image.
+
 When a `sigma` is provided, performs a slower, more accurate sharpen of the L channel in the LAB colour space.
-Separate control over the level of sharpening in "flat" and "jagged" areas is available.
+Fine-grained control over the level of sharpening in "flat" (m1) and "jagged" (m2) areas is available.
 
 See [libvips sharpen][8] operation.
 
 ### Parameters
 
-*   `options` **([Object][2] | [number][1])?** if present, is an Object with attributes or (deprecated) a number for `options.sigma`.
+*   `options` **([Object][2] | [number][1])?** if present, is an Object with attributes
 
-    *   `options.sigma` **[number][1]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`.
-    *   `options.m1` **[number][1]** the level of sharpening to apply to "flat" areas. (optional, default `1.0`)
-    *   `options.m2` **[number][1]** the level of sharpening to apply to "jagged" areas. (optional, default `2.0`)
-    *   `options.x1` **[number][1]** threshold between "flat" and "jagged" (optional, default `2.0`)
-    *   `options.y2` **[number][1]** maximum amount of brightening. (optional, default `10.0`)
-    *   `options.y3` **[number][1]** maximum amount of darkening. (optional, default `20.0`)
+    *   `options.sigma` **[number][1]?** the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`, between 0.000001 and 10000
+    *   `options.m1` **[number][1]** the level of sharpening to apply to "flat" areas, between 0 and 1000000 (optional, default `1.0`)
+    *   `options.m2` **[number][1]** the level of sharpening to apply to "jagged" areas, between 0 and 1000000 (optional, default `2.0`)
+    *   `options.x1` **[number][1]** threshold between "flat" and "jagged", between 0 and 1000000 (optional, default `2.0`)
+    *   `options.y2` **[number][1]** maximum amount of brightening, between 0 and 1000000 (optional, default `10.0`)
+    *   `options.y3` **[number][1]** maximum amount of darkening, between 0 and 1000000 (optional, default `20.0`)
 *   `flat` **[number][1]?** (deprecated) see `options.m1`.
 *   `jagged` **[number][1]?** (deprecated) see `options.m2`.
 
