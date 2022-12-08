@@ -20,7 +20,7 @@ Implements the [stream.Duplex][1] class.
     JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.
 *   `options` **[Object][13]?** if present, is an Object with optional attributes.
 
-    *   `options.failOn` **[string][12]** level of sensitivity to invalid images, one of (in order of sensitivity): 'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels. (optional, default `'warning'`)
+    *   `options.failOn` **[string][12]** when to abort processing of invalid pixel data, one of (in order of sensitivity): 'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels, invalid metadata will always abort. (optional, default `'warning'`)
     *   `options.limitInputPixels` **([number][14] | [boolean][15])** Do not process input images where the number of pixels
         (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.
         An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). (optional, default `268402689`)
