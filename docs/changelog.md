@@ -9,6 +9,9 @@ Requires libvips v8.13.3
 * Expose `interFrameMaxError` and `interPaletteMaxError` GIF optimisation properties.
   [#3401](https://github.com/lovell/sharp/issues/3401)
 
+* Allow installation on Linux with glibc patch versions e.g. Fedora 38.
+  [#3423](https://github.com/lovell/sharp/issues/3423)
+
 * Expand range of existing `sharpen` parameters to match libvips.
   [#3427](https://github.com/lovell/sharp/issues/3427)
 
