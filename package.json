@@ -146,7 +146,7 @@
     "extract-zip": "^2.0.1",
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
-    "mocha": "^10.1.0",
+    "mocha": "^10.2.0",
     "mock-fs": "^5.2.0",
     "nyc": "^15.1.0",
     "prebuild": "^11.0.4",
