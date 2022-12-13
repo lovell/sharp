@@ -152,6 +152,7 @@ namespace sharp {
     PPM,
     FITS,
     EXR,
+    JXL,
     VIPS,
     RAW,
     UNKNOWN,
@@ -182,6 +183,7 @@ namespace sharp {
   bool IsHeic(std::string const &str);
   bool IsHeif(std::string const &str);
   bool IsAvif(std::string const &str);
+  bool IsJxl(std::string const &str);
   bool IsDz(std::string const &str);
   bool IsDzZip(std::string const &str);
   bool IsV(std::string const &str);

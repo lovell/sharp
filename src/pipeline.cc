@@ -939,6 +939,21 @@ class PipelineWorker : public Napi::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "dz";
+        } else if (baton->formatOut == "jxl" ||
+          (baton->formatOut == "input" && inputImageType == sharp::ImageType::JXL)) {
+          // Write JXL to buffer
+          image = sharp::RemoveAnimationProperties(image);
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.jxlsave_buffer(VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("distance", baton->jxlDistance)
+            ->set("tier", baton->jxlDecodingTier)
+            ->set("effort", baton->jxlEffort)
+            ->set("lossless", baton->jxlLossless)));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "jxl";
         } else if (baton->formatOut == "raw" ||
           (baton->formatOut == "input" && inputImageType == sharp::ImageType::RAW)) {
           // Write raw, uncompressed image data to buffer
@@ -977,6 +992,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         bool const isTiff = sharp::IsTiff(baton->fileOut);
         bool const isJp2 = sharp::IsJp2(baton->fileOut);
         bool const isHeif = sharp::IsHeif(baton->fileOut);
+        bool const isJxl = sharp::IsJxl(baton->fileOut);
         bool const isDz = sharp::IsDz(baton->fileOut);
         bool const isDzZip = sharp::IsDzZip(baton->fileOut);
         bool const isV = sharp::IsV(baton->fileOut);
@@ -1094,6 +1110,17 @@ class PipelineWorker : public Napi::AsyncWorker {
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("lossless", baton->heifLossless));
           baton->formatOut = "heif";
+        } else if (baton->formatOut == "jxl" || (mightMatchInput && isJxl) ||
+          (willMatchInput && inputImageType == sharp::ImageType::JXL)) {
+          // Write JXL to file
+          image = sharp::RemoveAnimationProperties(image);
+          image.jxlsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("strip", !baton->withMetadata)
+            ->set("distance", baton->jxlDistance)
+            ->set("tier", baton->jxlDecodingTier)
+            ->set("effort", baton->jxlEffort)
+            ->set("lossless", baton->jxlLossless));
+          baton->formatOut = "jxl";
         } else if (baton->formatOut == "dz" || isDz || isDzZip) {
           // Write DZ to file
           if (isDzZip) {
@@ -1579,6 +1606,10 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     options, "heifCompression", VIPS_TYPE_FOREIGN_HEIF_COMPRESSION);
   baton->heifEffort = sharp::AttrAsUint32(options, "heifEffort");
   baton->heifChromaSubsampling = sharp::AttrAsStr(options, "heifChromaSubsampling");
+  baton->jxlDistance = sharp::AttrAsDouble(options, "jxlDistance");
+  baton->jxlDecodingTier = sharp::AttrAsUint32(options, "jxlDecodingTier");
+  baton->jxlEffort = sharp::AttrAsUint32(options, "jxlEffort");
+  baton->jxlLossless = sharp::AttrAsBool(options, "jxlLossless");
   baton->rawDepth = sharp::AttrAsEnum<VipsBandFormat>(options, "rawDepth", VIPS_TYPE_BAND_FORMAT);
   // Animated output properties
   if (sharp::HasAttr(options, "loop")) {

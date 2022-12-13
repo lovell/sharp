@@ -536,6 +536,38 @@ Returns **Sharp**&#x20;
 
 *   **since**: 0.23.0
 
+## jxl
+
+Use these JPEG-XL (JXL) options for output image.
+
+This feature is experimental, please do not use in production systems.
+
+Requires libvips compiled with support for libjxl.
+The prebuilt binaries do not include this - see
+[installing a custom libvips][14].
+
+Image metadata (EXIF, XMP) is unsupported.
+
+### Parameters
+
+*   `options` **[Object][6]?** output options
+
+    *   `options.distance` **[number][12]** maximum encoding error, between 0 (highest quality) and 15 (lowest quality) (optional, default `1.0`)
+    *   `options.quality` **[number][12]?** calculate `distance` based on JPEG-like quality, between 1 and 100, overrides distance if specified
+    *   `options.decodingTier` **[number][12]** target decode speed tier, between 0 (highest quality) and 4 (lowest quality) (optional, default `0`)
+    *   `options.lossless` **[boolean][10]** use lossless compression (optional, default `false`)
+    *   `options.effort` **[number][12]** CPU effort, between 3 (fastest) and 9 (slowest) (optional, default `7`)
+
+<!---->
+
+*   Throws **[Error][4]** Invalid options
+
+Returns **Sharp**&#x20;
+
+**Meta**
+
+*   **since**: 0.31.3
+
 ## raw
 
 Force output to be raw, uncompressed pixel data.

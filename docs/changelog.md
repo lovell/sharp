@@ -6,6 +6,9 @@ Requires libvips v8.13.3
 
 ### v0.31.3 - TBD
 
+* Add experimental support for JPEG-XL images. Requires libvips compiled with libjxl.
+  [#2731](https://github.com/lovell/sharp/issues/2731)
+
 * Expose `interFrameMaxError` and `interPaletteMaxError` GIF optimisation properties.
   [#3401](https://github.com/lovell/sharp/issues/3401)
 
