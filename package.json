@@ -141,7 +141,7 @@
   "devDependencies": {
     "async": "^3.2.4",
     "cc": "^3.0.1",
-    "documentation": "^14.0.0",
+    "documentation": "^14.0.1",
     "exif-reader": "^1.0.3",
     "extract-zip": "^2.0.1",
     "icc": "^2.0.0",
