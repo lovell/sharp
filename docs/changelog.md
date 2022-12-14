@@ -9,6 +9,9 @@ Requires libvips v8.13.3
 * Add experimental support for JPEG-XL images. Requires libvips compiled with libjxl.
   [#2731](https://github.com/lovell/sharp/issues/2731)
 
+* Add runtime detection of V8 memory cage, ensures compatibility with Electron 21 onwards.
+  [#3384](https://github.com/lovell/sharp/issues/3384)
+
 * Expose `interFrameMaxError` and `interPaletteMaxError` GIF optimisation properties.
   [#3401](https://github.com/lovell/sharp/issues/3401)
 
