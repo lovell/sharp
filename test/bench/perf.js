@@ -7,15 +7,22 @@ const { exec } = require('child_process');
 const async = require('async');
 const Benchmark = require('benchmark');
 
+const safeRequire = (name) => {
+  try {
+    return require(name);
+  } catch (err) {}
+  return null;
+};
+
 // Contenders
 const sharp = require('../../');
 const gm = require('gm');
 const imagemagick = require('imagemagick');
-const mapnik = require('mapnik');
+const mapnik = safeRequire('mapnik');
 const jimp = require('jimp');
 const squoosh = require('@squoosh/lib');
 process.env.TF_CPP_MIN_LOG_LEVEL = 1;
-const tfjs = require('@tensorflow/tfjs-node');
+const tfjs = safeRequire('@tensorflow/tfjs-node');
 
 const fixtures = require('../fixtures');
 
@@ -138,7 +145,7 @@ async.series({
       }
     });
     // mapnik
-    jpegSuite.add('mapnik-file-file', {
+    mapnik && jpegSuite.add('mapnik-file-file', {
       defer: true,
       fn: function (deferred) {
         mapnik.Image.open(fixtures.inputJpg, function (err, img) {
@@ -253,7 +260,7 @@ async.series({
       }
     });
     // tfjs
-    jpegSuite.add('tfjs-node-buffer-buffer', {
+    tfjs && jpegSuite.add('tfjs-node-buffer-buffer', {
       defer: true,
       fn: function (deferred) {
         const decoded = tfjs.node.decodeJpeg(inputJpgBuffer);
@@ -677,7 +684,7 @@ async.series({
       }
     });
     // mapnik
-    pngSuite.add('mapnik-file-file', {
+    mapnik && pngSuite.add('mapnik-file-file', {
       defer: true,
       fn: function (deferred) {
         mapnik.Image.open(fixtures.inputPngAlphaPremultiplicationLarge, function (err, img) {
