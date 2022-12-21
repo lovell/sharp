@@ -4,7 +4,7 @@
 
 Requires libvips v8.13.3
 
-### v0.31.3 - TBD
+### v0.31.3 - 21st December 2022
 
 * Add experimental support for JPEG-XL images. Requires libvips compiled with libjxl.
   [#2731](https://github.com/lovell/sharp/issues/2731)
