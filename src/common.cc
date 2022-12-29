@@ -167,6 +167,9 @@ namespace sharp {
       if (HasAttr(input, "textSpacing")) {
         descriptor->textSpacing = AttrAsUint32(input, "textSpacing");
       }
+      if (HasAttr(input, "textWrap")) {
+        descriptor->textWrap = AttrAsEnum<VipsTextWrap>(input, "textWrap", VIPS_TYPE_TEXT_WRAP);
+      }
     }
     // Limit input images to a given number of pixels, where pixels = width * height
     descriptor->limitInputPixels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputPixels"));
@@ -454,6 +457,7 @@ namespace sharp {
           ->set("justify", descriptor->textJustify)
           ->set("rgba", descriptor->textRgba)
           ->set("spacing", descriptor->textSpacing)
+          ->set("wrap", descriptor->textWrap)
           ->set("autofit_dpi", &descriptor->textAutofitDpi);
         if (descriptor->textWidth > 0) {
           textOptions->set("width", descriptor->textWidth);
@@ -609,6 +613,15 @@ namespace sharp {
     copy.remove(VIPS_META_PAGE_HEIGHT);
     copy.remove("delay");
     copy.remove("loop");
+    return copy;
+  }
+
+  /*
+    Remove GIF palette from image.
+  */
+  VImage RemoveGifPalette(VImage image) {
+    VImage copy = image.copy();
+    copy.remove("gif-palette");
     return copy;
   }
 

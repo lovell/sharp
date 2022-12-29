@@ -165,7 +165,8 @@ struct PipelineBaton {
   double gifDither;
   double gifInterFrameMaxError;
   double gifInterPaletteMaxError;
-  bool gifReoptimise;
+  bool gifReuse;
+  bool gifProgressive;
   int tiffQuality;
   VipsForeignTiffCompression tiffCompression;
   VipsForeignTiffPredictor tiffPredictor;
@@ -322,7 +323,8 @@ struct PipelineBaton {
     gifDither(1.0),
     gifInterFrameMaxError(0.0),
     gifInterPaletteMaxError(3.0),
-    gifReoptimise(false),
+    gifReuse(true),
+    gifProgressive(false),
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),

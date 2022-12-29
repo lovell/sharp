@@ -80,6 +80,9 @@ class MetadataWorker : public Napi::AsyncWorker {
       if (image.get_typeof(VIPS_META_RESOLUTION_UNIT) == VIPS_TYPE_REF_STRING) {
         baton->resolutionUnit = image.get_string(VIPS_META_RESOLUTION_UNIT);
       }
+      if (image.get_typeof("magick-format") == VIPS_TYPE_REF_STRING) {
+        baton->formatMagick = image.get_string("magick-format");
+      }
       if (image.get_typeof("openslide.level-count") == VIPS_TYPE_REF_STRING) {
         int const levels = std::stoi(image.get_string("openslide.level-count"));
         for (int l = 0; l < levels; l++) {
@@ -203,6 +206,9 @@ class MetadataWorker : public Napi::AsyncWorker {
       }
       if (!baton->resolutionUnit.empty()) {
         info.Set("resolutionUnit", baton->resolutionUnit == "in" ? "inch" : baton->resolutionUnit);
+      }
+      if (!baton->formatMagick.empty()) {
+        info.Set("formatMagick", baton->formatMagick);
       }
       if (!baton->levels.empty()) {
         int i = 0;

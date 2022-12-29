@@ -80,19 +80,36 @@ describe('GIF input', () => {
     assert.strictEqual(true, reduced.length < original.length);
   });
 
-  it('valid optimise', () => {
-    assert.doesNotThrow(() => sharp().gif({ reoptimise: true }));
-    assert.doesNotThrow(() => sharp().gif({ reoptimize: true }));
+  it('valid reuse', () => {
+    assert.doesNotThrow(() => sharp().gif({ reuse: true }));
+    assert.doesNotThrow(() => sharp().gif({ reuse: false }));
   });
 
-  it('invalid reoptimise throws', () => {
+  it('invalid reuse throws', () => {
     assert.throws(
-      () => sharp().gif({ reoptimise: -1 }),
-      /Expected boolean for gifReoptimise but received -1 of type number/
+      () => sharp().gif({ reuse: -1 }),
+      /Expected boolean for gifReuse but received -1 of type number/
     );
     assert.throws(
-      () => sharp().gif({ reoptimize: 'fail' }),
-      /Expected boolean for gifReoptimise but received fail of type string/
+      () => sharp().gif({ reuse: 'fail' }),
+      /Expected boolean for gifReuse but received fail of type string/
+    );
+  });
+
+  it('progressive changes file size', async () => {
+    const nonProgressive = await sharp(fixtures.inputGif).gif({ progressive: false }).toBuffer();
+    const progressive = await sharp(fixtures.inputGif).gif({ progressive: true }).toBuffer();
+    assert(nonProgressive.length !== progressive.length);
+  });
+
+  it('invalid progressive throws', () => {
+    assert.throws(
+      () => sharp().gif({ progressive: -1 }),
+      /Expected boolean for gifProgressive but received -1 of type number/
+    );
+    assert.throws(
+      () => sharp().gif({ progressive: 'fail' }),
+      /Expected boolean for gifProgressive but received fail of type string/
     );
   });
 

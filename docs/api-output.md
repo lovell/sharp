@@ -328,8 +328,8 @@ The palette of the input image will be re-used if possible.
 
 *   `options` **[Object][6]?** output options
 
-    *   `options.reoptimise` **[boolean][10]** always generate new palettes (slow), re-use existing by default (optional, default `false`)
-    *   `options.reoptimize` **[boolean][10]** alternative spelling of `options.reoptimise` (optional, default `false`)
+    *   `options.reuse` **[boolean][10]** re-use existing palette, otherwise generate new (slow) (optional, default `true`)
+    *   `options.progressive` **[boolean][10]** use progressive (interlace) scan (optional, default `false`)
     *   `options.colours` **[number][12]** maximum number of palette entries, including transparency, between 2 and 256 (optional, default `256`)
     *   `options.colors` **[number][12]** alternative spelling of `options.colours` (optional, default `256`)
     *   `options.effort` **[number][12]** CPU effort, between 1 (fastest) and 10 (slowest) (optional, default `7`)

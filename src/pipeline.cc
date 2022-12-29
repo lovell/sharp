@@ -409,6 +409,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           image = image.bandjoin(joinImage);
         }
         image = image.copy(VImage::option()->set("interpretation", baton->colourspace));
+        image = sharp::RemoveGifPalette(image);
       }
 
       inputWidth = image.width();
@@ -660,6 +661,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           ys.push_back(top);
         }
         image = VImage::composite(images, modes, VImage::option()->set("x", xs)->set("y", ys));
+        image = sharp::RemoveGifPalette(image);
       }
 
       // Gamma decoding (brighten)
@@ -689,6 +691,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         std::tie(booleanImage, booleanImageType) = sharp::OpenInput(baton->boolean);
         booleanImage = sharp::EnsureColourspace(booleanImage, baton->colourspaceInput);
         image = sharp::Boolean(image, booleanImage, baton->booleanOp);
+        image = sharp::RemoveGifPalette(image);
       }
 
       // Apply per-channel Bandbool bitwise operations after all other operations
@@ -870,7 +873,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("bitdepth", baton->gifBitdepth)
             ->set("effort", baton->gifEffort)
-            ->set("reoptimise", baton->gifReoptimise)
+            ->set("reuse", baton->gifReuse)
+            ->set("interlace", baton->gifProgressive)
             ->set("interframe_maxerror", baton->gifInterFrameMaxError)
             ->set("interpalette_maxerror", baton->gifInterPaletteMaxError)
             ->set("dither", baton->gifDither)));
@@ -1068,7 +1072,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("bitdepth", baton->gifBitdepth)
             ->set("effort", baton->gifEffort)
-            ->set("reoptimise", baton->gifReoptimise)
+            ->set("reuse", baton->gifReuse)
+            ->set("interlace", baton->gifProgressive)
             ->set("dither", baton->gifDither));
           baton->formatOut = "gif";
         } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
@@ -1582,7 +1587,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->gifDither = sharp::AttrAsDouble(options, "gifDither");
   baton->gifInterFrameMaxError = sharp::AttrAsDouble(options, "gifInterFrameMaxError");
   baton->gifInterPaletteMaxError = sharp::AttrAsDouble(options, "gifInterPaletteMaxError");
-  baton->gifReoptimise = sharp::AttrAsBool(options, "gifReoptimise");
+  baton->gifReuse = sharp::AttrAsBool(options, "gifReuse");
+  baton->gifProgressive = sharp::AttrAsBool(options, "gifProgressive");
   baton->tiffQuality = sharp::AttrAsUint32(options, "tiffQuality");
   baton->tiffPyramid = sharp::AttrAsBool(options, "tiffPyramid");
   baton->tiffBitdepth = sharp::AttrAsUint32(options, "tiffBitdepth");

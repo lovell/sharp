@@ -63,6 +63,7 @@ Implements the [stream.Duplex][1] class.
         *   `options.text.dpi` **[number][14]** the resolution (size) at which to render the text. Does not take effect if `height` is specified. (optional, default `72`)
         *   `options.text.rgba` **[boolean][15]** set this to true to enable RGBA output. This is useful for colour emoji rendering, or support for pango markup features like `<span foreground="red">Red!</span>`. (optional, default `false`)
         *   `options.text.spacing` **[number][14]** text line height in points. Will use the font line height if none is specified. (optional, default `0`)
+        *   `options.text.wrap` **[number][14]** word wrapping style when width is provided, one of: 'word', 'char', 'charWord' (prefer char, fallback to word) or 'none'. (optional, default `'word'`)
 
 ### Examples
 

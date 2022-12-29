@@ -294,4 +294,24 @@ describe('Text to image', () => {
       });
     });
   });
+
+  it('valid wrap throws', () => {
+    assert.doesNotThrow(() => sharp({ text: { text: 'text', wrap: 'none' } }));
+    assert.doesNotThrow(() => sharp({ text: { text: 'text', wrap: 'wordChar' } }));
+  });
+
+  it('invalid wrap throws', () => {
+    assert.throws(
+      () => sharp({ text: { text: 'text', wrap: 1 } }),
+      /Expected one of: word, char, wordChar, none for text\.wrap but received 1 of type number/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', wrap: false } }),
+      /Expected one of: word, char, wordChar, none for text\.wrap but received false of type boolean/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', wrap: 'invalid' } }),
+      /Expected one of: word, char, wordChar, none for text\.wrap but received invalid of type string/
+    );
+  });
 });

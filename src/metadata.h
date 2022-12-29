@@ -41,6 +41,7 @@ struct MetadataBaton {
   int pagePrimary;
   std::string compression;
   std::string resolutionUnit;
+  std::string formatMagick;
   std::vector<std::pair<int, int>> levels;
   int subifds;
   std::vector<double> background;

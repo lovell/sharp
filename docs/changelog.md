@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.32 - *flow*
+
+Requires libvips v8.14.0
+
+### v0.32.0 - TBD
+
+* Replace GIF output `optimise` / `optimize` option with `reuse`.
+
+* Add `progressive` option to GIF output for interlacing.
+
+* Add `wrap` option to text image creation.
+
+* Add `formatMagick` property to metadata of images loaded via *magick.
+
+* Allow use of GPS (IFD3) EXIF metadata.
+  [#2767](https://github.com/lovell/sharp/issues/2767)
+
+* Prebuilt binaries: ensure macOS 10.13+ support, as documented.
+  [#3438](https://github.com/lovell/sharp/issues/3438)
+
+* Prebuilt binaries: prevent use of glib slice allocator, improves QEMU support.
+  [#3448](https://github.com/lovell/sharp/issues/3448)
+
 ## v0.31 - *eagle*
 
 Requires libvips v8.13.3
