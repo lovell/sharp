@@ -115,7 +115,8 @@ and that it can be located using `pkg-config --modversion vips-cpp`.
 For help compiling libvips and its dependencies, please see
 [building libvips from source](https://www.libvips.org/install.html#building-libvips-from-source).
 
-The use of a globally-installed libvips is unsupported on Windows.
+The use of a globally-installed libvips is unsupported on Windows
+and on macOS when running Node.js under Rosetta.
 
 ## Building from source
 
