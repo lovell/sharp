@@ -142,7 +142,7 @@
     "async": "^3.2.4",
     "cc": "^3.0.1",
     "documentation": "^14.0.1",
-    "exif-reader": "^1.0.3",
+    "exif-reader": "^1.1.0",
     "extract-zip": "^2.0.1",
     "icc": "^2.0.0",
     "license-checker": "^25.0.1",
