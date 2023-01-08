@@ -95,7 +95,7 @@
     "test-unit": "nyc --reporter=lcov --reporter=text --check-coverage --branches=100 mocha",
     "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;MIT\"",
     "test-leak": "./test/leak/leak.sh",
-    "docs-build": "documentation lint lib && node docs/build && node docs/search-index/build",
+    "docs-build": "node docs/build && node docs/search-index/build",
     "docs-serve": "cd docs && npx serve",
     "docs-publish": "cd docs && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
   },
@@ -141,10 +141,10 @@
   "devDependencies": {
     "async": "^3.2.4",
     "cc": "^3.0.1",
-    "documentation": "^14.0.1",
     "exif-reader": "^1.1.0",
     "extract-zip": "^2.0.1",
     "icc": "^2.0.0",
+    "jsdoc-to-markdown": "^8.0.0",
     "license-checker": "^25.0.1",
     "mocha": "^10.2.0",
     "mock-fs": "^5.2.0",
