@@ -1,2 +1,2 @@
 src/libvips/* linguist-vendored
-build/** linguist-generated
+build/Release/sharp-emscripten-wasm32.node.* linguist-generated

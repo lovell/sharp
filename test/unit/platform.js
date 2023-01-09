@@ -17,23 +17,19 @@ describe('Platform-detection', function () {
     }
   });
 
-  // Don't let outer npm_config_* variables leak into a platform test.
-  beforeEach(() => {
+  function cleanupEnv () {
     for (const key of npmConfigKeys()) {
       delete process.env[key];
     }
-  });
+  }
+
+  // Don't let outer npm_config_* variables leak into a platform test.
+  beforeEach(cleanupEnv);
 
   // Restore the original config for other test suites.
   after(() => {
-    for (const key of npmConfigKeys()) {
-      const value = npmEnv[key];
-      if (value === undefined) {
-        delete process.env[key];
-      } else {
-        process.env[key] = value;
-      }
-    }
+    cleanupEnv();
+    Object.assign(process.env, npmEnv);
   });
 
   it('Can override arch with npm_config_arch', function () {
