@@ -8957,6 +8957,9 @@ var asmLibraryArg = {
  "invoke_iiiiiiiiiiii": invoke_iiiiiiiiiiii,
  "invoke_iiiiiiiiiiiii": invoke_iiiiiiiiiiiii,
  "invoke_iiiiij": invoke_iiiiij,
+ "invoke_iiijii": invoke_iiijii,
+ "invoke_iij": invoke_iij,
+ "invoke_ji": invoke_ji,
  "invoke_jii": invoke_jii,
  "invoke_jiiii": invoke_jiiii,
  "invoke_jiji": invoke_jiji,
@@ -8982,6 +8985,7 @@ var asmLibraryArg = {
  "invoke_viiiiiiiiii": invoke_viiiiiiiiii,
  "invoke_viiiiiiiiiii": invoke_viiiiiiiiiii,
  "invoke_viiiiiiiiiiiiiii": invoke_viiiiiiiiiiiiiii,
+ "invoke_viij": invoke_viij,
  "llvm_eh_typeid_for": _llvm_eh_typeid_for,
  "memory": wasmMemory,
  "napi_add_finalizer": _napi_add_finalizer,
@@ -9570,6 +9574,18 @@ function invoke_viiiiiiiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10,
  }
 }
 
+function invoke_ji(index, a1) {
+ var sp = stackSave();
+ try {
+  return getWasmTableEntry(index)(a1);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+  return 0n;
+ }
+}
+
 function invoke_jiji(index, a1, a2, a3) {
  var sp = stackSave();
  try {
@@ -9579,6 +9595,39 @@ function invoke_jiji(index, a1, a2, a3) {
   if (e !== e + 0) throw e;
   _setThrew(1, 0);
   return 0n;
+ }
+}
+
+function invoke_iij(index, a1, a2) {
+ var sp = stackSave();
+ try {
+  return getWasmTableEntry(index)(a1, a2);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_viij(index, a1, a2, a3) {
+ var sp = stackSave();
+ try {
+  getWasmTableEntry(index)(a1, a2, a3);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_iiijii(index, a1, a2, a3, a4, a5) {
+ var sp = stackSave();
+ try {
+  return getWasmTableEntry(index)(a1, a2, a3, a4, a5);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
  }
 }
 
