@@ -23,6 +23,9 @@ Requires libvips v8.14.0
 * Prebuilt binaries: prevent use of glib slice allocator, improves QEMU support.
   [#3448](https://github.com/lovell/sharp/issues/3448)
 
+* Reduce sharpen `sigma` maximum from 10000 to 10.
+  [#3521](https://github.com/lovell/sharp/issues/3521)
+
 ## v0.31 - *eagle*
 
 Requires libvips v8.13.3

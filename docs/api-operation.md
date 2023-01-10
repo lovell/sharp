@@ -158,7 +158,7 @@ See [libvips sharpen](https://www.libvips.org/API/current/libvips-convolution.ht
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [options] | <code>Object</code> \| <code>number</code> |  | if present, is an Object with attributes |
-| [options.sigma] | <code>number</code> |  | the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`, between 0.000001 and 10000 |
+| [options.sigma] | <code>number</code> |  | the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`, between 0.000001 and 10 |
 | [options.m1] | <code>number</code> | <code>1.0</code> | the level of sharpening to apply to "flat" areas, between 0 and 1000000 |
 | [options.m2] | <code>number</code> | <code>2.0</code> | the level of sharpening to apply to "jagged" areas, between 0 and 1000000 |
 | [options.x1] | <code>number</code> | <code>2.0</code> | threshold between "flat" and "jagged", between 0 and 1000000 |

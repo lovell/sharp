@@ -110,7 +110,7 @@ describe('Sharpen', function () {
 
   it('invalid options.sigma', () => assert.throws(
     () => sharp().sharpen({ sigma: -1 }),
-    /Expected number between 0\.000001 and 10000 for options\.sigma but received -1 of type number/
+    /Expected number between 0\.000001 and 10 for options\.sigma but received -1 of type number/
   ));
 
   it('invalid options.m1', () => assert.throws(
