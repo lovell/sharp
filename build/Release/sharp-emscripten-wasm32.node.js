@@ -1221,13 +1221,13 @@ function spawnThread(threadParams) {
 
 var PATH = {
  isAbs: path => nodePath["isAbsolute"](path),
- normalize: path => nodePath["normalize"](path),
+ normalize: path => nodePath["posix"]["normalize"](path),
  dirname: path => nodePath["dirname"](path),
  basename: path => nodePath["basename"](path),
  join: function() {
-  return nodePath["join"].apply(null, arguments);
+  return nodePath["posix"]["join"].apply(null, arguments);
  },
- join2: (l, r) => nodePath["join"](l, r)
+ join2: (l, r) => nodePath["posix"]["join"](l, r)
 };
 
 function getRandomDevice() {
@@ -2021,6 +2021,24 @@ var NODEFS = {
 };
 
 var NODERAWFS = {
+ init: (input, output, error) => {
+  VFS.init(input, output, error);
+  var _wrapNodeError = function(func) {
+   return function() {
+    try {
+     return func.apply(this, arguments);
+    } catch (e) {
+     if (e.code) {
+      throw new FS.ErrnoError(ERRNO_CODES[e.code]);
+     }
+     throw e;
+    }
+   };
+  };
+  for (var _key in NODERAWFS) {
+   FS[_key] = _wrapNodeError(NODERAWFS[_key]);
+  }
+ },
  lookup: function(parent, name) {
   return FS.lookupPath(parent.path + "/" + name).node;
  },
@@ -2040,26 +2058,6 @@ var NODERAWFS = {
     path: path
    }
   };
- },
- createStandardStreams: function() {
-  FS.streams[0] = FS.createStream({
-   nfd: 0,
-   position: 0,
-   path: "",
-   flags: 0,
-   tty: true,
-   seekable: false
-  }, 0, 0);
-  for (var i = 1; i < 3; i++) {
-   FS.streams[i] = FS.createStream({
-    nfd: i,
-    position: 0,
-    path: "",
-    flags: 577,
-    tty: true,
-    seekable: false
-   }, i, i);
-  }
  },
  cwd: function() {
   return process.cwd();
@@ -5841,11 +5839,7 @@ function warnOnce(text) {
  }
 }
 
-function _emscripten_check_blocking_allowed() {
- if (ENVIRONMENT_IS_NODE) return;
- if (ENVIRONMENT_IS_WORKER) return;
- warnOnce("Blocking on the main thread is very dangerous, see https://emscripten.org/docs/porting/pthreads.html#blocking-on-the-main-browser-thread");
-}
+function _emscripten_check_blocking_allowed() {}
 
 function _emscripten_date_now() {
  return Date.now();
@@ -7763,26 +7757,13 @@ ERRNO_CODES = {
  "ESTRPIPE": 135
 };
 
-if (ENVIRONMENT_IS_NODE) {
- var _wrapNodeError = function(func) {
-  return function() {
-   try {
-    return func.apply(this, arguments);
-   } catch (e) {
-    if (e.code) {
-     throw new FS.ErrnoError(ERRNO_CODES[e.code]);
-    }
-    throw e;
-   }
-  };
- };
- var VFS = Object.assign({}, FS);
- for (var _key in NODERAWFS) {
-  FS[_key] = _wrapNodeError(NODERAWFS[_key]);
- }
-} else {
+if (!ENVIRONMENT_IS_NODE) {
  throw new Error("NODERAWFS is currently only supported on Node.js environment.");
 }
+
+var VFS = Object.assign({}, FS);
+
+FS.init = NODERAWFS.init;
 
 embind_init_charCodes();
 
