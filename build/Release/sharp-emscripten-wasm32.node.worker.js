@@ -142,9 +142,6 @@ function handleMessage(e) {
       Module['PThread'].threadInitTLS();
 
       if (!initializedJS) {
-        // Embind must initialize itself on all threads, as it generates support JS.
-        // We only do this once per worker since they get reused
-        Module['__embind_initialize_bindings']();
 
         // Execute any proxied work that came in before the thread was
         // initialized. Only do this once because it is only possible for

@@ -40,10 +40,6 @@
       # Stricter linking options - don't link HTML5, OpenGL, etc.
       '-sAUTO_JS_LIBRARIES=0',
       '-sAUTO_NATIVE_LIBRARIES=0',
-      # We want to treat strings as Unicode rather than as binary data.
-      '-sEMBIND_STD_STRING_IS_UTF8=1',
-      # emnapi needs Embind
-      '--bind',
     ],
     'defines': [
       '__STDC_FORMAT_MACROS',
