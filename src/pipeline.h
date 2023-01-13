@@ -75,8 +75,8 @@ struct PipelineBaton {
   int cropOffsetLeft;
   int cropOffsetTop;
   bool hasAttentionCenter;
-  int attentionCenterX;
-  int attentionCenterY;
+  int attentionX;
+  int attentionY;
   bool premultiplied;
   bool tileCentre;
   bool fastShrinkOnLoad;
@@ -240,8 +240,8 @@ struct PipelineBaton {
     cropOffsetLeft(0),
     cropOffsetTop(0),
     hasAttentionCenter(false),
-    attentionCenterX(0),
-    attentionCenterY(0),
+    attentionX(0),
+    attentionY(0),
     premultiplied(false),
     tintA(128.0),
     tintB(128.0),

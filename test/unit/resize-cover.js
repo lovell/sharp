@@ -376,8 +376,8 @@ describe('Resize fit=cover', function () {
           assert.strictEqual(320, info.height);
           assert.strictEqual(-107, info.cropOffsetLeft);
           assert.strictEqual(0, info.cropOffsetTop);
-          assert.strictEqual(588, info.attentionCenterX);
-          assert.strictEqual(640, info.attentionCenterY);
+          assert.strictEqual(588, info.attentionX);
+          assert.strictEqual(640, info.attentionY);
           fixtures.assertSimilar(fixtures.expected('crop-strategy-attention.jpg'), data, done);
         });
     });
@@ -396,9 +396,29 @@ describe('Resize fit=cover', function () {
           assert.strictEqual(80, info.height);
           assert.strictEqual(0, info.cropOffsetLeft);
           assert.strictEqual(0, info.cropOffsetTop);
-          assert.strictEqual(0, info.attentionCenterX);
-          assert.strictEqual(0, info.attentionCenterY);
+          assert.strictEqual(0, info.attentionX);
+          assert.strictEqual(0, info.attentionY);
           fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
+        });
+    });
+
+    it('WebP', function (done) {
+      sharp(fixtures.inputWebP)
+        .resize(320, 80, {
+          fit: 'cover',
+          position: sharp.strategy.attention
+        })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual('webp', info.format);
+          assert.strictEqual(3, info.channels);
+          assert.strictEqual(320, info.width);
+          assert.strictEqual(80, info.height);
+          assert.strictEqual(0, info.cropOffsetLeft);
+          assert.strictEqual(-161, info.cropOffsetTop);
+          assert.strictEqual(288, info.attentionX);
+          assert.strictEqual(745, info.attentionY);
+          fixtures.assertSimilar(fixtures.expected('crop-strategy.webp'), data, done);
         });
     });
 
