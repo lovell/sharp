@@ -6,6 +6,8 @@ Requires libvips v8.14.0
 
 ### v0.32.0 - TBD
 
+* Default to using sequential rather than random access read where possible.
+
 * Replace GIF output `optimise` / `optimize` option with `reuse`.
 
 * Add `progressive` option to GIF output for interlacing.

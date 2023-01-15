@@ -399,7 +399,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Join additional color channels to the image
-      if (baton->joinChannelIn.size() > 0) {
+      if (!baton->joinChannelIn.empty()) {
         VImage joinImage;
         sharp::ImageType joinImageType = sharp::ImageType::UNKNOWN;
 
@@ -504,7 +504,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Affine transform
-      if (baton->affineMatrix.size() > 0) {
+      if (!baton->affineMatrix.empty()) {
         MultiPageUnsupported(nPages, "Affine");
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
@@ -1644,9 +1644,11 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
       baton->trimThreshold > 0.0 ||
       baton->normalise ||
       baton->position == 16 || baton->position == 17 ||
-      baton->angle % 360 != 0 ||
-      fmod(baton->rotationAngle, 360.0) != 0.0 ||
-      baton->useExifOrientation
+      baton->angle != 0 ||
+      baton->rotationAngle != 0.0 ||
+      baton->tileAngle != 0 ||
+      baton->useExifOrientation ||
+      !baton->affineMatrix.empty()
     ) {
       baton->input->access = VIPS_ACCESS_RANDOM;
     }

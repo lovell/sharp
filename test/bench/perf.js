@@ -535,10 +535,10 @@ async.series({
             }
           });
       }
-    }).add('sharp-sequentialRead', {
+    }).add('sharp-random-access-read', {
       defer: true,
       fn: function (deferred) {
-        sharp(inputJpgBuffer, { sequentialRead: true })
+        sharp(inputJpgBuffer, { sequentialRead: false })
           .resize(width, height)
           .toBuffer(function (err) {
             if (err) {
