@@ -228,16 +228,6 @@ the use of an alternative memory allocator such as
 Those using musl-based Linux (e.g. Alpine) and non-Linux systems are
 unaffected.
 
-## Heroku
-
-Add the
-[jemalloc buildpack](https://github.com/gaffneyc/heroku-buildpack-jemalloc)
-to reduce the effects of memory fragmentation.
-
-Set
-[NODE_MODULES_CACHE](https://devcenter.heroku.com/articles/nodejs-support#cache-behavior)
-to `false` when using the `yarn` package manager.
-
 ## AWS Lambda
 
 The `node_modules` directory of the
