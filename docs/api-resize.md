@@ -53,7 +53,7 @@ Previous calls to `resize` in the same pipeline will be ignored.
 | [options.kernel] | <code>String</code> | <code>&#x27;lanczos3&#x27;</code> | the kernel to use for image reduction. Use the `fastShrinkOnLoad` option to control kernel vs shrink-on-load. |
 | [options.withoutEnlargement] | <code>Boolean</code> | <code>false</code> | do not enlarge if the width *or* height are already less than the specified dimensions, equivalent to GraphicsMagick's `>` geometry option. |
 | [options.withoutReduction] | <code>Boolean</code> | <code>false</code> | do not reduce if the width *or* height are already greater than the specified dimensions, equivalent to GraphicsMagick's `<` geometry option. |
-| [options.fastShrinkOnLoad] | <code>Boolean</code> | <code>true</code> | take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. |
+| [options.fastShrinkOnLoad] | <code>Boolean</code> | <code>true</code> | take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern or round-down of an auto-scaled dimension. |
 
 **Example**  
 ```js
