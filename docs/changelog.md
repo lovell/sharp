@@ -25,6 +25,10 @@ Requires libvips v8.14.0
 * Prebuilt binaries: prevent use of glib slice allocator, improves QEMU support.
   [#3448](https://github.com/lovell/sharp/issues/3448)
 
+* Add focus point coordinates to output when using attention based crop.
+  [#3470](https://github.com/lovell/sharp/pull/3470)
+  [@ejoebstl](https://github.com/ejoebstl)
+
 * Reduce sharpen `sigma` maximum from 10000 to 10.
   [#3521](https://github.com/lovell/sharp/issues/3521)
 

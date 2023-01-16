@@ -263,3 +263,6 @@ GitHub: https://github.com/antonmarsden
 
 Name:  Marcos Casagrande
 GitHub: https://github.com/marcosc90
+
+Name: Emanuel Jöbstl
+GitHub: https://github.com/ejoebstl
