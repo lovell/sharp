@@ -276,7 +276,7 @@ class MetadataWorker : public Napi::AsyncWorker {
 Napi::Value metadata(const Napi::CallbackInfo& info) {
   // V8 objects are converted to non-V8 types held in the baton struct
   MetadataBaton *baton = new MetadataBaton;
-  Napi::Object options = info[0].As<Napi::Object>();
+  Napi::Object options = info[size_t(0)].As<Napi::Object>();
 
   // Input
   baton->input = sharp::CreateInputDescriptor(options.Get("input").As<Napi::Object>());
@@ -285,7 +285,7 @@ Napi::Value metadata(const Napi::CallbackInfo& info) {
   Napi::Function debuglog = options.Get("debuglog").As<Napi::Function>();
 
   // Join queue for worker thread
-  Napi::Function callback = info[1].As<Napi::Function>();
+  Napi::Function callback = info[size_t(1)].As<Napi::Function>();
   MetadataWorker *worker = new MetadataWorker(callback, baton, debuglog);
   worker->Receiver().Set("options", options);
   worker->Queue();

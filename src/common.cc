@@ -79,7 +79,9 @@ namespace sharp {
   Napi::Buffer<char> NewOrCopyBuffer(Napi::Env env, char* data, size_t len) {
     try {
       return Napi::Buffer<char>::New(env, data, len, FreeCallback);
-    } catch (Napi::Error const &err) {}
+    } catch (Napi::Error const &err) {
+      static_cast<void>(err);
+    }
     Napi::Buffer<char> buf = Napi::Buffer<char>::Copy(env, data, len);
     FreeCallback(nullptr, data);
     return buf;

@@ -30,16 +30,16 @@ Napi::Value cache(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
   // Set memory limit
-  if (info[0].IsNumber()) {
-    vips_cache_set_max_mem(info[0].As<Napi::Number>().Int32Value() * 1048576);
+  if (info[size_t(0)].IsNumber()) {
+    vips_cache_set_max_mem(info[size_t(0)].As<Napi::Number>().Int32Value() * 1048576);
   }
   // Set file limit
-  if (info[1].IsNumber()) {
-    vips_cache_set_max_files(info[1].As<Napi::Number>().Int32Value());
+  if (info[size_t(1)].IsNumber()) {
+    vips_cache_set_max_files(info[size_t(1)].As<Napi::Number>().Int32Value());
   }
   // Set items limit
-  if (info[2].IsNumber()) {
-    vips_cache_set_max(info[2].As<Napi::Number>().Int32Value());
+  if (info[size_t(2)].IsNumber()) {
+    vips_cache_set_max(info[size_t(2)].As<Napi::Number>().Int32Value());
   }
 
   // Get memory stats
@@ -69,8 +69,8 @@ Napi::Value cache(const Napi::CallbackInfo& info) {
 */
 Napi::Value concurrency(const Napi::CallbackInfo& info) {
   // Set concurrency
-  if (info[0].IsNumber()) {
-    vips_concurrency_set(info[0].As<Napi::Number>().Int32Value());
+  if (info[size_t(0)].IsNumber()) {
+    vips_concurrency_set(info[size_t(0)].As<Napi::Number>().Int32Value());
   }
   // Get concurrency
   return Napi::Number::New(info.Env(), vips_concurrency_get());
@@ -91,8 +91,8 @@ Napi::Value counters(const Napi::CallbackInfo& info) {
 */
 Napi::Value simd(const Napi::CallbackInfo& info) {
   // Set state
-  if (info[0].IsBoolean()) {
-    vips_vector_set_enabled(info[0].As<Napi::Boolean>().Value());
+  if (info[size_t(0)].IsBoolean()) {
+    vips_vector_set_enabled(info[size_t(0)].As<Napi::Boolean>().Value());
   }
   // Get state
   return Napi::Boolean::New(info.Env(), vips_vector_isenabled());
@@ -185,10 +185,10 @@ Napi::Value _maxColourDistance(const Napi::CallbackInfo& info) {
 
   // Open input files
   VImage image1;
-  sharp::ImageType imageType1 = sharp::DetermineImageType(info[0].As<Napi::String>().Utf8Value().data());
+  sharp::ImageType imageType1 = sharp::DetermineImageType(info[size_t(0)].As<Napi::String>().Utf8Value().data());
   if (imageType1 != sharp::ImageType::UNKNOWN) {
     try {
-      image1 = VImage::new_from_file(info[0].As<Napi::String>().Utf8Value().c_str());
+      image1 = VImage::new_from_file(info[size_t(0)].As<Napi::String>().Utf8Value().c_str());
     } catch (...) {
       throw Napi::Error::New(env, "Input file 1 has corrupt header");
     }
@@ -196,10 +196,10 @@ Napi::Value _maxColourDistance(const Napi::CallbackInfo& info) {
     throw Napi::Error::New(env, "Input file 1 is of an unsupported image format");
   }
   VImage image2;
-  sharp::ImageType imageType2 = sharp::DetermineImageType(info[1].As<Napi::String>().Utf8Value().data());
+  sharp::ImageType imageType2 = sharp::DetermineImageType(info[size_t(1)].As<Napi::String>().Utf8Value().data());
   if (imageType2 != sharp::ImageType::UNKNOWN) {
     try {
-      image2 = VImage::new_from_file(info[1].As<Napi::String>().Utf8Value().c_str());
+      image2 = VImage::new_from_file(info[size_t(1)].As<Napi::String>().Utf8Value().c_str());
     } catch (...) {
       throw Napi::Error::New(env, "Input file 2 has corrupt header");
     }

@@ -1387,7 +1387,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // V8 objects are converted to non-V8 types held in the baton struct
   PipelineBaton *baton = new PipelineBaton;
-  Napi::Object options = info[0].As<Napi::Object>();
+  Napi::Object options = info[size_t(0)].As<Napi::Object>();
 
   // Input
   baton->input = sharp::CreateInputDescriptor(options.Get("input").As<Napi::Object>());
@@ -1661,7 +1661,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   Napi::Function queueListener = options.Get("queueListener").As<Napi::Function>();
 
   // Join queue for worker thread
-  Napi::Function callback = info[1].As<Napi::Function>();
+  Napi::Function callback = info[size_t(1)].As<Napi::Function>();
   PipelineWorker *worker = new PipelineWorker(callback, baton, debuglog, queueListener);
   worker->Receiver().Set("options", options);
   worker->Queue();
