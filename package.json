@@ -155,7 +155,7 @@
     "prebuild": "^11.0.4",
     "rimraf": "^3.0.2",
     "semistandard": "^16.0.1",
-    "tsd": "^0.24.1"
+    "tsd": "^0.25.0"
   },
   "license": "Apache-2.0",
   "config": {

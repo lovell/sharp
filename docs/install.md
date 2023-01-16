@@ -302,6 +302,17 @@ custom:
         - npm install --arch=x64 --platform=linux sharp
 ```
 
+## TypeScript
+
+TypeScript definitions are published as part of
+the `sharp` package from v0.32.0.
+
+Previously these were available via the `@types/sharp` package,
+which is now deprecated.
+
+When using Typescript, please ensure `devDependencies` includes
+the `@types/node` package.
+
 ## Fonts
 
 When creating text images or rendering SVG images that contain text elements,

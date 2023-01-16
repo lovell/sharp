@@ -19,6 +19,9 @@ Requires libvips v8.14.0
 * Allow use of GPS (IFD3) EXIF metadata.
   [#2767](https://github.com/lovell/sharp/issues/2767)
 
+* TypeScript definitions are now maintained and published directly, deprecating the `@types/sharp` package.
+  [#3369](https://github.com/lovell/sharp/issues/3369)
+
 * Prebuilt binaries: ensure macOS 10.13+ support, as documented.
   [#3438](https://github.com/lovell/sharp/issues/3438)
 

@@ -1,5 +1,6 @@
 /**
  * Type definitions originally lifted from `@types/sharp`, MIT-licensed.
+ * https://opensource.org/licenses/MIT
  *
  * Original definition authors:
  *  - Wooseop Kim <https://github.com/wooseopkim>
