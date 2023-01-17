@@ -37,6 +37,7 @@ A `Promise` is returned when `callback` is not provided.
 - `iptc`: Buffer containing raw IPTC data, if present
 - `xmp`: Buffer containing raw XMP data, if present
 - `tifftagPhotoshop`: Buffer containing raw TIFFTAG_PHOTOSHOP data, if present
+- `formatMagick`: String containing format for images loaded via *magick
 
 
 
