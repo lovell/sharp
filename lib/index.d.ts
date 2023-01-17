@@ -46,7 +46,7 @@ declare namespace sharp {
     /** Object containing nested boolean values representing the available input and output formats/methods. */
     const format: FormatEnum;
 
-    /** An Object containing the version numbers of libvips and its dependencies. */
+    /** An Object containing the version numbers of sharp, libvips and its dependencies. */
     const versions: {
         vips: string;
         cairo?: string | undefined;
@@ -67,6 +67,7 @@ declare namespace sharp {
         pango?: string | undefined;
         pixman?: string | undefined;
         png?: string | undefined;
+        sharp?: string | undefined;
         svg?: string | undefined;
         tiff?: string | undefined;
         webp?: string | undefined;
@@ -808,7 +809,7 @@ declare namespace sharp {
         limitInputPixels?: number | boolean | undefined;
         /** Set this to true to remove safety features that help prevent memory exhaustion (SVG, PNG). (optional, default false) */
         unlimited?: boolean | undefined;
-        /** Set this to true to use sequential rather than random access where possible. This can reduce memory usage and might improve performance on some systems. (optional, default false) */
+        /** Set this to false to use random access rather than sequential read. Some operations will do this automatically. */
         sequentialRead?: boolean | undefined;
         /** Number representing the DPI for vector images in the range 1 to 100000. (optional, default 72) */
         density?: number | undefined;
@@ -902,6 +903,8 @@ declare namespace sharp {
         rgba?: boolean;
         /** Text line height in points. Will use the font line height if none is specified. (optional, default `0`) */
         spacing?: number;
+        /** Word wrapping style when width is provided, one of: 'word', 'char', 'charWord' (prefer char, fallback to word) or 'none' */
+        wrap?: TextWrap;
     }
 
     interface WriteableMetadata {
@@ -972,6 +975,8 @@ declare namespace sharp {
         subifds?: number | undefined;
         /** The unit of resolution (density) */
         resolutionUnit?: 'inch' | 'cm' | undefined;
+        /** String containing format for images loaded via *magick */
+        formatMagick?: string | undefined;
     }
 
     interface LevelMetadata {
@@ -1117,10 +1122,10 @@ declare namespace sharp {
     }
 
     interface GifOptions extends OutputOptions, AnimationOptions {
-        /** Always generate new palettes (slow), re-use existing by default (optional, default false) */
-        reoptimise?: boolean | undefined;
-        /** Alternative spelling of "reoptimise" (optional, default false) */
-        reoptimize?: boolean | undefined;
+        /** Re-use existing palette, otherwise generate new (slow) */
+        reuse?: boolean | undefined;
+        /** Use progressive (interlace) scan */
+        progressive?: boolean | undefined;
         /** Maximum number of palette entries, including transparency, between 2 and 256 (optional, default 256) */
         colours?: number | undefined;
         /** Alternative spelling of "colours". Maximum number of palette entries, including transparency, between 2 and 256 (optional, default 256) */
@@ -1418,6 +1423,9 @@ declare namespace sharp {
         trimOffsetTop?: number | undefined;
         /** DPI the font was rendered at, only defined when using `text` input */
         textAutofitDpi?: number | undefined;
+        /** When using the attention crop strategy, the focal point of the cropped region */
+        attentionX?: number | undefined;
+        attentionY?: number | undefined;
     }
 
     interface AvailableFormatInfo {
@@ -1459,6 +1467,8 @@ declare namespace sharp {
     type FailOnOptions = 'none' | 'truncated' | 'error' | 'warning';
 
     type TextAlign = 'left' | 'centre' | 'center' | 'right';
+
+    type TextWrap = 'word' | 'char' | 'charWord' | 'none';
 
     type TileContainer = 'fs' | 'zip';
 

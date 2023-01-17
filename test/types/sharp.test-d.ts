@@ -352,8 +352,10 @@ sharp(input)
   .gif({})
   .gif({ loop: 0, delay: [], force: true })
   .gif({ delay: 30 })
-  .gif({ reoptimise: true })
-  .gif({ reoptimize: false })
+  .gif({ reuse: true })
+  .gif({ reuse: false })
+  .gif({ progressive: true })
+  .gif({ progressive: false })
   .toBuffer({ resolveWithObject: true })
   .then(({ data, info }) => {
     console.log(data);
@@ -589,6 +591,7 @@ sharp({
     rgba: true,
     justify: true,
     spacing: 10,
+    wrap: 'charWord',
   },
 })
   .png()
