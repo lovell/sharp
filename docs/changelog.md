@@ -32,6 +32,9 @@ Requires libvips v8.14.0
   [#3470](https://github.com/lovell/sharp/pull/3470)
   [@ejoebstl](https://github.com/ejoebstl)
 
+* Respect `fastShrinkOnLoad` resize option for WebP input.
+  [#3516](https://github.com/lovell/sharp/issues/3516)
+
 * Reduce sharpen `sigma` maximum from 10000 to 10.
   [#3521](https://github.com/lovell/sharp/issues/3521)
 

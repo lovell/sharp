@@ -115,6 +115,14 @@ describe('WebP', function () {
       )
   );
 
+  it('should produce different file size with/out shrink-on-load', async () => {
+    const [shrunk, resized] = await Promise.all([
+      sharp(fixtures.inputWebP).resize({ width: 16 }).toBuffer(),
+      sharp(fixtures.inputWebP).resize({ width: 16, fastShrinkOnLoad: false, kernel: 'nearest' }).toBuffer()
+    ]);
+    assert.notStrictEqual(shrunk.length, resized.length);
+  });
+
   it('invalid effort throws', () => {
     assert.throws(() => {
       sharp().webp({ effort: true });
