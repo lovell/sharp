@@ -1,5 +1,5 @@
 ## versions
-An Object containing the version numbers of libvips and its dependencies.
+An Object containing the version numbers of sharp, libvips and its dependencies.
 
 
 **Example**  

@@ -32,6 +32,9 @@ Requires libvips v8.14.0
   [#3470](https://github.com/lovell/sharp/pull/3470)
   [@ejoebstl](https://github.com/ejoebstl)
 
+* Expose sharp version as `sharp.versions.sharp`.
+  [#3471](https://github.com/lovell/sharp/issues/3471)
+
 * Respect `fastShrinkOnLoad` resize option for WebP input.
   [#3516](https://github.com/lovell/sharp/issues/3516)
 
