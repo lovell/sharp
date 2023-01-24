@@ -175,7 +175,7 @@ describe('Modulate', function () {
           .png({ compressionLevel: 0 })
           .toFile(actual)
           .then(() => {
-            fixtures.assertMaxColourDistance(actual, expected);
+            fixtures.assertMaxColourDistance(actual, expected, 3);
           });
       });
     });

@@ -16,6 +16,8 @@ Requires libvips v8.14.0
 
 * Add `formatMagick` property to metadata of images loaded via *magick.
 
+* Prefer integer (un)premultiply for faster resizing of RGBA images.
+
 * Allow use of GPS (IFD3) EXIF metadata.
   [#2767](https://github.com/lovell/sharp/issues/2767)
 
