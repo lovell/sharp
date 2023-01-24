@@ -8,7 +8,7 @@
     "test": "node perf && node random && node parallel"
   },
   "dependencies": {
-    "@squoosh/cli": "0.7.2",
+    "@squoosh/cli": "0.7.3",
     "@squoosh/lib": "0.4.0",
     "async": "3.2.4",
     "benchmark": "2.1.4",
@@ -18,7 +18,7 @@
     "semver": "7.3.8"
   },
   "optionalDependencies": {
-    "@tensorflow/tfjs-node": "4.1.0",
+    "@tensorflow/tfjs-node": "4.2.0",
     "mapnik": "4.5.9"
   },
   "license": "Apache-2.0",
