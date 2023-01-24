@@ -367,11 +367,12 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::EnsureAlpha(image, 1);
       }
 
+      VipsBandFormat premultiplyFormat = image.format();
       bool const shouldPremultiplyAlpha = sharp::HasAlpha(image) &&
         (shouldResize || shouldBlur || shouldConv || shouldSharpen);
 
       if (shouldPremultiplyAlpha) {
-        image = image.premultiply();
+        image = image.premultiply().cast(premultiplyFormat);
       }
 
       // Resize
@@ -583,13 +584,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Reverse premultiplication after all transformations
       if (shouldPremultiplyAlpha) {
-        image = image.unpremultiply();
-        // Cast pixel values to integer
-        if (sharp::Is16Bit(image.interpretation())) {
-          image = image.cast(VIPS_FORMAT_USHORT);
-        } else {
-          image = image.cast(VIPS_FORMAT_UCHAR);
-        }
+        image = image.unpremultiply().cast(premultiplyFormat);
       }
       baton->premultiplied = shouldPremultiplyAlpha;
 
