@@ -28,7 +28,7 @@ is downloaded via HTTPS, verified via Subresource Integrity
 and decompressed into `node_modules/sharp/vendor` during `npm install`.
 
 This provides support for the
-JPEG, PNG, WebP, AVIF, TIFF, GIF and SVG (input) image formats.
+JPEG, PNG, WebP, AVIF (limited to 8-bit depth), TIFF, GIF and SVG (input) image formats.
 
 The following platforms have prebuilt libvips but not sharp:
 
