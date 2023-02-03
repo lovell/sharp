@@ -12,6 +12,9 @@ describe('Raw pixel data', function () {
         sharp(Buffer.from(''));
       }, /empty/);
       assert.throws(function () {
+        sharp(new ArrayBuffer(0));
+      }, /empty/);
+      assert.throws(function () {
         sharp(new Uint8Array(0));
       }, /empty/);
       assert.throws(function () {
