@@ -150,6 +150,23 @@ describe('Input/output', function () {
     readable.pipe(pipeline).pipe(writable);
   });
 
+  it('Read from ArrayBuffer and write to Buffer', async () => {
+    const uint8array = Uint8Array.from([255, 255, 255, 0, 0, 0]);
+    const arrayBuffer = new ArrayBuffer(uint8array.byteLength);
+    new Uint8Array(arrayBuffer).set(uint8array);
+    const { data, info } = await sharp(arrayBuffer, {
+      raw: {
+        width: 2,
+        height: 1,
+        channels: 3
+      }
+    }).toBuffer({ resolveWithObject: true });
+
+    assert.deepStrictEqual(uint8array, new Uint8Array(data));
+    assert.strictEqual(info.width, 2);
+    assert.strictEqual(info.height, 1);
+  });
+
   it('Read from Uint8Array and write to Buffer', async () => {
     const uint8array = Uint8Array.from([255, 255, 255, 0, 0, 0]);
     const { data, info } = await sharp(uint8array, {
