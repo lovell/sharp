@@ -43,6 +43,10 @@ Requires libvips v8.14.0
 * Reduce sharpen `sigma` maximum from 10000 to 10.
   [#3521](https://github.com/lovell/sharp/issues/3521)
 
+* Add support for `ArrayBuffer` input.
+  [#3548](https://github.com/lovell/sharp/pull/3548)
+  [@kapouer](https://github.com/kapouer)
+
 ## v0.31 - *eagle*
 
 Requires libvips v8.13.3
