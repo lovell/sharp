@@ -29,6 +29,7 @@ declare function sharp(options?: sharp.SharpOptions): sharp.Sharp;
 declare function sharp(
     input?:
         | Buffer
+        | ArrayBuffer
         | Uint8Array
         | Uint8ClampedArray
         | Int8Array
