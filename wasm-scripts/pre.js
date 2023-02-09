@@ -11,10 +11,11 @@ Module.preRun = () => {
   ENV.VIPS_CONCURRENCY = vipsConcurrency;
 };
 
-Module.onEmnapiInitialized = (err, emnapi) => {
-  if (err) {
-    throw err;
-  }
+Module.onRuntimeInitialized = () => {
+  const emnapi = Module.emnapiInit({
+    context: require('@tybys/emnapi-runtime').createContext(),
+    // nodeBinding: require('@tybys/emnapi-node-binding')
+  });
 
   // At this point only libvips workers are up & running.
   // Mark all of them as weakly referenced so that they

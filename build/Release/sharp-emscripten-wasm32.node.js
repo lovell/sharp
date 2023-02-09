@@ -65,10 +65,10 @@ Module.preRun = () => {
  ENV.VIPS_CONCURRENCY = vipsConcurrency;
 };
 
-Module.onEmnapiInitialized = (err, emnapi) => {
- if (err) {
-  throw err;
- }
+Module.onRuntimeInitialized = () => {
+ const emnapi = Module.emnapiInit({
+  context: require("@tybys/emnapi-runtime").createContext()
+ });
  for (const worker of PThread.runningWorkers) {
   worker.unref();
  }
@@ -4376,6 +4376,34 @@ function ___cxa_find_matching_catch_3() {
  return thrown;
 }
 
+function ___cxa_find_matching_catch_4() {
+ var thrown = exceptionLast;
+ if (!thrown) {
+  setTempRet0(0);
+  return 0;
+ }
+ var info = new ExceptionInfo(thrown);
+ info.set_adjusted_ptr(thrown);
+ var thrownType = info.get_type();
+ if (!thrownType) {
+  setTempRet0(0);
+  return thrown;
+ }
+ for (var i = 0; i < arguments.length; i++) {
+  var caughtType = arguments[i];
+  if (caughtType === 0 || caughtType === thrownType) {
+   break;
+  }
+  var adjusted_ptr_addr = info.ptr + 16;
+  if (___cxa_can_catch(caughtType, thrownType, adjusted_ptr_addr)) {
+   setTempRet0(caughtType);
+   return thrown;
+  }
+ }
+ setTempRet0(thrownType);
+ return thrown;
+}
+
 function ___cxa_rethrow() {
  var info = exceptionCaught.pop();
  if (!info) {
@@ -4755,143 +4783,74 @@ function __dlopen_js(filename, flag) {
  abort(dlopenMissingError);
 }
 
-var emnapi = undefined;
-
-var emnapiGetDynamicCalls = {
- call_vp: function(_ptr, a) {
-  return getWasmTableEntry(_ptr)(a);
- },
- call_vpp: function(_ptr, a, b) {
-  return getWasmTableEntry(_ptr)(a, b);
- },
- call_ppp: function(_ptr, a, b) {
-  return getWasmTableEntry(_ptr)(a, b);
- },
- call_vpip: function(_ptr, a, b, c) {
-  return getWasmTableEntry(_ptr)(a, b, c);
- },
- call_vppp: function(_ptr, a, b, c) {
-  return getWasmTableEntry(_ptr)(a, b, c);
- },
- call_vpppp: function(_ptr, a, b, c, d) {
-  return getWasmTableEntry(_ptr)(a, b, c, d);
- }
+var emnapiModule = {
+ exports: {},
+ loaded: false,
+ filename: null
 };
 
-var errorMessagesPtr = undefined;
+var emnapiCtx = undefined;
 
-var napiExtendedErrorInfoPtr = undefined;
-
-function emnapiInit() {
- var registered = false;
- var emnapiExports;
- var exportsKey;
- var env;
- function callInStack(f) {
-  var stack = stackSave();
-  var r;
-  try {
-   r = f();
-  } catch (err) {
-   stackRestore(stack);
-   throw err;
-  }
-  stackRestore(stack);
-  return r;
+function emnapiInit(options) {
+ if (emnapiModule.loaded) return emnapiModule.exports;
+ if (typeof options !== "object" || options === null) {
+  throw new TypeError("Invalid emnapi init option");
  }
- function moduleRegister() {
-  if (registered) return emnapiExports;
-  registered = true;
-  napiExtendedErrorInfoPtr = _malloc(16);
-  var lastError = {
-   data: napiExtendedErrorInfoPtr,
-   getErrorCode: function() {
-    return GROWABLE_HEAP_I32()[napiExtendedErrorInfoPtr + 12 >> 2];
-   },
-   setErrorCode: function(_code) {
-    GROWABLE_HEAP_I32()[napiExtendedErrorInfoPtr + 12 >> 2] = _code;
-   },
-   setErrorMessage: function(_ptr) {
-    GROWABLE_HEAP_U32()[napiExtendedErrorInfoPtr >> 2] = _ptr;
-   },
-   dispose: function() {
-    _free(napiExtendedErrorInfoPtr);
-    napiExtendedErrorInfoPtr = 0;
-   }
-  };
-  env = emnapi.Env.create(emnapiGetDynamicCalls, lastError);
-  var scope = emnapi.openScope(env, emnapi.HandleScope);
-  try {
-   emnapiExports = env.callIntoModule(function(envObject) {
-    var exports = {};
-    var exportsHandle = scope.add(envObject, exports);
-    var napiValue = _napi_register_wasm_v1(envObject.id, exportsHandle.id);
-    return !napiValue ? exports : emnapi.handleStore.get(napiValue).value;
-   });
-  } catch (err) {
-   emnapi.closeScope(env, scope);
-   registered = false;
-   throw err;
-  }
-  emnapi.closeScope(env, scope);
-  return emnapiExports;
+ var context = options.context;
+ if (typeof context !== "object" || context === null) {
+  throw new TypeError("Invalid `options.context`. You can create a context by `import { createContext } from '@tybys/emnapi-runtime`'");
  }
- addOnInit(function(Module) {
-  delete Module._napi_register_wasm_v1;
-  delete Module.__emnapi_runtime_init;
-  callInStack(function() {
-   var key_pp = stackAlloc(4);
-   var errormessages_pp = stackAlloc(4);
-   __emnapi_runtime_init(key_pp, errormessages_pp);
-   var key_p = GROWABLE_HEAP_U32()[key_pp >> 2];
-   exportsKey = (key_p ? UTF8ToString(key_p) : "emnapiExports") || "emnapiExports";
-   errorMessagesPtr = GROWABLE_HEAP_U32()[errormessages_pp >> 2] || 0;
+ emnapiCtx = context;
+ if (typeof options.filename === "string") {
+  emnapiModule.filename = options.filename;
+ }
+ var envObject = emnapiModule.envObject || (emnapiModule.envObject = emnapiCtx.createEnv(function(cb) {
+  return getWasmTableEntry(cb);
+ }));
+ var scope = emnapiCtx.openScope(envObject);
+ try {
+  envObject.callIntoModule(function(_envObject) {
+   var exports = emnapiModule.exports;
+   var exportsHandle = scope.add(exports);
+   var napiValue = _napi_register_wasm_v1(_envObject.id, exportsHandle.id);
+   emnapiModule.exports = !napiValue ? exports : emnapiCtx.handleStore.get(napiValue).value;
   });
-  var exports;
-  try {
-   exports = moduleRegister();
-  } catch (err) {
-   if (typeof Module.onEmnapiInitialized === "function") {
-    Module.onEmnapiInitialized(err || new Error(String(err)));
-    return;
-   } else {
-    throw err;
-   }
-  }
-  Module[exportsKey] = exports;
-  if (typeof Module.onEmnapiInitialized === "function") {
-   Module.onEmnapiInitialized(null, exports);
-  }
- });
+ } catch (err) {
+  emnapiCtx.closeScope(envObject, scope);
+  throw err;
+ }
+ emnapiCtx.closeScope(envObject, scope);
+ emnapiModule.loaded = true;
+ delete emnapiModule.envObject;
+ return emnapiModule.exports;
 }
 
 function __emnapi_call_into_module(env, callback, data) {
- var envObject = emnapi.envStore.get(env);
- var scope = emnapi.openScope(envObject, emnapi.HandleScope);
+ var envObject = emnapiCtx.envStore.get(env);
+ var scope = emnapiCtx.openScope(envObject);
  try {
-  envObject.callIntoModule(function(_envObject) {
-   emnapiGetDynamicCalls.call_vpp(callback, env, data);
+  envObject.callIntoModule(function() {
+   getWasmTableEntry(callback)(env, data);
   });
- } catch (err) {
-  emnapi.closeScope(envObject, scope);
-  throw err;
+ } finally {
+  emnapiCtx.closeScope(envObject, scope);
  }
- emnapi.closeScope(envObject, scope);
 }
 
-var emnapiSetImmediate = typeof setImmediate === "function" ? setImmediate : function(f) {
- var channel = new MessageChannel();
- channel.port1.onmessage = function() {
-  channel.port1.onmessage = null;
-  channel = undefined;
-  f();
- };
- channel.port2.postMessage(null);
-};
+function __emnapi_get_last_error_info(env, error_code, engine_error_code, engine_reserved) {
+ var envObject = emnapiCtx.envStore.get(env);
+ var lastError = envObject.lastError;
+ var errorCode = lastError.errorCode;
+ var engineErrorCode = lastError.engineErrorCode >>> 0;
+ var engineReserved = lastError.engineReserved;
+ GROWABLE_HEAP_I32()[error_code >> 2] = errorCode;
+ GROWABLE_HEAP_U32()[engine_error_code >> 2] = engineErrorCode;
+ GROWABLE_HEAP_U32()[engine_reserved >> 2] = engineReserved;
+}
 
 function __emnapi_set_immediate(callback, data) {
- emnapiSetImmediate(function() {
-  emnapiGetDynamicCalls.call_vp(callback, data);
+ emnapiCtx.feature.setImmediate(function() {
+  getWasmTableEntry(callback)(data);
  });
 }
 
@@ -5065,70 +5024,6 @@ function __tzset_js(timezone, daylight, tzname) {
 
 function _abort() {
  abort("");
-}
-
-function emnapiWrap(type, env, js_object, native_object, finalize_cb, finalize_hint, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ js_object ], function() {
-   var value = emnapi.handleStore.get(js_object);
-   if (!(value.isObject() || value.isFunction())) {
-    return envObject.setLastError(1);
-   }
-   if (type === 0) {
-    if (value.wrapped !== 0) {
-     return envObject.setLastError(1);
-    }
-   } else if (type === 1) {
-    if (!finalize_cb) return envObject.setLastError(1);
-   }
-   var reference;
-   if (result) {
-    if (!finalize_cb) return envObject.setLastError(1);
-    reference = emnapi.Reference.create(envObject, value.id, 0, false, finalize_cb, native_object, finalize_hint);
-    GROWABLE_HEAP_U32()[result >> 2] = reference.id;
-   } else {
-    reference = emnapi.Reference.create(envObject, value.id, 0, true, finalize_cb, native_object, !finalize_cb ? finalize_cb : finalize_hint);
-   }
-   if (type === 0) {
-    value.wrapped = reference.id;
-   }
-   return envObject.getReturnStatus();
-  });
- });
-}
-
-function _emnapi_create_external_uint8array(env, external_data, byte_length, finalize_cb, finalize_hint, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   byte_length = byte_length >>> 0;
-   if (!external_data) {
-    byte_length = 0;
-   }
-   if (byte_length > 2147483647) {
-    throw new RangeError("Cannot create a Uint8Array larger than 2147483647 bytes");
-   }
-   if (external_data + byte_length > GROWABLE_HEAP_U8().buffer.byteLength) {
-    throw new RangeError("Memory out of range");
-   }
-   if (!emnapi.supportFinalizer && finalize_cb) {
-    throw new emnapi.NotSupportWeakRefError("emnapi_create_external_uint8array", 'Parameter "finalize_cb" must be 0(NULL)');
-   }
-   var u8arr = new Uint8Array(GROWABLE_HEAP_U8().buffer, external_data, byte_length);
-   var handle = emnapi.addToCurrentScope(envObject, u8arr);
-   if (finalize_cb) {
-    var status_1 = emnapiWrap(1, env, handle.id, external_data, finalize_cb, finalize_hint, 0);
-    if (status_1 === 10) {
-     var err = envObject.tryCatch.extractException();
-     envObject.clearLastError();
-     throw err;
-    } else if (status_1 !== 0) {
-     return envObject.setLastError(status_1);
-    }
-   }
-   GROWABLE_HEAP_U32()[result >> 2] = handle.id;
-   return envObject.getReturnStatus();
-  });
- });
 }
 
 function warnOnce(text) {
@@ -5427,180 +5322,601 @@ function _llvm_eh_typeid_for(type) {
  return type;
 }
 
+function emnapiWrap(type, env, js_object, native_object, finalize_cb, finalize_hint, result) {
+ var referenceId;
+ if (env == 0) return 1;
+ var envObject_14 = emnapiCtx.envStore.get(env);
+ if (envObject_14.tryCatch.hasCaught()) return envObject_14.setLastError(10);
+ envObject_14.clearLastError();
+ try {
+  if (js_object == 0) return envObject_14.setLastError(1);
+  var handle_4 = emnapiCtx.handleStore.get(js_object);
+  if (!(handle_4.isObject() || handle_4.isFunction())) {
+   return envObject_14.setLastError(1);
+  }
+  if (typeof emnapiExternalMemory !== "undefined" && ArrayBuffer.isView(handle_4.value)) {
+   if (emnapiExternalMemory.wasmMemoryViewTable.has(handle_4.value)) {
+    handle_4 = emnapiCtx.addToCurrentScope(emnapiExternalMemory.wasmMemoryViewTable.get(handle_4.value));
+   }
+  }
+  if (type === 0) {
+   if (envObject_14.getObjectBinding(handle_4.value).wrapped !== 0) {
+    return envObject_14.setLastError(1);
+   }
+  } else if (type === 1) {
+   if (!finalize_cb) return envObject_14.setLastError(1);
+  }
+  var reference_1 = void 0;
+  if (result) {
+   if (!finalize_cb) return envObject_14.setLastError(1);
+   reference_1 = emnapiCtx.createReference(envObject_14, handle_4.id, 0, 1, finalize_cb, native_object, finalize_hint);
+   referenceId = reference_1.id;
+   GROWABLE_HEAP_U32()[result >> 2] = referenceId;
+  } else {
+   reference_1 = emnapiCtx.createReference(envObject_14, handle_4.id, 0, 0, finalize_cb, native_object, !finalize_cb ? finalize_cb : finalize_hint);
+  }
+  if (type === 0) {
+   envObject_14.getObjectBinding(handle_4.value).wrapped = reference_1.id;
+  }
+  return envObject_14.getReturnStatus();
+ } catch (err_15) {
+  envObject_14.tryCatch.setError(err_15);
+  return envObject_14.setLastError(10);
+ }
+}
+
 function _napi_add_finalizer(env, js_object, native_object, finalize_cb, finalize_hint, result) {
- if (!emnapi.supportFinalizer) {
-  return emnapi.preamble(env, function() {
-   throw new emnapi.NotSupportWeakRefError("napi_add_finalizer", "This API is unavailable");
-  });
+ if (!emnapiCtx.feature.supportFinalizer) {
+  if (env == 0) return 1;
+  var envObject_48 = emnapiCtx.envStore.get(env);
+  if (envObject_48.tryCatch.hasCaught()) return envObject_48.setLastError(10);
+  envObject_48.clearLastError();
+  try {
+   throw emnapiCtx.createNotSupportWeakRefError("napi_add_finalizer", "This API is unavailable");
+   return null;
+  } catch (err_49) {
+   envObject_48.tryCatch.setError(err_49);
+   return envObject_48.setLastError(10);
+  }
  }
  return emnapiWrap(1, env, js_object, native_object, finalize_cb, finalize_hint, result);
 }
 
 function _napi_call_function(env, recv, func, argc, argv, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ recv ], function() {
-   argc = argc >>> 0;
-   if (argc > 0) {
-    if (!argv) return envObject.setLastError(1);
-   }
-   var v8recv = emnapi.handleStore.get(recv).value;
-   if (!func) return envObject.setLastError(1);
-   var v8func = emnapi.handleStore.get(func).value;
-   if (typeof v8func !== "function") return envObject.setLastError(1);
-   var args = [];
-   for (var i = 0; i < argc; i++) {
-    var argVal = GROWABLE_HEAP_U32()[argv + i * 4 >> 2];
-    args.push(emnapi.handleStore.get(argVal).value);
-   }
-   var ret = v8func.apply(v8recv, args);
-   if (result) {
-    var v = envObject.ensureHandleId(ret);
-    GROWABLE_HEAP_U32()[result >> 2] = v;
-   }
-   return envObject.clearLastError();
-  });
- });
+ var i = 0;
+ var v;
+ if (env == 0) return 1;
+ var envObject_12 = emnapiCtx.envStore.get(env);
+ if (envObject_12.tryCatch.hasCaught()) return envObject_12.setLastError(10);
+ envObject_12.clearLastError();
+ try {
+  if (recv == 0) return envObject_12.setLastError(1);
+  argc = argc >>> 0;
+  if (argc > 0) {
+   if (!argv) return envObject_12.setLastError(1);
+  }
+  var v8recv_1 = emnapiCtx.handleStore.get(recv).value;
+  if (!func) return envObject_12.setLastError(1);
+  var v8func_1 = emnapiCtx.handleStore.get(func).value;
+  if (typeof v8func_1 !== "function") return envObject_12.setLastError(1);
+  var args_1 = [];
+  for (;i < argc; i++) {
+   var argVal_1 = GROWABLE_HEAP_U32()[argv + i * 4 >> 2];
+   args_1.push(emnapiCtx.handleStore.get(argVal_1).value);
+  }
+  var ret_2 = v8func_1.apply(v8recv_1, args_1);
+  if (result) {
+   v = envObject_12.ensureHandleId(ret_2);
+   GROWABLE_HEAP_U32()[result >> 2] = v;
+  }
+  return envObject_12.clearLastError();
+ } catch (err_13) {
+  envObject_12.tryCatch.setError(err_13);
+  return envObject_12.setLastError(10);
+ }
 }
 
 function _napi_clear_last_error(env) {
- var envObject = emnapi.envStore.get(env);
+ var envObject = emnapiCtx.envStore.get(env);
  return envObject.clearLastError();
 }
 
 function _napi_close_escapable_handle_scope(env, scope) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ scope ], function() {
-   var scopeObject = emnapi.scopeStore.get(scope);
-   if (envObject.openHandleScopes === 0 || scopeObject !== emnapi.getCurrentScope()) {
-    return 13;
-   }
-   emnapi.closeScope(envObject, emnapi.scopeStore.get(scope));
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (scope == 0) return envObject.setLastError(1);
+ if (envObject.openHandleScopes === 0) {
+  return 13;
+ }
+ emnapiCtx.closeScope(envObject);
+ return envObject.clearLastError();
 }
 
 function _napi_close_handle_scope(env, scope) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ scope ], function() {
-   var scopeObject = emnapi.scopeStore.get(scope);
-   if (envObject.openHandleScopes === 0 || scopeObject !== emnapi.getCurrentScope()) {
-    return 13;
-   }
-   emnapi.closeScope(envObject, emnapi.scopeStore.get(scope));
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (scope == 0) return envObject.setLastError(1);
+ if (envObject.openHandleScopes === 0) {
+  return 13;
+ }
+ emnapiCtx.closeScope(envObject);
+ return envObject.clearLastError();
 }
 
 function _napi_create_array(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var value = emnapi.addToCurrentScope(envObject, []).id;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ var value = emnapiCtx.addToCurrentScope([]).id;
+ GROWABLE_HEAP_U32()[result >> 2] = value;
+ return envObject.clearLastError();
 }
 
 function _napi_create_array_with_length(env, length, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   length = length >>> 0;
-   var value = emnapi.addToCurrentScope(envObject, new Array(length)).id;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ length = length >>> 0;
+ var value = emnapiCtx.addToCurrentScope(new Array(length)).id;
+ GROWABLE_HEAP_U32()[result >> 2] = value;
+ return envObject.clearLastError();
+}
+
+var emnapiExternalMemory = {
+ init: function() {
+  emnapiExternalMemory.registry = typeof FinalizationRegistry === "function" ? new FinalizationRegistry(function(_pointer) {
+   _free(_pointer);
+  }) : undefined;
+  emnapiExternalMemory.table = new WeakMap();
+  emnapiExternalMemory.wasmMemoryViewTable = new WeakMap();
+ },
+ getArrayBufferPointer: function(arrayBuffer, shouldCopy) {
+  var _a;
+  if (arrayBuffer === GROWABLE_HEAP_U8().buffer) {
+   return {
+    address: 0,
+    ownership: 0,
+    runtimeAllocated: 0
+   };
+  }
+  if (emnapiExternalMemory.table.has(arrayBuffer)) {
+   return emnapiExternalMemory.table.get(arrayBuffer);
+  }
+  if (!shouldCopy) {
+   return {
+    address: 0,
+    ownership: 0,
+    runtimeAllocated: 0
+   };
+  }
+  var pointer = _malloc(arrayBuffer.byteLength);
+  if (!pointer) throw new Error("Out of memory");
+  GROWABLE_HEAP_U8().set(new Uint8Array(arrayBuffer), pointer);
+  var pointerInfo = {
+   address: pointer,
+   ownership: emnapiExternalMemory.registry ? 0 : 1,
+   runtimeAllocated: 1
+  };
+  emnapiExternalMemory.table.set(arrayBuffer, pointerInfo);
+  (_a = emnapiExternalMemory.registry) === null || _a === void 0 ? void 0 : _a.register(arrayBuffer, pointer);
+  return pointerInfo;
+ },
+ getOrUpdateMemoryView: function(view) {
+  if (view.buffer === GROWABLE_HEAP_U8().buffer) {
+   if (!emnapiExternalMemory.wasmMemoryViewTable.has(view)) {
+    emnapiExternalMemory.wasmMemoryViewTable.set(view, {
+     Ctor: view.constructor,
+     address: view.byteOffset,
+     length: view instanceof DataView ? view.byteLength : view.length,
+     ownership: 1,
+     runtimeAllocated: 0
+    });
+   }
+   return view;
+  }
+  var isDetachedArrayBuffer = function(arrayBuffer) {
+   if (arrayBuffer.byteLength === 0) {
+    try {
+     new Uint8Array(arrayBuffer);
+    } catch (_) {
+     return true;
+    }
+   }
+   return false;
+  };
+  if (isDetachedArrayBuffer(view.buffer) && emnapiExternalMemory.wasmMemoryViewTable.has(view)) {
+   var info = emnapiExternalMemory.wasmMemoryViewTable.get(view);
+   var Ctor = info.Ctor;
+   var newView = void 0;
+   var Buffer = emnapiCtx.feature.Buffer;
+   if (typeof Buffer === "function" && Ctor === Buffer) {
+    newView = Buffer.from(GROWABLE_HEAP_U8().buffer, info.address, info.length);
+   } else {
+    newView = new Ctor(GROWABLE_HEAP_U8().buffer, info.address, info.length);
+   }
+   emnapiExternalMemory.wasmMemoryViewTable.set(newView, info);
+   return newView;
+  }
+  return view;
+ },
+ getViewPointer: function(view, shouldCopy) {
+  view = emnapiExternalMemory.getOrUpdateMemoryView(view);
+  if (view.buffer === GROWABLE_HEAP_U8().buffer) {
+   if (emnapiExternalMemory.wasmMemoryViewTable.has(view)) {
+    var _a = emnapiExternalMemory.wasmMemoryViewTable.get(view), address_1 = _a.address, ownership_1 = _a.ownership, runtimeAllocated_1 = _a.runtimeAllocated;
+    return {
+     address: address_1,
+     ownership: ownership_1,
+     runtimeAllocated: runtimeAllocated_1,
+     view: view
+    };
+   }
+   return {
+    address: view.byteOffset,
+    ownership: 1,
+    runtimeAllocated: 0,
+    view: view
+   };
+  }
+  var _b = emnapiExternalMemory.getArrayBufferPointer(view.buffer, shouldCopy), address = _b.address, ownership = _b.ownership, runtimeAllocated = _b.runtimeAllocated;
+  return {
+   address: address === 0 ? 0 : address + view.byteOffset,
+   ownership: ownership,
+   runtimeAllocated: runtimeAllocated,
+   view: view
+  };
+ }
+};
+
+function emnapiCreateArrayBuffer(byte_length, data) {
+ byte_length = byte_length >>> 0;
+ var arrayBuffer = new ArrayBuffer(byte_length);
+ if (data) {
+  var p = emnapiExternalMemory.getArrayBufferPointer(arrayBuffer, true).address;
+  GROWABLE_HEAP_U32()[data >> 2] = p;
+ }
+ return arrayBuffer;
+}
+
+function _napi_create_buffer_copy(env, length, data, result_data, result) {
+ var value;
+ if (env == 0) return 1;
+ var envObject_57 = emnapiCtx.envStore.get(env);
+ if (envObject_57.tryCatch.hasCaught()) return envObject_57.setLastError(10);
+ envObject_57.clearLastError();
+ try {
+  if (result == 0) return envObject_57.setLastError(1);
+  var arrayBuffer_3 = emnapiCreateArrayBuffer(length, result_data);
+  var Buffer_2 = emnapiCtx.feature.Buffer;
+  var buffer_4 = Buffer_2.from(arrayBuffer_3);
+  buffer_4.set(GROWABLE_HEAP_U8().subarray(data, data + length));
+  value = emnapiCtx.addToCurrentScope(buffer_4).id;
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  return envObject_57.getReturnStatus();
+ } catch (err_61) {
+  envObject_57.tryCatch.setError(err_61);
+  return envObject_57.setLastError(10);
+ }
 }
 
 function _napi_create_double(env, value, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var v = emnapi.addToCurrentScope(envObject, value).id;
-   GROWABLE_HEAP_U32()[result >> 2] = v;
-   return envObject.clearLastError();
-  });
- });
-}
-
-function emnapiSetErrorCode(envObject, error, code, code_string) {
- if (code || code_string) {
-  var codeValue = void 0;
-  if (code) {
-   codeValue = emnapi.handleStore.get(code).value;
-   if (typeof codeValue !== "string") {
-    return envObject.setLastError(3);
-   }
-  } else {
-   codeValue = UTF8ToString(code_string);
-  }
-  error.code = codeValue;
- }
- return 0;
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ var v = emnapiCtx.addToCurrentScope(value).id;
+ GROWABLE_HEAP_U32()[result >> 2] = v;
+ return envObject.clearLastError();
 }
 
 function _napi_create_error(env, code, msg, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ msg, result ], function() {
-   var msgValue = emnapi.handleStore.get(msg).value;
-   if (typeof msgValue !== "string") {
-    return envObject.setLastError(3);
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (msg == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var msgValue = emnapiCtx.handleStore.get(msg).value;
+ if (typeof msgValue !== "string") {
+  return envObject.setLastError(3);
+ }
+ var error = new Error(msgValue);
+ if (code) {
+  var codeValue_1 = emnapiCtx.handleStore.get(code).value;
+  if (typeof codeValue_1 !== "string") {
+   return envObject.setLastError(3);
+  }
+  error.code = codeValue_1;
+ }
+ var value = emnapiCtx.addToCurrentScope(error).id;
+ GROWABLE_HEAP_U32()[result >> 2] = value;
+ return envObject.clearLastError();
+}
+
+function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_length, finalize_cb, finalize_hint, result) {
+ var value;
+ if (env == 0) return 1;
+ var envObject_3 = emnapiCtx.envStore.get(env);
+ if (envObject_3.tryCatch.hasCaught()) return envObject_3.setLastError(10);
+ envObject_3.clearLastError();
+ try {
+  if (result == 0) return envObject_3.setLastError(1);
+  byte_length = byte_length >>> 0;
+  if (!external_data) {
+   byte_length = 0;
+  }
+  if (byte_length > 2147483647) {
+   throw new RangeError("Cannot create a memory view larger than 2147483647 bytes");
+  }
+  if (external_data + byte_length > GROWABLE_HEAP_U8().buffer.byteLength) {
+   throw new RangeError("Memory out of range");
+  }
+  if (!emnapiCtx.feature.supportFinalizer && finalize_cb) {
+   throw emnapiCtx.createNotSupportWeakRefError("emnapi_create_memory_view", 'Parameter "finalize_cb" must be 0(NULL)');
+  }
+  var viewDescriptor_1 = void 0;
+  switch (typedarray_type) {
+  case 0:
+   viewDescriptor_1 = {
+    Ctor: Int8Array,
+    address: external_data,
+    length: byte_length,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 1:
+   viewDescriptor_1 = {
+    Ctor: Uint8Array,
+    address: external_data,
+    length: byte_length,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 2:
+   viewDescriptor_1 = {
+    Ctor: Uint8ClampedArray,
+    address: external_data,
+    length: byte_length,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 3:
+   viewDescriptor_1 = {
+    Ctor: Int16Array,
+    address: external_data,
+    length: byte_length >> 1,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 4:
+   viewDescriptor_1 = {
+    Ctor: Uint16Array,
+    address: external_data,
+    length: byte_length >> 1,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 5:
+   viewDescriptor_1 = {
+    Ctor: Int32Array,
+    address: external_data,
+    length: byte_length >> 2,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 6:
+   viewDescriptor_1 = {
+    Ctor: Uint32Array,
+    address: external_data,
+    length: byte_length >> 2,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 7:
+   viewDescriptor_1 = {
+    Ctor: Float32Array,
+    address: external_data,
+    length: byte_length >> 2,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 8:
+   viewDescriptor_1 = {
+    Ctor: Float64Array,
+    address: external_data,
+    length: byte_length >> 3,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 9:
+   viewDescriptor_1 = {
+    Ctor: BigInt64Array,
+    address: external_data,
+    length: byte_length >> 3,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case 10:
+   viewDescriptor_1 = {
+    Ctor: BigUint64Array,
+    address: external_data,
+    length: byte_length >> 3,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case -1:
+   viewDescriptor_1 = {
+    Ctor: DataView,
+    address: external_data,
+    length: byte_length,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  case -2:
+   viewDescriptor_1 = {
+    Ctor: emnapiCtx.feature.Buffer,
+    address: external_data,
+    length: byte_length,
+    ownership: 1,
+    runtimeAllocated: 0
+   };
+   break;
+
+  default:
+   return envObject_3.setLastError(1);
+  }
+  var Ctor_1 = viewDescriptor_1.Ctor;
+  var typedArray_1 = typedarray_type === -2 ? emnapiCtx.feature.Buffer.from(GROWABLE_HEAP_U8().buffer, viewDescriptor_1.address, viewDescriptor_1.length) : new Ctor_1(GROWABLE_HEAP_U8().buffer, viewDescriptor_1.address, viewDescriptor_1.length);
+  var handle_1 = emnapiCtx.addToCurrentScope(typedArray_1);
+  emnapiExternalMemory.wasmMemoryViewTable.set(typedArray_1, viewDescriptor_1);
+  if (finalize_cb) {
+   var status_1 = emnapiWrap(1, env, handle_1.id, external_data, finalize_cb, finalize_hint, 0);
+   if (status_1 === 10) {
+    var err_3 = envObject_3.tryCatch.extractException();
+    envObject_3.clearLastError();
+    throw err_3;
+   } else if (status_1 !== 0) {
+    return envObject_3.setLastError(status_1);
    }
-   var error = new Error(msgValue);
-   var status = emnapiSetErrorCode(envObject, error, code, 0);
-   if (status !== 0) return status;
-   var value = emnapi.addToCurrentScope(envObject, error).id;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
+  }
+  value = handle_1.id;
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  return envObject_3.getReturnStatus();
+ } catch (err_4) {
+  envObject_3.tryCatch.setError(err_4);
+  return envObject_3.setLastError(10);
+ }
+}
+
+function _napi_create_external_buffer(env, length, data, finalize_cb, finalize_hint, result) {
+ return _emnapi_create_memory_view(env, -2, data, length, finalize_cb, finalize_hint, result);
+}
+
+function emnapiUtf8Decoder() {
+ var fallbackDecoder = {
+  decode: function(input) {
+   var isArrayBuffer = input instanceof ArrayBuffer;
+   var isView = ArrayBuffer.isView(input);
+   if (!isArrayBuffer && !isView) {
+    throw new TypeError('The "input" argument must be an instance of ArrayBuffer or ArrayBufferView');
+   }
+   var bytes = isArrayBuffer ? new Uint8Array(input) : new Uint8Array(input.buffer, input.byteOffset, input.byteLength);
+   var inputIndex = 0;
+   var pendingSize = Math.min(256 * 256, bytes.length + 1);
+   var pending = new Uint16Array(pendingSize);
+   var chunks = [];
+   var pendingIndex = 0;
+   for (;;) {
+    var more = inputIndex < bytes.length;
+    if (!more || pendingIndex >= pendingSize - 1) {
+     var subarray = pending.subarray(0, pendingIndex);
+     var arraylike = subarray;
+     chunks.push(String.fromCharCode.apply(null, arraylike));
+     if (!more) {
+      return chunks.join("");
+     }
+     bytes = bytes.subarray(inputIndex);
+     inputIndex = 0;
+     pendingIndex = 0;
+    }
+    var byte1 = bytes[inputIndex++];
+    if ((byte1 & 128) === 0) {
+     pending[pendingIndex++] = byte1;
+    } else if ((byte1 & 224) === 192) {
+     var byte2 = bytes[inputIndex++] & 63;
+     pending[pendingIndex++] = (byte1 & 31) << 6 | byte2;
+    } else if ((byte1 & 240) === 224) {
+     var byte2 = bytes[inputIndex++] & 63;
+     var byte3 = bytes[inputIndex++] & 63;
+     pending[pendingIndex++] = (byte1 & 31) << 12 | byte2 << 6 | byte3;
+    } else if ((byte1 & 248) === 240) {
+     var byte2 = bytes[inputIndex++] & 63;
+     var byte3 = bytes[inputIndex++] & 63;
+     var byte4 = bytes[inputIndex++] & 63;
+     var codepoint = (byte1 & 7) << 18 | byte2 << 12 | byte3 << 6 | byte4;
+     if (codepoint > 65535) {
+      codepoint -= 65536;
+      pending[pendingIndex++] = codepoint >>> 10 & 1023 | 55296;
+      codepoint = 56320 | codepoint & 1023;
+     }
+     pending[pendingIndex++] = codepoint;
+    } else {}
+   }
+  }
+ };
+ var tmp;
+ tmp = fallbackDecoder;
+ emnapiUtf8Decoder = tmp;
+}
+
+function emnapiUtf8ToString(ptr, length) {
+ if (length == -1) {
+  return UTF8ToString(ptr);
+ }
+ length = length >>> 0;
+ return emnapiUtf8Decoder.decode(GROWABLE_HEAP_U8().slice(ptr, ptr + length));
 }
 
 function emnapiCreateFunction(envObject, utf8name, length, cb, data) {
- var functionName = !utf8name || !length ? "" : length === -1 ? UTF8ToString(utf8name) : UTF8ToString(utf8name, length);
+ var functionName = !utf8name || !length ? "" : emnapiUtf8ToString(utf8name, length);
  var f;
  var makeFunction = function() {
   return function() {
    "use strict";
-   var newTarget = this && this instanceof f ? this.constructor : undefined;
-   var cbinfo = emnapi.CallbackInfo.create(envObject, this, data, arguments.length, Array.prototype.slice.call(arguments), newTarget);
-   var scope = emnapi.openScope(envObject, emnapi.HandleScope);
-   var r;
+   emnapiCtx.cbinfoStack.push(this, data, arguments, f);
+   var scope = emnapiCtx.openScope(envObject);
    try {
-    r = envObject.callIntoModule(function(envObject) {
-     var napiValue = emnapiGetDynamicCalls.call_ppp(cb, envObject.id, cbinfo.id);
-     return !napiValue ? undefined : emnapi.handleStore.get(napiValue).value;
+    return envObject.callIntoModule(function(envObject) {
+     var napiValue = getWasmTableEntry(cb)(envObject.id, 0);
+     return !napiValue ? undefined : emnapiCtx.handleStore.get(napiValue).value;
     });
-   } catch (err) {
-    cbinfo.dispose();
-    emnapi.closeScope(envObject, scope);
-    throw err;
+   } finally {
+    emnapiCtx.cbinfoStack.pop();
+    emnapiCtx.closeScope(envObject, scope);
    }
-   cbinfo.dispose();
-   emnapi.closeScope(envObject, scope);
-   return r;
   };
  };
  if (functionName === "") {
   f = makeFunction();
+  return {
+   status: 0,
+   f: f
+  };
+ }
+ if (!/^[_$a-zA-Z][_$a-zA-Z0-9]*$/.test(functionName)) {
+  return {
+   status: 1,
+   f: undefined
+  };
+ }
+ if (emnapiCtx.feature.supportNewFunction) {
+  f = new Function("_", "return function " + functionName + "(){" + '"use strict";' + "return _.apply(this,arguments);" + "};")(makeFunction());
  } else {
-  if (!/^[_$a-zA-Z][_$a-zA-Z0-9]*$/.test(functionName)) {
-   return {
-    status: 1,
-    f: undefined
-   };
-  }
-  if (emnapi.supportNewFunction) {
-   f = new Function("_", "return function " + functionName + "(){" + '"use strict";' + "return _.apply(this,arguments);" + "};")(makeFunction());
-  } else {
-   f = makeFunction();
-   if (emnapi.canSetFunctionName) {
-    Object.defineProperty(f, "name", {
-     value: functionName
-    });
-   }
-  }
+  f = makeFunction();
+  if (emnapiCtx.feature.canSetFunctionName) Object.defineProperty(f, "name", {
+   value: functionName
+  });
  }
  return {
   status: 0,
@@ -5609,105 +5925,114 @@ function emnapiCreateFunction(envObject, utf8name, length, cb, data) {
 }
 
 function _napi_create_function(env, utf8name, length, cb, data, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result, cb ], function() {
-   var fresult = emnapiCreateFunction(envObject, utf8name, length, cb, data);
-   if (fresult.status !== 0) return envObject.setLastError(fresult.status);
-   var f = fresult.f;
-   var valueHandle = emnapi.addToCurrentScope(envObject, f);
-   var value = valueHandle.id;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.getReturnStatus();
-  });
- });
+ var value;
+ if (env == 0) return 1;
+ var envObject_11 = emnapiCtx.envStore.get(env);
+ if (envObject_11.tryCatch.hasCaught()) return envObject_11.setLastError(10);
+ envObject_11.clearLastError();
+ try {
+  if (result == 0) return envObject_11.setLastError(1);
+  if (cb == 0) return envObject_11.setLastError(1);
+  var fresult_1 = emnapiCreateFunction(envObject_11, utf8name, length, cb, data);
+  if (fresult_1.status !== 0) return envObject_11.setLastError(fresult_1.status);
+  var f_1 = fresult_1.f;
+  var valueHandle_1 = emnapiCtx.addToCurrentScope(f_1);
+  value = valueHandle_1.id;
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  return envObject_11.getReturnStatus();
+ } catch (err_12) {
+  envObject_11.tryCatch.setError(err_12);
+  return envObject_11.setLastError(10);
+ }
 }
 
 function _napi_create_object(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var value = emnapi.addToCurrentScope(envObject, {}).id;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ var value = emnapiCtx.addToCurrentScope({}).id;
+ GROWABLE_HEAP_U32()[result >> 2] = value;
+ return envObject.clearLastError();
 }
 
 function _napi_create_reference(env, value, initial_refcount, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, result ], function() {
-   var handle = emnapi.handleStore.get(value);
-   if (!(handle.isObject() || handle.isFunction())) {
-    return envObject.setLastError(2);
-   }
-   var ref = emnapi.Reference.create(envObject, handle.id, initial_refcount >>> 0, false);
-   GROWABLE_HEAP_U32()[result >> 2] = ref.id;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (value == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var handle = emnapiCtx.handleStore.get(value);
+ if (!(handle.isObject() || handle.isFunction())) {
+  return envObject.setLastError(2);
+ }
+ var ref = emnapiCtx.createReference(envObject, handle.id, initial_refcount >>> 0, 1);
+ GROWABLE_HEAP_U32()[result >> 2] = ref.id;
+ return envObject.clearLastError();
 }
 
 function _napi_create_string_latin1(env, str, length, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   length = length >>> 0;
-   if (!(length === 4294967295 || length <= 2147483647) || !str) {
-    return envObject.setLastError(1);
-   }
-   var latin1String = "";
-   var len = 0;
-   if (length === -1) {
-    while (true) {
-     var ch = GROWABLE_HEAP_U8()[str];
-     if (!ch) break;
-     latin1String += String.fromCharCode(ch);
-     str++;
-    }
-   } else {
-    while (len < length) {
-     var ch = GROWABLE_HEAP_U8()[str];
-     if (!ch) break;
-     latin1String += String.fromCharCode(ch);
-     len++;
-     str++;
-    }
-   }
-   var value = emnapi.addToCurrentScope(envObject, latin1String).id;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ length = length >>> 0;
+ if (!(length === 4294967295 || length <= 2147483647) || !str) {
+  return envObject.setLastError(1);
+ }
+ var latin1String = "";
+ var len = 0;
+ if (length === -1) {
+  while (true) {
+   var ch = GROWABLE_HEAP_U8()[str];
+   if (!ch) break;
+   latin1String += String.fromCharCode(ch);
+   str++;
+  }
+ } else {
+  while (len < length) {
+   var ch = GROWABLE_HEAP_U8()[str];
+   if (!ch) break;
+   latin1String += String.fromCharCode(ch);
+   len++;
+   str++;
+  }
+ }
+ var value = emnapiCtx.addToCurrentScope(latin1String).id;
+ GROWABLE_HEAP_U32()[result >> 2] = value;
+ return envObject.clearLastError();
 }
 
 function _napi_create_string_utf8(env, str, length, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   length = length >>> 0;
-   if (!(length === 4294967295 || length <= 2147483647) || !str) {
-    return envObject.setLastError(1);
-   }
-   var utf8String = length === -1 ? UTF8ToString(str) : UTF8ToString(str, length);
-   var value = emnapi.addToCurrentScope(envObject, utf8String).id;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ if (length < -1 || length > 2147483647 || !str) {
+  return envObject.setLastError(1);
+ }
+ var utf8String = emnapiUtf8ToString(str, length);
+ var value = emnapiCtx.addToCurrentScope(utf8String).id;
+ GROWABLE_HEAP_U32()[result >> 2] = value;
+ return envObject.clearLastError();
 }
 
 function _napi_create_type_error(env, code, msg, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ msg, result ], function() {
-   var msgValue = emnapi.handleStore.get(msg).value;
-   if (typeof msgValue !== "string") {
-    return envObject.setLastError(3);
-   }
-   var error = new TypeError(msgValue);
-   var status = emnapiSetErrorCode(envObject, error, code, 0);
-   if (status !== 0) return status;
-   var value = emnapi.addToCurrentScope(envObject, error).id;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (msg == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var msgValue = emnapiCtx.handleStore.get(msg).value;
+ if (typeof msgValue !== "string") {
+  return envObject.setLastError(3);
+ }
+ var error = new TypeError(msgValue);
+ if (code) {
+  var codeValue_2 = emnapiCtx.handleStore.get(code).value;
+  if (typeof codeValue_2 !== "string") {
+   return envObject.setLastError(3);
+  }
+  error.code = codeValue_2;
+ }
+ var value = emnapiCtx.addToCurrentScope(error).id;
+ GROWABLE_HEAP_U32()[result >> 2] = value;
+ return envObject.clearLastError();
 }
 
 function emnapiDefineProperty(envObject, obj, propertyName, method, getter, setter, value, attributes, data) {
@@ -5741,132 +6066,138 @@ function emnapiDefineProperty(envObject, obj, propertyName, method, getter, sett
    configurable: (attributes & 4) !== 0,
    enumerable: (attributes & 2) !== 0,
    writable: (attributes & 1) !== 0,
-   value: emnapi.handleStore.get(value).value
+   value: emnapiCtx.handleStore.get(value).value
   };
   Object.defineProperty(obj, propertyName, desc);
  }
 }
 
 function _napi_define_properties(env, object, property_count, properties) {
- return emnapi.preamble(env, function(envObject) {
+ var propPtr, attributes;
+ if (env == 0) return 1;
+ var envObject_32 = emnapiCtx.envStore.get(env);
+ if (envObject_32.tryCatch.hasCaught()) return envObject_32.setLastError(10);
+ envObject_32.clearLastError();
+ try {
   property_count = property_count >>> 0;
   if (property_count > 0) {
-   if (!properties) return envObject.setLastError(1);
+   if (!properties) return envObject_32.setLastError(1);
   }
-  if (!object) return envObject.setLastError(1);
-  var h = emnapi.handleStore.get(object);
-  var maybeObject = h.value;
-  if (!(h.isObject() || h.isFunction())) {
-   return envObject.setLastError(2);
+  if (!object) return envObject_32.setLastError(1);
+  var h_14 = emnapiCtx.handleStore.get(object);
+  var maybeObject_1 = h_14.value;
+  if (!(h_14.isObject() || h_14.isFunction())) {
+   return envObject_32.setLastError(2);
   }
-  var propertyName;
-  for (var i = 0; i < property_count; i++) {
-   var propPtr = properties + i * (4 * 8);
-   var utf8Name = GROWABLE_HEAP_U32()[propPtr >> 2];
+  var propertyName_1 = void 0;
+  for (var i_2 = 0; i_2 < property_count; i_2++) {
+   propPtr = properties + i_2 * (4 * 8);
+   var utf8Name_1 = GROWABLE_HEAP_U32()[propPtr >> 2];
    var name_2 = GROWABLE_HEAP_U32()[propPtr + 4 >> 2];
-   var method = GROWABLE_HEAP_U32()[propPtr + 8 >> 2];
-   var getter = GROWABLE_HEAP_U32()[propPtr + 12 >> 2];
-   var setter = GROWABLE_HEAP_U32()[propPtr + 16 >> 2];
-   var value = GROWABLE_HEAP_U32()[propPtr + 20 >> 2];
-   var attributes = GROWABLE_HEAP_I32()[propPtr + 24 >> 2];
-   var data = GROWABLE_HEAP_U32()[propPtr + 28 >> 2];
-   if (utf8Name) {
-    propertyName = UTF8ToString(utf8Name);
+   var method_1 = GROWABLE_HEAP_U32()[propPtr + 8 >> 2];
+   var getter_1 = GROWABLE_HEAP_U32()[propPtr + 12 >> 2];
+   var setter_1 = GROWABLE_HEAP_U32()[propPtr + 16 >> 2];
+   var value_2 = GROWABLE_HEAP_U32()[propPtr + 20 >> 2];
+   attributes = GROWABLE_HEAP_I32()[propPtr + 24 >> 2];
+   var data_1 = GROWABLE_HEAP_U32()[propPtr + 28 >> 2];
+   if (utf8Name_1) {
+    propertyName_1 = UTF8ToString(utf8Name_1);
    } else {
     if (!name_2) {
-     return envObject.setLastError(4);
+     return envObject_32.setLastError(4);
     }
-    propertyName = emnapi.handleStore.get(name_2).value;
-    if (typeof propertyName !== "string" && typeof propertyName !== "symbol") {
-     return envObject.setLastError(4);
+    propertyName_1 = emnapiCtx.handleStore.get(name_2).value;
+    if (typeof propertyName_1 !== "string" && typeof propertyName_1 !== "symbol") {
+     return envObject_32.setLastError(4);
     }
    }
-   emnapiDefineProperty(envObject, maybeObject, propertyName, method, getter, setter, value, attributes, data);
+   emnapiDefineProperty(envObject_32, maybeObject_1, propertyName_1, method_1, getter_1, setter_1, value_2, attributes, data_1);
   }
   return 0;
- });
+ } catch (err_33) {
+  envObject_32.tryCatch.setError(err_33);
+  return envObject_32.setLastError(10);
+ }
 }
 
 function _napi_delete_reference(env, ref) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ ref ], function() {
-   emnapi.Reference.doDelete(emnapi.refStore.get(ref));
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (ref == 0) return envObject.setLastError(1);
+ emnapiCtx.refStore.get(ref).dispose();
+ return envObject.clearLastError();
 }
 
 function _napi_escape_handle(env, scope, escapee, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ scope, escapee, result ], function() {
-   var scopeObject = emnapi.scopeStore.get(scope);
-   if (!scopeObject.escapeCalled()) {
-    var newHandle = scopeObject.escape(escapee);
-    var value = newHandle ? newHandle.id : 0;
-    GROWABLE_HEAP_U32()[result >> 2] = value;
-    return envObject.clearLastError();
-   }
-   return envObject.setLastError(12);
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (scope == 0) return envObject.setLastError(1);
+ if (escapee == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var scopeObject = emnapiCtx.scopeStore.get(scope);
+ if (!scopeObject.escapeCalled()) {
+  var newHandle = scopeObject.escape(escapee);
+  var value = newHandle ? newHandle.id : 0;
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  return envObject.clearLastError();
+ }
+ return envObject.setLastError(12);
 }
 
 function _napi_fatal_error(location, location_len, message, message_len) {
- abort("FATAL ERROR: " + (location_len === -1 ? UTF8ToString(location) : UTF8ToString(location, location_len)) + " " + (message_len === -1 ? UTF8ToString(message) : UTF8ToString(message, message_len)));
+ abort("FATAL ERROR: " + emnapiUtf8ToString(location, location_len) + " " + emnapiUtf8ToString(message, message_len));
 }
 
 function _napi_get_and_clear_last_exception(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   if (!envObject.tryCatch.hasCaught()) {
-    GROWABLE_HEAP_U32()[result >> 2] = 1;
-    return envObject.clearLastError();
-   } else {
-    var err = envObject.tryCatch.exception();
-    var value = envObject.ensureHandleId(err);
-    GROWABLE_HEAP_U32()[result >> 2] = value;
-    envObject.tryCatch.reset();
-   }
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ if (!envObject.tryCatch.hasCaught()) {
+  GROWABLE_HEAP_U32()[result >> 2] = 1;
+  return envObject.clearLastError();
+ } else {
+  var err = envObject.tryCatch.exception();
+  var value = envObject.ensureHandleId(err);
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  envObject.tryCatch.reset();
+ }
+ return envObject.clearLastError();
 }
 
 function _napi_get_array_length(env, value, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, result ], function() {
-   var handle = emnapi.handleStore.get(value);
-   if (!handle.isArray()) {
-    return envObject.setLastError(8);
-   }
-   GROWABLE_HEAP_U32()[result >> 2] = handle.value.length >>> 0;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (value == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var handle = emnapiCtx.handleStore.get(value);
+ if (!handle.isArray()) {
+  return envObject.setLastError(8);
+ }
+ GROWABLE_HEAP_U32()[result >> 2] = handle.value.length >>> 0;
+ return envObject.clearLastError();
 }
 
 function _napi_get_boolean(env, value, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var v = value === 0 ? emnapi.HandleStore.ID_FALSE : emnapi.HandleStore.ID_TRUE;
-   GROWABLE_HEAP_U32()[result >> 2] = v;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ var v = value === 0 ? 3 : 4;
+ GROWABLE_HEAP_U32()[result >> 2] = v;
+ return envObject.clearLastError();
 }
 
-function _napi_get_cb_info(env, cbinfo, argc, argv, this_arg, data) {
- if (!env) return 1;
- var envObject = emnapi.envStore.get(env);
- if (!cbinfo) return envObject.setLastError(1);
- var cbinfoValue = emnapi.cbInfoStore.get(cbinfo);
+function _napi_get_cb_info(env, _cbinfo, argc, argv, this_arg, data) {
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ var cbinfoValue = emnapiCtx.cbinfoStack.current;
  if (argv) {
-  if (!argc) return envObject.setLastError(1);
+  if (argc == 0) return envObject.setLastError(1);
   var argcValue = GROWABLE_HEAP_U32()[argc >> 2];
-  var arrlen = argcValue < cbinfoValue._length ? argcValue : cbinfoValue._length;
+  var len = cbinfoValue.args.length;
+  var arrlen = argcValue < len ? argcValue : len;
   var i = 0;
   for (;i < arrlen; i++) {
-   var argVal = envObject.ensureHandleId(cbinfoValue._args[i]);
+   var argVal = envObject.ensureHandleId(cbinfoValue.args[i]);
    GROWABLE_HEAP_U32()[argv + i * 4 >> 2] = argVal;
   }
   if (i < argcValue) {
@@ -5876,254 +6207,254 @@ function _napi_get_cb_info(env, cbinfo, argc, argv, this_arg, data) {
   }
  }
  if (argc) {
-  GROWABLE_HEAP_U32()[argc >> 2] = cbinfoValue._length;
+  GROWABLE_HEAP_U32()[argc >> 2] = cbinfoValue.args.length;
  }
  if (this_arg) {
-  var v = envObject.ensureHandleId(cbinfoValue._this);
+  var v = envObject.ensureHandleId(cbinfoValue.thiz);
   GROWABLE_HEAP_U32()[this_arg >> 2] = v;
  }
  if (data) {
-  GROWABLE_HEAP_U32()[data >> 2] = cbinfoValue._data;
+  GROWABLE_HEAP_U32()[data >> 2] = cbinfoValue.data;
  }
  return envObject.clearLastError();
 }
 
 function _napi_get_element(env, object, index, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result, object ], function() {
-   var h = emnapi.handleStore.get(object);
-   if (h.value == null) {
-    throw new TypeError("Cannot convert undefined or null to object");
-   }
-   var v;
-   try {
-    v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
-   } catch (_) {
-    return envObject.setLastError(2);
-   }
-   var value = envObject.ensureHandleId(v[index >>> 0]);
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.getReturnStatus();
-  });
- });
-}
-
-function _napi_get_global(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var value = emnapi.HandleStore.ID_GLOBAL;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
-}
-
-function _napi_get_last_error_info(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var error_code = envObject.lastError.getErrorCode();
-   var messagePointer = GROWABLE_HEAP_U32()[errorMessagesPtr + error_code * 4 >> 2];
-   envObject.lastError.setErrorMessage(messagePointer);
-   if (error_code === 0) {
-    envObject.clearLastError();
-   }
-   var value = envObject.lastError.data;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return 0;
-  });
- });
+ var value;
+ if (env == 0) return 1;
+ var envObject_30 = emnapiCtx.envStore.get(env);
+ if (envObject_30.tryCatch.hasCaught()) return envObject_30.setLastError(10);
+ envObject_30.clearLastError();
+ try {
+  if (result == 0) return envObject_30.setLastError(1);
+  if (object == 0) return envObject_30.setLastError(1);
+  var h_12 = emnapiCtx.handleStore.get(object);
+  if (h_12.value == null) {
+   throw new TypeError("Cannot convert undefined or null to object");
+  }
+  var v_7 = void 0;
+  try {
+   v_7 = h_12.isObject() || h_12.isFunction() ? h_12.value : Object(h_12.value);
+  } catch (_9) {
+   return envObject_30.setLastError(2);
+  }
+  value = envObject_30.ensureHandleId(v_7[index >>> 0]);
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  return envObject_30.getReturnStatus();
+ } catch (err_31) {
+  envObject_30.tryCatch.setError(err_31);
+  return envObject_30.setLastError(10);
+ }
 }
 
 function _napi_get_named_property(env, object, utf8name, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result, object ], function() {
-   if (!utf8name) {
-    return envObject.setLastError(1);
-   }
-   var h = emnapi.handleStore.get(object);
-   if (h.value == null) {
-    throw new TypeError("Cannot convert undefined or null to object");
-   }
-   var v;
-   try {
-    v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
-   } catch (_) {
-    return envObject.setLastError(2);
-   }
-   var value = envObject.ensureHandleId(v[UTF8ToString(utf8name)]);
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.getReturnStatus();
-  });
- });
+ var value;
+ if (env == 0) return 1;
+ var envObject_27 = emnapiCtx.envStore.get(env);
+ if (envObject_27.tryCatch.hasCaught()) return envObject_27.setLastError(10);
+ envObject_27.clearLastError();
+ try {
+  if (result == 0) return envObject_27.setLastError(1);
+  if (object == 0) return envObject_27.setLastError(1);
+  if (!utf8name) {
+   return envObject_27.setLastError(1);
+  }
+  var h_9 = emnapiCtx.handleStore.get(object);
+  if (h_9.value == null) {
+   throw new TypeError("Cannot convert undefined or null to object");
+  }
+  var v_5 = void 0;
+  try {
+   v_5 = h_9.isObject() || h_9.isFunction() ? h_9.value : Object(h_9.value);
+  } catch (_7) {
+   return envObject_27.setLastError(2);
+  }
+  value = envObject_27.ensureHandleId(v_5[UTF8ToString(utf8name)]);
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  return envObject_27.getReturnStatus();
+ } catch (err_28) {
+  envObject_27.tryCatch.setError(err_28);
+  return envObject_27.setLastError(10);
+ }
 }
 
 function _napi_get_null(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var value = emnapi.HandleStore.ID_NULL;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ var value = 2;
+ GROWABLE_HEAP_U32()[result >> 2] = value;
+ return envObject.clearLastError();
 }
 
 function _napi_get_property(env, object, key, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ key, result, object ], function() {
-   var h = emnapi.handleStore.get(object);
-   if (h.value == null) {
-    throw new TypeError("Cannot convert undefined or null to object");
-   }
-   var v;
-   try {
-    v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
-   } catch (_) {
-    return envObject.setLastError(2);
-   }
-   var value = envObject.ensureHandleId(v[emnapi.handleStore.get(key).value]);
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.getReturnStatus();
-  });
- });
-}
-
-function emnapiAddName(ret, name, key_filter, conversion_mode) {
- if (ret.indexOf(name) !== -1) return;
- if (conversion_mode === 0) {
-  ret.push(name);
- } else if (conversion_mode === 1) {
-  var realName = typeof name === "number" ? String(name) : name;
-  if (typeof realName === "string") {
-   if (!(key_filter & 8)) {
-    ret.push(realName);
-   }
-  } else {
-   ret.push(realName);
+ var value;
+ if (env == 0) return 1;
+ var envObject_22 = emnapiCtx.envStore.get(env);
+ if (envObject_22.tryCatch.hasCaught()) return envObject_22.setLastError(10);
+ envObject_22.clearLastError();
+ try {
+  if (key == 0) return envObject_22.setLastError(1);
+  if (result == 0) return envObject_22.setLastError(1);
+  if (object == 0) return envObject_22.setLastError(1);
+  var h_4 = emnapiCtx.handleStore.get(object);
+  if (h_4.value == null) {
+   throw new TypeError("Cannot convert undefined or null to object");
   }
+  var v_2 = void 0;
+  try {
+   v_2 = h_4.isObject() || h_4.isFunction() ? h_4.value : Object(h_4.value);
+  } catch (_3) {
+   return envObject_22.setLastError(2);
+  }
+  value = envObject_22.ensureHandleId(v_2[emnapiCtx.handleStore.get(key).value]);
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  return envObject_22.getReturnStatus();
+ } catch (err_23) {
+  envObject_22.tryCatch.setError(err_23);
+  return envObject_22.setLastError(10);
  }
-}
-
-function emnapiGetPropertyNames(obj, collection_mode, key_filter, conversion_mode) {
- var props = [];
- var names;
- var symbols;
- var i;
- var own = true;
- var integerIndiceRegex = /^(0|[1-9][0-9]*)$/;
- do {
-  names = Object.getOwnPropertyNames(obj);
-  symbols = Object.getOwnPropertySymbols(obj);
-  for (i = 0; i < names.length; i++) {
-   props.push({
-    name: integerIndiceRegex.test(names[i]) ? Number(names[i]) : names[i],
-    desc: Object.getOwnPropertyDescriptor(obj, names[i]),
-    own: own
-   });
-  }
-  for (i = 0; i < symbols.length; i++) {
-   props.push({
-    name: symbols[i],
-    desc: Object.getOwnPropertyDescriptor(obj, symbols[i]),
-    own: own
-   });
-  }
-  if (collection_mode === 1) {
-   break;
-  }
-  obj = Object.getPrototypeOf(obj);
-  own = false;
- } while (obj);
- var ret = [];
- for (i = 0; i < props.length; i++) {
-  var prop = props[i];
-  var name_1 = prop.name;
-  var desc = prop.desc;
-  if (key_filter === 0) {
-   emnapiAddName(ret, name_1, key_filter, conversion_mode);
-  } else {
-   if (key_filter & 8 && typeof name_1 === "string") {
-    continue;
-   }
-   if (key_filter & 16 && typeof name_1 === "symbol") {
-    continue;
-   }
-   var shouldAdd = true;
-   switch (key_filter & 7) {
-   case 1:
-    {
-     shouldAdd = Boolean(desc.writable);
-     break;
-    }
-
-   case 2:
-    {
-     shouldAdd = Boolean(desc.enumerable);
-     break;
-    }
-
-   case 1 | 2:
-    {
-     shouldAdd = Boolean(desc.writable && desc.enumerable);
-     break;
-    }
-
-   case 4:
-    {
-     shouldAdd = Boolean(desc.configurable);
-     break;
-    }
-
-   case 4 | 1:
-    {
-     shouldAdd = Boolean(desc.configurable && desc.writable);
-     break;
-    }
-
-   case 4 | 2:
-    {
-     shouldAdd = Boolean(desc.configurable && desc.enumerable);
-     break;
-    }
-
-   case 4 | 2 | 1:
-    {
-     shouldAdd = Boolean(desc.configurable && desc.enumerable && desc.writable);
-     break;
-    }
-   }
-   if (shouldAdd) {
-    emnapiAddName(ret, name_1, key_filter, conversion_mode);
-   }
-  }
- }
- return ret;
 }
 
 function _napi_get_all_property_names(env, object, key_mode, key_filter, key_conversion, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result, object ], function() {
-   var h = emnapi.handleStore.get(object);
-   if (h.value == null) {
-    throw new TypeError("Cannot convert undefined or null to object");
+ var value;
+ if (env == 0) return 1;
+ var envObject_19 = emnapiCtx.envStore.get(env);
+ if (envObject_19.tryCatch.hasCaught()) return envObject_19.setLastError(10);
+ envObject_19.clearLastError();
+ try {
+  if (result == 0) return envObject_19.setLastError(1);
+  if (object == 0) return envObject_19.setLastError(1);
+  var h_1 = emnapiCtx.handleStore.get(object);
+  if (h_1.value == null) {
+   throw new TypeError("Cannot convert undefined or null to object");
+  }
+  var obj_1 = void 0;
+  try {
+   obj_1 = h_1.isObject() || h_1.isFunction() ? h_1.value : Object(h_1.value);
+  } catch (_1) {
+   return envObject_19.setLastError(2);
+  }
+  if (key_mode !== 0 && key_mode !== 1) {
+   return envObject_19.setLastError(1);
+  }
+  if (key_conversion !== 0 && key_conversion !== 1) {
+   return envObject_19.setLastError(1);
+  }
+  var props_1 = [];
+  var names_1 = void 0;
+  var symbols_1 = void 0;
+  var i_1 = void 0;
+  var own_1 = true;
+  var integerIndiceRegex_1 = /^(0|[1-9][0-9]*)$/;
+  do {
+   names_1 = Object.getOwnPropertyNames(obj_1);
+   symbols_1 = Object.getOwnPropertySymbols(obj_1);
+   for (i_1 = 0; i_1 < names_1.length; i_1++) {
+    props_1.push({
+     name: integerIndiceRegex_1.test(names_1[i_1]) ? Number(names_1[i_1]) : names_1[i_1],
+     desc: Object.getOwnPropertyDescriptor(obj_1, names_1[i_1]),
+     own_1: own_1
+    });
    }
-   var v;
-   try {
-    v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
-   } catch (_) {
-    return envObject.setLastError(2);
+   for (i_1 = 0; i_1 < symbols_1.length; i_1++) {
+    props_1.push({
+     name: symbols_1[i_1],
+     desc: Object.getOwnPropertyDescriptor(obj_1, symbols_1[i_1]),
+     own_1: own_1
+    });
    }
-   if (key_mode !== 0 && key_mode !== 1) {
-    return envObject.setLastError(1);
+   if (key_mode === 1) {
+    break;
    }
-   if (key_conversion !== 0 && key_conversion !== 1) {
-    return envObject.setLastError(1);
+   obj_1 = Object.getPrototypeOf(obj_1);
+   own_1 = false;
+  } while (obj_1);
+  var ret_4 = [];
+  var addName_1 = function(ret_4, name, key_filter, conversion_mode) {
+   if (ret_4.indexOf(name) !== -1) return;
+   if (conversion_mode === 0) {
+    ret_4.push(name);
+   } else if (conversion_mode === 1) {
+    var realName_1 = typeof name === "number" ? String(name) : name;
+    if (typeof realName_1 === "string") {
+     if (!(key_filter & 8)) {
+      ret_4.push(realName_1);
+     }
+    } else {
+     ret_4.push(realName_1);
+    }
    }
-   var names = emnapiGetPropertyNames(v, key_mode, key_filter, key_conversion);
-   var value = emnapi.addToCurrentScope(envObject, names).id;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.getReturnStatus();
-  });
- });
+  };
+  for (i_1 = 0; i_1 < props_1.length; i_1++) {
+   var prop_1 = props_1[i_1];
+   var name_1 = prop_1.name;
+   var desc_1 = prop_1.desc;
+   if (key_filter === 0) {
+    addName_1(ret_4, name_1, key_filter, key_conversion);
+   } else {
+    if (key_filter & 8 && typeof name_1 === "string") {
+     continue;
+    }
+    if (key_filter & 16 && typeof name_1 === "symbol") {
+     continue;
+    }
+    var shouldAdd_1 = true;
+    switch (key_filter & 7) {
+    case 1:
+     {
+      shouldAdd_1 = Boolean(desc_1.writable);
+      break;
+     }
+
+    case 2:
+     {
+      shouldAdd_1 = Boolean(desc_1.enumerable);
+      break;
+     }
+
+    case 1 | 2:
+     {
+      shouldAdd_1 = Boolean(desc_1.writable && desc_1.enumerable);
+      break;
+     }
+
+    case 4:
+     {
+      shouldAdd_1 = Boolean(desc_1.configurable);
+      break;
+     }
+
+    case 4 | 1:
+     {
+      shouldAdd_1 = Boolean(desc_1.configurable && desc_1.writable);
+      break;
+     }
+
+    case 4 | 2:
+     {
+      shouldAdd_1 = Boolean(desc_1.configurable && desc_1.enumerable);
+      break;
+     }
+
+    case 4 | 2 | 1:
+     {
+      shouldAdd_1 = Boolean(desc_1.configurable && desc_1.enumerable && desc_1.writable);
+      break;
+     }
+    }
+    if (shouldAdd_1) {
+     addName_1(ret_4, name_1, key_filter, key_conversion);
+    }
+   }
+  }
+  value = emnapiCtx.addToCurrentScope(ret_4).id;
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  return envObject_19.getReturnStatus();
+ } catch (err_20) {
+  envObject_19.tryCatch.setError(err_20);
+  return envObject_19.setLastError(10);
+ }
 }
 
 function _napi_get_property_names(env, object, result) {
@@ -6131,382 +6462,394 @@ function _napi_get_property_names(env, object, result) {
 }
 
 function _napi_get_reference_value(env, ref, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ ref, result ], function() {
-   var reference = emnapi.refStore.get(ref);
-   var handleId = reference.get();
-   GROWABLE_HEAP_U32()[result >> 2] = handleId;
-   return envObject.clearLastError();
-  });
- });
-}
-
-var typedArrayMemoryMap = new WeakMap();
-
-var memoryPointerDeleter = typeof FinalizationRegistry === "function" ? new FinalizationRegistry(function(pointer) {
- _free(pointer);
-}) : undefined;
-
-function getViewPointer(view) {
- if (!memoryPointerDeleter) {
-  return 0;
- }
- if (view.buffer === GROWABLE_HEAP_U8().buffer) {
-  return view.byteOffset;
- }
- var pointer;
- if (typedArrayMemoryMap.has(view)) {
-  pointer = typedArrayMemoryMap.get(view);
-  GROWABLE_HEAP_U8().set(new Uint8Array(view.buffer, view.byteOffset, view.byteLength), pointer);
-  return pointer;
- }
- pointer = _malloc(view.byteLength);
- GROWABLE_HEAP_U8().set(new Uint8Array(view.buffer, view.byteOffset, view.byteLength), pointer);
- typedArrayMemoryMap.set(view, pointer);
- memoryPointerDeleter.register(view, pointer);
- return pointer;
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (ref == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var reference = emnapiCtx.refStore.get(ref);
+ var handleId = reference.get();
+ GROWABLE_HEAP_U32()[result >> 2] = handleId;
+ return envObject.clearLastError();
 }
 
 function _napi_get_typedarray_info(env, typedarray, type, length, data, arraybuffer, byte_offset) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ typedarray ], function() {
-   var handle = emnapi.handleStore.get(typedarray);
-   if (!handle.isTypedArray()) {
-    return envObject.setLastError(1);
-   }
-   var v = handle.value;
-   if (type) {
-    if (v instanceof Int8Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 0;
-    } else if (v instanceof Uint8Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 1;
-    } else if (v instanceof Uint8ClampedArray) {
-     GROWABLE_HEAP_I32()[type >> 2] = 2;
-    } else if (v instanceof Int16Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 3;
-    } else if (v instanceof Uint16Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 4;
-    } else if (v instanceof Int32Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 5;
-    } else if (v instanceof Uint32Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 6;
-    } else if (v instanceof Float32Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 7;
-    } else if (v instanceof Float64Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 8;
-    } else if (v instanceof BigInt64Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 9;
-    } else if (v instanceof BigUint64Array) {
-     GROWABLE_HEAP_I32()[type >> 2] = 10;
-    }
-   }
-   if (length) {
-    GROWABLE_HEAP_U32()[length >> 2] = v.length;
-   }
-   var buffer;
-   if (data || arraybuffer) {
-    buffer = v.buffer;
-    if (data) {
-     var p = getViewPointer(v);
-     GROWABLE_HEAP_U32()[data >> 2] = p;
-    }
-    if (arraybuffer) {
-     var ab = envObject.ensureHandleId(buffer);
-     GROWABLE_HEAP_U32()[arraybuffer >> 2] = ab;
-    }
-   }
-   if (byte_offset) {
-    GROWABLE_HEAP_U32()[byte_offset >> 2] = v.byteOffset;
-   }
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (typedarray == 0) return envObject.setLastError(1);
+ var handle = emnapiCtx.handleStore.get(typedarray);
+ if (!handle.isTypedArray()) {
+  return envObject.setLastError(1);
+ }
+ var v = handle.value;
+ if (type) {
+  if (v instanceof Int8Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 0;
+  } else if (v instanceof Uint8Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 1;
+  } else if (v instanceof Uint8ClampedArray) {
+   GROWABLE_HEAP_I32()[type >> 2] = 2;
+  } else if (v instanceof Int16Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 3;
+  } else if (v instanceof Uint16Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 4;
+  } else if (v instanceof Int32Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 5;
+  } else if (v instanceof Uint32Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 6;
+  } else if (v instanceof Float32Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 7;
+  } else if (v instanceof Float64Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 8;
+  } else if (v instanceof BigInt64Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 9;
+  } else if (v instanceof BigUint64Array) {
+   GROWABLE_HEAP_I32()[type >> 2] = 10;
+  }
+ }
+ if (length) {
+  GROWABLE_HEAP_U32()[length >> 2] = v.length;
+ }
+ var buffer;
+ if (data || arraybuffer) {
+  buffer = v.buffer;
+  if (data) {
+   var p = emnapiExternalMemory.getViewPointer(v, true).address;
+   GROWABLE_HEAP_U32()[data >> 2] = p;
+  }
+  if (arraybuffer) {
+   var ab = envObject.ensureHandleId(buffer);
+   GROWABLE_HEAP_U32()[arraybuffer >> 2] = ab;
+  }
+ }
+ if (byte_offset) {
+  GROWABLE_HEAP_U32()[byte_offset >> 2] = v.byteOffset;
+ }
+ return envObject.clearLastError();
 }
 
 function _napi_get_undefined(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var value = emnapi.HandleStore.ID_UNDEFINED;
-   GROWABLE_HEAP_U32()[result >> 2] = value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ var value = 1;
+ GROWABLE_HEAP_U32()[result >> 2] = value;
+ return envObject.clearLastError();
 }
 
 function _napi_get_value_bool(env, value, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, result ], function() {
-   var handle = emnapi.handleStore.get(value);
-   if (typeof handle.value !== "boolean") {
-    return envObject.setLastError(7);
-   }
-   GROWABLE_HEAP_U8()[result] = handle.value ? 1 : 0;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (value == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var handle = emnapiCtx.handleStore.get(value);
+ if (typeof handle.value !== "boolean") {
+  return envObject.setLastError(7);
+ }
+ GROWABLE_HEAP_U8()[result] = handle.value ? 1 : 0;
+ return envObject.clearLastError();
 }
 
 function _napi_get_value_double(env, value, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, result ], function() {
-   var handle = emnapi.handleStore.get(value);
-   if (typeof handle.value !== "number") {
-    return envObject.setLastError(6);
-   }
-   GROWABLE_HEAP_F64()[result >> 3] = handle.value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (value == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var handle = emnapiCtx.handleStore.get(value);
+ if (typeof handle.value !== "number") {
+  return envObject.setLastError(6);
+ }
+ GROWABLE_HEAP_F64()[result >> 3] = handle.value;
+ return envObject.clearLastError();
 }
 
 function _napi_get_value_int32(env, value, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, result ], function() {
-   var handle = emnapi.handleStore.get(value);
-   if (typeof handle.value !== "number") {
-    return envObject.setLastError(6);
-   }
-   GROWABLE_HEAP_I32()[result >> 2] = handle.value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (value == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var handle = emnapiCtx.handleStore.get(value);
+ if (typeof handle.value !== "number") {
+  return envObject.setLastError(6);
+ }
+ GROWABLE_HEAP_I32()[result >> 2] = handle.value;
+ return envObject.clearLastError();
 }
 
 function _napi_get_value_int64(env, value, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, result ], function() {
-   var handle = emnapi.handleStore.get(value);
-   if (typeof handle.value !== "number") {
-    return envObject.setLastError(6);
-   }
-   var numberValue = handle.value;
-   if (numberValue === Number.POSITIVE_INFINITY || numberValue === Number.NEGATIVE_INFINITY || isNaN(numberValue)) {
-    GROWABLE_HEAP_I32()[result >> 2] = 0;
-    GROWABLE_HEAP_I32()[result + 4 >> 2] = 0;
-   } else if (numberValue < -0x8000000000000000) {
-    GROWABLE_HEAP_I32()[result >> 2] = 0;
-    GROWABLE_HEAP_I32()[result + 4 >> 2] = 2147483648;
-   } else if (numberValue >= 0x8000000000000000) {
-    GROWABLE_HEAP_U32()[result >> 2] = 4294967295;
-    GROWABLE_HEAP_U32()[result + 4 >> 2] = 2147483647;
-   } else {
-    var tempDouble = void 0;
-    var tempI64 = [ numberValue >>> 0, (tempDouble = numberValue, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ];
-    GROWABLE_HEAP_I32()[result >> 2] = tempI64[0];
-    GROWABLE_HEAP_I32()[result + 4 >> 2] = tempI64[1];
-   }
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (value == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var handle = emnapiCtx.handleStore.get(value);
+ if (typeof handle.value !== "number") {
+  return envObject.setLastError(6);
+ }
+ var numberValue = handle.value;
+ if (numberValue === Number.POSITIVE_INFINITY || numberValue === Number.NEGATIVE_INFINITY || isNaN(numberValue)) {
+  GROWABLE_HEAP_I32()[result >> 2] = 0;
+  GROWABLE_HEAP_I32()[result + 4 >> 2] = 0;
+ } else if (numberValue < -0x8000000000000000) {
+  GROWABLE_HEAP_I32()[result >> 2] = 0;
+  GROWABLE_HEAP_I32()[result + 4 >> 2] = 2147483648;
+ } else if (numberValue >= 0x8000000000000000) {
+  GROWABLE_HEAP_U32()[result >> 2] = 4294967295;
+  GROWABLE_HEAP_U32()[result + 4 >> 2] = 2147483647;
+ } else {
+  var tempDouble = void 0;
+  var tempI64 = [ numberValue >>> 0, (tempDouble = numberValue, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ];
+  GROWABLE_HEAP_I32()[result >> 2] = tempI64[0];
+  GROWABLE_HEAP_I32()[result + 4 >> 2] = tempI64[1];
+ }
+ return envObject.clearLastError();
 }
 
 function _napi_get_value_string_utf8(env, value, buf, buf_size, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value ], function() {
-   buf_size = buf_size >>> 0;
-   var handle = emnapi.handleStore.get(value);
-   if (typeof handle.value !== "string") {
-    return envObject.setLastError(3);
-   }
-   if (!buf) {
-    if (!result) return envObject.setLastError(1);
-    var strLength = lengthBytesUTF8(handle.value);
-    GROWABLE_HEAP_U32()[result >> 2] = strLength;
-   } else if (buf_size !== 0) {
-    var copied = stringToUTF8(handle.value, buf, buf_size);
-    if (result) {
-     GROWABLE_HEAP_U32()[result >> 2] = copied;
-    }
-   } else if (result) {
-    GROWABLE_HEAP_U32()[result >> 2] = 0;
-   }
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (value == 0) return envObject.setLastError(1);
+ buf_size = buf_size >>> 0;
+ var handle = emnapiCtx.handleStore.get(value);
+ if (typeof handle.value !== "string") {
+  return envObject.setLastError(3);
+ }
+ if (!buf) {
+  if (!result) return envObject.setLastError(1);
+  var strLength = lengthBytesUTF8(handle.value);
+  GROWABLE_HEAP_U32()[result >> 2] = strLength;
+ } else if (buf_size !== 0) {
+  var copied = stringToUTF8(handle.value, buf, buf_size);
+  if (result) {
+   GROWABLE_HEAP_U32()[result >> 2] = copied;
+  }
+ } else if (result) {
+  GROWABLE_HEAP_U32()[result >> 2] = 0;
+ }
+ return envObject.clearLastError();
 }
 
 function _napi_get_value_uint32(env, value, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, result ], function() {
-   var handle = emnapi.handleStore.get(value);
-   if (typeof handle.value !== "number") {
-    return envObject.setLastError(6);
-   }
-   GROWABLE_HEAP_U32()[result >> 2] = handle.value;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (value == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var handle = emnapiCtx.handleStore.get(value);
+ if (typeof handle.value !== "number") {
+  return envObject.setLastError(6);
+ }
+ GROWABLE_HEAP_U32()[result >> 2] = handle.value;
+ return envObject.clearLastError();
 }
 
 function _napi_has_named_property(env, object, utf8name, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result, object ], function() {
-   if (!utf8name) {
-    return envObject.setLastError(1);
-   }
-   var h = emnapi.handleStore.get(object);
-   if (h.value == null) {
-    throw new TypeError("Cannot convert undefined or null to object");
-   }
-   var v;
-   try {
-    v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
-   } catch (_) {
-    return envObject.setLastError(2);
-   }
-   var r = UTF8ToString(utf8name) in v;
-   GROWABLE_HEAP_U8()[result] = r ? 1 : 0;
-   return envObject.getReturnStatus();
-  });
- });
+ if (env == 0) return 1;
+ var envObject_26 = emnapiCtx.envStore.get(env);
+ if (envObject_26.tryCatch.hasCaught()) return envObject_26.setLastError(10);
+ envObject_26.clearLastError();
+ try {
+  if (result == 0) return envObject_26.setLastError(1);
+  if (object == 0) return envObject_26.setLastError(1);
+  if (!utf8name) {
+   return envObject_26.setLastError(1);
+  }
+  var h_8 = emnapiCtx.handleStore.get(object);
+  if (h_8.value == null) {
+   throw new TypeError("Cannot convert undefined or null to object");
+  }
+  var v_4 = void 0;
+  try {
+   v_4 = h_8.isObject() || h_8.isFunction() ? h_8.value : Object(h_8.value);
+  } catch (_6) {
+   return envObject_26.setLastError(2);
+  }
+  var r_3 = UTF8ToString(utf8name) in v_4;
+  GROWABLE_HEAP_U8()[result] = r_3 ? 1 : 0;
+  return envObject_26.getReturnStatus();
+ } catch (err_27) {
+  envObject_26.tryCatch.setError(err_27);
+  return envObject_26.setLastError(10);
+ }
 }
 
 function _napi_has_own_property(env, object, key, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ key, result, object ], function() {
-   var h = emnapi.handleStore.get(object);
-   if (h.value == null) {
-    throw new TypeError("Cannot convert undefined or null to object");
-   }
-   var v;
-   try {
-    v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
-   } catch (_) {
-    return envObject.setLastError(2);
-   }
-   var prop = emnapi.handleStore.get(key).value;
-   if (typeof prop !== "string" && typeof prop !== "symbol") {
-    return envObject.setLastError(4);
-   }
-   var r = Object.prototype.hasOwnProperty.call(v, emnapi.handleStore.get(key).value);
-   GROWABLE_HEAP_U8()[result] = r ? 1 : 0;
-   return envObject.getReturnStatus();
-  });
- });
+ var value;
+ if (env == 0) return 1;
+ var envObject_24 = emnapiCtx.envStore.get(env);
+ if (envObject_24.tryCatch.hasCaught()) return envObject_24.setLastError(10);
+ envObject_24.clearLastError();
+ try {
+  if (key == 0) return envObject_24.setLastError(1);
+  if (result == 0) return envObject_24.setLastError(1);
+  if (object == 0) return envObject_24.setLastError(1);
+  var h_6 = emnapiCtx.handleStore.get(object);
+  if (h_6.value == null) {
+   throw new TypeError("Cannot convert undefined or null to object");
+  }
+  var v_3 = void 0;
+  try {
+   v_3 = h_6.isObject() || h_6.isFunction() ? h_6.value : Object(h_6.value);
+  } catch (_5) {
+   return envObject_24.setLastError(2);
+  }
+  var prop_2 = emnapiCtx.handleStore.get(key).value;
+  if (typeof prop_2 !== "string" && typeof prop_2 !== "symbol") {
+   return envObject_24.setLastError(4);
+  }
+  var r_2 = Object.prototype.hasOwnProperty.call(v_3, emnapiCtx.handleStore.get(key).value);
+  GROWABLE_HEAP_U8()[result] = r_2 ? 1 : 0;
+  return envObject_24.getReturnStatus();
+ } catch (err_25) {
+  envObject_24.tryCatch.setError(err_25);
+  return envObject_24.setLastError(10);
+ }
 }
 
 function _napi_has_property(env, object, key, result) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ key, result, object ], function() {
-   var h = emnapi.handleStore.get(object);
-   if (h.value == null) {
-    throw new TypeError("Cannot convert undefined or null to object");
-   }
-   var v;
-   try {
-    v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
-   } catch (_) {
-    return envObject.setLastError(2);
-   }
-   GROWABLE_HEAP_U8()[result] = emnapi.handleStore.get(key).value in v ? 1 : 0;
-   return envObject.getReturnStatus();
-  });
- });
+ if (env == 0) return 1;
+ var envObject_21 = emnapiCtx.envStore.get(env);
+ if (envObject_21.tryCatch.hasCaught()) return envObject_21.setLastError(10);
+ envObject_21.clearLastError();
+ try {
+  if (key == 0) return envObject_21.setLastError(1);
+  if (result == 0) return envObject_21.setLastError(1);
+  if (object == 0) return envObject_21.setLastError(1);
+  var h_3 = emnapiCtx.handleStore.get(object);
+  if (h_3.value == null) {
+   throw new TypeError("Cannot convert undefined or null to object");
+  }
+  var v_1 = void 0;
+  try {
+   v_1 = h_3.isObject() || h_3.isFunction() ? h_3.value : Object(h_3.value);
+  } catch (_2) {
+   return envObject_21.setLastError(2);
+  }
+  GROWABLE_HEAP_U8()[result] = emnapiCtx.handleStore.get(key).value in v_1 ? 1 : 0;
+  return envObject_21.getReturnStatus();
+ } catch (err_22) {
+  envObject_21.tryCatch.setError(err_22);
+  return envObject_21.setLastError(10);
+ }
 }
 
 function _napi_is_exception_pending(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var r = envObject.tryCatch.hasCaught();
-   GROWABLE_HEAP_U8()[result] = r ? 1 : 0;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ var r = envObject.tryCatch.hasCaught();
+ GROWABLE_HEAP_U8()[result] = r ? 1 : 0;
+ return envObject.clearLastError();
 }
 
 function _napi_open_escapable_handle_scope(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var scope = emnapi.openScope(envObject, emnapi.EscapableHandleScope);
-   GROWABLE_HEAP_U32()[result >> 2] = scope.id;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ var scope = emnapiCtx.openScope(envObject);
+ GROWABLE_HEAP_U32()[result >> 2] = scope.id;
+ return envObject.clearLastError();
 }
 
 function _napi_open_handle_scope(env, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ result ], function() {
-   var scope = emnapi.openScope(envObject, emnapi.HandleScope);
-   GROWABLE_HEAP_U32()[result >> 2] = scope.id;
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (result == 0) return envObject.setLastError(1);
+ var scope = emnapiCtx.openScope(envObject);
+ GROWABLE_HEAP_U32()[result >> 2] = scope.id;
+ return envObject.clearLastError();
 }
 
 function _napi_set_element(env, object, index, value) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, object ], function() {
-   var h = emnapi.handleStore.get(object);
-   if (!(h.isObject() || h.isFunction())) {
-    return envObject.setLastError(2);
-   }
-   h.value[index >>> 0] = emnapi.handleStore.get(value).value;
-   return envObject.getReturnStatus();
-  });
- });
+ if (env == 0) return 1;
+ var envObject_28 = emnapiCtx.envStore.get(env);
+ if (envObject_28.tryCatch.hasCaught()) return envObject_28.setLastError(10);
+ envObject_28.clearLastError();
+ try {
+  if (value == 0) return envObject_28.setLastError(1);
+  if (object == 0) return envObject_28.setLastError(1);
+  var h_10 = emnapiCtx.handleStore.get(object);
+  if (!(h_10.isObject() || h_10.isFunction())) {
+   return envObject_28.setLastError(2);
+  }
+  h_10.value[index >>> 0] = emnapiCtx.handleStore.get(value).value;
+  return envObject_28.getReturnStatus();
+ } catch (err_29) {
+  envObject_28.tryCatch.setError(err_29);
+  return envObject_28.setLastError(10);
+ }
 }
 
 function _napi_set_last_error(env, error_code, engine_error_code, engine_reserved) {
- var envObject = emnapi.envStore.get(env);
+ var envObject = emnapiCtx.envStore.get(env);
  return envObject.setLastError(error_code, engine_error_code, engine_reserved);
 }
 
 function _napi_set_named_property(env, object, cname, value) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, object ], function() {
-   var h = emnapi.handleStore.get(object);
-   if (!(h.isObject() || h.isFunction())) {
-    return envObject.setLastError(2);
-   }
-   if (!cname) {
-    return envObject.setLastError(1);
-   }
-   emnapi.handleStore.get(object).value[UTF8ToString(cname)] = emnapi.handleStore.get(value).value;
-   return 0;
-  });
- });
+ if (env == 0) return 1;
+ var envObject_25 = emnapiCtx.envStore.get(env);
+ if (envObject_25.tryCatch.hasCaught()) return envObject_25.setLastError(10);
+ envObject_25.clearLastError();
+ try {
+  if (value == 0) return envObject_25.setLastError(1);
+  if (object == 0) return envObject_25.setLastError(1);
+  var h_7 = emnapiCtx.handleStore.get(object);
+  if (!(h_7.isObject() || h_7.isFunction())) {
+   return envObject_25.setLastError(2);
+  }
+  if (!cname) {
+   return envObject_25.setLastError(1);
+  }
+  emnapiCtx.handleStore.get(object).value[UTF8ToString(cname)] = emnapiCtx.handleStore.get(value).value;
+  return 0;
+ } catch (err_26) {
+  envObject_25.tryCatch.setError(err_26);
+  return envObject_25.setLastError(10);
+ }
 }
 
 function _napi_throw(env, error) {
- return emnapi.preamble(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ error ], function() {
-   envObject.tryCatch.setError(emnapi.handleStore.get(error).value);
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject_6 = emnapiCtx.envStore.get(env);
+ if (envObject_6.tryCatch.hasCaught()) return envObject_6.setLastError(10);
+ envObject_6.clearLastError();
+ try {
+  if (error == 0) return envObject_6.setLastError(1);
+  envObject_6.tryCatch.setError(emnapiCtx.handleStore.get(error).value);
+  return envObject_6.clearLastError();
+ } catch (err_7) {
+  envObject_6.tryCatch.setError(err_7);
+  return envObject_6.setLastError(10);
+ }
 }
 
 function _napi_typeof(env, value, result) {
- return emnapi.checkEnv(env, function(envObject) {
-  return emnapi.checkArgs(envObject, [ value, result ], function() {
-   var v = emnapi.handleStore.get(value);
-   if (v.isNumber()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 3;
-   } else if (v.isBigInt()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 9;
-   } else if (v.isString()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 4;
-   } else if (v.isFunction()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 7;
-   } else if (v.isExternal()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 8;
-   } else if (v.isObject()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 6;
-   } else if (v.isBoolean()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 2;
-   } else if (v.isUndefined()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 0;
-   } else if (v.isSymbol()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 5;
-   } else if (v.isNull()) {
-    GROWABLE_HEAP_I32()[result >> 2] = 1;
-   } else {
-    return envObject.setLastError(1);
-   }
-   return envObject.clearLastError();
-  });
- });
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (value == 0) return envObject.setLastError(1);
+ if (result == 0) return envObject.setLastError(1);
+ var v = emnapiCtx.handleStore.get(value);
+ if (v.isNumber()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 3;
+ } else if (v.isBigInt()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 9;
+ } else if (v.isString()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 4;
+ } else if (v.isFunction()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 7;
+ } else if (v.isExternal()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 8;
+ } else if (v.isObject()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 6;
+ } else if (v.isBoolean()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 2;
+ } else if (v.isUndefined()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 0;
+ } else if (v.isSymbol()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 5;
+ } else if (v.isNull()) {
+  GROWABLE_HEAP_I32()[result >> 2] = 1;
+ } else {
+  return envObject.setLastError(1);
+ }
+ return envObject.clearLastError();
 }
 
 function __arraySum(array, index) {
@@ -7066,1070 +7409,9 @@ var VFS = Object.assign({}, FS);
 
 FS.init = NODERAWFS.init;
 
-var emnapi = function(exports) {
- var extendStatics = function(d, b) {
-  extendStatics = Object.setPrototypeOf || {
-   __proto__: []
-  } instanceof Array && function(d, b) {
-   d.__proto__ = b;
-  } || function(d, b) {
-   for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
-  };
-  return extendStatics(d, b);
- };
- function __extends(d, b) {
-  if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-  extendStatics(d, b);
-  function __() {
-   this.constructor = d;
-  }
-  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
- }
- var Store = function() {
-  function Store(capacity) {
-   this._values = [ undefined ];
-   this._values.length = capacity;
-   this._size = 1;
-   this._freeList = [];
-  }
-  Store.prototype.add = function(value) {
-   var id;
-   if (this._freeList.length) {
-    id = this._freeList.shift();
-   } else {
-    id = this._size;
-    this._size++;
-    var capacity = this._values.length;
-    if (id >= capacity) {
-     this._values.length = Math.ceil(capacity * 1.5);
-    }
-   }
-   value.id = id;
-   this._values[id] = value;
-  };
-  Store.prototype.get = function(id) {
-   return this._values[id];
-  };
-  Store.prototype.has = function(id) {
-   return this._values[id] !== undefined;
-  };
-  Store.prototype.remove = function(id) {
-   var value = this._values[id];
-   if (value) {
-    value.id = 0;
-    this._values[id] = undefined;
-    this._freeList.push(Number(id));
-   }
-  };
-  Store.prototype.dispose = function() {
-   for (var i = 1; i < this._size; ++i) {
-    var value = this._values[i];
-    value === null || value === void 0 ? void 0 : value.dispose();
-   }
-   this._values = [ undefined ];
-   this._size = 1;
-   this._freeList = [];
-  };
-  return Store;
- }();
- var EnvStore = function(_super) {
-  __extends(EnvStore, _super);
-  function EnvStore() {
-   return _super.call(this, 4) || this;
-  }
-  return EnvStore;
- }(Store);
- var envStore = new EnvStore();
- var _a$1;
- var supportNewFunction = function() {
-  var f;
-  try {
-   f = new Function();
-  } catch (_) {
-   return false;
-  }
-  return typeof f === "function";
- }();
- var _global = function() {
-  if (typeof globalThis !== "undefined") return globalThis;
-  var g = function() {
-   return this;
-  }();
-  if (!g && supportNewFunction) {
-   g = new Function("return this")();
-  }
-  if (!g) {
-   if (typeof __webpack_public_path__ === "undefined") {
-    if (typeof global !== "undefined") return global;
-   }
-   if (typeof window !== "undefined") return window;
-   if (typeof self !== "undefined") return self;
-  }
-  return g;
- }();
- var TryCatch = function() {
-  function TryCatch() {
-   this._exception = undefined;
-   this._caught = false;
-  }
-  TryCatch.prototype.hasCaught = function() {
-   return this._caught;
-  };
-  TryCatch.prototype.exception = function() {
-   return this._exception;
-  };
-  TryCatch.prototype.setError = function(err) {
-   this._exception = err;
-   this._caught = true;
-  };
-  TryCatch.prototype.reset = function() {
-   this._exception = undefined;
-   this._caught = false;
-  };
-  TryCatch.prototype.extractException = function() {
-   var e = this._exception;
-   this.reset();
-   return e;
-  };
-  return TryCatch;
- }();
- function checkEnv(env, fn) {
-  if (!env) return 1;
-  var envObject = envStore.get(env);
-  if (envObject === undefined) return 1;
-  return fn(envObject);
- }
- function checkArgs(envObject, args, fn) {
-  for (var i = 0; i < args.length; i++) {
-   var arg = args[i];
-   if (!arg) {
-    return envObject.setLastError(1);
-   }
-  }
-  return fn();
- }
- function preamble(env, fn) {
-  return checkEnv(env, function(envObject) {
-   if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
-   envObject.clearLastError();
-   try {
-    return fn(envObject);
-   } catch (err) {
-    envObject.tryCatch.setError(err);
-    return envObject.setLastError(10);
-   }
-  });
- }
- exports.canSetFunctionName = false;
- try {
-  exports.canSetFunctionName = !!((_a$1 = Object.getOwnPropertyDescriptor(Function.prototype, "name")) === null || _a$1 === void 0 ? void 0 : _a$1.configurable);
- } catch (_) {}
- var supportReflect = typeof Reflect === "object";
- var supportFinalizer = typeof FinalizationRegistry !== "undefined" && typeof WeakRef !== "undefined";
- var supportBigInt = typeof BigInt !== "undefined";
- function isReferenceType(v) {
-  return typeof v === "object" && v !== null || typeof v === "function";
- }
- var EmnapiError = function(_super) {
-  __extends(EmnapiError, _super);
-  function EmnapiError(message) {
-   var _newTarget = this.constructor;
-   var _this = _super.call(this, message) || this;
-   var ErrorConstructor = _newTarget;
-   var proto = ErrorConstructor.prototype;
-   if (!(_this instanceof EmnapiError)) {
-    var setPrototypeOf = Object.setPrototypeOf;
-    if (typeof setPrototypeOf === "function") {
-     setPrototypeOf.call(Object, _this, proto);
-    } else {
-     _this.__proto__ = proto;
-    }
-    if (typeof Error.captureStackTrace === "function") {
-     Error.captureStackTrace(_this, ErrorConstructor);
-    }
-   }
-   return _this;
-  }
-  return EmnapiError;
- }(Error);
- Object.defineProperty(EmnapiError.prototype, "name", {
-  configurable: true,
-  writable: true,
-  value: "EmnapiError"
- });
- var NotSupportWeakRefError = function(_super) {
-  __extends(NotSupportWeakRefError, _super);
-  function NotSupportWeakRefError(api, message) {
-   return _super.call(this, "".concat(api, ': The current runtime does not support "FinalizationRegistry" and "WeakRef".').concat(message ? " ".concat(message) : "")) || this;
-  }
-  return NotSupportWeakRefError;
- }(EmnapiError);
- Object.defineProperty(NotSupportWeakRefError.prototype, "name", {
-  configurable: true,
-  writable: true,
-  value: "NotSupportWeakRefError"
- });
- var NotSupportBigIntError = function(_super) {
-  __extends(NotSupportBigIntError, _super);
-  function NotSupportBigIntError(api, message) {
-   return _super.call(this, "".concat(api, ': The current runtime does not support "BigInt".').concat(message ? " ".concat(message) : "")) || this;
-  }
-  return NotSupportBigIntError;
- }(EmnapiError);
- Object.defineProperty(NotSupportBigIntError.prototype, "name", {
-  configurable: true,
-  writable: true,
-  value: "NotSupportBigIntError"
- });
- var ScopeStore = function(_super) {
-  __extends(ScopeStore, _super);
-  function ScopeStore() {
-   return _super.call(this, 8) || this;
-  }
-  return ScopeStore;
- }(Store);
- var scopeStore = new ScopeStore();
- var RefStore = function(_super) {
-  __extends(RefStore, _super);
-  function RefStore() {
-   return _super.call(this, 8) || this;
-  }
-  return RefStore;
- }(Store);
- var refStore = new RefStore();
- var DeferredStore = function(_super) {
-  __extends(DeferredStore, _super);
-  function DeferredStore() {
-   return _super.call(this, 8) || this;
-  }
-  return DeferredStore;
- }(Store);
- var deferredStore = new DeferredStore();
- var CallbackInfoStore = function(_super) {
-  __extends(CallbackInfoStore, _super);
-  function CallbackInfoStore() {
-   return _super.call(this, 16) || this;
-  }
-  return CallbackInfoStore;
- }(Store);
- var cbInfoStore = new CallbackInfoStore();
- var _a;
- var Handle = function() {
-  function Handle(envObject, id, value) {
-   this.wrapped = 0;
-   this._envObject = envObject;
-   this.id = id;
-   this.value = value;
-   this.inScope = null;
-   this.wrapped = 0;
-   this.tag = null;
-   this.refs = [];
-  }
-  Handle.create = function(envObject, value) {
-   var handle = new Handle(envObject, 0, value);
-   handleStore.add(handle);
-   return handle;
-  };
-  Handle.prototype.getEnv = function() {
-   return this._envObject;
-  };
-  Handle.prototype.moveTo = function(other) {
-   this._envObject = undefined;
-   this.id = 0;
-   this.value = undefined;
-   this.inScope = null;
-   other.wrapped = this.wrapped;
-   this.wrapped = 0;
-   other.tag = this.tag;
-   this.tag = null;
-   other.refs = this.refs;
-   this.refs = [];
-  };
-  Handle.prototype.isEmpty = function() {
-   return this.id === 0;
-  };
-  Handle.prototype.isNumber = function() {
-   return !this.isEmpty() && typeof this.value === "number";
-  };
-  Handle.prototype.isBigInt = function() {
-   return !this.isEmpty() && typeof this.value === "bigint";
-  };
-  Handle.prototype.isString = function() {
-   return !this.isEmpty() && typeof this.value === "string";
-  };
-  Handle.prototype.isFunction = function() {
-   return !this.isEmpty() && typeof this.value === "function";
-  };
-  Handle.prototype.isExternal = function() {
-   return !this.isEmpty() && this instanceof ExternalHandle;
-  };
-  Handle.prototype.isObject = function() {
-   return !this.isEmpty() && typeof this.value === "object" && this.value !== null;
-  };
-  Handle.prototype.isArray = function() {
-   return !this.isEmpty() && Array.isArray(this.value);
-  };
-  Handle.prototype.isArrayBuffer = function() {
-   return !this.isEmpty() && this.value instanceof ArrayBuffer;
-  };
-  Handle.prototype.isTypedArray = function() {
-   return !this.isEmpty() && ArrayBuffer.isView(this.value) && !(this.value instanceof DataView);
-  };
-  Handle.prototype.isDataView = function() {
-   return !this.isEmpty() && this.value instanceof DataView;
-  };
-  Handle.prototype.isDate = function() {
-   return !this.isEmpty() && this.value instanceof Date;
-  };
-  Handle.prototype.isPromise = function() {
-   return !this.isEmpty() && this.value instanceof Promise;
-  };
-  Handle.prototype.isBoolean = function() {
-   return !this.isEmpty() && typeof this.value === "boolean";
-  };
-  Handle.prototype.isUndefined = function() {
-   return !this.isEmpty() && this.value === undefined;
-  };
-  Handle.prototype.isSymbol = function() {
-   return !this.isEmpty() && typeof this.value === "symbol";
-  };
-  Handle.prototype.isNull = function() {
-   return !this.isEmpty() && this.value === null;
-  };
-  Handle.prototype.addRef = function(ref) {
-   if (this.refs.indexOf(ref) !== -1) {
-    return;
-   }
-   this.refs.push(ref);
-  };
-  Handle.prototype.removeRef = function(ref) {
-   var index = this.refs.indexOf(ref);
-   if (index !== -1) {
-    this.refs.splice(index, 1);
-   }
-   this.tryDispose();
-  };
-  Handle.prototype.tryDispose = function() {
-   if (this.id < HandleStore.getMinId || this.inScope !== null || (supportFinalizer ? this.refs.some(function(ref) {
-    return ref.refCount() > 0;
-   }) : this.refs.length > 0)) return;
-   this.dispose();
-  };
-  Handle.prototype.dispose = function() {
-   if (this.id === 0) return;
-   var id = this.id;
-   handleStore.remove(id);
-   this.id = 0;
-   this.value = undefined;
-  };
-  return Handle;
- }();
- function External() {
-  Object.setPrototypeOf(this, null);
- }
- External.prototype = null;
- var ExternalHandle = function(_super) {
-  __extends(ExternalHandle, _super);
-  function ExternalHandle(envObject, data) {
-   if (data === void 0) {
-    data = 0;
-   }
-   var _this = _super.call(this, envObject, 0, new External()) || this;
-   _this._data = data;
-   return _this;
-  }
-  ExternalHandle.createExternal = function(envObject, data) {
-   if (data === void 0) {
-    data = 0;
-   }
-   var h = new ExternalHandle(envObject, data);
-   handleStore.add(h);
-   return h;
-  };
-  ExternalHandle.prototype.data = function() {
-   return this._data;
-  };
-  return ExternalHandle;
- }(Handle);
- var HandleStore = function(_super) {
-  __extends(HandleStore, _super);
-  function HandleStore() {
-   var _this = _super.call(this, 16) || this;
-   _this._objWeakMap = new WeakMap();
-   _super.prototype.add.call(_this, new Handle(undefined, 1, undefined));
-   _super.prototype.add.call(_this, new Handle(undefined, 2, null));
-   _super.prototype.add.call(_this, new Handle(undefined, 3, false));
-   _super.prototype.add.call(_this, new Handle(undefined, 4, true));
-   _super.prototype.add.call(_this, new Handle(undefined, 5, _global));
-   return _this;
-  }
-  Object.defineProperty(HandleStore, "getMinId", {
-   get: function() {
-    return 6;
-   },
-   enumerable: false,
-   configurable: true
-  });
-  HandleStore.prototype.add = function(h) {
-   _super.prototype.add.call(this, h);
-   var isRefType = isReferenceType(h.value);
-   if (isRefType) {
-    if (this._objWeakMap.has(h.value)) {
-     var old = this._objWeakMap.get(h.value);
-     old.moveTo(h);
-    }
-    this._objWeakMap.set(h.value, h);
-   }
-  };
-  HandleStore.prototype.remove = function(id) {
-   if (!this.has(id) || id < HandleStore.getMinId) return;
-   _super.prototype.remove.call(this, id);
-  };
-  HandleStore.prototype.getObjectHandle = function(value) {
-   return this._objWeakMap.get(value);
-  };
-  HandleStore.prototype.dispose = function() {
-   this._objWeakMap = null;
-   _super.prototype.dispose.call(this);
-  };
-  HandleStore.ID_UNDEFINED = 1;
-  HandleStore.ID_NULL = 2;
-  HandleStore.ID_FALSE = 3;
-  HandleStore.ID_TRUE = 4;
-  HandleStore.ID_GLOBAL = 5;
-  HandleStore.globalConstants = (_a = {}, _a[HandleStore.ID_UNDEFINED] = undefined, 
-  _a[HandleStore.ID_NULL] = null, _a[HandleStore.ID_FALSE] = false, _a[HandleStore.ID_TRUE] = true, 
-  _a[HandleStore.ID_GLOBAL] = _global, _a);
-  return HandleStore;
- }(Store);
- var handleStore = new HandleStore();
- var HandleScope = function() {
-  function HandleScope(parentScope) {
-   this._disposed = false;
-   this.id = 0;
-   this.parent = parentScope;
-   this.child = null;
-   this.handles = [];
-  }
-  HandleScope._create = function(parentScope) {
-   var scope = new this(parentScope);
-   if (parentScope) {
-    parentScope.child = scope;
-   }
-   scopeStore.add(scope);
-   return scope;
-  };
-  HandleScope.create = function(parentScope) {
-   return HandleScope._create(parentScope);
-  };
-  HandleScope.prototype.add = function(envObject, value) {
-   if (value instanceof Handle) {
-    throw new TypeError("Can not add a handle to scope");
-   }
-   if (value === undefined) {
-    return handleStore.get(HandleStore.ID_UNDEFINED);
-   }
-   if (value === null) {
-    return handleStore.get(HandleStore.ID_NULL);
-   }
-   if (typeof value === "boolean") {
-    return handleStore.get(value ? HandleStore.ID_TRUE : HandleStore.ID_FALSE);
-   }
-   if (value === _global) {
-    return handleStore.get(HandleStore.ID_GLOBAL);
-   }
-   var h = Handle.create(envObject, value);
-   this.handles.push(h);
-   h.inScope = this;
-   return h;
-  };
-  HandleScope.prototype.addHandle = function(handle) {
-   if (this.handles.indexOf(handle) !== -1) {
-    return handle;
-   }
-   this.handles.push(handle);
-   handle.inScope = this;
-   return handle;
-  };
-  HandleScope.prototype.clearHandles = function() {
-   if (this.handles.length > 0) {
-    var handles = this.handles;
-    for (var i = 0; i < handles.length; i++) {
-     var handle = handles[i];
-     handle.inScope = null;
-     handle.tryDispose();
-    }
-    this.handles = [];
-   }
-  };
-  HandleScope.prototype.dispose = function() {
-   if (this._disposed) return;
-   this._disposed = true;
-   this.clearHandles();
-   this.parent = null;
-   this.child = null;
-   scopeStore.remove(this.id);
-  };
-  return HandleScope;
- }();
- var EscapableHandleScope = function(_super) {
-  __extends(EscapableHandleScope, _super);
-  function EscapableHandleScope(parentScope) {
-   var _this = _super.call(this, parentScope) || this;
-   _this._escapeCalled = false;
-   return _this;
-  }
-  EscapableHandleScope.create = function(parentScope) {
-   return EscapableHandleScope._create(parentScope);
-  };
-  EscapableHandleScope.prototype.escape = function(handle) {
-   if (this._escapeCalled) return null;
-   this._escapeCalled = true;
-   var exists = false;
-   var index = -1;
-   var handleId;
-   if (typeof handle === "number") {
-    handleId = handle;
-    for (var i = 0; i < this.handles.length; i++) {
-     if (this.handles[i].id === handleId) {
-      index = i;
-      exists = true;
-      break;
-     }
-    }
-   } else {
-    handleId = handle.id;
-    index = this.handles.indexOf(handle);
-    exists = index !== -1;
-   }
-   if (exists) {
-    var h = handleStore.get(handleId);
-    if (h && this.parent !== null) {
-     var envObject = h.getEnv();
-     this.handles.splice(index, 1);
-     handleStore.remove(handleId);
-     var newHandle = this.parent.add(envObject, h.value);
-     return newHandle;
-    } else {
-     return null;
-    }
-   } else {
-    return null;
-   }
-  };
-  EscapableHandleScope.prototype.escapeCalled = function() {
-   return this._escapeCalled;
-  };
-  return EscapableHandleScope;
- }(HandleScope);
- var rootScope = HandleScope.create(null);
- var currentScope = null;
- function getCurrentScope() {
-  return currentScope;
- }
- function addToCurrentScope(envObject, value) {
-  return currentScope.add(envObject, value);
- }
- function openScope(envObject, ScopeConstructor) {
-  if (ScopeConstructor === void 0) {
-   ScopeConstructor = HandleScope;
-  }
-  if (currentScope) {
-   var scope = ScopeConstructor.create(currentScope);
-   currentScope.child = scope;
-   currentScope = scope;
-  } else {
-   currentScope = rootScope;
-  }
-  envObject.openHandleScopes++;
-  return currentScope;
- }
- function closeScope(envObject, scope) {
-  if (scope === currentScope) {
-   currentScope = scope.parent;
-  }
-  if (scope.parent) {
-   scope.parent.child = scope.child;
-  }
-  if (scope.child) {
-   scope.child.parent = scope.parent;
-  }
-  if (scope === rootScope) {
-   scope.clearHandles();
-   scope.child = null;
-  } else {
-   scope.dispose();
-  }
-  envObject.openHandleScopes--;
- }
- var RefTracker = function() {
-  function RefTracker() {
-   this._next = null;
-   this._prev = null;
-  }
-  RefTracker.prototype.finalize = function(_isEnvTeardown) {};
-  RefTracker.prototype.link = function(list) {
-   this._prev = list;
-   this._next = list._next;
-   if (this._next !== null) {
-    this._next._prev = this;
-   }
-   list._next = this;
-  };
-  RefTracker.prototype.unlink = function() {
-   if (this._prev !== null) {
-    this._prev._next = this._next;
-   }
-   if (this._next !== null) {
-    this._next._prev = this._prev;
-   }
-   this._prev = null;
-   this._next = null;
-  };
-  RefTracker.finalizeAll = function(list) {
-   while (list._next !== null) {
-    list._next.finalize(true);
-   }
-  };
-  return RefTracker;
- }();
- var Finalizer = function() {
-  function Finalizer(envObject, _finalizeCallback, _finalizeData, _finalizeHint, refmode) {
-   if (_finalizeCallback === void 0) {
-    _finalizeCallback = 0;
-   }
-   if (_finalizeData === void 0) {
-    _finalizeData = 0;
-   }
-   if (_finalizeHint === void 0) {
-    _finalizeHint = 0;
-   }
-   if (refmode === void 0) {
-    refmode = 0;
-   }
-   this.envObject = envObject;
-   this._finalizeCallback = _finalizeCallback;
-   this._finalizeData = _finalizeData;
-   this._finalizeHint = _finalizeHint;
-   this._finalizeRan = false;
-   this._hasEnvReference = refmode === 1;
-   if (this._hasEnvReference) {
-    envObject.ref();
-   }
-  }
-  Finalizer.prototype.dispose = function() {
-   if (this._hasEnvReference) {
-    this.envObject.unref();
-   }
-   this.envObject = undefined;
-  };
-  return Finalizer;
- }();
- var RefBase = function(_super) {
-  __extends(RefBase, _super);
-  function RefBase(envObject, initial_refcount, delete_self, finalize_callback, finalize_data, finalize_hint) {
-   var _this = _super.call(this, envObject, finalize_callback, finalize_data, finalize_hint) || this;
-   _this._next = null;
-   _this._prev = null;
-   _this._refcount = initial_refcount;
-   _this._deleteSelf = delete_self;
-   _this.link(!finalize_callback ? envObject.reflist : envObject.finalizing_reflist);
-   return _this;
-  }
-  RefBase.finalizeAll = function(list) {
-   RefTracker.finalizeAll(list);
-  };
-  RefBase.prototype.link = function(list) {
-   RefTracker.prototype.link.call(this, list);
-  };
-  RefBase.prototype.unlink = function() {
-   RefTracker.prototype.unlink.call(this);
-  };
-  RefBase.prototype.dispose = function() {
-   this.unlink();
-   _super.prototype.dispose.call(this);
-  };
-  RefBase.prototype.data = function() {
-   return this._finalizeData;
-  };
-  RefBase.prototype.ref = function() {
-   return ++this._refcount;
-  };
-  RefBase.prototype.unref = function() {
-   if (this._refcount === 0) {
-    return 0;
-   }
-   return --this._refcount;
-  };
-  RefBase.prototype.refCount = function() {
-   return this._refcount;
-  };
-  RefBase.doDelete = function(reference) {
-   if (reference.refCount() !== 0 || reference._deleteSelf || reference._finalizeRan || !supportFinalizer) {
-    reference.dispose();
-   } else {
-    reference._deleteSelf = true;
-   }
-  };
-  RefBase.prototype.finalize = function(isEnvTeardown) {
-   if (isEnvTeardown === void 0) {
-    isEnvTeardown = false;
-   }
-   if (isEnvTeardown && this.refCount() > 0) this._refcount = 0;
-   var error;
-   var caught = false;
-   if (this._finalizeCallback) {
-    var fini = Number(this._finalizeCallback);
-    this._finalizeCallback = 0;
-    try {
-     this.envObject.callFinalizer(fini, this._finalizeData, this._finalizeHint);
-    } catch (err) {
-     caught = true;
-     error = err;
-    }
-   }
-   if (this._deleteSelf || isEnvTeardown) {
-    RefBase.doDelete(this);
-   } else {
-    this._finalizeRan = true;
-   }
-   if (caught) {
-    throw error;
-   }
-  };
-  return RefBase;
- }(Finalizer);
- var Env = function() {
-  function Env(emnapiGetDynamicCalls, lastError) {
-   this.emnapiGetDynamicCalls = emnapiGetDynamicCalls;
-   this.lastError = lastError;
-   this.openHandleScopes = 0;
-   this.instanceData = null;
-   this.tryCatch = new TryCatch();
-   this.refs = 1;
-   this.reflist = new RefTracker();
-   this.finalizing_reflist = new RefTracker();
-   this.id = 0;
-  }
-  Env.create = function(emnapiGetDynamicCalls, lastError) {
-   var env = new Env(emnapiGetDynamicCalls, lastError);
-   envStore.add(env);
-   return env;
-  };
-  Env.prototype.ref = function() {
-   this.refs++;
-  };
-  Env.prototype.unref = function() {
-   this.refs--;
-   if (this.refs === 0) {
-    this.dispose();
-   }
-  };
-  Env.prototype.ensureHandle = function(value) {
-   if (isReferenceType(value)) {
-    var handle = handleStore.getObjectHandle(value);
-    if (!handle) {
-     return currentScope.add(this, value);
-    }
-    if (handle.value === value) {
-     if (!handle.inScope) {
-      currentScope.addHandle(handle);
-     }
-     return handle;
-    }
-    handle.value = value;
-    Store.prototype.add.call(handleStore, handle);
-    currentScope.addHandle(handle);
-    return handle;
-   }
-   return currentScope.add(this, value);
-  };
-  Env.prototype.ensureHandleId = function(value) {
-   return this.ensureHandle(value).id;
-  };
-  Env.prototype.clearLastError = function() {
-   this.lastError.setErrorCode(0);
-   this.lastError.setErrorMessage(0);
-   return 0;
-  };
-  Env.prototype.setLastError = function(error_code, _engine_error_code, _engine_reserved) {
-   this.lastError.setErrorCode(error_code);
-   return error_code;
-  };
-  Env.prototype.getReturnStatus = function() {
-   return !this.tryCatch.hasCaught() ? 0 : this.setLastError(10);
-  };
-  Env.prototype.callIntoModule = function(fn) {
-   this.clearLastError();
-   var r = fn(this);
-   if (this.tryCatch.hasCaught()) {
-    var err = this.tryCatch.extractException();
-    if (this.lastError.getErrorCode() === 10) {
-     this.clearLastError();
-    }
-    throw err;
-   }
-   return r;
-  };
-  Env.prototype.callFinalizer = function(cb, data, hint) {
-   var _this = this;
-   var scope = openScope(this, HandleScope);
-   try {
-    this.callIntoModule(function(envObject) {
-     _this.emnapiGetDynamicCalls.call_vppp(cb, envObject.id, data, hint);
-    });
-   } catch (err) {
-    closeScope(this, scope);
-    throw err;
-   }
-   closeScope(this, scope);
-  };
-  Env.prototype.dispose = function() {
-   RefBase.finalizeAll(this.finalizing_reflist);
-   RefBase.finalizeAll(this.reflist);
-   this.tryCatch.extractException();
-   try {
-    this.lastError.dispose();
-   } catch (_) {}
-   this.lastError = null;
-   envStore.remove(this.id);
-  };
-  return Env;
- }();
- var Reference = function(_super) {
-  __extends(Reference, _super);
-  function Reference(envObject, handle, initialRefcount, deleteSelf, finalize_callback, finalize_data, finalize_hint) {
-   if (finalize_callback === void 0) {
-    finalize_callback = 0;
-   }
-   if (finalize_data === void 0) {
-    finalize_data = 0;
-   }
-   if (finalize_hint === void 0) {
-    finalize_hint = 0;
-   }
-   var _this = _super.call(this, envObject, initialRefcount >>> 0, deleteSelf, finalize_callback, finalize_data, finalize_hint) || this;
-   _this.envObject = envObject;
-   _this.handle = handle;
-   _this.finalizerRegistered = false;
-   _this.id = 0;
-   return _this;
-  }
-  Reference.create = function(envObject, handle_id, initialRefcount, deleteSelf, finalize_callback, finalize_data, finalize_hint) {
-   if (finalize_callback === void 0) {
-    finalize_callback = 0;
-   }
-   if (finalize_data === void 0) {
-    finalize_data = 0;
-   }
-   if (finalize_hint === void 0) {
-    finalize_hint = 0;
-   }
-   var handle = handleStore.get(handle_id);
-   var ref = new Reference(envObject, handle, initialRefcount, deleteSelf, finalize_callback, finalize_data, finalize_hint);
-   refStore.add(ref);
-   handle.addRef(ref);
-   if (supportFinalizer && isReferenceType(handle.value)) {
-    ref.objWeakRef = new WeakRef(handle.value);
-   } else {
-    ref.objWeakRef = null;
-   }
-   if (initialRefcount === 0) {
-    ref._setWeak(handle.value);
-   }
-   return ref;
-  };
-  Reference.prototype.ref = function() {
-   var count = _super.prototype.ref.call(this);
-   if (count === 1 && this.objWeakRef) {
-    var obj = this.objWeakRef.deref();
-    if (obj) {
-     var handle = this.envObject.ensureHandle(obj);
-     handle.addRef(this);
-     this._clearWeak();
-     if (handle !== this.handle) {
-      this.handle.removeRef(this);
-      this.handle = handle;
-     }
-    }
-   }
-   return count;
-  };
-  Reference.prototype.unref = function() {
-   var oldRefcount = this.refCount();
-   var refcount = _super.prototype.unref.call(this);
-   if (oldRefcount === 1 && refcount === 0) {
-    if (this.objWeakRef) {
-     var obj = this.objWeakRef.deref();
-     if (obj) {
-      this._setWeak(obj);
-     }
-    }
-    this.handle.tryDispose();
-   }
-   return refcount;
-  };
-  Reference.prototype.get = function() {
-   var _a;
-   if (this.objWeakRef) {
-    var obj = this.objWeakRef.deref();
-    if (obj) {
-     var handle = this.envObject.ensureHandle(obj);
-     handle.addRef(this);
-     if (handle !== this.handle) {
-      this.handle.removeRef(this);
-      this.handle = handle;
-     }
-     return handle.id;
-    }
-   } else {
-    if ((_a = this.handle) === null || _a === void 0 ? void 0 : _a.value) {
-     return this.handle.id;
-    }
-   }
-   return 0;
-  };
-  Reference.prototype._setWeak = function(value) {
-   if (!supportFinalizer || this.finalizerRegistered) return;
-   Reference.finalizationGroup.register(value, this, this);
-   this.finalizerRegistered = true;
-  };
-  Reference.prototype._clearWeak = function() {
-   if (!supportFinalizer || !this.finalizerRegistered) return;
-   try {
-    this.finalizerRegistered = false;
-    Reference.finalizationGroup.unregister(this);
-   } catch (_) {}
-  };
-  Reference.prototype.finalize = function(isEnvTeardown) {
-   if (isEnvTeardown === void 0) {
-    isEnvTeardown = false;
-   }
-   if (isEnvTeardown) {
-    this._clearWeak();
-   }
-   _super.prototype.finalize.call(this, isEnvTeardown);
-  };
-  Reference.prototype.dispose = function() {
-   if (this.id === 0) return;
-   refStore.remove(this.id);
-   this.handle.removeRef(this);
-   this._clearWeak();
-   this.handle = undefined;
-   _super.prototype.dispose.call(this);
-   this.id = 0;
-  };
-  Reference.finalizationGroup = supportFinalizer ? new FinalizationRegistry(function(ref) {
-   ref.finalize(false);
-  }) : null;
-  return Reference;
- }(RefBase);
- var Deferred = function() {
-  function Deferred(envObject, value) {
-   this.id = 0;
-   this.envObject = envObject;
-   this.value = value;
-  }
-  Deferred.create = function(envObject, value) {
-   var deferred = new Deferred(envObject, value);
-   deferredStore.add(deferred);
-   return deferred;
-  };
-  Deferred.prototype.resolve = function(value) {
-   this.value.resolve(value);
-   this.dispose();
-  };
-  Deferred.prototype.reject = function(reason) {
-   this.value.reject(reason);
-   this.dispose();
-  };
-  Deferred.prototype.dispose = function() {
-   deferredStore.remove(this.id);
-   this.id = 0;
-   this.value = null;
-  };
-  return Deferred;
- }();
- var CallbackInfo = function() {
-  function CallbackInfo(envObject, _this, _data, _length, _args, _newTarget) {
-   this.envObject = envObject;
-   this._this = _this;
-   this._data = _data;
-   this._length = _length;
-   this._args = _args;
-   this._newTarget = _newTarget;
-   this.id = 0;
-   this._isConstructCall = Boolean(_newTarget);
-  }
-  CallbackInfo.create = function(envObject, _this, _data, _length, _args, _newTarget) {
-   var cbInfo = new CallbackInfo(envObject, _this, _data, _length, _args, _newTarget);
-   cbInfoStore.add(cbInfo);
-   return cbInfo;
-  };
-  CallbackInfo.prototype.dispose = function() {
-   cbInfoStore.remove(this.id);
-   this.id = 0;
-   this._this = undefined;
-   this._data = 0;
-   this._length = 0;
-   this._args = undefined;
-   this._newTarget = undefined;
-   this._isConstructCall = false;
-  };
-  return CallbackInfo;
- }();
- Object.defineProperty(exports, "version", {
-  configurable: true,
-  enumerable: true,
-  writable: false,
-  value: "0.20.0"
- });
- exports.CallbackInfo = CallbackInfo;
- exports.CallbackInfoStore = CallbackInfoStore;
- exports.Deferred = Deferred;
- exports.DeferredStore = DeferredStore;
- exports.EmnapiError = EmnapiError;
- exports.Env = Env;
- exports.EnvStore = EnvStore;
- exports.EscapableHandleScope = EscapableHandleScope;
- exports.ExternalHandle = ExternalHandle;
- exports.Finalizer = Finalizer;
- exports.Handle = Handle;
- exports.HandleScope = HandleScope;
- exports.HandleStore = HandleStore;
- exports.NotSupportBigIntError = NotSupportBigIntError;
- exports.NotSupportWeakRefError = NotSupportWeakRefError;
- exports.RefBase = RefBase;
- exports.RefStore = RefStore;
- exports.RefTracker = RefTracker;
- exports.Reference = Reference;
- exports.ScopeStore = ScopeStore;
- exports.Store = Store;
- exports.TryCatch = TryCatch;
- exports.addToCurrentScope = addToCurrentScope;
- exports.cbInfoStore = cbInfoStore;
- exports.checkArgs = checkArgs;
- exports.checkEnv = checkEnv;
- exports.closeScope = closeScope;
- exports.deferredStore = deferredStore;
- exports.envStore = envStore;
- exports.getCurrentScope = getCurrentScope;
- exports.handleStore = handleStore;
- exports.openScope = openScope;
- exports.preamble = preamble;
- exports.refStore = refStore;
- exports.scopeStore = scopeStore;
- exports.supportBigInt = supportBigInt;
- exports.supportFinalizer = supportFinalizer;
- exports.supportNewFunction = supportNewFunction;
- exports.supportReflect = supportReflect;
- Object.defineProperty(exports, "__esModule", {
-  value: true
- });
- return exports;
-}({});
+emnapiExternalMemory.init();
 
-emnapiInit();
+emnapiUtf8Decoder();
 
 var proxiedFunctionTable = [ null, _proc_exit, exitOnMainThread, pthreadCreateProxied, ___syscall_dup, ___syscall_faccessat, ___syscall_fcntl64, ___syscall_fstat64, ___syscall_ftruncate64, ___syscall_getcwd, ___syscall_ioctl, ___syscall_lstat64, ___syscall_newfstatat, ___syscall_openat, ___syscall_rmdir, ___syscall_stat64, ___syscall_unlinkat, __mmap_js, __munmap_js, _environ_get, _environ_sizes_get, _fd_close, _fd_fdstat_get, _fd_read, _fd_seek, _fd_write ];
 
@@ -8142,6 +7424,7 @@ var asmLibraryArg = {
  "__cxa_end_catch": ___cxa_end_catch,
  "__cxa_find_matching_catch_2": ___cxa_find_matching_catch_2,
  "__cxa_find_matching_catch_3": ___cxa_find_matching_catch_3,
+ "__cxa_find_matching_catch_4": ___cxa_find_matching_catch_4,
  "__cxa_rethrow": ___cxa_rethrow,
  "__cxa_throw": ___cxa_throw,
  "__cxa_uncaught_exceptions": ___cxa_uncaught_exceptions,
@@ -8165,6 +7448,7 @@ var asmLibraryArg = {
  "_dlinit": __dlinit,
  "_dlopen_js": __dlopen_js,
  "_emnapi_call_into_module": __emnapi_call_into_module,
+ "_emnapi_get_last_error_info": __emnapi_get_last_error_info,
  "_emnapi_set_immediate": __emnapi_set_immediate,
  "_emscripten_default_pthread_stack_size": __emscripten_default_pthread_stack_size,
  "_emscripten_err": __emscripten_err,
@@ -8178,7 +7462,6 @@ var asmLibraryArg = {
  "_munmap_js": __munmap_js,
  "_tzset_js": __tzset_js,
  "abort": _abort,
- "emnapi_create_external_uint8array": _emnapi_create_external_uint8array,
  "emscripten_check_blocking_allowed": _emscripten_check_blocking_allowed,
  "emscripten_date_now": _emscripten_date_now,
  "emscripten_get_heap_max": _emscripten_get_heap_max,
@@ -8260,8 +7543,10 @@ var asmLibraryArg = {
  "napi_close_handle_scope": _napi_close_handle_scope,
  "napi_create_array": _napi_create_array,
  "napi_create_array_with_length": _napi_create_array_with_length,
+ "napi_create_buffer_copy": _napi_create_buffer_copy,
  "napi_create_double": _napi_create_double,
  "napi_create_error": _napi_create_error,
+ "napi_create_external_buffer": _napi_create_external_buffer,
  "napi_create_function": _napi_create_function,
  "napi_create_object": _napi_create_object,
  "napi_create_reference": _napi_create_reference,
@@ -8277,8 +7562,6 @@ var asmLibraryArg = {
  "napi_get_boolean": _napi_get_boolean,
  "napi_get_cb_info": _napi_get_cb_info,
  "napi_get_element": _napi_get_element,
- "napi_get_global": _napi_get_global,
- "napi_get_last_error_info": _napi_get_last_error_info,
  "napi_get_named_property": _napi_get_named_property,
  "napi_get_null": _napi_get_null,
  "napi_get_property": _napi_get_property,
@@ -8311,8 +7594,6 @@ var asmLibraryArg = {
 var asm = createWasm();
 
 var ___wasm_call_ctors = Module["___wasm_call_ctors"] = asm["__wasm_call_ctors"];
-
-var __emnapi_runtime_init = Module["__emnapi_runtime_init"] = asm["_emnapi_runtime_init"];
 
 var _free = Module["_free"] = asm["free"];
 
@@ -8378,9 +7659,9 @@ var ___cxa_can_catch = Module["___cxa_can_catch"] = asm["__cxa_can_catch"];
 
 var ___cxa_is_pointer_type = Module["___cxa_is_pointer_type"] = asm["__cxa_is_pointer_type"];
 
-var ___start_em_js = Module["___start_em_js"] = 1879700;
+var ___start_em_js = Module["___start_em_js"] = 1888808;
 
-var ___stop_em_js = Module["___stop_em_js"] = 1890128;
+var ___stop_em_js = Module["___stop_em_js"] = 1899236;
 
 function invoke_vii(index, a1, a2) {
  var sp = stackSave();
@@ -8437,6 +7718,17 @@ function invoke_iii(index, a1, a2) {
  }
 }
 
+function invoke_viiiii(index, a1, a2, a3, a4, a5) {
+ var sp = stackSave();
+ try {
+  getWasmTableEntry(index)(a1, a2, a3, a4, a5);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
 function invoke_ii(index, a1) {
  var sp = stackSave();
  try {
@@ -8457,17 +7749,6 @@ function invoke_jii(index, a1, a2) {
   if (e !== e + 0) throw e;
   _setThrew(1, 0);
   return 0n;
- }
-}
-
-function invoke_viiiii(index, a1, a2, a3, a4, a5) {
- var sp = stackSave();
- try {
-  getWasmTableEntry(index)(a1, a2, a3, a4, a5);
- } catch (e) {
-  stackRestore(sp);
-  if (e !== e + 0) throw e;
-  _setThrew(1, 0);
  }
 }
 
@@ -8881,10 +8162,10 @@ function invoke_viij(index, a1, a2, a3) {
  }
 }
 
-function invoke_iiijii(index, a1, a2, a3, a4, a5) {
+function invoke_iiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9) {
  var sp = stackSave();
  try {
-  return getWasmTableEntry(index)(a1, a2, a3, a4, a5);
+  return getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9);
  } catch (e) {
   stackRestore(sp);
   if (e !== e + 0) throw e;
@@ -8903,10 +8184,10 @@ function invoke_diiii(index, a1, a2, a3, a4) {
  }
 }
 
-function invoke_iiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9) {
+function invoke_viiiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) {
  var sp = stackSave();
  try {
-  return getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9);
+  getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11);
  } catch (e) {
   stackRestore(sp);
   if (e !== e + 0) throw e;
@@ -8914,10 +8195,10 @@ function invoke_iiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9) {
  }
 }
 
-function invoke_viiiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) {
+function invoke_iiijii(index, a1, a2, a3, a4, a5) {
  var sp = stackSave();
  try {
-  getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11);
+  return getWasmTableEntry(index)(a1, a2, a3, a4, a5);
  } catch (e) {
   stackRestore(sp);
   if (e !== e + 0) throw e;
@@ -8930,6 +8211,8 @@ Module["keepRuntimeAlive"] = keepRuntimeAlive;
 Module["wasmMemory"] = wasmMemory;
 
 Module["ExitStatus"] = ExitStatus;
+
+Module["emnapiInit"] = emnapiInit;
 
 var calledRun;
 

@@ -81,20 +81,6 @@ namespace sharp {
     return vector;
   }
 
-#ifdef __EMSCRIPTEN__
-  Napi::Value NewOrCopyBuffer(Napi::Env env, char *data, size_t length) {
-    napi_value uint8array_handle;
-    napi_status status = emnapi_create_external_uint8array(
-        env, data, length,
-        [](napi_env env, void* finalize_data, void* finalize_hint) {
-          g_free(finalize_data);
-        },
-        nullptr, &uint8array_handle);
-    NAPI_THROW_IF_FAILED(env, status, Napi::Value());
-    Napi::Value uint8array(env, uint8array_handle);
-    return env.Global().Get("Buffer").As<Napi::Function>().Get("from").As<Napi::Function>().Call({uint8array});
-  }
-#else
   Napi::Buffer<char> NewOrCopyBuffer(Napi::Env env, char* data, size_t len) {
     try {
       return Napi::Buffer<char>::New(env, data, len, FreeCallback);
@@ -103,7 +89,6 @@ namespace sharp {
     FreeCallback(nullptr, data);
     return buf;
   }
-#endif
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image
   InputDescriptor* CreateInputDescriptor(Napi::Object input) {

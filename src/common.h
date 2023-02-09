@@ -134,12 +134,7 @@ namespace sharp {
       vips_enum_from_nick(nullptr, type, AttrAsStr(obj, attr).data()));
   }
 
-#ifdef __EMSCRIPTEN__
-  Napi::Value
-#else
-  Napi::Buffer<char>
-#endif
-  NewOrCopyBuffer(Napi::Env env, char* data, size_t len);
+  Napi::Buffer<char> NewOrCopyBuffer(Napi::Env env, char* data, size_t len);
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image
   InputDescriptor* CreateInputDescriptor(Napi::Object input);
