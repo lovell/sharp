@@ -4,16 +4,37 @@
 
 Requires libvips v8.13.3
 
-### v0.31.3 - TBD
+### v0.31.3 - 21st December 2022
+
+* Add experimental support for JPEG-XL images. Requires libvips compiled with libjxl.
+  [#2731](https://github.com/lovell/sharp/issues/2731)
+
+* Add runtime detection of V8 memory cage, ensures compatibility with Electron 21 onwards.
+  [#3384](https://github.com/lovell/sharp/issues/3384)
 
 * Expose `interFrameMaxError` and `interPaletteMaxError` GIF optimisation properties.
   [#3401](https://github.com/lovell/sharp/issues/3401)
+
+* Allow installation on Linux with glibc patch versions e.g. Fedora 38.
+  [#3423](https://github.com/lovell/sharp/issues/3423)
+
+* Expand range of existing `sharpen` parameters to match libvips.
+  [#3427](https://github.com/lovell/sharp/issues/3427)
 
 * Prevent possible race condition awaiting metadata of Stream-based input.
   [#3451](https://github.com/lovell/sharp/issues/3451)
 
 * Improve `extractChannel` support for 16-bit output colourspaces.
   [#3453](https://github.com/lovell/sharp/issues/3453)
+
+* Ignore `sequentialRead` option when calculating image statistics.
+  [#3462](https://github.com/lovell/sharp/issues/3462)
+
+* Small performance improvement for operations that introduce a non-opaque background.
+  [#3465](https://github.com/lovell/sharp/issues/3465)
+
+* Ensure integral output of `linear` operation.
+  [#3468](https://github.com/lovell/sharp/issues/3468)
 
 ### v0.31.2 - 4th November 2022
 

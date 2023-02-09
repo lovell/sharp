@@ -76,6 +76,14 @@ namespace sharp {
     }
     return vector;
   }
+  Napi::Buffer<char> NewOrCopyBuffer(Napi::Env env, char* data, size_t len) {
+    try {
+      return Napi::Buffer<char>::New(env, data, len, FreeCallback);
+    } catch (Napi::Error const &err) {}
+    Napi::Buffer<char> buf = Napi::Buffer<char>::Copy(env, data, len);
+    FreeCallback(nullptr, data);
+    return buf;
+  }
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image
   InputDescriptor* CreateInputDescriptor(Napi::Object input) {
@@ -207,6 +215,9 @@ namespace sharp {
   bool IsAvif(std::string const &str) {
     return EndsWith(str, ".avif") || EndsWith(str, ".AVIF");
   }
+  bool IsJxl(std::string const &str) {
+    return EndsWith(str, ".jxl") || EndsWith(str, ".JXL");
+  }
   bool IsDz(std::string const &str) {
     return EndsWith(str, ".dzi") || EndsWith(str, ".DZI");
   }
@@ -237,6 +248,7 @@ namespace sharp {
       case ImageType::PPM: id = "ppm"; break;
       case ImageType::FITS: id = "fits"; break;
       case ImageType::EXR: id = "exr"; break;
+      case ImageType::JXL: id = "jxl"; break;
       case ImageType::VIPS: id = "vips"; break;
       case ImageType::RAW: id = "raw"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
@@ -281,6 +293,8 @@ namespace sharp {
     { "VipsForeignLoadPpmFile", ImageType::PPM },
     { "VipsForeignLoadFitsFile", ImageType::FITS },
     { "VipsForeignLoadOpenexr", ImageType::EXR },
+    { "VipsForeignLoadJxlFile", ImageType::JXL },
+    { "VipsForeignLoadJxlBuffer", ImageType::JXL },
     { "VipsForeignLoadVips", ImageType::VIPS },
     { "VipsForeignLoadVipsFile", ImageType::VIPS },
     { "VipsForeignLoadRaw", ImageType::RAW }
@@ -913,7 +927,7 @@ namespace sharp {
     // Add non-transparent alpha channel, if required
     if (colour[3] < 255.0 && !HasAlpha(image)) {
       image = image.bandjoin(
-        VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier));
+        VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier).cast(image.format()));
     }
     return std::make_tuple(image, alphaColour);
   }

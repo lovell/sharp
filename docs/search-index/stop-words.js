@@ -12,6 +12,7 @@ module.exports = [
   'and',
   'any',
   'are',
+  'available',
   'based',
   'been',
   'before',
@@ -74,10 +75,12 @@ module.exports = [
   'requires',
   'requiresharp',
   'returned',
+  'run',
   'same',
   'see',
   'set',
   'sets',
+  'sharp',
   'should',
   'since',
   'site',
@@ -116,5 +119,6 @@ module.exports = [
   'will',
   'with',
   'without',
-  'you'
+  'you',
+  'your'
 ];

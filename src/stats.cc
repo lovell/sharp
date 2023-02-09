@@ -176,6 +176,7 @@ Napi::Value stats(const Napi::CallbackInfo& info) {
 
   // Input
   baton->input = sharp::CreateInputDescriptor(options.Get("input").As<Napi::Object>());
+  baton->input->access = VIPS_ACCESS_RANDOM;
 
   // Function to notify of libvips warnings
   Napi::Function debuglog = options.Get("debuglog").As<Napi::Function>();

@@ -235,20 +235,20 @@ class MetadataWorker : public Napi::AsyncWorker {
         info.Set("orientation", baton->orientation);
       }
       if (baton->exifLength > 0) {
-        info.Set("exif", Napi::Buffer<char>::New(env, baton->exif, baton->exifLength, sharp::FreeCallback));
+        info.Set("exif", sharp::NewOrCopyBuffer(env, baton->exif, baton->exifLength));
       }
       if (baton->iccLength > 0) {
-        info.Set("icc", Napi::Buffer<char>::New(env, baton->icc, baton->iccLength, sharp::FreeCallback));
+        info.Set("icc", sharp::NewOrCopyBuffer(env, baton->icc, baton->iccLength));
       }
       if (baton->iptcLength > 0) {
-        info.Set("iptc", Napi::Buffer<char>::New(env, baton->iptc, baton->iptcLength, sharp::FreeCallback));
+        info.Set("iptc", sharp::NewOrCopyBuffer(env, baton->iptc, baton->iptcLength));
       }
       if (baton->xmpLength > 0) {
-        info.Set("xmp", Napi::Buffer<char>::New(env, baton->xmp, baton->xmpLength, sharp::FreeCallback));
+        info.Set("xmp", sharp::NewOrCopyBuffer(env, baton->xmp, baton->xmpLength));
       }
       if (baton->tifftagPhotoshopLength > 0) {
         info.Set("tifftagPhotoshop",
-          Napi::Buffer<char>::New(env, baton->tifftagPhotoshop, baton->tifftagPhotoshopLength, sharp::FreeCallback));
+          sharp::NewOrCopyBuffer(env, baton->tifftagPhotoshop, baton->tifftagPhotoshopLength));
       }
       Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
     } else {

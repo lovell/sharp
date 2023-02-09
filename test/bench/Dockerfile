@@ -9,7 +9,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
 # Install benchmark dependencies
-RUN apt-get install -y imagemagick libmagick++-dev graphicsmagick libmapnik-dev
+RUN apt-get install -y imagemagick libmagick++-dev graphicsmagick
 
 # Install sharp
 RUN mkdir /tmp/sharp
@@ -17,7 +17,7 @@ RUN cd /tmp && git clone --single-branch --branch $BRANCH https://github.com/lov
 RUN cd /tmp/sharp && npm install --build-from-source
 
 # Install benchmark test
-RUN cd /tmp/sharp/test/bench && npm install
+RUN cd /tmp/sharp/test/bench && npm install --omit optional
 
 RUN cat /etc/os-release | grep VERSION=
 RUN node -v

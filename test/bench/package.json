@@ -7,17 +7,19 @@
   "scripts": {
     "test": "node perf && node random && node parallel"
   },
-  "devDependencies": {
+  "dependencies": {
     "@squoosh/cli": "0.7.2",
     "@squoosh/lib": "0.4.0",
-    "@tensorflow/tfjs-node": "3.20.0",
     "async": "3.2.4",
     "benchmark": "2.1.4",
-    "gm": "1.24.0",
+    "gm": "1.25.0",
     "imagemagick": "0.1.3",
     "jimp": "0.16.2",
-    "mapnik": "4.5.9",
-    "semver": "7.3.7"
+    "semver": "7.3.8"
+  },
+  "optionalDependencies": {
+    "@tensorflow/tfjs-node": "4.1.0",
+    "mapnik": "4.5.9"
   },
   "license": "Apache-2.0",
   "engines": {

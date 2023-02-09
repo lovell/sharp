@@ -349,6 +349,13 @@
   fun:heif_context_read_from_reader
 }
 
+# orc
+{
+  addr_orcexec
+  Memcheck:Addr1
+  obj:*/orcexec.*
+}
+
 # libvips
 {
   cond_libvips_interpolate_lbb
@@ -944,4 +951,14 @@
   fun:_ZZN4node7binding6DLOpenERKN2v820FunctionCallbackInfoINS1_5ValueEEEENKUlPNS0_4DLibEE_clES8_
   fun:_ZN4node7binding6DLOpenERKN2v820FunctionCallbackInfoINS1_5ValueEEE
   fun:_ZN2v88internal12_GLOBAL__N_119HandleApiCallHelperILb0EEENS0_11MaybeHandleINS0_6ObjectEEEPNS0_7IsolateENS0_6HandleINS0_10HeapObjectEEESA_NS8_INS0_20FunctionTemplateInfoEEENS8_IS4_EENS0_16BuiltinArgumentsE
+}
+{
+  addr_node_binding_dlopen_strncmp
+  Memcheck:Addr8
+  fun:strncmp
+  fun:is_dst
+  ...
+  fun:dlopen_implementation
+  ...
+  fun:_ZNSt17_Function_handlerIFbPN4node7binding4DLibEEZNS1_6DLOpenERKN2v820FunctionCallbackInfoINS5_5ValueEEEEUlS3_E_E9_M_invokeERKSt9_Any_dataOS3_
 }

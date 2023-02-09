@@ -110,32 +110,32 @@ describe('Sharpen', function () {
 
   it('invalid options.sigma', () => assert.throws(
     () => sharp().sharpen({ sigma: -1 }),
-    /Expected number between 0\.01 and 10000 for options\.sigma but received -1 of type number/
+    /Expected number between 0\.000001 and 10000 for options\.sigma but received -1 of type number/
   ));
 
   it('invalid options.m1', () => assert.throws(
     () => sharp().sharpen({ sigma: 1, m1: -1 }),
-    /Expected number between 0 and 10000 for options\.m1 but received -1 of type number/
+    /Expected number between 0 and 1000000 for options\.m1 but received -1 of type number/
   ));
 
   it('invalid options.m2', () => assert.throws(
     () => sharp().sharpen({ sigma: 1, m2: -1 }),
-    /Expected number between 0 and 10000 for options\.m2 but received -1 of type number/
+    /Expected number between 0 and 1000000 for options\.m2 but received -1 of type number/
   ));
 
   it('invalid options.x1', () => assert.throws(
     () => sharp().sharpen({ sigma: 1, x1: -1 }),
-    /Expected number between 0 and 10000 for options\.x1 but received -1 of type number/
+    /Expected number between 0 and 1000000 for options\.x1 but received -1 of type number/
   ));
 
   it('invalid options.y2', () => assert.throws(
     () => sharp().sharpen({ sigma: 1, y2: -1 }),
-    /Expected number between 0 and 10000 for options\.y2 but received -1 of type number/
+    /Expected number between 0 and 1000000 for options\.y2 but received -1 of type number/
   ));
 
   it('invalid options.y3', () => assert.throws(
     () => sharp().sharpen({ sigma: 1, y3: -1 }),
-    /Expected number between 0 and 10000 for options\.y3 but received -1 of type number/
+    /Expected number between 0 and 1000000 for options\.y3 but received -1 of type number/
   ));
 
   it('sharpened image is larger than non-sharpened', function (done) {

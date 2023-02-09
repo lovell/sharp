@@ -138,7 +138,8 @@ try {
     const libcFamily = detectLibc.familySync();
     const libcVersion = detectLibc.versionSync();
     if (libcFamily === detectLibc.GLIBC && libcVersion && minimumGlibcVersionByArch[arch]) {
-      if (semverLessThan(`${libcVersion}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
+      const libcVersionWithoutPatch = libcVersion.split('.').slice(0, 2).join('.');
+      if (semverLessThan(`${libcVersionWithoutPatch}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
         handleError(new Error(`Use with glibc ${libcVersion} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
       }
     }
@@ -167,7 +168,7 @@ try {
     } else {
       const url = distBaseUrl + tarFilename;
       libvips.log(`Downloading ${url}`);
-      simpleGet({ url: url, agent: agent() }, function (err, response) {
+      simpleGet({ url: url, agent: agent(libvips.log) }, function (err, response) {
         if (err) {
           fail(err);
         } else if (response.statusCode === 404) {
