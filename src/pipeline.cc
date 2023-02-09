@@ -440,7 +440,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
-                left, top, width, height, background, nPages, &targetPageHeight)
+                left, top, width, height, VIPS_EXTEND_BACKGROUND, background, nPages, &targetPageHeight)
             : image.embed(left, top, width, height, VImage::option()
               ->set("extend", VIPS_EXTEND_BACKGROUND)
               ->set("background", background));
@@ -531,18 +531,37 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Extend edges
       if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
-        std::vector<double> background;
-        std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
-
+        VipsExtend extend = VIPS_EXTEND_BACKGROUND;
+        if (baton->extendMode == 1) {
+          extend = VIPS_EXTEND_COPY;
+        } else if (baton->extendMode == 2) {
+          extend = VIPS_EXTEND_REPEAT;
+        } else if (baton->extendMode == 3) {
+          extend = VIPS_EXTEND_MIRROR;
+        }
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
         baton->height = (nPages > 1 ? targetPageHeight : image.height()) + baton->extendTop + baton->extendBottom;
 
-        image = nPages > 1
-          ? sharp::EmbedMultiPage(image,
-              baton->extendLeft, baton->extendTop, baton->width, baton->height, background, nPages, &targetPageHeight)
-          : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
-              VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
+        if (extend == VIPS_EXTEND_BACKGROUND) {
+          std::vector<double> background;
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
+
+          image = nPages > 1
+            ? sharp::EmbedMultiPage(image,
+                baton->extendLeft, baton->extendTop, baton->width, baton->height,
+                extend, background, nPages, &targetPageHeight)
+            : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
+                VImage::option()->set("extend", extend)->set("background", background));
+        } else {
+          std::vector<double> ignoredBackground(1);
+          image = nPages > 1
+            ? sharp::EmbedMultiPage(image,
+                baton->extendLeft, baton->extendTop, baton->width, baton->height,
+                extend, ignoredBackground, nPages, &targetPageHeight)
+            : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
+                VImage::option()->set("extend", extend));
+        }
       }
       // Median - must happen before blurring, due to the utility of blurring after thresholding
       if (baton->medianSize > 0) {
@@ -1499,6 +1518,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->extendLeft = sharp::AttrAsInt32(options, "extendLeft");
   baton->extendRight = sharp::AttrAsInt32(options, "extendRight");
   baton->extendBackground = sharp::AttrAsVectorOfDouble(options, "extendBackground");
+  baton->extendMode = sharp::AttrAsInt32(options, "extendMode");
   baton->extractChannel = sharp::AttrAsInt32(options, "extractChannel");
   baton->affineMatrix = sharp::AttrAsVectorOfDouble(options, "affineMatrix");
   baton->affineBackground = sharp::AttrAsVectorOfDouble(options, "affineBackground");
