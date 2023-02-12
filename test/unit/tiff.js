@@ -2,8 +2,6 @@
 
 const fs = require('fs');
 const assert = require('assert');
-const promisify = require('util').promisify;
-const rimraf = require('rimraf');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -128,7 +126,7 @@ describe('TIFF', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert.strictEqual(startSize, info.size);
-        rimraf(outputTiff, done);
+        fs.rm(outputTiff, done);
       });
   });
 
@@ -145,7 +143,7 @@ describe('TIFF', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < (startSize / 2));
-        rimraf(outputTiff, done);
+        fs.rm(outputTiff, done);
       });
   });
 
@@ -167,7 +165,7 @@ describe('TIFF', function () {
         .metadata()
         .then(({ density }) => {
           assert.strictEqual(25400, density);
-          return promisify(rimraf)(outputTiff);
+          return fs.promises.rm(outputTiff);
         })
       )
   );
@@ -232,7 +230,7 @@ describe('TIFF', function () {
         assert.strictEqual('tiff', info.format);
         assert.strictEqual(3, info.channels);
         assert(info.size < startSize);
-        rimraf(outputTiff, done);
+        fs.rm(outputTiff, done);
       });
   });
 
@@ -284,7 +282,7 @@ describe('TIFF', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        rimraf(outputTiff, done);
+        fs.rm(outputTiff, done);
       });
   });
 
@@ -323,7 +321,7 @@ describe('TIFF', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        rimraf(outputTiff, done);
+        fs.rm(outputTiff, done);
       });
   });
 
@@ -338,7 +336,7 @@ describe('TIFF', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(startSize > info.size);
-        rimraf(outputTiff, done);
+        fs.rm(outputTiff, done);
       });
   });
 
@@ -353,7 +351,7 @@ describe('TIFF', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        rimraf(outputTiff, done);
+        fs.rm(outputTiff, done);
       });
   });
 
@@ -367,7 +365,7 @@ describe('TIFF', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size < startSize);
-        rimraf(outputTiff, done);
+        fs.rm(outputTiff, done);
       });
   });
 
@@ -445,7 +443,7 @@ describe('TIFF', function () {
         if (err) throw err;
         assert.strictEqual('tiff', info.format);
         assert(info.size > startSize);
-        rimraf(outputTiff, done);
+        fs.rm(outputTiff, done);
       });
   });
 

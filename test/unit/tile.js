@@ -5,7 +5,6 @@ const path = require('path');
 const assert = require('assert');
 
 const eachLimit = require('async/eachLimit');
-const rimraf = require('rimraf');
 const extractZip = require('extract-zip');
 
 const sharp = require('../../');
@@ -327,7 +326,7 @@ describe('Tile', function () {
 
   it('Deep Zoom layout', function (done) {
     const directory = fixtures.path('output.dzi_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .toFile(fixtures.path('output.dzi'), function (err, info) {
           if (err) throw err;
@@ -343,7 +342,7 @@ describe('Tile', function () {
 
   it('Deep Zoom layout with custom size+overlap', function (done) {
     const directory = fixtures.path('output.512.dzi_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           size: 512,
@@ -365,7 +364,7 @@ describe('Tile', function () {
 
   it('Deep Zoom layout with custom size+angle', function (done) {
     const directory = fixtures.path('output.512_90.dzi_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           size: 512,
@@ -399,7 +398,7 @@ describe('Tile', function () {
 
   it('Deep Zoom layout with depth of one', function (done) {
     const directory = fixtures.path('output.512_depth_one.dzi_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           size: 512,
@@ -415,7 +414,7 @@ describe('Tile', function () {
 
   it('Deep Zoom layout with depth of onepixel', function (done) {
     const directory = fixtures.path('output.512_depth_onepixel.dzi_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           size: 512,
@@ -431,7 +430,7 @@ describe('Tile', function () {
 
   it('Deep Zoom layout with depth of onetile', function (done) {
     const directory = fixtures.path('output.256_depth_onetile.dzi_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           size: 256,
@@ -447,7 +446,7 @@ describe('Tile', function () {
 
   it('Deep Zoom layout with skipBlanks', function (done) {
     const directory = fixtures.path('output.256_skip_blanks.dzi_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpgOverlayLayer2)
         .tile({
           size: 256,
@@ -466,7 +465,7 @@ describe('Tile', function () {
 
   it('Zoomify layout', function (done) {
     const directory = fixtures.path('output.zoomify.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           layout: 'zoomify'
@@ -490,7 +489,7 @@ describe('Tile', function () {
 
   it('Zoomify layout with depth one', function (done) {
     const directory = fixtures.path('output.zoomify.depth_one.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           size: 256,
@@ -511,7 +510,7 @@ describe('Tile', function () {
 
   it('Zoomify layout with depth onetile', function (done) {
     const directory = fixtures.path('output.zoomify.depth_onetile.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           size: 256,
@@ -532,7 +531,7 @@ describe('Tile', function () {
 
   it('Zoomify layout with depth onepixel', function (done) {
     const directory = fixtures.path('output.zoomify.depth_onepixel.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           size: 256,
@@ -553,7 +552,7 @@ describe('Tile', function () {
 
   it('Zoomify layout with skip blanks', function (done) {
     const directory = fixtures.path('output.zoomify.skipBlanks.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpgOverlayLayer2)
         .tile({
           size: 256,
@@ -577,7 +576,7 @@ describe('Tile', function () {
 
   it('Google layout', function (done) {
     const directory = fixtures.path('output.google.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           layout: 'google'
@@ -601,7 +600,7 @@ describe('Tile', function () {
 
   it('Google layout with jpeg format', function (done) {
     const directory = fixtures.path('output.jpg.google.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .jpeg({
           quality: 1
@@ -638,7 +637,7 @@ describe('Tile', function () {
 
   it('Google layout with png format', function (done) {
     const directory = fixtures.path('output.png.google.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .png({
           compressionLevel: 0
@@ -675,7 +674,7 @@ describe('Tile', function () {
 
   it('Google layout with webp format', function (done) {
     const directory = fixtures.path('output.webp.google.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .webp({
           quality: 1,
@@ -713,7 +712,7 @@ describe('Tile', function () {
 
   it('Google layout with depth one', function (done) {
     const directory = fixtures.path('output.google_depth_one.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           layout: 'google',
@@ -735,7 +734,7 @@ describe('Tile', function () {
 
   it('Google layout with depth onepixel', function (done) {
     const directory = fixtures.path('output.google_depth_onepixel.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           layout: 'google',
@@ -757,7 +756,7 @@ describe('Tile', function () {
 
   it('Google layout with depth onetile', function (done) {
     const directory = fixtures.path('output.google_depth_onetile.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           layout: 'google',
@@ -779,7 +778,7 @@ describe('Tile', function () {
 
   it('Google layout with default skip Blanks', function (done) {
     const directory = fixtures.path('output.google_depth_skipBlanks.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputPng)
         .tile({
           layout: 'google',
@@ -804,7 +803,7 @@ describe('Tile', function () {
 
   it('Google layout with center image in tile', function (done) {
     const directory = fixtures.path('output.google_center.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           center: true,
@@ -824,7 +823,7 @@ describe('Tile', function () {
 
   it('Google layout with center image in tile centre', function (done) {
     const directory = fixtures.path('output.google_center.dzi');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           centre: true,
@@ -845,7 +844,7 @@ describe('Tile', function () {
   it('IIIFv2 layout', function (done) {
     const name = 'output.iiif.info';
     const directory = fixtures.path(name);
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       const id = 'https://sharp.test.com/iiif';
       sharp(fixtures.inputJpg)
         .tile({
@@ -875,7 +874,7 @@ describe('Tile', function () {
   it('IIIFv3 layout', function (done) {
     const name = 'output.iiif3.info';
     const directory = fixtures.path(name);
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       const id = 'https://sharp.test.com/iiif3';
       sharp(fixtures.inputJpg)
         .tile({
@@ -907,7 +906,7 @@ describe('Tile', function () {
     const container = fixtures.path('output.dz.container.zip');
     const extractTo = fixtures.path('output.dz.container');
     const directory = path.join(extractTo, 'output.dz.container_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .toFile(container, function (err, info) {
           if (err) throw err;
@@ -934,7 +933,7 @@ describe('Tile', function () {
     const container = fixtures.path('output.dz.containeropt.zip');
     const extractTo = fixtures.path('output.dz.containeropt');
     const directory = path.join(extractTo, 'output.dz.containeropt_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({
           container: 'zip'
@@ -965,7 +964,7 @@ describe('Tile', function () {
     const container = fixtures.path('output.dz.tiles.zip');
     const extractTo = fixtures.path('output.dz.tiles');
     const directory = path.join(extractTo, 'output.dz.tiles_files');
-    rimraf(directory, function () {
+    fs.rm(directory, { recursive: true }, function () {
       sharp(fixtures.inputJpg)
         .tile({ basename: 'output.dz.tiles' })
         .toBuffer(function (err, data, info) {
