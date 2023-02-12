@@ -652,6 +652,7 @@ describe('Input/output', function () {
   it('toFormat=JPEG takes precedence over WebP extension', function (done) {
     const outputWebP = fixtures.path('output.webp');
     sharp(fixtures.inputPng)
+      .resize(8)
       .jpeg()
       .toFile(outputWebP, function (err, info) {
         if (err) throw err;
@@ -662,6 +663,7 @@ describe('Input/output', function () {
 
   it('toFormat=WebP takes precedence over JPEG extension', function (done) {
     sharp(fixtures.inputPng)
+      .resize(8)
       .webp()
       .toFile(outputJpg, function (err, info) {
         if (err) throw err;
@@ -695,6 +697,27 @@ describe('Input/output', function () {
         assert.strictEqual(60, info.height);
         rimraf(outputV, done);
       });
+  });
+
+  it('can ignore ICC profile', async () => {
+    const [r1, g1, b1] = await sharp(fixtures.inputJpgWithPortraitExif5, { ignoreIcc: true })
+      .extract({ width: 1, height: 1, top: 16, left: 16 })
+      .raw()
+      .toBuffer();
+
+    const [r2, g2, b2] = await sharp(fixtures.inputJpgWithPortraitExif5, { ignoreIcc: false })
+      .extract({ width: 1, height: 1, top: 16, left: 16 })
+      .raw()
+      .toBuffer();
+
+    assert.deepStrictEqual({ r1, g1, b1, r2, g2, b2 }, {
+      r1: 60,
+      r2: 77,
+      g1: 54,
+      g2: 69,
+      b1: 20,
+      b2: 25
+    });
   });
 
   describe('Switch off safety limits for certain formats', () => {
@@ -815,6 +838,11 @@ describe('Input/output', function () {
       assert.throws(function () {
         sharp({ density: 'zoinks' });
       }, /Expected number between 1 and 100000 for density but received zoinks of type string/);
+    });
+    it('Invalid ignoreIcc: string', function () {
+      assert.throws(function () {
+        sharp({ ignoreIcc: 'zoinks' });
+      }, /Expected boolean for ignoreIcc but received zoinks of type string/);
     });
     it('Setting animated property updates pages property', function () {
       assert.strictEqual(sharp({ animated: false }).options.input.pages, 1);

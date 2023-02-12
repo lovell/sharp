@@ -18,6 +18,8 @@ Requires libvips v8.14.0
 
 * Prefer integer (un)premultiply for faster resizing of RGBA images.
 
+* Add `ignoreIcc` input option to ignore embedded ICC profile.
+
 * Allow use of GPS (IFD3) EXIF metadata.
   [#2767](https://github.com/lovell/sharp/issues/2767)
 

@@ -814,6 +814,8 @@ declare namespace sharp {
         sequentialRead?: boolean | undefined;
         /** Number representing the DPI for vector images in the range 1 to 100000. (optional, default 72) */
         density?: number | undefined;
+        /** Should the embedded ICC profile, if any, be ignored. */
+        ignoreIcc?: boolean | undefined;
         /** Number of pages to extract for multi-page input (GIF, TIFF, PDF), use -1 for all pages */
         pages?: number | undefined;
         /** Page number to start extracting from for multi-page input (GIF, TIFF, PDF), zero based. (optional, default 0) */

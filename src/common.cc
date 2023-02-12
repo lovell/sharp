@@ -103,6 +103,10 @@ namespace sharp {
     if (HasAttr(input, "density")) {
       descriptor->density = AttrAsDouble(input, "density");
     }
+    // Should we ignore any embedded ICC profile
+    if (HasAttr(input, "ignoreIcc")) {
+      descriptor->ignoreIcc = AttrAsBool(input, "ignoreIcc");
+    }
     // Raw pixel input
     if (HasAttr(input, "rawChannels")) {
       descriptor->rawDepth = AttrAsEnum<VipsBandFormat>(input, "rawDepth", VIPS_TYPE_BAND_FORMAT);

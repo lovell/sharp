@@ -55,6 +55,7 @@ namespace sharp {
     size_t bufferLength;
     bool isBuffer;
     double density;
+    bool ignoreIcc;
     VipsBandFormat rawDepth;
     int rawChannels;
     int rawWidth;
@@ -93,6 +94,7 @@ namespace sharp {
       bufferLength(0),
       isBuffer(FALSE),
       density(72.0),
+      ignoreIcc(FALSE),
       rawDepth(VIPS_FORMAT_UCHAR),
       rawChannels(0),
       rawWidth(0),

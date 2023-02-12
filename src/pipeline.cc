@@ -320,7 +320,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (
         sharp::HasProfile(image) &&
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
-        image.interpretation() != VIPS_INTERPRETATION_GREY16
+        image.interpretation() != VIPS_INTERPRETATION_GREY16 &&
+        !baton->input->ignoreIcc
       ) {
         // Convert to sRGB/P3 using embedded profile
         try {
@@ -329,7 +330,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
-          // Ignore failure of embedded profile
+          sharp::VipsWarningCallback(nullptr, G_LOG_LEVEL_WARNING, "Invalid embedded profile", nullptr);
         }
       } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
         image = image.icc_transform(processingProfile, VImage::option()
