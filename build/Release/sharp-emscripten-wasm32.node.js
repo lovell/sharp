@@ -67,7 +67,7 @@ Module.preRun = () => {
 
 Module.onRuntimeInitialized = () => {
  const emnapi = Module.emnapiInit({
-  context: require("@tybys/emnapi-runtime").createContext()
+  context: require("@emnapi/runtime").getDefaultContext()
  });
  for (const worker of PThread.runningWorkers) {
   worker.unref();
@@ -4786,10 +4786,12 @@ function __dlopen_js(filename, flag) {
 var emnapiModule = {
  exports: {},
  loaded: false,
- filename: null
+ filename: ""
 };
 
 var emnapiCtx = undefined;
+
+var emnapiNodeBinding = undefined;
 
 function emnapiInit(options) {
  if (emnapiModule.loaded) return emnapiModule.exports;
@@ -4798,13 +4800,22 @@ function emnapiInit(options) {
  }
  var context = options.context;
  if (typeof context !== "object" || context === null) {
-  throw new TypeError("Invalid `options.context`. You can create a context by `import { createContext } from '@tybys/emnapi-runtime`'");
+  throw new TypeError("Invalid `options.context`. Use `import { getDefaultContext } from '@emnapi/runtime'`");
  }
  emnapiCtx = context;
  if (typeof options.filename === "string") {
   emnapiModule.filename = options.filename;
  }
+ if ("nodeBinding" in options) {
+  var nodeBinding = options.nodeBinding;
+  if (typeof nodeBinding !== "object" || nodeBinding === null) {
+   throw new TypeError("Invalid `options.nodeBinding`. Use @emnapi/node-binding package");
+  }
+  emnapiNodeBinding = nodeBinding;
+ }
  var envObject = emnapiModule.envObject || (emnapiModule.envObject = emnapiCtx.createEnv(function(cb) {
+  return getWasmTableEntry(cb);
+ }, function(cb) {
   return getWasmTableEntry(cb);
  }));
  var scope = emnapiCtx.openScope(envObject);
@@ -4825,16 +4836,29 @@ function emnapiInit(options) {
  return emnapiModule.exports;
 }
 
-function __emnapi_call_into_module(env, callback, data) {
+function __emnapi_call_into_module(env, callback, data, close_scope_if_throw) {
  var envObject = emnapiCtx.envStore.get(env);
  var scope = emnapiCtx.openScope(envObject);
  try {
   envObject.callIntoModule(function() {
    getWasmTableEntry(callback)(env, data);
   });
- } finally {
+ } catch (err) {
   emnapiCtx.closeScope(envObject, scope);
+  if (close_scope_if_throw) {
+   emnapiCtx.closeScope(envObject);
+  }
+  throw err;
  }
+ emnapiCtx.closeScope(envObject, scope);
+}
+
+function __emnapi_ctx_decrease_waiting_request_counter() {
+ emnapiCtx.decreaseWaitingRequestCounter();
+}
+
+function __emnapi_ctx_increase_waiting_request_counter() {
+ emnapiCtx.increaseWaitingRequestCounter();
 }
 
 function __emnapi_get_last_error_info(env, error_code, engine_error_code, engine_reserved) {
@@ -4848,10 +4872,62 @@ function __emnapi_get_last_error_info(env, error_code, engine_error_code, engine
  GROWABLE_HEAP_U32()[engine_reserved >> 2] = engineReserved;
 }
 
+function __emnapi_node_emit_async_destroy(async_id, trigger_async_id) {
+ if (!emnapiNodeBinding) return;
+ emnapiNodeBinding.node.emitAsyncDestroy({
+  asyncId: async_id,
+  triggerAsyncId: trigger_async_id
+ });
+}
+
+function __emnapi_node_emit_async_init(async_resource, async_resource_name, trigger_async_id, result) {
+ if (!emnapiNodeBinding) return;
+ var resource = emnapiCtx.handleStore.get(async_resource).value;
+ var resource_name = emnapiCtx.handleStore.get(async_resource_name).value;
+ var asyncContext = emnapiNodeBinding.node.emitAsyncInit(resource, resource_name, trigger_async_id);
+ var asyncId = asyncContext.asyncId;
+ var triggerAsyncId = asyncContext.triggerAsyncId;
+ if (result) {
+  GROWABLE_HEAP_F64()[result >> 3] = asyncId;
+  GROWABLE_HEAP_F64()[result + 8 >> 3] = triggerAsyncId;
+ }
+}
+
+function __emnapi_node_make_callback(env, async_resource, cb, argv, size, async_id, trigger_async_id, result) {
+ var i = 0;
+ var v;
+ if (!emnapiNodeBinding) return;
+ var resource = emnapiCtx.handleStore.get(async_resource).value;
+ var callback = emnapiCtx.handleStore.get(cb).value;
+ size = size >>> 0;
+ var arr = Array(size);
+ for (;i < size; i++) {
+  var argVal = GROWABLE_HEAP_U32()[argv + i * 4 >> 2];
+  arr[i] = emnapiCtx.handleStore.get(argVal).value;
+ }
+ var ret = emnapiNodeBinding.node.makeCallback(resource, callback, arr, {
+  asyncId: async_id,
+  triggerAsyncId: trigger_async_id
+ });
+ if (result) {
+  var envObject = emnapiCtx.envStore.get(env);
+  v = envObject.ensureHandleId(ret);
+  GROWABLE_HEAP_U32()[result >> 2] = v;
+ }
+}
+
 function __emnapi_set_immediate(callback, data) {
  emnapiCtx.feature.setImmediate(function() {
   getWasmTableEntry(callback)(data);
  });
+}
+
+function __emnapi_worker_unref(pid) {
+ var worker = PThread.pthreads[pid];
+ worker = worker.worker || worker;
+ if (typeof worker.unref === "function") {
+  worker.unref();
+ }
 }
 
 function __emscripten_default_pthread_stack_size() {
@@ -5024,6 +5100,10 @@ function __tzset_js(timezone, daylight, tzname) {
 
 function _abort() {
  abort("");
+}
+
+function _emnapi_is_node_binding_available() {
+ return emnapiNodeBinding ? 1 : 0;
 }
 
 function warnOnce(text) {
@@ -5322,83 +5402,63 @@ function _llvm_eh_typeid_for(type) {
  return type;
 }
 
-function emnapiWrap(type, env, js_object, native_object, finalize_cb, finalize_hint, result) {
- var referenceId;
- if (env == 0) return 1;
- var envObject_14 = emnapiCtx.envStore.get(env);
- if (envObject_14.tryCatch.hasCaught()) return envObject_14.setLastError(10);
- envObject_14.clearLastError();
- try {
-  if (js_object == 0) return envObject_14.setLastError(1);
-  var handle_4 = emnapiCtx.handleStore.get(js_object);
-  if (!(handle_4.isObject() || handle_4.isFunction())) {
-   return envObject_14.setLastError(1);
-  }
-  if (typeof emnapiExternalMemory !== "undefined" && ArrayBuffer.isView(handle_4.value)) {
-   if (emnapiExternalMemory.wasmMemoryViewTable.has(handle_4.value)) {
-    handle_4 = emnapiCtx.addToCurrentScope(emnapiExternalMemory.wasmMemoryViewTable.get(handle_4.value));
-   }
-  }
-  if (type === 0) {
-   if (envObject_14.getObjectBinding(handle_4.value).wrapped !== 0) {
-    return envObject_14.setLastError(1);
-   }
-  } else if (type === 1) {
-   if (!finalize_cb) return envObject_14.setLastError(1);
-  }
-  var reference_1 = void 0;
-  if (result) {
-   if (!finalize_cb) return envObject_14.setLastError(1);
-   reference_1 = emnapiCtx.createReference(envObject_14, handle_4.id, 0, 1, finalize_cb, native_object, finalize_hint);
-   referenceId = reference_1.id;
-   GROWABLE_HEAP_U32()[result >> 2] = referenceId;
-  } else {
-   reference_1 = emnapiCtx.createReference(envObject_14, handle_4.id, 0, 0, finalize_cb, native_object, !finalize_cb ? finalize_cb : finalize_hint);
-  }
-  if (type === 0) {
-   envObject_14.getObjectBinding(handle_4.value).wrapped = reference_1.id;
-  }
-  return envObject_14.getReturnStatus();
- } catch (err_15) {
-  envObject_14.tryCatch.setError(err_15);
-  return envObject_14.setLastError(10);
+function emnapiGetHandle(js_object) {
+ var handle = emnapiCtx.handleStore.get(js_object);
+ if (!(handle.isObject() || handle.isFunction())) {
+  return {
+   status: 1
+  };
  }
+ if (typeof emnapiExternalMemory !== "undefined" && ArrayBuffer.isView(handle.value)) {
+  if (emnapiExternalMemory.wasmMemoryViewTable.has(handle.value)) {
+   handle = emnapiCtx.addToCurrentScope(emnapiExternalMemory.wasmMemoryViewTable.get(handle.value));
+  }
+ }
+ return {
+  status: 0,
+  handle: handle
+ };
 }
 
-function _napi_add_finalizer(env, js_object, native_object, finalize_cb, finalize_hint, result) {
+function _napi_add_finalizer(env, js_object, finalize_data, finalize_cb, finalize_hint, result) {
+ if (env == 0) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
  if (!emnapiCtx.feature.supportFinalizer) {
-  if (env == 0) return 1;
-  var envObject_48 = emnapiCtx.envStore.get(env);
-  if (envObject_48.tryCatch.hasCaught()) return envObject_48.setLastError(10);
-  envObject_48.clearLastError();
-  try {
-   throw emnapiCtx.createNotSupportWeakRefError("napi_add_finalizer", "This API is unavailable");
-   return null;
-  } catch (err_49) {
-   envObject_48.tryCatch.setError(err_49);
-   return envObject_48.setLastError(10);
-  }
+  return envObject.setLastError(9);
  }
- return emnapiWrap(1, env, js_object, native_object, finalize_cb, finalize_hint, result);
+ if (js_object == 0) return envObject.setLastError(1);
+ if (finalize_cb == 0) return envObject.setLastError(1);
+ var handleResult = emnapiGetHandle(js_object);
+ if (handleResult.status !== 0) {
+  return envObject.setLastError(handleResult.status);
+ }
+ var handle = handleResult.handle;
+ var ownership = !result ? 0 : 1;
+ var reference = emnapiCtx.createReference(envObject, handle.id, 0, ownership, finalize_cb, finalize_data, finalize_hint);
+ if (result) {
+  var referenceId = reference.id;
+  GROWABLE_HEAP_U32()[result >> 2] = referenceId;
+ }
+ return envObject.clearLastError();
 }
 
 function _napi_call_function(env, recv, func, argc, argv, result) {
  var i = 0;
  var v;
  if (env == 0) return 1;
- var envObject_12 = emnapiCtx.envStore.get(env);
- if (envObject_12.tryCatch.hasCaught()) return envObject_12.setLastError(10);
- envObject_12.clearLastError();
+ var envObject_11 = emnapiCtx.envStore.get(env);
+ if (envObject_11.tryCatch.hasCaught()) return envObject_11.setLastError(10);
+ envObject_11.clearLastError();
  try {
-  if (recv == 0) return envObject_12.setLastError(1);
+  if (recv == 0) return envObject_11.setLastError(1);
   argc = argc >>> 0;
   if (argc > 0) {
-   if (!argv) return envObject_12.setLastError(1);
+   if (!argv) return envObject_11.setLastError(1);
   }
   var v8recv_1 = emnapiCtx.handleStore.get(recv).value;
-  if (!func) return envObject_12.setLastError(1);
+  if (!func) return envObject_11.setLastError(1);
   var v8func_1 = emnapiCtx.handleStore.get(func).value;
-  if (typeof v8func_1 !== "function") return envObject_12.setLastError(1);
+  if (typeof v8func_1 !== "function") return envObject_11.setLastError(1);
   var args_1 = [];
   for (;i < argc; i++) {
    var argVal_1 = GROWABLE_HEAP_U32()[argv + i * 4 >> 2];
@@ -5406,13 +5466,13 @@ function _napi_call_function(env, recv, func, argc, argv, result) {
   }
   var ret_2 = v8func_1.apply(v8recv_1, args_1);
   if (result) {
-   v = envObject_12.ensureHandleId(ret_2);
+   v = envObject_11.ensureHandleId(ret_2);
    GROWABLE_HEAP_U32()[result >> 2] = v;
   }
-  return envObject_12.clearLastError();
- } catch (err_13) {
-  envObject_12.tryCatch.setError(err_13);
-  return envObject_12.setLastError(10);
+  return envObject_11.clearLastError();
+ } catch (err_12) {
+  envObject_11.tryCatch.setError(err_12);
+  return envObject_11.setLastError(10);
  }
 }
 
@@ -5443,6 +5503,50 @@ function _napi_close_handle_scope(env, scope) {
  return envObject.clearLastError();
 }
 
+function _napi_coerce_to_object(env, value, result) {
+ var v;
+ if (env == 0) return 1;
+ var envObject_38 = emnapiCtx.envStore.get(env);
+ if (envObject_38.tryCatch.hasCaught()) return envObject_38.setLastError(10);
+ envObject_38.clearLastError();
+ try {
+  if (value == 0) return envObject_38.setLastError(1);
+  if (result == 0) return envObject_38.setLastError(1);
+  var handle_7 = emnapiCtx.handleStore.get(value);
+  if (handle_7.value == null) {
+   throw new TypeError("Cannot convert undefined or null to object");
+  }
+  v = envObject_38.ensureHandleId(Object(handle_7.value));
+  GROWABLE_HEAP_U32()[result >> 2] = v;
+  return envObject_38.getReturnStatus();
+ } catch (err_39) {
+  envObject_38.tryCatch.setError(err_39);
+  return envObject_38.setLastError(10);
+ }
+}
+
+function _napi_coerce_to_string(env, value, result) {
+ var v;
+ if (env == 0) return 1;
+ var envObject_39 = emnapiCtx.envStore.get(env);
+ if (envObject_39.tryCatch.hasCaught()) return envObject_39.setLastError(10);
+ envObject_39.clearLastError();
+ try {
+  if (value == 0) return envObject_39.setLastError(1);
+  if (result == 0) return envObject_39.setLastError(1);
+  var handle_8 = emnapiCtx.handleStore.get(value);
+  if (handle_8.isSymbol()) {
+   throw new TypeError("Cannot convert a Symbol value to a string");
+  }
+  v = emnapiCtx.addToCurrentScope(String(handle_8.value)).id;
+  GROWABLE_HEAP_U32()[result >> 2] = v;
+  return envObject_39.getReturnStatus();
+ } catch (err_40) {
+  envObject_39.tryCatch.setError(err_40);
+  return envObject_39.setLastError(10);
+ }
+}
+
 function _napi_create_array(env, result) {
  if (env == 0) return 1;
  var envObject = emnapiCtx.envStore.get(env);
@@ -5463,6 +5567,9 @@ function _napi_create_array_with_length(env, length, result) {
 }
 
 var emnapiExternalMemory = {
+ registry: {},
+ table: {},
+ wasmMemoryViewTable: {},
  init: function() {
   emnapiExternalMemory.registry = typeof FinalizationRegistry === "function" ? new FinalizationRegistry(function(_pointer) {
    _free(_pointer);
@@ -5470,39 +5577,56 @@ var emnapiExternalMemory = {
   emnapiExternalMemory.table = new WeakMap();
   emnapiExternalMemory.wasmMemoryViewTable = new WeakMap();
  },
+ isDetachedArrayBuffer: function(arrayBuffer) {
+  if (arrayBuffer.byteLength === 0) {
+   try {
+    new Uint8Array(arrayBuffer);
+   } catch (_) {
+    return true;
+   }
+  }
+  return false;
+ },
  getArrayBufferPointer: function(arrayBuffer, shouldCopy) {
   var _a;
-  if (arrayBuffer === GROWABLE_HEAP_U8().buffer) {
-   return {
-    address: 0,
-    ownership: 0,
-    runtimeAllocated: 0
-   };
+  var info = {
+   address: 0,
+   ownership: 0,
+   runtimeAllocated: 0
+  };
+  if (arrayBuffer === wasmMemory.buffer) {
+   return info;
   }
+  var isDetached = emnapiExternalMemory.isDetachedArrayBuffer(arrayBuffer);
   if (emnapiExternalMemory.table.has(arrayBuffer)) {
-   return emnapiExternalMemory.table.get(arrayBuffer);
+   var cachedInfo = emnapiExternalMemory.table.get(arrayBuffer);
+   if (isDetached) {
+    cachedInfo.address = 0;
+    return cachedInfo;
+   }
+   if (shouldCopy && cachedInfo.ownership === 0 && cachedInfo.runtimeAllocated === 1) {
+    new Uint8Array(wasmMemory.buffer).set(new Uint8Array(arrayBuffer), cachedInfo.address);
+   }
+   return cachedInfo;
+  }
+  if (isDetached || arrayBuffer.byteLength === 0) {
+   return info;
   }
   if (!shouldCopy) {
-   return {
-    address: 0,
-    ownership: 0,
-    runtimeAllocated: 0
-   };
+   return info;
   }
   var pointer = _malloc(arrayBuffer.byteLength);
   if (!pointer) throw new Error("Out of memory");
-  GROWABLE_HEAP_U8().set(new Uint8Array(arrayBuffer), pointer);
-  var pointerInfo = {
-   address: pointer,
-   ownership: emnapiExternalMemory.registry ? 0 : 1,
-   runtimeAllocated: 1
-  };
-  emnapiExternalMemory.table.set(arrayBuffer, pointerInfo);
+  new Uint8Array(wasmMemory.buffer).set(new Uint8Array(arrayBuffer), pointer);
+  info.address = pointer;
+  info.ownership = emnapiExternalMemory.registry ? 0 : 1;
+  info.runtimeAllocated = 1;
+  emnapiExternalMemory.table.set(arrayBuffer, info);
   (_a = emnapiExternalMemory.registry) === null || _a === void 0 ? void 0 : _a.register(arrayBuffer, pointer);
-  return pointerInfo;
+  return info;
  },
  getOrUpdateMemoryView: function(view) {
-  if (view.buffer === GROWABLE_HEAP_U8().buffer) {
+  if (view.buffer === wasmMemory.buffer) {
    if (!emnapiExternalMemory.wasmMemoryViewTable.has(view)) {
     emnapiExternalMemory.wasmMemoryViewTable.set(view, {
      Ctor: view.constructor,
@@ -5514,25 +5638,15 @@ var emnapiExternalMemory = {
    }
    return view;
   }
-  var isDetachedArrayBuffer = function(arrayBuffer) {
-   if (arrayBuffer.byteLength === 0) {
-    try {
-     new Uint8Array(arrayBuffer);
-    } catch (_) {
-     return true;
-    }
-   }
-   return false;
-  };
-  if (isDetachedArrayBuffer(view.buffer) && emnapiExternalMemory.wasmMemoryViewTable.has(view)) {
+  if (emnapiExternalMemory.isDetachedArrayBuffer(view.buffer) && emnapiExternalMemory.wasmMemoryViewTable.has(view)) {
    var info = emnapiExternalMemory.wasmMemoryViewTable.get(view);
    var Ctor = info.Ctor;
    var newView = void 0;
    var Buffer = emnapiCtx.feature.Buffer;
    if (typeof Buffer === "function" && Ctor === Buffer) {
-    newView = Buffer.from(GROWABLE_HEAP_U8().buffer, info.address, info.length);
+    newView = Buffer.from(wasmMemory.buffer, info.address, info.length);
    } else {
-    newView = new Ctor(GROWABLE_HEAP_U8().buffer, info.address, info.length);
+    newView = new Ctor(wasmMemory.buffer, info.address, info.length);
    }
    emnapiExternalMemory.wasmMemoryViewTable.set(newView, info);
    return newView;
@@ -5541,7 +5655,7 @@ var emnapiExternalMemory = {
  },
  getViewPointer: function(view, shouldCopy) {
   view = emnapiExternalMemory.getOrUpdateMemoryView(view);
-  if (view.buffer === GROWABLE_HEAP_U8().buffer) {
+  if (view.buffer === wasmMemory.buffer) {
    if (emnapiExternalMemory.wasmMemoryViewTable.has(view)) {
     var _a = emnapiExternalMemory.wasmMemoryViewTable.get(view), address_1 = _a.address, ownership_1 = _a.ownership, runtimeAllocated_1 = _a.runtimeAllocated;
     return {
@@ -5581,21 +5695,21 @@ function emnapiCreateArrayBuffer(byte_length, data) {
 function _napi_create_buffer_copy(env, length, data, result_data, result) {
  var value;
  if (env == 0) return 1;
- var envObject_57 = emnapiCtx.envStore.get(env);
- if (envObject_57.tryCatch.hasCaught()) return envObject_57.setLastError(10);
- envObject_57.clearLastError();
+ var envObject_56 = emnapiCtx.envStore.get(env);
+ if (envObject_56.tryCatch.hasCaught()) return envObject_56.setLastError(10);
+ envObject_56.clearLastError();
  try {
-  if (result == 0) return envObject_57.setLastError(1);
+  if (result == 0) return envObject_56.setLastError(1);
   var arrayBuffer_3 = emnapiCreateArrayBuffer(length, result_data);
   var Buffer_2 = emnapiCtx.feature.Buffer;
   var buffer_4 = Buffer_2.from(arrayBuffer_3);
-  buffer_4.set(GROWABLE_HEAP_U8().subarray(data, data + length));
+  buffer_4.set(new Uint8Array(wasmMemory.buffer).subarray(data, data + length));
   value = emnapiCtx.addToCurrentScope(buffer_4).id;
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_57.getReturnStatus();
- } catch (err_61) {
-  envObject_57.tryCatch.setError(err_61);
-  return envObject_57.setLastError(10);
+  return envObject_56.getReturnStatus();
+ } catch (err_60) {
+  envObject_56.tryCatch.setError(err_60);
+  return envObject_56.setLastError(10);
  }
 }
 
@@ -5633,11 +5747,11 @@ function _napi_create_error(env, code, msg, result) {
 function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_length, finalize_cb, finalize_hint, result) {
  var value;
  if (env == 0) return 1;
- var envObject_3 = emnapiCtx.envStore.get(env);
- if (envObject_3.tryCatch.hasCaught()) return envObject_3.setLastError(10);
- envObject_3.clearLastError();
+ var envObject_1 = emnapiCtx.envStore.get(env);
+ if (envObject_1.tryCatch.hasCaught()) return envObject_1.setLastError(10);
+ envObject_1.clearLastError();
  try {
-  if (result == 0) return envObject_3.setLastError(1);
+  if (result == 0) return envObject_1.setLastError(1);
   byte_length = byte_length >>> 0;
   if (!external_data) {
    byte_length = 0;
@@ -5645,7 +5759,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
   if (byte_length > 2147483647) {
    throw new RangeError("Cannot create a memory view larger than 2147483647 bytes");
   }
-  if (external_data + byte_length > GROWABLE_HEAP_U8().buffer.byteLength) {
+  if (external_data + byte_length > wasmMemory.buffer.byteLength) {
    throw new RangeError("Memory out of range");
   }
   if (!emnapiCtx.feature.supportFinalizer && finalize_cb) {
@@ -5784,28 +5898,28 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   default:
-   return envObject_3.setLastError(1);
+   return envObject_1.setLastError(1);
   }
   var Ctor_1 = viewDescriptor_1.Ctor;
-  var typedArray_1 = typedarray_type === -2 ? emnapiCtx.feature.Buffer.from(GROWABLE_HEAP_U8().buffer, viewDescriptor_1.address, viewDescriptor_1.length) : new Ctor_1(GROWABLE_HEAP_U8().buffer, viewDescriptor_1.address, viewDescriptor_1.length);
+  var typedArray_1 = typedarray_type === -2 ? emnapiCtx.feature.Buffer.from(wasmMemory.buffer, viewDescriptor_1.address, viewDescriptor_1.length) : new Ctor_1(wasmMemory.buffer, viewDescriptor_1.address, viewDescriptor_1.length);
   var handle_1 = emnapiCtx.addToCurrentScope(typedArray_1);
   emnapiExternalMemory.wasmMemoryViewTable.set(typedArray_1, viewDescriptor_1);
   if (finalize_cb) {
-   var status_1 = emnapiWrap(1, env, handle_1.id, external_data, finalize_cb, finalize_hint, 0);
+   var status_1 = _napi_add_finalizer(env, handle_1.id, external_data, finalize_cb, finalize_hint, 0);
    if (status_1 === 10) {
-    var err_3 = envObject_3.tryCatch.extractException();
-    envObject_3.clearLastError();
-    throw err_3;
+    var err_1 = envObject_1.tryCatch.extractException();
+    envObject_1.clearLastError();
+    throw err_1;
    } else if (status_1 !== 0) {
-    return envObject_3.setLastError(status_1);
+    return envObject_1.setLastError(status_1);
    }
   }
   value = handle_1.id;
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_3.getReturnStatus();
- } catch (err_4) {
-  envObject_3.tryCatch.setError(err_4);
-  return envObject_3.setLastError(10);
+  return envObject_1.getReturnStatus();
+ } catch (err_2) {
+  envObject_1.tryCatch.setError(err_2);
+  return envObject_1.setLastError(10);
  }
 }
 
@@ -5927,22 +6041,22 @@ function emnapiCreateFunction(envObject, utf8name, length, cb, data) {
 function _napi_create_function(env, utf8name, length, cb, data, result) {
  var value;
  if (env == 0) return 1;
- var envObject_11 = emnapiCtx.envStore.get(env);
- if (envObject_11.tryCatch.hasCaught()) return envObject_11.setLastError(10);
- envObject_11.clearLastError();
+ var envObject_10 = emnapiCtx.envStore.get(env);
+ if (envObject_10.tryCatch.hasCaught()) return envObject_10.setLastError(10);
+ envObject_10.clearLastError();
  try {
-  if (result == 0) return envObject_11.setLastError(1);
-  if (cb == 0) return envObject_11.setLastError(1);
-  var fresult_1 = emnapiCreateFunction(envObject_11, utf8name, length, cb, data);
-  if (fresult_1.status !== 0) return envObject_11.setLastError(fresult_1.status);
+  if (result == 0) return envObject_10.setLastError(1);
+  if (cb == 0) return envObject_10.setLastError(1);
+  var fresult_1 = emnapiCreateFunction(envObject_10, utf8name, length, cb, data);
+  if (fresult_1.status !== 0) return envObject_10.setLastError(fresult_1.status);
   var f_1 = fresult_1.f;
   var valueHandle_1 = emnapiCtx.addToCurrentScope(f_1);
   value = valueHandle_1.id;
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_11.getReturnStatus();
- } catch (err_12) {
-  envObject_11.tryCatch.setError(err_12);
-  return envObject_11.setLastError(10);
+  return envObject_10.getReturnStatus();
+ } catch (err_11) {
+  envObject_10.tryCatch.setError(err_11);
+  return envObject_10.setLastError(10);
  }
 }
 
@@ -5981,14 +6095,14 @@ function _napi_create_string_latin1(env, str, length, result) {
  var len = 0;
  if (length === -1) {
   while (true) {
-   var ch = GROWABLE_HEAP_U8()[str];
+   var ch = GROWABLE_HEAP_U8()[str >> 0];
    if (!ch) break;
    latin1String += String.fromCharCode(ch);
    str++;
   }
  } else {
   while (len < length) {
-   var ch = GROWABLE_HEAP_U8()[str];
+   var ch = GROWABLE_HEAP_U8()[str >> 0];
    if (!ch) break;
    latin1String += String.fromCharCode(ch);
    len++;
@@ -6173,7 +6287,8 @@ function _napi_get_array_length(env, value, result) {
  if (!handle.isArray()) {
   return envObject.setLastError(8);
  }
- GROWABLE_HEAP_U32()[result >> 2] = handle.value.length >>> 0;
+ var v = handle.value.length >>> 0;
+ GROWABLE_HEAP_U32()[result >> 2] = v;
  return envObject.clearLastError();
 }
 
@@ -6370,19 +6485,19 @@ function _napi_get_all_property_names(env, object, key_mode, key_filter, key_con
    obj_1 = Object.getPrototypeOf(obj_1);
    own_1 = false;
   } while (obj_1);
-  var ret_4 = [];
-  var addName_1 = function(ret_4, name, key_filter, conversion_mode) {
-   if (ret_4.indexOf(name) !== -1) return;
+  var ret_5 = [];
+  var addName_1 = function(ret_5, name, key_filter, conversion_mode) {
+   if (ret_5.indexOf(name) !== -1) return;
    if (conversion_mode === 0) {
-    ret_4.push(name);
+    ret_5.push(name);
    } else if (conversion_mode === 1) {
     var realName_1 = typeof name === "number" ? String(name) : name;
     if (typeof realName_1 === "string") {
      if (!(key_filter & 8)) {
-      ret_4.push(realName_1);
+      ret_5.push(realName_1);
      }
     } else {
-     ret_4.push(realName_1);
+     ret_5.push(realName_1);
     }
    }
   };
@@ -6391,7 +6506,7 @@ function _napi_get_all_property_names(env, object, key_mode, key_filter, key_con
    var name_1 = prop_1.name;
    var desc_1 = prop_1.desc;
    if (key_filter === 0) {
-    addName_1(ret_4, name_1, key_filter, key_conversion);
+    addName_1(ret_5, name_1, key_filter, key_conversion);
    } else {
     if (key_filter & 8 && typeof name_1 === "string") {
      continue;
@@ -6444,11 +6559,11 @@ function _napi_get_all_property_names(env, object, key_mode, key_filter, key_con
      }
     }
     if (shouldAdd_1) {
-     addName_1(ret_4, name_1, key_filter, key_conversion);
+     addName_1(ret_5, name_1, key_filter, key_conversion);
     }
    }
   }
-  value = emnapiCtx.addToCurrentScope(ret_4).id;
+  value = emnapiCtx.addToCurrentScope(ret_5).id;
   GROWABLE_HEAP_U32()[result >> 2] = value;
   return envObject_19.getReturnStatus();
  } catch (err_20) {
@@ -6482,29 +6597,33 @@ function _napi_get_typedarray_info(env, typedarray, type, length, data, arraybuf
  }
  var v = handle.value;
  if (type) {
+  var t = void 0;
   if (v instanceof Int8Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 0;
+   t = 0;
   } else if (v instanceof Uint8Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 1;
+   t = 1;
   } else if (v instanceof Uint8ClampedArray) {
-   GROWABLE_HEAP_I32()[type >> 2] = 2;
+   t = 2;
   } else if (v instanceof Int16Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 3;
+   t = 3;
   } else if (v instanceof Uint16Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 4;
+   t = 4;
   } else if (v instanceof Int32Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 5;
+   t = 5;
   } else if (v instanceof Uint32Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 6;
+   t = 6;
   } else if (v instanceof Float32Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 7;
+   t = 7;
   } else if (v instanceof Float64Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 8;
+   t = 8;
   } else if (v instanceof BigInt64Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 9;
+   t = 9;
   } else if (v instanceof BigUint64Array) {
-   GROWABLE_HEAP_I32()[type >> 2] = 10;
+   t = 10;
+  } else {
+   return envObject.setLastError(9);
   }
+  GROWABLE_HEAP_I32()[type >> 2] = t;
  }
  if (length) {
   GROWABLE_HEAP_U32()[length >> 2] = v.length;
@@ -6545,7 +6664,8 @@ function _napi_get_value_bool(env, value, result) {
  if (typeof handle.value !== "boolean") {
   return envObject.setLastError(7);
  }
- GROWABLE_HEAP_U8()[result] = handle.value ? 1 : 0;
+ var r = handle.value ? 1 : 0;
+ GROWABLE_HEAP_I8()[result >> 0] = r;
  return envObject.clearLastError();
 }
 
@@ -6558,7 +6678,8 @@ function _napi_get_value_double(env, value, result) {
  if (typeof handle.value !== "number") {
   return envObject.setLastError(6);
  }
- GROWABLE_HEAP_F64()[result >> 3] = handle.value;
+ var r = handle.value;
+ GROWABLE_HEAP_F64()[result >> 3] = r;
  return envObject.clearLastError();
 }
 
@@ -6585,6 +6706,7 @@ function _napi_get_value_int64(env, value, result) {
   return envObject.setLastError(6);
  }
  var numberValue = handle.value;
+ var tempI64;
  if (numberValue === Number.POSITIVE_INFINITY || numberValue === Number.NEGATIVE_INFINITY || isNaN(numberValue)) {
   GROWABLE_HEAP_I32()[result >> 2] = 0;
   GROWABLE_HEAP_I32()[result + 4 >> 2] = 0;
@@ -6596,7 +6718,7 @@ function _napi_get_value_int64(env, value, result) {
   GROWABLE_HEAP_U32()[result + 4 >> 2] = 2147483647;
  } else {
   var tempDouble = void 0;
-  var tempI64 = [ numberValue >>> 0, (tempDouble = numberValue, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ];
+  tempI64 = [ numberValue >>> 0, (tempDouble = numberValue, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ];
   GROWABLE_HEAP_I32()[result >> 2] = tempI64[0];
   GROWABLE_HEAP_I32()[result + 4 >> 2] = tempI64[1];
  }
@@ -6641,6 +6763,7 @@ function _napi_get_value_uint32(env, value, result) {
 }
 
 function _napi_has_named_property(env, object, utf8name, result) {
+ var r;
  if (env == 0) return 1;
  var envObject_26 = emnapiCtx.envStore.get(env);
  if (envObject_26.tryCatch.hasCaught()) return envObject_26.setLastError(10);
@@ -6661,8 +6784,8 @@ function _napi_has_named_property(env, object, utf8name, result) {
   } catch (_6) {
    return envObject_26.setLastError(2);
   }
-  var r_3 = UTF8ToString(utf8name) in v_4;
-  GROWABLE_HEAP_U8()[result] = r_3 ? 1 : 0;
+  r = UTF8ToString(utf8name) in v_4;
+  GROWABLE_HEAP_I8()[result >> 0] = r ? 1 : 0;
   return envObject_26.getReturnStatus();
  } catch (err_27) {
   envObject_26.tryCatch.setError(err_27);
@@ -6671,7 +6794,7 @@ function _napi_has_named_property(env, object, utf8name, result) {
 }
 
 function _napi_has_own_property(env, object, key, result) {
- var value;
+ var value, r;
  if (env == 0) return 1;
  var envObject_24 = emnapiCtx.envStore.get(env);
  if (envObject_24.tryCatch.hasCaught()) return envObject_24.setLastError(10);
@@ -6694,8 +6817,8 @@ function _napi_has_own_property(env, object, key, result) {
   if (typeof prop_2 !== "string" && typeof prop_2 !== "symbol") {
    return envObject_24.setLastError(4);
   }
-  var r_2 = Object.prototype.hasOwnProperty.call(v_3, emnapiCtx.handleStore.get(key).value);
-  GROWABLE_HEAP_U8()[result] = r_2 ? 1 : 0;
+  r = Object.prototype.hasOwnProperty.call(v_3, emnapiCtx.handleStore.get(key).value);
+  GROWABLE_HEAP_I8()[result >> 0] = r ? 1 : 0;
   return envObject_24.getReturnStatus();
  } catch (err_25) {
   envObject_24.tryCatch.setError(err_25);
@@ -6704,6 +6827,7 @@ function _napi_has_own_property(env, object, key, result) {
 }
 
 function _napi_has_property(env, object, key, result) {
+ var r;
  if (env == 0) return 1;
  var envObject_21 = emnapiCtx.envStore.get(env);
  if (envObject_21.tryCatch.hasCaught()) return envObject_21.setLastError(10);
@@ -6722,7 +6846,8 @@ function _napi_has_property(env, object, key, result) {
   } catch (_2) {
    return envObject_21.setLastError(2);
   }
-  GROWABLE_HEAP_U8()[result] = emnapiCtx.handleStore.get(key).value in v_1 ? 1 : 0;
+  r = emnapiCtx.handleStore.get(key).value in v_1 ? 1 : 0;
+  GROWABLE_HEAP_I8()[result >> 0] = r;
   return envObject_21.getReturnStatus();
  } catch (err_22) {
   envObject_21.tryCatch.setError(err_22);
@@ -6735,7 +6860,7 @@ function _napi_is_exception_pending(env, result) {
  var envObject = emnapiCtx.envStore.get(env);
  if (result == 0) return envObject.setLastError(1);
  var r = envObject.tryCatch.hasCaught();
- GROWABLE_HEAP_U8()[result] = r ? 1 : 0;
+ GROWABLE_HEAP_I8()[result >> 0] = r ? 1 : 0;
  return envObject.clearLastError();
 }
 
@@ -6807,16 +6932,16 @@ function _napi_set_named_property(env, object, cname, value) {
 
 function _napi_throw(env, error) {
  if (env == 0) return 1;
- var envObject_6 = emnapiCtx.envStore.get(env);
- if (envObject_6.tryCatch.hasCaught()) return envObject_6.setLastError(10);
- envObject_6.clearLastError();
+ var envObject_4 = emnapiCtx.envStore.get(env);
+ if (envObject_4.tryCatch.hasCaught()) return envObject_4.setLastError(10);
+ envObject_4.clearLastError();
  try {
-  if (error == 0) return envObject_6.setLastError(1);
-  envObject_6.tryCatch.setError(emnapiCtx.handleStore.get(error).value);
-  return envObject_6.clearLastError();
- } catch (err_7) {
-  envObject_6.tryCatch.setError(err_7);
-  return envObject_6.setLastError(10);
+  if (error == 0) return envObject_4.setLastError(1);
+  envObject_4.tryCatch.setError(emnapiCtx.handleStore.get(error).value);
+  return envObject_4.clearLastError();
+ } catch (err_5) {
+  envObject_4.tryCatch.setError(err_5);
+  return envObject_4.setLastError(10);
  }
 }
 
@@ -6826,29 +6951,31 @@ function _napi_typeof(env, value, result) {
  if (value == 0) return envObject.setLastError(1);
  if (result == 0) return envObject.setLastError(1);
  var v = emnapiCtx.handleStore.get(value);
+ var r;
  if (v.isNumber()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 3;
+  r = 3;
  } else if (v.isBigInt()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 9;
+  r = 9;
  } else if (v.isString()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 4;
+  r = 4;
  } else if (v.isFunction()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 7;
+  r = 7;
  } else if (v.isExternal()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 8;
+  r = 8;
  } else if (v.isObject()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 6;
+  r = 6;
  } else if (v.isBoolean()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 2;
+  r = 2;
  } else if (v.isUndefined()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 0;
+  r = 0;
  } else if (v.isSymbol()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 5;
+  r = 5;
  } else if (v.isNull()) {
-  GROWABLE_HEAP_I32()[result >> 2] = 1;
+  r = 1;
  } else {
   return envObject.setLastError(1);
  }
+ GROWABLE_HEAP_I32()[result >> 2] = r;
  return envObject.clearLastError();
 }
 
@@ -7448,8 +7575,14 @@ var asmLibraryArg = {
  "_dlinit": __dlinit,
  "_dlopen_js": __dlopen_js,
  "_emnapi_call_into_module": __emnapi_call_into_module,
+ "_emnapi_ctx_decrease_waiting_request_counter": __emnapi_ctx_decrease_waiting_request_counter,
+ "_emnapi_ctx_increase_waiting_request_counter": __emnapi_ctx_increase_waiting_request_counter,
  "_emnapi_get_last_error_info": __emnapi_get_last_error_info,
+ "_emnapi_node_emit_async_destroy": __emnapi_node_emit_async_destroy,
+ "_emnapi_node_emit_async_init": __emnapi_node_emit_async_init,
+ "_emnapi_node_make_callback": __emnapi_node_make_callback,
  "_emnapi_set_immediate": __emnapi_set_immediate,
+ "_emnapi_worker_unref": __emnapi_worker_unref,
  "_emscripten_default_pthread_stack_size": __emscripten_default_pthread_stack_size,
  "_emscripten_err": __emscripten_err,
  "_emscripten_get_now_is_monotonic": __emscripten_get_now_is_monotonic,
@@ -7462,6 +7595,7 @@ var asmLibraryArg = {
  "_munmap_js": __munmap_js,
  "_tzset_js": __tzset_js,
  "abort": _abort,
+ "emnapi_is_node_binding_available": _emnapi_is_node_binding_available,
  "emscripten_check_blocking_allowed": _emscripten_check_blocking_allowed,
  "emscripten_date_now": _emscripten_date_now,
  "emscripten_get_heap_max": _emscripten_get_heap_max,
@@ -7541,6 +7675,8 @@ var asmLibraryArg = {
  "napi_clear_last_error": _napi_clear_last_error,
  "napi_close_escapable_handle_scope": _napi_close_escapable_handle_scope,
  "napi_close_handle_scope": _napi_close_handle_scope,
+ "napi_coerce_to_object": _napi_coerce_to_object,
+ "napi_coerce_to_string": _napi_coerce_to_string,
  "napi_create_array": _napi_create_array,
  "napi_create_array_with_length": _napi_create_array_with_length,
  "napi_create_buffer_copy": _napi_create_buffer_copy,
@@ -7659,9 +7795,9 @@ var ___cxa_can_catch = Module["___cxa_can_catch"] = asm["__cxa_can_catch"];
 
 var ___cxa_is_pointer_type = Module["___cxa_is_pointer_type"] = asm["__cxa_is_pointer_type"];
 
-var ___start_em_js = Module["___start_em_js"] = 1888808;
+var ___start_em_js = Module["___start_em_js"] = 1880488;
 
-var ___stop_em_js = Module["___stop_em_js"] = 1899236;
+var ___stop_em_js = Module["___stop_em_js"] = 1890916;
 
 function invoke_vii(index, a1, a2) {
  var sp = stackSave();
