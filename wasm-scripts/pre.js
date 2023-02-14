@@ -13,8 +13,8 @@ Module.preRun = () => {
 
 Module.onRuntimeInitialized = () => {
   const emnapi = Module.emnapiInit({
-    context: require('@tybys/emnapi-runtime').createContext(),
-    // nodeBinding: require('@tybys/emnapi-node-binding')
+    context: require('@emnapi/runtime').getDefaultContext(),
+    // nodeBinding: require('@emnapi/node-binding')
   });
 
   // At this point only libvips workers are up & running.

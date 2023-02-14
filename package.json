@@ -130,7 +130,7 @@
     "vips"
   ],
   "dependencies": {
-    "@tybys/emnapi-runtime": "^0.25.1",
+    "@emnapi/runtime": "^0.31.0",
     "color": "^4.2.3",
     "detect-libc": "^2.0.1",
     "node-addon-api": "^5.0.0",
@@ -141,7 +141,7 @@
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
-    "@tybys/emnapi": "^0.25.1",
+    "emnapi": "^0.31.0",
     "async": "^3.2.4",
     "cc": "^3.0.1",
     "documentation": "^14.0.1",

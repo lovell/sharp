@@ -33,7 +33,7 @@
       '-std=gnu++17'
     ],
     'ldflags': [
-      '--js-library=<!(node -p "require(\'@tybys/emnapi\').js_library")',
+      '--js-library=<!(node -p "require(\'emnapi\').js_library")',
       # We're building a library, don't mess with global Node.js error handlers.
       '-sNODEJS_CATCH_EXIT=0',
       '-sNODEJS_CATCH_REJECTION=0',
@@ -46,10 +46,10 @@
       'BUILDING_NODE_EXTENSION'
     ],
     'include_dirs': [
-      '<!(node -p "require(\'@tybys/emnapi\').include")',
+      '<!(node -p "require(\'emnapi\').include")',
     ],
     'sources': [
-      '<!@(node -p "require(\'@tybys/emnapi\').sources.map(x => JSON.stringify(path.relative(process.cwd(), x))).join(\' \')")'
+      '<!@(node -p "require(\'emnapi\').sources.map(x => JSON.stringify(path.relative(process.cwd(), x))).join(\' \')")'
     ],
 
     'default_configuration': 'Release',
