@@ -531,36 +531,28 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Extend edges
       if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
-        VipsExtend extend = VIPS_EXTEND_BACKGROUND;
-        if (baton->extendMode == 1) {
-          extend = VIPS_EXTEND_COPY;
-        } else if (baton->extendMode == 2) {
-          extend = VIPS_EXTEND_REPEAT;
-        } else if (baton->extendMode == 3) {
-          extend = VIPS_EXTEND_MIRROR;
-        }
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
         baton->height = (nPages > 1 ? targetPageHeight : image.height()) + baton->extendTop + baton->extendBottom;
 
-        if (extend == VIPS_EXTEND_BACKGROUND) {
+        if (baton->extendWith == VIPS_EXTEND_BACKGROUND) {
           std::vector<double> background;
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
 
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
                 baton->extendLeft, baton->extendTop, baton->width, baton->height,
-                extend, background, nPages, &targetPageHeight)
+                baton->extendWith, background, nPages, &targetPageHeight)
             : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
-                VImage::option()->set("extend", extend)->set("background", background));
+                VImage::option()->set("extend", baton->extendWith)->set("background", background));
         } else {
           std::vector<double> ignoredBackground(1);
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
                 baton->extendLeft, baton->extendTop, baton->width, baton->height,
-                extend, ignoredBackground, nPages, &targetPageHeight)
+                baton->extendWith, ignoredBackground, nPages, &targetPageHeight)
             : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
-                VImage::option()->set("extend", extend));
+                VImage::option()->set("extend", baton->extendWith));
         }
       }
       // Median - must happen before blurring, due to the utility of blurring after thresholding
@@ -1518,7 +1510,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->extendLeft = sharp::AttrAsInt32(options, "extendLeft");
   baton->extendRight = sharp::AttrAsInt32(options, "extendRight");
   baton->extendBackground = sharp::AttrAsVectorOfDouble(options, "extendBackground");
-  baton->extendMode = sharp::AttrAsInt32(options, "extendMode");
+  baton->extendWith = sharp::AttrAsEnum<VipsExtend>(options, "extendWith", VIPS_TYPE_EXTEND);
   baton->extractChannel = sharp::AttrAsInt32(options, "extractChannel");
   baton->affineMatrix = sharp::AttrAsVectorOfDouble(options, "affineMatrix");
   baton->affineBackground = sharp::AttrAsVectorOfDouble(options, "affineBackground");

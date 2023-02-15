@@ -1243,7 +1243,7 @@ declare namespace sharp {
         sigma?: number | undefined;
     }
 
-    type ExtendMode = 'background' | 'copy' | 'repeat' | 'mirror';
+    type ExtendWith = 'background' | 'copy' | 'repeat' | 'mirror';
 
     interface ExtendOptions {
         /** single pixel count to top edge (optional, default 0) */
@@ -1257,7 +1257,7 @@ declare namespace sharp {
         /** background colour, parsed by the color module, defaults to black without transparency. (optional, default {r:0,g:0,b:0,alpha:1}) */
         background?: Color | undefined;
         /** how the extension is done, one of: "background", "copy", "repeat", "mirror" (optional, default `'background'`) */
-        extend?: ExtendMode | undefined;
+        extendWith?: ExtendWith | undefined;
     }
 
     interface TrimOptions {

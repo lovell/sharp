@@ -32,12 +32,12 @@ describe('Extend', function () {
     });
   });
 
-  ['background', 'copy', 'mirror', 'repeat'].forEach(extend => {
-    it(`extends all sides with animated WebP (${extend})`, function (done) {
+  ['background', 'copy', 'mirror', 'repeat'].forEach(extendWith => {
+    it(`extends all sides with animated WebP (${extendWith})`, function (done) {
       sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(120)
         .extend({
-          extend: extend,
+          extendWith: extendWith,
           top: 40,
           bottom: 40,
           left: 40,
@@ -47,15 +47,15 @@ describe('Extend', function () {
           if (err) throw err;
           assert.strictEqual(200, info.width);
           assert.strictEqual(200 * 9, info.height);
-          fixtures.assertSimilar(fixtures.expected(`extend-equal-${extend}.webp`), data, done);
+          fixtures.assertSimilar(fixtures.expected(`extend-equal-${extendWith}.webp`), data, done);
         });
     });
 
-    it(`extend all sides equally with RGB (${extend})`, function (done) {
+    it(`extend all sides equally with RGB (${extendWith})`, function (done) {
       sharp(fixtures.inputJpg)
         .resize(120)
         .extend({
-          extend: extend,
+          extendWith: extendWith,
           top: 10,
           bottom: 10,
           left: 10,
@@ -66,15 +66,15 @@ describe('Extend', function () {
           if (err) throw err;
           assert.strictEqual(140, info.width);
           assert.strictEqual(118, info.height);
-          fixtures.assertSimilar(fixtures.expected(`extend-equal-${extend}.jpg`), data, done);
+          fixtures.assertSimilar(fixtures.expected(`extend-equal-${extendWith}.jpg`), data, done);
         });
     });
 
-    it(`extend sides unequally with RGBA (${extend})`, function (done) {
+    it(`extend sides unequally with RGBA (${extendWith})`, function (done) {
       sharp(fixtures.inputPngWithTransparency16bit)
         .resize(120)
         .extend({
-          extend: extend,
+          extendWith: extendWith,
           top: 50,
           left: 10,
           right: 35,
@@ -84,14 +84,14 @@ describe('Extend', function () {
           if (err) throw err;
           assert.strictEqual(165, info.width);
           assert.strictEqual(170, info.height);
-          fixtures.assertSimilar(fixtures.expected(`extend-unequal-${extend}.png`), data, done);
+          fixtures.assertSimilar(fixtures.expected(`extend-unequal-${extendWith}.png`), data, done);
         });
     });
 
-    it('PNG with 2 channels', function (done) {
+    it(`PNG with 2 channels (${extendWith})`, function (done) {
       sharp(fixtures.inputPngWithGreyAlpha)
         .extend({
-          extend: extend,
+          extendWith: extendWith,
           top: 50,
           bottom: 50,
           left: 80,
@@ -105,7 +105,7 @@ describe('Extend', function () {
           assert.strictEqual(560, info.width);
           assert.strictEqual(400, info.height);
           assert.strictEqual(4, info.channels);
-          fixtures.assertSimilar(fixtures.expected(`extend-2channel-${extend}.png`), data, done);
+          fixtures.assertSimilar(fixtures.expected(`extend-2channel-${extendWith}.png`), data, done);
         });
     });
   });
@@ -144,10 +144,10 @@ describe('Extend', function () {
       /Expected positive integer for right but received \[object Object\] of type object/
     );
   });
-  it('invalid extend fails', () => {
+  it('invalid extendWith fails', () => {
     assert.throws(
-      () => sharp().extend({ extend: 'invalid-value' }),
-      /Expected valid extend mode for extend but received invalid-value of type string/
+      () => sharp().extend({ extendWith: 'invalid-value' }),
+      /Expected valid value for extendWith but received invalid-value of type string/
     );
   });
   it('can set all edges apart from right', () => {
