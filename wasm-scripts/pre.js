@@ -13,7 +13,7 @@ Module.preRun = () => {
 
 Module.onRuntimeInitialized = () => {
   const emnapi = Module.emnapiInit({
-    context: require('@emnapi/runtime').getDefaultContext(),
+    context: require('@emnapi/runtime').getDefaultContext()
     // nodeBinding: require('@emnapi/node-binding')
   });
 
