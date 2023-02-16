@@ -5,9 +5,9 @@ cd "${0%/*}"
 
 [ -f wasm-vips/build/target/lib/pkgconfig/vips-cpp.pc ] || (
   mkdir -p wasm-vips
-  curl -Ls https://github.com/kleisauke/wasm-vips/archive/73660c98483fbafe40e2f7b24b585b0ecca84aa5.tar.gz | tar xzC wasm-vips --strip-components=1
+  curl -Ls https://github.com/kleisauke/wasm-vips/archive/b24ca0b5d889ee5a5ff7eda91335452359c635b4.tar.gz | tar xzC wasm-vips --strip-components=1
   cd wasm-vips
-  npm run build -- --enable-lto --disable-modules --disable-jxl --disable-bindings --enable-libvips-cpp
+  npm run build -- --enable-lto --disable-modules --disable-jxl --disable-svg --disable-bindings --enable-libvips-cpp
 )
 
 docker run \
