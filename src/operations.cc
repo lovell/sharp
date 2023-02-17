@@ -399,7 +399,7 @@ namespace sharp {
     if (top == 0 && height == *pageHeight) {
       // Fast path; no need to adjust the height of the multi-page image
       return image.embed(left, 0, width, image.height(), VImage::option()
-        ->set("extendWith", extendWith)
+        ->set("extend", extendWith)
         ->set("background", background));
     } else if (left == 0 && width == image.width()) {
       // Fast path; no need to adjust the width of the multi-page image
