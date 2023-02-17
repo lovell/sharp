@@ -203,5 +203,10 @@
     "ignore": [
       "wasm-scripts/wasm-vips"
     ]
+  },
+  "nyc": {
+    "include": [
+      "lib"
+    ]
   }
 }
