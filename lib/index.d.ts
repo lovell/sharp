@@ -755,7 +755,7 @@ declare namespace sharp {
         resize(options: ResizeOptions): Sharp;
 
         /**
-         * Extends/pads the edges of the image with the provided background colour.
+         * Extends/pads the edges of the image with either the provided background colour or pixels derived from the image.
          * This operation will always occur after resizing and extraction, if any.
          * @param extend single pixel count to add to all edges or an Object with per-edge counts
          * @throws {Error} Invalid parameters
@@ -1245,6 +1245,8 @@ declare namespace sharp {
         sigma?: number | undefined;
     }
 
+    type ExtendWith = 'background' | 'copy' | 'repeat' | 'mirror';
+
     interface ExtendOptions {
         /** single pixel count to top edge (optional, default 0) */
         top?: number | undefined;
@@ -1256,6 +1258,8 @@ declare namespace sharp {
         right?: number | undefined;
         /** background colour, parsed by the color module, defaults to black without transparency. (optional, default {r:0,g:0,b:0,alpha:1}) */
         background?: Color | undefined;
+        /** how the extension is done, one of: "background", "copy", "repeat", "mirror" (optional, default `'background'`) */
+        extendWith?: ExtendWith | undefined;
     }
 
     interface TrimOptions {

@@ -124,7 +124,7 @@ namespace sharp {
    * Split into frames, embed each frame, reassemble, and update pageHeight.
    */
   VImage EmbedMultiPage(VImage image, int left, int top, int width, int height,
-                        std::vector<double> background, int nPages, int *pageHeight);
+                        VipsExtend extendWith, std::vector<double> background, int nPages, int *pageHeight);
 
 }  // namespace sharp
 

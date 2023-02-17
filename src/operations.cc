@@ -395,11 +395,11 @@ namespace sharp {
    * Split into frames, embed each frame, reassemble, and update pageHeight.
    */
   VImage EmbedMultiPage(VImage image, int left, int top, int width, int height,
-                        std::vector<double> background, int nPages, int *pageHeight) {
+                        VipsExtend extendWith, std::vector<double> background, int nPages, int *pageHeight) {
     if (top == 0 && height == *pageHeight) {
       // Fast path; no need to adjust the height of the multi-page image
       return image.embed(left, 0, width, image.height(), VImage::option()
-        ->set("extend", VIPS_EXTEND_BACKGROUND)
+        ->set("extend", extendWith)
         ->set("background", background));
     } else if (left == 0 && width == image.width()) {
       // Fast path; no need to adjust the width of the multi-page image
@@ -411,7 +411,7 @@ namespace sharp {
 
       // Do the embed on the wide image
       image = image.embed(0, top, image.width(), height, VImage::option()
-        ->set("extend", VIPS_EXTEND_BACKGROUND)
+        ->set("extend", extendWith)
         ->set("background", background));
 
       // Split the wide image into frames
@@ -441,7 +441,7 @@ namespace sharp {
       // Embed each frame in the target size
       for (int i = 0; i < nPages; i++) {
         pages[i] = pages[i].embed(left, top, width, height, VImage::option()
-          ->set("extend", VIPS_EXTEND_BACKGROUND)
+          ->set("extend", extendWith)
           ->set("background", background));
       }
 

@@ -125,6 +125,7 @@ struct PipelineBaton {
   int extendLeft;
   int extendRight;
   std::vector<double> extendBackground;
+  VipsExtend extendWith;
   bool withoutEnlargement;
   bool withoutReduction;
   std::vector<double> affineMatrix;
@@ -286,6 +287,7 @@ struct PipelineBaton {
     extendLeft(0),
     extendRight(0),
     extendBackground{ 0.0, 0.0, 0.0, 255.0 },
+    extendWith(VIPS_EXTEND_BACKGROUND),
     withoutEnlargement(false),
     withoutReduction(false),
     affineMatrix{ 1.0, 0.0, 0.0, 1.0 },
