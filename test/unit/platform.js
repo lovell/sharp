@@ -54,7 +54,7 @@ describe('Platform-detection', function () {
     assert.strictEqual('arm64vtest', platform().split('-')[1]);
   });
 
-  if (process.config.variables?.arm_version) {
+  if (process.config.variables.arm_version) {
     it('Can detect ARM version via process.config', function () {
       process.env.npm_config_arch = 'arm';
       assert.strictEqual(`armv${process.config.variables.arm_version}`, platform().split('-')[1]);

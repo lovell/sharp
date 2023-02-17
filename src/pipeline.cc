@@ -1206,7 +1206,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Add buffer size to info
         info.Set("size", static_cast<uint32_t>(baton->bufferOutLength));
         // Pass ownership of output data to Buffer instance
-        auto data = sharp::NewOrCopyBuffer(env, static_cast<char*>(baton->bufferOut),
+        Napi::Buffer<char> data = sharp::NewOrCopyBuffer(env, static_cast<char*>(baton->bufferOut),
           baton->bufferOutLength);
         Callback().Call(Receiver().Value(), { env.Null(), data, info });
       } else {
