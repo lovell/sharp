@@ -70,33 +70,14 @@ Module.onRuntimeInitialized = () => {
  for (const worker of PThread.runningWorkers) {
   worker.unref();
  }
- function wrapProperty(prop, wrapper) {
-  emnapi[prop] = wrapper(emnapi[prop]);
- }
- wrapProperty("concurrency", impl => (function(maybeSet) {
+ const {concurrency: concurrency} = emnapi;
+ emnapi.concurrency = function(maybeSet) {
   if (typeof maybeSet === "number" && maybeSet > vipsConcurrency) {
    console.warn(`Requested concurrency (${maybeSet}) is higher than the set limit (${vipsConcurrency}).`);
    maybeSet = vipsConcurrency;
   }
-  return impl.call(this, maybeSet);
- }));
- const emnapiWorker = PThread.unusedWorkers[0];
- let emnapiRefCount = 0;
- for (const fnName of [ "metadata", "pipeline", "stats" ]) {
-  wrapProperty(fnName, impl => (function(...args) {
-   if (emnapiRefCount++ === 0) {
-    emnapiWorker.ref();
-   }
-   const callback = args.pop();
-   args.push(function() {
-    if (--emnapiRefCount === 0) {
-     emnapiWorker.unref();
-    }
-    return callback.apply(this, arguments);
-   });
-   return impl.apply(this, args);
-  }));
- }
+  return concurrency.call(this, maybeSet);
+ };
  process.once("exit", () => {
   _vips_shutdown();
  });
