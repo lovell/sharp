@@ -27,6 +27,7 @@ Implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_st
 | [options.unlimited] | <code>boolean</code> | <code>false</code> | Set this to `true` to remove safety features that help prevent memory exhaustion (JPEG, PNG, SVG, HEIF). |
 | [options.sequentialRead] | <code>boolean</code> | <code>true</code> | Set this to `false` to use random access rather than sequential read. Some operations will do this automatically. |
 | [options.density] | <code>number</code> | <code>72</code> | number representing the DPI for vector images in the range 1 to 100000. |
+| [options.ignoreIcc] | <code>number</code> | <code>false</code> | should the embedded ICC profile, if any, be ignored. |
 | [options.pages] | <code>number</code> | <code>1</code> | number of pages to extract for multi-page input (GIF, WebP, AVIF, TIFF, PDF), use -1 for all pages. |
 | [options.page] | <code>number</code> | <code>0</code> | page number to start extracting from for multi-page input (GIF, WebP, AVIF, TIFF, PDF), zero based. |
 | [options.subifd] | <code>number</code> | <code>-1</code> | subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. |

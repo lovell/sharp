@@ -37,7 +37,7 @@ for (const match of matches) {
 ].forEach((section) => {
   const contents = fs.readFileSync(path.join(__dirname, '..', `api-${section}.md`), 'utf8');
   const matches = contents.matchAll(
-    /\n## (?<title>[A-Za-z]+)\n\n(?<firstparagraph>.+?)\n\n(?<parameters>### Parameters.+?Returns)?/gs
+    /\n## (?<title>[A-Za-z]+)\n(?<firstparagraph>.+?)\n\n(?<parameters>### Parameters.+?Returns)?/gs
   );
   for (const match of matches) {
     const { title, firstparagraph, parameters } = match.groups;
