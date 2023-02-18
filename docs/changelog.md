@@ -49,6 +49,10 @@ Requires libvips v8.14.0
   [#3548](https://github.com/lovell/sharp/pull/3548)
   [@kapouer](https://github.com/kapouer)
 
+* Add support to `extend` operation for `extendWith` to allow copy/mirror/repeat.
+  [#3556](https://github.com/lovell/sharp/pull/3556)
+  [@janaz](https://github.com/janaz)
+
 ## v0.31 - *eagle*
 
 Requires libvips v8.13.3

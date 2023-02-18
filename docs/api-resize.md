@@ -146,7 +146,8 @@ const scaleByHalf = await sharp(input)
 
 
 ## extend
-Extends/pads the edges of the image with the provided background colour.
+Extend / pad / extrude one or more edges of the image with either
+the provided background colour or pixels derived from the image.
 This operation will always occur after resizing and extraction, if any.
 
 
@@ -162,6 +163,7 @@ This operation will always occur after resizing and extraction, if any.
 | [extend.left] | <code>number</code> | <code>0</code> |  |
 | [extend.bottom] | <code>number</code> | <code>0</code> |  |
 | [extend.right] | <code>number</code> | <code>0</code> |  |
+| [extend.extendWith] | <code>String</code> | <code>&#x27;background&#x27;</code> | populate new pixels using this method, one of: background, copy, repeat, mirror. |
 | [extend.background] | <code>String</code> \| <code>Object</code> | <code>{r: 0, g: 0, b: 0, alpha: 1}</code> | background colour, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to black without transparency. |
 
 **Example**  
@@ -186,6 +188,16 @@ sharp(input)
   .extend({
     bottom: 10,
     background: 'red'
+  })
+  ...
+```
+**Example**  
+```js
+// Extrude image by 8 pixels to the right, mirroring existing right hand edge
+sharp(input)
+  .extend({
+    right: 8,
+    background: 'mirror'
   })
   ...
 ```

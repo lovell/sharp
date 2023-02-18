@@ -755,7 +755,8 @@ declare namespace sharp {
         resize(options: ResizeOptions): Sharp;
 
         /**
-         * Extends/pads the edges of the image with either the provided background colour or pixels derived from the image.
+         * Extend / pad / extrude one or more edges of the image with either
+         * the provided background colour or pixels derived from the image.
          * This operation will always occur after resizing and extraction, if any.
          * @param extend single pixel count to add to all edges or an Object with per-edge counts
          * @throws {Error} Invalid parameters

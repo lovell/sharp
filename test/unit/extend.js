@@ -147,7 +147,7 @@ describe('Extend', function () {
   it('invalid extendWith fails', () => {
     assert.throws(
       () => sharp().extend({ extendWith: 'invalid-value' }),
-      /Expected valid value for extendWith but received invalid-value of type string/
+      /Expected one of: background, copy, repeat, mirror for extendWith but received invalid-value of type string/
     );
   });
   it('can set all edges apart from right', () => {

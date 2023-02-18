@@ -266,3 +266,6 @@ GitHub: https://github.com/marcosc90
 
 Name: Emanuel Jöbstl
 GitHub: https://github.com/ejoebstl
+
+Name: Tomasz Janowski
+GitHub: https://github.com/janaz
