@@ -127,7 +127,7 @@ EXIF metadata is unsupported for TIFF output.
 | --- | --- | --- | --- |
 | [options] | <code>Object</code> |  |  |
 | [options.orientation] | <code>number</code> |  | value between 1 and 8, used to update the EXIF `Orientation` tag. |
-| [options.icc] | <code>string</code> |  | filesystem path to output ICC profile, defaults to sRGB. |
+| [options.icc] | <code>string</code> | <code>&quot;&#x27;srgb&#x27;&quot;</code> | Filesystem path to output ICC profile, relative to `process.cwd()`, defaults to built-in sRGB. |
 | [options.exif] | <code>Object.&lt;Object&gt;</code> | <code>{}</code> | Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data. |
 | [options.density] | <code>number</code> |  | Number of pixels per inch (DPI). |
 
