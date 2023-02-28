@@ -28,11 +28,11 @@ Implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_st
 | [options.sequentialRead] | <code>boolean</code> | <code>true</code> | Set this to `false` to use random access rather than sequential read. Some operations will do this automatically. |
 | [options.density] | <code>number</code> | <code>72</code> | number representing the DPI for vector images in the range 1 to 100000. |
 | [options.ignoreIcc] | <code>number</code> | <code>false</code> | should the embedded ICC profile, if any, be ignored. |
-| [options.pages] | <code>number</code> | <code>1</code> | number of pages to extract for multi-page input (GIF, WebP, AVIF, TIFF, PDF), use -1 for all pages. |
-| [options.page] | <code>number</code> | <code>0</code> | page number to start extracting from for multi-page input (GIF, WebP, AVIF, TIFF, PDF), zero based. |
+| [options.pages] | <code>number</code> | <code>1</code> | Number of pages to extract for multi-page input (GIF, WebP, TIFF), use -1 for all pages. |
+| [options.page] | <code>number</code> | <code>0</code> | Page number to start extracting from for multi-page input (GIF, WebP, TIFF), zero based. |
 | [options.subifd] | <code>number</code> | <code>-1</code> | subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. |
 | [options.level] | <code>number</code> | <code>0</code> | level to extract from a multi-level input (OpenSlide), zero based. |
-| [options.animated] | <code>boolean</code> | <code>false</code> | Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). |
+| [options.animated] | <code>boolean</code> | <code>false</code> | Set to `true` to read all frames/pages of an animated image (GIF, WebP, TIFF), equivalent of setting `pages` to `-1`. |
 | [options.raw] | <code>Object</code> |  | describes raw pixel input image data. See `raw()` for pixel ordering. |
 | [options.raw.width] | <code>number</code> |  | integral number of pixels wide. |
 | [options.raw.height] | <code>number</code> |  | integral number of pixels high. |
