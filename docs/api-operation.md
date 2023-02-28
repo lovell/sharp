@@ -357,9 +357,9 @@ This will, in general, enhance the clarity of the image by bringing out darker d
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  |  |
-| options.width | <code>number</code> |  | integer width of the region in pixels. |
-| options.height | <code>number</code> |  | integer height of the region in pixels. |
-| [options.maxSlope] | <code>number</code> | <code>3</code> | maximum value for the slope of the  cumulative histogram. A value of 0 disables contrast limiting. Valid values  are integers in the range 0-100 (inclusive) |
+| options.width | <code>number</code> |  | Integral width of the search window, in pixels. |
+| options.height | <code>number</code> |  | Integral height of the search window, in pixels. |
+| [options.maxSlope] | <code>number</code> | <code>3</code> | Integral level of brightening, between 0 and 100, where 0 disables contrast limiting. |
 
 **Example**  
 ```js

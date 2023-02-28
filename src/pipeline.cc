@@ -1659,6 +1659,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
       baton->rotationAngle != 0.0 ||
       baton->tileAngle != 0 ||
       baton->useExifOrientation ||
+      baton->claheWidth != 0 ||
       !baton->affineMatrix.empty()
     ) {
       baton->input->access = VIPS_ACCESS_RANDOM;
