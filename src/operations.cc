@@ -6,7 +6,6 @@
 #include <memory>
 #include <tuple>
 #include <vector>
-
 #include <vips/vips8>
 
 #include "common.h"
@@ -46,7 +45,7 @@ namespace sharp {
   /*
    * Stretch luminance to cover full dynamic range.
    */
-  VImage Normalise(VImage image) {
+  VImage Normalise(VImage image, int const lower, int const upper) {
     // Get original colourspace
     VipsInterpretation typeBeforeNormalize = image.interpretation();
     if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {
@@ -56,9 +55,11 @@ namespace sharp {
     VImage lab = image.colourspace(VIPS_INTERPRETATION_LAB);
     // Extract luminance
     VImage luminance = lab[0];
+
     // Find luminance range
-    int const min = luminance.percent(1);
-    int const max = luminance.percent(99);
+    int const min = lower == 0 ? luminance.min() : luminance.percent(lower);
+    int const max = upper == 100 ? luminance.max() : luminance.percent(upper);
+
     if (std::abs(max - min) > 1) {
       // Extract chroma
       VImage chroma = lab.extract_band(1, VImage::option()->set("n", 2));

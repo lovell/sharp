@@ -447,18 +447,26 @@ declare namespace sharp {
         negate(negate?: boolean | NegateOptions): Sharp;
 
         /**
-         * Enhance output image contrast by stretching its luminance to cover the full dynamic range.
-         * @param normalise true to enable and false to disable (defaults to true)
+         * Enhance output image contrast by stretching its luminance to cover a full dynamic range.
+         *
+         * Uses a histogram-based approach, taking a default range of 1% to 99% to reduce sensitivity to noise at the extremes.
+         *
+         * Luminance values below the `lower` percentile will be underexposed by clipping to zero.
+         * Luminance values above the `upper` percentile will be overexposed by clipping to the max pixel value.
+         *
+         * @param normalise options
+         * @throws {Error} Invalid parameters
          * @returns A sharp instance that can be used to chain operations
          */
-        normalise(normalise?: boolean): Sharp;
+        normalise(normalise?: NormaliseOptions): Sharp;
 
         /**
          * Alternative spelling of normalise.
-         * @param normalize true to enable and false to disable (defaults to true)
+         * @param normalize options
+         * @throws {Error} Invalid parameters
          * @returns A sharp instance that can be used to chain operations
          */
-        normalize(normalize?: boolean): Sharp;
+        normalize(normalize?: NormaliseOptions): Sharp;
 
         /**
          * Perform contrast limiting adaptive histogram equalization (CLAHE)
@@ -1216,6 +1224,13 @@ declare namespace sharp {
     interface NegateOptions {
         /** whether or not to negate any alpha channel. (optional, default true) */
         alpha?: boolean | undefined;
+    }
+
+    interface NormaliseOptions {
+      /** Percentile below which luminance values will be underexposed. */
+      lower?: number | undefined;
+      /** Percentile above which luminance values will be overexposed. */
+      upper?: number | undefined;
     }
 
     interface ResizeOptions {

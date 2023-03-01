@@ -74,6 +74,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       VipsAngle autoRotation = VIPS_ANGLE_D0;
       bool autoFlip = FALSE;
       bool autoFlop = FALSE;
+
       if (baton->useExifOrientation) {
         // Rotate and flip image according to Exif orientation
         std::tie(autoRotation, autoFlip, autoFlop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
@@ -682,7 +683,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Apply normalisation - stretch luminance to cover full dynamic range
       if (baton->normalise) {
-        image = sharp::Normalise(image);
+        image = sharp::Normalise(image,  baton->normaliseLower, baton->normaliseUpper);
       }
 
       // Apply contrast limiting adaptive histogram equalization (CLAHE)
@@ -1483,6 +1484,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->linearB = sharp::AttrAsVectorOfDouble(options, "linearB");
   baton->greyscale = sharp::AttrAsBool(options, "greyscale");
   baton->normalise = sharp::AttrAsBool(options, "normalise");
+  baton->normaliseLower = sharp::AttrAsUint32(options, "normaliseLower");
+  baton->normaliseUpper = sharp::AttrAsUint32(options, "normaliseUpper");
   baton->tintA = sharp::AttrAsDouble(options, "tintA");
   baton->tintB = sharp::AttrAsDouble(options, "tintB");
   baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");
