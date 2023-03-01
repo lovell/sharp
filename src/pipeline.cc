@@ -1175,7 +1175,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     // Handle warnings
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
-      debuglog.Call({ Napi::String::New(env, warning) });
+      debuglog.MakeCallback(Receiver().Value(), { Napi::String::New(env, warning) });
       warning = sharp::VipsWarningPop();
     }
 
@@ -1251,7 +1251,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     // Decrement processing task counter
     g_atomic_int_dec_and_test(&sharp::counterProcess);
     Napi::Number queueLength = Napi::Number::New(env, static_cast<double>(sharp::counterQueue));
-    queueListener.Call(Receiver().Value(), { queueLength });
+    queueListener.MakeCallback(Receiver().Value(), { queueLength });
   }
 
  private:
@@ -1681,7 +1681,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // Increment queued task counter
   g_atomic_int_inc(&sharp::counterQueue);
   Napi::Number queueLength = Napi::Number::New(info.Env(), static_cast<double>(sharp::counterQueue));
-  queueListener.Call(info.This(), { queueLength });
+  queueListener.MakeCallback(info.This(), { queueLength });
 
   return info.Env().Undefined();
 }

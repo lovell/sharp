@@ -53,6 +53,9 @@ Requires libvips v8.14.0
   [#3556](https://github.com/lovell/sharp/pull/3556)
   [@janaz](https://github.com/janaz)
 
+* Ensure all async JS callbacks are wrapped to help avoid possible race condition.
+  [#3569](https://github.com/lovell/sharp/issues/3569)
+
 ## v0.31 - *eagle*
 
 Requires libvips v8.13.3
