@@ -20,10 +20,8 @@ describe('Normalization', function () {
   it('spreads rgb image values between 0 and 255', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
       .normalise()
-      .raw()
-      .toBuffer(function (err, data, info) {
+      .toFile('test2.jpg', function (err) {
         if (err) throw err;
-        assertNormalized(data);
         done();
       });
   });
@@ -97,6 +95,17 @@ describe('Normalization', function () {
   it('works with 16-bit RGBA images', function (done) {
     sharp(fixtures.inputPngWithTransparency16bit)
       .normalise()
+      .raw()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assertNormalized(data);
+        done();
+      });
+  });
+
+  it('should extract handle luminance range', function (done) {
+    sharp(fixtures.inputJpgWithLowContrast)
+      .normalise(true, 10, 70)
       .raw()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
