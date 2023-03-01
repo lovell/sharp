@@ -99,6 +99,8 @@ struct PipelineBaton {
   double gammaOut;
   bool greyscale;
   bool normalise;
+  int normaliseLowerBin;
+  int normaliseUpperBin;
   int claheWidth;
   int claheHeight;
   int claheMaxSlope;
@@ -262,6 +264,8 @@ struct PipelineBaton {
     gamma(0.0),
     greyscale(false),
     normalise(false),
+    normaliseLowerBin(1),
+    normaliseUpperBin(99),
     claheWidth(0),
     claheHeight(0),
     claheMaxSlope(3),

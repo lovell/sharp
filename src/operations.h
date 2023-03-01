@@ -22,7 +22,7 @@ namespace sharp {
   /*
    * Stretch luminance to cover full dynamic range.
    */
-  VImage Normalise(VImage image);
+  VImage Normalise(VImage image, const int lowerBin, const int upperBin);
 
   /*
    * Contrast limiting adapative histogram equalization (CLAHE)
