@@ -55,9 +55,11 @@ namespace sharp {
     VImage lab = image.colourspace(VIPS_INTERPRETATION_LAB);
     // Extract luminance
     VImage luminance = lab[0];
+
     // Find luminance range
-    int const min = luminance.percent(lowerBin);
-    int const max = luminance.percent(upperBin);
+    int const min = lowerBin == 0 ? luminance.min() : luminance.percent(lowerBin);
+    int const max = upperBin == 100 ? luminance.max() : luminance.percent(upperBin);
+
     if (std::abs(max - min) > 1) {
       // Extract chroma
       VImage chroma = lab.extract_band(1, VImage::option()->set("n", 2));
