@@ -20,16 +20,18 @@ describe('Normalization', function () {
   it('spreads rgb image values between 0 and 255', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
       .normalise()
-      .toFile('test2.jpg', function (err) {
+      .raw()
+      .toBuffer(function (err, data, info) {
         if (err) throw err;
+        assertNormalized(data);
         done();
-      });
+      })
   });
 
   it('spreads grayscaled image values between 0 and 255', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
       .greyscale()
-      .normalize(true)
+      .normalize()
       .raw()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
@@ -105,12 +107,54 @@ describe('Normalization', function () {
 
   it('should extract handle luminance range', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
-      .normalise(true, 10, 70)
+      .normalise( 10, 70)
       .raw()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assertNormalized(data);
         done();
       });
+  });
+
+  it('should throw error when the lowerBin is below zero', function () {
+    assert.throws(
+      () => sharp().normalise(-10),
+      /Range must be between 0 and 100 inclusively/
+    );
+  });
+
+  it('should throw error when the lowerBin is above 100', function () {
+    assert.throws(
+      () => sharp().normalise(110),
+      /Range must be between 0 and 100 inclusively/
+    );
+  });
+
+  it('should throw error when the upperBin is below zero', function () {
+    assert.throws(
+      () => sharp().normalise(0,-10),
+      /Range must be between 0 and 100 inclusively/
+    );
+  });
+
+  it('should throw error when the upperBin is above 100', function () {
+    assert.throws(
+      () => sharp().normalise(0,110),
+      /Range must be between 0 and 100 inclusively/
+    );
+  });
+
+  it('should throw error when the lowerBin is not type number', function () {
+    assert.throws(
+      () => sharp().normalise(''),
+      /lowerBin and upperBin must be of type number/
+    );
+  });
+
+  it('should throw error when the upperBin is not type number', function () {
+    assert.throws(
+      () => sharp().normalise(0,''),
+      /lowerBin and upperBin must be of type number/
+    );
   });
 });
