@@ -246,6 +246,9 @@ SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=gli
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
+When integrating with AWS API Gateway, ensure it is configured with the relevant
+[binary media types](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings.html).
+
 ## Bundlers
 
 ### webpack
