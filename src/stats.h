@@ -40,6 +40,8 @@ struct StatsBaton {
   int dominantRed;
   int dominantGreen;
   int dominantBlue;
+  int minLuminance;
+  int maxLuminance;
 
   std::string err;
 
@@ -50,7 +52,9 @@ struct StatsBaton {
     sharpness(0.0),
     dominantRed(0),
     dominantGreen(0),
-    dominantBlue(0)
+    dominantBlue(0),
+    minLuminance(0),
+    maxLuminance(0)
     {}
 };
 

@@ -42,7 +42,7 @@ class StatsWorker : public Napi::AsyncWorker {
     if (imageType != sharp::ImageType::UNKNOWN) {
       try {
         vips::VImage stats = image.stats();
-        int const bands = image.bands();
+        int bands = image.bands();
         for (int b = 1; b <= bands; b++) {
           ChannelStats cStats(
             static_cast<int>(stats.getpoint(STAT_MIN_INDEX, b).front()),
@@ -57,6 +57,13 @@ class StatsWorker : public Napi::AsyncWorker {
             static_cast<int>(stats.getpoint(STAT_MAXY_INDEX, b).front()));
           baton->channelStats.push_back(cStats);
         }
+
+        // get lch stats
+        vips:VImage lch = image.colourspace(VIPS_INTERPRETATION_LCH);
+        vips::VImage lchStats = lch.stats();
+        baton -> minLuminance = static_cast<int>(lchStats.getpoint(STAT_MIN_INDEX, 1).front());
+        baton -> maxLuminance = static_cast<int>(lchStats.getpoint(STAT_MAX_INDEX, 1).front());
+
         // Image is not opaque when alpha layer is present and contains a non-mamixa value
         if (sharp::HasAlpha(image)) {
           double const minAlpha = static_cast<double>(stats.getpoint(STAT_MIN_INDEX, bands).front());
@@ -136,6 +143,8 @@ class StatsWorker : public Napi::AsyncWorker {
       info.Set("isOpaque", baton->isOpaque);
       info.Set("entropy", baton->entropy);
       info.Set("sharpness", baton->sharpness);
+      info.Set("maxLuminance", baton -> maxLuminance);
+      info.Set("minLuminance", baton -> minLuminance);
       Napi::Object dominant = Napi::Object::New(env);
       dominant.Set("r", baton->dominantRed);
       dominant.Set("g", baton->dominantGreen);
