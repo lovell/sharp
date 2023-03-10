@@ -1485,8 +1485,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->greyscale = sharp::AttrAsBool(options, "greyscale");
 
   baton->normalise = sharp::AttrAsBool(options, "normalise");
-  baton->normaliseLowerBin = sharp::AttrAsInt32(options,"normaliseLowerBin");
-  baton->normaliseUpperBin = sharp::AttrAsInt32(options,"normaliseUpperBin");
+  baton->normaliseLowerBin = sharp::AttrAsInt32(options, "normaliseLowerBin");
+  baton->normaliseUpperBin = sharp::AttrAsInt32(options, "normaliseUpperBin");
 
   baton->tintA = sharp::AttrAsDouble(options, "tintA");
   baton->tintB = sharp::AttrAsDouble(options, "tintB");

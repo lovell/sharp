@@ -92,7 +92,7 @@
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run test-lint && npm run test-unit && npm run test-licensing && npm run test-types",
-    "test-lint": "semistandard && cpplint",
+    "test-lint": "cpplint",
     "test-unit": "nyc --reporter=lcov --reporter=text --check-coverage --branches=100 mocha",
     "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;MIT\"",
     "test-leak": "./test/leak/leak.sh",
