@@ -1,8 +1,9 @@
 ## metadata
 Fast access to (uncached) image metadata without decoding any compressed pixel data.
 
-This is taken from the header of the input image.
-It does not include operations, such as resize, to be applied to the output image.
+This is read from the header of the input image.
+It does not take into consideration any operations to be applied to the output image,
+such as resize or rotate.
 
 Dimensions in the response will respect the `page` and `pages` properties of the
 [constructor parameters](/api-constructor#parameters).
