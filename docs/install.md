@@ -148,7 +148,7 @@ or the `npm_config_sharp_local_prebuilds` environment variable.
 URL example:
 if `sharp_binary_host` is set to `https://hostname/path`
 and the sharp version is `1.2.3` then the resultant URL will be
-`https://hostname/path/sharp-v1.2.3-napi-v5-platform-arch.tar.gz`.
+`https://hostname/path/v1.2.3/sharp-v1.2.3-napi-v5-platform-arch.tar.gz`.
 
 Filename example:
 if `sharp_local_prebuilds` is set to `/path`
