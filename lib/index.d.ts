@@ -448,17 +448,22 @@ declare namespace sharp {
 
         /**
          * Enhance output image contrast by stretching its luminance to cover the full dynamic range.
-         * @param normalise true to enable and false to disable (defaults to true)
+         * passing a lower or upper bin values will stretch the luminance such that the upper and lower
+         * bin values are at 0 to 255. all values above or below the upper and lower limit will be
+         * clipped to 0 and 255.
+         * @param normalise true to enable and false to disable, or an object with a
+         * lower and upper bin value to stretch the luminance between those two values (defaults to true)
          * @returns A sharp instance that can be used to chain operations
          */
-        normalise(normalise?: boolean): Sharp;
+        normalise(normalise?: boolean | NormalizeOptions): Sharp;
 
         /**
          * Alternative spelling of normalise.
-         * @param normalize true to enable and false to disable (defaults to true)
+         * @param normalise true to enable and false to disable, or an object with a
+         * lower and upper bin value to stretch the luminance between those two values (defaults to true)
          * @returns A sharp instance that can be used to chain operations
          */
-        normalize(normalize?: boolean): Sharp;
+        normalize(normalise?: boolean | NormalizeOptions): Sharp;
 
         /**
          * Perform contrast limiting adaptive histogram equalization (CLAHE)
@@ -1216,6 +1221,13 @@ declare namespace sharp {
     interface NegateOptions {
         /** whether or not to negate any alpha channel. (optional, default true) */
         alpha?: boolean | undefined;
+    }
+
+    interface NormalizeOptions {
+      /** lower percentage of luminance which to perform normalisation against */
+      lowerBin?: boolean | undefined;
+      /** upper percentage of luminance which to perform normalisation against */
+      upperBin?: number | undefined;
     }
 
     interface ResizeOptions {
