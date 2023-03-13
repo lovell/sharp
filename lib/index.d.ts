@@ -1012,6 +1012,10 @@ declare namespace sharp {
         sharpness: number;
         /** Object containing most dominant sRGB colour based on a 4096-bin 3D histogram (experimental) */
         dominant: { r: number; g: number; b: number };
+        /** Maximum luminence after conversion to CIELAB color space */
+        maxLuminance: number
+        /** Minimum luminence after conversion to CIELAB color space */
+        minLuminance: number
     }
 
     interface ChannelStats {

@@ -145,11 +145,13 @@ class StatsWorker : public Napi::AsyncWorker {
       info.Set("sharpness", baton->sharpness);
       info.Set("maxLuminance", baton -> maxLuminance);
       info.Set("minLuminance", baton -> minLuminance);
+
       Napi::Object dominant = Napi::Object::New(env);
       dominant.Set("r", baton->dominantRed);
       dominant.Set("g", baton->dominantGreen);
       dominant.Set("b", baton->dominantBlue);
       info.Set("dominant", dominant);
+
       Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
     } else {
       Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
