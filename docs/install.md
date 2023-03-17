@@ -179,6 +179,16 @@ and the libvips version is `4.5.6` then the resultant filename will be
 
 See the Chinese mirror below for a further example.
 
+If these binaries are modified, new integrity hashes can be provided
+at install time via `npm_package_config_integrity_platform_arch`
+environment variables, for example set
+`npm_package_config_integrity_linux_x64` to `sha512-abc...`.
+
+The integrity hash of a file can be generated via:
+```sh
+sha512sum libvips-x.y.z-platform-arch.tar.br | cut -f1 -d' ' | xxd -r -p | base64 -w 0
+```
+
 ## Chinese mirror
 
 A mirror site based in China, provided by Alibaba, contains binaries for both sharp and libvips.
