@@ -2,7 +2,7 @@
 
 ## v0.32 - *flow*
 
-Requires libvips v8.14.0
+Requires libvips v8.14.2
 
 ### v0.32.0 - TBD
 
