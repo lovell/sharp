@@ -155,7 +155,7 @@
     "nyc": "^15.1.0",
     "prebuild": "^11.0.4",
     "semistandard": "^16.0.1",
-    "tsd": "^0.26.1"
+    "tsd": "^0.28.0"
   },
   "license": "Apache-2.0",
   "config": {
