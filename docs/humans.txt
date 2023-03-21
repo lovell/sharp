@@ -269,3 +269,6 @@ GitHub: https://github.com/ejoebstl
 
 Name: Tomasz Janowski
 GitHub: https://github.com/janaz
+
+Name: Lachlan Newman
+GitHub: https://github.com/LachlanNewman

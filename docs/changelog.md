@@ -56,6 +56,10 @@ Requires libvips v8.14.0
 * Ensure all async JS callbacks are wrapped to help avoid possible race condition.
   [#3569](https://github.com/lovell/sharp/issues/3569)
 
+* Add support to `normalise` for `lower` and `upper` percentiles.
+  [#3583](https://github.com/lovell/sharp/pull/3583)
+  [@LachlanNewman](https://github.com/LachlanNewman)
+
 ## v0.31 - *eagle*
 
 Requires libvips v8.13.3

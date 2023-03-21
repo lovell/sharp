@@ -312,17 +312,32 @@ const output = await sharp(input)
 
 
 ## normalise
-Enhance output image contrast by stretching its luminance to cover the full dynamic range.
+Enhance output image contrast by stretching its luminance to cover a full dynamic range.
+
+Uses a histogram-based approach, taking a default range of 1% to 99% to reduce sensitivity to noise at the extremes.
+
+Luminance values below the `lower` percentile will be underexposed by clipping to zero.
+Luminance values above the `upper` percentile will be overexposed by clipping to the max pixel value.
 
 
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [normalise] | <code>Boolean</code> | <code>true</code> | 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>Object</code> |  |  |
+| [options.lower] | <code>number</code> | <code>1</code> | Percentile below which luminance values will be underexposed. |
+| [options.upper] | <code>number</code> | <code>99</code> | Percentile above which luminance values will be overexposed. |
 
 **Example**  
 ```js
-const output = await sharp(input).normalise().toBuffer();
+const output = await sharp(input)
+  .normalise()
+  .toBuffer();
+```
+**Example**  
+```js
+const output = await sharp(input)
+  .normalise({ lower: 0, upper: 100 })
+  .toBuffer();
 ```
 
 
@@ -331,13 +346,17 @@ Alternative spelling of normalise.
 
 
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [normalize] | <code>Boolean</code> | <code>true</code> | 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>Object</code> |  |  |
+| [options.lower] | <code>number</code> | <code>1</code> | Percentile below which luminance values will be underexposed. |
+| [options.upper] | <code>number</code> | <code>99</code> | Percentile above which luminance values will be overexposed. |
 
 **Example**  
 ```js
-const output = await sharp(input).normalize().toBuffer();
+const output = await sharp(input)
+  .normalize()
+  .toBuffer();
 ```
 
 
