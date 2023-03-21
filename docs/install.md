@@ -148,7 +148,7 @@ or the `npm_config_sharp_local_prebuilds` environment variable.
 URL example:
 if `sharp_binary_host` is set to `https://hostname/path`
 and the sharp version is `1.2.3` then the resultant URL will be
-`https://hostname/path/sharp-v1.2.3-napi-v5-platform-arch.tar.gz`.
+`https://hostname/path/v1.2.3/sharp-v1.2.3-napi-v5-platform-arch.tar.gz`.
 
 Filename example:
 if `sharp_local_prebuilds` is set to `/path`
@@ -178,6 +178,16 @@ and the libvips version is `4.5.6` then the resultant filename will be
 `/path/v4.5.6/libvips-4.5.6-platform-arch.tar.br`.
 
 See the Chinese mirror below for a further example.
+
+If these binaries are modified, new integrity hashes can be provided
+at install time via `npm_package_config_integrity_platform_arch`
+environment variables, for example set
+`npm_package_config_integrity_linux_x64` to `sha512-abc...`.
+
+The integrity hash of a file can be generated via:
+```sh
+sha512sum libvips-x.y.z-platform-arch.tar.br | cut -f1 -d' ' | xxd -r -p | base64 -w 0
+```
 
 ## Chinese mirror
 
@@ -245,6 +255,9 @@ SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=gli
 
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
+
+When integrating with AWS API Gateway, ensure it is configured with the relevant
+[binary media types](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings.html).
 
 ## Bundlers
 
