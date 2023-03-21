@@ -220,21 +220,16 @@ describe('Tile', function () {
 
   it('Valid depths pass', function () {
     ['onepixel', 'onetile', 'one'].forEach(function (depth) {
-      assert.doesNotThrow(function (depth) {
-        sharp().tile({
-          depth: depth
-        });
-      });
+      assert.doesNotThrow(() => sharp().tile({ depth }));
     });
   });
 
   it('Invalid depths fail', function () {
     ['depth', 1].forEach(function (depth) {
-      assert.throws(function () {
-        sharp().tile({
-          depth: depth
-        });
-      });
+      assert.throws(
+        () => sharp().tile({ depth }),
+        /Expected one of: onepixel, onetile, one for depth but received/
+      );
     });
   });
 
@@ -295,12 +290,17 @@ describe('Tile', function () {
     });
   });
 
-  it('Invalid center parameter value fail', function () {
-    assert.throws(function () {
-      sharp().tile({
-        centre: 'true'
-      });
-    });
+  it('Valid center parameter value passes', function () {
+    assert.doesNotThrow(
+      () => sharp().tile({ center: true })
+    );
+  });
+
+  it('Invalid centre parameter value fails', function () {
+    assert.throws(
+      () => sharp().tile({ centre: 'true' }),
+      /Expected boolean for tileCentre but received true of type string/
+    );
   });
 
   it('Valid id parameter value passes', function () {
@@ -319,676 +319,683 @@ describe('Tile', function () {
     });
   });
 
+  it('Valid basename parameter value passes', function () {
+    assert.doesNotThrow(
+      () => sharp().tile({ basename: 'pass' })
+    );
+  });
+
   it('Invalid basename parameter value fails', function () {
-    assert.throws(function () {
-      sharp().tile({
-        basename: true
+    assert.throws(
+      () => sharp().tile({ basename: true }),
+      /Expected string for basename but received/
+    );
+  });
+
+  if (sharp.format.dz.output.file) {
+    it('Deep Zoom layout', function (done) {
+      const directory = fixtures.path('output.dzi_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .toFile(fixtures.path('output.dzi'), function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('undefined', typeof info.size);
+            assertDeepZoomTiles(directory, 256, 13, done);
+          });
       });
     });
-  });
 
-  it('Deep Zoom layout', function (done) {
-    const directory = fixtures.path('output.dzi_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .toFile(fixtures.path('output.dzi'), function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('undefined', typeof info.size);
-          assertDeepZoomTiles(directory, 256, 13, done);
-        });
-    });
-  });
-
-  it('Deep Zoom layout with custom size+overlap', function (done) {
-    const directory = fixtures.path('output.512.dzi_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          size: 512,
-          overlap: 16
-        })
-        .toFile(fixtures.path('output.512.dzi'), function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('undefined', typeof info.size);
-          assertDeepZoomTiles(directory, 512 + (2 * 16), 13, function () {
-            assertTileOverlap(directory, 512, done);
-          });
-        });
-    });
-  });
-
-  it('Deep Zoom layout with custom size+angle', function (done) {
-    const directory = fixtures.path('output.512_90.dzi_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          size: 512,
-          angle: 90
-        })
-        .toFile(fixtures.path('output.512_90.dzi'), function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('undefined', typeof info.size);
-          assertDeepZoomTiles(directory, 512, 13, done);
-          // Verifies tiles in 10th level are rotated
-          const tile = path.join(directory, '10', '0_1.jpeg');
-          // verify that the width and height correspond to the rotated image
-          // expected are w=512 and h=170 for the 0_1.jpeg.
-          // if a 0 angle is supplied to the .tile function
-          // the expected values are w=170 and h=512 for the 1_0.jpeg
-          sharp(tile).metadata(function (err, metadata) {
-            if (err) {
-              throw err;
-            } else {
-              assert.strictEqual(true, metadata.width === 512);
-              assert.strictEqual(true, metadata.height === 170);
-            }
-          });
-        });
-    });
-  });
-
-  it('Deep Zoom layout with depth of one', function (done) {
-    const directory = fixtures.path('output.512_depth_one.dzi_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          size: 512,
-          depth: 'one'
-        })
-        .toFile(fixtures.path('output.512_depth_one.dzi'), function (err, info) {
-          if (err) throw err;
-          // Verify only one depth generated
-          assertDeepZoomTiles(directory, 512, 1, done);
-        });
-    });
-  });
-
-  it('Deep Zoom layout with depth of onepixel', function (done) {
-    const directory = fixtures.path('output.512_depth_onepixel.dzi_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          size: 512,
-          depth: 'onepixel'
-        })
-        .toFile(fixtures.path('output.512_depth_onepixel.dzi'), function (err, info) {
-          if (err) throw err;
-          // Verify only one depth generated
-          assertDeepZoomTiles(directory, 512, 13, done);
-        });
-    });
-  });
-
-  it('Deep Zoom layout with depth of onetile', function (done) {
-    const directory = fixtures.path('output.256_depth_onetile.dzi_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          size: 256,
-          depth: 'onetile'
-        })
-        .toFile(fixtures.path('output.256_depth_onetile.dzi'), function (err, info) {
-          if (err) throw err;
-          // Verify only one depth generated
-          assertDeepZoomTiles(directory, 256, 5, done);
-        });
-    });
-  });
-
-  it('Deep Zoom layout with skipBlanks', function (done) {
-    const directory = fixtures.path('output.256_skip_blanks.dzi_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpgOverlayLayer2)
-        .tile({
-          size: 256,
-          skipBlanks: 0
-        })
-        .toFile(fixtures.path('output.256_skip_blanks.dzi'), function (err, info) {
-          if (err) throw err;
-          // assert them 0_0.jpeg doesn't exist because it's a white tile
-          const whiteTilePath = path.join(directory, '11', '0_0.jpeg');
-          assert.strictEqual(fs.existsSync(whiteTilePath), false, 'Tile should not exist');
-          // Verify only one depth generated
-          assertDeepZoomTiles(directory, 256, 12, done);
-        });
-    });
-  });
-
-  it('Zoomify layout', function (done) {
-    const directory = fixtures.path('output.zoomify.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          layout: 'zoomify'
-        })
-        .toFile(fixtures.path('output.zoomify.dzi'), function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          fs.stat(path.join(directory, 'ImageProperties.xml'), function (err, stat) {
+    it('Deep Zoom layout with custom size+overlap', function (done) {
+      const directory = fixtures.path('output.512.dzi_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            size: 512,
+            overlap: 16
+          })
+          .toFile(fixtures.path('output.512.dzi'), function (err, info) {
             if (err) throw err;
-            assert.strictEqual(true, stat.isFile());
-            assert.strictEqual(true, stat.size > 0);
-            done();
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('undefined', typeof info.size);
+            assertDeepZoomTiles(directory, 512 + (2 * 16), 13, function () {
+              assertTileOverlap(directory, 512, done);
+            });
           });
-        });
+      });
     });
-  });
 
-  it('Zoomify layout with depth one', function (done) {
-    const directory = fixtures.path('output.zoomify.depth_one.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          size: 256,
-          layout: 'zoomify',
-          depth: 'one'
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          assertZoomifyTiles(directory, 256, 1, done);
-        });
-    });
-  });
-
-  it('Zoomify layout with depth onetile', function (done) {
-    const directory = fixtures.path('output.zoomify.depth_onetile.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          size: 256,
-          layout: 'zoomify',
-          depth: 'onetile'
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          assertZoomifyTiles(directory, 256, 5, done);
-        });
-    });
-  });
-
-  it('Zoomify layout with depth onepixel', function (done) {
-    const directory = fixtures.path('output.zoomify.depth_onepixel.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          size: 256,
-          layout: 'zoomify',
-          depth: 'onepixel'
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          assertZoomifyTiles(directory, 256, 13, done);
-        });
-    });
-  });
-
-  it('Zoomify layout with skip blanks', function (done) {
-    const directory = fixtures.path('output.zoomify.skipBlanks.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpgOverlayLayer2)
-        .tile({
-          size: 256,
-          layout: 'zoomify',
-          skipBlanks: 0
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          // assert them 0_0.jpeg doesn't exist because it's a white tile
-          const whiteTilePath = path.join(directory, 'TileGroup0', '2-0-0.jpg');
-          assert.strictEqual(fs.existsSync(whiteTilePath), false, 'Tile should not exist');
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2048, info.width);
-          assert.strictEqual(1536, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          assertZoomifyTiles(directory, 256, 4, done);
-        });
-    });
-  });
-
-  it('Google layout', function (done) {
-    const directory = fixtures.path('output.google.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          layout: 'google'
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          fs.stat(path.join(directory, '0', '0', '0.jpg'), function (err, stat) {
+    it('Deep Zoom layout with custom size+angle', function (done) {
+      const directory = fixtures.path('output.512_90.dzi_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            size: 512,
+            angle: 90
+          })
+          .toFile(fixtures.path('output.512_90.dzi'), function (err, info) {
             if (err) throw err;
-            assert.strictEqual(true, stat.isFile());
-            assert.strictEqual(true, stat.size > 0);
-            done();
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('undefined', typeof info.size);
+            assertDeepZoomTiles(directory, 512, 13, done);
+            // Verifies tiles in 10th level are rotated
+            const tile = path.join(directory, '10', '0_1.jpeg');
+            // verify that the width and height correspond to the rotated image
+            // expected are w=512 and h=170 for the 0_1.jpeg.
+            // if a 0 angle is supplied to the .tile function
+            // the expected values are w=170 and h=512 for the 1_0.jpeg
+            sharp(tile).metadata(function (err, metadata) {
+              if (err) {
+                throw err;
+              } else {
+                assert.strictEqual(true, metadata.width === 512);
+                assert.strictEqual(true, metadata.height === 170);
+              }
+            });
           });
-        });
+      });
     });
-  });
 
-  it('Google layout with jpeg format', function (done) {
-    const directory = fixtures.path('output.jpg.google.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .jpeg({
-          quality: 1
-        })
-        .tile({
-          layout: 'google'
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          const sample = path.join(directory, '0', '0', '0.jpg');
-          sharp(sample).metadata(function (err, metadata) {
+    it('Deep Zoom layout with depth of one', function (done) {
+      const directory = fixtures.path('output.512_depth_one.dzi_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            size: 512,
+            depth: 'one'
+          })
+          .toFile(fixtures.path('output.512_depth_one.dzi'), function (err, info) {
             if (err) throw err;
-            assert.strictEqual('jpeg', metadata.format);
-            assert.strictEqual('srgb', metadata.space);
-            assert.strictEqual(3, metadata.channels);
-            assert.strictEqual(false, metadata.hasProfile);
-            assert.strictEqual(false, metadata.hasAlpha);
-            assert.strictEqual(256, metadata.width);
-            assert.strictEqual(256, metadata.height);
-            fs.stat(sample, function (err, stat) {
+            // Verify only one depth generated
+            assertDeepZoomTiles(directory, 512, 1, done);
+          });
+      });
+    });
+
+    it('Deep Zoom layout with depth of onepixel', function (done) {
+      const directory = fixtures.path('output.512_depth_onepixel.dzi_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            size: 512,
+            depth: 'onepixel'
+          })
+          .toFile(fixtures.path('output.512_depth_onepixel.dzi'), function (err, info) {
+            if (err) throw err;
+            // Verify only one depth generated
+            assertDeepZoomTiles(directory, 512, 13, done);
+          });
+      });
+    });
+
+    it('Deep Zoom layout with depth of onetile', function (done) {
+      const directory = fixtures.path('output.256_depth_onetile.dzi_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            size: 256,
+            depth: 'onetile'
+          })
+          .toFile(fixtures.path('output.256_depth_onetile.dzi'), function (err, info) {
+            if (err) throw err;
+            // Verify only one depth generated
+            assertDeepZoomTiles(directory, 256, 5, done);
+          });
+      });
+    });
+
+    it('Deep Zoom layout with skipBlanks', function (done) {
+      const directory = fixtures.path('output.256_skip_blanks.dzi_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpgOverlayLayer2)
+          .tile({
+            size: 256,
+            skipBlanks: 0
+          })
+          .toFile(fixtures.path('output.256_skip_blanks.dzi'), function (err, info) {
+            if (err) throw err;
+            // assert them 0_0.jpeg doesn't exist because it's a white tile
+            const whiteTilePath = path.join(directory, '11', '0_0.jpeg');
+            assert.strictEqual(fs.existsSync(whiteTilePath), false, 'Tile should not exist');
+            // Verify only one depth generated
+            assertDeepZoomTiles(directory, 256, 12, done);
+          });
+      });
+    });
+
+    it('Zoomify layout', function (done) {
+      const directory = fixtures.path('output.zoomify.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            layout: 'zoomify'
+          })
+          .toFile(fixtures.path('output.zoomify.dzi'), function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            fs.stat(path.join(directory, 'ImageProperties.xml'), function (err, stat) {
               if (err) throw err;
-              assert.strictEqual(true, stat.size < 2000);
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
               done();
             });
           });
-        });
+      });
     });
-  });
 
-  it('Google layout with png format', function (done) {
-    const directory = fixtures.path('output.png.google.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .png({
-          compressionLevel: 0
-        })
-        .tile({
-          layout: 'google'
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          const sample = path.join(directory, '0', '0', '0.png');
-          sharp(sample).metadata(function (err, metadata) {
+    it('Zoomify layout with depth one', function (done) {
+      const directory = fixtures.path('output.zoomify.depth_one.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            size: 256,
+            layout: 'zoomify',
+            depth: 'one'
+          })
+          .toFile(directory, function (err, info) {
             if (err) throw err;
-            assert.strictEqual('png', metadata.format);
-            assert.strictEqual('srgb', metadata.space);
-            assert.strictEqual(3, metadata.channels);
-            assert.strictEqual(false, metadata.hasProfile);
-            assert.strictEqual(false, metadata.hasAlpha);
-            assert.strictEqual(256, metadata.width);
-            assert.strictEqual(256, metadata.height);
-            fs.stat(sample, function (err, stat) {
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            assertZoomifyTiles(directory, 256, 1, done);
+          });
+      });
+    });
+
+    it('Zoomify layout with depth onetile', function (done) {
+      const directory = fixtures.path('output.zoomify.depth_onetile.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            size: 256,
+            layout: 'zoomify',
+            depth: 'onetile'
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            assertZoomifyTiles(directory, 256, 5, done);
+          });
+      });
+    });
+
+    it('Zoomify layout with depth onepixel', function (done) {
+      const directory = fixtures.path('output.zoomify.depth_onepixel.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            size: 256,
+            layout: 'zoomify',
+            depth: 'onepixel'
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            assertZoomifyTiles(directory, 256, 13, done);
+          });
+      });
+    });
+
+    it('Zoomify layout with skip blanks', function (done) {
+      const directory = fixtures.path('output.zoomify.skipBlanks.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpgOverlayLayer2)
+          .tile({
+            size: 256,
+            layout: 'zoomify',
+            skipBlanks: 0
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            // assert them 0_0.jpeg doesn't exist because it's a white tile
+            const whiteTilePath = path.join(directory, 'TileGroup0', '2-0-0.jpg');
+            assert.strictEqual(fs.existsSync(whiteTilePath), false, 'Tile should not exist');
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2048, info.width);
+            assert.strictEqual(1536, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            assertZoomifyTiles(directory, 256, 4, done);
+          });
+      });
+    });
+
+    it('Google layout', function (done) {
+      const directory = fixtures.path('output.google.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            layout: 'google'
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            fs.stat(path.join(directory, '0', '0', '0.jpg'), function (err, stat) {
               if (err) throw err;
-              assert.strictEqual(true, stat.size > 44000);
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
               done();
             });
           });
-        });
+      });
     });
-  });
 
-  it('Google layout with webp format', function (done) {
-    const directory = fixtures.path('output.webp.google.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .webp({
-          quality: 1,
-          effort: 0
-        })
-        .tile({
-          layout: 'google'
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          const sample = path.join(directory, '0', '0', '0.webp');
-          sharp(sample).metadata(function (err, metadata) {
+    it('Google layout with jpeg format', function (done) {
+      const directory = fixtures.path('output.jpg.google.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .jpeg({
+            quality: 1
+          })
+          .tile({
+            layout: 'google'
+          })
+          .toFile(directory, function (err, info) {
             if (err) throw err;
-            assert.strictEqual('webp', metadata.format);
-            assert.strictEqual('srgb', metadata.space);
-            assert.strictEqual(3, metadata.channels);
-            assert.strictEqual(false, metadata.hasProfile);
-            assert.strictEqual(false, metadata.hasAlpha);
-            assert.strictEqual(256, metadata.width);
-            assert.strictEqual(256, metadata.height);
-            fs.stat(sample, function (err, stat) {
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            const sample = path.join(directory, '0', '0', '0.jpg');
+            sharp(sample).metadata(function (err, metadata) {
               if (err) throw err;
-              assert.strictEqual(true, stat.size < 2000);
+              assert.strictEqual('jpeg', metadata.format);
+              assert.strictEqual('srgb', metadata.space);
+              assert.strictEqual(3, metadata.channels);
+              assert.strictEqual(false, metadata.hasProfile);
+              assert.strictEqual(false, metadata.hasAlpha);
+              assert.strictEqual(256, metadata.width);
+              assert.strictEqual(256, metadata.height);
+              fs.stat(sample, function (err, stat) {
+                if (err) throw err;
+                assert.strictEqual(true, stat.size < 2000);
+                done();
+              });
+            });
+          });
+      });
+    });
+
+    it('Google layout with png format', function (done) {
+      const directory = fixtures.path('output.png.google.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .png({
+            compressionLevel: 0
+          })
+          .tile({
+            layout: 'google'
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            const sample = path.join(directory, '0', '0', '0.png');
+            sharp(sample).metadata(function (err, metadata) {
+              if (err) throw err;
+              assert.strictEqual('png', metadata.format);
+              assert.strictEqual('srgb', metadata.space);
+              assert.strictEqual(3, metadata.channels);
+              assert.strictEqual(false, metadata.hasProfile);
+              assert.strictEqual(false, metadata.hasAlpha);
+              assert.strictEqual(256, metadata.width);
+              assert.strictEqual(256, metadata.height);
+              fs.stat(sample, function (err, stat) {
+                if (err) throw err;
+                assert.strictEqual(true, stat.size > 44000);
+                done();
+              });
+            });
+          });
+      });
+    });
+
+    it('Google layout with webp format', function (done) {
+      const directory = fixtures.path('output.webp.google.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .webp({
+            quality: 1,
+            effort: 0
+          })
+          .tile({
+            layout: 'google'
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            const sample = path.join(directory, '0', '0', '0.webp');
+            sharp(sample).metadata(function (err, metadata) {
+              if (err) throw err;
+              assert.strictEqual('webp', metadata.format);
+              assert.strictEqual('srgb', metadata.space);
+              assert.strictEqual(3, metadata.channels);
+              assert.strictEqual(false, metadata.hasProfile);
+              assert.strictEqual(false, metadata.hasAlpha);
+              assert.strictEqual(256, metadata.width);
+              assert.strictEqual(256, metadata.height);
+              fs.stat(sample, function (err, stat) {
+                if (err) throw err;
+                assert.strictEqual(true, stat.size < 2000);
+                done();
+              });
+            });
+          });
+      });
+    });
+
+    it('Google layout with depth one', function (done) {
+      const directory = fixtures.path('output.google_depth_one.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            layout: 'google',
+            depth: 'one',
+            size: 256
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+
+            assertGoogleTiles(directory, 256, 1, done);
+          });
+      });
+    });
+
+    it('Google layout with depth onepixel', function (done) {
+      const directory = fixtures.path('output.google_depth_onepixel.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            layout: 'google',
+            depth: 'onepixel',
+            size: 256
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+
+            assertGoogleTiles(directory, 256, 13, done);
+          });
+      });
+    });
+
+    it('Google layout with depth onetile', function (done) {
+      const directory = fixtures.path('output.google_depth_onetile.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            layout: 'google',
+            depth: 'onetile',
+            size: 256
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+
+            assertGoogleTiles(directory, 256, 5, done);
+          });
+      });
+    });
+
+    it('Google layout with default skip Blanks', function (done) {
+      const directory = fixtures.path('output.google_depth_skipBlanks.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputPng)
+          .tile({
+            layout: 'google',
+            size: 256
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+
+            const whiteTilePath = path.join(directory, '4', '8', '0.jpg');
+            assert.strictEqual(fs.existsSync(whiteTilePath), false, 'Tile should not exist');
+
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2809, info.width);
+            assert.strictEqual(2074, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+
+            assertGoogleTiles(directory, 256, 5, done);
+          });
+      });
+    });
+
+    it('Google layout with center image in tile', function (done) {
+      const directory = fixtures.path('output.google_center.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            center: true,
+            layout: 'google'
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            fixtures.assertSimilar(fixtures.expected('tile_centered.jpg'), fs.readFileSync(path.join(directory, '0', '0', '0.jpg')), done);
+          });
+      });
+    });
+
+    it('Google layout with center image in tile centre', function (done) {
+      const directory = fixtures.path('output.google_center.dzi');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            centre: true,
+            layout: 'google'
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            fixtures.assertSimilar(fixtures.expected('tile_centered.jpg'), fs.readFileSync(path.join(directory, '0', '0', '0.jpg')), done);
+          });
+      });
+    });
+
+    it('IIIFv2 layout', function (done) {
+      const name = 'output.iiif.info';
+      const directory = fixtures.path(name);
+      fs.rm(directory, { recursive: true }, function () {
+        const id = 'https://sharp.test.com/iiif';
+        sharp(fixtures.inputJpg)
+          .tile({
+            layout: 'iiif',
+            id
+          })
+          .toFile(directory, function (err, info) {
+            if (err) throw err;
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            const infoJson = require(path.join(directory, 'info.json'));
+            assert.strictEqual('http://iiif.io/api/image/2/context.json', infoJson['@context']);
+            assert.strictEqual(`${id}/${name}`, infoJson['@id']);
+            fs.stat(path.join(directory, '0,0,256,256', '256,', '0', 'default.jpg'), function (err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
               done();
             });
           });
-        });
+      });
     });
-  });
 
-  it('Google layout with depth one', function (done) {
-    const directory = fixtures.path('output.google_depth_one.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          layout: 'google',
-          depth: 'one',
-          size: 256
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-
-          assertGoogleTiles(directory, 256, 1, done);
-        });
-    });
-  });
-
-  it('Google layout with depth onepixel', function (done) {
-    const directory = fixtures.path('output.google_depth_onepixel.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          layout: 'google',
-          depth: 'onepixel',
-          size: 256
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-
-          assertGoogleTiles(directory, 256, 13, done);
-        });
-    });
-  });
-
-  it('Google layout with depth onetile', function (done) {
-    const directory = fixtures.path('output.google_depth_onetile.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          layout: 'google',
-          depth: 'onetile',
-          size: 256
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-
-          assertGoogleTiles(directory, 256, 5, done);
-        });
-    });
-  });
-
-  it('Google layout with default skip Blanks', function (done) {
-    const directory = fixtures.path('output.google_depth_skipBlanks.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputPng)
-        .tile({
-          layout: 'google',
-          size: 256
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-
-          const whiteTilePath = path.join(directory, '4', '8', '0.jpg');
-          assert.strictEqual(fs.existsSync(whiteTilePath), false, 'Tile should not exist');
-
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2809, info.width);
-          assert.strictEqual(2074, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-
-          assertGoogleTiles(directory, 256, 5, done);
-        });
-    });
-  });
-
-  it('Google layout with center image in tile', function (done) {
-    const directory = fixtures.path('output.google_center.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          center: true,
-          layout: 'google'
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          fixtures.assertSimilar(fixtures.expected('tile_centered.jpg'), fs.readFileSync(path.join(directory, '0', '0', '0.jpg')), done);
-        });
-    });
-  });
-
-  it('Google layout with center image in tile centre', function (done) {
-    const directory = fixtures.path('output.google_center.dzi');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          centre: true,
-          layout: 'google'
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          fixtures.assertSimilar(fixtures.expected('tile_centered.jpg'), fs.readFileSync(path.join(directory, '0', '0', '0.jpg')), done);
-        });
-    });
-  });
-
-  it('IIIFv2 layout', function (done) {
-    const name = 'output.iiif.info';
-    const directory = fixtures.path(name);
-    fs.rm(directory, { recursive: true }, function () {
-      const id = 'https://sharp.test.com/iiif';
-      sharp(fixtures.inputJpg)
-        .tile({
-          layout: 'iiif',
-          id
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          const infoJson = require(path.join(directory, 'info.json'));
-          assert.strictEqual('http://iiif.io/api/image/2/context.json', infoJson['@context']);
-          assert.strictEqual(`${id}/${name}`, infoJson['@id']);
-          fs.stat(path.join(directory, '0,0,256,256', '256,', '0', 'default.jpg'), function (err, stat) {
+    it('IIIFv3 layout', function (done) {
+      const name = 'output.iiif3.info';
+      const directory = fixtures.path(name);
+      fs.rm(directory, { recursive: true }, function () {
+        const id = 'https://sharp.test.com/iiif3';
+        sharp(fixtures.inputJpg)
+          .tile({
+            layout: 'iiif3',
+            id
+          })
+          .toFile(directory, function (err, info) {
             if (err) throw err;
-            assert.strictEqual(true, stat.isFile());
-            assert.strictEqual(true, stat.size > 0);
-            done();
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            const infoJson = require(path.join(directory, 'info.json'));
+            assert.strictEqual('http://iiif.io/api/image/3/context.json', infoJson['@context']);
+            assert.strictEqual('ImageService3', infoJson.type);
+            assert.strictEqual(`${id}/${name}`, infoJson.id);
+            fs.stat(path.join(directory, '0,0,256,256', '256,256', '0', 'default.jpg'), function (err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
+              done();
+            });
           });
-        });
+      });
     });
-  });
 
-  it('IIIFv3 layout', function (done) {
-    const name = 'output.iiif3.info';
-    const directory = fixtures.path(name);
-    fs.rm(directory, { recursive: true }, function () {
-      const id = 'https://sharp.test.com/iiif3';
-      sharp(fixtures.inputJpg)
-        .tile({
-          layout: 'iiif3',
-          id
-        })
-        .toFile(directory, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          const infoJson = require(path.join(directory, 'info.json'));
-          assert.strictEqual('http://iiif.io/api/image/3/context.json', infoJson['@context']);
-          assert.strictEqual('ImageService3', infoJson.type);
-          assert.strictEqual(`${id}/${name}`, infoJson.id);
-          fs.stat(path.join(directory, '0,0,256,256', '256,256', '0', 'default.jpg'), function (err, stat) {
+    it('Write to ZIP container using file extension', function (done) {
+      const container = fixtures.path('output.dz.container.zip');
+      const extractTo = fixtures.path('output.dz.container');
+      const directory = path.join(extractTo, 'output.dz.container_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .toFile(container, function (err, info) {
             if (err) throw err;
-            assert.strictEqual(true, stat.isFile());
-            assert.strictEqual(true, stat.size > 0);
-            done();
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            fs.stat(container, function (err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
+              extractZip(container, { dir: path.dirname(extractTo) })
+                .then(() => {
+                  assertDeepZoomTiles(directory, 256, 13, done);
+                })
+                .catch(done);
+            });
           });
-        });
+      });
     });
-  });
 
-  it('Write to ZIP container using file extension', function (done) {
-    const container = fixtures.path('output.dz.container.zip');
-    const extractTo = fixtures.path('output.dz.container');
-    const directory = path.join(extractTo, 'output.dz.container_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .toFile(container, function (err, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          fs.stat(container, function (err, stat) {
+    it('Write to ZIP container using container tile option', function (done) {
+      const container = fixtures.path('output.dz.containeropt.zip');
+      const extractTo = fixtures.path('output.dz.containeropt');
+      const directory = path.join(extractTo, 'output.dz.containeropt_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({
+            container: 'zip'
+          })
+          .toFile(container, function (err, info) {
+            // Vips overrides .dzi extension to .zip used by container var below
             if (err) throw err;
-            assert.strictEqual(true, stat.isFile());
-            assert.strictEqual(true, stat.size > 0);
-            extractZip(container, { dir: path.dirname(extractTo) })
-              .then(() => {
-                assertDeepZoomTiles(directory, 256, 13, done);
-              })
-              .catch(done);
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            fs.stat(container, function (err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
+              extractZip(container, { dir: path.dirname(extractTo) })
+                .then(() => {
+                  assertDeepZoomTiles(directory, 256, 13, done);
+                })
+                .catch(done);
+            });
           });
-        });
+      });
     });
-  });
 
-  it('Write to ZIP container using container tile option', function (done) {
-    const container = fixtures.path('output.dz.containeropt.zip');
-    const extractTo = fixtures.path('output.dz.containeropt');
-    const directory = path.join(extractTo, 'output.dz.containeropt_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({
-          container: 'zip'
-        })
-        .toFile(container, function (err, info) {
-          // Vips overrides .dzi extension to .zip used by container var below
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          fs.stat(container, function (err, stat) {
+    it('Write ZIP container to Buffer', function (done) {
+      const container = fixtures.path('output.dz.tiles.zip');
+      const extractTo = fixtures.path('output.dz.tiles');
+      const directory = path.join(extractTo, 'output.dz.tiles_files');
+      fs.rm(directory, { recursive: true }, function () {
+        sharp(fixtures.inputJpg)
+          .tile({ basename: 'output.dz.tiles' })
+          .toBuffer(function (err, data, info) {
             if (err) throw err;
-            assert.strictEqual(true, stat.isFile());
-            assert.strictEqual(true, stat.size > 0);
-            extractZip(container, { dir: path.dirname(extractTo) })
-              .then(() => {
-                assertDeepZoomTiles(directory, 256, 13, done);
-              })
-              .catch(done);
+            assert.strictEqual('dz', info.format);
+            assert.strictEqual(2725, info.width);
+            assert.strictEqual(2225, info.height);
+            assert.strictEqual(3, info.channels);
+            assert.strictEqual('number', typeof info.size);
+            fs.writeFileSync(container, data);
+            fs.stat(container, function (err, stat) {
+              if (err) throw err;
+              assert.strictEqual(true, stat.isFile());
+              assert.strictEqual(true, stat.size > 0);
+              extractZip(container, { dir: path.dirname(extractTo) })
+                .then(() => {
+                  assertDeepZoomTiles(directory, 256, 13, done);
+                })
+                .catch(done);
+            });
           });
-        });
+      });
     });
-  });
-
-  it('Write ZIP container to Buffer', function (done) {
-    const container = fixtures.path('output.dz.tiles.zip');
-    const extractTo = fixtures.path('output.dz.tiles');
-    const directory = path.join(extractTo, 'output.dz.tiles_files');
-    fs.rm(directory, { recursive: true }, function () {
-      sharp(fixtures.inputJpg)
-        .tile({ basename: 'output.dz.tiles' })
-        .toBuffer(function (err, data, info) {
-          if (err) throw err;
-          assert.strictEqual('dz', info.format);
-          assert.strictEqual(2725, info.width);
-          assert.strictEqual(2225, info.height);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual('number', typeof info.size);
-          fs.writeFileSync(container, data);
-          fs.stat(container, function (err, stat) {
-            if (err) throw err;
-            assert.strictEqual(true, stat.isFile());
-            assert.strictEqual(true, stat.size > 0);
-            extractZip(container, { dir: path.dirname(extractTo) })
-              .then(() => {
-                assertDeepZoomTiles(directory, 256, 13, done);
-              })
-              .catch(done);
-          });
-        });
-    });
-  });
+  }
 });
