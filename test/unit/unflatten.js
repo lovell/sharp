@@ -14,13 +14,10 @@ describe('Unflatten', function () {
       });
   });
   it('unflatten transparent image', function (done) {
-    sharp(fixtures.inputPng).ensureAlpha()
+    sharp(fixtures.inputPngTrimSpecificColourIncludeAlpha).unflatten()
       .toBuffer(function (err, data) {
         if (err) throw err;
-        sharp(data).unflatten().toBuffer(function (err, data) {
-          if (err) throw err;
-          fixtures.assertSimilar(fixtures.expected('unflatten-white-transparent.png'), data, { threshold: 0 }, done);
-        });
+        fixtures.assertSimilar(fixtures.expected('unflatten-flag-white-transparent.png'), data, { threshold: 0 }, done);
       });
   });
   it('unflatten using threshold', function (done) {
