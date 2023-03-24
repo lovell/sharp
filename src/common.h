@@ -183,6 +183,11 @@ namespace sharp {
   bool IsV(std::string const &str);
 
   /*
+    Trim space from end of string.
+  */
+  std::string TrimEnd(std::string const &str);
+
+  /*
     Provide a string identifier for the given image type.
   */
   std::string ImageTypeId(ImageType const imageType);

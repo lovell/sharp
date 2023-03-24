@@ -227,6 +227,13 @@ namespace sharp {
   }
 
   /*
+    Trim space from end of string.
+  */
+  std::string TrimEnd(std::string const &str) {
+    return str.substr(0, str.find_last_not_of(" \n\r\f") + 1);
+  }
+
+  /*
     Provide a string identifier for the given image type.
   */
   std::string ImageTypeId(ImageType const imageType) {

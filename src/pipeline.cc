@@ -1234,7 +1234,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
       }
     } else {
-      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
+      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
     }
 
     // Delete baton
