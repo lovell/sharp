@@ -346,20 +346,12 @@ namespace sharp {
    */
   VImage Unflatten(VImage image) {
     if (HasAlpha(image)) {
-      throw VError("Cannot unflatten an image that already has an alpha channel");
+      VImage alpha = image[image.bands() - 1];
+      VImage noAlpha = RemoveAlpha(image);
+      return noAlpha.bandjoin(alpha & (noAlpha.colourspace(VIPS_INTERPRETATION_B_W) < 255));
+    } else {
+      return image.bandjoin(image.colourspace(VIPS_INTERPRETATION_B_W) < 255);
     }
-    size_t const bands = static_cast<size_t>(image.bands());
-    VImage alpha;
-    for (int i = 0; i < bands; i++) {
-      VImage band = image[i];
-      VImage tmp = band.colourspace(VIPS_INTERPRETATION_B_W) < 255;
-      if (i == 0) {
-        alpha = tmp;
-      } else {
-        alpha = alpha | tmp;
-      }
-    }
-    return image.bandjoin(alpha);
   }
 
   /*

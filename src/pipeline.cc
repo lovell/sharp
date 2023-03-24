@@ -563,7 +563,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Unflatten the image
-      if (baton->unflatten && !sharp::HasAlpha(image)) {
+      if (baton->unflatten) {
         image = sharp::Unflatten(image);
       }
 
