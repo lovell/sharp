@@ -2,7 +2,7 @@
 Resize image to `width`, `height` or `width x height`.
 
 When both a `width` and `height` are provided, the possible methods by which the image should **fit** these are:
-- `cover`: (default) Preserving aspect ratio, ensure the image covers both provided dimensions by cropping/clipping to fit.
+- `cover`: (default) Preserving aspect ratio, attempt to ensure the image covers both provided dimensions by cropping/clipping to fit.
 - `contain`: Preserving aspect ratio, contain within both provided dimensions using "letterboxing" where necessary.
 - `fill`: Ignore the aspect ratio of the input and stretch to both provided dimensions.
 - `inside`: Preserving aspect ratio, resize the image to be as large as possible while ensuring its dimensions are less than or equal to both those specified.
@@ -42,18 +42,18 @@ Previous calls to `resize` in the same pipeline will be ignored.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [width] | <code>number</code> |  | pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height. |
-| [height] | <code>number</code> |  | pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width. |
+| [width] | <code>number</code> |  | How many pixels wide the resultant image should be. Use `null` or `undefined` to auto-scale the width to match the height. |
+| [height] | <code>number</code> |  | How many pixels high the resultant image should be. Use `null` or `undefined` to auto-scale the height to match the width. |
 | [options] | <code>Object</code> |  |  |
-| [options.width] | <code>String</code> |  | alternative means of specifying `width`. If both are present this takes priority. |
-| [options.height] | <code>String</code> |  | alternative means of specifying `height`. If both are present this takes priority. |
-| [options.fit] | <code>String</code> | <code>&#x27;cover&#x27;</code> | how the image should be resized to fit both provided dimensions, one of `cover`, `contain`, `fill`, `inside` or `outside`. |
-| [options.position] | <code>String</code> | <code>&#x27;centre&#x27;</code> | position, gravity or strategy to use when `fit` is `cover` or `contain`. |
+| [options.width] | <code>number</code> |  | An alternative means of specifying `width`. If both are present this takes priority. |
+| [options.height] | <code>number</code> |  | An alternative means of specifying `height`. If both are present this takes priority. |
+| [options.fit] | <code>String</code> | <code>&#x27;cover&#x27;</code> | How the image should be resized/cropped to fit the target dimension(s), one of `cover`, `contain`, `fill`, `inside` or `outside`. |
+| [options.position] | <code>String</code> | <code>&#x27;centre&#x27;</code> | A position, gravity or strategy to use when `fit` is `cover` or `contain`. |
 | [options.background] | <code>String</code> \| <code>Object</code> | <code>{r: 0, g: 0, b: 0, alpha: 1}</code> | background colour when `fit` is `contain`, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to black without transparency. |
-| [options.kernel] | <code>String</code> | <code>&#x27;lanczos3&#x27;</code> | the kernel to use for image reduction. Use the `fastShrinkOnLoad` option to control kernel vs shrink-on-load. |
-| [options.withoutEnlargement] | <code>Boolean</code> | <code>false</code> | do not enlarge if the width *or* height are already less than the specified dimensions, equivalent to GraphicsMagick's `>` geometry option. |
-| [options.withoutReduction] | <code>Boolean</code> | <code>false</code> | do not reduce if the width *or* height are already greater than the specified dimensions, equivalent to GraphicsMagick's `<` geometry option. |
-| [options.fastShrinkOnLoad] | <code>Boolean</code> | <code>true</code> | take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern or round-down of an auto-scaled dimension. |
+| [options.kernel] | <code>String</code> | <code>&#x27;lanczos3&#x27;</code> | The kernel to use for image reduction. Use the `fastShrinkOnLoad` option to control kernel vs shrink-on-load. |
+| [options.withoutEnlargement] | <code>Boolean</code> | <code>false</code> | Do not scale up if the width *or* height are already less than the target dimensions, equivalent to GraphicsMagick's `>` geometry option. This may result in output dimensions smaller than the target dimensions. |
+| [options.withoutReduction] | <code>Boolean</code> | <code>false</code> | Do not scale down if the width *or* height are already greater than the target dimensions, equivalent to GraphicsMagick's `<` geometry option. This may still result in a crop to reach the target dimensions. |
+| [options.fastShrinkOnLoad] | <code>Boolean</code> | <code>true</code> | Take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern or round-down of an auto-scaled dimension. |
 
 **Example**  
 ```js

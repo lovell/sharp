@@ -764,7 +764,7 @@ declare namespace sharp {
          * @throws {Error} Invalid parameters
          * @returns A sharp instance that can be used to chain operations
          */
-        resize(width?: number | null, height?: number | null, options?: ResizeOptions): Sharp;
+        resize(widthOrOptions?: number | ResizeOptions | null, height?: number | null, options?: ResizeOptions): Sharp;
 
         /**
          * Shorthand for resize(null, null, options);
