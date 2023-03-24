@@ -4,7 +4,7 @@
 
 Requires libvips v8.14.2
 
-### v0.32.0 - TBD
+### v0.32.0 - 24th March 2023
 
 * Default to using sequential rather than random access read where possible.
 
