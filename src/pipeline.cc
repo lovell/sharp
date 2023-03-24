@@ -1,16 +1,5 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <algorithm>
 #include <cmath>
@@ -85,6 +74,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       VipsAngle autoRotation = VIPS_ANGLE_D0;
       bool autoFlip = FALSE;
       bool autoFlop = FALSE;
+
       if (baton->useExifOrientation) {
         // Rotate and flip image according to Exif orientation
         std::tie(autoRotation, autoFlip, autoFlop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
@@ -205,7 +195,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (jpegShrinkOnLoad > 1 && static_cast<int>(shrink) == jpegShrinkOnLoad) {
             jpegShrinkOnLoad /= 2;
           }
-        } else if (inputImageType == sharp::ImageType::WEBP && shrink > 1.0) {
+        } else if (inputImageType == sharp::ImageType::WEBP && baton->fastShrinkOnLoad && shrink > 1.0) {
           // Avoid upscaling via webp
           scale = 1.0 / shrink;
         } else if (inputImageType == sharp::ImageType::SVG ||
@@ -320,7 +310,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (
         sharp::HasProfile(image) &&
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
-        image.interpretation() != VIPS_INTERPRETATION_GREY16
+        image.interpretation() != VIPS_INTERPRETATION_GREY16 &&
+        !baton->input->ignoreIcc
       ) {
         // Convert to sRGB/P3 using embedded profile
         try {
@@ -329,7 +320,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
-          // Ignore failure of embedded profile
+          sharp::VipsWarningCallback(nullptr, G_LOG_LEVEL_WARNING, "Invalid embedded profile", nullptr);
         }
       } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
         image = image.icc_transform(processingProfile, VImage::option()
@@ -372,11 +363,12 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::EnsureAlpha(image, 1);
       }
 
+      VipsBandFormat premultiplyFormat = image.format();
       bool const shouldPremultiplyAlpha = sharp::HasAlpha(image) &&
         (shouldResize || shouldBlur || shouldConv || shouldSharpen);
 
       if (shouldPremultiplyAlpha) {
-        image = image.premultiply();
+        image = image.premultiply().cast(premultiplyFormat);
       }
 
       // Resize
@@ -404,7 +396,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Join additional color channels to the image
-      if (baton->joinChannelIn.size() > 0) {
+      if (!baton->joinChannelIn.empty()) {
         VImage joinImage;
         sharp::ImageType joinImageType = sharp::ImageType::UNKNOWN;
 
@@ -414,6 +406,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           image = image.bandjoin(joinImage);
         }
         image = image.copy(VImage::option()->set("interpretation", baton->colourspace));
+        image = sharp::RemoveGifPalette(image);
       }
 
       inputWidth = image.width();
@@ -443,7 +436,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
-                left, top, width, height, background, nPages, &targetPageHeight)
+                left, top, width, height, VIPS_EXTEND_BACKGROUND, background, nPages, &targetPageHeight)
             : image.embed(left, top, width, height, VImage::option()
               ->set("extend", VIPS_EXTEND_BACKGROUND)
               ->set("background", background));
@@ -460,6 +453,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             // Gravity-based crop
             int left;
             int top;
+
             std::tie(left, top) = sharp::CalculateCrop(
               inputWidth, inputHeight, baton->width, baton->height, baton->position);
             int width = std::min(inputWidth, baton->width);
@@ -470,16 +464,25 @@ class PipelineWorker : public Napi::AsyncWorker {
                   left, top, width, height, nPages, &targetPageHeight)
               : image.extract_area(left, top, width, height);
           } else {
+            int attention_x;
+            int attention_y;
+
             // Attention-based or Entropy-based crop
             MultiPageUnsupported(nPages, "Resize strategy");
             image = image.tilecache(VImage::option()
               ->set("access", VIPS_ACCESS_RANDOM)
               ->set("threaded", TRUE));
+
             image = image.smartcrop(baton->width, baton->height, VImage::option()
-              ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION));
+              ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION)
+              ->set("attention_x", &attention_x)
+              ->set("attention_y", &attention_y));
             baton->hasCropOffset = true;
             baton->cropOffsetLeft = static_cast<int>(image.xoffset());
             baton->cropOffsetTop = static_cast<int>(image.yoffset());
+            baton->hasAttentionCenter = true;
+            baton->attentionX = static_cast<int>(attention_x * jpegShrinkOnLoad / scale);
+            baton->attentionY = static_cast<int>(attention_y * jpegShrinkOnLoad / scale);
           }
         }
       }
@@ -508,7 +511,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Affine transform
-      if (baton->affineMatrix.size() > 0) {
+      if (!baton->affineMatrix.empty()) {
         MultiPageUnsupported(nPages, "Affine");
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
@@ -524,18 +527,29 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Extend edges
       if (baton->extendTop > 0 || baton->extendBottom > 0 || baton->extendLeft > 0 || baton->extendRight > 0) {
-        std::vector<double> background;
-        std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
-
         // Embed
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
         baton->height = (nPages > 1 ? targetPageHeight : image.height()) + baton->extendTop + baton->extendBottom;
 
-        image = nPages > 1
-          ? sharp::EmbedMultiPage(image,
-              baton->extendLeft, baton->extendTop, baton->width, baton->height, background, nPages, &targetPageHeight)
-          : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
-              VImage::option()->set("extend", VIPS_EXTEND_BACKGROUND)->set("background", background));
+        if (baton->extendWith == VIPS_EXTEND_BACKGROUND) {
+          std::vector<double> background;
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
+
+          image = nPages > 1
+            ? sharp::EmbedMultiPage(image,
+                baton->extendLeft, baton->extendTop, baton->width, baton->height,
+                baton->extendWith, background, nPages, &targetPageHeight)
+            : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
+                VImage::option()->set("extend", baton->extendWith)->set("background", background));
+        } else {
+          std::vector<double> ignoredBackground(1);
+          image = nPages > 1
+            ? sharp::EmbedMultiPage(image,
+                baton->extendLeft, baton->extendTop, baton->width, baton->height,
+                baton->extendWith, ignoredBackground, nPages, &targetPageHeight)
+            : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
+                VImage::option()->set("extend", baton->extendWith));
+        }
       }
       // Median - must happen before blurring, due to the utility of blurring after thresholding
       if (baton->medianSize > 0) {
@@ -577,13 +591,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Reverse premultiplication after all transformations
       if (shouldPremultiplyAlpha) {
-        image = image.unpremultiply();
-        // Cast pixel values to integer
-        if (sharp::Is16Bit(image.interpretation())) {
-          image = image.cast(VIPS_FORMAT_USHORT);
-        } else {
-          image = image.cast(VIPS_FORMAT_UCHAR);
-        }
+        image = image.unpremultiply().cast(premultiplyFormat);
       }
       baton->premultiplied = shouldPremultiplyAlpha;
 
@@ -665,6 +673,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           ys.push_back(top);
         }
         image = VImage::composite(images, modes, VImage::option()->set("x", xs)->set("y", ys));
+        image = sharp::RemoveGifPalette(image);
       }
 
       // Gamma decoding (brighten)
@@ -679,7 +688,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Apply normalisation - stretch luminance to cover full dynamic range
       if (baton->normalise) {
-        image = sharp::Normalise(image);
+        image = sharp::Normalise(image,  baton->normaliseLower, baton->normaliseUpper);
       }
 
       // Apply contrast limiting adaptive histogram equalization (CLAHE)
@@ -694,6 +703,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         std::tie(booleanImage, booleanImageType) = sharp::OpenInput(baton->boolean);
         booleanImage = sharp::EnsureColourspace(booleanImage, baton->colourspaceInput);
         image = sharp::Boolean(image, booleanImage, baton->booleanOp);
+        image = sharp::RemoveGifPalette(image);
       }
 
       // Apply per-channel Bandbool bitwise operations after all other operations
@@ -875,7 +885,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("bitdepth", baton->gifBitdepth)
             ->set("effort", baton->gifEffort)
-            ->set("reoptimise", baton->gifReoptimise)
+            ->set("reuse", baton->gifReuse)
+            ->set("interlace", baton->gifProgressive)
             ->set("interframe_maxerror", baton->gifInterFrameMaxError)
             ->set("interpalette_maxerror", baton->gifInterPaletteMaxError)
             ->set("dither", baton->gifDither)));
@@ -1073,7 +1084,8 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("strip", !baton->withMetadata)
             ->set("bitdepth", baton->gifBitdepth)
             ->set("effort", baton->gifEffort)
-            ->set("reoptimise", baton->gifReoptimise)
+            ->set("reuse", baton->gifReuse)
+            ->set("interlace", baton->gifProgressive)
             ->set("dither", baton->gifDither));
           baton->formatOut = "gif";
         } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
@@ -1169,7 +1181,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     // Handle warnings
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
-      debuglog.Call({ Napi::String::New(env, warning) });
+      debuglog.MakeCallback(Receiver().Value(), { Napi::String::New(env, warning) });
       warning = sharp::VipsWarningPop();
     }
 
@@ -1198,6 +1210,10 @@ class PipelineWorker : public Napi::AsyncWorker {
         info.Set("cropOffsetLeft", static_cast<int32_t>(baton->cropOffsetLeft));
         info.Set("cropOffsetTop", static_cast<int32_t>(baton->cropOffsetTop));
       }
+      if (baton->hasAttentionCenter) {
+        info.Set("attentionX", static_cast<int32_t>(baton->attentionX));
+        info.Set("attentionY", static_cast<int32_t>(baton->attentionY));
+      }
       if (baton->trimThreshold > 0.0) {
         info.Set("trimOffsetLeft", static_cast<int32_t>(baton->trimOffsetLeft));
         info.Set("trimOffsetTop", static_cast<int32_t>(baton->trimOffsetTop));
@@ -1223,7 +1239,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
       }
     } else {
-      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
+      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
     }
 
     // Delete baton
@@ -1241,7 +1257,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     // Decrement processing task counter
     g_atomic_int_dec_and_test(&sharp::counterProcess);
     Napi::Number queueLength = Napi::Number::New(env, static_cast<double>(sharp::counterQueue));
-    queueListener.Call(Receiver().Value(), { queueLength });
+    queueListener.MakeCallback(Receiver().Value(), { queueLength });
   }
 
  private:
@@ -1387,7 +1403,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // V8 objects are converted to non-V8 types held in the baton struct
   PipelineBaton *baton = new PipelineBaton;
-  Napi::Object options = info[0].As<Napi::Object>();
+  Napi::Object options = info[size_t(0)].As<Napi::Object>();
 
   // Input
   baton->input = sharp::CreateInputDescriptor(options.Get("input").As<Napi::Object>());
@@ -1475,6 +1491,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->linearB = sharp::AttrAsVectorOfDouble(options, "linearB");
   baton->greyscale = sharp::AttrAsBool(options, "greyscale");
   baton->normalise = sharp::AttrAsBool(options, "normalise");
+  baton->normaliseLower = sharp::AttrAsUint32(options, "normaliseLower");
+  baton->normaliseUpper = sharp::AttrAsUint32(options, "normaliseUpper");
   baton->tintA = sharp::AttrAsDouble(options, "tintA");
   baton->tintB = sharp::AttrAsDouble(options, "tintB");
   baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");
@@ -1492,6 +1510,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->extendLeft = sharp::AttrAsInt32(options, "extendLeft");
   baton->extendRight = sharp::AttrAsInt32(options, "extendRight");
   baton->extendBackground = sharp::AttrAsVectorOfDouble(options, "extendBackground");
+  baton->extendWith = sharp::AttrAsEnum<VipsExtend>(options, "extendWith", VIPS_TYPE_EXTEND);
   baton->extractChannel = sharp::AttrAsInt32(options, "extractChannel");
   baton->affineMatrix = sharp::AttrAsVectorOfDouble(options, "affineMatrix");
   baton->affineBackground = sharp::AttrAsVectorOfDouble(options, "affineBackground");
@@ -1589,7 +1608,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->gifDither = sharp::AttrAsDouble(options, "gifDither");
   baton->gifInterFrameMaxError = sharp::AttrAsDouble(options, "gifInterFrameMaxError");
   baton->gifInterPaletteMaxError = sharp::AttrAsDouble(options, "gifInterPaletteMaxError");
-  baton->gifReoptimise = sharp::AttrAsBool(options, "gifReoptimise");
+  baton->gifReuse = sharp::AttrAsBool(options, "gifReuse");
+  baton->gifProgressive = sharp::AttrAsBool(options, "gifProgressive");
   baton->tiffQuality = sharp::AttrAsUint32(options, "tiffQuality");
   baton->tiffPyramid = sharp::AttrAsBool(options, "tiffPyramid");
   baton->tiffBitdepth = sharp::AttrAsUint32(options, "tiffBitdepth");
@@ -1645,9 +1665,12 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
       baton->trimThreshold > 0.0 ||
       baton->normalise ||
       baton->position == 16 || baton->position == 17 ||
-      baton->angle % 360 != 0 ||
-      fmod(baton->rotationAngle, 360.0) != 0.0 ||
-      baton->useExifOrientation
+      baton->angle != 0 ||
+      baton->rotationAngle != 0.0 ||
+      baton->tileAngle != 0 ||
+      baton->useExifOrientation ||
+      baton->claheWidth != 0 ||
+      !baton->affineMatrix.empty()
     ) {
       baton->input->access = VIPS_ACCESS_RANDOM;
     }
@@ -1660,7 +1683,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   Napi::Function queueListener = options.Get("queueListener").As<Napi::Function>();
 
   // Join queue for worker thread
-  Napi::Function callback = info[1].As<Napi::Function>();
+  Napi::Function callback = info[size_t(1)].As<Napi::Function>();
   PipelineWorker *worker = new PipelineWorker(callback, baton, debuglog, queueListener);
   worker->Receiver().Set("options", options);
   worker->Queue();
@@ -1668,7 +1691,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // Increment queued task counter
   g_atomic_int_inc(&sharp::counterQueue);
   Napi::Number queueLength = Napi::Number::New(info.Env(), static_cast<double>(sharp::counterQueue));
-  queueListener.Call(info.This(), { queueLength });
+  queueListener.MakeCallback(info.This(), { queueLength });
 
   return info.Env().Undefined();
 }

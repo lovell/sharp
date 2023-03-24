@@ -1,16 +1,5 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
 
 #ifndef SRC_COMMON_H_
 #define SRC_COMMON_H_
@@ -25,9 +14,9 @@
 // Verify platform and compiler compatibility
 
 #if (VIPS_MAJOR_VERSION < 8) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 13) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 13 && VIPS_MICRO_VERSION < 3)
-#error "libvips version 8.13.3+ is required - please see https://sharp.pixelplumbing.com/install"
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 14) || \
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 14 && VIPS_MICRO_VERSION < 2)
+#error "libvips version 8.14.2+ is required - please see https://sharp.pixelplumbing.com/install"
 #endif
 
 #if ((!defined(__clang__)) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)))
@@ -55,6 +44,7 @@ namespace sharp {
     size_t bufferLength;
     bool isBuffer;
     double density;
+    bool ignoreIcc;
     VipsBandFormat rawDepth;
     int rawChannels;
     int rawWidth;
@@ -81,6 +71,7 @@ namespace sharp {
     int textDpi;
     bool textRgba;
     int textSpacing;
+    VipsTextWrap textWrap;
     int textAutofitDpi;
 
     InputDescriptor():
@@ -92,6 +83,7 @@ namespace sharp {
       bufferLength(0),
       isBuffer(FALSE),
       density(72.0),
+      ignoreIcc(FALSE),
       rawDepth(VIPS_FORMAT_UCHAR),
       rawChannels(0),
       rawWidth(0),
@@ -114,6 +106,7 @@ namespace sharp {
       textDpi(72),
       textRgba(FALSE),
       textSpacing(0),
+      textWrap(VIPS_TEXT_WRAP_WORD),
       textAutofitDpi(0) {}
   };
 
@@ -190,6 +183,11 @@ namespace sharp {
   bool IsV(std::string const &str);
 
   /*
+    Trim space from end of string.
+  */
+  std::string TrimEnd(std::string const &str);
+
+  /*
     Provide a string identifier for the given image type.
   */
   std::string ImageTypeId(ImageType const imageType);
@@ -254,6 +252,11 @@ namespace sharp {
     Remove animation properties from image.
   */
   VImage RemoveAnimationProperties(VImage image);
+
+  /*
+    Remove GIF palette from image.
+  */
+  VImage RemoveGifPalette(VImage image);
 
   /*
     Does this image have a non-default density?

@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const assert = require('assert');
@@ -10,6 +13,9 @@ describe('Raw pixel data', function () {
     it('Empty data', function () {
       assert.throws(function () {
         sharp(Buffer.from(''));
+      }, /empty/);
+      assert.throws(function () {
+        sharp(new ArrayBuffer(0));
       }, /empty/);
       assert.throws(function () {
         sharp(new Uint8Array(0));

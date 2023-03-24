@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const fs = require('fs');
@@ -37,7 +40,7 @@ for (const match of matches) {
 ].forEach((section) => {
   const contents = fs.readFileSync(path.join(__dirname, '..', `api-${section}.md`), 'utf8');
   const matches = contents.matchAll(
-    /\n## (?<title>[A-Za-z]+)\n\n(?<firstparagraph>.+?)\n\n(?<parameters>### Parameters.+?Returns)?/gs
+    /## (?<title>[A-Za-z]+)\n(?<firstparagraph>.+?)\n\n.+?(?<parameters>\| Param .+?\n\n)?\*\*Example/gs
   );
   for (const match of matches) {
     const { title, firstparagraph, parameters } = match.groups;

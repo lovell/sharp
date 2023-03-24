@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const stopWords = require('./stop-words');
@@ -13,8 +16,9 @@ const extractDescription = (str) =>
     .trim();
 
 const extractParameters = (str) =>
-  [...str.matchAll(/options\.(?<name>[^.`]+)/gs)]
+  [...str.matchAll(/options\.(?<name>[^.`\] ]+)/gs)]
     .map((match) => match.groups.name)
+    .map((name) => name.replace(/([A-Z])/g, ' $1').toLowerCase())
     .join(' ');
 
 const extractKeywords = (str) =>

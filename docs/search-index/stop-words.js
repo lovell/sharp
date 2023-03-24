@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 module.exports = [
@@ -16,6 +19,7 @@ module.exports = [
   'based',
   'been',
   'before',
+  'best',
   'both',
   'call',
   'callback',
@@ -60,14 +64,20 @@ module.exports = [
   'must',
   'non',
   'not',
+  'now',
   'occur',
   'occurs',
+  'one',
   'options',
   'other',
   'out',
   'over',
+  'part',
   'perform',
   'performs',
+  'please',
+  'pre',
+  'previously',
   'produce',
   'provide',
   'provided',
@@ -112,6 +122,7 @@ module.exports = [
   'using',
   'value',
   'values',
+  'via',
   'were',
   'when',
   'which',

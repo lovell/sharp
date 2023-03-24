@@ -1,16 +1,5 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
 
 #ifndef SRC_OPERATIONS_H_
 #define SRC_OPERATIONS_H_
@@ -33,7 +22,7 @@ namespace sharp {
   /*
    * Stretch luminance to cover full dynamic range.
    */
-  VImage Normalise(VImage image);
+  VImage Normalise(VImage image, int const lower, int const upper);
 
   /*
    * Contrast limiting adapative histogram equalization (CLAHE)
@@ -129,7 +118,7 @@ namespace sharp {
    * Split into frames, embed each frame, reassemble, and update pageHeight.
    */
   VImage EmbedMultiPage(VImage image, int left, int top, int width, int height,
-                        std::vector<double> background, int nPages, int *pageHeight);
+                        VipsExtend extendWith, std::vector<double> background, int nPages, int *pageHeight);
 
 }  // namespace sharp
 

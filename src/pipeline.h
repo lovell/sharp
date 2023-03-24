@@ -1,16 +1,5 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
 
 #ifndef SRC_PIPELINE_H_
 #define SRC_PIPELINE_H_
@@ -74,6 +63,9 @@ struct PipelineBaton {
   bool hasCropOffset;
   int cropOffsetLeft;
   int cropOffsetTop;
+  bool hasAttentionCenter;
+  int attentionX;
+  int attentionY;
   bool premultiplied;
   bool tileCentre;
   bool fastShrinkOnLoad;
@@ -109,6 +101,8 @@ struct PipelineBaton {
   double gammaOut;
   bool greyscale;
   bool normalise;
+  int normaliseLower;
+  int normaliseUpper;
   int claheWidth;
   int claheHeight;
   int claheMaxSlope;
@@ -124,6 +118,7 @@ struct PipelineBaton {
   int extendLeft;
   int extendRight;
   std::vector<double> extendBackground;
+  VipsExtend extendWith;
   bool withoutEnlargement;
   bool withoutReduction;
   std::vector<double> affineMatrix;
@@ -167,7 +162,8 @@ struct PipelineBaton {
   double gifDither;
   double gifInterFrameMaxError;
   double gifInterPaletteMaxError;
-  bool gifReoptimise;
+  bool gifReuse;
+  bool gifProgressive;
   int tiffQuality;
   VipsForeignTiffCompression tiffCompression;
   VipsForeignTiffPredictor tiffPredictor;
@@ -237,6 +233,9 @@ struct PipelineBaton {
     hasCropOffset(false),
     cropOffsetLeft(0),
     cropOffsetTop(0),
+    hasAttentionCenter(false),
+    attentionX(0),
+    attentionY(0),
     premultiplied(false),
     tintA(128.0),
     tintB(128.0),
@@ -269,6 +268,8 @@ struct PipelineBaton {
     gamma(0.0),
     greyscale(false),
     normalise(false),
+    normaliseLower(1),
+    normaliseUpper(99),
     claheWidth(0),
     claheHeight(0),
     claheMaxSlope(3),
@@ -283,6 +284,7 @@ struct PipelineBaton {
     extendLeft(0),
     extendRight(0),
     extendBackground{ 0.0, 0.0, 0.0, 255.0 },
+    extendWith(VIPS_EXTEND_BACKGROUND),
     withoutEnlargement(false),
     withoutReduction(false),
     affineMatrix{ 1.0, 0.0, 0.0, 1.0 },
@@ -326,7 +328,8 @@ struct PipelineBaton {
     gifDither(1.0),
     gifInterFrameMaxError(0.0),
     gifInterPaletteMaxError(3.0),
-    gifReoptimise(false),
+    gifReuse(true),
+    gifProgressive(false),
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),

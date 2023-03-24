@@ -28,7 +28,7 @@ is downloaded via HTTPS, verified via Subresource Integrity
 and decompressed into `node_modules/sharp/vendor` during `npm install`.
 
 This provides support for the
-JPEG, PNG, WebP, AVIF, TIFF, GIF and SVG (input) image formats.
+JPEG, PNG, WebP, AVIF (limited to 8-bit depth), TIFF, GIF and SVG (input) image formats.
 
 The following platforms have prebuilt libvips but not sharp:
 
@@ -115,7 +115,8 @@ and that it can be located using `pkg-config --modversion vips-cpp`.
 For help compiling libvips and its dependencies, please see
 [building libvips from source](https://www.libvips.org/install.html#building-libvips-from-source).
 
-The use of a globally-installed libvips is unsupported on Windows.
+The use of a globally-installed libvips is unsupported on Windows
+and on macOS when running Node.js under Rosetta.
 
 ## Building from source
 
@@ -147,7 +148,7 @@ or the `npm_config_sharp_local_prebuilds` environment variable.
 URL example:
 if `sharp_binary_host` is set to `https://hostname/path`
 and the sharp version is `1.2.3` then the resultant URL will be
-`https://hostname/path/sharp-v1.2.3-napi-v5-platform-arch.tar.gz`.
+`https://hostname/path/v1.2.3/sharp-v1.2.3-napi-v5-platform-arch.tar.gz`.
 
 Filename example:
 if `sharp_local_prebuilds` is set to `/path`
@@ -177,6 +178,16 @@ and the libvips version is `4.5.6` then the resultant filename will be
 `/path/v4.5.6/libvips-4.5.6-platform-arch.tar.br`.
 
 See the Chinese mirror below for a further example.
+
+If these binaries are modified, new integrity hashes can be provided
+at install time via `npm_package_config_integrity_platform_arch`
+environment variables, for example set
+`npm_package_config_integrity_linux_x64` to `sha512-abc...`.
+
+The integrity hash of a file can be generated via:
+```sh
+sha512sum libvips-x.y.z-platform-arch.tar.br | cut -f1 -d' ' | xxd -r -p | base64 -w 0
+```
 
 ## Chinese mirror
 
@@ -227,16 +238,6 @@ the use of an alternative memory allocator such as
 Those using musl-based Linux (e.g. Alpine) and non-Linux systems are
 unaffected.
 
-## Heroku
-
-Add the
-[jemalloc buildpack](https://github.com/gaffneyc/heroku-buildpack-jemalloc)
-to reduce the effects of memory fragmentation.
-
-Set
-[NODE_MODULES_CACHE](https://devcenter.heroku.com/articles/nodejs-support#cache-behavior)
-to `false` when using the `yarn` package manager.
-
 ## AWS Lambda
 
 The `node_modules` directory of the
@@ -254,6 +255,9 @@ SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=gli
 
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
+
+When integrating with AWS API Gateway, ensure it is configured with the relevant
+[binary media types](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings.html).
 
 ## Bundlers
 
@@ -300,6 +304,17 @@ custom:
       scripts:
         - npm install --arch=x64 --platform=linux sharp
 ```
+
+## TypeScript
+
+TypeScript definitions are published as part of
+the `sharp` package from v0.32.0.
+
+Previously these were available via the `@types/sharp` package,
+which is now deprecated.
+
+When using Typescript, please ensure `devDependencies` includes
+the `@types/node` package.
 
 ## Fonts
 

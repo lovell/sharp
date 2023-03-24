@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const os = require('os');
@@ -32,6 +35,7 @@ const outputWebP = fixtures.path('output.webp');
 
 const width = 720;
 const height = 588;
+const heightPng = 540;
 
 // Disable libvips cache to ensure tests are as fair as they can be
 sharp.cache(false);
@@ -535,10 +539,10 @@ async.series({
             }
           });
       }
-    }).add('sharp-sequentialRead', {
+    }).add('sharp-random-access-read', {
       defer: true,
       fn: function (deferred) {
-        sharp(inputJpgBuffer, { sequentialRead: true })
+        sharp(inputJpgBuffer, { sequentialRead: false })
           .resize(width, height)
           .toBuffer(function (err) {
             if (err) {
@@ -648,7 +652,7 @@ async.series({
             throw err;
           } else {
             image
-              .resize(width, height)
+              .resize(width, heightPng)
               .deflateLevel(6)
               .filterType(0)
               .getBuffer(jimp.MIME_PNG, function (err) {
@@ -669,7 +673,7 @@ async.series({
             throw err;
           } else {
             image
-              .resize(width, height)
+              .resize(width, heightPng)
               .deflateLevel(6)
               .filterType(0)
               .write(outputPng, function (err) {
@@ -683,6 +687,59 @@ async.series({
         });
       }
     });
+    // squoosh-cli
+    pngSuite.add('squoosh-cli-file-file', {
+      defer: true,
+      fn: function (deferred) {
+        exec(`./node_modules/.bin/squoosh-cli \
+          --output-dir ${os.tmpdir()} \
+          --resize '{"enabled":true,"width":${width},"height":${heightPng},"method":"lanczos3","premultiply":true,"linearRGB":false}' \
+          --oxipng '{"level":1}' \
+          "${fixtures.inputPngAlphaPremultiplicationLarge}"`, function (err) {
+          if (err) {
+            throw err;
+          }
+          deferred.resolve();
+        });
+      }
+    });
+    // squoosh-lib (GPLv3)
+    pngSuite.add('squoosh-lib-buffer-buffer', {
+      defer: true,
+      fn: function (deferred) {
+        const pool = new squoosh.ImagePool();
+        const image = pool.ingestImage(inputPngBuffer);
+        image.decoded
+          .then(function () {
+            return image.preprocess({
+              resize: {
+                enabled: true,
+                width,
+                height: heightPng,
+                method: 'lanczos3',
+                premultiply: true,
+                linearRGB: false
+              }
+            });
+          })
+          .then(function () {
+            return image.encode({
+              oxipng: {
+                level: 1
+              }
+            });
+          })
+          .then(function () {
+            return pool.close();
+          })
+          .then(function () {
+            return image.encodedWith.oxipng;
+          })
+          .then(function () {
+            deferred.resolve();
+          });
+      }
+    });
     // mapnik
     mapnik && pngSuite.add('mapnik-file-file', {
       defer: true,
@@ -691,13 +748,13 @@ async.series({
           if (err) throw err;
           img.premultiply(function (err, img) {
             if (err) throw err;
-            img.resize(width, height, {
+            img.resize(width, heightPng, {
               scaling_method: mapnik.imageScaling.lanczos
             }, function (err, img) {
               if (err) throw err;
               img.demultiply(function (err, img) {
                 if (err) throw err;
-                img.save(outputPng, 'png', function (err) {
+                img.save(outputPng, 'png32:f=no:z=6', function (err) {
                   if (err) throw err;
                   deferred.resolve();
                 });
@@ -713,13 +770,13 @@ async.series({
           if (err) throw err;
           img.premultiply(function (err, img) {
             if (err) throw err;
-            img.resize(width, height, {
+            img.resize(width, heightPng, {
               scaling_method: mapnik.imageScaling.lanczos
             }, function (err, img) {
               if (err) throw err;
               img.demultiply(function (err, img) {
                 if (err) throw err;
-                img.encode('png', function (err) {
+                img.encode('png32:f=no:z=6', function (err) {
                   if (err) throw err;
                   deferred.resolve();
                 });
@@ -737,7 +794,7 @@ async.series({
           srcPath: fixtures.inputPngAlphaPremultiplicationLarge,
           dstPath: outputPng,
           width: width,
-          height: height,
+          height: heightPng,
           filter: 'Lanczos',
           customArgs: [
             '-define', 'PNG:compression-level=6',
@@ -758,7 +815,7 @@ async.series({
       fn: function (deferred) {
         gm(fixtures.inputPngAlphaPremultiplicationLarge)
           .filter('Lanczos')
-          .resize(width, height)
+          .resize(width, heightPng)
           .define('PNG:compression-level=6')
           .define('PNG:compression-filter=0')
           .write(outputPng, function (err) {
@@ -774,7 +831,7 @@ async.series({
       fn: function (deferred) {
         gm(fixtures.inputPngAlphaPremultiplicationLarge)
           .filter('Lanczos')
-          .resize(width, height)
+          .resize(width, heightPng)
           .define('PNG:compression-level=6')
           .define('PNG:compression-filter=0')
           .toBuffer(function (err) {
@@ -792,7 +849,7 @@ async.series({
       minSamples,
       fn: function (deferred) {
         sharp(inputPngBuffer)
-          .resize(width, height)
+          .resize(width, heightPng)
           .png({ compressionLevel: 6 })
           .toFile(outputPng, function (err) {
             if (err) {
@@ -807,9 +864,9 @@ async.series({
       minSamples,
       fn: function (deferred) {
         sharp(inputPngBuffer)
-          .resize(width, height)
+          .resize(width, heightPng)
           .png({ compressionLevel: 6 })
-          .toBuffer(function (err) {
+          .toBuffer(function (err, data) {
             if (err) {
               throw err;
             } else {
@@ -822,7 +879,7 @@ async.series({
       minSamples,
       fn: function (deferred) {
         sharp(fixtures.inputPngAlphaPremultiplicationLarge)
-          .resize(width, height)
+          .resize(width, heightPng)
           .png({ compressionLevel: 6 })
           .toFile(outputPng, function (err) {
             if (err) {
@@ -837,7 +894,7 @@ async.series({
       minSamples,
       fn: function (deferred) {
         sharp(fixtures.inputPngAlphaPremultiplicationLarge)
-          .resize(width, height)
+          .resize(width, heightPng)
           .png({ compressionLevel: 6 })
           .toBuffer(function (err) {
             if (err) {
@@ -852,7 +909,7 @@ async.series({
       minSamples,
       fn: function (deferred) {
         sharp(inputPngBuffer)
-          .resize(width, height)
+          .resize(width, heightPng)
           .png({ compressionLevel: 6, progressive: true })
           .toBuffer(function (err) {
             if (err) {
@@ -867,7 +924,7 @@ async.series({
       minSamples,
       fn: function (deferred) {
         sharp(inputPngBuffer)
-          .resize(width, height)
+          .resize(width, heightPng)
           .png({ adaptiveFiltering: true, compressionLevel: 6 })
           .toBuffer(function (err) {
             if (err) {
@@ -882,7 +939,7 @@ async.series({
       minSamples,
       fn: function (deferred) {
         sharp(inputPngBuffer)
-          .resize(width, height)
+          .resize(width, heightPng)
           .png({ compressionLevel: 9 })
           .toBuffer(function (err) {
             if (err) {

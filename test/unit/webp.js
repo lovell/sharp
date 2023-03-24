@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const fs = require('fs');
@@ -114,6 +117,14 @@ describe('WebP', function () {
           })
       )
   );
+
+  it('should produce different file size with/out shrink-on-load', async () => {
+    const [shrunk, resized] = await Promise.all([
+      sharp(fixtures.inputWebP).resize({ width: 16 }).toBuffer(),
+      sharp(fixtures.inputWebP).resize({ width: 16, fastShrinkOnLoad: false, kernel: 'nearest' }).toBuffer()
+    ]);
+    assert.notStrictEqual(shrunk.length, resized.length);
+  });
 
   it('invalid effort throws', () => {
     assert.throws(() => {

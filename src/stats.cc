@@ -1,16 +1,5 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <numeric>
 #include <vector>
@@ -117,7 +106,7 @@ class StatsWorker : public Napi::AsyncWorker {
     // Handle warnings
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
-      debuglog.Call({ Napi::String::New(env, warning) });
+      debuglog.MakeCallback(Receiver().Value(), { Napi::String::New(env, warning) });
       warning = sharp::VipsWarningPop();
     }
 
@@ -154,7 +143,7 @@ class StatsWorker : public Napi::AsyncWorker {
       info.Set("dominant", dominant);
       Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
     } else {
-      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, baton->err).Value() });
+      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
     }
 
     delete baton->input;
@@ -172,7 +161,7 @@ class StatsWorker : public Napi::AsyncWorker {
 Napi::Value stats(const Napi::CallbackInfo& info) {
   // V8 objects are converted to non-V8 types held in the baton struct
   StatsBaton *baton = new StatsBaton;
-  Napi::Object options = info[0].As<Napi::Object>();
+  Napi::Object options = info[size_t(0)].As<Napi::Object>();
 
   // Input
   baton->input = sharp::CreateInputDescriptor(options.Get("input").As<Napi::Object>());
@@ -182,7 +171,7 @@ Napi::Value stats(const Napi::CallbackInfo& info) {
   Napi::Function debuglog = options.Get("debuglog").As<Napi::Function>();
 
   // Join queue for worker thread
-  Napi::Function callback = info[1].As<Napi::Function>();
+  Napi::Function callback = info[size_t(1)].As<Napi::Function>();
   StatsWorker *worker = new StatsWorker(callback, baton, debuglog);
   worker->Receiver().Set("options", options);
   worker->Queue();

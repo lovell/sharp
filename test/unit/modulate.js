@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const sharp = require('../../');
@@ -175,7 +178,7 @@ describe('Modulate', function () {
           .png({ compressionLevel: 0 })
           .toFile(actual)
           .then(() => {
-            fixtures.assertMaxColourDistance(actual, expected);
+            fixtures.assertMaxColourDistance(actual, expected, 3);
           });
       });
     });

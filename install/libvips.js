@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const fs = require('fs');
@@ -128,9 +131,6 @@ try {
     if (arch === 'ia32' && !platformAndArch.startsWith('win32')) {
       throw new Error(`Intel Architecture 32-bit systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
-    if (platformAndArch === 'darwin-arm64') {
-      throw new Error("Please run 'brew install vips' to install libvips on Apple M1 (ARM64) systems");
-    }
     if (platformAndArch === 'freebsd-x64' || platformAndArch === 'openbsd-x64' || platformAndArch === 'sunos-x64') {
       throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
@@ -153,7 +153,6 @@ try {
     if (!semverSatisfies(process.versions.node, supportedNodeVersion)) {
       handleError(new Error(`Expected Node.js version ${supportedNodeVersion} but found ${process.versions.node}`));
     }
-
     // Download to per-process temporary file
     const tarFilename = ['libvips', minimumLibvipsVersionLabelled, platformAndArch].join('-') + '.tar.br';
     const tarPathCache = path.join(libvips.cachePath(), tarFilename);

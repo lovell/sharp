@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const sharp = require('../../');
@@ -40,8 +43,9 @@ describe('Linear adjustment', function () {
 
   it('applies linear levels adjustment w alpha ch', function (done) {
     sharp(fixtures.inputPngOverlayLayer1)
+      .resize(240)
       .linear(a, b)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('alpha-layer-1-fill-linear.png'), data, done);
       });
@@ -49,8 +53,9 @@ describe('Linear adjustment', function () {
 
   it('applies slope level adjustment w alpha ch', function (done) {
     sharp(fixtures.inputPngOverlayLayer1)
+      .resize(240)
       .linear(a)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('alpha-layer-1-fill-slope.png'), data, done);
       });
@@ -58,8 +63,9 @@ describe('Linear adjustment', function () {
 
   it('applies offset level adjustment w alpha ch', function (done) {
     sharp(fixtures.inputPngOverlayLayer1)
+      .resize(240)
       .linear(null, b)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('alpha-layer-1-fill-offset.png'), data, done);
       });

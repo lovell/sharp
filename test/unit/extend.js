@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const assert = require('assert');
@@ -32,39 +35,82 @@ describe('Extend', function () {
     });
   });
 
-  it('extend all sides equally with RGB', function (done) {
-    sharp(fixtures.inputJpg)
-      .resize(120)
-      .extend({
-        top: 10,
-        bottom: 10,
-        left: 10,
-        right: 10,
-        background: { r: 255, g: 0, b: 0 }
-      })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(140, info.width);
-        assert.strictEqual(118, info.height);
-        fixtures.assertSimilar(fixtures.expected('extend-equal.jpg'), data, done);
-      });
-  });
+  ['background', 'copy', 'mirror', 'repeat'].forEach(extendWith => {
+    it(`extends all sides with animated WebP (${extendWith})`, function (done) {
+      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+        .resize(120)
+        .extend({
+          extendWith: extendWith,
+          top: 40,
+          bottom: 40,
+          left: 40,
+          right: 40
+        })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(200, info.width);
+          assert.strictEqual(200 * 9, info.height);
+          fixtures.assertSimilar(fixtures.expected(`extend-equal-${extendWith}.webp`), data, done);
+        });
+    });
 
-  it('extend sides unequally with RGBA', function (done) {
-    sharp(fixtures.inputPngWithTransparency16bit)
-      .resize(120)
-      .extend({
-        top: 50,
-        left: 10,
-        right: 35,
-        background: { r: 0, g: 0, b: 0, alpha: 0 }
-      })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(165, info.width);
-        assert.strictEqual(170, info.height);
-        fixtures.assertSimilar(fixtures.expected('extend-unequal.png'), data, done);
-      });
+    it(`extend all sides equally with RGB (${extendWith})`, function (done) {
+      sharp(fixtures.inputJpg)
+        .resize(120)
+        .extend({
+          extendWith: extendWith,
+          top: 10,
+          bottom: 10,
+          left: 10,
+          right: 10,
+          background: { r: 255, g: 0, b: 0 }
+        })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(140, info.width);
+          assert.strictEqual(118, info.height);
+          fixtures.assertSimilar(fixtures.expected(`extend-equal-${extendWith}.jpg`), data, done);
+        });
+    });
+
+    it(`extend sides unequally with RGBA (${extendWith})`, function (done) {
+      sharp(fixtures.inputPngWithTransparency16bit)
+        .resize(120)
+        .extend({
+          extendWith: extendWith,
+          top: 50,
+          left: 10,
+          right: 35,
+          background: { r: 0, g: 0, b: 0, alpha: 0 }
+        })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(165, info.width);
+          assert.strictEqual(170, info.height);
+          fixtures.assertSimilar(fixtures.expected(`extend-unequal-${extendWith}.png`), data, done);
+        });
+    });
+
+    it(`PNG with 2 channels (${extendWith})`, function (done) {
+      sharp(fixtures.inputPngWithGreyAlpha)
+        .extend({
+          extendWith: extendWith,
+          top: 50,
+          bottom: 50,
+          left: 80,
+          right: 80,
+          background: 'transparent'
+        })
+        .toBuffer(function (err, data, info) {
+          if (err) throw err;
+          assert.strictEqual(true, data.length > 0);
+          assert.strictEqual('png', info.format);
+          assert.strictEqual(560, info.width);
+          assert.strictEqual(400, info.height);
+          assert.strictEqual(4, info.channels);
+          fixtures.assertSimilar(fixtures.expected(`extend-2channel-${extendWith}.png`), data, done);
+        });
+    });
   });
 
   it('missing parameter fails', function () {
@@ -101,6 +147,12 @@ describe('Extend', function () {
       /Expected positive integer for right but received \[object Object\] of type object/
     );
   });
+  it('invalid extendWith fails', () => {
+    assert.throws(
+      () => sharp().extend({ extendWith: 'invalid-value' }),
+      /Expected one of: background, copy, repeat, mirror for extendWith but received invalid-value of type string/
+    );
+  });
   it('can set all edges apart from right', () => {
     assert.doesNotThrow(() => sharp().extend({ top: 1, left: 2, bottom: 3 }));
   });
@@ -118,24 +170,6 @@ describe('Extend', function () {
         assert.strictEqual(610, info.width);
         assert.strictEqual(460, info.height);
         fixtures.assertSimilar(fixtures.expected('addAlphaChanelBeforeExtend.png'), data, done);
-      });
-  });
-
-  it('PNG with 2 channels', function (done) {
-    sharp(fixtures.inputPngWithGreyAlpha)
-      .extend({
-        bottom: 20,
-        right: 20,
-        background: 'transparent'
-      })
-      .toBuffer(function (err, data, info) {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(420, info.width);
-        assert.strictEqual(320, info.height);
-        assert.strictEqual(4, info.channels);
-        fixtures.assertSimilar(fixtures.expected('extend-2channel.png'), data, done);
       });
   });
 

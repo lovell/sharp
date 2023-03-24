@@ -1,23 +1,11 @@
-// Copyright 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Lovell Fuller and contributors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <algorithm>
 #include <functional>
 #include <memory>
 #include <tuple>
 #include <vector>
-
 #include <vips/vips8>
 
 #include "common.h"
@@ -57,7 +45,7 @@ namespace sharp {
   /*
    * Stretch luminance to cover full dynamic range.
    */
-  VImage Normalise(VImage image) {
+  VImage Normalise(VImage image, int const lower, int const upper) {
     // Get original colourspace
     VipsInterpretation typeBeforeNormalize = image.interpretation();
     if (typeBeforeNormalize == VIPS_INTERPRETATION_RGB) {
@@ -67,9 +55,11 @@ namespace sharp {
     VImage lab = image.colourspace(VIPS_INTERPRETATION_LAB);
     // Extract luminance
     VImage luminance = lab[0];
+
     // Find luminance range
-    int const min = luminance.percent(1);
-    int const max = luminance.percent(99);
+    int const min = lower == 0 ? luminance.min() : luminance.percent(lower);
+    int const max = upper == 100 ? luminance.max() : luminance.percent(upper);
+
     if (std::abs(max - min) > 1) {
       // Extract chroma
       VImage chroma = lab.extract_band(1, VImage::option()->set("n", 2));
@@ -420,11 +410,11 @@ namespace sharp {
    * Split into frames, embed each frame, reassemble, and update pageHeight.
    */
   VImage EmbedMultiPage(VImage image, int left, int top, int width, int height,
-                        std::vector<double> background, int nPages, int *pageHeight) {
+                        VipsExtend extendWith, std::vector<double> background, int nPages, int *pageHeight) {
     if (top == 0 && height == *pageHeight) {
       // Fast path; no need to adjust the height of the multi-page image
       return image.embed(left, 0, width, image.height(), VImage::option()
-        ->set("extend", VIPS_EXTEND_BACKGROUND)
+        ->set("extend", extendWith)
         ->set("background", background));
     } else if (left == 0 && width == image.width()) {
       // Fast path; no need to adjust the width of the multi-page image
@@ -436,7 +426,7 @@ namespace sharp {
 
       // Do the embed on the wide image
       image = image.embed(0, top, image.width(), height, VImage::option()
-        ->set("extend", VIPS_EXTEND_BACKGROUND)
+        ->set("extend", extendWith)
         ->set("background", background));
 
       // Split the wide image into frames
@@ -466,7 +456,7 @@ namespace sharp {
       // Embed each frame in the target size
       for (int i = 0; i < nPages; i++) {
         pages[i] = pages[i].embed(left, top, width, height, VImage::option()
-          ->set("extend", VIPS_EXTEND_BACKGROUND)
+          ->set("extend", extendWith)
           ->set("background", background));
       }
 

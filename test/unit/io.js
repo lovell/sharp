@@ -1,9 +1,11 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
-const rimraf = require('rimraf');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -28,7 +30,7 @@ describe('Input/output', function () {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        rimraf(outputJpg, done);
+        fs.rm(outputJpg, done);
       });
     });
     sharp(fixtures.inputJpg).resize(320, 240).pipe(writable);
@@ -45,7 +47,7 @@ describe('Input/output', function () {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        rimraf(outputJpg, done);
+        fs.rm(outputJpg, done);
       });
     });
     sharp(inputJpgBuffer).resize(320, 240).pipe(writable);
@@ -59,7 +61,7 @@ describe('Input/output', function () {
       assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
-      rimraf(outputJpg, done);
+      fs.rm(outputJpg, done);
     });
     readable.pipe(pipeline);
   });
@@ -143,11 +145,28 @@ describe('Input/output', function () {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        rimraf(outputJpg, done);
+        fs.rm(outputJpg, done);
       });
     });
     const pipeline = sharp().resize(320, 240);
     readable.pipe(pipeline).pipe(writable);
+  });
+
+  it('Read from ArrayBuffer and write to Buffer', async () => {
+    const uint8array = Uint8Array.from([255, 255, 255, 0, 0, 0]);
+    const arrayBuffer = new ArrayBuffer(uint8array.byteLength);
+    new Uint8Array(arrayBuffer).set(uint8array);
+    const { data, info } = await sharp(arrayBuffer, {
+      raw: {
+        width: 2,
+        height: 1,
+        channels: 3
+      }
+    }).toBuffer({ resolveWithObject: true });
+
+    assert.deepStrictEqual(uint8array, new Uint8Array(data));
+    assert.strictEqual(info.width, 2);
+    assert.strictEqual(info.height, 1);
   });
 
   it('Read from Uint8Array and write to Buffer', async () => {
@@ -214,7 +233,7 @@ describe('Input/output', function () {
     });
     writable.on('close', function () {
       assert.strictEqual(true, infoEventEmitted);
-      rimraf(outputJpg, done);
+      fs.rm(outputJpg, done);
     });
     readable.pipe(pipeline).pipe(writable);
   });
@@ -229,7 +248,7 @@ describe('Input/output', function () {
     });
     writable.on('close', function () {
       assert.strictEqual(true, closeEventEmitted);
-      rimraf(outputJpg, done);
+      fs.rm(outputJpg, done);
     });
     readable.pipe(pipeline).pipe(writable);
   });
@@ -241,7 +260,7 @@ describe('Input/output', function () {
       anErrorWasEmitted = !!err;
     }).on('end', function () {
       assert(anErrorWasEmitted);
-      rimraf(outputJpg, done);
+      fs.rm(outputJpg, done);
     });
     const readableButNotAnImage = fs.createReadStream(__filename);
     const writable = fs.createWriteStream(outputJpg);
@@ -255,7 +274,7 @@ describe('Input/output', function () {
       anErrorWasEmitted = !!err;
     }).on('end', function () {
       assert(anErrorWasEmitted);
-      rimraf(outputJpg, done);
+      fs.rm(outputJpg, done);
     });
     const writable = fs.createWriteStream(outputJpg);
     readableButNotAnImage.pipe(writable);
@@ -272,7 +291,7 @@ describe('Input/output', function () {
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        rimraf(outputJpg, done);
+        fs.rm(outputJpg, done);
       });
     });
     const pipeline = sharp().resize(320, 240);
@@ -550,7 +569,7 @@ describe('Input/output', function () {
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(outputZoinks, done);
+          fs.rm(outputZoinks, done);
         });
     });
 
@@ -563,7 +582,7 @@ describe('Input/output', function () {
           assert.strictEqual('png', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(outputZoinks, done);
+          fs.rm(outputZoinks, done);
         });
     });
 
@@ -576,7 +595,7 @@ describe('Input/output', function () {
           assert.strictEqual('webp', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(outputZoinks, done);
+          fs.rm(outputZoinks, done);
         });
     });
 
@@ -589,7 +608,7 @@ describe('Input/output', function () {
           assert.strictEqual('tiff', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(outputZoinks, done);
+          fs.rm(outputZoinks, done);
         });
     });
 
@@ -603,7 +622,7 @@ describe('Input/output', function () {
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(80, info.height);
-          rimraf(outputZoinks, done);
+          fs.rm(outputZoinks, done);
         });
     });
   });
@@ -635,16 +654,18 @@ describe('Input/output', function () {
   it('toFormat=JPEG takes precedence over WebP extension', function (done) {
     const outputWebP = fixtures.path('output.webp');
     sharp(fixtures.inputPng)
+      .resize(8)
       .jpeg()
       .toFile(outputWebP, function (err, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
-        rimraf(outputWebP, done);
+        fs.rm(outputWebP, done);
       });
   });
 
   it('toFormat=WebP takes precedence over JPEG extension', function (done) {
     sharp(fixtures.inputPng)
+      .resize(8)
       .webp()
       .toFile(outputJpg, function (err, info) {
         if (err) throw err;
@@ -676,8 +697,29 @@ describe('Input/output', function () {
         assert.strictEqual('v', info.format);
         assert.strictEqual(70, info.width);
         assert.strictEqual(60, info.height);
-        rimraf(outputV, done);
+        fs.rm(outputV, done);
       });
+  });
+
+  it('can ignore ICC profile', async () => {
+    const [r1, g1, b1] = await sharp(fixtures.inputJpgWithPortraitExif5, { ignoreIcc: true })
+      .extract({ width: 1, height: 1, top: 16, left: 16 })
+      .raw()
+      .toBuffer();
+
+    const [r2, g2, b2] = await sharp(fixtures.inputJpgWithPortraitExif5, { ignoreIcc: false })
+      .extract({ width: 1, height: 1, top: 16, left: 16 })
+      .raw()
+      .toBuffer();
+
+    assert.deepStrictEqual({ r1, g1, b1, r2, g2, b2 }, {
+      r1: 60,
+      r2: 77,
+      g1: 54,
+      g2: 69,
+      b1: 20,
+      b2: 25
+    });
   });
 
   describe('Switch off safety limits for certain formats', () => {
@@ -798,6 +840,11 @@ describe('Input/output', function () {
       assert.throws(function () {
         sharp({ density: 'zoinks' });
       }, /Expected number between 1 and 100000 for density but received zoinks of type string/);
+    });
+    it('Invalid ignoreIcc: string', function () {
+      assert.throws(function () {
+        sharp({ ignoreIcc: 'zoinks' });
+      }, /Expected boolean for ignoreIcc but received zoinks of type string/);
     });
     it('Setting animated property updates pages property', function () {
       assert.strictEqual(sharp({ animated: false }).options.input.pages, 1);

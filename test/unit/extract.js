@@ -1,3 +1,6 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const assert = require('assert');
@@ -290,7 +293,7 @@ describe('Partial image extraction', function () {
         .extract({ left: 3000, top: 10, width: 10, height: 10 })
         .toBuffer(function (err) {
           assert(err instanceof Error);
-          assert.strictEqual(err.message, 'extract_area: bad extract area\n');
+          assert.strictEqual(err.message, 'extract_area: bad extract area');
           done();
         });
     });
