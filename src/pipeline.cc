@@ -333,11 +333,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Flatten(image, baton->flattenBackground);
       }
 
-      // Unflatten the image
-      if (baton->unflatten && !sharp::HasAlpha(image)) {
-        image = sharp::Unflatten(image, baton->unflattenThresholds);
-      }
-
       // Negate the colours in the image
       if (baton->negate) {
         image = sharp::Negate(image, baton->negateAlpha);
@@ -555,7 +550,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->medianSize > 0) {
         image = image.median(baton->medianSize);
       }
+
       // Threshold - must happen before blurring, due to the utility of blurring after thresholding
+      // Threshold - must happen before unflatten to enable non-white unflattening
       if (baton->threshold != 0) {
         image = sharp::Threshold(image, baton->threshold, baton->thresholdGrayscale);
       }
@@ -563,6 +560,11 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Blur
       if (shouldBlur) {
         image = sharp::Blur(image, baton->blurSigma);
+      }
+
+      // Unflatten the image
+      if (baton->unflatten && !sharp::HasAlpha(image)) {
+        image = sharp::Unflatten(image);
       }
 
       // Convolve
@@ -1466,7 +1468,6 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->flatten = sharp::AttrAsBool(options, "flatten");
   baton->flattenBackground = sharp::AttrAsVectorOfDouble(options, "flattenBackground");
   baton->unflatten = sharp::AttrAsBool(options, "unflatten");
-  baton->unflattenThresholds = sharp::AttrAsVectorOfDouble(options, "unflattenThresholds");
   baton->negate = sharp::AttrAsBool(options, "negate");
   baton->negateAlpha = sharp::AttrAsBool(options, "negateAlpha");
   baton->blurSigma = sharp::AttrAsDouble(options, "blurSigma");

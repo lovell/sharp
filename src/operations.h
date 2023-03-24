@@ -89,7 +89,7 @@ namespace sharp {
   /*
    * Unflatten
    */
-  VImage Unflatten(VImage image, std::vector<double> const thresholds);
+  VImage Unflatten(VImage image);
 
   /*
    * Recomb with a Matrix of the given bands/channel size.
