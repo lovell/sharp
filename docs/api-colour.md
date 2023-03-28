@@ -55,7 +55,8 @@ Alternative spelling of `greyscale`.
 Set the pipeline colourspace.
 
 The input image will be converted to the provided colourspace at the start of the pipeline.
-All operations will use this colourspace before converting to the output colourspace, as defined by [toColourspace](#toColourspace).
+All operations will use this colourspace before converting to the output colourspace,
+as defined by [toColourspace](#tocolourspace).
 
 This feature is experimental and has not yet been fully-tested with all operations.
 

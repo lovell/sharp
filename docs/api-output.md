@@ -6,7 +6,7 @@ with JPEG, PNG, WebP, AVIF, TIFF, GIF, DZI, and libvips' V format supported.
 Note that raw pixel data is only supported for buffer output.
 
 By default all metadata will be removed, which includes EXIF-based orientation.
-See [withMetadata](#withMetadata) for control over this.
+See [withMetadata](#withmetadata) for control over this.
 
 The caller is responsible for ensuring directory structures and permissions exist.
 
@@ -42,12 +42,12 @@ sharp(input)
 Write output to a Buffer.
 JPEG, PNG, WebP, AVIF, TIFF, GIF and raw pixel data output are supported.
 
-Use [toFormat](#toFormat) or one of the format-specific functions such as [jpeg](#jpeg), [png](#png) etc. to set the output format.
+Use [toFormat](#toformat) or one of the format-specific functions such as [jpeg](#jpeg), [png](#png) etc. to set the output format.
 
 If no explicit format is set, the output format will match the input image, except SVG input which becomes PNG output.
 
 By default all metadata will be removed, which includes EXIF-based orientation.
-See [withMetadata](#withMetadata) for control over this.
+See [withMetadata](#withmetadata) for control over this.
 
 `callback`, if present, gets three arguments `(err, data, info)` where:
 - `err` is an error, if any.
@@ -373,7 +373,8 @@ await sharp('in.gif', { animated: true })
 ## tiff
 Use these TIFF options for output image.
 
-The `density` can be set in pixels/inch via [withMetadata](#withMetadata) instead of providing `xres` and `yres` in pixels/mm.
+The `density` can be set in pixels/inch via [withMetadata](#withmetadata)
+instead of providing `xres` and `yres` in pixels/mm.
 
 
 **Throws**:
