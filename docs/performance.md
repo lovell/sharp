@@ -98,7 +98,7 @@ Note: jimp does not support premultiply/unpremultiply.
 | jimp               | buffer | buffer |    7.62 |     19.1 |
 | imagemagick        | file   | file   |    7.96 |     19.9 |
 | sharp              | file   | file   |   12.97 |     32.4 |
-| sharp              | buffer | buffer |   13.12 |     45.0 |
+| sharp              | buffer | buffer |   13.12 |     32.8 |
 
 ## Running the benchmark test
 
