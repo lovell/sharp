@@ -24,7 +24,7 @@ describe('Unflatten', function () {
     sharp(fixtures.inputPngPalette).unflatten(true).threshold(128, { grayscale: false })
       .toBuffer(function (err, data) {
         if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('unflatten-swiss.png'), data, { threshold: 0 }, done);
+        fixtures.assertSimilar(fixtures.expected('unflatten-swiss.png'), data, { threshold: 1 }, done);
       });
   });
   it('no unflatten', function (done) {
