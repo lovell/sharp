@@ -4,6 +4,11 @@
 
 Requires libvips v8.14.2
 
+### v0.32.1 - TBD
+
+* Ensure use of `flip` operation forces random access read (regression in 0.32.0).
+  [#3600](https://github.com/lovell/sharp/issues/3600)
+
 ### v0.32.0 - 24th March 2023
 
 * Default to using sequential rather than random access read where possible.
