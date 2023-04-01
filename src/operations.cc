@@ -332,12 +332,13 @@ namespace sharp {
     if (a.size() > bands) {
       throw VError("Band expansion using linear is unsupported");
     }
+    bool const uchar = !Is16Bit(image.interpretation());
     if (HasAlpha(image) && a.size() != bands && (a.size() == 1 || a.size() == bands - 1 || bands - 1 == 1)) {
       // Separate alpha channel
       VImage alpha = image[bands - 1];
-      return RemoveAlpha(image).linear(a, b, VImage::option()->set("uchar", TRUE)).bandjoin(alpha);
+      return RemoveAlpha(image).linear(a, b, VImage::option()->set("uchar", uchar)).bandjoin(alpha);
     } else {
-      return image.linear(a, b, VImage::option()->set("uchar", TRUE));
+      return image.linear(a, b, VImage::option()->set("uchar", uchar));
     }
   }
 

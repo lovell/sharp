@@ -51,6 +51,16 @@ describe('Linear adjustment', function () {
       });
   });
 
+  it('applies linear levels adjustment to 16-bit w alpha ch', function (done) {
+    sharp(fixtures.inputPngWithTransparency16bit)
+      .linear(a, b)
+      .png({ compressionLevel: 0 })
+      .toBuffer(function (err, data) {
+        if (err) throw err;
+        fixtures.assertSimilar(fixtures.expected('linear-16bit.png'), data, done);
+      });
+  });
+
   it('applies slope level adjustment w alpha ch', function (done) {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(240)
