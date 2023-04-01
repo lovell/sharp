@@ -428,6 +428,13 @@ declare namespace sharp {
         flatten(flatten?: boolean | FlattenOptions): Sharp;
 
         /**
+         * Unflatten - add an alpha channel to the image if required, and make white pixels fully transparent. Alpha for non-white pixels will be unchanged/opaque.
+         * @param unflatten true to enable and false to disable (defaults to true)
+         * @returns A sharp instance that can be used to chain operations
+         */
+        unflatten(unflatten?: boolean): Sharp;
+
+        /**
          * Apply a gamma correction by reducing the encoding (darken) pre-resize at a factor of 1/gamma then increasing the encoding (brighten) post-resize at a factor of gamma.
          * This can improve the perceived brightness of a resized image in non-linear colour spaces.
          * JPEG and WebP input images will not take advantage of the shrink-on-load performance optimisation when applying a gamma correction.
