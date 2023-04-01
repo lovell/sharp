@@ -240,7 +240,7 @@ struct PipelineBaton {
     tintB(128.0),
     flatten(false),
     flattenBackground{ 0.0, 0.0, 0.0 },
-    unflatten(true),
+    unflatten(false),
     negate(false),
     negateAlpha(true),
     blurSigma(0.0),
