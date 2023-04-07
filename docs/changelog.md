@@ -6,6 +6,10 @@ Requires libvips v8.14.2
 
 ### v0.32.1 - TBD
 
+* Add experimental `unflatten` operation.
+  [#3461](https://github.com/lovell/sharp/pull/3461)
+  [@antonmarsden](https://github.com/antonmarsden)
+
 * Ensure use of `flip` operation forces random access read (regression in 0.32.0).
   [#3600](https://github.com/lovell/sharp/issues/3600)
 

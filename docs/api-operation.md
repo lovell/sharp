@@ -265,6 +265,31 @@ await sharp(rgbaInput)
 ```
 
 
+## unflatten
+Ensure the image has an alpha channel
+with all white pixel values made fully transparent.
+
+Existing alpha channel values for non-white pixels remain unchanged.
+
+This feature is experimental and the API may change.
+
+
+**Since**: 0.32.1  
+**Example**  
+```js
+await sharp(rgbInput)
+  .unflatten()
+  .toBuffer();
+```
+**Example**  
+```js
+await sharp(rgbInput)
+  .threshold(128, { grayscale: false }) // converter bright pixels to white
+  .unflatten()
+  .toBuffer();
+```
+
+
 ## gamma
 Apply a gamma correction by reducing the encoding (darken) pre-resize at a factor of `1/gamma`
 then increasing the encoding (brighten) post-resize at a factor of `gamma`.

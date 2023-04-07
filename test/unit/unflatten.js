@@ -1,9 +1,10 @@
+// Copyright 2013 Lovell Fuller and others.
+// SPDX-License-Identifier: Apache-2.0
+
 'use strict';
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
-
-// const assert = require('assert');
 
 describe('Unflatten', function () {
   it('unflatten white background', function (done) {
@@ -21,17 +22,10 @@ describe('Unflatten', function () {
       });
   });
   it('unflatten using threshold', function (done) {
-    sharp(fixtures.inputPngPalette).unflatten(true).threshold(128, { grayscale: false })
+    sharp(fixtures.inputPngPalette).unflatten().threshold(128, { grayscale: false })
       .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('unflatten-swiss.png'), data, { threshold: 1 }, done);
-      });
-  });
-  it('no unflatten', function (done) {
-    sharp(fixtures.inputPng).unflatten(false)
-      .toBuffer(function (err, data) {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.inputPng, data, { threshold: 0 }, done);
       });
   });
 });
