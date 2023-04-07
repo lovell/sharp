@@ -343,6 +343,19 @@ namespace sharp {
   }
 
   /*
+   * Unflatten
+   */
+  VImage Unflatten(VImage image) {
+    if (HasAlpha(image)) {
+      VImage alpha = image[image.bands() - 1];
+      VImage noAlpha = RemoveAlpha(image);
+      return noAlpha.bandjoin(alpha & (noAlpha.colourspace(VIPS_INTERPRETATION_B_W) < 255));
+    } else {
+      return image.bandjoin(image.colourspace(VIPS_INTERPRETATION_B_W) < 255);
+    }
+  }
+
+  /*
    * Ensure the image is in a given colourspace
    */
   VImage EnsureColourspace(VImage image, VipsInterpretation colourspace) {
