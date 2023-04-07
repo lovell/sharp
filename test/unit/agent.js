@@ -21,7 +21,7 @@ describe('HTTP agent', function () {
     assert.strictEqual(123, proxy.options.proxy.port);
     assert.strictEqual('user:pass', proxy.options.proxy.proxyAuth);
     assert.strictEqual(443, proxy.defaultPort);
-    assert.strictEqual(logMsg, 'Via proxy https:://secure:123 with credentials');
+    assert.strictEqual(logMsg, 'Via proxy https://secure:123 with credentials');
   });
 
   it('HTTPS proxy with auth from HTTPS_PROXY using credentials containing special characters', function () {
@@ -34,7 +34,7 @@ describe('HTTP agent', function () {
     assert.strictEqual(789, proxy.options.proxy.port);
     assert.strictEqual('user,:pass=', proxy.options.proxy.proxyAuth);
     assert.strictEqual(443, proxy.defaultPort);
-    assert.strictEqual(logMsg, 'Via proxy https:://secure:789 with credentials');
+    assert.strictEqual(logMsg, 'Via proxy https://secure:789 with credentials');
   });
 
   it('HTTP proxy without auth from npm_config_proxy', function () {
@@ -47,6 +47,6 @@ describe('HTTP agent', function () {
     assert.strictEqual(456, proxy.options.proxy.port);
     assert.strictEqual(null, proxy.options.proxy.proxyAuth);
     assert.strictEqual(443, proxy.defaultPort);
-    assert.strictEqual(logMsg, 'Via proxy http:://plaintext:456 no credentials');
+    assert.strictEqual(logMsg, 'Via proxy http://plaintext:456 no credentials');
   });
 });
