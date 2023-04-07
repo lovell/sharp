@@ -16,6 +16,10 @@ Requires libvips v8.14.2
 * Ensure `linear` operation works with 16-bit input (regression in 0.31.3).
   [#3605](https://github.com/lovell/sharp/issues/3605)
 
+* Install: ensure proxy URLs are logged correctly.
+  [#3615](https://github.com/lovell/sharp/pull/3615)
+  [@TomWis97](https://github.com/TomWis97)
+
 ### v0.32.0 - 24th March 2023
 
 * Default to using sequential rather than random access read where possible.
