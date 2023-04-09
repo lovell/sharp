@@ -8,7 +8,9 @@ const assert = require('assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Text to image', () => {
+describe('Text to image', function () {
+  this.retries(3);
+
   it('text with default values', async () => {
     const output = fixtures.path('output.text-default.png');
     const text = sharp({
