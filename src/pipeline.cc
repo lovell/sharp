@@ -470,6 +470,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
             image = image.smartcrop(baton->width, baton->height, VImage::option()
               ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION)
+              ->set("premultiplied", shouldPremultiplyAlpha)
               ->set("attention_x", &attention_x)
               ->set("attention_y", &attention_y));
             baton->hasCropOffset = true;
