@@ -322,7 +322,10 @@ class PipelineWorker : public Napi::AsyncWorker {
         } catch(...) {
           sharp::VipsWarningCallback(nullptr, G_LOG_LEVEL_WARNING, "Invalid embedded profile", nullptr);
         }
-      } else if (image.interpretation() == VIPS_INTERPRETATION_CMYK) {
+      } else if (
+        image.interpretation() == VIPS_INTERPRETATION_CMYK &&
+        baton->colourspaceInput != VIPS_INTERPRETATION_CMYK
+      ) {
         image = image.icc_transform(processingProfile, VImage::option()
           ->set("input_profile", "cmyk")
           ->set("intent", VIPS_INTENT_PERCEPTUAL));

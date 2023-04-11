@@ -20,6 +20,9 @@ Requires libvips v8.14.2
   [#3615](https://github.com/lovell/sharp/pull/3615)
   [@TomWis97](https://github.com/TomWis97)
 
+* Ensure profile-less CMYK to CMYK roundtrip skips colourspace conversion.
+  [#3620](https://github.com/lovell/sharp/issues/3620)
+
 ### v0.32.0 - 24th March 2023
 
 * Default to using sequential rather than random access read where possible.

@@ -93,6 +93,19 @@ describe('Colour space conversion', function () {
       });
   });
 
+  it('Profile-less CMYK roundtrip', async () => {
+    const [c, m, y, k] = await sharp(fixtures.inputJpgWithCmykNoProfile)
+      .pipelineColourspace('cmyk')
+      .toColourspace('cmyk')
+      .raw()
+      .toBuffer();
+
+    assert.deepStrictEqual(
+      { c, m, y, k },
+      { c: 55, m: 27, y: 0, k: 0 }
+    );
+  });
+
   it('From sRGB with RGB16 pipeline, resize with gamma, to sRGB', function (done) {
     sharp(fixtures.inputPngGradients)
       .pipelineColourspace('rgb16')
