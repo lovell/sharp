@@ -23,6 +23,9 @@ Requires libvips v8.14.2
 * Ensure profile-less CMYK to CMYK roundtrip skips colourspace conversion.
   [#3620](https://github.com/lovell/sharp/issues/3620)
 
+* Add support for `modulate` operation when using non-sRGB pipeline colourspace.
+  [#3620](https://github.com/lovell/sharp/issues/3620)
+
 ### v0.32.0 - 24th March 2023
 
 * Default to using sequential rather than random access read where possible.
