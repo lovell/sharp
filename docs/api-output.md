@@ -374,6 +374,48 @@ await sharp('in.gif', { animated: true })
   .gif({ interFrameMaxError: 8 })
   .toFile('optim.gif');
 ```
+<a name="jp2"></a>
+
+## jp
+Use these JP2 options for output image.
+
+Requires libvips compiled with support for OpenJPEG.
+The prebuilt binaries do not include this - see
+[installing a custom libvips](https://sharp.pixelplumbing.com/install#custom-libvips).
+
+
+**Throws**:
+
+- <code>Error</code> Invalid options
+
+**Since**: 0.29.1  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>Object</code> |  | output options |
+| [options.quality] | <code>number</code> | <code>80</code> | quality, integer 1-100 |
+| [options.lossless] | <code>boolean</code> | <code>false</code> | use lossless compression mode |
+| [options.tileWidth] | <code>number</code> | <code>512</code> | horizontal tile size |
+| [options.tileHeight] | <code>number</code> | <code>512</code> | vertical tile size |
+| [options.chromaSubsampling] | <code>string</code> | <code>&quot;&#x27;4:4:4&#x27;&quot;</code> | set to '4:2:0' to use chroma subsampling |
+
+**Example**  
+```js
+// Convert any input to lossless JP2 output
+const data = await sharp(input)
+  .jp2({ lossless: true })
+  .toBuffer();
+```
+**Example**  
+```js
+// Convert any input to very high quality JP2 output
+const data = await sharp(input)
+  .jp2({
+    quality: 100,
+    chromaSubsampling: '4:4:4'
+  })
+  .toBuffer();
+```
 
 
 ## tiff
