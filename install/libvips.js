@@ -77,7 +77,11 @@ const verifyIntegrity = function (platformAndArch) {
     flush: function (done) {
       const digest = `sha512-${hash.digest('base64')}`;
       if (expected !== digest) {
-        libvips.removeVendoredLibvips();
+        try {
+          libvips.removeVendoredLibvips();
+        } catch (err) {
+          libvips.log(err.message);
+        }
         libvips.log(`Integrity expected: ${expected}`);
         libvips.log(`Integrity received: ${digest}`);
         done(new Error(`Integrity check failed for ${platformAndArch}`));
