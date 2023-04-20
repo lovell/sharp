@@ -98,8 +98,6 @@ readableStream
 A [guide for contributors](https://github.com/lovell/sharp/blob/main/.github/CONTRIBUTING.md)
 covers reporting bugs, requesting features and submitting code changes.
 
-[![Node-API v5](https://img.shields.io/badge/Node--API-v5-green.svg)](https://nodejs.org/dist/latest/docs/api/n-api.html#n_api_n_api_version_matrix)
-
 ## Licensing
 
 Copyright 2013 Lovell Fuller and others.
