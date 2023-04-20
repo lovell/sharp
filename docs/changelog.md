@@ -26,6 +26,9 @@ Requires libvips v8.14.2
 * Add support for `modulate` operation when using non-sRGB pipeline colourspace.
   [#3620](https://github.com/lovell/sharp/issues/3620)
 
+* Ensure `trim` operation works with CMYK images (regression in 0.31.0).
+  [#3636](https://github.com/lovell/sharp/issues/3636)
+
 ### v0.32.0 - 24th March 2023
 
 * Default to using sequential rather than random access read where possible.

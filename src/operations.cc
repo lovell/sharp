@@ -269,30 +269,20 @@ namespace sharp {
     if (image.width() < 3 && image.height() < 3) {
       throw VError("Image to trim must be at least 3x3 pixels");
     }
-
-    // Scale up 8-bit values to match 16-bit input image
-    double multiplier = sharp::Is16Bit(image.interpretation()) ? 256.0 : 1.0;
-    threshold *= multiplier;
-
-    std::vector<double> backgroundAlpha(1);
     if (background.size() == 0) {
       // Top-left pixel provides the default background colour if none is given
       background = image.extract_area(0, 0, 1, 1)(0, 0);
-      multiplier = 1.0;
+    } else if (sharp::Is16Bit(image.interpretation())) {
+      for (size_t i = 0; i < background.size(); i++) {
+        background[i] *= 256.0;
+      }
+      threshold *= 256.0;
     }
-    if (HasAlpha(image) && background.size() == 4) {
-      // Just discard the alpha because flattening the background colour with
-      // itself (effectively what find_trim() does) gives the same result
-      backgroundAlpha[0] = background[3] * multiplier;
-    }
-    if (image.bands() > 2) {
-      background = {
-        background[0] * multiplier,
-        background[1] * multiplier,
-        background[2] * multiplier
-      };
+    std::vector<double> backgroundAlpha({ background.back() });
+    if (HasAlpha(image)) {
+      background.pop_back();
     } else {
-      background[0] = background[0] * multiplier;
+      background.resize(image.bands());
     }
     int left, top, width, height;
     left = image.find_trim(&top, &width, &height, VImage::option()

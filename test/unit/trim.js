@@ -153,6 +153,32 @@ describe('Trim borders', function () {
     assert.strictEqual(trimOffsetLeft, -12);
   });
 
+  it('Ensure CMYK image can be trimmed', async () => {
+    const cmyk = await sharp({
+      create: {
+        width: 16,
+        height: 8,
+        channels: 3,
+        background: 'red'
+      }
+    })
+      .extend({ left: 12, right: 24, background: 'blue' })
+      .toColourspace('cmyk')
+      .jpeg()
+      .toBuffer();
+
+    const { info } = await sharp(cmyk)
+      .trim()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+    assert.strictEqual(width, 16);
+    assert.strictEqual(height, 8);
+    assert.strictEqual(trimOffsetTop, 0);
+    assert.strictEqual(trimOffsetLeft, -12);
+  });
+
   it('Ensure trim of image with all pixels same is no-op', async () => {
     const { info } = await sharp({
       create: {
