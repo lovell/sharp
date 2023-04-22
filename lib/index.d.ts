@@ -356,7 +356,7 @@ declare namespace sharp {
          * Perform an affine transform on an image. This operation will always occur after resizing, extraction and rotation, if any.
          * You must provide an array of length 4 or a 2x2 affine transformation matrix.
          * By default, new pixels are filled with a black background. You can provide a background color with the `background` option.
-         * A particular interpolator may also be specified. Set the `interpolator` option to an attribute of the `sharp.interpolator` Object e.g. `sharp.interpolator.nohalo`.
+         * A particular interpolator may also be specified. Set the `interpolator` option to an attribute of the `sharp.interpolators` Object e.g. `sharp.interpolators.nohalo`.
          *
          * In the case of a 2x2 matrix, the transform is:
          * X = matrix[0, 0] * (x + idx) + matrix[0, 1] * (y + idy) + odx
