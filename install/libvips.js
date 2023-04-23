@@ -140,17 +140,19 @@ try {
       throw new Error(`BSD/SunOS systems require manual installation of libvips >= ${minimumLibvipsVersion}`);
     }
     // Linux libc version check
-    const libcFamily = detectLibc.familySync();
     const libcVersionRaw = detectLibc.versionSync();
-    const libcVersion = semverCoerce(libcVersionRaw).version;
-    if (libcFamily === detectLibc.GLIBC && libcVersion && minimumGlibcVersionByArch[arch]) {
-      if (semverLessThan(libcVersion, semverCoerce(minimumGlibcVersionByArch[arch]).version)) {
-        handleError(new Error(`Use with glibc ${libcVersionRaw} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
+    if (libcVersionRaw) {
+      const libcFamily = detectLibc.familySync();
+      const libcVersion = semverCoerce(libcVersionRaw).version;
+      if (libcFamily === detectLibc.GLIBC && minimumGlibcVersionByArch[arch]) {
+        if (semverLessThan(libcVersion, semverCoerce(minimumGlibcVersionByArch[arch]).version)) {
+          handleError(new Error(`Use with glibc ${libcVersionRaw} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
+        }
       }
-    }
-    if (libcFamily === detectLibc.MUSL && libcVersion) {
-      if (semverLessThan(libcVersion, '1.1.24')) {
-        handleError(new Error(`Use with musl ${libcVersionRaw} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
+      if (libcFamily === detectLibc.MUSL) {
+        if (semverLessThan(libcVersion, '1.1.24')) {
+          handleError(new Error(`Use with musl ${libcVersionRaw} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
+        }
       }
     }
     // Node.js minimum version check
