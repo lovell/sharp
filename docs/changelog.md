@@ -29,6 +29,9 @@ Requires libvips v8.14.2
 * Ensure `trim` operation works with CMYK images (regression in 0.31.0).
   [#3636](https://github.com/lovell/sharp/issues/3636)
 
+* Install: coerce libc version to semver.
+  [#3641](https://github.com/lovell/sharp/issues/3641)
+
 ### v0.32.0 - 24th March 2023
 
 * Default to using sequential rather than random access read where possible.

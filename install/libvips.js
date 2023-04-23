@@ -11,6 +11,7 @@ const zlib = require('zlib');
 const { createHash } = require('crypto');
 
 const detectLibc = require('detect-libc');
+const semverCoerce = require('semver/functions/coerce');
 const semverLessThan = require('semver/functions/lt');
 const semverSatisfies = require('semver/functions/satisfies');
 const simpleGet = require('simple-get');
@@ -140,16 +141,16 @@ try {
     }
     // Linux libc version check
     const libcFamily = detectLibc.familySync();
-    const libcVersion = detectLibc.versionSync();
+    const libcVersionRaw = detectLibc.versionSync();
+    const libcVersion = semverCoerce(libcVersionRaw).version;
     if (libcFamily === detectLibc.GLIBC && libcVersion && minimumGlibcVersionByArch[arch]) {
-      const libcVersionWithoutPatch = libcVersion.split('.').slice(0, 2).join('.');
-      if (semverLessThan(`${libcVersionWithoutPatch}.0`, `${minimumGlibcVersionByArch[arch]}.0`)) {
-        handleError(new Error(`Use with glibc ${libcVersion} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
+      if (semverLessThan(libcVersion, semverCoerce(minimumGlibcVersionByArch[arch]).version)) {
+        handleError(new Error(`Use with glibc ${libcVersionRaw} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
       }
     }
     if (libcFamily === detectLibc.MUSL && libcVersion) {
       if (semverLessThan(libcVersion, '1.1.24')) {
-        handleError(new Error(`Use with musl ${libcVersion} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
+        handleError(new Error(`Use with musl ${libcVersionRaw} requires manual installation of libvips >= ${minimumLibvipsVersion}`));
       }
     }
     // Node.js minimum version check
