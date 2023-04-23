@@ -126,7 +126,6 @@ namespace sharp {
     return static_cast<T>(
       vips_enum_from_nick(nullptr, type, AttrAsStr(obj, attr).data()));
   }
-  Napi::Buffer<char> NewOrCopyBuffer(Napi::Env env, char* data, size_t len);
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image
   InputDescriptor* CreateInputDescriptor(Napi::Object input);
