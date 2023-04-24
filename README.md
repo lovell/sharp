@@ -1,5 +1,11 @@
 # sharp
 
+<p align="center">
+<img alt="Npm version" src="https://img.shields.io/npm/v/sharp">
+  <img alt="" src="https://img.shields.io/npm/dm/sharp"/>
+  <img alt="" src="https://badgen.net/bundlephobia/minzip/sharp"/>
+</p>
+
 <img src="https://cdn.jsdelivr.net/gh/lovell/sharp@main/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
 
 The typical use case for this high speed Node.js module
