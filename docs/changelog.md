@@ -4,7 +4,7 @@
 
 Requires libvips v8.14.2
 
-### v0.32.1 - TBD
+### v0.32.1 - 27th April 2023
 
 * Add experimental `unflatten` operation.
   [#3461](https://github.com/lovell/sharp/pull/3461)
