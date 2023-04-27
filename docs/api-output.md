@@ -374,9 +374,9 @@ await sharp('in.gif', { animated: true })
   .gif({ interFrameMaxError: 8 })
   .toFile('optim.gif');
 ```
-<a name="jp2"></a>
 
-## jp
+
+## jp2
 Use these JP2 options for output image.
 
 Requires libvips compiled with support for OpenJPEG.
