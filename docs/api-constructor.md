@@ -51,9 +51,9 @@ Implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_st
 | [options.text.text] | <code>string</code> |  | text to render as a UTF-8 string. It can contain Pango markup, for example `<i>Le</i>Monde`. |
 | [options.text.font] | <code>string</code> |  | font name to render with. |
 | [options.text.fontfile] | <code>string</code> |  | absolute filesystem path to a font file that can be used by `font`. |
-| [options.text.width] | <code>number</code> | <code>0</code> | integral number of pixels to word-wrap at. Lines of text wider than this will be broken at word boundaries. |
-| [options.text.height] | <code>number</code> | <code>0</code> | integral number of pixels high. When defined, `dpi` will be ignored and the text will automatically fit the pixel resolution defined by `width` and `height`. Will be ignored if `width` is not specified or set to 0. |
-| [options.text.align] | <code>string</code> | <code>&quot;&#x27;left&#x27;&quot;</code> | text alignment (`'left'`, `'centre'`, `'center'`, `'right'`). |
+| [options.text.width] | <code>number</code> | <code>0</code> | Integral number of pixels to word-wrap at. Lines of text wider than this will be broken at word boundaries. |
+| [options.text.height] | <code>number</code> | <code>0</code> | Maximum integral number of pixels high. When defined, `dpi` will be ignored and the text will automatically fit the pixel resolution defined by `width` and `height`. Will be ignored if `width` is not specified or set to 0. |
+| [options.text.align] | <code>string</code> | <code>&quot;&#x27;left&#x27;&quot;</code> | Alignment style for multi-line text (`'left'`, `'centre'`, `'center'`, `'right'`). |
 | [options.text.justify] | <code>boolean</code> | <code>false</code> | set this to true to apply justification to the text. |
 | [options.text.dpi] | <code>number</code> | <code>72</code> | the resolution (size) at which to render the text. Does not take effect if `height` is specified. |
 | [options.text.rgba] | <code>boolean</code> | <code>false</code> | set this to true to enable RGBA output. This is useful for colour emoji rendering, or support for pango markup features like `<span foreground="red">Red!</span>`. |
