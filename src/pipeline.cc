@@ -380,11 +380,11 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (autoRotation != VIPS_ANGLE_D0) {
         image = image.rot(autoRotation);
       }
-      // Flip (mirror about Y axis)
+      // Mirror vertically (up-down) about the x-axis
       if (baton->flip || autoFlip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
       }
-      // Flop (mirror about X axis)
+      // Mirror horizontally (left-right) about the y-axis
       if (baton->flop || autoFlop) {
         image = image.flip(VIPS_DIRECTION_HORIZONTAL);
       }
