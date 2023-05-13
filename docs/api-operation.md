@@ -59,7 +59,10 @@ const resizeThenRotate = await sharp(input)
 ## flip
 Mirror the image vertically (up-down) about the x-axis.
 This always occurs before rotation, if any.
+
 The use of `flip` implies the removal of the EXIF `Orientation` tag, if any.
+
+This operation does not work correctly with multi-page images.
 
 
 
@@ -76,6 +79,7 @@ const output = await sharp(input).flip().toBuffer();
 ## flop
 Mirror the image horizontally (left-right) about the y-axis.
 This always occurs before rotation, if any.
+
 The use of `flop` implies the removal of the EXIF `Orientation` tag, if any.
 
 
