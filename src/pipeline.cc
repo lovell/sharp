@@ -399,6 +399,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         sharp::ImageType joinImageType = sharp::ImageType::UNKNOWN;
 
         for (unsigned int i = 0; i < baton->joinChannelIn.size(); i++) {
+          baton->joinChannelIn[i]->access = baton->input->access;
           std::tie(joinImage, joinImageType) = sharp::OpenInput(baton->joinChannelIn[i]);
           joinImage = sharp::EnsureColourspace(joinImage, baton->colourspaceInput);
           image = image.bandjoin(joinImage);
@@ -608,6 +609,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         for (Composite *composite : baton->composite) {
           VImage compositeImage;
           sharp::ImageType compositeImageType = sharp::ImageType::UNKNOWN;
+          composite->input->access = baton->input->access;
           std::tie(compositeImage, compositeImageType) = sharp::OpenInput(composite->input);
           compositeImage = sharp::EnsureColourspace(compositeImage, baton->colourspaceInput);
           // Verify within current dimensions
@@ -706,6 +708,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->boolean != nullptr) {
         VImage booleanImage;
         sharp::ImageType booleanImageType = sharp::ImageType::UNKNOWN;
+        baton->boolean->access = baton->input->access;
         std::tie(booleanImage, booleanImageType) = sharp::OpenInput(baton->boolean);
         booleanImage = sharp::EnsureColourspace(booleanImage, baton->colourspaceInput);
         image = sharp::Boolean(image, booleanImage, baton->booleanOp);
