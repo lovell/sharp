@@ -637,3 +637,17 @@ sharp('input.png').composite([
 sharp('input.png').tile({
   basename: 'output.dz.tiles',
 });
+
+// https://github.com/lovell/sharp/issues/3669
+sharp(input).composite([
+  {
+    raw: {
+      width: 1,
+      height: 1,
+      channels: 1,
+      premultiplied: false,
+    },
+    sequentialRead: false,
+    unlimited: true,
+  }
+]);

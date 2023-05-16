@@ -1350,9 +1350,9 @@ declare namespace sharp {
         grayscale?: boolean | undefined;
     }
 
-    interface OverlayOptions {
+    interface OverlayOptions extends SharpOptions {
         /** Buffer containing image data, String containing the path to an image file, or Create object  */
-        input?: string | Buffer | { create: Create } | { text: CreateText } | undefined;
+        input?: string | Buffer | { create: Create } | { text: CreateText } | { raw: CreateRaw } | undefined;
         /** how to blend this image with the image below. (optional, default `'over'`) */
         blend?: Blend | undefined;
         /** gravity at which to place the overlay. (optional, default 'centre') */
@@ -1363,25 +1363,8 @@ declare namespace sharp {
         left?: number | undefined;
         /** set to true to repeat the overlay image across the entire image with the given  gravity. (optional, default false) */
         tile?: boolean | undefined;
-        /** number representing the DPI for vector overlay image. (optional, default 72) */
-        density?: number | undefined;
-        /** describes overlay when using raw pixel data. */
-        raw?: Raw | undefined;
         /** Set to true to avoid premultipling the image below. Equivalent to the --premultiplied vips option. */
         premultiplied?: boolean | undefined;
-        /** Set to true to read all frames/pages of an animated image. (optional, default false). */
-        animated?: boolean | undefined;
-        /**
-         *  When to abort processing of invalid pixel data, one of (in order of sensitivity):
-         *  'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels, invalid metadata will always abort. (optional, default 'warning')
-         */
-        failOn?: FailOnOptions | undefined;
-        /**
-         * Do not process input images where the number of pixels (width x height) exceeds this limit.
-         * Assumes image dimensions contained in the input metadata can be trusted.
-         * An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). (optional, default 268402689)
-         */
-        limitInputPixels?: number | boolean | undefined;
     }
 
     interface TileOptions {
