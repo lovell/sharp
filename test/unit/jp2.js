@@ -25,6 +25,13 @@ describe('JP2 output', () => {
         /JP2 output requires libvips with support for OpenJPEG/
       )
     );
+
+    it('File with JP2-like suffix should not fail due to missing OpenJPEG', () => {
+      const output = fixtures.path('output.failj2c');
+      return assert.doesNotReject(
+        async () => sharp(fixtures.inputPngWithOneColor).toFile(output)
+      );
+    });
   } else {
     it('JP2 Buffer to PNG Buffer', () => {
       sharp(fs.readFileSync(fixtures.inputJp2))
