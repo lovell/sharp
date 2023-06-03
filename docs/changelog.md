@@ -6,6 +6,9 @@ Requires libvips v8.14.2
 
 ### v0.32.2 - TBD
 
+* Ensure exceptions are not thrown when terminating.
+  [#3569](https://github.com/lovell/sharp/issues/3569)
+
 * Ensure the same access method is used for all inputs (regression in 0.32.0).
   [#3669](https://github.com/lovell/sharp/issues/3669)
 
