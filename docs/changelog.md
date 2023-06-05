@@ -12,6 +12,10 @@ Requires libvips v8.14.2
 * Ensure the same access method is used for all inputs (regression in 0.32.0).
   [#3669](https://github.com/lovell/sharp/issues/3669)
 
+* Improve detection of jp2 filename extensions.
+  [#3674](https://github.com/lovell/sharp/pull/3674)
+  [@bianjunjie1981](https://github.com/bianjunjie1981)
+
 ### v0.32.1 - 27th April 2023
 
 * Add experimental `unflatten` operation.
