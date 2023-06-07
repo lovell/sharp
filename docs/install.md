@@ -354,6 +354,24 @@ Without this, the following error may occur:
 Module did not self-register
 ```
 
+**If you are using [AVA](https://github.com/avajs/ava) then you can use this workaround per [#3164](https://github.com/lovell/sharp/issues/3164#issuecomment-1579642822):**
+
+```sh
+npm install detect-libc
+```
+
+Modify your AVA configuration or `ava.config.js` as follows:
+
+```js
+// ava.config.js
+const { familySync, GLIBC } = require('detect-libc');
+
+module.exports = {
+  // <https://github.com/lovell/sharp/issues/3164>
+  workerThreads: familySync() !== GLIBC
+};
+```
+
 ## Known conflicts
 
 ### Canvas and Windows
