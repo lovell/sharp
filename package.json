@@ -89,7 +89,7 @@
     "Ingvar Stepanyan <me@rreverser.com>"
   ],
   "scripts": {
-    "install": "node install/noop-wasm || (node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
+    "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run test-lint && npm run test-unit && npm run test-licensing",
     "test-lint": "semistandard && cpplint",
@@ -131,10 +131,10 @@
     "vips"
   ],
   "dependencies": {
-    "@emnapi/runtime": "^0.31.0",
+    "@emnapi/runtime": "^0.40.0",
     "color": "^4.2.3",
     "detect-libc": "^2.0.1",
-    "node-addon-api": "^5.0.0",
+    "node-addon-api": "^6.0.0",
     "prebuild-install": "^7.1.1",
     "semver": "^7.3.8",
     "simple-get": "^4.0.1",
@@ -142,10 +142,10 @@
     "tunnel-agent": "^0.6.0"
   },
   "devDependencies": {
-    "emnapi": "^0.31.0",
     "async": "^3.2.4",
     "cc": "^3.0.1",
     "documentation": "^14.0.1",
+    "emnapi": "file:emnapi/packages/emnapi",
     "exif-reader": "^1.0.3",
     "extract-zip": "^2.0.1",
     "icc": "^2.0.0",

@@ -1,4 +1,4 @@
-/* global Module, ENV, PThread, _vips_shutdown */
+/* global Module, ENV, _vips_shutdown */
 
 let vipsConcurrency;
 if ('webcontainer' in process.versions) {
@@ -17,13 +17,6 @@ Module.onRuntimeInitialized = () => {
     // nodeBinding: require('@emnapi/node-binding')
   });
 
-  // At this point only libvips workers are up & running.
-  // Mark all of them as weakly referenced so that they
-  // don't prevent Node.js from exiting.
-  for (const worker of PThread.runningWorkers) {
-    worker.unref();
-  }
-
   const { concurrency } = emnapi;
   emnapi.concurrency = function (maybeSet) {
     if (typeof maybeSet === 'number' && maybeSet > vipsConcurrency) {
@@ -39,6 +32,7 @@ Module.onRuntimeInitialized = () => {
   // This doesn't matter too much in real Node.js, but it does in WebContainer.
   process.once('exit', () => {
     _vips_shutdown();
+    _uv__threadpool_cleanup();
   });
 
   module.exports = emnapi;

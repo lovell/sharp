@@ -67,9 +67,6 @@ Module.onRuntimeInitialized = () => {
  const emnapi = Module.emnapiInit({
   context: require("@emnapi/runtime").getDefaultContext()
  });
- for (const worker of PThread.runningWorkers) {
-  worker.unref();
- }
  const {concurrency: concurrency} = emnapi;
  emnapi.concurrency = function(maybeSet) {
   if (typeof maybeSet === "number" && maybeSet > vipsConcurrency) {
@@ -80,6 +77,7 @@ Module.onRuntimeInitialized = () => {
  };
  process.once("exit", () => {
   _vips_shutdown();
+  _uv__threadpool_cleanup();
  });
  module.exports = emnapi;
 };
@@ -104,13 +102,13 @@ var ENVIRONMENT_IS_SHELL = false;
 
 var ENVIRONMENT_IS_PTHREAD = Module["ENVIRONMENT_IS_PTHREAD"] || false;
 
-var _scriptDir;
+var currentScript;
 
-if (ENVIRONMENT_IS_NODE) {
- _scriptDir = __filename;
+if (typeof __filename !== "undefined") {
+ currentScript = __filename;
 } else if (ENVIRONMENT_IS_WORKER) {
- _scriptDir = self.location.href;
-} else _scriptDir = undefined;
+ currentScript = self.location.href;
+} else currentScript = "";
 
 var scriptDirectory = "";
 
@@ -122,12 +120,6 @@ function locateFile(path) {
 }
 
 var read_, readAsync, readBinary, setWindowTitle;
-
-function logExceptionOnExit(e) {
- if (e instanceof ExitStatus) return;
- let toLog = e;
- err("exiting due to exception: " + toLog);
-}
 
 if (ENVIRONMENT_IS_NODE) {
  var fs = require("fs");
@@ -144,30 +136,24 @@ if (ENVIRONMENT_IS_NODE) {
   }
   return ret;
  };
- readAsync = (filename, onload, onerror) => {
+ readAsync = (filename, onload, onerror, binary = true) => {
   filename = isFileURI(filename) ? new URL(filename) : nodePath.normalize(filename);
-  fs.readFile(filename, function(err, data) {
-   if (err) onerror(err); else onload(data.buffer);
+  fs.readFile(filename, binary ? undefined : "utf8", (err, data) => {
+   if (err) onerror(err); else onload(binary ? data.buffer : data);
   });
  };
- if (process["argv"].length > 1) {
-  thisProgram = process["argv"][1].replace(/\\/g, "/");
+ if (!Module["thisProgram"] && process.argv.length > 1) {
+  thisProgram = process.argv[1].replace(/\\/g, "/");
  }
- arguments_ = process["argv"].slice(2);
+ arguments_ = process.argv.slice(2);
  if (typeof module != "undefined") {
   module["exports"] = Module;
  }
  quit_ = (status, toThrow) => {
-  if (keepRuntimeAlive()) {
-   process["exitCode"] = status;
-   throw toThrow;
-  }
-  logExceptionOnExit(toThrow);
-  process["exit"](status);
+  process.exitCode = status;
+  throw toThrow;
  };
- Module["inspect"] = function() {
-  return "[Emscripten Module object]";
- };
+ Module["inspect"] = () => "[Emscripten Module object]";
  let nodeWorkerThreads;
  try {
   nodeWorkerThreads = require("worker_threads");
@@ -177,13 +163,8 @@ if (ENVIRONMENT_IS_NODE) {
  }
  global.Worker = nodeWorkerThreads.Worker;
 } else if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
- if (typeof document != "undefined" && document.currentScript) {
-  scriptDirectory = document.currentScript.src;
- }
- if (scriptDirectory.indexOf("blob:") !== 0) {
-  scriptDirectory = scriptDirectory.substr(0, scriptDirectory.replace(/[?#].*/, "").lastIndexOf("/") + 1);
- } else {
-  scriptDirectory = "";
+ if (currentScript.indexOf("blob:") !== 0) {
+  scriptDirectory = currentScript.substr(0, currentScript.replace(/[?#].*/, "").lastIndexOf("/") + 1);
  }
  if (!ENVIRONMENT_IS_NODE) {
   read_ = url => {
@@ -227,11 +208,11 @@ if (ENVIRONMENT_IS_NODE) {
 
 var defaultPrint = console.log.bind(console);
 
-var defaultPrintErr = console.warn.bind(console);
+var defaultPrintErr = console.error.bind(console);
 
 if (ENVIRONMENT_IS_NODE) {
- defaultPrint = str => fs.writeSync(1, str + "\n");
- defaultPrintErr = str => fs.writeSync(2, str + "\n");
+ defaultPrint = (...args) => fs.writeSync(1, args.join(" ") + "\n");
+ defaultPrintErr = (...args) => fs.writeSync(2, args.join(" ") + "\n");
 }
 
 var out = Module["print"] || defaultPrint;
@@ -270,97 +251,6 @@ function assert(condition, text) {
  if (!condition) {
   abort(text);
  }
-}
-
-function UTF8ArrayToString(heapOrArray, idx, maxBytesToRead) {
- var endIdx = idx + maxBytesToRead;
- var str = "";
- while (!(idx >= endIdx)) {
-  var u0 = heapOrArray[idx++];
-  if (!u0) return str;
-  if (!(u0 & 128)) {
-   str += String.fromCharCode(u0);
-   continue;
-  }
-  var u1 = heapOrArray[idx++] & 63;
-  if ((u0 & 224) == 192) {
-   str += String.fromCharCode((u0 & 31) << 6 | u1);
-   continue;
-  }
-  var u2 = heapOrArray[idx++] & 63;
-  if ((u0 & 240) == 224) {
-   u0 = (u0 & 15) << 12 | u1 << 6 | u2;
-  } else {
-   u0 = (u0 & 7) << 18 | u1 << 12 | u2 << 6 | heapOrArray[idx++] & 63;
-  }
-  if (u0 < 65536) {
-   str += String.fromCharCode(u0);
-  } else {
-   var ch = u0 - 65536;
-   str += String.fromCharCode(55296 | ch >> 10, 56320 | ch & 1023);
-  }
- }
- return str;
-}
-
-function UTF8ToString(ptr, maxBytesToRead) {
- return ptr ? UTF8ArrayToString(GROWABLE_HEAP_U8(), ptr, maxBytesToRead) : "";
-}
-
-function stringToUTF8Array(str, heap, outIdx, maxBytesToWrite) {
- if (!(maxBytesToWrite > 0)) return 0;
- var startIdx = outIdx;
- var endIdx = outIdx + maxBytesToWrite - 1;
- for (var i = 0; i < str.length; ++i) {
-  var u = str.charCodeAt(i);
-  if (u >= 55296 && u <= 57343) {
-   var u1 = str.charCodeAt(++i);
-   u = 65536 + ((u & 1023) << 10) | u1 & 1023;
-  }
-  if (u <= 127) {
-   if (outIdx >= endIdx) break;
-   heap[outIdx++] = u;
-  } else if (u <= 2047) {
-   if (outIdx + 1 >= endIdx) break;
-   heap[outIdx++] = 192 | u >> 6;
-   heap[outIdx++] = 128 | u & 63;
-  } else if (u <= 65535) {
-   if (outIdx + 2 >= endIdx) break;
-   heap[outIdx++] = 224 | u >> 12;
-   heap[outIdx++] = 128 | u >> 6 & 63;
-   heap[outIdx++] = 128 | u & 63;
-  } else {
-   if (outIdx + 3 >= endIdx) break;
-   heap[outIdx++] = 240 | u >> 18;
-   heap[outIdx++] = 128 | u >> 12 & 63;
-   heap[outIdx++] = 128 | u >> 6 & 63;
-   heap[outIdx++] = 128 | u & 63;
-  }
- }
- heap[outIdx] = 0;
- return outIdx - startIdx;
-}
-
-function stringToUTF8(str, outPtr, maxBytesToWrite) {
- return stringToUTF8Array(str, GROWABLE_HEAP_U8(), outPtr, maxBytesToWrite);
-}
-
-function lengthBytesUTF8(str) {
- var len = 0;
- for (var i = 0; i < str.length; ++i) {
-  var c = str.charCodeAt(i);
-  if (c <= 127) {
-   len++;
-  } else if (c <= 2047) {
-   len += 2;
-  } else if (c >= 55296 && c <= 57343) {
-   len += 4;
-   ++i;
-  } else {
-   len += 3;
-  }
- }
- return len;
 }
 
 var HEAP, HEAP8, HEAPU8, HEAP16, HEAPU16, HEAP32, HEAPU32, HEAPF32, HEAP64, HEAPU64, HEAPF64;
@@ -420,8 +310,10 @@ var __ATPOSTRUN__ = [];
 
 var runtimeInitialized = false;
 
+var runtimeKeepaliveCounter = 0;
+
 function keepRuntimeAlive() {
- return noExitRuntime;
+ return noExitRuntime || runtimeKeepaliveCounter > 0;
 }
 
 function preRun() {
@@ -548,24 +440,20 @@ function getBinary(file) {
  }
 }
 
-function getBinaryPromise() {
+function getBinaryPromise(binaryFile) {
  if (!wasmBinary && (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER)) {
   if (typeof fetch == "function") {
-   return fetch(wasmBinaryFile, {
+   return fetch(binaryFile, {
     credentials: "same-origin"
-   }).then(function(response) {
+   }).then(response => {
     if (!response["ok"]) {
-     throw "failed to load wasm binary file at '" + wasmBinaryFile + "'";
+     throw "failed to load wasm binary file at '" + binaryFile + "'";
     }
     return response["arrayBuffer"]();
-   }).catch(function() {
-    return getBinary(wasmBinaryFile);
-   });
+   }).catch(() => getBinary(binaryFile));
   }
  }
- return Promise.resolve().then(function() {
-  return getBinary(wasmBinaryFile);
- });
+ return Promise.resolve().then(() => getBinary(binaryFile));
 }
 
 function instantiateSync(file, info) {
@@ -599,26 +487,21 @@ function createWasm() {
   wasmTable = Module["asm"]["__indirect_function_table"];
   addOnInit(Module["asm"]["__wasm_call_ctors"]);
   wasmModule = module;
-  PThread.loadWasmModuleToAllWorkers(() => removeRunDependency("wasm-instantiate"));
+  removeRunDependency("wasm-instantiate");
+  return exports;
  }
  addRunDependency("wasm-instantiate");
  if (Module["instantiateWasm"]) {
   try {
-   var exports = Module["instantiateWasm"](info, receiveInstance);
-   return exports;
+   return Module["instantiateWasm"](info, receiveInstance);
   } catch (e) {
    err("Module.instantiateWasm callback failed with error: " + e);
    return false;
   }
  }
  var result = instantiateSync(wasmBinaryFile, info);
- receiveInstance(result[0], result[1]);
- return Module["asm"];
+ return receiveInstance(result[0], result[1]);
 }
-
-var tempDouble;
-
-var tempI64;
 
 function unbox_small_structs(type_ptr) {
  var type_id = GROWABLE_HEAP_U16()[(type_ptr + 6 >> 1) + 0];
@@ -1085,14 +968,19 @@ function ffi_prep_closure_loc_helper(closure, cif, fun, user_data, codeloc) {
 
 function ExitStatus(status) {
  this.name = "ExitStatus";
- this.message = "Program terminated with exit(" + status + ")";
+ this.message = `Program terminated with exit(${status})`;
  this.status = status;
+}
+
+function terminateWorker(worker) {
+ worker.terminate();
+ worker.onmessage = e => {};
 }
 
 function killThread(pthread_ptr) {
  var worker = PThread.pthreads[pthread_ptr];
  delete PThread.pthreads[pthread_ptr];
- worker.terminate();
+ terminateWorker(worker);
  __emscripten_thread_free_data(pthread_ptr);
  PThread.runningWorkers.splice(PThread.runningWorkers.indexOf(worker), 1);
  worker.pthread_ptr = 0;
@@ -1131,7 +1019,7 @@ function spawnThread(threadParams) {
   "pthread_ptr": threadParams.pthread_ptr
  };
  if (ENVIRONMENT_IS_NODE) {
-  worker.ref();
+  worker.unref();
  }
  worker.postMessage(msg, threadParams.transferList);
  return 0;
@@ -1148,20 +1036,26 @@ var PATH = {
  join2: (l, r) => nodePath["posix"]["join"](l, r)
 };
 
-function getRandomDevice() {
+function initRandomFill() {
  if (typeof crypto == "object" && typeof crypto["getRandomValues"] == "function") {
-  var randomBuffer = new Uint8Array(1);
-  return () => {
-   crypto.getRandomValues(randomBuffer);
-   return randomBuffer[0];
-  };
+  return view => (view.set(crypto.getRandomValues(new Uint8Array(view.byteLength))), 
+  view);
  } else if (ENVIRONMENT_IS_NODE) {
   try {
    var crypto_module = require("crypto");
-   return () => crypto_module["randomBytes"](1)[0];
+   var randomFillSync = crypto_module["randomFillSync"];
+   if (randomFillSync) {
+    return view => crypto_module["randomFillSync"](view);
+   }
+   var randomBytes = crypto_module["randomBytes"];
+   return view => (view.set(randomBytes(view.byteLength)), view);
   } catch (e) {}
  }
- return () => abort("randomDevice");
+ abort("initRandomDevice");
+}
+
+function randomFill(view) {
+ return (randomFill = initRandomFill())(view);
 }
 
 var PATH_FS = {
@@ -1173,12 +1067,95 @@ var PATH_FS = {
  relative: (from, to) => nodePath["posix"]["relative"](from || FS.cwd(), to || FS.cwd())
 };
 
+function lengthBytesUTF8(str) {
+ var len = 0;
+ for (var i = 0; i < str.length; ++i) {
+  var c = str.charCodeAt(i);
+  if (c <= 127) {
+   len++;
+  } else if (c <= 2047) {
+   len += 2;
+  } else if (c >= 55296 && c <= 57343) {
+   len += 4;
+   ++i;
+  } else {
+   len += 3;
+  }
+ }
+ return len;
+}
+
+function stringToUTF8Array(str, heap, outIdx, maxBytesToWrite) {
+ if (!(maxBytesToWrite > 0)) return 0;
+ var startIdx = outIdx;
+ var endIdx = outIdx + maxBytesToWrite - 1;
+ for (var i = 0; i < str.length; ++i) {
+  var u = str.charCodeAt(i);
+  if (u >= 55296 && u <= 57343) {
+   var u1 = str.charCodeAt(++i);
+   u = 65536 + ((u & 1023) << 10) | u1 & 1023;
+  }
+  if (u <= 127) {
+   if (outIdx >= endIdx) break;
+   heap[outIdx++] = u;
+  } else if (u <= 2047) {
+   if (outIdx + 1 >= endIdx) break;
+   heap[outIdx++] = 192 | u >> 6;
+   heap[outIdx++] = 128 | u & 63;
+  } else if (u <= 65535) {
+   if (outIdx + 2 >= endIdx) break;
+   heap[outIdx++] = 224 | u >> 12;
+   heap[outIdx++] = 128 | u >> 6 & 63;
+   heap[outIdx++] = 128 | u & 63;
+  } else {
+   if (outIdx + 3 >= endIdx) break;
+   heap[outIdx++] = 240 | u >> 18;
+   heap[outIdx++] = 128 | u >> 12 & 63;
+   heap[outIdx++] = 128 | u >> 6 & 63;
+   heap[outIdx++] = 128 | u & 63;
+  }
+ }
+ heap[outIdx] = 0;
+ return outIdx - startIdx;
+}
+
 function intArrayFromString(stringy, dontAddNull, length) {
  var len = length > 0 ? length : lengthBytesUTF8(stringy) + 1;
  var u8array = new Array(len);
  var numBytesWritten = stringToUTF8Array(stringy, u8array, 0, u8array.length);
  if (dontAddNull) u8array.length = numBytesWritten;
  return u8array;
+}
+
+function UTF8ArrayToString(heapOrArray, idx, maxBytesToRead) {
+ var endIdx = idx + maxBytesToRead;
+ var str = "";
+ while (!(idx >= endIdx)) {
+  var u0 = heapOrArray[idx++];
+  if (!u0) return str;
+  if (!(u0 & 128)) {
+   str += String.fromCharCode(u0);
+   continue;
+  }
+  var u1 = heapOrArray[idx++] & 63;
+  if ((u0 & 224) == 192) {
+   str += String.fromCharCode((u0 & 31) << 6 | u1);
+   continue;
+  }
+  var u2 = heapOrArray[idx++] & 63;
+  if ((u0 & 240) == 224) {
+   u0 = (u0 & 15) << 12 | u1 << 6 | u2;
+  } else {
+   u0 = (u0 & 7) << 18 | u1 << 12 | u2 << 6 | heapOrArray[idx++] & 63;
+  }
+  if (u0 < 65536) {
+   str += String.fromCharCode(u0);
+  } else {
+   var ch = u0 - 65536;
+   str += String.fromCharCode(55296 | ch >> 10, 56320 | ch & 1023);
+  }
+ }
+ return str;
 }
 
 var TTY = {
@@ -1636,19 +1613,85 @@ var MEMFS = {
 };
 
 function asyncLoad(url, onload, onerror, noRunDep) {
- var dep = !noRunDep ? getUniqueRunDependency("al " + url) : "";
+ var dep = !noRunDep ? getUniqueRunDependency(`al ${url}`) : "";
  readAsync(url, arrayBuffer => {
-  assert(arrayBuffer, 'Loading data file "' + url + '" failed (no arrayBuffer).');
+  assert(arrayBuffer, `Loading data file "${url}" failed (no arrayBuffer).`);
   onload(new Uint8Array(arrayBuffer));
   if (dep) removeRunDependency(dep);
  }, event => {
   if (onerror) {
    onerror();
   } else {
-   throw 'Loading data file "' + url + '" failed.';
+   throw `Loading data file "${url}" failed.`;
   }
  });
  if (dep) addRunDependency(dep);
+}
+
+var preloadPlugins = Module["preloadPlugins"] || [];
+
+function FS_handledByPreloadPlugin(byteArray, fullname, finish, onerror) {
+ if (typeof Browser != "undefined") Browser.init();
+ var handled = false;
+ preloadPlugins.forEach(function(plugin) {
+  if (handled) return;
+  if (plugin["canHandle"](fullname)) {
+   plugin["handle"](byteArray, fullname, finish, onerror);
+   handled = true;
+  }
+ });
+ return handled;
+}
+
+function FS_createPreloadedFile(parent, name, url, canRead, canWrite, onload, onerror, dontCreateFile, canOwn, preFinish) {
+ var fullname = name ? PATH_FS.resolve(PATH.join2(parent, name)) : parent;
+ var dep = getUniqueRunDependency(`cp ${fullname}`);
+ function processData(byteArray) {
+  function finish(byteArray) {
+   if (preFinish) preFinish();
+   if (!dontCreateFile) {
+    FS.createDataFile(parent, name, byteArray, canRead, canWrite, canOwn);
+   }
+   if (onload) onload();
+   removeRunDependency(dep);
+  }
+  if (FS_handledByPreloadPlugin(byteArray, fullname, finish, () => {
+   if (onerror) onerror();
+   removeRunDependency(dep);
+  })) {
+   return;
+  }
+  finish(byteArray);
+ }
+ addRunDependency(dep);
+ if (typeof url == "string") {
+  asyncLoad(url, byteArray => processData(byteArray), onerror);
+ } else {
+  processData(url);
+ }
+}
+
+function FS_modeStringToFlags(str) {
+ var flagModes = {
+  "r": 0,
+  "r+": 2,
+  "w": 512 | 64 | 1,
+  "w+": 512 | 64 | 2,
+  "a": 1024 | 64 | 1,
+  "a+": 1024 | 64 | 2
+ };
+ var flags = flagModes[str];
+ if (typeof flags == "undefined") {
+  throw new Error(`Unknown file open mode: ${str}`);
+ }
+ return flags;
+}
+
+function FS_getMode(canRead, canWrite) {
+ var mode = 0;
+ if (canRead) mode |= 292 | 73;
+ if (canWrite) mode |= 146;
+ return mode;
 }
 
 var ERRNO_CODES = {};
@@ -1657,7 +1700,7 @@ var NODEFS = {
  isWindows: false,
  staticInit: () => {
   NODEFS.isWindows = !!process.platform.match(/^win/);
-  var flags = process["binding"]("constants");
+  var flags = process.binding("constants");
   if (flags["fs"]) {
    flags = flags["fs"];
   }
@@ -1958,7 +2001,7 @@ var NODERAWFS = {
   }
  },
  lookup: function(parent, name) {
-  return FS.lookupPath(parent.path + "/" + name).node;
+  return FS.lookupPath(`${parent.path}/${name}`).node;
  },
  lookupPath: function(path, opts = {}) {
   if (opts.parent) {
@@ -2021,14 +2064,22 @@ var NODERAWFS = {
  chmod: function() {
   fs.chmodSync.apply(void 0, arguments);
  },
- fchmod: function() {
-  fs.fchmodSync.apply(void 0, arguments);
+ fchmod: function(fd, mode) {
+  var stream = FS.getStream(fd);
+  if (!stream) {
+   throw new FS.ErrnoError(8);
+  }
+  fs.fchmodSync(stream.nfd, mode);
  },
  chown: function() {
   fs.chownSync.apply(void 0, arguments);
  },
- fchown: function() {
-  fs.fchownSync.apply(void 0, arguments);
+ fchown: function(fd, owner, group) {
+  var stream = FS.getStream(fd);
+  if (!stream) {
+   throw new FS.ErrnoError(8);
+  }
+  fs.fchownSync(stream.nfd, owner, group);
  },
  truncate: function() {
   fs.truncateSync.apply(void 0, arguments);
@@ -2037,14 +2088,18 @@ var NODERAWFS = {
   if (len < 0) {
    throw new FS.ErrnoError(28);
   }
-  fs.ftruncateSync.apply(void 0, arguments);
+  var stream = FS.getStream(fd);
+  if (!stream) {
+   throw new FS.ErrnoError(8);
+  }
+  fs.ftruncateSync(stream.nfd, len);
  },
  utime: function(path, atime, mtime) {
   fs.utimesSync(path, atime / 1e3, mtime / 1e3);
  },
- open: function(path, flags, mode, suggestFD) {
+ open: function(path, flags, mode) {
   if (typeof flags == "string") {
-   flags = VFS.modeStringToFlags(flags);
+   flags = FS_modeStringToFlags(flags);
   }
   var pathTruncated = path.split("/").map(function(s) {
    return s.substr(0, 255);
@@ -2056,26 +2111,23 @@ var NODERAWFS = {
    throw new FS.ErrnoError(ERRNO_CODES.ENOTDIR);
   }
   var newMode = NODEFS.getMode(pathTruncated);
-  var fd = suggestFD != null ? suggestFD : FS.nextfd(nfd);
   var node = {
    id: st.ino,
    mode: newMode,
    node_ops: NODERAWFS,
    path: path
   };
-  var stream = FS.createStream({
+  return FS.createStream({
    nfd: nfd,
    position: 0,
    path: path,
    flags: flags,
    node: node,
    seekable: true
-  }, fd, fd);
-  FS.streams[fd] = stream;
-  return stream;
+  });
  },
- createStream: function(stream, fd_start, fd_end) {
-  var rtn = VFS.createStream(stream, fd_start, fd_end);
+ createStream: function(stream, fd) {
+  var rtn = VFS.createStream(stream, fd);
   if (typeof rtn.shared.refcnt == "undefined") {
    rtn.shared.refcnt = 1;
   } else {
@@ -2083,15 +2135,9 @@ var NODERAWFS = {
   }
   return rtn;
  },
- closeStream: function(fd) {
-  if (FS.streams[fd]) {
-   FS.streams[fd].shared.refcnt--;
-  }
-  VFS.closeStream(fd);
- },
  close: function(stream) {
-  FS.closeStream(stream.fd);
-  if (!stream.stream_ops && stream.shared.refcnt === 0) {
+  VFS.closeStream(stream.fd);
+  if (!stream.stream_ops && --stream.shared.refcnt === 0) {
    fs.closeSync(stream.nfd);
   }
  },
@@ -2234,9 +2280,9 @@ var FS = {
    if (FS.isRoot(node)) {
     var mount = node.mount.mountpoint;
     if (!path) return mount;
-    return mount[mount.length - 1] !== "/" ? mount + "/" + path : mount + path;
+    return mount[mount.length - 1] !== "/" ? `${mount}/${path}` : mount + path;
    }
-   path = path ? node.name + "/" + path : node.name;
+   path = path ? `${node.name}/${path}` : node.name;
    node = node.parent;
   }
  },
@@ -2316,21 +2362,6 @@ var FS = {
  isSocket: mode => {
   return (mode & 49152) === 49152;
  },
- flagModes: {
-  "r": 0,
-  "r+": 2,
-  "w": 577,
-  "w+": 578,
-  "a": 1089,
-  "a+": 1090
- },
- modeStringToFlags: str => {
-  var flags = FS.flagModes[str];
-  if (typeof flags == "undefined") {
-   throw new Error("Unknown file open mode: " + str);
-  }
-  return flags;
- },
  flagsToPermissionString: flag => {
   var perms = [ "r", "w", "rw" ][flag & 3];
   if (flag & 512) {
@@ -2403,8 +2434,8 @@ var FS = {
   return FS.nodePermissions(node, FS.flagsToPermissionString(flags));
  },
  MAX_OPEN_FDS: 4096,
- nextfd: (fd_start = 0, fd_end = FS.MAX_OPEN_FDS) => {
-  for (var fd = fd_start; fd <= fd_end; fd++) {
+ nextfd: () => {
+  for (var fd = 0; fd <= FS.MAX_OPEN_FDS; fd++) {
    if (!FS.streams[fd]) {
     return fd;
    }
@@ -2412,7 +2443,7 @@ var FS = {
   throw new FS.ErrnoError(33);
  },
  getStream: fd => FS.streams[fd],
- createStream: (stream, fd_start, fd_end) => {
+ createStream: (stream, fd = -1) => {
   if (!FS.FSStream) {
    FS.FSStream = function() {
     this.shared = {};
@@ -2461,7 +2492,9 @@ var FS = {
    });
   }
   stream = Object.assign(new FS.FSStream(), stream);
-  var fd = FS.nextfd(fd_start, fd_end);
+  if (fd == -1) {
+   fd = FS.nextfd();
+  }
   stream.fd = fd;
   FS.streams[fd] = stream;
   return stream;
@@ -2507,7 +2540,7 @@ var FS = {
   }
   FS.syncFSRequests++;
   if (FS.syncFSRequests > 1) {
-   err("warning: " + FS.syncFSRequests + " FS.syncfs operations in flight at once, probably just doing extra work");
+   err(`warning: ${FS.syncFSRequests} FS.syncfs operations in flight at once, probably just doing extra work`);
   }
   var mounts = FS.getMounts(FS.root.mount);
   var completed = 0;
@@ -2924,7 +2957,7 @@ var FS = {
   if (path === "") {
    throw new FS.ErrnoError(44);
   }
-  flags = typeof flags == "string" ? FS.modeStringToFlags(flags) : flags;
+  flags = typeof flags == "string" ? FS_modeStringToFlags(flags) : flags;
   mode = typeof mode == "undefined" ? 438 : mode;
   if (flags & 64) {
    mode = mode & 4095 | 32768;
@@ -3129,7 +3162,7 @@ var FS = {
   opts.flags = opts.flags || 0;
   opts.encoding = opts.encoding || "binary";
   if (opts.encoding !== "utf8" && opts.encoding !== "binary") {
-   throw new Error('Invalid encoding type "' + opts.encoding + '"');
+   throw new Error(`Invalid encoding type "${opts.encoding}"`);
   }
   var ret;
   var stream = FS.open(path, opts.flags);
@@ -3192,9 +3225,15 @@ var FS = {
   TTY.register(FS.makedev(6, 0), TTY.default_tty1_ops);
   FS.mkdev("/dev/tty", FS.makedev(5, 0));
   FS.mkdev("/dev/tty1", FS.makedev(6, 0));
-  var random_device = getRandomDevice();
-  FS.createDevice("/dev", "random", random_device);
-  FS.createDevice("/dev", "urandom", random_device);
+  var randomBuffer = new Uint8Array(1024), randomLeft = 0;
+  var randomByte = () => {
+   if (randomLeft === 0) {
+    randomLeft = randomFill(randomBuffer).byteLength;
+   }
+   return randomBuffer[--randomLeft];
+  };
+  FS.createDevice("/dev", "random", randomByte);
+  FS.createDevice("/dev", "urandom", randomByte);
   FS.mkdir("/dev/shm");
   FS.mkdir("/dev/shm/tmp");
  },
@@ -3250,6 +3289,7 @@ var FS = {
  ensureErrnoError: () => {
   if (FS.ErrnoError) return;
   FS.ErrnoError = function ErrnoError(errno, node) {
+   this.name = "ErrnoError";
    this.node = node;
    this.setErrno = function(errno) {
     this.errno = errno;
@@ -3293,12 +3333,6 @@ var FS = {
    }
    FS.close(stream);
   }
- },
- getMode: (canRead, canWrite) => {
-  var mode = 0;
-  if (canRead) mode |= 292 | 73;
-  if (canWrite) mode |= 146;
-  return mode;
  },
  findObject: (path, dontResolveLastLink) => {
   var ret = FS.analyzePath(path, dontResolveLastLink);
@@ -3362,7 +3396,7 @@ var FS = {
  },
  createFile: (parent, name, properties, canRead, canWrite) => {
   var path = PATH.join2(typeof parent == "string" ? parent : FS.getPath(parent), name);
-  var mode = FS.getMode(canRead, canWrite);
+  var mode = FS_getMode(canRead, canWrite);
   return FS.create(path, mode);
  },
  createDataFile: (parent, name, data, canRead, canWrite, canOwn) => {
@@ -3371,7 +3405,7 @@ var FS = {
    parent = typeof parent == "string" ? parent : FS.getPath(parent);
    path = name ? PATH.join2(parent, name) : parent;
   }
-  var mode = FS.getMode(canRead, canWrite);
+  var mode = FS_getMode(canRead, canWrite);
   var node = FS.create(path, mode);
   if (data) {
    if (typeof data == "string") {
@@ -3389,7 +3423,7 @@ var FS = {
  },
  createDevice: (parent, name, input, output) => {
   var path = PATH.join2(typeof parent == "string" ? parent : FS.getPath(parent), name);
-  var mode = FS.getMode(!!input, !!output);
+  var mode = FS_getMode(!!input, !!output);
   if (!FS.createDevice.major) FS.createDevice.major = 64;
   var dev = FS.makedev(FS.createDevice.major++, 0);
   FS.registerDevice(dev, {
@@ -3605,118 +3639,12 @@ var FS = {
   };
   node.stream_ops = stream_ops;
   return node;
- },
- createPreloadedFile: (parent, name, url, canRead, canWrite, onload, onerror, dontCreateFile, canOwn, preFinish) => {
-  var fullname = name ? PATH_FS.resolve(PATH.join2(parent, name)) : parent;
-  var dep = getUniqueRunDependency("cp " + fullname);
-  function processData(byteArray) {
-   function finish(byteArray) {
-    if (preFinish) preFinish();
-    if (!dontCreateFile) {
-     FS.createDataFile(parent, name, byteArray, canRead, canWrite, canOwn);
-    }
-    if (onload) onload();
-    removeRunDependency(dep);
-   }
-   if (Browser.handledByPreloadPlugin(byteArray, fullname, finish, () => {
-    if (onerror) onerror();
-    removeRunDependency(dep);
-   })) {
-    return;
-   }
-   finish(byteArray);
-  }
-  addRunDependency(dep);
-  if (typeof url == "string") {
-   asyncLoad(url, byteArray => processData(byteArray), onerror);
-  } else {
-   processData(url);
-  }
- },
- indexedDB: () => {
-  return window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
- },
- DB_NAME: () => {
-  return "EM_FS_" + window.location.pathname;
- },
- DB_VERSION: 20,
- DB_STORE_NAME: "FILE_DATA",
- saveFilesToDB: (paths, onload = (() => {}), onerror = (() => {})) => {
-  var indexedDB = FS.indexedDB();
-  try {
-   var openRequest = indexedDB.open(FS.DB_NAME(), FS.DB_VERSION);
-  } catch (e) {
-   return onerror(e);
-  }
-  openRequest.onupgradeneeded = () => {
-   out("creating db");
-   var db = openRequest.result;
-   db.createObjectStore(FS.DB_STORE_NAME);
-  };
-  openRequest.onsuccess = () => {
-   var db = openRequest.result;
-   var transaction = db.transaction([ FS.DB_STORE_NAME ], "readwrite");
-   var files = transaction.objectStore(FS.DB_STORE_NAME);
-   var ok = 0, fail = 0, total = paths.length;
-   function finish() {
-    if (fail == 0) onload(); else onerror();
-   }
-   paths.forEach(path => {
-    var putRequest = files.put(FS.analyzePath(path).object.contents, path);
-    putRequest.onsuccess = () => {
-     ok++;
-     if (ok + fail == total) finish();
-    };
-    putRequest.onerror = () => {
-     fail++;
-     if (ok + fail == total) finish();
-    };
-   });
-   transaction.onerror = onerror;
-  };
-  openRequest.onerror = onerror;
- },
- loadFilesFromDB: (paths, onload = (() => {}), onerror = (() => {})) => {
-  var indexedDB = FS.indexedDB();
-  try {
-   var openRequest = indexedDB.open(FS.DB_NAME(), FS.DB_VERSION);
-  } catch (e) {
-   return onerror(e);
-  }
-  openRequest.onupgradeneeded = onerror;
-  openRequest.onsuccess = () => {
-   var db = openRequest.result;
-   try {
-    var transaction = db.transaction([ FS.DB_STORE_NAME ], "readonly");
-   } catch (e) {
-    onerror(e);
-    return;
-   }
-   var files = transaction.objectStore(FS.DB_STORE_NAME);
-   var ok = 0, fail = 0, total = paths.length;
-   function finish() {
-    if (fail == 0) onload(); else onerror();
-   }
-   paths.forEach(path => {
-    var getRequest = files.get(path);
-    getRequest.onsuccess = () => {
-     if (FS.analyzePath(path).exists) {
-      FS.unlink(path);
-     }
-     FS.createDataFile(PATH.dirname(path), PATH.basename(path), getRequest.result, true, true, true);
-     ok++;
-     if (ok + fail == total) finish();
-    };
-    getRequest.onerror = () => {
-     fail++;
-     if (ok + fail == total) finish();
-    };
-   });
-   transaction.onerror = onerror;
-  };
-  openRequest.onerror = onerror;
  }
 };
+
+function UTF8ToString(ptr, maxBytesToRead) {
+ return ptr ? UTF8ArrayToString(GROWABLE_HEAP_U8(), ptr, maxBytesToRead) : "";
+}
 
 var SYSCALLS = {
  DEFAULT_POLLMASK: 5,
@@ -3755,27 +3683,19 @@ var SYSCALLS = {
   GROWABLE_HEAP_I32()[buf + 20 >> 2] = stat.uid;
   GROWABLE_HEAP_I32()[buf + 24 >> 2] = stat.gid;
   GROWABLE_HEAP_I32()[buf + 28 >> 2] = stat.rdev;
-  tempI64 = [ stat.size >>> 0, (tempDouble = stat.size, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ], 
-  GROWABLE_HEAP_I32()[buf + 40 >> 2] = tempI64[0], GROWABLE_HEAP_I32()[buf + 44 >> 2] = tempI64[1];
+  HEAP64[buf + 40 >> 3] = BigInt(stat.size);
   GROWABLE_HEAP_I32()[buf + 48 >> 2] = 4096;
   GROWABLE_HEAP_I32()[buf + 52 >> 2] = stat.blocks;
   var atime = stat.atime.getTime();
   var mtime = stat.mtime.getTime();
   var ctime = stat.ctime.getTime();
-  tempI64 = [ Math.floor(atime / 1e3) >>> 0, (tempDouble = Math.floor(atime / 1e3), 
-  +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ], 
-  GROWABLE_HEAP_I32()[buf + 56 >> 2] = tempI64[0], GROWABLE_HEAP_I32()[buf + 60 >> 2] = tempI64[1];
+  HEAP64[buf + 56 >> 3] = BigInt(Math.floor(atime / 1e3));
   GROWABLE_HEAP_U32()[buf + 64 >> 2] = atime % 1e3 * 1e3;
-  tempI64 = [ Math.floor(mtime / 1e3) >>> 0, (tempDouble = Math.floor(mtime / 1e3), 
-  +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ], 
-  GROWABLE_HEAP_I32()[buf + 72 >> 2] = tempI64[0], GROWABLE_HEAP_I32()[buf + 76 >> 2] = tempI64[1];
+  HEAP64[buf + 72 >> 3] = BigInt(Math.floor(mtime / 1e3));
   GROWABLE_HEAP_U32()[buf + 80 >> 2] = mtime % 1e3 * 1e3;
-  tempI64 = [ Math.floor(ctime / 1e3) >>> 0, (tempDouble = Math.floor(ctime / 1e3), 
-  +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ], 
-  GROWABLE_HEAP_I32()[buf + 88 >> 2] = tempI64[0], GROWABLE_HEAP_I32()[buf + 92 >> 2] = tempI64[1];
+  HEAP64[buf + 88 >> 3] = BigInt(Math.floor(ctime / 1e3));
   GROWABLE_HEAP_U32()[buf + 96 >> 2] = ctime % 1e3 * 1e3;
-  tempI64 = [ stat.ino >>> 0, (tempDouble = stat.ino, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ], 
-  GROWABLE_HEAP_I32()[buf + 104 >> 2] = tempI64[0], GROWABLE_HEAP_I32()[buf + 108 >> 2] = tempI64[1];
+  HEAP64[buf + 104 >> 3] = BigInt(stat.ino);
   return 0;
  },
  doMsync: function(addr, stream, len, flags, offset) {
@@ -3806,7 +3726,7 @@ var SYSCALLS = {
 };
 
 function _proc_exit(code) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(1, 1, code);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(1, 1, code);
  EXITSTATUS = code;
  if (!keepRuntimeAlive()) {
   PThread.terminateAllThreads();
@@ -3818,11 +3738,9 @@ function _proc_exit(code) {
 
 function exitJS(status, implicit) {
  EXITSTATUS = status;
- if (!implicit) {
-  if (ENVIRONMENT_IS_PTHREAD) {
-   exitOnMainThread(status);
-   throw "unwind";
-  } else {}
+ if (ENVIRONMENT_IS_PTHREAD) {
+  exitOnMainThread(status);
+  throw "unwind";
  }
  _proc_exit(status);
 }
@@ -3849,10 +3767,10 @@ var PThread = {
   }
  },
  initMainThread: function() {
-  var pthreadPoolSize = vipsConcurrency + 3 + 1;
-  while (pthreadPoolSize--) {
-   PThread.allocateUnusedWorker();
-  }
+  addOnPreRun(() => {
+   addRunDependency("loading-workers");
+   PThread.loadWasmModuleToAllWorkers(() => removeRunDependency("loading-workers"));
+  });
  },
  initWorker: function() {
   noExitRuntime = false;
@@ -3860,14 +3778,17 @@ var PThread = {
  setExitStatus: function(status) {
   EXITSTATUS = status;
  },
+ terminateAllThreads__deps: [ "$terminateWorker" ],
  terminateAllThreads: function() {
-  for (var worker of Object.values(PThread.pthreads)) {
-   PThread.returnWorkerToPool(worker);
+  for (var worker of PThread.runningWorkers) {
+   terminateWorker(worker);
   }
   for (var worker of PThread.unusedWorkers) {
-   worker.terminate();
+   terminateWorker(worker);
   }
   PThread.unusedWorkers = [];
+  PThread.runningWorkers = [];
+  PThread.pthreads = [];
  },
  returnWorkerToPool: function(worker) {
   var pthread_ptr = worker.pthread_ptr;
@@ -3875,9 +3796,6 @@ var PThread = {
   PThread.unusedWorkers.push(worker);
   PThread.runningWorkers.splice(PThread.runningWorkers.indexOf(worker), 1);
   worker.pthread_ptr = 0;
-  if (ENVIRONMENT_IS_NODE) {
-   worker.unref();
-  }
   __emscripten_thread_free_data(pthread_ptr);
  },
  receiveObjectTransfer: function(data) {},
@@ -3899,8 +3817,8 @@ var PThread = {
     PThread.currentProxiedOperationCallerThread = undefined;
     return;
    }
-   if (cmd === "processProxyingQueue") {
-    executeNotifiedProxyingQueue(d["queue"]);
+   if (cmd === "checkMailbox") {
+    checkMailbox();
    } else if (cmd === "spawnThread") {
     spawnThread(d);
    } else if (cmd === "cleanupThread") {
@@ -3911,9 +3829,6 @@ var PThread = {
     cancelThread(d["thread"]);
    } else if (cmd === "loaded") {
     worker.loaded = true;
-    if (ENVIRONMENT_IS_NODE && !worker.pthread_ptr) {
-     worker.unref();
-    }
     onFinishedLoading(worker);
    } else if (cmd === "print") {
     out("Thread " + d["threadId"] + ": " + d["text"]);
@@ -3944,7 +3859,6 @@ var PThread = {
    worker.on("error", function(e) {
     worker.onerror(e);
    });
-   worker.on("detachedExit", function() {});
   }
   var handlers = [];
   var knownHandlers = [ "onExit", "onAbort", "print", "printErr" ];
@@ -3956,17 +3870,12 @@ var PThread = {
   worker.postMessage({
    "cmd": "load",
    "handlers": handlers,
-   "urlOrBlob": Module["mainScriptUrlOrBlob"] || _scriptDir,
+   "urlOrBlob": Module["mainScriptUrlOrBlob"] || currentScript,
    "wasmMemory": wasmMemory,
    "wasmModule": wasmModule
   });
  }),
  loadWasmModuleToAllWorkers: function(onMaybeReady) {
-  if (ENVIRONMENT_IS_PTHREAD) {
-   return onMaybeReady();
-  }
-  let pthreadPoolReady = Promise.all(PThread.unusedWorkers.map(PThread.loadWasmModuleToWorker));
-  Module["pthreadPoolReady"] = pthreadPoolReady;
   onMaybeReady();
  },
  allocateUnusedWorker: function() {
@@ -3977,9 +3886,6 @@ var PThread = {
  },
  getNewWorker: function() {
   if (PThread.unusedWorkers.length == 0) {
-   if (!ENVIRONMENT_IS_NODE) {
-    return;
-   }
    PThread.allocateUnusedWorker();
    PThread.loadWasmModuleToWorker(PThread.unusedWorkers[0]);
   }
@@ -3997,22 +3903,18 @@ function callRuntimeCallbacks(callbacks) {
 
 function establishStackSpace() {
  var pthread_ptr = _pthread_self();
- var stackTop = GROWABLE_HEAP_I32()[pthread_ptr + 52 >> 2];
+ var stackHigh = GROWABLE_HEAP_I32()[pthread_ptr + 52 >> 2];
  var stackSize = GROWABLE_HEAP_I32()[pthread_ptr + 56 >> 2];
- var stackMax = stackTop - stackSize;
- _emscripten_stack_set_limits(stackTop, stackMax);
- stackRestore(stackTop);
+ var stackLow = stackHigh - stackSize;
+ _emscripten_stack_set_limits(stackHigh, stackLow);
+ stackRestore(stackHigh);
 }
 
 Module["establishStackSpace"] = establishStackSpace;
 
 function exitOnMainThread(returnCode) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(2, 0, returnCode);
- try {
-  _exit(returnCode);
- } catch (e) {
-  handleException(e);
- }
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(2, 0, returnCode);
+ _exit(returnCode);
 }
 
 function getValue(ptr, type = "i8") {
@@ -4043,9 +3945,8 @@ function getValue(ptr, type = "i8") {
   return GROWABLE_HEAP_U32()[ptr >> 2];
 
  default:
-  abort("invalid type for getValue: " + type);
+  abort(`invalid type for getValue: ${type}`);
  }
- return null;
 }
 
 var wasmTableMirror = [];
@@ -4094,8 +3995,7 @@ function setValue(ptr, value, type = "i8") {
   break;
 
  case "i64":
-  tempI64 = [ value >>> 0, (tempDouble = value, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ], 
-  GROWABLE_HEAP_I32()[ptr >> 2] = tempI64[0], GROWABLE_HEAP_I32()[ptr + 4 >> 2] = tempI64[1];
+  HEAP64[ptr >> 3] = BigInt(value);
   break;
 
  case "float":
@@ -4111,12 +4011,12 @@ function setValue(ptr, value, type = "i8") {
   break;
 
  default:
-  abort("invalid type for setValue: " + type);
+  abort(`invalid type for setValue: ${type}`);
  }
 }
 
 function ___assert_fail(condition, filename, line, func) {
- abort("Assertion failed: " + UTF8ToString(condition) + ", at: " + [ filename ? UTF8ToString(filename) : "unknown filename", line, func ? UTF8ToString(func) : "unknown function" ]);
+ abort(`Assertion failed: ${UTF8ToString(condition)}, at: ` + [ filename ? UTF8ToString(filename) : "unknown filename", line, func ? UTF8ToString(func) : "unknown function" ]);
 }
 
 function ___call_sighandler(fp, sig) {
@@ -4124,10 +4024,6 @@ function ___call_sighandler(fp, sig) {
 }
 
 var exceptionCaught = [];
-
-function exception_addRef(info) {
- info.add_ref();
-}
 
 var uncaughtExceptionCount = 0;
 
@@ -4139,26 +4035,16 @@ function ___cxa_begin_catch(ptr) {
  }
  info.set_rethrown(false);
  exceptionCaught.push(info);
- exception_addRef(info);
+ ___cxa_increment_exception_refcount(info.excPtr);
  return info.get_exception_ptr();
 }
 
 var exceptionLast = 0;
 
-function exception_decRef(info) {
- if (info.release_ref() && !info.get_rethrown()) {
-  var destructor = info.get_destructor();
-  if (destructor) {
-   getWasmTableEntry(destructor)(info.excPtr);
-  }
-  ___cxa_free_exception(info.excPtr);
- }
-}
-
 function ___cxa_end_catch() {
  _setThrew(0);
  var info = exceptionCaught.pop();
- exception_decRef(info);
+ ___cxa_decrement_exception_refcount(info.excPtr);
  exceptionLast = 0;
 }
 
@@ -4176,9 +4062,6 @@ function ExceptionInfo(excPtr) {
  };
  this.get_destructor = function() {
   return GROWABLE_HEAP_U32()[this.ptr + 8 >> 2];
- };
- this.set_refcount = function(refcount) {
-  GROWABLE_HEAP_I32()[this.ptr >> 2] = refcount;
  };
  this.set_caught = function(caught) {
   caught = caught ? 1 : 0;
@@ -4198,16 +4081,6 @@ function ExceptionInfo(excPtr) {
   this.set_adjusted_ptr(0);
   this.set_type(type);
   this.set_destructor(destructor);
-  this.set_refcount(0);
-  this.set_caught(false);
-  this.set_rethrown(false);
- };
- this.add_ref = function() {
-  Atomics.add(GROWABLE_HEAP_I32(), this.ptr + 0 >> 2, 1);
- };
- this.release_ref = function() {
-  var prev = Atomics.sub(GROWABLE_HEAP_I32(), this.ptr + 0 >> 2, 1);
-  return prev === 1;
  };
  this.set_adjusted_ptr = function(adjustedPtr) {
   GROWABLE_HEAP_U32()[this.ptr + 16 >> 2] = adjustedPtr;
@@ -4226,51 +4099,11 @@ function ExceptionInfo(excPtr) {
  };
 }
 
-function withStackSave(f) {
- var stack = stackSave();
- var ret = f();
- stackRestore(stack);
- return ret;
-}
-
-function getExceptionMessageCommon(ptr) {
- return withStackSave(function() {
-  var type_addr_addr = stackAlloc(4);
-  var message_addr_addr = stackAlloc(4);
-  ___get_exception_message(ptr, type_addr_addr, message_addr_addr);
-  var type_addr = GROWABLE_HEAP_U32()[type_addr_addr >> 2];
-  var message_addr = GROWABLE_HEAP_U32()[message_addr_addr >> 2];
-  var type = UTF8ToString(type_addr);
-  _free(type_addr);
-  var message;
-  if (message_addr) {
-   message = UTF8ToString(message_addr);
-   _free(message_addr);
-  }
-  return [ type, message ];
- });
-}
-
-function getExceptionMessage(ptr) {
- return getExceptionMessageCommon(ptr);
-}
-
-var EmscriptenEH = class EmscriptenEH extends Error {};
-
-var CppException = class CppException extends EmscriptenEH {
- constructor(excPtr) {
-  super(excPtr);
-  const excInfo = getExceptionMessage(excPtr);
-  this.name = excInfo[0];
-  this.message = excInfo[1];
- }
-};
-
 function ___resumeException(ptr) {
  if (!exceptionLast) {
   exceptionLast = ptr;
  }
- throw new CppException(ptr);
+ throw exceptionLast;
 }
 
 function ___cxa_find_matching_catch() {
@@ -4320,7 +4153,7 @@ function ___cxa_rethrow() {
   uncaughtExceptionCount++;
  }
  exceptionLast = ptr;
- throw new CppException(ptr);
+ throw exceptionLast;
 }
 
 function ___cxa_throw(ptr, type, destructor) {
@@ -4328,7 +4161,7 @@ function ___cxa_throw(ptr, type, destructor) {
  info.init(type, destructor);
  exceptionLast = ptr;
  uncaughtExceptionCount++;
- throw new CppException(ptr);
+ throw exceptionLast;
 }
 
 function ___cxa_uncaught_exceptions() {
@@ -4336,7 +4169,7 @@ function ___cxa_uncaught_exceptions() {
 }
 
 function ___emscripten_init_main_thread_js(tb) {
- __emscripten_thread_init(tb, !ENVIRONMENT_IS_WORKER, 1, !ENVIRONMENT_IS_WEB);
+ __emscripten_thread_init(tb, !ENVIRONMENT_IS_WORKER, 1, !ENVIRONMENT_IS_WEB, 65536);
  PThread.threadInitTLS();
 }
 
@@ -4348,7 +4181,7 @@ function ___emscripten_thread_cleanup(thread) {
 }
 
 function pthreadCreateProxied(pthread_ptr, attr, startRoutine, arg) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(3, 1, pthread_ptr, attr, startRoutine, arg);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(3, 1, pthread_ptr, attr, startRoutine, arg);
  return ___pthread_create_js(pthread_ptr, attr, startRoutine, arg);
 }
 
@@ -4378,18 +4211,18 @@ function ___pthread_create_js(pthread_ptr, attr, startRoutine, arg) {
 }
 
 function ___syscall_dup(fd) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(4, 1, fd);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(4, 1, fd);
  try {
   var old = SYSCALLS.getStreamFromFD(fd);
-  return FS.createStream(old, 0).fd;
+  return FS.createStream(old).fd;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function ___syscall_faccessat(dirfd, path, amode, flags) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(5, 1, dirfd, path, amode, flags);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(5, 1, dirfd, path, amode, flags);
  try {
   path = SYSCALLS.getStr(path);
   path = SYSCALLS.calculateAt(dirfd, path);
@@ -4412,7 +4245,7 @@ function ___syscall_faccessat(dirfd, path, amode, flags) {
   }
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
@@ -4423,7 +4256,7 @@ function setErrNo(value) {
 }
 
 function ___syscall_fcntl64(fd, cmd, varargs) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(6, 1, fd, cmd, varargs);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(6, 1, fd, cmd, varargs);
  SYSCALLS.varargs = varargs;
  try {
   var stream = SYSCALLS.getStreamFromFD(fd);
@@ -4479,18 +4312,18 @@ function ___syscall_fcntl64(fd, cmd, varargs) {
    }
   }
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function ___syscall_fstat64(fd, buf) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(7, 1, fd, buf);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(7, 1, fd, buf);
  try {
   var stream = SYSCALLS.getStreamFromFD(fd);
   return SYSCALLS.doStat(FS.stat, stream.path, buf);
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
@@ -4504,20 +4337,24 @@ function bigintToI53Checked(num) {
 }
 
 function ___syscall_ftruncate64(fd, length) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(8, 1, fd, length);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(8, 1, fd, length);
  try {
   length = bigintToI53Checked(length);
   if (isNaN(length)) return -61;
   FS.ftruncate(fd, length);
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
+function stringToUTF8(str, outPtr, maxBytesToWrite) {
+ return stringToUTF8Array(str, GROWABLE_HEAP_U8(), outPtr, maxBytesToWrite);
+}
+
 function ___syscall_getcwd(buf, size) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(9, 1, buf, size);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(9, 1, buf, size);
  try {
   if (size === 0) return -28;
   var cwd = FS.cwd();
@@ -4526,13 +4363,13 @@ function ___syscall_getcwd(buf, size) {
   stringToUTF8(cwd, buf, size);
   return cwdLengthInBytes;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function ___syscall_ioctl(fd, op, varargs) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(10, 1, fd, op, varargs);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(10, 1, fd, op, varargs);
  SYSCALLS.varargs = varargs;
  try {
   var stream = SYSCALLS.getStreamFromFD(fd);
@@ -4591,24 +4428,24 @@ function ___syscall_ioctl(fd, op, varargs) {
    return -28;
   }
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function ___syscall_lstat64(path, buf) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(11, 1, path, buf);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(11, 1, path, buf);
  try {
   path = SYSCALLS.getStr(path);
   return SYSCALLS.doStat(FS.lstat, path, buf);
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function ___syscall_newfstatat(dirfd, path, buf, flags) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(12, 1, dirfd, path, buf, flags);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(12, 1, dirfd, path, buf, flags);
  try {
   path = SYSCALLS.getStr(path);
   var nofollow = flags & 256;
@@ -4617,13 +4454,13 @@ function ___syscall_newfstatat(dirfd, path, buf, flags) {
   path = SYSCALLS.calculateAt(dirfd, path, allowEmpty);
   return SYSCALLS.doStat(nofollow ? FS.lstat : FS.stat, path, buf);
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function ___syscall_openat(dirfd, path, flags, varargs) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(13, 1, dirfd, path, flags, varargs);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(13, 1, dirfd, path, flags, varargs);
  SYSCALLS.varargs = varargs;
  try {
   path = SYSCALLS.getStr(path);
@@ -4631,36 +4468,36 @@ function ___syscall_openat(dirfd, path, flags, varargs) {
   var mode = varargs ? SYSCALLS.get() : 0;
   return FS.open(path, flags, mode).fd;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function ___syscall_rmdir(path) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(14, 1, path);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(14, 1, path);
  try {
   path = SYSCALLS.getStr(path);
   FS.rmdir(path);
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function ___syscall_stat64(path, buf) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(15, 1, path, buf);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(15, 1, path, buf);
  try {
   path = SYSCALLS.getStr(path);
   return SYSCALLS.doStat(FS.stat, path, buf);
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function ___syscall_unlinkat(dirfd, path, flags) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(16, 1, dirfd, path, flags);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(16, 1, dirfd, path, flags);
  try {
   path = SYSCALLS.getStr(path);
   path = SYSCALLS.calculateAt(dirfd, path);
@@ -4673,21 +4510,9 @@ function ___syscall_unlinkat(dirfd, path, flags) {
   }
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
-}
-
-function __dlinit(main_dso_handle) {}
-
-var dlopenMissingError = "To use dlopen, you need enable dynamic linking, see https://github.com/emscripten-core/emscripten/wiki/Linking";
-
-function __dlopen_js(handle) {
- abort(dlopenMissingError);
-}
-
-function __dlsym_catchup_js(handle, symbolIndex) {
- abort(dlopenMissingError);
 }
 
 var emnapiModule = {
@@ -4700,6 +4525,8 @@ var emnapiCtx = undefined;
 
 var emnapiNodeBinding = undefined;
 
+var emnapiAsyncWorkPoolSize = 0;
+
 function emnapiInit(options) {
  if (emnapiModule.loaded) return emnapiModule.exports;
  if (typeof options !== "object" || options === null) {
@@ -4710,9 +4537,8 @@ function emnapiInit(options) {
   throw new TypeError("Invalid `options.context`. Use `import { getDefaultContext } from '@emnapi/runtime'`");
  }
  emnapiCtx = context;
- if (typeof options.filename === "string") {
-  emnapiModule.filename = options.filename;
- }
+ var filename = typeof options.filename === "string" ? options.filename : "";
+ emnapiModule.filename = filename;
  if ("nodeBinding" in options) {
   var nodeBinding = options.nodeBinding;
   if (typeof nodeBinding !== "object" || nodeBinding === null) {
@@ -4720,11 +4546,23 @@ function emnapiInit(options) {
   }
   emnapiNodeBinding = nodeBinding;
  }
- var envObject = emnapiModule.envObject || (emnapiModule.envObject = emnapiCtx.createEnv(function(cb) {
+ if ("asyncWorkPoolSize" in options) {
+  if (typeof options.asyncWorkPoolSize !== "number") {
+   throw new TypeError("options.asyncWorkPoolSize must be a integer");
+  }
+  emnapiAsyncWorkPoolSize = options.asyncWorkPoolSize >> 0;
+  if (emnapiAsyncWorkPoolSize > 1024) {
+   emnapiAsyncWorkPoolSize = 1024;
+  } else if (emnapiAsyncWorkPoolSize < -1024) {
+   emnapiAsyncWorkPoolSize = -1024;
+  }
+ }
+ var moduleApiVersion = _node_api_module_get_api_version_v1();
+ var envObject = emnapiModule.envObject || (emnapiModule.envObject = emnapiCtx.createEnv(filename, moduleApiVersion, function(cb) {
   return getWasmTableEntry(cb);
  }, function(cb) {
   return getWasmTableEntry(cb);
- }));
+ }, abort, emnapiNodeBinding));
  var scope = emnapiCtx.openScope(envObject);
  try {
   envObject.callIntoModule(function(_envObject) {
@@ -4743,11 +4581,11 @@ function emnapiInit(options) {
  return emnapiModule.exports;
 }
 
-function __emnapi_call_into_module(env, callback, data, close_scope_if_throw) {
+function __emnapi_callback_into_module(forceUncaught, env, callback, data, close_scope_if_throw) {
  var envObject = emnapiCtx.envStore.get(env);
  var scope = emnapiCtx.openScope(envObject);
  try {
-  envObject.callIntoModule(function() {
+  envObject.callbackIntoModule(Boolean(forceUncaught), function() {
    getWasmTableEntry(callback)(env, data);
   });
  } catch (err) {
@@ -4837,38 +4675,62 @@ function __emnapi_worker_unref(pid) {
  }
 }
 
-function __emscripten_default_pthread_stack_size() {
- return 65536;
-}
-
-function __emscripten_err(str) {
- err(UTF8ToString(str));
-}
-
 var nowIsMonotonic = true;
 
 function __emscripten_get_now_is_monotonic() {
  return nowIsMonotonic;
 }
 
-function executeNotifiedProxyingQueue(queue) {
- Atomics.store(GROWABLE_HEAP_I32(), queue >> 2, 1);
- if (_pthread_self()) {
-  __emscripten_proxy_execute_task_queue(queue);
+function maybeExit() {
+ if (!keepRuntimeAlive()) {
+  try {
+   if (ENVIRONMENT_IS_PTHREAD) __emscripten_thread_exit(EXITSTATUS); else _exit(EXITSTATUS);
+  } catch (e) {
+   handleException(e);
+  }
  }
- Atomics.compareExchange(GROWABLE_HEAP_I32(), queue >> 2, 1, 0);
 }
 
-Module["executeNotifiedProxyingQueue"] = executeNotifiedProxyingQueue;
+function callUserCallback(func) {
+ if (ABORT) {
+  return;
+ }
+ try {
+  func();
+  maybeExit();
+ } catch (e) {
+  handleException(e);
+ }
+}
 
-function __emscripten_notify_task_queue(targetThreadId, currThreadId, mainThreadId, queue) {
+function __emscripten_thread_mailbox_await(pthread_ptr) {
+ if (typeof Atomics.waitAsync === "function") {
+  var wait = Atomics.waitAsync(GROWABLE_HEAP_I32(), pthread_ptr >> 2, pthread_ptr);
+  wait.value.then(checkMailbox);
+  var waitingAsync = pthread_ptr + 128;
+  Atomics.store(GROWABLE_HEAP_I32(), waitingAsync >> 2, 1);
+ }
+}
+
+Module["__emscripten_thread_mailbox_await"] = __emscripten_thread_mailbox_await;
+
+function checkMailbox() {
+ var pthread_ptr = _pthread_self();
+ if (pthread_ptr) {
+  __emscripten_thread_mailbox_await(pthread_ptr);
+  callUserCallback(() => __emscripten_check_mailbox());
+ }
+}
+
+Module["checkMailbox"] = checkMailbox;
+
+function __emscripten_notify_mailbox_postmessage(targetThreadId, currThreadId, mainThreadId) {
  if (targetThreadId == currThreadId) {
-  setTimeout(() => executeNotifiedProxyingQueue(queue));
+  setTimeout(() => checkMailbox());
  } else if (ENVIRONMENT_IS_PTHREAD) {
   postMessage({
    "targetThread": targetThreadId,
-   "cmd": "processProxyingQueue",
-   "queue": queue
+   "cmd": "checkMailbox"
   });
  } else {
   var worker = PThread.pthreads[targetThreadId];
@@ -4876,21 +4738,23 @@ function __emscripten_notify_task_queue(targetThreadId, currThreadId, mainThread
    return;
   }
   worker.postMessage({
-   "cmd": "processProxyingQueue",
-   "queue": queue
+   "cmd": "checkMailbox"
   });
  }
- return 1;
 }
 
 function __emscripten_set_offscreencanvas_size(target, width, height) {
  return -1;
 }
 
-var EmscriptenSjLj = class EmscriptenSjLj extends EmscriptenEH {};
+function __emscripten_thread_set_strongref(thread) {
+ if (ENVIRONMENT_IS_NODE) {
+  PThread.pthreads[thread].ref();
+ }
+}
 
 function __emscripten_throw_longjmp() {
- throw new EmscriptenSjLj();
+ throw Infinity;
 }
 
 function readI53FromI64(ptr) {
@@ -4911,17 +4775,17 @@ function __gmtime_js(time, tmPtr) {
  GROWABLE_HEAP_I32()[tmPtr + 28 >> 2] = yday;
 }
 
-function __isLeapYear(year) {
+function isLeapYear(year) {
  return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
 }
 
-var __MONTH_DAYS_LEAP_CUMULATIVE = [ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 ];
+var MONTH_DAYS_LEAP_CUMULATIVE = [ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 ];
 
-var __MONTH_DAYS_REGULAR_CUMULATIVE = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ];
+var MONTH_DAYS_REGULAR_CUMULATIVE = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ];
 
-function __yday_from_date(date) {
- var isLeapYear = __isLeapYear(date.getFullYear());
- var monthDaysCumulative = isLeapYear ? __MONTH_DAYS_LEAP_CUMULATIVE : __MONTH_DAYS_REGULAR_CUMULATIVE;
+function ydayFromDate(date) {
+ var leap = isLeapYear(date.getFullYear());
+ var monthDaysCumulative = leap ? MONTH_DAYS_LEAP_CUMULATIVE : MONTH_DAYS_REGULAR_CUMULATIVE;
  var yday = monthDaysCumulative[date.getMonth()] + date.getDate() - 1;
  return yday;
 }
@@ -4935,7 +4799,7 @@ function __localtime_js(time, tmPtr) {
  GROWABLE_HEAP_I32()[tmPtr + 16 >> 2] = date.getMonth();
  GROWABLE_HEAP_I32()[tmPtr + 20 >> 2] = date.getFullYear() - 1900;
  GROWABLE_HEAP_I32()[tmPtr + 24 >> 2] = date.getDay();
- var yday = __yday_from_date(date) | 0;
+ var yday = ydayFromDate(date) | 0;
  GROWABLE_HEAP_I32()[tmPtr + 28 >> 2] = yday;
  GROWABLE_HEAP_I32()[tmPtr + 36 >> 2] = -(date.getTimezoneOffset() * 60);
  var start = new Date(date.getFullYear(), 0, 1);
@@ -4946,7 +4810,7 @@ function __localtime_js(time, tmPtr) {
 }
 
 function __mmap_js(len, prot, flags, fd, off, allocated, addr) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(17, 1, len, prot, flags, fd, off, allocated, addr);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(17, 1, len, prot, flags, fd, off, allocated, addr);
  try {
   var stream = SYSCALLS.getStreamFromFD(fd);
   var res = FS.mmap(stream, len, off, prot, flags);
@@ -4955,13 +4819,13 @@ function __mmap_js(len, prot, flags, fd, off, allocated, addr) {
   GROWABLE_HEAP_U32()[addr >> 2] = ptr;
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
 function __munmap_js(addr, len, prot, flags, fd, offset) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(18, 1, addr, len, prot, flags, fd, offset);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(18, 1, addr, len, prot, flags, fd, offset);
  try {
   var stream = SYSCALLS.getStreamFromFD(fd);
   if (prot & 2) {
@@ -4969,15 +4833,15 @@ function __munmap_js(addr, len, prot, flags, fd, offset) {
   }
   FS.munmap(stream);
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return -e.errno;
  }
 }
 
-function allocateUTF8(str) {
+function stringToNewUTF8(str) {
  var size = lengthBytesUTF8(str) + 1;
  var ret = _malloc(size);
- if (ret) stringToUTF8Array(str, GROWABLE_HEAP_I8(), ret, size);
+ if (ret) stringToUTF8(str, ret, size);
  return ret;
 }
 
@@ -4996,8 +4860,8 @@ function __tzset_js(timezone, daylight, tzname) {
  }
  var winterName = extractZone(winter);
  var summerName = extractZone(summer);
- var winterNamePtr = allocateUTF8(winterName);
- var summerNamePtr = allocateUTF8(summerName);
+ var winterNamePtr = stringToNewUTF8(winterName);
+ var summerNamePtr = stringToNewUTF8(summerName);
  if (summerOffset < winterOffset) {
   GROWABLE_HEAP_U32()[tzname >> 2] = winterNamePtr;
   GROWABLE_HEAP_U32()[tzname + 4 >> 2] = summerNamePtr;
@@ -5030,6 +4894,15 @@ function _emscripten_date_now() {
  return Date.now();
 }
 
+function runtimeKeepalivePush() {
+ runtimeKeepaliveCounter += 1;
+}
+
+function _emscripten_exit_with_live_runtime() {
+ runtimeKeepalivePush();
+ throw "unwind";
+}
+
 function getHeapMax() {
  return 2147483648;
 }
@@ -5041,22 +4914,24 @@ function _emscripten_get_heap_max() {
 var _emscripten_get_now;
 
 if (ENVIRONMENT_IS_NODE) {
- _emscripten_get_now = () => {
-  var t = process["hrtime"]();
-  return t[0] * 1e3 + t[1] / 1e6;
- };
-} else _emscripten_get_now = () => performance.timeOrigin + performance.now();
-
-function _emscripten_memcpy_big(dest, src, num) {
- GROWABLE_HEAP_U8().copyWithin(dest, src, src + num);
+ global.performance = require("perf_hooks").performance;
 }
+
+_emscripten_get_now = () => performance.timeOrigin + performance.now();
 
 function _emscripten_num_logical_cores() {
  if (ENVIRONMENT_IS_NODE) return require("os").cpus().length;
  return navigator["hardwareConcurrency"];
 }
 
-function _emscripten_proxy_to_main_thread_js(index, sync) {
+function withStackSave(f) {
+ var stack = stackSave();
+ var ret = f();
+ stackRestore(stack);
+ return ret;
+}
+
+function proxyToMainThread(index, sync) {
  var numCallArgs = arguments.length - 2;
  var outerArgs = arguments;
  return withStackSave(() => {
@@ -5073,31 +4948,32 @@ function _emscripten_proxy_to_main_thread_js(index, sync) {
     GROWABLE_HEAP_F64()[b + 2 * i + 1] = arg;
    }
   }
-  return _emscripten_run_in_main_runtime_thread_js(index, serializedNumCallArgs, args, sync);
+  return __emscripten_run_in_main_runtime_thread_js(index, serializedNumCallArgs, args, sync);
  });
 }
 
-var _emscripten_receive_on_main_thread_js_callArgs = [];
+var emscripten_receive_on_main_thread_js_callArgs = [];
 
 function _emscripten_receive_on_main_thread_js(index, numCallArgs, args) {
  numCallArgs /= 2;
- _emscripten_receive_on_main_thread_js_callArgs.length = numCallArgs;
+ emscripten_receive_on_main_thread_js_callArgs.length = numCallArgs;
  var b = args >> 3;
  for (var i = 0; i < numCallArgs; i++) {
   if (HEAP64[b + 2 * i]) {
-   _emscripten_receive_on_main_thread_js_callArgs[i] = HEAP64[b + 2 * i + 1];
+   emscripten_receive_on_main_thread_js_callArgs[i] = HEAP64[b + 2 * i + 1];
   } else {
-   _emscripten_receive_on_main_thread_js_callArgs[i] = GROWABLE_HEAP_F64()[b + 2 * i + 1];
+   emscripten_receive_on_main_thread_js_callArgs[i] = GROWABLE_HEAP_F64()[b + 2 * i + 1];
   }
  }
  var func = proxiedFunctionTable[index];
- return func.apply(null, _emscripten_receive_on_main_thread_js_callArgs);
+ return func.apply(null, emscripten_receive_on_main_thread_js_callArgs);
 }
 
 function emscripten_realloc_buffer(size) {
  var b = wasmMemory.buffer;
+ var pages = size - b.byteLength + 65535 >>> 16;
  try {
-  wasmMemory.grow(size - b.byteLength + 65535 >>> 16);
+  wasmMemory.grow(pages);
   updateMemoryViews();
   return 1;
  } catch (e) {}
@@ -5113,7 +4989,7 @@ function _emscripten_resize_heap(requestedSize) {
  if (requestedSize > maxHeapSize) {
   return false;
  }
- let alignUp = (x, multiple) => x + (multiple - x % multiple) % multiple;
+ var alignUp = (x, multiple) => x + (multiple - x % multiple) % multiple;
  for (var cutDown = 1; cutDown <= 4; cutDown *= 2) {
   var overGrownHeapSize = oldSize * (1 + .2 / cutDown);
   overGrownHeapSize = Math.min(overGrownHeapSize, requestedSize + 100663296);
@@ -5126,17 +5002,13 @@ function _emscripten_resize_heap(requestedSize) {
  return false;
 }
 
-function runtimeKeepalivePop() {}
+function runtimeKeepalivePop() {
+ runtimeKeepaliveCounter -= 1;
+}
 
 var _emscripten_runtime_keepalive_pop = runtimeKeepalivePop;
 
-function runtimeKeepalivePush() {}
-
 var _emscripten_runtime_keepalive_push = runtimeKeepalivePush;
-
-function _emscripten_unwind_to_js_event_loop() {
- throw "unwind";
-}
 
 var ENV = {};
 
@@ -5161,34 +5033,34 @@ function getEnvStrings() {
   }
   var strings = [];
   for (var x in env) {
-   strings.push(x + "=" + env[x]);
+   strings.push(`${x}=${env[x]}`);
   }
   getEnvStrings.strings = strings;
  }
  return getEnvStrings.strings;
 }
 
-function writeAsciiToMemory(str, buffer, dontAddNull) {
+function stringToAscii(str, buffer) {
  for (var i = 0; i < str.length; ++i) {
   GROWABLE_HEAP_I8()[buffer++ >> 0] = str.charCodeAt(i);
  }
- if (!dontAddNull) GROWABLE_HEAP_I8()[buffer >> 0] = 0;
+ GROWABLE_HEAP_I8()[buffer >> 0] = 0;
 }
 
 function _environ_get(__environ, environ_buf) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(19, 1, __environ, environ_buf);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(19, 1, __environ, environ_buf);
  var bufSize = 0;
  getEnvStrings().forEach(function(string, i) {
   var ptr = environ_buf + bufSize;
   GROWABLE_HEAP_U32()[__environ + i * 4 >> 2] = ptr;
-  writeAsciiToMemory(string, ptr);
+  stringToAscii(string, ptr);
   bufSize += string.length + 1;
  });
  return 0;
 }
 
 function _environ_sizes_get(penviron_count, penviron_buf_size) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(20, 1, penviron_count, penviron_buf_size);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(20, 1, penviron_count, penviron_buf_size);
  var strings = getEnvStrings();
  GROWABLE_HEAP_U32()[penviron_count >> 2] = strings.length;
  var bufSize = 0;
@@ -5200,26 +5072,34 @@ function _environ_sizes_get(penviron_count, penviron_buf_size) {
 }
 
 function _fd_close(fd) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(21, 1, fd);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(21, 1, fd);
  try {
   var stream = SYSCALLS.getStreamFromFD(fd);
   FS.close(stream);
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return e.errno;
  }
 }
 
 function _fd_fdstat_get(fd, pbuf) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(22, 1, fd, pbuf);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(22, 1, fd, pbuf);
  try {
-  var stream = SYSCALLS.getStreamFromFD(fd);
-  var type = stream.tty ? 2 : FS.isDir(stream.mode) ? 3 : FS.isLink(stream.mode) ? 7 : 4;
+  var rightsBase = 0;
+  var rightsInheriting = 0;
+  var flags = 0;
+  {
+   var stream = SYSCALLS.getStreamFromFD(fd);
+   var type = stream.tty ? 2 : FS.isDir(stream.mode) ? 3 : FS.isLink(stream.mode) ? 7 : 4;
+  }
   GROWABLE_HEAP_I8()[pbuf >> 0] = type;
+  GROWABLE_HEAP_I16()[pbuf + 2 >> 1] = flags;
+  HEAP64[pbuf + 8 >> 3] = BigInt(rightsBase);
+  HEAP64[pbuf + 16 >> 3] = BigInt(rightsInheriting);
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return e.errno;
  }
 }
@@ -5242,31 +5122,30 @@ function doReadv(stream, iov, iovcnt, offset) {
 }
 
 function _fd_read(fd, iov, iovcnt, pnum) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(23, 1, fd, iov, iovcnt, pnum);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(23, 1, fd, iov, iovcnt, pnum);
  try {
   var stream = SYSCALLS.getStreamFromFD(fd);
   var num = doReadv(stream, iov, iovcnt);
   GROWABLE_HEAP_U32()[pnum >> 2] = num;
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return e.errno;
  }
 }
 
 function _fd_seek(fd, offset, whence, newOffset) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(24, 1, fd, offset, whence, newOffset);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(24, 1, fd, offset, whence, newOffset);
  try {
   offset = bigintToI53Checked(offset);
   if (isNaN(offset)) return 61;
   var stream = SYSCALLS.getStreamFromFD(fd);
   FS.llseek(stream, offset, whence);
-  tempI64 = [ stream.position >>> 0, (tempDouble = stream.position, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0) ], 
-  GROWABLE_HEAP_I32()[newOffset >> 2] = tempI64[0], GROWABLE_HEAP_I32()[newOffset + 4 >> 2] = tempI64[1];
+  HEAP64[newOffset >> 3] = BigInt(stream.position);
   if (stream.getdents && offset === 0 && whence === 0) stream.getdents = null;
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return e.errno;
  }
 }
@@ -5288,14 +5167,14 @@ function doWritev(stream, iov, iovcnt, offset) {
 }
 
 function _fd_write(fd, iov, iovcnt, pnum) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(25, 1, fd, iov, iovcnt, pnum);
+ if (ENVIRONMENT_IS_PTHREAD) return proxyToMainThread(25, 1, fd, iov, iovcnt, pnum);
  try {
   var stream = SYSCALLS.getStreamFromFD(fd);
   var num = doWritev(stream, iov, iovcnt);
   GROWABLE_HEAP_U32()[pnum >> 2] = num;
   return 0;
  } catch (e) {
-  if (typeof FS == "undefined" || !(e instanceof FS.ErrnoError)) throw e;
+  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
   return e.errno;
  }
 }
@@ -5323,13 +5202,13 @@ function emnapiGetHandle(js_object) {
 }
 
 function _napi_add_finalizer(env, js_object, finalize_data, finalize_cb, finalize_hint, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
  if (!emnapiCtx.feature.supportFinalizer) {
   return envObject.setLastError(9);
  }
- if (js_object == 0) return envObject.setLastError(1);
- if (finalize_cb == 0) return envObject.setLastError(1);
+ if (!js_object) return envObject.setLastError(1);
+ if (!finalize_cb) return envObject.setLastError(1);
  var handleResult = emnapiGetHandle(js_object);
  if (handleResult.status !== 0) {
   return envObject.setLastError(handleResult.status);
@@ -5347,34 +5226,37 @@ function _napi_add_finalizer(env, js_object, finalize_data, finalize_cb, finaliz
 function _napi_call_function(env, recv, func, argc, argv, result) {
  var i = 0;
  var v;
- if (env == 0) return 1;
- var envObject_11 = emnapiCtx.envStore.get(env);
- if (envObject_11.tryCatch.hasCaught()) return envObject_11.setLastError(10);
- envObject_11.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (recv == 0) return envObject_11.setLastError(1);
+  if (!recv) return envObject.setLastError(1);
   argc = argc >>> 0;
   if (argc > 0) {
-   if (!argv) return envObject_11.setLastError(1);
+   if (!argv) return envObject.setLastError(1);
   }
-  var v8recv_1 = emnapiCtx.handleStore.get(recv).value;
-  if (!func) return envObject_11.setLastError(1);
-  var v8func_1 = emnapiCtx.handleStore.get(func).value;
-  if (typeof v8func_1 !== "function") return envObject_11.setLastError(1);
-  var args_1 = [];
+  var v8recv = emnapiCtx.handleStore.get(recv).value;
+  if (!func) return envObject.setLastError(1);
+  var v8func = emnapiCtx.handleStore.get(func).value;
+  if (typeof v8func !== "function") return envObject.setLastError(1);
+  var args = [];
   for (;i < argc; i++) {
-   var argVal_1 = GROWABLE_HEAP_U32()[argv + i * 4 >> 2];
-   args_1.push(emnapiCtx.handleStore.get(argVal_1).value);
+   var argVal = GROWABLE_HEAP_U32()[argv + i * 4 >> 2];
+   args.push(emnapiCtx.handleStore.get(argVal).value);
   }
-  var ret_2 = v8func_1.apply(v8recv_1, args_1);
+  var ret = v8func.apply(v8recv, args);
   if (result) {
-   v = envObject_11.ensureHandleId(ret_2);
+   v = envObject.ensureHandleId(ret);
    GROWABLE_HEAP_U32()[result >> 2] = v;
   }
-  return envObject_11.clearLastError();
- } catch (err_12) {
-  envObject_11.tryCatch.setError(err_12);
-  return envObject_11.setLastError(10);
+  return envObject.clearLastError();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
@@ -5384,9 +5266,9 @@ function _napi_clear_last_error(env) {
 }
 
 function _napi_close_escapable_handle_scope(env, scope) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (scope == 0) return envObject.setLastError(1);
+ if (!scope) return envObject.setLastError(1);
  if (envObject.openHandleScopes === 0) {
   return 13;
  }
@@ -5395,9 +5277,9 @@ function _napi_close_escapable_handle_scope(env, scope) {
 }
 
 function _napi_close_handle_scope(env, scope) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (scope == 0) return envObject.setLastError(1);
+ if (!scope) return envObject.setLastError(1);
  if (envObject.openHandleScopes === 0) {
   return 13;
  }
@@ -5407,61 +5289,67 @@ function _napi_close_handle_scope(env, scope) {
 
 function _napi_coerce_to_object(env, value, result) {
  var v;
- if (env == 0) return 1;
- var envObject_38 = emnapiCtx.envStore.get(env);
- if (envObject_38.tryCatch.hasCaught()) return envObject_38.setLastError(10);
- envObject_38.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (value == 0) return envObject_38.setLastError(1);
-  if (result == 0) return envObject_38.setLastError(1);
-  var handle_7 = emnapiCtx.handleStore.get(value);
-  if (handle_7.value == null) {
+  if (!value) return envObject.setLastError(1);
+  if (!result) return envObject.setLastError(1);
+  var handle = emnapiCtx.handleStore.get(value);
+  if (handle.value == null) {
    throw new TypeError("Cannot convert undefined or null to object");
   }
-  v = envObject_38.ensureHandleId(Object(handle_7.value));
+  v = envObject.ensureHandleId(Object(handle.value));
   GROWABLE_HEAP_U32()[result >> 2] = v;
-  return envObject_38.getReturnStatus();
- } catch (err_39) {
-  envObject_38.tryCatch.setError(err_39);
-  return envObject_38.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_coerce_to_string(env, value, result) {
  var v;
- if (env == 0) return 1;
- var envObject_39 = emnapiCtx.envStore.get(env);
- if (envObject_39.tryCatch.hasCaught()) return envObject_39.setLastError(10);
- envObject_39.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (value == 0) return envObject_39.setLastError(1);
-  if (result == 0) return envObject_39.setLastError(1);
-  var handle_8 = emnapiCtx.handleStore.get(value);
-  if (handle_8.isSymbol()) {
+  if (!value) return envObject.setLastError(1);
+  if (!result) return envObject.setLastError(1);
+  var handle = emnapiCtx.handleStore.get(value);
+  if (handle.isSymbol()) {
    throw new TypeError("Cannot convert a Symbol value to a string");
   }
-  v = emnapiCtx.addToCurrentScope(String(handle_8.value)).id;
+  v = emnapiCtx.addToCurrentScope(String(handle.value)).id;
   GROWABLE_HEAP_U32()[result >> 2] = v;
-  return envObject_39.getReturnStatus();
- } catch (err_40) {
-  envObject_39.tryCatch.setError(err_40);
-  return envObject_39.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_create_array(env, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var value = emnapiCtx.addToCurrentScope([]).id;
  GROWABLE_HEAP_U32()[result >> 2] = value;
  return envObject.clearLastError();
 }
 
 function _napi_create_array_with_length(env, length, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  length = length >>> 0;
  var value = emnapiCtx.addToCurrentScope(new Array(length)).id;
  GROWABLE_HEAP_U32()[result >> 2] = value;
@@ -5540,7 +5428,8 @@ var emnapiExternalMemory = {
    }
    return view;
   }
-  if (emnapiExternalMemory.isDetachedArrayBuffer(view.buffer) && emnapiExternalMemory.wasmMemoryViewTable.has(view)) {
+  var maybeOldWasmMemory = emnapiExternalMemory.isDetachedArrayBuffer(view.buffer) || typeof SharedArrayBuffer === "function" && view.buffer instanceof SharedArrayBuffer;
+  if (maybeOldWasmMemory && emnapiExternalMemory.wasmMemoryViewTable.has(view)) {
    var info = emnapiExternalMemory.wasmMemoryViewTable.get(view);
    var Ctor = info.Ctor;
    var newView = void 0;
@@ -5596,50 +5485,293 @@ function emnapiCreateArrayBuffer(byte_length, data) {
 
 function _napi_create_buffer_copy(env, length, data, result_data, result) {
  var value;
- if (env == 0) return 1;
- var envObject_56 = emnapiCtx.envStore.get(env);
- if (envObject_56.tryCatch.hasCaught()) return envObject_56.setLastError(10);
- envObject_56.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (result == 0) return envObject_56.setLastError(1);
-  var arrayBuffer_3 = emnapiCreateArrayBuffer(length, result_data);
-  var Buffer_2 = emnapiCtx.feature.Buffer;
-  var buffer_4 = Buffer_2.from(arrayBuffer_3);
-  buffer_4.set(new Uint8Array(wasmMemory.buffer).subarray(data, data + length));
-  value = emnapiCtx.addToCurrentScope(buffer_4).id;
+  if (!result) return envObject.setLastError(1);
+  var Buffer = emnapiCtx.feature.Buffer;
+  if (!Buffer) {
+   throw emnapiCtx.createNotSupportBufferError("napi_create_buffer_copy", "");
+  }
+  var arrayBuffer = emnapiCreateArrayBuffer(length, result_data);
+  var buffer = Buffer.from(arrayBuffer);
+  buffer.set(new Uint8Array(wasmMemory.buffer).subarray(data, data + length));
+  value = emnapiCtx.addToCurrentScope(buffer).id;
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_56.getReturnStatus();
- } catch (err_60) {
-  envObject_56.tryCatch.setError(err_60);
-  return envObject_56.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_create_double(env, value, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var v = emnapiCtx.addToCurrentScope(value).id;
  GROWABLE_HEAP_U32()[result >> 2] = v;
  return envObject.clearLastError();
 }
 
+var emnapiString = {
+ utf8Decoder: undefined,
+ utf16Decoder: undefined,
+ init: function() {
+  var fallbackDecoder = {
+   decode: function(bytes) {
+    var inputIndex = 0;
+    var pendingSize = Math.min(4096, bytes.length + 1);
+    var pending = new Uint16Array(pendingSize);
+    var chunks = [];
+    var pendingIndex = 0;
+    for (;;) {
+     var more = inputIndex < bytes.length;
+     if (!more || pendingIndex >= pendingSize - 1) {
+      var subarray = pending.subarray(0, pendingIndex);
+      var arraylike = subarray;
+      chunks.push(String.fromCharCode.apply(null, arraylike));
+      if (!more) {
+       return chunks.join("");
+      }
+      bytes = bytes.subarray(inputIndex);
+      inputIndex = 0;
+      pendingIndex = 0;
+     }
+     var byte1 = bytes[inputIndex++];
+     if ((byte1 & 128) === 0) {
+      pending[pendingIndex++] = byte1;
+     } else if ((byte1 & 224) === 192) {
+      var byte2 = bytes[inputIndex++] & 63;
+      pending[pendingIndex++] = (byte1 & 31) << 6 | byte2;
+     } else if ((byte1 & 240) === 224) {
+      var byte2 = bytes[inputIndex++] & 63;
+      var byte3 = bytes[inputIndex++] & 63;
+      pending[pendingIndex++] = (byte1 & 31) << 12 | byte2 << 6 | byte3;
+     } else if ((byte1 & 248) === 240) {
+      var byte2 = bytes[inputIndex++] & 63;
+      var byte3 = bytes[inputIndex++] & 63;
+      var byte4 = bytes[inputIndex++] & 63;
+      var codepoint = (byte1 & 7) << 18 | byte2 << 12 | byte3 << 6 | byte4;
+      if (codepoint > 65535) {
+       codepoint -= 65536;
+       pending[pendingIndex++] = codepoint >>> 10 & 1023 | 55296;
+       codepoint = 56320 | codepoint & 1023;
+      }
+      pending[pendingIndex++] = codepoint;
+     } else {}
+    }
+   }
+  };
+  var utf8Decoder;
+  utf8Decoder = fallbackDecoder;
+  emnapiString.utf8Decoder = utf8Decoder;
+  var fallbackDecoder2 = {
+   decode: function(input) {
+    var bytes = new Uint16Array(input.buffer, input.byteOffset, input.byteLength / 2);
+    if (bytes.length <= 4096) {
+     return String.fromCharCode.apply(null, bytes);
+    }
+    var chunks = [];
+    var i = 0;
+    var len = 0;
+    for (;i < bytes.length; i += len) {
+     len = Math.min(4096, bytes.length - i);
+     chunks.push(String.fromCharCode.apply(null, bytes.subarray(i, i + len)));
+    }
+    return chunks.join("");
+   }
+  };
+  var utf16Decoder;
+  utf16Decoder = fallbackDecoder2;
+  emnapiString.utf16Decoder = utf16Decoder;
+ },
+ lengthBytesUTF8: function(str) {
+  var c;
+  var len = 0;
+  for (var i = 0; i < str.length; ++i) {
+   c = str.charCodeAt(i);
+   if (c <= 127) {
+    len++;
+   } else if (c <= 2047) {
+    len += 2;
+   } else if (c >= 55296 && c <= 57343) {
+    len += 4;
+    ++i;
+   } else {
+    len += 3;
+   }
+  }
+  return len;
+ },
+ UTF8ToString: function(ptr, length) {
+  if (!ptr || !length) return "";
+  ptr >>>= 0;
+  var HEAPU8 = new Uint8Array(wasmMemory.buffer);
+  var end = ptr;
+  if (length === -1) {
+   for (;GROWABLE_HEAP_U8()[end]; ) ++end;
+  } else {
+   end = ptr + (length >>> 0);
+  }
+  length = end - ptr;
+  if (length <= 16) {
+   var idx = ptr;
+   var str = "";
+   while (idx < end) {
+    var u0 = GROWABLE_HEAP_U8()[idx++];
+    if (!(u0 & 128)) {
+     str += String.fromCharCode(u0);
+     continue;
+    }
+    var u1 = GROWABLE_HEAP_U8()[idx++] & 63;
+    if ((u0 & 224) === 192) {
+     str += String.fromCharCode((u0 & 31) << 6 | u1);
+     continue;
+    }
+    var u2 = GROWABLE_HEAP_U8()[idx++] & 63;
+    if ((u0 & 240) === 224) {
+     u0 = (u0 & 15) << 12 | u1 << 6 | u2;
+    } else {
+     u0 = (u0 & 7) << 18 | u1 << 12 | u2 << 6 | GROWABLE_HEAP_U8()[idx++] & 63;
+    }
+    if (u0 < 65536) {
+     str += String.fromCharCode(u0);
+    } else {
+     var ch = u0 - 65536;
+     str += String.fromCharCode(55296 | ch >> 10, 56320 | ch & 1023);
+    }
+   }
+   return str;
+  }
+  return emnapiString.utf8Decoder.decode(GROWABLE_HEAP_U8().slice(ptr, end));
+ },
+ stringToUTF8: function(str, outPtr, maxBytesToWrite) {
+  var HEAPU8 = new Uint8Array(wasmMemory.buffer);
+  var outIdx = outPtr;
+  outIdx >>>= 0;
+  if (!(maxBytesToWrite > 0)) {
+   return 0;
+  }
+  var startIdx = outIdx;
+  var endIdx = outIdx + maxBytesToWrite - 1;
+  for (var i = 0; i < str.length; ++i) {
+   var u = str.charCodeAt(i);
+   if (u >= 55296 && u <= 57343) {
+    var u1 = str.charCodeAt(++i);
+    u = 65536 + ((u & 1023) << 10) | u1 & 1023;
+   }
+   if (u <= 127) {
+    if (outIdx >= endIdx) break;
+    GROWABLE_HEAP_U8()[outIdx++] = u;
+   } else if (u <= 2047) {
+    if (outIdx + 1 >= endIdx) break;
+    GROWABLE_HEAP_U8()[outIdx++] = 192 | u >> 6;
+    GROWABLE_HEAP_U8()[outIdx++] = 128 | u & 63;
+   } else if (u <= 65535) {
+    if (outIdx + 2 >= endIdx) break;
+    GROWABLE_HEAP_U8()[outIdx++] = 224 | u >> 12;
+    GROWABLE_HEAP_U8()[outIdx++] = 128 | u >> 6 & 63;
+    GROWABLE_HEAP_U8()[outIdx++] = 128 | u & 63;
+   } else {
+    if (outIdx + 3 >= endIdx) break;
+    GROWABLE_HEAP_U8()[outIdx++] = 240 | u >> 18;
+    GROWABLE_HEAP_U8()[outIdx++] = 128 | u >> 12 & 63;
+    GROWABLE_HEAP_U8()[outIdx++] = 128 | u >> 6 & 63;
+    GROWABLE_HEAP_U8()[outIdx++] = 128 | u & 63;
+   }
+  }
+  GROWABLE_HEAP_U8()[outIdx] = 0;
+  return outIdx - startIdx;
+ },
+ UTF16ToString: function(ptr, length) {
+  if (!ptr || !length) return "";
+  ptr >>>= 0;
+  var end = ptr;
+  if (length === -1) {
+   var idx = end >> 1;
+   var HEAPU16 = new Uint16Array(wasmMemory.buffer);
+   while (GROWABLE_HEAP_U16()[idx]) ++idx;
+   end = idx << 1;
+  } else {
+   end = ptr + (length >>> 0) * 2;
+  }
+  length = end - ptr;
+  if (length <= 32) {
+   return String.fromCharCode.apply(null, new Uint16Array(wasmMemory.buffer, ptr, length / 2));
+  }
+  var HEAPU8 = new Uint8Array(wasmMemory.buffer);
+  return emnapiString.utf16Decoder.decode(GROWABLE_HEAP_U8().slice(ptr, end));
+ },
+ stringToUTF16: function(str, outPtr, maxBytesToWrite) {
+  if (maxBytesToWrite === undefined) {
+   maxBytesToWrite = 2147483647;
+  }
+  if (maxBytesToWrite < 2) return 0;
+  maxBytesToWrite -= 2;
+  var startPtr = outPtr;
+  var numCharsToWrite = maxBytesToWrite < str.length * 2 ? maxBytesToWrite / 2 : str.length;
+  for (var i = 0; i < numCharsToWrite; ++i) {
+   var codeUnit = str.charCodeAt(i);
+   GROWABLE_HEAP_I16()[outPtr >> 1] = codeUnit;
+   outPtr += 2;
+  }
+  GROWABLE_HEAP_I16()[outPtr >> 1] = 0;
+  return outPtr - startPtr;
+ },
+ newString: function(env, str, length, result, stringMaker) {
+  if (!env) return 1;
+  var envObject = emnapiCtx.envStore.get(env);
+  var autoLength = length === -1;
+  var sizelength = length >>> 0;
+  if (length !== 0) {
+   if (!str) return envObject.setLastError(1);
+  }
+  if (!result) return envObject.setLastError(1);
+  if (!(autoLength || sizelength <= 2147483647)) {
+   return envObject.setLastError(1);
+  }
+  var strValue = stringMaker(autoLength, sizelength);
+  var value = emnapiCtx.addToCurrentScope(strValue).id;
+  GROWABLE_HEAP_U32()[result >> 2] = value;
+  return envObject.clearLastError();
+ },
+ newExternalString: function(env, str, length, finalize_callback, finalize_hint, result, copied, createApi, stringMaker) {
+  var status = createApi(env, str, length, result);
+  if (status === 0) {
+   if (copied) {
+    GROWABLE_HEAP_I8()[copied >> 0] = 1;
+   }
+   if (finalize_callback) {
+    var envObject = emnapiCtx.envStore.get(env);
+    envObject.callFinalizer(finalize_callback, str, finalize_hint);
+   }
+  }
+  return status;
+ }
+};
+
 function _napi_create_error(env, code, msg, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (msg == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!msg) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var msgValue = emnapiCtx.handleStore.get(msg).value;
  if (typeof msgValue !== "string") {
   return envObject.setLastError(3);
  }
  var error = new Error(msgValue);
  if (code) {
-  var codeValue_1 = emnapiCtx.handleStore.get(code).value;
-  if (typeof codeValue_1 !== "string") {
+  var codeValue = emnapiCtx.handleStore.get(code).value;
+  if (typeof codeValue !== "string") {
    return envObject.setLastError(3);
   }
-  error.code = codeValue_1;
+  error.code = codeValue;
  }
  var value = emnapiCtx.addToCurrentScope(error).id;
  GROWABLE_HEAP_U32()[result >> 2] = value;
@@ -5648,12 +5780,15 @@ function _napi_create_error(env, code, msg, result) {
 
 function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_length, finalize_cb, finalize_hint, result) {
  var value;
- if (env == 0) return 1;
- var envObject_1 = emnapiCtx.envStore.get(env);
- if (envObject_1.tryCatch.hasCaught()) return envObject_1.setLastError(10);
- envObject_1.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (result == 0) return envObject_1.setLastError(1);
+  if (!result) return envObject.setLastError(1);
   byte_length = byte_length >>> 0;
   if (!external_data) {
    byte_length = 0;
@@ -5667,10 +5802,10 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
   if (!emnapiCtx.feature.supportFinalizer && finalize_cb) {
    throw emnapiCtx.createNotSupportWeakRefError("emnapi_create_memory_view", 'Parameter "finalize_cb" must be 0(NULL)');
   }
-  var viewDescriptor_1 = void 0;
+  var viewDescriptor = void 0;
   switch (typedarray_type) {
   case 0:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: Int8Array,
     address: external_data,
     length: byte_length,
@@ -5680,7 +5815,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 1:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: Uint8Array,
     address: external_data,
     length: byte_length,
@@ -5690,7 +5825,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 2:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: Uint8ClampedArray,
     address: external_data,
     length: byte_length,
@@ -5700,7 +5835,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 3:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: Int16Array,
     address: external_data,
     length: byte_length >> 1,
@@ -5710,7 +5845,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 4:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: Uint16Array,
     address: external_data,
     length: byte_length >> 1,
@@ -5720,7 +5855,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 5:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: Int32Array,
     address: external_data,
     length: byte_length >> 2,
@@ -5730,7 +5865,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 6:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: Uint32Array,
     address: external_data,
     length: byte_length >> 2,
@@ -5740,7 +5875,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 7:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: Float32Array,
     address: external_data,
     length: byte_length >> 2,
@@ -5750,7 +5885,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 8:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: Float64Array,
     address: external_data,
     length: byte_length >> 3,
@@ -5760,7 +5895,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 9:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: BigInt64Array,
     address: external_data,
     length: byte_length >> 3,
@@ -5770,7 +5905,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case 10:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: BigUint64Array,
     address: external_data,
     length: byte_length >> 3,
@@ -5780,7 +5915,7 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case -1:
-   viewDescriptor_1 = {
+   viewDescriptor = {
     Ctor: DataView,
     address: external_data,
     length: byte_length,
@@ -5790,38 +5925,43 @@ function _emnapi_create_memory_view(env, typedarray_type, external_data, byte_le
    break;
 
   case -2:
-   viewDescriptor_1 = {
-    Ctor: emnapiCtx.feature.Buffer,
-    address: external_data,
-    length: byte_length,
-    ownership: 1,
-    runtimeAllocated: 0
-   };
-   break;
+   {
+    if (!emnapiCtx.feature.Buffer) {
+     throw emnapiCtx.createNotSupportBufferError("emnapi_create_memory_view", "");
+    }
+    viewDescriptor = {
+     Ctor: emnapiCtx.feature.Buffer,
+     address: external_data,
+     length: byte_length,
+     ownership: 1,
+     runtimeAllocated: 0
+    };
+    break;
+   }
 
   default:
-   return envObject_1.setLastError(1);
+   return envObject.setLastError(1);
   }
-  var Ctor_1 = viewDescriptor_1.Ctor;
-  var typedArray_1 = typedarray_type === -2 ? emnapiCtx.feature.Buffer.from(wasmMemory.buffer, viewDescriptor_1.address, viewDescriptor_1.length) : new Ctor_1(wasmMemory.buffer, viewDescriptor_1.address, viewDescriptor_1.length);
-  var handle_1 = emnapiCtx.addToCurrentScope(typedArray_1);
-  emnapiExternalMemory.wasmMemoryViewTable.set(typedArray_1, viewDescriptor_1);
+  var Ctor = viewDescriptor.Ctor;
+  var typedArray = typedarray_type === -2 ? emnapiCtx.feature.Buffer.from(wasmMemory.buffer, viewDescriptor.address, viewDescriptor.length) : new Ctor(wasmMemory.buffer, viewDescriptor.address, viewDescriptor.length);
+  var handle = emnapiCtx.addToCurrentScope(typedArray);
+  emnapiExternalMemory.wasmMemoryViewTable.set(typedArray, viewDescriptor);
   if (finalize_cb) {
-   var status_1 = _napi_add_finalizer(env, handle_1.id, external_data, finalize_cb, finalize_hint, 0);
+   var status_1 = _napi_add_finalizer(env, handle.id, external_data, finalize_cb, finalize_hint, 0);
    if (status_1 === 10) {
-    var err_1 = envObject_1.tryCatch.extractException();
-    envObject_1.clearLastError();
-    throw err_1;
+    var err = envObject.tryCatch.extractException();
+    envObject.clearLastError();
+    throw err;
    } else if (status_1 !== 0) {
-    return envObject_1.setLastError(status_1);
+    return envObject.setLastError(status_1);
    }
   }
-  value = handle_1.id;
+  value = handle.id;
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_1.getReturnStatus();
- } catch (err_2) {
-  envObject_1.tryCatch.setError(err_2);
-  return envObject_1.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
@@ -5829,73 +5969,8 @@ function _napi_create_external_buffer(env, length, data, finalize_cb, finalize_h
  return _emnapi_create_memory_view(env, -2, data, length, finalize_cb, finalize_hint, result);
 }
 
-function emnapiUtf8Decoder() {
- var fallbackDecoder = {
-  decode: function(input) {
-   var isArrayBuffer = input instanceof ArrayBuffer;
-   var isView = ArrayBuffer.isView(input);
-   if (!isArrayBuffer && !isView) {
-    throw new TypeError('The "input" argument must be an instance of ArrayBuffer or ArrayBufferView');
-   }
-   var bytes = isArrayBuffer ? new Uint8Array(input) : new Uint8Array(input.buffer, input.byteOffset, input.byteLength);
-   var inputIndex = 0;
-   var pendingSize = Math.min(256 * 256, bytes.length + 1);
-   var pending = new Uint16Array(pendingSize);
-   var chunks = [];
-   var pendingIndex = 0;
-   for (;;) {
-    var more = inputIndex < bytes.length;
-    if (!more || pendingIndex >= pendingSize - 1) {
-     var subarray = pending.subarray(0, pendingIndex);
-     var arraylike = subarray;
-     chunks.push(String.fromCharCode.apply(null, arraylike));
-     if (!more) {
-      return chunks.join("");
-     }
-     bytes = bytes.subarray(inputIndex);
-     inputIndex = 0;
-     pendingIndex = 0;
-    }
-    var byte1 = bytes[inputIndex++];
-    if ((byte1 & 128) === 0) {
-     pending[pendingIndex++] = byte1;
-    } else if ((byte1 & 224) === 192) {
-     var byte2 = bytes[inputIndex++] & 63;
-     pending[pendingIndex++] = (byte1 & 31) << 6 | byte2;
-    } else if ((byte1 & 240) === 224) {
-     var byte2 = bytes[inputIndex++] & 63;
-     var byte3 = bytes[inputIndex++] & 63;
-     pending[pendingIndex++] = (byte1 & 31) << 12 | byte2 << 6 | byte3;
-    } else if ((byte1 & 248) === 240) {
-     var byte2 = bytes[inputIndex++] & 63;
-     var byte3 = bytes[inputIndex++] & 63;
-     var byte4 = bytes[inputIndex++] & 63;
-     var codepoint = (byte1 & 7) << 18 | byte2 << 12 | byte3 << 6 | byte4;
-     if (codepoint > 65535) {
-      codepoint -= 65536;
-      pending[pendingIndex++] = codepoint >>> 10 & 1023 | 55296;
-      codepoint = 56320 | codepoint & 1023;
-     }
-     pending[pendingIndex++] = codepoint;
-    } else {}
-   }
-  }
- };
- var tmp;
- tmp = fallbackDecoder;
- emnapiUtf8Decoder = tmp;
-}
-
-function emnapiUtf8ToString(ptr, length) {
- if (length == -1) {
-  return UTF8ToString(ptr);
- }
- length = length >>> 0;
- return emnapiUtf8Decoder.decode(GROWABLE_HEAP_U8().slice(ptr, ptr + length));
-}
-
 function emnapiCreateFunction(envObject, utf8name, length, cb, data) {
- var functionName = !utf8name || !length ? "" : emnapiUtf8ToString(utf8name, length);
+ var functionName = !utf8name || !length ? "" : emnapiString.UTF8ToString(utf8name, length);
  var f;
  var makeFunction = function() {
   return function() {
@@ -5927,7 +6002,15 @@ function emnapiCreateFunction(envObject, utf8name, length, cb, data) {
   };
  }
  if (emnapiCtx.feature.supportNewFunction) {
-  f = new Function("_", "return function " + functionName + "(){" + '"use strict";' + "return _.apply(this,arguments);" + "};")(makeFunction());
+  var _ = makeFunction();
+  try {
+   f = new Function("_", "return function " + functionName + "(){" + '"use strict";' + "return _.apply(this,arguments);" + "};")(_);
+  } catch (_err) {
+   f = makeFunction();
+   if (emnapiCtx.feature.canSetFunctionName) Object.defineProperty(f, "name", {
+    value: functionName
+   });
+  }
  } else {
   f = makeFunction();
   if (emnapiCtx.feature.canSetFunctionName) Object.defineProperty(f, "name", {
@@ -5942,43 +6025,48 @@ function emnapiCreateFunction(envObject, utf8name, length, cb, data) {
 
 function _napi_create_function(env, utf8name, length, cb, data, result) {
  var value;
- if (env == 0) return 1;
- var envObject_10 = emnapiCtx.envStore.get(env);
- if (envObject_10.tryCatch.hasCaught()) return envObject_10.setLastError(10);
- envObject_10.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (result == 0) return envObject_10.setLastError(1);
-  if (cb == 0) return envObject_10.setLastError(1);
-  var fresult_1 = emnapiCreateFunction(envObject_10, utf8name, length, cb, data);
-  if (fresult_1.status !== 0) return envObject_10.setLastError(fresult_1.status);
-  var f_1 = fresult_1.f;
-  var valueHandle_1 = emnapiCtx.addToCurrentScope(f_1);
-  value = valueHandle_1.id;
+  if (!result) return envObject.setLastError(1);
+  if (!cb) return envObject.setLastError(1);
+  var fresult = emnapiCreateFunction(envObject, utf8name, length, cb, data);
+  if (fresult.status !== 0) return envObject.setLastError(fresult.status);
+  var f = fresult.f;
+  var valueHandle = emnapiCtx.addToCurrentScope(f);
+  value = valueHandle.id;
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_10.getReturnStatus();
- } catch (err_11) {
-  envObject_10.tryCatch.setError(err_11);
-  return envObject_10.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_create_object(env, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var value = emnapiCtx.addToCurrentScope({}).id;
  GROWABLE_HEAP_U32()[result >> 2] = value;
  return envObject.clearLastError();
 }
 
 function _napi_create_reference(env, value, initial_refcount, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (value == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!value) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var handle = emnapiCtx.handleStore.get(value);
- if (!(handle.isObject() || handle.isFunction())) {
-  return envObject.setLastError(2);
+ if (envObject.moduleApiVersion !== 2147483647) {
+  if (!(handle.isObject() || handle.isFunction() || handle.isSymbol())) {
+   return envObject.setLastError(1);
+  }
  }
  var ref = emnapiCtx.createReference(envObject, handle.id, initial_refcount >>> 0, 1);
  GROWABLE_HEAP_U32()[result >> 2] = ref.id;
@@ -5986,65 +6074,51 @@ function _napi_create_reference(env, value, initial_refcount, result) {
 }
 
 function _napi_create_string_latin1(env, str, length, result) {
- if (env == 0) return 1;
- var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
- length = length >>> 0;
- if (!(length === 4294967295 || length <= 2147483647) || !str) {
-  return envObject.setLastError(1);
- }
- var latin1String = "";
- var len = 0;
- if (length === -1) {
-  while (true) {
-   var ch = GROWABLE_HEAP_U8()[str >> 0];
-   if (!ch) break;
-   latin1String += String.fromCharCode(ch);
-   str++;
+ return emnapiString.newString(env, str, length, result, function(autoLength, sizeLength) {
+  var latin1String = "";
+  var len = 0;
+  if (autoLength) {
+   while (true) {
+    var ch = GROWABLE_HEAP_U8()[str >> 0];
+    if (!ch) break;
+    latin1String += String.fromCharCode(ch);
+    str++;
+   }
+  } else {
+   while (len < sizeLength) {
+    var ch = GROWABLE_HEAP_U8()[str >> 0];
+    if (!ch) break;
+    latin1String += String.fromCharCode(ch);
+    len++;
+    str++;
+   }
   }
- } else {
-  while (len < length) {
-   var ch = GROWABLE_HEAP_U8()[str >> 0];
-   if (!ch) break;
-   latin1String += String.fromCharCode(ch);
-   len++;
-   str++;
-  }
- }
- var value = emnapiCtx.addToCurrentScope(latin1String).id;
- GROWABLE_HEAP_U32()[result >> 2] = value;
- return envObject.clearLastError();
+  return latin1String;
+ });
 }
 
 function _napi_create_string_utf8(env, str, length, result) {
- if (env == 0) return 1;
- var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
- if (length < -1 || length > 2147483647 || !str) {
-  return envObject.setLastError(1);
- }
- var utf8String = emnapiUtf8ToString(str, length);
- var value = emnapiCtx.addToCurrentScope(utf8String).id;
- GROWABLE_HEAP_U32()[result >> 2] = value;
- return envObject.clearLastError();
+ return emnapiString.newString(env, str, length, result, function() {
+  return emnapiString.UTF8ToString(str, length);
+ });
 }
 
 function _napi_create_type_error(env, code, msg, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (msg == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!msg) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var msgValue = emnapiCtx.handleStore.get(msg).value;
  if (typeof msgValue !== "string") {
   return envObject.setLastError(3);
  }
  var error = new TypeError(msgValue);
  if (code) {
-  var codeValue_2 = emnapiCtx.handleStore.get(code).value;
-  if (typeof codeValue_2 !== "string") {
+  var codeValue = emnapiCtx.handleStore.get(code).value;
+  if (typeof codeValue !== "string") {
    return envObject.setLastError(3);
   }
-  error.code = codeValue_2;
+  error.code = codeValue;
  }
  var value = emnapiCtx.addToCurrentScope(error).id;
  GROWABLE_HEAP_U32()[result >> 2] = value;
@@ -6090,66 +6164,69 @@ function emnapiDefineProperty(envObject, obj, propertyName, method, getter, sett
 
 function _napi_define_properties(env, object, property_count, properties) {
  var propPtr, attributes;
- if (env == 0) return 1;
- var envObject_32 = emnapiCtx.envStore.get(env);
- if (envObject_32.tryCatch.hasCaught()) return envObject_32.setLastError(10);
- envObject_32.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
   property_count = property_count >>> 0;
   if (property_count > 0) {
-   if (!properties) return envObject_32.setLastError(1);
+   if (!properties) return envObject.setLastError(1);
   }
-  if (!object) return envObject_32.setLastError(1);
-  var h_14 = emnapiCtx.handleStore.get(object);
-  var maybeObject_1 = h_14.value;
-  if (!(h_14.isObject() || h_14.isFunction())) {
-   return envObject_32.setLastError(2);
+  if (!object) return envObject.setLastError(1);
+  var h = emnapiCtx.handleStore.get(object);
+  var maybeObject = h.value;
+  if (!(h.isObject() || h.isFunction())) {
+   return envObject.setLastError(2);
   }
-  var propertyName_1 = void 0;
-  for (var i_2 = 0; i_2 < property_count; i_2++) {
-   propPtr = properties + i_2 * (4 * 8);
-   var utf8Name_1 = GROWABLE_HEAP_U32()[propPtr >> 2];
+  var propertyName = void 0;
+  for (var i = 0; i < property_count; i++) {
+   propPtr = properties + i * (4 * 8);
+   var utf8Name = GROWABLE_HEAP_U32()[propPtr >> 2];
    var name_2 = GROWABLE_HEAP_U32()[propPtr + 4 >> 2];
-   var method_1 = GROWABLE_HEAP_U32()[propPtr + 8 >> 2];
-   var getter_1 = GROWABLE_HEAP_U32()[propPtr + 12 >> 2];
-   var setter_1 = GROWABLE_HEAP_U32()[propPtr + 16 >> 2];
-   var value_2 = GROWABLE_HEAP_U32()[propPtr + 20 >> 2];
+   var method = GROWABLE_HEAP_U32()[propPtr + 8 >> 2];
+   var getter = GROWABLE_HEAP_U32()[propPtr + 12 >> 2];
+   var setter = GROWABLE_HEAP_U32()[propPtr + 16 >> 2];
+   var value = GROWABLE_HEAP_U32()[propPtr + 20 >> 2];
    attributes = GROWABLE_HEAP_I32()[propPtr + 24 >> 2];
-   var data_1 = GROWABLE_HEAP_U32()[propPtr + 28 >> 2];
-   if (utf8Name_1) {
-    propertyName_1 = UTF8ToString(utf8Name_1);
+   var data = GROWABLE_HEAP_U32()[propPtr + 28 >> 2];
+   if (utf8Name) {
+    propertyName = emnapiString.UTF8ToString(utf8Name, -1);
    } else {
     if (!name_2) {
-     return envObject_32.setLastError(4);
+     return envObject.setLastError(4);
     }
-    propertyName_1 = emnapiCtx.handleStore.get(name_2).value;
-    if (typeof propertyName_1 !== "string" && typeof propertyName_1 !== "symbol") {
-     return envObject_32.setLastError(4);
+    propertyName = emnapiCtx.handleStore.get(name_2).value;
+    if (typeof propertyName !== "string" && typeof propertyName !== "symbol") {
+     return envObject.setLastError(4);
     }
    }
-   emnapiDefineProperty(envObject_32, maybeObject_1, propertyName_1, method_1, getter_1, setter_1, value_2, attributes, data_1);
+   emnapiDefineProperty(envObject, maybeObject, propertyName, method, getter, setter, value, attributes, data);
   }
   return 0;
- } catch (err_33) {
-  envObject_32.tryCatch.setError(err_33);
-  return envObject_32.setLastError(10);
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_delete_reference(env, ref) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (ref == 0) return envObject.setLastError(1);
+ if (!ref) return envObject.setLastError(1);
  emnapiCtx.refStore.get(ref).dispose();
  return envObject.clearLastError();
 }
 
 function _napi_escape_handle(env, scope, escapee, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (scope == 0) return envObject.setLastError(1);
- if (escapee == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!scope) return envObject.setLastError(1);
+ if (!escapee) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var scopeObject = emnapiCtx.scopeStore.get(scope);
  if (!scopeObject.escapeCalled()) {
   var newHandle = scopeObject.escape(escapee);
@@ -6161,13 +6238,19 @@ function _napi_escape_handle(env, scope, escapee, result) {
 }
 
 function _napi_fatal_error(location, location_len, message, message_len) {
- abort("FATAL ERROR: " + emnapiUtf8ToString(location, location_len) + " " + emnapiUtf8ToString(message, message_len));
+ var locationStr = emnapiString.UTF8ToString(location, location_len);
+ var messageStr = emnapiString.UTF8ToString(message, message_len);
+ if (emnapiNodeBinding) {
+  emnapiNodeBinding.napi.fatalError(locationStr, messageStr);
+ } else {
+  abort("FATAL ERROR: " + locationStr + " " + messageStr);
+ }
 }
 
 function _napi_get_and_clear_last_exception(env, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  if (!envObject.tryCatch.hasCaught()) {
   GROWABLE_HEAP_U32()[result >> 2] = 1;
   return envObject.clearLastError();
@@ -6181,10 +6264,10 @@ function _napi_get_and_clear_last_exception(env, result) {
 }
 
 function _napi_get_array_length(env, value, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (value == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!value) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var handle = emnapiCtx.handleStore.get(value);
  if (!handle.isArray()) {
   return envObject.setLastError(8);
@@ -6195,20 +6278,20 @@ function _napi_get_array_length(env, value, result) {
 }
 
 function _napi_get_boolean(env, value, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var v = value === 0 ? 3 : 4;
  GROWABLE_HEAP_U32()[result >> 2] = v;
  return envObject.clearLastError();
 }
 
 function _napi_get_cb_info(env, _cbinfo, argc, argv, this_arg, data) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
  var cbinfoValue = emnapiCtx.cbinfoStack.current;
  if (argv) {
-  if (argc == 0) return envObject.setLastError(1);
+  if (!argc) return envObject.setLastError(1);
   var argcValue = GROWABLE_HEAP_U32()[argc >> 2];
   var len = cbinfoValue.args.length;
   var arrlen = argcValue < len ? argcValue : len;
@@ -6238,67 +6321,73 @@ function _napi_get_cb_info(env, _cbinfo, argc, argv, this_arg, data) {
 
 function _napi_get_element(env, object, index, result) {
  var value;
- if (env == 0) return 1;
- var envObject_30 = emnapiCtx.envStore.get(env);
- if (envObject_30.tryCatch.hasCaught()) return envObject_30.setLastError(10);
- envObject_30.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (result == 0) return envObject_30.setLastError(1);
-  if (object == 0) return envObject_30.setLastError(1);
-  var h_12 = emnapiCtx.handleStore.get(object);
-  if (h_12.value == null) {
+  if (!result) return envObject.setLastError(1);
+  if (!object) return envObject.setLastError(1);
+  var h = emnapiCtx.handleStore.get(object);
+  if (h.value == null) {
    throw new TypeError("Cannot convert undefined or null to object");
   }
-  var v_7 = void 0;
+  var v = void 0;
   try {
-   v_7 = h_12.isObject() || h_12.isFunction() ? h_12.value : Object(h_12.value);
-  } catch (_9) {
-   return envObject_30.setLastError(2);
+   v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
+  } catch (_) {
+   return envObject.setLastError(2);
   }
-  value = envObject_30.ensureHandleId(v_7[index >>> 0]);
+  value = envObject.ensureHandleId(v[index >>> 0]);
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_30.getReturnStatus();
- } catch (err_31) {
-  envObject_30.tryCatch.setError(err_31);
-  return envObject_30.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_get_named_property(env, object, utf8name, result) {
  var value;
- if (env == 0) return 1;
- var envObject_27 = emnapiCtx.envStore.get(env);
- if (envObject_27.tryCatch.hasCaught()) return envObject_27.setLastError(10);
- envObject_27.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (result == 0) return envObject_27.setLastError(1);
-  if (object == 0) return envObject_27.setLastError(1);
+  if (!result) return envObject.setLastError(1);
+  if (!object) return envObject.setLastError(1);
   if (!utf8name) {
-   return envObject_27.setLastError(1);
+   return envObject.setLastError(1);
   }
-  var h_9 = emnapiCtx.handleStore.get(object);
-  if (h_9.value == null) {
+  var h = emnapiCtx.handleStore.get(object);
+  if (h.value == null) {
    throw new TypeError("Cannot convert undefined or null to object");
   }
-  var v_5 = void 0;
+  var v = void 0;
   try {
-   v_5 = h_9.isObject() || h_9.isFunction() ? h_9.value : Object(h_9.value);
-  } catch (_7) {
-   return envObject_27.setLastError(2);
+   v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
+  } catch (_) {
+   return envObject.setLastError(2);
   }
-  value = envObject_27.ensureHandleId(v_5[UTF8ToString(utf8name)]);
+  value = envObject.ensureHandleId(v[emnapiString.UTF8ToString(utf8name, -1)]);
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_27.getReturnStatus();
- } catch (err_28) {
-  envObject_27.tryCatch.setError(err_28);
-  return envObject_27.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_get_null(env, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var value = 2;
  GROWABLE_HEAP_U32()[result >> 2] = value;
  return envObject.clearLastError();
@@ -6306,109 +6395,115 @@ function _napi_get_null(env, result) {
 
 function _napi_get_property(env, object, key, result) {
  var value;
- if (env == 0) return 1;
- var envObject_22 = emnapiCtx.envStore.get(env);
- if (envObject_22.tryCatch.hasCaught()) return envObject_22.setLastError(10);
- envObject_22.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (key == 0) return envObject_22.setLastError(1);
-  if (result == 0) return envObject_22.setLastError(1);
-  if (object == 0) return envObject_22.setLastError(1);
-  var h_4 = emnapiCtx.handleStore.get(object);
-  if (h_4.value == null) {
+  if (!key) return envObject.setLastError(1);
+  if (!result) return envObject.setLastError(1);
+  if (!object) return envObject.setLastError(1);
+  var h = emnapiCtx.handleStore.get(object);
+  if (h.value == null) {
    throw new TypeError("Cannot convert undefined or null to object");
   }
-  var v_2 = void 0;
+  var v = void 0;
   try {
-   v_2 = h_4.isObject() || h_4.isFunction() ? h_4.value : Object(h_4.value);
-  } catch (_3) {
-   return envObject_22.setLastError(2);
+   v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
+  } catch (_) {
+   return envObject.setLastError(2);
   }
-  value = envObject_22.ensureHandleId(v_2[emnapiCtx.handleStore.get(key).value]);
+  value = envObject.ensureHandleId(v[emnapiCtx.handleStore.get(key).value]);
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_22.getReturnStatus();
- } catch (err_23) {
-  envObject_22.tryCatch.setError(err_23);
-  return envObject_22.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_get_all_property_names(env, object, key_mode, key_filter, key_conversion, result) {
  var value;
- if (env == 0) return 1;
- var envObject_19 = emnapiCtx.envStore.get(env);
- if (envObject_19.tryCatch.hasCaught()) return envObject_19.setLastError(10);
- envObject_19.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (result == 0) return envObject_19.setLastError(1);
-  if (object == 0) return envObject_19.setLastError(1);
-  var h_1 = emnapiCtx.handleStore.get(object);
-  if (h_1.value == null) {
+  if (!result) return envObject.setLastError(1);
+  if (!object) return envObject.setLastError(1);
+  var h = emnapiCtx.handleStore.get(object);
+  if (h.value == null) {
    throw new TypeError("Cannot convert undefined or null to object");
   }
-  var obj_1 = void 0;
+  var obj = void 0;
   try {
-   obj_1 = h_1.isObject() || h_1.isFunction() ? h_1.value : Object(h_1.value);
-  } catch (_1) {
-   return envObject_19.setLastError(2);
+   obj = h.isObject() || h.isFunction() ? h.value : Object(h.value);
+  } catch (_) {
+   return envObject.setLastError(2);
   }
   if (key_mode !== 0 && key_mode !== 1) {
-   return envObject_19.setLastError(1);
+   return envObject.setLastError(1);
   }
   if (key_conversion !== 0 && key_conversion !== 1) {
-   return envObject_19.setLastError(1);
+   return envObject.setLastError(1);
   }
-  var props_1 = [];
-  var names_1 = void 0;
-  var symbols_1 = void 0;
-  var i_1 = void 0;
-  var own_1 = true;
-  var integerIndiceRegex_1 = /^(0|[1-9][0-9]*)$/;
+  var props = [];
+  var names = void 0;
+  var symbols = void 0;
+  var i = void 0;
+  var own = true;
+  var integerIndiceRegex = /^(0|[1-9][0-9]*)$/;
   do {
-   names_1 = Object.getOwnPropertyNames(obj_1);
-   symbols_1 = Object.getOwnPropertySymbols(obj_1);
-   for (i_1 = 0; i_1 < names_1.length; i_1++) {
-    props_1.push({
-     name: integerIndiceRegex_1.test(names_1[i_1]) ? Number(names_1[i_1]) : names_1[i_1],
-     desc: Object.getOwnPropertyDescriptor(obj_1, names_1[i_1]),
-     own_1: own_1
+   names = Object.getOwnPropertyNames(obj);
+   symbols = Object.getOwnPropertySymbols(obj);
+   for (i = 0; i < names.length; i++) {
+    props.push({
+     name: integerIndiceRegex.test(names[i]) ? Number(names[i]) : names[i],
+     desc: Object.getOwnPropertyDescriptor(obj, names[i]),
+     own: own
     });
    }
-   for (i_1 = 0; i_1 < symbols_1.length; i_1++) {
-    props_1.push({
-     name: symbols_1[i_1],
-     desc: Object.getOwnPropertyDescriptor(obj_1, symbols_1[i_1]),
-     own_1: own_1
+   for (i = 0; i < symbols.length; i++) {
+    props.push({
+     name: symbols[i],
+     desc: Object.getOwnPropertyDescriptor(obj, symbols[i]),
+     own: own
     });
    }
    if (key_mode === 1) {
     break;
    }
-   obj_1 = Object.getPrototypeOf(obj_1);
-   own_1 = false;
-  } while (obj_1);
-  var ret_5 = [];
-  var addName_1 = function(ret_5, name, key_filter, conversion_mode) {
-   if (ret_5.indexOf(name) !== -1) return;
+   obj = Object.getPrototypeOf(obj);
+   own = false;
+  } while (obj);
+  var ret = [];
+  var addName = function(ret, name, key_filter, conversion_mode) {
+   if (ret.indexOf(name) !== -1) return;
    if (conversion_mode === 0) {
-    ret_5.push(name);
+    ret.push(name);
    } else if (conversion_mode === 1) {
-    var realName_1 = typeof name === "number" ? String(name) : name;
-    if (typeof realName_1 === "string") {
+    var realName = typeof name === "number" ? String(name) : name;
+    if (typeof realName === "string") {
      if (!(key_filter & 8)) {
-      ret_5.push(realName_1);
+      ret.push(realName);
      }
     } else {
-     ret_5.push(realName_1);
+     ret.push(realName);
     }
    }
   };
-  for (i_1 = 0; i_1 < props_1.length; i_1++) {
-   var prop_1 = props_1[i_1];
-   var name_1 = prop_1.name;
-   var desc_1 = prop_1.desc;
+  for (i = 0; i < props.length; i++) {
+   var prop = props[i];
+   var name_1 = prop.name;
+   var desc = prop.desc;
    if (key_filter === 0) {
-    addName_1(ret_5, name_1, key_filter, key_conversion);
+    addName(ret, name_1, key_filter, key_conversion);
    } else {
     if (key_filter & 8 && typeof name_1 === "string") {
      continue;
@@ -6416,61 +6511,61 @@ function _napi_get_all_property_names(env, object, key_mode, key_filter, key_con
     if (key_filter & 16 && typeof name_1 === "symbol") {
      continue;
     }
-    var shouldAdd_1 = true;
+    var shouldAdd = true;
     switch (key_filter & 7) {
     case 1:
      {
-      shouldAdd_1 = Boolean(desc_1.writable);
+      shouldAdd = Boolean(desc.writable);
       break;
      }
 
     case 2:
      {
-      shouldAdd_1 = Boolean(desc_1.enumerable);
+      shouldAdd = Boolean(desc.enumerable);
       break;
      }
 
     case 1 | 2:
      {
-      shouldAdd_1 = Boolean(desc_1.writable && desc_1.enumerable);
+      shouldAdd = Boolean(desc.writable && desc.enumerable);
       break;
      }
 
     case 4:
      {
-      shouldAdd_1 = Boolean(desc_1.configurable);
+      shouldAdd = Boolean(desc.configurable);
       break;
      }
 
     case 4 | 1:
      {
-      shouldAdd_1 = Boolean(desc_1.configurable && desc_1.writable);
+      shouldAdd = Boolean(desc.configurable && desc.writable);
       break;
      }
 
     case 4 | 2:
      {
-      shouldAdd_1 = Boolean(desc_1.configurable && desc_1.enumerable);
+      shouldAdd = Boolean(desc.configurable && desc.enumerable);
       break;
      }
 
     case 4 | 2 | 1:
      {
-      shouldAdd_1 = Boolean(desc_1.configurable && desc_1.enumerable && desc_1.writable);
+      shouldAdd = Boolean(desc.configurable && desc.enumerable && desc.writable);
       break;
      }
     }
-    if (shouldAdd_1) {
-     addName_1(ret_5, name_1, key_filter, key_conversion);
+    if (shouldAdd) {
+     addName(ret, name_1, key_filter, key_conversion);
     }
    }
   }
-  value = emnapiCtx.addToCurrentScope(ret_5).id;
+  value = emnapiCtx.addToCurrentScope(ret).id;
   GROWABLE_HEAP_U32()[result >> 2] = value;
-  return envObject_19.getReturnStatus();
- } catch (err_20) {
-  envObject_19.tryCatch.setError(err_20);
-  return envObject_19.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
@@ -6479,10 +6574,10 @@ function _napi_get_property_names(env, object, result) {
 }
 
 function _napi_get_reference_value(env, ref, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (ref == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!ref) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var reference = emnapiCtx.refStore.get(ref);
  var handleId = reference.get();
  GROWABLE_HEAP_U32()[result >> 2] = handleId;
@@ -6490,9 +6585,9 @@ function _napi_get_reference_value(env, ref, result) {
 }
 
 function _napi_get_typedarray_info(env, typedarray, type, length, data, arraybuffer, byte_offset) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (typedarray == 0) return envObject.setLastError(1);
+ if (!typedarray) return envObject.setLastError(1);
  var handle = emnapiCtx.handleStore.get(typedarray);
  if (!handle.isTypedArray()) {
   return envObject.setLastError(1);
@@ -6549,19 +6644,19 @@ function _napi_get_typedarray_info(env, typedarray, type, length, data, arraybuf
 }
 
 function _napi_get_undefined(env, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var value = 1;
  GROWABLE_HEAP_U32()[result >> 2] = value;
  return envObject.clearLastError();
 }
 
 function _napi_get_value_bool(env, value, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (value == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!value) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var handle = emnapiCtx.handleStore.get(value);
  if (typeof handle.value !== "boolean") {
   return envObject.setLastError(7);
@@ -6572,10 +6667,10 @@ function _napi_get_value_bool(env, value, result) {
 }
 
 function _napi_get_value_double(env, value, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (value == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!value) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var handle = emnapiCtx.handleStore.get(value);
  if (typeof handle.value !== "number") {
   return envObject.setLastError(6);
@@ -6586,10 +6681,10 @@ function _napi_get_value_double(env, value, result) {
 }
 
 function _napi_get_value_int32(env, value, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (value == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!value) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var handle = emnapiCtx.handleStore.get(value);
  if (typeof handle.value !== "number") {
   return envObject.setLastError(6);
@@ -6599,10 +6694,10 @@ function _napi_get_value_int32(env, value, result) {
 }
 
 function _napi_get_value_int64(env, value, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (value == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!value) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var handle = emnapiCtx.handleStore.get(value);
  if (typeof handle.value !== "number") {
   return envObject.setLastError(6);
@@ -6628,9 +6723,9 @@ function _napi_get_value_int64(env, value, result) {
 }
 
 function _napi_get_value_string_utf8(env, value, buf, buf_size, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (value == 0) return envObject.setLastError(1);
+ if (!value) return envObject.setLastError(1);
  buf_size = buf_size >>> 0;
  var handle = emnapiCtx.handleStore.get(value);
  if (typeof handle.value !== "string") {
@@ -6638,10 +6733,10 @@ function _napi_get_value_string_utf8(env, value, buf, buf_size, result) {
  }
  if (!buf) {
   if (!result) return envObject.setLastError(1);
-  var strLength = lengthBytesUTF8(handle.value);
+  var strLength = emnapiString.lengthBytesUTF8(handle.value);
   GROWABLE_HEAP_U32()[result >> 2] = strLength;
  } else if (buf_size !== 0) {
-  var copied = stringToUTF8(handle.value, buf, buf_size);
+  var copied = emnapiString.stringToUTF8(handle.value, buf, buf_size);
   if (result) {
    GROWABLE_HEAP_U32()[result >> 2] = copied;
   }
@@ -6652,10 +6747,10 @@ function _napi_get_value_string_utf8(env, value, buf, buf_size, result) {
 }
 
 function _napi_get_value_uint32(env, value, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (value == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!value) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var handle = emnapiCtx.handleStore.get(value);
  if (typeof handle.value !== "number") {
   return envObject.setLastError(6);
@@ -6666,141 +6761,153 @@ function _napi_get_value_uint32(env, value, result) {
 
 function _napi_has_named_property(env, object, utf8name, result) {
  var r;
- if (env == 0) return 1;
- var envObject_26 = emnapiCtx.envStore.get(env);
- if (envObject_26.tryCatch.hasCaught()) return envObject_26.setLastError(10);
- envObject_26.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (result == 0) return envObject_26.setLastError(1);
-  if (object == 0) return envObject_26.setLastError(1);
+  if (!result) return envObject.setLastError(1);
+  if (!object) return envObject.setLastError(1);
   if (!utf8name) {
-   return envObject_26.setLastError(1);
+   return envObject.setLastError(1);
   }
-  var h_8 = emnapiCtx.handleStore.get(object);
-  if (h_8.value == null) {
+  var h = emnapiCtx.handleStore.get(object);
+  if (h.value == null) {
    throw new TypeError("Cannot convert undefined or null to object");
   }
-  var v_4 = void 0;
+  var v = void 0;
   try {
-   v_4 = h_8.isObject() || h_8.isFunction() ? h_8.value : Object(h_8.value);
-  } catch (_6) {
-   return envObject_26.setLastError(2);
+   v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
+  } catch (_) {
+   return envObject.setLastError(2);
   }
-  r = UTF8ToString(utf8name) in v_4;
+  r = emnapiString.UTF8ToString(utf8name, -1) in v;
   GROWABLE_HEAP_I8()[result >> 0] = r ? 1 : 0;
-  return envObject_26.getReturnStatus();
- } catch (err_27) {
-  envObject_26.tryCatch.setError(err_27);
-  return envObject_26.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_has_own_property(env, object, key, result) {
  var value, r;
- if (env == 0) return 1;
- var envObject_24 = emnapiCtx.envStore.get(env);
- if (envObject_24.tryCatch.hasCaught()) return envObject_24.setLastError(10);
- envObject_24.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (key == 0) return envObject_24.setLastError(1);
-  if (result == 0) return envObject_24.setLastError(1);
-  if (object == 0) return envObject_24.setLastError(1);
-  var h_6 = emnapiCtx.handleStore.get(object);
-  if (h_6.value == null) {
+  if (!key) return envObject.setLastError(1);
+  if (!result) return envObject.setLastError(1);
+  if (!object) return envObject.setLastError(1);
+  var h = emnapiCtx.handleStore.get(object);
+  if (h.value == null) {
    throw new TypeError("Cannot convert undefined or null to object");
   }
-  var v_3 = void 0;
+  var v = void 0;
   try {
-   v_3 = h_6.isObject() || h_6.isFunction() ? h_6.value : Object(h_6.value);
-  } catch (_5) {
-   return envObject_24.setLastError(2);
+   v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
+  } catch (_) {
+   return envObject.setLastError(2);
   }
-  var prop_2 = emnapiCtx.handleStore.get(key).value;
-  if (typeof prop_2 !== "string" && typeof prop_2 !== "symbol") {
-   return envObject_24.setLastError(4);
+  var prop = emnapiCtx.handleStore.get(key).value;
+  if (typeof prop !== "string" && typeof prop !== "symbol") {
+   return envObject.setLastError(4);
   }
-  r = Object.prototype.hasOwnProperty.call(v_3, emnapiCtx.handleStore.get(key).value);
+  r = Object.prototype.hasOwnProperty.call(v, emnapiCtx.handleStore.get(key).value);
   GROWABLE_HEAP_I8()[result >> 0] = r ? 1 : 0;
-  return envObject_24.getReturnStatus();
- } catch (err_25) {
-  envObject_24.tryCatch.setError(err_25);
-  return envObject_24.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_has_property(env, object, key, result) {
  var r;
- if (env == 0) return 1;
- var envObject_21 = emnapiCtx.envStore.get(env);
- if (envObject_21.tryCatch.hasCaught()) return envObject_21.setLastError(10);
- envObject_21.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (key == 0) return envObject_21.setLastError(1);
-  if (result == 0) return envObject_21.setLastError(1);
-  if (object == 0) return envObject_21.setLastError(1);
-  var h_3 = emnapiCtx.handleStore.get(object);
-  if (h_3.value == null) {
+  if (!key) return envObject.setLastError(1);
+  if (!result) return envObject.setLastError(1);
+  if (!object) return envObject.setLastError(1);
+  var h = emnapiCtx.handleStore.get(object);
+  if (h.value == null) {
    throw new TypeError("Cannot convert undefined or null to object");
   }
-  var v_1 = void 0;
+  var v = void 0;
   try {
-   v_1 = h_3.isObject() || h_3.isFunction() ? h_3.value : Object(h_3.value);
-  } catch (_2) {
-   return envObject_21.setLastError(2);
+   v = h.isObject() || h.isFunction() ? h.value : Object(h.value);
+  } catch (_) {
+   return envObject.setLastError(2);
   }
-  r = emnapiCtx.handleStore.get(key).value in v_1 ? 1 : 0;
+  r = emnapiCtx.handleStore.get(key).value in v ? 1 : 0;
   GROWABLE_HEAP_I8()[result >> 0] = r;
-  return envObject_21.getReturnStatus();
- } catch (err_22) {
-  envObject_21.tryCatch.setError(err_22);
-  return envObject_21.setLastError(10);
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_is_exception_pending(env, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var r = envObject.tryCatch.hasCaught();
  GROWABLE_HEAP_I8()[result >> 0] = r ? 1 : 0;
  return envObject.clearLastError();
 }
 
 function _napi_open_escapable_handle_scope(env, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var scope = emnapiCtx.openScope(envObject);
  GROWABLE_HEAP_U32()[result >> 2] = scope.id;
  return envObject.clearLastError();
 }
 
 function _napi_open_handle_scope(env, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (result == 0) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var scope = emnapiCtx.openScope(envObject);
  GROWABLE_HEAP_U32()[result >> 2] = scope.id;
  return envObject.clearLastError();
 }
 
 function _napi_set_element(env, object, index, value) {
- if (env == 0) return 1;
- var envObject_28 = emnapiCtx.envStore.get(env);
- if (envObject_28.tryCatch.hasCaught()) return envObject_28.setLastError(10);
- envObject_28.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (value == 0) return envObject_28.setLastError(1);
-  if (object == 0) return envObject_28.setLastError(1);
-  var h_10 = emnapiCtx.handleStore.get(object);
-  if (!(h_10.isObject() || h_10.isFunction())) {
-   return envObject_28.setLastError(2);
+  if (!value) return envObject.setLastError(1);
+  if (!object) return envObject.setLastError(1);
+  var h = emnapiCtx.handleStore.get(object);
+  if (!(h.isObject() || h.isFunction())) {
+   return envObject.setLastError(2);
   }
-  h_10.value[index >>> 0] = emnapiCtx.handleStore.get(value).value;
-  return envObject_28.getReturnStatus();
- } catch (err_29) {
-  envObject_28.tryCatch.setError(err_29);
-  return envObject_28.setLastError(10);
+  h.value[index >>> 0] = emnapiCtx.handleStore.get(value).value;
+  return envObject.getReturnStatus();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
@@ -6810,48 +6917,54 @@ function _napi_set_last_error(env, error_code, engine_error_code, engine_reserve
 }
 
 function _napi_set_named_property(env, object, cname, value) {
- if (env == 0) return 1;
- var envObject_25 = emnapiCtx.envStore.get(env);
- if (envObject_25.tryCatch.hasCaught()) return envObject_25.setLastError(10);
- envObject_25.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (value == 0) return envObject_25.setLastError(1);
-  if (object == 0) return envObject_25.setLastError(1);
-  var h_7 = emnapiCtx.handleStore.get(object);
-  if (!(h_7.isObject() || h_7.isFunction())) {
-   return envObject_25.setLastError(2);
+  if (!value) return envObject.setLastError(1);
+  if (!object) return envObject.setLastError(1);
+  var h = emnapiCtx.handleStore.get(object);
+  if (!(h.isObject() || h.isFunction())) {
+   return envObject.setLastError(2);
   }
   if (!cname) {
-   return envObject_25.setLastError(1);
+   return envObject.setLastError(1);
   }
-  emnapiCtx.handleStore.get(object).value[UTF8ToString(cname)] = emnapiCtx.handleStore.get(value).value;
+  emnapiCtx.handleStore.get(object).value[emnapiString.UTF8ToString(cname, -1)] = emnapiCtx.handleStore.get(value).value;
   return 0;
- } catch (err_26) {
-  envObject_25.tryCatch.setError(err_26);
-  return envObject_25.setLastError(10);
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_throw(env, error) {
- if (env == 0) return 1;
- var envObject_4 = emnapiCtx.envStore.get(env);
- if (envObject_4.tryCatch.hasCaught()) return envObject_4.setLastError(10);
- envObject_4.clearLastError();
+ if (!env) return 1;
+ var envObject = emnapiCtx.envStore.get(env);
+ if (envObject.tryCatch.hasCaught()) return envObject.setLastError(10);
+ if (!envObject.canCallIntoJs()) {
+  return envObject.setLastError(envObject.moduleApiVersion === 2147483647 ? 23 : 10);
+ }
+ envObject.clearLastError();
  try {
-  if (error == 0) return envObject_4.setLastError(1);
-  envObject_4.tryCatch.setError(emnapiCtx.handleStore.get(error).value);
-  return envObject_4.clearLastError();
- } catch (err_5) {
-  envObject_4.tryCatch.setError(err_5);
-  return envObject_4.setLastError(10);
+  if (!error) return envObject.setLastError(1);
+  envObject.tryCatch.setError(emnapiCtx.handleStore.get(error).value);
+  return envObject.clearLastError();
+ } catch (err) {
+  envObject.tryCatch.setError(err);
+  return envObject.setLastError(10);
  }
 }
 
 function _napi_typeof(env, value, result) {
- if (env == 0) return 1;
+ if (!env) return 1;
  var envObject = emnapiCtx.envStore.get(env);
- if (value == 0) return envObject.setLastError(1);
- if (result == 0) return envObject.setLastError(1);
+ if (!value) return envObject.setLastError(1);
+ if (!result) return envObject.setLastError(1);
  var v = emnapiCtx.handleStore.get(value);
  var r;
  if (v.isNumber()) {
@@ -6881,22 +6994,22 @@ function _napi_typeof(env, value, result) {
  return envObject.clearLastError();
 }
 
-function __arraySum(array, index) {
+function arraySum(array, index) {
  var sum = 0;
  for (var i = 0; i <= index; sum += array[i++]) {}
  return sum;
 }
 
-var __MONTH_DAYS_LEAP = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+var MONTH_DAYS_LEAP = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
 
-var __MONTH_DAYS_REGULAR = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+var MONTH_DAYS_REGULAR = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
 
-function __addDays(date, days) {
+function addDays(date, days) {
  var newDate = new Date(date.getTime());
  while (days > 0) {
-  var leap = __isLeapYear(newDate.getFullYear());
+  var leap = isLeapYear(newDate.getFullYear());
   var currentMonth = newDate.getMonth();
-  var daysInCurrentMonth = (leap ? __MONTH_DAYS_LEAP : __MONTH_DAYS_REGULAR)[currentMonth];
+  var daysInCurrentMonth = (leap ? MONTH_DAYS_LEAP : MONTH_DAYS_REGULAR)[currentMonth];
   if (days > daysInCurrentMonth - newDate.getDate()) {
    days -= daysInCurrentMonth - newDate.getDate() + 1;
    newDate.setDate(1);
@@ -7016,7 +7129,7 @@ function _strftime(s, maxsize, format, tm) {
   }
  }
  function getWeekBasedYear(date) {
-  var thisDate = __addDays(new Date(date.tm_year + 1900, 0, 1), date.tm_yday);
+  var thisDate = addDays(new Date(date.tm_year + 1900, 0, 1), date.tm_yday);
   var janFourthThisYear = new Date(thisDate.getFullYear(), 0, 4);
   var janFourthNextYear = new Date(thisDate.getFullYear() + 1, 0, 4);
   var firstWeekStartThisYear = getFirstWeekStartDate(janFourthThisYear);
@@ -7067,7 +7180,7 @@ function _strftime(s, maxsize, format, tm) {
    return leadingNulls(twelveHour, 2);
   },
   "%j": function(date) {
-   return leadingNulls(date.tm_mday + __arraySum(__isLeapYear(date.tm_year + 1900) ? __MONTH_DAYS_LEAP : __MONTH_DAYS_REGULAR, date.tm_mon - 1), 3);
+   return leadingNulls(date.tm_mday + arraySum(isLeapYear(date.tm_year + 1900) ? MONTH_DAYS_LEAP : MONTH_DAYS_REGULAR, date.tm_mon - 1), 3);
   },
   "%m": function(date) {
    return leadingNulls(date.tm_mon + 1, 2);
@@ -7105,12 +7218,12 @@ function _strftime(s, maxsize, format, tm) {
    if (!val) {
     val = 52;
     var dec31 = (date.tm_wday + 7 - date.tm_yday - 1) % 7;
-    if (dec31 == 4 || dec31 == 5 && __isLeapYear(date.tm_year % 400 - 1)) {
+    if (dec31 == 4 || dec31 == 5 && isLeapYear(date.tm_year % 400 - 1)) {
      val++;
     }
    } else if (val == 53) {
     var jan1 = (date.tm_wday + 371 - date.tm_yday) % 7;
-    if (jan1 != 4 && (jan1 != 3 || !__isLeapYear(date.tm_year))) val = 1;
+    if (jan1 != 4 && (jan1 != 3 || !isLeapYear(date.tm_year))) val = 1;
    }
    return leadingNulls(val, 2);
   },
@@ -7188,7 +7301,7 @@ function uleb128Encode(n, target) {
 function sigToWasmTypes(sig) {
  var typeNames = {
   "i": "i32",
-  "j": "i32",
+  "j": "i64",
   "f": "f32",
   "d": "f64",
   "p": "i32"
@@ -7199,9 +7312,6 @@ function sigToWasmTypes(sig) {
  };
  for (var i = 1; i < sig.length; ++i) {
   type.parameters.push(typeNames[sig[i]]);
-  if (sig[i] === "j") {
-   type.parameters.push("i32");
-  }
  }
  return type;
 }
@@ -7299,6 +7409,8 @@ Object.defineProperties(FSNode.prototype, {
 });
 
 FS.FSNode = FSNode;
+
+FS.createPreloadedFile = FS_createPreloadedFile;
 
 FS.staticInit();
 
@@ -7440,7 +7552,7 @@ FS.init = NODERAWFS.init;
 
 emnapiExternalMemory.init();
 
-emnapiUtf8Decoder();
+emnapiString.init();
 
 var proxiedFunctionTable = [ null, _proc_exit, exitOnMainThread, pthreadCreateProxied, ___syscall_dup, ___syscall_faccessat, ___syscall_fcntl64, ___syscall_fstat64, ___syscall_ftruncate64, ___syscall_getcwd, ___syscall_ioctl, ___syscall_lstat64, ___syscall_newfstatat, ___syscall_openat, ___syscall_rmdir, ___syscall_stat64, ___syscall_unlinkat, __mmap_js, __munmap_js, _environ_get, _environ_sizes_get, _fd_close, _fd_fdstat_get, _fd_read, _fd_seek, _fd_write ];
 
@@ -7472,10 +7584,7 @@ var wasmImports = {
  "__syscall_rmdir": ___syscall_rmdir,
  "__syscall_stat64": ___syscall_stat64,
  "__syscall_unlinkat": ___syscall_unlinkat,
- "_dlinit": __dlinit,
- "_dlopen_js": __dlopen_js,
- "_dlsym_catchup_js": __dlsym_catchup_js,
- "_emnapi_call_into_module": __emnapi_call_into_module,
+ "_emnapi_callback_into_module": __emnapi_callback_into_module,
  "_emnapi_ctx_decrease_waiting_request_counter": __emnapi_ctx_decrease_waiting_request_counter,
  "_emnapi_ctx_increase_waiting_request_counter": __emnapi_ctx_increase_waiting_request_counter,
  "_emnapi_get_last_error_info": __emnapi_get_last_error_info,
@@ -7484,11 +7593,11 @@ var wasmImports = {
  "_emnapi_node_make_callback": __emnapi_node_make_callback,
  "_emnapi_set_immediate": __emnapi_set_immediate,
  "_emnapi_worker_unref": __emnapi_worker_unref,
- "_emscripten_default_pthread_stack_size": __emscripten_default_pthread_stack_size,
- "_emscripten_err": __emscripten_err,
  "_emscripten_get_now_is_monotonic": __emscripten_get_now_is_monotonic,
- "_emscripten_notify_task_queue": __emscripten_notify_task_queue,
+ "_emscripten_notify_mailbox_postmessage": __emscripten_notify_mailbox_postmessage,
  "_emscripten_set_offscreencanvas_size": __emscripten_set_offscreencanvas_size,
+ "_emscripten_thread_mailbox_await": __emscripten_thread_mailbox_await,
+ "_emscripten_thread_set_strongref": __emscripten_thread_set_strongref,
  "_emscripten_throw_longjmp": __emscripten_throw_longjmp,
  "_gmtime_js": __gmtime_js,
  "_localtime_js": __localtime_js,
@@ -7499,15 +7608,14 @@ var wasmImports = {
  "emnapi_is_node_binding_available": _emnapi_is_node_binding_available,
  "emscripten_check_blocking_allowed": _emscripten_check_blocking_allowed,
  "emscripten_date_now": _emscripten_date_now,
+ "emscripten_exit_with_live_runtime": _emscripten_exit_with_live_runtime,
  "emscripten_get_heap_max": _emscripten_get_heap_max,
  "emscripten_get_now": _emscripten_get_now,
- "emscripten_memcpy_big": _emscripten_memcpy_big,
  "emscripten_num_logical_cores": _emscripten_num_logical_cores,
  "emscripten_receive_on_main_thread_js": _emscripten_receive_on_main_thread_js,
  "emscripten_resize_heap": _emscripten_resize_heap,
  "emscripten_runtime_keepalive_pop": _emscripten_runtime_keepalive_pop,
  "emscripten_runtime_keepalive_push": _emscripten_runtime_keepalive_push,
- "emscripten_unwind_to_js_event_loop": _emscripten_unwind_to_js_event_loop,
  "environ_get": _environ_get,
  "environ_sizes_get": _environ_sizes_get,
  "exit": _exit,
@@ -7525,10 +7633,12 @@ var wasmImports = {
  "invoke_i": invoke_i,
  "invoke_ii": invoke_ii,
  "invoke_iidi": invoke_iidi,
+ "invoke_iif": invoke_iif,
  "invoke_iii": invoke_iii,
  "invoke_iiid": invoke_iiid,
  "invoke_iiii": invoke_iiii,
  "invoke_iiiii": invoke_iiiii,
+ "invoke_iiiiid": invoke_iiiiid,
  "invoke_iiiiii": invoke_iiiiii,
  "invoke_iiiiiii": invoke_iiiiiii,
  "invoke_iiiiiiii": invoke_iiiiiiii,
@@ -7536,13 +7646,13 @@ var wasmImports = {
  "invoke_iiiiiiiiiii": invoke_iiiiiiiiiii,
  "invoke_iiiiiiiiiiii": invoke_iiiiiiiiiiii,
  "invoke_iiiiiiiiiiiii": invoke_iiiiiiiiiiiii,
+ "invoke_iiiiiiiiiiiiiiiii": invoke_iiiiiiiiiiiiiiiii,
  "invoke_iiiiij": invoke_iiiiij,
  "invoke_iiijii": invoke_iiijii,
  "invoke_iij": invoke_iij,
  "invoke_ji": invoke_ji,
  "invoke_jii": invoke_jii,
  "invoke_jiiii": invoke_jiiii,
- "invoke_jiji": invoke_jiji,
  "invoke_v": invoke_v,
  "invoke_vi": invoke_vi,
  "invoke_vid": invoke_vid,
@@ -7632,17 +7742,19 @@ var _free = asm["free"];
 
 var _malloc = asm["malloc"];
 
+var _uv__threadpool_cleanup = Module["_uv__threadpool_cleanup"] = asm["uv__threadpool_cleanup"];
+
 var ___errno_location = asm["__errno_location"];
 
-var _emscripten_main_browser_thread_id = asm["emscripten_main_browser_thread_id"];
+var _emscripten_main_runtime_thread_id = asm["emscripten_main_runtime_thread_id"];
 
 var _pthread_self = Module["_pthread_self"] = asm["pthread_self"];
 
-var getTempRet0 = asm["getTempRet0"];
-
 var ___cxa_free_exception = asm["__cxa_free_exception"];
 
-var _napi_register_wasm_v1 = Module["_napi_register_wasm_v1"] = asm["napi_register_wasm_v1"];
+var _node_api_module_get_api_version_v1 = asm["node_api_module_get_api_version_v1"];
+
+var _napi_register_wasm_v1 = asm["napi_register_wasm_v1"];
 
 var _vips_shutdown = Module["_vips_shutdown"] = asm["vips_shutdown"];
 
@@ -7651,8 +7763,6 @@ var _ntohs = asm["ntohs"];
 var __emscripten_tls_init = Module["__emscripten_tls_init"] = asm["_emscripten_tls_init"];
 
 var _emscripten_builtin_memalign = asm["emscripten_builtin_memalign"];
-
-var ___dl_seterr = asm["__dl_seterr"];
 
 var __emscripten_thread_init = Module["__emscripten_thread_init"] = asm["_emscripten_thread_init"];
 
@@ -7664,19 +7774,17 @@ var _htons = asm["htons"];
 
 var _htonl = asm["htonl"];
 
-var _emscripten_run_in_main_runtime_thread_js = asm["emscripten_run_in_main_runtime_thread_js"];
+var __emscripten_run_in_main_runtime_thread_js = asm["_emscripten_run_in_main_runtime_thread_js"];
 
 var _emscripten_dispatch_to_thread_ = asm["emscripten_dispatch_to_thread_"];
-
-var __emscripten_proxy_execute_task_queue = Module["__emscripten_proxy_execute_task_queue"] = asm["_emscripten_proxy_execute_task_queue"];
 
 var __emscripten_thread_free_data = asm["_emscripten_thread_free_data"];
 
 var __emscripten_thread_exit = Module["__emscripten_thread_exit"] = asm["_emscripten_thread_exit"];
 
-var _setThrew = asm["setThrew"];
+var __emscripten_check_mailbox = Module["__emscripten_check_mailbox"] = asm["_emscripten_check_mailbox"];
 
-var _saveSetjmp = asm["saveSetjmp"];
+var _setThrew = asm["setThrew"];
 
 var setTempRet0 = asm["setTempRet0"];
 
@@ -7688,15 +7796,17 @@ var stackRestore = asm["stackRestore"];
 
 var stackAlloc = asm["stackAlloc"];
 
-var ___get_exception_message = asm["__get_exception_message"];
+var ___cxa_decrement_exception_refcount = asm["__cxa_decrement_exception_refcount"];
+
+var ___cxa_increment_exception_refcount = asm["__cxa_increment_exception_refcount"];
 
 var ___cxa_can_catch = asm["__cxa_can_catch"];
 
 var ___cxa_is_pointer_type = asm["__cxa_is_pointer_type"];
 
-var ___start_em_js = Module["___start_em_js"] = 1900584;
+var ___start_em_js = Module["___start_em_js"] = 1888712;
 
-var ___stop_em_js = Module["___stop_em_js"] = 1911012;
+var ___stop_em_js = Module["___stop_em_js"] = 1899140;
 
 function invoke_vii(index, a1, a2) {
  var sp = stackSave();
@@ -7704,7 +7814,7 @@ function invoke_vii(index, a1, a2) {
   getWasmTableEntry(index)(a1, a2);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7715,7 +7825,7 @@ function invoke_iiii(index, a1, a2, a3) {
   return getWasmTableEntry(index)(a1, a2, a3);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7726,7 +7836,7 @@ function invoke_viii(index, a1, a2, a3) {
   getWasmTableEntry(index)(a1, a2, a3);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7737,7 +7847,7 @@ function invoke_dii(index, a1, a2) {
   return getWasmTableEntry(index)(a1, a2);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7748,7 +7858,7 @@ function invoke_iii(index, a1, a2) {
   return getWasmTableEntry(index)(a1, a2);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7759,7 +7869,7 @@ function invoke_viiiii(index, a1, a2, a3, a4, a5) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7770,7 +7880,7 @@ function invoke_ii(index, a1) {
   return getWasmTableEntry(index)(a1);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7781,7 +7891,7 @@ function invoke_jii(index, a1, a2) {
   return getWasmTableEntry(index)(a1, a2);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
   return 0n;
  }
@@ -7793,7 +7903,7 @@ function invoke_i(index) {
   return getWasmTableEntry(index)();
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7804,7 +7914,7 @@ function invoke_viiiiiii(index, a1, a2, a3, a4, a5, a6, a7) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7815,7 +7925,7 @@ function invoke_vid(index, a1, a2) {
   getWasmTableEntry(index)(a1, a2);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7826,7 +7936,7 @@ function invoke_iiid(index, a1, a2, a3) {
   return getWasmTableEntry(index)(a1, a2, a3);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7837,40 +7947,7 @@ function invoke_viiii(index, a1, a2, a3, a4) {
   getWasmTableEntry(index)(a1, a2, a3, a4);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
-  _setThrew(1, 0);
- }
-}
-
-function invoke_iiiiii(index, a1, a2, a3, a4, a5) {
- var sp = stackSave();
- try {
-  return getWasmTableEntry(index)(a1, a2, a3, a4, a5);
- } catch (e) {
-  stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
-  _setThrew(1, 0);
- }
-}
-
-function invoke_viid(index, a1, a2, a3) {
- var sp = stackSave();
- try {
-  getWasmTableEntry(index)(a1, a2, a3);
- } catch (e) {
-  stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
-  _setThrew(1, 0);
- }
-}
-
-function invoke_v(index) {
- var sp = stackSave();
- try {
-  getWasmTableEntry(index)();
- } catch (e) {
-  stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7881,7 +7958,40 @@ function invoke_vi(index, a1) {
   getWasmTableEntry(index)(a1);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_iiiiii(index, a1, a2, a3, a4, a5) {
+ var sp = stackSave();
+ try {
+  return getWasmTableEntry(index)(a1, a2, a3, a4, a5);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_viid(index, a1, a2, a3) {
+ var sp = stackSave();
+ try {
+  getWasmTableEntry(index)(a1, a2, a3);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_v(index) {
+ var sp = stackSave();
+ try {
+  getWasmTableEntry(index)();
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7892,7 +8002,7 @@ function invoke_iiiii(index, a1, a2, a3, a4) {
   return getWasmTableEntry(index)(a1, a2, a3, a4);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7903,7 +8013,7 @@ function invoke_iiiiiiii(index, a1, a2, a3, a4, a5, a6, a7) {
   return getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7914,7 +8024,7 @@ function invoke_iiiiiii(index, a1, a2, a3, a4, a5, a6) {
   return getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7925,7 +8035,7 @@ function invoke_di(index, a1) {
   return getWasmTableEntry(index)(a1);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7936,7 +8046,7 @@ function invoke_iidi(index, a1, a2, a3) {
   return getWasmTableEntry(index)(a1, a2, a3);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7947,7 +8057,7 @@ function invoke_viiddi(index, a1, a2, a3, a4, a5) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7958,7 +8068,7 @@ function invoke_viiiiii(index, a1, a2, a3, a4, a5, a6) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7969,7 +8079,7 @@ function invoke_viidi(index, a1, a2, a3, a4) {
   getWasmTableEntry(index)(a1, a2, a3, a4);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7980,7 +8090,7 @@ function invoke_viiid(index, a1, a2, a3, a4) {
   getWasmTableEntry(index)(a1, a2, a3, a4);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -7991,7 +8101,7 @@ function invoke_viiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8002,7 +8112,7 @@ function invoke_viiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8013,7 +8123,7 @@ function invoke_viiiiddi(index, a1, a2, a3, a4, a5, a6, a7) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8024,7 +8134,7 @@ function invoke_viiddid(index, a1, a2, a3, a4, a5, a6) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8035,7 +8145,7 @@ function invoke_viidddddd(index, a1, a2, a3, a4, a5, a6, a7, a8) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8046,7 +8156,7 @@ function invoke_viidd(index, a1, a2, a3, a4) {
   getWasmTableEntry(index)(a1, a2, a3, a4);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8057,7 +8167,18 @@ function invoke_iiiiij(index, a1, a2, a3, a4, a5) {
   return getWasmTableEntry(index)(a1, a2, a3, a4, a5);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_iiiiid(index, a1, a2, a3, a4, a5) {
+ var sp = stackSave();
+ try {
+  return getWasmTableEntry(index)(a1, a2, a3, a4, a5);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8068,7 +8189,7 @@ function invoke_iiiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) {
   return getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8079,7 +8200,7 @@ function invoke_jiiii(index, a1, a2, a3, a4) {
   return getWasmTableEntry(index)(a1, a2, a3, a4);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
   return 0n;
  }
@@ -8091,7 +8212,7 @@ function invoke_iiiiiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a1
   return getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8102,7 +8223,7 @@ function invoke_fiii(index, a1, a2, a3) {
   return getWasmTableEntry(index)(a1, a2, a3);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8113,7 +8234,7 @@ function invoke_diii(index, a1, a2, a3) {
   return getWasmTableEntry(index)(a1, a2, a3);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8124,7 +8245,7 @@ function invoke_iiiiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11
   return getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8135,7 +8256,7 @@ function invoke_viiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) {
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8146,7 +8267,7 @@ function invoke_viiiiiiiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10,
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8157,19 +8278,7 @@ function invoke_ji(index, a1) {
   return getWasmTableEntry(index)(a1);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
-  _setThrew(1, 0);
-  return 0n;
- }
-}
-
-function invoke_jiji(index, a1, a2, a3) {
- var sp = stackSave();
- try {
-  return getWasmTableEntry(index)(a1, a2, a3);
- } catch (e) {
-  stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
   return 0n;
  }
@@ -8181,7 +8290,18 @@ function invoke_iij(index, a1, a2) {
   return getWasmTableEntry(index)(a1, a2);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_iif(index, a1, a2) {
+ var sp = stackSave();
+ try {
+  return getWasmTableEntry(index)(a1, a2);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8192,7 +8312,18 @@ function invoke_viij(index, a1, a2, a3) {
   getWasmTableEntry(index)(a1, a2, a3);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_iiiiiiiiiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16) {
+ var sp = stackSave();
+ try {
+  return getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8203,7 +8334,7 @@ function invoke_iiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9) {
   return getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8214,7 +8345,7 @@ function invoke_diiii(index, a1, a2, a3, a4) {
   return getWasmTableEntry(index)(a1, a2, a3, a4);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8225,7 +8356,7 @@ function invoke_viiiiiiiiiii(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11
   getWasmTableEntry(index)(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }
@@ -8236,7 +8367,7 @@ function invoke_iiijii(index, a1, a2, a3, a4, a5) {
   return getWasmTableEntry(index)(a1, a2, a3, a4, a5);
  } catch (e) {
   stackRestore(sp);
-  if (!(e instanceof EmscriptenEH)) throw e;
+  if (e !== e + 0) throw e;
   _setThrew(1, 0);
  }
 }

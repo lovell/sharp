@@ -73,6 +73,7 @@
       'NAPI_VERSION=7'
     ],
     'dependencies': [
+      '<!(node -p "require(\'node-addon-api\').gyp")',
       'libvips-cpp'
     ],
     'variables': {
@@ -100,6 +101,9 @@
       'src/utilities.cc',
       'src/sharp.cc'
     ],
+    'include_dirs': [
+      '<!(node -p "require(\'node-addon-api\').include_dir")',
+    ],
     'conditions': [
       ['OS == "emscripten"', {
         # .js because that's how Emscripten knows what to build, and .node
@@ -125,25 +129,13 @@
           '-sTEXTDECODER=0',
           # Support 64-bit integers.
           '-sWASM_BIGINT',
-          # CPU cores + 3 extra threads for libvips + 1 extra thread for an emnapi async task.
-          '-sPTHREAD_POOL_SIZE="vipsConcurrency+3+1"',
-          '-sPTHREAD_POOL_SIZE_STRICT=2',
-          # Don't wait for the pthread pool to keep initialization synchronous.
-          '-sPTHREAD_POOL_DELAY_LOAD',
 
           # We're building only for Node.js for now
           '-sENVIRONMENT=node',
           # Propagate filesystem to Node.js.
           '-sNODERAWFS',
-          # Exit helper
-          '-sEXPORTED_FUNCTIONS=["_vips_shutdown"]',
-        ],
-      }, {
-        'dependencies': [
-          '<!(node -p "require(\'node-addon-api\').gyp")',
-        ],
-        'include_dirs': [
-          '<!(node -p "require(\'node-addon-api\').include_dir")',
+          # Exit helpers
+          '-sEXPORTED_FUNCTIONS=["_vips_shutdown", "_uv__threadpool_cleanup"]',
         ],
       }],
       ['use_global_libvips == "true"', {
