@@ -14,8 +14,7 @@
     "benchmark": "2.1.4",
     "gm": "1.25.0",
     "imagemagick": "0.1.3",
-    "jimp": "0.22.7",
-    "semver": "7.3.8"
+    "jimp": "0.22.7"
   },
   "optionalDependencies": {
     "@tensorflow/tfjs-node": "4.2.0",
