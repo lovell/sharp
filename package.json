@@ -131,10 +131,10 @@
     "vips"
   ],
   "dependencies": {
-    "@emnapi/runtime": "^0.40.0",
+    "@emnapi/runtime": "^0.41.0",
     "color": "^4.2.3",
     "detect-libc": "^2.0.1",
-    "node-addon-api": "^6.0.0",
+    "node-addon-api": "^6.1.0",
     "prebuild-install": "^7.1.1",
     "semver": "^7.3.8",
     "simple-get": "^4.0.1",
@@ -145,7 +145,7 @@
     "async": "^3.2.4",
     "cc": "^3.0.1",
     "documentation": "^14.0.1",
-    "emnapi": "file:emnapi/packages/emnapi",
+    "emnapi": "^0.41.0",
     "exif-reader": "^1.0.3",
     "extract-zip": "^2.0.1",
     "icc": "^2.0.0",

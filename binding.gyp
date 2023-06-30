@@ -135,7 +135,7 @@
           # Propagate filesystem to Node.js.
           '-sNODERAWFS',
           # Exit helpers
-          '-sEXPORTED_FUNCTIONS=["_vips_shutdown", "_uv__threadpool_cleanup"]',
+          '-sEXPORTED_FUNCTIONS=["_vips_shutdown", "_uv_library_shutdown"]',
         ],
       }],
       ['use_global_libvips == "true"', {

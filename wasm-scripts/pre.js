@@ -1,4 +1,4 @@
-/* global Module, ENV, _vips_shutdown */
+/* global Module, ENV, _vips_shutdown, _uv_library_shutdown */
 
 let vipsConcurrency;
 if ('webcontainer' in process.versions) {
@@ -32,7 +32,7 @@ Module.onRuntimeInitialized = () => {
   // This doesn't matter too much in real Node.js, but it does in WebContainer.
   process.once('exit', () => {
     _vips_shutdown();
-    _uv__threadpool_cleanup();
+    _uv_library_shutdown();
   });
 
   module.exports = emnapi;
