@@ -89,7 +89,7 @@
     "Ingvar Stepanyan <me@rreverser.com>"
   ],
   "scripts": {
-    "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
+    "install": "(node install/libvips && node install/dll-copy && prebuild-install) || node install/noop-wasm || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run test-lint && npm run test-unit && npm run test-licensing",
     "test-lint": "semistandard && cpplint",

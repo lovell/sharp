@@ -121,6 +121,9 @@ try {
     process.exit(1);
   } else if (libvips.hasVendoredLibvips()) {
     libvips.log(`Using existing vendored libvips v${minimumLibvipsVersion}`);
+  } else if (process.env.npm_config_arch?.startsWith('wasm')) {
+    libvips.log('Using WebAssembly build');
+    process.exit(1);
   } else {
     // Is this arch/platform supported?
     const arch = process.env.npm_config_arch || process.arch;
