@@ -56,7 +56,7 @@ describe('Utilities', function () {
       let expected = 16;
       const actual = sharp.concurrency(expected);
       if (process.env.npm_config_arch?.startsWith('wasm')) {
-        expected = Math.min(expected, require('os').cpus().length);
+        expected = 'webcontainer' in process.versions ? 2 : Math.min(expected, require('os').cpus().length);
       }
       assert.strictEqual(actual, expected);
     });
