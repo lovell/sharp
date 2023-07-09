@@ -153,7 +153,7 @@
     "mocha": "^10.2.0",
     "mock-fs": "^5.2.0",
     "nyc": "^15.1.0",
-    "prebuild": "lovell/prebuild#node-gyp-9",
+    "prebuild": "lovell/prebuild#add-nodejs-20-drop-nodejs-10-and-12",
     "semistandard": "^16.0.1",
     "tsd": "^0.28.1"
   },
