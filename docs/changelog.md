@@ -16,6 +16,9 @@ Requires libvips v8.14.2
   [#3674](https://github.com/lovell/sharp/pull/3674)
   [@bianjunjie1981](https://github.com/bianjunjie1981)
 
+* Prevent over-compute in affine-based rotate before resize.
+  [#3722](https://github.com/lovell/sharp/issues/3722)
+
 ### v0.32.1 - 27th April 2023
 
 * Add experimental `unflatten` operation.

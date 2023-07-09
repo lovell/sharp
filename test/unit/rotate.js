@@ -473,4 +473,20 @@ describe('Rotation', function () {
     assert.strictEqual(g, 64);
     assert.strictEqual(b, 30);
   });
+
+  it('Resize after affine-based rotation does not overcompute', async () =>
+    sharp({
+      create: {
+        width: 4640,
+        height: 2610,
+        channels: 3,
+        background: 'black'
+      }
+    })
+      .rotate(28)
+      .resize({ width: 640, height: 360 })
+      .raw()
+      .timeout({ seconds: 5 })
+      .toBuffer()
+  );
 });

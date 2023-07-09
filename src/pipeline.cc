@@ -116,7 +116,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           MultiPageUnsupported(nPages, "Rotate");
           std::vector<double> background;
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, FALSE);
-          image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
+          image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background)).cache();
         }
       }
 
