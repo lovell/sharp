@@ -16,6 +16,9 @@ Requires libvips v8.14.2
   [#3674](https://github.com/lovell/sharp/pull/3674)
   [@bianjunjie1981](https://github.com/bianjunjie1981)
 
+* Guard use of smartcrop premultiplied option to prevent warning (regression in 0.32.1).
+  [#3710](https://github.com/lovell/sharp/issues/3710)
+
 * Prevent over-compute in affine-based rotate before resize.
   [#3722](https://github.com/lovell/sharp/issues/3722)
 
