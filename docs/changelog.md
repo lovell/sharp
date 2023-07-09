@@ -19,6 +19,9 @@ Requires libvips v8.14.2
 * Prevent over-compute in affine-based rotate before resize.
   [#3722](https://github.com/lovell/sharp/issues/3722)
 
+* Allow sequential read for EXIF-based auto-orientation.
+  [#3725](https://github.com/lovell/sharp/issues/3725)
+
 ### v0.32.1 - 27th April 2023
 
 * Add experimental `unflatten` operation.
