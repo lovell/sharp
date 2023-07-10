@@ -669,6 +669,10 @@ namespace sharp {
       if (image.width() > 65535 || height > 65535) {
         throw vips::VError("Processed image is too large for the GIF format");
       }
+    } else if (imageType == ImageType::HEIF) {
+      if (image.width() > 16384 || height > 16384) {
+        throw vips::VError("Processed image is too large for the HEIF format");
+      }
     }
   }
 

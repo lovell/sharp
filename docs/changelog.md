@@ -6,6 +6,8 @@ Requires libvips v8.14.2
 
 ### v0.32.2 - TBD
 
+* Limit HEIF output dimensions to 16384x16384, matches libvips.
+
 * Ensure exceptions are not thrown when terminating.
   [#3569](https://github.com/lovell/sharp/issues/3569)
 
