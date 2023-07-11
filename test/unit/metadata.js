@@ -55,8 +55,8 @@ describe('Image metadata', function () {
       assert.strictEqual(true, metadata.exif instanceof Buffer);
       const exif = exifReader(metadata.exif);
       assert.strictEqual('object', typeof exif);
-      assert.strictEqual('object', typeof exif.image);
-      assert.strictEqual('number', typeof exif.image.XResolution);
+      assert.strictEqual('object', typeof exif.Image);
+      assert.strictEqual('number', typeof exif.Image.XResolution);
       // ICC
       assert.strictEqual('object', typeof metadata.icc);
       assert.strictEqual(true, metadata.icc instanceof Buffer);
@@ -523,8 +523,8 @@ describe('Image metadata', function () {
           // EXIF
           const exif = exifReader(metadata.exif);
           assert.strictEqual('object', typeof exif);
-          assert.strictEqual('object', typeof exif.image);
-          assert.strictEqual('number', typeof exif.image.XResolution);
+          assert.strictEqual('object', typeof exif.Image);
+          assert.strictEqual('number', typeof exif.Image.XResolution);
           // ICC
           assert.strictEqual('object', typeof metadata.icc);
           assert.strictEqual(true, metadata.icc instanceof Buffer);
@@ -589,8 +589,8 @@ describe('Image metadata', function () {
           // EXIF
           const exif = exifReader(metadata.exif);
           assert.strictEqual('object', typeof exif);
-          assert.strictEqual('object', typeof exif.image);
-          assert.strictEqual('number', typeof exif.image.XResolution);
+          assert.strictEqual('object', typeof exif.Image);
+          assert.strictEqual('number', typeof exif.Image.XResolution);
           // ICC
           assert.strictEqual('object', typeof metadata.icc);
           assert.strictEqual(true, metadata.icc instanceof Buffer);
@@ -656,8 +656,8 @@ describe('Image metadata', function () {
 
     const { exif } = await sharp(data).metadata();
     const parsedExif = exifReader(exif);
-    assert.strictEqual(parsedExif.image.Software, 'sharp');
-    assert.strictEqual(parsedExif.exif.ExposureTime, 0.2);
+    assert.strictEqual(parsedExif.Image.Software, 'sharp');
+    assert.strictEqual(parsedExif.Photo.ExposureTime, 0.2);
   });
 
   it('Set density of JPEG', async () => {
