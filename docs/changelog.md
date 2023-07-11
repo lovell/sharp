@@ -4,7 +4,7 @@
 
 Requires libvips v8.14.2
 
-### v0.32.2 - TBD
+### v0.32.2 - 11th July 2023
 
 * Limit HEIF output dimensions to 16384x16384, matches libvips.
 
