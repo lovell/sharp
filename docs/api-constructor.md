@@ -22,7 +22,7 @@ Implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_st
 | --- | --- | --- | --- |
 | [input] | <code>Buffer</code> \| <code>ArrayBuffer</code> \| <code>Uint8Array</code> \| <code>Uint8ClampedArray</code> \| <code>Int8Array</code> \| <code>Uint16Array</code> \| <code>Int16Array</code> \| <code>Uint32Array</code> \| <code>Int32Array</code> \| <code>Float32Array</code> \| <code>Float64Array</code> \| <code>string</code> |  | if present, can be  a Buffer / ArrayBuffer / Uint8Array / Uint8ClampedArray containing JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image data, or  a TypedArray containing raw pixel image data, or  a String containing the filesystem path to an JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image file.  JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present. |
 | [options] | <code>Object</code> |  | if present, is an Object with optional attributes. |
-| [options.failOn] | <code>string</code> | <code>&quot;&#x27;warning&#x27;&quot;</code> | when to abort processing of invalid pixel data, one of (in order of sensitivity): 'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels, invalid metadata will always abort. |
+| [options.failOn] | <code>string</code> | <code>&quot;&#x27;warning&#x27;&quot;</code> | when to abort processing of invalid pixel data, one of (in order of sensitivity): 'none' (least), 'truncated', 'error' or 'warning' (most), higher levels imply lower levels, invalid metadata will always abort. |
 | [options.limitInputPixels] | <code>number</code> \| <code>boolean</code> | <code>268402689</code> | Do not process input images where the number of pixels  (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.  An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). |
 | [options.unlimited] | <code>boolean</code> | <code>false</code> | Set this to `true` to remove safety features that help prevent memory exhaustion (JPEG, PNG, SVG, HEIF). |
 | [options.sequentialRead] | <code>boolean</code> | <code>true</code> | Set this to `false` to use random access rather than sequential read. Some operations will do this automatically. |
@@ -84,7 +84,7 @@ readableStream.pipe(transformer).pipe(writableStream);
 ```
 **Example**  
 ```js
-// Create a blank 300x200 PNG image of semi-transluent red pixels
+// Create a blank 300x200 PNG image of semi-translucent red pixels
 sharp({
   create: {
     width: 300,

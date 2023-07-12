@@ -42,14 +42,14 @@ and https://www.cairographics.org/operators/
 | [images[].input.text.align] | <code>string</code> | <code>&quot;&#x27;left&#x27;&quot;</code> | text alignment (`'left'`, `'centre'`, `'center'`, `'right'`). |
 | [images[].input.text.justify] | <code>boolean</code> | <code>false</code> | set this to true to apply justification to the text. |
 | [images[].input.text.dpi] | <code>number</code> | <code>72</code> | the resolution (size) at which to render the text. Does not take effect if `height` is specified. |
-| [images[].input.text.rgba] | <code>boolean</code> | <code>false</code> | set this to true to enable RGBA output. This is useful for colour emoji rendering, or support for pango markup features like `<span foreground="red">Red!</span>`. |
+| [images[].input.text.rgba] | <code>boolean</code> | <code>false</code> | set this to true to enable RGBA output. This is useful for colour emoji rendering, or support for Pango markup features like `<span foreground="red">Red!</span>`. |
 | [images[].input.text.spacing] | <code>number</code> | <code>0</code> | text line height in points. Will use the font line height if none is specified. |
 | [images[].blend] | <code>String</code> | <code>&#x27;over&#x27;</code> | how to blend this image with the image below. |
 | [images[].gravity] | <code>String</code> | <code>&#x27;centre&#x27;</code> | gravity at which to place the overlay. |
 | [images[].top] | <code>Number</code> |  | the pixel offset from the top edge. |
 | [images[].left] | <code>Number</code> |  | the pixel offset from the left edge. |
 | [images[].tile] | <code>Boolean</code> | <code>false</code> | set to true to repeat the overlay image across the entire image with the given `gravity`. |
-| [images[].premultiplied] | <code>Boolean</code> | <code>false</code> | set to true to avoid premultipling the image below. Equivalent to the `--premultiplied` vips option. |
+| [images[].premultiplied] | <code>Boolean</code> | <code>false</code> | set to true to avoid premultiplying the image below. Equivalent to the `--premultiplied` vips option. |
 | [images[].density] | <code>Number</code> | <code>72</code> | number representing the DPI for vector overlay image. |
 | [images[].raw] | <code>Object</code> |  | describes overlay when using raw pixel data. |
 | [images[].raw.width] | <code>Number</code> |  |  |

@@ -3,7 +3,7 @@ Rotate the output image by either an explicit angle
 or auto-orient based on the EXIF `Orientation` tag.
 
 If an angle is provided, it is converted to a valid positive degree rotation.
-For example, `-450` will produce a 270deg rotation.
+For example, `-450` will produce a 270 degree rotation.
 
 When rotating by an angle other than a multiple of 90,
 the background colour can be provided with the `background` option.
@@ -533,7 +533,7 @@ await sharp(rgbInput)
 
 
 ## recomb
-Recomb the image with the specified matrix.
+Recombine the image with the specified matrix.
 
 
 **Throws**:
@@ -556,7 +556,7 @@ sharp(input)
   ])
   .raw()
   .toBuffer(function(err, data, info) {
-    // data contains the raw pixel data after applying the recomb
+    // data contains the raw pixel data after applying the matrix
     // With this example input, a sepia filter has been applied
   });
 ```
@@ -607,7 +607,7 @@ const output = await sharp(input)
 ```
 **Example**  
 ```js
-// decreate brightness and saturation while also hue-rotating by 90 degrees
+// decrease brightness and saturation while also hue-rotating by 90 degrees
 const output = await sharp(input)
   .modulate({
     brightness: 0.5,
