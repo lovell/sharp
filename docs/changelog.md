@@ -4,6 +4,11 @@
 
 Requires libvips v8.14.2
 
+### v0.32.3 - TBD
+
+* Ensure decoding remains sequential for all operations (regression in 0.32.2).
+  [#3725](https://github.com/lovell/sharp/issues/3725)
+
 ### v0.32.2 - 11th July 2023
 
 * Limit HEIF output dimensions to 16384x16384, matches libvips.

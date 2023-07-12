@@ -370,6 +370,11 @@ namespace sharp {
   std::pair<double, double> ResolveShrink(int width, int height, int targetWidth, int targetHeight,
     Canvas canvas, bool swap, bool withoutEnlargement, bool withoutReduction);
 
+  /*
+    Ensure decoding remains sequential.
+  */
+  VImage StaySequential(VImage image, VipsAccess access, bool condition = TRUE);
+
 }  // namespace sharp
 
 #endif  // SRC_COMMON_H_

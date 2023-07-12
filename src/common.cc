@@ -1035,4 +1035,13 @@ namespace sharp {
     return std::make_pair(hshrink, vshrink);
   }
 
+  /*
+    Ensure decoding remains sequential.
+  */
+  VImage StaySequential(VImage image, VipsAccess access, bool condition) {
+    if (access == VIPS_ACCESS_SEQUENTIAL && condition) {
+      return image.copy_memory();
+    }
+    return image;
+  }
 }  // namespace sharp

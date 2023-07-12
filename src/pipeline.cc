@@ -56,6 +56,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       vips::VImage image;
       sharp::ImageType inputImageType;
       std::tie(image, inputImageType) = sharp::OpenInput(baton->input);
+      VipsAccess access = baton->input->access;
       image = sharp::EnsureColourspace(image, baton->colourspaceInput);
 
       int nPages = baton->input->pages;
@@ -79,9 +80,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Rotate and flip image according to Exif orientation
         std::tie(autoRotation, autoFlip, autoFlop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
         image = sharp::RemoveExifOrientation(image);
-        if (baton->input->access == VIPS_ACCESS_SEQUENTIAL && (autoRotation != VIPS_ANGLE_D0 || autoFlip)) {
-          image = image.copy_memory();
-        }
       } else {
         rotation = CalculateAngleRotation(baton->angle);
       }
@@ -93,6 +91,13 @@ class PipelineWorker : public Napi::AsyncWorker {
           baton->rotationAngle != 0.0);
 
       if (shouldRotateBefore) {
+        image = sharp::StaySequential(image, access,
+          rotation != VIPS_ANGLE_D0 ||
+          autoRotation != VIPS_ANGLE_D0 ||
+          autoFlip ||
+          baton->flip ||
+          baton->rotationAngle != 0.0);
+
         if (autoRotation != VIPS_ANGLE_D0) {
           image = image.rot(autoRotation);
           autoRotation = VIPS_ANGLE_D0;
@@ -126,6 +131,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Trim
       if (baton->trimThreshold > 0.0) {
         MultiPageUnsupported(nPages, "Trim");
+        image = sharp::StaySequential(image, access);
         image = sharp::Trim(image, baton->trimBackground, baton->trimThreshold);
         baton->trimOffsetLeft = image.xoffset();
         baton->trimOffsetTop = image.yoffset();
@@ -212,7 +218,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // pdfload* and svgload*
       if (jpegShrinkOnLoad > 1) {
         vips::VOption *option = VImage::option()
-          ->set("access", baton->input->access)
+          ->set("access", access)
           ->set("shrink", jpegShrinkOnLoad)
           ->set("unlimited", baton->input->unlimited)
           ->set("fail_on", baton->input->failOn);
@@ -227,7 +233,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       } else if (scale != 1.0) {
         vips::VOption *option = VImage::option()
-          ->set("access", baton->input->access)
+          ->set("access", access)
           ->set("scale", scale)
           ->set("fail_on", baton->input->failOn);
         if (inputImageType == sharp::ImageType::WEBP) {
@@ -379,6 +385,11 @@ class PipelineWorker : public Napi::AsyncWorker {
           ->set("kernel", baton->kernel));
       }
 
+      image = sharp::StaySequential(image, access,
+        autoRotation != VIPS_ANGLE_D0 ||
+        baton->flip ||
+        autoFlip ||
+        rotation != VIPS_ANGLE_D0);
       // Auto-rotate post-extract
       if (autoRotation != VIPS_ANGLE_D0) {
         image = image.rot(autoRotation);
@@ -402,7 +413,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         sharp::ImageType joinImageType = sharp::ImageType::UNKNOWN;
 
         for (unsigned int i = 0; i < baton->joinChannelIn.size(); i++) {
-          baton->joinChannelIn[i]->access = baton->input->access;
+          baton->joinChannelIn[i]->access = access;
           std::tie(joinImage, joinImageType) = sharp::OpenInput(baton->joinChannelIn[i]);
           joinImage = sharp::EnsureColourspace(joinImage, baton->colourspaceInput);
           image = image.bandjoin(joinImage);
@@ -471,10 +482,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
             // Attention-based or Entropy-based crop
             MultiPageUnsupported(nPages, "Resize strategy");
-            image = image.tilecache(VImage::option()
-              ->set("access", VIPS_ACCESS_RANDOM)
-              ->set("threaded", TRUE));
-
+            image = sharp::StaySequential(image, access);
             image = image.smartcrop(baton->width, baton->height, VImage::option()
               ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION)
 #if (VIPS_MAJOR_VERSION >= 8 && VIPS_MINOR_VERSION >= 15)
@@ -495,6 +503,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Rotate post-extract non-90 angle
       if (!baton->rotateBeforePreExtract && baton->rotationAngle != 0.0) {
         MultiPageUnsupported(nPages, "Rotate");
+        image = sharp::StaySequential(image, access);
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, shouldPremultiplyAlpha);
         image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
@@ -518,6 +527,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Affine transform
       if (!baton->affineMatrix.empty()) {
         MultiPageUnsupported(nPages, "Affine");
+        image = sharp::StaySequential(image, access);
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
         vips::VInterpolate interp = vips::VInterpolate::new_from_name(
@@ -614,7 +624,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         for (Composite *composite : baton->composite) {
           VImage compositeImage;
           sharp::ImageType compositeImageType = sharp::ImageType::UNKNOWN;
-          composite->input->access = baton->input->access;
+          composite->input->access = access;
           std::tie(compositeImage, compositeImageType) = sharp::OpenInput(composite->input);
           compositeImage = sharp::EnsureColourspace(compositeImage, baton->colourspaceInput);
           // Verify within current dimensions
@@ -701,11 +711,13 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Apply normalisation - stretch luminance to cover full dynamic range
       if (baton->normalise) {
-        image = sharp::Normalise(image,  baton->normaliseLower, baton->normaliseUpper);
+        image = sharp::StaySequential(image, access);
+        image = sharp::Normalise(image, baton->normaliseLower, baton->normaliseUpper);
       }
 
       // Apply contrast limiting adaptive histogram equalization (CLAHE)
       if (baton->claheWidth != 0 && baton->claheHeight != 0) {
+        image = sharp::StaySequential(image, access);
         image = sharp::Clahe(image, baton->claheWidth, baton->claheHeight, baton->claheMaxSlope);
       }
 
@@ -713,7 +725,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->boolean != nullptr) {
         VImage booleanImage;
         sharp::ImageType booleanImageType = sharp::ImageType::UNKNOWN;
-        baton->boolean->access = baton->input->access;
+        baton->boolean->access = access;
         std::tie(booleanImage, booleanImageType) = sharp::OpenInput(baton->boolean);
         booleanImage = sharp::EnsureColourspace(booleanImage, baton->colourspaceInput);
         image = sharp::Boolean(image, booleanImage, baton->booleanOp);
@@ -963,6 +975,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (!sharp::HasAlpha(image)) {
             baton->tileBackground.pop_back();
           }
+          image = sharp::StaySequential(image, access, baton->tileAngle != 0);
           vips::VOption *options = BuildOptionsDZ(baton);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.dzsave_buffer(options));
           baton->bufferOut = static_cast<char*>(area->data);
@@ -1162,6 +1175,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (!sharp::HasAlpha(image)) {
             baton->tileBackground.pop_back();
           }
+          image = sharp::StaySequential(image, access, baton->tileAngle != 0);
           vips::VOption *options = BuildOptionsDZ(baton);
           image.dzsave(const_cast<char*>(baton->fileOut.data()), options);
           baton->formatOut = "dz";
@@ -1673,23 +1687,6 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->tileCentre = sharp::AttrAsBool(options, "tileCentre");
   baton->tileId = sharp::AttrAsStr(options, "tileId");
   baton->tileBasename = sharp::AttrAsStr(options, "tileBasename");
-
-  // Force random access for certain operations
-  if (baton->input->access == VIPS_ACCESS_SEQUENTIAL) {
-    if (
-      baton->trimThreshold > 0.0 ||
-      baton->normalise ||
-      baton->position == 16 || baton->position == 17 ||
-      baton->angle != 0 ||
-      baton->rotationAngle != 0.0 ||
-      baton->tileAngle != 0 ||
-      baton->flip ||
-      baton->claheWidth != 0 ||
-      !baton->affineMatrix.empty()
-    ) {
-      baton->input->access = VIPS_ACCESS_RANDOM;
-    }
-  }
 
   // Function to notify of libvips warnings
   Napi::Function debuglog = options.Get("debuglog").As<Napi::Function>();
