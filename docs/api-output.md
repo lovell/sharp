@@ -294,6 +294,7 @@ Use these WebP options for output image.
 | [options.lossless] | <code>boolean</code> | <code>false</code> | use lossless compression mode |
 | [options.nearLossless] | <code>boolean</code> | <code>false</code> | use near_lossless compression mode |
 | [options.smartSubsample] | <code>boolean</code> | <code>false</code> | use high quality chroma subsampling |
+| [options.preset] | <code>string</code> | <code>&quot;&#x27;default&#x27;&quot;</code> | named preset for preprocessing/filtering, one of: default, photo, picture, drawing, icon, text |
 | [options.effort] | <code>number</code> | <code>4</code> | CPU effort, between 0 (fastest) and 6 (slowest) |
 | [options.loop] | <code>number</code> | <code>0</code> | number of animation iterations, use 0 for infinite animation |
 | [options.delay] | <code>number</code> \| <code>Array.&lt;number&gt;</code> |  | delay(s) between animation frames (in milliseconds) |

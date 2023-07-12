@@ -6,6 +6,9 @@ Requires libvips v8.14.2
 
 ### v0.32.3 - TBD
 
+* Expose `preset` option for WebP output.
+  [#3639](https://github.com/lovell/sharp/issues/3639)
+
 * Ensure decoding remains sequential for all operations (regression in 0.32.2).
   [#3725](https://github.com/lovell/sharp/issues/3725)
 

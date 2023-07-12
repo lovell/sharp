@@ -102,6 +102,29 @@ describe('WebP', function () {
     });
   });
 
+  it('should produce a different file size with specific preset', () =>
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .webp({ preset: 'default' })
+      .toBuffer()
+      .then(presetDefault =>
+        sharp(fixtures.inputJpg)
+          .resize(320, 240)
+          .webp({ preset: 'picture' })
+          .toBuffer()
+          .then(presetPicture => {
+            assert.notStrictEqual(presetDefault.length, presetPicture.length);
+          })
+      )
+  );
+
+  it('invalid preset throws', () => {
+    assert.throws(
+      () => sharp().webp({ preset: 'fail' }),
+      /Expected one of: default, photo, picture, drawing, icon, text for preset but received fail of type string/
+    );
+  });
+
   it('should produce a smaller file size with increased effort', () =>
     sharp(fixtures.inputJpg)
       .resize(320, 240)

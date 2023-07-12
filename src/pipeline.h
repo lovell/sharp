@@ -153,6 +153,7 @@ struct PipelineBaton {
   bool webpNearLossless;
   bool webpLossless;
   bool webpSmartSubsample;
+  VipsForeignWebpPreset webpPreset;
   int webpEffort;
   bool webpMinSize;
   bool webpMixed;
@@ -318,6 +319,7 @@ struct PipelineBaton {
     webpNearLossless(false),
     webpLossless(false),
     webpSmartSubsample(false),
+    webpPreset(VIPS_FOREIGN_WEBP_PRESET_DEFAULT),
     webpEffort(4),
     webpMinSize(false),
     webpMixed(false),
