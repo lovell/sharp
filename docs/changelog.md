@@ -4,7 +4,7 @@
 
 Requires libvips v8.14.2
 
-### v0.32.3 - TBD
+### v0.32.3 - 14th July 2023
 
 * Expose `preset` option for WebP output.
   [#3639](https://github.com/lovell/sharp/issues/3639)
