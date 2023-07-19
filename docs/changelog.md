@@ -4,6 +4,10 @@
 
 Requires libvips v8.14.2
 
+### v0.32.4 - TBD
+
+* Expose ability to (un)block low-level libvips operations by name.
+
 ### v0.32.3 - 14th July 2023
 
 * Expose `preset` option for WebP output.

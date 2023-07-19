@@ -165,6 +165,17 @@ Napi::Value format(const Napi::CallbackInfo& info) {
 }
 
 /*
+  (Un)block libvips operations at runtime.
+*/
+void block(const Napi::CallbackInfo& info) {
+  Napi::Array ops = info[size_t(0)].As<Napi::Array>();
+  bool const state = info[size_t(1)].As<Napi::Boolean>().Value();
+  for (unsigned int i = 0; i < ops.Length(); i++) {
+    vips_operation_block_set(ops.Get(i).As<Napi::String>().Utf8Value().c_str(), state);
+  }
+}
+
+/*
   Synchronous, internal-only method used by some of the functional tests.
   Calculates the maximum colour distance using the DE2000 algorithm
   between two images of the same dimensions and number of channels.

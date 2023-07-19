@@ -166,3 +166,58 @@ const simd = sharp.simd();
 const simd = sharp.simd(false);
 // prevent libvips from using liborc at runtime
 ```
+
+
+## block
+Block libvips operations at runtime.
+
+This is in addition to the `VIPS_BLOCK_UNTRUSTED` environment variable,
+which when set will block all "untrusted" operations.
+
+
+**Since**: 0.32.4  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> |  |
+| options.operation | <code>Array.&lt;string&gt;</code> | List of libvips low-level operation names to block. |
+
+**Example** *(Block all TIFF input.)*  
+```js
+sharp.block({
+  operation: ['VipsForeignLoadTiff']
+});
+```
+
+
+## unblock
+Unblock libvips operations at runtime.
+
+This is useful for defining a list of allowed operations.
+
+
+**Since**: 0.32.4  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> |  |
+| options.operation | <code>Array.&lt;string&gt;</code> | List of libvips low-level operation names to unblock. |
+
+**Example** *(Block all input except WebP from the filesystem.)*  
+```js
+sharp.block({
+  operation: ['VipsForeignLoad']
+});
+sharp.unblock({
+  operation: ['VipsForeignLoadWebpFile']
+});
+```
+**Example** *(Block all input except JPEG and PNG from a Buffer or Stream.)*  
+```js
+sharp.block({
+  operation: ['VipsForeignLoad']
+});
+sharp.unblock({
+  operation: ['VipsForeignLoadJpegBuffer', 'VipsForeignLoadPngBuffer']
+});
+```

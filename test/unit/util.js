@@ -153,4 +153,41 @@ describe('Utilities', function () {
       assert.strictEqual(true, Array.isArray(sharp.vendor.installed));
     });
   });
+
+  describe('Block', () => {
+    it('Can block a named operation', () => {
+      sharp.block({ operation: ['test'] });
+    });
+    it('Can unblock a named operation', () => {
+      sharp.unblock({ operation: ['test'] });
+    });
+    it('Invalid block operation throws', () => {
+      assert.throws(() => sharp.block(1),
+        /Expected object for options but received 1 of type number/
+      );
+      assert.throws(() => sharp.block({}),
+        /Expected Array<string> for operation but received undefined of type undefined/
+      );
+      assert.throws(() => sharp.block({ operation: 'fail' }),
+        /Expected Array<string> for operation but received fail of type string/
+      );
+      assert.throws(() => sharp.block({ operation: ['maybe', false] }),
+        /Expected Array<string> for operation but received maybe,false of type object/
+      );
+    });
+    it('Invalid unblock operation throws', () => {
+      assert.throws(() => sharp.unblock(1),
+        /Expected object for options but received 1 of type number/
+      );
+      assert.throws(() => sharp.unblock({}),
+        /Expected Array<string> for operation but received undefined of type undefined/
+      );
+      assert.throws(() => sharp.unblock({ operation: 'fail' }),
+        /Expected Array<string> for operation but received fail of type string/
+      );
+      assert.throws(() => sharp.unblock({ operation: ['maybe', false] }),
+        /Expected Array<string> for operation but received maybe,false of type object/
+      );
+    });
+  });
 });

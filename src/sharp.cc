@@ -31,6 +31,7 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
   exports.Set("simd", Napi::Function::New(env, simd));
   exports.Set("libvipsVersion", Napi::Function::New(env, libvipsVersion));
   exports.Set("format", Napi::Function::New(env, format));
+  exports.Set("block", Napi::Function::New(env, block));
   exports.Set("_maxColourDistance", Napi::Function::New(env, _maxColourDistance));
   exports.Set("_isUsingJemalloc", Napi::Function::New(env, _isUsingJemalloc));
   exports.Set("stats", Napi::Function::New(env, stats));
