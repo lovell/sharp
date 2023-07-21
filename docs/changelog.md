@@ -2,11 +2,16 @@
 
 ## v0.32 - *flow*
 
-Requires libvips v8.14.2
+Requires libvips v8.14.3
 
 ### v0.32.4 - TBD
 
+* Upgrade to libvips v8.14.3 for upstream bug fixes.
+
 * Expose ability to (un)block low-level libvips operations by name.
+
+* Prebuilt binaries: restore support for tile-based output.
+  [#3581](https://github.com/lovell/sharp/issues/3581)
 
 ### v0.32.3 - 14th July 2023
 

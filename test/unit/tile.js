@@ -928,7 +928,7 @@ describe('Tile', function () {
               if (err) throw err;
               assert.strictEqual(true, stat.isFile());
               assert.strictEqual(true, stat.size > 0);
-              extractZip(container, { dir: path.dirname(extractTo) })
+              extractZip(container, { dir: extractTo })
                 .then(() => {
                   assertDeepZoomTiles(directory, 256, 13, done);
                 })
@@ -959,7 +959,7 @@ describe('Tile', function () {
               if (err) throw err;
               assert.strictEqual(true, stat.isFile());
               assert.strictEqual(true, stat.size > 0);
-              extractZip(container, { dir: path.dirname(extractTo) })
+              extractZip(container, { dir: extractTo })
                 .then(() => {
                   assertDeepZoomTiles(directory, 256, 13, done);
                 })
@@ -988,7 +988,7 @@ describe('Tile', function () {
               if (err) throw err;
               assert.strictEqual(true, stat.isFile());
               assert.strictEqual(true, stat.size > 0);
-              extractZip(container, { dir: path.dirname(extractTo) })
+              extractZip(container, { dir: extractTo })
                 .then(() => {
                   assertDeepZoomTiles(directory, 256, 13, done);
                 })

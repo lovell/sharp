@@ -159,19 +159,19 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "libvips": "8.14.2",
+    "libvips": "8.14.3",
     "integrity": {
-      "darwin-arm64v8": "sha512-eUuxg6H0tXgX4z2lsaGtZ4cbPAm7yoFgkvPDd4csxoiVt+QUB25pEJwiXw7oB53VlBFIp3O8lbydSFS5zH8MQQ==",
-      "darwin-x64": "sha512-cMT4v76IgzSR0VoXqLk/yftRyzMEZ+SBVMLzXCgqP/lmnYisrpmHHNqrWnoZbUUBXbPXLn6KMultYOJHe/c9ZQ==",
-      "linux-arm64v8": "sha512-OcDJ/ly80pxwaKnw0W91sSvZczPtWsjmzrY/+6NMiQZT84LkmeaRuwErbHhorKDxnl7iZuNn9Uj5V25Xmj+LDQ==",
-      "linux-armv6": "sha512-hk2ohSOYTJEtVQxEQFyQ+tuayKpYqx6NiXa7AE+8MF+yscxt+g+mLJ7TjDqtmb4ttFGH4IVfsEfU2YXIqWqkpg==",
-      "linux-armv7": "sha512-/5Ci2Cd+yLZmTaEt9lVJ89elxX3RMJpps0ESjj43X40yrwka51QfXeg1QV38uNzZpCDIZkrbXZK0lyKldjpLuA==",
-      "linux-x64": "sha512-wjCKmWfBb0uz1UB7rPDLvO0s+VWuoAY/Vv/YGCRFEQUkdSLQUgHExrOMMbOM3FleuYfQqznDYCXXphkl7X44+w==",
-      "linuxmusl-arm64v8": "sha512-QtD2n90yi+rLE65C0gksFUU5uMUFPICI/pS3A0bgthpIcoCejAOYs3ZjVWpZbHQuV/lWahIUYO78MB9CzY860A==",
-      "linuxmusl-x64": "sha512-TokQ/ETCJAsPYuxIMOPYDp25rlcwtpmIMtRUR9PB75TmZEJe7abRfCEInIPYeD8F/HxxnJSLiEdlbn1z1Jfzng==",
-      "win32-arm64v8": "sha512-IIuj4EAgLqEVAoOuYH79C61a7TcJXlU/RBwk+5JsGWc2mr4J/Ar5J01e6XBvU4Lu3eqcU+3GPaACZEa1511buA==",
-      "win32-ia32": "sha512-CsZi7lrReX3B6tmYgOGJ0IiAfcN5APDC6l+3gdosxfTfwpLLO+jXaSmyNwIGeMqrdgckG/gwwc+IrUZmkmjJ/A==",
-      "win32-x64": "sha512-J7znmNKUK4ZKo6SnSnEtzT1xRAwvkGXxIx9/QihAadu1TFdS06yNhcENmwC4973+KZBlAdVpWbZ8sLrEoWkdCA=="
+      "darwin-arm64v8": "sha512-zeb7jQ/5ARZfBH9Uy5wlpN05bFpiIN0qN3gIIpfJhpN0rhGDnjJZQgK0W+pOmG1YiLL42BMCS0SHldb0xE33rA==",
+      "darwin-x64": "sha512-C3N6smxdfprfz58cjojv0aekYXDl6+f9SwpGpxPG5RrZnrDMn5NOXtUQOEQ8PZ3Hd9VzfkJTnW/s36EvcMPfYg==",
+      "linux-arm64v8": "sha512-hT6B+OswqVQH10Fggq3jpOdn+GhxNx+5bk+EMr3lY3RZy72PZ+n4ZHJDfYSxAymdiz5rCdzGxsRLMb9GgD4OSw==",
+      "linux-armv6": "sha512-cW9giVrBssHXFt07l+PgqGu7P7XRDv7oW8jC6iXGBcjG75N7rXz2CK0DyPclfnyoWH4IQ78dh5SkQWmb6X4tig==",
+      "linux-armv7": "sha512-hgqFt3UkZHK6D91JtYrYmT1niznh+N93Zxj2EWXgTLAdcS1D3QqaDPEg2EhInHbXqYvfOuQYAAXPxt7zVtKqcw==",
+      "linux-x64": "sha512-FKbMBbCcFcSugRtuiTsA6Cov+M2WQ8nzvmmJ5xYYpRg/rsrWvObFT+6x/YBpblur9uXGjGIehjXVZtB3VXc+pg==",
+      "linuxmusl-arm64v8": "sha512-RTf6mrFyLGWnyt0DH4nHeXv5oSZMSJWxTdTt4cjvJsgp2Husz3mNJLQJGeehCuqPCYj/liJ9NIczw8u71eHFng==",
+      "linuxmusl-x64": "sha512-y/8UOkHzKhi/5UM1/ONyPvpuhO11nPQmuJWfzqUKj8kSKnDasmxv3FN46yI0XY3xA2oFC8lQNFBnLudQsi3Nvw==",
+      "win32-arm64v8": "sha512-D3PiVL981S7V0bSUwW3OqDS48H9QRw2vqQhYIY3JcIEssOnjWxmJGaz0Y9Zb8TYF5DHnnD6g5kEhob5Y2PIVEw==",
+      "win32-ia32": "sha512-FuLIaSIYJGJAcxyKkG/3/uuTzputekKSCcRCpRHkQS9J8IwM+yHzQeJ5W2PyAvNdeGIEwlYq3wnCNcXe1UGXWA==",
+      "win32-x64": "sha512-VQg4aBqpEfybgV8bjnrjfvnosxQDII/23mouFUfKHCsH5kvvHV5tTuPsxm6qbl+SCVploDK/zK1qpjop8YEvtg=="
     },
     "runtime": "napi",
     "target": 7
