@@ -39,24 +39,24 @@
     <rect x="22" y="28" width="24" height="132" fill="#fff" opacity="0.5"/>
     <rect x="178" y="28" width="24" height="132" fill="#fff" opacity="0.5"/>
     <rect x="48" y="30" width="128" height="128" fill="none" stroke="#000" stroke-width="4"/>
-    <text x="112" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">cover</text>
+    <text x="112" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="sans" font-size="32" font-weight="bold">cover</text>
   </g>
   <g id="contain">
     <rect x="240" y="30" width="128" height="128" fill="url(#img)" stroke="#000" stroke-width="4"/>
-    <text x="304" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">contain</text>
+    <text x="304" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="sans" font-size="32" font-weight="bold" fill="#555">contain</text>
   </g>
   <g id="fill">
     <rect x="432" y="30" width="128" height="128" fill="url(#img-fill)" stroke="#000" stroke-width="4"/>
-    <text x="496" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">fill</text>
+    <text x="496" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="sans" font-size="32" font-weight="bold">fill</text>
   </g>
   <g id="inside">
     <rect x="624" y="48" width="128" height="92" fill="url(#img)" stroke="#000" stroke-width="4"/>
     <rect x="624" y="30" width="128" height="128" fill="none" stroke="#000" stroke-width="4" stroke-dasharray="12 4" stroke-dashoffset="6"/>
-    <text x="688" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">inside</text>
+    <text x="688" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="sans" font-size="32" font-weight="bold" fill="#555">inside</text>
   </g>
   <g id="outside">
     <rect x="792" y="30" width="176" height="128" fill="url(#img)" stroke="#000" stroke-width="4"/>
     <rect x="816" y="30" width="128" height="128" fill="none" stroke="#000" stroke-width="4" stroke-dasharray="12 4" stroke-dashoffset="-2"/>
-    <text x="880" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">outside</text>
+    <text x="880" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="sans" font-size="32" font-weight="bold">outside</text>
   </g>
 </svg>
