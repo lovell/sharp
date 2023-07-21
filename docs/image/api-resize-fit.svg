@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="998" height="243" viewBox="0 0 998 243">
+  <defs>
+    <g id="placeholder">
+      <rect width="180" height="128" fill="#64bed8"/>
+      <circle cx="61.1" cy="36.8" r="19.3" fill="#ffefa9"/>
+      <circle cx="61.1" cy="36.8" r="18.1" fill="#fdda42"/>
+      <path d="m67.2 34.7 15.2 46L90 57.9l30.4 38 7.8-15.2 7.5 15.4H44z" fill="#6a696f"/>
+      <path d="m82.4 80.7-15.2-46-.3 69h22.9z" fill="#474749"/>
+      <path d="m90.1 58 12.2 15 18.2 23-13.9.1z" fill="#474749"/>
+      <path d="M135.8 96H131l-2.8-15.3z" fill="#474749"/>
+      <path d="M35.2 96h107.1c0 1.7-1.4 3.2-3.2 3.2H38.4a3.2 3.2 0 0 1-3.2-3.2z" fill="#b9c861"/>
+      <path d="m67.2 34.7-.1 31-6.2-3-5.3 2.7z" fill="#fff"/>
+      <path d="m67.2 34.7 7.6 23-7.7 8z" fill="#b3b1b4"/>
+      <rect width="30.8" height="7.7" x="71.1" y="27.2" rx="2.8" ry="4.1" fill="#fff"/>
+      <rect width="30.8" height="7.7" x="82.2" y="34.8" rx="2.8" ry="4.1" fill="#fff"/>
+      <rect width="30.8" height="7.7" x="36.2" y="19.6" rx="2.8" ry="4.1" fill="#fff"/>
+      <path d="m89.6 72.8-7.2 7.9L90 57.9l10 23z" fill="#fff"/>
+      <path d="m90.1 58 10 23 2.2-8z" fill="#b3b1b4"/>
+      <path d="M131.2 85.2 137 68l9 17.2-8 6z" fill="#8da128"/>
+      <rect width="109.4" height="6.8" x="33.9" y="99.1" rx="13.2" ry="11.4" fill="#22b0d6"/>
+      <path d="m137 68-5.8 17.2 6.8 6.1.3-13.7z" fill="#727d2e"/>
+      <rect width="83.3" height="6.8" x="50.8" y="103.6" rx="10" ry="11.4" fill="#22b0d6"/>
+      <rect width=".7" height="18.4" x="138" y="77.6" fill="#585657"/>
+      <rect width=".5" height="5.2" x="2" y="-161.3" fill="#585657" transform="rotate(120)"/>
+      <rect width=".5" height="5.3" x="5.5" y="-163.3" fill="#585657" transform="rotate(120)"/>
+      <rect width=".5" height="4.8" x="-142.4" y="77.7" fill="#585657" transform="rotate(240)"/>
+      <rect width=".5" height="5.1" x="-146" y="75.6" fill="#585657" transform="rotate(240)"/>
+    </g>
+    <pattern id="img" height="100%" width="100%" viewBox="0 0 180 128">
+      <use xlink:href="#placeholder"/>
+    </pattern>
+    <pattern id="img-fill" width="100%" height="100%" viewBox="0 0 180 128" preserveAspectRatio="none">
+      <use xlink:href="#placeholder"/>
+    </pattern>
+  </defs>
+  <g id="cover">
+    <rect x="22" y="28" width="180" height="132" fill="url(#img)"/>
+    <rect x="22" y="28" width="24" height="132" fill="#fff" opacity="0.5"/>
+    <rect x="178" y="28" width="24" height="132" fill="#fff" opacity="0.5"/>
+    <rect x="48" y="30" width="128" height="128" fill="none" stroke="#000" stroke-width="4"/>
+    <text x="112" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">cover</text>
+  </g>
+  <g id="contain">
+    <rect x="240" y="30" width="128" height="128" fill="url(#img)" stroke="#000" stroke-width="4"/>
+    <text x="304" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">contain</text>
+  </g>
+  <g id="fill">
+    <rect x="432" y="30" width="128" height="128" fill="url(#img-fill)" stroke="#000" stroke-width="4"/>
+    <text x="496" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">fill</text>
+  </g>
+  <g id="inside">
+    <rect x="624" y="48" width="128" height="92" fill="url(#img)" stroke="#000" stroke-width="4"/>
+    <rect x="624" y="30" width="128" height="128" fill="none" stroke="#000" stroke-width="4" stroke-dasharray="12 4" stroke-dashoffset="6"/>
+    <text x="688" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">inside</text>
+  </g>
+  <g id="outside">
+    <rect x="792" y="30" width="176" height="128" fill="url(#img)" stroke="#000" stroke-width="4"/>
+    <rect x="816" y="30" width="128" height="128" fill="none" stroke="#000" stroke-width="4" stroke-dasharray="12 4" stroke-dashoffset="-2"/>
+    <text x="880" y="90%" dominant-baseline="middle" text-anchor="middle" font-size="48" font-weight="bold">outside</text>
+  </g>
+</svg>
