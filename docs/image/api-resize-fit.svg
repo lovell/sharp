@@ -34,10 +34,9 @@
       <use xlink:href="#placeholder"/>
     </pattern>
   </defs>
+  <rect x="0" y="0" width="998" height="243" fill="#ddd"/>
   <g id="cover">
     <rect x="22" y="28" width="180" height="132" fill="url(#img)"/>
-    <rect x="22" y="28" width="24" height="132" fill="#fff" opacity="0.5"/>
-    <rect x="178" y="28" width="24" height="132" fill="#fff" opacity="0.5"/>
     <rect x="48" y="30" width="128" height="128" fill="none" stroke="#000" stroke-width="4"/>
     <text x="112" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="sans" font-size="32" font-weight="bold">cover</text>
   </g>
