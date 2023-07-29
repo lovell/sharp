@@ -5,7 +5,7 @@ ARG BRANCH=main
 RUN apt-get -y update && apt-get install -y build-essential curl git
 
 # Install latest Node.js LTS
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get install -y nodejs
 
 # Install benchmark dependencies
@@ -23,4 +23,9 @@ RUN cat /etc/os-release | grep VERSION=
 RUN node -v
 
 WORKDIR /tmp/sharp/test/bench
+
+# Workaround for: https://github.com/emscripten-core/emscripten/pull/16917
+# This could be removed once Squoosh is an optional dependency.
+ENV NODE_OPTIONS="--no-experimental-fetch"
+
 CMD [ "node", "perf" ]
