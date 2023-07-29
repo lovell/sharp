@@ -109,7 +109,7 @@ async.series({
     jpegSuite.add('squoosh-lib-buffer-buffer', {
       defer: true,
       fn: function (deferred) {
-        const pool = new squoosh.ImagePool();
+        const pool = new squoosh.ImagePool(os.cpus().length);
         const image = pool.ingestImage(inputJpgBuffer);
         image.decoded
           .then(function () {
@@ -707,7 +707,7 @@ async.series({
     pngSuite.add('squoosh-lib-buffer-buffer', {
       defer: true,
       fn: function (deferred) {
-        const pool = new squoosh.ImagePool();
+        const pool = new squoosh.ImagePool(os.cpus().length);
         const image = pool.ingestImage(inputPngBuffer);
         image.decoded
           .then(function () {
