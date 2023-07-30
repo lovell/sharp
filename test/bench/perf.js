@@ -652,7 +652,7 @@ async.series({
             throw err;
           } else {
             image
-              .resize(width, heightPng)
+              .resize(width, heightPng, jimp.RESIZE_BICUBIC)
               .deflateLevel(6)
               .filterType(0)
               .getBuffer(jimp.MIME_PNG, function (err) {
@@ -673,7 +673,7 @@ async.series({
             throw err;
           } else {
             image
-              .resize(width, heightPng)
+              .resize(width, heightPng, jimp.RESIZE_BICUBIC)
               .deflateLevel(6)
               .filterType(0)
               .write(outputPng, function (err) {
