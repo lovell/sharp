@@ -146,7 +146,7 @@ declare namespace sharp {
     const kernel: KernelEnum;
     const fit: FitEnum;
     const bool: BoolEnum;
-    const preset: PresetEnum
+    const preset: WebpPresetEnum
 
     interface Sharp extends Duplex {
         //#region Channel functions
@@ -1129,7 +1129,7 @@ declare namespace sharp {
         /** Allow mixture of lossy and lossless animation frames (slow) (optional, default false) */
         mixed?: boolean;
         /** Preset options: one of default, photo, picture, drawing, icon, text (optional, default 'default') */
-        preset?: keyof PresetEnum | undefined;
+        preset?: keyof WebpPresetEnum | undefined;
     }
 
     interface AvifOptions extends OutputOptions {
@@ -1479,7 +1479,7 @@ declare namespace sharp {
         lanczos3: 'lanczos3';
     }
 
-    interface PresetEnum {
+    interface WebpPresetEnum {
         default: 'default';
         picture: 'picture';
         photo: 'photo';
