@@ -660,5 +660,4 @@ sharp('input.tiff').webp({ preset: 'icon' }).toFile('out.webp');
 sharp('input.tiff').webp({ preset: 'drawing' }).toFile('out.webp');
 sharp('input.tiff').webp({ preset: 'text' }).toFile('out.webp');
 sharp('input.tiff').webp({ preset: 'default' }).toFile('out.webp');
-sharp('input.tiff').webp({ preset: sharp.preset.photo }).toFile('out.webp');
 
