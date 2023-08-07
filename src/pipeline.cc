@@ -20,18 +20,15 @@
 #include "operations.h"
 #include "pipeline.h"
 
-#if defined(WIN32)
+#ifdef _WIN32
 #define STAT64_STRUCT __stat64
 #define STAT64_FUNCTION _stat64
-#elif defined(__APPLE__)
-#define STAT64_STRUCT stat
-#define STAT64_FUNCTION stat
-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
-#define STAT64_STRUCT stat
-#define STAT64_FUNCTION stat
-#else
+#elif defined(_LARGEFILE64_SOURCE)
 #define STAT64_STRUCT stat64
 #define STAT64_FUNCTION stat64
+#else
+#define STAT64_STRUCT stat
+#define STAT64_FUNCTION stat
 #endif
 
 class PipelineWorker : public Napi::AsyncWorker {
