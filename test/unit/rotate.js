@@ -192,6 +192,23 @@ describe('Rotation', function () {
       });
   });
 
+  it('Auto-rotate by 270 degrees, rectangular output ignoring aspect ratio', function (done) {
+    sharp(fixtures.inputJpgWithLandscapeExif8)
+      .resize(320, 240, { fit: sharp.fit.fill })
+      .rotate()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        sharp(data).metadata(function (err, metadata) {
+          if (err) throw err;
+          assert.strictEqual(320, metadata.width);
+          assert.strictEqual(240, metadata.height);
+          done();
+        });
+      });
+  });
+
   it('Rotate by 30 degrees, rectangular output ignoring aspect ratio', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240, { fit: sharp.fit.fill })
