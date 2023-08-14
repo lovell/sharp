@@ -4,6 +4,20 @@
 
 Requires libvips v8.14.3
 
+### v0.32.5 - TBD
+
+* TypeScript: Add missing `WebpPresetEnum` to definitions.
+  [#3748](https://github.com/lovell/sharp/pull/3748)
+  [@pilotso11](https://github.com/pilotso11)
+
+* Ensure compilation using musl v1.2.4.
+  [#3755](https://github.com/lovell/sharp/pull/3755)
+  [@kleisauke](https://github.com/kleisauke)
+
+* TypeScript: Ensure `minSize` property of `WebpOptions` is boolean.
+  [#3758](https://github.com/lovell/sharp/pull/3758)
+  [@sho-xizz](https://github.com/sho-xizz)
+
 ### v0.32.4 - 21st July 2023
 
 * Upgrade to libvips v8.14.3 for upstream bug fixes.
