@@ -489,4 +489,28 @@ describe('Rotation', function () {
       .timeout({ seconds: 5 })
       .toBuffer()
   );
+
+  it('Rotate 90 then resize with inside fit', async () => {
+    const data = await sharp({ create: { width: 16, height: 8, channels: 3, background: 'red' } })
+      .rotate(90)
+      .resize({ width: 6, fit: 'inside' })
+      .png({ compressionLevel: 0 })
+      .toBuffer();
+
+    const { width, height } = await sharp(data).metadata();
+    assert.strictEqual(width, 6);
+    assert.strictEqual(height, 12);
+  });
+
+  it('Resize with inside fit then rotate 90', async () => {
+    const data = await sharp({ create: { width: 16, height: 8, channels: 3, background: 'red' } })
+      .resize({ width: 6, fit: 'inside' })
+      .rotate(90)
+      .png({ compressionLevel: 0 })
+      .toBuffer();
+
+    const { width, height } = await sharp(data).metadata();
+    assert.strictEqual(width, 3);
+    assert.strictEqual(height, 6);
+  });
 });

@@ -14,6 +14,9 @@ Requires libvips v8.14.3
   [#3755](https://github.com/lovell/sharp/pull/3755)
   [@kleisauke](https://github.com/kleisauke)
 
+* Ensure resize with a `fit` of `inside` respects 90/270 degree rotation.
+  [#3756](https://github.com/lovell/sharp/issues/3756)
+
 * TypeScript: Ensure `minSize` property of `WebpOptions` is boolean.
   [#3758](https://github.com/lovell/sharp/pull/3758)
   [@sho-xizz](https://github.com/sho-xizz)

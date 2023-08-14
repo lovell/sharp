@@ -968,6 +968,9 @@ namespace sharp {
     if (swap && canvas != Canvas::IGNORE_ASPECT) {
       // Swap input width and height when requested.
       std::swap(width, height);
+      if (canvas == Canvas::MAX) {
+        std::swap(targetWidth, targetHeight);
+      }
     }
 
     double hshrink = 1.0;
