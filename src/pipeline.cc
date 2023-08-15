@@ -788,9 +788,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Apply output ICC profile
-      if (!baton->withMetadataIcc.empty()) {
+      if (baton->withMetadata) {
         image = image.icc_transform(
-          const_cast<char*>(baton->withMetadataIcc.data()),
+          baton->withMetadataIcc.empty() ? "srgb" : const_cast<char*>(baton->withMetadataIcc.data()),
           VImage::option()
             ->set("input_profile", processingProfile)
             ->set("embedded", TRUE)

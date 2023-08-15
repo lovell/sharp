@@ -781,6 +781,19 @@ describe('Image metadata', function () {
     });
   });
 
+  it('withMetadata adds default sRGB profile', async () => {
+    const data = await sharp(fixtures.inputJpg)
+      .resize(32, 24)
+      .withMetadata()
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    const { colorSpace, deviceClass, intent } = icc.parse(metadata.icc);
+    assert.strictEqual(colorSpace, 'RGB');
+    assert.strictEqual(deviceClass, 'Monitor');
+    assert.strictEqual(intent, 'Perceptual');
+  });
+
   it('File input with corrupt header fails gracefully', function (done) {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .metadata(function (err) {

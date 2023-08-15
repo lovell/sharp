@@ -21,6 +21,9 @@ Requires libvips v8.14.3
   [#3758](https://github.com/lovell/sharp/pull/3758)
   [@sho-xizz](https://github.com/sho-xizz)
 
+* Ensure `withMetadata` adds default sRGB profile.
+  [#3761](https://github.com/lovell/sharp/issues/3761)
+
 ### v0.32.4 - 21st July 2023
 
 * Upgrade to libvips v8.14.3 for upstream bug fixes.
