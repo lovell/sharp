@@ -2,9 +2,11 @@
 
 ## v0.32 - *flow*
 
-Requires libvips v8.14.3
+Requires libvips v8.14.4
 
 ### v0.32.5 - TBD
+
+* Upgrade to libvips v8.14.4 for upstream bug fixes.
 
 * TypeScript: Add missing `WebpPresetEnum` to definitions.
   [#3748](https://github.com/lovell/sharp/pull/3748)
