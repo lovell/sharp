@@ -157,15 +157,18 @@ class PipelineWorker : public Napi::AsyncWorker {
       int targetResizeWidth = baton->width;
       int targetResizeHeight = baton->height;
 
-      // Swap input output width and height when rotating by 90 or 270 degrees
-      bool swap = !baton->rotateBeforePreExtract &&
-        (rotation == VIPS_ANGLE_D90 || rotation == VIPS_ANGLE_D270 ||
-          autoRotation == VIPS_ANGLE_D90 || autoRotation == VIPS_ANGLE_D270);
+      // When auto-rotating by 90 or 270 degrees, swap the target width and
+      // height to ensure the behavior aligns with how it would have been if
+      // the rotation had taken place *before* resizing.
+      if (!baton->rotateBeforePreExtract &&
+        (autoRotation == VIPS_ANGLE_D90 || autoRotation == VIPS_ANGLE_D270)) {
+        std::swap(targetResizeWidth, targetResizeHeight);
+      }
 
       // Shrink to pageHeight, so we work for multi-page images
       std::tie(hshrink, vshrink) = sharp::ResolveShrink(
         inputWidth, pageHeight, targetResizeWidth, targetResizeHeight,
-        baton->canvas, swap, baton->withoutEnlargement, baton->withoutReduction);
+        baton->canvas, baton->withoutEnlargement, baton->withoutReduction);
 
       // The jpeg preload shrink.
       int jpegShrinkOnLoad = 1;
@@ -299,7 +302,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Shrink to pageHeight, so we work for multi-page images
       std::tie(hshrink, vshrink) = sharp::ResolveShrink(
         inputWidth, pageHeight, targetResizeWidth, targetResizeHeight,
-        baton->canvas, swap, baton->withoutEnlargement, baton->withoutReduction);
+        baton->canvas, baton->withoutEnlargement, baton->withoutReduction);
 
       int targetHeight = static_cast<int>(std::rint(static_cast<double>(pageHeight) / vshrink));
       int targetPageHeight = targetHeight;

@@ -362,13 +362,10 @@ namespace sharp {
   VImage EnsureAlpha(VImage image, double const value);
 
   /*
-    Calculate the shrink factor, taking into account auto-rotate, the canvas
-    mode, and so on. The hshrink/vshrink are the amount to shrink the input
-    image axes by in order for the output axes (ie. after rotation) to match
-    the required thumbnail width/height and canvas mode.
+    Calculate the horizontal and vertical shrink factors, taking the canvas mode into account.
   */
   std::pair<double, double> ResolveShrink(int width, int height, int targetWidth, int targetHeight,
-    Canvas canvas, bool swap, bool withoutEnlargement, bool withoutReduction);
+    Canvas canvas, bool withoutEnlargement, bool withoutReduction);
 
   /*
     Ensure decoding remains sequential.
