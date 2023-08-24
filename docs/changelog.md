@@ -4,6 +4,11 @@
 
 Requires libvips v8.14.4
 
+### v0.32.6 - TBD
+
+* Ensure `withMetadata` does not add default sRGB profile to RGB16 (regression in 0.32.5).
+  [#3773](https://github.com/lovell/sharp/issues/3773)
+
 ### v0.32.5 - 15th August 2023
 
 * Upgrade to libvips v8.14.4 for upstream bug fixes.

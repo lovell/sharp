@@ -109,8 +109,8 @@ await sharp(pixelArray, { raw: { width, height, channels } })
 
 ## withMetadata
 Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
-This will also convert to and add a web-friendly sRGB ICC profile unless a custom
-output profile is provided.
+This will also convert to and add a web-friendly sRGB ICC profile if appropriate,
+unless a custom output profile is provided.
 
 The default behaviour, when `withMetadata` is not used, is to convert to the device-independent
 sRGB colour space and strip all metadata, including the removal of any ICC profile.

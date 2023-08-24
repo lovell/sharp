@@ -794,6 +794,17 @@ describe('Image metadata', function () {
     assert.strictEqual(intent, 'Perceptual');
   });
 
+  it('withMetadata does not add default sRGB profile to RGB16', async () => {
+    const data = await sharp(fixtures.inputJpg)
+      .resize(32, 24)
+      .toColorspace('rgb16')
+      .withMetadata()
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    assert.strictEqual(undefined, metadata.icc);
+  });
+
   it('File input with corrupt header fails gracefully', function (done) {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .metadata(function (err) {

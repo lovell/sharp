@@ -789,12 +789,14 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Apply output ICC profile
       if (baton->withMetadata) {
-        image = image.icc_transform(
-          baton->withMetadataIcc.empty() ? "srgb" : const_cast<char*>(baton->withMetadataIcc.data()),
-          VImage::option()
-            ->set("input_profile", processingProfile)
-            ->set("embedded", TRUE)
-            ->set("intent", VIPS_INTENT_PERCEPTUAL));
+        if (image.interpretation() == VIPS_INTERPRETATION_sRGB || !baton->withMetadataIcc.empty()) {
+          image = image.icc_transform(
+            baton->withMetadataIcc.empty() ? "srgb" : const_cast<char*>(baton->withMetadataIcc.data()),
+            VImage::option()
+              ->set("input_profile", processingProfile)
+              ->set("embedded", TRUE)
+              ->set("intent", VIPS_INTENT_PERCEPTUAL));
+        }
       }
       // Override EXIF Orientation tag
       if (baton->withMetadata && baton->withMetadataOrientation != -1) {
