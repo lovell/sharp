@@ -11,7 +11,7 @@ the background colour can be provided with the `background` option.
 If no angle is provided, it is determined from the EXIF data.
 Mirroring is supported and may infer the use of a flip operation.
 
-The use of `rotate` implies the removal of the EXIF `Orientation` tag, if any.
+The use of `rotate` without an angle will remove the EXIF `Orientation` tag, if any.
 
 Only one rotation can occur per pipeline.
 Previous calls to `rotate` in the same pipeline will be ignored.
