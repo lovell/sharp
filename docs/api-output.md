@@ -583,7 +583,7 @@ Image metadata (EXIF, XMP) is unsupported.
 
 
 ## raw
-> raw([options])
+> raw([options]) ⇒ <code>Sharp</code>
 
 Force output to be raw, uncompressed pixel data.
 Pixel ordering is left-to-right, top-to-bottom, without padding.
