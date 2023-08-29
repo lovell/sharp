@@ -1,9 +1,13 @@
 ## Sharp
+> Sharp
+
 
 **Emits**: <code>Sharp#event:info</code>, <code>Sharp#event:warning</code>  
 <a name="new_Sharp_new"></a>
 
 ### new
+> new Sharp([input], [options])
+
 Constructor factory to create an instance of `sharp`, to which further methods are chained.
 
 JPEG, PNG, WebP, GIF, AVIF or TIFF format image data can be streamed out from this object.
@@ -159,6 +163,8 @@ await sharp({
 
 
 ## clone
+> clone() ⇒ [<code>Sharp</code>](#Sharp)
+
 Take a "snapshot" of the Sharp instance, returning a new instance.
 Cloned instances inherit the input of their parent instance.
 This allows multiple output Streams and therefore multiple processing pipelines to share a single input Stream.

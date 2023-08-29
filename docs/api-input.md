@@ -1,4 +1,6 @@
 ## metadata
+> metadata([callback]) ⇒ <code>Promise.&lt;Object&gt;</code> \| <code>Sharp</code>
+
 Fast access to (uncached) image metadata without decoding any compressed pixel data.
 
 This is read from the header of the input image.
@@ -81,6 +83,8 @@ function getNormalSize({ width, height, orientation }) {
 
 
 ## stats
+> stats([callback]) ⇒ <code>Promise.&lt;Object&gt;</code>
+
 Access to pixel-derived image statistics for every channel in the image.
 A `Promise` is returned when `callback` is not provided.
 

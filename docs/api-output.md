@@ -1,4 +1,6 @@
 ## toFile
+> toFile(fileOut, [callback]) ⇒ <code>Promise.&lt;Object&gt;</code>
+
 Write output image data to a file.
 
 If an explicit output format is not selected, it will be inferred from the extension,
@@ -39,6 +41,8 @@ sharp(input)
 
 
 ## toBuffer
+> toBuffer([options], [callback]) ⇒ <code>Promise.&lt;Buffer&gt;</code>
+
 Write output to a Buffer.
 JPEG, PNG, WebP, AVIF, TIFF, GIF and raw pixel data output are supported.
 
@@ -108,6 +112,8 @@ await sharp(pixelArray, { raw: { width, height, channels } })
 
 
 ## withMetadata
+> withMetadata([options]) ⇒ <code>Sharp</code>
+
 Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
 This will also convert to and add a web-friendly sRGB ICC profile if appropriate,
 unless a custom output profile is provided.
@@ -167,6 +173,8 @@ const data = await sharp(input)
 
 
 ## toFormat
+> toFormat(format, options) ⇒ <code>Sharp</code>
+
 Force output to a given format.
 
 
@@ -190,6 +198,8 @@ const data = await sharp(input)
 
 
 ## jpeg
+> jpeg([options]) ⇒ <code>Sharp</code>
+
 Use these JPEG options for output image.
 
 
@@ -235,6 +245,8 @@ const data = await sharp(input)
 
 
 ## png
+> png([options]) ⇒ <code>Sharp</code>
+
 Use these PNG options for output image.
 
 By default, PNG output is full colour at 8 or 16 bits per pixel.
@@ -278,6 +290,8 @@ const data = await sharp(input)
 
 
 ## webp
+> webp([options]) ⇒ <code>Sharp</code>
+
 Use these WebP options for output image.
 
 
@@ -319,6 +333,8 @@ const outputWebp = await sharp(inputWebp, { animated: true })
 
 
 ## gif
+> gif([options]) ⇒ <code>Sharp</code>
+
 Use these GIF options for the output image.
 
 The first entry in the palette is reserved for transparency.
@@ -378,6 +394,8 @@ await sharp('in.gif', { animated: true })
 
 
 ## jp2
+> jp2([options]) ⇒ <code>Sharp</code>
+
 Use these JP2 options for output image.
 
 Requires libvips compiled with support for OpenJPEG.
@@ -420,6 +438,8 @@ const data = await sharp(input)
 
 
 ## tiff
+> tiff([options]) ⇒ <code>Sharp</code>
+
 Use these TIFF options for output image.
 
 The `density` can be set in pixels/inch via [withMetadata](#withmetadata)
@@ -461,6 +481,8 @@ sharp('input.svg')
 
 
 ## avif
+> avif([options]) ⇒ <code>Sharp</code>
+
 Use these AVIF options for output image.
 
 Whilst it is possible to create AVIF images smaller than 16x16 pixels,
@@ -498,6 +520,8 @@ const data = await sharp(input)
 
 
 ## heif
+> heif([options]) ⇒ <code>Sharp</code>
+
 Use these HEIF options for output image.
 
 Support for patent-encumbered HEIC images using `hevc` compression requires the use of a
@@ -528,6 +552,8 @@ const data = await sharp(input)
 
 
 ## jxl
+> jxl([options]) ⇒ <code>Sharp</code>
+
 Use these JPEG-XL (JXL) options for output image.
 
 This feature is experimental, please do not use in production systems.
@@ -557,6 +583,8 @@ Image metadata (EXIF, XMP) is unsupported.
 
 
 ## raw
+> raw([options])
+
 Force output to be raw, uncompressed pixel data.
 Pixel ordering is left-to-right, top-to-bottom, without padding.
 Channel ordering will be RGB or RGBA for non-greyscale colourspaces.
@@ -592,6 +620,8 @@ const data = await sharp('input.png')
 
 
 ## tile
+> tile([options]) ⇒ <code>Sharp</code>
+
 Use tile-based deep zoom (image pyramid) output.
 
 Set the format and options for tile images via the `toFormat`, `jpeg`, `png` or `webp` functions.
@@ -653,6 +683,8 @@ readableStream
 
 
 ## timeout
+> timeout(options) ⇒ <code>Sharp</code>
+
 Set a timeout for processing, in seconds.
 Use a value of zero to continue processing indefinitely, the default behaviour.
 

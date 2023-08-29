@@ -1,4 +1,6 @@
 ## versions
+> versions
+
 An Object containing the version numbers of sharp, libvips and its dependencies.
 
 
@@ -9,6 +11,8 @@ console.log(sharp.versions);
 
 
 ## interpolators
+> interpolators : <code>enum</code>
+
 An Object containing the available interpolators and their proper values
 
 
@@ -27,6 +31,8 @@ An Object containing the available interpolators and their proper values
 
 
 ## format
+> format ⇒ <code>Object</code>
+
 An Object containing nested boolean values representing the available input and output formats/methods.
 
 
@@ -37,6 +43,8 @@ console.log(sharp.format);
 
 
 ## vendor
+> vendor
+
 An Object containing the platform and architecture
 of the current and installed vendored binaries.
 
@@ -48,6 +56,8 @@ console.log(sharp.vendor);
 
 
 ## queue
+> queue
+
 An EventEmitter that emits a `change` event when a task is either:
 - queued, waiting for _libuv_ to provide a worker thread
 - complete
@@ -62,6 +72,8 @@ sharp.queue.on('change', function(queueLength) {
 
 
 ## cache
+> cache([options]) ⇒ <code>Object</code>
+
 Gets or, when options are provided, sets the limits of _libvips'_ operation cache.
 Existing entries in the cache will be trimmed after any change in limits.
 This method always returns cache statistics,
@@ -89,6 +101,8 @@ sharp.cache(false);
 
 
 ## concurrency
+> concurrency([concurrency]) ⇒ <code>number</code>
+
 Gets or, when a concurrency is provided, sets
 the maximum number of threads _libvips_ should use to process _each image_.
 These are from a thread pool managed by glib,
@@ -132,6 +146,8 @@ sharp.concurrency(0); // 4
 
 
 ## counters
+> counters() ⇒ <code>Object</code>
+
 Provides access to internal task counters.
 - queue is the number of tasks this module has queued waiting for _libuv_ to provide a worker thread from its pool.
 - process is the number of resize tasks currently being processed.
@@ -144,6 +160,8 @@ const counters = sharp.counters(); // { queue: 2, process: 4 }
 
 
 ## simd
+> simd([simd]) ⇒ <code>boolean</code>
+
 Get and set use of SIMD vector unit instructions.
 Requires libvips to have been compiled with liborc support.
 
@@ -169,6 +187,8 @@ const simd = sharp.simd(false);
 
 
 ## block
+> block(options)
+
 Block libvips operations at runtime.
 
 This is in addition to the `VIPS_BLOCK_UNTRUSTED` environment variable,
@@ -191,6 +211,8 @@ sharp.block({
 
 
 ## unblock
+> unblock(options)
+
 Unblock libvips operations at runtime.
 
 This is useful for defining a list of allowed operations.

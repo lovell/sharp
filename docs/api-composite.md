@@ -1,4 +1,6 @@
 ## composite
+> composite(images) ⇒ <code>Sharp</code>
+
 Composite image(s) over the processed (resized, extracted etc.) image.
 
 The images to composite must be the same size or smaller than the processed image.

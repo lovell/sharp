@@ -29,7 +29,7 @@ const jsdoc2md = require('jsdoc-to-markdown');
   });
 
   const cleanMarkdown = markdown
-    .replace(/(## [A-Za-z0-9]+)[^\n]*/g, '$1') // simplify headings to match those of documentationjs, ensures existing URLs work
+    .replace(/(## )([A-Za-z0-9]+)([^\n]*)/g, '$1$2\n> $2$3\n') // simplify headings to match those of documentationjs, ensures existing URLs work
     .replace(/<a name="[A-Za-z0-9+]+"><\/a>/g, '') // remove anchors, let docute add these (at markdown to HTML render time)
     .replace(/\*\*Kind\*\*: global[^\n]+/g, '') // remove all "global" Kind labels (requires JSDoc refactoring)
     .trim();

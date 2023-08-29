@@ -1,4 +1,6 @@
 ## resize
+> resize([width], [height], [options]) ⇒ <code>Sharp</code>
+
 Resize image to `width`, `height` or `width x height`.
 
 When both a `width` and `height` are provided, the possible methods by which the image should **fit** these are:
@@ -146,6 +148,8 @@ const scaleByHalf = await sharp(input)
 
 
 ## extend
+> extend(extend) ⇒ <code>Sharp</code>
+
 Extend / pad / extrude one or more edges of the image with either
 the provided background colour or pixels derived from the image.
 This operation will always occur after resizing and extraction, if any.
@@ -204,6 +208,8 @@ sharp(input)
 
 
 ## extract
+> extract(options) ⇒ <code>Sharp</code>
+
 Extract/crop a region of the image.
 
 - Use `extract` before `resize` for pre-resize extraction.
@@ -245,6 +251,8 @@ sharp(input)
 
 
 ## trim
+> trim(trim) ⇒ <code>Sharp</code>
+
 Trim pixels from all edges that contain values similar to the given background colour, which defaults to that of the top-left pixel.
 
 Images with an alpha channel will use the combined bounding box of alpha and non-alpha channels.

@@ -1,4 +1,6 @@
 ## removeAlpha
+> removeAlpha() ⇒ <code>Sharp</code>
+
 Remove alpha channel, if any. This is a no-op if the image does not have an alpha channel.
 
 See also [flatten](/api-operation#flatten).
@@ -15,6 +17,8 @@ sharp('rgba.png')
 
 
 ## ensureAlpha
+> ensureAlpha([alpha]) ⇒ <code>Sharp</code>
+
 Ensure the output image has an alpha transparency channel.
 If missing, the added alpha channel will have the specified
 transparency level, defaulting to fully-opaque (1).
@@ -48,6 +52,8 @@ const rgba = await sharp(rgb)
 
 
 ## extractChannel
+> extractChannel(channel) ⇒ <code>Sharp</code>
+
 Extract a single channel from a multi-channel image.
 
 
@@ -78,6 +84,8 @@ const [red1, red2, ...] = await sharp(input)
 
 
 ## joinChannel
+> joinChannel(images, options) ⇒ <code>Sharp</code>
+
 Join one or more channels to the image.
 The meaning of the added channels depends on the output colourspace, set with `toColourspace()`.
 By default the output image will be web-friendly sRGB, with additional channels interpreted as alpha channels.
@@ -102,6 +110,8 @@ For raw pixel input, the `options` object should contain a `raw` attribute, whic
 
 
 ## bandbool
+> bandbool(boolOp) ⇒ <code>Sharp</code>
+
 Perform a bitwise boolean operation on all input image channels (bands) to produce a single channel output image.
 
 
