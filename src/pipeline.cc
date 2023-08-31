@@ -653,7 +653,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             if (across != 0 || down != 0) {
               int left;
               int top;
-              compositeImage = compositeImage.copy_memory().replicate(across, down);
+              compositeImage = sharp::StaySequential(compositeImage, access).replicate(across, down);
               if (composite->hasOffset) {
                 std::tie(left, top) = sharp::CalculateCrop(
                   compositeImage.width(), compositeImage.height(), image.width(), image.height(),
