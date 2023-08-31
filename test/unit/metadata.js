@@ -794,15 +794,40 @@ describe('Image metadata', function () {
     assert.strictEqual(intent, 'Perceptual');
   });
 
-  it('withMetadata does not add default sRGB profile to RGB16', async () => {
-    const data = await sharp(fixtures.inputJpg)
-      .resize(32, 24)
+  it('withMetadata adds default sRGB profile to RGB16', async () => {
+    const data = await sharp({
+      create: {
+        width: 8, height: 8, channels: 4, background: 'orange'
+      }
+    })
       .toColorspace('rgb16')
+      .png()
       .withMetadata()
       .toBuffer();
 
     const metadata = await sharp(data).metadata();
-    assert.strictEqual(undefined, metadata.icc);
+    assert.strictEqual(metadata.depth, 'ushort');
+
+    const { description } = icc.parse(metadata.icc);
+    assert.strictEqual(description, 'sRGB');
+  });
+
+  it('withMetadata adds P3 profile to 16-bit PNG', async () => {
+    const data = await sharp({
+      create: {
+        width: 8, height: 8, channels: 4, background: 'orange'
+      }
+    })
+      .toColorspace('rgb16')
+      .png()
+      .withMetadata({ icc: 'p3' })
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    assert.strictEqual(metadata.depth, 'ushort');
+
+    const { description } = icc.parse(metadata.icc);
+    assert.strictEqual(description, 'sP3C');
   });
 
   it('File input with corrupt header fails gracefully', function (done) {

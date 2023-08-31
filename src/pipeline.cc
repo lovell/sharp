@@ -326,7 +326,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         try {
           image = image.icc_transform(processingProfile, VImage::option()
             ->set("embedded", TRUE)
-            ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
+            ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
           sharp::VipsWarningCallback(nullptr, G_LOG_LEVEL_WARNING, "Invalid embedded profile", nullptr);
@@ -763,6 +763,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         if (baton->withMetadata && sharp::HasProfile(image) && baton->withMetadataIcc.empty()) {
           image = image.icc_transform("srgb", VImage::option()
             ->set("embedded", TRUE)
+            ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         }
       }
@@ -789,14 +790,13 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Apply output ICC profile
       if (baton->withMetadata) {
-        if (image.interpretation() == VIPS_INTERPRETATION_sRGB || !baton->withMetadataIcc.empty()) {
-          image = image.icc_transform(
-            baton->withMetadataIcc.empty() ? "srgb" : const_cast<char*>(baton->withMetadataIcc.data()),
-            VImage::option()
-              ->set("input_profile", processingProfile)
-              ->set("embedded", TRUE)
-              ->set("intent", VIPS_INTENT_PERCEPTUAL));
-        }
+        image = image.icc_transform(
+          baton->withMetadataIcc.empty() ? "srgb" : const_cast<char*>(baton->withMetadataIcc.data()),
+          VImage::option()
+            ->set("input_profile", processingProfile)
+            ->set("embedded", TRUE)
+            ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
+            ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
       // Override EXIF Orientation tag
       if (baton->withMetadata && baton->withMetadataOrientation != -1) {
