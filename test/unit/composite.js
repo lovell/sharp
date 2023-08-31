@@ -472,4 +472,28 @@ describe('composite', () => {
     assert.strictEqual(b, 19);
     assert.strictEqual(a, 128);
   });
+
+  it('Ensure tiled overlay is fully decoded', async () => {
+    const tile = await sharp({
+      create: {
+        width: 8, height: 513, channels: 3, background: 'red'
+      }
+    })
+      .png({ compressionLevel: 0 })
+      .toBuffer();
+
+    const { info } = await sharp({
+      create: {
+        width: 8, height: 514, channels: 3, background: 'green'
+      }
+    })
+      .composite([{
+        input: tile,
+        tile: true
+      }])
+      .toBuffer({ resolveWithObject: true });
+
+    assert.strictEqual(info.width, 8);
+    assert.strictEqual(info.height, 514);
+  });
 });

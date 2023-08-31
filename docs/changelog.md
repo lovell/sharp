@@ -6,6 +6,9 @@ Requires libvips v8.14.4
 
 ### v0.32.6 - TBD
 
+* Ensure composite tile images are fully decoded (regression in 0.32.0).
+  [#3767](https://github.com/lovell/sharp/issues/3767)
+
 * Ensure `withMetadata` does not add default sRGB profile to RGB16 (regression in 0.32.5).
   [#3773](https://github.com/lovell/sharp/issues/3773)
 
