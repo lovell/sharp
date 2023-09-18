@@ -153,9 +153,9 @@
     "mocha": "^10.2.0",
     "mock-fs": "^5.2.0",
     "nyc": "^15.1.0",
-    "prebuild": "lovell/prebuild#add-nodejs-20-drop-nodejs-10-and-12",
+    "prebuild": "^12.0.0",
     "semistandard": "^16.0.1",
-    "tsd": "^0.28.1"
+    "tsd": "^0.29.0"
   },
   "license": "Apache-2.0",
   "config": {
