@@ -2,9 +2,11 @@
 
 ## v0.32 - *flow*
 
-Requires libvips v8.14.4
+Requires libvips v8.14.5
 
 ### v0.32.6 - TBD
+
+* Upgrade to libvips v8.14.5 for upstream bug fixes.
 
 * Ensure composite tile images are fully decoded (regression in 0.32.0).
   [#3767](https://github.com/lovell/sharp/issues/3767)
