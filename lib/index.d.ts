@@ -139,6 +139,52 @@ declare namespace sharp {
      */
     function simd(enable?: boolean): boolean;
 
+    /**
+     * Block libvips operations at runtime.
+     *
+     * This is in addition to the `VIPS_BLOCK_UNTRUSTED` environment variable,
+     * which when set will block all "untrusted" operations.
+     *
+     * @since 0.32.4
+     *
+     * @example <caption>Block all TIFF input.</caption>
+     * sharp.block({
+     *   operation: ['VipsForeignLoadTiff']
+     * });
+     *
+     * @param {Object} options
+     * @param {Array<string>} options.operation - List of libvips low-level operation names to block.
+     */
+    function block(options: { operation: string[] }): void;
+
+    /**
+     * Unblock libvips operations at runtime.
+     *
+     * This is useful for defining a list of allowed operations.
+     *
+     * @since 0.32.4
+     *
+     * @example <caption>Block all input except WebP from the filesystem.</caption>
+     * sharp.block({
+     *   operation: ['VipsForeignLoad']
+     * });
+     * sharp.unblock({
+     *   operation: ['VipsForeignLoadWebpFile']
+     * });
+     *
+     * @example <caption>Block all input except JPEG and PNG from a Buffer or Stream.</caption>
+     * sharp.block({
+     *   operation: ['VipsForeignLoad']
+     * });
+     * sharp.unblock({
+     *   operation: ['VipsForeignLoadJpegBuffer', 'VipsForeignLoadPngBuffer']
+     * });
+     *
+     * @param {Object} options
+     * @param {Array<string>} options.operation - List of libvips low-level operation names to unblock.
+     */
+    function unblock(options: { operation: string[] }): void;
+
     //#endregion
 
     const gravity: GravityEnum;
