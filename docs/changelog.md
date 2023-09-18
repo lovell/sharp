@@ -15,6 +15,10 @@ Requires libvips v8.14.4
 * Ensure `withMetadata` does not reduce 16-bit images to 8-bit (regression in 0.32.5).
   [#3773](https://github.com/lovell/sharp/issues/3773)
 
+* TypeScript: Add definitions for block and unblock.
+  [#3799](https://github.com/lovell/sharp/pull/3799)
+  [@ldrick](https://github.com/ldrick)
+
 ### v0.32.5 - 15th August 2023
 
 * Upgrade to libvips v8.14.4 for upstream bug fixes.
