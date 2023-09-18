@@ -4,7 +4,7 @@
 
 Requires libvips v8.14.5
 
-### v0.32.6 - TBD
+### v0.32.6 - 18th September 2023
 
 * Upgrade to libvips v8.14.5 for upstream bug fixes.
 
