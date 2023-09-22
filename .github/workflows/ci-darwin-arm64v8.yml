@@ -7,16 +7,18 @@ jobs:
   CI:
     permissions:
       contents: write # for npx prebuild to make release
-    name: Node.js ${{ matrix.nodejs_version }} ${{ matrix.nodejs_arch }} ${{ matrix.prebuild && '- prebuild' }}
+    name: Node.js ${{ matrix.nodejs_version }} ${{ matrix.platform }} ${{ matrix.prebuild && '- prebuild' }}
     runs-on: macos-m1
     strategy:
       fail-fast: false
       matrix:
         include:
-          - nodejs_version: 14
+          - nodejs_version: "^18.17.0"
             nodejs_arch: x64
-          - nodejs_version: 18
+            platform: darwin-x64
+          - nodejs_version: "^18.17.0"
             nodejs_arch: arm64
+            platform: darwin-arm64
             prebuild: true
     defaults:
       run:
@@ -30,7 +32,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install
-        run: npm install --build-from-source --unsafe-perm
+        run: npm install --build-from-source
       - name: Test
         run: npm test
       - name: Prebuild

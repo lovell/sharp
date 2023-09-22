@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.33 - *gauge*
+
+Requires libvips v8.14.5
+
+### v0.33.0 - TBD
+
+* Drop support for Node.js 14 and 16, now requires Node.js >= 18.17.0
+
 ## v0.32 - *flow*
 
 Requires libvips v8.14.5

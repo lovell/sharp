@@ -10,7 +10,7 @@ yarn add sharp
 
 ## Prerequisites
 
-* Node.js >= 14.15.0
+* Node.js >= 18.17.0
 
 ## Prebuilt binaries
 

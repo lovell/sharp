@@ -134,7 +134,7 @@
   "dependencies": {
     "color": "^4.2.3",
     "detect-libc": "^2.0.2",
-    "node-addon-api": "^6.1.0",
+    "node-addon-api": "^7.0.0",
     "prebuild-install": "^7.1.1",
     "semver": "^7.5.4",
     "simple-get": "^4.0.1",
@@ -177,7 +177,7 @@
     "target": 7
   },
   "engines": {
-    "node": ">=14.15.0"
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"

@@ -11,6 +11,6 @@ task:
     - pkg upgrade -y
     - pkg install -y devel/git devel/pkgconf graphics/vips www/node20 www/npm
   install_script:
-    - npm install --build-from-source --unsafe-perm
+    - npm install --build-from-source
   test_script:
     - npm test
