@@ -174,7 +174,7 @@
       "win32-x64": "sha512-BwKckinJZ0Fu/EcunqiLPwOLEBWp4xf8GV7nvmVuKKz5f6B+GxoA2k9aa2wueqv4r4RJVgV/aWXZWFKOIjre/Q=="
     },
     "runtime": "napi",
-    "target": 7
+    "target": 9
   },
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
@@ -184,7 +184,7 @@
   },
   "binary": {
     "napi_versions": [
-      7
+      9
     ]
   },
   "semistandard": {

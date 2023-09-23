@@ -70,7 +70,7 @@
   }, {
     'target_name': 'sharp-<(platform_and_arch)',
     'defines': [
-      'NAPI_VERSION=7',
+      'NAPI_VERSION=9',
       'NODE_ADDON_API_DISABLE_DEPRECATED',
       'NODE_API_SWALLOW_UNTHROWABLE_EXCEPTIONS'
     ],
