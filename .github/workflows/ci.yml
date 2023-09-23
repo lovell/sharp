@@ -78,11 +78,11 @@ jobs:
       - name: Dependencies (Linux musl)
         if: contains(matrix.container, 'alpine')
         run: apk add build-base git python3 font-noto --update-cache
-      - name: Dependencies (Python 3.10 - macOS, Windows)
+      - name: Dependencies (Python 3.11 - macOS, Windows)
         if: contains(matrix.os, 'macos') || contains(matrix.os, 'windows')
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Dependencies (Node.js - macOS, Windows)
         if: contains(matrix.os, 'macos') || contains(matrix.os, 'windows')
         uses: actions/setup-node@v3
