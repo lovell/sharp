@@ -1,13 +1,13 @@
-name: CI (GitHub)
+name: CI
 on:
   - push
   - pull_request
 permissions: {}
 jobs:
-  CI:
+  github-runner:
     permissions:
-      contents: write # for npx prebuild to make release
-    name: ${{ matrix.container || matrix.os }} - Node.js ${{ matrix.platform }} ${{ matrix.nodejs_arch }} ${{ matrix.prebuild && '- prebuild' }}
+      contents: write
+    name: ${{ matrix.platform }} - Node.js ${{ matrix.nodejs_version_major }} ${{ matrix.prebuild && '- prebuild' }}
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     strategy:
@@ -17,52 +17,60 @@ jobs:
           - os: ubuntu-22.04
             container: rockylinux:8
             nodejs_version: "^18.17.0"
+            nodejs_version_major: 18
             platform: linux-x64
             prebuild: true
           - os: ubuntu-22.04
             container: rockylinux:8
             nodejs_version: "^20.3.0"
+            nodejs_version_major: 20
             platform: linux-x64
           - os: ubuntu-22.04
             container: node:18-alpine3.17
+            nodejs_version_major: 18
             platform: linuxmusl-x64
             prebuild: true
           - os: ubuntu-22.04
             container: node:20-alpine3.18
+            nodejs_version_major: 20
             platform: linuxmusl-x64
           - os: macos-11
-            nodejs_version: "^18.17.0"
             nodejs_arch: x64
+            nodejs_version: "^18.17.0"
             platform: darwin-x64
             prebuild: true
           - os: macos-11
-            nodejs_version: "^20.3.0"
             nodejs_arch: x64
+            nodejs_version: "^20.3.0"
+            nodejs_version_major: 20
             platform: darwin-x64
           - os: windows-2019
-            nodejs_version: "^18.17.0"
             nodejs_arch: x86
+            nodejs_version: "^18.17.0"
+            nodejs_version_major: 18
             platform: win32-ia32
             prebuild: true
           - os: windows-2019
-            nodejs_version: "^20.3.0"
             nodejs_arch: x86
+            nodejs_version: "^20.3.0"
+            nodejs_version_major: 20
             platform: win32-ia32
           - os: windows-2019
-            nodejs_version: "^18.17.0"
             nodejs_arch: x64
+            nodejs_version: "^18.17.0"
+            nodejs_version_major: 18
             platform: win32-x64
             prebuild: true
           - os: windows-2019
-            nodejs_version: "^20.3.0"
             nodejs_arch: x64
+            nodejs_version: "^20.3.0"
+            nodejs_version_major: 20
             platform: win32-x64
     steps:
       - name: Dependencies (Linux glibc)
         if: contains(matrix.container, 'centos')
         run: |
-          NODE_MAJOR="${{ contains(matrix.nodejs_version, '^18.') && '18' || '20' }}"
-          yum install -y https://rpm.nodesource.com/pub_${NODE_MAJOR}.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm
+          yum install -y https://rpm.nodesource.com/pub_${{ matrix.nodejs_version_major }}.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm
           yum install -y https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
           yum install -y centos-release-scl
           yum install -y devtoolset-11-gcc-c++ make git python3 nodejs fontconfig google-noto-sans-fonts
@@ -70,8 +78,7 @@ jobs:
       - name: Dependencies (Rocky Linux glibc)
         if: contains(matrix.container, 'rockylinux')
         run: |
-          NODE_MAJOR="${{ contains(matrix.nodejs_version, '^18.') && '18' || '20' }}"
-          dnf install -y https://rpm.nodesource.com/pub_${NODE_MAJOR}.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm
+          dnf install -y https://rpm.nodesource.com/pub_${{ matrix.nodejs_version_major }}.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm
           dnf install -y --setopt=nodesource-nodejs.module_hotfixes=1 nodejs
           dnf install -y gcc-toolset-11-gcc-c++ make git python3 fontconfig google-noto-sans-fonts
           echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
@@ -90,7 +97,7 @@ jobs:
           node-version: ${{ matrix.nodejs_version }}
           architecture: ${{ matrix.nodejs_arch }}
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Fix working directory ownership
         if: matrix.container
         run: chown root.root .
@@ -103,13 +110,13 @@ jobs:
         env:
           prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
         run: npx prebuild
-  linux-arm:
+  github-runner-qemu:
     permissions:
       contents: write
     name: linux-arm - Node.js 18 - prebuild
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: uraimo/run-on-arch-action@v2
         with:
           arch: armv6
@@ -127,3 +134,41 @@ jobs:
             npm install --build-from-source
             npx mocha --no-config --spec=test/unit/io.js
             [[ -n $prebuild_upload ]] && npx prebuild || true
+  macstadium-runner:
+    permissions:
+      contents: write
+    name: ${{ matrix.platform }} - Node.js ${{ matrix.nodejs_version_major }} ${{ matrix.prebuild && '- prebuild' }}
+    runs-on: macos-m1
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nodejs_arch: x64
+            nodejs_version: "^18.17.0"
+            nodejs_version_major: 18
+            platform: darwin-x64
+          - nodejs_arch: arm64
+            nodejs_version: "^18.17.0"
+            nodejs_version_major: 18
+            platform: darwin-arm64
+            prebuild: true
+    defaults:
+      run:
+        shell: /usr/bin/arch -arch arm64e /bin/bash -l {0}
+    steps:
+      - name: Dependencies (Node.js)
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.nodejs_version }}
+          architecture: ${{ matrix.nodejs_arch }}
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install
+        run: npm install --build-from-source
+      - name: Test
+        run: npm test
+      - name: Prebuild
+        if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
+        env:
+          prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
+        run: npx prebuild
