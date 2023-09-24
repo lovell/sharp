@@ -103,3 +103,27 @@ jobs:
         env:
           prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
         run: npx prebuild
+  linux-arm:
+    permissions:
+      contents: write
+    name: linux-arm - Node.js 18 - prebuild
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: armv6
+          distro: buster
+          env: |
+            nodejs_version: "18.17.0"
+            prebuild_upload: "${{ startsWith(github.ref, 'refs/tags/') && secrets.GITHUB_TOKEN || '' }}"
+          run: |
+            apt-get update
+            apt-get install -y fontconfig fonts-noto-core g++ git libatomic1 make python3 xz-utils
+            mkdir /opt/nodejs
+            curl --silent https://unofficial-builds.nodejs.org/download/release/v${nodejs_version}/node-v${nodejs_version}-linux-armv6l.tar.xz | tar xJC /opt/nodejs --strip-components=1
+            export PATH=$PATH:/opt/nodejs/bin
+            chown root.root .
+            npm install --build-from-source
+            npx mocha --no-config --spec=test/unit/io.js
+            [[ -n $prebuild_upload ]] && npx prebuild || true
