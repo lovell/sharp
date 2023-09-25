@@ -12,7 +12,6 @@ labels: installation
 <!-- Please place an [x] in the box to confirm. -->
 
 - [ ] I have read the [documentation relating to installation](https://sharp.pixelplumbing.com/install).
-- [ ] I have ensured that the architecture and platform of Node.js used for `npm install` is the same as the architecture and platform of Node.js used at runtime.
 
 ### Are you using the latest version of sharp?
 
@@ -24,13 +23,25 @@ If you cannot confirm this, please upgrade to the latest version and try again b
 
 If you are using another package which depends on a version of `sharp` that is not the latest, please open an issue against that package instead.
 
-### Is this a problem with filesystem permissions?
+### Are you using a supported runtime?
 
-If you are using npm v6 or earlier and installing as a `root` or `sudo` user, have you tried with the `npm install --unsafe-perm` flag?
+<!-- Please place an [x] in the relevant box to confirm. -->
 
-If you are using npm v7 or later, does the user running `npm install` own the directory it is run in?
+- [ ] I am using Node.js 18 with a version >= 18.17.0
+- [ ] I am using Node.js 20 with a version >= 20.3.0
+- [ ] I am using Node.js 21 or later
 
-If you are using the `ignore-scripts` feature of `npm`, have you tried with the `npm install --ignore-scripts=false` flag?
+If you cannot confirm any of these, please upgrade to the latest version and try again before opening an issue.
+
+### Are you using a supported package manager?
+
+<!-- Please place an [x] in the relevant box to confirm. -->
+
+- [ ] I am using npm >= 9.6.5
+- [ ] I am using yarn >= 3.2.0
+- [ ] I am using pnpm >= 7.1.0
+
+If you cannot confirm any of these, please upgrade to the latest version and try again before opening an issue.
 
 ### What is the complete output of running `npm install --verbose --foreground-scripts sharp` in an empty directory?
 

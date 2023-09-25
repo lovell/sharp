@@ -1,0 +1,45 @@
+{
+  "name": "@sharpen/sharp-linuxmusl-x64",
+  "version": "0.0.1-alpha.1",
+  "description": "Prebuilt sharp for use with Linux (musl) x64",
+  "homepage": "https://sharp.pixelplumbing.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lovell/sharp.git",
+    "directory": "npm/linuxmusl-x64"
+  },
+  "license": "Apache-2.0",
+  "funding": {
+    "url": "https://opencollective.com/libvips"
+  },
+  "preferUnplugged": true,
+  "optionalDependencies": {
+    "@sharpen/sharp-libvips-linuxmusl-x64": "0.0.1-alpha.1"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    "./sharp.node": "./lib/sharp-linuxmusl-x64.node",
+    "./package": "./package.json"
+  },
+  "engines": {
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0",
+    "npm": ">=9.6.5",
+    "yarn": ">=3.2.0",
+    "pnpm": ">=7.1.0",
+    "musl": ">=1.2.2"
+  },
+  "os": [
+    "linux"
+  ],
+  "libc": [
+    "musl"
+  ],
+  "cpu": [
+    "x64"
+  ]
+}

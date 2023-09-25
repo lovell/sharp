@@ -7,7 +7,6 @@ const assert = require('assert');
 const fs = require('fs');
 const semver = require('semver');
 const libvips = require('../../lib/libvips');
-const mockFS = require('mock-fs');
 
 const originalPlatform = process.platform;
 
@@ -59,10 +58,6 @@ describe('libvips binaries', function () {
       assert.strictEqual('string', typeof minimumLibvipsVersion);
       assert.notStrictEqual(null, semver.valid(minimumLibvipsVersion));
     });
-    it('hasVendoredLibvips returns a boolean', function () {
-      const hasVendoredLibvips = libvips.hasVendoredLibvips();
-      assert.strictEqual('boolean', typeof hasVendoredLibvips);
-    });
     it('useGlobalLibvips can be ignored via an env var', function () {
       process.env.SHARP_IGNORE_GLOBAL_LIBVIPS = 1;
 
@@ -71,62 +66,48 @@ describe('libvips binaries', function () {
 
       delete process.env.SHARP_IGNORE_GLOBAL_LIBVIPS;
     });
-    it('cachePath returns a valid path ending with _libvips', function () {
-      const cachePath = libvips.cachePath();
-      assert.strictEqual('string', typeof cachePath);
-      assert.strictEqual('_libvips', cachePath.substr(-8));
-      assert.strictEqual(true, fs.existsSync(cachePath));
+  });
+
+  describe('Build time platform detection', () => {
+    it('Can override platform with npm_config_platform and npm_config_libc', () => {
+      process.env.npm_config_platform = 'testplatform';
+      process.env.npm_config_libc = 'testlibc';
+      const [platform] = libvips.buildPlatformArch().split('-');
+      assert.strictEqual(platform, 'testplatformtestlibc');
+      delete process.env.npm_config_platform;
+      delete process.env.npm_config_libc;
+    });
+    it('Can override arch with npm_config_arch', () => {
+      process.env.npm_config_arch = 'test';
+      const [, arch] = libvips.buildPlatformArch().split('-');
+      assert.strictEqual(arch, 'test');
+      delete process.env.npm_config_arch;
     });
   });
 
-  describe('integrity', function () {
-    it('reads value from environment variable', function () {
-      const prev = process.env.npm_package_config_integrity_platform_arch;
-      process.env.npm_package_config_integrity_platform_arch = 'sha512-test';
-
-      const integrity = libvips.integrity('platform-arch');
-      assert.strictEqual('sha512-test', integrity);
-
-      process.env.npm_package_config_integrity_platform_arch = prev;
+  describe('Build time directories', () => {
+    it('sharp-libvips include', () => {
+      const dir = libvips.buildSharpLibvipsIncludeDir();
+      assert.strictEqual(fs.statSync(dir).isDirectory(), true);
     });
-    it('reads value from package.json', function () {
-      const prev = process.env.npm_package_config_integrity_linux_x64;
-      delete process.env.npm_package_config_integrity_linux_x64;
-
-      const integrity = libvips.integrity('linux-x64');
-      assert.strictEqual('sha512-', integrity.substr(0, 7));
-
-      process.env.npm_package_config_integrity_linux_x64 = prev;
+    it('sharp-libvips cplusplus', () => {
+      const dir = libvips.buildSharpLibvipsCPlusPlusDir();
+      assert.strictEqual(fs.statSync(dir).isDirectory(), true);
+    });
+    it('sharp-libvips lib', () => {
+      const dir = libvips.buildSharpLibvipsLibDir();
+      assert.strictEqual(fs.statSync(dir).isDirectory(), true);
     });
   });
 
-  describe('safe directory creation', function () {
-    before(function () {
-      mockFS({
-        exampleDirA: {
-          exampleDirB: {
-            exampleFile: 'Example test file'
-          }
-        }
-      });
+  describe('Runtime detection', () => {
+    it('platform', () => {
+      const [platform] = libvips.runtimePlatformArch().split('-');
+      assert.strict(['darwin', 'linux', 'linuxmusl', 'win32'].includes(platform));
     });
-    after(function () { mockFS.restore(); });
-
-    it('mkdirSync creates a directory', function () {
-      const dirPath = 'createdDir';
-
-      libvips.mkdirSync(dirPath);
-      assert.strictEqual(true, fs.existsSync(dirPath));
-    });
-    it('mkdirSync does not throw error or overwrite an existing dir', function () {
-      const dirPath = 'exampleDirA';
-      const nestedDirPath = 'exampleDirA/exampleDirB';
-      assert.strictEqual(true, fs.existsSync(dirPath));
-
-      libvips.mkdirSync(dirPath);
-
-      assert.strictEqual(true, fs.existsSync(dirPath));
-      assert.strictEqual(true, fs.existsSync(nestedDirPath));
+    it('arch', () => {
+      const [, arch] = libvips.runtimePlatformArch().split('-');
+      assert.strict(['arm', 'arm64', 'ia32', 'x64'].includes(arch));
     });
   });
 

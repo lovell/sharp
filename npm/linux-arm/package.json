@@ -1,0 +1,45 @@
+{
+  "name": "@sharpen/sharp-linux-arm",
+  "version": "0.0.1-alpha.1",
+  "description": "Prebuilt sharp for use with Linux (glibc) ARM (32-bit)",
+  "homepage": "https://sharp.pixelplumbing.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lovell/sharp.git",
+    "directory": "npm/linux-arm"
+  },
+  "license": "Apache-2.0",
+  "funding": {
+    "url": "https://opencollective.com/libvips"
+  },
+  "preferUnplugged": true,
+  "optionalDependencies": {
+    "@sharpen/sharp-libvips-linux-arm": "0.0.1-alpha.1"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    "./sharp.node": "./lib/sharp-linux-arm.node",
+    "./package": "./package.json"
+  },
+  "engines": {
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0",
+    "npm": ">=9.6.5",
+    "yarn": ">=3.2.0",
+    "pnpm": ">=7.1.0",
+    "glibc": ">=2.28"
+  },
+  "os": [
+    "linux"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "cpu": [
+    "arm"
+  ]
+}

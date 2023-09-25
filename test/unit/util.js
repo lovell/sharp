@@ -146,14 +146,6 @@ describe('Utilities', function () {
     });
   });
 
-  describe('Vendor', function () {
-    it('Contains expected attributes', function () {
-      assert.strictEqual('object', typeof sharp.vendor);
-      assert.strictEqual('string', typeof sharp.vendor.current);
-      assert.strictEqual(true, Array.isArray(sharp.vendor.installed));
-    });
-  });
-
   describe('Block', () => {
     it('Can block a named operation', () => {
       sharp.block({ operation: ['test'] });

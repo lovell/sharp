@@ -1,7 +1,7 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP, GIF, AVIF and TIFF images",
-  "version": "0.32.6",
+  "version": "0.33.0-alpha.1",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://github.com/lovell/sharp",
   "contributors": [
@@ -89,14 +89,16 @@
     "Lachlan Newman <lachnewman007@gmail.com>"
   ],
   "scripts": {
-    "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
-    "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
+    "install": "node install/check",
+    "clean": "rm -rf build/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run test-lint && npm run test-unit && npm run test-licensing && npm run test-types",
     "test-lint": "semistandard && cpplint",
     "test-unit": "nyc --reporter=lcov --reporter=text --check-coverage --branches=100 mocha",
-    "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;MIT\"",
+    "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;LGPL-3.0-or-later;MIT\"",
     "test-leak": "./test/leak/leak.sh",
     "test-types": "tsd",
+    "package-from-local-build": "node npm/from-local-build",
+    "package-from-github-release": "node npm/from-github-release",
     "docs-build": "node docs/build && node docs/search-index/build",
     "docs-serve": "cd docs && npx serve",
     "docs-publish": "cd docs && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
@@ -111,7 +113,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/lovell/sharp"
+    "url": "git://github.com/lovell/sharp.git"
   },
   "keywords": [
     "jpeg",
@@ -135,13 +137,30 @@
     "color": "^4.2.3",
     "detect-libc": "^2.0.2",
     "node-addon-api": "^7.0.0",
-    "prebuild-install": "^7.1.1",
-    "semver": "^7.5.4",
-    "simple-get": "^4.0.1",
-    "tar-fs": "^3.0.4",
-    "tunnel-agent": "^0.6.0"
+    "semver": "^7.5.4"
+  },
+  "optionalDependencies": {
+    "@sharpen/sharp-darwin-arm64": "0.0.1-alpha.1",
+    "@sharpen/sharp-darwin-x64": "0.0.1-alpha.1",
+    "@sharpen/sharp-linux-arm": "0.0.1-alpha.1",
+    "@sharpen/sharp-linux-arm64": "0.0.1-alpha.1",
+    "@sharpen/sharp-linux-x64": "0.0.1-alpha.1",
+    "@sharpen/sharp-linuxmusl-arm64": "0.0.1-alpha.1",
+    "@sharpen/sharp-linuxmusl-x64": "0.0.1-alpha.1",
+    "@sharpen/sharp-win32-ia32": "0.0.1-alpha.1",
+    "@sharpen/sharp-win32-x64": "0.0.1-alpha.1"
   },
   "devDependencies": {
+    "@sharpen/sharp-libvips-darwin-arm64": "0.0.1-alpha.1",
+    "@sharpen/sharp-libvips-darwin-x64": "0.0.1-alpha.1",
+    "@sharpen/sharp-libvips-dev": "0.0.1-alpha.1",
+    "@sharpen/sharp-libvips-linux-arm": "0.0.1-alpha.1",
+    "@sharpen/sharp-libvips-linux-arm64": "0.0.1-alpha.1",
+    "@sharpen/sharp-libvips-linux-x64": "0.0.1-alpha.1",
+    "@sharpen/sharp-libvips-linuxmusl-arm64": "0.0.1-alpha.1",
+    "@sharpen/sharp-libvips-linuxmusl-x64": "0.0.1-alpha.1",
+    "@sharpen/sharp-libvips-win32-ia32": "0.0.1-alpha.1",
+    "@sharpen/sharp-libvips-win32-x64": "0.0.1-alpha.1",
     "@types/node": "*",
     "async": "^3.2.4",
     "cc": "^3.0.1",
@@ -151,33 +170,16 @@
     "jsdoc-to-markdown": "^8.0.0",
     "license-checker": "^25.0.1",
     "mocha": "^10.2.0",
-    "mock-fs": "^5.2.0",
     "nyc": "^15.1.0",
     "prebuild": "^12.1.0",
     "semistandard": "^16.0.1",
+    "tar-fs": "^3.0.4",
     "tsd": "^0.29.0"
   },
   "license": "Apache-2.0",
-  "config": {
-    "libvips": "8.14.5",
-    "integrity": {
-      "darwin-arm64v8": "sha512-1QZzICfCJd4wAO0P6qmYI5e5VFMt9iCE4QgefI8VMMbdSzjIXA9L/ARN6pkMQPZ3h20Y9RtJ2W1skgCsvCIccw==",
-      "darwin-x64": "sha512-sMIKMYXsdU9FlIfztj6Kt/SfHlhlDpP0Ups7ftVFqwjaszmYmpI9y/d/q3mLb4jrzuSiSUEislSWCwBnW7MPTw==",
-      "linux-arm64v8": "sha512-CD8owELzkDumaom+O3jJ8fKamILAQdj+//KK/VNcHK3sngUcFpdjx36C8okwbux9sml/T7GTB/gzpvReDrAejQ==",
-      "linux-armv6": "sha512-wk6IPHatDFVWKJy7lI1TJezHGHPQut1wF2bwx256KlZwXUQU3fcVcMpV1zxXjgLFewHq2+uhyMkoSGBPahWzlA==",
-      "linux-armv7": "sha512-HEZC9KYtkmBK5rUR2MqBhrVarnQVZ/TwLUeLkKq0XuoM2pc/eXI6N0Fh5NGEFwdXI2XE8g1ySf+OYS6DDi+xCQ==",
-      "linux-x64": "sha512-SlFWrITSW5XVUkaFPQOySAaSGXnhkGJCj8X2wGYYta9hk5piZldQyMp4zwy0z6UeRu1qKTKtZvmq28W3Gnh9xA==",
-      "linuxmusl-arm64v8": "sha512-ga9iX7WUva3sG/VsKkOD318InLlCfPIztvzCZKZ2/+izQXRbQi8VoXWMHgEN4KHACv45FTl7mJ/8CRqUzhS8wQ==",
-      "linuxmusl-x64": "sha512-yeaHnpfee1hrZLok2l4eFceHzlfq8gN3QOu0R4Mh8iMK5O5vAUu97bdtxeZZeJJvHw8tfh2/msGi0qysxKN8bw==",
-      "win32-arm64v8": "sha512-kR91hy9w1+GEXK56hLh51+hBCBo7T+ijM4Slkmvb/2PsYZySq5H7s61n99iDYl6kTJP2y9sW5Xcvm3uuXDaDgg==",
-      "win32-ia32": "sha512-HrnofEbzHNpHJ0vVnjsTj5yfgVdcqdWshXuwFO2zc8xlEjA83BvXZ0lVj9MxPxkxJ2ta+/UlLr+CFzc5bOceMw==",
-      "win32-x64": "sha512-BwKckinJZ0Fu/EcunqiLPwOLEBWp4xf8GV7nvmVuKKz5f6B+GxoA2k9aa2wueqv4r4RJVgV/aWXZWFKOIjre/Q=="
-    },
-    "runtime": "napi",
-    "target": 9
-  },
   "engines": {
-    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0",
+    "libvips": ">=8.14.5"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"

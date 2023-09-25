@@ -91,12 +91,6 @@ declare namespace sharp {
         zlib?: string | undefined;
     };
 
-    /** An Object containing the platform and architecture of the current and installed vendored binaries. */
-    const vendor: {
-        current: string;
-        installed: string[];
-    };
-
     /** An Object containing the available interpolators and their proper values */
     const interpolators: Interpolators;
 

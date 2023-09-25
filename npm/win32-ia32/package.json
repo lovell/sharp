@@ -1,0 +1,41 @@
+{
+  "name": "@sharpen/sharp-win32-ia32",
+  "version": "0.0.1-alpha.1",
+  "description": "Prebuilt sharp for use with Windows x86 (32-bit)",
+  "homepage": "https://sharp.pixelplumbing.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lovell/sharp.git",
+    "directory": "npm/win32-ia32"
+  },
+  "license": "Apache-2.0 AND LGPL-3.0-or-later",
+  "funding": {
+    "url": "https://opencollective.com/libvips"
+  },
+  "preferUnplugged": true,
+  "optionalDependencies": {
+    "@sharpen/sharp-libvips-win32-ia32": "0.0.1-alpha.1"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    "./sharp.node": "./lib/sharp-win32-ia32.node",
+    "./package": "./package.json"
+  },
+  "engines": {
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0",
+    "npm": ">=9.6.5",
+    "yarn": ">=3.2.0",
+    "pnpm": ">=7.1.0"
+  },
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "ia32"
+  ]
+}

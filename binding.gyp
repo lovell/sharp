@@ -1,11 +1,16 @@
+# Copyright 2013 Lovell Fuller and others.
+# SPDX-License-Identifier: Apache-2.0
+
 {
   'variables': {
     'vips_version': '<!(node -p "require(\'./lib/libvips\').minimumLibvipsVersion")',
-    'platform_and_arch': '<!(node -p "require(\'./lib/platform\')()")',
-    'sharp_vendor_dir': './vendor/<(vips_version)/<(platform_and_arch)'
+    'platform_and_arch': '<!(node -p "require(\'./lib/libvips\').buildPlatformArch()")',
+    'sharp_libvips_include_dir': '<!(node -p "require(\'./lib/libvips\').buildSharpLibvipsIncludeDir()")',
+    'sharp_libvips_cplusplus_dir': '<!(node -p "require(\'./lib/libvips\').buildSharpLibvipsCPlusPlusDir()")',
+    'sharp_libvips_lib_dir': '<!(node -p "require(\'./lib/libvips\').buildSharpLibvipsLibDir()")'
   },
   'targets': [{
-    'target_name': 'libvips-cpp',
+    'target_name': 'win-libvips-cpp',
     'conditions': [
       ['OS == "win"', {
         # Build libvips C++ binding for Windows due to MSVC std library ABI changes
@@ -15,19 +20,19 @@
           '_ALLOW_KEYWORD_MACROS'
         ],
         'sources': [
-          'src/libvips/cplusplus/VConnection.cpp',
-          'src/libvips/cplusplus/VError.cpp',
-          'src/libvips/cplusplus/VImage.cpp',
-          'src/libvips/cplusplus/VInterpolate.cpp',
-          'src/libvips/cplusplus/VRegion.cpp'
+          '<(sharp_libvips_cplusplus_dir)/VConnection.cpp',
+          '<(sharp_libvips_cplusplus_dir)/VError.cpp',
+          '<(sharp_libvips_cplusplus_dir)/VImage.cpp',
+          '<(sharp_libvips_cplusplus_dir)/VInterpolate.cpp',
+          '<(sharp_libvips_cplusplus_dir)/VRegion.cpp'
         ],
         'include_dirs': [
-          '<(sharp_vendor_dir)/include',
-          '<(sharp_vendor_dir)/include/glib-2.0',
-          '<(sharp_vendor_dir)/lib/glib-2.0/include'
+          '<(sharp_libvips_include_dir)',
+          '<(sharp_libvips_include_dir)/glib-2.0',
+          '<(sharp_libvips_lib_dir)/glib-2.0/include'
         ],
         'link_settings': {
-          'library_dirs': ['<(sharp_vendor_dir)/lib'],
+          'library_dirs': ['<(sharp_libvips_lib_dir)'],
           'libraries': [
             'libvips.lib',
             'libglib-2.0.lib',
@@ -76,10 +81,9 @@
     ],
     'dependencies': [
       '<!(node -p "require(\'node-addon-api\').gyp")',
-      'libvips-cpp'
+      'win-libvips-cpp'
     ],
     'variables': {
-      'runtime_link%': 'shared',
       'conditions': [
         ['OS != "win"', {
           'pkg_config_path': '<!(node -p "require(\'./lib/libvips\').pkgConfigPath()")',
@@ -106,12 +110,8 @@
       ['use_global_libvips == "true"', {
         # Use pkg-config for include and lib
         'include_dirs': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --cflags-only-I vips-cpp vips glib-2.0 | sed s\/-I//g)'],
+        'libraries': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips-cpp)'],
         'conditions': [
-          ['runtime_link == "static"', {
-            'libraries': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs --static vips-cpp)']
-          }, {
-            'libraries': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips-cpp)']
-          }],
           ['OS == "linux"', {
             'defines': [
               # Inspect libvips-cpp.so to determine which C++11 ABI version was used and set _GLIBCXX_USE_CXX11_ABI accordingly. This is quite horrible.
@@ -122,9 +122,9 @@
       }, {
         # Use pre-built libvips stored locally within node_modules
         'include_dirs': [
-          '<(sharp_vendor_dir)/include',
-          '<(sharp_vendor_dir)/include/glib-2.0',
-          '<(sharp_vendor_dir)/lib/glib-2.0/include'
+          '<(sharp_libvips_include_dir)',
+          '<(sharp_libvips_include_dir)/glib-2.0',
+          '<(sharp_libvips_lib_dir)/glib-2.0/include'
         ],
         'conditions': [
           ['OS == "win"', {
@@ -133,7 +133,7 @@
               '_FILE_OFFSET_BITS=64'
             ],
             'link_settings': {
-              'library_dirs': ['<(sharp_vendor_dir)/lib'],
+              'library_dirs': ['<(sharp_libvips_lib_dir)'],
               'libraries': [
                 'libvips.lib',
                 'libglib-2.0.lib',
@@ -143,7 +143,9 @@
           }],
           ['OS == "mac"', {
             'link_settings': {
-              'library_dirs': ['../<(sharp_vendor_dir)/lib'],
+              'library_dirs': [
+                '<(sharp_libvips_lib_dir)'
+              ],
               'libraries': [
                 'libvips-cpp.42.dylib'
               ]
@@ -151,7 +153,9 @@
             'xcode_settings': {
               'OTHER_LDFLAGS': [
                 # Ensure runtime linking is relative to sharp.node
-                '-Wl,-rpath,\'@loader_path/../../<(sharp_vendor_dir)/lib\''
+                '-Wl,-rpath,\'@loader_path/../../sharp-libvips-<(platform_and_arch)/lib\'',
+                '-Wl,-rpath,\'@loader_path/../../node_modules/@sharpen/sharp-libvips-<(platform_and_arch)/lib\'',
+                '-Wl,-rpath,\'@loader_path/../../../node_modules/@sharpen/sharp-libvips-<(platform_and_arch)/lib\''
               ]
             }
           }],
@@ -160,13 +164,19 @@
               '_GLIBCXX_USE_CXX11_ABI=1'
             ],
             'link_settings': {
-              'library_dirs': ['../<(sharp_vendor_dir)/lib'],
+              'library_dirs': [
+                '<(sharp_libvips_lib_dir)'
+              ],
               'libraries': [
                 '-l:libvips-cpp.so.42'
               ],
               'ldflags': [
                 # Ensure runtime linking is relative to sharp.node
-                '-Wl,-s -Wl,--disable-new-dtags -Wl,-rpath=\'$$ORIGIN/../../<(sharp_vendor_dir)/lib\''
+                '-Wl,-s',
+                '-Wl,--disable-new-dtags',
+                '-Wl,-rpath=\'$$ORIGIN/../../sharp-libvips-<(platform_and_arch)/lib\'',
+                '-Wl,-rpath=\'$$ORIGIN/../../node_modules/@sharpen/sharp-libvips-<(platform_and_arch)/lib\'',
+                '-Wl,-rpath=\'$$ORIGIN/../../../node_modules/@sharpen/sharp-libvips-<(platform_and_arch)/lib\''
               ]
             }
           }]
@@ -232,5 +242,23 @@
         ]
       }
     },
+  }, {
+    'target_name': 'win-copy-dlls',
+    'type': 'none',
+    'dependencies': [
+      'sharp-<(platform_and_arch)'
+    ],
+    'conditions': [
+      ['OS == "win"', {
+        'copies': [{
+          'destination': 'build/Release',
+          'files': [
+            '<(sharp_libvips_lib_dir)/libvips-42.dll',
+            '<(sharp_libvips_lib_dir)/libglib-2.0-0.dll',
+            '<(sharp_libvips_lib_dir)/libgobject-2.0-0.dll'
+          ]
+        }]
+      }]
+    ]
   }]
 }

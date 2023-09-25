@@ -73,8 +73,6 @@ readableStream.pipe(transformer).pipe(writableStream);
 
 console.log(sharp.format);
 console.log(sharp.versions);
-console.log(sharp.vendor.current);
-console.log(sharp.vendor.installed.join(', '));
 
 sharp.queue.on('change', (queueLength: number) => {
   console.log(`Queue contains ${queueLength} task(s)`);

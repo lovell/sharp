@@ -1,6 +1,8 @@
 build
 node_modules
 /coverage
+npm/*/*
+!npm/*/package.json
 test/bench/node_modules
 test/fixtures/output*
 test/fixtures/vips-properties.xml
@@ -9,7 +11,6 @@ test/saliency/report.json
 test/saliency/Image*
 test/saliency/[Uu]serData*
 !test/saliency/userData.js
-vendor
 .gitattributes
 .DS_Store
 .nyc_output
