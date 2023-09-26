@@ -5,7 +5,7 @@
 
 const os = require('os');
 const fs = require('fs');
-const { exec } = require('child_process');
+const { exec, execSync } = require('child_process');
 
 const async = require('async');
 const Benchmark = require('benchmark');
@@ -40,8 +40,10 @@ const heightPng = 540;
 // Disable libvips cache to ensure tests are as fair as they can be
 sharp.cache(false);
 
-// Spawn one thread per CPU
-sharp.concurrency(os.cpus().length);
+// Spawn one thread per physical CPU core
+const physicalCores = Number(execSync('lscpu -p | egrep -v "^#" | sort -u -t, -k 2,4 | wc -l', { encoding: 'utf-8' }).trim());
+console.log(`Detected ${physicalCores} physical cores`);
+sharp.concurrency(physicalCores);
 
 async.series({
   jpeg: function (callback) {

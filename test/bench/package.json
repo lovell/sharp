@@ -17,11 +17,8 @@
     "jimp": "0.22.10"
   },
   "optionalDependencies": {
-    "@tensorflow/tfjs-node": "4.9.0",
+    "@tensorflow/tfjs-node": "4.11.0",
     "mapnik": "4.5.9"
   },
-  "license": "Apache-2.0",
-  "engines": {
-    "node": "16"
-  }
+  "license": "Apache-2.0"
 }
