@@ -269,7 +269,7 @@ describe('composite', () => {
           .resize(80)
           .composite([{
             input: fixtures.inputPngWithTransparency16bit,
-            gravity: gravity
+            gravity
           }])
           .toBuffer((err, data, info) => {
             if (err) throw err;
@@ -314,7 +314,7 @@ describe('composite', () => {
           .composite([{
             input: fixtures.inputPngWithTransparency16bit,
             tile: true,
-            gravity: gravity
+            gravity
           }])
           .toBuffer((err, data, info) => {
             if (err) throw err;

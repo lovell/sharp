@@ -646,7 +646,7 @@ describe('Resize dimensions', function () {
   ].forEach(function (kernel) {
     it(`kernel ${kernel}`, function (done) {
       sharp(fixtures.inputJpg)
-        .resize(320, null, { kernel: kernel })
+        .resize(320, null, { kernel })
         .toBuffer(function (err, data, info) {
           if (err) throw err;
           assert.strictEqual('jpeg', info.format);

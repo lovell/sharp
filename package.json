@@ -172,7 +172,7 @@
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "prebuild": "^12.1.0",
-    "semistandard": "^16.0.1",
+    "semistandard": "^17.0.0",
     "tar-fs": "^3.0.4",
     "tsd": "^0.29.0"
   },

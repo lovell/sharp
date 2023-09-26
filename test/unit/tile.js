@@ -125,7 +125,7 @@ describe('Tile', function () {
     [1, 8192].forEach(function (size) {
       assert.doesNotThrow(function () {
         sharp().tile({
-          size: size
+          size
         });
       });
     });
@@ -135,7 +135,7 @@ describe('Tile', function () {
     ['zoinks', 1.1, -1, 0, 8193].forEach(function (size) {
       assert.throws(function () {
         sharp().tile({
-          size: size
+          size
         });
       });
     });
@@ -146,7 +146,7 @@ describe('Tile', function () {
       assert.doesNotThrow(function () {
         sharp().tile({
           size: 8192,
-          overlap: overlap
+          overlap
         });
       });
     });
@@ -156,7 +156,7 @@ describe('Tile', function () {
     ['zoinks', 1.1, -1, 8193].forEach(function (overlap) {
       assert.throws(function () {
         sharp().tile({
-          overlap: overlap
+          overlap
         });
       });
     });
@@ -166,7 +166,7 @@ describe('Tile', function () {
     ['fs', 'zip'].forEach(function (container) {
       assert.doesNotThrow(function () {
         sharp().tile({
-          container: container
+          container
         });
       });
     });
@@ -176,7 +176,7 @@ describe('Tile', function () {
     ['zoinks', 1].forEach(function (container) {
       assert.throws(function () {
         sharp().tile({
-          container: container
+          container
         });
       });
     });
@@ -186,7 +186,7 @@ describe('Tile', function () {
     ['dz', 'google', 'zoomify'].forEach(function (layout) {
       assert.doesNotThrow(function () {
         sharp().tile({
-          layout: layout
+          layout
         });
       });
     });
@@ -196,7 +196,7 @@ describe('Tile', function () {
     ['zoinks', 1].forEach(function (layout) {
       assert.throws(function () {
         sharp().tile({
-          layout: layout
+          layout
         });
       });
     });
@@ -254,7 +254,7 @@ describe('Tile', function () {
     [90, 270, -90].forEach(function (angle) {
       assert.doesNotThrow(function () {
         sharp().tile({
-          angle: angle
+          angle
         });
       });
     });
@@ -264,7 +264,7 @@ describe('Tile', function () {
     ['zoinks', 1.1, -1, 27].forEach(function (angle) {
       assert.throws(function () {
         sharp().tile({
-          angle: angle
+          angle
         });
       });
     });

@@ -40,7 +40,7 @@ describe('Extend', function () {
       sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(120)
         .extend({
-          extendWith: extendWith,
+          extendWith,
           top: 40,
           bottom: 40,
           left: 40,
@@ -58,7 +58,7 @@ describe('Extend', function () {
       sharp(fixtures.inputJpg)
         .resize(120)
         .extend({
-          extendWith: extendWith,
+          extendWith,
           top: 10,
           bottom: 10,
           left: 10,
@@ -77,7 +77,7 @@ describe('Extend', function () {
       sharp(fixtures.inputPngWithTransparency16bit)
         .resize(120)
         .extend({
-          extendWith: extendWith,
+          extendWith,
           top: 50,
           left: 10,
           right: 35,
@@ -94,7 +94,7 @@ describe('Extend', function () {
     it(`PNG with 2 channels (${extendWith})`, function (done) {
       sharp(fixtures.inputPngWithGreyAlpha)
         .extend({
-          extendWith: extendWith,
+          extendWith,
           top: 50,
           bottom: 50,
           left: 80,

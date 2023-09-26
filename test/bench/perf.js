@@ -190,8 +190,8 @@ async.series({
           srcPath: fixtures.inputJpg,
           dstPath: outputJpg,
           quality: 0.8,
-          width: width,
-          height: height,
+          width,
+          height,
           format: 'jpg',
           filter: 'Lanczos'
         }, function (err) {
@@ -795,7 +795,7 @@ async.series({
         imagemagick.resize({
           srcPath: fixtures.inputPngAlphaPremultiplicationLarge,
           dstPath: outputPng,
-          width: width,
+          width,
           height: heightPng,
           filter: 'Lanczos',
           customArgs: [

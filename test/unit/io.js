@@ -914,7 +914,7 @@ describe('Input/output', function () {
         channels: 3,
         background: { r: 0, g: 255, b: 0 }
       };
-      sharp({ create: create })
+      sharp({ create })
         .jpeg()
         .toBuffer(function (err, data, info) {
           if (err) throw err;
@@ -932,7 +932,7 @@ describe('Input/output', function () {
         channels: 4,
         background: { r: 255, g: 0, b: 0, alpha: 128 }
       };
-      sharp({ create: create })
+      sharp({ create })
         .png()
         .toBuffer(function (err, data, info) {
           if (err) throw err;
@@ -951,7 +951,7 @@ describe('Input/output', function () {
         background: { r: 0, g: 0, b: 0 }
       };
       assert.throws(function () {
-        sharp({ create: create });
+        sharp({ create });
       });
     });
     it('Missing background', function () {
@@ -961,7 +961,7 @@ describe('Input/output', function () {
         channels: 3
       };
       assert.throws(function () {
-        sharp({ create: create });
+        sharp({ create });
       });
     });
   });

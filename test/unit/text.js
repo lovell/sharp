@@ -66,7 +66,7 @@ describe('Text to image', function () {
     const text = sharp({
       text: {
         text: 'Hello, world!',
-        dpi: dpi
+        dpi
       }
     });
     text.toFile(output, function (err, info) {
@@ -87,7 +87,7 @@ describe('Text to image', function () {
       text: {
         text: '<span foreground="red" font="100">red</span><span font="50" background="cyan">blue</span>',
         rgba: true,
-        dpi: dpi
+        dpi
       }
     });
     text.toFile(output, function (err, info) {
@@ -146,7 +146,7 @@ describe('Text to image', function () {
           text: {
             text: '<span background="cyan">cool</span>',
             font: 'sans 30',
-            dpi: dpi,
+            dpi,
             rgba: true
           }
         },

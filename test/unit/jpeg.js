@@ -36,7 +36,7 @@ describe('JPEG', function () {
     [-1, 88.2, 'test'].forEach(function (quality) {
       it(quality.toString(), function () {
         assert.throws(function () {
-          sharp().jpeg({ quality: quality });
+          sharp().jpeg({ quality });
         });
       });
     });
