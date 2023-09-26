@@ -1227,6 +1227,8 @@ declare namespace sharp {
         compression?: string | undefined;
         /** Compression predictor options: none, horizontal, float (optional, default 'horizontal') */
         predictor?: string | undefined;
+        /** Write 1-bit images as miniswhite (optional, default false) */
+        miniswhite?: boolean | undefined;
         /** Write an image pyramid (optional, default false) */
         pyramid?: boolean | undefined;
         /** Write a tiled tiff (optional, default false) */

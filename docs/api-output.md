@@ -458,6 +458,7 @@ instead of providing `xres` and `yres` in pixels/mm.
 | [options.force] | <code>boolean</code> | <code>true</code> | force TIFF output, otherwise attempt to use input format |
 | [options.compression] | <code>string</code> | <code>&quot;&#x27;jpeg&#x27;&quot;</code> | compression options: none, jpeg, deflate, packbits, ccittfax4, lzw, webp, zstd, jp2k |
 | [options.predictor] | <code>string</code> | <code>&quot;&#x27;horizontal&#x27;&quot;</code> | compression predictor options: none, horizontal, float |
+| [options.miniswhite] | <code>boolean</code> | <code>false</code> | write 1-bit images as miniswhite |
 | [options.pyramid] | <code>boolean</code> | <code>false</code> | write an image pyramid |
 | [options.tile] | <code>boolean</code> | <code>false</code> | write a tiled tiff |
 | [options.tileWidth] | <code>number</code> | <code>256</code> | horizontal tile size |

@@ -462,6 +462,18 @@ describe('TIFF', function () {
     });
   });
 
+  it('TIFF miniswhite true value does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ miniswhite: true });
+    });
+  });
+
+  it('Invalid TIFF miniswhite value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ miniswhite: 'true' });
+    });
+  });
+
   it('Invalid TIFF tile value throws error', function () {
     assert.throws(function () {
       sharp().tiff({ tile: 'true' });

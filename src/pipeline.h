@@ -169,6 +169,7 @@ struct PipelineBaton {
   VipsForeignTiffPredictor tiffPredictor;
   bool tiffPyramid;
   int tiffBitdepth;
+  bool tiffMiniswhite;
   bool tiffTile;
   int tiffTileHeight;
   int tiffTileWidth;
@@ -333,6 +334,7 @@ struct PipelineBaton {
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
+    tiffMiniswhite(false),
     tiffPyramid(false),
     tiffBitdepth(8),
     tiffTile(false),

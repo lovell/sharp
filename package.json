@@ -86,7 +86,8 @@
     "Ankur Parihar <ankur.github@gmail.com>",
     "Brahim Ait elhaj <brahima@gmail.com>",
     "Mart Jansink <m.jansink@gmail.com>",
-    "Lachlan Newman <lachnewman007@gmail.com>"
+    "Lachlan Newman <lachnewman007@gmail.com>",
+    "Dennis Beatty <dennis@dcbeatty.com>"
   ],
   "scripts": {
     "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
