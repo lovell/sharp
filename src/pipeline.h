@@ -169,6 +169,7 @@ struct PipelineBaton {
   VipsForeignTiffPredictor tiffPredictor;
   bool tiffPyramid;
   int tiffBitdepth;
+  bool tiffMiniswhite;
   bool tiffTile;
   int tiffTileHeight;
   int tiffTileWidth;
@@ -335,6 +336,7 @@ struct PipelineBaton {
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
     tiffPyramid(false),
     tiffBitdepth(8),
+    tiffMiniswhite(false),
     tiffTile(false),
     tiffTileHeight(256),
     tiffTileWidth(256),

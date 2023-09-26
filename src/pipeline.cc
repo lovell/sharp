@@ -940,6 +940,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("Q", baton->tiffQuality)
             ->set("bitdepth", baton->tiffBitdepth)
             ->set("compression", baton->tiffCompression)
+            ->set("miniswhite", baton->tiffMiniswhite)
             ->set("predictor", baton->tiffPredictor)
             ->set("pyramid", baton->tiffPyramid)
             ->set("tile", baton->tiffTile)
@@ -1136,6 +1137,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("Q", baton->tiffQuality)
             ->set("bitdepth", baton->tiffBitdepth)
             ->set("compression", baton->tiffCompression)
+            ->set("miniswhite", baton->tiffMiniswhite)
             ->set("predictor", baton->tiffPredictor)
             ->set("pyramid", baton->tiffPyramid)
             ->set("tile", baton->tiffTile)
@@ -1647,6 +1649,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->gifProgressive = sharp::AttrAsBool(options, "gifProgressive");
   baton->tiffQuality = sharp::AttrAsUint32(options, "tiffQuality");
   baton->tiffPyramid = sharp::AttrAsBool(options, "tiffPyramid");
+  baton->tiffMiniswhite = sharp::AttrAsBool(options, "tiffMiniswhite");
   baton->tiffBitdepth = sharp::AttrAsUint32(options, "tiffBitdepth");
   baton->tiffTile = sharp::AttrAsBool(options, "tiffTile");
   baton->tiffTileWidth = sharp::AttrAsUint32(options, "tiffTileWidth");

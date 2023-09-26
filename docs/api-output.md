@@ -466,6 +466,7 @@ instead of providing `xres` and `yres` in pixels/mm.
 | [options.yres] | <code>number</code> | <code>1.0</code> | vertical resolution in pixels/mm |
 | [options.resolutionUnit] | <code>string</code> | <code>&quot;&#x27;inch&#x27;&quot;</code> | resolution unit options: inch, cm |
 | [options.bitdepth] | <code>number</code> | <code>8</code> | reduce bitdepth to 1, 2 or 4 bit |
+| [options.miniswhite] | <code>boolean</code> | <code>false</code> | write 1-bit images as miniswhite |
 
 **Example**  
 ```js
