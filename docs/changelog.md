@@ -8,6 +8,8 @@ Requires libvips v8.14.5
 
 * Drop support for Node.js 14 and 16, now requires Node.js >= 18.17.0
 
+* Remove `sharp.vendor`.
+
 ## v0.32 - *flow*
 
 Requires libvips v8.14.5
