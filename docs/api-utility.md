@@ -42,19 +42,6 @@ console.log(sharp.format);
 ```
 
 
-## vendor
-> vendor
-
-An Object containing the platform and architecture
-of the current and installed vendored binaries.
-
-
-**Example**  
-```js
-console.log(sharp.vendor);
-```
-
-
 ## queue
 > queue
 

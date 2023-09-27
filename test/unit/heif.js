@@ -8,34 +8,34 @@ const assert = require('assert');
 const sharp = require('../../');
 
 describe('HEIF', () => {
-  it('called without options does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  it('called without options throws an error', () => {
+    assert.throws(() => {
       sharp().heif();
     });
   });
   it('valid quality does not throw an error', () => {
     assert.doesNotThrow(() => {
-      sharp().heif({ quality: 80 });
+      sharp().heif({ compression: 'av1', quality: 80 });
     });
   });
   it('invalid quality should throw an error', () => {
     assert.throws(() => {
-      sharp().heif({ quality: 101 });
+      sharp().heif({ compression: 'av1', quality: 101 });
     });
   });
   it('non-numeric quality should throw an error', () => {
     assert.throws(() => {
-      sharp().heif({ quality: 'fail' });
+      sharp().heif({ compression: 'av1', quality: 'fail' });
     });
   });
   it('valid lossless does not throw an error', () => {
     assert.doesNotThrow(() => {
-      sharp().heif({ lossless: true });
+      sharp().heif({ compression: 'av1', lossless: true });
     });
   });
   it('non-boolean lossless should throw an error', () => {
     assert.throws(() => {
-      sharp().heif({ lossless: 'fail' });
+      sharp().heif({ compression: 'av1', lossless: 'fail' });
     });
   });
   it('valid compression does not throw an error', () => {
@@ -55,27 +55,27 @@ describe('HEIF', () => {
   });
   it('valid effort does not throw an error', () => {
     assert.doesNotThrow(() => {
-      sharp().heif({ effort: 6 });
+      sharp().heif({ compression: 'av1', effort: 6 });
     });
   });
   it('out of range effort should throw an error', () => {
     assert.throws(() => {
-      sharp().heif({ effort: 10 });
+      sharp().heif({ compression: 'av1', effort: 10 });
     });
   });
   it('invalid effort should throw an error', () => {
     assert.throws(() => {
-      sharp().heif({ effort: 'fail' });
+      sharp().heif({ compression: 'av1', effort: 'fail' });
     });
   });
   it('invalid chromaSubsampling should throw an error', () => {
     assert.throws(() => {
-      sharp().heif({ chromaSubsampling: 'fail' });
+      sharp().heif({ compression: 'av1', chromaSubsampling: 'fail' });
     });
   });
   it('valid chromaSubsampling does not throw an error', () => {
     assert.doesNotThrow(() => {
-      sharp().heif({ chromaSubsampling: '4:4:4' });
+      sharp().heif({ compression: 'av1', chromaSubsampling: '4:4:4' });
     });
   });
 });

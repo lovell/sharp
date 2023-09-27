@@ -485,9 +485,6 @@ sharp('input.svg')
 
 Use these AVIF options for output image.
 
-Whilst it is possible to create AVIF images smaller than 16x16 pixels,
-most web browsers do not display these properly.
-
 AVIF image sequences are not supported.
 
 
@@ -520,7 +517,7 @@ const data = await sharp(input)
 
 
 ## heif
-> heif([options]) ⇒ <code>Sharp</code>
+> heif(options) ⇒ <code>Sharp</code>
 
 Use these HEIF options for output image.
 
@@ -536,9 +533,9 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [options] | <code>Object</code> |  | output options |
+| options | <code>Object</code> |  | output options |
+| options.compression | <code>string</code> |  | compression format: av1, hevc |
 | [options.quality] | <code>number</code> | <code>50</code> | quality, integer 1-100 |
-| [options.compression] | <code>string</code> | <code>&quot;&#x27;av1&#x27;&quot;</code> | compression format: av1, hevc |
 | [options.lossless] | <code>boolean</code> | <code>false</code> | use lossless compression |
 | [options.effort] | <code>number</code> | <code>4</code> | CPU effort, between 0 (fastest) and 9 (slowest) |
 | [options.chromaSubsampling] | <code>string</code> | <code>&quot;&#x27;4:4:4&#x27;&quot;</code> | set to '4:2:0' to use chroma subsampling |

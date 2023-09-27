@@ -699,7 +699,6 @@ declare namespace sharp {
 
         /**
          * Use these AVIF options for output image.
-         * Whilst it is possible to create AVIF images smaller than 16x16 pixels, most web browsers do not display these properly.
          * @param options Output options.
          * @throws {Error} Invalid options
          * @returns A sharp instance that can be used to chain operations
