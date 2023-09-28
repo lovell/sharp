@@ -20,8 +20,25 @@ const mapTarballEntry = (header) => {
   return header;
 };
 
+const licensing = `
+## Licensing
+
+Copyright 2013 Lovell Fuller and others.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+[https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+`;
+
 workspaces.map(async platform => {
-  const url = `https://github.com/lovell/sharp/releases/download/v${version}/sharp-v${version}-napi-v7-${platform}.tar.gz`;
+  const url = `https://github.com/lovell/sharp/releases/download/v${version}/sharp-v${version}-napi-v9-${platform}.tar.gz`;
   const dir = path.join(__dirname, platform);
   const response = await fetch(url);
   if (!response.ok) {
@@ -36,7 +53,7 @@ workspaces.map(async platform => {
   );
   // Generate README
   const { name, description } = require(`./${platform}/package.json`);
-  await writeFile(path.join(dir, 'README.md'), `# ${name}\n${description}`);
+  await writeFile(path.join(dir, 'README.md'), `# \`${name}\`\n\n${description}.\n${licensing}`);
   // Copy Apache-2.0 LICENSE
   await copyFile(path.join(__dirname, '..', 'LICENSE'), path.join(dir, 'LICENSE'));
   // Copy Windows-specific files

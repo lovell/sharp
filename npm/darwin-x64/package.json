@@ -19,6 +19,9 @@
   "files": [
     "lib"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     "./sharp.node": "./lib/sharp-darwin-x64.node",
     "./package": "./package.json"
