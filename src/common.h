@@ -7,6 +7,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <atomic>
 
 #include <napi.h>
 #include <vips/vips8>
@@ -161,10 +162,10 @@ namespace sharp {
   };
 
   // How many tasks are in the queue?
-  extern volatile int counterQueue;
+  extern std::atomic<int> counterQueue;
 
   // How many tasks are being processed?
-  extern volatile int counterProcess;
+  extern std::atomic<int> counterProcess;
 
   // Filename extension checkers
   bool IsJpeg(std::string const &str);

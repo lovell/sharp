@@ -166,10 +166,10 @@ namespace sharp {
   }
 
   // How many tasks are in the queue?
-  volatile int counterQueue = 0;
+  std::atomic<int> counterQueue{0};
 
   // How many tasks are being processed?
-  volatile int counterProcess = 0;
+  std::atomic<int> counterProcess{0};
 
   // Filename extension checkers
   static bool EndsWith(std::string const &str, std::string const &end) {

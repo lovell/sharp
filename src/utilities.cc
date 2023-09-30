@@ -70,8 +70,8 @@ Napi::Value concurrency(const Napi::CallbackInfo& info) {
 */
 Napi::Value counters(const Napi::CallbackInfo& info) {
   Napi::Object counters = Napi::Object::New(info.Env());
-  counters.Set("queue", sharp::counterQueue);
-  counters.Set("process", sharp::counterProcess);
+  counters.Set("queue", static_cast<int>(sharp::counterQueue));
+  counters.Set("process", static_cast<int>(sharp::counterProcess));
   return counters;
 }
 

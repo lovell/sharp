@@ -30,7 +30,7 @@ class StatsWorker : public Napi::AsyncWorker {
 
   void Execute() {
     // Decrement queued task counter
-    g_atomic_int_dec_and_test(&sharp::counterQueue);
+    sharp::counterQueue--;
 
     vips::VImage image;
     sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
@@ -177,7 +177,7 @@ Napi::Value stats(const Napi::CallbackInfo& info) {
   worker->Queue();
 
   // Increment queued task counter
-  g_atomic_int_inc(&sharp::counterQueue);
+  sharp::counterQueue++;
 
   return info.Env().Undefined();
 }

@@ -44,9 +44,9 @@ class PipelineWorker : public Napi::AsyncWorker {
   // libuv worker
   void Execute() {
     // Decrement queued task counter
-    g_atomic_int_dec_and_test(&sharp::counterQueue);
+    sharp::counterQueue--;
     // Increment processing task counter
-    g_atomic_int_inc(&sharp::counterProcess);
+    sharp::counterProcess++;
 
     try {
       // Open input
@@ -1289,8 +1289,8 @@ class PipelineWorker : public Napi::AsyncWorker {
     delete baton;
 
     // Decrement processing task counter
-    g_atomic_int_dec_and_test(&sharp::counterProcess);
-    Napi::Number queueLength = Napi::Number::New(env, static_cast<double>(sharp::counterQueue));
+    sharp::counterProcess--;
+    Napi::Number queueLength = Napi::Number::New(env, static_cast<int>(sharp::counterQueue));
     queueListener.MakeCallback(Receiver().Value(), { queueLength });
   }
 
@@ -1707,8 +1707,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   worker->Queue();
 
   // Increment queued task counter
-  g_atomic_int_inc(&sharp::counterQueue);
-  Napi::Number queueLength = Napi::Number::New(info.Env(), static_cast<double>(sharp::counterQueue));
+  Napi::Number queueLength = Napi::Number::New(info.Env(), static_cast<int>(++sharp::counterQueue));
   queueListener.MakeCallback(info.This(), { queueLength });
 
   return info.Env().Undefined();
