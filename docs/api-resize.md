@@ -214,7 +214,7 @@ Extract/crop a region of the image.
 
 - Use `extract` before `resize` for pre-resize extraction.
 - Use `extract` after `resize` for post-resize extraction.
-- Use `extract` before and after for both.
+- Use `extract` twice and `resize` once for extract-then-resize-then-extract in a fixed operation order.
 
 
 **Throws**:

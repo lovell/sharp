@@ -319,5 +319,16 @@ describe('Partial image extraction', function () {
       s.extract(options);
       assert.strictEqual(warningMessage, 'ignoring previous extract options');
     });
+
+    it('Multiple extract+resize emits warning', () => {
+      let warningMessage = '';
+      const s = sharp();
+      s.on('warning', function (msg) { warningMessage = msg; });
+      const options = { top: 0, left: 0, width: 1, height: 1 };
+      s.extract(options).extract(options);
+      assert.strictEqual(warningMessage, '');
+      s.resize(1);
+      assert.strictEqual(warningMessage, 'operation order will be: extract, resize, extract');
+    });
   });
 });
