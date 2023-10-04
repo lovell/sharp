@@ -1,6 +1,6 @@
 {
   "name": "@sharpen/sharp-linuxmusl-x64",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Prebuilt sharp for use with Linux (musl) x64",
   "homepage": "https://sharp.pixelplumbing.com",
   "repository": {
