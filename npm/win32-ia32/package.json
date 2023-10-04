@@ -13,18 +13,18 @@
     "url": "https://opencollective.com/libvips"
   },
   "preferUnplugged": true,
-  "optionalDependencies": {
-    "@sharpen/sharp-libvips-win32-ia32": "0.0.1-alpha.1"
-  },
   "files": [
-    "lib"
+    "lib",
+    "versions.json",
+    "THIRD-PARTY-NOTICES.md"
   ],
   "publishConfig": {
     "access": "public"
   },
   "exports": {
     "./sharp.node": "./lib/sharp-win32-ia32.node",
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./versions": "./versions.json"
   },
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0",
