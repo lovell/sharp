@@ -141,7 +141,7 @@ jobs:
             npm pkg set "optionalDependencies.@sharpen/sharp-linux-arm=file:./npm/linux-arm"
             npm run clean
             npm install --ignore-scripts
-            npx mocha --no-config --spec=test/unit/io.js
+            npx mocha --no-config --spec=test/unit/io.js --timeout=30000
             [[ -n $prebuild_upload ]] && npx prebuild || true
   macstadium-runner:
     permissions:
