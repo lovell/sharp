@@ -10,7 +10,7 @@
     'sharp_libvips_lib_dir': '<!(node -p "require(\'./lib/libvips\').buildSharpLibvipsLibDir()")'
   },
   'targets': [{
-    'target_name': 'win-libvips-cpp',
+    'target_name': 'libvips-cpp',
     'conditions': [
       ['OS == "win"', {
         # Build libvips C++ binding for Windows due to MSVC std library ABI changes
@@ -243,7 +243,7 @@
       }
     },
   }, {
-    'target_name': 'win-copy-dlls',
+    'target_name': 'copy-dll',
     'type': 'none',
     'dependencies': [
       'sharp-<(platform_and_arch)'
