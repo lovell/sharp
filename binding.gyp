@@ -81,7 +81,7 @@
     ],
     'dependencies': [
       '<!(node -p "require(\'node-addon-api\').gyp")',
-      'win-libvips-cpp'
+      'libvips-cpp'
     ],
     'variables': {
       'conditions': [
