@@ -5,7 +5,7 @@
 
 // Populate contents of all packages with the current GitHub release
 
-const { writeFile, copyFile } = require('node:fs/promises');
+const { writeFile, copyFile, rm } = require('node:fs/promises');
 const path = require('node:path');
 const { Readable } = require('node:stream');
 const { pipeline } = require('node:stream/promises');
@@ -46,10 +46,12 @@ workspaces.map(async platform => {
     return;
   }
   // Extract prebuild tarball
+  const lib = path.join(dir, 'lib');
+  await rm(lib, { recursive: true });
   await pipeline(
     Readable.fromWeb(response.body),
     createGunzip(),
-    extract(path.join(dir, 'lib'), { map: mapTarballEntry })
+    extract(lib, { map: mapTarballEntry })
   );
   // Generate README
   const { name, description } = require(`./${platform}/package.json`);
