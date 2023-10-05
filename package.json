@@ -103,13 +103,14 @@
     "docs-serve": "cd docs && npx serve",
     "docs-publish": "cd docs && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
   },
+  "type": "commonjs",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "binding.gyp",
-    "install/**",
-    "lib/**",
-    "src/**"
+    "install",
+    "lib",
+    "src"
   ],
   "repository": {
     "type": "git",

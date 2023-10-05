@@ -22,6 +22,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "type": "commonjs",
   "exports": {
     "./sharp.node": "./lib/sharp-darwin-arm64.node",
     "./package": "./package.json"

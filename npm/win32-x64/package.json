@@ -21,6 +21,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "type": "commonjs",
   "exports": {
     "./sharp.node": "./lib/sharp-win32-x64.node",
     "./package": "./package.json"

@@ -22,6 +22,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "type": "commonjs",
   "exports": {
     "./sharp.node": "./lib/sharp-linux-arm64.node",
     "./package": "./package.json"
