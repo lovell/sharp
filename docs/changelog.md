@@ -13,6 +13,9 @@ Requires libvips v8.14.5
 * Make `compression` option of `heif` mandatory to help reduce HEIF vs HEIC confusion.
   [#3740](https://github.com/lovell/sharp/issues/3740)
 
+* Ensure correct interpretation of 16-bit raw input.
+  [#3808](https://github.com/lovell/sharp/issues/3808)
+
 ## v0.32 - *flow*
 
 Requires libvips v8.14.5

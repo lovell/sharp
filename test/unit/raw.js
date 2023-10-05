@@ -284,4 +284,42 @@ describe('Raw pixel data', function () {
       );
     }
   });
+
+  describe('16-bit roundtrip', () => {
+    it('grey', async () => {
+      const grey = 42000;
+      const png = await sharp(
+        Uint16Array.from([grey]),
+        { raw: { width: 1, height: 1, channels: 1 } }
+      )
+        .toColourspace('grey16')
+        .png({ compressionLevel: 0 })
+        .toBuffer();
+      const raw = await sharp(png)
+        .toColourspace('grey16')
+        .raw({ depth: 'ushort' })
+        .toBuffer();
+
+      assert.strictEqual(raw.readUint16LE(0), grey);
+    });
+
+    it('RGB', async () => {
+      const rgb = [10946, 28657, 46368];
+      const png = await sharp(
+        Uint16Array.from(rgb),
+        { raw: { width: 1, height: 1, channels: 3 } }
+      )
+        .toColourspace('rgb16')
+        .png({ compressionLevel: 0 })
+        .toBuffer();
+      const raw = await sharp(png)
+        .toColourspace('rgb16')
+        .raw({ depth: 'ushort' })
+        .toBuffer();
+
+      assert.strictEqual(raw.readUint16LE(0), rgb[0]);
+      assert.strictEqual(raw.readUint16LE(2), rgb[1]);
+      assert.strictEqual(raw.readUint16LE(4), rgb[2]);
+    });
+  });
 });

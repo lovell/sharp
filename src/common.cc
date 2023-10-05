@@ -363,12 +363,13 @@ namespace sharp {
     if (descriptor->isBuffer) {
       if (descriptor->rawChannels > 0) {
         // Raw, uncompressed pixel data
+        bool const is8bit = vips_band_format_is8bit(descriptor->rawDepth);
         image = VImage::new_from_memory(descriptor->buffer, descriptor->bufferLength,
           descriptor->rawWidth, descriptor->rawHeight, descriptor->rawChannels, descriptor->rawDepth);
         if (descriptor->rawChannels < 3) {
-          image.get_image()->Type = VIPS_INTERPRETATION_B_W;
+          image.get_image()->Type = is8bit ? VIPS_INTERPRETATION_B_W : VIPS_INTERPRETATION_GREY16;
         } else {
-          image.get_image()->Type = VIPS_INTERPRETATION_sRGB;
+          image.get_image()->Type = is8bit ? VIPS_INTERPRETATION_sRGB : VIPS_INTERPRETATION_RGB16;
         }
         if (descriptor->rawPremultiplied) {
           image = image.unpremultiply();
