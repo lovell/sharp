@@ -1,6 +1,8 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+#include <mutex>  // NOLINT(build/c++11)
+
 #include <napi.h>
 #include <vips/vips8>
 
@@ -10,14 +12,11 @@
 #include "utilities.h"
 #include "stats.h"
 
-static void* sharp_vips_init(void*) {
-  vips_init("sharp");
-  return nullptr;
-}
-
 Napi::Object init(Napi::Env env, Napi::Object exports) {
-  static GOnce sharp_vips_init_once = G_ONCE_INIT;
-  g_once(&sharp_vips_init_once, static_cast<GThreadFunc>(sharp_vips_init), nullptr);
+  static std::once_flag sharp_vips_init_once;
+  std::call_once(sharp_vips_init_once, []() {
+    vips_init("sharp");
+  });
 
   g_log_set_handler("VIPS", static_cast<GLogLevelFlags>(G_LOG_LEVEL_WARNING),
     static_cast<GLogFunc>(sharp::VipsWarningCallback), nullptr);
