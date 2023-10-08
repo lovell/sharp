@@ -3,18 +3,27 @@
 
 'use strict';
 
-const { useGlobalLibvips, globalLibvipsVersion, log, gypRebuild } = require('../lib/libvips');
+const { useGlobalLibvips, globalLibvipsVersion, log, spawnRebuild } = require('../lib/libvips');
 
 const buildFromSource = (msg) => {
   log(msg);
   log('Attempting to build from source via node-gyp');
   try {
-    require('node-gyp');
+    require('node-addon-api');
+    log('Found node-addon-api');
   } catch (err) {
-    log('You might need to install node-gyp');
+    log('Please add node-addon-api to your dependencies');
+    return;
+  }
+  try {
+    const gyp = require('node-gyp');
+    log(`Found node-gyp version ${gyp().version}`);
+  } catch (err) {
+    log('Please add node-gyp to your dependencies');
+    return;
   }
   log('See https://sharp.pixelplumbing.com/install#building-from-source');
-  const status = gypRebuild();
+  const status = spawnRebuild();
   if (status !== 0) {
     process.exit(status);
   }

@@ -90,7 +90,7 @@
   ],
   "scripts": {
     "install": "node install/check",
-    "clean": "rm -rf build/ .nyc_output/ coverage/ test/fixtures/output.*",
+    "clean": "rm -rf src/build/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run test-lint && npm run test-unit && npm run test-licensing && npm run test-types",
     "test-lint": "semistandard && cpplint",
     "test-unit": "nyc --reporter=lcov --reporter=text --check-coverage --branches=100 mocha",
@@ -107,10 +107,9 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
-    "binding.gyp",
     "install",
     "lib",
-    "src"
+    "src/*.{cc,h,gyp}"
   ],
   "repository": {
     "type": "git",
@@ -137,7 +136,6 @@
   "dependencies": {
     "color": "^4.2.3",
     "detect-libc": "^2.0.2",
-    "node-addon-api": "^7.0.0",
     "semver": "^7.5.4"
   },
   "optionalDependencies": {
@@ -171,6 +169,7 @@
     "jsdoc-to-markdown": "^8.0.0",
     "license-checker": "^25.0.1",
     "mocha": "^10.2.0",
+    "node-addon-api": "^7.0.0",
     "nyc": "^15.1.0",
     "prebuild": "^12.1.0",
     "semistandard": "^17.0.0",

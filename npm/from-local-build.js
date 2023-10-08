@@ -14,7 +14,7 @@ const platform = buildPlatformArch();
 const dest = path.join(__dirname, platform);
 
 // Use same config as prebuild to copy binary files
-const release = path.join(__dirname, '..', 'build', 'Release');
+const release = path.join(__dirname, '..', 'src', 'build', 'Release');
 const prebuildrc = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '.prebuildrc'), 'utf8'));
 const include = new RegExp(prebuildrc['include-regex'], 'i');
 fs.cpSync(release, path.join(dest, 'lib'), {

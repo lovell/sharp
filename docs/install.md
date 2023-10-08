@@ -53,9 +53,15 @@ This module will be compiled from source at `npm install` time when:
 Building from source requires:
 
 * C++11 compiler
+* [node-addon-api](https://www.npmjs.com/package/node-addon-api)
 * [node-gyp](https://github.com/nodejs/node-gyp#installation) and its dependencies
 
-If `node-gyp` cannot be found, try adding it to `devDependencies`.
+There is an install-time check for these dependencies.
+If `node-addon-api` or `node-gyp` cannot be found, try adding them via:
+
+```sh
+npm install --save node-addon-api node-gyp
+```
 
 For cross-compiling, the `--platform`, `--arch` and `--libc` npm flags
 (or the `npm_config_platform`, `npm_config_arch` and `npm_config_libc` environment variables)

@@ -3,11 +3,11 @@
 
 {
   'variables': {
-    'vips_version': '<!(node -p "require(\'./lib/libvips\').minimumLibvipsVersion")',
-    'platform_and_arch': '<!(node -p "require(\'./lib/libvips\').buildPlatformArch()")',
-    'sharp_libvips_include_dir': '<!(node -p "require(\'./lib/libvips\').buildSharpLibvipsIncludeDir()")',
-    'sharp_libvips_cplusplus_dir': '<!(node -p "require(\'./lib/libvips\').buildSharpLibvipsCPlusPlusDir()")',
-    'sharp_libvips_lib_dir': '<!(node -p "require(\'./lib/libvips\').buildSharpLibvipsLibDir()")'
+    'vips_version': '<!(node -p "require(\'../lib/libvips\').minimumLibvipsVersion")',
+    'platform_and_arch': '<!(node -p "require(\'../lib/libvips\').buildPlatformArch()")',
+    'sharp_libvips_include_dir': '<!(node -p "require(\'../lib/libvips\').buildSharpLibvipsIncludeDir()")',
+    'sharp_libvips_cplusplus_dir': '<!(node -p "require(\'../lib/libvips\').buildSharpLibvipsCPlusPlusDir()")',
+    'sharp_libvips_lib_dir': '<!(node -p "require(\'../lib/libvips\').buildSharpLibvipsLibDir()")'
   },
   'targets': [{
     'target_name': 'libvips-cpp',
@@ -86,8 +86,8 @@
     'variables': {
       'conditions': [
         ['OS != "win"', {
-          'pkg_config_path': '<!(node -p "require(\'./lib/libvips\').pkgConfigPath()")',
-          'use_global_libvips': '<!(node -p "Boolean(require(\'./lib/libvips\').useGlobalLibvips()).toString()")'
+          'pkg_config_path': '<!(node -p "require(\'../lib/libvips\').pkgConfigPath()")',
+          'use_global_libvips': '<!(node -p "Boolean(require(\'../lib/libvips\').useGlobalLibvips()).toString()")'
         }, {
           'pkg_config_path': '',
           'use_global_libvips': ''
@@ -95,13 +95,13 @@
       ]
     },
     'sources': [
-      'src/common.cc',
-      'src/metadata.cc',
-      'src/stats.cc',
-      'src/operations.cc',
-      'src/pipeline.cc',
-      'src/utilities.cc',
-      'src/sharp.cc'
+      'common.cc',
+      'metadata.cc',
+      'stats.cc',
+      'operations.cc',
+      'pipeline.cc',
+      'utilities.cc',
+      'sharp.cc'
     ],
     'include_dirs': [
       '<!(node -p "require(\'node-addon-api\').include_dir")',
