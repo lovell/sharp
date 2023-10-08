@@ -110,18 +110,14 @@ jobs:
           npm run clean
           npm install --ignore-scripts
           npm test
-      - name: Prebuild copy package.json
-        if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
-        uses: chpoit/js-copy-github-action@v1
-        with:
-          source: package.json
-          target: src/package.json
       - name: Prebuild
         if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
         env:
           prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: src
-        run: npx prebuild
+        run: |
+          node -e "require('fs').cpSync('package.json', 'src/package.json')"
+          cd src
+          npx prebuild
   github-runner-qemu:
     permissions:
       contents: write
