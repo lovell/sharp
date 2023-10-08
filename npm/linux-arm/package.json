@@ -1,6 +1,6 @@
 {
   "name": "@sharpen/sharp-linux-arm",
-  "version": "0.0.1-alpha.4",
+  "version": "0.0.1-alpha.5",
   "description": "Prebuilt sharp for use with Linux (glibc) ARM (32-bit)",
   "homepage": "https://sharp.pixelplumbing.com",
   "repository": {
