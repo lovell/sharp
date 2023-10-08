@@ -110,10 +110,17 @@ jobs:
           npm run clean
           npm install --ignore-scripts
           npm test
+      - name: Prebuild copy package.json
+        if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
+        uses: chpoit/js-copy-github-action@v1
+        with:
+          source: package.json
+          target: src/package.json
       - name: Prebuild
         if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
         env:
           prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: src
         run: npx prebuild
   github-runner-qemu:
     permissions:
@@ -142,7 +149,7 @@ jobs:
             npm run clean
             npm install --ignore-scripts
             npx mocha --no-config --spec=test/unit/io.js --timeout=30000
-            [[ -n $prebuild_upload ]] && npx prebuild || true
+            [[ -n $prebuild_upload ]] && cd src && ln -s ../package.json && npx prebuild || true
   macstadium-runner:
     permissions:
       contents: write
@@ -187,4 +194,4 @@ jobs:
         if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
         env:
           prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
-        run: npx prebuild
+        run: cd src && ln -s ../package.json && npx prebuild

@@ -42,7 +42,7 @@ jobs:
           sudo docker exec sharp sh -c "npm run clean"
           sudo docker exec sharp sh -c "npm install --ignore-scripts"
           sudo docker exec sharp sh -c "npm test"
-      - run: "[[ -n $CIRCLE_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"npx prebuild --upload=$prebuild_upload\" || true"
+      - run: "[[ -n $CIRCLE_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"cd src && ln -s ../package.json && npx prebuild --upload=$prebuild_upload\" || true"
   linux-arm64-glibc-node-20:
     resource_class: arm.medium
     machine:
@@ -83,7 +83,7 @@ jobs:
           sudo docker exec sharp sh -c "npm run clean"
           sudo docker exec sharp sh -c "npm install --ignore-scripts"
           sudo docker exec sharp sh -c "npm test"
-      - run: "[[ -n $CIRCLE_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"npx prebuild --upload=$prebuild_upload\" || true"
+      - run: "[[ -n $CIRCLE_TAG ]] && sudo docker exec --env prebuild_upload sharp sh -c \"cd src && ln -s ../package.json && npx prebuild --upload=$prebuild_upload\" || true"
   linux-arm64-musl-node-20:
     resource_class: arm.medium
     machine:
