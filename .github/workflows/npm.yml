@@ -1,0 +1,78 @@
+name: "npm release smoke test"
+
+on:
+  push:
+    tags:
+      - "v**"
+
+permissions: {}
+
+jobs:
+  release-smoke-test:
+    name: "${{ github.ref }} ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-22.04
+          - name: darwin-x64
+            os: macos-11
+          - name: win32-x64
+            os: windows-2019
+    steps:
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Install Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - name: Install Bun
+        if: ${{ !contains(matrix.os, 'windows') }}
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Version
+        id: version
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setOutput('semver', context.ref.replace('refs/tags/v',''))
+      - name: Create package.json
+        uses: DamianReeves/write-file-action@v1
+        with:
+          path: package.json
+          contents: |
+            {
+              "dependencies": {
+                "sharp": "${{ steps.version.outputs.semver }}"
+              }
+            }
+      - name: Create release.mjs
+        uses: DamianReeves/write-file-action@v1
+        with:
+          path: release.mjs
+          contents: |
+            import { createRequire } from 'node:module';
+            import { deepStrictEqual } from 'node:assert';
+            const require = createRequire(import.meta.url);
+            const sharp = require('sharp');
+            deepStrictEqual(['.jpg', '.jpeg', '.jpe'], sharp.format.jpeg.input.fileSuffix);
+
+      - name: Run with Node.js
+        run: |
+          npm install --ignore-scripts
+          node release.mjs
+
+      - name: Run with Deno
+        run: deno run --allow-read --allow-ffi release.mjs
+
+      - name: Run with Bun
+        if: ${{ !contains(matrix.os, 'windows') }}
+        run: |
+          bun install --ignore-scripts
+          bun release.mjs
