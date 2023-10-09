@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <string>
+#include <cstdio>
 
 #include <napi.h>
 #include <vips/vips8>
@@ -92,7 +93,7 @@ Napi::Value simd(const Napi::CallbackInfo& info) {
 */
 Napi::Value libvipsVersion(const Napi::CallbackInfo& info) {
   char version[9];
-  g_snprintf(version, sizeof(version), "%d.%d.%d", vips_version(0), vips_version(1), vips_version(2));
+  std::snprintf(version, sizeof(version), "%d.%d.%d", vips_version(0), vips_version(1), vips_version(2));
   return Napi::String::New(info.Env(), version);
 }
 
