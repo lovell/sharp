@@ -5,12 +5,14 @@ npm install sharp
 ```
 
 ```sh
-yarn add sharp
+pnpm add sharp
 ```
 
 ```sh
-pnpm add sharp
+yarn add sharp
 ```
+
+Yarn Plug'n'Play is unsupported.
 
 ## Prerequisites
 
