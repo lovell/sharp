@@ -1,7 +1,7 @@
 {
   "name": "sharp",
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP, GIF, AVIF and TIFF images",
-  "version": "0.33.0-alpha.7",
+  "version": "0.33.0-alpha.8",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://github.com/lovell/sharp",
   "contributors": [
@@ -139,8 +139,8 @@
     "semver": "^7.5.4"
   },
   "optionalDependencies": {
-    "@sharpen/sharp-darwin-arm64": "0.0.1-alpha.7",
-    "@sharpen/sharp-darwin-x64": "0.0.1-alpha.7",
+    "@sharpen/sharp-darwin-arm64": "0.0.1-alpha.8",
+    "@sharpen/sharp-darwin-x64": "0.0.1-alpha.8",
     "@sharpen/sharp-libvips-darwin-arm64": "0.0.1-alpha.2",
     "@sharpen/sharp-libvips-darwin-x64": "0.0.1-alpha.2",
     "@sharpen/sharp-libvips-linux-arm": "0.0.1-alpha.2",
@@ -148,13 +148,13 @@
     "@sharpen/sharp-libvips-linux-x64": "0.0.1-alpha.2",
     "@sharpen/sharp-libvips-linuxmusl-arm64": "0.0.1-alpha.2",
     "@sharpen/sharp-libvips-linuxmusl-x64": "0.0.1-alpha.2",
-    "@sharpen/sharp-linux-arm": "0.0.1-alpha.7",
-    "@sharpen/sharp-linux-arm64": "0.0.1-alpha.7",
-    "@sharpen/sharp-linux-x64": "0.0.1-alpha.7",
-    "@sharpen/sharp-linuxmusl-arm64": "0.0.1-alpha.7",
-    "@sharpen/sharp-linuxmusl-x64": "0.0.1-alpha.7",
-    "@sharpen/sharp-win32-ia32": "0.0.1-alpha.7",
-    "@sharpen/sharp-win32-x64": "0.0.1-alpha.7"
+    "@sharpen/sharp-linux-arm": "0.0.1-alpha.8",
+    "@sharpen/sharp-linux-arm64": "0.0.1-alpha.8",
+    "@sharpen/sharp-linux-x64": "0.0.1-alpha.8",
+    "@sharpen/sharp-linuxmusl-arm64": "0.0.1-alpha.8",
+    "@sharpen/sharp-linuxmusl-x64": "0.0.1-alpha.8",
+    "@sharpen/sharp-win32-ia32": "0.0.1-alpha.8",
+    "@sharpen/sharp-win32-x64": "0.0.1-alpha.8"
   },
   "devDependencies": {
     "@sharpen/sharp-libvips-dev": "0.0.1-alpha.2",

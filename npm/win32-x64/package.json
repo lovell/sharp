@@ -1,6 +1,6 @@
 {
   "name": "@sharpen/sharp-win32-x64",
-  "version": "0.0.1-alpha.7",
+  "version": "0.0.1-alpha.8",
   "description": "Prebuilt sharp for use with Windows x64",
   "homepage": "https://sharp.pixelplumbing.com",
   "repository": {

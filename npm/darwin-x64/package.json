@@ -1,6 +1,6 @@
 {
   "name": "@sharpen/sharp-darwin-x64",
-  "version": "0.0.1-alpha.7",
+  "version": "0.0.1-alpha.8",
   "description": "Prebuilt sharp for use with macOS x64",
   "homepage": "https://sharp.pixelplumbing.com",
   "repository": {
@@ -14,7 +14,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@sharpen/sharp-libvips-darwin-x64": "0.0.1-alpha.1"
+    "@sharpen/sharp-libvips-darwin-x64": "0.0.1-alpha.2"
   },
   "files": [
     "lib"
