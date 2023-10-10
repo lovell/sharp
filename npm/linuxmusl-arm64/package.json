@@ -13,6 +13,9 @@
     "url": "https://opencollective.com/libvips"
   },
   "preferUnplugged": true,
+  "optionalDependencies": {
+    "@sharpen/sharp-libvips-linuxmusl-arm64": "0.0.1-alpha.1"
+  },
   "files": [
     "lib"
   ],
