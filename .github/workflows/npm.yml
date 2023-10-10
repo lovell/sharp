@@ -1,4 +1,4 @@
-name: "npm release smoke test"
+name: "CI: npm smoke test"
 
 on:
   push:
@@ -26,6 +26,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - name: Install Deno
         uses: denoland/setup-deno@v1
         with:
@@ -63,10 +67,28 @@ jobs:
             const sharp = require('sharp');
             deepStrictEqual(['.jpg', '.jpeg', '.jpe'], sharp.format.jpeg.input.fileSuffix);
 
-      - name: Run with Node.js
+      - name: Run with Node.js + npm
         run: |
           npm install --ignore-scripts
           node release.mjs
+          rm -r node_modules/ package-lock.json
+
+      - name: Run with Node.js + pnpm
+        run: |
+          pnpm install --ignore-scripts
+          node release.mjs
+          rm -r node_modules/ pnpm-lock.yaml
+
+      - name: Run with Node.js + yarn
+        run: |
+          corepack enable
+          yarn set version stable
+          yarn config set enableScripts false
+          yarn config set nodeLinker node-modules
+          yarn install
+          node release.mjs
+          rm -r node_modules/ .yarn/ yarn.lock .yarnrc.yml
+          corepack disable
 
       - name: Run with Deno
         run: deno run --allow-read --allow-ffi release.mjs
