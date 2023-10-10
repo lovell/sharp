@@ -111,6 +111,9 @@
         # Use pkg-config for include and lib
         'include_dirs': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --cflags-only-I vips-cpp vips glib-2.0 | sed s\/-I//g)'],
         'libraries': ['<!@(PKG_CONFIG_PATH="<(pkg_config_path)" pkg-config --libs vips-cpp)'],
+        'defines': [
+          'SHARP_USE_GLOBAL_LIBVIPS'
+        ],
         'conditions': [
           ['OS == "linux"', {
             'defines': [
