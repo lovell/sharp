@@ -459,27 +459,29 @@ describe('Input/output', function () {
     });
   });
 
-  it('Fail when input is invalid Buffer', function (done) {
-    sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer().then(function () {
-      assert(false);
-      done();
-    }).catch(function (err) {
-      assert(err instanceof Error);
-      assert.strictEqual('Input buffer contains unsupported image format', err.message);
-      done();
-    });
-  });
+  it('Fail when input is invalid Buffer', async () =>
+    assert.rejects(
+      () => sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer(),
+      (err) => {
+        assert.strictEqual(err.message, 'Input buffer contains unsupported image format');
+        assert(err.stack.includes('at Sharp.toBuffer'));
+        assert(err.stack.includes(__filename));
+        return true;
+      }
+    )
+  );
 
-  it('Fail when input file path is missing', function (done) {
-    sharp('does-not-exist').toBuffer().then(function () {
-      assert(false);
-      done();
-    }).catch(function (err) {
-      assert(err instanceof Error);
-      assert.strictEqual('Input file is missing: does-not-exist', err.message);
-      done();
-    });
-  });
+  it('Fail when input file path is missing', async () =>
+    assert.rejects(
+      () => sharp('does-not-exist').toFile('fail'),
+      (err) => {
+        assert.strictEqual(err.message, 'Input file is missing: does-not-exist');
+        assert(err.stack.includes('at Sharp.toFile'));
+        assert(err.stack.includes(__filename));
+        return true;
+      }
+    )
+  );
 
   describe('Fail for unsupported input', function () {
     it('Undefined', function () {

@@ -14,6 +14,9 @@ Requires libvips v8.14.5
 
 * Remove `sharp.vendor`.
 
+* Ensure all `Error` objects contain a `stack` property.
+  [#3653](https://github.com/lovell/sharp/issues/3653)
+
 * Make `compression` option of `heif` mandatory to help reduce HEIF vs HEIC confusion.
   [#3740](https://github.com/lovell/sharp/issues/3740)
 

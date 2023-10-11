@@ -690,9 +690,23 @@ describe('Image Stats', function () {
   it('File input with corrupt header fails gracefully', function (done) {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .stats(function (err) {
-        assert.strictEqual(true, !!err);
+        assert(err.message.includes('Input file has corrupt header'));
+        assert(err.stack.includes('at Sharp.stats'));
+        assert(err.stack.includes(__filename));
         done();
       });
+  });
+
+  it('Stream input with corrupt header fails gracefully', function (done) {
+    fs.createReadStream(fixtures.inputJpgWithCorruptHeader).pipe(
+      sharp()
+        .stats(function (err) {
+          assert(err.message.includes('Input buffer has corrupt header'));
+          assert(err.stack.includes('at Sharp.stats'));
+          assert(err.stack.includes(__filename));
+          done();
+        })
+    );
   });
 
   it('File input with corrupt header fails gracefully, Promise out', function () {

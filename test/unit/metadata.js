@@ -395,13 +395,27 @@ describe('Image metadata', function () {
     });
   });
 
-  it('Non-existent file in, Promise out', function (done) {
-    sharp('fail').metadata().then(function (metadata) {
-      throw new Error('Non-existent file');
-    }, function (err) {
-      assert.ok(!!err);
-      done();
-    });
+  it('Non-existent file in, Promise out', async () =>
+    assert.rejects(
+      () => sharp('fail').metadata(),
+      (err) => {
+        assert.strictEqual(err.message, 'Input file is missing: fail');
+        assert(err.stack.includes('at Sharp.metadata'));
+        assert(err.stack.includes(__filename));
+        return true;
+      }
+    )
+  );
+
+  it('Invalid stream in, callback out', (done) => {
+    fs.createReadStream(__filename).pipe(
+      sharp().metadata((err) => {
+        assert.strictEqual(err.message, 'Input buffer contains unsupported image format');
+        assert(err.stack.includes('at Sharp.metadata'));
+        assert(err.stack.includes(__filename));
+        done();
+      })
+    );
   });
 
   it('Stream in, Promise out', function (done) {
