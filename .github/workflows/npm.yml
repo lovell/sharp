@@ -9,33 +9,84 @@ permissions: {}
 
 jobs:
   release-smoke-test:
-    name: "${{ github.ref }} ${{ matrix.name }}"
-    runs-on: ${{ matrix.os }}
+    name: "${{ github.ref_name }} ${{ matrix.name }}"
+    runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: linux-x64
-            os: ubuntu-22.04
-          - name: darwin-x64
-            os: macos-11
-          - name: win32-x64
-            os: windows-2019
+          - name: linux-x64-node-npm
+            runs-on: ubuntu-22.04
+            runtime: node
+            package-manager: npm
+          - name: linux-x64-node-pnpm
+            runs-on: ubuntu-22.04
+            runtime: node
+            package-manager: pnpm
+          - name: linux-x64-node-yarn
+            runs-on: ubuntu-22.04
+            runtime: node
+            package-manager: yarn
+          - name: linux-x64-deno
+            runs-on: ubuntu-22.04
+            runtime: deno
+          - name: linux-x64-bun
+            runs-on: ubuntu-22.04
+            runtime: bun
+
+          - name: darwin-x64-node-npm
+            runs-on: macos-11
+            runtime: node
+            package-manager: npm
+          - name: darwin-x64-node-pnpm
+            runs-on: macos-11
+            runtime: node
+            package-manager: pnpm
+          - name: darwin-x64-node-yarn
+            runs-on: macos-11
+            runtime: node
+            package-manager: yarn
+          - name: darwin-x64-deno
+            runs-on: macos-11
+            runtime: deno
+          - name: darwin-x64-bun
+            runs-on: macos-11
+            runtime: bun
+
+          - name: win32-x64-node-npm
+            runs-on: windows-2019
+            runtime: node
+            package-manager: npm
+          - name: win32-x64-node-pnpm
+            runs-on: windows-2019
+            runtime: node
+            package-manager: pnpm
+          - name: win32-x64-node-yarn
+            runs-on: windows-2019
+            runtime: node
+            package-manager: yarn
+          - name: win32-x64-deno
+            runs-on: windows-2019
+            runtime: deno
+
     steps:
       - name: Install Node.js
+        if: ${{ matrix.runtime == 'node' }}
         uses: actions/setup-node@v3
         with:
           node-version: 20
       - name: Install pnpm
+        if: ${{ matrix.package-manager == 'pnpm' }}
         uses: pnpm/action-setup@v2
         with:
           version: 8
       - name: Install Deno
+        if: ${{ matrix.runtime == 'deno' }}
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
       - name: Install Bun
-        if: ${{ !contains(matrix.os, 'windows') }}
+        if: ${{ matrix.runtime == 'bun' }}
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
@@ -68,33 +119,34 @@ jobs:
             deepStrictEqual(['.jpg', '.jpeg', '.jpe'], sharp.format.jpeg.input.fileSuffix);
 
       - name: Run with Node.js + npm
+        if: ${{ matrix.runtime == 'node' && matrix.package-manager == 'npm' }}
         run: |
           npm install --ignore-scripts
           node release.mjs
-          rm -r node_modules/ package-lock.json
 
       - name: Run with Node.js + pnpm
+        if: ${{ matrix.runtime == 'node' && matrix.package-manager == 'pnpm' }}
         run: |
           pnpm install --ignore-scripts
           node release.mjs
-          rm -r node_modules/ pnpm-lock.yaml
 
       - name: Run with Node.js + yarn
+        if: ${{ matrix.runtime == 'node' && matrix.package-manager == 'yarn' }}
         run: |
           corepack enable
           yarn set version stable
+          yarn config set enableImmutableInstalls false
           yarn config set enableScripts false
           yarn config set nodeLinker node-modules
           yarn install
           node release.mjs
-          rm -r node_modules/ .yarn/ yarn.lock .yarnrc.yml
-          corepack disable
 
       - name: Run with Deno
+        if: ${{ matrix.runtime == 'deno' }}
         run: deno run --allow-read --allow-ffi release.mjs
 
       - name: Run with Bun
-        if: ${{ !contains(matrix.os, 'windows') }}
+        if: ${{ matrix.runtime == 'bun' }}
         run: |
           bun install --ignore-scripts
           bun release.mjs
