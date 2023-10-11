@@ -661,3 +661,6 @@ sharp('input.tiff').webp({ preset: 'drawing' }).toFile('out.webp');
 sharp('input.tiff').webp({ preset: 'text' }).toFile('out.webp');
 sharp('input.tiff').webp({ preset: 'default' }).toFile('out.webp');
 
+// Allow a boolean or an object for metadata options.
+// https://github.com/lovell/sharp/issues/3822
+sharp(input).withMetadata().withMetadata({}).withMetadata(false);
