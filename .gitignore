@@ -8,11 +8,6 @@ test/bench/node_modules
 test/fixtures/output*
 test/fixtures/vips-properties.xml
 test/leak/libvips.supp
-test/saliency/report.json
-test/saliency/Image*
-test/saliency/[Uu]serData*
-!test/saliency/userData.js
-.gitattributes
 .DS_Store
 .nyc_output
 .vscode/
