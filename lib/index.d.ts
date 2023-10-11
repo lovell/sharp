@@ -640,7 +640,7 @@ declare namespace sharp {
          * @param withMetadata
          * @throws {Error} Invalid parameters.
          */
-        withMetadata(withMetadata?: WriteableMetadata): Sharp;
+        withMetadata(withMetadata?: boolean | WriteableMetadata): Sharp;
 
         /**
          * Use these JPEG options for output image.
@@ -1275,10 +1275,10 @@ declare namespace sharp {
     }
 
     interface NormaliseOptions {
-      /** Percentile below which luminance values will be underexposed. */
-      lower?: number | undefined;
-      /** Percentile above which luminance values will be overexposed. */
-      upper?: number | undefined;
+        /** Percentile below which luminance values will be underexposed. */
+        lower?: number | undefined;
+        /** Percentile above which luminance values will be overexposed. */
+        upper?: number | undefined;
     }
 
     interface ResizeOptions {
