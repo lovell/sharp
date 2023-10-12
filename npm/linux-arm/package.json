@@ -1,5 +1,5 @@
 {
-  "name": "@sharpen/sharp-linux-arm",
+  "name": "@img/sharp-linux-arm",
   "version": "0.0.1-alpha.8",
   "description": "Prebuilt sharp for use with Linux (glibc) ARM (32-bit)",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -14,7 +14,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@sharpen/sharp-libvips-linux-arm": "0.0.1-alpha.2"
+    "@img/sharp-libvips-linux-arm": "0.0.1"
   },
   "files": [
     "lib"

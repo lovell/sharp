@@ -157,8 +157,8 @@
               'OTHER_LDFLAGS': [
                 # Ensure runtime linking is relative to sharp.node
                 '-Wl,-rpath,\'@loader_path/../../sharp-libvips-<(platform_and_arch)/lib\'',
-                '-Wl,-rpath,\'@loader_path/../../node_modules/@sharpen/sharp-libvips-<(platform_and_arch)/lib\'',
-                '-Wl,-rpath,\'@loader_path/../../../node_modules/@sharpen/sharp-libvips-<(platform_and_arch)/lib\''
+                '-Wl,-rpath,\'@loader_path/../../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\'',
+                '-Wl,-rpath,\'@loader_path/../../../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\''
               ]
             }
           }],
@@ -178,8 +178,8 @@
                 '-Wl,-s',
                 '-Wl,--disable-new-dtags',
                 '-Wl,-rpath=\'$$ORIGIN/../../sharp-libvips-<(platform_and_arch)/lib\'',
-                '-Wl,-rpath=\'$$ORIGIN/../../node_modules/@sharpen/sharp-libvips-<(platform_and_arch)/lib\'',
-                '-Wl,-rpath=\'$$ORIGIN/../../../node_modules/@sharpen/sharp-libvips-<(platform_and_arch)/lib\''
+                '-Wl,-rpath=\'$$ORIGIN/../../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\'',
+                '-Wl,-rpath=\'$$ORIGIN/../../../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\''
               ]
             }
           }]

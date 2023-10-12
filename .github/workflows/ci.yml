@@ -106,7 +106,7 @@ jobs:
       - name: Test packaging
         run: |
           npm run package-from-local-build
-          npm pkg set "optionalDependencies.@sharpen/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
+          npm pkg set "optionalDependencies.@img/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
           npm run clean
           npm install --ignore-scripts
           npm test
@@ -141,7 +141,7 @@ jobs:
             npm install --build-from-source
             npx mocha --no-config --spec=test/unit/io.js
             npm run package-from-local-build
-            npm pkg set "optionalDependencies.@sharpen/sharp-linux-arm=file:./npm/linux-arm"
+            npm pkg set "optionalDependencies.@img/sharp-linux-arm=file:./npm/linux-arm"
             npm run clean
             npm install --ignore-scripts
             npx mocha --no-config --spec=test/unit/io.js --timeout=30000
@@ -182,7 +182,7 @@ jobs:
       - name: Test packaging
         run: |
           npm run package-from-local-build
-          npm pkg set "optionalDependencies.@sharpen/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
+          npm pkg set "optionalDependencies.@img/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
           npm run clean
           npm install --ignore-scripts
           npm test

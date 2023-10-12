@@ -38,7 +38,7 @@ jobs:
       - run: sudo docker exec sharp sh -c "npm test"
       - run: |
           sudo docker exec sharp sh -c "npm run package-from-local-build"
-          sudo docker exec sharp sh -c "npm pkg set \"optionalDependencies.@sharpen/sharp-linux-arm64=file:./npm/linux-arm64\""
+          sudo docker exec sharp sh -c "npm pkg set \"optionalDependencies.@img/sharp-linux-arm64=file:./npm/linux-arm64\""
           sudo docker exec sharp sh -c "npm run clean"
           sudo docker exec sharp sh -c "npm install --ignore-scripts"
           sudo docker exec sharp sh -c "npm test"
@@ -62,7 +62,7 @@ jobs:
       - run: sudo docker exec sharp sh -c "npm test"
       - run: |
           sudo docker exec sharp sh -c "npm run package-from-local-build"
-          sudo docker exec sharp sh -c "npm pkg set \"optionalDependencies.@sharpen/sharp-linux-arm64=file:./npm/linux-arm64\""
+          sudo docker exec sharp sh -c "npm pkg set \"optionalDependencies.@img/sharp-linux-arm64=file:./npm/linux-arm64\""
           sudo docker exec sharp sh -c "npm run clean"
           sudo docker exec sharp sh -c "npm install --ignore-scripts"
           sudo docker exec sharp sh -c "npm test"
@@ -79,7 +79,7 @@ jobs:
       - run: sudo docker exec sharp sh -c "npm test"
       - run: |
           sudo docker exec sharp sh -c "npm run package-from-local-build"
-          sudo docker exec sharp sh -c "npm pkg set \"optionalDependencies.@sharpen/sharp-linuxmusl-arm64=file:./npm/linuxmusl-arm64\""
+          sudo docker exec sharp sh -c "npm pkg set \"optionalDependencies.@img/sharp-linuxmusl-arm64=file:./npm/linuxmusl-arm64\""
           sudo docker exec sharp sh -c "npm run clean"
           sudo docker exec sharp sh -c "npm install --ignore-scripts"
           sudo docker exec sharp sh -c "npm test"
@@ -99,7 +99,7 @@ jobs:
       - run: sudo docker exec sharp sh -c "npm test"
       - run: |
           sudo docker exec sharp sh -c "npm run package-from-local-build"
-          sudo docker exec sharp sh -c "npm pkg set \"optionalDependencies.@sharpen/sharp-linuxmusl-arm64=file:./npm/linuxmusl-arm64\""
+          sudo docker exec sharp sh -c "npm pkg set \"optionalDependencies.@img/sharp-linuxmusl-arm64=file:./npm/linuxmusl-arm64\""
           sudo docker exec sharp sh -c "npm run clean"
           sudo docker exec sharp sh -c "npm install --ignore-scripts"
           sudo docker exec sharp sh -c "npm test"

@@ -1,5 +1,5 @@
 {
-  "name": "@sharpen/sharp-win32-x64",
+  "name": "@img/sharp-win32-x64",
   "version": "0.0.1-alpha.8",
   "description": "Prebuilt sharp for use with Windows x64",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -15,8 +15,7 @@
   "preferUnplugged": true,
   "files": [
     "lib",
-    "versions.json",
-    "THIRD-PARTY-NOTICES.md"
+    "versions.json"
   ],
   "publishConfig": {
     "access": "public"
@@ -24,7 +23,8 @@
   "type": "commonjs",
   "exports": {
     "./sharp.node": "./lib/sharp-win32-x64.node",
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./versions": "./versions.json"
   },
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0",

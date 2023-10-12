@@ -5,7 +5,7 @@
 
 // Populate contents of all packages with the current GitHub release
 
-const { writeFile, copyFile, rm } = require('node:fs/promises');
+const { readFile, writeFile, appendFile, copyFile, rm } = require('node:fs/promises');
 const path = require('node:path');
 const { Readable } = require('node:stream');
 const { pipeline } = require('node:stream/promises');
@@ -60,11 +60,12 @@ workspaces.map(async platform => {
   await copyFile(path.join(__dirname, '..', 'LICENSE'), path.join(dir, 'LICENSE'));
   // Copy Windows-specific files
   if (platform.startsWith('win32-')) {
-    const sharpLibvipsDir = path.join(require(`@sharpen/sharp-libvips-${platform}/lib`), '..');
-    await Promise.all(
-      ['versions.json', 'THIRD-PARTY-NOTICES.md'].map(
-        filename => copyFile(path.join(sharpLibvipsDir, filename), path.join(dir, filename))
-      )
-    );
+    const sharpLibvipsDir = path.join(require(`@img/sharp-libvips-${platform}/lib`), '..');
+    // Copy versions.json
+    await copyFile(path.join(sharpLibvipsDir, 'versions.json'), path.join(dir, 'versions.json'));
+    // Append third party licensing to README
+    const readme = await readFile(path.join(sharpLibvipsDir, 'README.md'), { encoding: 'utf-8' });
+    const thirdParty = readme.substring(readme.indexOf('\nThis software contains'));
+    appendFile(path.join(dir, 'README.md'), thirdParty);
   }
 });

@@ -1,5 +1,5 @@
 {
-  "name": "@sharpen/sharp-linuxmusl-x64",
+  "name": "@img/sharp-linuxmusl-x64",
   "version": "0.0.1-alpha.8",
   "description": "Prebuilt sharp for use with Linux (musl) x64",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -14,7 +14,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@sharpen/sharp-libvips-linuxmusl-x64": "0.0.1-alpha.2"
+    "@img/sharp-libvips-linuxmusl-x64": "0.0.1"
   },
   "files": [
     "lib"

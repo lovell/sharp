@@ -106,14 +106,14 @@ must include binaries for either the linux-x64 or linux-arm64 platforms
 depending on the chosen architecture.
 
 When building your deployment package on a machine that differs from the target architecture,
-you will need to install either `@sharpen/sharp-linux-x64` or `@sharpen/sharp-linux-arm64` package.
+you will need to install either `@img/sharp-linux-x64` or `@img/sharp-linux-arm64` package.
 
 ```sh
-npm install --force @sharpen/sharp-linux-x64
+npm install --force @img/sharp-linux-x64
 ```
 
 ```sh
-npm install --force @sharpen/sharp-linux-arm64
+npm install --force @img/sharp-linux-arm64
 ```
 
 To get the best performance select the largest memory available.
@@ -165,7 +165,7 @@ custom:
       - sharp
     packagerOptions:
       scripts:
-        - npm install --force @sharpen/sharp-linux-x64
+        - npm install --force @img/sharp-linux-x64
 ```
 
 ## TypeScript
