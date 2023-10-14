@@ -2,9 +2,13 @@
 
 <img src="https://cdn.jsdelivr.net/gh/lovell/sharp@main/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
 
-The typical use case for this high speed Node.js module
+The typical use case for this high speed Node-API module
 is to convert large images in common formats to
 smaller, web-friendly JPEG, PNG, WebP, GIF and AVIF images of varying dimensions.
+
+It can be used with all JavaScript runtimes
+that provide support for Node-API v9, including
+Node.js >= 18.17.0, Deno and Bun.
 
 Resizing an image is typically 4x-5x faster than using the
 quickest ImageMagick and GraphicsMagick settings
@@ -16,7 +20,7 @@ Lanczos resampling ensures quality is not sacrificed for speed.
 As well as image resizing, operations such as
 rotation, extraction, compositing and gamma correction are available.
 
-Most modern macOS, Windows and Linux systems running Node.js >= 14.15.0
+Most modern macOS, Windows and Linux systems
 do not require any additional install or runtime dependencies.
 
 ### Formats

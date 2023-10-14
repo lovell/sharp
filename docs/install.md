@@ -1,5 +1,7 @@
 # Installation
 
+Works with your choice of JavaScript package manager.
+
 ```sh
 npm install sharp
 ```
@@ -9,14 +11,20 @@ pnpm add sharp
 ```
 
 ```sh
-yarn add sharp
+yarn add sharp # v3 recommended, Plug'n'Play unsupported
 ```
 
-Yarn Plug'n'Play is unsupported.
+```sh
+bun add sharp
+```
+
+```sh
+deno run --allow-ffi ...
+```
 
 ## Prerequisites
 
-* Node.js >= 18.17.0
+* Node-API v9 compatible runtime e.g. Node.js >= 18.17.0
 
 ## Prebuilt binaries
 
