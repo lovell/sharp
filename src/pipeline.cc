@@ -1215,7 +1215,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     // Handle warnings
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
-      debuglog.MakeCallback(Receiver().Value(), { Napi::String::New(env, warning) });
+      debuglog.Call(Receiver().Value(), { Napi::String::New(env, warning) });
       warning = sharp::VipsWarningPop();
     }
 
@@ -1263,17 +1263,17 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Pass ownership of output data to Buffer instance
         Napi::Buffer<char> data = Napi::Buffer<char>::NewOrCopy(env, static_cast<char*>(baton->bufferOut),
           baton->bufferOutLength, sharp::FreeCallback);
-        Callback().MakeCallback(Receiver().Value(), { env.Null(), data, info });
+        Callback().Call(Receiver().Value(), { env.Null(), data, info });
       } else {
         // Add file size to info
         struct STAT64_STRUCT st;
         if (STAT64_FUNCTION(baton->fileOut.data(), &st) == 0) {
           info.Set("size", static_cast<uint32_t>(st.st_size));
         }
-        Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
+        Callback().Call(Receiver().Value(), { env.Null(), info });
       }
     } else {
-      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
+      Callback().Call(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
     }
 
     // Delete baton
@@ -1291,7 +1291,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     // Decrement processing task counter
     sharp::counterProcess--;
     Napi::Number queueLength = Napi::Number::New(env, static_cast<int>(sharp::counterQueue));
-    queueListener.MakeCallback(Receiver().Value(), { queueLength });
+    queueListener.Call(Receiver().Value(), { queueLength });
   }
 
  private:
@@ -1708,7 +1708,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
 
   // Increment queued task counter
   Napi::Number queueLength = Napi::Number::New(info.Env(), static_cast<int>(++sharp::counterQueue));
-  queueListener.MakeCallback(info.This(), { queueLength });
+  queueListener.Call(info.This(), { queueLength });
 
   return info.Env().Undefined();
 }
