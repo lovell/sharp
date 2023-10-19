@@ -11,13 +11,16 @@ const fixtures = require('../fixtures');
 describe('Text to image', function () {
   this.retries(3);
 
-  it('text with default values', async () => {
+  it('text with default values', async function () {
     const output = fixtures.path('output.text-default.png');
     const text = sharp({
       text: {
         text: 'Hello, world !'
       }
     });
+    if (!sharp.versions.pango) {
+      return this.skip();
+    }
     const info = await text.png().toFile(output);
     assert.strictEqual('png', info.format);
     assert.strictEqual(3, info.channels);
@@ -49,6 +52,9 @@ describe('Text to image', function () {
         height: maxHeight
       }
     });
+    if (!sharp.versions.pango) {
+      return this.skip();
+    }
     text.toFile(output, function (err, info) {
       if (err) throw err;
       assert.strictEqual('png', info.format);
@@ -69,6 +75,9 @@ describe('Text to image', function () {
         dpi
       }
     });
+    if (!sharp.versions.pango) {
+      return this.skip();
+    }
     text.toFile(output, function (err, info) {
       if (err) throw err;
       assert.strictEqual('png', info.format);
@@ -90,6 +99,9 @@ describe('Text to image', function () {
         dpi
       }
     });
+    if (!sharp.versions.pango) {
+      return this.skip();
+    }
     text.toFile(output, function (err, info) {
       if (err) throw err;
       assert.strictEqual('png', info.format);
@@ -112,6 +124,9 @@ describe('Text to image', function () {
         font: 'sans 100'
       }
     });
+    if (!sharp.versions.pango) {
+      return this.skip();
+    }
     text.toFile(output, function (err, info) {
       if (err) throw err;
       assert.strictEqual('png', info.format);
@@ -122,7 +137,7 @@ describe('Text to image', function () {
     });
   });
 
-  it('text with justify and composite', done => {
+  it('text with justify and composite', function (done) {
     const output = fixtures.path('output.text-composite.png');
     const width = 500;
     const dpi = 300;
@@ -153,6 +168,9 @@ describe('Text to image', function () {
         left: 30,
         top: 250
       }]);
+    if (!sharp.versions.pango) {
+      return this.skip();
+    }
     text.toFile(output, function (err, info) {
       if (err) throw err;
       assert.strictEqual('png', info.format);

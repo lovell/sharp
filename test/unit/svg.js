@@ -141,21 +141,21 @@ describe('SVG input', function () {
 
   it('Fails to render SVG larger than 32767x32767', () =>
     assert.rejects(
-      () => sharp(Buffer.from('<svg width="32768" height="1" />')).toBuffer(),
+      () => sharp(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="32768" height="1" />')).toBuffer(),
       /Input SVG image exceeds 32767x32767 pixel limit/
     )
   );
 
   it('Fails to render scaled SVG larger than 32767x32767', () =>
     assert.rejects(
-      () => sharp(Buffer.from('<svg width="32767" height="1" />')).resize(32768).toBuffer(),
+      () => sharp(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="32767" height="1" />')).resize(32768).toBuffer(),
       /Input SVG image will exceed 32767x32767 pixel limit when scaled/
     )
   );
 
   it('Detects SVG passed as a string', () =>
     assert.rejects(
-      () => sharp('<svg></svg>').toBuffer(),
+      () => sharp('<svg xmlns="http://www.w3.org/2000/svg"></svg>').toBuffer(),
       /Input file is missing, did you mean/
     )
   );
