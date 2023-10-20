@@ -130,6 +130,9 @@
           '<(sharp_libvips_include_dir)/glib-2.0',
           '<(sharp_libvips_lib_dir)/glib-2.0/include'
         ],
+        'library_dirs': [
+          '<(sharp_libvips_lib_dir)'
+        ],
         'conditions': [
           ['OS == "win"', {
             'defines': [
@@ -137,7 +140,6 @@
               '_FILE_OFFSET_BITS=64'
             ],
             'link_settings': {
-              'library_dirs': ['<(sharp_libvips_lib_dir)'],
               'libraries': [
                 'libvips.lib',
                 'libglib-2.0.lib',
@@ -147,9 +149,6 @@
           }],
           ['OS == "mac"', {
             'link_settings': {
-              'library_dirs': [
-                '<(sharp_libvips_lib_dir)'
-              ],
               'libraries': [
                 'libvips-cpp.42.dylib'
               ]
@@ -169,9 +168,6 @@
               '_GLIBCXX_USE_CXX11_ABI=1'
             ],
             'link_settings': {
-              'library_dirs': [
-                '<(sharp_libvips_lib_dir)'
-              ],
               'libraries': [
                 '-l:libvips-cpp.so.42'
               ],
