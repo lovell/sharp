@@ -6,43 +6,44 @@
 const assert = require('assert');
 
 const sharp = require('../../');
-const fixtures = require('../fixtures');
 
-describe('Median filter', () => {
-  it('1x1 window', async () => {
-    const [r, g, b] = await sharp(fixtures.inputSvgSmallViewBox)
-      .median(1)
+const row = [0, 3, 15, 63, 127, 255];
+const input = Buffer.from(Array.from(row, () => row).flat());
+const raw = {
+  width: 6,
+  height: 6,
+  channels: 1
+};
+
+describe('Median filter', function () {
+  it('default window (3x3)', async () => {
+    const data = await sharp(input, { raw })
+      .median()
+      .toColourspace('b-w')
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 0, g: 0, b: 0 }, { r, g, b });
+    assert.deepStrictEqual(data.subarray(0, 6), Buffer.from(row));
   });
 
   it('3x3 window', async () => {
-    const [r, g, b] = await sharp(fixtures.inputSvgSmallViewBox)
+    const data = await sharp(input, { raw })
       .median(3)
+      .toColourspace('b-w')
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 255, g: 0, b: 127 }, { r, g, b });
+    assert.deepStrictEqual(data.subarray(0, 6), Buffer.from(row));
   });
 
-  it('7x7 window', async () => {
-    const [r, g, b] = await sharp(fixtures.inputSvgSmallViewBox)
-      .median(7)
+  it('5x5 window', async () => {
+    const data = await sharp(input, { raw })
+      .median(5)
+      .toColourspace('b-w')
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 255, g: 19, b: 146 }, { r, g, b });
-  });
-
-  it('default window (3x3)', async () => {
-    const [r, g, b] = await sharp(fixtures.inputSvgSmallViewBox)
-      .median()
-      .raw()
-      .toBuffer();
-
-    assert.deepStrictEqual({ r: 255, g: 0, b: 127 }, { r, g, b });
+    assert.deepStrictEqual(data.subarray(0, 6), Buffer.from([0, 3, 15, 15, 63, 127]));
   });
 
   it('invalid radius', () => {
