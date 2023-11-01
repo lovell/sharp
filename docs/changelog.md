@@ -27,6 +27,9 @@ Requires libvips v8.14.5
   [#3823](https://github.com/lovell/sharp/pull/3823)
   [@uhthomas](https://github.com/uhthomas)
 
+* Ensure multi-page extract remains sequential.
+  [#3837](https://github.com/lovell/sharp/issues/3837)
+
 ## v0.32 - *flow*
 
 Requires libvips v8.14.5

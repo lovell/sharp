@@ -370,6 +370,7 @@ namespace sharp {
       pages.reserve(nPages);
 
       // Split the image into cropped frames
+      image = StaySequential(image, VIPS_ACCESS_SEQUENTIAL);
       for (int i = 0; i < nPages; i++) {
         pages.push_back(
           image.extract_area(left, *pageHeight * i + top, width, height));
