@@ -121,27 +121,42 @@ jobs:
   github-runner-qemu:
     permissions:
       contents: write
-    name: linux-arm - Node.js 18 - prebuild
+    name: ${{ matrix.platform }} - Node.js ${{ matrix.nodejs_version_major }} - prebuild
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux-arm
+            run_on_arch: armv6
+            nodejs_arch: armv6l
+            nodejs_hostname: unofficial-builds.nodejs.org
+            nodejs_version: "18.17.0"
+            nodejs_version_major: 18
+          - platform: linux-s390x
+            run_on_arch: s390x
+            nodejs_arch: s390x
+            nodejs_hostname: nodejs.org
+            nodejs_version: "18.17.0"
+            nodejs_version_major: 18
     steps:
       - uses: actions/checkout@v4
       - uses: uraimo/run-on-arch-action@v2
         with:
-          arch: armv6
+          arch: ${{ matrix.run_on_arch }}
           distro: buster
           env: |
-            nodejs_version: "18.17.0"
             prebuild_upload: "${{ startsWith(github.ref, 'refs/tags/') && secrets.GITHUB_TOKEN || '' }}"
           run: |
             apt-get update
-            apt-get install -y fontconfig fonts-noto-core g++ git libatomic1 make python3 xz-utils
+            apt-get install -y curl g++ git libatomic1 make python3 xz-utils
             mkdir /opt/nodejs
-            curl --silent https://unofficial-builds.nodejs.org/download/release/v${nodejs_version}/node-v${nodejs_version}-linux-armv6l.tar.xz | tar xJC /opt/nodejs --strip-components=1
+            curl --silent https://${{ matrix.nodejs_hostname }}/download/release/v${{ matrix.nodejs_version}}/node-v${{ matrix.nodejs_version}}-linux-${{ matrix.nodejs_arch }}.tar.xz | tar xJC /opt/nodejs --strip-components=1
             export PATH=$PATH:/opt/nodejs/bin
             npm install --build-from-source
-            npx mocha --no-config --spec=test/unit/io.js
+            npx mocha --no-config --spec=test/unit/io.js --timeout=30000
             npm run package-from-local-build
-            npm pkg set "optionalDependencies.@img/sharp-linux-arm=file:./npm/linux-arm"
+            npm pkg set "optionalDependencies.@img/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
             npm run clean
             npm install --ignore-scripts
             npx mocha --no-config --spec=test/unit/io.js --timeout=30000
