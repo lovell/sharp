@@ -59,8 +59,8 @@ describe('Text to image', function () {
       if (err) throw err;
       assert.strictEqual('png', info.format);
       assert.strictEqual(3, info.channels);
-      assert.ok(info.width <= maxWidth);
-      assert.ok(info.height <= maxHeight);
+      assert.ok(info.width <= maxWidth, `Actual width ${info.width}`);
+      assert.ok(info.height <= maxHeight, `Actual height ${info.height}`);
       assert.ok(info.textAutofitDpi > 0);
       done();
     });
