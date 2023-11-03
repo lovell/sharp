@@ -275,3 +275,6 @@ GitHub: https://github.com/LachlanNewman
 
 Name: BJJ
 GitHub: https://github.com/bianjunjie1981
+
+Name: Dennis Beatty
+GitHub: https://github.com/dnsbty

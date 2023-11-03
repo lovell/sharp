@@ -23,6 +23,10 @@ Requires libvips v8.14.5
 * Ensure correct interpretation of 16-bit raw input.
   [#3808](https://github.com/lovell/sharp/issues/3808)
 
+* Add support for `miniswhite` when using TIFF output.
+  [#3812](https://github.com/lovell/sharp/pull/3812)
+  [@dnsbty](https://github.com/dnsbty)
+
 * TypeScript: add missing definition for `withMetadata` boolean.
   [#3823](https://github.com/lovell/sharp/pull/3823)
   [@uhthomas](https://github.com/uhthomas)
