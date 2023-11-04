@@ -112,10 +112,8 @@ jobs:
         with:
           path: release.mjs
           contents: |
-            import { createRequire } from 'node:module';
             import { deepStrictEqual } from 'node:assert';
-            const require = createRequire(import.meta.url);
-            const sharp = require('sharp');
+            import sharp from 'sharp';
             deepStrictEqual(['.jpg', '.jpeg', '.jpe'], sharp.format.jpeg.input.fileSuffix);
 
       - name: Run with Node.js + npm
