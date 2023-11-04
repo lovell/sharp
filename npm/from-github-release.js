@@ -47,7 +47,7 @@ workspaces.map(async platform => {
   }
   // Extract prebuild tarball
   const lib = path.join(dir, 'lib');
-  await rm(lib, { recursive: true });
+  await rm(lib, { force: true, recursive: true });
   await pipeline(
     Readable.fromWeb(response.body),
     createGunzip(),
