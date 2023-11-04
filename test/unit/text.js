@@ -44,13 +44,11 @@ describe('Text to image', function () {
 
   it('text with width and height', function (done) {
     const output = fixtures.path('output.text-width-height.png');
-    const maxWidth = 500;
-    const maxHeight = 500;
     const text = sharp({
       text: {
         text: 'Hello, world!',
-        width: maxWidth,
-        height: maxHeight
+        width: 500,
+        height: 400
       }
     });
     if (!sharp.versions.pango) {
@@ -60,9 +58,9 @@ describe('Text to image', function () {
       if (err) throw err;
       assert.strictEqual('png', info.format);
       assert.strictEqual(3, info.channels);
-      assert.ok(inRange(info.width, 1, maxWidth + 5), `Actual width ${info.width}`);
-      assert.ok(inRange(info.height, 1, maxHeight + 5), `Actual height ${info.height}`);
-      assert.ok(info.textAutofitDpi > 0);
+      assert.ok(inRange(info.width, 450, 550), `Actual width ${info.width}`);
+      assert.ok(inRange(info.height, 300, 450), `Actual height ${info.height}`);
+      assert.ok(inRange(info.textAutofitDpi, 900, 1200), `Actual textAutofitDpi ${info.textAutofitDpi}`);
       done();
     });
   });
