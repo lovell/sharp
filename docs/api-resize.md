@@ -251,7 +251,7 @@ sharp(input)
 
 
 ## trim
-> trim(trim) ⇒ <code>Sharp</code>
+> trim([options]) ⇒ <code>Sharp</code>
 
 Trim pixels from all edges that contain values similar to the given background colour, which defaults to that of the top-left pixel.
 
@@ -259,8 +259,7 @@ Images with an alpha channel will use the combined bounding box of alpha and non
 
 If the result of this operation would trim an image to nothing then no change is made.
 
-The `info` response Object, obtained from callback of `.toFile()` or `.toBuffer()`,
-will contain `trimOffsetLeft` and `trimOffsetTop` properties.
+The `info` response Object will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
 
 **Throws**:
@@ -270,46 +269,44 @@ will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| trim | <code>string</code> \| <code>number</code> \| <code>Object</code> |  | the specific background colour to trim, the threshold for doing so or an Object with both. |
-| [trim.background] | <code>string</code> \| <code>Object</code> | <code>&quot;&#x27;top-left pixel&#x27;&quot;</code> | background colour, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to that of the top-left pixel. |
-| [trim.threshold] | <code>number</code> | <code>10</code> | the allowed difference from the above colour, a positive number. |
+| [options] | <code>Object</code> |  |  |
+| [options.background] | <code>string</code> \| <code>Object</code> | <code>&quot;&#x27;top-left pixel&#x27;&quot;</code> | Background colour, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to that of the top-left pixel. |
+| [options.threshold] | <code>number</code> | <code>10</code> | Allowed difference from the above colour, a positive number. |
+| [options.lineArt] | <code>boolean</code> | <code>false</code> | Does the input more closely resemble line art (e.g. vector) rather than being photographic? |
 
 **Example**  
 ```js
 // Trim pixels with a colour similar to that of the top-left pixel.
-sharp(input)
+await sharp(input)
   .trim()
-  .toFile(output, function(err, info) {
-    ...
-  });
+  .toFile(output);
 ```
 **Example**  
 ```js
 // Trim pixels with the exact same colour as that of the top-left pixel.
-sharp(input)
-  .trim(0)
-  .toFile(output, function(err, info) {
-    ...
-  });
+await sharp(input)
+  .trim({
+    threshold: 0
+  })
+  .toFile(output);
 ```
 **Example**  
 ```js
-// Trim only pixels with a similar colour to red.
-sharp(input)
-  .trim("#FF0000")
-  .toFile(output, function(err, info) {
-    ...
-  });
+// Assume input is line art and trim only pixels with a similar colour to red.
+const output = await sharp(input)
+  .trim({
+    background: "#FF0000",
+    lineArt: true
+  })
+  .toBuffer();
 ```
 **Example**  
 ```js
 // Trim all "yellow-ish" pixels, being more lenient with the higher threshold.
-sharp(input)
+const output = await sharp(input)
   .trim({
     background: "yellow",
     threshold: 42,
   })
-  .toFile(output, function(err, info) {
-    ...
-  });
+  .toBuffer();
 ```

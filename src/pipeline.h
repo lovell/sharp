@@ -92,6 +92,7 @@ struct PipelineBaton {
   bool thresholdGrayscale;
   std::vector<double> trimBackground;
   double trimThreshold;
+  bool trimLineArt;
   int trimOffsetLeft;
   int trimOffsetTop;
   std::vector<double> linearA;
@@ -260,7 +261,8 @@ struct PipelineBaton {
     threshold(0),
     thresholdGrayscale(true),
     trimBackground{},
-    trimThreshold(0.0),
+    trimThreshold(-1.0),
+    trimLineArt(false),
     trimOffsetLeft(0),
     trimOffsetTop(0),
     linearA{},

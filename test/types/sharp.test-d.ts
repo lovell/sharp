@@ -572,8 +572,8 @@ const nohalo: string = sharp.interpolators.nohalo;
 const vertexSplitQuadraticBasisSpline: string = sharp.interpolators.vertexSplitQuadraticBasisSpline;
 
 // Triming
-sharp(input).trim('#000').toBuffer();
-sharp(input).trim(10).toBuffer();
+sharp(input).trim({ background: '#000' }).toBuffer();
+sharp(input).trim({ threshold: 10, lineArt: true }).toBuffer();
 sharp(input).trim({ background: '#bf1942', threshold: 30 }).toBuffer();
 
 // Text input

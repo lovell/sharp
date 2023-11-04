@@ -847,11 +847,11 @@ declare namespace sharp {
          * Trim pixels from all edges that contain values similar to the given background colour, which defaults to that of the top-left pixel.
          * Images with an alpha channel will use the combined bounding box of alpha and non-alpha channels.
          * The info response Object will contain trimOffsetLeft and trimOffsetTop properties.
-         * @param trim The specific background colour to trim, the threshold for doing so or an Object with both.
+         * @param options trim options
          * @throws {Error} Invalid parameters
          * @returns A sharp instance that can be used to chain operations
          */
-        trim(trim?: string | number | TrimOptions): Sharp;
+        trim(options?: TrimOptions): Sharp;
 
         //#endregion
     }
@@ -1342,10 +1342,12 @@ declare namespace sharp {
     }
 
     interface TrimOptions {
-        /** background colour, parsed by the color module, defaults to that of the top-left pixel. (optional) */
+        /** Background colour, parsed by the color module, defaults to that of the top-left pixel. (optional) */
         background?: Color | undefined;
-        /** the allowed difference from the above colour, a positive number. (optional, default `10`) */
+        /** Allowed difference from the above colour, a positive number. (optional, default 10) */
         threshold?: number | undefined;
+        /** Does the input more closely resemble line art (e.g. vector) rather than being photographic? (optional, default false) */
+        lineArt?: boolean | undefined;
     }
 
     interface RawOptions {

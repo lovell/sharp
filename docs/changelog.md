@@ -14,6 +14,9 @@ Requires libvips v8.15.0
 
 * Remove `sharp.vendor`.
 
+* Options for `trim` operation must be an Object, add new `lineArt` option.
+  [#2363](https://github.com/lovell/sharp/issues/2363)
+
 * Ensure all `Error` objects contain a `stack` property.
   [#3653](https://github.com/lovell/sharp/issues/3653)
 

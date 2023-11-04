@@ -265,7 +265,7 @@ namespace sharp {
   /*
     Trim an image
   */
-  VImage Trim(VImage image, std::vector<double> background, double threshold) {
+  VImage Trim(VImage image, std::vector<double> background, double threshold, bool const lineArt) {
     if (image.width() < 3 && image.height() < 3) {
       throw VError("Image to trim must be at least 3x3 pixels");
     }
@@ -287,6 +287,7 @@ namespace sharp {
     int left, top, width, height;
     left = image.find_trim(&top, &width, &height, VImage::option()
       ->set("background", background)
+      ->set("line_art", lineArt)
       ->set("threshold", threshold));
     if (HasAlpha(image)) {
       // Search alpha channel (A)
@@ -294,6 +295,7 @@ namespace sharp {
       VImage alpha = image[image.bands() - 1];
       leftA = alpha.find_trim(&topA, &widthA, &heightA, VImage::option()
         ->set("background", backgroundAlpha)
+        ->set("line_art", lineArt)
         ->set("threshold", threshold));
       if (widthA > 0 && heightA > 0) {
         if (width > 0 && height > 0) {

@@ -46,7 +46,9 @@ describe('Trim borders', function () {
   it('16-bit PNG with alpha channel', function (done) {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 32)
-      .trim(20)
+      .trim({
+        threshold: 20
+      })
       .toBuffer(function (err, data, info) {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
@@ -96,7 +98,9 @@ describe('Trim borders', function () {
       .then(rotated30 =>
         sharp(rotated30)
           .rotate(-30)
-          .trim(128)
+          .trim({
+            threshold: 128
+          })
           .toBuffer({ resolveWithObject: true })
           .then(({ info }) => {
             assert.strictEqual(20, info.width);
@@ -198,49 +202,26 @@ describe('Trim borders', function () {
     assert.strictEqual(trimOffsetLeft, 0);
   });
 
-  describe('Valid parameters', function () {
-    const expected = fixtures.expected('alpha-layer-1-fill-trim-resize.png');
-    Object.entries({
-      'Background and threshold default': undefined,
-      'Background string': '#00000000',
-      'Background option': {
-        background: '#00000000'
-      },
-      'Threshold number': 10,
-      'Threshold option': {
-        threshold: 10
-      }
-    }).forEach(function ([description, parameter]) {
-      it(description, function (done) {
-        sharp(fixtures.inputPngOverlayLayer1)
-          .resize(450, 322)
-          .trim(parameter)
-          .toBuffer(function (err, data, info) {
-            if (err) throw err;
-            assert.strictEqual('png', info.format);
-            assert.strictEqual(450, info.width);
-            assert.strictEqual(322, info.height);
-            assert.strictEqual(-204, info.trimOffsetLeft);
-            assert.strictEqual(0, info.trimOffsetTop);
-            fixtures.assertSimilar(expected, data, done);
-          });
-      });
-    });
+  it('Works with line-art', async () => {
+    const { info } = await sharp(fixtures.inputJpgOverlayLayer2)
+      .trim({ lineArt: true })
+      .toBuffer({ resolveWithObject: true });
+
+    assert.strictEqual(info.trimOffsetTop, -552);
   });
 
   describe('Invalid parameters', function () {
     Object.entries({
-      'Invalid background string': 'fail',
+      'Invalid string': 'fail',
       'Invalid background option': {
         background: 'fail'
       },
-
-      'Negative threshold number': -1,
       'Negative threshold option': {
         threshold: -1
       },
-
-      Boolean: false
+      'Invalid lineArt': {
+        lineArt: 'fail'
+      }
     }).forEach(function ([description, parameter]) {
       it(description, function () {
         assert.throws(function () {
@@ -253,7 +234,9 @@ describe('Trim borders', function () {
   describe('Specific background colour', function () {
     it('Doesn\'t trim at all', async () => {
       const { info } = await sharp(fixtures.inputPngTrimSpecificColour)
-        .trim('yellow')
+        .trim({
+          background: 'yellow'
+        })
         .toBuffer({ resolveWithObject: true });
 
       const { width, height, trimOffsetTop, trimOffsetLeft } = info;
@@ -265,7 +248,9 @@ describe('Trim borders', function () {
 
     it('Only trims the bottom', async () => {
       const { info } = await sharp(fixtures.inputPngTrimSpecificColour)
-        .trim('#21468B')
+        .trim({
+          background: '#21468B'
+        })
         .toBuffer({ resolveWithObject: true });
 
       const { width, height, trimOffsetTop, trimOffsetLeft } = info;
@@ -277,7 +262,9 @@ describe('Trim borders', function () {
 
     it('Only trims the bottom, in 16-bit', async () => {
       const { info } = await sharp(fixtures.inputPngTrimSpecificColour16bit)
-        .trim('#21468B')
+        .trim({
+          background: '#21468B'
+        })
         .toBuffer({ resolveWithObject: true });
 
       const { width, height, trimOffsetTop, trimOffsetLeft } = info;
@@ -289,7 +276,9 @@ describe('Trim borders', function () {
 
     it('Only trims the bottom, including alpha', async () => {
       const { info } = await sharp(fixtures.inputPngTrimSpecificColourIncludeAlpha)
-        .trim('#21468B80')
+        .trim({
+          background: '#21468B80'
+        })
         .toBuffer({ resolveWithObject: true });
 
       const { width, height, trimOffsetTop, trimOffsetLeft } = info;

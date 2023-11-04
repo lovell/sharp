@@ -126,10 +126,10 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Trim
-      if (baton->trimThreshold > 0.0) {
+      if (baton->trimThreshold >= 0.0) {
         MultiPageUnsupported(nPages, "Trim");
         image = sharp::StaySequential(image, access);
-        image = sharp::Trim(image, baton->trimBackground, baton->trimThreshold);
+        image = sharp::Trim(image, baton->trimBackground, baton->trimThreshold, baton->trimLineArt);
         baton->trimOffsetLeft = image.xoffset();
         baton->trimOffsetTop = image.yoffset();
       }
@@ -182,7 +182,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       //  - trimming or pre-resize extract isn't required;
       //  - input colourspace is not specified;
       bool const shouldPreShrink = (targetResizeWidth > 0 || targetResizeHeight > 0) &&
-        baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold == 0.0 &&
+        baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold < 0.0 &&
         baton->colourspaceInput == VIPS_INTERPRETATION_LAST && !shouldRotateBefore;
 
       if (shouldPreShrink) {
@@ -1248,11 +1248,10 @@ class PipelineWorker : public Napi::AsyncWorker {
         info.Set("attentionX", static_cast<int32_t>(baton->attentionX));
         info.Set("attentionY", static_cast<int32_t>(baton->attentionY));
       }
-      if (baton->trimThreshold > 0.0) {
+      if (baton->trimThreshold >= 0.0) {
         info.Set("trimOffsetLeft", static_cast<int32_t>(baton->trimOffsetLeft));
         info.Set("trimOffsetTop", static_cast<int32_t>(baton->trimOffsetTop));
       }
-
       if (baton->input->textAutofitDpi) {
         info.Set("textAutofitDpi", static_cast<uint32_t>(baton->input->textAutofitDpi));
       }
@@ -1519,6 +1518,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->thresholdGrayscale = sharp::AttrAsBool(options, "thresholdGrayscale");
   baton->trimBackground = sharp::AttrAsVectorOfDouble(options, "trimBackground");
   baton->trimThreshold = sharp::AttrAsDouble(options, "trimThreshold");
+  baton->trimLineArt = sharp::AttrAsBool(options, "trimLineArt");
   baton->gamma = sharp::AttrAsDouble(options, "gamma");
   baton->gammaOut = sharp::AttrAsDouble(options, "gammaOut");
   baton->linearA = sharp::AttrAsVectorOfDouble(options, "linearA");
