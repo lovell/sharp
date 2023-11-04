@@ -170,9 +170,9 @@
                 '-l:libvips-cpp.so.42'
               ],
               'ldflags': [
-                # Ensure runtime linking is relative to sharp.node
                 '-Wl,-s',
                 '-Wl,--disable-new-dtags',
+                '-Wl,-z,nodelete',
                 '-Wl,-rpath=\'$$ORIGIN/../../sharp-libvips-<(platform_and_arch)/lib\'',
                 '-Wl,-rpath=\'$$ORIGIN/../../../<(sharp_libvips_version)/sharp-libvips-<(platform_and_arch)/lib\'',
                 '-Wl,-rpath=\'$$ORIGIN/../../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\'',

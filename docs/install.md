@@ -213,19 +213,6 @@ use the `FONTCONFIG_PATH` environment variable to point to a custom location.
 
 Embedded SVG fonts are unsupported.
 
-## Worker threads
-
-On some platforms, including glibc-based Linux,
-the main thread must call `require('sharp')`
-_before_ worker threads are created.
-This is to ensure shared libraries remain loaded in memory
-until after all threads are complete.
-
-Without this, the following error may occur:
-```
-Module did not self-register
-```
-
 ## Known conflicts
 
 ### Canvas and Windows
