@@ -49,7 +49,7 @@ describe('Tint', function () {
   });
 
   it('tints rgb image with sepia tone', function (done) {
-    const output = fixtures.path('output.tint-sepia.jpg');
+    const output = fixtures.path('output.tint-sepia-hex.jpg');
     sharp(fixtures.inputJpg)
       .resize(320, 240, { fastShrinkOnLoad: false })
       .tint('#704214')
@@ -63,7 +63,7 @@ describe('Tint', function () {
   });
 
   it('tints rgb image with sepia tone with rgb colour', function (done) {
-    const output = fixtures.path('output.tint-sepia.jpg');
+    const output = fixtures.path('output.tint-sepia-rgb.jpg');
     sharp(fixtures.inputJpg)
       .resize(320, 240, { fastShrinkOnLoad: false })
       .tint([112, 66, 20])

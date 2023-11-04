@@ -2,7 +2,7 @@
 
 ## v0.33 - *gauge*
 
-Requires libvips v8.14.5
+Requires libvips v8.15.0
 
 ### v0.33.0 - TBD
 

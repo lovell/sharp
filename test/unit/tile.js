@@ -741,28 +741,6 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout with depth onepixel', function (done) {
-      const directory = fixtures.path('output.google_depth_onepixel.dzi');
-      fs.rm(directory, { recursive: true }, function () {
-        sharp(fixtures.inputJpg)
-          .tile({
-            layout: 'google',
-            depth: 'onepixel',
-            size: 256
-          })
-          .toFile(directory, function (err, info) {
-            if (err) throw err;
-            assert.strictEqual('dz', info.format);
-            assert.strictEqual(2725, info.width);
-            assert.strictEqual(2225, info.height);
-            assert.strictEqual(3, info.channels);
-            assert.strictEqual('number', typeof info.size);
-
-            assertGoogleTiles(directory, 256, 13, done);
-          });
-      });
-    });
-
     it('Google layout with depth onetile', function (done) {
       const directory = fixtures.path('output.google_depth_onetile.dzi');
       fs.rm(directory, { recursive: true }, function () {

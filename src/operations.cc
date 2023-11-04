@@ -141,7 +141,7 @@ namespace sharp {
       return image.conv(blur);
     } else {
       // Slower, accurate Gaussian blur
-      return image.gaussblur(sigma);
+      return StaySequential(image, VIPS_ACCESS_SEQUENTIAL).gaussblur(sigma);
     }
   }
 

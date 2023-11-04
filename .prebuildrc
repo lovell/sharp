@@ -1,6 +1,6 @@
 {
   "runtime": "napi",
-  "include-regex": "(sharp-.+\\.node|libvips-.+\\.dll|libglib-.+\\.dll|libgobject-.+\\.dll)",
+  "include-regex": "(sharp-.+\\.node|libvips-.+\\.dll)",
   "prerelease": true,
   "strip": true
 }

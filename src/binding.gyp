@@ -33,11 +33,11 @@
           '<(sharp_libvips_lib_dir)/glib-2.0/include'
         ],
         'link_settings': {
-          'library_dirs': ['<(sharp_libvips_lib_dir)'],
+          'library_dirs': [
+            '<(sharp_libvips_lib_dir)'
+          ],
           'libraries': [
-            'libvips.lib',
-            'libglib-2.0.lib',
-            'libgobject-2.0.lib'
+            'libvips.lib'
           ],
         },
         'configurations': {
@@ -141,9 +141,7 @@
             ],
             'link_settings': {
               'libraries': [
-                'libvips.lib',
-                'libglib-2.0.lib',
-                'libgobject-2.0.lib'
+                'libvips.lib'
               ]
             }
           }],
@@ -255,9 +253,7 @@
         'copies': [{
           'destination': 'build/Release',
           'files': [
-            '<(sharp_libvips_lib_dir)/libvips-42.dll',
-            '<(sharp_libvips_lib_dir)/libglib-2.0-0.dll',
-            '<(sharp_libvips_lib_dir)/libgobject-2.0-0.dll'
+            '<(sharp_libvips_lib_dir)/libvips-42.dll'
           ]
         }]
       }]

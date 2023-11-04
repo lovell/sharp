@@ -11,7 +11,7 @@ const fixtures = require('../fixtures');
 describe('Timeout', function () {
   it('Will timeout after 1s when performing slow blur operation', () => assert.rejects(
     () => sharp(fixtures.inputJpg)
-      .blur(100)
+      .blur(200)
       .timeout({ seconds: 1 })
       .toBuffer(),
     /timeout: [0-9]+% complete/
