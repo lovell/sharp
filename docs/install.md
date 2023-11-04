@@ -32,9 +32,10 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 
 * macOS x64 (>= 10.13)
 * macOS ARM64
-* Linux x64 (glibc >= 2.26, musl >= 1.2.2, CPU with SSE4.2)
-* Linux ARM64 (glibc >= 2.26, musl >= 1.2.2)
 * Linux ARM (glibc >= 2.28)
+* Linux ARM64 (glibc >= 2.26, musl >= 1.2.2)
+* Linux s390x (glibc >= 2.28)
+* Linux x64 (glibc >= 2.26, musl >= 1.2.2, CPU with SSE4.2)
 * Windows x64
 * Windows x86
 

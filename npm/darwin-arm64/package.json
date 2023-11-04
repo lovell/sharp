@@ -1,7 +1,7 @@
 {
   "name": "@img/sharp-darwin-arm64",
-  "version": "0.33.0-alpha.9",
-  "description": "Prebuilt sharp for use with macOS ARM64",
+  "version": "0.33.0-alpha.10",
+  "description": "Prebuilt sharp for use with macOS 64-bit ARM",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
   "repository": {
