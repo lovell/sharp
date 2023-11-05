@@ -118,6 +118,16 @@ When building your deployment package on a machine that differs from the target 
 you will need to install either `@img/sharp-linux-x64` or `@img/sharp-linux-arm64` package.
 
 ```sh
+npm install --os=linux --cpu=x64
+```
+
+```sh
+npm install --os=linux --cpu=arm64
+```
+
+When using npm 9 or earlier, this can be achieved using the following:
+
+```sh
 npm install --force @img/sharp-linux-x64
 ```
 
@@ -174,7 +184,7 @@ custom:
       - sharp
     packagerOptions:
       scripts:
-        - npm install --force @img/sharp-linux-x64
+        - npm install --os=linux --cpu=x64 sharp
 ```
 
 ## TypeScript
