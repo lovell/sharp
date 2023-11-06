@@ -164,7 +164,7 @@
     "@img/sharp-libvips-win32-ia32": "0.0.3",
     "@img/sharp-libvips-win32-x64": "0.0.3",
     "@types/node": "*",
-    "async": "^3.2.4",
+    "async": "^3.2.5",
     "cc": "^3.0.1",
     "exif-reader": "^2.0.0",
     "extract-zip": "^2.0.1",
