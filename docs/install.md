@@ -78,6 +78,15 @@ For cross-compiling, the `--platform`, `--arch` and `--libc` npm flags
 (or the `npm_config_platform`, `npm_config_arch` and `npm_config_libc` environment variables)
 can be used to configure the target environment.
 
+## WebAssembly
+
+Experimental support is provided for runtime environments that provide
+multi-threaded Wasm via Workers.
+
+```sh
+npm install --cpu=wasm32 sharp
+```
+
 ## FreeBSD
 
 The `vips` package must be installed before `npm install` is run.

@@ -161,6 +161,38 @@ jobs:
             npm install --ignore-scripts
             npx mocha --no-config --spec=test/unit/io.js --timeout=30000
             [[ -n $prebuild_upload ]] && cd src && ln -s ../package.json && npx prebuild || true
+  github-runner-emscripten:
+    permissions:
+      contents: write
+    name: wasm32 - prebuild
+    runs-on: ubuntu-22.04
+    container: "emscripten/emsdk:3.1.48"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Dependencies
+        run: apt-get update && apt-get install -y pkg-config
+      - name: Dependencies (Node.js)
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - name: Install
+        run: emmake npm install --build-from-source
+      - name: Test
+        run: emmake npm test
+      - name: Test packaging
+        run: |
+          emmake npm run package-from-local-build
+          npm pkg set "optionalDependencies.@img/sharp-wasm32=file:./npm/wasm32"
+          npm run clean
+          npm install --cpu=wasm32
+          npm test
+      - name: Prebuild
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          npm_config_nodedir: emscripten
+          prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
+        run: cd src && ln -s ../package.json && emmake npx prebuild --platform=emscripten --arch=wasm32 --strip=0
   macstadium-runner:
     permissions:
       contents: write

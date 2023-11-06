@@ -1,0 +1,42 @@
+{
+  "name": "@img/sharp-wasm32",
+  "version": "0.33.0-alpha.10",
+  "description": "Prebuilt sharp for use with wasm32",
+  "author": "Lovell Fuller <npm@lovell.info>",
+  "homepage": "https://sharp.pixelplumbing.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lovell/sharp.git",
+    "directory": "npm/wasm32"
+  },
+  "license": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
+  "funding": {
+    "url": "https://opencollective.com/libvips"
+  },
+  "preferUnplugged": true,
+  "files": [
+    "lib",
+    "versions.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "exports": {
+    "./sharp.node": "./lib/sharp-wasm32.node.js",
+    "./package": "./package.json",
+    "./versions": "./versions.json"
+  },
+  "engines": {
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0",
+    "npm": ">=9.6.5",
+    "yarn": ">=3.2.0",
+    "pnpm": ">=7.1.0"
+  },
+  "dependencies": {
+    "@emnapi/runtime": "^0.43.1"
+  },
+  "cpu": [
+    "wasm32"
+  ]
+}

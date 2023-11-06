@@ -179,6 +179,26 @@
                 '-Wl,-rpath=\'$$ORIGIN/../../../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\''
               ]
             }
+          }],
+          ['OS == "emscripten"', {
+            'product_extension': 'node.js',
+            'link_settings': {
+              'ldflags': [
+                '-fexceptions',
+                '--pre-js=<!(node -p "require.resolve(\'./emscripten/pre.js\')")',
+                '-Oz',
+                '-sALLOW_MEMORY_GROWTH',
+                '-sENVIRONMENT=node',
+                '-sEXPORTED_FUNCTIONS=["_vips_shutdown", "_uv_library_shutdown"]',
+                '-sNODERAWFS',
+                '-sTEXTDECODER=0',
+                '-sWASM_ASYNC_COMPILATION=0',
+                '-sWASM_BIGINT'
+              ],
+              'libraries': [
+                '<!@(PKG_CONFIG_PATH="<!(node -p "require(\'@img/sharp-libvips-dev-wasm32/lib\')")/pkgconfig" pkg-config --static --libs vips-cpp)'
+              ],
+            }
           }]
         ]
       }]

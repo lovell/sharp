@@ -103,6 +103,11 @@ Napi::Value libvipsVersion(const Napi::CallbackInfo& info) {
 #else
   version.Set("isGlobal", Napi::Boolean::New(env, false));
 #endif
+#ifdef __EMSCRIPTEN__
+  version.Set("isWasm", Napi::Boolean::New(env, true));
+#else
+  version.Set("isWasm", Napi::Boolean::New(env, false));
+#endif
   return version;
 }
 

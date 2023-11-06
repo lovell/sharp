@@ -38,7 +38,8 @@ limitations under the License.
 `;
 
 workspaces.map(async platform => {
-  const url = `https://github.com/lovell/sharp/releases/download/v${version}/sharp-v${version}-napi-v9-${platform}.tar.gz`;
+  const prebuildPlatform = platform === 'wasm32' ? 'emscripten-wasm32' : platform;
+  const url = `https://github.com/lovell/sharp/releases/download/v${version}/sharp-v${version}-napi-v9-${prebuildPlatform}.tar.gz`;
   const dir = path.join(__dirname, platform);
   const response = await fetch(url);
   if (!response.ok) {
@@ -58,8 +59,8 @@ workspaces.map(async platform => {
   await writeFile(path.join(dir, 'README.md'), `# \`${name}\`\n\n${description}.\n${licensing}`);
   // Copy Apache-2.0 LICENSE
   await copyFile(path.join(__dirname, '..', 'LICENSE'), path.join(dir, 'LICENSE'));
-  // Copy Windows-specific files
-  if (platform.startsWith('win32-')) {
+  // Copy files for packages without an explicit sharp-libvips dependency (Windows, wasm)
+  if (platform.startsWith('win') || platform.startsWith('wasm')) {
     const sharpLibvipsDir = path.join(require(`@img/sharp-libvips-${platform}/lib`), '..');
     // Copy versions.json
     await copyFile(path.join(sharpLibvipsDir, 'versions.json'), path.join(dir, 'versions.json'));
