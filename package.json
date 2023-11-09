@@ -87,7 +87,8 @@
     "Brahim Ait elhaj <brahima@gmail.com>",
     "Mart Jansink <m.jansink@gmail.com>",
     "Lachlan Newman <lachnewman007@gmail.com>",
-    "Dennis Beatty <dennis@dcbeatty.com>"
+    "Dennis Beatty <dennis@dcbeatty.com>",
+    "Ingvar Stepanyan <me@rreverser.com>"
   ],
   "scripts": {
     "install": "node install/check",
@@ -156,16 +157,20 @@
     "@img/sharp-linux-x64": "0.33.0-alpha.10",
     "@img/sharp-linuxmusl-arm64": "0.33.0-alpha.10",
     "@img/sharp-linuxmusl-x64": "0.33.0-alpha.10",
+    "@img/sharp-wasm32": "0.33.0-alpha.10",
     "@img/sharp-win32-ia32": "0.33.0-alpha.10",
     "@img/sharp-win32-x64": "0.33.0-alpha.10"
   },
   "devDependencies": {
+    "@emnapi/runtime": "^0.43.1",
     "@img/sharp-libvips-dev": "0.0.3",
+    "@img/sharp-libvips-dev-wasm32": "0.0.3",
     "@img/sharp-libvips-win32-ia32": "0.0.3",
     "@img/sharp-libvips-win32-x64": "0.0.3",
     "@types/node": "*",
     "async": "^3.2.5",
     "cc": "^3.0.1",
+    "emnapi": "^0.43.1",
     "exif-reader": "^2.0.0",
     "extract-zip": "^2.0.1",
     "icc": "^3.0.0",
@@ -201,6 +206,11 @@
     "linelength": "120",
     "filter": [
       "build/include"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "lib"
     ]
   },
   "tsd": {

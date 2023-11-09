@@ -14,6 +14,9 @@ Requires libvips v8.15.0
 
 * Remove `sharp.vendor`.
 
+* Add experimental support for WebAssembly-based runtimes.
+  [@RReverser](https://github.com/RReverser)
+
 * Options for `trim` operation must be an Object, add new `lineArt` option.
   [#2363](https://github.com/lovell/sharp/issues/2363)
 

@@ -69,17 +69,25 @@ describe('libvips binaries', function () {
   });
 
   describe('Build time platform detection', () => {
-    it('Can override platform with npm_config_platform and npm_config_libc', () => {
+    it('Can override platform with npm_config_platform and npm_config_libc', function () {
       process.env.npm_config_platform = 'testplatform';
       process.env.npm_config_libc = 'testlibc';
-      const [platform] = libvips.buildPlatformArch().split('-');
+      const platformArch = libvips.buildPlatformArch();
+      if (platformArch === 'wasm32') {
+        return this.skip();
+      }
+      const [platform] = platformArch.split('-');
       assert.strictEqual(platform, 'testplatformtestlibc');
       delete process.env.npm_config_platform;
       delete process.env.npm_config_libc;
     });
-    it('Can override arch with npm_config_arch', () => {
+    it('Can override arch with npm_config_arch', function () {
       process.env.npm_config_arch = 'test';
-      const [, arch] = libvips.buildPlatformArch().split('-');
+      const platformArch = libvips.buildPlatformArch();
+      if (platformArch === 'wasm32') {
+        return this.skip();
+      }
+      const [, arch] = platformArch.split('-');
       assert.strictEqual(arch, 'test');
       delete process.env.npm_config_arch;
     });
