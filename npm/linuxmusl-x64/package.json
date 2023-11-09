@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-linuxmusl-x64",
-  "version": "0.33.0-alpha.10",
+  "version": "0.33.0-alpha.11",
   "description": "Prebuilt sharp for use with Linux (musl) x64",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
