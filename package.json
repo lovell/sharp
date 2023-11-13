@@ -162,7 +162,7 @@
     "@img/sharp-win32-x64": "0.33.0-alpha.11"
   },
   "devDependencies": {
-    "@emnapi/runtime": "^0.43.1",
+    "@emnapi/runtime": "^0.44.0",
     "@img/sharp-libvips-dev": "1.0.0",
     "@img/sharp-libvips-dev-wasm32": "1.0.0",
     "@img/sharp-libvips-win32-ia32": "1.0.0",
@@ -170,7 +170,7 @@
     "@types/node": "*",
     "async": "^3.2.5",
     "cc": "^3.0.1",
-    "emnapi": "^0.43.1",
+    "emnapi": "^0.44.0",
     "exif-reader": "^2.0.0",
     "extract-zip": "^2.0.1",
     "icc": "^3.0.0",
