@@ -4,7 +4,7 @@
 
 The typical use case for this high speed Node.js module
 is to convert large images in common formats to
-smaller, web-friendly JPEG, PNG, WebP, GIF and AVIF images of varying dimensions.
+smaller, web-friendly JPEG, PNG, WebP, GIF, AVIF and JXL images of varying dimensions.
 
 Resizing an image is typically 4x-5x faster than using the
 quickest ImageMagick and GraphicsMagick settings
@@ -100,7 +100,7 @@ covers reporting bugs, requesting features and submitting code changes.
 
 ## Licensing
 
-Copyright 2013 Lovell Fuller and others.
+Copyright 2013-today Lovell Fuller and others.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
