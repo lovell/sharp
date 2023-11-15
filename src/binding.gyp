@@ -223,11 +223,6 @@
     'configurations': {
       'Release': {
         'conditions': [
-          ['OS == "linux"', {
-            'cflags_cc': [
-              '-Wno-cast-function-type'
-            ]
-          }],
           ['target_arch == "arm"', {
             'cflags_cc': [
               '-Wno-psabi'
