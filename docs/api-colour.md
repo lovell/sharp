@@ -1,7 +1,7 @@
 ## tint
-> tint(rgb) ⇒ <code>Sharp</code>
+> tint(tint) ⇒ <code>Sharp</code>
 
-Tint the image using the provided chroma while preserving the image luminance.
+Tint the image using the provided colour.
 An alpha channel may be present and will be unchanged by the operation.
 
 
@@ -12,7 +12,7 @@ An alpha channel may be present and will be unchanged by the operation.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| rgb | <code>string</code> \| <code>Object</code> | parsed by the [color](https://www.npmjs.org/package/color) module to extract chroma values. |
+| tint | <code>String</code> \| <code>Object</code> | Parsed by the [color](https://www.npmjs.org/package/color) module. |
 
 **Example**  
 ```js

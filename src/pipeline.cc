@@ -736,8 +736,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Tint the image
-      if (baton->tintA < 128.0 || baton->tintB < 128.0) {
-        image = sharp::Tint(image, baton->tintA, baton->tintB);
+      if (baton->tint[0] >= 0.0) {
+        image = sharp::Tint(image, baton->tint);
       }
 
       // Remove alpha channel, if any
@@ -1527,8 +1527,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->normalise = sharp::AttrAsBool(options, "normalise");
   baton->normaliseLower = sharp::AttrAsUint32(options, "normaliseLower");
   baton->normaliseUpper = sharp::AttrAsUint32(options, "normaliseUpper");
-  baton->tintA = sharp::AttrAsDouble(options, "tintA");
-  baton->tintB = sharp::AttrAsDouble(options, "tintB");
+  baton->tint = sharp::AttrAsVectorOfDouble(options, "tint");
   baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");
   baton->claheHeight = sharp::AttrAsUint32(options, "claheHeight");
   baton->claheMaxSlope = sharp::AttrAsUint32(options, "claheMaxSlope");
