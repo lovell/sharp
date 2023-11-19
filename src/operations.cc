@@ -16,30 +16,44 @@ using vips::VError;
 
 namespace sharp {
   /*
-   * Tint an image using the specified chroma, preserving the original image luminance
+   * Tint an image using the provided RGB.
    */
-  VImage Tint(VImage image, double const a, double const b) {
-    // Get original colourspace
+  VImage Tint(VImage image, std::vector<double> const tint) {
+    std::vector<double> const tintLab = (VImage::black(1, 1) + tint)
+      .colourspace(VIPS_INTERPRETATION_LAB, VImage::option()->set("source_space", VIPS_INTERPRETATION_sRGB))
+      .getpoint(0, 0);
+    // LAB identity function
+    VImage identityLab = VImage::identity(VImage::option()->set("bands", 3))
+      .colourspace(VIPS_INTERPRETATION_LAB, VImage::option()->set("source_space", VIPS_INTERPRETATION_sRGB));
+    // Scale luminance range, 0.0 to 1.0
+    VImage l = identityLab[0] / 100;
+    // Weighting functions
+    VImage weightL = 1.0 - 4.0 * ((l - 0.5) * (l - 0.5));
+    VImage weightAB = (weightL * tintLab).extract_band(1, VImage::option()->set("n", 2));
+    identityLab = identityLab[0].bandjoin(weightAB);
+    // Convert lookup table to sRGB
+    VImage lut = identityLab.colourspace(VIPS_INTERPRETATION_sRGB,
+      VImage::option()->set("source_space", VIPS_INTERPRETATION_LAB));
+    // Original colourspace
     VipsInterpretation typeBeforeTint = image.interpretation();
     if (typeBeforeTint == VIPS_INTERPRETATION_RGB) {
       typeBeforeTint = VIPS_INTERPRETATION_sRGB;
     }
-    // Extract luminance
-    VImage luminance = image.colourspace(VIPS_INTERPRETATION_LAB)[0];
-    // Create the tinted version by combining the L from the original and the chroma from the tint
-    std::vector<double> chroma {a, b};
-    VImage tinted = luminance
-      .bandjoin(chroma)
-      .copy(VImage::option()->set("interpretation", VIPS_INTERPRETATION_LAB))
-      .colourspace(typeBeforeTint);
-    // Attach original alpha channel, if any
+    // Apply lookup table
     if (HasAlpha(image)) {
-      // Extract original alpha channel
       VImage alpha = image[image.bands() - 1];
-      // Join alpha channel to normalised image
-      tinted = tinted.bandjoin(alpha);
+      image = RemoveAlpha(image)
+        .colourspace(VIPS_INTERPRETATION_B_W)
+        .maplut(lut)
+        .colourspace(typeBeforeTint)
+        .bandjoin(alpha);
+    } else {
+      image = image
+        .colourspace(VIPS_INTERPRETATION_B_W)
+        .maplut(lut)
+        .colourspace(typeBeforeTint);
     }
-    return tinted;
+    return image;
   }
 
   /*

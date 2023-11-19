@@ -239,12 +239,12 @@ declare namespace sharp {
         //#region Color functions
 
         /**
-         * Tint the image using the provided chroma while preserving the image luminance.
+         * Tint the image using the provided colour.
          * An alpha channel may be present and will be unchanged by the operation.
-         * @param rgb Parsed by the color module to extract chroma values.
+         * @param tint Parsed by the color module.
          * @returns A sharp instance that can be used to chain operations
          */
-        tint(rgb: Color): Sharp;
+        tint(tint: Color): Sharp;
 
         /**
          * Convert to 8-bit greyscale; 256 shades of grey.

@@ -69,8 +69,7 @@ struct PipelineBaton {
   bool premultiplied;
   bool tileCentre;
   bool fastShrinkOnLoad;
-  double tintA;
-  double tintB;
+  std::vector<double> tint;
   bool flatten;
   std::vector<double> flattenBackground;
   bool unflatten;
@@ -239,8 +238,7 @@ struct PipelineBaton {
     attentionX(0),
     attentionY(0),
     premultiplied(false),
-    tintA(128.0),
-    tintB(128.0),
+    tint{ -1.0, 0.0, 0.0, 0.0 },
     flatten(false),
     flattenBackground{ 0.0, 0.0, 0.0 },
     unflatten(false),
