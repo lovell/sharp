@@ -634,13 +634,50 @@ declare namespace sharp {
         toBuffer(options: { resolveWithObject: true }): Promise<{ data: Buffer; info: OutputInfo }>;
 
         /**
+         * Keep all EXIF metadata from the input image in the output image.
+         * EXIF metadata is unsupported for TIFF output.
+         * @returns A sharp instance that can be used to chain operations
+         */
+        keepExif(): Sharp;
+
+        /**
+         * Set EXIF metadata in the output image, ignoring any EXIF in the input image.
+         * @param {Exif} exif Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data.
+         * @returns A sharp instance that can be used to chain operations
+         * @throws {Error} Invalid parameters
+         */
+        withExif(exif: Exif): Sharp;
+
+        /**
+         * Update EXIF metadata from the input image in the output image.
+         * @param {Exif} exif Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data.
+         * @returns A sharp instance that can be used to chain operations
+         * @throws {Error} Invalid parameters
+         */
+        withExifMerge(exif: Exif): Sharp;
+
+        /**
+         * Keep ICC profile from the input image in the output image where possible.
+         * @returns A sharp instance that can be used to chain operations
+         */
+        keepIccProfile(): Sharp;
+
+        /**
+         * Transform using an ICC profile and attach to the output image.
+         * @param {string} icc - Absolute filesystem path to output ICC profile or built-in profile name (srgb, p3, cmyk).
+         * @returns A sharp instance that can be used to chain operations
+         * @throws {Error} Invalid parameters
+         */
+        withIccProfile(icc: string, options?: WithIccProfileOptions): Sharp;
+
+        /**
          * Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
          * The default behaviour, when withMetadata is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
          * This will also convert to and add a web-friendly sRGB ICC profile.
          * @param withMetadata
          * @throws {Error} Invalid parameters.
          */
-        withMetadata(withMetadata?: boolean | WriteableMetadata): Sharp;
+        withMetadata(withMetadata?: WriteableMetadata): Sharp;
 
         /**
          * Use these JPEG options for output image.
@@ -978,15 +1015,32 @@ declare namespace sharp {
         wrap?: TextWrap;
     }
 
+    interface ExifDir {
+        [k: string]: string;
+    }
+
+    interface Exif {
+        'IFD0'?: ExifDir;
+        'IFD1'?: ExifDir;
+        'IFD2'?: ExifDir;
+        'IFD3'?: ExifDir;
+    }
+
     interface WriteableMetadata {
-        /** Value between 1 and 8, used to update the EXIF Orientation tag. */
-        orientation?: number | undefined;
-        /** Filesystem path to output ICC profile, defaults to sRGB. */
-        icc?: string | undefined;
-        /** Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data. (optional, default {}) */
-        exif?: Record<string, any> | undefined;
         /** Number of pixels per inch (DPI) */
         density?: number | undefined;
+        /** Value between 1 and 8, used to update the EXIF Orientation tag. */
+        orientation?: number | undefined;
+        /**
+         * Filesystem path to output ICC profile, defaults to sRGB.
+         * @deprecated Use `withIccProfile()` instead.
+        */
+        icc?: string | undefined;
+        /**
+         * Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data.
+         * @deprecated Use `withExif()` or `withExifMerge()` instead.
+         */
+        exif?: Exif | undefined;
     }
 
     interface Metadata {
@@ -1094,6 +1148,11 @@ declare namespace sharp {
     interface OutputOptions {
         /** Force format output, otherwise attempt to use input format (optional, default true) */
         force?: boolean | undefined;
+    }
+
+    interface WithIccProfileOptions {
+        /**  Should the ICC profile be included in the output image metadata? (optional, default true) */
+        attach?: boolean | undefined;
     }
 
     interface JpegOptions extends OutputOptions {

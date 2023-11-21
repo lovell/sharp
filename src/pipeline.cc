@@ -315,6 +315,11 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Ensure we're using a device-independent colour space
+      std::pair<char*, size_t> inputProfile(nullptr, 0);
+      if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->withIccProfile.empty()) {
+        // Cache input profile for use with output
+        inputProfile = sharp::GetProfile(image);
+      }
       char const *processingProfile = image.interpretation() == VIPS_INTERPRETATION_RGB16 ? "p3" : "srgb";
       if (
         sharp::HasProfile(image) &&
@@ -758,7 +763,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         // Transform colours from embedded profile to output profile
-        if (baton->withMetadata && sharp::HasProfile(image) && baton->withMetadataIcc.empty()) {
+        if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) &&
+          baton->withIccProfile.empty() && sharp::HasProfile(image)) {
           image = image.icc_transform("srgb", VImage::option()
             ->set("embedded", TRUE)
             ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
@@ -787,27 +793,30 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Apply output ICC profile
-      if (baton->withMetadata) {
-        image = image.icc_transform(
-          baton->withMetadataIcc.empty() ? "srgb" : const_cast<char*>(baton->withMetadataIcc.data()),
-          VImage::option()
-            ->set("input_profile", processingProfile)
-            ->set("embedded", TRUE)
-            ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
-            ->set("intent", VIPS_INTENT_PERCEPTUAL));
+      if (!baton->withIccProfile.empty()) {
+        image = image.icc_transform(const_cast<char*>(baton->withIccProfile.data()), VImage::option()
+          ->set("input_profile", processingProfile)
+          ->set("embedded", TRUE)
+          ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
+          ->set("intent", VIPS_INTENT_PERCEPTUAL));
+      } else if (baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) {
+        image = sharp::SetProfile(image, inputProfile);
       }
       // Override EXIF Orientation tag
-      if (baton->withMetadata && baton->withMetadataOrientation != -1) {
+      if (baton->withMetadataOrientation != -1) {
         image = sharp::SetExifOrientation(image, baton->withMetadataOrientation);
       }
       // Override pixel density
       if (baton->withMetadataDensity > 0) {
         image = sharp::SetDensity(image, baton->withMetadataDensity);
       }
-      // Metadata key/value pairs, e.g. EXIF
-      if (!baton->withMetadataStrs.empty()) {
+      // EXIF key/value pairs
+      if (baton->keepMetadata & VIPS_FOREIGN_KEEP_EXIF) {
         image = image.copy();
-        for (const auto& s : baton->withMetadataStrs) {
+        if (!baton->withExifMerge) {
+          image = sharp::RemoveExif(image);
+        }
+        for (const auto& s : baton->withExif) {
           image.set(s.first.data(), s.second.data());
         }
       }
@@ -828,7 +837,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write JPEG to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.jpegsave_buffer(VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->jpegQuality)
             ->set("interlace", baton->jpegProgressive)
             ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
@@ -870,7 +879,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write PNG to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::PNG);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.pngsave_buffer(VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("interlace", baton->pngProgressive)
             ->set("compression", baton->pngCompressionLevel)
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)
@@ -889,7 +898,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write WEBP to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::WEBP);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.webpsave_buffer(VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->webpQuality)
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
@@ -909,7 +918,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write GIF to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::GIF);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.gifsave_buffer(VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("bitdepth", baton->gifBitdepth)
             ->set("effort", baton->gifEffort)
             ->set("reuse", baton->gifReuse)
@@ -934,7 +943,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             image = image.cast(VIPS_FORMAT_FLOAT);
           }
           VipsArea *area = reinterpret_cast<VipsArea*>(image.tiffsave_buffer(VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->tiffQuality)
             ->set("bitdepth", baton->tiffBitdepth)
             ->set("compression", baton->tiffCompression)
@@ -958,7 +967,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::HEIF);
           image = sharp::RemoveAnimationProperties(image).cast(VIPS_FORMAT_UCHAR);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.heifsave_buffer(VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
             ->set("effort", baton->heifEffort)
@@ -990,7 +999,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write JXL to buffer
           image = sharp::RemoveAnimationProperties(image);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.jxlsave_buffer(VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("distance", baton->jxlDistance)
             ->set("tier", baton->jxlDecodingTier)
             ->set("effort", baton->jxlEffort)
@@ -1051,7 +1060,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write JPEG to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->jpegQuality)
             ->set("interlace", baton->jpegProgressive)
             ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
@@ -1081,7 +1090,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write PNG to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::PNG);
           image.pngsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("interlace", baton->pngProgressive)
             ->set("compression", baton->pngCompressionLevel)
             ->set("filter", baton->pngAdaptiveFiltering ? VIPS_FOREIGN_PNG_FILTER_ALL : VIPS_FOREIGN_PNG_FILTER_NONE)
@@ -1096,7 +1105,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write WEBP to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::WEBP);
           image.webpsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->webpQuality)
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
@@ -1112,7 +1121,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write GIF to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::GIF);
           image.gifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("bitdepth", baton->gifBitdepth)
             ->set("effort", baton->gifEffort)
             ->set("reuse", baton->gifReuse)
@@ -1131,7 +1140,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             image = image.cast(VIPS_FORMAT_FLOAT);
           }
           image.tiffsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->tiffQuality)
             ->set("bitdepth", baton->tiffBitdepth)
             ->set("compression", baton->tiffCompression)
@@ -1151,7 +1160,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::HEIF);
           image = sharp::RemoveAnimationProperties(image).cast(VIPS_FORMAT_UCHAR);
           image.heifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
             ->set("effort", baton->heifEffort)
@@ -1165,7 +1174,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write JXL to file
           image = sharp::RemoveAnimationProperties(image);
           image.jxlsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata)
+            ->set("keep", baton->keepMetadata)
             ->set("distance", baton->jxlDistance)
             ->set("tier", baton->jxlDecodingTier)
             ->set("effort", baton->jxlEffort)
@@ -1187,7 +1196,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           (willMatchInput && inputImageType == sharp::ImageType::VIPS)) {
           // Write V to file
           image.vipssave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("strip", !baton->withMetadata));
+            ->set("keep", baton->keepMetadata));
           baton->formatOut = "v";
         } else {
           // Unsupported output format
@@ -1401,7 +1410,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       suffix = AssembleSuffixString(extname, options);
     }
     vips::VOption *options = VImage::option()
-      ->set("strip", !baton->withMetadata)
+      ->set("keep", baton->keepMetadata)
       ->set("tile_size", baton->tileSize)
       ->set("overlap", baton->tileOverlap)
       ->set("container", baton->tileContainer)
@@ -1593,18 +1602,19 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // Output
   baton->formatOut = sharp::AttrAsStr(options, "formatOut");
   baton->fileOut = sharp::AttrAsStr(options, "fileOut");
-  baton->withMetadata = sharp::AttrAsBool(options, "withMetadata");
+  baton->keepMetadata = sharp::AttrAsUint32(options, "keepMetadata");
   baton->withMetadataOrientation = sharp::AttrAsUint32(options, "withMetadataOrientation");
   baton->withMetadataDensity = sharp::AttrAsDouble(options, "withMetadataDensity");
-  baton->withMetadataIcc = sharp::AttrAsStr(options, "withMetadataIcc");
-  Napi::Object mdStrs = options.Get("withMetadataStrs").As<Napi::Object>();
-  Napi::Array mdStrKeys = mdStrs.GetPropertyNames();
-  for (unsigned int i = 0; i < mdStrKeys.Length(); i++) {
-    std::string k = sharp::AttrAsStr(mdStrKeys, i);
-    if (mdStrs.HasOwnProperty(k)) {
-      baton->withMetadataStrs.insert(std::make_pair(k, sharp::AttrAsStr(mdStrs, k)));
+  baton->withIccProfile = sharp::AttrAsStr(options, "withIccProfile");
+  Napi::Object withExif = options.Get("withExif").As<Napi::Object>();
+  Napi::Array withExifKeys = withExif.GetPropertyNames();
+  for (unsigned int i = 0; i < withExifKeys.Length(); i++) {
+    std::string k = sharp::AttrAsStr(withExifKeys, i);
+    if (withExif.HasOwnProperty(k)) {
+      baton->withExif.insert(std::make_pair(k, sharp::AttrAsStr(withExif, k)));
     }
   }
+  baton->withExifMerge = sharp::AttrAsBool(options, "withExifMerge");
   baton->timeoutSeconds = sharp::AttrAsUint32(options, "timeoutSeconds");
   // Format-specific
   baton->jpegQuality = sharp::AttrAsUint32(options, "jpegQuality");

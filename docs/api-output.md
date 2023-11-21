@@ -111,17 +111,157 @@ await sharp(pixelArray, { raw: { width, height, channels } })
 ```
 
 
+## keepExif
+> keepExif() ⇒ <code>Sharp</code>
+
+Keep all EXIF metadata from the input image in the output image.
+
+EXIF metadata is unsupported for TIFF output.
+
+
+**Since**: 0.33.0  
+**Example**  
+```js
+const outputWithExif = await sharp(inputWithExif)
+  .keepExif()
+  .toBuffer();
+```
+
+
+## withExif
+> withExif(exif) ⇒ <code>Sharp</code>
+
+Set EXIF metadata in the output image, ignoring any EXIF in the input image.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+**Since**: 0.33.0  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| exif | <code>Object.&lt;string, Object.&lt;string, string&gt;&gt;</code> | Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data. |
+
+**Example**  
+```js
+const dataWithExif = await sharp(input)
+  .withExif({
+    IFD0: {
+      Copyright: 'The National Gallery'
+    },
+    IFD3: {
+      GPSLatitudeRef: 'N',
+      GPSLatitude: '51/1 30/1 3230/100',
+      GPSLongitudeRef: 'W',
+      GPSLongitude: '0/1 7/1 4366/100'
+    }
+  })
+  .toBuffer();
+```
+
+
+## withExifMerge
+> withExifMerge(exif) ⇒ <code>Sharp</code>
+
+Update EXIF metadata from the input image in the output image.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+**Since**: 0.33.0  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| exif | <code>Object.&lt;string, Object.&lt;string, string&gt;&gt;</code> | Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data. |
+
+**Example**  
+```js
+const dataWithMergedExif = await sharp(inputWithExif)
+  .withExifMerge({
+    IFD0: {
+      Copyright: 'The National Gallery'
+    }
+  })
+  .toBuffer();
+```
+
+
+## keepIccProfile
+> keepIccProfile() ⇒ <code>Sharp</code>
+
+Keep ICC profile from the input image in the output image.
+
+Where necessary, will attempt to convert the output colour space to match the profile.
+
+
+**Since**: 0.33.0  
+**Example**  
+```js
+const outputWithIccProfile = await sharp(inputWithIccProfile)
+  .keepIccProfile()
+  .toBuffer();
+```
+
+
+## withIccProfile
+> withIccProfile(icc, [options]) ⇒ <code>Sharp</code>
+
+Transform using an ICC profile and attach to the output image.
+
+This can either be an absolute filesystem path or
+built-in profile name (`srgb`, `p3`, `cmyk`).
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+**Since**: 0.33.0  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| icc | <code>string</code> |  | Absolute filesystem path to output ICC profile or built-in profile name (srgb, p3, cmyk). |
+| [options] | <code>Object</code> |  |  |
+| [options.attach] | <code>number</code> | <code>true</code> | Should the ICC profile be included in the output image metadata? |
+
+**Example**  
+```js
+const outputWithP3 = await sharp(input)
+  .withIccProfile('p3')
+  .toBuffer();
+```
+
+
+## keepMetadata
+> keepMetadata() ⇒ <code>Sharp</code>
+
+Keep all metadata (EXIF, ICC, XMP, IPTC) from the input image in the output image.
+
+The default behaviour, when `keepMetadata` is not used, is to convert to the device-independent
+sRGB colour space and strip all metadata, including the removal of any ICC profile.
+
+
+**Since**: 0.33.0  
+**Example**  
+```js
+const outputWithMetadata = await sharp(inputWithMetadata)
+  .keepMetadata()
+  .toBuffer();
+```
+
+
 ## withMetadata
 > withMetadata([options]) ⇒ <code>Sharp</code>
 
-Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
-This will also convert to and add a web-friendly sRGB ICC profile if appropriate,
-unless a custom output profile is provided.
+Keep most metadata (EXIF, XMP, IPTC) from the input image in the output image.
 
-The default behaviour, when `withMetadata` is not used, is to convert to the device-independent
-sRGB colour space and strip all metadata, including the removal of any ICC profile.
+This will also convert to and add a web-friendly sRGB ICC profile if appropriate.
 
-EXIF metadata is unsupported for TIFF output.
+Allows orientation and density to be set or updated.
 
 
 **Throws**:
@@ -129,38 +269,16 @@ EXIF metadata is unsupported for TIFF output.
 - <code>Error</code> Invalid parameters
 
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [options] | <code>Object</code> |  |  |
-| [options.orientation] | <code>number</code> |  | value between 1 and 8, used to update the EXIF `Orientation` tag. |
-| [options.icc] | <code>string</code> | <code>&quot;&#x27;srgb&#x27;&quot;</code> | Filesystem path to output ICC profile, relative to `process.cwd()`, defaults to built-in sRGB. |
-| [options.exif] | <code>Object.&lt;Object&gt;</code> | <code>{}</code> | Object keyed by IFD0, IFD1 etc. of key/value string pairs to write as EXIF data. |
-| [options.density] | <code>number</code> |  | Number of pixels per inch (DPI). |
+| Param | Type | Description |
+| --- | --- | --- |
+| [options] | <code>Object</code> |  |
+| [options.orientation] | <code>number</code> | Used to update the EXIF `Orientation` tag, integer between 1 and 8. |
+| [options.density] | <code>number</code> | Number of pixels per inch (DPI). |
 
 **Example**  
 ```js
-sharp('input.jpg')
+const outputSrgbWithMetadata = await sharp(inputRgbWithMetadata)
   .withMetadata()
-  .toFile('output-with-metadata.jpg')
-  .then(info => { ... });
-```
-**Example**  
-```js
-// Set output EXIF metadata
-const data = await sharp(input)
-  .withMetadata({
-    exif: {
-      IFD0: {
-        Copyright: 'The National Gallery'
-      },
-      IFD3: {
-        GPSLatitudeRef: 'N',
-        GPSLatitude: '51/1 30/1 3230/100',
-        GPSLongitudeRef: 'W',
-        GPSLongitude: '0/1 7/1 4366/100'
-      }
-    }
-  })
   .toBuffer();
 ```
 **Example**  

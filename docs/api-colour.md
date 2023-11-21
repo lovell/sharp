@@ -12,7 +12,7 @@ An alpha channel may be present and will be unchanged by the operation.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| tint | <code>String</code> \| <code>Object</code> | Parsed by the [color](https://www.npmjs.org/package/color) module. |
+| tint | <code>string</code> \| <code>Object</code> | Parsed by the [color](https://www.npmjs.org/package/color) module. |
 
 **Example**  
 ```js

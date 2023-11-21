@@ -531,7 +531,33 @@ namespace sharp {
     Does this image have an embedded profile?
   */
   bool HasProfile(VImage image) {
-    return (image.get_typeof(VIPS_META_ICC_NAME) != 0) ? TRUE : FALSE;
+    return image.get_typeof(VIPS_META_ICC_NAME) == VIPS_TYPE_BLOB;
+  }
+
+  /*
+    Get copy of embedded profile.
+  */
+  std::pair<char*, size_t> GetProfile(VImage image) {
+    std::pair<char*, size_t> icc(nullptr, 0);
+    if (HasProfile(image)) {
+      size_t length;
+      const void *data = image.get_blob(VIPS_META_ICC_NAME, &length);
+      icc.first = static_cast<char*>(g_malloc(length));
+      icc.second = length;
+      memcpy(icc.first, data, length);
+    }
+    return icc;
+  }
+
+  /*
+    Set embedded profile.
+  */
+  VImage SetProfile(VImage image, std::pair<char*, size_t> icc) {
+    if (icc.first != nullptr) {
+      image = image.copy();
+      image.set(VIPS_META_ICC_NAME, reinterpret_cast<VipsCallbackFn>(vips_area_free_cb), icc.first, icc.second);
+    }
+    return image;
   }
 
   /*
@@ -540,6 +566,27 @@ namespace sharp {
   */
   bool HasAlpha(VImage image) {
     return image.has_alpha();
+  }
+
+  static void* RemoveExifCallback(VipsImage *image, char const *field, GValue *value, void *data) {
+    std::vector<std::string> *fieldNames = static_cast<std::vector<std::string> *>(data);
+    std::string fieldName(field);
+    if (fieldName.substr(0, 8) == ("exif-ifd")) {
+      fieldNames->push_back(fieldName);
+    }
+    return nullptr;
+  }
+
+  /*
+    Remove all EXIF-related image fields.
+  */
+  VImage RemoveExif(VImage image) {
+    std::vector<std::string> fieldNames;
+    vips_image_map(image.get_image(), static_cast<VipsImageMapFn>(RemoveExifCallback), &fieldNames);
+    for (const auto& f : fieldNames) {
+      image.remove(f.data());
+    }
+    return image;
   }
 
   /*
