@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-linux-s390x",
-  "version": "0.33.0-rc.1",
+  "version": "0.33.0-rc.2",
   "description": "Prebuilt sharp for use with Linux (glibc) s390x",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
