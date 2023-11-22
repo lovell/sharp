@@ -223,10 +223,25 @@ namespace sharp {
   bool HasProfile(VImage image);
 
   /*
+    Get copy of embedded profile.
+  */
+  std::pair<char*, size_t> GetProfile(VImage image);
+
+  /*
+    Set embedded profile.
+  */
+  VImage SetProfile(VImage image, std::pair<char*, size_t> icc);
+
+  /*
     Does this image have an alpha channel?
     Uses colour space interpretation with number of channels to guess this.
   */
   bool HasAlpha(VImage image);
+
+  /*
+    Remove all EXIF-related image fields.
+  */
+  VImage RemoveExif(VImage image);
 
   /*
     Get EXIF Orientation of image, if any.

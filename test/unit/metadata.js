@@ -11,6 +11,8 @@ const icc = require('icc');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
+const create = { width: 1, height: 1, channels: 3, background: 'red' };
+
 describe('Image metadata', function () {
   it('JPEG', function (done) {
     sharp(fixtures.inputJpg).metadata(function (err, metadata) {
@@ -552,11 +554,55 @@ describe('Image metadata', function () {
       });
   });
 
+  it('keep existing ICC profile', async () => {
+    const data = await sharp(fixtures.inputJpgWithExif)
+      .keepIccProfile()
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    const { description } = icc.parse(metadata.icc);
+    assert.strictEqual(description, 'Generic RGB Profile');
+  });
+
+  it('keep existing ICC profile, ignore colourspace conversion', async () => {
+    const data = await sharp(fixtures.inputJpgWithExif)
+      .keepIccProfile()
+      .toColourspace('cmyk')
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    assert.strictEqual(metadata.channels, 3);
+    const { description } = icc.parse(metadata.icc);
+    assert.strictEqual(description, 'Generic RGB Profile');
+  });
+
+  it('transform to ICC profile and attach', async () => {
+    const data = await sharp({ create })
+      .png()
+      .withIccProfile('p3', { attach: true })
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    const { description } = icc.parse(metadata.icc);
+    assert.strictEqual(description, 'sP3C');
+  });
+
+  it('transform to ICC profile but do not attach', async () => {
+    const data = await sharp({ create })
+      .png()
+      .withIccProfile('p3', { attach: false })
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    assert.strictEqual(3, metadata.channels);
+    assert.strictEqual(undefined, metadata.icc);
+  });
+
   it('Apply CMYK output ICC profile', function (done) {
     const output = fixtures.path('output.icc-cmyk.jpg');
     sharp(fixtures.inputJpg)
       .resize(64)
-      .withMetadata({ icc: 'cmyk' })
+      .withIccProfile('cmyk')
       .toFile(output, function (err) {
         if (err) throw err;
         sharp(output).metadata(function (err, metadata) {
@@ -581,7 +627,7 @@ describe('Image metadata', function () {
     const output = fixtures.path('output.hilutite.jpg');
     sharp(fixtures.inputJpg)
       .resize(64)
-      .withMetadata({ icc: fixtures.path('hilutite.icm') })
+      .withIccProfile(fixtures.path('hilutite.icm'))
       .toFile(output, function (err, info) {
         if (err) throw err;
         fixtures.assertMaxColourDistance(output, fixtures.expected('hilutite.jpg'), 9);
@@ -620,7 +666,6 @@ describe('Image metadata', function () {
   it('Remove EXIF metadata after a resize', function (done) {
     sharp(fixtures.inputJpgWithExif)
       .resize(320, 240)
-      .withMetadata(false)
       .toBuffer(function (err, buffer) {
         if (err) throw err;
         sharp(buffer).metadata(function (err, metadata) {
@@ -651,14 +696,7 @@ describe('Image metadata', function () {
   });
 
   it('Add EXIF metadata to JPEG', async () => {
-    const data = await sharp({
-      create: {
-        width: 8,
-        height: 8,
-        channels: 3,
-        background: 'red'
-      }
-    })
+    const data = await sharp({ create })
       .jpeg()
       .withMetadata({
         exif: {
@@ -675,14 +713,7 @@ describe('Image metadata', function () {
   });
 
   it('Set density of JPEG', async () => {
-    const data = await sharp({
-      create: {
-        width: 8,
-        height: 8,
-        channels: 3,
-        background: 'red'
-      }
-    })
+    const data = await sharp({ create })
       .withMetadata({
         density: 300
       })
@@ -694,14 +725,7 @@ describe('Image metadata', function () {
   });
 
   it('Set density of PNG', async () => {
-    const data = await sharp({
-      create: {
-        width: 8,
-        height: 8,
-        channels: 3,
-        background: 'red'
-      }
-    })
+    const data = await sharp({ create })
       .withMetadata({
         density: 96
       })
@@ -809,11 +833,7 @@ describe('Image metadata', function () {
   });
 
   it('withMetadata adds default sRGB profile to RGB16', async () => {
-    const data = await sharp({
-      create: {
-        width: 8, height: 8, channels: 4, background: 'orange'
-      }
-    })
+    const data = await sharp({ create })
       .toColorspace('rgb16')
       .png()
       .withMetadata()
@@ -827,11 +847,7 @@ describe('Image metadata', function () {
   });
 
   it('withMetadata adds P3 profile to 16-bit PNG', async () => {
-    const data = await sharp({
-      create: {
-        width: 8, height: 8, channels: 4, background: 'orange'
-      }
-    })
+    const data = await sharp({ create })
       .toColorspace('rgb16')
       .png()
       .withMetadata({ icc: 'p3' })
@@ -871,7 +887,89 @@ describe('Image metadata', function () {
       });
   });
 
-  describe('Invalid withMetadata parameters', function () {
+  it('keepExif maintains all EXIF metadata', async () => {
+    const data1 = await sharp({ create })
+      .withExif({
+        IFD0: {
+          Copyright: 'Test 1',
+          Software: 'sharp'
+        }
+      })
+      .jpeg()
+      .toBuffer();
+
+    const data2 = await sharp(data1)
+      .keepExif()
+      .toBuffer();
+
+    const md2 = await sharp(data2).metadata();
+    const exif2 = exifReader(md2.exif);
+    assert.strictEqual(exif2.Image.Copyright, 'Test 1');
+    assert.strictEqual(exif2.Image.Software, 'sharp');
+  });
+
+  it('withExif replaces all EXIF metadata', async () => {
+    const data1 = await sharp({ create })
+      .withExif({
+        IFD0: {
+          Copyright: 'Test 1',
+          Software: 'sharp'
+        }
+      })
+      .jpeg()
+      .toBuffer();
+
+    const md1 = await sharp(data1).metadata();
+    const exif1 = exifReader(md1.exif);
+    assert.strictEqual(exif1.Image.Copyright, 'Test 1');
+    assert.strictEqual(exif1.Image.Software, 'sharp');
+
+    const data2 = await sharp(data1)
+      .withExif({
+        IFD0: {
+          Copyright: 'Test 2'
+        }
+      })
+      .toBuffer();
+
+    const md2 = await sharp(data2).metadata();
+    const exif2 = exifReader(md2.exif);
+    assert.strictEqual(exif2.Image.Copyright, 'Test 2');
+    assert.strictEqual(exif2.Image.Software, undefined);
+  });
+
+  it('withExifMerge merges all EXIF metadata', async () => {
+    const data1 = await sharp({ create })
+      .withExif({
+        IFD0: {
+          Copyright: 'Test 1'
+        }
+      })
+      .jpeg()
+      .toBuffer();
+
+    const md1 = await sharp(data1).metadata();
+    const exif1 = exifReader(md1.exif);
+    assert.strictEqual(exif1.Image.Copyright, 'Test 1');
+    assert.strictEqual(exif1.Image.Software, undefined);
+
+    const data2 = await sharp(data1)
+      .withExifMerge({
+        IFD0: {
+          Copyright: 'Test 2',
+          Software: 'sharp'
+
+        }
+      })
+      .toBuffer();
+
+    const md2 = await sharp(data2).metadata();
+    const exif2 = exifReader(md2.exif);
+    assert.strictEqual(exif2.Image.Copyright, 'Test 2');
+    assert.strictEqual(exif2.Image.Software, 'sharp');
+  });
+
+  describe('Invalid parameters', function () {
     it('String orientation', function () {
       assert.throws(function () {
         sharp().withMetadata({ orientation: 'zoinks' });
@@ -921,6 +1019,23 @@ describe('Image metadata', function () {
       assert.throws(function () {
         sharp().withMetadata({ exif: { ifd0: { fail: false } } });
       });
+    });
+    it('withIccProfile invalid profile', () => {
+      assert.throws(
+        () => sharp().withIccProfile(false),
+        /Expected string for icc but received false of type boolean/
+      );
+    });
+    it('withIccProfile missing attach', () => {
+      assert.doesNotThrow(
+        () => sharp().withIccProfile('test', {})
+      );
+    });
+    it('withIccProfile invalid attach', () => {
+      assert.throws(
+        () => sharp().withIccProfile('test', { attach: 1 }),
+        /Expected boolean for attach but received 1 of type number/
+      );
     });
   });
 });

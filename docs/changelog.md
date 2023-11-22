@@ -14,6 +14,8 @@ Requires libvips v8.15.0
 
 * Remove `sharp.vendor`.
 
+* Partially deprecate `withMetadata()`, use `withExif()` and `withIccProfile()`.
+
 * Add experimental support for WebAssembly-based runtimes.
   [@RReverser](https://github.com/RReverser)
 
@@ -40,6 +42,9 @@ Requires libvips v8.15.0
 * TypeScript: add missing definition for `withMetadata` boolean.
   [#3823](https://github.com/lovell/sharp/pull/3823)
   [@uhthomas](https://github.com/uhthomas)
+
+* Add more fine-grained control over output metadata.
+  [#3824](https://github.com/lovell/sharp/issues/3824)
 
 * Ensure multi-page extract remains sequential.
   [#3837](https://github.com/lovell/sharp/issues/3837)
