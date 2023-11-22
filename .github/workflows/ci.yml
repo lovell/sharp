@@ -185,7 +185,7 @@ jobs:
           emmake npm run package-from-local-build
           npm pkg set "optionalDependencies.@img/sharp-wasm32=file:./npm/wasm32"
           npm run clean
-          rm -r node_modules/@img/sharp-linux-x64
+          rm -rf node_modules/@img/sharp-linux-x64
           npm install --cpu=wasm32
           npm test
       - name: Prebuild
