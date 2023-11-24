@@ -83,6 +83,8 @@ can be used to configure the target environment.
 Experimental support is provided for runtime environments that provide
 multi-threaded Wasm via Workers.
 
+Use in web browsers is unsupported.
+
 ```sh
 npm install --cpu=wasm32 sharp
 ```
