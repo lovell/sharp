@@ -173,41 +173,6 @@
   fun:TIFFWriteEncodedTile
 }
 
-# gsf
-{
-  param_gsf_output_write
-  Memcheck:Param
-  write(buf)
-  fun:write
-  ...
-  fun:gsf_output_write
-}
-{
-  value_gsf_output_write_crc32_little
-  Memcheck:Value8
-  fun:crc32_little
-  ...
-  fun:gsf_output_write
-}
-{
-  param_gsf_new_do_write
-  Memcheck:Param
-  write(buf)
-  ...
-  fun:new_do_write
-  ...
-  fun:gsf_output_close
-}
-{
-  param_gsf_output_write
-  Memcheck:Param
-  write(buf)
-  ...
-  fun:new_do_write
-  ...
-  fun:gsf_output_write
-}
-
 # fontconfig
 {
   leak_fontconfig_FcConfigSubstituteWithPat
@@ -349,11 +314,39 @@
   fun:heif_context_read_from_reader
 }
 
-# orc
+# glib
 {
-  addr_orcexec
-  Memcheck:Addr1
-  obj:*/orcexec.*
+  leak_glib__tls_get_addr
+  Memcheck:Leak
+  match-leak-kinds: possible
+  ...
+  fun:malloc
+  fun:allocate_dtv_entry
+  fun:allocate_and_init
+  fun:tls_get_addr_tail
+  fun:__tls_get_addr
+}
+{
+  value_g_utf8_make_valid_strlen
+  Memcheck:Value8
+  fun:strlen
+  fun:g_utf8_make_valid
+}
+{
+  value_g_utf8_make_valid_strncpy
+  Memcheck:Value8
+  fun:strncpy
+  fun:g_strndup
+  ...
+  fun:g_utf8_make_valid
+}
+{
+  cond_g_utf8_make_valid_strncpy
+  Memcheck:Cond
+  fun:strncpy
+  fun:g_strndup
+  ...
+  fun:g_utf8_make_valid
 }
 
 # libvips
@@ -942,6 +935,79 @@
   Memcheck:Cond
   ...
   fun:_ZN2v88internal18ArrayBufferSweeper10ReleaseAllEv
+}
+{
+  cond_node_Builtins_JSEntry
+  Memcheck:Cond
+  ...
+  fun:Builtins_JSEntry
+  ...
+  fun:uv__poll_io_uring
+}
+{
+  cond_node_Builtins_TestEqualStrictHandler
+  Memcheck:Cond
+  fun:Builtins_TestEqualStrictHandler
+  ...
+  fun:uv__poll_io_uring
+}
+{
+  cond_node_Builtins_TestGreaterThanHandler
+  Memcheck:Cond
+  fun:Builtins_TestGreaterThanHandler
+  ...
+  fun:uv__poll_io_uring
+}
+{
+  cond_node_AfterStat
+  Memcheck:Cond
+  ...
+  fun:_ZN4node2fs9AfterStatEP7uv_fs_s
+  ...
+  fun:uv__poll_io_uring
+}
+{
+  cond_node_AfterMkdirp
+  Memcheck:Cond
+  fun:_ZN4node2fs11AfterMkdirpEP7uv_fs_s
+  fun:_ZN4node24MakeLibuvRequestCallbackI7uv_fs_sPFvPS1_EE7WrapperES2_
+  fun:_ZZZN4node2fs11MKDirpAsyncEP9uv_loop_sP7uv_fs_sPKciPFvS4_EENKUlS4_E_clES4_ENUlS4_E_4_FUNES4_
+  fun:uv__poll_io_uring
+}
+{
+  cond_v8_ArrayBufferSweeper_Finalize
+  Memcheck:Cond
+  fun:_ZN2v88internal18ArrayBufferSweeper8FinalizeEv
+}
+{
+  cond_v8_AdjustAmountOfExternalAllocatedMemory
+  Memcheck:Cond
+  fun:_ZN2v87Isolate37AdjustAmountOfExternalAllocatedMemoryEl
+}
+{
+  cond_v8_IncrementalMarkingLimitReached
+  Memcheck:Cond
+  fun:_ZN2v88internal4Heap30IncrementalMarkingLimitReachedEv
+}
+{
+  cond_v8_ShouldExpandOldGenerationOnSlowAllocation
+  Memcheck:Cond
+  fun:_ZN2v88internal4Heap41ShouldExpandOldGenerationOnSlowAllocationEPNS0_9LocalHeapENS0_16AllocationOriginE
+}
+{
+  cond_v8_ArrayBufferSweeper_SweepingJob_SweepListFull
+  Memcheck:Cond
+  fun:_ZN2v88internal18ArrayBufferSweeper11SweepingJob13SweepListFullEPNS0_15ArrayBufferListE
+}
+{
+  cond_v8_ArrayBufferSweeper_SweepingJob_SweepYoung
+  Memcheck:Cond
+  fun:_ZN2v88internal18ArrayBufferSweeper11SweepingJob10SweepYoungEv
+}
+{
+  cond_v8_StartIncrementalMarkingIfAllocationLimitIsReachedBackground
+  Memcheck:Cond
+  fun:_ZN2v88internal4Heap59StartIncrementalMarkingIfAllocationLimitIsReachedBackgroundEv
 }
 {
   addr_v8_ZN2v88internal12_GLOBAL__N_119HandleApiCallHelperILb0EEENS0
