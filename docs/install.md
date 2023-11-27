@@ -42,6 +42,36 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 This provides support for the
 JPEG, PNG, WebP, AVIF (limited to 8-bit depth), TIFF, GIF and SVG (input) image formats.
 
+## Cross-platform
+
+At install time, package managers will automatically select prebuilt binaries for the current OS platform and CPU architecture, where available.
+
+Some package managers support multiple platforms and architectures within the same installation tree.
+
+### npm
+
+Use the `--os`, `--cpu` and `--libc` flags:
+
+Example to support both Intel and ARM CPUs on macOS:
+```sh
+npm install --cpu=x64 --os=darwin  sharp
+npm install --cpu=arm64 --os=darwin sharp
+```
+
+Example to support both glibc and musl-based Linux:
+```sh
+npm install --cpu=x64 --os=linux sharp
+npm install --cpu=x64 --os=linux --libc=musl sharp
+```
+
+### yarn
+
+Use the [supportedArchitectures](https://yarnpkg.com/configuration/yarnrc#supportedArchitectures) configuration.
+
+### pnpm
+
+Use the [supportedArchitectures](https://pnpm.io/package_json#pnpmsupportedarchitectures) configuration.
+
 ## Custom libvips
 
 To use a custom, globally-installed version of libvips instead of the provided binaries,
