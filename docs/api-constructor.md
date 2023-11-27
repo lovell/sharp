@@ -17,6 +17,10 @@ Non-critical problems encountered during processing are emitted as `warning` eve
 
 Implements the [stream.Duplex](http://nodejs.org/api/stream.html#stream_class_stream_duplex) class.
 
+When loading more than one page/frame of an animated image,
+these are combined as a vertically-stacked "toilet roll" image
+where the overall height is the `pageHeight` multiplied by the number of `pages`.
+
 **Throws**:
 
 - <code>Error</code> Invalid parameters
