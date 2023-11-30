@@ -27,21 +27,28 @@ If you are using another package which depends on a version of `sharp` that is n
 
 <!-- Please place an [x] in the relevant box to confirm. -->
 
-- [ ] I am using Node.js 18 with a version >= 18.17.0
-- [ ] I am using Node.js 20 with a version >= 20.3.0
-- [ ] I am using Node.js 21 or later
+- [ ] I am using Node.js with a version that satisfies `^18.17.0 || ^20.3.0 || >=21.0.0`
+- [ ] I am using Deno
+- [ ] I am using Bun
 
-If you cannot confirm any of these, please upgrade to the latest version and try again before opening an issue.
+If you cannot confirm any of these,
+please upgrade to the latest version
+and try again before opening an issue.
 
-### Are you using a supported package manager?
+### Are you using a supported package manager and installing optional dependencies?
 
 <!-- Please place an [x] in the relevant box to confirm. -->
 
-- [ ] I am using npm >= 9.6.5
-- [ ] I am using yarn >= 3.2.0
-- [ ] I am using pnpm >= 7.1.0
+- [ ] I am using npm >= 9.6.5 with `--include=optional`
+- [ ] I am using yarn >= 3.2.0 and I am not using the "Plug'n'Play" linker
+- [ ] I am using pnpm >= 7.1.0 with `--no-optional=false`
+- [ ] I am using Deno
+- [ ] I am using Bun
 
-If you cannot confirm any of these, please upgrade to the latest version and try again before opening an issue.
+If you cannot confirm any of these,
+please upgrade to the latest version of your chosen package manager
+and ensure you are allowing the installation of optional dependencies
+before opening an issue.
 
 ### What is the complete output of running `npm install --verbose --foreground-scripts sharp` in an empty directory?
 

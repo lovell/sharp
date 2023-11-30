@@ -2,6 +2,8 @@
 
 Works with your choice of JavaScript package manager.
 
+Please ensure optional dependencies can be installed.
+
 ```sh
 npm install sharp
 ```
