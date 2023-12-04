@@ -13,7 +13,14 @@ pnpm add sharp
 ```
 
 ```sh
-yarn add sharp # v3 recommended, Plug'n'Play unsupported
+# yarn v3+ (Plug'n'Play is unsupported)
+yarn config set nodeLinker node-modules
+yarn add sharp
+```
+
+```sh
+# yarn v1 (maintenance mode)
+yarn add sharp --ignore-engines
 ```
 
 ```sh
