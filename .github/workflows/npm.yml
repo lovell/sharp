@@ -139,6 +139,17 @@ jobs:
           yarn install
           node release.mjs
 
+      - name: Run with Node.js + yarn pnp
+        if: ${{ matrix.runtime == 'node' && matrix.package-manager == 'yarn' }}
+        run: |
+          corepack enable
+          yarn set version stable
+          yarn config set enableImmutableInstalls false
+          yarn config set enableScripts false
+          yarn config set nodeLinker pnp
+          yarn install
+          node release.mjs
+
       - name: Run with Deno
         if: ${{ matrix.runtime == 'deno' }}
         run: deno run --allow-read --allow-ffi release.mjs
