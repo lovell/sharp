@@ -4,6 +4,11 @@
 
 Requires libvips v8.15.0
 
+### v0.33.1 - TBD
+
+* Add support for Yarn Plug'n'Play filesystem layout.
+  [#3888](https://github.com/lovell/sharp/issues/3888)
+
 ### v0.33.0 - 29th November 2023
 
 * Drop support for Node.js 14 and 16, now requires Node.js >= 18.17.0

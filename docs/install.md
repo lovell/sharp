@@ -13,8 +13,6 @@ pnpm add sharp
 ```
 
 ```sh
-# yarn v3+ (Plug'n'Play is unsupported)
-yarn config set nodeLinker node-modules
 yarn add sharp
 ```
 
