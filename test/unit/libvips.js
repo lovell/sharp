@@ -145,11 +145,22 @@ describe('libvips binaries', function () {
     });
   });
 
-  it('yarn locator hash', () => {
-    const locatorHash = libvips.yarnLocator();
-    if (locatorHash.length) {
-      assert.strict(locatorHash.length, 10);
-      assert.strict(/[a-f0-9]{10}/.test(locatorHash));
-    }
+  describe('yarn locator hash', () => {
+    it('known platform', () => {
+      process.env.npm_config_platform = 'linux';
+      process.env.npm_config_arch = 's390x';
+      const locatorHash = libvips.yarnLocator();
+      assert.strictEqual(locatorHash, '86cc8ee6e4');
+      delete process.env.npm_config_platform;
+      delete process.env.npm_config_arch;
+    });
+    it('unknown platform', () => {
+      process.env.npm_config_platform = 'unknown-platform';
+      process.env.npm_config_arch = 'unknown-arch';
+      const locatorHash = libvips.yarnLocator();
+      assert.strictEqual(locatorHash, '');
+      delete process.env.npm_config_platform;
+      delete process.env.npm_config_arch;
+    });
   });
 });
