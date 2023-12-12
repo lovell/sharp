@@ -151,7 +151,7 @@ const counters = sharp.counters(); // { queue: 2, process: 4 }
 > simd([simd]) ⇒ <code>boolean</code>
 
 Get and set use of SIMD vector unit instructions.
-Requires libvips to have been compiled with liborc support.
+Requires libvips to have been compiled with highway support.
 
 Improves the performance of `resize`, `blur` and `sharpen` operations
 by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM NEON.
@@ -165,12 +165,12 @@ by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM N
 **Example**  
 ```js
 const simd = sharp.simd();
-// simd is `true` if the runtime use of liborc is currently enabled
+// simd is `true` if the runtime use of highway is currently enabled
 ```
 **Example**  
 ```js
 const simd = sharp.simd(false);
-// prevent libvips from using liborc at runtime
+// prevent libvips from using highway at runtime
 ```
 
 

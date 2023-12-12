@@ -126,7 +126,7 @@ declare namespace sharp {
     function counters(): SharpCounters;
 
     /**
-     * Get and set use of SIMD vector unit instructions. Requires libvips to have been compiled with liborc support.
+     * Get and set use of SIMD vector unit instructions. Requires libvips to have been compiled with highway support.
      * Improves the performance of resize, blur and sharpen operations by taking advantage of the SIMD vector unit of the CPU, e.g. Intel SSE and ARM NEON.
      * @param enable enable or disable use of SIMD vector unit instructions
      * @returns true if usage of SIMD vector unit instructions is enabled
