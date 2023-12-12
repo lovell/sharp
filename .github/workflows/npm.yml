@@ -105,7 +105,8 @@ jobs:
             {
               "dependencies": {
                 "sharp": "${{ steps.version.outputs.semver }}"
-              }
+              },
+              "type": "module"
             }
       - name: Create release.mjs
         uses: DamianReeves/write-file-action@v1.2
@@ -133,7 +134,6 @@ jobs:
         run: |
           corepack enable
           yarn set version stable
-          yarn config set enableImmutableInstalls false
           yarn config set enableScripts false
           yarn config set nodeLinker node-modules
           yarn install
@@ -144,11 +144,10 @@ jobs:
         run: |
           corepack enable
           yarn set version stable
-          yarn config set enableImmutableInstalls false
           yarn config set enableScripts false
           yarn config set nodeLinker pnp
           yarn install
-          node release.mjs
+          yarn node release.mjs
 
       - name: Run with Deno
         if: ${{ matrix.runtime == 'deno' }}
