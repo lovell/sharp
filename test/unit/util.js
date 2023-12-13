@@ -9,16 +9,19 @@ const sharp = require('../../');
 
 describe('Utilities', function () {
   describe('Cache', function () {
-    it('Can be disabled', function () {
-      sharp.cache(false);
-      const cache = sharp.cache(false);
-      assert.strictEqual(cache.memory.current, 0);
-      assert.strictEqual(cache.memory.max, 0);
-      assert.strictEqual(typeof cache.memory.high, 'number');
-      assert.strictEqual(cache.files.current, 0);
-      assert.strictEqual(cache.files.max, 0);
-      assert.strictEqual(cache.items.current, 0);
-      assert.strictEqual(cache.items.max, 0);
+    it('Can be disabled', function (done) {
+      queueMicrotask(() => {
+        sharp.cache(false);
+        const cache = sharp.cache(false);
+        assert.strictEqual(cache.memory.current, 0);
+        assert.strictEqual(cache.memory.max, 0);
+        assert.strictEqual(typeof cache.memory.high, 'number');
+        assert.strictEqual(cache.files.current, 0);
+        assert.strictEqual(cache.files.max, 0);
+        assert.strictEqual(cache.items.current, 0);
+        assert.strictEqual(cache.items.max, 0);
+        done();
+      });
     });
     it('Can be enabled with defaults', function () {
       const cache = sharp.cache(true);
