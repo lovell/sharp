@@ -11,7 +11,10 @@ labels: installation
 
 <!-- Please place an [x] in the box to confirm. -->
 
-- [ ] I have read the [documentation relating to installation](https://sharp.pixelplumbing.com/install).
+- [ ] I have read and understood all of the [documentation relating to installation](https://sharp.pixelplumbing.com/install).
+- [ ] I have searched for known bugs relating to this problem in my choice of package manager.
+
+You must confirm both of these before continuing.
 
 ### Are you using the latest version of sharp?
 
@@ -47,7 +50,7 @@ and try again before opening an issue.
 
 If you cannot confirm any of these,
 please upgrade to the latest version of your chosen package manager
-and ensure you are allowing the installation of optional dependencies
+and ensure you are allowing the installation of optional or multi-platform dependencies
 before opening an issue.
 
 ### What is the complete output of running `npm install --verbose --foreground-scripts sharp` in an empty directory?

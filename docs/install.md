@@ -4,6 +4,10 @@ Works with your choice of JavaScript package manager.
 
 > ⚠️  **Please ensure your package manager is configured to install optional dependencies**
 
+If a package manager lockfile must support multiple platforms,
+please see the [cross-platform](#cross-platform) section
+to help decide which package manager is appropriate.
+
 ```sh
 npm install sharp
 ```
@@ -51,17 +55,21 @@ JPEG, PNG, WebP, AVIF (limited to 8-bit depth), TIFF, GIF and SVG (input) image 
 
 ## Cross-platform
 
-At install time, package managers will automatically select prebuilt binaries for the current OS platform and CPU architecture, where available.
+At install time, package managers will automatically select prebuilt binaries
+for the current OS platform and CPU architecture, where available.
 
-Some package managers support multiple platforms and architectures within the same installation tree.
+Some package managers support multiple platforms and architectures
+within the same installation tree and/or using the same lockfile.
 
 ### npm
 
-Use the `--os`, `--cpu` and `--libc` flags:
+> ⚠️ **npm `package-lock.json` files can cause installation problems due to [npm bug #4828](https://github.com/npm/cli/issues/4828)**
+
+Provides limited support via `--os`, `--cpu` and `--libc` flags.
 
 Example to support both Intel and ARM CPUs on macOS:
 ```sh
-npm install --cpu=x64 --os=darwin  sharp
+npm install --cpu=x64 --os=darwin sharp
 npm install --cpu=arm64 --os=darwin sharp
 ```
 
