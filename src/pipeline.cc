@@ -794,11 +794,15 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Apply output ICC profile
       if (!baton->withIccProfile.empty()) {
-        image = image.icc_transform(const_cast<char*>(baton->withIccProfile.data()), VImage::option()
-          ->set("input_profile", processingProfile)
-          ->set("embedded", TRUE)
-          ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
-          ->set("intent", VIPS_INTENT_PERCEPTUAL));
+        try {
+          image = image.icc_transform(const_cast<char*>(baton->withIccProfile.data()), VImage::option()
+            ->set("input_profile", processingProfile)
+            ->set("embedded", TRUE)
+            ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
+            ->set("intent", VIPS_INTENT_PERCEPTUAL));
+        } catch(...) {
+          sharp::VipsWarningCallback(nullptr, G_LOG_LEVEL_WARNING, "Invalid profile", nullptr);
+        }
       } else if (baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) {
         image = sharp::SetProfile(image, inputProfile);
       }

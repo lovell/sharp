@@ -598,6 +598,24 @@ describe('Image metadata', function () {
     assert.strictEqual(undefined, metadata.icc);
   });
 
+  it('transform to invalid ICC profile emits warning', async () => {
+    const img = sharp({ create })
+      .png()
+      .withIccProfile(fixtures.path('invalid-illuminant.icc'));
+
+    let warningEmitted = '';
+    img.on('warning', (warning) => {
+      warningEmitted = warning;
+    });
+
+    const data = await img.toBuffer();
+    assert.strictEqual('Invalid profile', warningEmitted);
+
+    const metadata = await sharp(data).metadata();
+    assert.strictEqual(3, metadata.channels);
+    assert.strictEqual(undefined, metadata.icc);
+  });
+
   it('Apply CMYK output ICC profile', function (done) {
     const output = fixtures.path('output.icc-cmyk.jpg');
     sharp(fixtures.inputJpg)
