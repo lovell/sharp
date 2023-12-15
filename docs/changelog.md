@@ -12,6 +12,10 @@ Requires libvips v8.15.0
 * Emit warning when attempting to use invalid ICC profiles.
   [#3895](https://github.com/lovell/sharp/issues/3895)
 
+* Ensure `VIPS_NOVECTOR` environment variable is respected.
+  [#3897](https://github.com/lovell/sharp/pull/3897)
+  [@icetee](https://github.com/icetee)
+
 ### v0.33.0 - 29th November 2023
 
 * Drop support for Node.js 14 and 16, now requires Node.js >= 18.17.0

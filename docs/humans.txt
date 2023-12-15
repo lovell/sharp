@@ -281,3 +281,6 @@ GitHub: https://github.com/dnsbty
 
 Name: Ingvar Stepanyan
 GitHub: https://github.com/RReverser
+
+Name: Tamás András Horváth
+GitHub: https://github.com/icetee
