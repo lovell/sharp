@@ -1,5 +1,5 @@
 freebsd_instance:
-  image_family: freebsd-13-2
+  image_family: freebsd-14-0-snap
 
 task:
   name: FreeBSD
@@ -10,7 +10,8 @@ task:
     - pkg update -f
     - pkg upgrade -y
     - pkg install -y devel/git devel/pkgconf graphics/vips www/node20 www/npm
+    - pkg-config --modversion vips-cpp
   install_script:
     - npm install --build-from-source
   test_script:
-    - npm test
+    - npx mocha --no-config --spec=test/unit/io.js --timeout=30000

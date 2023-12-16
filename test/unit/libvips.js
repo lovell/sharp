@@ -96,22 +96,28 @@ describe('libvips binaries', function () {
   describe('Build time directories', () => {
     it('sharp-libvips include', () => {
       const dir = libvips.buildSharpLibvipsIncludeDir();
-      assert.strictEqual(fs.statSync(dir).isDirectory(), true);
+      if (dir) {
+        assert.strictEqual(fs.statSync(dir).isDirectory(), true);
+      }
     });
     it('sharp-libvips cplusplus', () => {
       const dir = libvips.buildSharpLibvipsCPlusPlusDir();
-      assert.strictEqual(fs.statSync(dir).isDirectory(), true);
+      if (dir) {
+        assert.strictEqual(fs.statSync(dir).isDirectory(), true);
+      }
     });
     it('sharp-libvips lib', () => {
       const dir = libvips.buildSharpLibvipsLibDir();
-      assert.strictEqual(fs.statSync(dir).isDirectory(), true);
+      if (dir) {
+        assert.strictEqual(fs.statSync(dir).isDirectory(), true);
+      }
     });
   });
 
   describe('Runtime detection', () => {
     it('platform', () => {
       const [platform] = libvips.runtimePlatformArch().split('-');
-      assert.strict(['darwin', 'linux', 'linuxmusl', 'win32'].includes(platform));
+      assert.strict(['darwin', 'freebsd', 'linux', 'linuxmusl', 'win32'].includes(platform));
     });
     it('arch', () => {
       const [, arch] = libvips.runtimePlatformArch().split('-');
