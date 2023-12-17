@@ -27,6 +27,10 @@ jobs:
             runs-on: ubuntu-22.04
             runtime: node
             package-manager: yarn
+          - name: linux-x64-node-yarn-pnp
+            runs-on: ubuntu-22.04
+            runtime: node
+            package-manager: yarn-pnp
           - name: linux-x64-deno
             runs-on: ubuntu-22.04
             runtime: deno
@@ -46,6 +50,10 @@ jobs:
             runs-on: macos-11
             runtime: node
             package-manager: yarn
+          - name: darwin-x64-node-yarn-pnp
+            runs-on: macos-11
+            runtime: node
+            package-manager: yarn-pnp
           - name: darwin-x64-deno
             runs-on: macos-11
             runtime: deno
@@ -65,6 +73,10 @@ jobs:
             runs-on: windows-2019
             runtime: node
             package-manager: yarn
+          - name: win32-x64-node-yarn-pnp
+            runs-on: windows-2019
+            runtime: node
+            package-manager: yarn-pnp
           - name: win32-x64-deno
             runs-on: windows-2019
             runtime: deno
@@ -118,32 +130,34 @@ jobs:
             deepStrictEqual(['.jpg', '.jpeg', '.jpe'], sharp.format.jpeg.input.fileSuffix);
 
       - name: Run with Node.js + npm
-        if: ${{ matrix.runtime == 'node' && matrix.package-manager == 'npm' }}
+        if: ${{ matrix.package-manager == 'npm' }}
         run: |
           npm install --ignore-scripts
           node release.mjs
 
       - name: Run with Node.js + pnpm
-        if: ${{ matrix.runtime == 'node' && matrix.package-manager == 'pnpm' }}
+        if: ${{ matrix.package-manager == 'pnpm' }}
         run: |
           pnpm install --ignore-scripts
           node release.mjs
 
       - name: Run with Node.js + yarn
-        if: ${{ matrix.runtime == 'node' && matrix.package-manager == 'yarn' }}
+        if: ${{ matrix.package-manager == 'yarn' }}
         run: |
           corepack enable
           yarn set version stable
+          yarn config set enableImmutableInstalls false
           yarn config set enableScripts false
           yarn config set nodeLinker node-modules
           yarn install
           node release.mjs
 
       - name: Run with Node.js + yarn pnp
-        if: ${{ matrix.runtime == 'node' && matrix.package-manager == 'yarn' }}
+        if: ${{ matrix.package-manager == 'yarn-pnp' }}
         run: |
           corepack enable
           yarn set version stable
+          yarn config set enableImmutableInstalls false
           yarn config set enableScripts false
           yarn config set nodeLinker pnp
           yarn install
