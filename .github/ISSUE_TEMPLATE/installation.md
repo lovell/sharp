@@ -24,7 +24,8 @@ You must confirm both of these before continuing.
 
 If you cannot confirm this, please upgrade to the latest version and try again before opening an issue.
 
-If you are using another package which depends on a version of `sharp` that is not the latest, please open an issue against that package instead.
+If you are using another package which depends on a version of `sharp` that is not the latest,
+please open an issue against that package instead.
 
 ### Are you using a supported runtime?
 
@@ -43,15 +44,13 @@ and try again before opening an issue.
 <!-- Please place an [x] in the relevant box to confirm. -->
 
 - [ ] I am using npm >= 9.6.5 with `--include=optional`
-- [ ] I am using yarn >= 3.2.0 and I am not using the "Plug'n'Play" linker
+- [ ] I am using yarn >= 3.2.0
 - [ ] I am using pnpm >= 7.1.0 with `--no-optional=false`
 - [ ] I am using Deno
 - [ ] I am using Bun
 
-If you cannot confirm any of these,
-please upgrade to the latest version of your chosen package manager
-and ensure you are allowing the installation of optional or multi-platform dependencies
-before opening an issue.
+If you cannot confirm any of these, please upgrade to the latest version of your chosen package manager
+and ensure you are allowing the installation of optional or multi-platform dependencies before opening an issue.
 
 ### What is the complete output of running `npm install --verbose --foreground-scripts sharp` in an empty directory?
 
