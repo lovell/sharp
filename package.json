@@ -3,7 +3,7 @@
   "description": "High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP, GIF, AVIF and TIFF images",
   "version": "0.33.1-rc.2",
   "author": "Lovell Fuller <npm@lovell.info>",
-  "homepage": "https://github.com/lovell/sharp",
+  "homepage": "https://sharp.pixelplumbing.com",
   "contributors": [
     "Pierre Inglebert <pierre.inglebert@gmail.com>",
     "Jonathan Ong <jonathanrichardong@gmail.com>",
