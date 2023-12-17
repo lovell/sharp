@@ -4,7 +4,7 @@
 
 Requires libvips v8.15.0
 
-### v0.33.1 - TBD
+### v0.33.1 - 17th December 2023
 
 * Add support for Yarn Plug'n'Play filesystem layout.
   [#3888](https://github.com/lovell/sharp/issues/3888)
