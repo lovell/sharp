@@ -61,7 +61,7 @@ for the current OS platform and CPU architecture, where available.
 Some package managers support multiple platforms and architectures
 within the same installation tree and/or using the same lockfile.
 
-### npm
+### npm v10+
 
 > ⚠️ **npm `package-lock.json` files can cause installation problems due to [npm bug #4828](https://github.com/npm/cli/issues/4828)**
 
@@ -79,11 +79,11 @@ npm install --cpu=x64 --os=linux sharp
 npm install --cpu=x64 --os=linux --libc=musl sharp
 ```
 
-### yarn
+### yarn v3+
 
 Use the [supportedArchitectures](https://yarnpkg.com/configuration/yarnrc#supportedArchitectures) configuration.
 
-### pnpm
+### pnpm v8+
 
 Use the [supportedArchitectures](https://pnpm.io/package_json#pnpmsupportedarchitectures) configuration.
 
@@ -173,25 +173,8 @@ must include binaries for either the linux-x64 or linux-arm64 platforms
 depending on the chosen architecture.
 
 When building your deployment package on a machine that differs from the target architecture,
-you will need to install either `@img/sharp-linux-x64` or `@img/sharp-linux-arm64` package.
-
-```sh
-npm install --os=linux --cpu=x64 sharp
-```
-
-```sh
-npm install --os=linux --cpu=arm64 sharp
-```
-
-When using npm 9 or earlier, this can be achieved using the following:
-
-```sh
-npm install --force @img/sharp-linux-x64
-```
-
-```sh
-npm install --force @img/sharp-linux-arm64
-```
+see the [cross-platform](#cross-platform) section to help decide which package manager is appropriate
+and how to configure it.
 
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
