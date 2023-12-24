@@ -342,6 +342,12 @@ declare namespace sharp {
         metadata(): Promise<Metadata>;
 
         /**
+         * Keep all metadata (EXIF, ICC, XMP, IPTC) from the input image in the output image.
+         * @returns A sharp instance that can be used to chain operations
+         */
+        keepMetadata(): Sharp;
+
+        /**
          * Access to pixel-derived image statistics for every channel in the image.
          * @returns A sharp instance that can be used to chain operations
          */

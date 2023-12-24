@@ -44,6 +44,12 @@ sharp('input.png')
     // sharpened, with metadata, 90% quality WebP image data. Phew!
   });
 
+sharp('input.png')
+  .keepMetadata()
+  .toFile('output.png', (err, info) => {
+    // output.png is an image containing input.png along with all metadata(EXIF, ICC, XMP, IPTC) from input.png
+  })
+
 sharp('input.jpg')
   .resize(300, 200)
   .toFile('output.jpg', (err: Error) => {
