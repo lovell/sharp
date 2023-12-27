@@ -52,6 +52,10 @@ and try again before opening an issue.
 If you cannot confirm any of these, please upgrade to the latest version of your chosen package manager
 and ensure you are allowing the installation of optional or multi-platform dependencies before opening an issue.
 
+### What is the complete error message, including the full stack trace?
+
+<!-- Please provide the error message and stack trace here. -->
+
 ### What is the complete output of running `npm install --verbose --foreground-scripts sharp` in an empty directory?
 
 <details>
