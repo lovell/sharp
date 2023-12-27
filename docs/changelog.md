@@ -4,6 +4,12 @@
 
 Requires libvips v8.15.0
 
+### v0.33.2 - TBD
+
+* TypeScript: add definition for `keepMetadata`.
+  [#3914](https://github.com/lovell/sharp/pull/3914)
+  [@abhi0498](https://github.com/abhi0498)
+
 ### v0.33.1 - 17th December 2023
 
 * Add support for Yarn Plug'n'Play filesystem layout.
