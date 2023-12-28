@@ -176,6 +176,9 @@ When building your deployment package on a machine that differs from the target 
 see the [cross-platform](#cross-platform) section to help decide which package manager is appropriate
 and how to configure it.
 
+Some package managers use symbolic links
+but AWS Lambda does not support these within deployment packages.
+
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
