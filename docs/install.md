@@ -109,8 +109,8 @@ This module will be compiled from source at `npm install` time when:
 Building from source requires:
 
 * C++11 compiler
-* [node-addon-api](https://www.npmjs.com/package/node-addon-api)
-* [node-gyp](https://github.com/nodejs/node-gyp#installation) and its dependencies
+* [node-addon-api](https://www.npmjs.com/package/node-addon-api) version 7+
+* [node-gyp](https://github.com/nodejs/node-gyp#installation) version 9+ and its dependencies
 
 There is an install-time check for these dependencies.
 If `node-addon-api` or `node-gyp` cannot be found, try adding them via:
