@@ -231,6 +231,21 @@ custom:
         - npm install --os=linux --cpu=x64 sharp
 ```
 
+### electron
+
+Ensure sharp is unpacked from the ASAR archive file using the
+[asarUnpack](https://www.electron.build/configuration/configuration.html)
+option.
+
+```json
+{
+  "build": {
+    "asar": true,
+    "asarUnpack": ["**/node_modules/sharp/**/*"]
+  }
+}
+```
+
 ## TypeScript
 
 TypeScript definitions are published as part of
