@@ -10,6 +10,9 @@ Requires libvips v8.15.0
   [#3914](https://github.com/lovell/sharp/pull/3914)
   [@abhi0498](https://github.com/abhi0498)
 
+* Ensure `extend` operation stays sequential when copying (regression in 0.32.0).
+  [#3928](https://github.com/lovell/sharp/issues/3928)
+
 ### v0.33.1 - 17th December 2023
 
 * Add support for Yarn Plug'n'Play filesystem layout.

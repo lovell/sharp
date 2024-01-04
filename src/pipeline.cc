@@ -561,6 +561,7 @@ class PipelineWorker : public Napi::AsyncWorker {
                 VImage::option()->set("extend", baton->extendWith)->set("background", background));
         } else {
           std::vector<double> ignoredBackground(1);
+          image = sharp::StaySequential(image, baton->input->access);
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
                 baton->extendLeft, baton->extendTop, baton->width, baton->height,
