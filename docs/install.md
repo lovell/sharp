@@ -233,7 +233,7 @@ custom:
 
 ### electron
 
-Ensure sharp is unpacked from the ASAR archive file using the
+Ensure `sharp` is unpacked from the ASAR archive file using the
 [asarUnpack](https://www.electron.build/configuration/configuration.html)
 option.
 
@@ -241,7 +241,10 @@ option.
 {
   "build": {
     "asar": true,
-    "asarUnpack": ["**/node_modules/sharp/**/*"]
+    "asarUnpack": [
+      "**/node_modules/sharp/**/*",
+      "**/node_modules/@img/**/*"
+    ]
   }
 }
 ```
