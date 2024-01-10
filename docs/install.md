@@ -35,7 +35,7 @@ deno run --allow-ffi ...
 
 ## Prerequisites
 
-- Node-API v9 compatible runtime e.g. Node.js ^18.17.0 or >=20.3.0.
+* Node-API v9 compatible runtime e.g. Node.js ^18.17.0 or >=20.3.0.
 
 ## Prebuilt binaries
 
