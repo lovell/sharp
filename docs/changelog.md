@@ -27,7 +27,7 @@ Requires libvips v8.15.0
 
 ### v0.33.0 - 29th November 2023
 
-* Drop support for Node.js 14 and 16, now requires Node.js >= 18.17.0
+* Drop support for Node.js 14 and 16, now requires Node.js ^18.17.0 or >= 20.3.0
 
 * Prebuilt binaries distributed via npm registry and installed via package manager.
 
