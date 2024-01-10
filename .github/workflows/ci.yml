@@ -47,6 +47,17 @@ jobs:
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
             platform: darwin-x64
+          - os: macos-13-arm
+            nodejs_arch: arn64
+            nodejs_version: "^18.17.0"
+            nodejs_version_major: 18
+            platform: darwin-arn64
+            prebuild: true
+          - os: macos-13-arm
+            nodejs_arch: arn64
+            nodejs_version: "^20.3.0"
+            nodejs_version_major: 20
+            platform: darwin-arn64
           - os: windows-2019
             nodejs_arch: x86
             nodejs_version: "18.18.2" # pinned to avoid 18.19.0 and npm 10
@@ -69,6 +80,17 @@ jobs:
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
             platform: win32-x64
+          - os: windows-2022
+            nodejs_arch: arm64
+            nodejs_version: "^18.17.0"
+            nodejs_version_major: 18
+            platform: win32-arm64
+            prebuild: true
+          - os: windows-202022
+            nodejs_arch: arm64
+            nodejs_version: "^20.3.0"
+            nodejs_version_major: 20
+            platform: win32-arm64
     steps:
       - name: Dependencies (Rocky Linux glibc)
         if: contains(matrix.container, 'rockylinux')
