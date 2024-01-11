@@ -170,6 +170,13 @@ jobs:
           node-version: "20"
       - name: Install
         run: emmake npm install --build-from-source
+      - name: Verify emscripten versions match
+        run: |
+          EMSCRIPTEN_VERSION_LIBVIPS=$(node -p "require('@img/sharp-libvips-dev-wasm32/versions').emscripten")
+          EMSCRIPTEN_VERSION_SHARP=$(emcc -dumpversion)
+          echo "libvips built with emscripten $EMSCRIPTEN_VERSION_LIBVIPS"
+          echo "sharp built with emscripten $EMSCRIPTEN_VERSION_SHARP"
+          test "$EMSCRIPTEN_VERSION_LIBVIPS" = "$EMSCRIPTEN_VERSION_SHARP"
       - name: Test
         run: emmake npm test
       - name: Test packaging
