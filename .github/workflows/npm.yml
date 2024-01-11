@@ -127,7 +127,7 @@ jobs:
           contents: |
             import { deepStrictEqual } from 'node:assert';
             import sharp from 'sharp';
-            deepStrictEqual(['.jpg', '.jpeg', '.jpe'], sharp.format.jpeg.input.fileSuffix);
+            deepStrictEqual(['.jpg', '.jpeg', '.jpe', '.jfif'], sharp.format.jpeg.input.fileSuffix);
 
       - name: Run with Node.js + npm
         if: ${{ matrix.package-manager == 'npm' }}
