@@ -96,6 +96,9 @@ class PipelineWorker : public Napi::AsyncWorker {
           baton->rotationAngle != 0.0);
 
         if (autoRotation != VIPS_ANGLE_D0) {
+          if (autoRotation != VIPS_ANGLE_D180) {
+            MultiPageUnsupported(nPages, "Rotate");
+          }
           image = image.rot(autoRotation);
           autoRotation = VIPS_ANGLE_D0;
         }
@@ -114,6 +117,9 @@ class PipelineWorker : public Napi::AsyncWorker {
           baton->flop = FALSE;
         }
         if (rotation != VIPS_ANGLE_D0) {
+          if (rotation != VIPS_ANGLE_D180) {
+            MultiPageUnsupported(nPages, "Rotate");
+          }
           image = image.rot(rotation);
           rotation = VIPS_ANGLE_D0;
         }
@@ -397,6 +403,9 @@ class PipelineWorker : public Napi::AsyncWorker {
         rotation != VIPS_ANGLE_D0);
       // Auto-rotate post-extract
       if (autoRotation != VIPS_ANGLE_D0) {
+        if (autoRotation != VIPS_ANGLE_D180) {
+          MultiPageUnsupported(nPages, "Rotate");
+        }
         image = image.rot(autoRotation);
       }
       // Mirror vertically (up-down) about the x-axis
@@ -409,6 +418,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
       // Rotate post-extract 90-angle
       if (rotation != VIPS_ANGLE_D0) {
+        if (rotation != VIPS_ANGLE_D180) {
+          MultiPageUnsupported(nPages, "Rotate");
+        }
         image = image.rot(rotation);
       }
 

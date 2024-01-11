@@ -353,6 +353,21 @@ describe('Rotation', function () {
     )
   );
 
+  it('Animated image rotate 180', () =>
+    assert.doesNotReject(() => sharp(fixtures.inputGifAnimated, { animated: true })
+      .rotate(180)
+      .toBuffer()
+    )
+  );
+
+  it('Animated image rotate non-180 rejects', () =>
+    assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+      .rotate(90)
+      .toBuffer(),
+    /Rotate is not supported for multi-page images/
+    )
+  );
+
   it('Multiple rotate emits warning', () => {
     let warningMessage = '';
     const s = sharp();

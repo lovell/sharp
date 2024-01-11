@@ -13,6 +13,9 @@ Requires libvips v8.15.0
 * Ensure `extend` operation stays sequential when copying (regression in 0.32.0).
   [#3928](https://github.com/lovell/sharp/issues/3928)
 
+* Improve error handling for unsupported multi-page rotation.
+  [#3940](https://github.com/lovell/sharp/issues/3940)
+
 ### v0.33.1 - 17th December 2023
 
 * Add support for Yarn Plug'n'Play filesystem layout.

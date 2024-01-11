@@ -18,6 +18,8 @@ The use of `rotate` without an angle will remove the EXIF `Orientation` tag, if 
 Only one rotation can occur per pipeline.
 Previous calls to `rotate` in the same pipeline will be ignored.
 
+Multi-page images can only be rotated by 180 degrees.
+
 Method order is important when rotating, resizing and/or extracting regions,
 for example `.rotate(x).extract(y)` will produce a different result to `.extract(y).rotate(x)`.
 
