@@ -134,7 +134,7 @@ describe('Utilities', function () {
       });
     });
     it('input fileSuffix', function () {
-      assert.deepStrictEqual(['.jpg', '.jpeg', '.jpe'], sharp.format.jpeg.input.fileSuffix);
+      assert.deepStrictEqual(['.jpg', '.jpeg', '.jpe', '.jfif'], sharp.format.jpeg.input.fileSuffix);
     });
     it('output alias', function () {
       assert.deepStrictEqual(['jpe', 'jpg'], sharp.format.jpeg.output.alias);

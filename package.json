@@ -143,14 +143,14 @@
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "0.33.1",
     "@img/sharp-darwin-x64": "0.33.1",
-    "@img/sharp-libvips-darwin-arm64": "1.0.0",
-    "@img/sharp-libvips-darwin-x64": "1.0.0",
-    "@img/sharp-libvips-linux-arm": "1.0.0",
-    "@img/sharp-libvips-linux-arm64": "1.0.0",
-    "@img/sharp-libvips-linux-s390x": "1.0.0",
-    "@img/sharp-libvips-linux-x64": "1.0.0",
-    "@img/sharp-libvips-linuxmusl-arm64": "1.0.0",
-    "@img/sharp-libvips-linuxmusl-x64": "1.0.0",
+    "@img/sharp-libvips-darwin-arm64": "1.0.1",
+    "@img/sharp-libvips-darwin-x64": "1.0.1",
+    "@img/sharp-libvips-linux-arm": "1.0.1",
+    "@img/sharp-libvips-linux-arm64": "1.0.1",
+    "@img/sharp-libvips-linux-s390x": "1.0.1",
+    "@img/sharp-libvips-linux-x64": "1.0.1",
+    "@img/sharp-libvips-linuxmusl-arm64": "1.0.1",
+    "@img/sharp-libvips-linuxmusl-x64": "1.0.1",
     "@img/sharp-linux-arm": "0.33.1",
     "@img/sharp-linux-arm64": "0.33.1",
     "@img/sharp-linux-s390x": "0.33.1",
@@ -163,10 +163,10 @@
   },
   "devDependencies": {
     "@emnapi/runtime": "^0.45.0",
-    "@img/sharp-libvips-dev": "1.0.0",
-    "@img/sharp-libvips-dev-wasm32": "1.0.0",
-    "@img/sharp-libvips-win32-ia32": "1.0.0",
-    "@img/sharp-libvips-win32-x64": "1.0.0",
+    "@img/sharp-libvips-dev": "1.0.1",
+    "@img/sharp-libvips-dev-wasm32": "1.0.1",
+    "@img/sharp-libvips-win32-ia32": "1.0.1",
+    "@img/sharp-libvips-win32-x64": "1.0.1",
     "@types/node": "*",
     "async": "^3.2.5",
     "cc": "^3.0.1",
@@ -187,7 +187,7 @@
   "license": "Apache-2.0",
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0",
-    "libvips": ">=8.15.0"
+    "libvips": ">=8.15.1"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"
