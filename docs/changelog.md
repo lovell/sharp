@@ -4,7 +4,7 @@
 
 Requires libvips v8.15.1
 
-### v0.33.2 - TBD
+### v0.33.2 - 12th January 2024
 
 * TypeScript: add definition for `keepMetadata`.
   [#3914](https://github.com/lovell/sharp/pull/3914)
