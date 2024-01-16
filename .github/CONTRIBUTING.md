@@ -63,7 +63,7 @@ By way of example, the `background()` method present in v0.20.0 was deprecated i
 
 ## Documentation
 
-The public API is documented with [JSDoc](http://usejsdoc.org/) annotated comments.
+The public API is documented with [JSDoc](https://jsdoc.app/) annotated comments.
 
 These can be converted to Markdown by running:
 ```sh
