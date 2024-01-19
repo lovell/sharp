@@ -451,7 +451,7 @@ describe('composite', () => {
     assert.strictEqual(info.height, 40);
   });
 
-  it('Ensure implict unpremultiply after resize but before composite', async () => {
+  it('Ensure implicit unpremultiply after resize but before composite', async () => {
     const [r, g, b, a] = await sharp({
       create: {
         width: 1, height: 1, channels: 4, background: 'saddlebrown'
