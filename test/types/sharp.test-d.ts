@@ -410,7 +410,7 @@ sharp({
 
 // Taken from API documentation at
 // https://sharp.pixelplumbing.com/api-operation#clahe
-// introducted
+// introduced
 sharp('input.jpg').clahe({ width: 10, height: 10 }).toFile('output.jpg');
 
 sharp('input.jpg').clahe({ width: 10, height: 10, maxSlope: 5 }).toFile('outfile.jpg');
