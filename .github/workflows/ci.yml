@@ -47,6 +47,17 @@ jobs:
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
             platform: darwin-x64
+          - os: macos-14
+            nodejs_arch: arm64
+            nodejs_version: "^18.17.0"
+            nodejs_version_major: 18
+            platform: darwin-arm64
+            prebuild: true
+          - os: macos-14
+            nodejs_arch: arm64
+            nodejs_version: "^20.3.0"
+            nodejs_version_major: 20
+            platform: darwin-arm64
           - os: windows-2019
             nodejs_arch: x86
             nodejs_version: "18.18.2" # pinned to avoid 18.19.0 and npm 10
@@ -193,48 +204,3 @@ jobs:
           npm_config_nodedir: emscripten
           prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
         run: cd src && ln -s ../package.json && emmake npx prebuild --platform=emscripten --arch=wasm32 --strip=0
-  macstadium-runner:
-    permissions:
-      contents: write
-    name: ${{ matrix.platform }} - Node.js ${{ matrix.nodejs_version_major }} ${{ matrix.prebuild && '- prebuild' }}
-    runs-on: macos-m1
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - nodejs_arch: x64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
-            platform: darwin-x64
-          - nodejs_arch: arm64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
-            platform: darwin-arm64
-            prebuild: true
-    defaults:
-      run:
-        shell: /usr/bin/arch -arch arm64e /bin/bash -l {0}
-    steps:
-      - name: Dependencies (Node.js)
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.nodejs_version }}
-          architecture: ${{ matrix.nodejs_arch }}
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install
-        run: npm install --build-from-source
-      - name: Test
-        run: npm test
-      - name: Test packaging
-        run: |
-          npm run package-from-local-build
-          npm pkg set "optionalDependencies.@img/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
-          npm run clean
-          npm install --ignore-scripts
-          npm test
-      - name: Prebuild
-        if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
-        env:
-          prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
-        run: cd src && ln -s ../package.json && npx prebuild
