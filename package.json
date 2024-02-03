@@ -171,18 +171,18 @@
     "async": "^3.2.5",
     "cc": "^3.0.1",
     "emnapi": "^0.45.0",
-    "exif-reader": "^2.0.0",
+    "exif-reader": "^2.0.1",
     "extract-zip": "^2.0.1",
     "icc": "^3.0.0",
-    "jsdoc-to-markdown": "^8.0.0",
+    "jsdoc-to-markdown": "^8.0.1",
     "license-checker": "^25.0.1",
     "mocha": "^10.2.0",
-    "node-addon-api": "^7.0.0",
+    "node-addon-api": "^7.1.0",
     "nyc": "^15.1.0",
-    "prebuild": "^12.1.0",
+    "prebuild": "^13.0.0",
     "semistandard": "^17.0.0",
     "tar-fs": "^3.0.4",
-    "tsd": "^0.30.3"
+    "tsd": "^0.30.4"
   },
   "license": "Apache-2.0",
   "engines": {
