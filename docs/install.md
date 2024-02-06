@@ -233,6 +233,8 @@ custom:
 
 ### electron
 
+#### electron-builder
+
 Ensure `sharp` is unpacked from the ASAR archive file using the
 [asarUnpack](https://www.electron.build/configuration/configuration.html)
 option.
@@ -247,6 +249,36 @@ option.
     ]
   }
 }
+```
+
+#### electron forge + vite
+
+> NOTE: due to this message on electron forge website (as of 06-Feb-2024)
+> it is advised to use `npm` package manager to avoid problems with electron forge and modern sharp versions:
+> ```Electron Forge currently only supports npm and Yarn Classic. If you are using Yarn >=2, please use the nodeLinker: node-modules install mode.```
+
+(sharp >=0.33.2)
+
+For sharp to work with electron forge with vite,
+rollup external option should be added to the `vite.main.config.(js|ts)`
+like this:
+
+```js
+import { defineConfig } from 'vite';
+
+// https://vitejs.dev/config
+export default defineConfig({
+  // Other parts of configuration
+  build: {
+    rollupOptions: {
+      external: [
+        "sharp"
+      ]
+    }
+  },
+  // Other parts of configuration
+});
+
 ```
 
 ## TypeScript
