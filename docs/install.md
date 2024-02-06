@@ -249,6 +249,26 @@ option.
 }
 ```
 
+### vite
+
+Ensure `sharp` is excluded from bundling via the
+[build.rollupOptions](https://vitejs.dev/config/build-options.html)
+configuration.
+
+```js
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      external: [
+        "sharp"
+      ]
+    }
+  }
+});
+```
+
 ## TypeScript
 
 TypeScript definitions are published as part of
