@@ -576,6 +576,19 @@ describe('Image metadata', function () {
     assert.strictEqual(description, 'Generic RGB Profile');
   });
 
+  it('keep existing CMYK ICC profile', async () => {
+    const data = await sharp(fixtures.inputJpgWithCmykProfile)
+      .pipelineColourspace('cmyk')
+      .toColourspace('cmyk')
+      .keepIccProfile()
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    assert.strictEqual(metadata.channels, 4);
+    const { description } = icc.parse(metadata.icc);
+    assert.strictEqual(description, 'U.S. Web Coated (SWOP) v2');
+  });
+
   it('transform to ICC profile and attach', async () => {
     const data = await sharp({ create })
       .png()

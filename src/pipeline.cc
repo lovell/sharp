@@ -776,7 +776,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         // Transform colours from embedded profile to output profile
-        if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) &&
+        if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->colourspaceInput != VIPS_INTERPRETATION_CMYK &&
           baton->withIccProfile.empty() && sharp::HasProfile(image)) {
           image = image.icc_transform("srgb", VImage::option()
             ->set("embedded", TRUE)

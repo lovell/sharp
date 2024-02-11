@@ -4,6 +4,11 @@
 
 Requires libvips v8.15.1
 
+### v0.33.3 - TBD
+
+* Ensure `keepIccProfile` retains CMYK input profiles.
+  [#3906](https://github.com/lovell/sharp/issues/3906)
+
 ### v0.33.2 - 12th January 2024
 
 * Upgrade to libvips v8.15.1 for upstream bug fixes.
