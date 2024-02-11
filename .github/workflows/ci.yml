@@ -91,12 +91,12 @@ jobs:
         run: apk add build-base git python3 font-noto --update-cache
       - name: Dependencies (Python 3.11 - macOS, Windows)
         if: contains(matrix.os, 'macos') || contains(matrix.os, 'windows')
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.12"
       - name: Dependencies (Node.js)
         if: "!contains(matrix.platform, 'linuxmusl')"
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.nodejs_version }}
           architecture: ${{ matrix.nodejs_arch }}
@@ -176,7 +176,7 @@ jobs:
       - name: Dependencies
         run: apt-get update && apt-get install -y pkg-config
       - name: Dependencies (Node.js)
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
       - name: Install
