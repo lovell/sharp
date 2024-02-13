@@ -763,7 +763,7 @@ The prebuilt binaries do not include this - see
 | [options.angle] | <code>number</code> | <code>0</code> | tile angle of rotation, must be a multiple of 90. |
 | [options.background] | <code>string</code> \| <code>Object</code> | <code>&quot;{r: 255, g: 255, b: 255, alpha: 1}&quot;</code> | background colour, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to white without transparency. |
 | [options.depth] | <code>string</code> |  | how deep to make the pyramid, possible values are `onepixel`, `onetile` or `one`, default based on layout. |
-| [options.skipBlanks] | <code>number</code> | <code>-1</code> | threshold to skip tile generation, a value 0 - 255 for 8-bit images or 0 - 65535 for 16-bit images |
+| [options.skipBlanks] | <code>number</code> | <code>-1</code> | Threshold to skip tile generation. Range is 0-255 for 8-bit images, 0-65535 for 16-bit images. Default is 5 for `google` layout, -1 (no skip) otherwise. |
 | [options.container] | <code>string</code> | <code>&quot;&#x27;fs&#x27;&quot;</code> | tile container, with value `fs` (filesystem) or `zip` (compressed file). |
 | [options.layout] | <code>string</code> | <code>&quot;&#x27;dz&#x27;&quot;</code> | filesystem layout, possible values are `dz`, `iiif`, `iiif3`, `zoomify` or `google`. |
 | [options.centre] | <code>boolean</code> | <code>false</code> | centre image in tile. |
