@@ -367,9 +367,13 @@ const data = await sharp(input)
 
 Use these PNG options for output image.
 
-By default, PNG output is full colour at 8 or 16 bits per pixel.
+By default, PNG output is full colour at 8 bits per pixel.
+
 Indexed PNG input at 1, 2 or 4 bits per pixel is converted to 8 bits per pixel.
 Set `palette` to `true` for slower, indexed PNG output.
+
+For 16 bits per pixel output, convert to `rgb16` via
+[toColourspace](/api-colour#tocolourspace).
 
 
 **Throws**:
@@ -404,6 +408,14 @@ const data = await sharp(input)
 const data = await sharp(input)
   .png({ palette: true })
   .toBuffer();
+```
+**Example**  
+```js
+// Output 16 bits per pixel RGB(A)
+const data = await sharp(input)
+ .toColourspace('rgb16')
+ .png()
+ .toBuffer();
 ```
 
 
