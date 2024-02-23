@@ -34,7 +34,7 @@
     "pnpm": ">=7.1.0"
   },
   "dependencies": {
-    "@emnapi/runtime": "^0.45.0"
+    "@emnapi/runtime": "^1.0.0"
   },
   "cpu": [
     "wasm32"
