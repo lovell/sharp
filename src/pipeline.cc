@@ -778,7 +778,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Transform colours from embedded profile to output profile
         if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->colourspaceInput != VIPS_INTERPRETATION_CMYK &&
           baton->withIccProfile.empty() && sharp::HasProfile(image)) {
-          image = image.icc_transform("srgb", VImage::option()
+          image = image.icc_transform(processingProfile, VImage::option()
             ->set("embedded", TRUE)
             ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
