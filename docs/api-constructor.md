@@ -79,14 +79,16 @@ sharp('input.jpg')
 ```
 **Example**  
 ```js
-// Read image data from readableStream,
+// Read image data from remote URL,
 // resize to 300 pixels wide,
 // emit an 'info' event with calculated dimensions
 // and finally write image data to writableStream
-var transformer = sharp()
+const { body } = fetch('https://...');
+const readableStream = Readable.fromWeb(body);
+const transformer = sharp()
   .resize(300)
-  .on('info', function(info) {
-    console.log('Image height is ' + info.height);
+  .on('info', ({ height }) => {
+    console.log(`Image height is ${height}`);
   });
 readableStream.pipe(transformer).pipe(writableStream);
 ```
