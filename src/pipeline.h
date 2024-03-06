@@ -205,7 +205,7 @@ struct PipelineBaton {
   int extractChannel;
   bool removeAlpha;
   double ensureAlpha;
-  VipsInterpretation colourspaceInput;
+  VipsInterpretation colourspacePipeline;
   VipsInterpretation colourspace;
   std::vector<int> delay;
   int loop;
@@ -369,7 +369,7 @@ struct PipelineBaton {
     extractChannel(-1),
     removeAlpha(false),
     ensureAlpha(-1.0),
-    colourspaceInput(VIPS_INTERPRETATION_LAST),
+    colourspacePipeline(VIPS_INTERPRETATION_LAST),
     colourspace(VIPS_INTERPRETATION_LAST),
     loop(-1),
     tileSize(256),

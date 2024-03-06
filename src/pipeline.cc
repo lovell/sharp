@@ -54,7 +54,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       sharp::ImageType inputImageType;
       std::tie(image, inputImageType) = sharp::OpenInput(baton->input);
       VipsAccess access = baton->input->access;
-      image = sharp::EnsureColourspace(image, baton->colourspaceInput);
+      image = sharp::EnsureColourspace(image, baton->colourspacePipeline);
 
       int nPages = baton->input->pages;
       if (nPages == -1) {
@@ -189,7 +189,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       //  - input colourspace is not specified;
       bool const shouldPreShrink = (targetResizeWidth > 0 || targetResizeHeight > 0) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold < 0.0 &&
-        baton->colourspaceInput == VIPS_INTERPRETATION_LAST && !shouldRotateBefore;
+        baton->colourspacePipeline == VIPS_INTERPRETATION_LAST && !shouldRotateBefore;
 
       if (shouldPreShrink) {
         // The common part of the shrink: the bit by which both axes must be shrunk
@@ -331,7 +331,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         sharp::HasProfile(image) &&
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
         image.interpretation() != VIPS_INTERPRETATION_GREY16 &&
-        baton->colourspaceInput != VIPS_INTERPRETATION_CMYK &&
+        baton->colourspacePipeline != VIPS_INTERPRETATION_CMYK &&
         !baton->input->ignoreIcc
       ) {
         // Convert to sRGB/P3 using embedded profile
@@ -345,7 +345,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       } else if (
         image.interpretation() == VIPS_INTERPRETATION_CMYK &&
-        baton->colourspaceInput != VIPS_INTERPRETATION_CMYK
+        baton->colourspacePipeline != VIPS_INTERPRETATION_CMYK
       ) {
         image = image.icc_transform(processingProfile, VImage::option()
           ->set("input_profile", "cmyk")
@@ -433,7 +433,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         for (unsigned int i = 0; i < baton->joinChannelIn.size(); i++) {
           baton->joinChannelIn[i]->access = access;
           std::tie(joinImage, joinImageType) = sharp::OpenInput(baton->joinChannelIn[i]);
-          joinImage = sharp::EnsureColourspace(joinImage, baton->colourspaceInput);
+          joinImage = sharp::EnsureColourspace(joinImage, baton->colourspacePipeline);
           image = image.bandjoin(joinImage);
         }
         image = image.copy(VImage::option()->set("interpretation", baton->colourspace));
@@ -643,7 +643,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::ImageType compositeImageType = sharp::ImageType::UNKNOWN;
           composite->input->access = access;
           std::tie(compositeImage, compositeImageType) = sharp::OpenInput(composite->input);
-          compositeImage = sharp::EnsureColourspace(compositeImage, baton->colourspaceInput);
+          compositeImage = sharp::EnsureColourspace(compositeImage, baton->colourspacePipeline);
           // Verify within current dimensions
           if (compositeImage.width() > image.width() || compositeImage.height() > image.height()) {
             throw vips::VError("Image to composite must have same dimensions or smaller");
@@ -744,7 +744,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         sharp::ImageType booleanImageType = sharp::ImageType::UNKNOWN;
         baton->boolean->access = access;
         std::tie(booleanImage, booleanImageType) = sharp::OpenInput(baton->boolean);
-        booleanImage = sharp::EnsureColourspace(booleanImage, baton->colourspaceInput);
+        booleanImage = sharp::EnsureColourspace(booleanImage, baton->colourspacePipeline);
         image = sharp::Boolean(image, booleanImage, baton->booleanOp);
         image = sharp::RemoveGifPalette(image);
       }
@@ -777,7 +777,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         // Transform colours from embedded profile to output profile
-        if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->colourspaceInput != VIPS_INTERPRETATION_CMYK &&
+        if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->colourspacePipeline != VIPS_INTERPRETATION_CMYK &&
           baton->withIccProfile.empty() && sharp::HasProfile(image)) {
           image = image.icc_transform(processingProfile, VImage::option()
             ->set("embedded", TRUE)
@@ -1608,10 +1608,10 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
        baton->recombMatrix[i] = sharp::AttrAsDouble(recombMatrix, i);
     }
   }
-  baton->colourspaceInput = sharp::AttrAsEnum<VipsInterpretation>(
-    options, "colourspaceInput", VIPS_TYPE_INTERPRETATION);
-  if (baton->colourspaceInput == VIPS_INTERPRETATION_ERROR) {
-    baton->colourspaceInput = VIPS_INTERPRETATION_LAST;
+  baton->colourspacePipeline = sharp::AttrAsEnum<VipsInterpretation>(
+    options, "colourspacePipeline", VIPS_TYPE_INTERPRETATION);
+  if (baton->colourspacePipeline == VIPS_INTERPRETATION_ERROR) {
+    baton->colourspacePipeline = VIPS_INTERPRETATION_LAST;
   }
   baton->colourspace = sharp::AttrAsEnum<VipsInterpretation>(options, "colourspace", VIPS_TYPE_INTERPRETATION);
   if (baton->colourspace == VIPS_INTERPRETATION_ERROR) {
