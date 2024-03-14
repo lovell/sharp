@@ -595,7 +595,7 @@ sharp({
     rgba: true,
     justify: true,
     spacing: 10,
-    wrap: 'charWord',
+    wrap: 'wordChar',
   },
 })
   .png()
