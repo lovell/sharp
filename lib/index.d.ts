@@ -1017,7 +1017,7 @@ declare namespace sharp {
         rgba?: boolean;
         /** Text line height in points. Will use the font line height if none is specified. (optional, default `0`) */
         spacing?: number;
-        /** Word wrapping style when width is provided, one of: 'word', 'char', 'charWord' (prefer char, fallback to word) or 'none' */
+        /** Word wrapping style when width is provided, one of: 'word', 'char', 'word-char' (prefer word, fallback to char) or 'none' */
         wrap?: TextWrap;
     }
 
@@ -1613,7 +1613,7 @@ declare namespace sharp {
 
     type TextAlign = 'left' | 'centre' | 'center' | 'right';
 
-    type TextWrap = 'word' | 'char' | 'charWord' | 'none';
+    type TextWrap = 'word' | 'char' | 'word-char' | 'none';
 
     type TileContainer = 'fs' | 'zip';
 
