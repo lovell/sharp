@@ -10,6 +10,10 @@ Requires libvips v8.15.1
   [#3906](https://github.com/lovell/sharp/issues/3906)
   [#4008](https://github.com/lovell/sharp/issues/4008)
 
+* Ensure `text.wrap` property can accept `word-char` as value.
+  [#4028](https://github.com/lovell/sharp/pull/4028)
+  [@yolopunk](https://github.com/yolopunk)
+
 ### v0.33.2 - 12th January 2024
 
 * Upgrade to libvips v8.15.1 for upstream bug fixes.
