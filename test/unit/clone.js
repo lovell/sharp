@@ -77,4 +77,26 @@ describe('Clone', function () {
     assert.strictEqual(0, original.listenerCount('finish'));
     assert.strictEqual(0, clone.listenerCount('finish'));
   });
+
+  it('Ensure deep clone of properties, including arrays', async () => {
+    const alpha = await sharp({
+      create: { width: 320, height: 240, channels: 3, background: 'red' }
+    }).toColourspace('b-w').png().toBuffer();
+
+    const original = sharp();
+    const joiner = original.clone().joinChannel(alpha);
+    const negater = original.clone().negate();
+
+    fs.createReadStream(fixtures.inputJpg320x240).pipe(original);
+    const joined = await joiner.png({ effort: 1 }).toBuffer();
+    const negated = await negater.png({ effort: 1 }).toBuffer();
+
+    const joinedMetadata = await sharp(joined).metadata();
+    assert.strictEqual(joinedMetadata.channels, 4);
+    assert.strictEqual(joinedMetadata.hasAlpha, true);
+
+    const negatedMetadata = await sharp(negated).metadata();
+    assert.strictEqual(negatedMetadata.channels, 3);
+    assert.strictEqual(negatedMetadata.hasAlpha, false);
+  });
 });

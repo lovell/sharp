@@ -14,6 +14,9 @@ Requires libvips v8.15.1
   [#4028](https://github.com/lovell/sharp/pull/4028)
   [@yolopunk](https://github.com/yolopunk)
 
+* Ensure `clone` takes a deep copy of existing options.
+  [#4029](https://github.com/lovell/sharp/issues/4029)
+
 ### v0.33.2 - 12th January 2024
 
 * Upgrade to libvips v8.15.1 for upstream bug fixes.
