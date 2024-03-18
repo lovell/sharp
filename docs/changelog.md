@@ -2,9 +2,11 @@
 
 ## v0.33 - *gauge*
 
-Requires libvips v8.15.1
+Requires libvips v8.15.2
 
 ### v0.33.3 - TBD
+
+* Upgrade to libvips v8.15.2 for upstream bug fixes.
 
 * Ensure `keepIccProfile` retains P3 and CMYK input profiles.
   [#3906](https://github.com/lovell/sharp/issues/3906)

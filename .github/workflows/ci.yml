@@ -169,7 +169,7 @@ jobs:
       contents: write
     name: wasm32 - prebuild
     runs-on: ubuntu-22.04
-    container: "emscripten/emsdk:3.1.51"
+    container: "emscripten/emsdk:3.1.56"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
