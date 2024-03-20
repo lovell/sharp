@@ -1244,6 +1244,8 @@ declare namespace sharp {
         effort?: number | undefined;
         /** set to '4:2:0' to use chroma subsampling, requires libvips v8.11.0 (optional, default '4:4:4') */
         chromaSubsampling?: string | undefined;
+        /** Set bitdepth to 8, 10 or 12 bit (optional, default 8) */
+        bitdepth?: 8 | 10 | 12 | undefined;
     }
 
     interface HeifOptions extends OutputOptions {
@@ -1257,6 +1259,8 @@ declare namespace sharp {
         effort?: number | undefined;
         /** set to '4:2:0' to use chroma subsampling (optional, default '4:4:4') */
         chromaSubsampling?: string | undefined;
+        /** Set bitdepth to 8, 10 or 12 bit (optional, default 8) */
+        bitdepth?: 8 | 10 | 12 | undefined;
     }
 
     interface GifOptions extends OutputOptions, AnimationOptions {
