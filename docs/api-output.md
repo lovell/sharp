@@ -617,6 +617,7 @@ sharp('input.svg')
 Use these AVIF options for output image.
 
 AVIF image sequences are not supported.
+Prebuilt binaries support a bitdepth of 8 only.
 
 
 **Throws**:
@@ -632,6 +633,7 @@ AVIF image sequences are not supported.
 | [options.lossless] | <code>boolean</code> | <code>false</code> | use lossless compression |
 | [options.effort] | <code>number</code> | <code>4</code> | CPU effort, between 0 (fastest) and 9 (slowest) |
 | [options.chromaSubsampling] | <code>string</code> | <code>&quot;&#x27;4:4:4&#x27;&quot;</code> | set to '4:2:0' to use chroma subsampling |
+| [options.bitdepth] | <code>number</code> | <code>8</code> | set bitdepth to 8, 10 or 12 bit |
 
 **Example**  
 ```js
@@ -670,6 +672,7 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
 | [options.lossless] | <code>boolean</code> | <code>false</code> | use lossless compression |
 | [options.effort] | <code>number</code> | <code>4</code> | CPU effort, between 0 (fastest) and 9 (slowest) |
 | [options.chromaSubsampling] | <code>string</code> | <code>&quot;&#x27;4:4:4&#x27;&quot;</code> | set to '4:2:0' to use chroma subsampling |
+| [options.bitdepth] | <code>number</code> | <code>8</code> | set bitdepth to 8, 10 or 12 bit |
 
 **Example**  
 ```js

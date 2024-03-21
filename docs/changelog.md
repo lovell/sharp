@@ -19,6 +19,10 @@ Requires libvips v8.15.2
 * Ensure `clone` takes a deep copy of existing options.
   [#4029](https://github.com/lovell/sharp/issues/4029)
 
+* Add `bitdepth` option to `heif` output (prebuilt binaries support 8-bit only).
+  [#4036](https://github.com/lovell/sharp/pull/4036)
+  [@mertalev](https://github.com/mertalev)
+
 ### v0.33.2 - 12th January 2024
 
 * Upgrade to libvips v8.15.1 for upstream bug fixes.
