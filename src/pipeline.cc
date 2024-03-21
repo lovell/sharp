@@ -989,7 +989,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
             ->set("effort", baton->heifEffort)
-            ->set("bitdepth", 8)
+            ->set("bitdepth", baton->heifBitdepth)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("lossless", baton->heifLossless)));
@@ -1182,7 +1182,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("Q", baton->heifQuality)
             ->set("compression", baton->heifCompression)
             ->set("effort", baton->heifEffort)
-            ->set("bitdepth", 8)
+            ->set("bitdepth", baton->heifBitdepth)
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("lossless", baton->heifLossless));
@@ -1696,6 +1696,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     options, "heifCompression", VIPS_TYPE_FOREIGN_HEIF_COMPRESSION);
   baton->heifEffort = sharp::AttrAsUint32(options, "heifEffort");
   baton->heifChromaSubsampling = sharp::AttrAsStr(options, "heifChromaSubsampling");
+  baton->heifBitdepth = sharp::AttrAsUint32(options, "heifBitdepth");
   baton->jxlDistance = sharp::AttrAsDouble(options, "jxlDistance");
   baton->jxlDecodingTier = sharp::AttrAsUint32(options, "jxlDecodingTier");
   baton->jxlEffort = sharp::AttrAsUint32(options, "jxlEffort");
