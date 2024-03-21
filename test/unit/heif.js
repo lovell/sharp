@@ -79,9 +79,16 @@ describe('HEIF', () => {
     });
   });
   it('valid bitdepth value does not throw an error', () => {
+    const { heif } = sharp.versions;
+    delete sharp.versions.heif;
     assert.doesNotThrow(() => {
       sharp().heif({ compression: 'av1', bitdepth: 12 });
     });
+    sharp.versions.heif = '1.2.3';
+    assert.throws(() => {
+      sharp().heif({ compression: 'av1', bitdepth: 10 });
+    }, /Error: Expected 8 for bitdepth when using prebuilt binaries but received 10 of type number/);
+    sharp.versions.heif = heif;
   });
   it('invalid bitdepth value should throw an error', () => {
     assert.throws(() => {
