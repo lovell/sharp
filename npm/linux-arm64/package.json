@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-linux-arm64",
-  "version": "0.33.3-rc.0",
+  "version": "0.33.3",
   "description": "Prebuilt sharp for use with Linux (glibc) 64-bit ARM",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
