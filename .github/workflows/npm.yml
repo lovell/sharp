@@ -110,7 +110,7 @@ jobs:
           script: |
             core.setOutput('semver', context.ref.replace('refs/tags/v',''))
       - name: Create package.json
-        uses: DamianReeves/write-file-action@v1.2
+        uses: DamianReeves/write-file-action@v1.3
         with:
           path: package.json
           contents: |
@@ -121,7 +121,7 @@ jobs:
               "type": "module"
             }
       - name: Create release.mjs
-        uses: DamianReeves/write-file-action@v1.2
+        uses: DamianReeves/write-file-action@v1.3
         with:
           path: release.mjs
           contents: |
