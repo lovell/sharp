@@ -176,7 +176,7 @@
     "icc": "^3.0.0",
     "jsdoc-to-markdown": "^8.0.1",
     "license-checker": "^25.0.1",
-    "mocha": "^10.3.0",
+    "mocha": "^10.4.0",
     "node-addon-api": "^8.0.0",
     "nyc": "^15.1.0",
     "prebuild": "^13.0.0",
