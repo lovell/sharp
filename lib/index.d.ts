@@ -1479,6 +1479,8 @@ declare namespace sharp {
         tile?: boolean | undefined;
         /** Set to true to avoid premultipling the image below. Equivalent to the --premultiplied vips option. */
         premultiplied?: boolean | undefined;
+        /** Set to true to read all frames/pages of an animated image. (optional, default false) */
+        animated?: boolean | undefined;
     }
 
     interface TileOptions {
