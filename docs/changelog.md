@@ -4,6 +4,12 @@
 
 Requires libvips v8.15.2
 
+### v0.33.4 - TBD
+
+* TypeScript: add missing definitions for `OverlayOptions`.
+  [#4048](https://github.com/lovell/sharp/pull/4048)
+  [@ike-gg](https://github.com/ike-gg)
+
 ### v0.33.3 - 23rd March 2024
 
 * Upgrade to libvips v8.15.2 for upstream bug fixes.
