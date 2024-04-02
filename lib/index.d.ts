@@ -1479,6 +1479,14 @@ declare namespace sharp {
         tile?: boolean | undefined;
         /** Set to true to avoid premultipling the image below. Equivalent to the --premultiplied vips option. */
         premultiplied?: boolean | undefined;
+        /** number representing the DPI for vector overlay image. (optional, default 72)*/
+        density?: number | undefined;
+        /** Set to true to read all frames/pages of an animated image. (optional, default false) */
+        animated?: boolean | undefined;
+        /** see sharp() constructor, (optional, default 'warning') */
+        failOn?: FailOnOptions | undefined;
+        /** see sharp() constructor, (optional, default 268402689) */
+        limitInputPixels?: number | boolean | undefined;
     }
 
     interface TileOptions {

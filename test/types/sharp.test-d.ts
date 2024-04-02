@@ -680,3 +680,24 @@ sharp(input)
   .keepIccProfile()
   .withIccProfile('filename')
   .withIccProfile('filename', { attach: false });
+
+// Added missing types for OverlayOptions
+// https://github.com/lovell/sharp/pull/4048
+sharp(input).composite([
+  {
+    input: 'image.gif', 
+    animated: true, 
+    limitInputPixels: 536805378, 
+    density: 144, 
+    failOn: "warning"
+  }
+])
+sharp(input).composite([
+  {
+    input: 'image.png',  
+    animated: false,
+    limitInputPixels: 178935126, 
+    density: 72, 
+    failOn: "truncated"
+  }
+])
