@@ -21,17 +21,21 @@ When using a **fit** of `cover` or `contain`, the default **position** is `centr
 
 Some of these values are based on the [object-position](https://developer.mozilla.org/en-US/docs/Web/CSS/object-position) CSS property.
 
-The experimental strategy-based approach resizes so one dimension is at its target length
+The strategy-based approach initially resizes so one dimension is at its target length
 then repeatedly ranks edge regions, discarding the edge with the lowest score based on the selected strategy.
 - `entropy`: focus on the region with the highest [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_%28information_theory%29).
 - `attention`: focus on the region with the highest luminance frequency, colour saturation and presence of skin tones.
 
-Possible interpolation kernels are:
+Possible downsizing kernels are:
 - `nearest`: Use [nearest neighbour interpolation](http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation).
+- `linear`: Use a [triangle filter](https://en.wikipedia.org/wiki/Triangular_function).
 - `cubic`: Use a [Catmull-Rom spline](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline).
 - `mitchell`: Use a [Mitchell-Netravali spline](https://www.cs.utexas.edu/~fussell/courses/cs384g-fall2013/lectures/mitchell/Mitchell.pdf).
 - `lanczos2`: Use a [Lanczos kernel](https://en.wikipedia.org/wiki/Lanczos_resampling#Lanczos_kernel) with `a=2`.
 - `lanczos3`: Use a Lanczos kernel with `a=3` (the default).
+
+When upsampling, these kernels map to `nearest`, `linear` and `cubic` interpolators.
+Downsampling kernels without a matching upsampling interpolator map to `cubic`.
 
 Only one resize can occur per pipeline.
 Previous calls to `resize` in the same pipeline will be ignored.
@@ -52,7 +56,7 @@ Previous calls to `resize` in the same pipeline will be ignored.
 | [options.fit] | <code>String</code> | <code>&#x27;cover&#x27;</code> | How the image should be resized/cropped to fit the target dimension(s), one of `cover`, `contain`, `fill`, `inside` or `outside`. |
 | [options.position] | <code>String</code> | <code>&#x27;centre&#x27;</code> | A position, gravity or strategy to use when `fit` is `cover` or `contain`. |
 | [options.background] | <code>String</code> \| <code>Object</code> | <code>{r: 0, g: 0, b: 0, alpha: 1}</code> | background colour when `fit` is `contain`, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to black without transparency. |
-| [options.kernel] | <code>String</code> | <code>&#x27;lanczos3&#x27;</code> | The kernel to use for image reduction. Use the `fastShrinkOnLoad` option to control kernel vs shrink-on-load. |
+| [options.kernel] | <code>String</code> | <code>&#x27;lanczos3&#x27;</code> | The kernel to use for image reduction and the inferred interpolator to use for upsampling. Use the `fastShrinkOnLoad` option to control kernel vs shrink-on-load. |
 | [options.withoutEnlargement] | <code>Boolean</code> | <code>false</code> | Do not scale up if the width *or* height are already less than the target dimensions, equivalent to GraphicsMagick's `>` geometry option. This may result in output dimensions smaller than the target dimensions. |
 | [options.withoutReduction] | <code>Boolean</code> | <code>false</code> | Do not scale down if the width *or* height are already greater than the target dimensions, equivalent to GraphicsMagick's `<` geometry option. This may still result in a crop to reach the target dimensions. |
 | [options.fastShrinkOnLoad] | <code>Boolean</code> | <code>true</code> | Take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern or round-down of an auto-scaled dimension. |
