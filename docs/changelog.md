@@ -6,6 +6,8 @@ Requires libvips v8.15.2
 
 ### v0.33.4 - TBD
 
+* Remove experimental status from `pipelineColourspace`.
+
 * TypeScript: add missing definitions for `OverlayOptions`.
   [#4048](https://github.com/lovell/sharp/pull/4048)
   [@ike-gg](https://github.com/ike-gg)
