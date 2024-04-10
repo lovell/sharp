@@ -66,6 +66,14 @@ describe('libvips binaries', function () {
 
       delete process.env.SHARP_IGNORE_GLOBAL_LIBVIPS;
     });
+    it('useGlobalLibvips can be forced via an env var', function () {
+      process.env.SHARP_FORCE_GLOBAL_LIBVIPS = 1;
+
+      const useGlobalLibvips = libvips.useGlobalLibvips();
+      assert.strictEqual(true, useGlobalLibvips);
+
+      delete process.env.SHARP_FORCE_GLOBAL_LIBVIPS;
+    });
   });
 
   describe('Build time platform detection', () => {

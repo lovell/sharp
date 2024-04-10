@@ -103,8 +103,13 @@ and on macOS when running Node.js under Rosetta.
 
 This module will be compiled from source at `npm install` time when:
 
-* a globally-installed libvips is detected (set the `SHARP_IGNORE_GLOBAL_LIBVIPS` environment variable to skip this), or
+* a globally-installed libvips is detected, or
 * when the `npm install --build-from-source` flag is used.
+
+The logic to detect a globally-installed libvips can be skipped by setting the
+`SHARP_IGNORE_GLOBAL_LIBVIPS` (never try to use it) or
+`SHARP_FORCE_GLOBAL_LIBVIPS` (always try to use it, even when missing or outdated)
+environment variables.
 
 Building from source requires:
 
