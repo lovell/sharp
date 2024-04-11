@@ -7,15 +7,13 @@
   <meta name="description" content="Resize large images in common formats to smaller, web-friendly JPEG, PNG, WebP, GIF and AVIF images of varying dimensions">
   <meta property="og:title" content="sharp - High performance Node.js image processing">
   <meta property="og:image" content="https://cdn.jsdelivr.net/gh/lovell/sharp@main/docs/image/sharp-logo-600.png">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; style-src 'unsafe-inline';
-    img-src 'unsafe-inline' data: https://cdn.jsdelivr.net/gh/lovell/ https://www.google-analytics.com;
-    connect-src 'self' https://www.google-analytics.com;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval'
-      https://www.google-analytics.com/analytics.js;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; object-src 'none';
+    style-src 'unsafe-inline';
+    img-src 'unsafe-inline' data: https://cdn.jsdelivr.net/gh/lovell/;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com/beacon.min.js;">
   <link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/gh/lovell/sharp@main/docs/image/sharp-logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/lovell/sharp@main/docs/image/sharp-logo-32.png">
   <link rel="author" href="/humans.txt" type="text/plain">
-  <link rel="dns-prefetch" href="https://www.google-analytics.com">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -67,7 +65,6 @@
   <div id="docute"></div>
   <script src="docute.min.js"></script>
   <script>
-    /* docute-google-analytics@1/dist/index.min.js */ !function(e,n){"object"==typeof exports&&"undefined"!=typeof module?module.exports=n():"function"==typeof define&&define.amd?define(n):(e=e||self).docuteGoogleAnalytics=n()}(this,function(){"use strict";function e(e){var n;window.ga||((n=document.createElement("script")).async=!0,n.src="https://www.google-analytics.com/analytics.js",document.body.appendChild(n),window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=Number(new Date),ga("create",e,"auto"))}function n(n,t){e(t),ga("set","page",n),ga("send","pageview")}return function(e){return{name:"@google-analytics",extend:function(t){!function(e,t){"function"==typeof e?e(function(e){n(e,t)}):e.afterEach(function(e){n(e.fullPath,t)})}(t.router,e)}}}});
     const docuteApiTitlePlugin = {
       name: 'apiTitle',
       extend(api) {
@@ -126,7 +123,6 @@
       detectSystemDarkTheme: true,
       footer: '<a href="https://pixelplumbing.com/" target="_blank">pixelplumbing.com<a>',
       plugins: [
-        docuteGoogleAnalytics('UA-13034748-12'),
         docuteApiTitlePlugin,
         docuteApiSearchPlugin
       ],
