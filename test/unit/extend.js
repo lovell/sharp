@@ -73,20 +73,6 @@ describe('Extend', function () {
         });
     });
 
-    it('extend top with mirroring uses ordered read', async () => {
-      const data = await sharp(fixtures.inputJpg)
-        .extend({
-          extendWith: 'mirror',
-          top: 1
-        })
-        .png({ compressionLevel: 0 })
-        .toBuffer();
-
-      const { width, height } = await sharp(data).metadata();
-      assert.strictEqual(2725, width);
-      assert.strictEqual(2226, height);
-    });
-
     it(`extend sides unequally with RGBA (${extendWith})`, function (done) {
       sharp(fixtures.inputPngWithTransparency16bit)
         .resize(120)
@@ -125,6 +111,39 @@ describe('Extend', function () {
           fixtures.assertSimilar(fixtures.expected(`extend-2channel-${extendWith}.png`), data, done);
         });
     });
+  });
+
+  it('extend top with mirroring uses ordered read', async () => {
+    const data = await sharp(fixtures.inputJpg)
+      .extend({
+        extendWith: 'mirror',
+        top: 1
+      })
+      .png({ compressionLevel: 0 })
+      .toBuffer();
+
+    const { width, height } = await sharp(data).metadata();
+    assert.strictEqual(2725, width);
+    assert.strictEqual(2226, height);
+  });
+
+  it('multi-page extend uses ordered read', async () => {
+    const multiPageTiff = await sharp(fixtures.inputGifAnimated, { animated: true })
+      .resize({ width: 8, height: 48 })
+      .tiff()
+      .toBuffer();
+
+    const data = await sharp(multiPageTiff, { pages: -1 })
+      .extend({
+        background: 'red',
+        top: 1
+      })
+      .png({ compressionLevel: 0 })
+      .toBuffer();
+
+    const { width, height } = await sharp(data).metadata();
+    assert.strictEqual(8, width);
+    assert.strictEqual(1470, height);
   });
 
   it('missing parameter fails', function () {

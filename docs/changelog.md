@@ -18,6 +18,9 @@ Requires libvips v8.15.2
 * Expose `bilinear` resizing kernel (and interpolator).
   [#4061](https://github.com/lovell/sharp/issues/4061)
 
+* Ensure `extend` operation stays sequential for multi-page TIFF (regression in 0.32.0).
+  [#4069](https://github.com/lovell/sharp/issues/4069)
+
 ### v0.33.3 - 23rd March 2024
 
 * Upgrade to libvips v8.15.2 for upstream bug fixes.

@@ -566,6 +566,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           std::vector<double> background;
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
 
+          image = sharp::StaySequential(image, baton->input->access, nPages > 1);
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
                 baton->extendLeft, baton->extendTop, baton->width, baton->height,
