@@ -228,26 +228,34 @@ describe('Text to image', function () {
     });
   });
 
-  it('bad width input', function () {
-    assert.throws(function () {
-      sharp({
-        text: {
-          text: 'text',
-          width: 'bad'
-        }
-      });
-    });
+  it('invalid width', () => {
+    assert.throws(
+      () => sharp({ text: { text: 'text', width: 'bad' } }),
+      /Expected positive integer for text\.width but received bad of type string/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', width: 0.1 } }),
+      /Expected positive integer for text\.width but received 0.1 of type number/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', width: -1 } }),
+      /Expected positive integer for text\.width but received -1 of type number/
+    );
   });
 
-  it('bad height input', function () {
-    assert.throws(function () {
-      sharp({
-        text: {
-          text: 'text',
-          height: 'bad'
-        }
-      });
-    });
+  it('invalid height', () => {
+    assert.throws(
+      () => sharp({ text: { text: 'text', height: 'bad' } }),
+      /Expected positive integer for text\.height but received bad of type string/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', height: 0.1 } }),
+      /Expected positive integer for text\.height but received 0.1 of type number/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', height: -1 } }),
+      /Expected positive integer for text\.height but received -1 of type number/
+    );
   });
 
   it('bad align input', function () {
@@ -272,15 +280,19 @@ describe('Text to image', function () {
     });
   });
 
-  it('bad dpi input', function () {
-    assert.throws(function () {
-      sharp({
-        text: {
-          text: 'text',
-          dpi: -10
-        }
-      });
-    });
+  it('invalid dpi', () => {
+    assert.throws(
+      () => sharp({ text: { text: 'text', dpi: 'bad' } }),
+      /Expected integer between 1 and 1000000 for text\.dpi but received bad of type string/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', dpi: 0.1 } }),
+      /Expected integer between 1 and 1000000 for text\.dpi but received 0.1 of type number/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', dpi: -1 } }),
+      /Expected integer between 1 and 1000000 for text\.dpi but received -1 of type number/
+    );
   });
 
   it('bad rgba input', function () {
@@ -294,15 +306,19 @@ describe('Text to image', function () {
     });
   });
 
-  it('bad spacing input', function () {
-    assert.throws(function () {
-      sharp({
-        text: {
-          text: 'text',
-          spacing: 'number expected'
-        }
-      });
-    });
+  it('invalid spacing', () => {
+    assert.throws(
+      () => sharp({ text: { text: 'text', spacing: 'bad' } }),
+      /Expected integer between -1000000 and 1000000 for text\.spacing but received bad of type string/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', spacing: 0.1 } }),
+      /Expected integer between -1000000 and 1000000 for text\.spacing but received 0.1 of type number/
+    );
+    assert.throws(
+      () => sharp({ text: { text: 'text', spacing: -1000001 } }),
+      /Expected integer between -1000000 and 1000000 for text\.spacing but received -1000001 of type number/
+    );
   });
 
   it('only height or dpi not both', function () {

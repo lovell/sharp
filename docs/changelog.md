@@ -21,6 +21,9 @@ Requires libvips v8.15.2
 * Ensure `extend` operation stays sequential for multi-page TIFF (regression in 0.32.0).
   [#4069](https://github.com/lovell/sharp/issues/4069)
 
+* Tighten validation of constructor `text` integer properties.
+  [#4071](https://github.com/lovell/sharp/issues/4071)
+
 ### v0.33.3 - 23rd March 2024
 
 * Upgrade to libvips v8.15.2 for upstream bug fixes.
