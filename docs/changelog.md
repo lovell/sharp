@@ -24,6 +24,10 @@ Requires libvips v8.15.2
 * Tighten validation of constructor `text` integer properties.
   [#4071](https://github.com/lovell/sharp/issues/4071)
 
+* Simplify internal StaySequential logic.
+  [#4074](https://github.com/lovell/sharp/pull/4074)
+  [@kleisauke](https://github.com/kleisauke)
+
 ### v0.33.3 - 23rd March 2024
 
 * Upgrade to libvips v8.15.2 for upstream bug fixes.
