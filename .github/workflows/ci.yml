@@ -131,12 +131,14 @@ jobs:
       matrix:
         include:
           - platform: linux-arm
+            distro: buster
             run_on_arch: armv6
             nodejs_arch: armv6l
             nodejs_hostname: unofficial-builds.nodejs.org
             nodejs_version: "18.17.0"
             nodejs_version_major: 18
           - platform: linux-s390x
+            distro: bullseye
             run_on_arch: s390x
             nodejs_arch: s390x
             nodejs_hostname: nodejs.org
@@ -147,7 +149,7 @@ jobs:
       - uses: uraimo/run-on-arch-action@v2
         with:
           arch: ${{ matrix.run_on_arch }}
-          distro: buster
+          distro: ${{ matrix.distro }}
           env: |
             prebuild_upload: "${{ startsWith(github.ref, 'refs/tags/') && secrets.GITHUB_TOKEN || '' }}"
           run: |
