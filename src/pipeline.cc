@@ -88,7 +88,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           baton->rotationAngle != 0.0);
 
       if (shouldRotateBefore) {
-        image = sharp::StaySequential(image, access,
+        image = sharp::StaySequential(image,
           rotation != VIPS_ANGLE_D0 ||
           autoRotation != VIPS_ANGLE_D0 ||
           autoFlip ||
@@ -134,7 +134,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Trim
       if (baton->trimThreshold >= 0.0) {
         MultiPageUnsupported(nPages, "Trim");
-        image = sharp::StaySequential(image, access);
+        image = sharp::StaySequential(image);
         image = sharp::Trim(image, baton->trimBackground, baton->trimThreshold, baton->trimLineArt);
         baton->trimOffsetLeft = image.xoffset();
         baton->trimOffsetTop = image.yoffset();
@@ -397,7 +397,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           ->set("kernel", baton->kernel));
       }
 
-      image = sharp::StaySequential(image, access,
+      image = sharp::StaySequential(image,
         autoRotation != VIPS_ANGLE_D0 ||
         baton->flip ||
         autoFlip ||
@@ -500,7 +500,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
             // Attention-based or Entropy-based crop
             MultiPageUnsupported(nPages, "Resize strategy");
-            image = sharp::StaySequential(image, access);
+            image = sharp::StaySequential(image);
             image = image.smartcrop(baton->width, baton->height, VImage::option()
               ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION)
               ->set("premultiplied", shouldPremultiplyAlpha)
@@ -519,7 +519,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Rotate post-extract non-90 angle
       if (!baton->rotateBeforePreExtract && baton->rotationAngle != 0.0) {
         MultiPageUnsupported(nPages, "Rotate");
-        image = sharp::StaySequential(image, access);
+        image = sharp::StaySequential(image);
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, shouldPremultiplyAlpha);
         image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
@@ -543,7 +543,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Affine transform
       if (!baton->affineMatrix.empty()) {
         MultiPageUnsupported(nPages, "Affine");
-        image = sharp::StaySequential(image, access);
+        image = sharp::StaySequential(image);
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
         vips::VInterpolate interp = vips::VInterpolate::new_from_name(
@@ -566,7 +566,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           std::vector<double> background;
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
 
-          image = sharp::StaySequential(image, baton->input->access, nPages > 1);
+          image = sharp::StaySequential(image, nPages > 1);
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
                 baton->extendLeft, baton->extendTop, baton->width, baton->height,
@@ -575,7 +575,7 @@ class PipelineWorker : public Napi::AsyncWorker {
                 VImage::option()->set("extend", baton->extendWith)->set("background", background));
         } else {
           std::vector<double> ignoredBackground(1);
-          image = sharp::StaySequential(image, baton->input->access);
+          image = sharp::StaySequential(image);
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
                 baton->extendLeft, baton->extendTop, baton->width, baton->height,
@@ -671,7 +671,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             if (across != 0 || down != 0) {
               int left;
               int top;
-              compositeImage = sharp::StaySequential(compositeImage, access).replicate(across, down);
+              compositeImage = sharp::StaySequential(compositeImage).replicate(across, down);
               if (composite->hasOffset) {
                 std::tie(left, top) = sharp::CalculateCrop(
                   compositeImage.width(), compositeImage.height(), image.width(), image.height(),
@@ -729,13 +729,13 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Apply normalisation - stretch luminance to cover full dynamic range
       if (baton->normalise) {
-        image = sharp::StaySequential(image, access);
+        image = sharp::StaySequential(image);
         image = sharp::Normalise(image, baton->normaliseLower, baton->normaliseUpper);
       }
 
       // Apply contrast limiting adaptive histogram equalization (CLAHE)
       if (baton->claheWidth != 0 && baton->claheHeight != 0) {
-        image = sharp::StaySequential(image, access);
+        image = sharp::StaySequential(image);
         image = sharp::Clahe(image, baton->claheWidth, baton->claheHeight, baton->claheMaxSlope);
       }
 
@@ -1005,7 +1005,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (!sharp::HasAlpha(image)) {
             baton->tileBackground.pop_back();
           }
-          image = sharp::StaySequential(image, access, baton->tileAngle != 0);
+          image = sharp::StaySequential(image, baton->tileAngle != 0);
           vips::VOption *options = BuildOptionsDZ(baton);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.dzsave_buffer(options));
           baton->bufferOut = static_cast<char*>(area->data);
@@ -1207,7 +1207,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (!sharp::HasAlpha(image)) {
             baton->tileBackground.pop_back();
           }
-          image = sharp::StaySequential(image, access, baton->tileAngle != 0);
+          image = sharp::StaySequential(image, baton->tileAngle != 0);
           vips::VOption *options = BuildOptionsDZ(baton);
           image.dzsave(const_cast<char*>(baton->fileOut.data()), options);
           baton->formatOut = "dz";
