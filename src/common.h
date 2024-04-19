@@ -386,7 +386,7 @@ namespace sharp {
   /*
     Ensure decoding remains sequential.
   */
-  VImage StaySequential(VImage image, VipsAccess access, bool condition = TRUE);
+  VImage StaySequential(VImage image, bool condition = TRUE);
 
 }  // namespace sharp
 
