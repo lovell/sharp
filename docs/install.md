@@ -67,15 +67,17 @@ within the same installation tree and/or using the same lockfile.
 
 Provides limited support via `--os`, `--cpu` and `--libc` flags.
 
-Example to support both Intel and ARM CPUs on macOS:
+To support macOS with Intel x64 and ARM64 CPUs:
 ```sh
 npm install --cpu=x64 --os=darwin sharp
 npm install --cpu=arm64 --os=darwin sharp
 ```
 
-Example to support both glibc and musl-based Linux:
+When the cross-target is Linux, the C standard library must be specified.
+
+To support glibc (e.g. Debian) and musl (e.g. Alpine) Linux with Intel x64 CPUs:
 ```sh
-npm install --cpu=x64 --os=linux sharp
+npm install --cpu=x64 --os=linux --libc=glibc sharp
 npm install --cpu=x64 --os=linux --libc=musl sharp
 ```
 
