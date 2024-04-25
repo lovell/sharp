@@ -32,6 +32,22 @@ If you are using another package which depends on a version of `sharp` that is n
 
 <!-- Please provide output of the above command here. -->
 
+### Does this problem relate to file caching?
+
+The default behaviour of libvips is to cache input files, which can lead to `EBUSY` or `EPERM` errors on Windows.
+Use `[sharp.cache(false)](https://sharp.pixelplumbing.com/api-utility#cache)` to switch this feature off.
+
+- [ ] Adding `sharp.cache(false)` does not fix this problem.
+
+### Does this problem relate to images appearing to have been rotated by 90 degrees?
+
+Images that contain EXIF Orientation metadata are not auto-oriented. By default, EXIF metadata is removed.
+
+- To auto-orient pixel values use the parameter-less `[rotate()](https://sharp.pixelplumbing.com/api-operation#rotate)` operation.
+- To retain EXIF Orientation use `[keepExif()](https://sharp.pixelplumbing.com/api-output#keepexif)`.
+
+- [ ] Using `rotate()` or `keepExif()` does not fix this problem.
+
 ### What are the steps to reproduce?
 
 <!-- Please enter steps to reproduce here. -->
