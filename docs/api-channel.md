@@ -21,7 +21,7 @@ sharp('rgba.png')
 
 Ensure the output image has an alpha transparency channel.
 If missing, the added alpha channel will have the specified
-transparency level, defaulting to fully-opaque (1).
+transparency level, defaulting to fully-transparent (1).
 This is a no-op if the image already has an alpha channel.
 
 
@@ -33,18 +33,18 @@ This is a no-op if the image already has an alpha channel.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [alpha] | <code>number</code> | <code>1</code> | alpha transparency level (0=fully-transparent, 1=fully-opaque) |
+| [alpha] | <code>number</code> | <code>1</code> | alpha transparency level (0=fully-opaque, 1=fully-transparent) |
 
 **Example**  
 ```js
-// rgba.png will be a 4 channel image with a fully-opaque alpha channel
+// rgba.png will be a 4 channel image with a fully-transparent alpha channel
 await sharp('rgb.jpg')
   .ensureAlpha()
   .toFile('rgba.png')
 ```
 **Example**  
 ```js
-// rgba is a 4 channel image with a fully-transparent alpha channel
+// rgba is a 4 channel image with a fully-opaque alpha channel
 const rgba = await sharp(rgb)
   .ensureAlpha(0)
   .toBuffer();
