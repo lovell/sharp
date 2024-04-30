@@ -8,6 +8,8 @@ Requires libvips v8.15.2
 
 * Remove experimental status from `pipelineColourspace`.
 
+* Reduce default concurrency when musl thread over-subscription detected.
+
 * TypeScript: add missing definitions for `OverlayOptions`.
   [#4048](https://github.com/lovell/sharp/pull/4048)
   [@ike-gg](https://github.com/ike-gg)
