@@ -75,7 +75,7 @@ namespace sharp {
       Napi::Buffer<char> buffer = input.Get("buffer").As<Napi::Buffer<char>>();
       descriptor->bufferLength = buffer.Length();
       descriptor->buffer = buffer.Data();
-      descriptor->isBuffer = TRUE;
+      descriptor->isBuffer = true;
     }
     descriptor->failOn = AttrAsEnum<VipsFailOn>(input, "failOn", VIPS_TYPE_FAIL_ON);
     // Density for vector-based input
@@ -384,7 +384,7 @@ namespace sharp {
               ->set("access", descriptor->access)
               ->set("fail_on", descriptor->failOn);
             if (descriptor->unlimited && ImageTypeSupportsUnlimited(imageType)) {
-              option->set("unlimited", TRUE);
+              option->set("unlimited", true);
             }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
@@ -488,7 +488,7 @@ namespace sharp {
               ->set("access", descriptor->access)
               ->set("fail_on", descriptor->failOn);
             if (descriptor->unlimited && ImageTypeSupportsUnlimited(imageType)) {
-              option->set("unlimited", TRUE);
+              option->set("unlimited", true);
             }
             if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
               option->set("dpi", descriptor->density);
@@ -768,7 +768,7 @@ namespace sharp {
         int *timeout = VIPS_NEW(im, int);
         *timeout = seconds;
         g_signal_connect(im, "eval", G_CALLBACK(VipsProgressCallBack), timeout);
-        vips_image_set_progress(im, TRUE);
+        vips_image_set_progress(im, true);
       }
     }
   }
@@ -778,7 +778,7 @@ namespace sharp {
   */
   void VipsProgressCallBack(VipsImage *im, VipsProgress *progress, int *timeout) {
     if (*timeout > 0 && progress->run >= *timeout) {
-      vips_image_set_kill(im, TRUE);
+      vips_image_set_kill(im, true);
       vips_error("timeout", "%d%% complete", progress->percent);
       *timeout = 0;
     }

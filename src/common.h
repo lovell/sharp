@@ -79,12 +79,12 @@ namespace sharp {
       buffer(nullptr),
       failOn(VIPS_FAIL_ON_WARNING),
       limitInputPixels(0x3FFF * 0x3FFF),
-      unlimited(FALSE),
+      unlimited(false),
       access(VIPS_ACCESS_RANDOM),
       bufferLength(0),
-      isBuffer(FALSE),
+      isBuffer(false),
       density(72.0),
-      ignoreIcc(FALSE),
+      ignoreIcc(false),
       rawDepth(VIPS_FORMAT_UCHAR),
       rawChannels(0),
       rawWidth(0),
@@ -103,9 +103,9 @@ namespace sharp {
       textWidth(0),
       textHeight(0),
       textAlign(VIPS_ALIGN_LOW),
-      textJustify(FALSE),
+      textJustify(false),
       textDpi(72),
-      textRgba(FALSE),
+      textRgba(false),
       textSpacing(0),
       textWrap(VIPS_TEXT_WRAP_WORD),
       textAutofitDpi(0) {}
@@ -386,7 +386,7 @@ namespace sharp {
   /*
     Ensure decoding remains sequential.
   */
-  VImage StaySequential(VImage image, bool condition = TRUE);
+  VImage StaySequential(VImage image, bool condition = true);
 
 }  // namespace sharp
 

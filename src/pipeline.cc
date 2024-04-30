@@ -70,8 +70,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Calculate angle of rotation
       VipsAngle rotation = VIPS_ANGLE_D0;
       VipsAngle autoRotation = VIPS_ANGLE_D0;
-      bool autoFlip = FALSE;
-      bool autoFlop = FALSE;
+      bool autoFlip = false;
+      bool autoFlop = false;
 
       if (baton->useExifOrientation) {
         // Rotate and flip image according to Exif orientation
@@ -104,17 +104,17 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
         if (autoFlip) {
           image = image.flip(VIPS_DIRECTION_VERTICAL);
-          autoFlip = FALSE;
+          autoFlip = false;
         } else if (baton->flip) {
           image = image.flip(VIPS_DIRECTION_VERTICAL);
-          baton->flip = FALSE;
+          baton->flip = false;
         }
         if (autoFlop) {
           image = image.flip(VIPS_DIRECTION_HORIZONTAL);
-          autoFlop = FALSE;
+          autoFlop = false;
         } else if (baton->flop) {
           image = image.flip(VIPS_DIRECTION_HORIZONTAL);
-          baton->flop = FALSE;
+          baton->flop = false;
         }
         if (rotation != VIPS_ANGLE_D0) {
           if (rotation != VIPS_ANGLE_D180) {
@@ -126,7 +126,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         if (baton->rotationAngle != 0.0) {
           MultiPageUnsupported(nPages, "Rotate");
           std::vector<double> background;
-          std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, FALSE);
+          std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, false);
           image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background)).copy_memory();
         }
       }
@@ -337,7 +337,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Convert to sRGB/P3 using embedded profile
         try {
           image = image.icc_transform(processingProfile, VImage::option()
-            ->set("embedded", TRUE)
+            ->set("embedded", true)
             ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
@@ -781,7 +781,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->colourspacePipeline != VIPS_INTERPRETATION_CMYK &&
           baton->withIccProfile.empty() && sharp::HasProfile(image)) {
           image = image.icc_transform(processingProfile, VImage::option()
-            ->set("embedded", TRUE)
+            ->set("embedded", true)
             ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         }
@@ -812,7 +812,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         try {
           image = image.icc_transform(const_cast<char*>(baton->withIccProfile.data()), VImage::option()
             ->set("input_profile", processingProfile)
-            ->set("embedded", TRUE)
+            ->set("embedded", true)
             ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
@@ -1339,16 +1339,16 @@ class PipelineWorker : public Napi::AsyncWorker {
   std::tuple<VipsAngle, bool, bool>
   CalculateExifRotationAndFlip(int const exifOrientation) {
     VipsAngle rotate = VIPS_ANGLE_D0;
-    bool flip = FALSE;
-    bool flop = FALSE;
+    bool flip = false;
+    bool flop = false;
     switch (exifOrientation) {
       case 6: rotate = VIPS_ANGLE_D90; break;
       case 3: rotate = VIPS_ANGLE_D180; break;
       case 8: rotate = VIPS_ANGLE_D270; break;
-      case 2: flop = TRUE; break;  // flop 1
-      case 7: flip = TRUE; rotate = VIPS_ANGLE_D90; break;  // flip 6
-      case 4: flop = TRUE; rotate = VIPS_ANGLE_D180; break;  // flop 3
-      case 5: flip = TRUE; rotate = VIPS_ANGLE_D270; break;  // flip 8
+      case 2: flop = true; break;  // flop 1
+      case 7: flip = true; rotate = VIPS_ANGLE_D90; break;  // flip 6
+      case 4: flop = true; rotate = VIPS_ANGLE_D180; break;  // flop 3
+      case 5: flip = true; rotate = VIPS_ANGLE_D270; break;  // flip 8
     }
     return std::make_tuple(rotate, flip, flop);
   }
@@ -1396,7 +1396,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     std::string suffix;
     if (baton->tileFormat == "png") {
       std::vector<std::pair<std::string, std::string>> options {
-        {"interlace", baton->pngProgressive ? "TRUE" : "FALSE"},
+        {"interlace", baton->pngProgressive ? "true" : "false"},
         {"compression", std::to_string(baton->pngCompressionLevel)},
         {"filter", baton->pngAdaptiveFiltering ? "all" : "none"}
       };
@@ -1405,25 +1405,25 @@ class PipelineWorker : public Napi::AsyncWorker {
       std::vector<std::pair<std::string, std::string>> options {
         {"Q", std::to_string(baton->webpQuality)},
         {"alpha_q", std::to_string(baton->webpAlphaQuality)},
-        {"lossless", baton->webpLossless ? "TRUE" : "FALSE"},
-        {"near_lossless", baton->webpNearLossless ? "TRUE" : "FALSE"},
-        {"smart_subsample", baton->webpSmartSubsample ? "TRUE" : "FALSE"},
+        {"lossless", baton->webpLossless ? "true" : "false"},
+        {"near_lossless", baton->webpNearLossless ? "true" : "false"},
+        {"smart_subsample", baton->webpSmartSubsample ? "true" : "false"},
         {"preset", vips_enum_nick(VIPS_TYPE_FOREIGN_WEBP_PRESET, baton->webpPreset)},
-        {"min_size", baton->webpMinSize ? "TRUE" : "FALSE"},
-        {"mixed", baton->webpMixed ? "TRUE" : "FALSE"},
+        {"min_size", baton->webpMinSize ? "true" : "false"},
+        {"mixed", baton->webpMixed ? "true" : "false"},
         {"effort", std::to_string(baton->webpEffort)}
       };
       suffix = AssembleSuffixString(".webp", options);
     } else {
       std::vector<std::pair<std::string, std::string>> options {
         {"Q", std::to_string(baton->jpegQuality)},
-        {"interlace", baton->jpegProgressive ? "TRUE" : "FALSE"},
+        {"interlace", baton->jpegProgressive ? "true" : "false"},
         {"subsample_mode", baton->jpegChromaSubsampling == "4:4:4" ? "off" : "on"},
-        {"trellis_quant", baton->jpegTrellisQuantisation ? "TRUE" : "FALSE"},
+        {"trellis_quant", baton->jpegTrellisQuantisation ? "true" : "false"},
         {"quant_table", std::to_string(baton->jpegQuantisationTable)},
-        {"overshoot_deringing", baton->jpegOvershootDeringing ? "TRUE": "FALSE"},
-        {"optimize_scans", baton->jpegOptimiseScans ? "TRUE": "FALSE"},
-        {"optimize_coding", baton->jpegOptimiseCoding ? "TRUE": "FALSE"}
+        {"overshoot_deringing", baton->jpegOvershootDeringing ? "true": "false"},
+        {"optimize_scans", baton->jpegOptimiseScans ? "true": "false"},
+        {"optimize_coding", baton->jpegOptimiseCoding ? "true": "false"}
       };
       std::string extname = baton->tileLayout == VIPS_FOREIGN_DZ_LAYOUT_DZ ? ".jpeg" : ".jpg";
       suffix = AssembleSuffixString(extname, options);
