@@ -10,8 +10,8 @@ try {
     log(msg);
     log('Attempting to build from source via node-gyp');
     try {
-      require('node-addon-api');
-      log('Found node-addon-api');
+      const addonApi = require('node-addon-api');
+      log(`Found node-addon-api ${addonApi.version || ''}`);
     } catch (err) {
       log('Please add node-addon-api to your dependencies');
       return;
