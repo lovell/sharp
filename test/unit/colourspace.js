@@ -111,14 +111,14 @@ describe('Colour space conversion', function () {
       .resize(320, 240)
       .toColourspace('cmyk')
       .pipelineColourspace('cmyk')
-      .withIccProfile(fixtures.path('U.S. Web Coated (SWOP) v2.icc'))
+      .withIccProfile(fixtures.path('XCMYK 2017.icc'))
       .raw()
       .toBuffer();
 
     const [c, m, y, k] = data;
     assert.deepStrictEqual(
       { c, m, y, k },
-      { c: 25, m: 255, y: 255, k: 4 }
+      { c: 1, m: 239, y: 227, k: 5 }
     );
   });
 
@@ -127,7 +127,7 @@ describe('Colour space conversion', function () {
       .resize(320, 240)
       .toColourspace('cmyk')
       .pipelineColourspace('cmyk')
-      .withIccProfile(fixtures.path('U.S. Web Coated (SWOP) v2.icc'))
+      .withIccProfile(fixtures.path('XCMYK 2017.icc'))
       .negate()
       .toBuffer(function (err, data, info) {
         if (err) throw err;
