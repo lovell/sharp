@@ -357,11 +357,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Flatten(image, baton->flattenBackground);
       }
 
-      // Negate the colours in the image
-      if (baton->negate) {
-        image = sharp::Negate(image, baton->negateAlpha);
-      }
-
       // Gamma encoding (darken)
       if (baton->gamma >= 1 && baton->gamma <= 3) {
         image = sharp::Gamma(image, 1.0 / baton->gamma);
@@ -821,6 +816,12 @@ class PipelineWorker : public Napi::AsyncWorker {
       } else if (baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) {
         image = sharp::SetProfile(image, inputProfile);
       }
+
+      // Negate the colours in the image
+      if (baton->negate) {
+        image = sharp::Negate(image, baton->negateAlpha);
+      }
+
       // Override EXIF Orientation tag
       if (baton->withMetadataOrientation != -1) {
         image = sharp::SetExifOrientation(image, baton->withMetadataOrientation);

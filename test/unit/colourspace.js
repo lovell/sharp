@@ -106,6 +106,43 @@ describe('Colour space conversion', function () {
     );
   });
 
+  it('CMYK profile to CMYK profile conversion using perceptual intent', async () => {
+    const data = await sharp(fixtures.inputTiffFogra)
+      .resize(320, 240)
+      .toColourspace('cmyk')
+      .pipelineColourspace('cmyk')
+      .withIccProfile(fixtures.path('XCMYK 2017.icc'))
+      .raw()
+      .toBuffer();
+
+    const [c, m, y, k] = data;
+    assert.deepStrictEqual(
+      { c, m, y, k },
+      { c: 1, m: 239, y: 227, k: 5 }
+    );
+  });
+
+  it('CMYK profile to CMYK profile with negate', (done) => {
+    sharp(fixtures.inputTiffFogra)
+      .resize(320, 240)
+      .toColourspace('cmyk')
+      .pipelineColourspace('cmyk')
+      .withIccProfile(fixtures.path('XCMYK 2017.icc'))
+      .negate()
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('tiff', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(
+          fixtures.expected('colourspace.cmyk-to-cmyk-negated.tif'),
+          data,
+          { threshold: 0 },
+          done
+        );
+      });
+  });
+
   it('From sRGB with RGB16 pipeline, resize with gamma, to sRGB', function (done) {
     sharp(fixtures.inputPngGradients)
       .pipelineColourspace('rgb16')

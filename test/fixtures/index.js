@@ -114,6 +114,7 @@ module.exports = {
   inputTiffUncompressed: getPath('uncompressed_tiff.tiff'), // https://code.google.com/archive/p/imagetestsuite/wikis/TIFFTestSuite.wiki file: 0c84d07e1b22b76f24cccc70d8788e4a.tif
   inputTiff8BitDepth: getPath('8bit_depth.tiff'),
   inputTifftagPhotoshop: getPath('tifftag-photoshop.tiff'), // https://github.com/lovell/sharp/issues/1600
+  inputTiffFogra: getPath('fogra-0-100-100-0.tif'), // https://github.com/lovell/sharp/issues/4045
 
   inputJp2: getPath('relax.jp2'), // https://www.fnordware.com/j2k/relax.jp2
   inputGif: getPath('Crash_test.gif'), // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
