@@ -179,7 +179,7 @@
     "mocha": "^10.4.0",
     "node-addon-api": "^8.0.0",
     "nyc": "^15.1.0",
-    "prebuild": "^13.0.0",
+    "prebuild": "^13.0.1",
     "semistandard": "^17.0.0",
     "tar-fs": "^3.0.6",
     "tsd": "^0.31.0"
