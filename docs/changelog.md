@@ -4,7 +4,7 @@
 
 Requires libvips v8.15.2
 
-### v0.33.4 - TBD
+### v0.33.4 - 16th May 2024
 
 * Remove experimental status from `pipelineColourspace`.
 
