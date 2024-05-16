@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp",
-  "version": "0.33.3",
+  "version": "0.33.4-rc.0",
   "private": "true",
   "workspaces": [
     "darwin-arm64",
