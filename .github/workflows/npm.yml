@@ -39,26 +39,26 @@ jobs:
             runtime: bun
 
           - name: darwin-x64-node-npm
-            runs-on: macos-11
+            runs-on: macos-12
             runtime: node
             package-manager: npm
           - name: darwin-x64-node-pnpm
-            runs-on: macos-11
+            runs-on: macos-12
             runtime: node
             package-manager: pnpm
           - name: darwin-x64-node-yarn
-            runs-on: macos-11
+            runs-on: macos-12
             runtime: node
             package-manager: yarn
           - name: darwin-x64-node-yarn-pnp
-            runs-on: macos-11
+            runs-on: macos-12
             runtime: node
             package-manager: yarn-pnp
           - name: darwin-x64-deno
-            runs-on: macos-11
+            runs-on: macos-12
             runtime: deno
           - name: darwin-x64-bun
-            runs-on: macos-11
+            runs-on: macos-12
             runtime: bun
 
           - name: win32-x64-node-npm

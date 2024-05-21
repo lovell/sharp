@@ -36,13 +36,13 @@ jobs:
             container: node:20-alpine3.18
             nodejs_version_major: 20
             platform: linuxmusl-x64
-          - os: macos-11
+          - os: macos-12
             nodejs_arch: x64
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
             platform: darwin-x64
             prebuild: true
-          - os: macos-11
+          - os: macos-12
             nodejs_arch: x64
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
