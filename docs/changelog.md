@@ -4,6 +4,12 @@
 
 Requires libvips v8.15.2
 
+### v0.33.5 - TBD
+
+* Ensure option to force use of a globally-installed libvips works correctly.
+  [#4111](https://github.com/lovell/sharp/pull/4111)
+  [@project0](https://github.com/project0)
+
 ### v0.33.4 - 16th May 2024
 
 * Remove experimental status from `pipelineColourspace`.

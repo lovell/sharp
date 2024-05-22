@@ -293,3 +293,6 @@ GitHub: https://github.com/mertalev
 
 Name: Adriaan Meuris
 GitHub: https://github.com/adriaanmeuris
+
+Name: Richard Hillmann
+GitHub: https://github.com/project0

@@ -30,7 +30,7 @@ try {
     }
   };
 
-  if (useGlobalLibvips()) {
+  if (useGlobalLibvips(log)) {
     buildFromSource(`Detected globally-installed libvips v${globalLibvipsVersion()}`);
   } else if (process.env.npm_config_build_from_source) {
     buildFromSource('Detected --build-from-source flag');

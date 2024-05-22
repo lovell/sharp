@@ -72,6 +72,15 @@ describe('libvips binaries', function () {
       const useGlobalLibvips = libvips.useGlobalLibvips();
       assert.strictEqual(true, useGlobalLibvips);
 
+      let logged = false;
+      const logger = function (message) {
+        assert.strictEqual(message, 'Detected SHARP_FORCE_GLOBAL_LIBVIPS, skipping search for globally-installed libvips');
+        logged = true;
+      };
+      const useGlobalLibvipsWithLogger = libvips.useGlobalLibvips(logger);
+      assert.strictEqual(true, useGlobalLibvipsWithLogger);
+      assert.strictEqual(true, logged);
+
       delete process.env.SHARP_FORCE_GLOBAL_LIBVIPS;
     });
   });
