@@ -72,6 +72,9 @@ describe('libvips binaries', function () {
       const useGlobalLibvips = libvips.useGlobalLibvips();
       assert.strictEqual(true, useGlobalLibvips);
 
+      const useGlobalLibvipsQuiet = libvips.useGlobalLibvips(true);
+      assert.strictEqual(true, useGlobalLibvipsQuiet);
+
       delete process.env.SHARP_FORCE_GLOBAL_LIBVIPS;
     });
   });
