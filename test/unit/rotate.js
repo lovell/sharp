@@ -417,6 +417,7 @@ describe('Rotation', function () {
   it('Flip and flop', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320)
+      .flip()
       .flop()
       .toBuffer(function (err, data, info) {
         if (err) throw err;

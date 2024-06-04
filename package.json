@@ -88,7 +88,8 @@
     "Mart Jansink <m.jansink@gmail.com>",
     "Lachlan Newman <lachnewman007@gmail.com>",
     "Dennis Beatty <dennis@dcbeatty.com>",
-    "Ingvar Stepanyan <me@rreverser.com>"
+    "Ingvar Stepanyan <me@rreverser.com>",
+    "Don Denton <don@happycollision.com>"
   ],
   "scripts": {
     "install": "node install/check",
