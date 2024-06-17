@@ -849,6 +849,11 @@ class PipelineWorker : public Napi::AsyncWorker {
       image = sharp::SetAnimationProperties(
         image, nPages, targetPageHeight, baton->delay, baton->loop);
 
+      if (image.get_typeof(VIPS_META_PAGE_HEIGHT) == G_TYPE_INT) {
+        baton->pageHeightOut = image.get_int(VIPS_META_PAGE_HEIGHT);
+        baton->pagesOut = image.get_int(VIPS_META_N_PAGES);
+      }
+
       // Output
       sharp::SetTimeout(image, baton->timeoutSeconds);
       if (baton->fileOut.empty()) {
@@ -1283,6 +1288,10 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
       if (baton->input->textAutofitDpi) {
         info.Set("textAutofitDpi", static_cast<uint32_t>(baton->input->textAutofitDpi));
+      }
+      if (baton->pageHeightOut) {
+        info.Set("pageHeight", static_cast<int32_t>(baton->pageHeightOut));
+        info.Set("pages", static_cast<int32_t>(baton->pagesOut));
       }
 
       if (baton->bufferOutLength > 0) {

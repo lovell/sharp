@@ -24,7 +24,7 @@ A `Promise` is returned when `callback` is not provided.
 | Param | Type | Description |
 | --- | --- | --- |
 | fileOut | <code>string</code> | the path to write the image data to. |
-| [callback] | <code>function</code> | called on completion with two arguments `(err, info)`. `info` contains the output image `format`, `size` (bytes), `width`, `height`, `channels` and `premultiplied` (indicating if premultiplication was used). When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`. When using the attention crop strategy also contains `attentionX` and `attentionY`, the focal point of the cropped region. May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text. |
+| [callback] | <code>function</code> | called on completion with two arguments `(err, info)`. `info` contains the output image `format`, `size` (bytes), `width`, `height`, `channels` and `premultiplied` (indicating if premultiplication was used). When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`. When using the attention crop strategy also contains `attentionX` and `attentionY`, the focal point of the cropped region. Animated output will also contain `pageHeight` and `pages`. May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text. |
 
 **Example**  
 ```js
@@ -59,6 +59,7 @@ See [withMetadata](#withmetadata) for control over this.
 - `info` contains the output image `format`, `size` (bytes), `width`, `height`,
 `channels` and `premultiplied` (indicating if premultiplication was used).
 When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
+Animated output will also contain `pageHeight` and `pages`.
 May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text.
 
 A `Promise` is returned when `callback` is not provided.

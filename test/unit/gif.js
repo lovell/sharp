@@ -39,7 +39,7 @@ describe('GIF input', () => {
       })
   );
 
-  it('Animated GIF first page to PNG', () =>
+  it('Animated GIF first page to non-animated GIF', () =>
     sharp(fixtures.inputGifAnimated)
       .toBuffer({ resolveWithObject: true })
       .then(({ data, info }) => {
@@ -49,10 +49,12 @@ describe('GIF input', () => {
         assert.strictEqual(80, info.width);
         assert.strictEqual(80, info.height);
         assert.strictEqual(4, info.channels);
+        assert.strictEqual(undefined, info.pages);
+        assert.strictEqual(undefined, info.pageHeight);
       })
   );
 
-  it('Animated GIF all pages to PNG "toilet roll"', () =>
+  it('Animated GIF round trip', () =>
     sharp(fixtures.inputGifAnimated, { pages: -1 })
       .toBuffer({ resolveWithObject: true })
       .then(({ data, info }) => {
@@ -62,6 +64,8 @@ describe('GIF input', () => {
         assert.strictEqual(80, info.width);
         assert.strictEqual(2400, info.height);
         assert.strictEqual(4, info.channels);
+        assert.strictEqual(30, info.pages);
+        assert.strictEqual(80, info.pageHeight);
       })
   );
 

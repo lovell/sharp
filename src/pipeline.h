@@ -43,6 +43,8 @@ struct PipelineBaton {
   std::string fileOut;
   void *bufferOut;
   size_t bufferOutLength;
+  int pageHeightOut;
+  int pagesOut;
   std::vector<Composite *> composite;
   std::vector<sharp::InputDescriptor *> joinChannelIn;
   int topOffsetPre;
@@ -226,6 +228,8 @@ struct PipelineBaton {
   PipelineBaton():
     input(nullptr),
     bufferOutLength(0),
+    pageHeightOut(0),
+    pagesOut(0),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),
