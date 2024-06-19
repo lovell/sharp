@@ -13,6 +13,9 @@ Requires libvips v8.15.2
   [#4111](https://github.com/lovell/sharp/pull/4111)
   [@project0](https://github.com/project0)
 
+* Ensure `sharp.format.heif` includes only AVIF when using prebuilt binaries.
+  [#4132](https://github.com/lovell/sharp/issues/4132)
+
 ### v0.33.4 - 16th May 2024
 
 * Remove experimental status from `pipelineColourspace`.
