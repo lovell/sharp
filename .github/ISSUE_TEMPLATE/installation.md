@@ -43,7 +43,7 @@ and try again before opening an issue.
 
 <!-- Please place an [x] in the relevant box to confirm. -->
 
-- [ ] I am using npm >= 9.6.5 with `--include=optional`
+- [ ] I am using npm >= 10.1.0 with `--include=optional`
 - [ ] I am using yarn >= 3.2.0
 - [ ] I am using pnpm >= 7.1.0 with `--no-optional=false`
 - [ ] I am using Deno
