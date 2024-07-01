@@ -177,13 +177,13 @@
     "icc": "^3.0.0",
     "jsdoc-to-markdown": "^8.0.1",
     "license-checker": "^25.0.1",
-    "mocha": "^10.4.0",
+    "mocha": "^10.5.2",
     "node-addon-api": "^8.0.0",
-    "nyc": "^15.1.0",
+    "nyc": "^17.0.0",
     "prebuild": "^13.0.1",
     "semistandard": "^17.0.0",
     "tar-fs": "^3.0.6",
-    "tsd": "^0.31.0"
+    "tsd": "^0.31.1"
   },
   "license": "Apache-2.0",
   "engines": {
