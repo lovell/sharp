@@ -16,6 +16,10 @@ Requires libvips v8.15.2
 * Ensure `sharp.format.heif` includes only AVIF when using prebuilt binaries.
   [#4132](https://github.com/lovell/sharp/issues/4132)
 
+* Add support to recomb operation for 4x4 matrices.
+  [#4147](https://github.com/lovell/sharp/pull/4147)
+  [@ton11797](https://github.com/ton11797)
+
 ### v0.33.4 - 16th May 2024
 
 * Remove experimental status from `pipelineColourspace`.

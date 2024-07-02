@@ -609,7 +609,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Recomb
-      if (baton->recombMatrix != NULL) {
+      if (!baton->recombMatrix.empty()) {
         image = sharp::Recomb(image, baton->recombMatrix);
       }
 
@@ -1613,10 +1613,11 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     }
   }
   if (options.Has("recombMatrix")) {
-    baton->recombMatrix = std::unique_ptr<double[]>(new double[9]);
     Napi::Array recombMatrix = options.Get("recombMatrix").As<Napi::Array>();
-    for (unsigned int i = 0; i < 9; i++) {
-       baton->recombMatrix[i] = sharp::AttrAsDouble(recombMatrix, i);
+    unsigned int matrixElements = recombMatrix.Length();
+    baton->recombMatrix.resize(matrixElements);
+    for (unsigned int i = 0; i < matrixElements; i++) {
+      baton->recombMatrix[i] = sharp::AttrAsDouble(recombMatrix, i);
     }
   }
   baton->colourspacePipeline = sharp::AttrAsEnum<VipsInterpretation>(

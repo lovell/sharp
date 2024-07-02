@@ -295,6 +295,13 @@ sharp('input.gif')
     [0.2392, 0.4696, 0.0912],
   ])
 
+  .recomb([
+    [1,0,0,0],
+    [0,1,0,0],
+    [0,0,1,0],
+    [0,0,0,1],
+  ])
+
   .modulate({ brightness: 2 })
   .modulate({ hue: 180 })
   .modulate({ lightness: 10 })

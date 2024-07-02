@@ -223,7 +223,7 @@ struct PipelineBaton {
   VipsForeignDzDepth tileDepth;
   std::string tileId;
   std::string tileBasename;
-  std::unique_ptr<double[]> recombMatrix;
+  std::vector<double> recombMatrix;
 
   PipelineBaton():
     input(nullptr),

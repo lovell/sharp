@@ -580,7 +580,7 @@ Recombine the image with the specified matrix.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| inputMatrix | <code>Array.&lt;Array.&lt;number&gt;&gt;</code> | 3x3 Recombination matrix |
+| inputMatrix | <code>Array.&lt;Array.&lt;number&gt;&gt;</code> | 3x3 or 4x4 Recombination matrix |
 
 **Example**  
 ```js
