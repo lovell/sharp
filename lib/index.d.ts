@@ -571,11 +571,11 @@ declare namespace sharp {
 
         /**
          * Recomb the image with the specified matrix.
-         * @param inputMatrix 3x3 Recombination matrix
+         * @param inputMatrix 3x3 Recombination matrix or 4x4 Recombination matrix
          * @throws {Error} Invalid parameters
          * @returns A sharp instance that can be used to chain operations
          */
-        recomb(inputMatrix: Matrix3x3): Sharp;
+        recomb(inputMatrix: Matrix3x3 | Matrix4x4): Sharp;
 
         /**
          * Transforms the image using brightness, saturation, hue rotation and lightness.
@@ -1730,6 +1730,7 @@ declare namespace sharp {
 
     type Matrix2x2 = [[number, number], [number, number]];
     type Matrix3x3 = [[number, number, number], [number, number, number], [number, number, number]];
+    type Matrix4x4 = [[number, number, number, number], [number, number, number, number], [number, number, number, number], [number, number, number, number]];
 }
 
 export = sharp;
