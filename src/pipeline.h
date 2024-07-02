@@ -224,6 +224,7 @@ struct PipelineBaton {
   std::string tileId;
   std::string tileBasename;
   std::unique_ptr<double[]> recombMatrix;
+  int recombMatrixSize;
 
   PipelineBaton():
     input(nullptr),

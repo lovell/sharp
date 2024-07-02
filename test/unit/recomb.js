@@ -121,6 +121,29 @@ describe('Recomb', function () {
       });
   });
 
+  it('applies opacity 30% to the image', function (done) {
+    const output = fixtures.path('output.recomb-opacity.png');
+    sharp(fixtures.inputPngWithTransparent)
+      .recomb([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 0.3]
+      ])
+      .toFile(output, function (err, info) {
+        if (err) throw err;
+        assert.strictEqual('png', info.format);
+        assert.strictEqual(48, info.width);
+        assert.strictEqual(48, info.height);
+        fixtures.assertMaxColourDistance(
+          output,
+          fixtures.expected('d-opacity-30.png'),
+          17
+        );
+        done();
+      });
+  });
+
   describe('invalid matrix specification', function () {
     it('missing', function () {
       assert.throws(function () {

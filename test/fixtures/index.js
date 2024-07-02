@@ -139,6 +139,7 @@ module.exports = {
 
   testPattern: getPath('test-pattern.png'),
 
+  inputPngWithTransparent: getPath('d.png'),
   // Path for tests requiring human inspection
   path: getPath,
 
