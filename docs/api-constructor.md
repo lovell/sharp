@@ -33,6 +33,7 @@ where the overall height is the `pageHeight` multiplied by the number of `pages`
 | [options.failOn] | <code>string</code> | <code>&quot;&#x27;warning&#x27;&quot;</code> | When to abort processing of invalid pixel data, one of (in order of sensitivity, least to most): 'none', 'truncated', 'error', 'warning'. Higher levels imply lower levels. Invalid metadata will always abort. |
 | [options.limitInputPixels] | <code>number</code> \| <code>boolean</code> | <code>268402689</code> | Do not process input images where the number of pixels  (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.  An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). |
 | [options.unlimited] | <code>boolean</code> | <code>false</code> | Set this to `true` to remove safety features that help prevent memory exhaustion (JPEG, PNG, SVG, HEIF). |
+| [options.autoOrient] | <code>boolean</code> | <code>false</code> | Set this to `true` to rotate/flip the image to match EXIF `Orientation`, if any. |
 | [options.sequentialRead] | <code>boolean</code> | <code>true</code> | Set this to `false` to use random access rather than sequential read. Some operations will do this automatically. |
 | [options.density] | <code>number</code> | <code>72</code> | number representing the DPI for vector images in the range 1 to 100000. |
 | [options.ignoreIcc] | <code>number</code> | <code>false</code> | should the embedded ICC profile, if any, be ignored. |

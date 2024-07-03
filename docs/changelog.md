@@ -16,6 +16,10 @@ Requires libvips v8.16.0
 
 * Expose WebP `smartDeblock` output option.
 
+* Add `autoOrient` operation and constructor option.
+  [#4151](https://github.com/lovell/sharp/pull/4151)
+  [@happycollision](https://github.com/happycollision)
+
 * TypeScript: Ensure channel counts use the correct range.
   [#4197](https://github.com/lovell/sharp/pull/4197)
   [@DavidVaness](https://github.com/DavidVaness)

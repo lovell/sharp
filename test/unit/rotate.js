@@ -9,46 +9,110 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Rotation', function () {
-  ['Landscape', 'Portrait'].forEach(function (orientation) {
-    [1, 2, 3, 4, 5, 6, 7, 8].forEach(function (exifTag) {
-      const input = fixtures[`inputJpgWith${orientation}Exif${exifTag}`];
-      const expectedOutput = fixtures.expected(`${orientation}_${exifTag}-out.jpg`);
-      it(`Auto-rotate ${orientation} image with EXIF Orientation ${exifTag}`, function (done) {
-        const [expectedWidth, expectedHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
-        sharp(input)
-          .rotate()
-          .toBuffer(function (err, data, info) {
-            if (err) throw err;
-            assert.strictEqual(info.width, expectedWidth);
-            assert.strictEqual(info.height, expectedHeight);
-            fixtures.assertSimilar(expectedOutput, data, done);
+  ['autoOrient', 'constructor'].forEach(function (rotateMethod) {
+    describe(`Auto orientation via ${rotateMethod}:`, () => {
+      const options = rotateMethod === 'constructor' ? { autoOrient: true } : {};
+
+      ['Landscape', 'Portrait'].forEach(function (orientation) {
+        [1, 2, 3, 4, 5, 6, 7, 8].forEach(function (exifTag) {
+          const input = fixtures[`inputJpgWith${orientation}Exif${exifTag}`];
+          const expectedOutput = fixtures.expected(`${orientation}_${exifTag}-out.jpg`);
+          it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate`, function (done) {
+            const [expectedWidth, expectedHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
+
+            const img = sharp(input, options);
+            rotateMethod === 'autoOrient' && img.autoOrient();
+
+            img.toBuffer(function (err, data, info) {
+              if (err) throw err;
+              assert.strictEqual(info.width, expectedWidth);
+              assert.strictEqual(info.height, expectedHeight);
+              fixtures.assertSimilar(expectedOutput, data, done);
+            });
           });
-      });
-      it(`Auto-rotate then resize ${orientation} image with EXIF Orientation ${exifTag}`, function (done) {
-        const [expectedWidth, expectedHeight] = orientation === 'Landscape' ? [320, 240] : [320, 427];
-        sharp(input)
-          .rotate()
-          .resize({ width: 320 })
-          .toBuffer(function (err, data, info) {
-            if (err) throw err;
-            assert.strictEqual(info.width, expectedWidth);
-            assert.strictEqual(info.height, expectedHeight);
-            fixtures.assertSimilar(expectedOutput, data, done);
+
+          it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then resize`, function (done) {
+            const [expectedWidth, expectedHeight] = orientation === 'Landscape' ? [320, 240] : [320, 427];
+
+            const img = sharp(input, options);
+            rotateMethod === 'autoOrient' && img.autoOrient();
+
+            img.resize({ width: 320 })
+              .toBuffer(function (err, data, info) {
+                if (err) throw err;
+                assert.strictEqual(info.width, expectedWidth);
+                assert.strictEqual(info.height, expectedHeight);
+                fixtures.assertSimilar(expectedOutput, data, done);
+              });
           });
-      });
-      it(`Resize then auto-rotate ${orientation} image with EXIF Orientation ${exifTag}`, function (done) {
-        const [expectedWidth, expectedHeight] = orientation === 'Landscape'
-          ? (exifTag < 5) ? [320, 240] : [320, 240]
-          : [320, 427];
-        sharp(input)
-          .resize({ width: 320 })
-          .rotate()
-          .toBuffer(function (err, data, info) {
-            if (err) throw err;
-            assert.strictEqual(info.width, expectedWidth);
-            assert.strictEqual(info.height, expectedHeight);
-            fixtures.assertSimilar(expectedOutput, data, done);
+
+          if (rotateMethod !== 'constructor') {
+            it(`${orientation} image with EXIF Orientation ${exifTag}: Resize then auto-rotate`, function (done) {
+              const [expectedWidth, expectedHeight] = orientation === 'Landscape'
+                ? (exifTag < 5) ? [320, 240] : [320, 240]
+                : [320, 427];
+
+              const img = sharp(input, options)
+                .resize({ width: 320 });
+
+              rotateMethod === 'autoOrient' && img.autoOrient();
+              img.toBuffer(function (err, data, info) {
+                if (err) throw err;
+                assert.strictEqual(info.width, expectedWidth);
+                assert.strictEqual(info.height, expectedHeight);
+                fixtures.assertSimilar(expectedOutput, data, done);
+              });
+            });
+          }
+
+          [true, false].forEach((doResize) => {
+            [90, 180, 270, 45].forEach(function (angle) {
+              const [inputWidth, inputHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
+              const expectedOutput = fixtures.expected(`${orientation}_${exifTag}_rotate${angle}-out.jpg`);
+              it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then rotate ${angle} ${doResize ? 'and resize' : ''}`, function (done) {
+                const [width, height] = (angle === 45 ? [742, 742] : [inputWidth, inputHeight]).map((x) => doResize ? Math.floor(x / 1.875) : x);
+                const [expectedWidth, expectedHeight] = angle % 180 === 0 ? [width, height] : [height, width];
+
+                const img = sharp(input, options);
+                rotateMethod === 'autoOrient' && img.autoOrient();
+
+                img.rotate(angle);
+                doResize && img.resize(expectedWidth);
+
+                img.toBuffer(function (err, data, info) {
+                  if (err) throw err;
+                  assert.strictEqual(info.width, expectedWidth);
+                  assert.strictEqual(info.height, expectedHeight);
+                  fixtures.assertSimilar(expectedOutput, data, done);
+                });
+              });
+            });
+
+            [[true, true], [true, false], [false, true]].forEach(function ([flip, flop]) {
+              const [inputWidth, inputHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
+              const flipFlopFileName = [flip && 'flip', flop && 'flop'].filter(Boolean).join('_');
+              const flipFlopTestName = [flip && 'flip', flop && 'flop'].filter(Boolean).join(' & ');
+              it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then ${flipFlopTestName} ${doResize ? 'and resize' : ''}`, function (done) {
+                const expectedOutput = fixtures.expected(`${orientation}_${exifTag}_${flipFlopFileName}-out.jpg`);
+
+                const img = sharp(input, options);
+
+                rotateMethod === 'autoOrient' && img.autoOrient();
+
+                flip && img.flip();
+                flop && img.flop();
+                doResize && img.resize(orientation === 'Landscape' ? 320 : 240);
+
+                img.toBuffer(function (err, data, info) {
+                  if (err) throw err;
+                  assert.strictEqual(info.width, inputWidth / (doResize ? 1.875 : 1));
+                  assert.strictEqual(info.height, inputHeight / (doResize ? 1.875 : 1));
+                  fixtures.assertSimilar(expectedOutput, data, done);
+                });
+              });
+            });
           });
+        });
       });
     });
   });
@@ -372,10 +436,34 @@ describe('Rotation', function () {
     let warningMessage = '';
     const s = sharp();
     s.on('warning', function (msg) { warningMessage = msg; });
-    s.rotate();
+    s.rotate(90);
     assert.strictEqual(warningMessage, '');
-    s.rotate();
+    s.rotate(180);
     assert.strictEqual(warningMessage, 'ignoring previous rotate options');
+  });
+
+  it('Multiple rotate: last one wins (cardinal)', function (done) {
+    sharp(fixtures.inputJpg)
+      .rotate(45)
+      .rotate(90)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(2225, info.width);
+        assert.strictEqual(2725, info.height);
+        done();
+      });
+  });
+
+  it('Multiple rotate: last one wins (non cardinal)', function (done) {
+    sharp(fixtures.inputJpg)
+      .rotate(90)
+      .rotate(45)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(3500, info.width);
+        assert.strictEqual(3500, info.height);
+        done();
+      });
   });
 
   it('Flip - vertical', function (done) {
@@ -546,4 +634,11 @@ describe('Rotation', function () {
     assert.strictEqual(width, 3);
     assert.strictEqual(height, 6);
   });
+
+  it('Invalid autoOrient throws', () =>
+    assert.throws(
+      () => sharp({ autoOrient: 'fail' }),
+      /Expected boolean for autoOrient but received fail of type string/
+    )
+  );
 });

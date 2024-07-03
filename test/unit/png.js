@@ -138,6 +138,10 @@ describe('PNG', function () {
 
     const { size, ...metadata } = await sharp(data).metadata();
     assert.deepStrictEqual(metadata, {
+      autoOrient: {
+        height: 68,
+        width: 68
+      },
       format: 'png',
       width: 68,
       height: 68,

@@ -702,7 +702,8 @@ sharp(input).composite([
     animated: true, 
     limitInputPixels: 536805378, 
     density: 144, 
-    failOn: "warning"
+    failOn: "warning",
+    autoOrient: true
   }
 ])
 sharp(input).composite([
@@ -719,3 +720,7 @@ const colour: sharp.Colour = '#fff';
 const color: sharp.Color = '#fff';
 sharp({ pdfBackground: colour });
 sharp({ pdfBackground: color });
+
+sharp({ autoOrient: true });
+sharp({ autoOrient: false });
+sharp().autoOrient();

@@ -109,7 +109,6 @@ struct PipelineBaton {
   int claheWidth;
   int claheHeight;
   int claheMaxSlope;
-  bool useExifOrientation;
   int angle;
   double rotationAngle;
   std::vector<double> rotationBackground;
@@ -282,7 +281,6 @@ struct PipelineBaton {
     claheWidth(0),
     claheHeight(0),
     claheMaxSlope(3),
-    useExifOrientation(false),
     angle(0),
     rotationAngle(0.0),
     rotationBackground{ 0.0, 0.0, 0.0, 255.0 },

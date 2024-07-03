@@ -72,15 +72,9 @@ image
 ```
 **Example**  
 ```js
-// Based on EXIF rotation metadata, get the right-side-up width and height:
-
-const size = getNormalSize(await sharp(input).metadata());
-
-function getNormalSize({ width, height, orientation }) {
-  return (orientation || 0) >= 5
-    ? { width: height, height: width }
-    : { width, height };
-}
+// Get dimensions taking EXIF Orientation into account.
+const { autoOrient } = await sharp(input).metadata();
+const { width, height } = autoOrient;
 ```
 
 

@@ -242,6 +242,15 @@ class MetadataWorker : public Napi::AsyncWorker {
       if (baton->orientation > 0) {
         info.Set("orientation", baton->orientation);
       }
+      Napi::Object autoOrient = Napi::Object::New(env);
+      info.Set("autoOrient", autoOrient);
+      if (baton->orientation >= 5) {
+        autoOrient.Set("width", baton->height);
+        autoOrient.Set("height", baton->width);
+      } else {
+        autoOrient.Set("width", baton->width);
+        autoOrient.Set("height", baton->height);
+      }
       if (baton->exifLength > 0) {
         info.Set("exif", Napi::Buffer<char>::NewOrCopy(env, baton->exif, baton->exifLength, sharp::FreeCallback));
       }

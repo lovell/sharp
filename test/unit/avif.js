@@ -23,6 +23,10 @@ describe('AVIF', () => {
     const { size, ...metadata } = await sharp(data)
       .metadata();
     assert.deepStrictEqual(metadata, {
+      autoOrient: {
+        height: 13,
+        width: 32
+      },
       channels: 3,
       chromaSubsampling: '4:2:0',
       density: 72,
@@ -48,6 +52,10 @@ describe('AVIF', () => {
     const { size, ...metadata } = await sharp(data)
       .metadata();
     assert.deepStrictEqual(metadata, {
+      autoOrient: {
+        height: 26,
+        width: 32
+      },
       channels: 3,
       compression: 'av1',
       depth: 'uchar',
@@ -72,6 +80,10 @@ describe('AVIF', () => {
     const { size, ...metadata } = await sharp(data)
       .metadata();
     assert.deepStrictEqual(metadata, {
+      autoOrient: {
+        height: 13,
+        width: 32
+      },
       channels: 3,
       compression: 'av1',
       depth: 'uchar',
@@ -97,6 +109,10 @@ describe('AVIF', () => {
     const { size, ...metadata } = await sharp(data)
       .metadata();
     assert.deepStrictEqual(metadata, {
+      autoOrient: {
+        height: 300,
+        width: 10
+      },
       channels: 4,
       compression: 'av1',
       depth: 'uchar',
@@ -123,6 +139,10 @@ describe('AVIF', () => {
     const { size, ...metadata } = await sharp(data)
       .metadata();
     assert.deepStrictEqual(metadata, {
+      autoOrient: {
+        height: 26,
+        width: 32
+      },
       channels: 3,
       compression: 'av1',
       depth: 'uchar',
