@@ -609,8 +609,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Recomb
-      if (baton->recombMatrix != NULL) {
-        image = sharp::Recomb(image, baton->recombMatrix, baton->recombMatrixSize);
+      if (!baton->recombMatrix.empty()) {
+        image = sharp::Recomb(image, baton->recombMatrix);
       }
 
       // Modulate
@@ -1613,14 +1613,9 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     }
   }
   if (options.Has("recombMatrix")) {
-    baton->recombMatrixSize = sharp::AttrAsInt32(options, "recombMatrixSize");
-    if (baton->recombMatrixSize == 3) {
-      baton->recombMatrix = std::unique_ptr<double[]>(new double[9]);
-    } else {
-      baton->recombMatrix = std::unique_ptr<double[]>(new double[16]);
-    }
     Napi::Array recombMatrix = options.Get("recombMatrix").As<Napi::Array>();
-    unsigned int matrixElements = baton->recombMatrixSize * baton->recombMatrixSize;
+    unsigned int matrixElements = recombMatrix.Length();
+    baton->recombMatrix.resize(matrixElements);
     for (unsigned int i = 0; i < matrixElements; i++) {
       baton->recombMatrix[i] = sharp::AttrAsDouble(recombMatrix, i);
     }

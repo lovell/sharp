@@ -95,7 +95,7 @@ namespace sharp {
    * Recomb with a Matrix of the given bands/channel size.
    * Eg. RGB will be a 3x3 matrix.
    */
-  VImage Recomb(VImage image, std::unique_ptr<double[]> const &matrix, int recombMatrixSize);
+  VImage Recomb(VImage image, std::vector<double> const &matrix);
 
   /*
    * Modulate brightness, saturation, hue and lightness

@@ -183,14 +183,15 @@ namespace sharp {
    * Recomb with a Matrix of the given bands/channel size.
    * Eg. RGB will be a 3x3 matrix.
    */
-  VImage Recomb(VImage image, std::unique_ptr<double[]> const &matrix, int recombMatrixSize) {
-    double *m = matrix.get();
+  VImage Recomb(VImage image, std::vector<double> const& matrix) {
+    const double* m = matrix.data();
+    void *matrix_data = const_cast<void*>(static_cast<const void*>(m));
     image = image.colourspace(VIPS_INTERPRETATION_sRGB);
-    if (recombMatrixSize == 3) {
+    if (matrix.size() == 9) {
       return image
         .recomb(image.bands() == 3
           ? VImage::new_from_memory(
-            m, 9 * sizeof(double), 3, 3, 1, VIPS_FORMAT_DOUBLE
+            matrix_data, 9 * sizeof(double), 3, 3, 1, VIPS_FORMAT_DOUBLE
           )
           : VImage::new_matrixv(4, 4,
             m[0], m[1], m[2], 0.0,
@@ -199,7 +200,7 @@ namespace sharp {
             0.0, 0.0, 0.0, 1.0));
     } else {
       return image
-        .recomb(VImage::new_from_memory(m, 16 * sizeof(double), 4, 4, 1, VIPS_FORMAT_DOUBLE));
+        .recomb(VImage::new_from_memory(matrix_data, 16 * sizeof(double), 4, 4, 1, VIPS_FORMAT_DOUBLE));
     }
   }
 
