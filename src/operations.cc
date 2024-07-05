@@ -164,10 +164,10 @@ namespace sharp {
    */
   VImage Convolve(VImage image, int const width, int const height,
     double const scale, double const offset,
-    std::unique_ptr<double[]> const &kernel_v
+    std::vector<double> const &kernel_v
   ) {
     VImage kernel = VImage::new_from_memory(
-      kernel_v.get(),
+      static_cast<void*>(const_cast<double*>(kernel_v.data())),
       width * height * sizeof(double),
       width,
       height,

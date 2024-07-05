@@ -197,7 +197,7 @@ struct PipelineBaton {
   std::unordered_map<std::string, std::string> withExif;
   bool withExifMerge;
   int timeoutSeconds;
-  std::unique_ptr<double[]> convKernel;
+  std::vector<double> convKernel;
   int convKernelWidth;
   int convKernelHeight;
   double convKernelScale;

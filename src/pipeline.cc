@@ -1606,7 +1606,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     baton->convKernelScale = sharp::AttrAsDouble(kernel, "scale");
     baton->convKernelOffset = sharp::AttrAsDouble(kernel, "offset");
     size_t const kernelSize = static_cast<size_t>(baton->convKernelWidth * baton->convKernelHeight);
-    baton->convKernel = std::unique_ptr<double[]>(new double[kernelSize]);
+    baton->convKernel.resize(kernelSize);
     Napi::Array kdata = kernel.Get("kernel").As<Napi::Array>();
     for (unsigned int i = 0; i < kernelSize; i++) {
       baton->convKernel[i] = sharp::AttrAsDouble(kdata, i);
