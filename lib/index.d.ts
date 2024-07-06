@@ -364,24 +364,72 @@ declare namespace sharp {
         //#region Operation functions
 
         /**
-         * Rotate the output image by either an explicit angle or auto-orient based on the EXIF Orientation tag.
+         * Rotate the output image by either an explicit angle
+         * or auto-orient based on the EXIF `Orientation` tag.
          *
-         * If an angle is provided, it is converted to a valid positive degree rotation. For example, -450 will produce a 270deg rotation.
+         * If an angle is provided, it is converted to a valid positive degree rotation.
+         * For example, `-450` will produce a 270 degree rotation.
          *
-         * When rotating by an angle other than a multiple of 90, the background colour can be provided with the background option.
+         * When rotating by an angle other than a multiple of 90,
+         * the background colour can be provided with the `background` option.
          *
-         * If no angle is provided, it is determined from the EXIF data. Mirroring is supported and may infer the use of a flip operation.
+         * If no angle is provided, it is determined from the EXIF data.
+         * Mirroring is supported and may infer the use of a flip operation.
          *
-         * The use of rotate implies the removal of the EXIF Orientation tag, if any.
+         * The use of `rotate` without an angle will remove the EXIF `Orientation` tag, if any.
          *
-         * Method order is important when both rotating and extracting regions, for example rotate(x).extract(y) will produce a different result to extract(y).rotate(x).
-         * @param angle angle of rotation. (optional, default auto)
-         * @param options if present, is an Object with optional attributes.
+         * Only one rotation can occur per pipeline (aside from an initial call without
+         * arguments to orient via EXIF data). Previous calls to `rotate` in the same
+         * pipeline will be ignored.
+         *
+         * Multi-page images can only be rotated by 180 degrees.
+         *
+         * Method order is important when rotating, resizing and/or extracting regions,
+         * for example `.rotate(x).extract(y)` will produce a different result to `.extract(y).rotate(x)`.
+         *
+         * @example
+         * const pipeline = sharp()
+         *   .rotate()
+         *   .resize(null, 200)
+         *   .toBuffer(function (err, outputBuffer, info) {
+         *     // outputBuffer contains 200px high JPEG image data,
+         *     // auto-rotated using EXIF Orientation tag
+         *     // info.width and info.height contain the dimensions of the resized image
+         *   });
+         * readableStream.pipe(pipeline);
+         *
+         * @example
+         * const rotateThenResize = await sharp(input)
+         *   .rotate(90)
+         *   .resize({ width: 16, height: 8, fit: 'fill' })
+         *   .toBuffer();
+         * const resizeThenRotate = await sharp(input)
+         *   .resize({ width: 16, height: 8, fit: 'fill' })
+         *   .rotate(90)
+         *   .toBuffer();
+         *
+         * @param {number} [angle=auto] angle of rotation.
+         * @param {Object} [options] - if present, is an Object with optional attributes.
+         * @param {string|Object} [options.background="#000000"] parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
+         * @returns {Sharp}
          * @throws {Error} Invalid parameters
-         * @returns A sharp instance that can be used to chain operations
          */
         rotate(angle?: number, options?: RotateOptions): Sharp;
 
+        /**
+         * Alias for calling `rotate()` with no arguments, which orients the image based
+         * on EXIF orientsion.
+         *
+         * This operation is aliased to emphasize its purpose, helping to remove any
+         * confusion between rotation and orientation.
+         *
+         * @example
+         * const output = await sharp(input).autoOrient().toBuffer();
+         *
+         * @returns {Sharp}
+         */
+        autoOrient(): Sharp
+  
         /**
          * Flip the image about the vertical Y axis. This always occurs after rotation, if any.
          * The use of flip implies the removal of the EXIF Orientation tag, if any.

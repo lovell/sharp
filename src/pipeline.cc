@@ -67,9 +67,9 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Rotate and flip image according to Exif orientation
         std::tie(autoRotation, autoFlip, autoFlop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
         image = sharp::RemoveExifOrientation(image);
-      } else {
-        rotation = CalculateAngleRotation(baton->angle);
       }
+
+      rotation = CalculateAngleRotation(baton->angle);
 
       // Rotate pre-extract
       bool const shouldRotateBefore = baton->rotateBeforePreExtract &&
@@ -92,18 +92,14 @@ class PipelineWorker : public Napi::AsyncWorker {
           image = image.rot(autoRotation);
           autoRotation = VIPS_ANGLE_D0;
         }
-        if (autoFlip) {
+        if (autoFlip != baton->flip) {
           image = image.flip(VIPS_DIRECTION_VERTICAL);
           autoFlip = false;
-        } else if (baton->flip) {
-          image = image.flip(VIPS_DIRECTION_VERTICAL);
           baton->flip = false;
         }
-        if (autoFlop) {
+        if (autoFlop != baton->flop) {
           image = image.flip(VIPS_DIRECTION_HORIZONTAL);
           autoFlop = false;
-        } else if (baton->flop) {
-          image = image.flip(VIPS_DIRECTION_HORIZONTAL);
           baton->flop = false;
         }
         if (rotation != VIPS_ANGLE_D0) {
@@ -396,11 +392,11 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.rot(autoRotation);
       }
       // Mirror vertically (up-down) about the x-axis
-      if (baton->flip || autoFlip) {
+      if (baton->flip != autoFlip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
       }
       // Mirror horizontally (left-right) about the y-axis
-      if (baton->flop || autoFlop) {
+      if (baton->flop != autoFlop) {
         image = image.flip(VIPS_DIRECTION_HORIZONTAL);
       }
       // Rotate post-extract 90-angle

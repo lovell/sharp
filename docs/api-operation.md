@@ -15,8 +15,9 @@ Mirroring is supported and may infer the use of a flip operation.
 
 The use of `rotate` without an angle will remove the EXIF `Orientation` tag, if any.
 
-Only one rotation can occur per pipeline.
-Previous calls to `rotate` in the same pipeline will be ignored.
+Only one rotation can occur per pipeline (aside from an initial call without
+arguments to orient via EXIF data). Previous calls to `rotate` in the same
+pipeline will be ignored.
 
 Multi-page images can only be rotated by 180 degrees.
 
@@ -57,6 +58,22 @@ const resizeThenRotate = await sharp(input)
   .resize({ width: 16, height: 8, fit: 'fill' })
   .rotate(90)
   .toBuffer();
+```
+
+
+## autoOrient
+> autoOrient() ⇒ <code>Sharp</code>
+
+Alias for calling `rotate()` with no arguments, which orients the image based
+on EXIF orientsion.
+
+This operation is aliased to emphasize its purpose, helping to remove any
+confusion between rotation and orientation.
+
+
+**Example**  
+```js
+const output = await sharp(input).autoOrient().toBuffer();
 ```
 
 
