@@ -63,41 +63,46 @@ describe('Rotation', function () {
           });
       });
 
-      [90, 180, 270, 45].forEach(function (angle) {
-        const [inputWidth, inputHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
-        const expectedOutput = fixtures.expected(`${orientation}_${exifTag}_rotate${angle}-out.jpg`);
-        it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then rotate ${angle}`, function (done) {
-          const [width, height] = angle === 45 ? [742, 742] : [inputWidth, inputHeight];
-          const [expectedWidth, expectedHeight] = angle % 180 === 0 ? [width, height] : [height, width];
+      [true, false].forEach((doResize) => {
+        [90, 180, 270, 45].forEach(function (angle) {
+          const [inputWidth, inputHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
+          const expectedOutput = fixtures.expected(`${orientation}_${exifTag}_rotate${angle}-out.jpg`);
+          it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then rotate ${angle} ${doResize ? 'and resize' : ''}`, function (done) {
+            const [width, height] = (angle === 45 ? [742, 742] : [inputWidth, inputHeight]).map((x) => doResize ? Math.floor(x / 1.875) : x);
+            const [expectedWidth, expectedHeight] = angle % 180 === 0 ? [width, height] : [height, width];
 
-          sharp(input)
-            .rotate()
-            .rotate(angle)
-            .toBuffer(function (err, data, info) {
+            const img = sharp(input)
+              .rotate()
+              .rotate(angle);
+            doResize && img.resize(expectedWidth);
+
+            img.toBuffer(function (err, data, info) {
               if (err) throw err;
               assert.strictEqual(info.width, expectedWidth);
               assert.strictEqual(info.height, expectedHeight);
               fixtures.assertSimilar(expectedOutput, data, done);
             });
+          });
         });
-      });
 
-      [[true, true], [true, false], [false, true]].forEach(function ([flip, flop]) {
-        const [inputWidth, inputHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
-        const flipFlopFileName = [flip && 'flip', flop && 'flop'].filter(Boolean).join('_');
-        const flipFlopTestName = [flip && 'flip', flop && 'flop'].filter(Boolean).join(' & ');
-        it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then ${flipFlopTestName}`, function (done) {
-          const expectedOutput = fixtures.expected(`${orientation}_${exifTag}_${flipFlopFileName}-out.jpg`);
+        [[true, true], [true, false], [false, true]].forEach(function ([flip, flop]) {
+          const [inputWidth, inputHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
+          const flipFlopFileName = [flip && 'flip', flop && 'flop'].filter(Boolean).join('_');
+          const flipFlopTestName = [flip && 'flip', flop && 'flop'].filter(Boolean).join(' & ');
+          it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then ${flipFlopTestName} ${doResize ? 'and resize' : ''}`, function (done) {
+            const expectedOutput = fixtures.expected(`${orientation}_${exifTag}_${flipFlopFileName}-out.jpg`);
 
-          const img = sharp(input).rotate();
-          flip && img.flip();
-          flop && img.flop();
+            const img = sharp(input).rotate();
+            flip && img.flip();
+            flop && img.flop();
+            doResize && img.resize(orientation === 'Landscape' ? 320 : 240);
 
-          img.toBuffer(function (err, data, info) {
-            if (err) throw err;
-            assert.strictEqual(info.width, inputWidth);
-            assert.strictEqual(info.height, inputHeight);
-            fixtures.assertSimilar(expectedOutput, data, done);
+            img.toBuffer(function (err, data, info) {
+              if (err) throw err;
+              assert.strictEqual(info.width, inputWidth / (doResize ? 1.875 : 1));
+              assert.strictEqual(info.height, inputHeight / (doResize ? 1.875 : 1));
+              fixtures.assertSimilar(expectedOutput, data, done);
+            });
           });
         });
       });
