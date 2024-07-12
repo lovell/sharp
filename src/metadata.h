@@ -9,6 +9,8 @@
 
 #include "./common.h"
 
+typedef std::vector<std::pair<std::string, std::string>> MetadataComments;
+
 struct MetadataBaton {
   // Input
   sharp::InputDescriptor *input;
@@ -47,6 +49,7 @@ struct MetadataBaton {
   size_t xmpLength;
   char *tifftagPhotoshop;
   size_t tifftagPhotoshopLength;
+  MetadataComments comments;
   std::string err;
 
   MetadataBaton():
