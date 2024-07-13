@@ -949,6 +949,13 @@ declare namespace sharp {
 
     interface SharpOptions {
         /**
+         * Auto-orient based on the EXIF `Orientation` tag, if present.
+         * Mirroring is supported and may infer the use of a flip operation.
+         *
+         * Using this option will remove the EXIF `Orientation` tag, if any.
+         */
+        autoOrient?: boolean;
+        /**
          *  When to abort processing of invalid pixel data, one of (in order of sensitivity):
          *  'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels, invalid metadata will always abort. (optional, default 'warning')
          */
