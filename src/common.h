@@ -33,6 +33,7 @@ namespace sharp {
   struct InputDescriptor {  // NOLINT(runtime/indentation_namespace)
     std::string name;
     std::string file;
+    bool autoOrient;
     char *buffer;
     VipsFailOn failOn;
     uint64_t limitInputPixels;
@@ -73,6 +74,7 @@ namespace sharp {
     std::vector<double> pdfBackground;
 
     InputDescriptor():
+      autoOrient(false),
       buffer(nullptr),
       failOn(VIPS_FAIL_ON_WARNING),
       limitInputPixels(0x3FFF * 0x3FFF),

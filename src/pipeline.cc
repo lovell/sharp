@@ -627,6 +627,32 @@ class PipelineWorker : public Napi::AsyncWorker {
           composite->input->access = access;
           std::tie(compositeImage, compositeImageType) = sharp::OpenInput(composite->input);
           compositeImage = sharp::EnsureColourspace(compositeImage, baton->colourspacePipeline);
+
+          if (composite->input->autoOrient) {
+            // Calculate angle of rotation
+            VipsAngle compositeAutoRotation = VIPS_ANGLE_D0;
+            bool compositeAutoFlip = false;
+            bool compositeAutoFlop = false;
+
+            // Rotate and flip image according to Exif orientation
+            std::tie(compositeAutoRotation, compositeAutoFlip, compositeAutoFlop) =
+              CalculateExifRotationAndFlip(sharp::ExifOrientation(compositeImage));
+
+            compositeImage = sharp::RemoveExifOrientation(compositeImage);
+
+            if (compositeAutoRotation != VIPS_ANGLE_D0) {
+              compositeImage = compositeImage.rot(compositeAutoRotation);
+            }
+            // Mirror vertically (up-down) about the x-axis
+            if (compositeAutoFlip) {
+              compositeImage = compositeImage.flip(VIPS_DIRECTION_VERTICAL);
+            }
+            // Mirror horizontally (left-right) about the y-axis
+            if (compositeAutoFlop) {
+              compositeImage = compositeImage.flip(VIPS_DIRECTION_HORIZONTAL);
+            }
+          }
+
           // Verify within current dimensions
           if (compositeImage.width() > image.width() || compositeImage.height() > image.height()) {
             throw vips::VError("Image to composite must have same dimensions or smaller");
