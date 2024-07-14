@@ -441,9 +441,9 @@ describe('Rotation', function () {
     let warningMessage = '';
     const s = sharp();
     s.on('warning', function (msg) { warningMessage = msg; });
-    s.rotate();
+    s.rotate(90);
     assert.strictEqual(warningMessage, '');
-    s.rotate();
+    s.rotate(180);
     assert.strictEqual(warningMessage, 'ignoring previous rotate options');
   });
 
