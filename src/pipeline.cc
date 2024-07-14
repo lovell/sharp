@@ -63,7 +63,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       bool autoFlip = false;
       bool autoFlop = false;
 
-      if (baton->useExifOrientation) {
+      if (baton->input->autoOrient) {
         // Rotate and flip image according to Exif orientation
         std::tie(autoRotation, autoFlip, autoFlop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
         image = sharp::RemoveExifOrientation(image);
@@ -1589,7 +1589,6 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");
   baton->claheHeight = sharp::AttrAsUint32(options, "claheHeight");
   baton->claheMaxSlope = sharp::AttrAsUint32(options, "claheMaxSlope");
-  baton->useExifOrientation = sharp::AttrAsBool(options, "useExifOrientation");
   baton->angle = sharp::AttrAsInt32(options, "angle");
   baton->rotationAngle = sharp::AttrAsDouble(options, "rotationAngle");
   baton->rotationBackground = sharp::AttrAsVectorOfDouble(options, "rotationBackground");
