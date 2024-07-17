@@ -84,7 +84,7 @@ jobs:
       - name: Dependencies (Rocky Linux glibc)
         if: contains(matrix.container, 'rockylinux')
         run: |
-          dnf install -y gcc-toolset-11-gcc-c++ make git python3 fontconfig google-noto-sans-fonts
+          dnf install -y gcc-toolset-11-gcc-c++ make git python3.12 fontconfig google-noto-sans-fonts
           echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
       - name: Dependencies (Linux musl)
         if: contains(matrix.container, 'alpine')
@@ -131,7 +131,7 @@ jobs:
       matrix:
         include:
           - platform: linux-arm
-            distro: buster
+            distro: bullseye
             run_on_arch: armv6
             nodejs_arch: armv6l
             nodejs_hostname: unofficial-builds.nodejs.org
