@@ -252,7 +252,7 @@ class MetadataWorker : public Napi::AsyncWorker {
       }
       if (baton->comments.size() > 0) {
         int i = 0;
-        Napi::Array comments = Napi::Array::New(env);
+        Napi::Array comments = Napi::Array::New(env, baton->comments.size());
         for (auto &c : baton->comments) {
           Napi::Object comment = Napi::Object::New(env);
           comment.Set("keyword", c.first);
