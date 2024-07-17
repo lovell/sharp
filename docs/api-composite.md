@@ -46,6 +46,7 @@ and https://www.cairographics.org/operators/
 | [images[].input.text.dpi] | <code>number</code> | <code>72</code> | the resolution (size) at which to render the text. Does not take effect if `height` is specified. |
 | [images[].input.text.rgba] | <code>boolean</code> | <code>false</code> | set this to true to enable RGBA output. This is useful for colour emoji rendering, or support for Pango markup features like `<span foreground="red">Red!</span>`. |
 | [images[].input.text.spacing] | <code>number</code> | <code>0</code> | text line height in points. Will use the font line height if none is specified. |
+| [images[].autoOrient] | <code>Boolean</code> | <code>false</code> | set to true to use EXIF orientation data, if present, to orient the image. |
 | [images[].blend] | <code>String</code> | <code>&#x27;over&#x27;</code> | how to blend this image with the image below. |
 | [images[].gravity] | <code>String</code> | <code>&#x27;centre&#x27;</code> | gravity at which to place the overlay. |
 | [images[].top] | <code>Number</code> |  | the pixel offset from the top edge. |

@@ -73,13 +73,13 @@ class PipelineWorker : public Napi::AsyncWorker {
       bool autoFlip = false;
       bool autoFlop = false;
 
-      if (baton->useExifOrientation) {
+      if (baton->input->autoOrient) {
         // Rotate and flip image according to Exif orientation
         std::tie(autoRotation, autoFlip, autoFlop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
         image = sharp::RemoveExifOrientation(image);
-      } else {
-        rotation = CalculateAngleRotation(baton->angle);
       }
+
+      rotation = CalculateAngleRotation(baton->angle);
 
       // Rotate pre-extract
       bool const shouldRotateBefore = baton->rotateBeforePreExtract &&
@@ -102,18 +102,14 @@ class PipelineWorker : public Napi::AsyncWorker {
           image = image.rot(autoRotation);
           autoRotation = VIPS_ANGLE_D0;
         }
-        if (autoFlip) {
+        if (autoFlip != baton->flip) {
           image = image.flip(VIPS_DIRECTION_VERTICAL);
           autoFlip = false;
-        } else if (baton->flip) {
-          image = image.flip(VIPS_DIRECTION_VERTICAL);
           baton->flip = false;
         }
-        if (autoFlop) {
+        if (autoFlop != baton->flop) {
           image = image.flip(VIPS_DIRECTION_HORIZONTAL);
           autoFlop = false;
-        } else if (baton->flop) {
-          image = image.flip(VIPS_DIRECTION_HORIZONTAL);
           baton->flop = false;
         }
         if (rotation != VIPS_ANGLE_D0) {
@@ -405,11 +401,11 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.rot(autoRotation);
       }
       // Mirror vertically (up-down) about the x-axis
-      if (baton->flip || autoFlip) {
+      if (baton->flip != autoFlip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
       }
       // Mirror horizontally (left-right) about the y-axis
-      if (baton->flop || autoFlop) {
+      if (baton->flop != autoFlop) {
         image = image.flip(VIPS_DIRECTION_HORIZONTAL);
       }
       // Rotate post-extract 90-angle
@@ -640,6 +636,32 @@ class PipelineWorker : public Napi::AsyncWorker {
           composite->input->access = access;
           std::tie(compositeImage, compositeImageType) = sharp::OpenInput(composite->input);
           compositeImage = sharp::EnsureColourspace(compositeImage, baton->colourspacePipeline);
+
+          if (composite->input->autoOrient) {
+            // Calculate angle of rotation
+            VipsAngle compositeAutoRotation = VIPS_ANGLE_D0;
+            bool compositeAutoFlip = false;
+            bool compositeAutoFlop = false;
+
+            // Rotate and flip image according to Exif orientation
+            std::tie(compositeAutoRotation, compositeAutoFlip, compositeAutoFlop) =
+              CalculateExifRotationAndFlip(sharp::ExifOrientation(compositeImage));
+
+            compositeImage = sharp::RemoveExifOrientation(compositeImage);
+
+            if (compositeAutoRotation != VIPS_ANGLE_D0) {
+              compositeImage = compositeImage.rot(compositeAutoRotation);
+            }
+            // Mirror vertically (up-down) about the x-axis
+            if (compositeAutoFlip) {
+              compositeImage = compositeImage.flip(VIPS_DIRECTION_VERTICAL);
+            }
+            // Mirror horizontally (left-right) about the y-axis
+            if (compositeAutoFlop) {
+              compositeImage = compositeImage.flip(VIPS_DIRECTION_HORIZONTAL);
+            }
+          }
+
           // Verify within current dimensions
           if (compositeImage.width() > image.width() || compositeImage.height() > image.height()) {
             throw vips::VError("Image to composite must have same dimensions or smaller");
@@ -1569,7 +1591,6 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->claheWidth = sharp::AttrAsUint32(options, "claheWidth");
   baton->claheHeight = sharp::AttrAsUint32(options, "claheHeight");
   baton->claheMaxSlope = sharp::AttrAsUint32(options, "claheMaxSlope");
-  baton->useExifOrientation = sharp::AttrAsBool(options, "useExifOrientation");
   baton->angle = sharp::AttrAsInt32(options, "angle");
   baton->rotationAngle = sharp::AttrAsDouble(options, "rotationAngle");
   baton->rotationBackground = sharp::AttrAsVectorOfDouble(options, "rotationBackground");

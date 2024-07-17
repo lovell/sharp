@@ -1,22 +1,19 @@
 ## rotate
 > rotate([angle], [options]) ⇒ <code>Sharp</code>
 
-Rotate the output image by either an explicit angle
-or auto-orient based on the EXIF `Orientation` tag.
+Rotate the output image.
 
-If an angle is provided, it is converted to a valid positive degree rotation.
+The provided angle is converted to a valid positive degree rotation.
 For example, `-450` will produce a 270 degree rotation.
 
 When rotating by an angle other than a multiple of 90,
 the background colour can be provided with the `background` option.
 
-If no angle is provided, it is determined from the EXIF data.
-Mirroring is supported and may infer the use of a flip operation.
+For backwards compatibility, if no angle is provided, `.autoOrient()` will be called.
 
-The use of `rotate` without an angle will remove the EXIF `Orientation` tag, if any.
-
-Only one rotation can occur per pipeline.
-Previous calls to `rotate` in the same pipeline will be ignored.
+Only one rotation can occur per pipeline (aside from an initial call without
+arguments to orient via EXIF data). Previous calls to `rotate` in the same
+pipeline will be ignored.
 
 Multi-page images can only be rotated by 180 degrees.
 
@@ -37,18 +34,6 @@ for example `.rotate(x).extract(y)` will produce a different result to `.extract
 
 **Example**  
 ```js
-const pipeline = sharp()
-  .rotate()
-  .resize(null, 200)
-  .toBuffer(function (err, outputBuffer, info) {
-    // outputBuffer contains 200px high JPEG image data,
-    // auto-rotated using EXIF Orientation tag
-    // info.width and info.height contain the dimensions of the resized image
-  });
-readableStream.pipe(pipeline);
-```
-**Example**  
-```js
 const rotateThenResize = await sharp(input)
   .rotate(90)
   .resize({ width: 16, height: 8, fit: 'fill' })
@@ -57,6 +42,34 @@ const resizeThenRotate = await sharp(input)
   .resize({ width: 16, height: 8, fit: 'fill' })
   .rotate(90)
   .toBuffer();
+```
+
+
+## autoOrient
+> autoOrient() ⇒ <code>Sharp</code>
+
+Auto-orient based on the EXIF `Orientation` tag, then remove the tag.
+Mirroring is supported and may infer the use of a flip operation.
+
+Previous or subsequent use of `rotate(angle)` and either `flip()` or `flop()`
+will logically occur after auto-orientation, regardless of call order.
+
+
+**Example**  
+```js
+const output = await sharp(input).autoOrient().toBuffer();
+```
+**Example**  
+```js
+const pipeline = sharp()
+  .autoOrient()
+  .resize(null, 200)
+  .toBuffer(function (err, outputBuffer, info) {
+    // outputBuffer contains 200px high JPEG image data,
+    // auto-oriented using EXIF Orientation tag
+    // info.width and info.height contain the dimensions of the resized image
+  });
+readableStream.pipe(pipeline);
 ```
 
 

@@ -138,6 +138,21 @@ describe('composite', () => {
     fixtures.assertMaxColourDistance(actual, expected);
   });
 
+  it('autoOrient', (done) => {
+    const filename = 'composite-autoOrient.jpg';
+    const exifImg = fixtures.inputJpgWithExif;
+    const actual = fixtures.path(`output.${filename}`);
+    const expected = fixtures.expected(filename);
+    sharp({ create: { width: 600, height: 600, channels: 4, background: { ...red, alpha: 1 } } })
+      .composite([{
+        input: exifImg,
+        autoOrient: true
+      }])
+      .toFile(actual).then(() => {
+        fixtures.assertSimilar(actual, expected, done);
+      });
+  });
+
   it('zero offset', done => {
     sharp(fixtures.inputJpg)
       .resize(80)
