@@ -464,7 +464,7 @@ declare namespace sharp {
          * @throws {Error} Invalid parameters
          * @returns A sharp instance that can be used to chain operations
          */
-        blur(sigma?: number | boolean): Sharp;
+        blur(sigma?: number | boolean | BlurOptions): Sharp;
 
         /**
          * Merge alpha transparency channel, if any, with background.
@@ -1340,6 +1340,15 @@ declare namespace sharp {
     interface RotateOptions {
         /** parsed by the color module to extract values for red, green, blue and alpha. (optional, default "#000000") */
         background?: Color | undefined;
+    }
+
+    type Precision = 'integer' | 'float' | 'approximate';
+
+    interface BlurOptions {
+        /** A value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2` */
+        sigma: number;
+        /** How accurate the operation should be, one of: integer, float, approximate. (optional, default "integer") */
+        precision?: Precision | undefined;
     }
 
     interface FlattenOptions {
