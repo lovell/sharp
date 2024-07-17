@@ -305,7 +305,7 @@ const char *PNG_COMMENT_START = "png-comment-";
 const int PNG_COMMENT_START_LEN = strlen(PNG_COMMENT_START);
 
 static void* readPNGComment(VipsImage *image, const char *field, GValue *value, void *p) {
-  MetadataComments *comments = reinterpret_cast<MetadataComments *>(p);
+  MetadataComments *comments = static_cast<MetadataComments *>(p);
 
   if (vips_isprefix(PNG_COMMENT_START, field)) {
     const char *keyword = strchr(field + PNG_COMMENT_START_LEN, '-');
