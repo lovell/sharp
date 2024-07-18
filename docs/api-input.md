@@ -42,7 +42,7 @@ A `Promise` is returned when `callback` is not provided.
 - `xmp`: Buffer containing raw XMP data, if present
 - `tifftagPhotoshop`: Buffer containing raw TIFFTAG_PHOTOSHOP data, if present
 - `formatMagick`: String containing format for images loaded via *magick
-- `comments`:  Array of keyword/text pairs representing PNG text blocks, if present.
+- `comments`: Array of keyword/text pairs representing PNG text blocks, if present.
 
 
 

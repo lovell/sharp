@@ -20,6 +20,10 @@ Requires libvips v8.15.2
   [#4147](https://github.com/lovell/sharp/pull/4147)
   [@ton11797](https://github.com/ton11797)
 
+* Expose PNG text chunks as `comments` metadata.
+  [#4157](https://github.com/lovell/sharp/pull/4157)
+  [@nkeynes](https://github.com/nkeynes)
+
 ### v0.33.4 - 16th May 2024
 
 * Remove experimental status from `pipelineColourspace`.
