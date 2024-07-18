@@ -10,6 +10,8 @@
 #include "common.h"
 #include "metadata.h"
 
+static void* readPNGComment(VipsImage *image, const char *field, GValue *value, void *p);
+
 class MetadataWorker : public Napi::AsyncWorker {
  public:
   MetadataWorker(Napi::Function callback, MetadataBaton *baton, Napi::Function debuglog) :
@@ -131,6 +133,8 @@ class MetadataWorker : public Napi::AsyncWorker {
         memcpy(baton->tifftagPhotoshop, tifftagPhotoshop, tifftagPhotoshopLength);
         baton->tifftagPhotoshopLength = tifftagPhotoshopLength;
       }
+      // PNG comments
+      vips_image_map(image.get_image(), readPNGComment, &baton->comments);
     }
 
     // Clean up
@@ -246,6 +250,17 @@ class MetadataWorker : public Napi::AsyncWorker {
           Napi::Buffer<char>::NewOrCopy(env, baton->tifftagPhotoshop,
             baton->tifftagPhotoshopLength, sharp::FreeCallback));
       }
+      if (baton->comments.size() > 0) {
+        int i = 0;
+        Napi::Array comments = Napi::Array::New(env, baton->comments.size());
+        for (auto &c : baton->comments) {
+          Napi::Object comment = Napi::Object::New(env);
+          comment.Set("keyword", c.first);
+          comment.Set("text", c.second);
+          comments.Set(i++, comment);
+        }
+        info.Set("comments", comments);
+      }
       Callback().Call(Receiver().Value(), { env.Null(), info });
     } else {
       Callback().Call(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
@@ -284,4 +299,22 @@ Napi::Value metadata(const Napi::CallbackInfo& info) {
   sharp::counterQueue++;
 
   return info.Env().Undefined();
+}
+
+const char *PNG_COMMENT_START = "png-comment-";
+const int PNG_COMMENT_START_LEN = strlen(PNG_COMMENT_START);
+
+static void* readPNGComment(VipsImage *image, const char *field, GValue *value, void *p) {
+  MetadataComments *comments = static_cast<MetadataComments *>(p);
+
+  if (vips_isprefix(PNG_COMMENT_START, field)) {
+    const char *keyword = strchr(field + PNG_COMMENT_START_LEN, '-');
+    const char *str;
+    if (keyword != NULL && !vips_image_get_string(image, field, &str)) {
+      keyword++;  // Skip the hyphen
+      comments->push_back(std::make_pair(keyword, str));
+    }
+  }
+
+  return NULL;
 }

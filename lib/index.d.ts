@@ -1108,11 +1108,18 @@ declare namespace sharp {
         resolutionUnit?: 'inch' | 'cm' | undefined;
         /** String containing format for images loaded via *magick */
         formatMagick?: string | undefined;
+        /** Array of keyword/text pairs representing PNG text blocks, if present. */
+        comments?: CommentsMetadata[] | undefined;
     }
 
     interface LevelMetadata {
         width: number;
         height: number;
+    }
+
+    interface CommentsMetadata {
+        keyword: string;
+        text: string;
     }
 
     interface Stats {
