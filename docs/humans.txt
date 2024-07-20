@@ -28,7 +28,7 @@ Name: Brandon Aaron
 GitHub: https://github.com/brandonaaron
 
 Name: Andreas Lind
-GitHub: https://github.com/papandreouGitHub:
+GitHub: https://github.com/papandreou
 
 Name: Maurus Cuelenaere
 GitHub: https://github.com/mcuelenaere
@@ -261,7 +261,7 @@ GitHub: https://github.com/brahima
 Name: Anton Marsden
 GitHub: https://github.com/antonmarsden
 
-Name:  Marcos Casagrande
+Name: Marcos Casagrande
 GitHub: https://github.com/marcosc90
 
 Name: Emanuel Jöbstl
@@ -302,6 +302,3 @@ GitHub: https://github.com/ton11797
 
 Name: Nathan Keynes
 GitHub: https://github.com/nkeynes
-
-Name: Marcos Casagrande
-GitHub: https://github.com/marcosc90
