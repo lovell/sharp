@@ -231,7 +231,7 @@ const output = await sharp(input).median(5).toBuffer();
 
 
 ## blur
-> blur([sigma]) ⇒ <code>Sharp</code>
+> blur([options]) ⇒ <code>Sharp</code>
 
 Blur the image.
 
@@ -245,9 +245,11 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 - <code>Error</code> Invalid parameters
 
 
-| Param | Type | Description |
-| --- | --- | --- |
-| [sigma] | <code>number</code> | a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`. |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>Object</code> \| <code>number</code> \| <code>Boolean</code> |  |  |
+| [options.sigma] | <code>number</code> |  | a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`. |
+| [options.precision] | <code>string</code> | <code>&quot;&#x27;integer&#x27;&quot;</code> | How accurate the operation should be, one of: integer, float, approximate. |
 
 **Example**  
 ```js

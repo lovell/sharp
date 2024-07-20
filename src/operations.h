@@ -47,7 +47,7 @@ namespace sharp {
   /*
    * Gaussian blur. Use sigma of -1.0 for fast blur.
    */
-  VImage Blur(VImage image, double const sigma);
+  VImage Blur(VImage image, double const sigma, VipsPrecision precision);
 
   /*
    * Convolution with a kernel.

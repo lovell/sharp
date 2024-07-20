@@ -35,6 +35,19 @@ describe('Blur', function () {
       });
   });
 
+  it('specific options.sigma 10', function (done) {
+    sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .blur({ sigma: 10 })
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual('jpeg', info.format);
+        assert.strictEqual(320, info.width);
+        assert.strictEqual(240, info.height);
+        fixtures.assertSimilar(fixtures.expected('blur-10.jpg'), data, done);
+      });
+  });
+
   it('specific radius 0.3', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -90,5 +103,34 @@ describe('Blur', function () {
             done();
           });
       });
+  });
+
+  it('invalid precision', function () {
+    assert.throws(function () {
+      sharp(fixtures.inputJpg).blur({ sigma: 1, precision: 'invalid' });
+    }, /Expected one of: integer, float, approximate for precision but received invalid of type string/);
+  });
+
+  it('specific radius 10 and precision approximate', async () => {
+    const approximate = await sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .blur({ sigma: 10, precision: 'approximate' })
+      .toBuffer();
+    const integer = await sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .blur(10)
+      .toBuffer();
+
+    assert.notDeepEqual(approximate, integer);
+
+    await new Promise(resolve => {
+      fixtures.assertSimilar(fixtures.expected('blur-10.jpg'), approximate, resolve);
+    });
+  });
+
+  it('options.sigma is required if options object is passed', function () {
+    assert.throws(function () {
+      sharp(fixtures.inputJpg).blur({ precision: 'invalid' });
+    }, /Expected number between 0.3 and 1000 for options.sigma but received undefined of type undefined/);
   });
 });
