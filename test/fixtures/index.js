@@ -14,29 +14,26 @@ const getPath = function (filename) {
 
 // Generates a 64-bit-as-binary-string image fingerprint
 // Based on the dHash gradient method - see http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html
-const fingerprint = function (image, callback) {
-  sharp(image)
+async function fingerprint (image) {
+  return sharp(image)
     .flatten('gray')
     .greyscale()
     .normalise()
     .resize(9, 8, { fit: sharp.fit.fill })
     .raw()
-    .toBuffer(function (err, data) {
-      if (err) {
-        callback(err);
-      } else {
-        let fingerprint = '';
-        for (let col = 0; col < 8; col++) {
-          for (let row = 0; row < 8; row++) {
-            const left = data[(row * 8) + col];
-            const right = data[(row * 8) + col + 1];
-            fingerprint = fingerprint + (left < right ? '1' : '0');
-          }
+    .toBuffer()
+    .then(function (data) {
+      let fingerprint = '';
+      for (let col = 0; col < 8; col++) {
+        for (let row = 0; row < 8; row++) {
+          const left = data[(row * 8) + col];
+          const right = data[(row * 8) + col + 1];
+          fingerprint = fingerprint + (left < right ? '1' : '0');
         }
-        callback(null, fingerprint);
       }
+      return fingerprint;
     });
-};
+}
 
 module.exports = {
 
@@ -151,46 +148,44 @@ module.exports = {
   // Verify similarity of expected vs actual images via fingerprint
   // Specify distance threshold using `options={threshold: 42}`, default
   // `threshold` is 5;
-  assertSimilar: function (expectedImage, actualImage, options, callback) {
+  assertSimilar: async function (expectedImage, actualImage, options, callback) {
     if (typeof options === 'function') {
       callback = options;
       options = {};
     }
-
-    if (typeof options === 'undefined' && options === null) {
+    if (typeof options === 'undefined' || options === null) {
       options = {};
     }
-
     if (options.threshold === null || typeof options.threshold === 'undefined') {
       options.threshold = 5; // ~7% threshold
     }
-
     if (typeof options.threshold !== 'number') {
       throw new TypeError('`options.threshold` must be a number');
     }
 
-    if (typeof callback !== 'function') {
-      throw new TypeError('`callback` must be a function');
+    try {
+      const [expectedFingerprint, actualFingerprint] = await Promise.all([
+        fingerprint(expectedImage),
+        fingerprint(actualImage)
+      ]);
+      let distance = 0;
+      for (let i = 0; i < 64; i++) {
+        if (expectedFingerprint[i] !== actualFingerprint[i]) {
+          distance++;
+        }
+      }
+      if (distance > options.threshold) {
+        throw new Error(`Expected maximum similarity distance: ${options.threshold}. Actual: ${distance}.`);
+      }
+    } catch (err) {
+      if (callback) {
+        return callback(err);
+      }
+      throw err;
     }
-
-    fingerprint(expectedImage, function (err, expectedFingerprint) {
-      if (err) return callback(err);
-      fingerprint(actualImage, function (err, actualFingerprint) {
-        if (err) return callback(err);
-        let distance = 0;
-        for (let i = 0; i < 64; i++) {
-          if (expectedFingerprint[i] !== actualFingerprint[i]) {
-            distance++;
-          }
-        }
-
-        if (distance > options.threshold) {
-          return callback(new Error('Expected maximum similarity distance: ' + options.threshold + '. Actual: ' + distance + '.'));
-        }
-
-        callback();
-      });
-    });
+    if (callback) {
+      callback();
+    }
   },
 
   assertMaxColourDistance: function (actualImagePath, expectedImagePath, acceptedDistance) {

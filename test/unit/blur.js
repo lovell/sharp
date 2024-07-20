@@ -122,10 +122,7 @@ describe('Blur', function () {
       .toBuffer();
 
     assert.notDeepEqual(approximate, integer);
-
-    await new Promise(resolve => {
-      fixtures.assertSimilar(fixtures.expected('blur-10.jpg'), approximate, resolve);
-    });
+    await fixtures.assertSimilar(fixtures.expected('blur-10.jpg'), approximate);
   });
 
   it('options.sigma is required if options object is passed', function () {
