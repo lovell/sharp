@@ -24,6 +24,10 @@ Requires libvips v8.15.2
   [#4157](https://github.com/lovell/sharp/pull/4157)
   [@nkeynes](https://github.com/nkeynes)
 
+* Expose optional `precision` parameter of `blur` operation.
+  [#4168](https://github.com/lovell/sharp/pull/4168)
+  [@marcosc90](https://github.com/marcosc90)
+
 ### v0.33.4 - 16th May 2024
 
 * Remove experimental status from `pipelineColourspace`.
