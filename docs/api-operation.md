@@ -250,6 +250,7 @@ When a `sigma` is provided, performs a slower, more accurate Gaussian blur.
 | [options] | <code>Object</code> \| <code>number</code> \| <code>Boolean</code> |  |  |
 | [options.sigma] | <code>number</code> |  | a value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`. |
 | [options.precision] | <code>string</code> | <code>&quot;&#x27;integer&#x27;&quot;</code> | How accurate the operation should be, one of: integer, float, approximate. |
+| [options.minAmplitude] | <code>number</code> | <code>0.2</code> | A value between 0.001 and 1. A smaller value will generate a larger, more accurate mask. |
 
 **Example**  
 ```js

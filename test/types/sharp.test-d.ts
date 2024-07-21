@@ -63,6 +63,7 @@ sharp().blur();
 sharp().blur(1);
 sharp().blur({ sigma: 1 });
 sharp().blur({ sigma: 1, precision: 'approximate' });
+sharp().blur({ sigma: 1, minAmplitude: 0.8 });
 
 sharp({
   create: {

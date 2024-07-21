@@ -111,6 +111,16 @@ describe('Blur', function () {
     }, /Expected one of: integer, float, approximate for precision but received invalid of type string/);
   });
 
+  it('invalid minAmplitude', function () {
+    assert.throws(function () {
+      sharp(fixtures.inputJpg).blur({ sigma: 1, minAmplitude: 0 });
+    }, /Expected number between 0.001 and 1 for minAmplitude but received 0 of type number/);
+
+    assert.throws(function () {
+      sharp(fixtures.inputJpg).blur({ sigma: 1, minAmplitude: 1.01 });
+    }, /Expected number between 0.001 and 1 for minAmplitude but received 1.01 of type number/);
+  });
+
   it('specific radius 10 and precision approximate', async () => {
     const approximate = await sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -123,6 +133,20 @@ describe('Blur', function () {
 
     assert.notDeepEqual(approximate, integer);
     await fixtures.assertSimilar(fixtures.expected('blur-10.jpg'), approximate);
+  });
+
+  it('specific radius 10 and minAmplitude 0.01', async () => {
+    const minAmplitudeLow = await sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .blur({ sigma: 10, minAmplitude: 0.01 })
+      .toBuffer();
+    const minAmplitudeDefault = await sharp(fixtures.inputJpg)
+      .resize(320, 240)
+      .blur(10)
+      .toBuffer();
+
+    assert.notDeepEqual(minAmplitudeLow, minAmplitudeDefault);
+    await fixtures.assertSimilar(fixtures.expected('blur-10.jpg'), minAmplitudeLow);
   });
 
   it('options.sigma is required if options object is passed', function () {

@@ -144,7 +144,7 @@ namespace sharp {
   /*
    * Gaussian blur. Use sigma of -1.0 for fast blur.
    */
-  VImage Blur(VImage image, double const sigma, VipsPrecision precision) {
+  VImage Blur(VImage image, double const sigma, VipsPrecision precision, double const minAmpl) {
     if (sigma == -1.0) {
       // Fast, mild blur - averages neighbouring pixels
       VImage blur = VImage::new_matrixv(3, 3,
@@ -156,7 +156,8 @@ namespace sharp {
     } else {
       // Slower, accurate Gaussian blur
       return StaySequential(image).gaussblur(sigma, VImage::option()
-        ->set("precision", precision));
+        ->set("precision", precision)
+        ->set("min_ampl", minAmpl));
     }
   }
 
