@@ -1347,6 +1347,8 @@ declare namespace sharp {
     interface BlurOptions {
         /** A value between 0.3 and 1000 representing the sigma of the Gaussian mask, where `sigma = 1 + radius / 2` */
         sigma: number;
+        /** A value between 0.001 and 1. A smaller value will generate a larger, more accurate mask. */
+        minAmplitude?: number;
         /** How accurate the operation should be, one of: integer, float, approximate. (optional, default "integer") */
         precision?: Precision | undefined;
     }

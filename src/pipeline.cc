@@ -592,7 +592,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Blur
       if (shouldBlur) {
-        image = sharp::Blur(image, baton->blurSigma, baton->precision);
+        image = sharp::Blur(image, baton->blurSigma, baton->precision, baton->minAmpl);
       }
 
       // Unflatten the image
@@ -1542,6 +1542,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->negateAlpha = sharp::AttrAsBool(options, "negateAlpha");
   baton->blurSigma = sharp::AttrAsDouble(options, "blurSigma");
   baton->precision = sharp::AttrAsEnum<VipsPrecision>(options, "precision", VIPS_TYPE_PRECISION);
+  baton->minAmpl = sharp::AttrAsDouble(options, "minAmpl");
   baton->brightness = sharp::AttrAsDouble(options, "brightness");
   baton->saturation = sharp::AttrAsDouble(options, "saturation");
   baton->hue = sharp::AttrAsInt32(options, "hue");
