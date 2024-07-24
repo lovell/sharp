@@ -641,13 +641,13 @@ describe('Image metadata', function () {
       .png()
       .withIccProfile(fixtures.path('invalid-illuminant.icc'));
 
-    let warningEmitted = '';
+    const warningsEmitted = [];
     img.on('warning', (warning) => {
-      warningEmitted = warning;
+      warningsEmitted.push(warning);
     });
 
     const data = await img.toBuffer();
-    assert.strictEqual('Invalid profile', warningEmitted);
+    assert.strict(warningsEmitted.includes('Invalid profile'));
 
     const metadata = await sharp(data).metadata();
     assert.strictEqual(3, metadata.channels);
