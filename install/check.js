@@ -18,7 +18,7 @@ try {
     }
     try {
       const gyp = require('node-gyp');
-      log(`Found node-gyp version ${gyp().version}`);
+      log(`Found node-gyp ${gyp().version}`);
     } catch (err) {
       log('Please add node-gyp to your dependencies');
       return;

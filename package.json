@@ -139,7 +139,7 @@
   "dependencies": {
     "color": "^4.2.3",
     "detect-libc": "^2.0.3",
-    "semver": "^7.6.0"
+    "semver": "^7.6.3"
   },
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "0.33.4",
@@ -175,10 +175,10 @@
     "exif-reader": "^2.0.1",
     "extract-zip": "^2.0.1",
     "icc": "^3.0.0",
-    "jsdoc-to-markdown": "^8.0.1",
+    "jsdoc-to-markdown": "^8.0.2",
     "license-checker": "^25.0.1",
-    "mocha": "^10.5.2",
-    "node-addon-api": "^8.0.0",
+    "mocha": "^10.7.0",
+    "node-addon-api": "^8.1.0",
     "nyc": "^17.0.0",
     "prebuild": "^13.0.1",
     "semistandard": "^17.0.0",
