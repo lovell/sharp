@@ -29,6 +29,9 @@ Requires libvips v8.15.2
   [#4172](https://github.com/lovell/sharp/pull/4172)
   [@marcosc90](https://github.com/marcosc90)
 
+* Ensure `keepIccProfile` avoids colour transformation where possible.
+  [#4186](https://github.com/lovell/sharp/issues/4186)
+
 ### v0.33.4 - 16th May 2024
 
 * Remove experimental status from `pipelineColourspace`.

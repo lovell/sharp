@@ -325,6 +325,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->withIccProfile.empty()) {
         // Cache input profile for use with output
         inputProfile = sharp::GetProfile(image);
+        baton->input->ignoreIcc = true;
       }
       char const *processingProfile = image.interpretation() == VIPS_INTERPRETATION_RGB16 ? "p3" : "srgb";
       if (

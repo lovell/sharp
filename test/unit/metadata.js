@@ -601,6 +601,17 @@ describe('Image metadata', function () {
     assert.strictEqual(description, 'Generic RGB Profile');
   });
 
+  it('keep existing ICC profile, avoid colour transform', async () => {
+    const [r, g, b] = await sharp(fixtures.inputPngWithProPhotoProfile)
+      .keepIccProfile()
+      .raw()
+      .toBuffer();
+
+    assert.strictEqual(r, 131);
+    assert.strictEqual(g, 141);
+    assert.strictEqual(b, 192);
+  });
+
   it('keep existing CMYK ICC profile', async () => {
     const data = await sharp(fixtures.inputJpgWithCmykProfile)
       .pipelineColourspace('cmyk')
