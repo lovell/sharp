@@ -144,14 +144,14 @@
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "0.33.4",
     "@img/sharp-darwin-x64": "0.33.4",
-    "@img/sharp-libvips-darwin-arm64": "1.0.2",
-    "@img/sharp-libvips-darwin-x64": "1.0.2",
-    "@img/sharp-libvips-linux-arm": "1.0.2",
-    "@img/sharp-libvips-linux-arm64": "1.0.2",
-    "@img/sharp-libvips-linux-s390x": "1.0.2",
-    "@img/sharp-libvips-linux-x64": "1.0.2",
-    "@img/sharp-libvips-linuxmusl-arm64": "1.0.2",
-    "@img/sharp-libvips-linuxmusl-x64": "1.0.2",
+    "@img/sharp-libvips-darwin-arm64": "1.0.4",
+    "@img/sharp-libvips-darwin-x64": "1.0.4",
+    "@img/sharp-libvips-linux-arm": "1.0.4",
+    "@img/sharp-libvips-linux-arm64": "1.0.4",
+    "@img/sharp-libvips-linux-s390x": "1.0.4",
+    "@img/sharp-libvips-linux-x64": "1.0.4",
+    "@img/sharp-libvips-linuxmusl-arm64": "1.0.4",
+    "@img/sharp-libvips-linuxmusl-x64": "1.0.4",
     "@img/sharp-linux-arm": "0.33.4",
     "@img/sharp-linux-arm64": "0.33.4",
     "@img/sharp-linux-s390x": "0.33.4",
@@ -164,10 +164,10 @@
   },
   "devDependencies": {
     "@emnapi/runtime": "^1.2.0",
-    "@img/sharp-libvips-dev": "1.0.2",
-    "@img/sharp-libvips-dev-wasm32": "1.0.3",
-    "@img/sharp-libvips-win32-ia32": "1.0.2",
-    "@img/sharp-libvips-win32-x64": "1.0.2",
+    "@img/sharp-libvips-dev": "1.0.4",
+    "@img/sharp-libvips-dev-wasm32": "1.0.5",
+    "@img/sharp-libvips-win32-ia32": "1.0.4",
+    "@img/sharp-libvips-win32-x64": "1.0.4",
     "@types/node": "*",
     "async": "^3.2.5",
     "cc": "^3.0.1",
@@ -175,9 +175,9 @@
     "exif-reader": "^2.0.1",
     "extract-zip": "^2.0.1",
     "icc": "^3.0.0",
-    "jsdoc-to-markdown": "^8.0.2",
+    "jsdoc-to-markdown": "^8.0.3",
     "license-checker": "^25.0.1",
-    "mocha": "^10.7.0",
+    "mocha": "^10.7.3",
     "node-addon-api": "^8.1.0",
     "nyc": "^17.0.0",
     "prebuild": "^13.0.1",
@@ -188,7 +188,7 @@
   "license": "Apache-2.0",
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0",
-    "libvips": ">=8.15.2"
+    "libvips": ">=8.15.3"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"

@@ -2,9 +2,11 @@
 
 ## v0.33 - *gauge*
 
-Requires libvips v8.15.2
+Requires libvips v8.15.3
 
 ### v0.33.5 - TBD
+
+* Upgrade to libvips v8.15.3 for upstream bug fixes.
 
 * Add `pageHeight` and `pages` to response of multi-page output.
   [#3411](https://github.com/lovell/sharp/issues/3411)
