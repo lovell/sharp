@@ -15,6 +15,9 @@ Requires libvips v8.15.3
   [#4111](https://github.com/lovell/sharp/pull/4111)
   [@project0](https://github.com/project0)
 
+* Minimise use of `engines` property to improve yarn v1 support.
+  [#4130](https://github.com/lovell/sharp/issues/4130)
+
 * Ensure `sharp.format.heif` includes only AVIF when using prebuilt binaries.
   [#4132](https://github.com/lovell/sharp/issues/4132)
 
