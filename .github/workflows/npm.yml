@@ -31,6 +31,10 @@ jobs:
             runs-on: ubuntu-22.04
             runtime: node
             package-manager: yarn-pnp
+          - name: linux-x64-node-yarn-v1
+            runs-on: ubuntu-22.04
+            runtime: node
+            package-manager: yarn-v1
           - name: linux-x64-deno
             runs-on: ubuntu-22.04
             runtime: deno
@@ -54,6 +58,10 @@ jobs:
             runs-on: macos-12
             runtime: node
             package-manager: yarn-pnp
+          - name: darwin-x64-node-yarn-v1
+            runs-on: macos-12
+            runtime: node
+            package-manager: yarn-v1
           - name: darwin-x64-deno
             runs-on: macos-12
             runtime: deno
@@ -77,6 +85,10 @@ jobs:
             runs-on: windows-2019
             runtime: node
             package-manager: yarn-pnp
+          - name: win32-x64-node-yarn-v1
+            runs-on: windows-2019
+            runtime: node
+            package-manager: yarn-v1
           - name: win32-x64-deno
             runs-on: windows-2019
             runtime: deno
@@ -89,7 +101,7 @@ jobs:
           node-version: 20
       - name: Install pnpm
         if: ${{ matrix.package-manager == 'pnpm' }}
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 8
       - name: Install Deno
@@ -99,13 +111,13 @@ jobs:
           deno-version: v1.x
       - name: Install Bun
         if: ${{ matrix.runtime == 'bun' }}
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
       - name: Version
         id: version
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             core.setOutput('semver', context.ref.replace('refs/tags/v',''))
@@ -162,6 +174,14 @@ jobs:
           yarn config set nodeLinker pnp
           yarn install
           yarn node release.mjs
+
+      - name: Run with Node.js + yarn v1
+        if: ${{ matrix.package-manager == 'yarn-v1' }}
+        run: |
+          corepack enable
+          yarn set version classic
+          yarn install
+          node release.mjs
 
       - name: Run with Deno
         if: ${{ matrix.runtime == 'deno' }}

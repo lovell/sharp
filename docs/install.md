@@ -21,11 +21,6 @@ yarn add sharp
 ```
 
 ```sh
-# yarn v1 (maintenance mode)
-yarn add sharp --ignore-engines
-```
-
-```sh
 bun add sharp
 ```
 
