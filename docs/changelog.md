@@ -37,6 +37,10 @@ Requires libvips v8.15.3
 * Ensure `keepIccProfile` avoids colour transformation where possible.
   [#4186](https://github.com/lovell/sharp/issues/4186)
 
+* TypeScript: `chromaSubsampling` metadata is optional.
+  [#4191](https://github.com/lovell/sharp/pull/4191)
+  [@DavidVaness](https://github.com/DavidVaness)
+
 ### v0.33.4 - 16th May 2024
 
 * Remove experimental status from `pipelineColourspace`.
