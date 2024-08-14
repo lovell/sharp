@@ -1069,7 +1069,7 @@ declare namespace sharp {
         /** Number of pixels per inch (DPI), if present */
         density?: number | undefined;
         /** String containing JPEG chroma subsampling, 4:2:0 or 4:4:4 for RGB, 4:2:0:4 or 4:4:4:4 for CMYK */
-        chromaSubsampling: string;
+        chromaSubsampling?: string | undefined;
         /** Boolean indicating whether the image is interlaced using a progressive scan */
         isProgressive?: boolean | undefined;
         /** Number of pages/frames contained within the image, with support for TIFF, HEIF, PDF, animated GIF and animated WebP */
