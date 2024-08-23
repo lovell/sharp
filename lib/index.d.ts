@@ -1441,8 +1441,8 @@ declare namespace sharp {
         depth?: 'char' | 'uchar' | 'short' | 'ushort' | 'int' | 'uint' | 'float' | 'complex' | 'double' | 'dpcomplex';
     }
 
-    /** 3 for sRGB, 4 for CMYK */
-    type Channels = 3 | 4;
+    /** 1 for grayscale, 2 for grayscale + alpha, 3 for sRGB, 4 for CMYK or RGBA */
+    type Channels = 1 | 2 | 3 | 4;
 
     interface RGBA {
         r?: number | undefined;
