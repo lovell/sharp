@@ -8,6 +8,10 @@ Requires libvips v8.15.5-rc1
 
 * Upgrade to libvips v8.15.5-rc1 for upstream bug fixes.
 
+* TypeScript: Ensure channel counts use the correct range.
+  [#4197](https://github.com/lovell/sharp/pull/4197)
+  [@DavidVaness](https://github.com/DavidVaness)
+
 * Improve support for ppc64le architecture.
   [#4203](https://github.com/lovell/sharp/pull/4203)
   [@sumitd2](https://github.com/sumitd2)

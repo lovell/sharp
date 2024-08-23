@@ -971,7 +971,7 @@ declare namespace sharp {
     interface Raw {
         width: number;
         height: number;
-        channels: 1 | 2 | 3 | 4;
+        channels: Channels;
     }
 
     interface CreateRaw extends Raw {
@@ -979,13 +979,15 @@ declare namespace sharp {
         premultiplied?: boolean | undefined;
     }
 
+    type CreateChannels = 3 | 4;
+
     interface Create {
         /** Number of pixels wide. */
         width: number;
         /** Number of pixels high. */
         height: number;
-        /** Number of bands e.g. 3 for RGB, 4 for RGBA */
-        channels: Channels;
+        /** Number of bands, 3 for RGB, 4 for RGBA */
+        channels: CreateChannels;
         /** Parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha. */
         background: Colour | Color;
         /** Describes a noise to be created. */
@@ -1443,8 +1445,8 @@ declare namespace sharp {
         depth?: 'char' | 'uchar' | 'short' | 'ushort' | 'int' | 'uint' | 'float' | 'complex' | 'double' | 'dpcomplex';
     }
 
-    /** 3 for sRGB, 4 for CMYK */
-    type Channels = 3 | 4;
+    /** 1 for grayscale, 2 for grayscale + alpha, 3 for sRGB, 4 for CMYK or RGBA */
+    type Channels = 1 | 2 | 3 | 4;
 
     interface RGBA {
         r?: number | undefined;
@@ -1579,7 +1581,7 @@ declare namespace sharp {
         size: number;
         width: number;
         height: number;
-        channels: 1 | 2 | 3 | 4;
+        channels: Channels;
         /** indicating if premultiplication was used */
         premultiplied: boolean;
         /** Only defined when using a crop strategy */
