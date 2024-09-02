@@ -138,7 +138,7 @@ describe('libvips binaries', function () {
     });
     it('arch', () => {
       const [, arch] = libvips.runtimePlatformArch().split('-');
-      assert.strict(['arm', 'arm64', 'ia32', 'x64'].includes(arch));
+      assert.strict(['arm', 'arm64', 'ia32', 'x64', 'ppc64'].includes(arch));
     });
     it('isUnsupportedNodeRuntime', () => {
       assert.strictEqual(libvips.isUnsupportedNodeRuntime(), undefined);
