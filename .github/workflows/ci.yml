@@ -147,7 +147,7 @@ jobs:
           - platform: linux-ppc64
             distro: bullseye
             run_on_arch: ppc64le
-            nodejs_arch: ppc64
+            nodejs_arch: ppc64le
             nodejs_hostname: nodejs.org
             nodejs_version: "18.17.0"
             nodejs_version_major: 18
