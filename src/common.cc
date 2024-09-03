@@ -109,6 +109,10 @@ namespace sharp {
     if (HasAttr(input, "subifd")) {
       descriptor->subifd = AttrAsInt32(input, "subifd");
     }
+    // // PDF background color
+    if (HasAttr(input, "pdfBackground")) {
+      descriptor->pdfBackground = AttrAsVectorOfDouble(input, "pdfBackground");
+    }
     // Create new image
     if (HasAttr(input, "createChannels")) {
       descriptor->createChannels = AttrAsUint32(input, "createChannels");
@@ -402,6 +406,9 @@ namespace sharp {
             if (imageType == ImageType::TIFF) {
               option->set("subifd", descriptor->subifd);
             }
+            if (imageType == ImageType::PDF) {
+              option->set("background", descriptor->pdfBackground);
+            }
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
@@ -505,6 +512,9 @@ namespace sharp {
             }
             if (imageType == ImageType::TIFF) {
               option->set("subifd", descriptor->subifd);
+            }
+            if (imageType == ImageType::PDF) {
+              option->set("background", descriptor->pdfBackground);
             }
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {

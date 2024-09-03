@@ -935,6 +935,8 @@ declare namespace sharp {
         subifd?: number | undefined;
         /** Level to extract from a multi-level input (OpenSlide), zero based. (optional, default 0) */
         level?: number | undefined;
+        /** Background color to use when PDF is partially transparent. Requires the use of a globally-installed libvips compiled with support for PDFium, poppler-glib, ImageMagick, or GraphicsMagick. */
+        pdfBackground?: Color | undefined;
         /** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default false) */
         animated?: boolean | undefined;
         /** Describes raw pixel input image data. See raw() for pixel ordering. */
