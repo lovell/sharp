@@ -109,8 +109,8 @@ namespace sharp {
       textRgba(false),
       textSpacing(0),
       textWrap(VIPS_TEXT_WRAP_WORD),
-      textAutofitDpi(0) {},
-      pdfBackground{ 255.0, 255.0, 255.0, 255.0 }
+      textAutofitDpi(0),
+      pdfBackground{ 255.0, 255.0, 255.0, 255.0 } {}
   };
 
   // Convenience methods to access the attributes of a Napi::Object
