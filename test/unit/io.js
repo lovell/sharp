@@ -893,6 +893,27 @@ describe('Input/output', function () {
         sharp({ subifd: 1.2 });
       }, /Expected integer between -1 and 100000 for subifd but received 1.2 of type number/);
     });
+    it('Valid pdfBackground property (string)', function () {
+      sharp({ pdfBackground: '#00ff00' });
+    });
+    it('Valid pdfBackground property (object)', function () {
+      sharp({ pdfBackground: { r: 0, g: 255, b: 0 } });
+    });
+    it('Invalid pdfBackground property (string) throws', function () {
+      assert.throws(function () {
+        sharp({ pdfBackground: '00ff00' });
+      }, /Unable to parse color from string/);
+    });
+    it('Invalid pdfBackground property (number) throws', function () {
+      assert.throws(function () {
+        sharp({ pdfBackground: 255 });
+      }, /Expected object or string for background/);
+    });
+    it('Invalid pdfBackground property (object)', function () {
+      assert.throws(function () {
+        sharp({ pdfBackground: { red: 0, green: 255, blue: 0 } });
+      }, /Unable to parse color from object/);
+    });
   });
 
   it('Fails when writing to missing directory', async () => {
