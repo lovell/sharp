@@ -714,3 +714,8 @@ sharp(input).composite([
     failOn: "truncated"
   }
 ])
+
+const colour: sharp.Colour = '#fff';
+const color: sharp.Color = '#fff';
+sharp({ pdfBackground: colour });
+sharp({ pdfBackground: color });

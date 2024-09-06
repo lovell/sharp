@@ -244,14 +244,14 @@ declare namespace sharp {
          * @param tint Parsed by the color module.
          * @returns A sharp instance that can be used to chain operations
          */
-        tint(tint: Color): Sharp;
+        tint(tint: Colour | Color): Sharp;
 
         /**
          * Convert to 8-bit greyscale; 256 shades of grey.
          * This is a linear operation.
          * If the input image is in a non-linear colour space such as sRGB, use gamma() with greyscale() for the best results.
-         * By default the output image will be web-friendly sRGB and contain three (identical) color channels.
-         * This may be overridden by other sharp operations such as toColourspace('b-w'), which will produce an output image containing one color channel.
+         * By default the output image will be web-friendly sRGB and contain three (identical) colour channels.
+         * This may be overridden by other sharp operations such as toColourspace('b-w'), which will produce an output image containing one colour channel.
          * An alpha channel may be present, and will be unchanged by the operation.
          * @param greyscale true to enable and false to disable (defaults to true)
          * @returns A sharp instance that can be used to chain operations
@@ -401,7 +401,7 @@ declare namespace sharp {
         /**
          * Perform an affine transform on an image. This operation will always occur after resizing, extraction and rotation, if any.
          * You must provide an array of length 4 or a 2x2 affine transformation matrix.
-         * By default, new pixels are filled with a black background. You can provide a background color with the `background` option.
+         * By default, new pixels are filled with a black background. You can provide a background colour with the `background` option.
          * A particular interpolator may also be specified. Set the `interpolator` option to an attribute of the `sharp.interpolators` Object e.g. `sharp.interpolators.nohalo`.
          *
          * In the case of a 2x2 matrix, the transform is:
@@ -935,8 +935,8 @@ declare namespace sharp {
         subifd?: number | undefined;
         /** Level to extract from a multi-level input (OpenSlide), zero based. (optional, default 0) */
         level?: number | undefined;
-        /** Background color to use when PDF is partially transparent. Requires the use of a globally-installed libvips compiled with support for PDFium, poppler-glib, ImageMagick, or GraphicsMagick. */
-        pdfBackground?: Color | undefined;
+        /** Background colour to use when PDF is partially transparent. Requires the use of a globally-installed libvips compiled with support for PDFium, Poppler, ImageMagick or GraphicsMagick. */
+        pdfBackground?: Colour | Color | undefined;
         /** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default false) */
         animated?: boolean | undefined;
         /** Describes raw pixel input image data. See raw() for pixel ordering. */
@@ -987,7 +987,7 @@ declare namespace sharp {
         /** Number of bands e.g. 3 for RGB, 4 for RGBA */
         channels: Channels;
         /** Parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha. */
-        background: Color;
+        background: Colour | Color;
         /** Describes a noise to be created. */
         noise?: Noise | undefined;
     }
@@ -1341,7 +1341,7 @@ declare namespace sharp {
 
     interface RotateOptions {
         /** parsed by the color module to extract values for red, green, blue and alpha. (optional, default "#000000") */
-        background?: Color | undefined;
+        background?: Colour | Color | undefined;
     }
 
     type Precision = 'integer' | 'float' | 'approximate';
@@ -1357,7 +1357,7 @@ declare namespace sharp {
 
     interface FlattenOptions {
         /** background colour, parsed by the color module, defaults to black. (optional, default {r:0,g:0,b:0}) */
-        background?: Color | undefined;
+        background?: Colour | Color | undefined;
     }
 
     interface NegateOptions {
@@ -1382,7 +1382,7 @@ declare namespace sharp {
         /** Position, gravity or strategy to use when fit is cover or contain. (optional, default 'centre') */
         position?: number | string | undefined;
         /** Background colour when using a fit of contain, parsed by the color module, defaults to black without transparency. (optional, default {r:0,g:0,b:0,alpha:1}) */
-        background?: Color | undefined;
+        background?: Colour | Color | undefined;
         /** The kernel to use for image reduction. (optional, default 'lanczos3') */
         kernel?: keyof KernelEnum | undefined;
         /** Do not enlarge if the width or height are already less than the specified dimensions, equivalent to GraphicsMagick's > geometry option. (optional, default false) */
@@ -1425,14 +1425,14 @@ declare namespace sharp {
         /** single pixel count to right edge (optional, default 0) */
         right?: number | undefined;
         /** background colour, parsed by the color module, defaults to black without transparency. (optional, default {r:0,g:0,b:0,alpha:1}) */
-        background?: Color | undefined;
+        background?: Colour | Color | undefined;
         /** how the extension is done, one of: "background", "copy", "repeat", "mirror" (optional, default `'background'`) */
         extendWith?: ExtendWith | undefined;
     }
 
     interface TrimOptions {
         /** Background colour, parsed by the color module, defaults to that of the top-left pixel. (optional) */
-        background?: Color | undefined;
+        background?: Colour | Color | undefined;
         /** Allowed difference from the above colour, a positive number. (optional, default 10) */
         threshold?: number | undefined;
         /** Does the input more closely resemble line art (e.g. vector) rather than being photographic? (optional, default false) */
@@ -1453,7 +1453,8 @@ declare namespace sharp {
         alpha?: number | undefined;
     }
 
-    type Color = string | RGBA;
+    type Colour = string | RGBA;
+    type Color = Colour;
 
     interface Kernel {
         /** width of the kernel in pixels. */
