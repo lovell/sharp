@@ -144,6 +144,13 @@ jobs:
             nodejs_hostname: nodejs.org
             nodejs_version: "18.17.0"
             nodejs_version_major: 18
+          - platform: linux-ppc64
+            distro: bullseye
+            run_on_arch: ppc64le
+            nodejs_arch: ppc64le
+            nodejs_hostname: nodejs.org
+            nodejs_version: "18.17.0"
+            nodejs_version_major: 18
     steps:
       - uses: actions/checkout@v4
       - uses: uraimo/run-on-arch-action@v2
