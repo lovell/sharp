@@ -7,7 +7,6 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const eachLimit = require('async/eachLimit');
 const extractZip = require('extract-zip');
 
 const sharp = require('../../');
@@ -31,11 +30,10 @@ const assertDeepZoomTiles = function (directory, expectedSize, expectedLevels, d
     });
   });
   // Verify each tile is <= expectedSize
-  eachLimit(tiles, 8, function (tile, done) {
-    sharp(tile).metadata(function (err, metadata) {
-      if (err) {
-        done(err);
-      } else {
+  Promise.all(tiles.map(function (tile) {
+    return sharp(tile)
+      .metadata()
+      .then(function (metadata) {
         assert.strictEqual('jpeg', metadata.format);
         assert.strictEqual('srgb', metadata.space);
         assert.strictEqual(3, metadata.channels);
@@ -43,10 +41,10 @@ const assertDeepZoomTiles = function (directory, expectedSize, expectedLevels, d
         assert.strictEqual(false, metadata.hasAlpha);
         assert.strictEqual(true, metadata.width <= expectedSize);
         assert.strictEqual(true, metadata.height <= expectedSize);
-        done();
-      }
-    });
-  }, done);
+      });
+  }))
+    .then(() => done())
+    .catch(done);
 };
 
 const assertZoomifyTiles = function (directory, expectedTileSize, expectedLevels, done) {
