@@ -4,6 +4,16 @@
 
 Requires libvips v8.15.3
 
+### v0.33.6 - TBD
+
+* Improve support for ppc64le architecture.
+  [#4203](https://github.com/lovell/sharp/pull/4203)
+  [@sumitd2](https://github.com/sumitd2)
+
+* Add `pdfBackground` constructor property.
+  [#4207](https://github.com/lovell/sharp/pull/4207)
+  [@calebmer](https://github.com/calebmer)
+
 ### v0.33.5 - 16th August 2024
 
 * Upgrade to libvips v8.15.3 for upstream bug fixes.

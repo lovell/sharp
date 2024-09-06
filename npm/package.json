@@ -7,6 +7,7 @@
     "darwin-x64",
     "linux-arm",
     "linux-arm64",
+    "linux-ppc64",
     "linux-s390x",
     "linux-x64",
     "linuxmusl-arm64",

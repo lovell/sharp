@@ -302,3 +302,9 @@ GitHub: https://github.com/ton11797
 
 Name: Nathan Keynes
 GitHub: https://github.com/nkeynes
+
+Name: Sumit D
+GitHub: https://github.com/sumitd2
+
+Name: Caleb Meredith
+GitHub: https://github.com/calebmer
