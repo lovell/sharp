@@ -12,7 +12,7 @@
     'sharp_libvips_lib_dir': '<!(node -p "require(\'../lib/libvips\').buildSharpLibvipsLibDir()")'
   },
   'targets': [{
-    'target_name': 'libvips-cpp',
+    'target_name': 'libvips-cpp-<(vips_version)',
     'conditions': [
       ['OS == "win"', {
         # Build libvips C++ binding for Windows due to MSVC std library ABI changes
@@ -83,7 +83,7 @@
     ],
     'dependencies': [
       '<!(node -p "require(\'node-addon-api\').gyp")',
-      'libvips-cpp'
+      'libvips-cpp-<(vips_version)'
     ],
     'variables': {
       'conditions': [
@@ -149,7 +149,7 @@
           ['OS == "mac"', {
             'link_settings': {
               'libraries': [
-                'libvips-cpp.42.dylib'
+                'libvips-cpp.<(vips_version).dylib'
               ]
             },
             'xcode_settings': {
@@ -169,7 +169,7 @@
             ],
             'link_settings': {
               'libraries': [
-                '-l:libvips-cpp.so.42'
+                '-l:libvips-cpp.so.<(vips_version)'
               ],
               'ldflags': [
                 '-Wl,-s',

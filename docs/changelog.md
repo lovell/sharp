@@ -2,9 +2,11 @@
 
 ## v0.33 - *gauge*
 
-Requires libvips v8.15.3
+Requires libvips v8.15.5-rc1
 
 ### v0.33.6 - TBD
+
+* Upgrade to libvips v8.15.5-rc1 for upstream bug fixes.
 
 * Improve support for ppc64le architecture.
   [#4203](https://github.com/lovell/sharp/pull/4203)
