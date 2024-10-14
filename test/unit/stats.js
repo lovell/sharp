@@ -27,7 +27,7 @@ describe('Image Stats', function () {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
-      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.332915340666659));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.7883011147075762));
 
       const { r, g, b } = stats.dominant;
@@ -272,7 +272,7 @@ describe('Image Stats', function () {
 
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.51758075132966));
-      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 9.959951636662941));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 9.971384105278734));
 
       const { r, g, b } = stats.dominant;
       assert.strictEqual(40, r);
@@ -336,8 +336,8 @@ describe('Image Stats', function () {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
-      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 6.087309412541799));
-      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 2.9250574456255682));
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 6.08118048729375));
+      assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 2.936767879098001));
 
       const { r, g, b } = stats.dominant;
       assert.strictEqual(120, r);
@@ -484,7 +484,7 @@ describe('Image Stats', function () {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
-      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.332915340666659));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
 
       const { r, g, b } = stats.dominant;
@@ -552,7 +552,7 @@ describe('Image Stats', function () {
 
     return pipeline.stats().then(function (stats) {
       assert.strictEqual(true, stats.isOpaque);
-      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.332915340666659));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
 
       const { r, g, b } = stats.dominant;
@@ -615,7 +615,7 @@ describe('Image Stats', function () {
   it('File in, Promise out', function () {
     return sharp(fixtures.inputJpg).stats().then(function (stats) {
       assert.strictEqual(true, stats.isOpaque);
-      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.319914765248541));
+      assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.332915340666659));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
 
       const { r, g, b } = stats.dominant;
@@ -682,8 +682,8 @@ describe('Image Stats', function () {
     return Promise
       .all([original, blurred])
       .then(([original, blurred]) => {
-        assert.strictEqual(true, isInAcceptableRange(original.sharpness, 0.7883011147075476));
-        assert.strictEqual(true, isInAcceptableRange(blurred.sharpness, 0.4791559805997398));
+        assert.strictEqual(true, isInAcceptableRange(original.sharpness, 0.789046400439488));
+        assert.strictEqual(true, isInAcceptableRange(blurred.sharpness, 0.47985138441709047));
       });
   });
 

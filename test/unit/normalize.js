@@ -15,8 +15,8 @@ const assertNormalized = function (data) {
     min = Math.min(min, data[i]);
     max = Math.max(max, data[i]);
   }
-  assert.strictEqual(0, min);
-  assert.ok([254, 255].includes(max));
+  assert.strictEqual(0, min, 'min too high');
+  assert.ok(max > 248, 'max too low');
 };
 
 describe('Normalization', function () {

@@ -18,7 +18,7 @@
         # Build libvips C++ binding for Windows due to MSVC std library ABI changes
         'type': 'shared_library',
         'defines': [
-          'VIPS_CPLUSPLUS_EXPORTS',
+          '_VIPS_PUBLIC=__declspec(dllexport)',
           '_ALLOW_KEYWORD_MACROS'
         ],
         'sources': [

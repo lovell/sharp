@@ -1,12 +1,10 @@
 # Changelog
 
-## v0.33 - *gauge*
+## v0.34 - *hat*
 
-Requires libvips v8.15.5-rc1
+Requires libvips v8.16.0-rc1
 
 ### v0.33.6 - TBD
-
-* Upgrade to libvips v8.15.5-rc1 for upstream bug fixes.
 
 * TypeScript: Ensure channel counts use the correct range.
   [#4197](https://github.com/lovell/sharp/pull/4197)
@@ -19,6 +17,10 @@ Requires libvips v8.15.5-rc1
 * Add `pdfBackground` constructor property.
   [#4207](https://github.com/lovell/sharp/pull/4207)
   [@calebmer](https://github.com/calebmer)
+
+## v0.33 - *gauge*
+
+Requires libvips v8.15.3
 
 ### v0.33.5 - 16th August 2024
 
