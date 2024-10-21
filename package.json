@@ -139,7 +139,8 @@
   "dependencies": {
     "color": "^4.2.3",
     "detect-libc": "^2.0.3",
-    "semver": "^7.6.3"
+    "semver": "^7.6.3",
+    "sharp": "^0.33.5"
   },
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "0.33.5",
