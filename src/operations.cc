@@ -472,4 +472,28 @@ namespace sharp {
     }
   }
 
+  /*
+   * Dilate an image
+   */
+  VImage Dilate(VImage image, int const width) {
+    const int maskWidth = 2*width + 1;
+    VImage mask = VImage::new_matrix(maskWidth, maskWidth);
+
+    return image.morph(
+      mask,
+      VIPS_OPERATION_MORPHOLOGY_DILATE).invert();
+  }
+
+  /*
+   * Erode an image
+   */
+  VImage Erode(VImage image, int const width) {
+    const int maskWidth = 2*width + 1;
+    VImage mask = VImage::new_matrix(maskWidth, maskWidth);
+
+    return image.morph(
+      mask,
+      VIPS_OPERATION_MORPHOLOGY_ERODE).invert();
+  }
+
 }  // namespace sharp
