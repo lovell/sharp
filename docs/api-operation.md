@@ -265,6 +265,30 @@ const gaussianBlurred = await sharp(input)
   .toBuffer();
 ```
 
+## dilate
+
+Dilate the image.
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [width] | <code>number</code> | <code>1</code> | a value between 1 and XX representing the mask size | 
+
+## erode
+
+Erodes the image.
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [width] | <code>number</code> | <code>1</code> | a value between 1 and XX representing the mask size | 
+
 
 ## flatten
 > flatten([options]) ⇒ <code>Sharp</code>

@@ -591,6 +591,16 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Threshold(image, baton->threshold, baton->thresholdGrayscale);
       }
 
+      // Dilate - must happen before blurring, due to the utility of dilating after thresholding
+      if (baton->dilateWidth != 0) {
+        image = sharp::Dilate(image, baton->dilateWidth);
+      }
+
+      // Erode - must happen before blurring, due to the utility of eroding after thresholding
+      if (baton->erodeWidth != 0) {
+        image = sharp::Erode(image, baton->erodeWidth);
+      }
+
       // Blur
       if (shouldBlur) {
         image = sharp::Blur(image, baton->blurSigma, baton->precision, baton->minAmpl);
@@ -1564,6 +1574,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->gammaOut = sharp::AttrAsDouble(options, "gammaOut");
   baton->linearA = sharp::AttrAsVectorOfDouble(options, "linearA");
   baton->linearB = sharp::AttrAsVectorOfDouble(options, "linearB");
+  baton->dilateWidth = sharp::AttrAsUint32(options, "dilateWidth");
+  baton->erodeWidth = sharp::AttrAsUint32(options, "erodeWidth");
   baton->greyscale = sharp::AttrAsBool(options, "greyscale");
   baton->normalise = sharp::AttrAsBool(options, "normalise");
   baton->normaliseLower = sharp::AttrAsUint32(options, "normaliseLower");

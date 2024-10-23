@@ -120,6 +120,15 @@ namespace sharp {
   VImage EmbedMultiPage(VImage image, int left, int top, int width, int height,
                         VipsExtend extendWith, std::vector<double> background, int nPages, int *pageHeight);
 
+  /*
+   * Dilate an image
+   */
+  VImage Dilate(VImage image, int const maskWidth);
+
+  /*
+   * Erode an image
+   */
+  VImage Erode(VImage image, int const maskWidth);
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_
