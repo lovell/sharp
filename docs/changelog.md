@@ -2,7 +2,7 @@
 
 ## v0.34 - *hat*
 
-Requires libvips v8.16.0-rc1
+Requires libvips v8.16.0-rc2
 
 ### v0.33.6 - TBD
 

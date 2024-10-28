@@ -931,7 +931,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .metadata(function (err) {
         assert.strictEqual(true, !!err);
-        assert.ok(err.message.includes('Input file has corrupt header: VipsJpeg: Premature end of'), err);
+        assert.ok(err.message.includes('Input file has corrupt header: VipsJpeg: premature end of'), err);
         done();
       });
   });
@@ -940,7 +940,7 @@ describe('Image metadata', function () {
     sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
       .metadata(function (err) {
         assert.strictEqual(true, !!err);
-        assert.ok(err.message.includes('Input buffer has corrupt header: VipsJpeg: Premature end of'), err);
+        assert.ok(err.message.includes('Input buffer has corrupt header: VipsJpeg: premature end of'), err);
         done();
       });
   });

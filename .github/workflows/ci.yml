@@ -14,38 +14,53 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             container: rockylinux:8
             nodejs_arch: x64
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
             platform: linux-x64
             prebuild: true
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             container: rockylinux:8
             nodejs_arch: x64
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
             platform: linux-x64
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
+            container: rockylinux:8
+            nodejs_arch: x64
+            nodejs_version: "^22.9.0"
+            nodejs_version_major: 22
+            platform: linux-x64
+          - os: ubuntu-24.04
             container: node:18-alpine3.17
             nodejs_version_major: 18
             platform: linuxmusl-x64
             prebuild: true
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             container: node:20-alpine3.18
             nodejs_version_major: 20
             platform: linuxmusl-x64
-          - os: macos-12
+          - os: ubuntu-24.04
+            container: node:22-alpine3.20
+            nodejs_version_major: 22
+            platform: linuxmusl-x64
+          - os: macos-13
             nodejs_arch: x64
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
             platform: darwin-x64
             prebuild: true
-          - os: macos-12
+          - os: macos-13
             nodejs_arch: x64
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
+            platform: darwin-x64
+          - os: macos-13
+            nodejs_arch: x64
+            nodejs_version: "^22.9.0"
+            nodejs_version_major: 22
             platform: darwin-x64
           - os: macos-14
             nodejs_arch: arm64
@@ -57,6 +72,11 @@ jobs:
             nodejs_arch: arm64
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
+            platform: darwin-arm64
+          - os: macos-14
+            nodejs_arch: arm64
+            nodejs_version: "^22.9.0"
+            nodejs_version_major: 22
             platform: darwin-arm64
           - os: windows-2019
             nodejs_arch: x86
@@ -70,6 +90,11 @@ jobs:
             nodejs_version_major: 20
             platform: win32-ia32
           - os: windows-2019
+            nodejs_arch: x86
+            nodejs_version: "^22.9.0"
+            nodejs_version_major: 22
+            platform: win32-ia32
+          - os: windows-2019
             nodejs_arch: x64
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
@@ -79,6 +104,11 @@ jobs:
             nodejs_arch: x64
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
+            platform: win32-x64
+          - os: windows-2019
+            nodejs_arch: x64
+            nodejs_version: "^22.9.0"
+            nodejs_version_major: 22
             platform: win32-x64
     steps:
       - name: Dependencies (Rocky Linux glibc)
@@ -125,7 +155,7 @@ jobs:
     permissions:
       contents: write
     name: ${{ matrix.platform }} - Node.js ${{ matrix.nodejs_version_major }} - prebuild
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -177,8 +207,8 @@ jobs:
     permissions:
       contents: write
     name: wasm32 - prebuild
-    runs-on: ubuntu-22.04
-    container: "emscripten/emsdk:3.1.68"
+    runs-on: ubuntu-24.04
+    container: "emscripten/emsdk:3.1.70"
     steps:
       - name: Checkout
         uses: actions/checkout@v4

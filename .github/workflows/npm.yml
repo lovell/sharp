@@ -16,57 +16,57 @@ jobs:
       matrix:
         include:
           - name: linux-x64-node-npm
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-24.04
             runtime: node
             package-manager: npm
           - name: linux-x64-node-pnpm
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-24.04
             runtime: node
             package-manager: pnpm
           - name: linux-x64-node-yarn
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-24.04
             runtime: node
             package-manager: yarn
           - name: linux-x64-node-yarn-pnp
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-24.04
             runtime: node
             package-manager: yarn-pnp
           - name: linux-x64-node-yarn-v1
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-24.04
             runtime: node
             package-manager: yarn-v1
           - name: linux-x64-deno
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-24.04
             runtime: deno
           - name: linux-x64-bun
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-24.04
             runtime: bun
 
           - name: darwin-x64-node-npm
-            runs-on: macos-12
+            runs-on: macos-13
             runtime: node
             package-manager: npm
           - name: darwin-x64-node-pnpm
-            runs-on: macos-12
+            runs-on: macos-13
             runtime: node
             package-manager: pnpm
           - name: darwin-x64-node-yarn
-            runs-on: macos-12
+            runs-on: macos-13
             runtime: node
             package-manager: yarn
           - name: darwin-x64-node-yarn-pnp
-            runs-on: macos-12
+            runs-on: macos-13
             runtime: node
             package-manager: yarn-pnp
           - name: darwin-x64-node-yarn-v1
-            runs-on: macos-12
+            runs-on: macos-13
             runtime: node
             package-manager: yarn-v1
           - name: darwin-x64-deno
-            runs-on: macos-12
+            runs-on: macos-13
             runtime: deno
           - name: darwin-x64-bun
-            runs-on: macos-12
+            runs-on: macos-13
             runtime: bun
 
           - name: win32-x64-node-npm
