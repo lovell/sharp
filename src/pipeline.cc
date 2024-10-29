@@ -929,6 +929,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
             ->set("smart_subsample", baton->webpSmartSubsample)
+            ->set("smart_deblock", baton->webpSmartDeblock)
             ->set("preset", baton->webpPreset)
             ->set("effort", baton->webpEffort)
             ->set("min_size", baton->webpMinSize)
@@ -1136,6 +1137,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("lossless", baton->webpLossless)
             ->set("near_lossless", baton->webpNearLossless)
             ->set("smart_subsample", baton->webpSmartSubsample)
+            ->set("smart_deblock", baton->webpSmartDeblock)
             ->set("preset", baton->webpPreset)
             ->set("effort", baton->webpEffort)
             ->set("min_size", baton->webpMinSize)
@@ -1419,6 +1421,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         {"lossless", baton->webpLossless ? "true" : "false"},
         {"near_lossless", baton->webpNearLossless ? "true" : "false"},
         {"smart_subsample", baton->webpSmartSubsample ? "true" : "false"},
+        {"smart_deblock", baton->webpSmartDeblock ? "true" : "false"},
         {"preset", vips_enum_nick(VIPS_TYPE_FOREIGN_WEBP_PRESET, baton->webpPreset)},
         {"min_size", baton->webpMinSize ? "true" : "false"},
         {"mixed", baton->webpMixed ? "true" : "false"},
@@ -1676,6 +1679,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->webpLossless = sharp::AttrAsBool(options, "webpLossless");
   baton->webpNearLossless = sharp::AttrAsBool(options, "webpNearLossless");
   baton->webpSmartSubsample = sharp::AttrAsBool(options, "webpSmartSubsample");
+  baton->webpSmartDeblock = sharp::AttrAsBool(options, "webpSmartDeblock");
   baton->webpPreset = sharp::AttrAsEnum<VipsForeignWebpPreset>(options, "webpPreset", VIPS_TYPE_FOREIGN_WEBP_PRESET);
   baton->webpEffort = sharp::AttrAsUint32(options, "webpEffort");
   baton->webpMinSize = sharp::AttrAsBool(options, "webpMinSize");
