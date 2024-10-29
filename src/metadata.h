@@ -24,7 +24,8 @@ struct MetadataBaton {
   int density;
   std::string chromaSubsampling;
   bool isProgressive;
-  int paletteBitDepth;
+  bool isPalette;
+  int bitsPerSample;
   int pages;
   int pageHeight;
   int loop;
@@ -59,7 +60,8 @@ struct MetadataBaton {
     channels(0),
     density(0),
     isProgressive(false),
-    paletteBitDepth(0),
+    isPalette(false),
+    bitsPerSample(0),
     pages(0),
     pageHeight(0),
     loop(-1),

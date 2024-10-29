@@ -1076,6 +1076,10 @@ declare namespace sharp {
         chromaSubsampling?: string | undefined;
         /** Boolean indicating whether the image is interlaced using a progressive scan */
         isProgressive?: boolean | undefined;
+        /** Boolean indicating whether the image is palette-based (GIF, PNG). */
+        isPalette?: boolean | undefined;
+        /** Number of bits per sample for each channel (GIF, PNG). */
+        bitsPerSample?: number | undefined;
         /** Number of pages/frames contained within the image, with support for TIFF, HEIF, PDF, animated GIF and animated WebP */
         pages?: number | undefined;
         /** Number of pixels high each page in a multi-page image will be. */

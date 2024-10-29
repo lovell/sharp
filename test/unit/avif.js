@@ -34,6 +34,7 @@ describe('AVIF', () => {
       // Math.round(13.40625) = 13
       height: 13,
       isProgressive: false,
+      isPalette: false,
       space: 'srgb',
       width: 32
     });
@@ -55,6 +56,8 @@ describe('AVIF', () => {
       hasProfile: false,
       height: 26,
       isProgressive: false,
+      isPalette: false,
+      bitsPerSample: 8,
       pagePrimary: 0,
       pages: 1,
       space: 'srgb',
@@ -77,6 +80,8 @@ describe('AVIF', () => {
       hasProfile: false,
       height: 13,
       isProgressive: false,
+      isPalette: false,
+      bitsPerSample: 8,
       pagePrimary: 0,
       pages: 1,
       space: 'srgb',
@@ -100,6 +105,8 @@ describe('AVIF', () => {
       hasProfile: false,
       height: 300,
       isProgressive: false,
+      isPalette: false,
+      bitsPerSample: 8,
       pagePrimary: 0,
       pages: 1,
       space: 'srgb',
@@ -124,6 +131,8 @@ describe('AVIF', () => {
       hasProfile: false,
       height: 26,
       isProgressive: false,
+      isPalette: false,
+      bitsPerSample: 8,
       pagePrimary: 0,
       pages: 1,
       space: 'srgb',

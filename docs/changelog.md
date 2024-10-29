@@ -6,6 +6,8 @@ Requires libvips v8.16.0-rc2
 
 ### v0.33.6 - TBD
 
+* Add `isPalette` and `bitsPerSample` to metadata, deprecate `paletteBitDepth`.
+
 * TypeScript: Ensure channel counts use the correct range.
   [#4197](https://github.com/lovell/sharp/pull/4197)
   [@DavidVaness](https://github.com/DavidVaness)

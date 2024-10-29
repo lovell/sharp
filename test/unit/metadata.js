@@ -878,6 +878,8 @@ describe('Image metadata', function () {
       channels: 3,
       depth: 'uchar',
       isProgressive: false,
+      isPalette: false,
+      bitsPerSample: 8,
       pages: 1,
       pagePrimary: 0,
       compression: 'av1',
