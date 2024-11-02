@@ -10,6 +10,9 @@ Requires libvips v8.16.0-rc2
 
 * Expose WebP `smartDeblock` output option.
 
+* Ensure `background` metadata can be parsed by `color` package.
+  [#4090](https://github.com/lovell/sharp/issues/4090)
+
 * TypeScript: Ensure channel counts use the correct range.
   [#4197](https://github.com/lovell/sharp/pull/4197)
   [@DavidVaness](https://github.com/DavidVaness)

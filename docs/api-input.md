@@ -31,7 +31,7 @@ A `Promise` is returned when `callback` is not provided.
 - `pagePrimary`: Number of the primary page in a HEIF image
 - `levels`: Details of each level in a multi-level image provided as an array of objects, requires libvips compiled with support for OpenSlide
 - `subifds`: Number of Sub Image File Directories in an OME-TIFF image
-- `background`: Default background colour, if present, for PNG (bKGD) and GIF images, either an RGB Object or a single greyscale value
+- `background`: Default background colour, if present, for PNG (bKGD) and GIF images
 - `compression`: The encoder used to compress an HEIF file, `av1` (AVIF) or `hevc` (HEIC)
 - `resolutionUnit`: The unit of resolution (density), either `inch` or `cm`, if present
 - `hasProfile`: Boolean indicating the presence of an embedded ICC profile

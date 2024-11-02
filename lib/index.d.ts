@@ -1106,8 +1106,8 @@ declare namespace sharp {
         tifftagPhotoshop?: Buffer | undefined;
         /** The encoder used to compress an HEIF file, `av1` (AVIF) or `hevc` (HEIC) */
         compression?: 'av1' | 'hevc';
-        /** Default background colour, if present, for PNG (bKGD) and GIF images, either an RGB Object or a single greyscale value */
-        background?: { r: number; g: number; b: number } | number;
+        /** Default background colour, if present, for PNG (bKGD) and GIF images */
+        background?: { r: number; g: number; b: number } | { gray: number };
         /** Details of each level in a multi-level image provided as an array of objects, requires libvips compiled with support for OpenSlide */
         levels?: LevelMetadata[] | undefined;
         /** Number of Sub Image File Directories in an OME-TIFF image */

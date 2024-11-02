@@ -80,6 +80,8 @@ module.exports = {
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),
   inputPngWithOneColor: getPath('2x2_fdcce6.png'),
   inputPngWithTransparency16bit: getPath('tbgn2c16.png'), // http://www.schaik.com/pngsuite/tbgn2c16.png
+  inputPng8BitGreyBackground: getPath('bgbn4a08.png'), // http://www.schaik.com/pngsuite/bgbn4a08.png
+  inputPng16BitGreyBackground: getPath('bggn4a16.png'), // http://www.schaik.com/pngsuite/bggn4a16.png
   inputPng16BitGreyAlpha: getPath('16-bit-grey-alpha.png'), // CC-BY-NC-SA florc http://www.colourlovers.com/pattern/50713/pat
   inputPngOverlayLayer0: getPath('alpha-layer-0-background.png'),
   inputPngOverlayLayer1: getPath('alpha-layer-1-fill.png'),

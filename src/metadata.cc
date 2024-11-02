@@ -3,6 +3,7 @@
 
 #include <numeric>
 #include <vector>
+#include <cmath>
 
 #include <napi.h>
 #include <vips/vips8>
@@ -226,15 +227,15 @@ class MetadataWorker : public Napi::AsyncWorker {
         info.Set("subifds", baton->subifds);
       }
       if (!baton->background.empty()) {
+        Napi::Object background = Napi::Object::New(env);
         if (baton->background.size() == 3) {
-          Napi::Object background = Napi::Object::New(env);
           background.Set("r", baton->background[0]);
           background.Set("g", baton->background[1]);
           background.Set("b", baton->background[2]);
-          info.Set("background", background);
         } else {
-          info.Set("background", baton->background[0]);
+          background.Set("gray", round(baton->background[0] * 100 / 255));
         }
+        info.Set("background", background);
       }
       info.Set("hasProfile", baton->hasProfile);
       info.Set("hasAlpha", baton->hasAlpha);
