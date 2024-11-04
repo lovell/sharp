@@ -15,7 +15,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-darwin-arm64": "1.1.0-rc2"
+    "@img/sharp-libvips-darwin-arm64": "1.1.0-rc3"
   },
   "files": [
     "lib"

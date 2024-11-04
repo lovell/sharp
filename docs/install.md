@@ -36,7 +36,7 @@ deno run --allow-ffi ...
 
 Ready-compiled sharp and libvips binaries are provided for use on the most common platforms:
 
-* macOS x64 (>= 10.13)
+* macOS x64 (>= 10.15)
 * macOS ARM64
 * Linux ARM (glibc >= 2.28)
 * Linux ARM64 (glibc >= 2.26, musl >= 1.2.2)

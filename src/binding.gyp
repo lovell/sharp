@@ -214,7 +214,7 @@
     ],
     'xcode_settings': {
       'CLANG_CXX_LANGUAGE_STANDARD': 'c++11',
-      'MACOSX_DEPLOYMENT_TARGET': '10.13',
+      'MACOSX_DEPLOYMENT_TARGET': '10.15',
       'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
       'GCC_ENABLE_CPP_RTTI': 'YES',
       'OTHER_CPLUSPLUSFLAGS': [
