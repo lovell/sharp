@@ -10,6 +10,9 @@ Requires libvips v8.16.0
 
 * Expose WebP `smartDeblock` output option.
 
+* Support `info.size` on wide-character systems via upgrade to C++17.
+  [#3943](https://github.com/lovell/sharp/issues/3943)
+
 * Ensure `background` metadata can be parsed by `color` package.
   [#4090](https://github.com/lovell/sharp/issues/4090)
 

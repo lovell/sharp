@@ -38,7 +38,7 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 
 * macOS x64 (>= 10.15)
 * macOS ARM64
-* Linux ARM (glibc >= 2.28)
+* Linux ARM (glibc >= 2.31)
 * Linux ARM64 (glibc >= 2.26, musl >= 1.2.2)
 * Linux ppc64 (glibc >= 2.31)
 * Linux s390x (glibc >= 2.31)
@@ -111,7 +111,7 @@ environment variables.
 
 Building from source requires:
 
-* C++11 compiler
+* C++17 compiler
 * [node-addon-api](https://www.npmjs.com/package/node-addon-api) version 7+
 * [node-gyp](https://github.com/nodejs/node-gyp#installation) version 9+ and its dependencies
 
