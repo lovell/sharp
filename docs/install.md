@@ -236,8 +236,10 @@ custom:
 
 ### electron
 
+#### electron-builder
+
 Ensure `sharp` is unpacked from the ASAR archive file using the
-[asarUnpack](https://www.electron.build/configuration/configuration.html)
+[asarUnpack](https://www.electron.build/app-builder-lib.interface.platformspecificbuildoptions#asarunpack)
 option.
 
 ```json
@@ -248,6 +250,22 @@ option.
       "**/node_modules/sharp/**/*",
       "**/node_modules/@img/**/*"
     ]
+  }
+}
+```
+
+#### electron-forge
+
+Ensure `sharp` is unpacked from the ASAR archive file using the
+[unpack](https://js.electronforge.io/interfaces/_electron_forge_maker_squirrel.InternalOptions.Options.html#asar)
+option.
+
+```json
+{
+  "packagerConfig": {
+    "asar": {
+      "unpack": "**/node_modules/{sharp,@img}/**/*"
+    }
   }
 }
 ```
