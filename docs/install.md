@@ -233,11 +233,10 @@ custom:
       scripts:
         - npm install --os=linux --cpu=x64 sharp
 ```
-
-### electron
+### electron-builder
 
 Ensure `sharp` is unpacked from the ASAR archive file using the
-[asarUnpack](https://www.electron.build/configuration/configuration.html)
+[asarUnpack](https://www.electron.build/app-builder-lib.interface.platformspecificbuildoptions#asarunpack)
 option.
 
 ```json
@@ -250,6 +249,22 @@ option.
     ]
   }
 }
+```
+
+### electron-forge
+
+Ensure `sharp` is unpacked from the ASAR archive file using the
+[unpack](https://www.electronforge.io/config/plugins/auto-unpack-natives)
+option.
+
+```js
+module.exports = {
+  packagerConfig: {
+    asar: {
+      unpack: "**/node_modules/{sharp,@img}/**/*"
+    }
+  }
+};
 ```
 
 ### vite
