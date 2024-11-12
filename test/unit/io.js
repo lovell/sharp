@@ -724,6 +724,22 @@ describe('Input/output', function () {
     });
   });
 
+  it('can use the jp2Oneshot option to handle multi-part tiled JPEG 2000 file', async () => {
+    assert.rejects(async function () {
+      await sharp(fixtures.inputJp2TileParts).toFile(outputJpg);
+    });
+
+    await assert.doesNotReject(async function () {
+      await sharp(fixtures.inputJp2TileParts, { jp2Oneshot: true }).toFile(
+        outputJpg
+      );
+      const meta = await sharp(outputJpg).metadata();
+      assert.strictEqual(meta.format, 'jpeg');
+      assert.strictEqual(meta.width, 320);
+      assert.strictEqual(meta.height, 240);
+    });
+  });
+
   describe('Switch off safety limits for certain formats', () => {
     it('Valid', () => {
       assert.doesNotThrow(() => {

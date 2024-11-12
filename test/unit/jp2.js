@@ -98,5 +98,11 @@ describe('JP2 output', () => {
         sharp().jpeg({ chromaSubsampling: '4:2:2' });
       });
     });
+
+    it('invalid JP2 oneshot value throws error', function () {
+      assert.throws(
+        () => sharp(fixtures.inputJp2TileParts, { jp2Oneshot: 'fail' })
+      );
+    });
   }
 });
