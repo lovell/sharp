@@ -75,6 +75,7 @@ namespace sharp {
     VipsTextWrap textWrap;
     int textAutofitDpi;
     std::vector<double> pdfBackground;
+    bool jp2Oneshot;
 
     InputDescriptor():
       buffer(nullptr),
@@ -110,7 +111,8 @@ namespace sharp {
       textSpacing(0),
       textWrap(VIPS_TEXT_WRAP_WORD),
       textAutofitDpi(0),
-      pdfBackground{ 255.0, 255.0, 255.0, 255.0 } {}
+      pdfBackground{ 255.0, 255.0, 255.0, 255.0 },
+      jp2Oneshot(false) {}
   };
 
   // Convenience methods to access the attributes of a Napi::Object
