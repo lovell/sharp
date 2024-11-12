@@ -47,6 +47,7 @@ where the overall height is the `pageHeight` multiplied by the number of `pages`
 | [options.subifd] | <code>number</code> | <code>-1</code> | subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. |
 | [options.level] | <code>number</code> | <code>0</code> | level to extract from a multi-level input (OpenSlide), zero based. |
 | [options.pdfBackground] | <code>string</code> \| <code>Object</code> |  | Background colour to use when PDF is partially transparent. Parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha. Requires the use of a globally-installed libvips compiled with support for PDFium, Poppler, ImageMagick or GraphicsMagick. |
+| [options.jp2Oneshot] | <code>boolean</code> | <code>false</code> | Set to `true` to decode tiled JPEG 2000 images in a single operation, improving compatibility. |
 | [options.animated] | <code>boolean</code> | <code>false</code> | Set to `true` to read all frames/pages of an animated image (GIF, WebP, TIFF), equivalent of setting `pages` to `-1`. |
 | [options.raw] | <code>Object</code> |  | describes raw pixel input image data. See `raw()` for pixel ordering. |
 | [options.raw.width] | <code>number</code> |  | integral number of pixels wide. |

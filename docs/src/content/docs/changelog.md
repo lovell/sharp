@@ -10,6 +10,10 @@ Requires libvips v8.17.0
 
 * Upgrade to libvips v8.17.0 for upstream bug fixes.
 
+* Expose JPEG 2000 `oneshot` decoder option.
+  [#4262](https://github.com/lovell/sharp/pull/4262)
+  [@mbklein](https://github.com/mbklein)
+
 * Support composite operation with non-sRGB pipeline colourspace.
   [#4412](https://github.com/lovell/sharp/pull/4412)
   [@kleisauke](https://github.com/kleisauke)

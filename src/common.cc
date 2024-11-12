@@ -113,6 +113,10 @@ namespace sharp {
     if (HasAttr(input, "pdfBackground")) {
       descriptor->pdfBackground = AttrAsVectorOfDouble(input, "pdfBackground");
     }
+    // Use JPEG 2000 oneshot mode?
+    if (HasAttr(input, "jp2Oneshot")) {
+      descriptor->jp2Oneshot = AttrAsBool(input, "jp2Oneshot");
+    }
     // Create new image
     if (HasAttr(input, "createChannels")) {
       descriptor->createChannels = AttrAsUint32(input, "createChannels");
@@ -434,6 +438,9 @@ namespace sharp {
             if (imageType == ImageType::PDF) {
               option->set("background", descriptor->pdfBackground);
             }
+            if (imageType == ImageType::JP2) {
+              option->set("oneshot", descriptor->jp2Oneshot);
+            }
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
@@ -540,6 +547,9 @@ namespace sharp {
             }
             if (imageType == ImageType::PDF) {
               option->set("background", descriptor->pdfBackground);
+            }
+            if (imageType == ImageType::JP2) {
+              option->set("oneshot", descriptor->jp2Oneshot);
             }
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {

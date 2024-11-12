@@ -117,6 +117,7 @@ module.exports = {
   inputTiffFogra: getPath('fogra-0-100-100-0.tif'), // https://github.com/lovell/sharp/issues/4045
 
   inputJp2: getPath('relax.jp2'), // https://www.fnordware.com/j2k/relax.jp2
+  inputJp2TileParts: getPath('relax_tileparts.jp2'), // kdu_expand -i relax.jp2 -o relax-tmp.tif ; kdu_compress -i relax-tmp.tif -o relax_tileparts.jp2 -jp2_space sRGB Clayers=8 -rate 1.0,0.04 Stiles='{128,128}' ORGtparts=L ; rm relax-tmp.tif
   inputGif: getPath('Crash_test.gif'), // http://upload.wikimedia.org/wikipedia/commons/e/e3/Crash_test.gif
   inputGifGreyPlusAlpha: getPath('grey-plus-alpha.gif'), // http://i.imgur.com/gZ5jlmE.gif
   inputGifAnimated: getPath('rotating-squares.gif'), // CC0 https://loading.io/spinner/blocks/-rotating-squares-preloader-gif

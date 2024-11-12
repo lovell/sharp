@@ -721,6 +721,9 @@ const color: sharp.Color = '#fff';
 sharp({ pdfBackground: colour });
 sharp({ pdfBackground: color });
 
+sharp({ jp2Oneshot: true });
+sharp({ jp2Oneshot: false });
+
 sharp({ autoOrient: true });
 sharp({ autoOrient: false });
 sharp().autoOrient();
