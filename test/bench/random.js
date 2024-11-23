@@ -12,7 +12,6 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 sharp.cache(false);
-sharp.simd(true);
 
 const min = 320;
 const max = 960;
