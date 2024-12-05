@@ -6,8 +6,8 @@ Composite image(s) over the processed (resized, extracted etc.) image.
 The images to composite must be the same size or smaller than the processed image.
 If both `top` and `left` options are provided, they take precedence over `gravity`.
 
-Any resize, rotate or extract operations in the same processing pipeline
-will always be applied to the input image before composition.
+Other operations in the same processing pipeline (e.g. resize, rotate, flip,
+flop, extract) will always be applied to the input image before composition.
 
 The `blend` option can be one of `clear`, `source`, `over`, `in`, `out`, `atop`,
 `dest`, `dest-over`, `dest-in`, `dest-out`, `dest-atop`,
