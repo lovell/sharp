@@ -102,6 +102,8 @@ describe('Image metadata', function () {
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual(1, metadata.orientation);
+      assert.strictEqual(2464, metadata.appliedOrientation.width);
+      assert.strictEqual(3248, metadata.appliedOrientation.height);
       assert.strictEqual('undefined', typeof metadata.exif);
       assert.strictEqual('undefined', typeof metadata.icc);
       assert.strictEqual('inch', metadata.resolutionUnit);
@@ -148,6 +150,8 @@ describe('Image metadata', function () {
       assert.strictEqual(false, metadata.hasProfile);
       assert.strictEqual(false, metadata.hasAlpha);
       assert.strictEqual('undefined', typeof metadata.orientation);
+      assert.strictEqual(2809, metadata.appliedOrientation.width);
+      assert.strictEqual(2074, metadata.appliedOrientation.height);
       assert.strictEqual('undefined', typeof metadata.exif);
       assert.strictEqual('undefined', typeof metadata.icc);
       done();
@@ -218,7 +222,11 @@ describe('Image metadata', function () {
       isPalette: false,
       isProgressive: false,
       space: 'b-w',
-      width: 32
+      width: 32,
+      appliedOrientation: {
+        width: 32,
+        height: 32
+      }
     });
   });
 
@@ -239,7 +247,11 @@ describe('Image metadata', function () {
       isPalette: false,
       isProgressive: false,
       space: 'grey16',
-      width: 32
+      width: 32,
+      appliedOrientation: {
+        width: 32,
+        height: 32
+      }
     });
   });
 
@@ -601,6 +613,10 @@ describe('Image metadata', function () {
           if (err) throw err;
           assert.strictEqual(true, metadata.hasProfile);
           assert.strictEqual(8, metadata.orientation);
+          assert.strictEqual(320, metadata.width);
+          assert.strictEqual(240, metadata.height);
+          assert.strictEqual(240, metadata.appliedOrientation.width);
+          assert.strictEqual(320, metadata.appliedOrientation.height);
           assert.strictEqual('object', typeof metadata.exif);
           assert.strictEqual(true, metadata.exif instanceof Buffer);
           // EXIF
@@ -926,7 +942,11 @@ describe('Image metadata', function () {
       pagePrimary: 0,
       compression: 'av1',
       hasProfile: false,
-      hasAlpha: false
+      hasAlpha: false,
+      appliedOrientation: {
+        width: 2048,
+        height: 858
+      }
     });
   });
 

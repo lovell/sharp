@@ -1119,6 +1119,13 @@ declare namespace sharp {
         width?: number | undefined;
         /** Number of pixels high (EXIF orientation is not taken into consideration) */
         height?: number | undefined;
+        /** Any changed metadata after the image orientation is applied. */
+        appliedOrientation: {
+            /** Number of pixels wide (EXIF orientation is taken into consideration) */
+            width: number;
+            /** Number of pixels high (EXIF orientation is taken into consideration) */
+            height: number;
+        };
         /** Name of colour space interpretation */
         space?: keyof ColourspaceEnum | undefined;
         /** Number of bands e.g. 3 for sRGB, 4 for CMYK */
