@@ -447,6 +447,30 @@ describe('Rotation', function () {
     assert.strictEqual(warningMessage, 'ignoring previous rotate options');
   });
 
+  it('Multiple rotate: last one wins (cardinal)', function (done) {
+    sharp(fixtures.inputJpg)
+      .rotate(45)
+      .rotate(90)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(2225, info.width);
+        assert.strictEqual(2725, info.height);
+        done();
+      });
+  });
+
+  it('Multiple rotate: last one wins (non cardinal)', function (done) {
+    sharp(fixtures.inputJpg)
+      .rotate(90)
+      .rotate(45)
+      .toBuffer(function (err, data, info) {
+        if (err) throw err;
+        assert.strictEqual(3500, info.width);
+        assert.strictEqual(3500, info.height);
+        done();
+      });
+  });
+
   it('Flip - vertical', function (done) {
     sharp(fixtures.inputJpg)
       .resize(320)
