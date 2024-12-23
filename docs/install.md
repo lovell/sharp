@@ -135,6 +135,8 @@ Use in web browsers is unsupported.
 
 Native text rendering is unsupported.
 
+[Tile-based output](/api-output#tile) is unsupported.
+
 ```sh
 npm install --cpu=wasm32 sharp
 ```
