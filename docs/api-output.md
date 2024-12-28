@@ -762,10 +762,6 @@ Use a `.zip` or `.szi` file extension with `toFile` to write to a compressed arc
 
 The container will be set to `zip` when the output is a Buffer or Stream, otherwise it will default to `fs`.
 
-Requires libvips compiled with support for libgsf.
-The prebuilt binaries do not include this - see
-[installing a custom libvips](https://sharp.pixelplumbing.com/install#custom-libvips).
-
 
 **Throws**:
 
