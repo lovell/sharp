@@ -4,17 +4,17 @@
 
 Requires libvips v8.16.0
 
-### v0.33.6 - TBD
+### v0.34.0 - TBD
+
+* Breaking: Support `info.size` on wide-character systems via upgrade to C++17.
+  [#3943](https://github.com/lovell/sharp/issues/3943)
+
+* Breaking: Ensure `background` metadata can be parsed by `color` package.
+  [#4090](https://github.com/lovell/sharp/issues/4090)
 
 * Add `isPalette` and `bitsPerSample` to metadata, deprecate `paletteBitDepth`.
 
 * Expose WebP `smartDeblock` output option.
-
-* Support `info.size` on wide-character systems via upgrade to C++17.
-  [#3943](https://github.com/lovell/sharp/issues/3943)
-
-* Ensure `background` metadata can be parsed by `color` package.
-  [#4090](https://github.com/lovell/sharp/issues/4090)
 
 * TypeScript: Ensure channel counts use the correct range.
   [#4197](https://github.com/lovell/sharp/pull/4197)
