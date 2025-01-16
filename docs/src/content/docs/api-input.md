@@ -1,3 +1,7 @@
+---
+title: Input metadata
+---
+
 ## metadata
 > metadata([callback]) ⇒ <code>Promise.&lt;Object&gt;</code> \| <code>Sharp</code>
 

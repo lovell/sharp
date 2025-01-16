@@ -1,5 +1,7 @@
-# Changelog
-
+---
+title: Changelog
+---
+  
 ## v0.34 - *hat*
 
 Requires libvips v8.16.0

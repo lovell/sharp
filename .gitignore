@@ -14,3 +14,5 @@ test/leak/libvips.supp
 package-lock.json
 .idea
 .firebase
+.astro
+docs/dist

@@ -1,14 +1,7 @@
 {
   "hosting": {
     "site": "pixelplumbing-sharp",
-    "public": ".",
-    "ignore": [
-      ".*",
-      "build.js",
-      "firebase.json",
-      "image/**",
-      "search-index/**"
-    ],
+    "public": "dist",
     "headers": [
       {
         "source": "**",

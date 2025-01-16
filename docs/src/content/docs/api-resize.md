@@ -1,3 +1,7 @@
+---
+title: Resizing images
+---
+
 ## resize
 > resize([width], [height], [options]) ⇒ <code>Sharp</code>
 

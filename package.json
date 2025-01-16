@@ -102,9 +102,9 @@
     "test-types": "tsd",
     "package-from-local-build": "node npm/from-local-build",
     "package-from-github-release": "node npm/from-github-release",
-    "docs-build": "node docs/build && node docs/search-index/build",
-    "docs-serve": "cd docs && npx serve",
-    "docs-publish": "cd docs && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
+    "docs-build": "node docs/build.mjs",
+    "docs-serve": "cd docs && npm start",
+    "docs-publish": "cd docs && npm run build && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
   },
   "type": "commonjs",
   "main": "lib/index.js",

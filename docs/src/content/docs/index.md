@@ -1,4 +1,6 @@
-# sharp
+---
+title: "High performance Node.js image processing"
+---
 
 <img src="https://cdn.jsdelivr.net/gh/lovell/sharp@main/docs/image/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
 
@@ -23,7 +25,11 @@ rotation, extraction, compositing and gamma correction are available.
 Most modern macOS, Windows and Linux systems
 do not require any additional install or runtime dependencies.
 
-### Formats
+```sh
+npm install sharp
+```
+
+## Formats
 
 This module supports reading JPEG, PNG, WebP, GIF, AVIF, TIFF and SVG images.
 
@@ -37,7 +43,7 @@ Deep Zoom image pyramids can be generated,
 suitable for use with "slippy map" tile viewers like
 [OpenSeadragon](https://github.com/openseadragon/openseadragon).
 
-### Fast
+## Fast
 
 This module is powered by the blazingly fast
 [libvips](https://github.com/libvips/libvips) image processing library,
@@ -52,7 +58,7 @@ taking full advantage of multiple CPU cores and L1/L2/L3 cache.
 Everything remains non-blocking thanks to _libuv_,
 no child processes are spawned and Promises/async/await are supported.
 
-### Optimal
+## Optimal
 
 The features of `mozjpeg` and `pngquant` can be used
 to optimise the file size of JPEG and PNG images respectively,
@@ -71,12 +77,12 @@ The file size of animated GIF output is optimised
 without having to use separate command line tools such as
 [gifsicle](https://www.lcdf.org/gifsicle/).
 
-### Contributing
+## Contributing
 
 A [guide for contributors](https://github.com/lovell/sharp/blob/main/.github/CONTRIBUTING.md)
 covers reporting bugs, requesting features and submitting code changes.
 
-### Licensing
+## Licensing
 
 Copyright 2013 Lovell Fuller and others.
 

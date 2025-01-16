@@ -1,8 +1,12 @@
-# Installation
+---
+title: Installation
+---
 
 Works with your choice of JavaScript package manager.
 
-> ⚠️  **Please ensure your package manager is configured to install optional dependencies**
+:::caution
+Please ensure your package manager is configured to install optional dependencies
+:::
 
 If a package manager lockfile must support multiple platforms,
 please see the [cross-platform](#cross-platform) section
@@ -59,7 +63,9 @@ within the same installation tree and/or using the same lockfile.
 
 ### npm v10+
 
-> ⚠️ **npm `package-lock.json` files can cause installation problems due to [npm bug #4828](https://github.com/npm/cli/issues/4828)**
+:::caution
+npm `package-lock.json` files shared by multiple platforms can cause installation problems due to [npm bug #4828](https://github.com/npm/cli/issues/4828)
+:::
 
 Provides limited support via `--os`, `--cpu` and `--libc` flags.
 

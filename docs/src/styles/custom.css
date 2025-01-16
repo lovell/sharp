@@ -1,0 +1,45 @@
+@view-transition {
+  navigation: auto;
+}
+
+:root {
+  --sl-content-width: 60rem;
+  --sl-color-accent-low: #072d00;
+  --sl-color-accent: #247f00;
+  --sl-color-accent-high: #aad7a0;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #eaf0e8;
+  --sl-color-gray-2: #c5cdc3;
+  --sl-color-gray-3: #99a796;
+  --sl-color-gray-4: #4f5c4d;
+  --sl-color-gray-5: #303c2d;
+  --sl-color-gray-6: #1f2a1c;
+  --sl-color-black: #151a13;
+}
+
+:root[data-theme="light"] {
+  --sl-color-accent-low: #c0e2b8;
+  --sl-color-accent: #165800;
+  --sl-color-accent-high: #0d3e00;
+  --sl-color-white: #151a13;
+  --sl-color-gray-1: #1f2a1c;
+  --sl-color-gray-2: #303c2d;
+  --sl-color-gray-3: #4f5c4d;
+  --sl-color-gray-4: #82907f;
+  --sl-color-gray-5: #bdc4bb;
+  --sl-color-gray-6: #eaf0e8;
+  --sl-color-gray-7: #f4f7f3;
+  --sl-color-black: #ffffff;
+}
+
+blockquote {
+  background-color: var(--sl-color-gray-6);
+  padding: 1rem;
+}
+
+.site-title::after {
+  content: "High performance Node.js image processing";
+  color: var(--sl-color-text);
+  font-size: var(--sl-text-sm);
+  padding-top: 0.3rem;
+}

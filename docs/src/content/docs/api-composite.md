@@ -1,3 +1,7 @@
+---
+title: Compositing images
+---
+
 ## composite
 > composite(images) ⇒ <code>Sharp</code>
 

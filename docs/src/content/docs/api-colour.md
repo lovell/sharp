@@ -1,3 +1,7 @@
+---
+title: Colour manipulation
+---
+
 ## tint
 > tint(tint) ⇒ <code>Sharp</code>
 

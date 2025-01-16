@@ -1,3 +1,7 @@
+---
+title: Output options
+---
+
 ## toFile
 > toFile(fileOut, [callback]) ⇒ <code>Promise.&lt;Object&gt;</code>
 

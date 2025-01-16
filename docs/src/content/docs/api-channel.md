@@ -1,3 +1,7 @@
+---
+title: Channel manipulation
+---
+
 ## removeAlpha
 > removeAlpha() ⇒ <code>Sharp</code>
 

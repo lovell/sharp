@@ -1,4 +1,6 @@
-# Performance
+---
+title: Performance
+---
 
 A test to benchmark the performance of this module relative to alternatives.
 

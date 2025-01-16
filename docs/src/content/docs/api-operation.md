@@ -1,3 +1,7 @@
+---
+title: Image operations
+---
+
 ## rotate
 > rotate([angle], [options]) ⇒ <code>Sharp</code>
 

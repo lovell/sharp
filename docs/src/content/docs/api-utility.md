@@ -1,3 +1,7 @@
+---
+title: Global properties
+---
+
 ## versions
 > versions
 
