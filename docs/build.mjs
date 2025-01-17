@@ -31,7 +31,7 @@ Object.keys(pages).forEach(async (m) => {
   });
 
   const cleanMarkdown =
-    `---\ntitle: ${pages[m]}\n---\n\n` +
+    `---\n# This file was auto-generated from JSDoc in lib/${m}.js\ntitle: ${pages[m]}\n---\n\n` +
     markdown
       .replace(/(## )([A-Za-z0-9]+)([^\n]*)/g, '$1$2\n> $2$3\n') // simplify headings
       .replace(/<a name="[A-Za-z0-9+]+"><\/a>/g, '') // remove anchors

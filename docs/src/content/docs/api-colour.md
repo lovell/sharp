@@ -1,4 +1,5 @@
 ---
+# This file was auto-generated from JSDoc in lib/colour.js
 title: Colour manipulation
 ---
 
