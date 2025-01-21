@@ -34,6 +34,10 @@ Requires libvips v8.16.0
   [#4207](https://github.com/lovell/sharp/pull/4207)
   [@calebmer](https://github.com/calebmer)
 
+* Add support for RGBE images. Requires libvips compiled with radiance support.
+  [#4316](https://github.com/lovell/sharp/pull/4316)
+  [@florentzabera](https://github.com/florentzabera)
+
 ## v0.33 - *gauge*
 
 Requires libvips v8.15.3

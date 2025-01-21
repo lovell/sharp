@@ -147,6 +147,7 @@ namespace sharp {
     FITS,
     EXR,
     JXL,
+    RAD,
     VIPS,
     RAW,
     UNKNOWN,
