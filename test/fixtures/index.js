@@ -138,6 +138,9 @@ module.exports = {
   testPattern: getPath('test-pattern.png'),
 
   inputPngWithTransparent: getPath('d.png'),
+
+  inputHdr: getPath('rogland_moonlit_night_1k.hdr'), // CC0 https://polyhaven.com/a/rogland_moonlit_night
+
   // Path for tests requiring human inspection
   path: getPath,
 

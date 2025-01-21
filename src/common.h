@@ -151,6 +151,7 @@ namespace sharp {
     JXL,
     VIPS,
     RAW,
+    RAD,
     UNKNOWN,
     MISSING
   };
