@@ -40,19 +40,7 @@ import { Duplex } from 'stream';
  */
 declare function sharp(options?: sharp.SharpOptions): sharp.Sharp;
 declare function sharp(
-    input?:
-        | Buffer
-        | ArrayBuffer
-        | Uint8Array
-        | Uint8ClampedArray
-        | Int8Array
-        | Uint16Array
-        | Int16Array
-        | Uint32Array
-        | Int32Array
-        | Float32Array
-        | Float64Array
-        | string,
+    input?: sharp.SharpInput | Array<sharp.SharpInput>,
     options?: sharp.SharpOptions,
 ): sharp.Sharp;
 
@@ -945,6 +933,19 @@ declare namespace sharp {
         //#endregion
     }
 
+    type SharpInput = Buffer
+        | ArrayBuffer
+        | Uint8Array
+        | Uint8ClampedArray
+        | Int8Array
+        | Uint16Array
+        | Int16Array
+        | Uint32Array
+        | Int32Array
+        | Float32Array
+        | Float64Array
+        | string;
+
     interface SharpOptions {
         /**
          * Auto-orient based on the EXIF `Orientation` tag, if present.
@@ -998,6 +999,8 @@ declare namespace sharp {
         create?: Create | undefined;
         /** Describes a new text image to be created. */
         text?: CreateText | undefined;
+        /** Describes how array of input images should be joined. */
+        join?: Join | undefined;
     }
 
     interface CacheOptions {
@@ -1076,6 +1079,21 @@ declare namespace sharp {
         spacing?: number;
         /** Word wrapping style when width is provided, one of: 'word', 'char', 'word-char' (prefer word, fallback to char) or 'none' */
         wrap?: TextWrap;
+    }
+
+    interface Join {
+        /** Number of images per row. */
+        across?: number | undefined;
+        /** Treat input as frames of an animated image. */
+        animated?: boolean | undefined;
+        /** Space between images, in pixels. */
+        shim?: number | undefined;
+        /** Background colour. */
+        background?: Colour | Color | undefined;
+        /** Horizontal alignment. */
+        halign?: HorizontalAlignment | undefined;
+        /** Vertical alignment. */
+        valign?: VerticalAlignment | undefined;
     }
 
     interface ExifDir {
@@ -1715,6 +1733,10 @@ declare namespace sharp {
     type TextAlign = 'left' | 'centre' | 'center' | 'right';
 
     type TextWrap = 'word' | 'char' | 'word-char' | 'none';
+
+    type HorizontalAlignment = 'left' | 'centre' | 'center' | 'right';
+
+    type VerticalAlignment = 'top' | 'centre' | 'center' | 'bottom';
 
     type TileContainer = 'fs' | 'zip';
 

@@ -724,3 +724,19 @@ sharp({ pdfBackground: color });
 sharp({ autoOrient: true });
 sharp({ autoOrient: false });
 sharp().autoOrient();
+
+sharp([input, input]);
+sharp([input, input], {
+  join: {
+    animated: true
+  }
+});
+sharp([input, input], {
+  join: {
+    across: 2,
+    shim: 5,
+    background: colour,
+    halign: 'centre',
+    valign: 'bottom'
+  }
+});

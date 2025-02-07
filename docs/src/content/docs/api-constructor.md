@@ -33,7 +33,7 @@ where the overall height is the `pageHeight` multiplied by the number of `pages`
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [input] | <code>Buffer</code> \| <code>ArrayBuffer</code> \| <code>Uint8Array</code> \| <code>Uint8ClampedArray</code> \| <code>Int8Array</code> \| <code>Uint16Array</code> \| <code>Int16Array</code> \| <code>Uint32Array</code> \| <code>Int32Array</code> \| <code>Float32Array</code> \| <code>Float64Array</code> \| <code>string</code> |  | if present, can be  a Buffer / ArrayBuffer / Uint8Array / Uint8ClampedArray containing JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image data, or  a TypedArray containing raw pixel image data, or  a String containing the filesystem path to an JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image file.  JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present. |
+| [input] | <code>Buffer</code> \| <code>ArrayBuffer</code> \| <code>Uint8Array</code> \| <code>Uint8ClampedArray</code> \| <code>Int8Array</code> \| <code>Uint16Array</code> \| <code>Int16Array</code> \| <code>Uint32Array</code> \| <code>Int32Array</code> \| <code>Float32Array</code> \| <code>Float64Array</code> \| <code>string</code> \| <code>Array</code> |  | if present, can be  a Buffer / ArrayBuffer / Uint8Array / Uint8ClampedArray containing JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image data, or  a TypedArray containing raw pixel image data, or  a String containing the filesystem path to an JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image file.  An array of inputs can be provided, and these will be joined together.  JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present. |
 | [options] | <code>Object</code> |  | if present, is an Object with optional attributes. |
 | [options.failOn] | <code>string</code> | <code>&quot;&#x27;warning&#x27;&quot;</code> | When to abort processing of invalid pixel data, one of (in order of sensitivity, least to most): 'none', 'truncated', 'error', 'warning'. Higher levels imply lower levels. Invalid metadata will always abort. |
 | [options.limitInputPixels] | <code>number</code> \| <code>boolean</code> | <code>268402689</code> | Do not process input images where the number of pixels  (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.  An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). |
@@ -74,6 +74,13 @@ where the overall height is the `pageHeight` multiplied by the number of `pages`
 | [options.text.rgba] | <code>boolean</code> | <code>false</code> | set this to true to enable RGBA output. This is useful for colour emoji rendering, or support for pango markup features like `<span foreground="red">Red!</span>`. |
 | [options.text.spacing] | <code>number</code> | <code>0</code> | text line height in points. Will use the font line height if none is specified. |
 | [options.text.wrap] | <code>string</code> | <code>&quot;&#x27;word&#x27;&quot;</code> | word wrapping style when width is provided, one of: 'word', 'char', 'word-char' (prefer word, fallback to char) or 'none'. |
+| [options.join] | <code>Object</code> |  | describes how an array of input images should be joined. |
+| [options.join.across] | <code>number</code> | <code>1</code> | number of images to join horizontally. |
+| [options.join.animated] | <code>boolean</code> | <code>false</code> | set this to `true` to join the images as an animated image. |
+| [options.join.shim] | <code>number</code> | <code>0</code> | number of pixels to insert between joined images. |
+| [options.join.background] | <code>string</code> \| <code>Object</code> |  | parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha. |
+| [options.join.halign] | <code>string</code> | <code>&quot;&#x27;left&#x27;&quot;</code> | horizontal alignment style for images joined horizontally (`'left'`, `'centre'`, `'center'`, `'right'`). |
+| [options.join.valign] | <code>string</code> | <code>&quot;&#x27;top&#x27;&quot;</code> | vertical alignment style for images joined vertically (`'top'`, `'centre'`, `'center'`, `'bottom'`). |
 
 **Example**  
 ```js
@@ -172,6 +179,22 @@ await sharp({
     dpi: 300
   }
 }).toFile('text_rgba.png');
+```
+**Example**  
+```js
+// Join four input images as a 2x2 grid with a 4 pixel gutter
+const data = await sharp(
+ [image1, image2, image3, image4],
+ { join: { across: 2, shim: 4 } }
+).toBuffer();
+```
+**Example**  
+```js
+// Generate a two-frame animated image from emoji
+const images = ['😀', '😛'].map(text => ({
+  text: { text, width: 64, height: 64, channels: 4, rgba: true }
+}));
+await sharp(images, { join: { animated: true } }).toFile('out.gif');
 ```
 
 

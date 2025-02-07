@@ -160,10 +160,30 @@ namespace sharp {
         descriptor->textWrap = AttrAsEnum<VipsTextWrap>(input, "textWrap", VIPS_TYPE_TEXT_WRAP);
       }
     }
+    // Join images together
+    if (HasAttr(input, "joinAnimated")) {
+      descriptor->joinAnimated = AttrAsBool(input, "joinAnimated");
+    }
+    if (HasAttr(input, "joinAcross")) {
+      descriptor->joinAcross = AttrAsUint32(input, "joinAcross");
+    }
+    if (HasAttr(input, "joinShim")) {
+      descriptor->joinShim = AttrAsUint32(input, "joinShim");
+    }
+    if (HasAttr(input, "joinBackground")) {
+      descriptor->joinBackground = AttrAsVectorOfDouble(input, "joinBackground");
+    }
+    if (HasAttr(input, "joinHalign")) {
+      descriptor->joinHalign = AttrAsEnum<VipsAlign>(input, "joinHalign", VIPS_TYPE_ALIGN);
+    }
+    if (HasAttr(input, "joinValign")) {
+      descriptor->joinValign = AttrAsEnum<VipsAlign>(input, "joinValign", VIPS_TYPE_ALIGN);
+    }
     // Limit input images to a given number of pixels, where pixels = width * height
     descriptor->limitInputPixels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputPixels"));
-    // Allow switch from random to sequential access
-    descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
+    if (HasAttr(input, "access")) {
+      descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
+    }
     // Remove safety features and allow unlimited input
     descriptor->unlimited = AttrAsBool(input, "unlimited");
     // Use the EXIF orientation to auto orient the image

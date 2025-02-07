@@ -39,6 +39,7 @@ struct Composite {
 
 struct PipelineBaton {
   sharp::InputDescriptor *input;
+  std::vector<sharp::InputDescriptor *> join;
   std::string formatOut;
   std::string fileOut;
   void *bufferOut;
