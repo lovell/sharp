@@ -50,33 +50,35 @@ declare namespace sharp {
 
     /** An Object containing the version numbers of sharp, libvips and its dependencies. */
     const versions: {
-        vips: string;
+        aom?: string | undefined;
+        archive?: string | undefined;
         cairo?: string | undefined;
-        croco?: string | undefined;
+        cgif?: string | undefined;
         exif?: string | undefined;
         expat?: string | undefined;
         ffi?: string | undefined;
         fontconfig?: string | undefined;
         freetype?: string | undefined;
-        gdkpixbuf?: string | undefined;
-        gif?: string | undefined;
+        fribidi?: string | undefined;
         glib?: string | undefined;
-        gsf?: string | undefined;
         harfbuzz?: string | undefined;
-        jpeg?: string | undefined;
+        heif?: string | undefined;
+        highway?: string | undefined;
+        imagequant?: string | undefined;
         lcms?: string | undefined;
-        orc?: string | undefined;
+        mozjpeg?: string | undefined;
         pango?: string | undefined;
         pixman?: string | undefined;
         png?: string | undefined;
-        sharp?: string | undefined;
-        svg?: string | undefined;
+        "proxy-libintl"?: string | undefined;
+        rsvg?: string | undefined;
+        sharp: string;
+        spng?: string | undefined;
         tiff?: string | undefined;
+        vips: string;
         webp?: string | undefined;
-        avif?: string | undefined;
-        heif?: string | undefined;
         xml?: string | undefined;
-        zlib?: string | undefined;
+        "zlib-ng"?: string | undefined;
     };
 
     /** An Object containing the available interpolators and their proper values */
