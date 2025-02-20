@@ -246,12 +246,6 @@ namespace sharp {
   VImage SetProfile(VImage image, std::pair<char*, size_t> icc);
 
   /*
-    Does this image have an alpha channel?
-    Uses colour space interpretation with number of channels to guess this.
-  */
-  bool HasAlpha(VImage image);
-
-  /*
     Remove all EXIF-related image fields.
   */
   VImage RemoveExif(VImage image);
@@ -381,7 +375,7 @@ namespace sharp {
   std::tuple<VImage, std::vector<double>> ApplyAlpha(VImage image, std::vector<double> colour, bool premultiply);
 
   /*
-    Removes alpha channel, if any.
+    Removes alpha channels, if any.
   */
   VImage RemoveAlpha(VImage image);
 

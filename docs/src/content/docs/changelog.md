@@ -11,6 +11,9 @@ Requires libvips v8.16.0
 * Breaking: Support array of input images to be joined or animated.
   [#1580](https://github.com/lovell/sharp/issues/1580)
 
+* Breaking: Ensure `removeAlpha` removes all alpha channels.
+  [#2266](https://github.com/lovell/sharp/issues/2266)
+
 * Breaking: Support `info.size` on wide-character systems via upgrade to C++17.
   [#3943](https://github.com/lovell/sharp/issues/3943)
 

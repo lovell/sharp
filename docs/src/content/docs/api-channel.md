@@ -6,7 +6,7 @@ title: Channel manipulation
 ## removeAlpha
 > removeAlpha() ⇒ <code>Sharp</code>
 
-Remove alpha channel, if any. This is a no-op if the image does not have an alpha channel.
+Remove alpha channels, if any. This is a no-op if the image does not have an alpha channel.
 
 See also [flatten](/api-operation#flatten).
 

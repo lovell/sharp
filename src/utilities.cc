@@ -233,10 +233,10 @@ Napi::Value _maxColourDistance(const Napi::CallbackInfo& info) {
   double maxColourDistance;
   try {
     // Premultiply and remove alpha
-    if (sharp::HasAlpha(image1)) {
+    if (image1.has_alpha()) {
       image1 = image1.premultiply().extract_band(1, VImage::option()->set("n", image1.bands() - 1));
     }
-    if (sharp::HasAlpha(image2)) {
+    if (image2.has_alpha()) {
       image2 = image2.premultiply().extract_band(1, VImage::option()->set("n", image2.bands() - 1));
     }
     // Calculate colour distance

@@ -595,14 +595,6 @@ namespace sharp {
     return image;
   }
 
-  /*
-    Does this image have an alpha channel?
-    Uses colour space interpretation with number of channels to guess this.
-  */
-  bool HasAlpha(VImage image) {
-    return image.has_alpha();
-  }
-
   static void* RemoveExifCallback(VipsImage *image, char const *field, GValue *value, void *data) {
     std::vector<std::string> *fieldNames = static_cast<std::vector<std::string> *>(data);
     std::string fieldName(field);
@@ -1011,13 +1003,13 @@ namespace sharp {
       };
     }
     // Add alpha channel to alphaColour colour
-    if (colour[3] < 255.0 || HasAlpha(image)) {
+    if (colour[3] < 255.0 || image.has_alpha()) {
       alphaColour.push_back(colour[3] * multiplier);
     }
     // Ensure alphaColour colour uses correct colourspace
     alphaColour = sharp::GetRgbaAsColourspace(alphaColour, image.interpretation(), premultiply);
     // Add non-transparent alpha channel, if required
-    if (colour[3] < 255.0 && !HasAlpha(image)) {
+    if (colour[3] < 255.0 && !image.has_alpha()) {
       image = image.bandjoin(
         VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier).cast(image.format()));
     }
@@ -1025,10 +1017,10 @@ namespace sharp {
   }
 
   /*
-    Removes alpha channel, if any.
+    Removes alpha channels, if any.
   */
   VImage RemoveAlpha(VImage image) {
-    if (HasAlpha(image)) {
+    while (image.bands() > 1 && image.has_alpha()) {
       image = image.extract_band(0, VImage::option()->set("n", image.bands() - 1));
     }
     return image;
@@ -1038,7 +1030,7 @@ namespace sharp {
     Ensures alpha channel, if missing.
   */
   VImage EnsureAlpha(VImage image, double const value) {
-    if (!HasAlpha(image)) {
+    if (!image.has_alpha()) {
       std::vector<double> alpha;
       alpha.push_back(value * sharp::MaximumImageAlpha(image.interpretation()));
       image = image.bandjoin_const(alpha);

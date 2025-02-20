@@ -51,11 +51,11 @@ class PipelineWorker : public Napi::AsyncWorker {
           std::tie(image, inputImageType) = sharp::OpenInput(join);
           image = sharp::EnsureColourspace(image, baton->colourspacePipeline);
           images.push_back(image);
-          hasAlpha |= sharp::HasAlpha(image);
+          hasAlpha |= image.has_alpha();
         }
         if (hasAlpha) {
           for (auto &image : images) {
-            if (!sharp::HasAlpha(image)) {
+            if (!image.has_alpha()) {
               image = sharp::EnsureAlpha(image, 1);
             }
           }
@@ -372,7 +372,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Flatten image to remove alpha channel
-      if (baton->flatten && sharp::HasAlpha(image)) {
+      if (baton->flatten && image.has_alpha()) {
         image = sharp::Flatten(image, baton->flattenBackground);
       }
 
@@ -392,12 +392,12 @@ class PipelineWorker : public Napi::AsyncWorker {
       bool const shouldSharpen = baton->sharpenSigma != 0.0;
       bool const shouldComposite = !baton->composite.empty();
 
-      if (shouldComposite && !sharp::HasAlpha(image)) {
+      if (shouldComposite && !image.has_alpha()) {
         image = sharp::EnsureAlpha(image, 1);
       }
 
       VipsBandFormat premultiplyFormat = image.format();
-      bool const shouldPremultiplyAlpha = sharp::HasAlpha(image) &&
+      bool const shouldPremultiplyAlpha = image.has_alpha() &&
         (shouldResize || shouldBlur || shouldConv || shouldSharpen);
 
       if (shouldPremultiplyAlpha) {
@@ -725,9 +725,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           }
           // Ensure image to composite is sRGB with unpremultiplied alpha
           compositeImage = compositeImage.colourspace(VIPS_INTERPRETATION_sRGB);
-          if (!sharp::HasAlpha(compositeImage)) {
-            compositeImage = sharp::EnsureAlpha(compositeImage, 1);
-          }
+          compositeImage = sharp::EnsureAlpha(compositeImage, 1);
           if (composite->premultiplied) compositeImage = compositeImage.unpremultiply();
           // Calculate position
           int left;
@@ -828,7 +826,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Extract channel
       if (baton->extractChannel > -1) {
         if (baton->extractChannel >= image.bands()) {
-          if (baton->extractChannel == 3 && sharp::HasAlpha(image)) {
+          if (baton->extractChannel == 3 && image.has_alpha()) {
             baton->extractChannel = image.bands() - 1;
           } else {
             (baton->err)
@@ -1052,7 +1050,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         } else if (baton->formatOut == "dz") {
           // Write DZ to buffer
           baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
-          if (!sharp::HasAlpha(image)) {
+          if (!image.has_alpha()) {
             baton->tileBackground.pop_back();
           }
           image = sharp::StaySequential(image, baton->tileAngle != 0);
@@ -1256,7 +1254,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (isDzZip) {
             baton->tileContainer = VIPS_FOREIGN_DZ_CONTAINER_ZIP;
           }
-          if (!sharp::HasAlpha(image)) {
+          if (!image.has_alpha()) {
             baton->tileBackground.pop_back();
           }
           image = sharp::StaySequential(image, baton->tileAngle != 0);

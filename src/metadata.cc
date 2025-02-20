@@ -95,7 +95,7 @@ class MetadataWorker : public Napi::AsyncWorker {
         baton->background = image.get_array_double("background");
       }
       // Derived attributes
-      baton->hasAlpha = sharp::HasAlpha(image);
+      baton->hasAlpha = image.has_alpha();
       baton->orientation = sharp::ExifOrientation(image);
       // EXIF
       if (image.get_typeof(VIPS_META_EXIF_NAME) == VIPS_TYPE_BLOB) {

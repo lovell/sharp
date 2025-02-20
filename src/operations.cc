@@ -40,7 +40,7 @@ namespace sharp {
       typeBeforeTint = VIPS_INTERPRETATION_sRGB;
     }
     // Apply lookup table
-    if (HasAlpha(image)) {
+    if (image.has_alpha()) {
       VImage alpha = image[image.bands() - 1];
       image = RemoveAlpha(image)
         .colourspace(VIPS_INTERPRETATION_B_W)
@@ -83,7 +83,7 @@ namespace sharp {
       // Scale luminance, join to chroma, convert back to original colourspace
       VImage normalized = luminance.linear(f, a).bandjoin(chroma).colourspace(typeBeforeNormalize);
       // Attach original alpha channel, if any
-      if (HasAlpha(image)) {
+      if (image.has_alpha()) {
         // Extract original alpha channel
         VImage alpha = image[image.bands() - 1];
         // Join alpha channel to normalised image
@@ -106,7 +106,7 @@ namespace sharp {
    * Gamma encoding/decoding
    */
   VImage Gamma(VImage image, double const exponent) {
-    if (HasAlpha(image)) {
+    if (image.has_alpha()) {
       // Separate alpha channel
       VImage alpha = image[image.bands() - 1];
       return RemoveAlpha(image).gamma(VImage::option()->set("exponent", exponent)).bandjoin(alpha);
@@ -132,7 +132,7 @@ namespace sharp {
    * Produce the "negative" of the image.
    */
   VImage Negate(VImage image, bool const negateAlpha) {
-    if (HasAlpha(image) && !negateAlpha) {
+    if (image.has_alpha() && !negateAlpha) {
       // Separate alpha channel
       VImage alpha = image[image.bands() - 1];
       return RemoveAlpha(image).invert().bandjoin(alpha);
@@ -205,7 +205,7 @@ namespace sharp {
   VImage Modulate(VImage image, double const brightness, double const saturation,
                   int const hue, double const lightness) {
     VipsInterpretation colourspaceBeforeModulate = image.interpretation();
-    if (HasAlpha(image)) {
+    if (image.has_alpha()) {
       // Separate alpha channel
       VImage alpha = image[image.bands() - 1];
       return RemoveAlpha(image)
@@ -297,7 +297,7 @@ namespace sharp {
       threshold *= 256.0;
     }
     std::vector<double> backgroundAlpha({ background.back() });
-    if (HasAlpha(image)) {
+    if (image.has_alpha()) {
       background.pop_back();
     } else {
       background.resize(image.bands());
@@ -307,7 +307,7 @@ namespace sharp {
       ->set("background", background)
       ->set("line_art", lineArt)
       ->set("threshold", threshold));
-    if (HasAlpha(image)) {
+    if (image.has_alpha()) {
       // Search alpha channel (A)
       int leftA, topA, widthA, heightA;
       VImage alpha = image[image.bands() - 1];
@@ -344,7 +344,7 @@ namespace sharp {
       throw VError("Band expansion using linear is unsupported");
     }
     bool const uchar = !Is16Bit(image.interpretation());
-    if (HasAlpha(image) && a.size() != bands && (a.size() == 1 || a.size() == bands - 1 || bands - 1 == 1)) {
+    if (image.has_alpha() && a.size() != bands && (a.size() == 1 || a.size() == bands - 1 || bands - 1 == 1)) {
       // Separate alpha channel
       VImage alpha = image[bands - 1];
       return RemoveAlpha(image).linear(a, b, VImage::option()->set("uchar", uchar)).bandjoin(alpha);
@@ -357,7 +357,7 @@ namespace sharp {
    * Unflatten
    */
   VImage Unflatten(VImage image) {
-    if (HasAlpha(image)) {
+    if (image.has_alpha()) {
       VImage alpha = image[image.bands() - 1];
       VImage noAlpha = RemoveAlpha(image);
       return noAlpha.bandjoin(alpha & (noAlpha.colourspace(VIPS_INTERPRETATION_B_W) < 255));
