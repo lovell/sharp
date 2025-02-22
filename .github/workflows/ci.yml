@@ -183,6 +183,7 @@ jobs:
             nodejs_version_major: 18
     steps:
       - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v2
         with:
           arch: ${{ matrix.run_on_arch }}
