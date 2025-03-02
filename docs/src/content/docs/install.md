@@ -128,6 +128,10 @@ If `node-addon-api` or `node-gyp` cannot be found, try adding them via:
 npm install --save node-addon-api node-gyp
 ```
 
+When using `pnpm`, you may need to add `sharp` to
+[onlyBuiltDependencies](https://pnpm.io/package_json#pnpmonlybuiltdependencies)
+to ensure the installation script can be run.
+
 For cross-compiling, the `--platform`, `--arch` and `--libc` npm flags
 (or the `npm_config_platform`, `npm_config_arch` and `npm_config_libc` environment variables)
 can be used to configure the target environment.
