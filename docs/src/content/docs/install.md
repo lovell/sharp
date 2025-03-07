@@ -20,6 +20,10 @@ npm install sharp
 pnpm add sharp
 ```
 
+When using `pnpm`, you may need to add `sharp` to
+[ignoredBuiltDependencies](https://pnpm.io/package_json#pnpmignoredbuiltdependencies)
+to silence warnings.
+
 ```sh
 yarn add sharp
 ```
