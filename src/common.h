@@ -16,8 +16,8 @@
 
 #if (VIPS_MAJOR_VERSION < 8) || \
   (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 16) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 16 && VIPS_MICRO_VERSION < 0)
-#error "libvips version 8.16.0+ is required - please see https://sharp.pixelplumbing.com/install"
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 16 && VIPS_MICRO_VERSION < 1)
+#error "libvips version 8.16.1+ is required - please see https://sharp.pixelplumbing.com/install"
 #endif
 
 #if defined(__has_include)

@@ -4,7 +4,7 @@ title: Changelog
   
 ## v0.34 - *hat*
 
-Requires libvips v8.16.0
+Requires libvips v8.16.1
 
 ### v0.34.0 - TBD
 
