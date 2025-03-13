@@ -937,6 +937,24 @@
   fun:_ZN2v88internal18ArrayBufferSweeper10ReleaseAllEv
 }
 {
+  cond_v8_ZN2v88internal8compiler12PipelineImpl13OptimizeGraphEPNS1_7LinkageE
+  Memcheck:Cond
+  ...
+  fun:_ZN2v88internal8compiler12PipelineImpl13OptimizeGraphEPNS1_7LinkageE
+}
+{
+  cond_v8_ZN2v88internal4Heap20HasLowAllocationRateEv
+  Memcheck:Cond
+  ...
+  fun:_ZN2v88internal4Heap20HasLowAllocationRateEv
+}
+{
+  cond_v8_ZN2v88internal4Heap15RecomputeLimitsENS0_16GarbageCollectorENS_4base9TimeTicksE
+  Memcheck:Cond
+  ...
+  fun:_ZN2v88internal4Heap15RecomputeLimitsENS0_16GarbageCollectorENS_4base9TimeTicksE
+}
+{
   cond_node_Builtins_JSEntry
   Memcheck:Cond
   ...

@@ -1369,6 +1369,9 @@ class PipelineWorker : public Napi::AsyncWorker {
     for (sharp::InputDescriptor *input : baton->joinChannelIn) {
       delete input;
     }
+    for (sharp::InputDescriptor *input : baton->join) {
+      delete input;
+    }
     delete baton;
 
     // Decrement processing task counter
