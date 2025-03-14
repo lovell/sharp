@@ -52,7 +52,7 @@ async.series({
     jpegSuite.add('jimp-buffer-buffer', {
       defer: true,
       fn: async function (deferred) {
-        const image = await Jimp.read(inputJpgBuffer)
+        const image = await Jimp.read(inputJpgBuffer);
         await image
           .resize({ w: width, h: height, mode: Jimp.RESIZE_BICUBIC })
           .getBuffer(JimpMime.jpeg, { quality: 80 });
@@ -576,7 +576,7 @@ async.series({
     }).add('jimp-file-file', {
       defer: true,
       fn: async function (deferred) {
-        const image = await Jimp.read(fixtures.inputPngAlphaPremultiplicationLarge)
+        const image = await Jimp.read(fixtures.inputPngAlphaPremultiplicationLarge);
         await image
           .resize({ w: width, h: heightPng, mode: Jimp.RESIZE_BICUBIC })
           .write(outputPng, { deflateLevel: 6, filterType: 0 });
