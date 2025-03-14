@@ -8,16 +8,14 @@
     "test": "node perf && node random && node parallel"
   },
   "dependencies": {
-    "@squoosh/cli": "0.7.3",
-    "@squoosh/lib": "0.5.3",
-    "async": "3.2.5",
+    "async": "3.2.6",
     "benchmark": "2.1.4",
-    "gm": "1.25.0",
+    "gm": "1.25.1",
     "imagemagick": "0.1.3",
-    "jimp": "0.22.10"
+    "jimp": "1.6.0"
   },
   "optionalDependencies": {
-    "@tensorflow/tfjs-node": "4.13.0",
+    "@tensorflow/tfjs-node": "4.22.0",
     "mapnik": "4.5.9"
   },
   "license": "Apache-2.0"

@@ -3,9 +3,8 @@
 
 'use strict';
 
-const os = require('os');
 const fs = require('fs');
-const { exec, execSync } = require('child_process');
+const { execSync } = require('child_process');
 
 const async = require('async');
 const Benchmark = require('benchmark');
@@ -22,8 +21,8 @@ const sharp = require('../../');
 const gm = require('gm');
 const imagemagick = require('imagemagick');
 const mapnik = safeRequire('mapnik');
-const jimp = require('jimp');
-const squoosh = require('@squoosh/lib');
+const { Jimp, JimpMime } = require('jimp');
+
 process.env.TF_CPP_MIN_LOG_LEVEL = 1;
 const tfjs = safeRequire('@tensorflow/tfjs-node');
 
@@ -52,102 +51,21 @@ async.series({
     // jimp
     jpegSuite.add('jimp-buffer-buffer', {
       defer: true,
-      fn: function (deferred) {
-        jimp.read(inputJpgBuffer, function (err, image) {
-          if (err) {
-            throw err;
-          } else {
-            image
-              .resize(width, height, jimp.RESIZE_BICUBIC)
-              .quality(80)
-              .getBuffer(jimp.MIME_JPEG, function (err) {
-                if (err) {
-                  throw err;
-                } else {
-                  deferred.resolve();
-                }
-              });
-          }
-        });
+      fn: async function (deferred) {
+        const image = await Jimp.read(inputJpgBuffer)
+        await image
+          .resize({ w: width, h: height, mode: Jimp.RESIZE_BICUBIC })
+          .getBuffer(JimpMime.jpeg, { quality: 80 });
+        deferred.resolve();
       }
     }).add('jimp-file-file', {
       defer: true,
-      fn: function (deferred) {
-        jimp.read(fixtures.inputJpg, function (err, image) {
-          if (err) {
-            throw err;
-          } else {
-            image
-              .resize(width, height, jimp.RESIZE_BICUBIC)
-              .quality(80)
-              .write(outputJpg, function (err) {
-                if (err) {
-                  throw err;
-                } else {
-                  deferred.resolve();
-                }
-              });
-          }
-        });
-      }
-    });
-    // squoosh-cli
-    jpegSuite.add('squoosh-cli-file-file', {
-      defer: true,
-      fn: function (deferred) {
-        exec(`./node_modules/.bin/squoosh-cli \
-          --output-dir ${os.tmpdir()} \
-          --resize '{"enabled":true,"width":${width},"height":${height},"method":"lanczos3","premultiply":false,"linearRGB":false}' \
-          --mozjpeg '{"quality":80,"progressive":false,"optimize_coding":true,"quant_table":0,"trellis_multipass":false,"chroma_subsample":2,"separate_chroma_quality":false}' \
-          "${fixtures.inputJpg}"`, function (err) {
-          if (err) {
-            throw err;
-          }
-          deferred.resolve();
-        });
-      }
-    });
-    // squoosh-lib (GPLv3)
-    jpegSuite.add('squoosh-lib-buffer-buffer', {
-      defer: true,
-      fn: function (deferred) {
-        const pool = new squoosh.ImagePool(os.cpus().length);
-        const image = pool.ingestImage(inputJpgBuffer);
-        image.decoded
-          .then(function () {
-            return image.preprocess({
-              resize: {
-                enabled: true,
-                width,
-                height,
-                method: 'lanczos3',
-                premultiply: false,
-                linearRGB: false
-              }
-            });
-          })
-          .then(function () {
-            return image.encode({
-              mozjpeg: {
-                quality: 80,
-                progressive: false,
-                optimize_coding: true,
-                quant_table: 0,
-                trellis_multipass: false,
-                chroma_subsample: 2,
-                separate_chroma_quality: false
-              }
-            });
-          })
-          .then(function () {
-            return pool.close();
-          })
-          .then(function () {
-            return image.encodedWith.mozjpeg;
-          })
-          .then(function () {
-            deferred.resolve();
-          });
+      fn: async function (deferred) {
+        const image = await Jimp.read(fixtures.inputJpg);
+        await image
+          .resize({ w: width, h: height, mode: Jimp.RESIZE_BICUBIC })
+          .getBuffer(JimpMime.jpeg, { quality: 80 });
+        deferred.resolve();
       }
     });
     // mapnik
@@ -648,98 +566,21 @@ async.series({
     // jimp
     pngSuite.add('jimp-buffer-buffer', {
       defer: true,
-      fn: function (deferred) {
-        jimp.read(inputPngBuffer, function (err, image) {
-          if (err) {
-            throw err;
-          } else {
-            image
-              .resize(width, heightPng, jimp.RESIZE_BICUBIC)
-              .deflateLevel(6)
-              .filterType(0)
-              .getBuffer(jimp.MIME_PNG, function (err) {
-                if (err) {
-                  throw err;
-                } else {
-                  deferred.resolve();
-                }
-              });
-          }
-        });
+      fn: async function (deferred) {
+        const image = await Jimp.read(inputPngBuffer);
+        await image
+          .resize({ w: width, h: heightPng, mode: Jimp.RESIZE_BICUBIC })
+          .getBuffer(JimpMime.png, { deflateLevel: 6, filterType: 0 });
+        deferred.resolve();
       }
     }).add('jimp-file-file', {
       defer: true,
-      fn: function (deferred) {
-        jimp.read(fixtures.inputPngAlphaPremultiplicationLarge, function (err, image) {
-          if (err) {
-            throw err;
-          } else {
-            image
-              .resize(width, heightPng, jimp.RESIZE_BICUBIC)
-              .deflateLevel(6)
-              .filterType(0)
-              .write(outputPng, function (err) {
-                if (err) {
-                  throw err;
-                } else {
-                  deferred.resolve();
-                }
-              });
-          }
-        });
-      }
-    });
-    // squoosh-cli
-    pngSuite.add('squoosh-cli-file-file', {
-      defer: true,
-      fn: function (deferred) {
-        exec(`./node_modules/.bin/squoosh-cli \
-          --output-dir ${os.tmpdir()} \
-          --resize '{"enabled":true,"width":${width},"height":${heightPng},"method":"lanczos3","premultiply":true,"linearRGB":false}' \
-          --oxipng '{"level":1}' \
-          "${fixtures.inputPngAlphaPremultiplicationLarge}"`, function (err) {
-          if (err) {
-            throw err;
-          }
-          deferred.resolve();
-        });
-      }
-    });
-    // squoosh-lib (GPLv3)
-    pngSuite.add('squoosh-lib-buffer-buffer', {
-      defer: true,
-      fn: function (deferred) {
-        const pool = new squoosh.ImagePool(os.cpus().length);
-        const image = pool.ingestImage(inputPngBuffer);
-        image.decoded
-          .then(function () {
-            return image.preprocess({
-              resize: {
-                enabled: true,
-                width,
-                height: heightPng,
-                method: 'lanczos3',
-                premultiply: true,
-                linearRGB: false
-              }
-            });
-          })
-          .then(function () {
-            return image.encode({
-              oxipng: {
-                level: 1
-              }
-            });
-          })
-          .then(function () {
-            return pool.close();
-          })
-          .then(function () {
-            return image.encodedWith.oxipng;
-          })
-          .then(function () {
-            deferred.resolve();
-          });
+      fn: async function (deferred) {
+        const image = await Jimp.read(fixtures.inputPngAlphaPremultiplicationLarge)
+        await image
+          .resize({ w: width, h: heightPng, mode: Jimp.RESIZE_BICUBIC })
+          .write(outputPng, { deflateLevel: 6, filterType: 0 });
+        deferred.resolve();
       }
     });
     // mapnik
