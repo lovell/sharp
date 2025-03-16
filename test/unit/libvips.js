@@ -179,7 +179,7 @@ describe('libvips binaries', function () {
       process.env.npm_config_arch = 's390x';
       process.env.npm_config_libc = '';
       const locatorHash = libvips.yarnLocator();
-      assert.strictEqual(locatorHash, '9b2ea457de');
+      assert.strictEqual(locatorHash, 'e34c58507a');
       delete process.env.npm_config_platform;
       delete process.env.npm_config_arch;
       delete process.env.npm_config_libc;
