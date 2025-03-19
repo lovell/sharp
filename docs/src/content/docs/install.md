@@ -286,6 +286,10 @@ option.
 }
 ```
 
+When using `electron-forge` with [Webpack](#webpack),
+you may also need to add
+[forge-externals-plugin](https://www.npmjs.com/package/@timfish/forge-externals-plugin).
+
 ### vite
 
 Ensure `sharp` is excluded from bundling via the
