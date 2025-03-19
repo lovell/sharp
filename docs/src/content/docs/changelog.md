@@ -24,6 +24,8 @@ Requires libvips v8.16.1
 
 * Expose WebP `smartDeblock` output option.
 
+* Prevent use of linux-x64 binaries with v1 microarchitecture.
+
 * Add `autoOrient` operation and constructor option.
   [#4151](https://github.com/lovell/sharp/pull/4151)
   [@happycollision](https://github.com/happycollision)

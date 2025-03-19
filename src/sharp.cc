@@ -33,6 +33,7 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
   exports.Set("block", Napi::Function::New(env, block));
   exports.Set("_maxColourDistance", Napi::Function::New(env, _maxColourDistance));
   exports.Set("_isUsingJemalloc", Napi::Function::New(env, _isUsingJemalloc));
+  exports.Set("_isUsingX64V2", Napi::Function::New(env, _isUsingX64V2));
   exports.Set("stats", Napi::Function::New(env, stats));
   return exports;
 }

@@ -267,3 +267,20 @@ Napi::Value _isUsingJemalloc(const Napi::CallbackInfo& info) {
   return Napi::Boolean::New(env, false);
 }
 #endif
+
+#if defined(__GNUC__) && defined(__x86_64__)
+// Are SSE 4.2 intrinsics available at runtime?
+Napi::Value _isUsingX64V2(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  unsigned int eax, ebx, ecx, edx;
+  __asm__ __volatile__("cpuid"
+    : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
+    : "a"(1));
+  return Napi::Boolean::New(env, (ecx & 1U << 20) != 0);
+}
+#else
+Napi::Value _isUsingX64V2(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  return Napi::Boolean::New(env, false);
+}
+#endif
