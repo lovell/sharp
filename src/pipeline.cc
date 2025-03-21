@@ -1705,6 +1705,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   }
   baton->withExifMerge = sharp::AttrAsBool(options, "withExifMerge");
   baton->timeoutSeconds = sharp::AttrAsUint32(options, "timeoutSeconds");
+  baton->loop = sharp::AttrAsUint32(options, "loop");
+  baton->delay = sharp::AttrAsInt32Vector(options, "delay");
   // Format-specific
   baton->jpegQuality = sharp::AttrAsUint32(options, "jpegQuality");
   baton->jpegProgressive = sharp::AttrAsBool(options, "jpegProgressive");
@@ -1774,13 +1776,6 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->jxlEffort = sharp::AttrAsUint32(options, "jxlEffort");
   baton->jxlLossless = sharp::AttrAsBool(options, "jxlLossless");
   baton->rawDepth = sharp::AttrAsEnum<VipsBandFormat>(options, "rawDepth", VIPS_TYPE_BAND_FORMAT);
-  // Animated output properties
-  if (sharp::HasAttr(options, "loop")) {
-    baton->loop = sharp::AttrAsUint32(options, "loop");
-  }
-  if (sharp::HasAttr(options, "delay")) {
-    baton->delay = sharp::AttrAsInt32Vector(options, "delay");
-  }
   baton->tileSize = sharp::AttrAsUint32(options, "tileSize");
   baton->tileOverlap = sharp::AttrAsUint32(options, "tileOverlap");
   baton->tileAngle = sharp::AttrAsInt32(options, "tileAngle");

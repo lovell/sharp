@@ -224,4 +224,18 @@ describe('GIF input', () => {
     const after = await input.gif({ interPaletteMaxError: 100 }).toBuffer();
     assert.strict(before.length > after.length);
   });
+
+  it('non-animated input defaults to no-loop', async () => {
+    for (const input of [fixtures.inputGif, fixtures.inputPng]) {
+      const data = await sharp(input)
+        .resize(8)
+        .gif({ effort: 1 })
+        .toBuffer();
+
+      const { format, pages, loop } = await sharp(data).metadata();
+      assert.strictEqual('gif', format);
+      assert.strictEqual(1, pages);
+      assert.strictEqual(1, loop);
+    }
+  });
 });

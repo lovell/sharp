@@ -14,6 +14,9 @@ Requires libvips v8.16.1
 * Breaking: Ensure `removeAlpha` removes all alpha channels.
   [#2266](https://github.com/lovell/sharp/issues/2266)
 
+* Breaking: Non-animated GIF output defaults to no-loop instead of loop-forever.
+  [#3394](https://github.com/lovell/sharp/issues/3394)
+
 * Breaking: Support `info.size` on wide-character systems via upgrade to C++17.
   [#3943](https://github.com/lovell/sharp/issues/3943)
 
