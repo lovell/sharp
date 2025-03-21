@@ -1032,7 +1032,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           (baton->formatOut == "input" && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::HEIF);
-          image = sharp::RemoveAnimationProperties(image).cast(VIPS_FORMAT_UCHAR);
+          image = sharp::RemoveAnimationProperties(image);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.heifsave_buffer(VImage::option()
             ->set("keep", baton->keepMetadata)
             ->set("Q", baton->heifQuality)
@@ -1227,7 +1227,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           (willMatchInput && inputImageType == sharp::ImageType::HEIF)) {
           // Write HEIF to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::HEIF);
-          image = sharp::RemoveAnimationProperties(image).cast(VIPS_FORMAT_UCHAR);
+          image = sharp::RemoveAnimationProperties(image);
           image.heifsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
             ->set("keep", baton->keepMetadata)
             ->set("Q", baton->heifQuality)

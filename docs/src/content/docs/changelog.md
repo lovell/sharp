@@ -49,6 +49,9 @@ Requires libvips v8.16.1
   [#4316](https://github.com/lovell/sharp/pull/4316)
   [@florentzabera](https://github.com/florentzabera)
 
+* Allow wide-gamut HEIF output at higher bitdepths.
+  [#4344](https://github.com/lovell/sharp/issues/4344)
+
 ## v0.33 - *gauge*
 
 Requires libvips v8.15.3
