@@ -505,6 +505,22 @@ declare namespace sharp {
         blur(sigma?: number | boolean | BlurOptions): Sharp;
 
         /**
+         * Expand foreground objects using the dilate morphological operator.
+         * @param {Number} [width=1] dilation width in pixels.
+         * @throws {Error} Invalid parameters
+         * @returns A sharp instance that can be used to chain operations
+         */
+        dilate(width?: number): Sharp;
+
+        /**
+         * Shrink foreground objects using the erode morphological operator.
+         * @param {Number} [width=1] erosion width in pixels.
+         * @throws {Error} Invalid parameters
+         * @returns A sharp instance that can be used to chain operations
+         */
+        erode(width?: number): Sharp;
+
+        /**
          * Merge alpha transparency channel, if any, with background.
          * @param flatten true to enable and false to disable (defaults to true)
          * @returns A sharp instance that can be used to chain operations

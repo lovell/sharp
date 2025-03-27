@@ -314,3 +314,6 @@ GitHub: https://github.com/happycollision
 
 Name: Florent Zabera
 GitHub: https://github.com/florentzabera
+
+Name: Quentin Pinçon
+GitHub: https://github.com/qpincon

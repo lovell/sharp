@@ -128,6 +128,8 @@ module.exports = {
 
   inputJPGBig: getPath('flowers.jpeg'),
 
+  inputPngDotAndLines: getPath('dot-and-lines.png'),
+
   inputPngStripesV: getPath('stripesV.png'),
   inputPngStripesH: getPath('stripesH.png'),
 

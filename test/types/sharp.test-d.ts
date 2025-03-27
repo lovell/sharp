@@ -740,3 +740,8 @@ sharp([input, input], {
     valign: 'bottom'
   }
 });
+
+sharp().erode();
+sharp().erode(1);
+sharp().dilate();
+sharp().dilate(1);

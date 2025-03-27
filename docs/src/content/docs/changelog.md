@@ -45,6 +45,10 @@ Requires libvips v8.16.1
   [#4207](https://github.com/lovell/sharp/pull/4207)
   [@calebmer](https://github.com/calebmer)
 
+* Expose erode and dilate operations.
+  [#4243](https://github.com/lovell/sharp/pull/4243)
+  [@qpincon](https://github.com/qpincon)
+
 * Add support for RGBE images. Requires libvips compiled with radiance support.
   [#4316](https://github.com/lovell/sharp/pull/4316)
   [@florentzabera](https://github.com/florentzabera)

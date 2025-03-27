@@ -284,6 +284,52 @@ const gaussianBlurred = await sharp(input)
 ```
 
 
+## dilate
+> dilate([width]) ⇒ <code>Sharp</code>
+
+Expand foreground objects using the dilate morphological operator.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [width] | <code>Number</code> | <code>1</code> | dilation width in pixels. |
+
+**Example**  
+```js
+const output = await sharp(input)
+  .dilate()
+  .toBuffer();
+```
+
+
+## erode
+> erode([width]) ⇒ <code>Sharp</code>
+
+Shrink foreground objects using the erode morphological operator.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [width] | <code>Number</code> | <code>1</code> | erosion width in pixels. |
+
+**Example**  
+```js
+const output = await sharp(input)
+  .erode()
+  .toBuffer();
+```
+
+
 ## flatten
 > flatten([options]) ⇒ <code>Sharp</code>
 
