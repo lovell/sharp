@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-darwin-arm64",
-  "version": "0.34.0-rc.0",
+  "version": "0.34.0-rc.1",
   "description": "Prebuilt sharp for use with macOS 64-bit ARM",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -15,7 +15,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-darwin-arm64": "1.1.0-rc4"
+    "@img/sharp-libvips-darwin-arm64": "1.1.0-rc5"
   },
   "files": [
     "lib"
