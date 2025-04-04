@@ -19,7 +19,10 @@
         'type': 'shared_library',
         'defines': [
           '_VIPS_PUBLIC=__declspec(dllexport)',
-          '_ALLOW_KEYWORD_MACROS'
+          '_ALLOW_KEYWORD_MACROS',
+          'G_DISABLE_ASSERT',
+          'G_DISABLE_CAST_CHECKS',
+          'G_DISABLE_CHECKS'
         ],
         'sources': [
           '<(sharp_libvips_cplusplus_dir)/VConnection.cpp',
