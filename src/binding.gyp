@@ -80,6 +80,9 @@
   }, {
     'target_name': 'sharp-<(platform_and_arch)',
     'defines': [
+      'G_DISABLE_ASSERT',
+      'G_DISABLE_CAST_CHECKS',
+      'G_DISABLE_CHECKS',
       'NAPI_VERSION=9',
       'NODE_ADDON_API_DISABLE_DEPRECATED',
       'NODE_API_SWALLOW_UNTHROWABLE_EXCEPTIONS'
