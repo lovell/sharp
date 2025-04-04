@@ -6,7 +6,7 @@ title: Changelog
 
 Requires libvips v8.16.1
 
-### v0.34.0 - TBD
+### v0.34.0 - 4th April 2025
 
 * Breaking: Support array of input images to be joined or animated.
   [#1580](https://github.com/lovell/sharp/issues/1580)
