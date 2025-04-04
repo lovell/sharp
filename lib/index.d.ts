@@ -971,7 +971,7 @@ declare namespace sharp {
          *
          * Using this option will remove the EXIF `Orientation` tag, if any.
          */
-        autoOrient?: boolean;
+        autoOrient?: boolean | undefined;
         /**
          *  When to abort processing of invalid pixel data, one of (in order of sensitivity):
          *  'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels, invalid metadata will always abort. (optional, default 'warning')
