@@ -179,6 +179,7 @@
                 '-Wl,-s',
                 '-Wl,--disable-new-dtags',
                 '-Wl,-z,nodelete',
+                '-Wl,-Bsymbolic-functions',
                 '-Wl,-rpath=\'$$ORIGIN/../../sharp-libvips-<(platform_and_arch)/lib\'',
                 '-Wl,-rpath=\'$$ORIGIN/../../../sharp-libvips-<(platform_and_arch)/<(sharp_libvips_version)/lib\'',
                 '-Wl,-rpath=\'$$ORIGIN/../../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\'',
