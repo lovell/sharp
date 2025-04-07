@@ -6,6 +6,12 @@ title: Changelog
 
 Requires libvips v8.16.1
 
+### v0.34.1 - TBD
+
+* TypeScript: Ensure new `autoOrient` property is optional.
+  [#4362](https://github.com/lovell/sharp/pull/4362)
+  [@styfle](https://github.com/styfle)
+
 ### v0.34.0 - 4th April 2025
 
 * Breaking: Support array of input images to be joined or animated.
