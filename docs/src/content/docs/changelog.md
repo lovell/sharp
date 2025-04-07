@@ -6,7 +6,7 @@ title: Changelog
 
 Requires libvips v8.16.1
 
-### v0.34.1 - TBD
+### v0.34.1 - 7th April 2025
 
 * TypeScript: Ensure new `autoOrient` property is optional.
   [#4362](https://github.com/lovell/sharp/pull/4362)
