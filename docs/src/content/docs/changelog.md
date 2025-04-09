@@ -6,6 +6,11 @@ title: Changelog
 
 Requires libvips v8.16.1
 
+### v0.34.2 - TBD
+
+* Ensure `pdfBackground` constructor property is used.
+  [#4207](https://github.com/lovell/sharp/pull/4207)
+
 ### v0.34.1 - 7th April 2025
 
 * TypeScript: Ensure new `autoOrient` property is optional.
