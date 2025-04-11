@@ -1699,6 +1699,10 @@ declare namespace sharp {
         /** When using the attention crop strategy, the focal point of the cropped region */
         attentionX?: number | undefined;
         attentionY?: number | undefined;
+        /** Number of pages/frames contained within the image, with support for TIFF, HEIF, PDF, animated GIF and animated WebP */
+        pages?: number | undefined;
+        /** Number of pixels high each page in a multi-page image will be. */
+        pageHeight?: number | undefined;
     }
 
     interface AvailableFormatInfo {
