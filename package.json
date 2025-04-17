@@ -161,7 +161,8 @@
     "@img/sharp-linuxmusl-x64": "0.34.1",
     "@img/sharp-wasm32": "0.34.1",
     "@img/sharp-win32-ia32": "0.34.1",
-    "@img/sharp-win32-x64": "0.34.1"
+    "@img/sharp-win32-x64": "0.34.1",
+    "@img/sharp-win32-arm64": "0.34.1"
   },
   "devDependencies": {
     "@emnapi/runtime": "^1.4.0",
