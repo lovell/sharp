@@ -1,0 +1,39 @@
+{
+  "name": "@img/sharp-win32-arm64",
+  "version": "0.34.1",
+  "description": "Prebuilt sharp for use with Windows arm64",
+  "author": "Lovell Fuller <npm@lovell.info>",
+  "homepage": "https://sharp.pixelplumbing.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lovell/sharp.git",
+    "directory": "npm/win32-arm64"
+  },
+  "license": "Apache-2.0 AND LGPL-3.0-or-later",
+  "funding": {
+    "url": "https://opencollective.com/libvips"
+  },
+  "preferUnplugged": true,
+  "files": [
+    "lib",
+    "versions.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "exports": {
+    "./sharp.node": "./lib/sharp-win32-arm64.node",
+    "./package": "./package.json",
+    "./versions": "./versions.json"
+  },
+  "engines": {
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
+  },
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "arm64"
+  ]
+}
