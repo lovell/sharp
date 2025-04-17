@@ -317,3 +317,6 @@ GitHub: https://github.com/florentzabera
 
 Name: Quentin Pinçon
 GitHub: https://github.com/qpincon
+
+Name: Hans Chen
+GitHub: https://github.com/hans00

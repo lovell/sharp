@@ -59,7 +59,7 @@ describe('Text to image', function () {
       assert.strictEqual('png', info.format);
       assert.strictEqual(3, info.channels);
       assert.ok(inRange(info.width, 400, 600), `Actual width ${info.width}`);
-      assert.ok(inRange(info.height, 300, 500), `Actual height ${info.height}`);
+      assert.ok(inRange(info.height, 290, 500), `Actual height ${info.height}`);
       assert.ok(inRange(info.textAutofitDpi, 900, 1300), `Actual textAutofitDpi ${info.textAutofitDpi}`);
       done();
     });

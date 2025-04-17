@@ -14,6 +14,10 @@ Requires libvips v8.16.1
 * Ensure `pdfBackground` constructor property is used.
   [#4207](https://github.com/lovell/sharp/pull/4207)
 
+* Add support for prebuilt Windows ARM64 binaries.
+  [#4375](https://github.com/lovell/sharp/pull/4375)
+  [@hans00](https://github.com/hans00)
+
 * TypeScript: Ensure `smartDeblock` property is included in WebP definition.
   [#4387](https://github.com/lovell/sharp/pull/4387)
   [@Stephen-X](https://github.com/Stephen-X)

@@ -160,6 +160,7 @@
     "@img/sharp-linuxmusl-arm64": "0.34.1",
     "@img/sharp-linuxmusl-x64": "0.34.1",
     "@img/sharp-wasm32": "0.34.1",
+    "@img/sharp-win32-arm64": "0.34.1",
     "@img/sharp-win32-ia32": "0.34.1",
     "@img/sharp-win32-x64": "0.34.1"
   },
@@ -167,6 +168,7 @@
     "@emnapi/runtime": "^1.4.0",
     "@img/sharp-libvips-dev": "1.1.0",
     "@img/sharp-libvips-dev-wasm32": "1.1.0",
+    "@img/sharp-libvips-win32-arm64": "1.1.0",
     "@img/sharp-libvips-win32-ia32": "1.1.0",
     "@img/sharp-libvips-win32-x64": "1.1.0",
     "@types/node": "*",

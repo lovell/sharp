@@ -110,6 +110,17 @@ jobs:
             nodejs_version: "^22.9.0"
             nodejs_version_major: 22
             platform: win32-x64
+          - os: windows-11-arm
+            nodejs_arch: arm64
+            nodejs_version: "^20.3.0"
+            nodejs_version_major: 20
+            platform: win32-arm64
+            prebuild: true
+          - os: windows-11-arm
+            nodejs_arch: arm64
+            nodejs_version: "^22.9.0"
+            nodejs_version_major: 22
+            platform: win32-arm64
     steps:
       - name: Dependencies (Rocky Linux glibc)
         if: contains(matrix.container, 'rockylinux')
