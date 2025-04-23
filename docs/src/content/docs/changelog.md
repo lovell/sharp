@@ -8,6 +8,9 @@ Requires libvips v8.16.1
 
 ### v0.34.2 - TBD
 
+* Ensure animated GIF to WebP conversion retains loop (regression in 0.34.0).
+  [#3394](https://github.com/lovell/sharp/issues/3394)
+
 * Ensure `pdfBackground` constructor property is used.
   [#4207](https://github.com/lovell/sharp/pull/4207)
 

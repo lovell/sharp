@@ -384,7 +384,7 @@ struct PipelineBaton {
     ensureAlpha(-1.0),
     colourspacePipeline(VIPS_INTERPRETATION_LAST),
     colourspace(VIPS_INTERPRETATION_LAST),
-    loop(1),
+    loop(-1),
     tileSize(256),
     tileOverlap(0),
     tileContainer(VIPS_FOREIGN_DZ_CONTAINER_FS),

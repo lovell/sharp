@@ -651,22 +651,21 @@ namespace sharp {
   */
   VImage SetAnimationProperties(VImage image, int nPages, int pageHeight, std::vector<int> delay, int loop) {
     bool hasDelay = !delay.empty();
-
-    // Avoid a copy if none of the animation properties are needed.
-    if (nPages == 1 && !hasDelay && loop == -1) return image;
-
-    if (delay.size() == 1) {
-      // We have just one delay, repeat that value for all frames.
-      delay.insert(delay.end(), nPages - 1, delay[0]);
-    }
-
-    // Attaching metadata, need to copy the image.
     VImage copy = image.copy();
 
     // Only set page-height if we have more than one page, or this could
     // accidentally turn into an animated image later.
     if (nPages > 1) copy.set(VIPS_META_PAGE_HEIGHT, pageHeight);
-    if (hasDelay) copy.set("delay", delay);
+    if (hasDelay) {
+      if (delay.size() == 1) {
+        // We have just one delay, repeat that value for all frames.
+        delay.insert(delay.end(), nPages - 1, delay[0]);
+      }
+      copy.set("delay", delay);
+    }
+    if (nPages == 1 && !hasDelay && loop == -1) {
+      loop = 1;
+    }
     if (loop != -1) copy.set("loop", loop);
 
     return copy;

@@ -238,4 +238,15 @@ describe('GIF input', () => {
       assert.strictEqual(1, loop);
     }
   });
+
+  it('Animated GIF to animated WebP merges identical frames', async () => {
+    const webp = await sharp(fixtures.inputGifAnimated, { animated: true })
+      .webp()
+      .toBuffer();
+
+    const { delay, loop, pages } = await sharp(webp).metadata();
+    assert.deepStrictEqual([120, 120, 90, 120, 120, 90, 120, 90, 30], delay);
+    assert.strictEqual(0, loop);
+    assert.strictEqual(9, pages);
+  });
 });
