@@ -1336,6 +1336,8 @@ declare namespace sharp {
         nearLossless?: boolean | undefined;
         /** Use high quality chroma subsampling (optional, default false) */
         smartSubsample?: boolean | undefined;
+        /** Auto-adjust the deblocking filter, slow but can improve low contrast edges (optional, default false) */
+        smartDeblock?: boolean | undefined;
         /** Level of CPU effort to reduce file size, integer 0-6 (optional, default 4) */
         effort?: number | undefined;
         /** Prevent use of animation key frames to minimise file size (slow) (optional, default false) */
