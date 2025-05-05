@@ -17,7 +17,7 @@ When both a `width` and `height` are provided, the possible methods by which the
 
 Some of these values are based on the [object-fit](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) CSS property.
 
-<img alt="Examples of various values for the fit property when resizing" width="100%" style="aspect-ratio: 998/243" src="https://cdn.jsdelivr.net/gh/lovell/sharp@main/docs/public/api-resize-fit.svg">
+<img alt="Examples of various values for the fit property when resizing" width="100%" style="aspect-ratio: 998/243" src="/api-resize-fit.svg">
 
 When using a **fit** of `cover` or `contain`, the default **position** is `centre`. Other options are:
 - `sharp.position`: `top`, `right top`, `right`, `right bottom`, `bottom`, `left bottom`, `left`, `left top`.

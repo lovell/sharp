@@ -18,7 +18,7 @@ export default defineConfig({
         tag: 'meta',
         attrs: {
           'http-equiv': 'Content-Security-Policy',
-          content: "default-src 'self'; connect-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn.jsdelivr.net/gh/lovell/; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com/beacon.min.js/;"
+          content: "default-src 'self'; connect-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com/beacon.min.js/;"
         }
       }, {
         tag: 'link',
