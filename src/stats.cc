@@ -60,7 +60,7 @@ class StatsWorker : public Napi::AsyncWorker {
         // Image is not opaque when alpha layer is present and contains a non-mamixa value
         if (image.has_alpha()) {
           double const minAlpha = static_cast<double>(stats.getpoint(STAT_MIN_INDEX, bands).front());
-          if (minAlpha != sharp::MaximumImageAlpha(image.interpretation())) {
+          if (minAlpha != vips_interpretation_max_alpha(image.interpretation())) {
             baton->isOpaque = false;
           }
         }
