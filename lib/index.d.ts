@@ -1146,13 +1146,13 @@ declare namespace sharp {
         /** Number value of the EXIF Orientation header, if present */
         orientation?: number | undefined;
         /** Name of decoder used to decompress image data e.g. jpeg, png, webp, gif, svg */
-        format?: keyof FormatEnum | undefined;
+        format: keyof FormatEnum;
         /** Total size of image in bytes, for Stream and Buffer input only */
         size?: number | undefined;
         /** Number of pixels wide (EXIF orientation is not taken into consideration) */
-        width?: number | undefined;
+        width: number;
         /** Number of pixels high (EXIF orientation is not taken into consideration) */
-        height?: number | undefined;
+        height: number;
         /** Any changed metadata after the image orientation is applied. */
         autoOrient: {
             /** Number of pixels wide (EXIF orientation is taken into consideration) */
@@ -1161,19 +1161,19 @@ declare namespace sharp {
             height: number;
         };
         /** Name of colour space interpretation */
-        space?: keyof ColourspaceEnum | undefined;
+        space: keyof ColourspaceEnum;
         /** Number of bands e.g. 3 for sRGB, 4 for CMYK */
-        channels?: Channels | undefined;
+        channels: Channels;
         /** Name of pixel depth format e.g. uchar, char, ushort, float ... */
-        depth?: string | undefined;
+        depth: keyof DepthEnum;
         /** Number of pixels per inch (DPI), if present */
         density?: number | undefined;
         /** String containing JPEG chroma subsampling, 4:2:0 or 4:4:4 for RGB, 4:2:0:4 or 4:4:4:4 for CMYK */
         chromaSubsampling?: string | undefined;
         /** Boolean indicating whether the image is interlaced using a progressive scan */
-        isProgressive?: boolean | undefined;
+        isProgressive: boolean;
         /** Boolean indicating whether the image is palette-based (GIF, PNG). */
-        isPalette?: boolean | undefined;
+        isPalette: boolean;
         /** Number of bits per sample for each channel (GIF, PNG). */
         bitsPerSample?: number | undefined;
         /** Number of pages/frames contained within the image, with support for TIFF, HEIF, PDF, animated GIF and animated WebP */
@@ -1187,9 +1187,9 @@ declare namespace sharp {
         /**  Number of the primary page in a HEIF image */
         pagePrimary?: number | undefined;
         /** Boolean indicating the presence of an embedded ICC profile */
-        hasProfile?: boolean | undefined;
+        hasProfile: boolean;
         /** Boolean indicating the presence of an alpha transparency channel */
-        hasAlpha?: boolean | undefined;
+        hasAlpha: boolean;
         /** Buffer containing raw EXIF data, if present */
         exif?: Buffer | undefined;
         /** Buffer containing raw ICC profile data, if present */
@@ -1745,11 +1745,38 @@ declare namespace sharp {
     }
 
     interface ColourspaceEnum {
-        multiband: string;
         'b-w': string;
-        bw: string;
+        cmc: string;
         cmyk: string;
+        fourier: string;
+        grey16: string;
+        histogram: string;
+        hsv: string;
+        lab: string;
+        labq: string;
+        labs: string;
+        lch: string;
+        matrix: string;
+        multiband: string;
+        rgb: string;
+        rgb16: string;
+        scrgb: string;
         srgb: string;
+        xyz: string;
+        yxy: string;
+    }
+
+    interface DepthEnum {
+        char: string;
+        complex: string;
+        double: string;
+        dpcomplex: string;
+        float: string;
+        int: string;
+        short: string;
+        uchar: string;
+        uint: string;
+        ushort: string;
     }
 
     type FailOnOptions = 'none' | 'truncated' | 'error' | 'warning';
@@ -1818,6 +1845,7 @@ declare namespace sharp {
     interface FormatEnum {
         avif: AvailableFormatInfo;
         dz: AvailableFormatInfo;
+        exr: AvailableFormatInfo;
         fits: AvailableFormatInfo;
         gif: AvailableFormatInfo;
         heif: AvailableFormatInfo;
@@ -1831,6 +1859,7 @@ declare namespace sharp {
         pdf: AvailableFormatInfo;
         png: AvailableFormatInfo;
         ppm: AvailableFormatInfo;
+        rad: AvailableFormatInfo;
         raw: AvailableFormatInfo;
         svg: AvailableFormatInfo;
         tiff: AvailableFormatInfo;
