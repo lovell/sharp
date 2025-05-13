@@ -1359,7 +1359,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         // Add file size to info
         if (baton->formatOut != "dz" || sharp::IsDzZip(baton->fileOut)) {
           try {
-            uint32_t const size = static_cast<uint32_t>(std::filesystem::file_size(baton->fileOut));
+            uint32_t const size = static_cast<uint32_t>(
+              std::filesystem::file_size(std::filesystem::u8path(baton->fileOut)));
             info.Set("size", size);
           } catch (...) {}
         }

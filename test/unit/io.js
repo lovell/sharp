@@ -1036,4 +1036,21 @@ describe('Input/output', function () {
       });
     readable.pipe(inPipeline).pipe(badPipeline);
   });
+
+  it('supports wide-character filenames', async () => {
+    const filename = fixtures.path('output.图片.jpg');
+    const create = {
+      width: 8,
+      height: 8,
+      channels: 3,
+      background: 'green'
+    };
+    await sharp({ create }).toFile(filename);
+
+    const { width, height, channels, format } = await sharp(filename).metadata();
+    assert.strictEqual(width, 8);
+    assert.strictEqual(height, 8);
+    assert.strictEqual(channels, 3);
+    assert.strictEqual(format, 'jpeg');
+  });
 });

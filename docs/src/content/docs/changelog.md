@@ -22,6 +22,9 @@ Requires libvips v8.16.1
   [#4387](https://github.com/lovell/sharp/pull/4387)
   [@Stephen-X](https://github.com/Stephen-X)
 
+* Ensure support for wide-character filenames on Windows (regression in 0.34.0).
+  [#4391](https://github.com/lovell/sharp/issues/4391)
+
 ### v0.34.1 - 7th April 2025
 
 * TypeScript: Ensure new `autoOrient` property is optional.
