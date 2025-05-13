@@ -358,12 +358,6 @@ namespace sharp {
   bool Is16Bit(VipsInterpretation const interpretation);
 
   /*
-    Return the image alpha maximum. Useful for combining alpha bands. scRGB
-    images are 0 - 1 for image data, but the alpha is 0 - 255.
-  */
-  double MaximumImageAlpha(VipsInterpretation const interpretation);
-
-  /*
     Convert RGBA value to another colourspace
   */
   std::vector<double> GetRgbaAsColourspace(std::vector<double> const rgba,
