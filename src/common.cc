@@ -995,9 +995,8 @@ namespace sharp {
     }
     // Add alpha channel(s) to alphaColour colour
     if (colour[3] < 255.0 || image.has_alpha()) {
-      do {
-        alphaColour.push_back(colour[3] * multiplier);
-      } while (alphaColour.size() < static_cast<size_t>(image.bands()));
+      int extraBands = image.bands() > 4 ? image.bands() - 3 : 1;
+      alphaColour.insert(alphaColour.end(), extraBands, colour[3] * multiplier);
     }
     // Ensure alphaColour colour uses correct colourspace
     alphaColour = sharp::GetRgbaAsColourspace(alphaColour, image.interpretation(), premultiply);
