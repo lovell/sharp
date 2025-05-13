@@ -18,6 +18,9 @@ Requires libvips v8.16.1
   [#4375](https://github.com/lovell/sharp/pull/4375)
   [@hans00](https://github.com/hans00)
 
+* Ensure resizing with a `fit` of `contain` supports multiple alpha channels.
+  [#4382](https://github.com/lovell/sharp/issues/4382)
+
 * TypeScript: Ensure `metadata` response more closely matches reality.
   [#4383](https://github.com/lovell/sharp/issues/4383)
 

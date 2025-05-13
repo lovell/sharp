@@ -806,4 +806,33 @@ describe('Resize fit=contain', function () {
         fixtures.assertSimilar(fixtures.expected('./embedgravitybird/9-c.png'), data, done);
       });
   });
+
+  it('multiple alpha channels', async () => {
+    const create = {
+      width: 20,
+      height: 12,
+      channels: 4,
+      background: 'green'
+    };
+    const multipleAlphaChannels = await sharp({ create })
+      .joinChannel({ create })
+      .tiff({ compression: 'deflate' })
+      .toBuffer();
+
+    const data = await sharp(multipleAlphaChannels)
+      .resize({
+        width: 8,
+        height: 8,
+        fit: 'contain',
+        background: 'blue'
+      })
+      .tiff({ compression: 'deflate' })
+      .toBuffer();
+    const { format, width, height, space, channels } = await sharp(data).metadata();
+    assert.deepStrictEqual(format, 'tiff');
+    assert.deepStrictEqual(width, 8);
+    assert.deepStrictEqual(height, 8);
+    assert.deepStrictEqual(space, 'srgb');
+    assert.deepStrictEqual(channels, 8);
+  });
 });
