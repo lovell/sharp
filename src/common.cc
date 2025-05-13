@@ -1003,8 +1003,7 @@ namespace sharp {
     alphaColour = sharp::GetRgbaAsColourspace(alphaColour, image.interpretation(), premultiply);
     // Add non-transparent alpha channel, if required
     if (colour[3] < 255.0 && !image.has_alpha()) {
-      image = image.bandjoin(
-        VImage::new_matrix(image.width(), image.height()).new_from_image(255 * multiplier).cast(image.format()));
+      image = image.bandjoin_const({ 255 * multiplier });
     }
     return std::make_tuple(image, alphaColour);
   }
@@ -1024,9 +1023,7 @@ namespace sharp {
   */
   VImage EnsureAlpha(VImage image, double const value) {
     if (!image.has_alpha()) {
-      std::vector<double> alpha;
-      alpha.push_back(value * vips_interpretation_max_alpha(image.interpretation()));
-      image = image.bandjoin_const(alpha);
+      image = image.bandjoin_const({ value * vips_interpretation_max_alpha(image.interpretation()) });
     }
     return image;
   }
