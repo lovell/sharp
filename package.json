@@ -138,8 +138,8 @@
   ],
   "dependencies": {
     "color": "^4.2.3",
-    "detect-libc": "^2.0.3",
-    "semver": "^7.7.1"
+    "detect-libc": "^2.0.4",
+    "semver": "^7.7.2"
   },
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "0.34.1",
@@ -165,7 +165,7 @@
     "@img/sharp-win32-x64": "0.34.1"
   },
   "devDependencies": {
-    "@emnapi/runtime": "^1.4.0",
+    "@emnapi/runtime": "^1.4.3",
     "@img/sharp-libvips-dev": "1.1.0",
     "@img/sharp-libvips-dev-wasm32": "1.1.0",
     "@img/sharp-libvips-win32-arm64": "1.1.0",
@@ -173,19 +173,19 @@
     "@img/sharp-libvips-win32-x64": "1.1.0",
     "@types/node": "*",
     "cc": "^3.0.1",
-    "emnapi": "^1.4.0",
+    "emnapi": "^1.4.3",
     "exif-reader": "^2.0.2",
     "extract-zip": "^2.0.1",
     "icc": "^3.0.0",
     "jsdoc-to-markdown": "^9.1.1",
     "license-checker": "^25.0.1",
-    "mocha": "^11.1.0",
+    "mocha": "^11.2.2",
     "node-addon-api": "^8.3.1",
     "nyc": "^17.1.0",
     "prebuild": "^13.0.1",
     "semistandard": "^17.0.0",
     "tar-fs": "^3.0.8",
-    "tsd": "^0.31.2"
+    "tsd": "^0.32.0"
   },
   "license": "Apache-2.0",
   "engines": {
