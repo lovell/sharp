@@ -21,7 +21,7 @@ pnpm add sharp
 ```
 
 When using `pnpm`, you may need to add `sharp` to
-[ignoredBuiltDependencies](https://pnpm.io/package_json#pnpmignoredbuiltdependencies)
+[ignoredBuiltDependencies](https://pnpm.io/settings#ignoredbuiltdependencies)
 to silence warnings.
 
 ```sh
@@ -94,7 +94,7 @@ Use the [supportedArchitectures](https://yarnpkg.com/configuration/yarnrc#suppor
 
 ### pnpm v8+
 
-Use the [supportedArchitectures](https://pnpm.io/package_json#pnpmsupportedarchitectures) configuration.
+Use the [supportedArchitectures](https://pnpm.io/settings#supportedarchitectures) configuration.
 
 ## Custom libvips
 
@@ -134,7 +134,7 @@ npm install --save node-addon-api node-gyp
 ```
 
 When using `pnpm`, you may need to add `sharp` to
-[onlyBuiltDependencies](https://pnpm.io/package_json#pnpmonlybuiltdependencies)
+[onlyBuiltDependencies](https://pnpm.io/settings#onlybuiltdependencies)
 to ensure the installation script can be run.
 
 For cross-compiling, the `--platform`, `--arch` and `--libc` npm flags
