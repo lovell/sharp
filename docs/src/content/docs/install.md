@@ -94,7 +94,7 @@ Use the [supportedArchitectures](https://yarnpkg.com/configuration/yarnrc#suppor
 
 ### pnpm v8+
 
-Use the [supportedArchitectures](https://pnpm.io/package_json#pnpmsupportedarchitectures) configuration.
+Use the [supportedArchitectures](https://pnpm.io/settings#supportedarchitectures) configuration.
 
 ## Custom libvips
 
