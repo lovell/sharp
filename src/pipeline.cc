@@ -294,6 +294,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           option->set("n", baton->input->pages);
           option->set("page", baton->input->page);
           option->set("dpi", baton->input->density);
+          option->set("background", baton->input->pdfBackground);
 
           if (baton->input->buffer != nullptr) {
             // Reload PDF buffer
