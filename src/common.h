@@ -78,6 +78,7 @@ namespace sharp {
     VipsAlign joinHalign;
     VipsAlign joinValign;
     std::vector<double> pdfBackground;
+    bool jp2Oneshot;
 
     InputDescriptor():
       autoOrient(false),
@@ -120,7 +121,8 @@ namespace sharp {
       joinBackground{ 0.0, 0.0, 0.0, 255.0 },
       joinHalign(VIPS_ALIGN_LOW),
       joinValign(VIPS_ALIGN_LOW),
-      pdfBackground{ 255.0, 255.0, 255.0, 255.0 } {}
+      pdfBackground{ 255.0, 255.0, 255.0, 255.0 },
+      jp2Oneshot(false) {}
   };
 
   // Convenience methods to access the attributes of a Napi::Object
