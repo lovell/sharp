@@ -15,7 +15,7 @@ Requires libvips v8.16.1
   [#4207](https://github.com/lovell/sharp/pull/4207)
   [#4398](https://github.com/lovell/sharp/issues/4398)
 
-* Add support for prebuilt Windows ARM64 binaries.
+* Add experimental support for prebuilt Windows ARM64 binaries.
   [#4375](https://github.com/lovell/sharp/pull/4375)
   [@hans00](https://github.com/hans00)
 

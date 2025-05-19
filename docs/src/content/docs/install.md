@@ -53,7 +53,7 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 * Linux x64 (glibc >= 2.26, musl >= 1.2.2, CPU with SSE4.2)
 * Windows x64
 * Windows x86
-* Windows ARM64
+* Windows ARM64 (experimental, CPU with ARMv8.4 required for all features)
 
 This provides support for the
 JPEG, PNG, WebP, AVIF (limited to 8-bit depth), TIFF, GIF and SVG (input) image formats.

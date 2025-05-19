@@ -626,6 +626,9 @@ Use these AVIF options for output image.
 AVIF image sequences are not supported.
 Prebuilt binaries support a bitdepth of 8 only.
 
+This feature is experimental on the Windows ARM64 platform
+and requires a CPU with ARM64v8.4 or later.
+
 
 **Throws**:
 
