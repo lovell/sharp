@@ -6,7 +6,7 @@ title: Changelog
 
 Requires libvips v8.16.1
 
-### v0.34.2 - TBD
+### v0.34.2 - 20th May 2025
 
 * Ensure animated GIF to WebP conversion retains loop (regression in 0.34.0).
   [#3394](https://github.com/lovell/sharp/issues/3394)
