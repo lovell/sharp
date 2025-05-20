@@ -70,10 +70,10 @@ export default defineConfig({
         { label: 'Performance', slug: 'performance' },
         { label: 'Changelog', slug: 'changelog' }
       ],
-      social: {
-        openCollective: 'https://opencollective.com/libvips',
-        github: 'https://github.com/lovell/sharp'
-      }
+      social: [
+        { icon: 'openCollective', label: 'Open Collective', href: 'https://opencollective.com/libvips' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/lovell/sharp' }
+      ]
     })
   ]
 });
