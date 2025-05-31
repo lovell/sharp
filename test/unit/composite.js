@@ -122,6 +122,26 @@ describe('composite', () => {
       });
   });
 
+  it('scrgb pipeline', () => {
+    const filename = 'composite-red-scrgb.png';
+    const actual = fixtures.path(`output.${filename}`);
+    const expected = fixtures.expected(filename);
+    return sharp({
+      create: {
+        width: 32, height: 32, channels: 4, background: red
+      }
+    })
+      .pipelineColourspace('scrgb')
+      .composite([{
+        input: fixtures.inputPngWithTransparency16bit,
+        blend: 'color-burn'
+      }])
+      .toFile(actual)
+      .then(() => {
+        fixtures.assertMaxColourDistance(actual, expected);
+      });
+  });
+
   it('multiple', async () => {
     const filename = 'composite-multiple.png';
     const actual = fixtures.path(`output.${filename}`);
