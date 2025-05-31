@@ -669,7 +669,6 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::ImageType compositeImageType = sharp::ImageType::UNKNOWN;
           composite->input->access = access;
           std::tie(compositeImage, compositeImageType) = sharp::OpenInput(composite->input);
-          compositeImage = sharp::EnsureColourspace(compositeImage, baton->colourspacePipeline);
 
           if (composite->input->autoOrient) {
             // Respect EXIF Orientation
@@ -734,8 +733,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             // gravity was used for extract_area, set it back to its default value of 0
             composite->gravity = 0;
           }
-          // Ensure image to composite is sRGB with unpremultiplied alpha
-          compositeImage = compositeImage.colourspace(VIPS_INTERPRETATION_sRGB);
+          // Ensure image to composite is with unpremultiplied alpha
           compositeImage = sharp::EnsureAlpha(compositeImage, 1);
           if (composite->premultiplied) compositeImage = compositeImage.unpremultiply();
           // Calculate position
@@ -760,7 +758,12 @@ class PipelineWorker : public Napi::AsyncWorker {
           xs.push_back(left);
           ys.push_back(top);
         }
-        image = VImage::composite(images, modes, VImage::option()->set("x", xs)->set("y", ys));
+        image = VImage::composite(images, modes, VImage::option()
+          ->set("compositing_space", baton->colourspacePipeline == VIPS_INTERPRETATION_LAST
+            ? VIPS_INTERPRETATION_sRGB
+            : baton->colourspacePipeline)
+          ->set("x", xs)
+          ->set("y", ys));
         image = sharp::RemoveGifPalette(image);
       }
 
