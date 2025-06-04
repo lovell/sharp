@@ -1,12 +1,12 @@
 {
-  "name": "@img/sharp-darwin-x64",
+  "name": "@studiosnack/sharp-darwin-x64",
   "version": "0.34.2",
   "description": "Prebuilt sharp for use with macOS x64",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lovell/sharp.git",
+    "url": "git+https://github.com/studiosnack/sharp.git",
     "directory": "npm/darwin-x64"
   },
   "license": "Apache-2.0",
@@ -15,7 +15,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-darwin-x64": "1.1.0"
+    "@studiosnack/sharp-libvips-darwin-x64": "1.1.0"
   },
   "files": [
     "lib"

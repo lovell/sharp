@@ -1,19 +1,25 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
+"use strict";
 
 // Populate contents of all packages with the current GitHub release
 
-const { readFile, writeFile, appendFile, copyFile, rm } = require('node:fs/promises');
-const path = require('node:path');
-const { Readable } = require('node:stream');
-const { pipeline } = require('node:stream/promises');
-const { createGunzip } = require('node:zlib');
-const { extract } = require('tar-fs');
+const {
+  readFile,
+  writeFile,
+  appendFile,
+  copyFile,
+  rm,
+} = require("node:fs/promises");
+const path = require("node:path");
+const { Readable } = require("node:stream");
+const { pipeline } = require("node:stream/promises");
+const { createGunzip } = require("node:zlib");
+const { extract } = require("tar-fs");
 
-const { workspaces } = require('./package.json');
-const { version } = require('../package.json');
+const { workspaces } = require("./package.json");
+const { version } = require("../package.json");
 
 const mapTarballEntry = (header) => {
   header.name = path.basename(header.name);
@@ -37,8 +43,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 `;
 
-workspaces.map(async platform => {
-  const prebuildPlatform = platform === 'wasm32' ? 'emscripten-wasm32' : platform;
+workspaces.map(async (platform) => {
+  const prebuildPlatform =
+    platform === "wasm32" ? "emscripten-wasm32" : platform;
   const url = `https://github.com/lovell/sharp/releases/download/v${version}/sharp-v${version}-napi-v9-${prebuildPlatform}.tar.gz`;
   const dir = path.join(__dirname, platform);
   const response = await fetch(url);
@@ -47,7 +54,7 @@ workspaces.map(async platform => {
     return;
   }
   // Extract prebuild tarball
-  const lib = path.join(dir, 'lib');
+  const lib = path.join(dir, "lib");
   await rm(lib, { force: true, recursive: true });
   await pipeline(
     Readable.fromWeb(response.body),
@@ -56,18 +63,34 @@ workspaces.map(async platform => {
   );
   // Generate README
   const { name, description } = require(`./${platform}/package.json`);
-  await writeFile(path.join(dir, 'README.md'), `# \`${name}\`\n\n${description}.\n${licensing}`);
+  await writeFile(
+    path.join(dir, "README.md"),
+    `# \`${name}\`\n\n${description}.\n${licensing}`
+  );
   // Copy Apache-2.0 LICENSE
-  await copyFile(path.join(__dirname, '..', 'LICENSE'), path.join(dir, 'LICENSE'));
+  await copyFile(
+    path.join(__dirname, "..", "LICENSE"),
+    path.join(dir, "LICENSE")
+  );
   // Copy files for packages without an explicit sharp-libvips dependency (Windows, wasm)
-  if (platform.startsWith('win') || platform.startsWith('wasm')) {
-    const libvipsPlatform = platform === 'wasm32' ? 'dev-wasm32' : platform;
-    const sharpLibvipsDir = path.join(require(`@img/sharp-libvips-${libvipsPlatform}/lib`), '..');
+  if (platform.startsWith("win") || platform.startsWith("wasm")) {
+    const libvipsPlatform = platform === "wasm32" ? "dev-wasm32" : platform;
+    const sharpLibvipsDir = path.join(
+      require(`@studiosnack/sharp-libvips-${libvipsPlatform}/lib`),
+      ".."
+    );
     // Copy versions.json
-    await copyFile(path.join(sharpLibvipsDir, 'versions.json'), path.join(dir, 'versions.json'));
+    await copyFile(
+      path.join(sharpLibvipsDir, "versions.json"),
+      path.join(dir, "versions.json")
+    );
     // Append third party licensing to README
-    const readme = await readFile(path.join(sharpLibvipsDir, 'README.md'), { encoding: 'utf-8' });
-    const thirdParty = readme.substring(readme.indexOf('\nThis software contains'));
-    appendFile(path.join(dir, 'README.md'), thirdParty);
+    const readme = await readFile(path.join(sharpLibvipsDir, "README.md"), {
+      encoding: "utf-8",
+    });
+    const thirdParty = readme.substring(
+      readme.indexOf("\nThis software contains")
+    );
+    appendFile(path.join(dir, "README.md"), thirdParty);
   }
 });

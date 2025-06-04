@@ -1,5 +1,5 @@
 {
-  "name": "@img/sharp-win32-ia32",
+  "name": "@studiosnack/sharp-win32-ia32",
   "version": "0.34.2",
   "description": "Prebuilt sharp for use with Windows x86 (32-bit)",
   "author": "Lovell Fuller <npm@lovell.info>",

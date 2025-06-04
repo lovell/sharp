@@ -1,5 +1,5 @@
 {
-  "name": "@img/sharp-win32-arm64",
+  "name": "@studiosnack/sharp-win32-arm64",
   "version": "0.34.2",
   "description": "Prebuilt sharp for use with Windows 64-bit ARM",
   "author": "Lovell Fuller <npm@lovell.info>",

@@ -1,5 +1,5 @@
 {
-  "name": "@img/sharp",
+  "name": "@studiosnack/sharp",
   "version": "0.34.2",
   "private": "true",
   "workspaces": [

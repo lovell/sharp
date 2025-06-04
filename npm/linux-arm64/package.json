@@ -1,5 +1,5 @@
 {
-  "name": "@img/sharp-linux-arm64",
+  "name": "@studiosnack/sharp-linux-arm64",
   "version": "0.34.2",
   "description": "Prebuilt sharp for use with Linux (glibc) 64-bit ARM",
   "author": "Lovell Fuller <npm@lovell.info>",
@@ -15,7 +15,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-linux-arm64": "1.1.0"
+    "@studiosnack/sharp-libvips-linux-arm64": "1.1.0"
   },
   "files": [
     "lib"

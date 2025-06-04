@@ -1,5 +1,5 @@
 {
-  "name": "@img/sharp-wasm32",
+  "name": "@studiosnack/sharp-wasm32",
   "version": "0.34.2",
   "description": "Prebuilt sharp for use with wasm32",
   "author": "Lovell Fuller <npm@lovell.info>",

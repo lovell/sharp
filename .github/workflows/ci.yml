@@ -17,13 +17,6 @@ jobs:
           - os: ubuntu-24.04
             container: rockylinux:8
             nodejs_arch: x64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
-            platform: linux-x64
-            prebuild: true
-          - os: ubuntu-24.04
-            container: rockylinux:8
-            nodejs_arch: x64
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
             platform: linux-x64
@@ -33,11 +26,7 @@ jobs:
             nodejs_version: "^22.9.0"
             nodejs_version_major: 22
             platform: linux-x64
-          - os: ubuntu-24.04
-            container: node:18-alpine3.17
-            nodejs_version_major: 18
-            platform: linuxmusl-x64
-            prebuild: true
+
           - os: ubuntu-24.04
             container: node:20-alpine3.18
             nodejs_version_major: 20
@@ -46,28 +35,7 @@ jobs:
             container: node:22-alpine3.20
             nodejs_version_major: 22
             platform: linuxmusl-x64
-          - os: macos-13
-            nodejs_arch: x64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
-            platform: darwin-x64
-            prebuild: true
-          - os: macos-13
-            nodejs_arch: x64
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
-            platform: darwin-x64
-          - os: macos-13
-            nodejs_arch: x64
-            nodejs_version: "^22.9.0"
-            nodejs_version_major: 22
-            platform: darwin-x64
-          - os: macos-14
-            nodejs_arch: arm64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
-            platform: darwin-arm64
-            prebuild: true
+
           - os: macos-14
             nodejs_arch: arm64
             nodejs_version: "^20.3.0"
@@ -78,49 +46,7 @@ jobs:
             nodejs_version: "^22.9.0"
             nodejs_version_major: 22
             platform: darwin-arm64
-          - os: windows-2019
-            nodejs_arch: x86
-            nodejs_version: "18.18.2" # pinned to avoid 18.19.0 and npm 10
-            nodejs_version_major: 18
-            platform: win32-ia32
-            prebuild: true
-          - os: windows-2019
-            nodejs_arch: x86
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
-            platform: win32-ia32
-          - os: windows-2019
-            nodejs_arch: x86
-            nodejs_version: "^22.9.0"
-            nodejs_version_major: 22
-            platform: win32-ia32
-          - os: windows-2019
-            nodejs_arch: x64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
-            platform: win32-x64
-            prebuild: true
-          - os: windows-2019
-            nodejs_arch: x64
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
-            platform: win32-x64
-          - os: windows-2019
-            nodejs_arch: x64
-            nodejs_version: "^22.9.0"
-            nodejs_version_major: 22
-            platform: win32-x64
-          - os: windows-11-arm
-            nodejs_arch: arm64
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
-            platform: win32-arm64
-            prebuild: true
-          - os: windows-11-arm
-            nodejs_arch: arm64
-            nodejs_version: "^22.9.0"
-            nodejs_version_major: 22
-            platform: win32-arm64
+
     steps:
       - name: Dependencies (Rocky Linux glibc)
         if: contains(matrix.container, 'rockylinux')
@@ -129,7 +55,7 @@ jobs:
           echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
       - name: Dependencies (Linux musl)
         if: contains(matrix.container, 'alpine')
-        run: apk add build-base git python3 font-noto --update-cache
+        run: apk add build-base git python3 font-noto vips vips-heif vips-jxl libheif vips-dev --update-cache
       - name: Dependencies (Python 3.11 - macOS, Windows)
         if: contains(matrix.os, 'macos') || contains(matrix.os, 'windows')
         uses: actions/setup-python@v5
@@ -150,7 +76,7 @@ jobs:
       - name: Test packaging
         run: |
           npm run package-from-local-build
-          npm pkg set "optionalDependencies.@img/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
+          npm pkg set "optionalDependencies.@studiosnack/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
           npm run clean
           npm install --ignore-scripts
           npm test
@@ -162,95 +88,3 @@ jobs:
           node -e "require('fs').cpSync('package.json', 'src/package.json')"
           cd src
           npx prebuild
-  github-runner-qemu:
-    permissions:
-      contents: write
-    name: ${{ matrix.platform }} - Node.js ${{ matrix.nodejs_version_major }} - prebuild
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: linux-arm
-            distro: bullseye
-            run_on_arch: armv6
-            nodejs_arch: armv6l
-            nodejs_hostname: unofficial-builds.nodejs.org
-            nodejs_version: "18.17.0"
-            nodejs_version_major: 18
-          - platform: linux-s390x
-            distro: bullseye
-            run_on_arch: s390x
-            nodejs_arch: s390x
-            nodejs_hostname: nodejs.org
-            nodejs_version: "18.17.0"
-            nodejs_version_major: 18
-          - platform: linux-ppc64
-            distro: bullseye
-            run_on_arch: ppc64le
-            nodejs_arch: ppc64le
-            nodejs_hostname: nodejs.org
-            nodejs_version: "18.17.0"
-            nodejs_version_major: 18
-    steps:
-      - uses: actions/checkout@v4
-      - uses: uraimo/run-on-arch-action@v3
-        with:
-          arch: ${{ matrix.run_on_arch }}
-          distro: ${{ matrix.distro }}
-          env: |
-            prebuild_upload: "${{ startsWith(github.ref, 'refs/tags/') && secrets.GITHUB_TOKEN || '' }}"
-          run: |
-            apt-get update
-            apt-get install -y curl g++ git libatomic1 make python3 xz-utils
-            mkdir /opt/nodejs
-            curl --silent https://${{ matrix.nodejs_hostname }}/download/release/v${{ matrix.nodejs_version}}/node-v${{ matrix.nodejs_version}}-linux-${{ matrix.nodejs_arch }}.tar.xz | tar xJC /opt/nodejs --strip-components=1
-            export PATH=$PATH:/opt/nodejs/bin
-            npm install --build-from-source
-            npx mocha --no-config --spec=test/unit/io.js --timeout=30000
-            npm run package-from-local-build
-            npm pkg set "optionalDependencies.@img/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
-            npm run clean
-            npm install --ignore-scripts
-            npx mocha --no-config --spec=test/unit/io.js --timeout=30000
-            [[ -n $prebuild_upload ]] && cd src && ln -s ../package.json && npx prebuild || true
-  github-runner-emscripten:
-    permissions:
-      contents: write
-    name: wasm32 - prebuild
-    runs-on: ubuntu-24.04
-    container: "emscripten/emsdk:4.0.6"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Dependencies
-        run: apt-get update && apt-get install -y pkg-config
-      - name: Dependencies (Node.js)
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install
-        run: emmake npm install --build-from-source
-      - name: Verify emscripten versions match
-        run: |
-          EMSCRIPTEN_VERSION_LIBVIPS=$(node -p "require('@img/sharp-libvips-dev-wasm32/versions').emscripten")
-          EMSCRIPTEN_VERSION_SHARP=$(emcc -dumpversion)
-          echo "libvips built with emscripten $EMSCRIPTEN_VERSION_LIBVIPS"
-          echo "sharp built with emscripten $EMSCRIPTEN_VERSION_SHARP"
-          test "$EMSCRIPTEN_VERSION_LIBVIPS" = "$EMSCRIPTEN_VERSION_SHARP"
-      - name: Test
-        run: emmake npm test
-      - name: Test packaging
-        run: |
-          emmake npm run package-from-local-build
-          npm pkg set "optionalDependencies.@img/sharp-wasm32=file:./npm/wasm32"
-          npm run clean
-          rm -rf node_modules/@img/sharp-linux-x64
-          npm install --cpu=wasm32
-          npm test
-      - name: Prebuild
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          npm_config_nodedir: emscripten
-          prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
-        run: cd src && ln -s ../package.json && emmake npx prebuild --platform=emscripten --arch=wasm32 --strip=0
