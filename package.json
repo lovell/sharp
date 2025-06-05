@@ -184,7 +184,7 @@
     "nyc": "^17.1.0",
     "prebuild": "^13.0.1",
     "semistandard": "^17.0.0",
-    "tar-fs": "^3.0.8",
+    "tar-fs": "^3.0.9",
     "tsd": "^0.32.0"
   },
   "license": "Apache-2.0",
