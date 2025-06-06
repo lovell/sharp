@@ -1010,6 +1010,8 @@ declare namespace sharp {
         /** Background colour to use when PDF is partially transparent. Requires the use of a globally-installed libvips compiled with support for PDFium, Poppler, ImageMagick or GraphicsMagick. */
         pdfBackground?: Colour | Color | undefined;
         /** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default false) */
+        jp2Oneshot?: boolean | undefined;
+        /** Set to `true` to load JPEG 2000 images using [oneshot mode](https://github.com/libvips/libvips/issues/4205) **/
         animated?: boolean | undefined;
         /** Describes raw pixel input image data. See raw() for pixel ordering. */
         raw?: CreateRaw | undefined;
