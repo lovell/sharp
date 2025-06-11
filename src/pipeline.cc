@@ -876,7 +876,12 @@ class PipelineWorker : public Napi::AsyncWorker {
           image.set(s.first.data(), s.second.data());
         }
       }
-
+      // XMP buffer
+      if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_XMP) && !baton->withXmp.empty()) {
+        image = image.copy();
+        image.set(VIPS_META_XMP_NAME, nullptr,
+          const_cast<void*>(static_cast<void const*>(baton->withXmp.c_str())), baton->withXmp.size());
+      }
       // Number of channels used in output image
       baton->channels = image.bands();
       baton->width = image.width();
@@ -1706,6 +1711,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     }
   }
   baton->withExifMerge = sharp::AttrAsBool(options, "withExifMerge");
+  baton->withXmp = sharp::AttrAsStr(options, "withXmp");
   baton->timeoutSeconds = sharp::AttrAsUint32(options, "timeoutSeconds");
   baton->loop = sharp::AttrAsUint32(options, "loop");
   baton->delay = sharp::AttrAsInt32Vector(options, "delay");

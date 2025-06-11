@@ -419,7 +419,7 @@ declare namespace sharp {
          * @returns {Sharp}
          */
         autoOrient(): Sharp
-  
+
         /**
          * Flip the image about the vertical Y axis. This always occurs after rotation, if any.
          * The use of flip implies the removal of the EXIF Orientation tag, if any.
@@ -729,6 +729,20 @@ declare namespace sharp {
          * @throws {Error} Invalid parameters
          */
         withIccProfile(icc: string, options?: WithIccProfileOptions): Sharp;
+
+        /**
+         * Keep all XMP metadata from the input image in the output image.
+         * @returns A sharp instance that can be used to chain operations
+         */
+        keepXmp(): Sharp;
+
+        /**
+         * Set XMP metadata in the output image.
+         * @param {string} xmp - String containing XMP metadata to be embedded in the output image.
+         * @returns A sharp instance that can be used to chain operations
+         * @throws {Error} Invalid parameters
+         */
+        withXmp(xmp: string): Sharp;
 
         /**
          * Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.

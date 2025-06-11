@@ -692,6 +692,8 @@ sharp(input)
       k2: 'v2'
     }
   })
+  .keepXmp()
+  .withXmp('test')
   .keepIccProfile()
   .withIccProfile('filename')
   .withIccProfile('filename', { attach: false });

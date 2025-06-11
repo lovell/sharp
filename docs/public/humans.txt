@@ -320,3 +320,6 @@ GitHub: https://github.com/qpincon
 
 Name: Hans Chen
 GitHub: https://github.com/hans00
+
+Name: Thibaut Patel
+GitHub: https://github.com/tpatel

@@ -242,6 +242,57 @@ const outputWithP3 = await sharp(input)
 ```
 
 
+## keepXmp
+> keepXmp() ⇒ <code>Sharp</code>
+
+Keep XMP metadata from the input image in the output image.
+
+
+**Since**: 0.34.3  
+**Example**  
+```js
+const outputWithXmp = await sharp(inputWithXmp)
+  .keepXmp()
+  .toBuffer();
+```
+
+
+## withXmp
+> withXmp(xmp) ⇒ <code>Sharp</code>
+
+Set XMP metadata in the output image.
+
+Supported by PNG, JPEG, WebP, and TIFF output.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+**Since**: 0.34.3  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| xmp | <code>string</code> | String containing XMP metadata to be embedded in the output image. |
+
+**Example**  
+```js
+const xmpString = `
+  <?xml version="1.0"?>
+  <x:xmpmeta xmlns:x="adobe:ns:meta/">
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/">
+        <dc:creator><rdf:Seq><rdf:li>John Doe</rdf:li></rdf:Seq></dc:creator>
+      </rdf:Description>
+    </rdf:RDF>
+  </x:xmpmeta>`;
+
+const data = await sharp(input)
+  .withXmp(xmpString)
+  .toBuffer();
+```
+
+
 ## keepMetadata
 > keepMetadata() ⇒ <code>Sharp</code>
 

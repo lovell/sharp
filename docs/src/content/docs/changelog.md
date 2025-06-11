@@ -31,6 +31,10 @@ Requires libvips v8.17.0
   [#4412](https://github.com/lovell/sharp/pull/4412)
   [@kleisauke](https://github.com/kleisauke)
 
+* Add `keepXmp` and `withXmp` for control over output XMP metadata.
+  [#4416](https://github.com/lovell/sharp/pull/4416)
+  [@tpatel](https://github.com/tpatel)
+
 ### v0.34.2 - 20th May 2025
 
 * Ensure animated GIF to WebP conversion retains loop (regression in 0.34.0).
