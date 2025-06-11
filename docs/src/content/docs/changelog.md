@@ -2,6 +2,13 @@
 title: Changelog
 ---
   
+## v0.35 - *unreleased*
+
+### Features
+
+* Add support for custom XMP metadata injection via `withMetadata({ xmp: Buffer })`.
+  Allows embedding custom XMP metadata into PNG, JPEG, WebP, and TIFF output images.
+
 ## v0.34 - *hat*
 
 Requires libvips v8.17.0

@@ -1100,6 +1100,178 @@ describe('Image metadata', function () {
     assert.strictEqual(exif2.Image.Software, 'sharp');
   });
 
+  describe('XMP metadata tests', function () {
+    it('withMetadata preserves existing XMP metadata from input', async () => {
+      const data = await sharp(fixtures.inputJpgWithIptcAndXmp)
+        .resize(320, 240)
+        .withMetadata()
+        .toBuffer();
+
+      const metadata = await sharp(data).metadata();
+      assert.strictEqual('object', typeof metadata.xmp);
+      assert.strictEqual(true, metadata.xmp instanceof Buffer);
+      assert.strictEqual(true, metadata.xmp.length > 0);
+      // Check that XMP starts with the expected XML declaration
+      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('<?xpacket begin="')), 0);
+    });
+
+    it('withXmp with custom XMP buffer replaces existing XMP', async () => {
+      const customXmp = Buffer.from('<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:creator><rdf:Seq><rdf:li>Test Creator</rdf:li></rdf:Seq></dc:creator><dc:title><rdf:Alt><rdf:li xml:lang="x-default">Test Title</rdf:li></rdf:Alt></dc:title></rdf:Description></rdf:RDF></x:xmpmeta>');
+
+      const data = await sharp(fixtures.inputJpgWithIptcAndXmp)
+        .resize(320, 240)
+        .withXmp(customXmp)
+        .toBuffer();
+
+      const metadata = await sharp(data).metadata();
+      assert.strictEqual('object', typeof metadata.xmp);
+      assert.strictEqual(true, metadata.xmp instanceof Buffer);
+
+      // Check that the XMP contains our custom content
+      const xmpString = metadata.xmp.toString();
+      assert.strictEqual(true, xmpString.includes('Test Creator'));
+      assert.strictEqual(true, xmpString.includes('Test Title'));
+    });
+
+    it('withXmp with custom XMP buffer on image without existing XMP', async () => {
+      const customXmp = Buffer.from('<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:description><rdf:Alt><rdf:li xml:lang="x-default">Added via Sharp</rdf:li></rdf:Alt></dc:description></rdf:Description></rdf:RDF></x:xmpmeta>');
+
+      const data = await sharp(fixtures.inputJpg)
+        .resize(320, 240)
+        .withXmp(customXmp)
+        .toBuffer();
+
+      const metadata = await sharp(data).metadata();
+      assert.strictEqual('object', typeof metadata.xmp);
+      assert.strictEqual(true, metadata.xmp instanceof Buffer);
+
+      // Check that the XMP contains our custom content
+      const xmpString = metadata.xmp.toString();
+      assert.strictEqual(true, xmpString.includes('Added via Sharp'));
+    });
+
+    it('withXmp with empty XMP buffer', async () => {
+      const emptyXmp = Buffer.alloc(0);
+
+      const data = await sharp(fixtures.inputJpg)
+        .resize(320, 240)
+        .withXmp(emptyXmp)
+        .toBuffer();
+
+      const metadata = await sharp(data).metadata();
+      // Empty XMP buffer should not add XMP metadata
+      assert.strictEqual('undefined', typeof metadata.xmp);
+    });
+
+    it('withXmp with valid XMP metadata for different image formats', async () => {
+      const customXmp = Buffer.from('<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:subject><rdf:Bag><rdf:li>test</rdf:li><rdf:li>metadata</rdf:li></rdf:Bag></dc:subject></rdf:Description></rdf:RDF></x:xmpmeta>');
+
+      // Test with JPEG output
+      const jpegData = await sharp(fixtures.inputJpg)
+        .resize(100, 100)
+        .jpeg()
+        .withXmp(customXmp)
+        .toBuffer();
+
+      const jpegMetadata = await sharp(jpegData).metadata();
+      assert.strictEqual('object', typeof jpegMetadata.xmp);
+      assert.strictEqual(true, jpegMetadata.xmp instanceof Buffer);
+      assert.strictEqual(true, jpegMetadata.xmp.toString().includes('test'));
+
+      // Test with PNG output (PNG should also support XMP metadata)
+      const pngData = await sharp(fixtures.inputJpg)
+        .resize(100, 100)
+        .png()
+        .withXmp(customXmp)
+        .toBuffer();
+
+      const pngMetadata = await sharp(pngData).metadata();
+      // PNG format should preserve XMP metadata when using withXmp
+      assert.strictEqual('object', typeof pngMetadata.xmp);
+      assert.strictEqual(true, pngMetadata.xmp instanceof Buffer);
+      assert.strictEqual(true, pngMetadata.xmp.toString().includes('test'));
+
+      // Test with WebP output (WebP should also support XMP metadata)
+      const webpData = await sharp(fixtures.inputJpg)
+        .resize(100, 100)
+        .webp()
+        .withXmp(customXmp)
+        .toBuffer();
+
+      const webpMetadata = await sharp(webpData).metadata();
+      // WebP format should preserve XMP metadata when using withXmp
+      assert.strictEqual('object', typeof webpMetadata.xmp);
+      assert.strictEqual(true, webpMetadata.xmp instanceof Buffer);
+      assert.strictEqual(true, webpMetadata.xmp.toString().includes('test'));
+    });
+
+    it('XMP metadata persists through multiple operations', async () => {
+      const customXmp = Buffer.from('<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier>persistent-test</dc:identifier></rdf:Description></rdf:RDF></x:xmpmeta>');
+
+      const data = await sharp(fixtures.inputJpg)
+        .resize(320, 240)
+        .withXmp(customXmp)
+        .rotate(90)
+        .blur(1)
+        .sharpen()
+        .toBuffer();
+
+      const metadata = await sharp(data).metadata();
+      assert.strictEqual('object', typeof metadata.xmp);
+      assert.strictEqual(true, metadata.xmp instanceof Buffer);
+      assert.strictEqual(true, metadata.xmp.toString().includes('persistent-test'));
+    });
+
+    it('withXmp XMP buffer works with WebP format specifically', async () => {
+      const webpXmp = Buffer.from('<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:creator><rdf:Seq><rdf:li>WebP Creator</rdf:li></rdf:Seq></dc:creator><dc:format>image/webp</dc:format></rdf:Description></rdf:RDF></x:xmpmeta>');
+
+      const data = await sharp(fixtures.inputJpg)
+        .resize(120, 80)
+        .webp({ quality: 80 })
+        .withXmp(webpXmp)
+        .toBuffer();
+
+      const metadata = await sharp(data).metadata();
+      assert.strictEqual('webp', metadata.format);
+      assert.strictEqual('object', typeof metadata.xmp);
+      assert.strictEqual(true, metadata.xmp instanceof Buffer);
+
+      const xmpString = metadata.xmp.toString();
+      assert.strictEqual(true, xmpString.includes('WebP Creator'));
+      assert.strictEqual(true, xmpString.includes('image/webp'));
+    });
+
+    it('withXmp XMP buffer validation - non-Buffer input', function () {
+      assert.throws(function () {
+        sharp().withXmp('not a buffer');
+      }, /Expected Buffer for xmp but received not a buffer of type string/);
+    });
+
+    it('withXmp XMP buffer validation - null input', function () {
+      assert.throws(function () {
+        sharp().withXmp(null);
+      }, /Expected Buffer for xmp but received null of type object/);
+    });
+
+    it('withXmp XMP buffer validation - undefined should not throw', function () {
+      assert.doesNotThrow(function () {
+        sharp().withXmp(undefined);
+      });
+    });
+
+    it('withXmp XMP buffer validation - object input', function () {
+      assert.throws(function () {
+        sharp().withXmp({});
+      }, /Expected Buffer for xmp but received \[object Object\] of type object/);
+    });
+
+    it('withXmp XMP buffer validation - number input', function () {
+      assert.throws(function () {
+        sharp().withXmp(123);
+      }, /Expected Buffer for xmp but received 123 of type number/);
+    });
+  });
+
   describe('Invalid parameters', function () {
     it('String orientation', function () {
       assert.throws(function () {

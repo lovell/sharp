@@ -202,6 +202,8 @@ struct PipelineBaton {
   std::string withIccProfile;
   std::unordered_map<std::string, std::string> withExif;
   bool withExifMerge;
+  void *withXmpBuffer;
+  size_t withXmpBufferLength;
   int timeoutSeconds;
   std::vector<double> convKernel;
   int convKernelWidth;
@@ -373,6 +375,8 @@ struct PipelineBaton {
     withMetadataOrientation(-1),
     withMetadataDensity(0.0),
     withExifMerge(true),
+    withXmpBuffer(nullptr),
+    withXmpBufferLength(0),
     timeoutSeconds(0),
     convKernelWidth(0),
     convKernelHeight(0),

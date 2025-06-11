@@ -196,6 +196,31 @@ const dataWithMergedExif = await sharp(inputWithExif)
 ```
 
 
+## withXmp
+> withXmp(xmp) ⇒ <code>Sharp</code>
+
+Set XMP metadata in the output image.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+**Since**: 0.33.0  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| xmp | <code>Buffer</code> | Buffer containing XMP metadata to be embedded in the output image. |
+
+**Example**  
+```js
+const xmpBuffer = Buffer.from('<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:creator><rdf:Seq><rdf:li>John Doe</rdf:li></rdf:Seq></dc:creator></rdf:Description></rdf:RDF></x:xmpmeta>');
+const dataWithXmp = await sharp(input)
+  .withXmp(xmpBuffer)
+  .toBuffer();
+```
+
+
 ## keepIccProfile
 > keepIccProfile() ⇒ <code>Sharp</code>
 
