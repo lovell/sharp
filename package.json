@@ -144,15 +144,15 @@
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "0.34.2",
     "@img/sharp-darwin-x64": "0.34.2",
-    "@img/sharp-libvips-darwin-arm64": "1.1.0",
-    "@img/sharp-libvips-darwin-x64": "1.1.0",
-    "@img/sharp-libvips-linux-arm": "1.1.0",
-    "@img/sharp-libvips-linux-arm64": "1.1.0",
-    "@img/sharp-libvips-linux-ppc64": "1.1.0",
-    "@img/sharp-libvips-linux-s390x": "1.1.0",
-    "@img/sharp-libvips-linux-x64": "1.1.0",
-    "@img/sharp-libvips-linuxmusl-arm64": "1.1.0",
-    "@img/sharp-libvips-linuxmusl-x64": "1.1.0",
+    "@img/sharp-libvips-darwin-arm64": "1.2.0-rc.1",
+    "@img/sharp-libvips-darwin-x64": "1.2.0-rc.1",
+    "@img/sharp-libvips-linux-arm": "1.2.0-rc.1",
+    "@img/sharp-libvips-linux-arm64": "1.2.0-rc.1",
+    "@img/sharp-libvips-linux-ppc64": "1.2.0-rc.1",
+    "@img/sharp-libvips-linux-s390x": "1.2.0-rc.1",
+    "@img/sharp-libvips-linux-x64": "1.2.0-rc.1",
+    "@img/sharp-libvips-linuxmusl-arm64": "1.2.0-rc.1",
+    "@img/sharp-libvips-linuxmusl-x64": "1.2.0-rc.1",
     "@img/sharp-linux-arm": "0.34.2",
     "@img/sharp-linux-arm64": "0.34.2",
     "@img/sharp-linux-s390x": "0.34.2",
@@ -166,11 +166,11 @@
   },
   "devDependencies": {
     "@emnapi/runtime": "^1.4.3",
-    "@img/sharp-libvips-dev": "1.1.0",
-    "@img/sharp-libvips-dev-wasm32": "1.1.0",
-    "@img/sharp-libvips-win32-arm64": "1.1.0",
-    "@img/sharp-libvips-win32-ia32": "1.1.0",
-    "@img/sharp-libvips-win32-x64": "1.1.0",
+    "@img/sharp-libvips-dev": "1.2.0-rc.1",
+    "@img/sharp-libvips-dev-wasm32": "1.2.0-rc.1",
+    "@img/sharp-libvips-win32-arm64": "1.2.0-rc.1",
+    "@img/sharp-libvips-win32-ia32": "1.2.0-rc.1",
+    "@img/sharp-libvips-win32-x64": "1.2.0-rc.1",
     "@types/node": "*",
     "cc": "^3.0.1",
     "emnapi": "^1.4.3",
@@ -179,12 +179,12 @@
     "icc": "^3.0.0",
     "jsdoc-to-markdown": "^9.1.1",
     "license-checker": "^25.0.1",
-    "mocha": "^11.4.0",
+    "mocha": "^11.6.0",
     "node-addon-api": "^8.3.1",
     "nyc": "^17.1.0",
     "prebuild": "^13.0.1",
     "semistandard": "^17.0.0",
-    "tar-fs": "^3.0.8",
+    "tar-fs": "^3.0.9",
     "tsd": "^0.32.0"
   },
   "license": "Apache-2.0",
@@ -192,7 +192,7 @@
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
   },
   "config": {
-    "libvips": ">=8.16.1"
+    "libvips": ">=8.17.0"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"

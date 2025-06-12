@@ -78,34 +78,34 @@ jobs:
             nodejs_version: "^22.9.0"
             nodejs_version_major: 22
             platform: darwin-arm64
-          - os: windows-2019
+          - os: windows-2022
             nodejs_arch: x86
             nodejs_version: "18.18.2" # pinned to avoid 18.19.0 and npm 10
             nodejs_version_major: 18
             platform: win32-ia32
             prebuild: true
-          - os: windows-2019
+          - os: windows-2022
             nodejs_arch: x86
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
             platform: win32-ia32
-          - os: windows-2019
+          - os: windows-2022
             nodejs_arch: x86
             nodejs_version: "^22.9.0"
             nodejs_version_major: 22
             platform: win32-ia32
-          - os: windows-2019
+          - os: windows-2022
             nodejs_arch: x64
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
             platform: win32-x64
             prebuild: true
-          - os: windows-2019
+          - os: windows-2022
             nodejs_arch: x64
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
             platform: win32-x64
-          - os: windows-2019
+          - os: windows-2022
             nodejs_arch: x64
             nodejs_version: "^22.9.0"
             nodejs_version_major: 22

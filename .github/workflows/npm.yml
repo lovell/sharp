@@ -70,27 +70,27 @@ jobs:
             runtime: bun
 
           - name: win32-x64-node-npm
-            runs-on: windows-2019
+            runs-on: windows-2022
             runtime: node
             package-manager: npm
           - name: win32-x64-node-pnpm
-            runs-on: windows-2019
+            runs-on: windows-2022
             runtime: node
             package-manager: pnpm
           - name: win32-x64-node-yarn
-            runs-on: windows-2019
+            runs-on: windows-2022
             runtime: node
             package-manager: yarn
           - name: win32-x64-node-yarn-pnp
-            runs-on: windows-2019
+            runs-on: windows-2022
             runtime: node
             package-manager: yarn-pnp
           - name: win32-x64-node-yarn-v1
-            runs-on: windows-2019
+            runs-on: windows-2022
             runtime: node
             package-manager: yarn-v1
           - name: win32-x64-deno
-            runs-on: windows-2019
+            runs-on: windows-2022
             runtime: deno
 
     steps:

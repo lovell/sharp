@@ -15,7 +15,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-linux-arm64": "1.1.0"
+    "@img/sharp-libvips-linux-arm64": "1.2.0-rc.1"
   },
   "files": [
     "lib"
