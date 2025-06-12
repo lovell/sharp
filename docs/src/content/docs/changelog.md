@@ -10,6 +10,8 @@ Requires libvips v8.17.0
 
 * Upgrade to libvips v8.17.0 for upstream bug fixes.
 
+* Add experimental support for prebuilt Linux RISC-V 64-bit binaries.
+
 * Support composite operation with non-sRGB pipeline colourspace.
   [#4412](https://github.com/lovell/sharp/pull/4412)
   [@kleisauke](https://github.com/kleisauke)
