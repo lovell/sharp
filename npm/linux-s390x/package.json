@@ -15,7 +15,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-linux-s390x": "1.2.0-rc.1"
+    "@img/sharp-libvips-linux-s390x": "1.2.0-rc.2"
   },
   "files": [
     "lib"
