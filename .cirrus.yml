@@ -1,5 +1,5 @@
 freebsd_instance:
-  image_family: freebsd-14-0-snap
+  image_family: freebsd-15-0-snap
 
 task:
   name: FreeBSD

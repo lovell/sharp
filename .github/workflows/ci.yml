@@ -9,7 +9,10 @@ jobs:
       contents: write
     name: ${{ matrix.platform }} - Node.js ${{ matrix.nodejs_version_major }} ${{ matrix.prebuild && '- prebuild' }}
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
+    container:
+      image: ${{ matrix.container }}
+      volumes:
+        - /:/host
     strategy:
       fail-fast: false
       matrix:
@@ -46,6 +49,28 @@ jobs:
             container: node:22-alpine3.20
             nodejs_version_major: 22
             platform: linuxmusl-x64
+          - os: ubuntu-24.04-arm
+            container: arm64v8/rockylinux:8
+            nodejs_arch: arm64
+            nodejs_version: "^18.17.0"
+            nodejs_version_major: 18
+            platform: linux-arm64
+            prebuild: true
+          - os: ubuntu-24.04-arm
+            container: arm64v8/rockylinux:8
+            nodejs_arch: arm64
+            nodejs_version: "^20.3.0"
+            nodejs_version_major: 20
+            platform: linux-arm64
+          - os: ubuntu-24.04-arm
+            container: node:18-alpine3.17
+            nodejs_version_major: 18
+            platform: linuxmusl-arm64
+            prebuild: true
+          - os: ubuntu-24.04-arm
+            container: node:20-alpine3.18
+            nodejs_version_major: 20
+            platform: linuxmusl-arm64
           - os: macos-13
             nodejs_arch: x64
             nodejs_version: "^18.17.0"
@@ -122,6 +147,16 @@ jobs:
             nodejs_version_major: 22
             platform: win32-arm64
     steps:
+      - name: Allow Linux musl containers on ARM64 runners # https://github.com/actions/runner/issues/801#issuecomment-2394425757
+        if: matrix.platform == 'linuxmusl-arm64'
+        shell: sh
+        run: |
+          apk add nodejs
+          sed -i "s:ID=alpine:ID=NotpineForGHA:" /etc/os-release
+          cd /host/home/runner/runners/*/externals/
+          rm -rf node20/*
+          mkdir node20/bin
+          ln -s /usr/bin/node node20/bin/node
       - name: Dependencies (Rocky Linux glibc)
         if: contains(matrix.container, 'rockylinux')
         run: |
