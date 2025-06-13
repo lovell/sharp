@@ -4,15 +4,12 @@ on:
   - pull_request
 permissions: {}
 jobs:
-  github-runner:
+  build-native:
     permissions:
-      contents: write
-    name: ${{ matrix.platform }} - Node.js ${{ matrix.nodejs_version_major }} ${{ matrix.prebuild && '- prebuild' }}
+      contents: read
+    name: "build-${{ matrix.platform }} [Node.js ${{ matrix.nodejs_version_major }}] ${{ matrix.package && '[package]' }}"
     runs-on: ${{ matrix.os }}
-    container:
-      image: ${{ matrix.container }}
-      volumes:
-        - /:/host
+    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
@@ -23,7 +20,7 @@ jobs:
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
             platform: linux-x64
-            prebuild: true
+            package: true
           - os: ubuntu-24.04
             container: rockylinux:8
             nodejs_arch: x64
@@ -40,7 +37,7 @@ jobs:
             container: node:18-alpine3.17
             nodejs_version_major: 18
             platform: linuxmusl-x64
-            prebuild: true
+            package: true
           - os: ubuntu-24.04
             container: node:20-alpine3.18
             nodejs_version_major: 20
@@ -55,28 +52,19 @@ jobs:
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
             platform: linux-arm64
-            prebuild: true
+            package: true
           - os: ubuntu-24.04-arm
             container: arm64v8/rockylinux:8
             nodejs_arch: arm64
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
             platform: linux-arm64
-          - os: ubuntu-24.04-arm
-            container: node:18-alpine3.17
-            nodejs_version_major: 18
-            platform: linuxmusl-arm64
-            prebuild: true
-          - os: ubuntu-24.04-arm
-            container: node:20-alpine3.18
-            nodejs_version_major: 20
-            platform: linuxmusl-arm64
           - os: macos-13
             nodejs_arch: x64
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
             platform: darwin-x64
-            prebuild: true
+            package: true
           - os: macos-13
             nodejs_arch: x64
             nodejs_version: "^20.3.0"
@@ -92,7 +80,7 @@ jobs:
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
             platform: darwin-arm64
-            prebuild: true
+            package: true
           - os: macos-14
             nodejs_arch: arm64
             nodejs_version: "^20.3.0"
@@ -108,7 +96,7 @@ jobs:
             nodejs_version: "18.18.2" # pinned to avoid 18.19.0 and npm 10
             nodejs_version_major: 18
             platform: win32-ia32
-            prebuild: true
+            package: true
           - os: windows-2022
             nodejs_arch: x86
             nodejs_version: "^20.3.0"
@@ -124,7 +112,7 @@ jobs:
             nodejs_version: "^18.17.0"
             nodejs_version_major: 18
             platform: win32-x64
-            prebuild: true
+            package: true
           - os: windows-2022
             nodejs_arch: x64
             nodejs_version: "^20.3.0"
@@ -140,28 +128,18 @@ jobs:
             nodejs_version: "^20.3.0"
             nodejs_version_major: 20
             platform: win32-arm64
-            prebuild: true
+            package: true
           - os: windows-11-arm
             nodejs_arch: arm64
             nodejs_version: "^22.9.0"
             nodejs_version_major: 22
             platform: win32-arm64
     steps:
-      - name: Allow Linux musl containers on ARM64 runners # https://github.com/actions/runner/issues/801#issuecomment-2394425757
-        if: matrix.platform == 'linuxmusl-arm64'
-        shell: sh
-        run: |
-          apk add nodejs
-          sed -i "s:ID=alpine:ID=NotpineForGHA:" /etc/os-release
-          cd /host/home/runner/runners/*/externals/
-          rm -rf node20/*
-          mkdir node20/bin
-          ln -s /usr/bin/node node20/bin/node
       - name: Dependencies (Rocky Linux glibc)
         if: contains(matrix.container, 'rockylinux')
         run: |
-          dnf install -y gcc-toolset-11-gcc-c++ make git python3.12 fontconfig google-noto-sans-fonts
-          echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
+          dnf install -y gcc-toolset-14-gcc-c++ make git python3.12 fontconfig google-noto-sans-fonts
+          echo "/opt/rh/gcc-toolset-14/root/usr/bin" >> $GITHUB_PATH
       - name: Dependencies (Linux musl)
         if: contains(matrix.container, 'alpine')
         run: apk add build-base git python3 font-noto --update-cache
@@ -176,31 +154,70 @@ jobs:
         with:
           node-version: ${{ matrix.nodejs_version }}
           architecture: ${{ matrix.nodejs_arch }}
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Install
         run: npm install --build-from-source
       - name: Test
         run: npm test
-      - name: Test packaging
-        run: |
-          npm run package-from-local-build
-          npm pkg set "optionalDependencies.@img/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
-          npm run clean
-          npm install --ignore-scripts
-          npm test
-      - name: Prebuild
-        if: matrix.prebuild && startsWith(github.ref, 'refs/tags/')
-        env:
-          prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          node -e "require('fs').cpSync('package.json', 'src/package.json')"
-          cd src
-          npx prebuild
-  github-runner-qemu:
+      - name: Populate npm package
+        if: matrix.package
+        run: npm run package-from-local-build
+      - uses: actions/upload-artifact@v4
+        if: matrix.package
+        with:
+          name: ${{ matrix.platform }}
+          path: npm/${{ matrix.platform }}
+          retention-days: 1
+          if-no-files-found: error
+  build-linuxmusl-arm-64:
     permissions:
-      contents: write
-    name: ${{ matrix.platform }} - Node.js ${{ matrix.nodejs_version_major }} - prebuild
+      contents: read
+    name: "build-linuxmusl-arm64 [Node.js ${{ matrix.nodejs_version_major }}] ${{ matrix.package && '[package]' }}"
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: ${{ matrix.container }}
+      volumes:
+        - /:/host
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - container: node:18-alpine3.17
+          nodejs_version_major: 18
+          package: true
+        - container: node:20-alpine3.18
+          nodejs_version_major: 20
+    steps:
+      - name: Allow Linux musl containers on ARM64 runners # https://github.com/actions/runner/issues/801#issuecomment-2394425757
+        shell: sh
+        run: |
+          apk add nodejs
+          sed -i "s:ID=alpine:ID=NotpineForGHA:" /etc/os-release
+          cd /host/home/runner/runners/*/externals/
+          rm -rf node20/*
+          mkdir node20/bin
+          ln -s /usr/bin/node node20/bin/node
+      - name: Dependencies
+        run: apk add build-base git python3 font-noto --update-cache
+      - uses: actions/checkout@v4
+      - name: Install
+        run: npm install --build-from-source
+      - name: Test
+        run: npm test
+      - name: Populate npm package
+        if: matrix.package
+        run: npm run package-from-local-build
+      - uses: actions/upload-artifact@v4
+        if: matrix.package
+        with:
+          name: linuxmusl-arm64
+          path: npm/linuxmusl-arm64
+          retention-days: 1
+          if-no-files-found: error
+  build-qemu:
+    permissions:
+      contents: read
+    name: "build-${{ matrix.platform }} [Node.js ${{ matrix.nodejs_version_major }}] [package]"
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -233,8 +250,6 @@ jobs:
         with:
           arch: ${{ matrix.run_on_arch }}
           distro: ${{ matrix.distro }}
-          env: |
-            prebuild_upload: "${{ startsWith(github.ref, 'refs/tags/') && secrets.GITHUB_TOKEN || '' }}"
           run: |
             apt-get update
             apt-get install -y curl g++ git libatomic1 make python3 xz-utils
@@ -244,20 +259,20 @@ jobs:
             npm install --build-from-source
             npx mocha --no-config --spec=test/unit/io.js --timeout=30000
             npm run package-from-local-build
-            npm pkg set "optionalDependencies.@img/sharp-${{ matrix.platform }}=file:./npm/${{ matrix.platform }}"
-            npm run clean
-            npm install --ignore-scripts
-            npx mocha --no-config --spec=test/unit/io.js --timeout=30000
-            [[ -n $prebuild_upload ]] && cd src && ln -s ../package.json && npx prebuild || true
-  github-runner-emscripten:
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}
+          path: npm/${{ matrix.platform }}
+          retention-days: 1
+          if-no-files-found: error
+  build-emscripten:
     permissions:
-      contents: write
-    name: wasm32 - prebuild
+      contents: read
+    name: "build-wasm32 [package]"
     runs-on: ubuntu-24.04
     container: "emscripten/emsdk:4.0.10"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Dependencies
         run: apt-get update && apt-get install -y pkg-config
       - name: Dependencies (Node.js)
@@ -275,17 +290,35 @@ jobs:
           test "$EMSCRIPTEN_VERSION_LIBVIPS" = "$EMSCRIPTEN_VERSION_SHARP"
       - name: Test
         run: emmake npm test
-      - name: Test packaging
-        run: |
-          emmake npm run package-from-local-build
-          npm pkg set "optionalDependencies.@img/sharp-wasm32=file:./npm/wasm32"
-          npm run clean
-          rm -rf node_modules/@img/sharp-linux-x64
-          npm install --cpu=wasm32
-          npm test
-      - name: Prebuild
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          npm_config_nodedir: emscripten
-          prebuild_upload: ${{ secrets.GITHUB_TOKEN }}
-        run: cd src && ln -s ../package.json && emmake npx prebuild --platform=emscripten --arch=wasm32 --strip=0
+      - name: Populate npm package
+        run: emmake npm run package-from-local-build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wasm32
+          path: npm/wasm32
+          retention-days: 1
+          if-no-files-found: error
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    needs:
+      - build-native
+      - build-linuxmusl-arm-64
+      - build-qemu
+      - build-emscripten
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: npm
+      - name: Create npm workspace tarball
+        run: tar -vcaf npm-workspace.tar.xz --directory npm --exclude=from-local-build.js .
+      - name: Create GitHub release for tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: npm-workspace.tar.xz
+          artifactContentType: application/x-xz
+          prerelease: ${{ contains(github.ref, '-rc') }}
+          makeLatest: ${{ !contains(github.ref, '-rc') }}

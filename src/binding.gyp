@@ -163,6 +163,8 @@
             },
             'xcode_settings': {
               'OTHER_LDFLAGS': [
+                '-Wl,-s',
+                '-Wl,-dead_strip',
                 # Ensure runtime linking is relative to sharp.node
                 '-Wl,-rpath,\'@loader_path/../../sharp-libvips-<(platform_and_arch)/lib\'',
                 '-Wl,-rpath,\'@loader_path/../../../sharp-libvips-<(platform_and_arch)/<(sharp_libvips_version)/lib\'',
@@ -175,6 +177,9 @@
           ['OS == "linux"', {
             'defines': [
               '_GLIBCXX_USE_CXX11_ABI=1'
+            ],
+            'cflags_cc': [
+              '<!(node -p "require(\'detect-libc\').isNonGlibcLinuxSync() ? \'\' : \'-flto=auto\'")'
             ],
             'link_settings': {
               'libraries': [

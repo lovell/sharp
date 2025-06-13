@@ -92,7 +92,7 @@
     "Don Denton <don@happycollision.com>"
   ],
   "scripts": {
-    "install": "node install/check",
+    "install": "node install/check.js",
     "clean": "rm -rf src/build/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run test-lint && npm run test-unit && npm run test-licensing && npm run test-types",
     "test-lint": "semistandard && cpplint",
@@ -100,8 +100,7 @@
     "test-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;LGPL-3.0-or-later;MIT\"",
     "test-leak": "./test/leak/leak.sh",
     "test-types": "tsd",
-    "package-from-local-build": "node npm/from-local-build",
-    "package-from-github-release": "node npm/from-github-release",
+    "package-from-local-build": "node npm/from-local-build.js",
     "docs-build": "node docs/build.mjs",
     "docs-serve": "cd docs && npm start",
     "docs-publish": "cd docs && npm run build && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
@@ -155,6 +154,7 @@
     "@img/sharp-libvips-linuxmusl-x64": "1.2.0-rc.2",
     "@img/sharp-linux-arm": "0.34.2",
     "@img/sharp-linux-arm64": "0.34.2",
+    "@img/sharp-linux-ppc64": "0.34.2",
     "@img/sharp-linux-s390x": "0.34.2",
     "@img/sharp-linux-x64": "0.34.2",
     "@img/sharp-linuxmusl-arm64": "0.34.2",
@@ -181,8 +181,8 @@
     "license-checker": "^25.0.1",
     "mocha": "^11.6.0",
     "node-addon-api": "^8.3.1",
+    "node-gyp": "^11.2.0",
     "nyc": "^17.1.0",
-    "prebuild": "^13.0.1",
     "semistandard": "^17.0.0",
     "tar-fs": "^3.0.9",
     "tsd": "^0.32.0"
@@ -196,11 +196,6 @@
   },
   "funding": {
     "url": "https://opencollective.com/libvips"
-  },
-  "binary": {
-    "napi_versions": [
-      9
-    ]
   },
   "semistandard": {
     "env": [
