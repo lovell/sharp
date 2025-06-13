@@ -175,7 +175,7 @@ The default memory allocator on most glibc-based Linux systems
 processes that involve lots of small memory allocations.
 
 For this reason, by default, sharp will limit the use of thread-based
-[concurrency](api-utility#concurrency) when the glibc allocator is
+[concurrency](/api-utility#concurrency) when the glibc allocator is
 detected at runtime.
 
 To help avoid fragmentation and improve performance on these systems,
