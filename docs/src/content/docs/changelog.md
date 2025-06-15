@@ -10,6 +10,8 @@ Requires libvips v8.17.0
 
 * Upgrade to libvips v8.17.0 for upstream bug fixes.
 
+* Add "Magic Kernel Sharp" (no relation) to resizing kernels.
+
 * Expose JPEG 2000 `oneshot` decoder option.
   [#4262](https://github.com/lovell/sharp/pull/4262)
   [@mbklein](https://github.com/mbklein)

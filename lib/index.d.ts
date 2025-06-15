@@ -1729,6 +1729,8 @@ declare namespace sharp {
         mitchell: 'mitchell';
         lanczos2: 'lanczos2';
         lanczos3: 'lanczos3';
+        mks2013: 'mks2013';
+        mks2021: 'mks2021';
     }
 
     interface PresetEnum {

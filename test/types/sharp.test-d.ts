@@ -188,6 +188,8 @@ sharp(input)
     // of the image data in inputBuffer
   });
 
+sharp(input).resize({ kernel: 'mks2013' });
+
 transformer = sharp()
   .resize(200, 200, {
     fit: 'cover',
