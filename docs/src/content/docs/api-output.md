@@ -496,6 +496,7 @@ The palette of the input image will be re-used if possible.
 | [options.dither] | <code>number</code> | <code>1.0</code> | level of Floyd-Steinberg error diffusion, between 0 (least) and 1 (most) |
 | [options.interFrameMaxError] | <code>number</code> | <code>0</code> | maximum inter-frame error for transparency, between 0 (lossless) and 32 |
 | [options.interPaletteMaxError] | <code>number</code> | <code>3</code> | maximum inter-palette error for palette reuse, between 0 and 256 |
+| [options.keepDuplicateFrames] | <code>boolean</code> | <code>false</code> | keep duplicate frames in the output instead of combining them |
 | [options.loop] | <code>number</code> | <code>0</code> | number of animation iterations, use 0 for infinite animation |
 | [options.delay] | <code>number</code> \| <code>Array.&lt;number&gt;</code> |  | delay(s) between animation frames (in milliseconds) |
 | [options.force] | <code>boolean</code> | <code>true</code> | force GIF output, otherwise attempt to use input format |

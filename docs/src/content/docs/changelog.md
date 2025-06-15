@@ -12,6 +12,8 @@ Requires libvips v8.17.0
 
 * Add "Magic Kernel Sharp" (no relation) to resizing kernels.
 
+* Expose `keepDuplicateFrames` GIF output parameter.
+
 * Expose JPEG 2000 `oneshot` decoder option.
   [#4262](https://github.com/lovell/sharp/pull/4262)
   [@mbklein](https://github.com/mbklein)

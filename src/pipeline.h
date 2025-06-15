@@ -169,6 +169,7 @@ struct PipelineBaton {
   double gifDither;
   double gifInterFrameMaxError;
   double gifInterPaletteMaxError;
+  bool gifKeepDuplicateFrames;
   bool gifReuse;
   bool gifProgressive;
   int tiffQuality;
@@ -342,6 +343,7 @@ struct PipelineBaton {
     gifDither(1.0),
     gifInterFrameMaxError(0.0),
     gifInterPaletteMaxError(3.0),
+    gifKeepDuplicateFrames(false),
     gifReuse(true),
     gifProgressive(false),
     tiffQuality(80),

@@ -1006,6 +1006,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("interlace", baton->gifProgressive)
             ->set("interframe_maxerror", baton->gifInterFrameMaxError)
             ->set("interpalette_maxerror", baton->gifInterPaletteMaxError)
+            ->set("keep_duplicate_frames", baton->gifKeepDuplicateFrames)
             ->set("dither", baton->gifDither)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -1209,6 +1210,9 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("effort", baton->gifEffort)
             ->set("reuse", baton->gifReuse)
             ->set("interlace", baton->gifProgressive)
+            ->set("interframe_maxerror", baton->gifInterFrameMaxError)
+            ->set("interpalette_maxerror", baton->gifInterPaletteMaxError)
+            ->set("keep_duplicate_frames", baton->gifKeepDuplicateFrames)
             ->set("dither", baton->gifDither));
           baton->formatOut = "gif";
         } else if (baton->formatOut == "tiff" || (mightMatchInput && isTiff) ||
@@ -1761,6 +1765,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->gifDither = sharp::AttrAsDouble(options, "gifDither");
   baton->gifInterFrameMaxError = sharp::AttrAsDouble(options, "gifInterFrameMaxError");
   baton->gifInterPaletteMaxError = sharp::AttrAsDouble(options, "gifInterPaletteMaxError");
+  baton->gifKeepDuplicateFrames = sharp::AttrAsBool(options, "gifKeepDuplicateFrames");
   baton->gifReuse = sharp::AttrAsBool(options, "gifReuse");
   baton->gifProgressive = sharp::AttrAsBool(options, "gifProgressive");
   baton->tiffQuality = sharp::AttrAsUint32(options, "tiffQuality");

@@ -375,6 +375,8 @@ sharp(input)
   .gif({ reuse: false })
   .gif({ progressive: true })
   .gif({ progressive: false })
+  .gif({ keepDuplicateFrames: true })
+  .gif({ keepDuplicateFrames: false })
   .toBuffer({ resolveWithObject: true })
   .then(({ data, info }) => {
     console.log(data);

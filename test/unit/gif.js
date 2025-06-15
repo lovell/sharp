@@ -187,6 +187,17 @@ describe('GIF input', () => {
     );
   });
 
+  it('invalid keepDuplicateFrames throws', () => {
+    assert.throws(
+      () => sharp().gif({ keepDuplicateFrames: -1 }),
+      /Expected boolean for keepDuplicateFrames but received -1 of type number/
+    );
+    assert.throws(
+      () => sharp().gif({ keepDuplicateFrames: 'fail' }),
+      /Expected boolean for keepDuplicateFrames but received fail of type string/
+    );
+  });
+
   it('should work with streams when only animated is set', function (done) {
     fs.createReadStream(fixtures.inputGifAnimated)
       .pipe(sharp({ animated: true }))
@@ -223,6 +234,20 @@ describe('GIF input', () => {
     const before = await input.gif({ interPaletteMaxError: 0 }).toBuffer();
     const after = await input.gif({ interPaletteMaxError: 100 }).toBuffer();
     assert.strict(before.length > after.length);
+  });
+
+  it('should keep duplicate frames via keepDuplicateFrames', async () => {
+    const create = { width: 8, height: 8, channels: 4, background: 'blue' };
+    const input = sharp([{ create }, { create }], { join: { animated: true } });
+
+    const before = await input.gif({ keepDuplicateFrames: false }).toBuffer();
+    const after = await input.gif({ keepDuplicateFrames: true }).toBuffer();
+    assert.strict(before.length < after.length);
+
+    const beforeMeta = await sharp(before).metadata();
+    const afterMeta = await sharp(after).metadata();
+    assert.strictEqual(beforeMeta.pages, 1);
+    assert.strictEqual(afterMeta.pages, 2);
   });
 
   it('non-animated input defaults to no-loop', async () => {

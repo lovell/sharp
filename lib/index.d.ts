@@ -1392,9 +1392,11 @@ declare namespace sharp {
         /** Level of Floyd-Steinberg error diffusion, between 0 (least) and 1 (most) (optional, default 1.0) */
         dither?: number | undefined;
         /** Maximum inter-frame error for transparency, between 0 (lossless) and 32 (optional, default 0) */
-        interFrameMaxError?: number;
+        interFrameMaxError?: number | undefined;
         /** Maximum inter-palette error for palette reuse, between 0 and 256 (optional, default 3) */
-        interPaletteMaxError?: number;
+        interPaletteMaxError?: number | undefined;
+        /** Keep duplicate frames in the output instead of combining them (optional, default false) */
+        keepDuplicateFrames?: boolean | undefined;
     }
 
     interface TiffOptions extends OutputOptions {
