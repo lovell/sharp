@@ -276,6 +276,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         } else if (inputImageType == sharp::ImageType::SVG) {
           option->set("unlimited", baton->input->unlimited);
           option->set("dpi", baton->input->density);
+          option->set("stylesheet", baton->input->svgStylesheet.data());
+          option->set("high_bitdepth", baton->input->svgHighBitdepth);
 
           if (baton->input->buffer != nullptr) {
             // Reload SVG buffer
