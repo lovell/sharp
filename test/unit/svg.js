@@ -139,6 +139,41 @@ describe('SVG input', function () {
     assert.strictEqual(info.channels, 4);
   });
 
+  it('Can apply custom CSS', async () => {
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
+      <svg  width="10" height="10" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="5" cy="5" r="4" fill="green" />
+      </svg>`;
+    const stylesheet = 'circle { fill: red }';
+
+    const [r, g, b, a] = await sharp(Buffer.from(svg), { svg: { stylesheet } })
+      .extract({ left: 5, top: 5, width: 1, height: 1 })
+      .raw()
+      .toBuffer();
+
+    assert.deepEqual([r, g, b, a], [255, 0, 0, 255]);
+  });
+
+  it('Invalid stylesheet input option throws', () =>
+    assert.throws(
+      () => sharp({ svg: { stylesheet: 123 } }),
+      /Expected string for svg\.stylesheet but received 123 of type number/
+    )
+  );
+
+  it('Valid highBitdepth input option does not throw', () =>
+    assert.doesNotThrow(
+      () => sharp({ svg: { highBitdepth: true } })
+    )
+  );
+
+  it('Invalid highBitdepth input option throws', () =>
+    assert.throws(
+      () => sharp({ svg: { highBitdepth: 123 } }),
+      /Expected boolean for svg\.highBitdepth but received 123 of type number/
+    )
+  );
+
   it('Fails to render SVG larger than 32767x32767', () =>
     assert.rejects(
       () => sharp(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="32768" height="1" />')).toBuffer(),

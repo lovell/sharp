@@ -730,6 +730,9 @@ sharp({ openSlide: { level: 0 } });
 sharp({ level: 0 }); // Deprecated
 sharp({ jp2: { oneshot: true } });
 sharp({ jp2: { oneshot: false } });
+sharp({ svg: { stylesheet: 'test' }});
+sharp({ svg: { highBitdepth: true }});
+sharp({ svg: { highBitdepth: false }});
 
 sharp({ autoOrient: true });
 sharp({ autoOrient: false });

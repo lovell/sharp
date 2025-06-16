@@ -1005,6 +1005,8 @@ declare namespace sharp {
         page?: number | undefined;
         /** TIFF specific input options */
         tiff?: TiffInputOptions | undefined;
+        /** SVG specific input options */
+        svg?: SvgInputOptions | undefined;
         /** PDF specific input options */
         pdf?: PdfInputOptions | undefined;
         /** OpenSlide specific input options */
@@ -1125,6 +1127,13 @@ declare namespace sharp {
     interface TiffInputOptions {
         /** Sub Image File Directory to extract, defaults to main image. Use -1 for all subifds. */
         subifd?: number | undefined;
+    }
+
+    interface SvgInputOptions {
+        /** Custom CSS for SVG input, applied with a User Origin during the CSS cascade. */
+        stylesheet?: string | undefined;
+        /** Set to `true` to render SVG input at 32-bits per channel (128-bit) instead of 8-bits per channel (32-bit) RGBA. */
+        highBitdepth?: boolean | undefined;
     }
 
     interface PdfInputOptions {

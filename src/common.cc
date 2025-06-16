@@ -101,6 +101,13 @@ namespace sharp {
     if (HasAttr(input, "page")) {
       descriptor->page = AttrAsUint32(input, "page");
     }
+    // SVG
+    if (HasAttr(input, "svgStylesheet")) {
+      descriptor->svgStylesheet = AttrAsStr(input, "svgStylesheet");
+    }
+    if (HasAttr(input, "svgHighBitdepth")) {
+      descriptor->svgHighBitdepth = AttrAsBool(input, "svgHighBitdepth");
+    }
     // Multi-level input (OpenSlide)
     if (HasAttr(input, "level")) {
       descriptor->level = AttrAsUint32(input, "level");
@@ -428,6 +435,10 @@ namespace sharp {
             if (ImageTypeSupportsPage(imageType)) {
               option->set("n", descriptor->pages);
               option->set("page", descriptor->page);
+            }
+            if (imageType == ImageType::SVG) {
+              option->set("stylesheet", descriptor->svgStylesheet.data());
+              option->set("high_bitdepth", descriptor->svgHighBitdepth);
             }
             if (imageType == ImageType::OPENSLIDE) {
               option->set("level", descriptor->level);

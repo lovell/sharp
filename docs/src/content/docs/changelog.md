@@ -14,6 +14,8 @@ Requires libvips v8.17.0
 
 * Deprecate top-level, format-specific constructor parameters, e.g. `subifd` becomes `tiff.subifd`.
 
+* Expose `stylesheet` and `highBitdepth` SVG input parameters.
+
 * Expose `keepDuplicateFrames` GIF output parameter.
 
 * Expose JPEG 2000 `oneshot` decoder option.

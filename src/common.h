@@ -77,6 +77,8 @@ namespace sharp {
     std::vector<double> joinBackground;
     VipsAlign joinHalign;
     VipsAlign joinValign;
+    std::string svgStylesheet;
+    bool svgHighBitdepth;
     std::vector<double> pdfBackground;
     bool jp2Oneshot;
 
@@ -121,6 +123,7 @@ namespace sharp {
       joinBackground{ 0.0, 0.0, 0.0, 255.0 },
       joinHalign(VIPS_ALIGN_LOW),
       joinValign(VIPS_ALIGN_LOW),
+      svgHighBitdepth(false),
       pdfBackground{ 255.0, 255.0, 255.0, 255.0 },
       jp2Oneshot(false) {}
   };

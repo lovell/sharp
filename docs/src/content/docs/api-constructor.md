@@ -80,6 +80,9 @@ where the overall height is the `pageHeight` multiplied by the number of `pages`
 | [options.join.valign] | <code>string</code> | <code>&quot;&#x27;top&#x27;&quot;</code> | vertical alignment style for images joined vertically (`'top'`, `'centre'`, `'center'`, `'bottom'`). |
 | [options.tiff] | <code>Object</code> |  | Describes TIFF specific options. |
 | [options.tiff.subifd] | <code>number</code> | <code>-1</code> | Sub Image File Directory to extract for OME-TIFF, defaults to main image. |
+| [options.svg] | <code>Object</code> |  | Describes SVG specific options. |
+| [options.svg.stylesheet] | <code>string</code> |  | Custom CSS for SVG input, applied with a User Origin during the CSS cascade. |
+| [options.svg.highBitdepth] | <code>boolean</code> | <code>false</code> | Set to `true` to render SVG input at 32-bits per channel (128-bit) instead of 8-bits per channel (32-bit) RGBA. |
 | [options.pdf] | <code>Object</code> |  | Describes PDF specific options. Requires the use of a globally-installed libvips compiled with support for PDFium, Poppler, ImageMagick or GraphicsMagick. |
 | [options.pdf.background] | <code>string</code> \| <code>Object</code> |  | Background colour to use when PDF is partially transparent. Parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha. |
 | [options.openSlide] | <code>Object</code> |  | Describes OpenSlide specific options. Requires the use of a globally-installed libvips compiled with support for OpenSlide. |
