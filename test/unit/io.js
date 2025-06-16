@@ -867,52 +867,91 @@ describe('Input/output', function () {
         sharp({ pages: '1' });
       }, /Expected integer between -1 and 100000 for pages but received 1 of type string/);
     });
-    it('Valid level property', function () {
+    it('Valid openSlide.level property', function () {
+      sharp({ openSlide: { level: 1 } });
       sharp({ level: 1 });
     });
-    it('Invalid level property (string) throws', function () {
-      assert.throws(function () {
-        sharp({ level: '1' });
-      }, /Expected integer between 0 and 256 for level but received 1 of type string/);
+    it('Invalid openSlide.level property (string) throws', function () {
+      assert.throws(
+        () => sharp({ openSlide: { level: '1' } }),
+        /Expected integer between 0 and 256 for openSlide.level but received 1 of type string/
+      );
+      assert.throws(
+        () => sharp({ level: '1' }),
+        /Expected integer between 0 and 256 for level but received 1 of type string/
+      );
     });
-    it('Invalid level property (negative) throws', function () {
-      assert.throws(function () {
-        sharp({ level: -1 });
-      }, /Expected integer between 0 and 256 for level but received -1 of type number/);
+    it('Invalid openSlide.level property (negative) throws', function () {
+      assert.throws(
+        () => sharp({ openSlide: { level: -1 } }),
+        /Expected integer between 0 and 256 for openSlide\.level but received -1 of type number/
+      );
+      assert.throws(
+        () => sharp({ level: -1 }),
+        /Expected integer between 0 and 256 for level but received -1 of type number/
+      );
     });
-    it('Valid subifd property', function () {
+    it('Valid tiff.subifd property', function () {
+      sharp({ tiff: { subifd: 1 } });
       sharp({ subifd: 1 });
     });
-    it('Invalid subifd property (string) throws', function () {
-      assert.throws(function () {
-        sharp({ subifd: '1' });
-      }, /Expected integer between -1 and 100000 for subifd but received 1 of type string/);
+    it('Invalid tiff.subifd property (string) throws', function () {
+      assert.throws(
+        () => sharp({ tiff: { subifd: '1' } }),
+        /Expected integer between -1 and 100000 for tiff\.subifd but received 1 of type string/
+      );
+      assert.throws(
+        () => sharp({ subifd: '1' }),
+        /Expected integer between -1 and 100000 for subifd but received 1 of type string/
+      );
     });
-    it('Invalid subifd property (float) throws', function () {
-      assert.throws(function () {
-        sharp({ subifd: 1.2 });
-      }, /Expected integer between -1 and 100000 for subifd but received 1.2 of type number/);
+    it('Invalid tiff.subifd property (float) throws', function () {
+      assert.throws(
+        () => sharp({ tiff: { subifd: 1.2 } }),
+        /Expected integer between -1 and 100000 for tiff\.subifd but received 1.2 of type number/
+      );
+      assert.throws(
+        () => sharp({ subifd: 1.2 }),
+        /Expected integer between -1 and 100000 for subifd but received 1.2 of type number/
+      );
     });
-    it('Valid pdfBackground property (string)', function () {
+    it('Valid pdf.background property (string)', function () {
+      sharp({ pdf: { background: '#00ff00' } });
       sharp({ pdfBackground: '#00ff00' });
     });
-    it('Valid pdfBackground property (object)', function () {
+    it('Valid pdf.background property (object)', function () {
+      sharp({ pdf: { background: { r: 0, g: 255, b: 0 } } });
       sharp({ pdfBackground: { r: 0, g: 255, b: 0 } });
     });
-    it('Invalid pdfBackground property (string) throws', function () {
-      assert.throws(function () {
-        sharp({ pdfBackground: '00ff00' });
-      }, /Unable to parse color from string/);
+    it('Invalid pdf.background property (string) throws', function () {
+      assert.throws(
+        () => sharp({ pdf: { background: '00ff00' } }),
+        /Unable to parse color from string/
+      );
+      assert.throws(
+        () => sharp({ pdfBackground: '00ff00' }),
+        /Unable to parse color from string/
+      );
     });
-    it('Invalid pdfBackground property (number) throws', function () {
-      assert.throws(function () {
-        sharp({ pdfBackground: 255 });
-      }, /Expected object or string for background/);
+    it('Invalid pdf.background property (number) throws', function () {
+      assert.throws(
+        () => sharp({ pdf: { background: 255 } }),
+        /Expected object or string for background/
+      );
+      assert.throws(
+        () => sharp({ pdf: { background: 255 } }),
+        /Expected object or string for background/
+      );
     });
-    it('Invalid pdfBackground property (object)', function () {
-      assert.throws(function () {
-        sharp({ pdfBackground: { red: 0, green: 255, blue: 0 } });
-      }, /Unable to parse color from object/);
+    it('Invalid pdf.background property (object)', function () {
+      assert.throws(
+        () => sharp({ pdf: { background: { red: 0, green: 255, blue: 0 } } }),
+        /Unable to parse color from object/
+      );
+      assert.throws(
+        () => sharp({ pdfBackground: { red: 0, green: 255, blue: 0 } }),
+        /Unable to parse color from object/
+      );
     });
   });
 

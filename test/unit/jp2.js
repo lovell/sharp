@@ -117,14 +117,14 @@ describe('JP2 output', () => {
 
   it('valid JP2 oneshot value does not throw error', () => {
     assert.doesNotThrow(
-      () => sharp(fixtures.inputJp2TileParts, { jp2Oneshot: true })
+      () => sharp({ jp2: { oneshot: true } })
     );
   });
 
   it('invalid JP2 oneshot value throws error', () => {
     assert.throws(
-      () => sharp(fixtures.inputJp2TileParts, { jp2Oneshot: 'fail' }),
-      /Expected boolean for jp2Oneshot but received fail of type string/
+      () => sharp({ jp2: { oneshot: 'fail' } }),
+      /Expected boolean for jp2.oneshot but received fail of type string/
     );
   });
 });

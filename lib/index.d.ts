@@ -1003,14 +1003,20 @@ declare namespace sharp {
         pages?: number | undefined;
         /** Page number to start extracting from for multi-page input (GIF, TIFF, PDF), zero based. (optional, default 0) */
         page?: number | undefined;
-        /** subIFD (Sub Image File Directory) to extract for OME-TIFF, defaults to main image. (optional, default -1) */
+        /** TIFF specific input options */
+        tiff?: TiffInputOptions | undefined;
+        /** PDF specific input options */
+        pdf?: PdfInputOptions | undefined;
+        /** OpenSlide specific input options */
+        openSlide?: OpenSlideInputOptions | undefined;
+        /** JPEG 2000 specific input options */
+        jp2?: Jp2InputOptions | undefined;
+        /** Deprecated: use tiff.subifd instead */
         subifd?: number | undefined;
-        /** Level to extract from a multi-level input (OpenSlide), zero based. (optional, default 0) */
-        level?: number | undefined;
-        /** Background colour to use when PDF is partially transparent. Requires the use of a globally-installed libvips compiled with support for PDFium, Poppler, ImageMagick or GraphicsMagick. */
+        /** Deprecated: use pdf.background instead */
         pdfBackground?: Colour | Color | undefined;
-        /** Set to `true` to load JPEG 2000 images using [oneshot mode](https://github.com/libvips/libvips/issues/4205) */
-        jp2Oneshot?: boolean | undefined;
+        /** Deprecated: use openSlide.level instead */
+        level?: number | undefined;
         /** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default false) */
         animated?: boolean | undefined;
         /** Describes raw pixel input image data. See raw() for pixel ordering. */
@@ -1114,6 +1120,26 @@ declare namespace sharp {
         halign?: HorizontalAlignment | undefined;
         /** Vertical alignment. */
         valign?: VerticalAlignment | undefined;
+    }
+
+    interface TiffInputOptions {
+        /** Sub Image File Directory to extract, defaults to main image. Use -1 for all subifds. */
+        subifd?: number | undefined;
+    }
+
+    interface PdfInputOptions {
+        /** Background colour to use when PDF is partially transparent. Requires the use of a globally-installed libvips compiled with support for PDFium, Poppler, ImageMagick or GraphicsMagick. */
+        background?: Colour | Color | undefined;
+    }
+
+    interface OpenSlideInputOptions {
+        /** Level to extract from a multi-level input, zero based. (optional, default 0) */
+        level?: number | undefined;
+    }
+
+    interface Jp2InputOptions {
+        /** Set to `true` to load JPEG 2000 images using [oneshot mode](https://github.com/libvips/libvips/issues/4205) */
+        oneshot?: boolean | undefined;
     }
 
     interface ExifDir {

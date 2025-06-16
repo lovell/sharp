@@ -12,6 +12,8 @@ Requires libvips v8.17.0
 
 * Add "Magic Kernel Sharp" (no relation) to resizing kernels.
 
+* Deprecate top-level, format-specific constructor parameters, e.g. `subifd` becomes `tiff.subifd`.
+
 * Expose `keepDuplicateFrames` GIF output parameter.
 
 * Expose JPEG 2000 `oneshot` decoder option.

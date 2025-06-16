@@ -435,9 +435,6 @@ sharp('input.jpg').clahe({ width: 10, height: 10, maxSlope: 5 }).toFile('outfile
 // Support `unlimited` input option
 sharp('input.png', { unlimited: true }).resize(320, 240).toFile('outfile.png');
 
-// Support `subifd` input option for tiffs
-sharp('input.tiff', { subifd: 3 }).resize(320, 240).toFile('outfile.png');
-
 // Support creating with noise
 sharp({
   create: {
@@ -720,13 +717,19 @@ sharp(input).composite([
   }
 ])
 
+// Support format-specific input options
 const colour: sharp.Colour = '#fff';
 const color: sharp.Color = '#fff';
-sharp({ pdfBackground: colour });
-sharp({ pdfBackground: color });
-
-sharp({ jp2Oneshot: true });
-sharp({ jp2Oneshot: false });
+sharp({ pdf: { background: colour } });
+sharp({ pdf: { background: color } });
+sharp({ pdfBackground: colour }); // Deprecated
+sharp({ pdfBackground: color }); // Deprecated
+sharp({ tiff: { subifd: 3 } });
+sharp({ subifd: 3 }); // Deprecated
+sharp({ openSlide: { level: 0 } });
+sharp({ level: 0 }); // Deprecated
+sharp({ jp2: { oneshot: true } });
+sharp({ jp2: { oneshot: false } });
 
 sharp({ autoOrient: true });
 sharp({ autoOrient: false });
