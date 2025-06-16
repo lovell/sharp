@@ -2,6 +2,38 @@
 title: Performance
 ---
 
+## Parallelism and concurrency
+
+Node.js uses a libuv-managed thread pool when processing asynchronous calls to native modules such as sharp.
+
+The maximum number of images that sharp can process in parallel is controlled by libuv's
+[`UV_THREADPOOL_SIZE`](https://nodejs.org/api/cli.html#uv_threadpool_sizesize)
+environment variable, which defaults to 4.
+
+When using more than 4 physical CPU cores, set this environment variable
+before the Node.js process starts to increase the thread pool size.
+
+```sh
+export UV_THREADPOOL_SIZE="$(lscpu -p | egrep -v "^#" | sort -u -t, -k 2,4 | wc -l)"
+```
+
+libvips uses a glib-managed thread pool to avoid the overhead of spawning new threads.
+
+The default number of threads used to concurrently process each image is the same as the number of CPU cores,
+except when using glibc-based Linux without jemalloc, where the default is `1` to help reduce memory fragmentation.
+
+Use [`sharp.concurrency()`](/api-utility/#concurrency) to manage the number of threads per image.
+
+To reduce memory fragmentation when using the default Linux glibc memory allocator, set the
+[`MALLOC_ARENA_MAX`](https://www.gnu.org/software/libc/manual/html_node/Memory-Allocation-Tunables.html)
+environment variable before the Node.js process starts to reduce the number of memory pools.
+
+```sh
+export MALLOC_ARENA_MAX="2"
+```
+
+## Benchmark
+
 A test to benchmark the performance of this module relative to alternatives.
 
 Greater libvips performance can be expected with caching enabled (default)
@@ -9,28 +41,28 @@ and using 8+ core machines, especially those with larger L1/L2 CPU caches.
 
 The I/O limits of the relevant (de)compression library will generally determine maximum throughput.
 
-## Contenders
+### Contenders
 
 * [jimp](https://www.npmjs.com/package/jimp) v1.6.0 - Image processing in pure JavaScript.
 * [imagemagick](https://www.npmjs.com/package/imagemagick) v0.1.3 - Supports filesystem only and "*has been unmaintained for a long time*".
 * [gm](https://www.npmjs.com/package/gm) v1.25.1 - Fully featured wrapper around GraphicsMagick's `gm` command line utility, but "*has been sunset*".
 * sharp v0.34.0 / libvips v8.16.1 - Caching within libvips disabled to ensure a fair comparison.
 
-## Environment
+### Environment
 
-### AMD64
+#### AMD64
 
 * AWS EC2 us-west-2 [c7a.xlarge](https://aws.amazon.com/ec2/instance-types/c7a/) (4x AMD EPYC 9R14)
 * Ubuntu 24.10 [fad5ba7223f8](https://hub.docker.com/layers/library/ubuntu/24.10/images/sha256-fad5ba7223f8d87179dfa23211d31845d47e07a474ac31ad5258afb606523c0d)
 * Node.js 22.14.0
 
-### ARM64
+#### ARM64
 
 * AWS EC2 us-west-2 [c8g.xlarge](https://aws.amazon.com/ec2/instance-types/c8g/) (4x ARM Graviton4)
 * Ubuntu 24.10 [133f2e05cb69](https://hub.docker.com/layers/library/ubuntu/24.10/images/sha256-133f2e05cb6958c3ce7ec870fd5a864558ba780fb7062315b51a23670bff7e76)
 * Node.js 22.14.0
 
-## Task: JPEG
+### Task: JPEG
 
 Decompress a 2725x2225 JPEG image,
 resize to 720x588 using Lanczos 3 resampling (where available),
@@ -62,7 +94,7 @@ Note: jimp does not support Lanczos 3, bicubic resampling used instead.
 | sharp              | file   | file   |   48.42 |     22.7 |
 | sharp              | buffer | buffer |   50.16 |     23.6 |
 
-## Task: PNG
+### Task: PNG
 
 Decompress a 2048x1536 RGBA PNG image,
 premultiply the alpha channel,
@@ -72,7 +104,7 @@ and without adaptive filtering.
 
 Note: jimp does not support premultiply/unpremultiply.
 
-### Results: PNG (AMD64)
+#### Results: PNG (AMD64)
 
 | Module             | Input  | Output | Ops/sec | Speed-up |
 | :----------------- | :----- | :----- | ------: | -------: |
@@ -82,7 +114,7 @@ Note: jimp does not support premultiply/unpremultiply.
 | sharp              | file   | file   |   27.93 |      3.2 |
 | sharp              | buffer | buffer |   28.69 |      3.3 |
 
-### Results: PNG (ARM64)
+#### Results: PNG (ARM64)
 
 | Module             | Input  | Output | Ops/sec | Speed-up |
 | :----------------- | :----- | :----- | ------: | -------: |

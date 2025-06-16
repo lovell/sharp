@@ -113,15 +113,9 @@ Some image format libraries spawn additional threads,
 e.g. libaom manages its own 4 threads when encoding AVIF images,
 and these are independent of the value set here.
 
-The maximum number of images that sharp can process in parallel
-is controlled by libuv's `UV_THREADPOOL_SIZE` environment variable,
-which defaults to 4.
-
-https://nodejs.org/api/cli.html#uv_threadpool_sizesize
-
-For example, by default, a machine with 8 CPU cores will process
-4 images in parallel and use up to 8 threads per image,
-so there will be up to 32 concurrent threads.
+:::note
+Further [control over performance](/performance) is available.
+:::
 
 
 **Returns**: <code>number</code> - concurrency  
