@@ -241,11 +241,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // factor for jpegload*, a double scale factor for webpload*,
       // pdfload* and svgload*
       if (jpegShrinkOnLoad > 1) {
-        vips::VOption *option = VImage::option()
-          ->set("access", access)
-          ->set("shrink", jpegShrinkOnLoad)
-          ->set("unlimited", baton->input->unlimited)
-          ->set("fail_on", baton->input->failOn);
+        vips::VOption *option = GetOptionsForImageType(inputImageType, baton->input)->set("shrink", jpegShrinkOnLoad);
         if (baton->input->buffer != nullptr) {
           // Reload JPEG buffer
           VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
@@ -256,14 +252,8 @@ class PipelineWorker : public Napi::AsyncWorker {
           image = VImage::jpegload(const_cast<char*>(baton->input->file.data()), option);
         }
       } else if (scale != 1.0) {
-        vips::VOption *option = VImage::option()
-          ->set("access", access)
-          ->set("scale", scale)
-          ->set("fail_on", baton->input->failOn);
+        vips::VOption *option = GetOptionsForImageType(inputImageType, baton->input)->set("scale", scale);
         if (inputImageType == sharp::ImageType::WEBP) {
-          option->set("n", baton->input->pages);
-          option->set("page", baton->input->page);
-
           if (baton->input->buffer != nullptr) {
             // Reload WebP buffer
             VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
@@ -274,11 +264,6 @@ class PipelineWorker : public Napi::AsyncWorker {
             image = VImage::webpload(const_cast<char*>(baton->input->file.data()), option);
           }
         } else if (inputImageType == sharp::ImageType::SVG) {
-          option->set("unlimited", baton->input->unlimited);
-          option->set("dpi", baton->input->density);
-          option->set("stylesheet", baton->input->svgStylesheet.data());
-          option->set("high_bitdepth", baton->input->svgHighBitdepth);
-
           if (baton->input->buffer != nullptr) {
             // Reload SVG buffer
             VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
@@ -293,11 +278,6 @@ class PipelineWorker : public Napi::AsyncWorker {
             throw vips::VError("Input SVG image will exceed 32767x32767 pixel limit when scaled");
           }
         } else if (inputImageType == sharp::ImageType::PDF) {
-          option->set("n", baton->input->pages);
-          option->set("page", baton->input->page);
-          option->set("dpi", baton->input->density);
-          option->set("background", baton->input->pdfBackground);
-
           if (baton->input->buffer != nullptr) {
             // Reload PDF buffer
             VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
@@ -307,7 +287,6 @@ class PipelineWorker : public Napi::AsyncWorker {
             // Reload PDF file
             image = VImage::pdfload(const_cast<char*>(baton->input->file.data()), option);
           }
-
           sharp::SetDensity(image, baton->input->density);
         }
       } else {

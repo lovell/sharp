@@ -221,14 +221,9 @@ namespace sharp {
   ImageType DetermineImageType(char const *file);
 
   /*
-    Does this image type support multiple pages?
+    Format-specific options builder
   */
-  bool ImageTypeSupportsPage(ImageType imageType);
-
-  /*
-    Does this image type support removal of safety limits?
-  */
-  bool ImageTypeSupportsUnlimited(ImageType imageType);
+  vips::VOption* GetOptionsForImageType(ImageType imageType, InputDescriptor *descriptor);
 
   /*
     Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)

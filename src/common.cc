@@ -395,6 +395,45 @@ namespace sharp {
   }
 
   /*
+    Format-specific options builder
+  */
+  vips::VOption* GetOptionsForImageType(ImageType imageType, InputDescriptor *descriptor) {
+    vips::VOption *option = VImage::option()
+      ->set("access", descriptor->access)
+      ->set("fail_on", descriptor->failOn);
+    if (descriptor->unlimited && ImageTypeSupportsUnlimited(imageType)) {
+      option->set("unlimited", true);
+    }
+    if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
+      option->set("dpi", descriptor->density);
+    }
+    if (imageType == ImageType::MAGICK) {
+      option->set("density", std::to_string(descriptor->density).data());
+    }
+    if (ImageTypeSupportsPage(imageType)) {
+      option->set("n", descriptor->pages);
+      option->set("page", descriptor->page);
+    }
+    if (imageType == ImageType::SVG) {
+      option->set("stylesheet", descriptor->svgStylesheet.data());
+      option->set("high_bitdepth", descriptor->svgHighBitdepth);
+    }
+    if (imageType == ImageType::OPENSLIDE) {
+      option->set("level", descriptor->level);
+    }
+    if (imageType == ImageType::TIFF) {
+      option->set("subifd", descriptor->subifd);
+    }
+    if (imageType == ImageType::PDF) {
+      option->set("background", descriptor->pdfBackground);
+    }
+    if (imageType == ImageType::JP2) {
+      option->set("oneshot", descriptor->jp2Oneshot);
+    }
+    return option;
+  }
+
+  /*
     Open an image from the given InputDescriptor (filesystem, compressed buffer, raw pixel data)
   */
   std::tuple<VImage, ImageType> OpenInput(InputDescriptor *descriptor) {
@@ -420,38 +459,7 @@ namespace sharp {
         imageType = DetermineImageType(descriptor->buffer, descriptor->bufferLength);
         if (imageType != ImageType::UNKNOWN) {
           try {
-            vips::VOption *option = VImage::option()
-              ->set("access", descriptor->access)
-              ->set("fail_on", descriptor->failOn);
-            if (descriptor->unlimited && ImageTypeSupportsUnlimited(imageType)) {
-              option->set("unlimited", true);
-            }
-            if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
-              option->set("dpi", descriptor->density);
-            }
-            if (imageType == ImageType::MAGICK) {
-              option->set("density", std::to_string(descriptor->density).data());
-            }
-            if (ImageTypeSupportsPage(imageType)) {
-              option->set("n", descriptor->pages);
-              option->set("page", descriptor->page);
-            }
-            if (imageType == ImageType::SVG) {
-              option->set("stylesheet", descriptor->svgStylesheet.data());
-              option->set("high_bitdepth", descriptor->svgHighBitdepth);
-            }
-            if (imageType == ImageType::OPENSLIDE) {
-              option->set("level", descriptor->level);
-            }
-            if (imageType == ImageType::TIFF) {
-              option->set("subifd", descriptor->subifd);
-            }
-            if (imageType == ImageType::PDF) {
-              option->set("background", descriptor->pdfBackground);
-            }
-            if (imageType == ImageType::JP2) {
-              option->set("oneshot", descriptor->jp2Oneshot);
-            }
+            vips::VOption *option = GetOptionsForImageType(imageType, descriptor);
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
@@ -534,34 +542,7 @@ namespace sharp {
         }
         if (imageType != ImageType::UNKNOWN) {
           try {
-            vips::VOption *option = VImage::option()
-              ->set("access", descriptor->access)
-              ->set("fail_on", descriptor->failOn);
-            if (descriptor->unlimited && ImageTypeSupportsUnlimited(imageType)) {
-              option->set("unlimited", true);
-            }
-            if (imageType == ImageType::SVG || imageType == ImageType::PDF) {
-              option->set("dpi", descriptor->density);
-            }
-            if (imageType == ImageType::MAGICK) {
-              option->set("density", std::to_string(descriptor->density).data());
-            }
-            if (ImageTypeSupportsPage(imageType)) {
-              option->set("n", descriptor->pages);
-              option->set("page", descriptor->page);
-            }
-            if (imageType == ImageType::OPENSLIDE) {
-              option->set("level", descriptor->level);
-            }
-            if (imageType == ImageType::TIFF) {
-              option->set("subifd", descriptor->subifd);
-            }
-            if (imageType == ImageType::PDF) {
-              option->set("background", descriptor->pdfBackground);
-            }
-            if (imageType == ImageType::JP2) {
-              option->set("oneshot", descriptor->jp2Oneshot);
-            }
+            vips::VOption *option = GetOptionsForImageType(imageType, descriptor);
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
