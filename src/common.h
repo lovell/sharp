@@ -50,8 +50,6 @@ namespace sharp {
     bool rawPremultiplied;
     int pages;
     int page;
-    int level;
-    int subifd;
     int createChannels;
     int createWidth;
     int createHeight;
@@ -79,6 +77,8 @@ namespace sharp {
     VipsAlign joinValign;
     std::string svgStylesheet;
     bool svgHighBitdepth;
+    int tiffSubifd;
+    int openSlideLevel;
     std::vector<double> pdfBackground;
     bool jp2Oneshot;
 
@@ -100,8 +100,6 @@ namespace sharp {
       rawPremultiplied(false),
       pages(1),
       page(0),
-      level(0),
-      subifd(-1),
       createChannels(0),
       createWidth(0),
       createHeight(0),
@@ -124,6 +122,8 @@ namespace sharp {
       joinHalign(VIPS_ALIGN_LOW),
       joinValign(VIPS_ALIGN_LOW),
       svgHighBitdepth(false),
+      tiffSubifd(-1),
+      openSlideLevel(0),
       pdfBackground{ 255.0, 255.0, 255.0, 255.0 },
       jp2Oneshot(false) {}
   };
