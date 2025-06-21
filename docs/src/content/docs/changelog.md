@@ -18,6 +18,8 @@ Requires libvips v8.17.0
 
 * Expose `keepDuplicateFrames` GIF output parameter.
 
+* Provide XMP metadata as a string, as well as a Buffer, where possible.
+
 * Add `pageHeight` option to `create` and `raw` input for animated images.
   [#3236](https://github.com/lovell/sharp/issues/3236)
 

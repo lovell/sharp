@@ -82,6 +82,7 @@ describe('Image metadata', function () {
       assert.strictEqual(true, metadata.xmp instanceof Buffer);
       assert.strictEqual(12466, metadata.xmp.byteLength);
       assert.strictEqual(metadata.xmp.indexOf(Buffer.from('<?xpacket begin="')), 0);
+      assert(metadata.xmpAsString.startsWith('<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>'));
       done();
     });
   });
@@ -106,6 +107,8 @@ describe('Image metadata', function () {
       assert.strictEqual(3248, metadata.autoOrient.height);
       assert.strictEqual('undefined', typeof metadata.exif);
       assert.strictEqual('undefined', typeof metadata.icc);
+      assert.strictEqual('undefined', typeof metadata.xmp);
+      assert.strictEqual('undefined', typeof metadata.xmpAsString);
       assert.strictEqual('inch', metadata.resolutionUnit);
       done();
     });
