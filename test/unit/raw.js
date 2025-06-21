@@ -55,6 +55,35 @@ describe('Raw pixel data', function () {
       });
     });
 
+    it('Invalid premultiplied', () => {
+      assert.throws(
+        () => sharp({ raw: { width: 1, height: 1, channels: 4, premultiplied: 'zoinks' } }),
+        /Expected boolean for raw\.premultiplied but received zoinks of type string/
+      );
+    });
+
+    it('Invalid pageHeight', () => {
+      const width = 8;
+      const height = 8;
+      const channels = 4;
+      assert.throws(
+        () => sharp({ raw: { width, height, channels, pageHeight: 'zoinks' } }),
+        /Expected positive integer for raw\.pageHeight but received zoinks of type string/
+      );
+      assert.throws(
+        () => sharp({ raw: { width, height, channels, pageHeight: -1 } }),
+        /Expected positive integer for raw\.pageHeight but received -1 of type number/
+      );
+      assert.throws(
+        () => sharp({ raw: { width, height, channels, pageHeight: 9 } }),
+        /Expected positive integer for raw\.pageHeight but received 9 of type number/
+      );
+      assert.throws(
+        () => sharp({ raw: { width, height, channels, pageHeight: 3 } }),
+        /Expected raw\.height 8 to be a multiple of raw\.pageHeight 3/
+      );
+    });
+
     it('RGB', function (done) {
       // Convert to raw pixel data
       sharp(fixtures.inputJpg)
@@ -283,6 +312,23 @@ describe('Raw pixel data', function () {
           })
       );
     }
+  });
+
+  it('Animated', async () => {
+    const gif = await sharp(
+      Buffer.alloc(8),
+      { raw: { width: 1, height: 2, channels: 4, pageHeight: 1 }, animated: true }
+    )
+      .gif({ keepDuplicateFrames: true })
+      .toBuffer();
+
+    console.log(await sharp(gif).metadata());
+
+    const { width, height, pages, delay } = await sharp(gif).metadata();
+    assert.strictEqual(width, 1);
+    assert.strictEqual(height, 1);
+    assert.strictEqual(pages, 2);
+    assert.strictEqual(delay.length, 2);
   });
 
   describe('16-bit roundtrip', () => {

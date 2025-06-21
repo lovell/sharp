@@ -173,6 +173,26 @@ describe('Gaussian noise', function () {
       });
   });
 
+  it('animated noise', async () => {
+    const gif = await sharp({
+      create: {
+        width: 16,
+        height: 64,
+        pageHeight: 16,
+        channels: 3,
+        noise: { type: 'gaussian' }
+      }
+    })
+      .gif()
+      .toBuffer();
+
+    const { width, height, pages, delay } = await sharp(gif).metadata();
+    assert.strictEqual(width, 16);
+    assert.strictEqual(height, 16);
+    assert.strictEqual(pages, 4);
+    assert.strictEqual(delay.length, 4);
+  });
+
   it('no create object properties specified', function () {
     assert.throws(function () {
       sharp({
@@ -258,5 +278,30 @@ describe('Gaussian noise', function () {
         }
       });
     });
+  });
+
+  it('Invalid pageHeight', () => {
+    const create = {
+      width: 8,
+      height: 8,
+      channels: 4,
+      noise: { type: 'gaussian' }
+    };
+    assert.throws(
+      () => sharp({ create: { ...create, pageHeight: 'zoinks' } }),
+      /Expected positive integer for create\.pageHeight but received zoinks of type string/
+    );
+    assert.throws(
+      () => sharp({ create: { ...create, pageHeight: -1 } }),
+      /Expected positive integer for create\.pageHeight but received -1 of type number/
+    );
+    assert.throws(
+      () => sharp({ create: { ...create, pageHeight: 9 } }),
+      /Expected positive integer for create\.pageHeight but received 9 of type number/
+    );
+    assert.throws(
+      () => sharp({ create: { ...create, pageHeight: 3 } }),
+      /Expected create\.height 8 to be a multiple of create\.pageHeight 3/
+    );
   });
 });

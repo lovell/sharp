@@ -1061,6 +1061,8 @@ declare namespace sharp {
     interface CreateRaw extends Raw {
         /** Specifies that the raw input has already been premultiplied, set to true to avoid sharp premultiplying the image. (optional, default false) */
         premultiplied?: boolean | undefined;
+        /** The height of each page/frame for animated images, must be an integral factor of the overall image height. */
+        pageHeight?: number | undefined;
     }
 
     type CreateChannels = 3 | 4;
@@ -1076,6 +1078,9 @@ declare namespace sharp {
         background: Colour | Color;
         /** Describes a noise to be created. */
         noise?: Noise | undefined;
+        /** The height of each page/frame for animated images, must be an integral factor of the overall image height. */
+        pageHeight?: number | undefined;
+
     }
 
     interface CreateText {
@@ -1549,7 +1554,7 @@ declare namespace sharp {
 
     interface Noise {
         /** type of generated noise, currently only gaussian is supported. */
-        type?: 'gaussian' | undefined;
+        type: 'gaussian';
         /** mean of pixels in generated noise. */
         mean?: number | undefined;
         /** standard deviation of pixels in generated noise. */

@@ -50,15 +50,17 @@ where the overall height is the `pageHeight` multiplied by the number of `pages`
 | [options.raw.height] | <code>number</code> |  | integral number of pixels high. |
 | [options.raw.channels] | <code>number</code> |  | integral number of channels, between 1 and 4. |
 | [options.raw.premultiplied] | <code>boolean</code> |  | specifies that the raw input has already been premultiplied, set to `true`  to avoid sharp premultiplying the image. (optional, default `false`) |
+| [options.raw.pageHeight] | <code>number</code> |  | The pixel height of each page/frame for animated images, must be an integral factor of `raw.height`. |
 | [options.create] | <code>Object</code> |  | describes a new image to be created. |
 | [options.create.width] | <code>number</code> |  | integral number of pixels wide. |
 | [options.create.height] | <code>number</code> |  | integral number of pixels high. |
 | [options.create.channels] | <code>number</code> |  | integral number of channels, either 3 (RGB) or 4 (RGBA). |
 | [options.create.background] | <code>string</code> \| <code>Object</code> |  | parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha. |
+| [options.create.pageHeight] | <code>number</code> |  | The pixel height of each page/frame for animated images, must be an integral factor of `create.height`. |
 | [options.create.noise] | <code>Object</code> |  | describes a noise to be created. |
 | [options.create.noise.type] | <code>string</code> |  | type of generated noise, currently only `gaussian` is supported. |
-| [options.create.noise.mean] | <code>number</code> |  | mean of pixels in generated noise. |
-| [options.create.noise.sigma] | <code>number</code> |  | standard deviation of pixels in generated noise. |
+| [options.create.noise.mean] | <code>number</code> | <code>128</code> | Mean value of pixels in the generated noise. |
+| [options.create.noise.sigma] | <code>number</code> | <code>30</code> | Standard deviation of pixel values in the generated noise. |
 | [options.text] | <code>Object</code> |  | describes a new text image to be created. |
 | [options.text.text] | <code>string</code> |  | text to render as a UTF-8 string. It can contain Pango markup, for example `<i>Le</i>Monde`. |
 | [options.text.font] | <code>string</code> |  | font name to render with. |

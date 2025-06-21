@@ -418,6 +418,7 @@ sharp({
     channels: 4,
     height: 25000,
     width: 25000,
+    pageHeight: 1000,
   },
   limitInputPixels: false,
 })
@@ -733,6 +734,13 @@ sharp({ jp2: { oneshot: false } });
 sharp({ svg: { stylesheet: 'test' }});
 sharp({ svg: { highBitdepth: true }});
 sharp({ svg: { highBitdepth: false }});
+
+// Raw input options
+const raw: sharp.Raw = { width: 1, height: 1, channels: 3 };
+sharp({ raw });
+sharp({ raw: { ...raw, premultiplied: true } });
+sharp({ raw: { ...raw, premultiplied: false } });
+sharp({ raw: { ...raw, pageHeight: 1 } });
 
 sharp({ autoOrient: true });
 sharp({ autoOrient: false });

@@ -18,6 +18,9 @@ Requires libvips v8.17.0
 
 * Expose `keepDuplicateFrames` GIF output parameter.
 
+* Add `pageHeight` option to `create` and `raw` input for animated images.
+  [#3236](https://github.com/lovell/sharp/issues/3236)
+
 * Expose JPEG 2000 `oneshot` decoder option.
   [#4262](https://github.com/lovell/sharp/pull/4262)
   [@mbklein](https://github.com/mbklein)

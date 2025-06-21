@@ -48,11 +48,13 @@ namespace sharp {
     int rawWidth;
     int rawHeight;
     bool rawPremultiplied;
+    int rawPageHeight;
     int pages;
     int page;
     int createChannels;
     int createWidth;
     int createHeight;
+    int createPageHeight;
     std::vector<double> createBackground;
     std::string createNoiseType;
     double createNoiseMean;
@@ -98,11 +100,13 @@ namespace sharp {
       rawWidth(0),
       rawHeight(0),
       rawPremultiplied(false),
+      rawPageHeight(0),
       pages(1),
       page(0),
       createChannels(0),
       createWidth(0),
       createHeight(0),
+      createPageHeight(0),
       createBackground{ 0.0, 0.0, 0.0, 255.0 },
       createNoiseMean(0.0),
       createNoiseSigma(0.0),
