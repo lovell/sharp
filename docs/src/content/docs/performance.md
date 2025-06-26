@@ -43,24 +43,24 @@ The I/O limits of the relevant (de)compression library will generally determine 
 
 ### Contenders
 
-* [jimp](https://www.npmjs.com/package/jimp) v1.6.0 - Image processing in pure JavaScript.
-* [imagemagick](https://www.npmjs.com/package/imagemagick) v0.1.3 - Supports filesystem only and "*has been unmaintained for a long time*".
-* [gm](https://www.npmjs.com/package/gm) v1.25.1 - Fully featured wrapper around GraphicsMagick's `gm` command line utility, but "*has been sunset*".
-* sharp v0.34.0 / libvips v8.16.1 - Caching within libvips disabled to ensure a fair comparison.
+- [jimp](https://www.npmjs.com/package/jimp) v1.6.0 - Image processing in pure JavaScript.
+- [imagemagick](https://www.npmjs.com/package/imagemagick) v0.1.3 - Supports filesystem only and "_has been unmaintained for a long time_".
+- [gm](https://www.npmjs.com/package/gm) v1.25.1 - Fully featured wrapper around GraphicsMagick's `gm` command line utility, but "_has been sunset_".
+- sharp v0.34.3 / libvips v8.17.0 - Caching within libvips disabled to ensure a fair comparison.
 
 ### Environment
 
 #### AMD64
 
-* AWS EC2 us-west-2 [c7a.xlarge](https://aws.amazon.com/ec2/instance-types/c7a/) (4x AMD EPYC 9R14)
-* Ubuntu 24.10 [fad5ba7223f8](https://hub.docker.com/layers/library/ubuntu/24.10/images/sha256-fad5ba7223f8d87179dfa23211d31845d47e07a474ac31ad5258afb606523c0d)
-* Node.js 22.14.0
+- AWS EC2 us-west-2 [c7a.xlarge](https://aws.amazon.com/ec2/instance-types/c7a/) (4x AMD EPYC 9R14)
+- Ubuntu 25.04
+- Node.js 24.3.0
 
 #### ARM64
 
-* AWS EC2 us-west-2 [c8g.xlarge](https://aws.amazon.com/ec2/instance-types/c8g/) (4x ARM Graviton4)
-* Ubuntu 24.10 [133f2e05cb69](https://hub.docker.com/layers/library/ubuntu/24.10/images/sha256-133f2e05cb6958c3ce7ec870fd5a864558ba780fb7062315b51a23670bff7e76)
-* Node.js 22.14.0
+- AWS EC2 us-west-2 [c8g.xlarge](https://aws.amazon.com/ec2/instance-types/c8g/) (4x ARM Graviton4)
+- Ubuntu 25.04
+- Node.js 24.3.0
 
 ### Task: JPEG
 
@@ -72,27 +72,29 @@ Note: jimp does not support Lanczos 3, bicubic resampling used instead.
 
 #### Results: JPEG (AMD64)
 
-| Module             | Input  | Output | Ops/sec | Speed-up |
-| :----------------- | :----- | :----- | ------: | -------: |
-| jimp               | buffer | buffer |    2.35 |      1.0 |
-| imagemagick        | file   | file   |   10.51 |      4.5 |
-| gm                 | buffer | buffer |   11.67 |      5.0 |
-| gm                 | file   | file   |   11.75 |      5.1 |
-| sharp              | stream | stream |   60.72 |     25.8 |
-| sharp              | file   | file   |   62.37 |     26.5 |
-| sharp              | buffer | buffer |   65.15 |     27.7 |
+| Package     | I/O    | Ops/sec | Speed-up |
+| :---------- | :----- | ------: | -------: |
+| jimp        | buffer |    2.40 |      1.0 |
+| jimp        | file   |    2.60 |      1.1 |
+| imagemagick | file   |    9.70 |      4.0 |
+| gm          | buffer |   11.60 |      4.8 |
+| gm          | file   |   11.72 |      4.9 |
+| sharp       | stream |   59.40 |     24.8 |
+| sharp       | file   |   62.67 |     26.1 |
+| sharp       | buffer |   64.42 |     26.8 |
 
 #### Results: JPEG (ARM64)
 
-| Module             | Input  | Output | Ops/sec | Speed-up |
-| :----------------- | :----- | :----- | ------: | -------: |
-| jimp               | buffer | buffer |    2.13 |      1.0 |
-| imagemagick        | file   | file   |   12.95 |      6.1 |
-| gm                 | buffer | buffer |   13.53 |      6.4 |
-| gm                 | file   | file   |   13.52 |      6.4 |
-| sharp              | stream | stream |   46.58 |     21.9 |
-| sharp              | file   | file   |   48.42 |     22.7 |
-| sharp              | buffer | buffer |   50.16 |     23.6 |
+| Package     | I/O    | Ops/sec | Speed-up |
+| :---------- | :----- | ------: | -------: |
+| jimp        | buffer |    2.24 |      1.0 |
+| jimp        | file   |    2.47 |      1.1 |
+| imagemagick | file   |   10.42 |      4.7 |
+| gm          | buffer |   12.80 |      5.7 |
+| gm          | file   |   12.88 |      5.7 |
+| sharp       | stream |   45.58 |     20.3 |
+| sharp       | file   |   47.99 |     21.4 |
+| sharp       | buffer |   49.20 |     22.0 |
 
 ### Task: PNG
 
@@ -106,23 +108,23 @@ Note: jimp does not support premultiply/unpremultiply.
 
 #### Results: PNG (AMD64)
 
-| Module             | Input  | Output | Ops/sec | Speed-up |
-| :----------------- | :----- | :----- | ------: | -------: |
-| gm                 | file   | file   |    8.66 |      1.0 |
-| imagemagick        | file   | file   |    8.79 |      1.0 |
-| jimp               | buffer | buffer |   11.26 |      1.3 |
-| sharp              | file   | file   |   27.93 |      3.2 |
-| sharp              | buffer | buffer |   28.69 |      3.3 |
+| Package     | I/O    | Ops/sec | Speed-up |
+| :---------- | :----- | ------: | -------: |
+| imagemagick | file   |    6.06 |      1.0 |
+| gm          | file   |    8.44 |      1.4 |
+| jimp        | buffer |   10.98 |      1.8 |
+| sharp       | file   |   28.26 |      4.7 |
+| sharp       | buffer |   28.70 |      4.7 |
 
 #### Results: PNG (ARM64)
 
-| Module             | Input  | Output | Ops/sec | Speed-up |
-| :----------------- | :----- | :----- | ------: | -------: |
-| gm                 | file   | file   |    9.65 |      1.0 |
-| imagemagick        | file   | file   |    9.72 |      1.0 |
-| jimp               | buffer | buffer |   10.68 |      1.1 |
-| sharp              | file   | file   |   23.90 |      2.5 |
-| sharp              | buffer | buffer |   24.48 |      2.5 |
+| Package     | I/O    | Ops/sec | Speed-up |
+| :---------- | :----- | ------: | -------: |
+| imagemagick | file   |    7.09 |      1.0 |
+| gm          | file   |    8.93 |      1.3 |
+| jimp        | buffer |   10.28 |      1.5 |
+| sharp       | file   |   23.81 |      3.4 |
+| sharp       | buffer |   24.19 |      3.4 |
 
 ## Running the benchmark test
 
