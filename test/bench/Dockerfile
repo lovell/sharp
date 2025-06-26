@@ -1,11 +1,11 @@
-FROM ubuntu:24.10
+FROM ubuntu:25.04
 ARG BRANCH=main
 
 # Install basic dependencies
 RUN apt-get -y update && apt-get install -y build-essential curl git ca-certificates gnupg
 
 # Install latest Node.js LTS
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
 RUN apt-get install -y nodejs
 

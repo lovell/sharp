@@ -552,6 +552,32 @@ async.series({
             }
           });
       }
+    }).add('sharp-mks2013', {
+      defer: true,
+      fn: function (deferred) {
+        sharp(inputJpgBuffer)
+          .resize(width, height, { kernel: 'mks2013' })
+          .toBuffer(function (err) {
+            if (err) {
+              throw err;
+            } else {
+              deferred.resolve();
+            }
+          });
+      }
+    }).add('sharp-mks2021', {
+      defer: true,
+      fn: function (deferred) {
+        sharp(inputJpgBuffer)
+          .resize(width, height, { kernel: 'mks2021' })
+          .toBuffer(function (err) {
+            if (err) {
+              throw err;
+            } else {
+              deferred.resolve();
+            }
+          });
+      }
     }).on('cycle', function (event) {
       console.log('kernels ' + String(event.target));
     }).on('complete', function () {
