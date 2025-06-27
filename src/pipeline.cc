@@ -876,6 +876,15 @@ class PipelineWorker : public Napi::AsyncWorker {
           image.set(s.first.data(), s.second.data());
         }
       }
+      // XMP buffer
+      if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_XMP)
+        && baton->withXmpBuffer != nullptr && baton->withXmpBufferLength > 0) {
+        image = image.copy();
+        image.set(VIPS_META_XMP_NAME, reinterpret_cast<VipsCallbackFn>(vips_area_free_cb),
+                  baton->withXmpBuffer, baton->withXmpBufferLength);
+        // VIPS now owns the memory and will free it via the callback
+        baton->withXmpBuffer = nullptr;  // Prevent double-free in destructor
+      }
 
       // Number of channels used in output image
       baton->channels = image.bands();
@@ -1372,6 +1381,10 @@ class PipelineWorker : public Napi::AsyncWorker {
     for (sharp::InputDescriptor *input : baton->join) {
       delete input;
     }
+    // Free XMP buffer if still allocated
+    if (baton->withXmpBuffer != nullptr) {
+      g_free(baton->withXmpBuffer);
+    }
     delete baton;
 
     // Decrement processing task counter
@@ -1706,6 +1719,18 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     }
   }
   baton->withExifMerge = sharp::AttrAsBool(options, "withExifMerge");
+  // XMP buffer
+  if (sharp::HasAttr(options, "withXmpBuffer")) {
+    Napi::Value xmpValue = options.Get("withXmpBuffer");
+    if (xmpValue.IsBuffer()) {
+      Napi::Buffer<char> withXmpBuffer = xmpValue.As<Napi::Buffer<char>>();
+      baton->withXmpBufferLength = withXmpBuffer.Length();
+      if (baton->withXmpBufferLength > 0) {
+        baton->withXmpBuffer = g_malloc(baton->withXmpBufferLength);
+        memcpy(baton->withXmpBuffer, withXmpBuffer.Data(), baton->withXmpBufferLength);
+      }
+    }
+  }
   baton->timeoutSeconds = sharp::AttrAsUint32(options, "timeoutSeconds");
   baton->loop = sharp::AttrAsUint32(options, "loop");
   baton->delay = sharp::AttrAsInt32Vector(options, "delay");
