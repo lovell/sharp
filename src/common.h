@@ -169,6 +169,7 @@ namespace sharp {
     EXR,
     JXL,
     RAD,
+    DCRAW,
     VIPS,
     RAW,
     UNKNOWN,

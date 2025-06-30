@@ -284,6 +284,7 @@ namespace sharp {
       case ImageType::EXR: id = "exr"; break;
       case ImageType::JXL: id = "jxl"; break;
       case ImageType::RAD: id = "rad"; break;
+      case ImageType::DCRAW: id = "dcraw"; break;
       case ImageType::VIPS: id = "vips"; break;
       case ImageType::RAW: id = "raw"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
@@ -332,6 +333,8 @@ namespace sharp {
     { "VipsForeignLoadJxlBuffer", ImageType::JXL },
     { "VipsForeignLoadRadFile", ImageType::RAD },
     { "VipsForeignLoadRadBuffer", ImageType::RAD },
+    { "VipsForeignLoadDcRawFile", ImageType::DCRAW },
+    { "VipsForeignLoadDcRawBuffer", ImageType::DCRAW },
     { "VipsForeignLoadVips", ImageType::VIPS },
     { "VipsForeignLoadVipsFile", ImageType::VIPS },
     { "VipsForeignLoadRaw", ImageType::RAW }

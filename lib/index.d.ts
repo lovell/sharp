@@ -1890,6 +1890,7 @@ declare namespace sharp {
 
     interface FormatEnum {
         avif: AvailableFormatInfo;
+        dcraw: AvailableFormatInfo;
         dz: AvailableFormatInfo;
         exr: AvailableFormatInfo;
         fits: AvailableFormatInfo;
