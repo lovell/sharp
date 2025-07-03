@@ -732,11 +732,11 @@ declare namespace sharp {
 
         /**
          * Set XMP metadata in the output image.
-         * @param {Buffer} xmp - Buffer containing XMP metadata to be embedded in the output image.
+         * @param {string} xmp - String containing XMP metadata to be embedded in the output image.
          * @returns A sharp instance that can be used to chain operations
          * @throws {Error} Invalid parameters
          */
-        withXmp(xmp: Buffer): Sharp;
+        withXmp(xmp: string): Sharp;
 
         /**
          * Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.

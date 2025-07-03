@@ -6,7 +6,7 @@ title: Changelog
 
 ### Features
 
-* Add support for custom XMP metadata injection via `withMetadata({ xmp: Buffer })`.
+* Add support for custom XMP metadata injection via `withXmp(xmp: string)`.
   Allows embedding custom XMP metadata into PNG, JPEG, WebP, and TIFF output images.
 
 ## v0.34 - *hat*
