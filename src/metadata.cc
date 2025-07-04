@@ -262,6 +262,10 @@ class MetadataWorker : public Napi::AsyncWorker {
       }
       if (baton->xmpLength > 0) {
         info.Set("xmp", Napi::Buffer<char>::NewOrCopy(env, baton->xmp, baton->xmpLength, sharp::FreeCallback));
+        if (g_utf8_validate(static_cast<char const *>(baton->xmp), baton->xmpLength, nullptr)) {
+          info.Set("xmpAsString",
+            Napi::String::New(env, static_cast<char const *>(baton->xmp), baton->xmpLength));
+        }
       }
       if (baton->tifftagPhotoshopLength > 0) {
         info.Set("tifftagPhotoshop",

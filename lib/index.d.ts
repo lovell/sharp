@@ -1254,6 +1254,8 @@ declare namespace sharp {
         iptc?: Buffer | undefined;
         /** Buffer containing raw XMP data, if present */
         xmp?: Buffer | undefined;
+        /** String containing XMP data, if valid UTF-8 */
+        xmpAsString?: string | undefined;
         /** Buffer containing raw TIFFTAG_PHOTOSHOP data, if present */
         tifftagPhotoshop?: Buffer | undefined;
         /** The encoder used to compress an HEIF file, `av1` (AVIF) or `hevc` (HEIC) */

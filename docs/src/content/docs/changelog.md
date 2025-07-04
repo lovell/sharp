@@ -20,6 +20,8 @@ Requires libvips v8.17.0
 
 * Add support for RAW digital camera image input. Requires libvips compiled with libraw support.
 
+* Provide XMP metadata as a string, as well as a Buffer, where possible.
+
 * Add `pageHeight` option to `create` and `raw` input for animated images.
   [#3236](https://github.com/lovell/sharp/issues/3236)
 
