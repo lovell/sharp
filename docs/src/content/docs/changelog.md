@@ -4,11 +4,11 @@ title: Changelog
   
 ## v0.34 - *hat*
 
-Requires libvips v8.17.0
+Requires libvips v8.17.1
 
 ### v0.34.3 - TBD
 
-* Upgrade to libvips v8.17.0 for upstream bug fixes.
+* Upgrade to libvips v8.17.1 for upstream bug fixes.
 
 * Add "Magic Kernel Sharp" (no relation) to resizing kernels.
 
