@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-linux-ppc64",
-  "version": "0.34.3-rc.0",
+  "version": "0.34.3-rc.1",
   "description": "Prebuilt sharp for use with Linux (glibc) ppc64",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",

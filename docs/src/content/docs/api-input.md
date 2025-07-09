@@ -46,6 +46,7 @@ A `Promise` is returned when `callback` is not provided.
 - `icc`: Buffer containing raw [ICC](https://www.npmjs.com/package/icc) profile data, if present
 - `iptc`: Buffer containing raw IPTC data, if present
 - `xmp`: Buffer containing raw XMP data, if present
+- `xmpAsString`: String containing XMP data, if valid UTF-8.
 - `tifftagPhotoshop`: Buffer containing raw TIFFTAG_PHOTOSHOP data, if present
 - `formatMagick`: String containing format for images loaded via *magick
 - `comments`: Array of keyword/text pairs representing PNG text blocks, if present.
