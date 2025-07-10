@@ -18,10 +18,8 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
     vips_init("sharp");
   });
 
-  for (auto domain : { "VIPS", "vips2tiff" }) {
-    g_log_set_handler(domain, static_cast<GLogLevelFlags>(G_LOG_LEVEL_WARNING),
-      static_cast<GLogFunc>(sharp::VipsWarningCallback), nullptr);
-  }
+  g_log_set_handler("VIPS", static_cast<GLogLevelFlags>(G_LOG_LEVEL_WARNING),
+    static_cast<GLogFunc>(sharp::VipsWarningCallback), nullptr);
 
   // Methods available to JavaScript
   exports.Set("metadata", Napi::Function::New(env, metadata));
