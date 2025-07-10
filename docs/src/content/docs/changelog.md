@@ -6,7 +6,7 @@ title: Changelog
 
 Requires libvips v8.17.1
 
-### v0.34.3 - TBD
+### v0.34.3 - 10th July 2025
 
 * Upgrade to libvips v8.17.1 for upstream bug fixes.
 
