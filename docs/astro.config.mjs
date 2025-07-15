@@ -1,6 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightAutoSidebar from 'starlight-auto-sidebar';
+
+import { version } from '../package.json';
 
 export default defineConfig({
   site: 'https://sharp.pixelplumbing.com',
@@ -68,12 +71,20 @@ export default defineConfig({
           ]
         },
         { label: 'Performance', slug: 'performance' },
-        { label: 'Changelog', slug: 'changelog' }
+        {
+          label: 'Changelog',
+          collapsed: true,
+          autogenerate: { directory: 'changelog' }
+        }
       ],
       social: [
         { icon: 'openCollective', label: 'Open Collective', href: 'https://opencollective.com/libvips' },
         { icon: 'github', label: 'GitHub', href: 'https://github.com/lovell/sharp' }
-      ]
+      ],
+      plugins: [starlightAutoSidebar()]
     })
-  ]
+  ],
+  redirects: {
+    '/changelog': `/changelog/v${version}`
+  }
 });

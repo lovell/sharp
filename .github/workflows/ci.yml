@@ -314,6 +314,12 @@ jobs:
           path: npm
       - name: Create npm workspace tarball
         run: tar -vcaf npm-workspace.tar.xz --directory npm --exclude=from-local-build.js .
+      - name: Parse semver for tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: madhead/semver-utils@v4
+        id: semver
+        with:
+          version: ${{ github.ref_name }}
       - name: Create GitHub release for tag
         if: startsWith(github.ref, 'refs/tags/v')
         uses: ncipollo/release-action@v1
@@ -322,3 +328,4 @@ jobs:
           artifactContentType: application/x-xz
           prerelease: ${{ contains(github.ref, '-rc') }}
           makeLatest: ${{ !contains(github.ref, '-rc') }}
+          bodyFile: "docs/src/content/docs/changelog/v${{ steps.semver.outputs.major }}.${{ steps.semver.outputs.minor }}.${{ steps.semver.outputs.patch }}.md"
