@@ -169,7 +169,7 @@ jobs:
           path: npm/${{ matrix.platform }}
           retention-days: 1
           if-no-files-found: error
-  build-linuxmusl-arm-64:
+  build-linuxmusl-arm64:
     permissions:
       contents: read
     name: "build-linuxmusl-arm64 [Node.js ${{ matrix.nodejs_version_major }}] ${{ matrix.package && '[package]' }}"
@@ -177,7 +177,8 @@ jobs:
     container:
       image: ${{ matrix.container }}
       volumes:
-        - /:/host
+        - /opt:/opt:rw,rshared
+        - /opt:/__e/node20:ro,rshared
     strategy:
       fail-fast: false
       matrix:
@@ -191,12 +192,10 @@ jobs:
       - name: Allow Linux musl containers on ARM64 runners # https://github.com/actions/runner/issues/801#issuecomment-2394425757
         shell: sh
         run: |
-          apk add nodejs
-          sed -i "s:ID=alpine:ID=NotpineForGHA:" /etc/os-release
-          cd /host/home/runner/runners/*/externals/
-          rm -rf node20/*
-          mkdir node20/bin
-          ln -s /usr/bin/node node20/bin/node
+          sed -i "/^ID=/s/alpine/NotpineForGHA/" /etc/os-release
+          apk add nodejs --update-cache
+          mkdir /opt/bin
+          ln -s /usr/bin/node /opt/bin/node
       - name: Dependencies
         run: apk add build-base git python3 font-noto --update-cache
       - uses: actions/checkout@v4
@@ -304,7 +303,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - build-native
-      - build-linuxmusl-arm-64
+      - build-linuxmusl-arm64
       - build-qemu
       - build-emscripten
     steps:
