@@ -322,8 +322,6 @@ describe('Raw pixel data', function () {
       .gif({ keepDuplicateFrames: true })
       .toBuffer();
 
-    console.log(await sharp(gif).metadata());
-
     const { width, height, pages, delay } = await sharp(gif).metadata();
     assert.strictEqual(width, 1);
     assert.strictEqual(height, 1);

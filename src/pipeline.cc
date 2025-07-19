@@ -98,7 +98,6 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->input->autoOrient) {
         // Rotate and flip image according to Exif orientation
         std::tie(autoRotation, autoFlip, autoFlop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
-        image = sharp::RemoveExifOrientation(image);
       }
 
       rotation = CalculateAngleRotation(baton->angle);
@@ -293,6 +292,9 @@ class PipelineWorker : public Napi::AsyncWorker {
         if (inputImageType == sharp::ImageType::SVG && (image.width() > 32767 || image.height() > 32767)) {
           throw vips::VError("Input SVG image exceeds 32767x32767 pixel limit");
         }
+      }
+      if (baton->input->autoOrient) {
+        image = sharp::RemoveExifOrientation(image);
       }
 
       // Any pre-shrinking may already have been done

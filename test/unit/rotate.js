@@ -635,6 +635,19 @@ describe('Rotation', function () {
     assert.strictEqual(height, 6);
   });
 
+  it('Shrink-on-load with autoOrient', async () => {
+    const data = await sharp(fixtures.inputJpgWithLandscapeExif6)
+      .resize(8)
+      .autoOrient()
+      .avif({ effort: 0 })
+      .toBuffer();
+
+    const { width, height, orientation } = await sharp(data).metadata();
+    assert.strictEqual(width, 8);
+    assert.strictEqual(height, 6);
+    assert.strictEqual(orientation, undefined);
+  });
+
   it('Invalid autoOrient throws', () =>
     assert.throws(
       () => sharp({ autoOrient: 'fail' }),
