@@ -115,7 +115,8 @@ struct PipelineBaton {
   int angle;
   double rotationAngle;
   std::vector<double> rotationBackground;
-  bool rotateBeforePreExtract;
+  bool rotateBefore;
+  bool orientBefore;
   bool flip;
   bool flop;
   int extendTop;

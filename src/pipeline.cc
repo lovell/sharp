@@ -92,30 +92,22 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Calculate angle of rotation
       VipsAngle rotation = VIPS_ANGLE_D0;
       VipsAngle autoRotation = VIPS_ANGLE_D0;
-      bool autoFlip = false;
       bool autoFlop = false;
 
       if (baton->input->autoOrient) {
         // Rotate and flip image according to Exif orientation
-        std::tie(autoRotation, autoFlip, autoFlop) = CalculateExifRotationAndFlip(sharp::ExifOrientation(image));
+        std::tie(autoRotation, autoFlop) = CalculateExifRotationAndFlop(sharp::ExifOrientation(image));
       }
 
       rotation = CalculateAngleRotation(baton->angle);
 
-      // Rotate pre-extract
-      bool const shouldRotateBefore = baton->rotateBeforePreExtract &&
-        (rotation != VIPS_ANGLE_D0 || autoRotation != VIPS_ANGLE_D0 ||
-          autoFlip || baton->flip || autoFlop || baton->flop ||
-          baton->rotationAngle != 0.0);
+      bool const shouldRotateBefore = baton->rotateBefore &&
+        (rotation != VIPS_ANGLE_D0 || baton->flip || baton->flop || baton->rotationAngle != 0.0);
+      bool const shouldOrientBefore = (shouldRotateBefore || baton->orientBefore) &&
+        (autoRotation != VIPS_ANGLE_D0 || autoFlop);
 
-      if (shouldRotateBefore) {
-        image = sharp::StaySequential(image,
-          rotation != VIPS_ANGLE_D0 ||
-          autoRotation != VIPS_ANGLE_D0 ||
-          autoFlip ||
-          baton->flip ||
-          baton->rotationAngle != 0.0);
-
+      if (shouldOrientBefore) {
+        image = sharp::StaySequential(image, autoRotation != VIPS_ANGLE_D0);
         if (autoRotation != VIPS_ANGLE_D0) {
           if (autoRotation != VIPS_ANGLE_D180) {
             MultiPageUnsupported(nPages, "Rotate");
@@ -123,14 +115,20 @@ class PipelineWorker : public Napi::AsyncWorker {
           image = image.rot(autoRotation);
           autoRotation = VIPS_ANGLE_D0;
         }
-        if (autoFlip != baton->flip) {
-          image = image.flip(VIPS_DIRECTION_VERTICAL);
-          autoFlip = false;
-          baton->flip = false;
-        }
-        if (autoFlop != baton->flop) {
+        if (autoFlop) {
           image = image.flip(VIPS_DIRECTION_HORIZONTAL);
           autoFlop = false;
+        }
+      }
+
+      if (shouldRotateBefore) {
+        image = sharp::StaySequential(image, rotation != VIPS_ANGLE_D0 || baton->flip || baton->rotationAngle != 0.0);
+        if (baton->flip) {
+          image = image.flip(VIPS_DIRECTION_VERTICAL);
+          baton->flip = false;
+        }
+        if (baton->flop) {
+          image = image.flip(VIPS_DIRECTION_HORIZONTAL);
           baton->flop = false;
         }
         if (rotation != VIPS_ANGLE_D0) {
@@ -145,6 +143,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           std::vector<double> background;
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, false);
           image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background)).copy_memory();
+          baton->rotationAngle = 0.0;
         }
       }
 
@@ -183,8 +182,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // When auto-rotating by 90 or 270 degrees, swap the target width and
       // height to ensure the behavior aligns with how it would have been if
       // the rotation had taken place *before* resizing.
-      if (!baton->rotateBeforePreExtract &&
-        (autoRotation == VIPS_ANGLE_D90 || autoRotation == VIPS_ANGLE_D270)) {
+      if (autoRotation == VIPS_ANGLE_D90 || autoRotation == VIPS_ANGLE_D270) {
         std::swap(targetResizeWidth, targetResizeHeight);
       }
 
@@ -206,7 +204,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       //  - input colourspace is not specified;
       bool const shouldPreShrink = (targetResizeWidth > 0 || targetResizeHeight > 0) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold < 0.0 &&
-        baton->colourspacePipeline == VIPS_INTERPRETATION_LAST && !shouldRotateBefore;
+        baton->colourspacePipeline == VIPS_INTERPRETATION_LAST && !(shouldOrientBefore || shouldRotateBefore);
 
       if (shouldPreShrink) {
         // The common part of the shrink: the bit by which both axes must be shrunk
@@ -398,7 +396,6 @@ class PipelineWorker : public Napi::AsyncWorker {
       image = sharp::StaySequential(image,
         autoRotation != VIPS_ANGLE_D0 ||
         baton->flip ||
-        autoFlip ||
         rotation != VIPS_ANGLE_D0);
       // Auto-rotate post-extract
       if (autoRotation != VIPS_ANGLE_D0) {
@@ -408,7 +405,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.rot(autoRotation);
       }
       // Mirror vertically (up-down) about the x-axis
-      if (baton->flip != autoFlip) {
+      if (baton->flip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
       }
       // Mirror horizontally (left-right) about the y-axis
@@ -515,7 +512,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Rotate post-extract non-90 angle
-      if (!baton->rotateBeforePreExtract && baton->rotationAngle != 0.0) {
+      if (!baton->rotateBefore && baton->rotationAngle != 0.0) {
         MultiPageUnsupported(nPages, "Rotate");
         image = sharp::StaySequential(image);
         std::vector<double> background;
@@ -656,20 +653,15 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (composite->input->autoOrient) {
             // Respect EXIF Orientation
             VipsAngle compositeAutoRotation = VIPS_ANGLE_D0;
-            bool compositeAutoFlip = false;
             bool compositeAutoFlop = false;
-            std::tie(compositeAutoRotation, compositeAutoFlip, compositeAutoFlop) =
-              CalculateExifRotationAndFlip(sharp::ExifOrientation(compositeImage));
+            std::tie(compositeAutoRotation, compositeAutoFlop) =
+              CalculateExifRotationAndFlop(sharp::ExifOrientation(compositeImage));
 
             compositeImage = sharp::RemoveExifOrientation(compositeImage);
-            compositeImage = sharp::StaySequential(compositeImage,
-              compositeAutoRotation != VIPS_ANGLE_D0 || compositeAutoFlip);
+            compositeImage = sharp::StaySequential(compositeImage, compositeAutoRotation != VIPS_ANGLE_D0);
 
             if (compositeAutoRotation != VIPS_ANGLE_D0) {
               compositeImage = compositeImage.rot(compositeAutoRotation);
-            }
-            if (compositeAutoFlip) {
-              compositeImage = compositeImage.flip(VIPS_DIRECTION_VERTICAL);
             }
             if (compositeAutoFlop) {
               compositeImage = compositeImage.flip(VIPS_DIRECTION_HORIZONTAL);
@@ -1402,21 +1394,20 @@ class PipelineWorker : public Napi::AsyncWorker {
     Calculate the angle of rotation and need-to-flip for the given Exif orientation
     By default, returns zero, i.e. no rotation.
   */
-  std::tuple<VipsAngle, bool, bool>
-  CalculateExifRotationAndFlip(int const exifOrientation) {
+  std::tuple<VipsAngle, bool>
+  CalculateExifRotationAndFlop(int const exifOrientation) {
     VipsAngle rotate = VIPS_ANGLE_D0;
-    bool flip = false;
     bool flop = false;
     switch (exifOrientation) {
       case 6: rotate = VIPS_ANGLE_D90; break;
       case 3: rotate = VIPS_ANGLE_D180; break;
       case 8: rotate = VIPS_ANGLE_D270; break;
-      case 2: flop = true; break;  // flop 1
-      case 7: flip = true; rotate = VIPS_ANGLE_D90; break;  // flip 6
-      case 4: flop = true; rotate = VIPS_ANGLE_D180; break;  // flop 3
-      case 5: flip = true; rotate = VIPS_ANGLE_D270; break;  // flip 8
+      case 2: flop = true; break;
+      case 7: flop = true; rotate = VIPS_ANGLE_D270; break;
+      case 4: flop = true; rotate = VIPS_ANGLE_D180; break;
+      case 5: flop = true; rotate = VIPS_ANGLE_D90; break;
     }
-    return std::make_tuple(rotate, flip, flop);
+    return std::make_tuple(rotate, flop);
   }
 
   /*
@@ -1641,7 +1632,8 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->angle = sharp::AttrAsInt32(options, "angle");
   baton->rotationAngle = sharp::AttrAsDouble(options, "rotationAngle");
   baton->rotationBackground = sharp::AttrAsVectorOfDouble(options, "rotationBackground");
-  baton->rotateBeforePreExtract = sharp::AttrAsBool(options, "rotateBeforePreExtract");
+  baton->rotateBefore = sharp::AttrAsBool(options, "rotateBefore");
+  baton->orientBefore = sharp::AttrAsBool(options, "orientBefore");
   baton->flip = sharp::AttrAsBool(options, "flip");
   baton->flop = sharp::AttrAsBool(options, "flop");
   baton->extendTop = sharp::AttrAsInt32(options, "extendTop");
