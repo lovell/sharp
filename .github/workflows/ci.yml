@@ -230,14 +230,14 @@ jobs:
             nodejs_version: "18.17.0"
             nodejs_version_major: 18
           - platform: linux-s390x
-            distro: bullseye
+            distro: bookworm
             run_on_arch: s390x
             nodejs_arch: s390x
             nodejs_hostname: nodejs.org
             nodejs_version: "18.17.0"
             nodejs_version_major: 18
           - platform: linux-ppc64
-            distro: bullseye
+            distro: bookworm
             run_on_arch: ppc64le
             nodejs_arch: ppc64le
             nodejs_hostname: nodejs.org
