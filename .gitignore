@@ -16,3 +16,4 @@ package-lock.json
 .firebase
 .astro
 docs/dist
+release-notes.md

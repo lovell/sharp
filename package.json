@@ -101,6 +101,7 @@
     "test-leak": "./test/leak/leak.sh",
     "test-types": "tsd",
     "package-from-local-build": "node npm/from-local-build.js",
+    "package-release-notes": "node npm/release-notes.js",
     "docs-build": "node docs/build.mjs",
     "docs-serve": "cd docs && npm start",
     "docs-publish": "cd docs && npm run build && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
