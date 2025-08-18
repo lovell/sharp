@@ -61,6 +61,8 @@ const rgba = await sharp(rgb)
 
 Extract a single channel from a multi-channel image.
 
+The output colourspace will be either `b-w` (8-bit) or `grey16` (16-bit).
+
 
 **Throws**:
 
