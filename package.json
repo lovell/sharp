@@ -182,11 +182,11 @@
     "license-checker": "^25.0.1",
     "mocha": "^11.7.1",
     "node-addon-api": "^8.5.0",
-    "node-gyp": "^11.2.0",
+    "node-gyp": "^11.4.1",
     "nyc": "^17.1.0",
     "semistandard": "^17.0.0",
     "tar-fs": "^3.1.0",
-    "tsd": "^0.32.0"
+    "tsd": "^0.33.0"
   },
   "license": "Apache-2.0",
   "engines": {
