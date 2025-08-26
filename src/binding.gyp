@@ -210,7 +210,6 @@
                 '-sENVIRONMENT=node',
                 '-sEXPORTED_FUNCTIONS=["emnapiInit", "_vips_shutdown", "_uv_library_shutdown"]',
                 '-sNODERAWFS',
-                '-sTEXTDECODER=0',
                 '-sWASM_ASYNC_COMPILATION=0',
                 '-sWASM_BIGINT'
               ],
