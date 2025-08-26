@@ -19,7 +19,6 @@
       '-sAUTO_JS_LIBRARIES=0',
       '-sAUTO_NATIVE_LIBRARIES=0',
       '-sDEFAULT_TO_CXX=0',
-      '-sNODEJS_CATCH_EXIT=0',
       '-sNODEJS_CATCH_REJECTION=0'
     ],
     'defines': [
