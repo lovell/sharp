@@ -210,8 +210,7 @@
                 '-sENVIRONMENT=node',
                 '-sEXPORTED_FUNCTIONS=["emnapiInit", "_vips_shutdown", "_uv_library_shutdown"]',
                 '-sNODERAWFS',
-                '-sWASM_ASYNC_COMPILATION=0',
-                '-sWASM_BIGINT'
+                '-sWASM_ASYNC_COMPILATION=0'
               ],
               'libraries': [
                 '<!@(PKG_CONFIG_PATH="<!(node -p "require(\'@img/sharp-libvips-dev-wasm32/lib\')")/pkgconfig" pkg-config --static --libs vips-cpp)'
