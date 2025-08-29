@@ -396,6 +396,7 @@ namespace sharp {
       imageType == ImageType::JPEG ||
       imageType == ImageType::PNG ||
       imageType == ImageType::SVG ||
+      imageType == ImageType::TIFF ||
       imageType == ImageType::HEIF;
   }
 
