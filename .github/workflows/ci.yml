@@ -300,6 +300,7 @@ jobs:
   release:
     permissions:
       contents: write
+      id-token: write
     runs-on: ubuntu-24.04
     needs:
       - build-native
@@ -314,11 +315,9 @@ jobs:
       - name: Create npm workspace tarball
         run: tar -vcaf npm-workspace.tar.xz --directory npm --exclude=from-local-build.js .
       - uses: actions/setup-node@v4
-        if: startsWith(github.ref, 'refs/tags/v')
         with:
-          node-version: "24"
+          node-version: '24'
       - name: Create release notes
-        if: startsWith(github.ref, 'refs/tags/v')
         run: npm run package-release-notes
       - name: Create GitHub release for tag
         if: startsWith(github.ref, 'refs/tags/v')
@@ -329,3 +328,9 @@ jobs:
           prerelease: ${{ contains(github.ref, '-rc') }}
           makeLatest: ${{ !contains(github.ref, '-rc') }}
           bodyFile: release-notes.md
+      - name: Publish platform-specific npm packages
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: cd npm && npm publish --workspaces --tag=${{ contains(github.ref, '-rc') && 'next' || 'latest' }} --dry-run
+      - name: Publish sharp npm package
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: npm publish --tag=${{ contains(github.ref, '-rc') && 'next' || 'latest' }} --dry-run
