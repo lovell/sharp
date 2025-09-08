@@ -25,7 +25,7 @@ rotation, extraction, compositing and gamma correction are available.
 Most modern macOS, Windows and Linux systems
 do not require any additional install or runtime dependencies.
 
-```sh
+```sh frame="none"
 npm install sharp
 ```
 
