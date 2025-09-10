@@ -137,7 +137,7 @@
     "vips"
   ],
   "dependencies": {
-    "color": "^4.2.3",
+    "@img/colour": "^1.0.0",
     "detect-libc": "^2.0.4",
     "semver": "^7.7.2"
   },
