@@ -323,3 +323,6 @@ GitHub: https://github.com/hans00
 
 Name: Thibaut Patel
 GitHub: https://github.com/tpatel
+
+Name: Maël Nison
+GitHub: https://github.com/arcanis
