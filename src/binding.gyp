@@ -168,6 +168,7 @@
                 # Ensure runtime linking is relative to sharp.node
                 '-Wl,-rpath,\'@loader_path/../../sharp-libvips-<(platform_and_arch)/lib\'',
                 '-Wl,-rpath,\'@loader_path/../../../sharp-libvips-<(platform_and_arch)/<(sharp_libvips_version)/lib\'',
+                '-Wl,-rpath,\'@loader_path/../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\'',
                 '-Wl,-rpath,\'@loader_path/../../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\'',
                 '-Wl,-rpath,\'@loader_path/../../../node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\'',
                 '-Wl,-rpath,\'@loader_path/../../../../../@img-sharp-libvips-<(platform_and_arch)-npm-<(sharp_libvips_version)-<(sharp_libvips_yarn_locator)/node_modules/@img/sharp-libvips-<(platform_and_arch)/lib\''
