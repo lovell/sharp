@@ -158,7 +158,8 @@ npm install --cpu=wasm32 sharp
 
 ## FreeBSD
 
-The `vips` package must be installed before `npm install` is run.
+The `vips` package must be installed before `npm install` is run,
+as well as the additional [building from source](#building-from-source) dependencies.
 
 ```sh frame="none"
 pkg install -y pkgconf vips
