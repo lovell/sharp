@@ -269,7 +269,7 @@ jobs:
       contents: read
     name: "build-wasm32 [package]"
     runs-on: ubuntu-24.04
-    container: "emscripten/emsdk:4.0.11"
+    container: "emscripten/emsdk:4.0.14"
     steps:
       - uses: actions/checkout@v4
       - name: Dependencies

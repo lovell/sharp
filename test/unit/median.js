@@ -43,7 +43,7 @@ describe('Median filter', function () {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual(data.subarray(0, 6), Buffer.from([0, 3, 15, 15, 63, 127]));
+    assert.deepStrictEqual(data.subarray(0, 6), Buffer.from(row));
   });
 
   it('invalid radius', () => {

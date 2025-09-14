@@ -15,7 +15,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-linuxmusl-x64": "1.2.1"
+    "@img/sharp-libvips-linuxmusl-x64": "1.2.2-rc.2"
   },
   "files": [
     "lib"
