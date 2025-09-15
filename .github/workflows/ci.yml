@@ -330,7 +330,7 @@ jobs:
           bodyFile: release-notes.md
       - name: Publish platform-specific npm packages
         if: startsWith(github.ref, 'refs/tags/v')
-        run: cd npm && npm publish --workspaces --tag=${{ contains(github.ref, '-rc') && 'next' || 'latest' }} --dry-run
+        run: cd npm && npm publish --workspaces --tag=${{ contains(github.ref, '-rc') && 'next' || 'latest' }}
       - name: Publish sharp npm package
         if: startsWith(github.ref, 'refs/tags/v')
-        run: npm publish --tag=${{ contains(github.ref, '-rc') && 'next' || 'latest' }} --dry-run
+        run: npm publish --tag=${{ contains(github.ref, '-rc') && 'next' || 'latest' }}
