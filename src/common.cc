@@ -421,14 +421,14 @@ namespace sharp {
               ->set("high_bitdepth", descriptor->svgHighBitdepth);
         break;
       case ImageType::TIFF:
-        option->set("tiffSubifd", descriptor->tiffSubifd);
+        option->set("subifd", descriptor->tiffSubifd);
         break;
       case ImageType::PDF:
         option->set("dpi", descriptor->density)
               ->set("background", descriptor->pdfBackground);
         break;
       case ImageType::OPENSLIDE:
-        option->set("openSlideLevel", descriptor->openSlideLevel);
+        option->set("level", descriptor->openSlideLevel);
         break;
       case ImageType::JP2:
         option->set("oneshot", descriptor->jp2Oneshot);
