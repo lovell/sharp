@@ -20,7 +20,7 @@ npm install sharp
 pnpm add sharp
 ```
 
-When using `pnpm`, you may need to add `sharp` to
+When using `pnpm`, add `sharp` to
 [ignoredBuiltDependencies](https://pnpm.io/settings#ignoredbuiltdependencies)
 to silence warnings.
 
@@ -33,7 +33,8 @@ bun add sharp
 ```
 
 ```sh frame="none"
-deno run --allow-ffi ...
+deno add --quiet npm:sharp
+deno run --allow-env --allow-ffi --allow-read --allow-sys ...
 ```
 
 ## Prerequisites

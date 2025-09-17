@@ -185,7 +185,9 @@ jobs:
 
       - name: Run with Deno
         if: ${{ matrix.runtime == 'deno' }}
-        run: deno run --allow-read --allow-ffi release.mjs
+        run: |
+          deno install
+          deno run --allow-env --allow-ffi --allow-read --allow-sys release.mjs
 
       - name: Run with Bun
         if: ${{ matrix.runtime == 'bun' }}
