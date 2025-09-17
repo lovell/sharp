@@ -1,11 +1,9 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
 const imagemagick = require('imagemagick');
 const gm = require('gm');
-const assert = require('assert');
+const assert = require('node:assert');
 const Benchmark = require('benchmark');
 
 const sharp = require('../../');
@@ -73,5 +71,5 @@ new Benchmark.Suite('random').add('imagemagick', {
   console.log(String(event.target));
 }).on('complete', function () {
   const winner = this.filter('fastest').map('name');
-  assert.strictEqual('sharp', String(winner), 'sharp was slower than ' + winner);
+  assert.strictEqual('sharp', String(winner), `sharp was slower than ${winner}`);
 }).run();

@@ -1,8 +1,6 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
 // Populate the npm package for the current platform with the local build
 
 const { copyFileSync, cpSync, readFileSync, writeFileSync, appendFileSync } = require('node:fs');

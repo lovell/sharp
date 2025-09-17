@@ -1,9 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const path = require('path');
+const path = require('node:path');
 const sharp = require('../../');
 const maxColourDistance = require('../../lib/sharp')._maxColourDistance;
 
@@ -196,10 +194,10 @@ module.exports = {
 
   assertMaxColourDistance: function (actualImagePath, expectedImagePath, acceptedDistance) {
     if (typeof actualImagePath !== 'string') {
-      throw new TypeError('`actualImagePath` must be a string; got ' + actualImagePath);
+      throw new TypeError(`\`actualImagePath\` must be a string; got ${actualImagePath}`);
     }
     if (typeof expectedImagePath !== 'string') {
-      throw new TypeError('`expectedImagePath` must be a string; got ' + expectedImagePath);
+      throw new TypeError(`\`expectedImagePath\` must be a string; got ${expectedImagePath}`);
     }
     if (typeof acceptedDistance !== 'number') {
       // Default threshold
@@ -207,7 +205,7 @@ module.exports = {
     }
     const distance = maxColourDistance(actualImagePath, expectedImagePath);
     if (distance > acceptedDistance) {
-      throw new Error('Expected maximum absolute distance of ' + acceptedDistance + ', actual ' + distance);
+      throw new Error(`Expected maximum absolute distance of ${acceptedDistance}, actual ${distance}`);
     }
   }
 

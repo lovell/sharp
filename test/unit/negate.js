@@ -1,9 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -104,7 +102,7 @@ describe('Negate', function () {
     const output = fixtures.path('output.unmodified-by-negate.png');
     sharp(fixtures.inputJpgWithLowContrast)
       .negate(false)
-      .toFile(output, function (err, info) {
+      .toFile(output, function (err) {
         if (err) throw err;
         fixtures.assertMaxColourDistance(output, fixtures.inputJpgWithLowContrast, 0);
         done();

@@ -1,9 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -200,7 +198,7 @@ describe('Raw pixel data', function () {
       });
       writable
         .jpeg()
-        .toBuffer(function (err, data, info) {
+        .toBuffer(function (err, _data, info) {
           if (err) throw err;
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(32, info.width);
@@ -285,20 +283,20 @@ describe('Raw pixel data', function () {
       });
     });
 
-    for (const { constructor, depth, bits } of [
-      { constructor: Uint8Array, depth: undefined, bits: 8 },
-      { constructor: Uint8Array, depth: 'uchar', bits: 8 },
-      { constructor: Uint8ClampedArray, depth: 'uchar', bits: 8 },
-      { constructor: Int8Array, depth: 'char', bits: 8 },
-      { constructor: Uint16Array, depth: 'ushort', bits: 16 },
-      { constructor: Int16Array, depth: 'short', bits: 16 },
-      { constructor: Uint32Array, depth: 'uint', bits: 32 },
-      { constructor: Int32Array, depth: 'int', bits: 32 },
-      { constructor: Float32Array, depth: 'float', bits: 32 },
-      { constructor: Float64Array, depth: 'double', bits: 64 }
+    for (const { type, depth, bits } of [
+      { type: Uint8Array, depth: undefined, bits: 8 },
+      { type: Uint8Array, depth: 'uchar', bits: 8 },
+      { type: Uint8ClampedArray, depth: 'uchar', bits: 8 },
+      { type: Int8Array, depth: 'char', bits: 8 },
+      { type: Uint16Array, depth: 'ushort', bits: 16 },
+      { type: Int16Array, depth: 'short', bits: 16 },
+      { type: Uint32Array, depth: 'uint', bits: 32 },
+      { type: Int32Array, depth: 'int', bits: 32 },
+      { type: Float32Array, depth: 'float', bits: 32 },
+      { type: Float64Array, depth: 'double', bits: 64 }
     ]) {
-      it(constructor.name, () =>
-        sharp(new constructor(3), { raw: { width: 1, height: 1, channels: 3 } })
+      it(type.name, () =>
+        sharp(new type(3), { raw: { width: 1, height: 1, channels: 3 } })
           .raw({ depth })
           .toBuffer({ resolveWithObject: true })
           .then(({ data, info }) => {

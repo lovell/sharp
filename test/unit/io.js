@@ -1,11 +1,9 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert');
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -388,9 +386,8 @@ describe('Input/output', function () {
   });
 
   it('Fail when output File is input File via Promise', function (done) {
-    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg).then(function (data) {
-      assert(false);
-      done();
+    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg).then(function () {
+      done(new Error('Unexpectedly resolved Promise'));
     }).catch(function (err) {
       assert(err instanceof Error);
       assert.strictEqual('Cannot use same file for input and output', err.message);
@@ -409,9 +406,8 @@ describe('Input/output', function () {
 
   it('Fail when output File is input File via Promise (relative output, absolute input)', function (done) {
     const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(fixtures.inputJpg).toFile(relativePath).then(function (data) {
-      assert(false);
-      done();
+    sharp(fixtures.inputJpg).toFile(relativePath).then(function () {
+      done(new Error('Unexpectedly resolved Promise'));
     }).catch(function (err) {
       assert(err instanceof Error);
       assert.strictEqual('Cannot use same file for input and output', err.message);
@@ -430,9 +426,8 @@ describe('Input/output', function () {
 
   it('Fail when output File is input File via Promise (relative input, absolute output)', function (done) {
     const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(relativePath).toFile(fixtures.inputJpg).then(function (data) {
-      assert(false);
-      done();
+    sharp(relativePath).toFile(fixtures.inputJpg).then(function () {
+      done(new Error('Unexpectedly resolved Promise'));
     }).catch(function (err) {
       assert(err instanceof Error);
       assert.strictEqual('Cannot use same file for input and output', err.message);
@@ -449,9 +444,8 @@ describe('Input/output', function () {
   });
 
   it('Fail when output File is empty via Promise', function (done) {
-    sharp(fixtures.inputJpg).toFile('').then(function (data) {
-      assert(false);
-      done();
+    sharp(fixtures.inputJpg).toFile('').then(function () {
+      done(new Error('Unexpectedly resolved Promise'));
     }).catch(function (err) {
       assert(err instanceof Error);
       assert.strictEqual('Missing output file path', err.message);
@@ -522,7 +516,7 @@ describe('Input/output', function () {
     try {
       sharp().toFormat('zoinks');
       isValid = true;
-    } catch (e) {}
+    } catch (_err) {}
     assert(!isValid);
     done();
   });
@@ -633,7 +627,7 @@ describe('Input/output', function () {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .png({ compressionLevel: 1, force: false })
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -1059,7 +1053,7 @@ describe('Input/output', function () {
       });
     const badPipeline = sharp({ raw: { width: 840, height: 500, channels: 3 } })
       .toFormat('jpeg')
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err) {
         assert.strictEqual(err.message.indexOf('memory area too small') > 0, true);
         const readable = fs.createReadStream(fixtures.inputJPGBig);
         const inPipeline = sharp()
@@ -1067,10 +1061,7 @@ describe('Input/output', function () {
           .raw();
         const goodPipeline = sharp({ raw: { width: 840, height: 472, channels: 3 } })
           .toFormat('jpeg')
-          .toBuffer(function (err, data, info) {
-            if (err) throw err;
-            done();
-          });
+          .toBuffer(done);
         readable.pipe(inPipeline).pipe(goodPipeline);
       });
     readable.pipe(inPipeline).pipe(badPipeline);

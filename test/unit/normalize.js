@@ -1,9 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -24,7 +22,7 @@ describe('Normalization', function () {
     sharp(fixtures.inputJpgWithLowContrast)
       .normalise()
       .raw()
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         assertNormalized(data);
         done();
@@ -36,7 +34,7 @@ describe('Normalization', function () {
       .greyscale()
       .normalize()
       .raw()
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         assertNormalized(data);
         done();
@@ -47,7 +45,7 @@ describe('Normalization', function () {
     sharp(fixtures.inputPngWithGreyAlpha)
       .normalise()
       .raw()
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         assertNormalized(data);
         done();
@@ -90,7 +88,7 @@ describe('Normalization', function () {
     const output = fixtures.path('output.unmodified-png-with-one-color.png');
     sharp(fixtures.inputPngWithOneColor)
       .normalize()
-      .toFile(output, function (err, info) {
+      .toFile(output, function (err) {
         if (err) done(err);
         fixtures.assertMaxColourDistance(output, fixtures.inputPngWithOneColor, 0);
         done();
@@ -101,7 +99,7 @@ describe('Normalization', function () {
     sharp(fixtures.inputPngWithTransparency16bit)
       .normalise()
       .raw()
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         assertNormalized(data);
         done();
@@ -112,7 +110,7 @@ describe('Normalization', function () {
     sharp(fixtures.inputJpgWithLowContrast)
       .normalise({ lower: 10, upper: 70 })
       .raw()
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         assertNormalized(data);
         done();

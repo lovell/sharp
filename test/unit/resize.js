@@ -1,9 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -129,7 +127,7 @@ describe('Resize dimensions', function () {
       .resize(0x4000, 0x4000)
       .extract({ top: 0x2000, left: 0x2000, width: 256, height: 256 })
       .webp()
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual('webp', info.format);
         assert.strictEqual(256, info.width);
@@ -149,7 +147,7 @@ describe('Resize dimensions', function () {
         assert.strictEqual(607, info.height);
         sharp(data)
           .resize(233, 131)
-          .toBuffer(function (err, data, info) {
+          .toBuffer(function (err, _data, info) {
             if (err) throw err;
             assert.strictEqual('webp', info.format);
             assert.strictEqual(233, info.width);
@@ -169,7 +167,7 @@ describe('Resize dimensions', function () {
         sharp(data)
           .rotate(90)
           .resize(533, 800)
-          .toBuffer(function (err, data, info) {
+          .toBuffer(function (err, _data, info) {
             if (err) throw err;
             assert.strictEqual(533, info.width);
             assert.strictEqual(800, info.height);
@@ -660,7 +658,7 @@ describe('Resize dimensions', function () {
     sharp(fixtures.inputTiff8BitDepth)
       .resize(210, 210, { kernel: 'nearest' })
       .png()
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual(210, info.width);
         assert.strictEqual(210, info.height);

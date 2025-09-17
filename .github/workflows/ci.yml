@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: "24"
-      - run: npm install --ignore-scripts --omit=optional
+      - run: npm install --ignore-scripts
       - run: npm run lint-cpp
       - run: npm run lint-js
       - run: npm run lint-licensing

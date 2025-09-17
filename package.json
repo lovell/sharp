@@ -97,7 +97,7 @@
     "test": "npm run lint && npm run test-unit",
     "lint": "npm run lint-cpp && npm run lint-js && npm run lint-licensing && npm run lint-types",
     "lint-cpp": "cpplint",
-    "lint-js": "semistandard",
+    "lint-js": "biome lint",
     "lint-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;LGPL-3.0-or-later;MIT\"",
     "lint-types": "tsd",
     "test-leak": "./test/leak/leak.sh",
@@ -168,6 +168,7 @@
     "@img/sharp-win32-x64": "0.34.4"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.2.4",
     "@emnapi/runtime": "^1.5.0",
     "@img/sharp-libvips-dev": "1.2.3",
     "@img/sharp-libvips-dev-wasm32": "1.2.3",
@@ -186,7 +187,6 @@
     "node-addon-api": "^8.5.0",
     "node-gyp": "^11.4.2",
     "nyc": "^17.1.0",
-    "semistandard": "^17.0.0",
     "tar-fs": "^3.1.1",
     "tsd": "^0.33.0"
   },
@@ -199,11 +199,6 @@
   },
   "funding": {
     "url": "https://opencollective.com/libvips"
-  },
-  "semistandard": {
-    "env": [
-      "mocha"
-    ]
   },
   "cc": {
     "linelength": "120",

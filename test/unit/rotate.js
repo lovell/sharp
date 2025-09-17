@@ -1,9 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -173,8 +171,8 @@ describe('Rotation', function () {
   });
 
   [-3690, -450, -90, 90, 450, 3690].forEach(function (angle) {
-    it('Rotate by any 90-multiple angle (' + angle + 'deg)', function (done) {
-      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
+    it(`Rotate by any 90-multiple angle (${angle}deg)`, function (done) {
+      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual(240, info.width);
         assert.strictEqual(320, info.height);
@@ -184,8 +182,8 @@ describe('Rotation', function () {
   });
 
   [-3750, -510, -150, 30, 390, 3630].forEach(function (angle) {
-    it('Rotate by any 30-multiple angle (' + angle + 'deg)', function (done) {
-      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
+    it(`Rotate by any 30-multiple angle (${angle}deg)`, function (done) {
+      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual(397, info.width);
         assert.strictEqual(368, info.height);
@@ -195,8 +193,8 @@ describe('Rotation', function () {
   });
 
   [-3780, -540, 0, 180, 540, 3780].forEach(function (angle) {
-    it('Rotate by any 180-multiple angle (' + angle + 'deg)', function (done) {
-      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, data, info) {
+    it(`Rotate by any 180-multiple angle (${angle}deg)`, function (done) {
+      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -446,7 +444,7 @@ describe('Rotation', function () {
     sharp(fixtures.inputJpg)
       .rotate(45)
       .rotate(90)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual(2225, info.width);
         assert.strictEqual(2725, info.height);
@@ -458,7 +456,7 @@ describe('Rotation', function () {
     sharp(fixtures.inputJpg)
       .rotate(90)
       .rotate(45)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual(3500, info.width);
         assert.strictEqual(3500, info.height);

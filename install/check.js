@@ -1,8 +1,6 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
 try {
   const { useGlobalLibvips, globalLibvipsVersion, log, spawnRebuild } = require('../lib/libvips');
 
@@ -12,14 +10,14 @@ try {
     try {
       const addonApi = require('node-addon-api');
       log(`Found node-addon-api ${addonApi.version || ''}`);
-    } catch (err) {
+    } catch (_err) {
       log('Please add node-addon-api to your dependencies');
       return;
     }
     try {
       const gyp = require('node-gyp');
       log(`Found node-gyp ${gyp().version}`);
-    } catch (err) {
+    } catch (_err) {
       log('Please add node-gyp to your dependencies');
       return;
     }

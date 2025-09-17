@@ -1,9 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 const fixtures = require('../fixtures');
 const sharp = require('../../');
 
@@ -67,7 +65,7 @@ describe('Alpha transparency', function () {
   it('Do not flatten', function (done) {
     sharp(fixtures.inputPngWithTransparency)
       .flatten(false)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(4, info.channels);
@@ -78,7 +76,7 @@ describe('Alpha transparency', function () {
   it('Ignored for JPEG', function (done) {
     sharp(fixtures.inputJpg)
       .flatten({ background: '#ff0000' })
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(3, info.channels);
@@ -100,7 +98,7 @@ describe('Alpha transparency', function () {
 
   it('Enlargement with non-nearest neighbor interpolation shouldn’t cause dark edges', function () {
     const base = 'alpha-premultiply-enlargement-2048x1536-paper.png';
-    const actual = fixtures.path('output.' + base);
+    const actual = fixtures.path(`output.${base}`);
     const expected = fixtures.expected(base);
     return sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .resize(2048, 1536)
@@ -112,7 +110,7 @@ describe('Alpha transparency', function () {
 
   it('Reduction with non-nearest neighbor interpolation shouldn’t cause dark edges', function () {
     const base = 'alpha-premultiply-reduction-1024x768-paper.png';
-    const actual = fixtures.path('output.' + base);
+    const actual = fixtures.path(`output.${base}`);
     const expected = fixtures.expected(base);
     return sharp(fixtures.inputPngAlphaPremultiplicationLarge)
       .resize(1024, 768)

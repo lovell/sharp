@@ -1,6 +1,9 @@
+// biome-ignore-all lint/correctness/noUnusedFunctionParameters: types only test file
+// biome-ignore-all lint/correctness/noUnusedVariables: types only test file
+
 import sharp = require('../../');
 
-import { createReadStream, createWriteStream } from 'fs';
+import { createReadStream, createWriteStream } from 'node:fs';
 
 const input: Buffer = Buffer.alloc(0);
 const readableStream: NodeJS.ReadableStream = createReadStream(input);
@@ -79,7 +82,7 @@ sharp({
 let transformer = sharp()
   .resize(300)
   .on('info', (info: sharp.OutputInfo) => {
-    console.log('Image height is ' + info.height);
+    console.log(`Image height is ${info.height}`);
   });
 readableStream.pipe(transformer).pipe(writableStream);
 

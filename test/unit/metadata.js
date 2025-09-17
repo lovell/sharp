@@ -1,10 +1,8 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const fs = require('fs');
-const assert = require('assert');
+const fs = require('node:fs');
+const assert = require('node:assert');
 const exifReader = require('exif-reader');
 const icc = require('icc');
 
@@ -756,7 +754,7 @@ describe('Image metadata', function () {
     sharp(fixtures.inputJpg)
       .resize(64)
       .withIccProfile(fixtures.path('hilutite.icm'))
-      .toFile(output, function (err, info) {
+      .toFile(output, function (err) {
         if (err) throw err;
         fixtures.assertMaxColourDistance(output, fixtures.expected('hilutite.jpg'), 9);
         done();

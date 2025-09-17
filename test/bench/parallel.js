@@ -1,11 +1,9 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
 process.env.UV_THREADPOOL_SIZE = 64;
 
-const assert = require('assert');
+const assert = require('node:assert');
 const async = require('async');
 
 const sharp = require('../../');
@@ -21,13 +19,12 @@ const timer = setInterval(function () {
 }, 100);
 
 async.mapSeries([1, 1, 2, 4, 8, 16, 32, 64], function (parallelism, next) {
-  const start = new Date().getTime();
+  const start = Date.now();
   async.times(parallelism,
-    function (id, callback) {
-      /* jslint unused: false */
+    function (_id, callback) {
       sharp(fixtures.inputJpg).resize(width, height).toBuffer(function (err, buffer) {
         buffer = null;
-        callback(err, new Date().getTime() - start);
+        callback(err, Date.now() - start);
       });
     },
     function (err, ids) {
@@ -37,7 +34,7 @@ async.mapSeries([1, 1, 2, 4, 8, 16, 32, 64], function (parallelism, next) {
       const mean = ids.reduce(function (a, b) {
         return a + b;
       }) / ids.length;
-      console.log(parallelism + ' parallel calls: fastest=' + ids[0] + 'ms slowest=' + ids[ids.length - 1] + 'ms mean=' + mean + 'ms');
+      console.log(`${parallelism} parallel calls: fastest=${ids[0]}ms slowest=${ids[ids.length - 1]}ms mean=${mean}ms`);
       next();
     }
   );

@@ -1,10 +1,8 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const fs = require('fs');
-const assert = require('assert');
+const fs = require('node:fs');
+const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -711,7 +709,7 @@ describe('Image Stats', function () {
 
   it('File input with corrupt header fails gracefully, Promise out', function () {
     return sharp(fixtures.inputJpgWithCorruptHeader)
-      .stats().then(function (stats) {
+      .stats().then(function () {
         throw new Error('Corrupt Header file');
       }).catch(function (err) {
         assert.ok(!!err);
@@ -724,7 +722,7 @@ describe('Image Stats', function () {
     fs.createReadStream(fixtures.inputJpgWithCorruptHeader).pipe(pipeline);
 
     return pipeline
-      .stats().then(function (stats) {
+      .stats().then(function () {
         throw new Error('Corrupt Header file');
       }).catch(function (err) {
         assert.ok(!!err);
@@ -740,7 +738,7 @@ describe('Image Stats', function () {
   });
 
   it('Non-existent file in, Promise out', function (done) {
-    sharp('fail').stats().then(function (stats) {
+    sharp('fail').stats().then(function () {
       throw new Error('Non-existent file');
     }, function (err) {
       assert.ok(!!err);

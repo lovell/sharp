@@ -1,12 +1,10 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-const assert = require('assert');
+const assert = require('node:assert');
 
 describe('Linear adjustment', function () {
   const blackPoint = 70;
@@ -17,7 +15,7 @@ describe('Linear adjustment', function () {
   it('applies linear levels adjustment w/o alpha ch', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
       .linear(a, b)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('low-contrast-linear.jpg'), data, done);
       });
@@ -26,7 +24,7 @@ describe('Linear adjustment', function () {
   it('applies slope level adjustment w/o alpha ch', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
       .linear(a)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('low-contrast-slope.jpg'), data, done);
       });
@@ -35,7 +33,7 @@ describe('Linear adjustment', function () {
   it('applies offset level adjustment w/o alpha ch', function (done) {
     sharp(fixtures.inputJpgWithLowContrast)
       .linear(null, b)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('low-contrast-offset.jpg'), data, done);
       });
@@ -83,7 +81,7 @@ describe('Linear adjustment', function () {
 
   it('per channel level adjustment', function (done) {
     sharp(fixtures.inputWebP)
-      .linear([0.25, 0.5, 0.75], [150, 100, 50]).toBuffer(function (err, data, info) {
+      .linear([0.25, 0.5, 0.75], [150, 100, 50]).toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('linear-per-channel.jpg'), data, done);
       });

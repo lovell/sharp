@@ -1,9 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -64,7 +62,7 @@ describe('Threshold', function () {
   it('threshold false (=0)', function (done) {
     sharp(fixtures.inputJpg)
       .threshold(false)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.inputJpg, data, done);
       });

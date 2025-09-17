@@ -1,11 +1,9 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert');
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert');
 
 const extractZip = require('extract-zip');
 
@@ -47,7 +45,7 @@ const assertDeepZoomTiles = function (directory, expectedSize, expectedLevels, d
     .catch(done);
 };
 
-const assertZoomifyTiles = function (directory, expectedTileSize, expectedLevels, done) {
+const assertZoomifyTiles = function (directory, expectedLevels, done) {
   fs.stat(path.join(directory, 'ImageProperties.xml'), function (err, stat) {
     if (err) throw err;
     assert.ok(stat.isFile());
@@ -57,7 +55,7 @@ const assertZoomifyTiles = function (directory, expectedTileSize, expectedLevels
     fs.readdirSync(path.join(directory, 'TileGroup0')).forEach(function (tile) {
       // Verify tile file name
       assert.ok(/^[0-9]+-[0-9]+-[0-9]+\.jpg$/.test(tile));
-      const level = parseInt(tile.split('-')[0]);
+      const level = Number(tile.split('-')[0]);
       maxTileLevel = Math.max(maxTileLevel, level);
     });
 
@@ -67,7 +65,7 @@ const assertZoomifyTiles = function (directory, expectedTileSize, expectedLevels
   });
 };
 
-const assertGoogleTiles = function (directory, expectedTileSize, expectedLevels, done) {
+const assertGoogleTiles = function (directory, expectedLevels, done) {
   // Get levels
   const dirents = fs.readdirSync(directory, { withFileTypes: true });
   const levels = dirents.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
@@ -411,7 +409,7 @@ describe('Tile', function () {
             size: 512,
             depth: 'one'
           })
-          .toFile(fixtures.path('output.512_depth_one.dzi'), function (err, info) {
+          .toFile(fixtures.path('output.512_depth_one.dzi'), function (err) {
             if (err) throw err;
             // Verify only one depth generated
             assertDeepZoomTiles(directory, 512, 1, done);
@@ -427,7 +425,7 @@ describe('Tile', function () {
             size: 512,
             depth: 'onepixel'
           })
-          .toFile(fixtures.path('output.512_depth_onepixel.dzi'), function (err, info) {
+          .toFile(fixtures.path('output.512_depth_onepixel.dzi'), function (err) {
             if (err) throw err;
             // Verify only one depth generated
             assertDeepZoomTiles(directory, 512, 13, done);
@@ -443,7 +441,7 @@ describe('Tile', function () {
             size: 256,
             depth: 'onetile'
           })
-          .toFile(fixtures.path('output.256_depth_onetile.dzi'), function (err, info) {
+          .toFile(fixtures.path('output.256_depth_onetile.dzi'), function (err) {
             if (err) throw err;
             // Verify only one depth generated
             assertDeepZoomTiles(directory, 256, 5, done);
@@ -459,7 +457,7 @@ describe('Tile', function () {
             size: 256,
             skipBlanks: 0
           })
-          .toFile(fixtures.path('output.256_skip_blanks.dzi'), function (err, info) {
+          .toFile(fixtures.path('output.256_skip_blanks.dzi'), function (err) {
             if (err) throw err;
             // assert them 0_0.jpeg doesn't exist because it's a white tile
             const whiteTilePath = path.join(directory, '11', '0_0.jpeg');
@@ -510,7 +508,7 @@ describe('Tile', function () {
             assert.strictEqual(2225, info.height);
             assert.strictEqual(3, info.channels);
             assert.strictEqual(undefined, info.size);
-            assertZoomifyTiles(directory, 256, 1, done);
+            assertZoomifyTiles(directory, 1, done);
           });
       });
     });
@@ -531,7 +529,7 @@ describe('Tile', function () {
             assert.strictEqual(2225, info.height);
             assert.strictEqual(3, info.channels);
             assert.strictEqual(undefined, info.size);
-            assertZoomifyTiles(directory, 256, 5, done);
+            assertZoomifyTiles(directory, 5, done);
           });
       });
     });
@@ -552,7 +550,7 @@ describe('Tile', function () {
             assert.strictEqual(2225, info.height);
             assert.strictEqual(3, info.channels);
             assert.strictEqual(undefined, info.size);
-            assertZoomifyTiles(directory, 256, 13, done);
+            assertZoomifyTiles(directory, 13, done);
           });
       });
     });
@@ -576,7 +574,7 @@ describe('Tile', function () {
             assert.strictEqual(1536, info.height);
             assert.strictEqual(3, info.channels);
             assert.strictEqual(undefined, info.size);
-            assertZoomifyTiles(directory, 256, 4, done);
+            assertZoomifyTiles(directory, 4, done);
           });
       });
     });
@@ -733,7 +731,7 @@ describe('Tile', function () {
             assert.strictEqual(2225, info.height);
             assert.strictEqual(3, info.channels);
             assert.strictEqual(undefined, info.size);
-            assertGoogleTiles(directory, 256, 1, done);
+            assertGoogleTiles(directory, 1, done);
           });
       });
     });
@@ -754,7 +752,7 @@ describe('Tile', function () {
             assert.strictEqual(2225, info.height);
             assert.strictEqual(3, info.channels);
             assert.strictEqual(undefined, info.size);
-            assertGoogleTiles(directory, 256, 5, done);
+            assertGoogleTiles(directory, 5, done);
           });
       });
     });
@@ -778,7 +776,7 @@ describe('Tile', function () {
             assert.strictEqual(2074, info.height);
             assert.strictEqual(3, info.channels);
             assert.strictEqual(undefined, info.size);
-            assertGoogleTiles(directory, 256, 5, done);
+            assertGoogleTiles(directory, 5, done);
           });
       });
     });

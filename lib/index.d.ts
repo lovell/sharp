@@ -27,7 +27,7 @@
 
 /// <reference types="node" />
 
-import { Duplex } from 'stream';
+import type { Duplex } from 'node:stream';
 
 //#region Constructor functions
 

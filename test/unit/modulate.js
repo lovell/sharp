@@ -1,10 +1,8 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
 const sharp = require('../../');
-const assert = require('assert');
+const assert = require('node:assert');
 const fixtures = require('../fixtures');
 
 describe('Modulate', function () {

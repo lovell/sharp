@@ -1,10 +1,8 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const assert = require('assert');
-const fs = require('fs');
+const assert = require('node:assert');
+const fs = require('node:fs');
 
 const sharp = require('../../lib');
 const fixtures = require('../fixtures');
@@ -32,7 +30,7 @@ describe('failOn', () => {
         isWarningEmitted = true;
       })
       .resize(32, 24)
-      .toBuffer(function (err, data, info) {
+      .toBuffer(function (err, _data, info) {
         if (err) throw err;
         assert.strictEqual(true, isWarningEmitted);
         assert.strictEqual('png', info.format);

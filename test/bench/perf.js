@@ -1,10 +1,8 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const fs = require('fs');
-const { execSync } = require('child_process');
+const fs = require('node:fs');
+const { execSync } = require('node:child_process');
 
 const async = require('async');
 const Benchmark = require('benchmark');
@@ -12,7 +10,7 @@ const Benchmark = require('benchmark');
 const safeRequire = (name) => {
   try {
     return require(name);
-  } catch (err) {}
+  } catch (_err) {}
   return null;
 };
 
@@ -280,7 +278,7 @@ async.series({
           });
       }
     }).on('cycle', function (event) {
-      console.log('jpeg ' + String(event.target));
+      console.log(`jpeg ${String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -505,7 +503,7 @@ async.series({
           });
       }
     }).on('cycle', function (event) {
-      console.log('operations ' + String(event.target));
+      console.log(`operations ${String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -579,7 +577,7 @@ async.series({
           });
       }
     }).on('cycle', function (event) {
-      console.log('kernels ' + String(event.target));
+      console.log(`kernels ${String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -735,7 +733,7 @@ async.series({
         sharp(inputPngBuffer)
           .resize(width, heightPng)
           .png({ compressionLevel: 6 })
-          .toBuffer(function (err, data) {
+          .toBuffer(function (err) {
             if (err) {
               throw err;
             } else {
@@ -820,7 +818,7 @@ async.series({
       }
     });
     pngSuite.on('cycle', function (event) {
-      console.log(' png ' + String(event.target));
+      console.log(` png ${String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -881,7 +879,7 @@ async.series({
           });
       }
     }).on('cycle', function (event) {
-      console.log('webp ' + String(event.target));
+      console.log(`webp ${String(event.target)}`);
     }).on('complete', function () {
       callback(null, this.filter('fastest').map('name'));
     }).run();
@@ -892,7 +890,7 @@ async.series({
   }
   Object.keys(results).forEach(function (format) {
     if (results[format].toString().substr(0, 5) !== 'sharp') {
-      console.log('sharp was slower than ' + results[format] + ' for ' + format);
+      console.log(`sharp was slower than ${results[format]} for ${format}`);
     }
   });
   console.dir(sharp.cache());

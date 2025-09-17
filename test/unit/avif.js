@@ -1,9 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 
 const sharp = require('../../');
 const { inputAvif, inputJpg, inputGifAnimated } = require('../fixtures');
@@ -20,8 +18,8 @@ describe('AVIF', () => {
       .resize(32)
       .jpeg()
       .toBuffer();
-    const { size, ...metadata } = await sharp(data)
-      .metadata();
+    const { size, ...metadata } = await sharp(data).metadata();
+    void size;
     assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 13,
@@ -49,8 +47,8 @@ describe('AVIF', () => {
       .resize(32)
       .avif({ effort: 0 })
       .toBuffer();
-    const { size, ...metadata } = await sharp(data)
-      .metadata();
+    const { size, ...metadata } = await sharp(data).metadata();
+    void size;
     assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 26,
@@ -77,8 +75,8 @@ describe('AVIF', () => {
     const data = await sharp(inputAvif)
       .resize(32)
       .toBuffer();
-    const { size, ...metadata } = await sharp(data)
-      .metadata();
+    const { size, ...metadata } = await sharp(data).metadata();
+    void size;
     assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 13,
@@ -106,8 +104,8 @@ describe('AVIF', () => {
       .resize(10)
       .avif({ effort: 0 })
       .toBuffer();
-    const { size, ...metadata } = await sharp(data)
-      .metadata();
+    const { size, ...metadata } = await sharp(data).metadata();
+    void size;
     assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 300,
@@ -136,8 +134,8 @@ describe('AVIF', () => {
       .sharpen()
       .avif({ effort: 0 })
       .toBuffer();
-    const { size, ...metadata } = await sharp(data)
-      .metadata();
+    const { size, ...metadata } = await sharp(data).metadata();
+    void size;
     assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 26,
