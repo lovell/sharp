@@ -96,7 +96,7 @@ jobs:
     steps:
       - name: Install Node.js
         if: ${{ matrix.runtime == 'node' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
       - name: Install pnpm
@@ -106,9 +106,9 @@ jobs:
           version: 8
       - name: Install Deno
         if: ${{ matrix.runtime == 'deno' }}
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
       - name: Install Bun
         if: ${{ matrix.runtime == 'bun' }}
         uses: oven-sh/setup-bun@v2
@@ -117,7 +117,7 @@ jobs:
 
       - name: Version
         id: version
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             core.setOutput('semver', context.ref.replace('refs/tags/v',''))
