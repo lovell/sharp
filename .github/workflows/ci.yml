@@ -4,9 +4,24 @@ on:
   - pull_request
 permissions: {}
 jobs:
+  lint:
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+      - run: npm install --ignore-scripts --omit=optional
+      - run: npm run lint-cpp
+      - run: npm run lint-js
+      - run: npm run lint-licensing
+      - run: npm run lint-types
   build-native:
     permissions:
       contents: read
+    needs: lint
     name: "build-${{ matrix.platform }} [Node.js ${{ matrix.nodejs_version_major }}] ${{ matrix.package && '[package]' }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -150,17 +165,14 @@ jobs:
           python-version: "3.12"
       - name: Dependencies (Node.js)
         if: "!contains(matrix.platform, 'linuxmusl')"
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.nodejs_version }}
           architecture: ${{ matrix.nodejs_arch }}
       - uses: actions/checkout@v4
-      - name: Install
-        run: npm install --build-from-source
-      - name: Test
-        run: npm test
-      - name: Populate npm package
-        if: matrix.package
+      - run: npm install --build-from-source
+      - run: npm run test-unit
+      - if: matrix.package
         run: npm run package-from-local-build
       - uses: actions/upload-artifact@v4
         if: matrix.package
@@ -172,6 +184,7 @@ jobs:
   build-linuxmusl-arm64:
     permissions:
       contents: read
+    needs: lint
     name: "build-linuxmusl-arm64 [Node.js ${{ matrix.nodejs_version_major }}] ${{ matrix.package && '[package]' }}"
     runs-on: ubuntu-24.04-arm
     container:
@@ -199,12 +212,9 @@ jobs:
       - name: Dependencies
         run: apk add build-base git python3 font-noto --update-cache
       - uses: actions/checkout@v4
-      - name: Install
-        run: npm install --build-from-source
-      - name: Test
-        run: npm test
-      - name: Populate npm package
-        if: matrix.package
+      - run: npm install --build-from-source
+      - run: npm run test-unit
+      - if: matrix.package
         run: npm run package-from-local-build
       - uses: actions/upload-artifact@v4
         if: matrix.package
@@ -216,6 +226,7 @@ jobs:
   build-qemu:
     permissions:
       contents: read
+    needs: lint
     name: "build-${{ matrix.platform }} [Node.js ${{ matrix.nodejs_version_major }}] [package]"
     runs-on: ubuntu-24.04
     strategy:
@@ -267,6 +278,7 @@ jobs:
   build-emscripten:
     permissions:
       contents: read
+    needs: lint
     name: "build-wasm32 [package]"
     runs-on: ubuntu-24.04
     container: "emscripten/emsdk:4.0.14"
@@ -275,11 +287,10 @@ jobs:
       - name: Dependencies
         run: apt-get update && apt-get install -y pkg-config
       - name: Dependencies (Node.js)
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "20"
-      - name: Install
-        run: emmake npm install --build-from-source
+      - run: emmake npm install --build-from-source
       - name: Verify emscripten versions match
         run: |
           EMSCRIPTEN_VERSION_LIBVIPS=$(node -p "require('@img/sharp-libvips-dev-wasm32/versions').emscripten")
@@ -287,10 +298,8 @@ jobs:
           echo "libvips built with emscripten $EMSCRIPTEN_VERSION_LIBVIPS"
           echo "sharp built with emscripten $EMSCRIPTEN_VERSION_SHARP"
           test "$EMSCRIPTEN_VERSION_LIBVIPS" = "$EMSCRIPTEN_VERSION_SHARP"
-      - name: Test
-        run: emmake npm test
-      - name: Populate npm package
-        run: emmake npm run package-from-local-build
+      - run: emmake npm run test-unit
+      - run: emmake npm run package-from-local-build
       - uses: actions/upload-artifact@v4
         with:
           name: wasm32
@@ -314,7 +323,7 @@ jobs:
           path: npm
       - name: Create npm workspace tarball
         run: tar -vcaf npm-workspace.tar.xz --directory npm --exclude=from-local-build.js .
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: '24'
       - name: Create release notes
