@@ -24,6 +24,10 @@ except when using glibc-based Linux without jemalloc, where the default is `1` t
 
 Use [`sharp.concurrency()`](/api-utility/#concurrency) to manage the number of threads per image.
 
+The size of the shared thread pool will grow on demand and shrink when idle.
+For control over this, set the `VIPS_MAX_THREADS` environment variable
+to a value between 4 and 1024 to pre-allocate the thread pool at process start.
+
 To reduce memory fragmentation when using the default Linux glibc memory allocator, set the
 [`MALLOC_ARENA_MAX`](https://www.gnu.org/software/libc/manual/html_node/Memory-Allocation-Tunables.html)
 environment variable before the Node.js process starts to reduce the number of memory pools.
