@@ -17,8 +17,8 @@ before the Node.js process starts to increase the thread pool size.
 export UV_THREADPOOL_SIZE="$(lscpu -p | egrep -v "^#" | sort -u -t, -k 2,4 | wc -l)"
 ```
 
-libvips uses a glib-managed thread pool to avoid the overhead of spawning new threads.
-The size of the shared thread pool will grow on demand and shrink when idle.
+libvips uses a shared thread pool to avoid the overhead of spawning new threads.
+The size of this thread pool will grow on demand and shrink when idle.
 
 The default number of threads used to concurrently process each image is the same as the number of CPU cores,
 except when using glibc-based Linux without jemalloc, where the default is `1` to help reduce memory fragmentation.
