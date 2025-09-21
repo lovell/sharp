@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { afterEach, beforeEach, describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -15,7 +16,7 @@ describe('Clone', function () {
     sharp.cache(true);
   });
 
-  it('Read from Stream and write to multiple Streams', function (done) {
+  it('Read from Stream and write to multiple Streams', function (_t, done) {
     let finishEventsExpected = 2;
     // Output stream 1
     const output1 = fixtures.path('output.multi-stream.1.jpg');

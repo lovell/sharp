@@ -1,25 +1,26 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Unflatten', function () {
-  it('unflatten white background', function (done) {
+  it('unflatten white background', function (_t, done) {
     sharp(fixtures.inputPng).unflatten()
       .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('unflatten-white-transparent.png'), data, { threshold: 0 }, done);
       });
   });
-  it('unflatten transparent image', function (done) {
+  it('unflatten transparent image', function (_t, done) {
     sharp(fixtures.inputPngTrimSpecificColourIncludeAlpha).unflatten()
       .toBuffer(function (err, data) {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('unflatten-flag-white-transparent.png'), data, { threshold: 0 }, done);
       });
   });
-  it('unflatten using threshold', function (done) {
+  it('unflatten using threshold', function (_t, done) {
     sharp(fixtures.inputPngPalette).unflatten().threshold(128, { grayscale: false })
       .toBuffer(function (err, data) {
         if (err) throw err;

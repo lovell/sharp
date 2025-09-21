@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -10,7 +11,7 @@ const fixtures = require('../fixtures');
 const outputTiff = fixtures.path('output.tiff');
 
 describe('TIFF', function () {
-  it('Load TIFF from Buffer', function (done) {
+  it('Load TIFF from Buffer', function (_t, done) {
     const inputTiffBuffer = fs.readFileSync(fixtures.inputTiff);
     sharp(inputTiffBuffer)
       .resize(320, 240)
@@ -26,7 +27,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('Load multi-page TIFF from file', function (done) {
+  it('Load multi-page TIFF from file', function (_t, done) {
     sharp(fixtures.inputTiffMultipage) // defaults to page 0
       .jpeg()
       .toBuffer(function (err, defaultData, defaultInfo) {
@@ -49,7 +50,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('Load multi-page TIFF from Buffer', function (done) {
+  it('Load multi-page TIFF from Buffer', function (_t, done) {
     const inputTiffBuffer = fs.readFileSync(fixtures.inputTiffMultipage);
     sharp(inputTiffBuffer) // defaults to page 0
       .jpeg()
@@ -73,7 +74,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('Save TIFF to Buffer', function (done) {
+  it('Save TIFF to Buffer', function (_t, done) {
     sharp(fixtures.inputTiff)
       .resize(320, 240)
       .toBuffer(function (err, data, info) {
@@ -114,7 +115,7 @@ describe('TIFF', function () {
     });
   });
 
-  it('Not squashing TIFF to a bit depth of 1 should not change the file size', function (done) {
+  it('Not squashing TIFF to a bit depth of 1 should not change the file size', function (_t, done) {
     const startSize = fs.statSync(fixtures.inputTiff8BitDepth).size;
     sharp(fixtures.inputTiff8BitDepth)
       .toColourspace('b-w') // can only squash 1 band uchar images
@@ -131,7 +132,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('Squashing TIFF to a bit depth of 1 should significantly reduce file size', function (done) {
+  it('Squashing TIFF to a bit depth of 1 should significantly reduce file size', function (_t, done) {
     const startSize = fs.statSync(fixtures.inputTiff8BitDepth).size;
     sharp(fixtures.inputTiff8BitDepth)
       .toColourspace('b-w') // can only squash 1 band uchar images
@@ -219,7 +220,7 @@ describe('TIFF', function () {
     });
   });
 
-  it('TIFF lzw compression with horizontal predictor shrinks test file', function (done) {
+  it('TIFF lzw compression with horizontal predictor shrinks test file', function (_t, done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -271,7 +272,7 @@ describe('TIFF', function () {
       })
   );
 
-  it('TIFF ccittfax4 compression shrinks b-w test file', function (done) {
+  it('TIFF ccittfax4 compression shrinks b-w test file', function (_t, done) {
     const startSize = fs.statSync(fixtures.inputTiff).size;
     sharp(fixtures.inputTiff)
       .toColourspace('b-w')
@@ -311,7 +312,7 @@ describe('TIFF', function () {
     assert.strictEqual(resolutionUnit, 'cm');
   });
 
-  it('TIFF deflate compression with horizontal predictor shrinks test file', function (done) {
+  it('TIFF deflate compression with horizontal predictor shrinks test file', function (_t, done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -326,7 +327,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF deflate compression with float predictor shrinks test file', function (done) {
+  it('TIFF deflate compression with float predictor shrinks test file', function (_t, done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -341,7 +342,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF deflate compression without predictor shrinks test file', function (done) {
+  it('TIFF deflate compression without predictor shrinks test file', function (_t, done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -356,7 +357,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF jpeg compression shrinks test file', function (done) {
+  it('TIFF jpeg compression shrinks test file', function (_t, done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -430,7 +431,7 @@ describe('TIFF', function () {
     });
   });
 
-  it('TIFF tiled pyramid image without compression enlarges test file', function (done) {
+  it('TIFF tiled pyramid image without compression enlarges test file', function (_t, done) {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -520,7 +521,7 @@ describe('TIFF', function () {
     });
   });
 
-  it('TIFF file input with invalid page fails gracefully', function (done) {
+  it('TIFF file input with invalid page fails gracefully', function (_t, done) {
     sharp(fixtures.inputTiffMultipage, { page: 2 })
       .toBuffer(function (err) {
         assert.strictEqual(true, !!err);
@@ -528,7 +529,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF buffer input with invalid page fails gracefully', function (done) {
+  it('TIFF buffer input with invalid page fails gracefully', function (_t, done) {
     sharp(fs.readFileSync(fixtures.inputTiffMultipage), { page: 2 })
       .toBuffer(function (err) {
         assert.strictEqual(true, !!err);

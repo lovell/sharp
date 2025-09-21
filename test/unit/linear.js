@@ -4,6 +4,7 @@
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 describe('Linear adjustment', function () {
@@ -12,7 +13,7 @@ describe('Linear adjustment', function () {
   const a = 255 / (whitePoint - blackPoint);
   const b = -blackPoint * a;
 
-  it('applies linear levels adjustment w/o alpha ch', function (done) {
+  it('applies linear levels adjustment w/o alpha ch', function (_t, done) {
     sharp(fixtures.inputJpgWithLowContrast)
       .linear(a, b)
       .toBuffer(function (err, data) {
@@ -21,7 +22,7 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('applies slope level adjustment w/o alpha ch', function (done) {
+  it('applies slope level adjustment w/o alpha ch', function (_t, done) {
     sharp(fixtures.inputJpgWithLowContrast)
       .linear(a)
       .toBuffer(function (err, data) {
@@ -30,7 +31,7 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('applies offset level adjustment w/o alpha ch', function (done) {
+  it('applies offset level adjustment w/o alpha ch', function (_t, done) {
     sharp(fixtures.inputJpgWithLowContrast)
       .linear(null, b)
       .toBuffer(function (err, data) {
@@ -39,7 +40,7 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('applies linear levels adjustment w alpha ch', function (done) {
+  it('applies linear levels adjustment w alpha ch', function (_t, done) {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(240)
       .linear(a, b)
@@ -49,7 +50,7 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('applies linear levels adjustment to 16-bit w alpha ch', function (done) {
+  it('applies linear levels adjustment to 16-bit w alpha ch', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency16bit)
       .linear(a, b)
       .png({ compressionLevel: 0 })
@@ -59,7 +60,7 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('applies slope level adjustment w alpha ch', function (done) {
+  it('applies slope level adjustment w alpha ch', function (_t, done) {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(240)
       .linear(a)
@@ -69,7 +70,7 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('applies offset level adjustment w alpha ch', function (done) {
+  it('applies offset level adjustment w alpha ch', function (_t, done) {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(240)
       .linear(null, b)
@@ -79,7 +80,7 @@ describe('Linear adjustment', function () {
       });
   });
 
-  it('per channel level adjustment', function (done) {
+  it('per channel level adjustment', function (_t, done) {
     sharp(fixtures.inputWebP)
       .linear([0.25, 0.5, 0.75], [150, 100, 50]).toBuffer(function (err, data) {
         if (err) throw err;

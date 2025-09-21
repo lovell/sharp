@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');

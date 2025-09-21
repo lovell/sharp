@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -10,7 +11,7 @@ const fixtures = require('../fixtures');
 const maxDistance = 6;
 
 describe('Tint', function () {
-  it('tints rgb image red', function (done) {
+  it('tints rgb image red', function (_t, done) {
     const output = fixtures.path('output.tint-red.jpg');
     sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -23,7 +24,7 @@ describe('Tint', function () {
       });
   });
 
-  it('tints rgb image green', function (done) {
+  it('tints rgb image green', function (_t, done) {
     const output = fixtures.path('output.tint-green.jpg');
     sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -36,7 +37,7 @@ describe('Tint', function () {
       });
   });
 
-  it('tints rgb image blue', function (done) {
+  it('tints rgb image blue', function (_t, done) {
     const output = fixtures.path('output.tint-blue.jpg');
     sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -49,7 +50,7 @@ describe('Tint', function () {
       });
   });
 
-  it('tints rgb image with sepia tone', function (done) {
+  it('tints rgb image with sepia tone', function (_t, done) {
     const output = fixtures.path('output.tint-sepia-hex.jpg');
     sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -63,7 +64,7 @@ describe('Tint', function () {
       });
   });
 
-  it('tints rgb image with sepia tone with rgb colour', function (done) {
+  it('tints rgb image with sepia tone with rgb colour', function (_t, done) {
     const output = fixtures.path('output.tint-sepia-rgb.jpg');
     sharp(fixtures.inputJpg)
       .resize(320, 240)
@@ -77,7 +78,7 @@ describe('Tint', function () {
       });
   });
 
-  it('tints rgb image with alpha channel', function (done) {
+  it('tints rgb image with alpha channel', function (_t, done) {
     const output = fixtures.path('output.tint-alpha.png');
     sharp(fixtures.inputPngRGBWithAlpha)
       .resize(320, 240)
@@ -91,7 +92,7 @@ describe('Tint', function () {
       });
   });
 
-  it('tints cmyk image red', function (done) {
+  it('tints cmyk image red', function (_t, done) {
     const output = fixtures.path('output.tint-cmyk.jpg');
     sharp(fixtures.inputJpgWithCmykProfile)
       .resize(320, 240)

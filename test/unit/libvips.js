@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { after, before, describe, it } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 const semver = require('semver');
@@ -152,7 +153,7 @@ describe('libvips binaries', function () {
       console.error = consoleError;
     });
 
-    it('logs an info message', function (done) {
+    it('logs an info message', function (_t, done) {
       console.log = function (msg) {
         assert.strictEqual(msg, 'sharp: progress');
         done();
@@ -160,7 +161,7 @@ describe('libvips binaries', function () {
       libvips.log('progress');
     });
 
-    it('logs an error message', function (done) {
+    it('logs an error message', function (_t, done) {
       console.error = function (msg) {
         assert.strictEqual(msg, 'sharp: Installation error: problem');
         done();

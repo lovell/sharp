@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const exifReader = require('exif-reader');
 const icc = require('icc');
@@ -12,7 +13,7 @@ const fixtures = require('../fixtures');
 const create = { width: 1, height: 1, channels: 3, background: 'red' };
 
 describe('Image metadata', function () {
-  it('JPEG', function (done) {
+  it('JPEG', function (_t, done) {
     sharp(fixtures.inputJpg).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
@@ -34,7 +35,7 @@ describe('Image metadata', function () {
     });
   });
 
-  it('JPEG with EXIF/ICC', function (done) {
+  it('JPEG with EXIF/ICC', function (_t, done) {
     sharp(fixtures.inputJpgWithExif).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
@@ -67,7 +68,7 @@ describe('Image metadata', function () {
     });
   });
 
-  it('JPEG with IPTC/XMP', function (done) {
+  it('JPEG with IPTC/XMP', function (_t, done) {
     sharp(fixtures.inputJpgWithIptcAndXmp).metadata(function (err, metadata) {
       if (err) throw err;
       // IPTC
@@ -85,7 +86,7 @@ describe('Image metadata', function () {
     });
   });
 
-  it('TIFF', function (done) {
+  it('TIFF', function (_t, done) {
     sharp(fixtures.inputTiff).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('tiff', metadata.format);
@@ -112,7 +113,7 @@ describe('Image metadata', function () {
     });
   });
 
-  it('Multipage TIFF', function (done) {
+  it('Multipage TIFF', function (_t, done) {
     sharp(fixtures.inputTiffMultipage).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('tiff', metadata.format);
@@ -135,7 +136,7 @@ describe('Image metadata', function () {
     });
   });
 
-  it('PNG', function (done) {
+  it('PNG', function (_t, done) {
     sharp(fixtures.inputPng).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
@@ -159,7 +160,7 @@ describe('Image metadata', function () {
     });
   });
 
-  it('PNG with comment', function (done) {
+  it('PNG with comment', function (_t, done) {
     sharp(fixtures.inputPngTestJoinChannel).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
@@ -184,7 +185,7 @@ describe('Image metadata', function () {
     });
   });
 
-  it('Transparent PNG', function (done) {
+  it('Transparent PNG', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
@@ -256,7 +257,7 @@ describe('Image metadata', function () {
     });
   });
 
-  it('WebP', function (done) {
+  it('WebP', function (_t, done) {
     sharp(fixtures.inputWebP).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('webp', metadata.format);
@@ -348,7 +349,7 @@ describe('Image metadata', function () {
       })
   );
 
-  it('GIF', function (done) {
+  it('GIF', function (_t, done) {
     sharp(fixtures.inputGif).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('gif', metadata.format);
@@ -368,7 +369,7 @@ describe('Image metadata', function () {
       done();
     });
   });
-  it('GIF grey+alpha', function (done) {
+  it('GIF grey+alpha', function (_t, done) {
     sharp(fixtures.inputGifGreyPlusAlpha).metadata(function (err, metadata) {
       if (err) throw err;
       assert.strictEqual('gif', metadata.format);
@@ -456,7 +457,7 @@ describe('Image metadata', function () {
       })
   );
 
-  it('File in, Promise out', function (done) {
+  it('File in, Promise out', function (_t, done) {
     sharp(fixtures.inputJpg).metadata().then(function (metadata) {
       assert.strictEqual('jpeg', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -489,7 +490,7 @@ describe('Image metadata', function () {
     )
   );
 
-  it('Invalid stream in, callback out', (done) => {
+  it('Invalid stream in, callback out', (_t, done) => {
     fs.createReadStream(__filename).pipe(
       sharp().metadata((err) => {
         assert.strictEqual(err.message, 'Input buffer contains unsupported image format');
@@ -500,7 +501,7 @@ describe('Image metadata', function () {
     );
   });
 
-  it('Stream in, Promise out', function (done) {
+  it('Stream in, Promise out', function (_t, done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp();
     pipeline.metadata().then(function (metadata) {
@@ -520,7 +521,7 @@ describe('Image metadata', function () {
       assert.strictEqual('undefined', typeof metadata.exif);
       assert.strictEqual('undefined', typeof metadata.icc);
       done();
-    }).catch(done);
+    }).catch(_t, done);
     readable.pipe(pipeline);
   });
 
@@ -538,7 +539,7 @@ describe('Image metadata', function () {
       );
   });
 
-  it('Stream in, finish event fires before metadata is requested', (done) => {
+  it('Stream in, finish event fires before metadata is requested', (_t, done) => {
     const create = { width: 1, height: 1, channels: 3, background: 'red' };
     const image1 = sharp({ create }).png().pipe(sharp());
     const image2 = sharp({ create }).png().pipe(sharp());
@@ -551,7 +552,7 @@ describe('Image metadata', function () {
     }, 500);
   });
 
-  it('Stream', function (done) {
+  it('Stream', function (_t, done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp().metadata(function (err, metadata) {
       if (err) throw err;
@@ -575,7 +576,7 @@ describe('Image metadata', function () {
     readable.pipe(pipeline);
   });
 
-  it('Resize to half width using metadata', function (done) {
+  it('Resize to half width using metadata', function (_t, done) {
     const image = sharp(fixtures.inputJpg);
     image.metadata(function (err, metadata) {
       if (err) throw err;
@@ -604,7 +605,7 @@ describe('Image metadata', function () {
     });
   });
 
-  it('Keep EXIF metadata and add sRGB profile after a resize', function (done) {
+  it('Keep EXIF metadata and add sRGB profile after a resize', function (_t, done) {
     sharp(fixtures.inputJpgWithExif)
       .resize(320, 240)
       .withMetadata()
@@ -724,7 +725,7 @@ describe('Image metadata', function () {
     assert.strictEqual(undefined, metadata.icc);
   });
 
-  it('Apply CMYK output ICC profile', function (done) {
+  it('Apply CMYK output ICC profile', function (_t, done) {
     const output = fixtures.path('output.icc-cmyk.jpg');
     sharp(fixtures.inputJpg)
       .resize(64)
@@ -749,7 +750,7 @@ describe('Image metadata', function () {
       });
   });
 
-  it('Apply custom output ICC profile', function (done) {
+  it('Apply custom output ICC profile', function (_t, done) {
     const output = fixtures.path('output.hilutite.jpg');
     sharp(fixtures.inputJpg)
       .resize(64)
@@ -789,7 +790,7 @@ describe('Image metadata', function () {
       )
   );
 
-  it('Remove EXIF metadata after a resize', function (done) {
+  it('Remove EXIF metadata after a resize', function (_t, done) {
     sharp(fixtures.inputJpgWithExif)
       .resize(320, 240)
       .toBuffer(function (err, buffer) {
@@ -805,7 +806,7 @@ describe('Image metadata', function () {
       });
   });
 
-  it('Remove metadata from PNG output', function (done) {
+  it('Remove metadata from PNG output', function (_t, done) {
     sharp(fixtures.inputJpgWithExif)
       .png()
       .toBuffer(function (err, buffer) {
@@ -992,7 +993,7 @@ describe('Image metadata', function () {
     assert.strictEqual(description, 'sP3C');
   });
 
-  it('File input with corrupt header fails gracefully', function (done) {
+  it('File input with corrupt header fails gracefully', function (_t, done) {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .metadata(function (err) {
         assert.strictEqual(true, !!err);
@@ -1001,7 +1002,7 @@ describe('Image metadata', function () {
       });
   });
 
-  it('Buffer input with corrupt header fails gracefully', function (done) {
+  it('Buffer input with corrupt header fails gracefully', function (_t, done) {
     sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
       .metadata(function (err) {
         assert.strictEqual(true, !!err);
@@ -1010,7 +1011,7 @@ describe('Image metadata', function () {
       });
   });
 
-  it('Unsupported lossless JPEG passes underlying error message', function (done) {
+  it('Unsupported lossless JPEG passes underlying error message', function (_t, done) {
     sharp(fixtures.inputJpgLossless)
       .metadata(function (err) {
         assert.strictEqual(true, !!err);

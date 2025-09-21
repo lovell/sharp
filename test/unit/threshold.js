@@ -1,13 +1,14 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Threshold', function () {
-  it('threshold 1 jpeg', function (done) {
+  it('threshold 1 jpeg', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(1)
@@ -20,7 +21,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('threshold 40 jpeg', function (done) {
+  it('threshold 40 jpeg', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(40)
@@ -33,7 +34,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('threshold 128', function (done) {
+  it('threshold 128', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(128)
@@ -46,7 +47,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('threshold true (=128)', function (done) {
+  it('threshold true (=128)', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(true)
@@ -59,7 +60,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('threshold false (=0)', function (done) {
+  it('threshold false (=0)', function (_t, done) {
     sharp(fixtures.inputJpg)
       .threshold(false)
       .toBuffer(function (err, data) {
@@ -68,7 +69,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('threshold grayscale: true (=128)', function (done) {
+  it('threshold grayscale: true (=128)', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(128, { grayscale: true })
@@ -81,7 +82,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('threshold default jpeg', function (done) {
+  it('threshold default jpeg', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold()
@@ -94,7 +95,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('threshold default png transparency', function (done) {
+  it('threshold default png transparency', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency)
       .resize(320, 240)
       .threshold()
@@ -107,7 +108,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('threshold default png alpha', function (done) {
+  it('threshold default png alpha', function (_t, done) {
     sharp(fixtures.inputPngWithGreyAlpha)
       .resize(320, 240)
       .threshold()
@@ -120,7 +121,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('threshold default webp transparency', function (done) {
+  it('threshold default webp transparency', function (_t, done) {
     sharp(fixtures.inputWebPWithTransparency)
       .threshold()
       .toBuffer(function (err, data, info) {
@@ -130,7 +131,7 @@ describe('Threshold', function () {
       });
   });
 
-  it('color threshold', function (done) {
+  it('color threshold', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(128, { grayscale: false })

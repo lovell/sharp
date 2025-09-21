@@ -1,13 +1,14 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Image channel extraction', function () {
-  it('Red channel', function (done) {
+  it('Red channel', function (_t, done) {
     sharp(fixtures.inputJpg)
       .extractChannel('red')
       .resize(320, 240)
@@ -19,7 +20,7 @@ describe('Image channel extraction', function () {
       });
   });
 
-  it('Green channel', function (done) {
+  it('Green channel', function (_t, done) {
     sharp(fixtures.inputJpg)
       .extractChannel('green')
       .resize(320, 240)
@@ -31,7 +32,7 @@ describe('Image channel extraction', function () {
       });
   });
 
-  it('Blue channel', function (done) {
+  it('Blue channel', function (_t, done) {
     sharp(fixtures.inputJpg)
       .extractChannel('blue')
       .resize(320, 240)
@@ -43,7 +44,7 @@ describe('Image channel extraction', function () {
       });
   });
 
-  it('Blue channel by number', function (done) {
+  it('Blue channel by number', function (_t, done) {
     sharp(fixtures.inputJpg)
       .extractChannel(2)
       .resize(320, 240)
@@ -64,7 +65,7 @@ describe('Image channel extraction', function () {
     assert.strictEqual(chroma, 104);
   });
 
-  it('Alpha from 16-bit PNG', function (done) {
+  it('Alpha from 16-bit PNG', function (_t, done) {
     const output = fixtures.path('output.extract-alpha-16bit.png');
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(16)
@@ -76,7 +77,7 @@ describe('Image channel extraction', function () {
       });
   });
 
-  it('Alpha from 2-channel input', function (done) {
+  it('Alpha from 2-channel input', function (_t, done) {
     const output = fixtures.path('output.extract-alpha-2-channel.png');
     sharp(fixtures.inputPngWithGreyAlpha)
       .extractChannel('alpha')

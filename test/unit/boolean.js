@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const fixtures = require('../fixtures');
@@ -16,7 +17,7 @@ describe('Boolean operation between two images', function () {
     sharp.bool.eor
   ]
     .forEach(function (op) {
-      it(`${op} operation, file`, function (done) {
+      it(`${op} operation, file`, function (_t, done) {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .boolean(fixtures.inputJpgBooleanTest, op)
@@ -28,7 +29,7 @@ describe('Boolean operation between two images', function () {
           });
       });
 
-      it(`${op} operation, buffer`, function (done) {
+      it(`${op} operation, buffer`, function (_t, done) {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .boolean(inputJpgBooleanTestBuffer, op)
@@ -40,7 +41,7 @@ describe('Boolean operation between two images', function () {
           });
       });
 
-      it(`${op} operation, raw`, function (done) {
+      it(`${op} operation, raw`, function (_t, done) {
         sharp(fixtures.inputJpgBooleanTest)
           .raw()
           .toBuffer(function (err, data, info) {

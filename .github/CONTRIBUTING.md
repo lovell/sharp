@@ -6,8 +6,6 @@ Hello, thank you for your interest in helping!
 
 Please create a [new issue](https://github.com/lovell/sharp/issues/new) containing the steps to reproduce the problem.
 
-If you're having installation problems, please include the output of running `npm install --verbose sharp`.
-
 New bugs are assigned a `triage` label whilst under investigation.
 
 ## Submit a new feature request
@@ -32,7 +30,6 @@ To test C++ changes, you can compile the module using `npm install --build-from-
 ## Submit a Pull Request with a new feature
 
 Please add JavaScript [unit tests](https://github.com/lovell/sharp/tree/main/test/unit) to cover your new feature.
-A test coverage report for the JavaScript code is generated in the `coverage/lcov-report` directory.
 Please also update the [TypeScript definitions](https://github.com/lovell/sharp/tree/main/lib/index.d.ts), along with the [type definition tests](https://github.com/lovell/sharp/tree/main/test/types/sharp.test-d.ts).
 
 Where possible, the functional tests use gradient-based perceptual hashes

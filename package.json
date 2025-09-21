@@ -99,9 +99,9 @@
     "lint-cpp": "cpplint",
     "lint-js": "biome lint",
     "lint-licensing": "license-checker --production --summary --onlyAllow=\"Apache-2.0;BSD;ISC;LGPL-3.0-or-later;MIT\"",
-    "lint-types": "tsd",
+    "lint-types": "tsd --files ./test/types/sharp.test-d.ts",
     "test-leak": "./test/leak/leak.sh",
-    "test-unit": "nyc --reporter=lcov --reporter=text --check-coverage --branches=100 mocha",
+    "test-unit": "node --experimental-test-coverage test/unit.mjs",
     "package-from-local-build": "node npm/from-local-build.js",
     "package-release-notes": "node npm/release-notes.js",
     "docs-build": "node docs/build.mjs",
@@ -183,10 +183,8 @@
     "icc": "^3.0.0",
     "jsdoc-to-markdown": "^9.1.2",
     "license-checker": "^25.0.1",
-    "mocha": "^11.7.2",
     "node-addon-api": "^8.5.0",
     "node-gyp": "^11.4.2",
-    "nyc": "^17.1.0",
     "tar-fs": "^3.1.1",
     "tsd": "^0.33.0"
   },
@@ -205,13 +203,5 @@
     "filter": [
       "build/include"
     ]
-  },
-  "nyc": {
-    "include": [
-      "lib"
-    ]
-  },
-  "tsd": {
-    "directory": "test/types/"
   }
 }

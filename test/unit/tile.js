@@ -3,6 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const extractZip = require('extract-zip');
@@ -329,7 +330,7 @@ describe('Tile', function () {
   });
 
   if (sharp.format.dz.output.file) {
-    it('Deep Zoom layout', function (done) {
+    it('Deep Zoom layout', function (_t, done) {
       const directory = fixtures.path('output.dzi_files');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -345,7 +346,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Deep Zoom layout with custom size+overlap', function (done) {
+    it('Deep Zoom layout with custom size+overlap', function (_t, done) {
       const directory = fixtures.path('output.512.dzi_files');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -367,7 +368,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Deep Zoom layout with custom size+angle', function (done) {
+    it('Deep Zoom layout with custom size+angle', function (_t, done) {
       const directory = fixtures.path('output.512_90.dzi_files');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -401,7 +402,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Deep Zoom layout with depth of one', function (done) {
+    it('Deep Zoom layout with depth of one', function (_t, done) {
       const directory = fixtures.path('output.512_depth_one.dzi_files');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -417,7 +418,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Deep Zoom layout with depth of onepixel', function (done) {
+    it('Deep Zoom layout with depth of onepixel', function (_t, done) {
       const directory = fixtures.path('output.512_depth_onepixel.dzi_files');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -433,7 +434,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Deep Zoom layout with depth of onetile', function (done) {
+    it('Deep Zoom layout with depth of onetile', function (_t, done) {
       const directory = fixtures.path('output.256_depth_onetile.dzi_files');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -449,7 +450,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Deep Zoom layout with skipBlanks', function (done) {
+    it('Deep Zoom layout with skipBlanks', function (_t, done) {
       const directory = fixtures.path('output.256_skip_blanks.dzi_files');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpgOverlayLayer2)
@@ -468,7 +469,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Zoomify layout', function (done) {
+    it('Zoomify layout', function (_t, done) {
       const directory = fixtures.path('output.zoomify.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -492,7 +493,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Zoomify layout with depth one', function (done) {
+    it('Zoomify layout with depth one', function (_t, done) {
       const directory = fixtures.path('output.zoomify.depth_one.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -513,7 +514,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Zoomify layout with depth onetile', function (done) {
+    it('Zoomify layout with depth onetile', function (_t, done) {
       const directory = fixtures.path('output.zoomify.depth_onetile.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -534,7 +535,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Zoomify layout with depth onepixel', function (done) {
+    it('Zoomify layout with depth onepixel', function (_t, done) {
       const directory = fixtures.path('output.zoomify.depth_onepixel.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -555,7 +556,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Zoomify layout with skip blanks', function (done) {
+    it('Zoomify layout with skip blanks', function (_t, done) {
       const directory = fixtures.path('output.zoomify.skipBlanks.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpgOverlayLayer2)
@@ -579,7 +580,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout', function (done) {
+    it('Google layout', function (_t, done) {
       const directory = fixtures.path('output.google.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -603,7 +604,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout with jpeg format', function (done) {
+    it('Google layout with jpeg format', function (_t, done) {
       const directory = fixtures.path('output.jpg.google.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -640,7 +641,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout with png format', function (done) {
+    it('Google layout with png format', function (_t, done) {
       const directory = fixtures.path('output.png.google.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -677,7 +678,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout with webp format', function (done) {
+    it('Google layout with webp format', function (_t, done) {
       const directory = fixtures.path('output.webp.google.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -715,7 +716,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout with depth one', function (done) {
+    it('Google layout with depth one', function (_t, done) {
       const directory = fixtures.path('output.google_depth_one.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -736,7 +737,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout with depth onetile', function (done) {
+    it('Google layout with depth onetile', function (_t, done) {
       const directory = fixtures.path('output.google_depth_onetile.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -757,7 +758,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout with default skip Blanks', function (done) {
+    it('Google layout with default skip Blanks', function (_t, done) {
       const directory = fixtures.path('output.google_depth_skipBlanks.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputPng)
@@ -781,7 +782,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout with center image in tile', function (done) {
+    it('Google layout with center image in tile', function (_t, done) {
       const directory = fixtures.path('output.google_center.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -801,7 +802,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Google layout with center image in tile centre', function (done) {
+    it('Google layout with center image in tile centre', function (_t, done) {
       const directory = fixtures.path('output.google_center.dzi');
       fs.rm(directory, { recursive: true }, function () {
         sharp(fixtures.inputJpg)
@@ -821,7 +822,7 @@ describe('Tile', function () {
       });
     });
 
-    it('IIIFv2 layout', function (done) {
+    it('IIIFv2 layout', function (_t, done) {
       const name = 'output.iiif.info';
       const directory = fixtures.path(name);
       fs.rm(directory, { recursive: true }, function () {
@@ -851,7 +852,7 @@ describe('Tile', function () {
       });
     });
 
-    it('IIIFv3 layout', function (done) {
+    it('IIIFv3 layout', function (_t, done) {
       const name = 'output.iiif3.info';
       const directory = fixtures.path(name);
       fs.rm(directory, { recursive: true }, function () {
@@ -882,7 +883,7 @@ describe('Tile', function () {
       });
     });
 
-    it('Write to ZIP container using file extension', function (done) {
+    it('Write to ZIP container using file extension', function (_t, done) {
       const container = fixtures.path('output.dz.container.zip');
       const extractTo = fixtures.path('output.dz.container');
       const directory = path.join(extractTo, 'output.dz.container_files');
@@ -903,13 +904,13 @@ describe('Tile', function () {
                 .then(() => {
                   assertDeepZoomTiles(directory, 256, 13, done);
                 })
-                .catch(done);
+                .catch(_t, done);
             });
           });
       });
     });
 
-    it('Write to ZIP container using container tile option', function (done) {
+    it('Write to ZIP container using container tile option', function (_t, done) {
       const container = fixtures.path('output.dz.containeropt.zip');
       const extractTo = fixtures.path('output.dz.containeropt');
       const directory = path.join(extractTo, 'output.dz.containeropt_files');
@@ -934,13 +935,13 @@ describe('Tile', function () {
                 .then(() => {
                   assertDeepZoomTiles(directory, 256, 13, done);
                 })
-                .catch(done);
+                .catch(_t, done);
             });
           });
       });
     });
 
-    it('Write ZIP container to Buffer', function (done) {
+    it('Write ZIP container to Buffer', function (_t, done) {
       const container = fixtures.path('output.dz.tiles.zip');
       const extractTo = fixtures.path('output.dz.tiles');
       const directory = path.join(extractTo, 'output.dz.tiles_files');
@@ -963,7 +964,7 @@ describe('Tile', function () {
                 .then(() => {
                   assertDeepZoomTiles(directory, 256, 13, done);
                 })
-                .catch(done);
+                .catch(_t, done);
             });
           });
       });

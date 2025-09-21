@@ -18,5 +18,5 @@ for test in $TESTS; do
     --show-leak-kinds=definite,indirect \
     --num-callers=20 \
     --trace-children=yes \
-    node --expose-gc --zero-fill-buffers node_modules/.bin/mocha --no-config --slow=60000 --timeout=120000 --require test/beforeEach.js "test/unit/$test";
+    node --zero-fill-buffers --test "test/unit/$test";
 done

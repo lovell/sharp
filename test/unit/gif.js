@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -196,7 +197,7 @@ describe('GIF input', () => {
     );
   });
 
-  it('should work with streams when only animated is set', function (done) {
+  it('should work with streams when only animated is set', function (_t, done) {
     fs.createReadStream(fixtures.inputGifAnimated)
       .pipe(sharp({ animated: true }))
       .gif()
@@ -208,7 +209,7 @@ describe('GIF input', () => {
       });
   });
 
-  it('should work with streams when only pages is set', function (done) {
+  it('should work with streams when only pages is set', function (_t, done) {
     fs.createReadStream(fixtures.inputGifAnimated)
       .pipe(sharp({ pages: -1 }))
       .gif()

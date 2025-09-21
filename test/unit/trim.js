@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -8,7 +9,7 @@ const inRange = require('../../lib/is').inRange;
 const fixtures = require('../fixtures');
 
 describe('Trim borders', function () {
-  it('Skip shrink-on-load', function (done) {
+  it('Skip shrink-on-load', function (_t, done) {
     const expected = fixtures.expected('alpha-layer-2-trim-resize.jpg');
     sharp(fixtures.inputJpgOverlayLayer2)
       .trim()
@@ -41,7 +42,7 @@ describe('Trim borders', function () {
       })
   );
 
-  it('16-bit PNG with alpha channel', function (done) {
+  it('16-bit PNG with alpha channel', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 32)
       .trim({
@@ -60,7 +61,7 @@ describe('Trim borders', function () {
       });
   });
 
-  it('Attempt to trim 2x2 pixel image fails', function (done) {
+  it('Attempt to trim 2x2 pixel image fails', function (_t, done) {
     sharp({
       create: {
         width: 2,
@@ -78,7 +79,7 @@ describe('Trim borders', function () {
         assert.strictEqual('Image to trim must be at least 3x3 pixels', err.message);
         done();
       })
-      .catch(done);
+      .catch(_t, done);
   });
 
   it('Should rotate before trim', () =>

@@ -1,13 +1,14 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Resize dimensions', function () {
-  it('Exact crop', function (done) {
+  it('Exact crop', function (_t, done) {
     sharp(fixtures.inputJpg).resize(320, 240).toBuffer(function (err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
@@ -18,7 +19,7 @@ describe('Resize dimensions', function () {
     });
   });
 
-  it('Fixed width', function (done) {
+  it('Fixed width', function (_t, done) {
     sharp(fixtures.inputJpg).resize(320).toBuffer(function (err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
@@ -29,7 +30,7 @@ describe('Resize dimensions', function () {
     });
   });
 
-  it('Fixed height', function (done) {
+  it('Fixed height', function (_t, done) {
     sharp(fixtures.inputJpg).resize(null, 320).toBuffer(function (err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
@@ -40,7 +41,7 @@ describe('Resize dimensions', function () {
     });
   });
 
-  it('Identity transform', function (done) {
+  it('Identity transform', function (_t, done) {
     sharp(fixtures.inputJpg).toBuffer(function (err, data, info) {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
@@ -51,7 +52,7 @@ describe('Resize dimensions', function () {
     });
   });
 
-  it('Upscale', function (done) {
+  it('Upscale', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(3000)
       .toBuffer(function (err, data, info) {
@@ -100,7 +101,7 @@ describe('Resize dimensions', function () {
     }, /Expected positive integer for height but received 1.5 of type number/);
   });
 
-  it('Invalid width - too large', function (done) {
+  it('Invalid width - too large', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(0x4000, 1)
       .webp()
@@ -111,7 +112,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Invalid height - too large', function (done) {
+  it('Invalid height - too large', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(1, 0x4000)
       .webp()
@@ -122,7 +123,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Webp resize then extract large image', function (done) {
+  it('Webp resize then extract large image', function (_t, done) {
     sharp(fixtures.inputWebP)
       .resize(0x4000, 0x4000)
       .extract({ top: 0x2000, left: 0x2000, width: 256, height: 256 })
@@ -136,7 +137,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('WebP shrink-on-load rounds to zero, ensure recalculation is correct', function (done) {
+  it('WebP shrink-on-load rounds to zero, ensure recalculation is correct', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(1080, 607)
       .webp()
@@ -157,7 +158,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('JPEG shrink-on-load with 90 degree rotation, ensure recalculation is correct', function (done) {
+  it('JPEG shrink-on-load with 90 degree rotation, ensure recalculation is correct', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(1920, 1280)
       .toBuffer(function (err, data, info) {
@@ -176,7 +177,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('TIFF embed known to cause rounding errors', function (done) {
+  it('TIFF embed known to cause rounding errors', function (_t, done) {
     sharp(fixtures.inputTiff)
       .resize(240, 320, { fit: sharp.fit.contain })
       .jpeg()
@@ -190,7 +191,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('TIFF known to cause rounding errors', function (done) {
+  it('TIFF known to cause rounding errors', function (_t, done) {
     sharp(fixtures.inputTiff)
       .resize(240, 320)
       .jpeg()
@@ -204,7 +205,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=inside, portrait', function (done) {
+  it('fit=inside, portrait', function (_t, done) {
     sharp(fixtures.inputTiff)
       .resize(320, 320, { fit: sharp.fit.inside })
       .jpeg()
@@ -218,7 +219,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=outside, portrait', function (done) {
+  it('fit=outside, portrait', function (_t, done) {
     sharp(fixtures.inputTiff)
       .resize(320, 320, { fit: sharp.fit.outside })
       .jpeg()
@@ -232,7 +233,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=inside, landscape', function (done) {
+  it('fit=inside, landscape', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: sharp.fit.inside })
       .toBuffer(function (err, data, info) {
@@ -245,7 +246,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=outside, landscape', function (done) {
+  it('fit=outside, landscape', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: sharp.fit.outside })
       .toBuffer(function (err, data, info) {
@@ -258,7 +259,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=inside, provide only one dimension', function (done) {
+  it('fit=inside, provide only one dimension', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         width: 320,
@@ -274,7 +275,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=outside, provide only one dimension', function (done) {
+  it('fit=outside, provide only one dimension', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         width: 320,
@@ -290,7 +291,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do not enlarge when input width is already less than output width', function (done) {
+  it('Do not enlarge when input width is already less than output width', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         width: 2800,
@@ -306,7 +307,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do not enlarge when input height is already less than output height', function (done) {
+  it('Do not enlarge when input height is already less than output height', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         height: 2300,
@@ -322,7 +323,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do crop when fit = cover and withoutEnlargement = true and width >= outputWidth, and height < outputHeight', function (done) {
+  it('Do crop when fit = cover and withoutEnlargement = true and width >= outputWidth, and height < outputHeight', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         width: 3000,
@@ -339,7 +340,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do crop when fit = cover and withoutEnlargement = true and width < outputWidth, and height >= outputHeight', function (done) {
+  it('Do crop when fit = cover and withoutEnlargement = true and width < outputWidth, and height >= outputHeight', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         width: 1500,
@@ -356,7 +357,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do enlarge when input width is less than output width', function (done) {
+  it('Do enlarge when input width is less than output width', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         width: 2800,
@@ -372,7 +373,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do enlarge when input width is less than output width', function (done) {
+  it('Do enlarge when input width is less than output width', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         width: 2800,
@@ -388,7 +389,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do enlarge when input height is less than output height', function (done) {
+  it('Do enlarge when input height is less than output height', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         height: 2300,
@@ -404,7 +405,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do enlarge when input width is less than output width', function (done) {
+  it('Do enlarge when input width is less than output width', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         width: 2800,
@@ -420,7 +421,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do not resize when both withoutEnlargement and withoutReduction are true', function (done) {
+  it('Do not resize when both withoutEnlargement and withoutReduction are true', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: 'fill', withoutEnlargement: true, withoutReduction: true })
       .toBuffer(function (err, data, info) {
@@ -433,7 +434,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do not reduce size when fit = outside and withoutReduction are true and height > outputHeight and width > outputWidth', function (done) {
+  it('Do not reduce size when fit = outside and withoutReduction are true and height > outputHeight and width > outputWidth', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: 'outside', withoutReduction: true })
       .toBuffer(function (err, data, info) {
@@ -446,7 +447,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Do resize when fit = outside and withoutReduction are true and input height > height and input width > width ', function (done) {
+  it('Do resize when fit = outside and withoutReduction are true and input height > height and input width > width ', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(3000, 3000, { fit: 'outside', withoutReduction: true })
       .toBuffer(function (err, data, info) {
@@ -459,7 +460,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=fill, downscale width and height', function (done) {
+  it('fit=fill, downscale width and height', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: 'fill' })
       .toBuffer(function (err, data, info) {
@@ -472,7 +473,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=fill, downscale width', function (done) {
+  it('fit=fill, downscale width', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         width: 320,
@@ -488,7 +489,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=fill, downscale height', function (done) {
+  it('fit=fill, downscale height', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize({
         height: 320,
@@ -504,7 +505,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=fill, upscale width and height', function (done) {
+  it('fit=fill, upscale width and height', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(3000, 3000, { fit: 'fill' })
       .toBuffer(function (err, data, info) {
@@ -517,7 +518,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=fill, upscale width', function (done) {
+  it('fit=fill, upscale width', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(3000, null, { fit: 'fill' })
       .toBuffer(function (err, data, info) {
@@ -530,7 +531,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=fill, upscale height', function (done) {
+  it('fit=fill, upscale height', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(null, 3000, { fit: 'fill' })
       .toBuffer(function (err, data, info) {
@@ -543,7 +544,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=fill, downscale width, upscale height', function (done) {
+  it('fit=fill, downscale width, upscale height', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 3000, { fit: 'fill' })
       .toBuffer(function (err, data, info) {
@@ -556,7 +557,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=fill, upscale width, downscale height', function (done) {
+  it('fit=fill, upscale width, downscale height', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(3000, 320, { fit: 'fill' })
       .toBuffer(function (err, data, info) {
@@ -569,7 +570,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('fit=fill, identity transform', function (done) {
+  it('fit=fill, identity transform', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(null, null, { fit: 'fill' })
       .toBuffer(function (err, data, info) {
@@ -582,7 +583,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Dimensions that result in differing even shrinks on each axis', function (done) {
+  it('Dimensions that result in differing even shrinks on each axis', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(645, 399)
       .toBuffer(function (err, data, info) {
@@ -600,7 +601,7 @@ describe('Resize dimensions', function () {
       });
   });
 
-  it('Dimensions that result in differing odd shrinks on each axis', function (done) {
+  it('Dimensions that result in differing odd shrinks on each axis', function (_t, done) {
     return sharp(fixtures.inputJpg)
       .resize(600, 399)
       .toBuffer(function (err, data, info) {
@@ -622,7 +623,7 @@ describe('Resize dimensions', function () {
     true,
     false
   ].forEach(function (value) {
-    it(`fastShrinkOnLoad: ${value} does not causes image shifts`, function (done) {
+    it(`fastShrinkOnLoad: ${value} does not causes image shifts`, function (_t, done) {
       sharp(fixtures.inputJpgCenteredImage)
         .resize(9, 8, { fastShrinkOnLoad: value })
         .png()
@@ -642,7 +643,7 @@ describe('Resize dimensions', function () {
     sharp.kernel.lanczos2,
     sharp.kernel.lanczos3
   ].forEach(function (kernel) {
-    it(`kernel ${kernel}`, function (done) {
+    it(`kernel ${kernel}`, function (_t, done) {
       sharp(fixtures.inputJpg)
         .resize(320, null, { kernel })
         .toBuffer(function (err, data, info) {
@@ -654,7 +655,7 @@ describe('Resize dimensions', function () {
     });
   });
 
-  it('nearest upsampling with integral factor', function (done) {
+  it('nearest upsampling with integral factor', function (_t, done) {
     sharp(fixtures.inputTiff8BitDepth)
       .resize(210, 210, { kernel: 'nearest' })
       .png()

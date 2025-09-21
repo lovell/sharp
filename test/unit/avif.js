@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -172,9 +173,10 @@ describe('AVIF', () => {
     )
   );
 
-  it('Invalid bitdepth value throws error', async () => {
-    assert.rejects(
+  it('Invalid bitdepth value throws error', () =>
+    assert.throws(
       () => sharp().avif({ bitdepth: 11 }),
-      /Error: Expected 8, 10 or 12 for bitdepth but received 11 of type number/);
-  });
+      /Expected 8, 10 or 12 for bitdepth but received 11 of type number/
+    )
+  );
 });

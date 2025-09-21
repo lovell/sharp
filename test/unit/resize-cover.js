@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -200,7 +201,7 @@ describe('Resize fit=cover', function () {
       fixture: 'gravity-west.jpg'
     }
   ].forEach(function (settings) {
-    it(settings.name, function (done) {
+    it(settings.name, function (_t, done) {
       sharp(fixtures.inputJpg)
         .resize(settings.width, settings.height, {
           fit: sharp.fit.cover,
@@ -215,7 +216,7 @@ describe('Resize fit=cover', function () {
     });
   });
 
-  it('Allows specifying the gravity as a string', function (done) {
+  it('Allows specifying the gravity as a string', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(80, 320, {
         fit: sharp.fit.cover,
@@ -271,7 +272,7 @@ describe('Resize fit=cover', function () {
   });
 
   describe('Animated WebP', function () {
-    it('Width only', function (done) {
+    it('Width only', function (_t, done) {
       sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(80, 320, { fit: sharp.fit.cover })
         .toBuffer(function (err, data, info) {
@@ -282,7 +283,7 @@ describe('Resize fit=cover', function () {
         });
     });
 
-    it('Height only', function (done) {
+    it('Height only', function (_t, done) {
       sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(320, 80, { fit: sharp.fit.cover })
         .toBuffer(function (err, data, info) {
@@ -295,7 +296,7 @@ describe('Resize fit=cover', function () {
   });
 
   describe('Entropy-based strategy', function () {
-    it('JPEG', function (done) {
+    it('JPEG', function (_t, done) {
       sharp(fixtures.inputJpg)
         .resize(80, 320, {
           fit: 'cover',
@@ -313,7 +314,7 @@ describe('Resize fit=cover', function () {
         });
     });
 
-    it('PNG', function (done) {
+    it('PNG', function (_t, done) {
       sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80, {
           fit: 'cover',
@@ -331,7 +332,7 @@ describe('Resize fit=cover', function () {
         });
     });
 
-    it('supports the strategy passed as a string', function (done) {
+    it('supports the strategy passed as a string', function (_t, done) {
       sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80, {
           fit: 'cover',
@@ -363,7 +364,7 @@ describe('Resize fit=cover', function () {
   });
 
   describe('Attention strategy', function () {
-    it('JPEG', function (done) {
+    it('JPEG', function (_t, done) {
       sharp(fixtures.inputJpg)
         .resize(80, 320, {
           fit: 'cover',
@@ -383,7 +384,7 @@ describe('Resize fit=cover', function () {
         });
     });
 
-    it('PNG', function (done) {
+    it('PNG', function (_t, done) {
       sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80, {
           fit: 'cover',
@@ -403,7 +404,7 @@ describe('Resize fit=cover', function () {
         });
     });
 
-    it('WebP', function (done) {
+    it('WebP', function (_t, done) {
       sharp(fixtures.inputWebP)
         .resize(320, 80, {
           fit: 'cover',
@@ -423,7 +424,7 @@ describe('Resize fit=cover', function () {
         });
     });
 
-    it('supports the strategy passed as a string', function (done) {
+    it('supports the strategy passed as a string', function (_t, done) {
       sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80, {
           fit: 'cover',

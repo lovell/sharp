@@ -1,13 +1,14 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Gamma correction', function () {
-  it('value of 0.0 (disabled)', function (done) {
+  it('value of 0.0 (disabled)', function (_t, done) {
     sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .toBuffer(function (err, data, info) {
@@ -19,7 +20,7 @@ describe('Gamma correction', function () {
       });
   });
 
-  it('value of 2.2 (default)', function (done) {
+  it('value of 2.2 (default)', function (_t, done) {
     sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .gamma()
@@ -32,7 +33,7 @@ describe('Gamma correction', function () {
       });
   });
 
-  it('value of 3.0', function (done) {
+  it('value of 3.0', function (_t, done) {
     sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .gamma(3)
@@ -45,7 +46,7 @@ describe('Gamma correction', function () {
       });
   });
 
-  it('input value of 2.2, output value of 3.0', function (done) {
+  it('input value of 2.2, output value of 3.0', function (_t, done) {
     sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .gamma(2.2, 3.0)
@@ -58,7 +59,7 @@ describe('Gamma correction', function () {
       });
   });
 
-  it('alpha transparency', function (done) {
+  it('alpha transparency', function (_t, done) {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(320)
       .gamma()

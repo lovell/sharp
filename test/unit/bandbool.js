@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fixtures = require('../fixtures');
 const sharp = require('../../');
@@ -12,7 +13,7 @@ describe('Bandbool per-channel boolean operations', function () {
     sharp.bool.eor
   ]
     .forEach(function (op) {
-      it(`${op} operation`, function (done) {
+      it(`${op} operation`, function (_t, done) {
         sharp(fixtures.inputPngBooleanNoAlpha)
           .bandbool(op)
           .toColourspace('b-w')
@@ -26,7 +27,7 @@ describe('Bandbool per-channel boolean operations', function () {
       });
     });
 
-  it('sRGB image retains 3 channels', function (done) {
+  it('sRGB image retains 3 channels', function (_t, done) {
     sharp(fixtures.inputJpg)
       .bandbool('and')
       .toBuffer(function (err, _data, info) {

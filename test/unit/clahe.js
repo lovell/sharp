@@ -1,13 +1,14 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../lib');
 const fixtures = require('../fixtures');
 
 describe('Clahe', function () {
-  it('width 5 width 5 maxSlope 0', function (done) {
+  it('width 5 width 5 maxSlope 0', function (_t, done) {
     sharp(fixtures.inputJpgClahe)
       .clahe({ width: 5, height: 5, maxSlope: 0 })
       .toBuffer(function (err, data, info) {
@@ -17,7 +18,7 @@ describe('Clahe', function () {
       });
   });
 
-  it('width 5 width 5 maxSlope 5', function (done) {
+  it('width 5 width 5 maxSlope 5', function (_t, done) {
     sharp(fixtures.inputJpgClahe)
       .clahe({ width: 5, height: 5, maxSlope: 5 })
       .toBuffer(function (err, data, info) {
@@ -27,7 +28,7 @@ describe('Clahe', function () {
       });
   });
 
-  it('width 11 width 25 maxSlope 14', function (done) {
+  it('width 11 width 25 maxSlope 14', function (_t, done) {
     sharp(fixtures.inputJpgClahe)
       .clahe({ width: 11, height: 25, maxSlope: 14 })
       .toBuffer(function (err, data, info) {
@@ -37,7 +38,7 @@ describe('Clahe', function () {
       });
   });
 
-  it('width 50 width 50 maxSlope 0', function (done) {
+  it('width 50 width 50 maxSlope 0', function (_t, done) {
     sharp(fixtures.inputJpgClahe)
       .clahe({ width: 50, height: 50, maxSlope: 0 })
       .toBuffer(function (err, data, info) {
@@ -47,7 +48,7 @@ describe('Clahe', function () {
       });
   });
 
-  it('width 50 width 50 maxSlope 14', function (done) {
+  it('width 50 width 50 maxSlope 14', function (_t, done) {
     sharp(fixtures.inputJpgClahe)
       .clahe({ width: 50, height: 50, maxSlope: 14 })
       .toBuffer(function (err, data, info) {
@@ -57,7 +58,7 @@ describe('Clahe', function () {
       });
   });
 
-  it('width 100 width 50 maxSlope 3', function (done) {
+  it('width 100 width 50 maxSlope 3', function (_t, done) {
     sharp(fixtures.inputJpgClahe)
       .clahe({ width: 100, height: 50, maxSlope: 3 })
       .toBuffer(function (err, data, info) {
@@ -67,7 +68,7 @@ describe('Clahe', function () {
       });
   });
 
-  it('width 100 width 100 maxSlope 0', function (done) {
+  it('width 100 width 100 maxSlope 0', function (_t, done) {
     sharp(fixtures.inputJpgClahe)
       .clahe({ width: 100, height: 100, maxSlope: 0 })
       .toBuffer(function (err, data, info) {
@@ -128,7 +129,7 @@ describe('Clahe', function () {
     });
   });
 
-  it('uses default maxSlope of 3', function (done) {
+  it('uses default maxSlope of 3', function (_t, done) {
     sharp(fixtures.inputJpgClahe)
       .clahe({ width: 100, height: 50 })
       .toBuffer(function (err, data, info) {

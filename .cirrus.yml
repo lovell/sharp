@@ -14,4 +14,4 @@ task:
   install_script:
     - npm install --build-from-source
   test_script:
-    - npx mocha --no-config --spec=test/unit/io.js --timeout=30000
+    - node --test test/unit/io.js

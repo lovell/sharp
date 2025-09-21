@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 
@@ -8,7 +9,7 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Image channel insertion', function () {
-  it('Grayscale to RGB, buffer', function (done) {
+  it('Grayscale to RGB, buffer', function (_t, done) {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
       .joinChannel(fixtures.inputPngTestJoinChannel) // new green channel
@@ -22,7 +23,7 @@ describe('Image channel insertion', function () {
       });
   });
 
-  it('Grayscale to RGB, file', function (done) {
+  it('Grayscale to RGB, file', function (_t, done) {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
       .joinChannel(fs.readFileSync(fixtures.inputPngTestJoinChannel)) // new green channel
@@ -36,7 +37,7 @@ describe('Image channel insertion', function () {
       });
   });
 
-  it('Grayscale to RGBA, buffer', function (done) {
+  it('Grayscale to RGBA, buffer', function (_t, done) {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
       .joinChannel([
@@ -54,7 +55,7 @@ describe('Image channel insertion', function () {
       });
   });
 
-  it('Grayscale to RGBA, file', function (done) {
+  it('Grayscale to RGBA, file', function (_t, done) {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
       .joinChannel([
@@ -72,7 +73,7 @@ describe('Image channel insertion', function () {
       });
   });
 
-  it('Grayscale to CMYK, buffers', function (done) {
+  it('Grayscale to CMYK, buffers', function (_t, done) {
     sharp(fixtures.inputPng) // gray -> magenta
       .resize(320, 240)
       .joinChannel([
@@ -91,7 +92,7 @@ describe('Image channel insertion', function () {
       });
   });
 
-  it('Join raw buffers to RGB', function (done) {
+  it('Join raw buffers to RGB', function (_t, done) {
     Promise.all([
       sharp(fixtures.inputPngTestJoinChannel).toColourspace('b-w').raw().toBuffer(),
       sharp(fixtures.inputPngStripesH).toColourspace('b-w').raw().toBuffer()
@@ -119,7 +120,7 @@ describe('Image channel insertion', function () {
       });
   });
 
-  it('Grayscale to RGBA, files, two arrays', function (done) {
+  it('Grayscale to RGBA, files, two arrays', function (_t, done) {
     sharp(fixtures.inputPng) // gray -> red
       .resize(320, 240)
       .joinChannel([fs.readFileSync(fixtures.inputPngTestJoinChannel)]) // new green channel

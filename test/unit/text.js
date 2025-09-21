@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -8,9 +9,7 @@ const fixtures = require('../fixtures');
 const { inRange } = require('../../lib/is');
 
 describe('Text to image', function () {
-  this.retries(3);
-
-  it('text with default values', async function () {
+  it('text with default values', async function (t) {
     const output = fixtures.path('output.text-default.png');
     const text = sharp({
       text: {
@@ -18,7 +17,7 @@ describe('Text to image', function () {
       }
     });
     if (!sharp.versions.pango) {
-      return this.skip();
+      return t.skip();
     }
     const info = await text.png().toFile(output);
     assert.strictEqual('png', info.format);
@@ -40,7 +39,7 @@ describe('Text to image', function () {
     assert.ok(info.textAutofitDpi > 0);
   });
 
-  it('text with width and height', function (done) {
+  it('text with width and height', function (t, done) {
     const output = fixtures.path('output.text-width-height.png');
     const text = sharp({
       text: {
@@ -50,7 +49,7 @@ describe('Text to image', function () {
       }
     });
     if (!sharp.versions.pango) {
-      return this.skip();
+      return t.skip();
     }
     text.toFile(output, function (err, info) {
       if (err) throw err;
@@ -63,7 +62,7 @@ describe('Text to image', function () {
     });
   });
 
-  it('text with dpi', function (done) {
+  it('text with dpi', function (t, done) {
     const output = fixtures.path('output.text-dpi.png');
     const dpi = 300;
     const text = sharp({
@@ -73,7 +72,7 @@ describe('Text to image', function () {
       }
     });
     if (!sharp.versions.pango) {
-      return this.skip();
+      return t.skip();
     }
     text.toFile(output, function (err, info) {
       if (err) throw err;
@@ -86,7 +85,7 @@ describe('Text to image', function () {
     });
   });
 
-  it('text with color and pango markup', function (done) {
+  it('text with color and pango markup', function (t, done) {
     const output = fixtures.path('output.text-color-pango.png');
     const dpi = 300;
     const text = sharp({
@@ -97,7 +96,7 @@ describe('Text to image', function () {
       }
     });
     if (!sharp.versions.pango) {
-      return this.skip();
+      return t.skip();
     }
     text.toFile(output, function (err, info) {
       if (err) throw err;
@@ -113,7 +112,7 @@ describe('Text to image', function () {
     });
   });
 
-  it('text with font', function (done) {
+  it('text with font', function (t, done) {
     const output = fixtures.path('output.text-with-font.png');
     const text = sharp({
       text: {
@@ -122,7 +121,7 @@ describe('Text to image', function () {
       }
     });
     if (!sharp.versions.pango) {
-      return this.skip();
+      return t.skip();
     }
     text.toFile(output, function (err, info) {
       if (err) throw err;
@@ -134,7 +133,7 @@ describe('Text to image', function () {
     });
   });
 
-  it('text with justify and composite', function (done) {
+  it('text with justify and composite', function (t, done) {
     const output = fixtures.path('output.text-composite.png');
     const width = 500;
     const dpi = 300;
@@ -166,7 +165,7 @@ describe('Text to image', function () {
         top: 250
       }]);
     if (!sharp.versions.pango) {
-      return this.skip();
+      return t.skip();
     }
     text.toFile(output, function (err, info) {
       if (err) throw err;

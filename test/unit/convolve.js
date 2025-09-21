@@ -1,13 +1,14 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Convolve', function () {
-  it('specific convolution kernel 1', function (done) {
+  it('specific convolution kernel 1', function (_t, done) {
     sharp(fixtures.inputPngStripesV)
       .convolve({
         width: 3,
@@ -29,7 +30,7 @@ describe('Convolve', function () {
       });
   });
 
-  it('specific convolution kernel 2', function (done) {
+  it('specific convolution kernel 2', function (_t, done) {
     sharp(fixtures.inputPngStripesH)
       .convolve({
         width: 3,
@@ -49,7 +50,7 @@ describe('Convolve', function () {
       });
   });
 
-  it('horizontal Sobel operator', function (done) {
+  it('horizontal Sobel operator', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .convolve({

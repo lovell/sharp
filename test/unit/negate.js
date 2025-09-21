@@ -1,13 +1,14 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Negate', function () {
-  it('negate (jpeg)', function (done) {
+  it('negate (jpeg)', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .negate()
@@ -20,7 +21,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate (png)', function (done) {
+  it('negate (png)', function (_t, done) {
     sharp(fixtures.inputPng)
       .resize(320, 240)
       .negate()
@@ -33,7 +34,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate (png, trans)', function (done) {
+  it('negate (png, trans)', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency)
       .resize(320, 240)
       .negate()
@@ -46,7 +47,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate (png, alpha)', function (done) {
+  it('negate (png, alpha)', function (_t, done) {
     sharp(fixtures.inputPngWithGreyAlpha)
       .resize(320, 240)
       .negate()
@@ -59,7 +60,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate (webp)', function (done) {
+  it('negate (webp)', function (_t, done) {
     sharp(fixtures.inputWebP)
       .resize(320, 240)
       .negate()
@@ -72,7 +73,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate (webp, trans)', function (done) {
+  it('negate (webp, trans)', function (_t, done) {
     sharp(fixtures.inputWebPWithTransparency)
       .resize(320, 240)
       .negate()
@@ -85,7 +86,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate (true)', function (done) {
+  it('negate (true)', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .negate(true)
@@ -98,7 +99,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate (false)', function (done) {
+  it('negate (false)', function (_t, done) {
     const output = fixtures.path('output.unmodified-by-negate.png');
     sharp(fixtures.inputJpgWithLowContrast)
       .negate(false)
@@ -109,7 +110,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate ({alpha: true})', function (done) {
+  it('negate ({alpha: true})', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .negate({ alpha: true })
@@ -122,7 +123,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate non-alpha channels (png)', function (done) {
+  it('negate non-alpha channels (png)', function (_t, done) {
     sharp(fixtures.inputPng)
       .resize(320, 240)
       .negate({ alpha: false })
@@ -135,7 +136,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate non-alpha channels (png, trans)', function (done) {
+  it('negate non-alpha channels (png, trans)', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency)
       .resize(320, 240)
       .negate({ alpha: false })
@@ -148,7 +149,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate non-alpha channels (png, alpha)', function (done) {
+  it('negate non-alpha channels (png, alpha)', function (_t, done) {
     sharp(fixtures.inputPngWithGreyAlpha)
       .resize(320, 240)
       .negate({ alpha: false })
@@ -161,7 +162,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate non-alpha channels (webp)', function (done) {
+  it('negate non-alpha channels (webp)', function (_t, done) {
     sharp(fixtures.inputWebP)
       .resize(320, 240)
       .negate({ alpha: false })
@@ -174,7 +175,7 @@ describe('Negate', function () {
       });
   });
 
-  it('negate non-alpha channels (webp, trans)', function (done) {
+  it('negate non-alpha channels (webp, trans)', function (_t, done) {
     sharp(fixtures.inputWebPWithTransparency)
       .resize(320, 240)
       .negate({ alpha: false })

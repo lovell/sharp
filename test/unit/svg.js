@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('SVG input', function () {
-  it('Convert SVG to PNG at default 72DPI', function (done) {
+  it('Convert SVG to PNG at default 72DPI', function (_t, done) {
     sharp(fixtures.inputSvg)
       .resize(1024)
       .extract({ left: 290, top: 760, width: 40, height: 40 })
@@ -29,7 +30,7 @@ describe('SVG input', function () {
       });
   });
 
-  it('Convert SVG to PNG at 1200DPI', function (done) {
+  it('Convert SVG to PNG at 1200DPI', function (_t, done) {
     sharp(fixtures.inputSvg, { density: 1200 })
       .resize(1024)
       .extract({ left: 290, top: 760, width: 40, height: 40 })
@@ -50,7 +51,7 @@ describe('SVG input', function () {
       });
   });
 
-  it('Convert SVG to PNG at DPI larger than 2400', function (done) {
+  it('Convert SVG to PNG at DPI larger than 2400', function (_t, done) {
     const size = 1024;
     sharp(fixtures.inputSvgSmallViewBox).metadata(function (err, metadata) {
       if (err) throw err;
@@ -75,7 +76,7 @@ describe('SVG input', function () {
     });
   });
 
-  it('Convert SVG to PNG utilizing scale-on-load', function (done) {
+  it('Convert SVG to PNG utilizing scale-on-load', function (_t, done) {
     const size = 1024;
     sharp(fixtures.inputSvgSmallViewBox)
       .resize(size)
@@ -96,7 +97,7 @@ describe('SVG input', function () {
       });
   });
 
-  it('Convert SVG to PNG at 14.4DPI', function (done) {
+  it('Convert SVG to PNG at 14.4DPI', function (_t, done) {
     sharp(fixtures.inputSvg, { density: 14.4 })
       .toFormat('png')
       .toBuffer(function (err, data, info) {
@@ -111,7 +112,7 @@ describe('SVG input', function () {
       });
   });
 
-  it('Convert SVG with embedded images to PNG, respecting dimensions, autoconvert to PNG', function (done) {
+  it('Convert SVG with embedded images to PNG, respecting dimensions, autoconvert to PNG', function (_t, done) {
     sharp(fixtures.inputSvgWithEmbeddedImages)
       .toBuffer(function (err, data, info) {
         if (err) throw err;

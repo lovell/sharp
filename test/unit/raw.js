@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -82,7 +83,7 @@ describe('Raw pixel data', function () {
       );
     });
 
-    it('RGB', function (done) {
+    it('RGB', function (_t, done) {
       // Convert to raw pixel data
       sharp(fixtures.inputJpg)
         .resize(256)
@@ -111,7 +112,7 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('RGBA', function (done) {
+    it('RGBA', function (_t, done) {
       // Convert to raw pixel data
       sharp(fixtures.inputPngOverlayLayer1)
         .resize(256)
@@ -140,7 +141,7 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('RGBA premultiplied', function (done) {
+    it('RGBA premultiplied', function (_t, done) {
       // Convert to raw pixel data
       sharp(fixtures.inputPngSolidAlpha)
         .resize(256)
@@ -186,7 +187,7 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('JPEG to raw Stream and back again', function (done) {
+    it('JPEG to raw Stream and back again', function (_t, done) {
       const width = 32;
       const height = 24;
       const writable = sharp({
@@ -213,7 +214,7 @@ describe('Raw pixel data', function () {
   });
 
   describe('Output raw, uncompressed image data', function () {
-    it('1 channel greyscale image', function (done) {
+    it('1 channel greyscale image', function (_t, done) {
       sharp(fixtures.inputJpg)
         .greyscale()
         .resize(32, 24)
@@ -230,7 +231,7 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('3 channel colour image without transparency', function (done) {
+    it('3 channel colour image without transparency', function (_t, done) {
       sharp(fixtures.inputJpg)
         .resize(32, 24)
         .toFormat('raw')
@@ -245,7 +246,7 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('4 channel colour image with transparency', function (done) {
+    it('4 channel colour image with transparency', function (_t, done) {
       sharp(fixtures.inputPngWithTransparency)
         .resize(32, 24)
         .toFormat(sharp.format.raw)

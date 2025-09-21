@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -20,7 +21,7 @@ describe('PNG', function () {
     });
   });
 
-  it('default compressionLevel generates smaller file than compressionLevel=0', function (done) {
+  it('default compressionLevel generates smaller file than compressionLevel=0', function (_t, done) {
     // First generate with default compressionLevel
     sharp(fixtures.inputPng)
       .resize(320, 240)
@@ -43,7 +44,7 @@ describe('PNG', function () {
       });
   });
 
-  it('without adaptiveFiltering generates smaller file', function (done) {
+  it('without adaptiveFiltering generates smaller file', function (_t, done) {
     // First generate with adaptive filtering
     sharp(fixtures.inputPng)
       .resize(320, 240)
@@ -78,7 +79,7 @@ describe('PNG', function () {
     });
   });
 
-  it('Progressive PNG image', function (done) {
+  it('Progressive PNG image', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .png({ progressive: false })

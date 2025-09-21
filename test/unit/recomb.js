@@ -1,6 +1,7 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -13,7 +14,7 @@ const sepia = [
 ];
 
 describe('Recomb', function () {
-  it('applies a sepia filter using recomb', function (done) {
+  it('applies a sepia filter using recomb', function (_t, done) {
     const output = fixtures.path('output.recomb-sepia.jpg');
     sharp(fixtures.inputJpgWithLandscapeExif1)
       .recomb(sepia)
@@ -31,7 +32,7 @@ describe('Recomb', function () {
       });
   });
 
-  it('applies a sepia filter using recomb to an PNG with Alpha', function (done) {
+  it('applies a sepia filter using recomb to an PNG with Alpha', function (_t, done) {
     const output = fixtures.path('output.recomb-sepia.png');
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .recomb(sepia)
@@ -63,7 +64,7 @@ describe('Recomb', function () {
     assert.strictEqual(3, info.channels);
   });
 
-  it('applies a different sepia filter using recomb', function (done) {
+  it('applies a different sepia filter using recomb', function (_t, done) {
     const output = fixtures.path('output.recomb-sepia2.jpg');
     sharp(fixtures.inputJpgWithLandscapeExif1)
       .recomb([
@@ -84,7 +85,7 @@ describe('Recomb', function () {
         done();
       });
   });
-  it('increases the saturation of the image', function (done) {
+  it('increases the saturation of the image', function (_t, done) {
     const saturationLevel = 1;
     const output = fixtures.path('output.recomb-saturation.jpg');
     sharp(fixtures.inputJpgWithLandscapeExif1)
@@ -119,7 +120,7 @@ describe('Recomb', function () {
       });
   });
 
-  it('applies opacity 30% to the image', function (done) {
+  it('applies opacity 30% to the image', function (_t, done) {
     const output = fixtures.path('output.recomb-opacity.png');
     sharp(fixtures.inputPngWithTransparent)
       .recomb([

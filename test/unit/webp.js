@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('WebP', function () {
-  it('WebP output', function (done) {
+  it('WebP output', function (_t, done) {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .toFormat(sharp.format.webp)
@@ -34,7 +35,7 @@ describe('WebP', function () {
     });
   });
 
-  it('should work for webp alpha quality', function (done) {
+  it('should work for webp alpha quality', function (_t, done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .webp({ alphaQuality: 80, effort: 0 })
       .toBuffer(function (err, data, info) {
@@ -45,7 +46,7 @@ describe('WebP', function () {
       });
   });
 
-  it('should work for webp lossless', function (done) {
+  it('should work for webp lossless', function (_t, done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .webp({ lossless: true, effort: 0 })
       .toBuffer(function (err, data, info) {
@@ -56,7 +57,7 @@ describe('WebP', function () {
       });
   });
 
-  it('should work for webp near-lossless', function (done) {
+  it('should work for webp near-lossless', function (_t, done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .webp({ nearLossless: true, quality: 50, effort: 0 })
       .toBuffer(function (err50, data50, info50) {
@@ -67,7 +68,7 @@ describe('WebP', function () {
       });
   });
 
-  it('should use near-lossless when both lossless and nearLossless are specified', function (done) {
+  it('should use near-lossless when both lossless and nearLossless are specified', function (_t, done) {
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .webp({ nearLossless: true, quality: 50, lossless: true, effort: 0 })
       .toBuffer(function (err50, data50, info50) {
@@ -269,7 +270,7 @@ describe('WebP', function () {
     assert.deepStrictEqual(updated.delay, [120, 120, 90, 120, 120, 90, 120, 90, 30]);
   });
 
-  it('should work with streams when only animated is set', function (done) {
+  it('should work with streams when only animated is set', function (_t, done) {
     fs.createReadStream(fixtures.inputWebPAnimated)
       .pipe(sharp({ animated: true }))
       .webp({ lossless: true, effort: 0 })
@@ -281,7 +282,7 @@ describe('WebP', function () {
       });
   });
 
-  it('should work with streams when only pages is set', function (done) {
+  it('should work with streams when only pages is set', function (_t, done) {
     fs.createReadStream(fixtures.inputWebPAnimated)
       .pipe(sharp({ pages: -1 }))
       .webp({ lossless: true, effort: 0 })

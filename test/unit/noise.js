@@ -1,13 +1,14 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Gaussian noise', function () {
-  it('generate single-channel gaussian noise', function (done) {
+  it('generate single-channel gaussian noise', function (_t, done) {
     const output = fixtures.path('output.noise-1-channel.png');
     const noise = sharp({
       create: {
@@ -36,7 +37,7 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('generate 3-channels gaussian noise', function (done) {
+  it('generate 3-channels gaussian noise', function (_t, done) {
     const output = fixtures.path('output.noise-3-channels.png');
     const noise = sharp({
       create: {
@@ -65,7 +66,7 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('overlay 3-channels gaussian noise over image', function (done) {
+  it('overlay 3-channels gaussian noise over image', function (_t, done) {
     const output = fixtures.path('output.noise-image.jpg');
     const noise = sharp({
       create: {
@@ -110,7 +111,7 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('overlay strong single-channel (sRGB) gaussian noise with 25% transparency over transparent png image', function (done) {
+  it('overlay strong single-channel (sRGB) gaussian noise with 25% transparency over transparent png image', function (_t, done) {
     const output = fixtures.path('output.noise-image-transparent.png');
     const width = 320;
     const height = 240;

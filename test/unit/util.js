@@ -1,13 +1,14 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const semver = require('semver');
 const sharp = require('../../');
 
 describe('Utilities', function () {
   describe('Cache', function () {
-    it('Can be disabled', function (done) {
+    it('Can be disabled', function (_t, done) {
       const check = setInterval(() => {
         const cache = sharp.cache(false);
         const empty =
@@ -75,7 +76,7 @@ describe('Utilities', function () {
   });
 
   describe('Counters', function () {
-    it('Have zero value at rest', (done) => {
+    it('Have zero value at rest', (_t, done) => {
       queueMicrotask(() => {
         const counters = sharp.counters();
         assert.strictEqual(0, counters.queue);

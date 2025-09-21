@@ -1,10 +1,11 @@
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Erode', function () {
-  it('erode 1 png', function (done) {
+  it('erode 1 png', function (_t, done) {
     sharp(fixtures.inputPngDotAndLines)
       .erode(1)
       .toBuffer(function (err, data, info) {
@@ -16,7 +17,7 @@ describe('Erode', function () {
       });
   });
 
-  it('erode 1 png - default width', function (done) {
+  it('erode 1 png - default width', function (_t, done) {
     sharp(fixtures.inputPngDotAndLines)
       .erode()
       .toBuffer(function (err, data, info) {

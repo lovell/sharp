@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require('node:fs');
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
@@ -20,7 +21,7 @@ function isInteger (val) {
 }
 
 describe('Image Stats', function () {
-  it('JPEG', function (done) {
+  it('JPEG', function (_t, done) {
     sharp(fixtures.inputJpg).stats(function (err, stats) {
       if (err) throw err;
 
@@ -85,7 +86,7 @@ describe('Image Stats', function () {
     });
   });
 
-  it('PNG without transparency', function (done) {
+  it('PNG without transparency', function (_t, done) {
     sharp(fixtures.inputPng).stats(function (err, stats) {
       if (err) throw err;
 
@@ -117,7 +118,7 @@ describe('Image Stats', function () {
     });
   });
 
-  it('PNG with transparency', function (done) {
+  it('PNG with transparency', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency).stats(function (err, stats) {
       if (err) throw err;
 
@@ -198,7 +199,7 @@ describe('Image Stats', function () {
     });
   });
 
-  it('PNG fully transparent', function (done) {
+  it('PNG fully transparent', function (_t, done) {
     sharp(fixtures.inputPngCompleteTransparency).stats(function (err, stats) {
       if (err) throw err;
 
@@ -231,7 +232,7 @@ describe('Image Stats', function () {
     });
   });
 
-  it('Tiff', function (done) {
+  it('Tiff', function (_t, done) {
     sharp(fixtures.inputTiff).stats(function (err, stats) {
       if (err) throw err;
 
@@ -264,7 +265,7 @@ describe('Image Stats', function () {
     });
   });
 
-  it('WebP', function (done) {
+  it('WebP', function (_t, done) {
     sharp(fixtures.inputWebP).stats(function (err, stats) {
       if (err) throw err;
 
@@ -329,7 +330,7 @@ describe('Image Stats', function () {
     });
   });
 
-  it('GIF', function (done) {
+  it('GIF', function (_t, done) {
     sharp(fixtures.inputGif).stats(function (err, stats) {
       if (err) throw err;
 
@@ -394,7 +395,7 @@ describe('Image Stats', function () {
     });
   });
 
-  it('Grayscale GIF with alpha', function (done) {
+  it('Grayscale GIF with alpha', function (_t, done) {
     sharp(fixtures.inputGifGreyPlusAlpha).stats(function (err, stats) {
       if (err) throw err;
 
@@ -476,7 +477,7 @@ describe('Image Stats', function () {
     assert.strictEqual(sharpness, 0);
   });
 
-  it('Stream in, Callback out', function (done) {
+  it('Stream in, Callback out', function (_t, done) {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp().stats(function (err, stats) {
       if (err) throw err;
@@ -685,7 +686,7 @@ describe('Image Stats', function () {
       });
   });
 
-  it('File input with corrupt header fails gracefully', function (done) {
+  it('File input with corrupt header fails gracefully', function (_t, done) {
     sharp(fixtures.inputJpgWithCorruptHeader)
       .stats(function (err) {
         assert(err.message.includes('Input file has corrupt header'));
@@ -695,7 +696,7 @@ describe('Image Stats', function () {
       });
   });
 
-  it('Stream input with corrupt header fails gracefully', function (done) {
+  it('Stream input with corrupt header fails gracefully', function (_t, done) {
     fs.createReadStream(fixtures.inputJpgWithCorruptHeader).pipe(
       sharp()
         .stats(function (err) {
@@ -729,7 +730,7 @@ describe('Image Stats', function () {
       });
   });
 
-  it('Buffer input with corrupt header fails gracefully', function (done) {
+  it('Buffer input with corrupt header fails gracefully', function (_t, done) {
     sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
       .stats(function (err) {
         assert.strictEqual(true, !!err);
@@ -737,7 +738,7 @@ describe('Image Stats', function () {
       });
   });
 
-  it('Non-existent file in, Promise out', function (done) {
+  it('Non-existent file in, Promise out', function (_t, done) {
     sharp('fail').stats().then(function () {
       throw new Error('Non-existent file');
     }, function (err) {

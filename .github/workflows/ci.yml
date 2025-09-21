@@ -267,7 +267,7 @@ jobs:
             curl --silent https://${{ matrix.nodejs_hostname }}/download/release/v${{ matrix.nodejs_version}}/node-v${{ matrix.nodejs_version}}-linux-${{ matrix.nodejs_arch }}.tar.xz | tar xJC /opt/nodejs --strip-components=1
             export PATH=$PATH:/opt/nodejs/bin
             npm install --build-from-source
-            npx mocha --no-config --spec=test/unit/io.js --timeout=30000
+            node --test test/unit/io.js
             npm run package-from-local-build
       - uses: actions/upload-artifact@v4
         with:

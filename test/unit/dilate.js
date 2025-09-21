@@ -1,10 +1,11 @@
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('Dilate', function () {
-  it('dilate 1 png', function (done) {
+  it('dilate 1 png', function (_t, done) {
     sharp(fixtures.inputPngDotAndLines)
       .dilate(1)
       .toBuffer(function (err, data, info) {
@@ -16,7 +17,7 @@ describe('Dilate', function () {
       });
   });
 
-  it('dilate 1 png - default width', function (done) {
+  it('dilate 1 png - default width', function (_t, done) {
     sharp(fixtures.inputPngDotAndLines)
       .dilate()
       .toBuffer(function (err, data, info) {

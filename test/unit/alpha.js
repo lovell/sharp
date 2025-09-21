@@ -1,12 +1,13 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fixtures = require('../fixtures');
 const sharp = require('../../');
 
 describe('Alpha transparency', function () {
-  it('Flatten to black', function (done) {
+  it('Flatten to black', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency)
       .flatten()
       .resize(400, 300)
@@ -18,7 +19,7 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Flatten to RGB orange', function (done) {
+  it('Flatten to RGB orange', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency)
       .resize(400, 300)
       .flatten({
@@ -33,7 +34,7 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Flatten to CSS/hex orange', function (done) {
+  it('Flatten to CSS/hex orange', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency)
       .resize(400, 300)
       .flatten({ background: '#ff6600' })
@@ -46,7 +47,7 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Flatten 16-bit PNG with transparency to orange', function (done) {
+  it('Flatten 16-bit PNG with transparency to orange', function (_t, done) {
     const output = fixtures.path('output.flatten-rgb16-orange.jpg');
     sharp(fixtures.inputPngWithTransparency16bit)
       .flatten({
@@ -62,7 +63,7 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Do not flatten', function (done) {
+  it('Do not flatten', function (_t, done) {
     sharp(fixtures.inputPngWithTransparency)
       .flatten(false)
       .toBuffer(function (err, _data, info) {
@@ -73,7 +74,7 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Ignored for JPEG', function (done) {
+  it('Ignored for JPEG', function (_t, done) {
     sharp(fixtures.inputJpg)
       .flatten({ background: '#ff0000' })
       .toBuffer(function (err, _data, info) {
