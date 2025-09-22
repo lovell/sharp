@@ -6,8 +6,8 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include <napi.h>
 #include <vips/vips8>

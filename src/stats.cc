@@ -1,15 +1,16 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <numeric>
-#include <vector>
 #include <iostream>
+#include <numeric>
+#include <string>
+#include <vector>
 
 #include <napi.h>
 #include <vips/vips8>
 
-#include "common.h"
-#include "stats.h"
+#include "./common.h"
+#include "./stats.h"
 
 class StatsWorker : public Napi::AsyncWorker {
  public:

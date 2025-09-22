@@ -1,16 +1,16 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <mutex>  // NOLINT(build/c++11)
+#include <mutex>
 
 #include <napi.h>
 #include <vips/vips8>
 
-#include "common.h"
-#include "metadata.h"
-#include "pipeline.h"
-#include "utilities.h"
-#include "stats.h"
+#include "./common.h"
+#include "./metadata.h"
+#include "./pipeline.h"
+#include "./stats.h"
+#include "./utilities.h"
 
 Napi::Object init(Napi::Env env, Napi::Object exports) {
   static std::once_flag sharp_vips_init_once;

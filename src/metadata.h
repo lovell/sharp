@@ -5,6 +5,7 @@
 #define SRC_METADATA_H_
 
 #include <string>
+#include <vector>
 #include <napi.h>
 
 #include "./common.h"

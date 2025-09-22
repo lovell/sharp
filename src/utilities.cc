@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <cmath>
-#include <string>
 #include <cstdio>
+#include <string>
 
 #include <napi.h>
 #include <vips/vips8>
 #include <vips/vector.h>
 
-#include "common.h"
-#include "operations.h"
-#include "utilities.h"
+#include "./common.h"
+#include "./operations.h"
+#include "./utilities.h"
 
 /*
   Get and set cache limits

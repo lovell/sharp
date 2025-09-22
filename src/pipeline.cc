@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <filesystem>
+#include <filesystem>  // NOLINT(build/c++17)
 #include <map>
 #include <memory>
 #include <numeric>
@@ -17,9 +17,9 @@
 #include <vips/vips8>
 #include <napi.h>
 
-#include "common.h"
-#include "operations.h"
-#include "pipeline.h"
+#include "./common.h"
+#include "./operations.h"
+#include "./pipeline.h"
 
 class PipelineWorker : public Napi::AsyncWorker {
  public:

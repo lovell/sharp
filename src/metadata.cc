@@ -1,15 +1,17 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <numeric>
-#include <vector>
 #include <cmath>
+#include <numeric>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <napi.h>
 #include <vips/vips8>
 
-#include "common.h"
-#include "metadata.h"
+#include "./common.h"
+#include "./metadata.h"
 
 static void* readPNGComment(VipsImage *image, const char *field, GValue *value, void *p);
 

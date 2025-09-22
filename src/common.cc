@@ -1,18 +1,20 @@
 // Copyright 2013 Lovell Fuller and others.
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
 #include <cstdlib>
-#include <string>
-#include <string.h>
-#include <vector>
-#include <queue>
 #include <map>
-#include <mutex>  // NOLINT(build/c++11)
+#include <mutex>
+#include <queue>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 #include <napi.h>
 #include <vips/vips8>
 
-#include "common.h"
+#include "./common.h"
 
 using vips::VImage;
 

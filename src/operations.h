@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 #include <tuple>
+#include <vector>
 #include <vips/vips8>
 
 using vips::VImage;

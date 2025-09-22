@@ -8,8 +8,8 @@
 #include <vector>
 #include <vips/vips8>
 
-#include "common.h"
-#include "operations.h"
+#include "./common.h"
+#include "./operations.h"
 
 using vips::VImage;
 using vips::VError;

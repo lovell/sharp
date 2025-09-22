@@ -4,10 +4,11 @@
 #ifndef SRC_COMMON_H_
 #define SRC_COMMON_H_
 
+#include <atomic>
 #include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
-#include <atomic>
 
 #include <napi.h>
 #include <vips/vips8>
@@ -30,7 +31,7 @@ using vips::VImage;
 
 namespace sharp {
 
-  struct InputDescriptor {  // NOLINT(runtime/indentation_namespace)
+  struct InputDescriptor {
     std::string name;
     std::string file;
     bool autoOrient;
