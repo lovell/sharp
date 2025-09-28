@@ -401,6 +401,46 @@ describe('TIFF', function () {
     });
   });
 
+  it('TIFF not using bigtiff does not support larger than 4GB file', function (_t, done) {
+    assert.throws(function () {
+      sharp(fixtures.inputTiffUncompressed)
+        .tiff({
+          compression: 'none',
+          bigtiff: false,
+        })
+        .toFile(outputTiff, (err, info) => {
+          if (err) throw err;
+          fs.rm(outputTiff, done);
+        });
+    });
+  });
+
+  it('TIFF using bigtiff does support larger than 4GB file', function (_t, done) {
+    assert.doesNotThrow(function () {
+      sharp(fixtures.inputTiffUncompressed)
+        .tiff({
+          compression: 'none',
+          bigtiff: true,
+        })
+        .toFile(outputTiff, (err, info) => {
+          if (err) throw err;
+          fs.rm(outputTiff, done);
+        });
+    });
+  });
+
+  it('TIFF bigtiff true value does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ bigtiff: true });
+    });
+  });
+
+  it('Invalid TIFF bigtiff value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ bigtiff: 'true' });
+    });
+  });
+
   it('TIFF invalid predictor option throws', function () {
     assert.throws(function () {
       sharp().tiff({ predictor: 'a' });
