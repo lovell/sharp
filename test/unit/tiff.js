@@ -401,43 +401,6 @@ describe('TIFF', function () {
     });
   });
 
-  // TODO: Add inputTiffHuge that compresses to more than 4 GB to fixtures and increase test timeout to 480000 s
-  // it('TIFF > 4GB can be saved when bigtiff is false (default)', function (_t, done) {
-  //   sharp(fixtures.inputTiffHuge, {
-  //     limitInputPixels: false,
-  //   })
-  //     .tiff({ 
-  //       compression: 'deflate', // none defaults to BigTIFF
-  //       bigtiff: false 
-  //     })
-  //     .toFile(outputTiff, (err, _info) => {
-  //       if (err) {
-  //         assert.ok(err);
-  //         fs.rm(outputTiff, () => done());
-  //       } else {
-  //         fs.rm(outputTiff, () => done(new Error('Expected an error but the large TIFF was created successfully')));
-  //       }
-  //     });
-  // });
-  
-  // it('TIFF > 4GB can be saved when bigtiff is true', function (_t, done) {
-  //   sharp(fixtures.inputTiffHuge, {
-  //     limitInputPixels: false,
-  //   })
-  //     .tiff({ 
-  //       compression: 'deflate', // none defaults to BigTIFF
-  //       bigtiff: true 
-  //     })
-  //     .toFile(outputTiff, (err, info) => {
-  //       if (err) {
-  //         fs.rm(outputTiff, () => done(err));
-  //       } else {
-  //         assert.ok(info.size > 4_294_967_296);
-  //         fs.rm(outputTiff, () => done());
-  //       }
-  //     });
-  // });
-
   it('TIFF bigtiff true value does not throw error', function () {
     assert.doesNotThrow(function () {
       sharp().tiff({ bigtiff: true });

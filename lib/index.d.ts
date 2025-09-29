@@ -1460,7 +1460,7 @@ declare namespace sharp {
         quality?: number | undefined;
         /** Compression options: none, jpeg, deflate, packbits, ccittfax4, lzw, webp, zstd, jp2k (optional, default 'jpeg') */
         compression?: string | undefined;
-        /** Use BigTIFF variant (optional, default false) */
+        /** Use BigTIFF variant (has no effect when compression is none) (optional, default false) */
         bigtiff?: boolean | undefined;
         /** Compression predictor options: none, horizontal, float (optional, default 'horizontal') */
         predictor?: string | undefined;
