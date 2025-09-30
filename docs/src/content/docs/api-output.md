@@ -646,6 +646,7 @@ instead of providing `xres` and `yres` in pixels/mm.
 | [options.quality] | <code>number</code> | <code>80</code> | quality, integer 1-100 |
 | [options.force] | <code>boolean</code> | <code>true</code> | force TIFF output, otherwise attempt to use input format |
 | [options.compression] | <code>string</code> | <code>&quot;&#x27;jpeg&#x27;&quot;</code> | compression options: none, jpeg, deflate, packbits, ccittfax4, lzw, webp, zstd, jp2k |
+| [options.bigtiff] | <code>boolean</code> | <code>false</code> | use BigTIFF variant (has no effect when compression is none) |
 | [options.predictor] | <code>string</code> | <code>&quot;&#x27;horizontal&#x27;&quot;</code> | compression predictor options: none, horizontal, float |
 | [options.pyramid] | <code>boolean</code> | <code>false</code> | write an image pyramid |
 | [options.tile] | <code>boolean</code> | <code>false</code> | write a tiled tiff |

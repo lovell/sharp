@@ -401,6 +401,18 @@ describe('TIFF', function () {
     });
   });
 
+  it('TIFF bigtiff true value does not throw error', function () {
+    assert.doesNotThrow(function () {
+      sharp().tiff({ bigtiff: true });
+    });
+  });
+
+  it('Invalid TIFF bigtiff value throws error', function () {
+    assert.throws(function () {
+      sharp().tiff({ bigtiff: 'true' });
+    });
+  });
+
   it('TIFF invalid predictor option throws', function () {
     assert.throws(function () {
       sharp().tiff({ predictor: 'a' });

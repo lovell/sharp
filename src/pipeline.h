@@ -175,6 +175,7 @@ struct PipelineBaton {
   bool gifProgressive;
   int tiffQuality;
   VipsForeignTiffCompression tiffCompression;
+  bool tiffBigtiff;
   VipsForeignTiffPredictor tiffPredictor;
   bool tiffPyramid;
   int tiffBitdepth;
@@ -350,6 +351,7 @@ struct PipelineBaton {
     gifProgressive(false),
     tiffQuality(80),
     tiffCompression(VIPS_FOREIGN_TIFF_COMPRESSION_JPEG),
+    tiffBigtiff(false),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
     tiffPyramid(false),
     tiffBitdepth(8),
