@@ -169,7 +169,8 @@ jobs:
           node-version: ${{ matrix.nodejs_version }}
           architecture: ${{ matrix.nodejs_arch }}
       - uses: actions/checkout@v4
-      - run: npm install --build-from-source
+      - run: npm install
+      - run: npm run build
       - run: npm run test-unit
       - if: matrix.package
         run: npm run package-from-local-build
@@ -211,7 +212,8 @@ jobs:
       - name: Dependencies
         run: apk add build-base git python3 font-noto --update-cache
       - uses: actions/checkout@v4
-      - run: npm install --build-from-source
+      - run: npm install
+      - run: npm run build
       - run: npm run test-unit
       - if: matrix.package
         run: npm run package-from-local-build
@@ -265,7 +267,8 @@ jobs:
             mkdir /opt/nodejs
             curl --silent https://${{ matrix.nodejs_hostname }}/download/release/v${{ matrix.nodejs_version}}/node-v${{ matrix.nodejs_version}}-linux-${{ matrix.nodejs_arch }}.tar.xz | tar xJC /opt/nodejs --strip-components=1
             export PATH=$PATH:/opt/nodejs/bin
-            npm install --build-from-source
+            npm install
+            npm run build
             node --test test/unit/io.js
             npm run package-from-local-build
       - uses: actions/upload-artifact@v4
@@ -289,7 +292,8 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "20"
-      - run: emmake npm install --build-from-source
+      - run: npm install
+      - run: emmake npm run build
       - name: Verify emscripten versions match
         run: |
           EMSCRIPTEN_VERSION_LIBVIPS=$(node -p "require('@img/sharp-libvips-dev-wasm32/versions').emscripten")

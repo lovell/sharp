@@ -25,7 +25,7 @@ Please select the `main` branch as the destination for your Pull Request so your
 
 Please squash your changes into a single commit using a command like `git rebase -i upstream/main`.
 
-To test C++ changes, you can compile the module using `npm install --build-from-source` and then run the tests using `npm test`.
+To test C++ changes, you can compile the module using `npm run build` and then run the tests using `npm test`.
 
 ## Submit a Pull Request with a new feature
 

@@ -111,10 +111,11 @@ and on macOS when running Node.js under Rosetta.
 
 ## Building from source
 
-This module will be compiled from source at `npm install` time when:
+This module will be compiled from source when:
 
 * a globally-installed libvips is detected, or
-* when the `npm install --build-from-source` flag is used.
+* using `npm explore sharp -- npm run build`, or
+* using the deprecated `npm run --build-from-source` at `npm install` time.
 
 The logic to detect a globally-installed libvips can be skipped by setting the
 `SHARP_IGNORE_GLOBAL_LIBVIPS` (never try to use it) or

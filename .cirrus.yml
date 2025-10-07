@@ -1,5 +1,5 @@
 freebsd_instance:
-  image_family: freebsd-15-0-snap
+  image_family: freebsd-15-0
 
 task:
   name: FreeBSD
@@ -9,9 +9,10 @@ task:
   prerequisites_script:
     - pkg update -f
     - pkg upgrade -y
-    - pkg install -y devel/git devel/pkgconf graphics/vips www/node20 www/npm
+    - pkg install -y devel/git devel/pkgconf graphics/vips www/node22 www/npm
     - pkg-config --modversion vips-cpp
   install_script:
-    - npm install --build-from-source
+    - npm install
+    - npm run build
   test_script:
     - node --test test/unit/io.js

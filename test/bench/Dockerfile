@@ -15,7 +15,7 @@ RUN apt-get install -y imagemagick libmagick++-dev graphicsmagick
 # Install sharp
 RUN mkdir /tmp/sharp
 RUN cd /tmp && git clone --single-branch --branch $BRANCH https://github.com/lovell/sharp.git
-RUN cd /tmp/sharp && npm install --build-from-source
+RUN cd /tmp/sharp && npm install && npm run build
 
 # Install benchmark test
 RUN cd /tmp/sharp/test/bench && npm install --omit optional
