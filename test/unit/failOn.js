@@ -103,4 +103,11 @@ describe('failOn', () => {
     fs.createReadStream(fixtures.inputJpgTruncated).pipe(writable);
     return writable.toBuffer();
   });
+
+  it('converts warnings to error for GeoTIFF', async () => {
+    await assert.rejects(
+      sharp(fixtures.inputTiffGeo).toBuffer(),
+      /Unknown field with tag 33550/
+    );
+  });
 });

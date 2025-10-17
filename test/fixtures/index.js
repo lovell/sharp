@@ -113,6 +113,7 @@ module.exports = {
   inputTiff8BitDepth: getPath('8bit_depth.tiff'),
   inputTifftagPhotoshop: getPath('tifftag-photoshop.tiff'), // https://github.com/lovell/sharp/issues/1600
   inputTiffFogra: getPath('fogra-0-100-100-0.tif'), // https://github.com/lovell/sharp/issues/4045
+  inputTiffGeo: getPath('bonne.geo.tif'), // https://download.osgeo.org/geotiff/samples/intergraph
 
   inputJp2: getPath('relax.jp2'), // https://www.fnordware.com/j2k/relax.jp2
   inputJp2TileParts: getPath('relax_tileparts.jp2'), // kdu_expand -i relax.jp2 -o relax-tmp.tif ; kdu_compress -i relax-tmp.tif -o relax_tileparts.jp2 -jp2_space sRGB Clayers=8 -rate 1.0,0.04 Stiles='{128,128}' ORGtparts=L ; rm relax-tmp.tif
