@@ -1,0 +1,46 @@
+{
+  "name": "@img/sharp-linux-riscv64",
+  "version": "0.34.4",
+  "description": "Prebuilt sharp for use with Linux (glibc) RISC-V 64-bit",
+  "author": "Lovell Fuller <npm@lovell.info>",
+  "homepage": "https://sharp.pixelplumbing.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lovell/sharp.git",
+    "directory": "npm/linux-riscv64"
+  },
+  "license": "Apache-2.0",
+  "funding": {
+    "url": "https://opencollective.com/libvips"
+  },
+  "preferUnplugged": true,
+  "optionalDependencies": {
+    "@img/sharp-libvips-linux-riscv64": "1.2.3"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "exports": {
+    "./sharp.node": "./lib/sharp-linux-riscv64.node",
+    "./package": "./package.json"
+  },
+  "engines": {
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
+  },
+  "config": {
+    "glibc": ">=2.41"
+  },
+  "os": [
+    "linux"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "cpu": [
+    "riscv64"
+  ]
+}

@@ -49,6 +49,7 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 * macOS ARM64
 * Linux ARM (glibc >= 2.31)
 * Linux ARM64 (glibc >= 2.26, musl >= 1.2.2)
+* Linux RISC-V 64-bit (glibc >= 2.41)
 * Linux ppc64 (glibc >= 2.36)
 * Linux s390x (glibc >= 2.36)
 * Linux x64 (glibc >= 2.26, musl >= 1.2.2, CPU with SSE4.2)

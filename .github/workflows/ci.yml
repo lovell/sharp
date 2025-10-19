@@ -235,32 +235,40 @@ jobs:
       matrix:
         include:
           - platform: linux-arm
-            distro: bullseye
-            run_on_arch: armv6
+            base_image: "balenalib/rpi-raspbian:bullseye"
             nodejs_arch: armv6l
             nodejs_hostname: unofficial-builds.nodejs.org
             nodejs_version: "18.17.0"
             nodejs_version_major: 18
           - platform: linux-s390x
-            distro: bookworm
-            run_on_arch: s390x
+            base_image: "--platform=linux/s390x s390x/debian:bookworm"
             nodejs_arch: s390x
             nodejs_hostname: nodejs.org
             nodejs_version: "18.17.0"
             nodejs_version_major: 18
           - platform: linux-ppc64
-            distro: bookworm
-            run_on_arch: ppc64le
+            base_image: "--platform=linux/ppc64le ppc64le/debian:bookworm"
             nodejs_arch: ppc64le
             nodejs_hostname: nodejs.org
             nodejs_version: "18.17.0"
             nodejs_version_major: 18
+          - platform: linux-riscv64
+            base_image: "--platform=linux/riscv64 riscv64/debian:trixie"
+            compiler_flags: "-march=rv64gc"
+            nodejs_arch: riscv64
+            nodejs_hostname: unofficial-builds.nodejs.org
+            nodejs_version: "20.19.5"
+            nodejs_version_major: 20
     steps:
       - uses: actions/checkout@v4
       - uses: uraimo/run-on-arch-action@v3
         with:
-          arch: ${{ matrix.run_on_arch }}
-          distro: ${{ matrix.distro }}
+          arch: none
+          distro: none
+          base_image: ${{ matrix.base_image }}
+          env: |
+            CFLAGS: "${{ matrix.compiler_flags }}"
+            CXXFLAGS: "${{ matrix.compiler_flags }}"
           run: |
             apt-get update
             apt-get install -y curl g++ git libatomic1 make python3 xz-utils
