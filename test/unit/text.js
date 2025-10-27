@@ -39,7 +39,7 @@ describe('Text to image', function () {
     assert.ok(info.textAutofitDpi > 0);
   });
 
-  it('text with width and height', function (t, done) {
+  it('text with width and height', async function (t) {
     const output = fixtures.path('output.text-width-height.png');
     const text = sharp({
       text: {
@@ -51,18 +51,15 @@ describe('Text to image', function () {
     if (!sharp.versions.pango) {
       return t.skip();
     }
-    text.toFile(output, function (err, info) {
-      if (err) throw err;
-      assert.strictEqual('png', info.format);
-      assert.strictEqual(3, info.channels);
-      assert.ok(inRange(info.width, 400, 600), `Actual width ${info.width}`);
-      assert.ok(inRange(info.height, 290, 500), `Actual height ${info.height}`);
-      assert.ok(inRange(info.textAutofitDpi, 900, 1300), `Actual textAutofitDpi ${info.textAutofitDpi}`);
-      done();
-    });
+    const info = await text.toFile(output);
+    assert.strictEqual('png', info.format);
+    assert.strictEqual(3, info.channels);
+    assert.ok(inRange(info.width, 400, 600), `Actual width ${info.width}`);
+    assert.ok(inRange(info.height, 290, 500), `Actual height ${info.height}`);
+    assert.ok(inRange(info.textAutofitDpi, 900, 1300), `Actual textAutofitDpi ${info.textAutofitDpi}`);
   });
 
-  it('text with dpi', function (t, done) {
+  it('text with dpi', async function (t) {
     const output = fixtures.path('output.text-dpi.png');
     const dpi = 300;
     const text = sharp({
@@ -74,18 +71,13 @@ describe('Text to image', function () {
     if (!sharp.versions.pango) {
       return t.skip();
     }
-    text.toFile(output, function (err, info) {
-      if (err) throw err;
-      assert.strictEqual('png', info.format);
-      sharp(output).metadata(function (err, metadata) {
-        if (err) throw err;
-        assert.strictEqual(dpi, metadata.density);
-        done();
-      });
-    });
+    const info = await text.toFile(output);
+    assert.strictEqual('png', info.format);
+    const metadata = await sharp(output).metadata();
+    assert.strictEqual(dpi, metadata.density);
   });
 
-  it('text with color and pango markup', function (t, done) {
+  it('text with color and pango markup', async function (t) {
     const output = fixtures.path('output.text-color-pango.png');
     const dpi = 300;
     const text = sharp({
@@ -98,21 +90,16 @@ describe('Text to image', function () {
     if (!sharp.versions.pango) {
       return t.skip();
     }
-    text.toFile(output, function (err, info) {
-      if (err) throw err;
-      assert.strictEqual('png', info.format);
-      assert.strictEqual(4, info.channels);
-      sharp(output).metadata(function (err, metadata) {
-        if (err) throw err;
-        assert.strictEqual(dpi, metadata.density);
-        assert.strictEqual('uchar', metadata.depth);
-        assert.strictEqual(true, metadata.hasAlpha);
-        done();
-      });
-    });
+    const info = await text.toFile(output);
+    assert.strictEqual('png', info.format);
+    assert.strictEqual(4, info.channels);
+    const metadata = await sharp(output).metadata();
+    assert.strictEqual(dpi, metadata.density);
+    assert.strictEqual('uchar', metadata.depth);
+    assert.strictEqual(true, metadata.hasAlpha);
   });
 
-  it('text with font', function (t, done) {
+  it('text with font', async function (t) {
     const output = fixtures.path('output.text-with-font.png');
     const text = sharp({
       text: {
@@ -123,17 +110,14 @@ describe('Text to image', function () {
     if (!sharp.versions.pango) {
       return t.skip();
     }
-    text.toFile(output, function (err, info) {
-      if (err) throw err;
-      assert.strictEqual('png', info.format);
-      assert.strictEqual(3, info.channels);
-      assert.ok(info.width > 30);
-      assert.ok(info.height > 10);
-      done();
-    });
+    const info = await text.toFile(output);
+    assert.strictEqual('png', info.format);
+    assert.strictEqual(3, info.channels);
+    assert.ok(info.width > 30);
+    assert.ok(info.height > 10);
   });
 
-  it('text with justify and composite', function (t, done) {
+  it('text with justify and composite', async function (t) {
     const output = fixtures.path('output.text-composite.png');
     const width = 500;
     const dpi = 300;
@@ -167,20 +151,15 @@ describe('Text to image', function () {
     if (!sharp.versions.pango) {
       return t.skip();
     }
-    text.toFile(output, function (err, info) {
-      if (err) throw err;
-      assert.strictEqual('png', info.format);
-      assert.strictEqual(4, info.channels);
-      assert.strictEqual(width, info.width);
-      assert.strictEqual(true, info.premultiplied);
-      sharp(output).metadata(function (err, metadata) {
-        if (err) throw err;
-        assert.strictEqual('srgb', metadata.space);
-        assert.strictEqual('uchar', metadata.depth);
-        assert.strictEqual(true, metadata.hasAlpha);
-        done();
-      });
-    });
+    const info = await text.toFile(output);
+    assert.strictEqual('png', info.format);
+    assert.strictEqual(4, info.channels);
+    assert.strictEqual(width, info.width);
+    assert.strictEqual(true, info.premultiplied);
+    const metadata = await sharp(output).metadata();
+    assert.strictEqual('srgb', metadata.space);
+    assert.strictEqual('uchar', metadata.depth);
+    assert.strictEqual(true, metadata.hasAlpha);
   });
 
   it('bad text input', function () {
