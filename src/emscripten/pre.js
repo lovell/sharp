@@ -1,5 +1,7 @@
-// Copyright 2013 Lovell Fuller and others.
-// SPDX-License-Identifier: Apache-2.0
+/*!
+  Copyright 2013 Lovell Fuller and others.
+  SPDX-License-Identifier: Apache-2.0
+*/
 
 /* global Module, ENV, _vips_shutdown, _uv_library_shutdown */
 

@@ -1,5 +1,7 @@
-// Copyright 2013 Lovell Fuller and others.
-// SPDX-License-Identifier: Apache-2.0
+/*!
+  Copyright 2013 Lovell Fuller and others.
+  SPDX-License-Identifier: Apache-2.0
+*/
 
 import fs from 'node:fs/promises';
 import path from 'node:path';

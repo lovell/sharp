@@ -1,5 +1,7 @@
-// Copyright 2013 Lovell Fuller and others.
-// SPDX-License-Identifier: Apache-2.0
+/*!
+  Copyright 2013 Lovell Fuller and others.
+  SPDX-License-Identifier: Apache-2.0
+*/
 
 #ifndef SRC_UTILITIES_H_
 #define SRC_UTILITIES_H_
