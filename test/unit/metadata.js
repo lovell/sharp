@@ -1013,13 +1013,23 @@ describe('Image metadata', function () {
       });
   });
 
-  it('Unsupported lossless JPEG passes underlying error message', function (_t, done) {
-    sharp(fixtures.inputJpgLossless)
-      .metadata(function (err) {
-        assert.strictEqual(true, !!err);
-        assert.strictEqual(true, /Input file has corrupt header: VipsJpeg: Unsupported JPEG process: SOF type 0xc3/.test(err.message));
-        done();
-      });
+  it('Lossless JPEG', async () => {
+    const metadata = await sharp(fixtures.inputJpgLossless).metadata();
+    assert.deepStrictEqual(metadata, {
+      format: 'jpeg',
+      width: 227,
+      height: 149,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      density: 72,
+      chromaSubsampling: '4:4:4',
+      isProgressive: false,
+      isPalette: false,
+      hasProfile: false,
+      hasAlpha: false,
+      autoOrient: { width: 227, height: 149 }
+    });
   });
 
   it('keepExif maintains all EXIF metadata', async () => {

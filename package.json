@@ -146,16 +146,16 @@
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "0.34.4",
     "@img/sharp-darwin-x64": "0.34.4",
-    "@img/sharp-libvips-darwin-arm64": "1.2.3",
-    "@img/sharp-libvips-darwin-x64": "1.2.3",
-    "@img/sharp-libvips-linux-arm": "1.2.3",
-    "@img/sharp-libvips-linux-arm64": "1.2.3",
-    "@img/sharp-libvips-linux-ppc64": "1.2.3",
-    "@img/sharp-libvips-linux-riscv64": "1.2.3",
-    "@img/sharp-libvips-linux-s390x": "1.2.3",
-    "@img/sharp-libvips-linux-x64": "1.2.3",
-    "@img/sharp-libvips-linuxmusl-arm64": "1.2.3",
-    "@img/sharp-libvips-linuxmusl-x64": "1.2.3",
+    "@img/sharp-libvips-darwin-arm64": "1.2.4",
+    "@img/sharp-libvips-darwin-x64": "1.2.4",
+    "@img/sharp-libvips-linux-arm": "1.2.4",
+    "@img/sharp-libvips-linux-arm64": "1.2.4",
+    "@img/sharp-libvips-linux-ppc64": "1.2.4",
+    "@img/sharp-libvips-linux-riscv64": "1.2.4",
+    "@img/sharp-libvips-linux-s390x": "1.2.4",
+    "@img/sharp-libvips-linux-x64": "1.2.4",
+    "@img/sharp-libvips-linuxmusl-arm64": "1.2.4",
+    "@img/sharp-libvips-linuxmusl-x64": "1.2.4",
     "@img/sharp-linux-arm": "0.34.4",
     "@img/sharp-linux-arm64": "0.34.4",
     "@img/sharp-linux-ppc64": "0.34.4",
@@ -170,16 +170,16 @@
     "@img/sharp-win32-x64": "0.34.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.6",
+    "@biomejs/biome": "^2.3.2",
     "@cpplint/cli": "^0.1.0",
-    "@emnapi/runtime": "^1.5.0",
-    "@img/sharp-libvips-dev": "1.2.3",
-    "@img/sharp-libvips-dev-wasm32": "1.2.3",
-    "@img/sharp-libvips-win32-arm64": "1.2.3",
-    "@img/sharp-libvips-win32-ia32": "1.2.3",
-    "@img/sharp-libvips-win32-x64": "1.2.3",
+    "@emnapi/runtime": "^1.6.0",
+    "@img/sharp-libvips-dev": "1.2.4",
+    "@img/sharp-libvips-dev-wasm32": "1.2.4",
+    "@img/sharp-libvips-win32-arm64": "1.2.4",
+    "@img/sharp-libvips-win32-ia32": "1.2.4",
+    "@img/sharp-libvips-win32-x64": "1.2.4",
     "@types/node": "*",
-    "emnapi": "^1.5.0",
+    "emnapi": "^1.6.0",
     "exif-reader": "^2.0.2",
     "extract-zip": "^2.0.1",
     "icc": "^3.0.0",
@@ -194,7 +194,7 @@
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
   },
   "config": {
-    "libvips": ">=8.17.2"
+    "libvips": ">=8.17.3"
   },
   "funding": {
     "url": "https://opencollective.com/libvips"

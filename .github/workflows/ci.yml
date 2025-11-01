@@ -291,7 +291,7 @@ jobs:
     needs: lint
     name: "build-wasm32 [package]"
     runs-on: ubuntu-24.04
-    container: "emscripten/emsdk:4.0.14"
+    container: "emscripten/emsdk:4.0.18"
     steps:
       - uses: actions/checkout@v4
       - name: Dependencies

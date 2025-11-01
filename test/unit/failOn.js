@@ -109,7 +109,7 @@ describe('failOn', () => {
   it('converts warnings to error for GeoTIFF', async () => {
     await assert.rejects(
       sharp(fixtures.inputTiffGeo).toBuffer(),
-      /Unknown field with tag 33550/
+      /Tag 34737/
     );
   });
 });
