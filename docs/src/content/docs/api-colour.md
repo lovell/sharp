@@ -80,7 +80,7 @@ as defined by [toColourspace](#tocolourspace).
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [colourspace] | <code>string</code> | pipeline colourspace e.g. `rgb16`, `scrgb`, `lab`, `grey16` [...](https://github.com/libvips/libvips/blob/41cff4e9d0838498487a00623462204eb10ee5b8/libvips/iofuncs/enumtypes.c#L774) |
+| [colourspace] | <code>string</code> | pipeline colourspace e.g. `rgb16`, `scrgb`, `lab`, `grey16` [...](https://www.libvips.org/API/current/enum.Interpretation.html) |
 
 **Example**  
 ```js
@@ -123,7 +123,7 @@ By default output image will be web-friendly sRGB, with additional channels inte
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [colourspace] | <code>string</code> | output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...](https://github.com/libvips/libvips/blob/3c0bfdf74ce1dc37a6429bed47fa76f16e2cd70a/libvips/iofuncs/enumtypes.c#L777-L794) |
+| [colourspace] | <code>string</code> | output colourspace e.g. `srgb`, `rgb`, `cmyk`, `lab`, `b-w` [...](https://www.libvips.org/API/current/enum.Interpretation.html) |
 
 **Example**  
 ```js

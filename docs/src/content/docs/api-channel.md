@@ -8,7 +8,7 @@ title: Channel manipulation
 
 Remove alpha channels, if any. This is a no-op if the image does not have an alpha channel.
 
-See also [flatten](/api-operation#flatten).
+See also [flatten](/api-operation/#flatten).
 
 
 **Example**  

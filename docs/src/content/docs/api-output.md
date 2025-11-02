@@ -201,7 +201,7 @@ const dataWithMergedExif = await sharp(inputWithExif)
 
 Keep ICC profile from the input image in the output image.
 
-Where necessary, will attempt to convert the output colour space to match the profile.
+For non-RGB output use [toColourspace](/api-colour/#tocolourspace).
 
 
 **Since**: 0.33.0  
@@ -430,7 +430,7 @@ Indexed PNG input at 1, 2 or 4 bits per pixel is converted to 8 bits per pixel.
 Set `palette` to `true` for slower, indexed PNG output.
 
 For 16 bits per pixel output, convert to `rgb16` via
-[toColourspace](/api-colour#tocolourspace).
+[toColourspace](/api-colour/#tocolourspace).
 
 
 **Throws**:
@@ -589,7 +589,7 @@ Use these JP2 options for output image.
 
 Requires libvips compiled with support for OpenJPEG.
 The prebuilt binaries do not include this - see
-[installing a custom libvips](https://sharp.pixelplumbing.com/install#custom-libvips).
+[installing a custom libvips](/install#custom-libvips).
 
 
 **Throws**:
@@ -754,7 +754,7 @@ This feature is experimental, please do not use in production systems.
 
 Requires libvips compiled with support for libjxl.
 The prebuilt binaries do not include this - see
-[installing a custom libvips](https://sharp.pixelplumbing.com/install#custom-libvips).
+[installing a custom libvips](/install/#custom-libvips).
 
 
 **Throws**:

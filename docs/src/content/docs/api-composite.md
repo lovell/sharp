@@ -21,7 +21,7 @@ The `blend` option can be one of `clear`, `source`, `over`, `in`, `out`, `atop`,
 `hard-light`, `soft-light`, `difference`, `exclusion`.
 
 More information about blend modes can be found at
-https://www.libvips.org/API/current/libvips-conversion.html#VipsBlendMode
+https://www.libvips.org/API/current/enum.BlendMode.html
 and https://www.cairographics.org/operators/
 
 
@@ -64,8 +64,8 @@ and https://www.cairographics.org/operators/
 | [images[].raw.height] | <code>Number</code> |  |  |
 | [images[].raw.channels] | <code>Number</code> |  |  |
 | [images[].animated] | <code>boolean</code> | <code>false</code> | Set to `true` to read all frames/pages of an animated image. |
-| [images[].failOn] | <code>string</code> | <code>&quot;&#x27;warning&#x27;&quot;</code> | @see [constructor parameters](/api-constructor#parameters) |
-| [images[].limitInputPixels] | <code>number</code> \| <code>boolean</code> | <code>268402689</code> | @see [constructor parameters](/api-constructor#parameters) |
+| [images[].failOn] | <code>string</code> | <code>&quot;&#x27;warning&#x27;&quot;</code> | @see [constructor parameters](/api-constructor/) |
+| [images[].limitInputPixels] | <code>number</code> \| <code>boolean</code> | <code>268402689</code> | @see [constructor parameters](/api-constructor/) |
 
 **Example**  
 ```js

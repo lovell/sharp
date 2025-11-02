@@ -179,7 +179,7 @@ When used without parameters, performs a fast, mild sharpen of the output image.
 When a `sigma` is provided, performs a slower, more accurate sharpen of the L channel in the LAB colour space.
 Fine-grained control over the level of sharpening in "flat" (m1) and "jagged" (m2) areas is available.
 
-See [libvips sharpen](https://www.libvips.org/API/current/libvips-convolution.html#vips-sharpen) operation.
+See [libvips sharpen](https://www.libvips.org/API/current/method.Image.sharpen.html) operation.
 
 
 **Throws**:

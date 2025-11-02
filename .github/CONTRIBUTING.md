@@ -14,7 +14,7 @@ If a [similar request](https://github.com/lovell/sharp/labels/enhancement) exist
 it's probably fastest to add a comment to it about your requirement.
 
 Implementation is usually straightforward if libvips
-[already supports](https://www.libvips.org/API/current/func-list.html)
+[already supports](https://www.libvips.org/API/current/function-list.html)
 the feature you need.
 
 ## Submit a Pull Request to fix a bug

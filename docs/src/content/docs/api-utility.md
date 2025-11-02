@@ -114,7 +114,7 @@ e.g. libaom manages its own 4 threads when encoding AVIF images,
 and these are independent of the value set here.
 
 :::note
-Further [control over performance](/performance) is available.
+Further [control over performance](/performance/) is available.
 :::
 
 
