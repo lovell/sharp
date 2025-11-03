@@ -7,24 +7,24 @@ const { describe, it } = require('node:test');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Unflatten', function () {
-  it('unflatten white background', function (_t, done) {
+describe('Unflatten', () => {
+  it('unflatten white background', (_t, done) => {
     sharp(fixtures.inputPng).unflatten()
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('unflatten-white-transparent.png'), data, { threshold: 0 }, done);
       });
   });
-  it('unflatten transparent image', function (_t, done) {
+  it('unflatten transparent image', (_t, done) => {
     sharp(fixtures.inputPngTrimSpecificColourIncludeAlpha).unflatten()
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('unflatten-flag-white-transparent.png'), data, { threshold: 0 }, done);
       });
   });
-  it('unflatten using threshold', function (_t, done) {
+  it('unflatten using threshold', (_t, done) => {
     sharp(fixtures.inputPngPalette).unflatten().threshold(128, { grayscale: false })
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('unflatten-swiss.png'), data, { threshold: 1 }, done);
       });

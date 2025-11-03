@@ -9,8 +9,8 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Gaussian noise', function () {
-  it('generate single-channel gaussian noise', function (_t, done) {
+describe('Gaussian noise', () => {
+  it('generate single-channel gaussian noise', (_t, done) => {
     const output = fixtures.path('output.noise-1-channel.png');
     const noise = sharp({
       create: {
@@ -24,13 +24,13 @@ describe('Gaussian noise', function () {
         }
       }
     }).toColourspace('b-w');
-    noise.toFile(output, function (err, info) {
+    noise.toFile(output, (err, info) => {
       if (err) throw err;
       assert.strictEqual('png', info.format);
       assert.strictEqual(1024, info.width);
       assert.strictEqual(768, info.height);
       assert.strictEqual(1, info.channels);
-      sharp(output).metadata(function (err, metadata) {
+      sharp(output).metadata((err, metadata) => {
         if (err) throw err;
         assert.strictEqual('b-w', metadata.space);
         assert.strictEqual('uchar', metadata.depth);
@@ -39,7 +39,7 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('generate 3-channels gaussian noise', function (_t, done) {
+  it('generate 3-channels gaussian noise', (_t, done) => {
     const output = fixtures.path('output.noise-3-channels.png');
     const noise = sharp({
       create: {
@@ -53,13 +53,13 @@ describe('Gaussian noise', function () {
         }
       }
     });
-    noise.toFile(output, function (err, info) {
+    noise.toFile(output, (err, info) => {
       if (err) throw err;
       assert.strictEqual('png', info.format);
       assert.strictEqual(1024, info.width);
       assert.strictEqual(768, info.height);
       assert.strictEqual(3, info.channels);
-      sharp(output).metadata(function (err, metadata) {
+      sharp(output).metadata((err, metadata) => {
         if (err) throw err;
         assert.strictEqual('srgb', metadata.space);
         assert.strictEqual('uchar', metadata.depth);
@@ -68,7 +68,7 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('overlay 3-channels gaussian noise over image', function (_t, done) {
+  it('overlay 3-channels gaussian noise over image', (_t, done) => {
     const output = fixtures.path('output.noise-image.jpg');
     const noise = sharp({
       create: {
@@ -82,7 +82,7 @@ describe('Gaussian noise', function () {
         }
       }
     });
-    noise.toBuffer(function (err, data, info) {
+    noise.toBuffer((err, data, info) => {
       if (err) throw err;
       assert.strictEqual(3, info.channels);
       sharp(fixtures.inputJpg)
@@ -98,14 +98,14 @@ describe('Gaussian noise', function () {
             }
           }
         ])
-        .toFile(output, function (err, info) {
+        .toFile(output, (err, info) => {
           if (err) throw err;
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(320, info.width);
           assert.strictEqual(240, info.height);
           assert.strictEqual(3, info.channels);
           // perceptual hashing detects that images are the same (difference is <=1%)
-          fixtures.assertSimilar(output, fixtures.inputJpg, function (err) {
+          fixtures.assertSimilar(output, fixtures.inputJpg, (err) => {
             if (err) throw err;
             done();
           });
@@ -113,7 +113,7 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('overlay strong single-channel (sRGB) gaussian noise with 25% transparency over transparent png image', function (_t, done) {
+  it('overlay strong single-channel (sRGB) gaussian noise with 25% transparency over transparent png image', (_t, done) => {
     const output = fixtures.path('output.noise-image-transparent.png');
     const width = 320;
     const height = 240;
@@ -136,14 +136,14 @@ describe('Gaussian noise', function () {
     });
     noise
       .toColourspace('b-w')
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(1, info.channels);
         sharp(data, { raw: rawData })
           .joinChannel(data, { raw: rawData }) // r channel
           .joinChannel(data, { raw: rawData }) // b channel
           .joinChannel(Buffer.alloc(width * height, 64), { raw: rawData }) // alpha channel
-          .toBuffer(function (err, data, info) {
+          .toBuffer((err, data, info) => {
             if (err) throw err;
             assert.strictEqual(4, info.channels);
             sharp(fixtures.inputPngRGBWithAlpha)
@@ -159,13 +159,13 @@ describe('Gaussian noise', function () {
                   }
                 }
               ])
-              .toFile(output, function (err, info) {
+              .toFile(output, (err, info) => {
                 if (err) throw err;
                 assert.strictEqual('png', info.format);
                 assert.strictEqual(width, info.width);
                 assert.strictEqual(height, info.height);
                 assert.strictEqual(4, info.channels);
-                fixtures.assertSimilar(output, fixtures.inputPngRGBWithAlpha, { threshold: 10 }, function (err) {
+                fixtures.assertSimilar(output, fixtures.inputPngRGBWithAlpha, { threshold: 10 }, (err) => {
                   if (err) throw err;
                   done();
                 });
@@ -194,16 +194,16 @@ describe('Gaussian noise', function () {
     assert.strictEqual(delay.length, 4);
   });
 
-  it('no create object properties specified', function () {
-    assert.throws(function () {
+  it('no create object properties specified', () => {
+    assert.throws(() => {
       sharp({
         create: {}
       });
     });
   });
 
-  it('invalid noise object', function () {
-    assert.throws(function () {
+  it('invalid noise object', () => {
+    assert.throws(() => {
       sharp({
         create: {
           width: 100,
@@ -215,8 +215,8 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('unknown type of noise', function () {
-    assert.throws(function () {
+  it('unknown type of noise', () => {
+    assert.throws(() => {
       sharp({
         create: {
           width: 100,
@@ -230,8 +230,8 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('gaussian noise, invalid amount of channels', function () {
-    assert.throws(function () {
+  it('gaussian noise, invalid amount of channels', () => {
+    assert.throws(() => {
       sharp({
         create: {
           width: 100,
@@ -247,8 +247,8 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('gaussian noise, invalid mean', function () {
-    assert.throws(function () {
+  it('gaussian noise, invalid mean', () => {
+    assert.throws(() => {
       sharp({
         create: {
           width: 100,
@@ -264,8 +264,8 @@ describe('Gaussian noise', function () {
     });
   });
 
-  it('gaussian noise, invalid sigma', function () {
-    assert.throws(function () {
+  it('gaussian noise, invalid sigma', () => {
+    assert.throws(() => {
       sharp({
         create: {
           width: 100,

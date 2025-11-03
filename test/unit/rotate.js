@@ -9,22 +9,22 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Rotation', function () {
-  ['autoOrient', 'constructor'].forEach(function (rotateMethod) {
+describe('Rotation', () => {
+  ['autoOrient', 'constructor'].forEach((rotateMethod) => {
     describe(`Auto orientation via ${rotateMethod}:`, () => {
       const options = rotateMethod === 'constructor' ? { autoOrient: true } : {};
 
-      ['Landscape', 'Portrait'].forEach(function (orientation) {
-        [1, 2, 3, 4, 5, 6, 7, 8].forEach(function (exifTag) {
+      ['Landscape', 'Portrait'].forEach((orientation) => {
+        [1, 2, 3, 4, 5, 6, 7, 8].forEach((exifTag) => {
           const input = fixtures[`inputJpgWith${orientation}Exif${exifTag}`];
           const expectedOutput = fixtures.expected(`${orientation}_${exifTag}-out.jpg`);
-          it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate`, function (_t, done) {
+          it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate`, (_t, done) => {
             const [expectedWidth, expectedHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
 
             const img = sharp(input, options);
             rotateMethod === 'autoOrient' && img.autoOrient();
 
-            img.toBuffer(function (err, data, info) {
+            img.toBuffer((err, data, info) => {
               if (err) throw err;
               assert.strictEqual(info.width, expectedWidth);
               assert.strictEqual(info.height, expectedHeight);
@@ -32,14 +32,14 @@ describe('Rotation', function () {
             });
           });
 
-          it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then resize`, function (_t, done) {
+          it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then resize`, (_t, done) => {
             const [expectedWidth, expectedHeight] = orientation === 'Landscape' ? [320, 240] : [320, 427];
 
             const img = sharp(input, options);
             rotateMethod === 'autoOrient' && img.autoOrient();
 
             img.resize({ width: 320 })
-              .toBuffer(function (err, data, info) {
+              .toBuffer((err, data, info) => {
                 if (err) throw err;
                 assert.strictEqual(info.width, expectedWidth);
                 assert.strictEqual(info.height, expectedHeight);
@@ -48,7 +48,7 @@ describe('Rotation', function () {
           });
 
           if (rotateMethod !== 'constructor') {
-            it(`${orientation} image with EXIF Orientation ${exifTag}: Resize then auto-rotate`, function (_t, done) {
+            it(`${orientation} image with EXIF Orientation ${exifTag}: Resize then auto-rotate`, (_t, done) => {
               const [expectedWidth, expectedHeight] = orientation === 'Landscape'
                 ? (exifTag < 5) ? [320, 240] : [320, 240]
                 : [320, 427];
@@ -57,7 +57,7 @@ describe('Rotation', function () {
                 .resize({ width: 320 });
 
               rotateMethod === 'autoOrient' && img.autoOrient();
-              img.toBuffer(function (err, data, info) {
+              img.toBuffer((err, data, info) => {
                 if (err) throw err;
                 assert.strictEqual(info.width, expectedWidth);
                 assert.strictEqual(info.height, expectedHeight);
@@ -67,10 +67,10 @@ describe('Rotation', function () {
           }
 
           [true, false].forEach((doResize) => {
-            [90, 180, 270, 45].forEach(function (angle) {
+            [90, 180, 270, 45].forEach((angle) => {
               const [inputWidth, inputHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
               const expectedOutput = fixtures.expected(`${orientation}_${exifTag}_rotate${angle}-out.jpg`);
-              it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then rotate ${angle} ${doResize ? 'and resize' : ''}`, function (_t, done) {
+              it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then rotate ${angle} ${doResize ? 'and resize' : ''}`, (_t, done) => {
                 const [width, height] = (angle === 45 ? [742, 742] : [inputWidth, inputHeight]).map((x) => doResize ? Math.floor(x / 1.875) : x);
                 const [expectedWidth, expectedHeight] = angle % 180 === 0 ? [width, height] : [height, width];
 
@@ -80,7 +80,7 @@ describe('Rotation', function () {
                 img.rotate(angle);
                 doResize && img.resize(expectedWidth);
 
-                img.toBuffer(function (err, data, info) {
+                img.toBuffer((err, data, info) => {
                   if (err) throw err;
                   assert.strictEqual(info.width, expectedWidth);
                   assert.strictEqual(info.height, expectedHeight);
@@ -89,11 +89,11 @@ describe('Rotation', function () {
               });
             });
 
-            [[true, true], [true, false], [false, true]].forEach(function ([flip, flop]) {
+            [[true, true], [true, false], [false, true]].forEach(([flip, flop]) => {
               const [inputWidth, inputHeight] = orientation === 'Landscape' ? [600, 450] : [450, 600];
               const flipFlopFileName = [flip && 'flip', flop && 'flop'].filter(Boolean).join('_');
               const flipFlopTestName = [flip && 'flip', flop && 'flop'].filter(Boolean).join(' & ');
-              it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then ${flipFlopTestName} ${doResize ? 'and resize' : ''}`, function (_t, done) {
+              it(`${orientation} image with EXIF Orientation ${exifTag}: Auto-rotate then ${flipFlopTestName} ${doResize ? 'and resize' : ''}`, (_t, done) => {
                 const expectedOutput = fixtures.expected(`${orientation}_${exifTag}_${flipFlopFileName}-out.jpg`);
 
                 const img = sharp(input, options);
@@ -104,7 +104,7 @@ describe('Rotation', function () {
                 flop && img.flop();
                 doResize && img.resize(orientation === 'Landscape' ? 320 : 240);
 
-                img.toBuffer(function (err, data, info) {
+                img.toBuffer((err, data, info) => {
                   if (err) throw err;
                   assert.strictEqual(info.width, inputWidth / (doResize ? 1.875 : 1));
                   assert.strictEqual(info.height, inputHeight / (doResize ? 1.875 : 1));
@@ -118,12 +118,12 @@ describe('Rotation', function () {
     });
   });
 
-  it('Rotate by 30 degrees with semi-transparent background', function (_t, done) {
+  it('Rotate by 30 degrees with semi-transparent background', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320)
       .rotate(30, { background: { r: 255, g: 0, b: 0, alpha: 0.5 } })
       .png()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(408, info.width);
@@ -132,11 +132,11 @@ describe('Rotation', function () {
       });
   });
 
-  it('Rotate by 30 degrees with solid background', function (_t, done) {
+  it('Rotate by 30 degrees with solid background', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320)
       .rotate(30, { background: { r: 255, g: 0, b: 0 } })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(408, info.width);
@@ -145,11 +145,11 @@ describe('Rotation', function () {
       });
   });
 
-  it('Rotate by 90 degrees, respecting output input size', function (_t, done) {
+  it('Rotate by 90 degrees, respecting output input size', (_t, done) => {
     sharp(fixtures.inputJpg)
       .rotate(90)
       .resize(320, 240)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
@@ -159,11 +159,11 @@ describe('Rotation', function () {
       });
   });
 
-  it('Resize then rotate by 30 degrees, respecting output input size', function (_t, done) {
+  it('Resize then rotate by 30 degrees, respecting output input size', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .rotate(30)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
@@ -173,9 +173,9 @@ describe('Rotation', function () {
       });
   });
 
-  [-3690, -450, -90, 90, 450, 3690].forEach(function (angle) {
-    it(`Rotate by any 90-multiple angle (${angle}deg)`, function (_t, done) {
-      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, _data, info) {
+  [-3690, -450, -90, 90, 450, 3690].forEach((angle) => {
+    it(`Rotate by any 90-multiple angle (${angle}deg)`, (_t, done) => {
+      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual(240, info.width);
         assert.strictEqual(320, info.height);
@@ -184,9 +184,9 @@ describe('Rotation', function () {
     });
   });
 
-  [-3750, -510, -150, 30, 390, 3630].forEach(function (angle) {
-    it(`Rotate by any 30-multiple angle (${angle}deg)`, function (_t, done) {
-      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, _data, info) {
+  [-3750, -510, -150, 30, 390, 3630].forEach((angle) => {
+    it(`Rotate by any 30-multiple angle (${angle}deg)`, (_t, done) => {
+      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual(397, info.width);
         assert.strictEqual(368, info.height);
@@ -195,9 +195,9 @@ describe('Rotation', function () {
     });
   });
 
-  [-3780, -540, 0, 180, 540, 3780].forEach(function (angle) {
-    it(`Rotate by any 180-multiple angle (${angle}deg)`, function (_t, done) {
-      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer(function (err, _data, info) {
+  [-3780, -540, 0, 180, 540, 3780].forEach((angle) => {
+    it(`Rotate by any 180-multiple angle (${angle}deg)`, (_t, done) => {
+      sharp(fixtures.inputJpg320x240).rotate(angle).toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -206,15 +206,15 @@ describe('Rotation', function () {
     });
   });
 
-  it('Rotate by 270 degrees, square output ignoring aspect ratio', function (_t, done) {
+  it('Rotate by 270 degrees, square output ignoring aspect ratio', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(240, 240, { fit: sharp.fit.fill })
       .rotate(270)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(240, info.width);
         assert.strictEqual(240, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(240, metadata.width);
           assert.strictEqual(240, metadata.height);
@@ -223,15 +223,15 @@ describe('Rotation', function () {
       });
   });
 
-  it('Rotate by 315 degrees, square output ignoring aspect ratio', function (_t, done) {
+  it('Rotate by 315 degrees, square output ignoring aspect ratio', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(240, 240, { fit: sharp.fit.fill })
       .rotate(315)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(339, info.width);
         assert.strictEqual(339, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(339, metadata.width);
           assert.strictEqual(339, metadata.height);
@@ -240,15 +240,15 @@ describe('Rotation', function () {
       });
   });
 
-  it('Rotate by 270 degrees, rectangular output ignoring aspect ratio', function (_t, done) {
+  it('Rotate by 270 degrees, rectangular output ignoring aspect ratio', (_t, done) => {
     sharp(fixtures.inputJpg)
       .rotate(270)
       .resize(320, 240, { fit: sharp.fit.fill })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(320, metadata.width);
           assert.strictEqual(240, metadata.height);
@@ -257,15 +257,15 @@ describe('Rotation', function () {
       });
   });
 
-  it('Auto-rotate by 270 degrees, rectangular output ignoring aspect ratio', function (_t, done) {
+  it('Auto-rotate by 270 degrees, rectangular output ignoring aspect ratio', (_t, done) => {
     sharp(fixtures.inputJpgWithLandscapeExif8)
       .resize(320, 240, { fit: sharp.fit.fill })
       .rotate()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(320, metadata.width);
           assert.strictEqual(240, metadata.height);
@@ -274,15 +274,15 @@ describe('Rotation', function () {
       });
   });
 
-  it('Rotate by 30 degrees, rectangular output ignoring aspect ratio', function (_t, done) {
+  it('Rotate by 30 degrees, rectangular output ignoring aspect ratio', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240, { fit: sharp.fit.fill })
       .rotate(30)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(397, info.width);
         assert.strictEqual(368, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(397, metadata.width);
           assert.strictEqual(368, metadata.height);
@@ -291,17 +291,17 @@ describe('Rotation', function () {
       });
   });
 
-  it('Input image has Orientation EXIF tag but do not rotate output', function (_t, done) {
+  it('Input image has Orientation EXIF tag but do not rotate output', (_t, done) => {
     sharp(fixtures.inputJpgWithExif)
       .resize(320)
       .withMetadata()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(427, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(8, metadata.orientation);
           done();
@@ -309,11 +309,11 @@ describe('Rotation', function () {
       });
   });
 
-  it('Input image has Orientation EXIF tag value of 8 (270 degrees), auto-rotate', function (_t, done) {
+  it('Input image has Orientation EXIF tag value of 8 (270 degrees), auto-rotate', (_t, done) => {
     sharp(fixtures.inputJpgWithExif)
       .rotate()
       .resize(320)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -322,17 +322,17 @@ describe('Rotation', function () {
       });
   });
 
-  it('Override EXIF Orientation tag metadata after auto-rotate', function (_t, done) {
+  it('Override EXIF Orientation tag metadata after auto-rotate', (_t, done) => {
     sharp(fixtures.inputJpgWithExif)
       .rotate()
       .resize(320)
       .withMetadata({ orientation: 3 })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(3, metadata.orientation);
           fixtures.assertSimilar(fixtures.expected('exif-8.jpg'), data, done);
@@ -340,17 +340,17 @@ describe('Rotation', function () {
       });
   });
 
-  it('Input image has Orientation EXIF tag value of 5 (270 degrees + flip), auto-rotate', function (_t, done) {
+  it('Input image has Orientation EXIF tag value of 5 (270 degrees + flip), auto-rotate', (_t, done) => {
     sharp(fixtures.inputJpgWithExifMirroring)
       .rotate()
       .resize(320)
       .withMetadata()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(1, metadata.orientation);
           fixtures.assertSimilar(fixtures.expected('exif-5.jpg'), data, done);
@@ -358,8 +358,8 @@ describe('Rotation', function () {
       });
   });
 
-  it('Attempt to auto-rotate using image that has no EXIF', function (_t, done) {
-    sharp(fixtures.inputJpg).rotate().resize(320).toBuffer(function (err, data, info) {
+  it('Attempt to auto-rotate using image that has no EXIF', (_t, done) => {
+    sharp(fixtures.inputJpg).rotate().resize(320).toBuffer((err, data, info) => {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
       assert.strictEqual('jpeg', info.format);
@@ -369,12 +369,12 @@ describe('Rotation', function () {
     });
   });
 
-  it('Attempt to auto-rotate image format without EXIF support', function (_t, done) {
+  it('Attempt to auto-rotate image format without EXIF support', (_t, done) => {
     sharp(fixtures.inputPng)
       .rotate()
       .resize(320)
       .jpeg()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
@@ -384,8 +384,8 @@ describe('Rotation', function () {
       });
   });
 
-  it('Rotate with a string argument, should fail', function () {
-    assert.throws(function () {
+  it('Rotate with a string argument, should fail', () => {
+    assert.throws(() => {
       sharp(fixtures.inputJpg).rotate('not-a-number');
     });
   });
@@ -436,18 +436,18 @@ describe('Rotation', function () {
   it('Multiple rotate emits warning', () => {
     let warningMessage = '';
     const s = sharp();
-    s.on('warning', function (msg) { warningMessage = msg; });
+    s.on('warning', (msg) => { warningMessage = msg; });
     s.rotate(90);
     assert.strictEqual(warningMessage, '');
     s.rotate(180);
     assert.strictEqual(warningMessage, 'ignoring previous rotate options');
   });
 
-  it('Multiple rotate: last one wins (cardinal)', function (_t, done) {
+  it('Multiple rotate: last one wins (cardinal)', (_t, done) => {
     sharp(fixtures.inputJpg)
       .rotate(45)
       .rotate(90)
-      .toBuffer(function (err, _data, info) {
+      .toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual(2225, info.width);
         assert.strictEqual(2725, info.height);
@@ -455,11 +455,11 @@ describe('Rotation', function () {
       });
   });
 
-  it('Multiple rotate: last one wins (non cardinal)', function (_t, done) {
+  it('Multiple rotate: last one wins (non cardinal)', (_t, done) => {
     sharp(fixtures.inputJpg)
       .rotate(90)
       .rotate(45)
-      .toBuffer(function (err, _data, info) {
+      .toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual(3500, info.width);
         assert.strictEqual(3500, info.height);
@@ -467,17 +467,17 @@ describe('Rotation', function () {
       });
   });
 
-  it('Flip - vertical', function (_t, done) {
+  it('Flip - vertical', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320)
       .flip()
       .withMetadata()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(261, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(1, metadata.orientation);
           fixtures.assertSimilar(fixtures.expected('flip.jpg'), data, done);
@@ -485,17 +485,17 @@ describe('Rotation', function () {
       });
   });
 
-  it('Flop - horizontal', function (_t, done) {
+  it('Flop - horizontal', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320)
       .flop()
       .withMetadata()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
         assert.strictEqual(261, info.height);
-        sharp(data).metadata(function (err, metadata) {
+        sharp(data).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(1, metadata.orientation);
           fixtures.assertSimilar(fixtures.expected('flop.jpg'), data, done);
@@ -503,12 +503,12 @@ describe('Rotation', function () {
       });
   });
 
-  it('Flip and flop', function (_t, done) {
+  it('Flip and flop', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320)
       .flip()
       .flop()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -517,12 +517,12 @@ describe('Rotation', function () {
       });
   });
 
-  it('Neither flip nor flop', function (_t, done) {
+  it('Neither flip nor flop', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320)
       .flip(false)
       .flop(false)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -531,12 +531,12 @@ describe('Rotation', function () {
       });
   });
 
-  it('Auto-rotate and flip', function (_t, done) {
+  it('Auto-rotate and flip', (_t, done) => {
     sharp(fixtures.inputJpgWithExif)
       .rotate()
       .flip()
       .resize(320)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -545,12 +545,12 @@ describe('Rotation', function () {
       });
   });
 
-  it('Auto-rotate and flop', function (_t, done) {
+  it('Auto-rotate and flop', (_t, done) => {
     sharp(fixtures.inputJpgWithExif)
       .rotate()
       .flop()
       .resize(320)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);

@@ -9,15 +9,15 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Resize fit=contain', function () {
-  it('Allows specifying the position as a string', function (_t, done) {
+describe('Resize fit=contain', () => {
+  it('Allows specifying the position as a string', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240, {
         fit: 'contain',
         position: 'center'
       })
       .png()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -25,11 +25,11 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('JPEG within PNG, no alpha channel', function (_t, done) {
+  it('JPEG within PNG, no alpha channel', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240, { fit: 'contain' })
       .png()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -40,14 +40,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('JPEG within WebP, to include alpha channel', function (_t, done) {
+  it('JPEG within WebP, to include alpha channel', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240, {
         fit: 'contain',
         background: { r: 0, g: 0, b: 0, alpha: 0 }
       })
       .webp()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('webp', info.format);
@@ -58,10 +58,10 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('PNG with alpha channel', function (_t, done) {
+  it('PNG with alpha channel', (_t, done) => {
     sharp(fixtures.inputPngWithTransparency)
       .resize(50, 50, { fit: 'contain' })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -72,10 +72,10 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('16-bit PNG with alpha channel', function (_t, done) {
+  it('16-bit PNG with alpha channel', (_t, done) => {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 16, { fit: 'contain' })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -86,13 +86,13 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('16-bit PNG with alpha channel onto RGBA', function (_t, done) {
+  it('16-bit PNG with alpha channel onto RGBA', (_t, done) => {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 16, {
         fit: 'contain',
         background: { r: 0, g: 0, b: 0, alpha: 0 }
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -103,13 +103,13 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('PNG with 2 channels', function (_t, done) {
+  it('PNG with 2 channels', (_t, done) => {
     sharp(fixtures.inputPngWithGreyAlpha)
       .resize(32, 16, {
         fit: 'contain',
         background: { r: 0, g: 0, b: 0, alpha: 0 }
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -120,14 +120,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('TIFF in LAB colourspace onto RGBA background', function (_t, done) {
+  it('TIFF in LAB colourspace onto RGBA background', (_t, done) => {
     sharp(fixtures.inputTiffCielab)
       .resize(64, 128, {
         fit: 'contain',
         background: { r: 255, g: 102, b: 0, alpha: 0.5 }
       })
       .png()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -138,10 +138,10 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Enlarge', function (_t, done) {
+  it('Enlarge', (_t, done) => {
     sharp(fixtures.inputPngWithOneColor)
       .resize(320, 240, { fit: 'contain' })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -152,14 +152,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  describe('Animated WebP', function () {
-    it('Width only', function (_t, done) {
+  describe('Animated WebP', () => {
+    it('Width only', (_t, done) => {
       sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(320, 240, {
           fit: 'contain',
           background: { r: 255, g: 0, b: 0 }
         })
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(true, data.length > 0);
           assert.strictEqual('webp', info.format);
@@ -170,13 +170,13 @@ describe('Resize fit=contain', function () {
         });
     });
 
-    it('Height only', function (_t, done) {
+    it('Height only', (_t, done) => {
       sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(240, 320, {
           fit: 'contain',
           background: { r: 255, g: 0, b: 0 }
         })
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(true, data.length > 0);
           assert.strictEqual('webp', info.format);
@@ -188,22 +188,22 @@ describe('Resize fit=contain', function () {
     });
   });
 
-  it('Invalid position values should fail', function () {
-    [-1, 8.1, 9, 1000000, false, 'vallejo'].forEach(function (position) {
-      assert.throws(function () {
+  it('Invalid position values should fail', () => {
+    [-1, 8.1, 9, 1000000, false, 'vallejo'].forEach((position) => {
+      assert.throws(() => {
         sharp().resize(null, null, { fit: 'contain', position });
       });
     });
   });
 
-  it('Position horizontal top', function (_t, done) {
+  it('Position horizontal top', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'top'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -214,14 +214,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal right top', function (_t, done) {
+  it('Position horizontal right top', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right top'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -232,14 +232,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal right', function (_t, done) {
+  it('Position horizontal right', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -250,14 +250,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal right bottom', function (_t, done) {
+  it('Position horizontal right bottom', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right bottom'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -268,14 +268,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal bottom', function (_t, done) {
+  it('Position horizontal bottom', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'bottom'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -286,14 +286,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal left bottom', function (_t, done) {
+  it('Position horizontal left bottom', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left bottom'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -304,14 +304,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal left', function (_t, done) {
+  it('Position horizontal left', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -322,14 +322,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal left top', function (_t, done) {
+  it('Position horizontal left top', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left top'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -340,14 +340,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal north', function (_t, done) {
+  it('Position horizontal north', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.north
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -358,14 +358,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal northeast', function (_t, done) {
+  it('Position horizontal northeast', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.northeast
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -376,14 +376,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal east', function (_t, done) {
+  it('Position horizontal east', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.east
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -394,14 +394,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal southeast', function (_t, done) {
+  it('Position horizontal southeast', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.southeast
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -412,14 +412,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal south', function (_t, done) {
+  it('Position horizontal south', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.south
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -430,14 +430,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal southwest', function (_t, done) {
+  it('Position horizontal southwest', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.southwest
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -448,14 +448,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal west', function (_t, done) {
+  it('Position horizontal west', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.west
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -466,14 +466,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal northwest', function (_t, done) {
+  it('Position horizontal northwest', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.northwest
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -484,14 +484,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position horizontal center', function (_t, done) {
+  it('Position horizontal center', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 100, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.center
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -502,14 +502,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical top', function (_t, done) {
+  it('Position vertical top', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'top'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -520,14 +520,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical right top', function (_t, done) {
+  it('Position vertical right top', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right top'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -538,14 +538,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical right', function (_t, done) {
+  it('Position vertical right', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -556,14 +556,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical right bottom', function (_t, done) {
+  it('Position vertical right bottom', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'right bottom'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -574,14 +574,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical bottom', function (_t, done) {
+  it('Position vertical bottom', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'bottom'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -592,14 +592,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical left bottom', function (_t, done) {
+  it('Position vertical left bottom', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left bottom'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -610,14 +610,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical left', function (_t, done) {
+  it('Position vertical left', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -628,14 +628,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical left top', function (_t, done) {
+  it('Position vertical left top', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: 'left top'
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -646,14 +646,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical north', function (_t, done) {
+  it('Position vertical north', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.north
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -664,14 +664,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical northeast', function (_t, done) {
+  it('Position vertical northeast', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.northeast
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -682,14 +682,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical east', function (_t, done) {
+  it('Position vertical east', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.east
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -700,14 +700,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical southeast', function (_t, done) {
+  it('Position vertical southeast', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.southeast
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -718,14 +718,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical south', function (_t, done) {
+  it('Position vertical south', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.south
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -736,14 +736,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical southwest', function (_t, done) {
+  it('Position vertical southwest', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.southwest
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -754,14 +754,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical west', function (_t, done) {
+  it('Position vertical west', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.west
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -772,14 +772,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical northwest', function (_t, done) {
+  it('Position vertical northwest', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.northwest
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -790,14 +790,14 @@ describe('Resize fit=contain', function () {
       });
   });
 
-  it('Position vertical center', function (_t, done) {
+  it('Position vertical center', (_t, done) => {
     sharp(fixtures.inputPngEmbed)
       .resize(200, 200, {
         fit: sharp.fit.contain,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         position: sharp.gravity.center
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);

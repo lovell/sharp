@@ -9,7 +9,7 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Join input images together', function () {
+describe('Join input images together', () => {
   it('Join two images horizontally', async () => {
     const data = await sharp([
       fixtures.inputPngPalette,

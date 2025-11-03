@@ -12,13 +12,13 @@ const fixtures = require('../fixtures');
 
 const outputTiff = fixtures.path('output.tiff');
 
-describe('TIFF', function () {
-  it('Load TIFF from Buffer', function (_t, done) {
+describe('TIFF', () => {
+  it('Load TIFF from Buffer', (_t, done) => {
     const inputTiffBuffer = fs.readFileSync(fixtures.inputTiff);
     sharp(inputTiffBuffer)
       .resize(320, 240)
       .jpeg()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -29,10 +29,10 @@ describe('TIFF', function () {
       });
   });
 
-  it('Load multi-page TIFF from file', function (_t, done) {
+  it('Load multi-page TIFF from file', (_t, done) => {
     sharp(fixtures.inputTiffMultipage) // defaults to page 0
       .jpeg()
-      .toBuffer(function (err, defaultData, defaultInfo) {
+      .toBuffer((err, defaultData, defaultInfo) => {
         if (err) throw err;
         assert.strictEqual(true, defaultData.length > 0);
         assert.strictEqual(defaultData.length, defaultInfo.size);
@@ -40,7 +40,7 @@ describe('TIFF', function () {
 
         sharp(fixtures.inputTiffMultipage, { page: 1 }) // 50%-scale copy of page 0
           .jpeg()
-          .toBuffer(function (err, scaledData, scaledInfo) {
+          .toBuffer((err, scaledData, scaledInfo) => {
             if (err) throw err;
             assert.strictEqual(true, scaledData.length > 0);
             assert.strictEqual(scaledData.length, scaledInfo.size);
@@ -52,11 +52,11 @@ describe('TIFF', function () {
       });
   });
 
-  it('Load multi-page TIFF from Buffer', function (_t, done) {
+  it('Load multi-page TIFF from Buffer', (_t, done) => {
     const inputTiffBuffer = fs.readFileSync(fixtures.inputTiffMultipage);
     sharp(inputTiffBuffer) // defaults to page 0
       .jpeg()
-      .toBuffer(function (err, defaultData, defaultInfo) {
+      .toBuffer((err, defaultData, defaultInfo) => {
         if (err) throw err;
         assert.strictEqual(true, defaultData.length > 0);
         assert.strictEqual(defaultData.length, defaultInfo.size);
@@ -64,7 +64,7 @@ describe('TIFF', function () {
 
         sharp(inputTiffBuffer, { page: 1 }) // 50%-scale copy of page 0
           .jpeg()
-          .toBuffer(function (err, scaledData, scaledInfo) {
+          .toBuffer((err, scaledData, scaledInfo) => {
             if (err) throw err;
             assert.strictEqual(true, scaledData.length > 0);
             assert.strictEqual(scaledData.length, scaledInfo.size);
@@ -76,10 +76,10 @@ describe('TIFF', function () {
       });
   });
 
-  it('Save TIFF to Buffer', function (_t, done) {
+  it('Save TIFF to Buffer', (_t, done) => {
     sharp(fixtures.inputTiff)
       .resize(320, 240)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -105,19 +105,19 @@ describe('TIFF', function () {
       )
   );
 
-  it('Invalid TIFF quality throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF quality throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ quality: 101 });
     });
   });
 
-  it('Missing TIFF quality does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('Missing TIFF quality does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff();
     });
   });
 
-  it('Not squashing TIFF to a bit depth of 1 should not change the file size', function (_t, done) {
+  it('Not squashing TIFF to a bit depth of 1 should not change the file size', (_t, done) => {
     const startSize = fs.statSync(fixtures.inputTiff8BitDepth).size;
     sharp(fixtures.inputTiff8BitDepth)
       .toColourspace('b-w') // can only squash 1 band uchar images
@@ -134,7 +134,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('Squashing TIFF to a bit depth of 1 should significantly reduce file size', function (_t, done) {
+  it('Squashing TIFF to a bit depth of 1 should significantly reduce file size', (_t, done) => {
     const startSize = fs.statSync(fixtures.inputTiff8BitDepth).size;
     sharp(fixtures.inputTiff8BitDepth)
       .toColourspace('b-w') // can only squash 1 band uchar images
@@ -151,8 +151,8 @@ describe('TIFF', function () {
       });
   });
 
-  it('Invalid TIFF bitdepth value throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF bitdepth value throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ bitdepth: 3 });
     }, /Error: Expected 1, 2, 4 or 8 for bitdepth but received 3 of type number/);
   });
@@ -210,19 +210,19 @@ describe('TIFF', function () {
     assert.strictEqual(25400, density);
   });
 
-  it('TIFF invalid xres value should throw an error', function () {
-    assert.throws(function () {
+  it('TIFF invalid xres value should throw an error', () => {
+    assert.throws(() => {
       sharp().tiff({ xres: '1000.0' });
     });
   });
 
-  it('TIFF invalid yres value should throw an error', function () {
-    assert.throws(function () {
+  it('TIFF invalid yres value should throw an error', () => {
+    assert.throws(() => {
       sharp().tiff({ yres: '1000.0' });
     });
   });
 
-  it('TIFF lzw compression with horizontal predictor shrinks test file', function (_t, done) {
+  it('TIFF lzw compression with horizontal predictor shrinks test file', (_t, done) => {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -274,7 +274,7 @@ describe('TIFF', function () {
       })
   );
 
-  it('TIFF ccittfax4 compression shrinks b-w test file', function (_t, done) {
+  it('TIFF ccittfax4 compression shrinks b-w test file', (_t, done) => {
     const startSize = fs.statSync(fixtures.inputTiff).size;
     sharp(fixtures.inputTiff)
       .toColourspace('b-w')
@@ -314,7 +314,7 @@ describe('TIFF', function () {
     assert.strictEqual(resolutionUnit, 'cm');
   });
 
-  it('TIFF deflate compression with horizontal predictor shrinks test file', function (_t, done) {
+  it('TIFF deflate compression with horizontal predictor shrinks test file', (_t, done) => {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -329,7 +329,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF deflate compression with float predictor shrinks test file', function (_t, done) {
+  it('TIFF deflate compression with float predictor shrinks test file', (_t, done) => {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -344,7 +344,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF deflate compression without predictor shrinks test file', function (_t, done) {
+  it('TIFF deflate compression without predictor shrinks test file', (_t, done) => {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -359,7 +359,7 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF jpeg compression shrinks test file', function (_t, done) {
+  it('TIFF jpeg compression shrinks test file', (_t, done) => {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -373,79 +373,79 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF none compression does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF none compression does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ compression: 'none' });
     });
   });
 
-  it('TIFF lzw compression does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF lzw compression does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ compression: 'lzw' });
     });
   });
 
-  it('TIFF deflate compression does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF deflate compression does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ compression: 'deflate' });
     });
   });
 
-  it('TIFF invalid compression option throws', function () {
-    assert.throws(function () {
+  it('TIFF invalid compression option throws', () => {
+    assert.throws(() => {
       sharp().tiff({ compression: 0 });
     });
   });
 
-  it('TIFF invalid compression option throws', function () {
-    assert.throws(function () {
+  it('TIFF invalid compression option throws', () => {
+    assert.throws(() => {
       sharp().tiff({ compression: 'a' });
     });
   });
 
-  it('TIFF bigtiff true value does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF bigtiff true value does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ bigtiff: true });
     });
   });
 
-  it('Invalid TIFF bigtiff value throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF bigtiff value throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ bigtiff: 'true' });
     });
   });
 
-  it('TIFF invalid predictor option throws', function () {
-    assert.throws(function () {
+  it('TIFF invalid predictor option throws', () => {
+    assert.throws(() => {
       sharp().tiff({ predictor: 'a' });
     });
   });
 
-  it('TIFF invalid resolutionUnit option throws', function () {
-    assert.throws(function () {
+  it('TIFF invalid resolutionUnit option throws', () => {
+    assert.throws(() => {
       sharp().tiff({ resolutionUnit: 'none' });
     });
   });
 
-  it('TIFF horizontal predictor does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF horizontal predictor does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ predictor: 'horizontal' });
     });
   });
 
-  it('TIFF float predictor does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF float predictor does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ predictor: 'float' });
     });
   });
 
-  it('TIFF none predictor does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF none predictor does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ predictor: 'none' });
     });
   });
 
-  it('TIFF tiled pyramid image without compression enlarges test file', function (_t, done) {
+  it('TIFF tiled pyramid image without compression enlarges test file', (_t, done) => {
     const startSize = fs.statSync(fixtures.inputTiffUncompressed).size;
     sharp(fixtures.inputTiffUncompressed)
       .tiff({
@@ -463,89 +463,89 @@ describe('TIFF', function () {
       });
   });
 
-  it('TIFF pyramid true value does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF pyramid true value does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ pyramid: true });
     });
   });
 
-  it('Invalid TIFF pyramid value throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF pyramid value throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ pyramid: 'true' });
     });
   });
 
-  it('TIFF miniswhite true value does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF miniswhite true value does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ miniswhite: true });
     });
   });
 
-  it('Invalid TIFF miniswhite value throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF miniswhite value throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ miniswhite: 'true' });
     });
   });
 
-  it('Invalid TIFF tile value throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF tile value throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ tile: 'true' });
     });
   });
 
-  it('TIFF tile true value does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('TIFF tile true value does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ tile: true });
     });
   });
 
-  it('Valid TIFF tileHeight value does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('Valid TIFF tileHeight value does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ tileHeight: 512 });
     });
   });
 
-  it('Valid TIFF tileWidth value does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('Valid TIFF tileWidth value does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().tiff({ tileWidth: 512 });
     });
   });
 
-  it('Invalid TIFF tileHeight value throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF tileHeight value throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ tileHeight: '256' });
     });
   });
 
-  it('Invalid TIFF tileWidth value throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF tileWidth value throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ tileWidth: '256' });
     });
   });
 
-  it('Invalid TIFF tileHeight value throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF tileHeight value throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ tileHeight: 0 });
     });
   });
 
-  it('Invalid TIFF tileWidth value throws error', function () {
-    assert.throws(function () {
+  it('Invalid TIFF tileWidth value throws error', () => {
+    assert.throws(() => {
       sharp().tiff({ tileWidth: 0 });
     });
   });
 
-  it('TIFF file input with invalid page fails gracefully', function (_t, done) {
+  it('TIFF file input with invalid page fails gracefully', (_t, done) => {
     sharp(fixtures.inputTiffMultipage, { page: 2 })
-      .toBuffer(function (err) {
+      .toBuffer((err) => {
         assert.strictEqual(true, !!err);
         done();
       });
   });
 
-  it('TIFF buffer input with invalid page fails gracefully', function (_t, done) {
+  it('TIFF buffer input with invalid page fails gracefully', (_t, done) => {
     sharp(fs.readFileSync(fixtures.inputTiffMultipage), { page: 2 })
-      .toBuffer(function (err) {
+      .toBuffer((err) => {
         assert.strictEqual(true, !!err);
         done();
       });

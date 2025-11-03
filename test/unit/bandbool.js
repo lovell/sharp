@@ -8,18 +8,18 @@ const assert = require('node:assert');
 const fixtures = require('../fixtures');
 const sharp = require('../../');
 
-describe('Bandbool per-channel boolean operations', function () {
+describe('Bandbool per-channel boolean operations', () => {
   [
     sharp.bool.and,
     sharp.bool.or,
     sharp.bool.eor
   ]
-    .forEach(function (op) {
-      it(`${op} operation`, function (_t, done) {
+    .forEach((op) => {
+      it(`${op} operation`, (_t, done) => {
         sharp(fixtures.inputPngBooleanNoAlpha)
           .bandbool(op)
           .toColourspace('b-w')
-          .toBuffer(function (err, data, info) {
+          .toBuffer((err, data, info) => {
             if (err) throw err;
             assert.strictEqual(200, info.width);
             assert.strictEqual(200, info.height);
@@ -29,24 +29,24 @@ describe('Bandbool per-channel boolean operations', function () {
       });
     });
 
-  it('sRGB image retains 3 channels', function (_t, done) {
+  it('sRGB image retains 3 channels', (_t, done) => {
     sharp(fixtures.inputJpg)
       .bandbool('and')
-      .toBuffer(function (err, _data, info) {
+      .toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual(3, info.channels);
         done();
       });
   });
 
-  it('Invalid operation', function () {
-    assert.throws(function () {
+  it('Invalid operation', () => {
+    assert.throws(() => {
       sharp().bandbool('fail');
     });
   });
 
-  it('Missing operation', function () {
-    assert.throws(function () {
+  it('Missing operation', () => {
+    assert.throws(() => {
       sharp().bandbool();
     });
   });

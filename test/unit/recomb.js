@@ -15,12 +15,12 @@ const sepia = [
   [0.2392, 0.4696, 0.0912]
 ];
 
-describe('Recomb', function () {
-  it('applies a sepia filter using recomb', function (_t, done) {
+describe('Recomb', () => {
+  it('applies a sepia filter using recomb', (_t, done) => {
     const output = fixtures.path('output.recomb-sepia.jpg');
     sharp(fixtures.inputJpgWithLandscapeExif1)
       .recomb(sepia)
-      .toFile(output, function (err, info) {
+      .toFile(output, (err, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(600, info.width);
@@ -34,11 +34,11 @@ describe('Recomb', function () {
       });
   });
 
-  it('applies a sepia filter using recomb to an PNG with Alpha', function (_t, done) {
+  it('applies a sepia filter using recomb to an PNG with Alpha', (_t, done) => {
     const output = fixtures.path('output.recomb-sepia.png');
     sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .recomb(sepia)
-      .toFile(output, function (err, info) {
+      .toFile(output, (err, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(1024, info.width);
@@ -66,7 +66,7 @@ describe('Recomb', function () {
     assert.strictEqual(3, info.channels);
   });
 
-  it('applies a different sepia filter using recomb', function (_t, done) {
+  it('applies a different sepia filter using recomb', (_t, done) => {
     const output = fixtures.path('output.recomb-sepia2.jpg');
     sharp(fixtures.inputJpgWithLandscapeExif1)
       .recomb([
@@ -74,7 +74,7 @@ describe('Recomb', function () {
         [0.349, 0.686, 0.168],
         [0.272, 0.534, 0.131]
       ])
-      .toFile(output, function (err, info) {
+      .toFile(output, (err, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(600, info.width);
@@ -87,7 +87,7 @@ describe('Recomb', function () {
         done();
       });
   });
-  it('increases the saturation of the image', function (_t, done) {
+  it('increases the saturation of the image', (_t, done) => {
     const saturationLevel = 1;
     const output = fixtures.path('output.recomb-saturation.jpg');
     sharp(fixtures.inputJpgWithLandscapeExif1)
@@ -108,7 +108,7 @@ describe('Recomb', function () {
           saturationLevel + 1 - 0.114
         ]
       ])
-      .toFile(output, function (err, info) {
+      .toFile(output, (err, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(600, info.width);
@@ -122,7 +122,7 @@ describe('Recomb', function () {
       });
   });
 
-  it('applies opacity 30% to the image', function (_t, done) {
+  it('applies opacity 30% to the image', (_t, done) => {
     const output = fixtures.path('output.recomb-opacity.png');
     sharp(fixtures.inputPngWithTransparent)
       .recomb([
@@ -131,7 +131,7 @@ describe('Recomb', function () {
         [0, 0, 1, 0],
         [0, 0, 0, 0.3]
       ])
-      .toFile(output, function (err, info) {
+      .toFile(output, (err, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(48, info.width);
@@ -145,19 +145,19 @@ describe('Recomb', function () {
       });
   });
 
-  describe('invalid matrix specification', function () {
-    it('missing', function () {
-      assert.throws(function () {
+  describe('invalid matrix specification', () => {
+    it('missing', () => {
+      assert.throws(() => {
         sharp(fixtures.inputJpg).recomb();
       });
     });
-    it('incorrect flat data', function () {
-      assert.throws(function () {
+    it('incorrect flat data', () => {
+      assert.throws(() => {
         sharp(fixtures.inputJpg).recomb([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
     });
-    it('incorrect sub size', function () {
-      assert.throws(function () {
+    it('incorrect sub size', () => {
+      assert.throws(() => {
         sharp(fixtures.inputJpg).recomb([
           [1, 2, 3, 4],
           [5, 6, 7, 8],
@@ -165,8 +165,8 @@ describe('Recomb', function () {
         ]);
       });
     });
-    it('incorrect top size', function () {
-      assert.throws(function () {
+    it('incorrect top size', () => {
+      assert.throws(() => {
         sharp(fixtures.inputJpg).recomb([[1, 2, 3, 4], [5, 6, 7, 8]]);
       });
     });

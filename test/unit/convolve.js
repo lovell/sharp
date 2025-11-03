@@ -9,8 +9,8 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Convolve', function () {
-  it('specific convolution kernel 1', function (_t, done) {
+describe('Convolve', () => {
+  it('specific convolution kernel 1', (_t, done) => {
     sharp(fixtures.inputPngStripesV)
       .convolve({
         width: 3,
@@ -23,7 +23,7 @@ describe('Convolve', function () {
           10, 20, 10
         ]
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(320, info.width);
@@ -32,7 +32,7 @@ describe('Convolve', function () {
       });
   });
 
-  it('specific convolution kernel 2', function (_t, done) {
+  it('specific convolution kernel 2', (_t, done) => {
     sharp(fixtures.inputPngStripesH)
       .convolve({
         width: 3,
@@ -43,7 +43,7 @@ describe('Convolve', function () {
           1, 0, 1
         ]
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(320, info.width);
@@ -52,7 +52,7 @@ describe('Convolve', function () {
       });
   });
 
-  it('horizontal Sobel operator', function (_t, done) {
+  it('horizontal Sobel operator', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .convolve({
@@ -64,7 +64,7 @@ describe('Convolve', function () {
           -1, 0, 1
         ]
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -73,14 +73,14 @@ describe('Convolve', function () {
       });
   });
 
-  describe('invalid kernel specification', function () {
-    it('missing', function () {
-      assert.throws(function () {
+  describe('invalid kernel specification', () => {
+    it('missing', () => {
+      assert.throws(() => {
         sharp(fixtures.inputJpg).convolve({});
       });
     });
-    it('incorrect data format', function () {
-      assert.throws(function () {
+    it('incorrect data format', () => {
+      assert.throws(() => {
         sharp(fixtures.inputJpg).convolve({
           width: 3,
           height: 3,
@@ -88,8 +88,8 @@ describe('Convolve', function () {
         });
       });
     });
-    it('incorrect dimensions', function () {
-      assert.throws(function () {
+    it('incorrect dimensions', () => {
+      assert.throws(() => {
         sharp(fixtures.inputJpg).convolve({
           width: 3,
           height: 4,

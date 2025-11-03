@@ -11,55 +11,55 @@ const libvips = require('../../lib/libvips');
 
 const originalPlatform = process.platform;
 
-const setPlatform = function (platform) {
+const setPlatform = (platform) => {
   Object.defineProperty(process, 'platform', { value: platform });
 };
 
-const restorePlatform = function () {
+const restorePlatform = () => {
   setPlatform(originalPlatform);
 };
 
-describe('libvips binaries', function () {
-  describe('Windows platform', function () {
-    before(function () { setPlatform('win32'); });
+describe('libvips binaries', () => {
+  describe('Windows platform', () => {
+    before(() => { setPlatform('win32'); });
     after(restorePlatform);
 
-    it('pkgConfigPath returns empty string', function () {
+    it('pkgConfigPath returns empty string', () => {
       assert.strictEqual('', libvips.pkgConfigPath());
     });
-    it('globalLibvipsVersion returns empty string', function () {
+    it('globalLibvipsVersion returns empty string', () => {
       assert.strictEqual('', libvips.globalLibvipsVersion());
     });
-    it('globalLibvipsVersion is always false', function () {
+    it('globalLibvipsVersion is always false', () => {
       assert.strictEqual(false, libvips.useGlobalLibvips());
     });
   });
 
-  describe('non-Windows platforms', function () {
-    before(function () { setPlatform('linux'); });
+  describe('non-Windows platforms', () => {
+    before(() => { setPlatform('linux'); });
     after(restorePlatform);
 
-    it('pkgConfigPath returns a string', function () {
+    it('pkgConfigPath returns a string', () => {
       const pkgConfigPath = libvips.pkgConfigPath();
       assert.strictEqual('string', typeof pkgConfigPath);
     });
-    it('globalLibvipsVersion returns a string', function () {
+    it('globalLibvipsVersion returns a string', () => {
       const globalLibvipsVersion = libvips.globalLibvipsVersion();
       assert.strictEqual('string', typeof globalLibvipsVersion);
     });
-    it('globalLibvipsVersion returns a boolean', function () {
+    it('globalLibvipsVersion returns a boolean', () => {
       const useGlobalLibvips = libvips.useGlobalLibvips();
       assert.strictEqual('boolean', typeof useGlobalLibvips);
     });
   });
 
-  describe('platform agnostic', function () {
-    it('minimumLibvipsVersion returns a valid semver', function () {
+  describe('platform agnostic', () => {
+    it('minimumLibvipsVersion returns a valid semver', () => {
       const minimumLibvipsVersion = libvips.minimumLibvipsVersion;
       assert.strictEqual('string', typeof minimumLibvipsVersion);
       assert.notStrictEqual(null, semver.valid(minimumLibvipsVersion));
     });
-    it('useGlobalLibvips can be ignored via an env var', function () {
+    it('useGlobalLibvips can be ignored via an env var', () => {
       process.env.SHARP_IGNORE_GLOBAL_LIBVIPS = 1;
 
       const useGlobalLibvips = libvips.useGlobalLibvips();
@@ -67,14 +67,14 @@ describe('libvips binaries', function () {
 
       delete process.env.SHARP_IGNORE_GLOBAL_LIBVIPS;
     });
-    it('useGlobalLibvips can be forced via an env var', function () {
+    it('useGlobalLibvips can be forced via an env var', () => {
       process.env.SHARP_FORCE_GLOBAL_LIBVIPS = 1;
 
       const useGlobalLibvips = libvips.useGlobalLibvips();
       assert.strictEqual(true, useGlobalLibvips);
 
       let logged = false;
-      const logger = function (message) {
+      const logger = (message) => {
         assert.strictEqual(message, 'Detected SHARP_FORCE_GLOBAL_LIBVIPS, skipping search for globally-installed libvips');
         logged = true;
       };
@@ -146,25 +146,25 @@ describe('libvips binaries', function () {
     });
   });
 
-  describe('logger', function () {
+  describe('logger', () => {
     const consoleLog = console.log;
     const consoleError = console.error;
 
-    after(function () {
+    after(() => {
       console.log = consoleLog;
       console.error = consoleError;
     });
 
-    it('logs an info message', function (_t, done) {
-      console.log = function (msg) {
+    it('logs an info message', (_t, done) => {
+      console.log = (msg) => {
         assert.strictEqual(msg, 'sharp: progress');
         done();
       };
       libvips.log('progress');
     });
 
-    it('logs an error message', function (_t, done) {
-      console.error = function (msg) {
+    it('logs an error message', (_t, done) => {
+      console.error = (msg) => {
         assert.strictEqual(msg, 'sharp: Installation error: problem');
         done();
       };

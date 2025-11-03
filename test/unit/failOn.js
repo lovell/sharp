@@ -11,10 +11,10 @@ const sharp = require('../../lib');
 const fixtures = require('../fixtures');
 
 describe('failOn', () => {
-  it('handles truncated JPEG', function (_t, done) {
+  it('handles truncated JPEG', (_t, done) => {
     sharp(fixtures.inputJpgTruncated, { failOn: 'none' })
       .resize(32, 24)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(32, info.width);
@@ -23,17 +23,17 @@ describe('failOn', () => {
       });
   });
 
-  it('handles truncated PNG, emits warnings', function (_t, done) {
+  it('handles truncated PNG, emits warnings', (_t, done) => {
     let isWarningEmitted = false;
     sharp(fixtures.inputPngTruncated, { failOn: 'none' })
-      .on('warning', function (warning) {
+      .on('warning', (warning) => {
         assert.ok(
           ['read gave 2 warnings', 'not enough data', 'end of stream']
             .some(m => warning.includes(m)));
         isWarningEmitted = true;
       })
       .resize(32, 24)
-      .toBuffer(function (err, _data, info) {
+      .toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual(true, isWarningEmitted);
         assert.strictEqual('png', info.format);
@@ -71,8 +71,8 @@ describe('failOn', () => {
     );
   });
 
-  it('returns errors to callback for truncated JPEG', function (_t, done) {
-    sharp(fixtures.inputJpgTruncated, { failOn: 'truncated' }).toBuffer(function (err, data, info) {
+  it('returns errors to callback for truncated JPEG', (_t, done) => {
+    sharp(fixtures.inputJpgTruncated, { failOn: 'truncated' }).toBuffer((err, data, info) => {
       assert.ok(err.message.includes('VipsJpeg: premature end of'), err);
       assert.strictEqual(data, undefined);
       assert.strictEqual(info, undefined);
@@ -80,8 +80,8 @@ describe('failOn', () => {
     });
   });
 
-  it('returns errors to callback for truncated PNG', function (_t, done) {
-    sharp(fixtures.inputPngTruncated, { failOn: 'truncated' }).toBuffer(function (err, data, info) {
+  it('returns errors to callback for truncated PNG', (_t, done) => {
+    sharp(fixtures.inputPngTruncated, { failOn: 'truncated' }).toBuffer((err, data, info) => {
       assert.ok(err.message.includes('read error'), err);
       assert.strictEqual(data, undefined);
       assert.strictEqual(info, undefined);
@@ -89,7 +89,7 @@ describe('failOn', () => {
     });
   });
 
-  it('rejects promises for truncated JPEG', function (_t, done) {
+  it('rejects promises for truncated JPEG', (_t, done) => {
     sharp(fixtures.inputJpgTruncated, { failOn: 'error' })
       .toBuffer()
       .then(() => {

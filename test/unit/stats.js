@@ -22,9 +22,9 @@ function isInteger (val) {
   return Number.isInteger(val);
 }
 
-describe('Image Stats', function () {
-  it('JPEG', function (_t, done) {
-    sharp(fixtures.inputJpg).stats(function (err, stats) {
+describe('Image Stats', () => {
+  it('JPEG', (_t, done) => {
+    sharp(fixtures.inputJpg).stats((err, stats) => {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
@@ -88,8 +88,8 @@ describe('Image Stats', function () {
     });
   });
 
-  it('PNG without transparency', function (_t, done) {
-    sharp(fixtures.inputPng).stats(function (err, stats) {
+  it('PNG without transparency', (_t, done) => {
+    sharp(fixtures.inputPng).stats((err, stats) => {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
@@ -120,8 +120,8 @@ describe('Image Stats', function () {
     });
   });
 
-  it('PNG with transparency', function (_t, done) {
-    sharp(fixtures.inputPngWithTransparency).stats(function (err, stats) {
+  it('PNG with transparency', (_t, done) => {
+    sharp(fixtures.inputPngWithTransparency).stats((err, stats) => {
       if (err) throw err;
 
       assert.strictEqual(false, stats.isOpaque);
@@ -201,8 +201,8 @@ describe('Image Stats', function () {
     });
   });
 
-  it('PNG fully transparent', function (_t, done) {
-    sharp(fixtures.inputPngCompleteTransparency).stats(function (err, stats) {
+  it('PNG fully transparent', (_t, done) => {
+    sharp(fixtures.inputPngCompleteTransparency).stats((err, stats) => {
       if (err) throw err;
 
       assert.strictEqual(false, stats.isOpaque);
@@ -234,8 +234,8 @@ describe('Image Stats', function () {
     });
   });
 
-  it('Tiff', function (_t, done) {
-    sharp(fixtures.inputTiff).stats(function (err, stats) {
+  it('Tiff', (_t, done) => {
+    sharp(fixtures.inputTiff).stats((err, stats) => {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
@@ -267,8 +267,8 @@ describe('Image Stats', function () {
     });
   });
 
-  it('WebP', function (_t, done) {
-    sharp(fixtures.inputWebP).stats(function (err, stats) {
+  it('WebP', (_t, done) => {
+    sharp(fixtures.inputWebP).stats((err, stats) => {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
@@ -332,8 +332,8 @@ describe('Image Stats', function () {
     });
   });
 
-  it('GIF', function (_t, done) {
-    sharp(fixtures.inputGif).stats(function (err, stats) {
+  it('GIF', (_t, done) => {
+    sharp(fixtures.inputGif).stats((err, stats) => {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
@@ -397,8 +397,8 @@ describe('Image Stats', function () {
     });
   });
 
-  it('Grayscale GIF with alpha', function (_t, done) {
-    sharp(fixtures.inputGifGreyPlusAlpha).stats(function (err, stats) {
+  it('Grayscale GIF with alpha', (_t, done) => {
+    sharp(fixtures.inputGifGreyPlusAlpha).stats((err, stats) => {
       if (err) throw err;
 
       assert.strictEqual(false, stats.isOpaque);
@@ -479,9 +479,9 @@ describe('Image Stats', function () {
     assert.strictEqual(sharpness, 0);
   });
 
-  it('Stream in, Callback out', function (_t, done) {
+  it('Stream in, Callback out', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJpg);
-    const pipeline = sharp().stats(function (err, stats) {
+    const pipeline = sharp().stats((err, stats) => {
       if (err) throw err;
 
       assert.strictEqual(true, stats.isOpaque);
@@ -546,12 +546,12 @@ describe('Image Stats', function () {
     readable.pipe(pipeline);
   });
 
-  it('Stream in, Promise out', function () {
+  it('Stream in, Promise out', () => {
     const pipeline = sharp();
 
     fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
 
-    return pipeline.stats().then(function (stats) {
+    return pipeline.stats().then((stats) => {
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.332915340666659));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
@@ -608,13 +608,12 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInRange(stats.channels[0].maxX, 0, 2725));
       assert.strictEqual(true, isInteger(stats.channels[0].maxY));
       assert.strictEqual(true, isInRange(stats.channels[0].maxY, 0, 2725));
-    }).catch(function (err) {
+    }).catch((err) => {
       throw err;
     });
   });
 
-  it('File in, Promise out', function () {
-    return sharp(fixtures.inputJpg).stats().then(function (stats) {
+  it('File in, Promise out', () => sharp(fixtures.inputJpg).stats().then((stats) => {
       assert.strictEqual(true, stats.isOpaque);
       assert.strictEqual(true, isInAcceptableRange(stats.entropy, 7.332915340666659));
       assert.strictEqual(true, isInAcceptableRange(stats.sharpness, 0.788301114707569));
@@ -671,10 +670,9 @@ describe('Image Stats', function () {
       assert.strictEqual(true, isInRange(stats.channels[0].maxX, 0, 2725));
       assert.strictEqual(true, isInteger(stats.channels[0].maxY));
       assert.strictEqual(true, isInRange(stats.channels[0].maxY, 0, 2725));
-    }).catch(function (err) {
+    }).catch((err) => {
       throw err;
-    });
-  });
+    }));
 
   it('Blurred image has lower sharpness than original', () => {
     const original = sharp(fixtures.inputJpg).stats();
@@ -688,9 +686,9 @@ describe('Image Stats', function () {
       });
   });
 
-  it('File input with corrupt header fails gracefully', function (_t, done) {
+  it('File input with corrupt header fails gracefully', (_t, done) => {
     sharp(fixtures.inputJpgWithCorruptHeader)
-      .stats(function (err) {
+      .stats((err) => {
         assert(err.message.includes('Input file has corrupt header'));
         assert(err.stack.includes('at Sharp.stats'));
         assert(err.stack.includes(__filename));
@@ -698,10 +696,10 @@ describe('Image Stats', function () {
       });
   });
 
-  it('Stream input with corrupt header fails gracefully', function (_t, done) {
+  it('Stream input with corrupt header fails gracefully', (_t, done) => {
     fs.createReadStream(fixtures.inputJpgWithCorruptHeader).pipe(
       sharp()
-        .stats(function (err) {
+        .stats((err) => {
           assert(err.message.includes('Input buffer has corrupt header'));
           assert(err.stack.includes('at Sharp.stats'));
           assert(err.stack.includes(__filename));
@@ -710,40 +708,38 @@ describe('Image Stats', function () {
     );
   });
 
-  it('File input with corrupt header fails gracefully, Promise out', function () {
-    return sharp(fixtures.inputJpgWithCorruptHeader)
-      .stats().then(function () {
+  it('File input with corrupt header fails gracefully, Promise out', () => sharp(fixtures.inputJpgWithCorruptHeader)
+      .stats().then(() => {
         throw new Error('Corrupt Header file');
-      }).catch(function (err) {
+      }).catch((err) => {
         assert.ok(!!err);
-      });
-  });
+      }));
 
-  it('File input with corrupt header fails gracefully, Stream In, Promise Out', function () {
+  it('File input with corrupt header fails gracefully, Stream In, Promise Out', () => {
     const pipeline = sharp();
 
     fs.createReadStream(fixtures.inputJpgWithCorruptHeader).pipe(pipeline);
 
     return pipeline
-      .stats().then(function () {
+      .stats().then(() => {
         throw new Error('Corrupt Header file');
-      }).catch(function (err) {
+      }).catch((err) => {
         assert.ok(!!err);
       });
   });
 
-  it('Buffer input with corrupt header fails gracefully', function (_t, done) {
+  it('Buffer input with corrupt header fails gracefully', (_t, done) => {
     sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
-      .stats(function (err) {
+      .stats((err) => {
         assert.strictEqual(true, !!err);
         done();
       });
   });
 
-  it('Non-existent file in, Promise out', function (_t, done) {
-    sharp('fail').stats().then(function () {
+  it('Non-existent file in, Promise out', (_t, done) => {
+    sharp('fail').stats().then(() => {
       throw new Error('Non-existent file');
-    }, function (err) {
+    }, (err) => {
       assert.ok(!!err);
       done();
     });

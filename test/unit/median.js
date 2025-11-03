@@ -16,7 +16,7 @@ const raw = {
   channels: 1
 };
 
-describe('Median filter', function () {
+describe('Median filter', () => {
   it('default window (3x3)', async () => {
     const data = await sharp(input, { raw })
       .median()

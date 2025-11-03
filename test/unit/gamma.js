@@ -9,11 +9,11 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Gamma correction', function () {
-  it('value of 0.0 (disabled)', function (_t, done) {
+describe('Gamma correction', () => {
+  it('value of 0.0 (disabled)', (_t, done) => {
     sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(129, info.width);
@@ -22,11 +22,11 @@ describe('Gamma correction', function () {
       });
   });
 
-  it('value of 2.2 (default)', function (_t, done) {
+  it('value of 2.2 (default)', (_t, done) => {
     sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .gamma()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(129, info.width);
@@ -35,11 +35,11 @@ describe('Gamma correction', function () {
       });
   });
 
-  it('value of 3.0', function (_t, done) {
+  it('value of 3.0', (_t, done) => {
     sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .gamma(3)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(129, info.width);
@@ -48,11 +48,11 @@ describe('Gamma correction', function () {
       });
   });
 
-  it('input value of 2.2, output value of 3.0', function (_t, done) {
+  it('input value of 2.2, output value of 3.0', (_t, done) => {
     sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .gamma(2.2, 3.0)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(129, info.width);
@@ -61,12 +61,12 @@ describe('Gamma correction', function () {
       });
   });
 
-  it('alpha transparency', function (_t, done) {
+  it('alpha transparency', (_t, done) => {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(320)
       .gamma()
       .jpeg()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -74,14 +74,14 @@ describe('Gamma correction', function () {
       });
   });
 
-  it('invalid first parameter value', function () {
-    assert.throws(function () {
+  it('invalid first parameter value', () => {
+    assert.throws(() => {
       sharp(fixtures.inputJpgWithGammaHoliness).gamma(4);
     });
   });
 
-  it('invalid second parameter value', function () {
-    assert.throws(function () {
+  it('invalid second parameter value', () => {
+    assert.throws(() => {
       sharp(fixtures.inputJpgWithGammaHoliness).gamma(2.2, 4);
     });
   });

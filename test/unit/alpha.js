@@ -8,12 +8,12 @@ const assert = require('node:assert');
 const fixtures = require('../fixtures');
 const sharp = require('../../');
 
-describe('Alpha transparency', function () {
-  it('Flatten to black', function (_t, done) {
+describe('Alpha transparency', () => {
+  it('Flatten to black', (_t, done) => {
     sharp(fixtures.inputPngWithTransparency)
       .flatten()
       .resize(400, 300)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(400, info.width);
         assert.strictEqual(300, info.height);
@@ -21,14 +21,14 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Flatten to RGB orange', function (_t, done) {
+  it('Flatten to RGB orange', (_t, done) => {
     sharp(fixtures.inputPngWithTransparency)
       .resize(400, 300)
       .flatten({
         background: { r: 255, g: 102, b: 0 }
       })
       .jpeg({ chromaSubsampling: '4:4:4' })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(400, info.width);
         assert.strictEqual(300, info.height);
@@ -36,12 +36,12 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Flatten to CSS/hex orange', function (_t, done) {
+  it('Flatten to CSS/hex orange', (_t, done) => {
     sharp(fixtures.inputPngWithTransparency)
       .resize(400, 300)
       .flatten({ background: '#ff6600' })
       .jpeg({ chromaSubsampling: '4:4:4' })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(400, info.width);
         assert.strictEqual(300, info.height);
@@ -49,13 +49,13 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Flatten 16-bit PNG with transparency to orange', function (_t, done) {
+  it('Flatten 16-bit PNG with transparency to orange', (_t, done) => {
     const output = fixtures.path('output.flatten-rgb16-orange.jpg');
     sharp(fixtures.inputPngWithTransparency16bit)
       .flatten({
         background: { r: 255, g: 102, b: 0 }
       })
-      .toFile(output, function (err, info) {
+      .toFile(output, (err, info) => {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
         assert.strictEqual(32, info.width);
@@ -65,10 +65,10 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Do not flatten', function (_t, done) {
+  it('Do not flatten', (_t, done) => {
     sharp(fixtures.inputPngWithTransparency)
       .flatten(false)
-      .toBuffer(function (err, _data, info) {
+      .toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(4, info.channels);
@@ -76,10 +76,10 @@ describe('Alpha transparency', function () {
       });
   });
 
-  it('Ignored for JPEG', function (_t, done) {
+  it('Ignored for JPEG', (_t, done) => {
     sharp(fixtures.inputJpg)
       .flatten({ background: '#ff0000' })
-      .toBuffer(function (err, _data, info) {
+      .toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(3, info.channels);
@@ -99,68 +99,60 @@ describe('Alpha transparency', function () {
     });
   });
 
-  it('Enlargement with non-nearest neighbor interpolation shouldn’t cause dark edges', function () {
+  it('Enlargement with non-nearest neighbor interpolation shouldn’t cause dark edges', () => {
     const base = 'alpha-premultiply-enlargement-2048x1536-paper.png';
     const actual = fixtures.path(`output.${base}`);
     const expected = fixtures.expected(base);
     return sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .resize(2048, 1536)
       .toFile(actual)
-      .then(function () {
+      .then(() => {
         fixtures.assertMaxColourDistance(actual, expected, 102);
       });
   });
 
-  it('Reduction with non-nearest neighbor interpolation shouldn’t cause dark edges', function () {
+  it('Reduction with non-nearest neighbor interpolation shouldn’t cause dark edges', () => {
     const base = 'alpha-premultiply-reduction-1024x768-paper.png';
     const actual = fixtures.path(`output.${base}`);
     const expected = fixtures.expected(base);
     return sharp(fixtures.inputPngAlphaPremultiplicationLarge)
       .resize(1024, 768)
       .toFile(actual)
-      .then(function () {
+      .then(() => {
         fixtures.assertMaxColourDistance(actual, expected, 102);
       });
   });
 
-  it('Removes alpha from fixtures with transparency, ignores those without', function () {
-    return Promise.all([
+  it('Removes alpha from fixtures with transparency, ignores those without', () => Promise.all([
       fixtures.inputPngWithTransparency,
       fixtures.inputPngWithTransparency16bit,
       fixtures.inputWebPWithTransparency,
       fixtures.inputJpg,
       fixtures.inputPng,
       fixtures.inputWebP
-    ].map(function (input) {
-      return sharp(input)
+    ].map((input) => sharp(input)
         .resize(10)
         .removeAlpha()
         .toBuffer({ resolveWithObject: true })
-        .then(function (result) {
+        .then((result) => {
           assert.strictEqual(3, result.info.channels);
-        });
-    }));
-  });
+        }))));
 
-  it('Ensures alpha from fixtures without transparency, ignores those with', function () {
-    return Promise.all([
+  it('Ensures alpha from fixtures without transparency, ignores those with', () => Promise.all([
       fixtures.inputPngWithTransparency,
       fixtures.inputPngWithTransparency16bit,
       fixtures.inputWebPWithTransparency,
       fixtures.inputJpg,
       fixtures.inputPng,
       fixtures.inputWebP
-    ].map(function (input) {
-      return sharp(input)
+    ].map((input) => sharp(input)
         .resize(10)
         .ensureAlpha()
         .png()
         .toBuffer({ resolveWithObject: true })
-        .then(function (result) {
+        .then((result) => {
           assert.strictEqual(4, result.info.channels);
-        });
-    }));
-  });
+        }))));
 
   it('Valid ensureAlpha value used for alpha channel', async () => {
     const background = { r: 255, g: 0, b: 0 };

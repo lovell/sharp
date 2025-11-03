@@ -49,15 +49,15 @@ describe('JP2 output', () => {
         });
     });
 
-    it('JP2 quality', function (done) {
+    it('JP2 quality', (done) => {
       sharp(fixtures.inputJp2)
         .resize(320, 240)
         .jp2({ quality: 70 })
-        .toBuffer(function (err, buffer70) {
+        .toBuffer((err, buffer70) => {
           if (err) throw err;
           sharp(fixtures.inputJp2)
             .resize(320, 240)
-            .toBuffer(function (err, buffer80) {
+            .toBuffer((err, buffer80) => {
               if (err) throw err;
               assert(buffer70.length < buffer80.length);
               done();
@@ -65,12 +65,12 @@ describe('JP2 output', () => {
         });
     });
 
-    it('Without chroma subsampling generates larger file', function (done) {
+    it('Without chroma subsampling generates larger file', (done) => {
       // First generate with chroma subsampling (default)
       sharp(fixtures.inputJp2)
         .resize(320, 240)
         .jp2({ chromaSubsampling: '4:2:0' })
-        .toBuffer(function (err, withChromaSubsamplingData, withChromaSubsamplingInfo) {
+        .toBuffer((err, withChromaSubsamplingData, withChromaSubsamplingInfo) => {
           if (err) throw err;
           assert.strictEqual(true, withChromaSubsamplingData.length > 0);
           assert.strictEqual(withChromaSubsamplingData.length, withChromaSubsamplingInfo.size);
@@ -81,7 +81,7 @@ describe('JP2 output', () => {
           sharp(fixtures.inputJp2)
             .resize(320, 240)
             .jp2({ chromaSubsampling: '4:4:4' })
-            .toBuffer(function (err, withoutChromaSubsamplingData, withoutChromaSubsamplingInfo) {
+            .toBuffer((err, withoutChromaSubsamplingData, withoutChromaSubsamplingInfo) => {
               if (err) throw err;
               assert.strictEqual(true, withoutChromaSubsamplingData.length > 0);
               assert.strictEqual(withoutChromaSubsamplingData.length, withoutChromaSubsamplingInfo.size);

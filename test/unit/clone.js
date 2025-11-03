@@ -10,21 +10,21 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Clone', function () {
-  beforeEach(function () {
+describe('Clone', () => {
+  beforeEach(() => {
     sharp.cache(false);
   });
-  afterEach(function () {
+  afterEach(() => {
     sharp.cache(true);
   });
 
-  it('Read from Stream and write to multiple Streams', function (_t, done) {
+  it('Read from Stream and write to multiple Streams', (_t, done) => {
     let finishEventsExpected = 2;
     // Output stream 1
     const output1 = fixtures.path('output.multi-stream.1.jpg');
     const writable1 = fs.createWriteStream(output1);
-    writable1.on('finish', function () {
-      sharp(output1).toBuffer(function (err, data, info) {
+    writable1.on('finish', () => {
+      sharp(output1).toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -41,8 +41,8 @@ describe('Clone', function () {
     // Output stream 2
     const output2 = fixtures.path('output.multi-stream.2.jpg');
     const writable2 = fs.createWriteStream(output2);
-    writable2.on('finish', function () {
-      sharp(output2).toBuffer(function (err, data, info) {
+    writable2.on('finish', () => {
+      sharp(output2).toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -65,14 +65,14 @@ describe('Clone', function () {
     fs.createReadStream(fixtures.inputJpg).pipe(rotator);
   });
 
-  it('Stream-based input attaches finish event listener to original', function () {
+  it('Stream-based input attaches finish event listener to original', () => {
     const original = sharp();
     const clone = original.clone();
     assert.strictEqual(1, original.listenerCount('finish'));
     assert.strictEqual(0, clone.listenerCount('finish'));
   });
 
-  it('Non Stream-based input does not attach finish event listeners', function () {
+  it('Non Stream-based input does not attach finish event listeners', () => {
     const original = sharp(fixtures.inputJpg);
     const clone = original.clone();
     assert.strictEqual(0, original.listenerCount('finish'));

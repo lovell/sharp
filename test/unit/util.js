@@ -8,9 +8,9 @@ const assert = require('node:assert');
 const semver = require('semver');
 const sharp = require('../../');
 
-describe('Utilities', function () {
-  describe('Cache', function () {
-    it('Can be disabled', function (_t, done) {
+describe('Utilities', () => {
+  describe('Cache', () => {
+    it('Can be disabled', (_t, done) => {
       const check = setInterval(() => {
         const cache = sharp.cache(false);
         const empty =
@@ -26,13 +26,13 @@ describe('Utilities', function () {
         }
       }, 2000);
     });
-    it('Can be enabled with defaults', function () {
+    it('Can be enabled with defaults', () => {
       const cache = sharp.cache(true);
       assert.strictEqual(cache.memory.max, 50);
       assert.strictEqual(cache.files.max, 20);
       assert.strictEqual(cache.items.max, 100);
     });
-    it('Can be set to zero', function () {
+    it('Can be set to zero', () => {
       const cache = sharp.cache({
         memory: 0,
         files: 0,
@@ -42,7 +42,7 @@ describe('Utilities', function () {
       assert.strictEqual(cache.files.max, 0);
       assert.strictEqual(cache.items.max, 0);
     });
-    it('Can be set to a maximum of 10MB, 100 files and 1000 items', function () {
+    it('Can be set to a maximum of 10MB, 100 files and 1000 items', () => {
       const cache = sharp.cache({
         memory: 10,
         files: 100,
@@ -52,7 +52,7 @@ describe('Utilities', function () {
       assert.strictEqual(cache.files.max, 100);
       assert.strictEqual(cache.items.max, 1000);
     });
-    it('Ignores invalid values', function () {
+    it('Ignores invalid values', () => {
       sharp.cache(true);
       const cache = sharp.cache('spoons');
       assert.strictEqual(cache.memory.max, 50);
@@ -61,23 +61,23 @@ describe('Utilities', function () {
     });
   });
 
-  describe('Concurrency', function () {
-    it('Can be set to use 16 threads', function () {
+  describe('Concurrency', () => {
+    it('Can be set to use 16 threads', () => {
       sharp.concurrency(16);
       assert.strictEqual(16, sharp.concurrency());
     });
-    it('Can be reset to default', function () {
+    it('Can be reset to default', () => {
       sharp.concurrency(0);
       assert.strictEqual(true, sharp.concurrency() > 0);
     });
-    it('Ignores invalid values', function () {
+    it('Ignores invalid values', () => {
       const defaultConcurrency = sharp.concurrency();
       sharp.concurrency('spoons');
       assert.strictEqual(defaultConcurrency, sharp.concurrency());
     });
   });
 
-  describe('Counters', function () {
+  describe('Counters', () => {
     it('Have zero value at rest', (_t, done) => {
       queueMicrotask(() => {
         const counters = sharp.counters();
@@ -88,28 +88,28 @@ describe('Utilities', function () {
     });
   });
 
-  describe('SIMD', function () {
-    it('Can get current state', function () {
+  describe('SIMD', () => {
+    it('Can get current state', () => {
       const simd = sharp.simd();
       assert.strictEqual(typeof simd, 'boolean');
     });
-    it('Can disable', function () {
+    it('Can disable', () => {
       const simd = sharp.simd(false);
       assert.strictEqual(simd, false);
     });
-    it('Can attempt to enable', function () {
+    it('Can attempt to enable', () => {
       const simd = sharp.simd(true);
       assert.strictEqual(typeof simd, 'boolean');
     });
   });
 
-  describe('Format', function () {
-    it('Contains expected attributes', function () {
+  describe('Format', () => {
+    it('Contains expected attributes', () => {
       assert.strictEqual('object', typeof sharp.format);
-      Object.keys(sharp.format).forEach(function (format) {
+      Object.keys(sharp.format).forEach((format) => {
         assert.strictEqual(true, 'id' in sharp.format[format]);
         assert.strictEqual(format, sharp.format[format].id);
-        ['input', 'output'].forEach(function (direction) {
+        ['input', 'output'].forEach((direction) => {
           assert.strictEqual(true, direction in sharp.format[format]);
           assert.strictEqual('object', typeof sharp.format[format][direction]);
           assert.strictEqual(true, [3, 4].includes(Object.keys(sharp.format[format][direction]).length));
@@ -122,30 +122,30 @@ describe('Utilities', function () {
         });
       });
     });
-    it('Raw file=false, buffer=true, stream=true', function () {
-      ['input', 'output'].forEach(function (direction) {
+    it('Raw file=false, buffer=true, stream=true', () => {
+      ['input', 'output'].forEach((direction) => {
         assert.strictEqual(false, sharp.format.raw[direction].file);
         assert.strictEqual(true, sharp.format.raw[direction].buffer);
         assert.strictEqual(true, sharp.format.raw[direction].stream);
       });
     });
-    it('vips format supports filesystem only', function () {
-      ['input', 'output'].forEach(function (direction) {
+    it('vips format supports filesystem only', () => {
+      ['input', 'output'].forEach((direction) => {
         assert.strictEqual(true, sharp.format.vips[direction].file);
         assert.strictEqual(false, sharp.format.vips[direction].buffer);
         assert.strictEqual(false, sharp.format.vips[direction].stream);
       });
     });
-    it('input fileSuffix', function () {
+    it('input fileSuffix', () => {
       assert.deepStrictEqual(['.jpg', '.jpeg', '.jpe', '.jfif'], sharp.format.jpeg.input.fileSuffix);
     });
-    it('output alias', function () {
+    it('output alias', () => {
       assert.deepStrictEqual(['jpe', 'jpg'], sharp.format.jpeg.output.alias);
     });
   });
 
-  describe('Versions', function () {
-    it('Contains expected attributes', function () {
+  describe('Versions', () => {
+    it('Contains expected attributes', () => {
       assert.strictEqual('object', typeof sharp.versions);
       assert(semver.valid(sharp.versions.vips));
       assert(semver.valid(sharp.versions.sharp));

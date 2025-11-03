@@ -14,9 +14,9 @@ const fixtures = require('../fixtures');
 
 const create = { width: 1, height: 1, channels: 3, background: 'red' };
 
-describe('Image metadata', function () {
-  it('JPEG', function (_t, done) {
-    sharp(fixtures.inputJpg).metadata(function (err, metadata) {
+describe('Image metadata', () => {
+  it('JPEG', (_t, done) => {
+    sharp(fixtures.inputJpg).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -37,8 +37,8 @@ describe('Image metadata', function () {
     });
   });
 
-  it('JPEG with EXIF/ICC', function (_t, done) {
-    sharp(fixtures.inputJpgWithExif).metadata(function (err, metadata) {
+  it('JPEG with EXIF/ICC', (_t, done) => {
+    sharp(fixtures.inputJpgWithExif).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -70,8 +70,8 @@ describe('Image metadata', function () {
     });
   });
 
-  it('JPEG with IPTC/XMP', function (_t, done) {
-    sharp(fixtures.inputJpgWithIptcAndXmp).metadata(function (err, metadata) {
+  it('JPEG with IPTC/XMP', (_t, done) => {
+    sharp(fixtures.inputJpgWithIptcAndXmp).metadata((err, metadata) => {
       if (err) throw err;
       // IPTC
       assert.strictEqual('object', typeof metadata.iptc);
@@ -88,8 +88,8 @@ describe('Image metadata', function () {
     });
   });
 
-  it('TIFF', function (_t, done) {
-    sharp(fixtures.inputTiff).metadata(function (err, metadata) {
+  it('TIFF', (_t, done) => {
+    sharp(fixtures.inputTiff).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('tiff', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -115,8 +115,8 @@ describe('Image metadata', function () {
     });
   });
 
-  it('Multipage TIFF', function (_t, done) {
-    sharp(fixtures.inputTiffMultipage).metadata(function (err, metadata) {
+  it('Multipage TIFF', (_t, done) => {
+    sharp(fixtures.inputTiffMultipage).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('tiff', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -138,8 +138,8 @@ describe('Image metadata', function () {
     });
   });
 
-  it('PNG', function (_t, done) {
-    sharp(fixtures.inputPng).metadata(function (err, metadata) {
+  it('PNG', (_t, done) => {
+    sharp(fixtures.inputPng).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -162,8 +162,8 @@ describe('Image metadata', function () {
     });
   });
 
-  it('PNG with comment', function (_t, done) {
-    sharp(fixtures.inputPngTestJoinChannel).metadata(function (err, metadata) {
+  it('PNG with comment', (_t, done) => {
+    sharp(fixtures.inputPngTestJoinChannel).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -187,8 +187,8 @@ describe('Image metadata', function () {
     });
   });
 
-  it('Transparent PNG', function (_t, done) {
-    sharp(fixtures.inputPngWithTransparency).metadata(function (err, metadata) {
+  it('Transparent PNG', (_t, done) => {
+    sharp(fixtures.inputPngWithTransparency).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -259,8 +259,8 @@ describe('Image metadata', function () {
     });
   });
 
-  it('WebP', function (_t, done) {
-    sharp(fixtures.inputWebP).metadata(function (err, metadata) {
+  it('WebP', (_t, done) => {
+    sharp(fixtures.inputWebP).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('webp', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -351,8 +351,8 @@ describe('Image metadata', function () {
       })
   );
 
-  it('GIF', function (_t, done) {
-    sharp(fixtures.inputGif).metadata(function (err, metadata) {
+  it('GIF', (_t, done) => {
+    sharp(fixtures.inputGif).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('gif', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -371,8 +371,8 @@ describe('Image metadata', function () {
       done();
     });
   });
-  it('GIF grey+alpha', function (_t, done) {
-    sharp(fixtures.inputGifGreyPlusAlpha).metadata(function (err, metadata) {
+  it('GIF grey+alpha', (_t, done) => {
+    sharp(fixtures.inputGifGreyPlusAlpha).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('gif', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -459,8 +459,8 @@ describe('Image metadata', function () {
       })
   );
 
-  it('File in, Promise out', function (_t, done) {
-    sharp(fixtures.inputJpg).metadata().then(function (metadata) {
+  it('File in, Promise out', (_t, done) => {
+    sharp(fixtures.inputJpg).metadata().then((metadata) => {
       assert.strictEqual('jpeg', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2725, metadata.width);
@@ -503,10 +503,10 @@ describe('Image metadata', function () {
     );
   });
 
-  it('Stream in, Promise out', function (_t, done) {
+  it('Stream in, Promise out', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const pipeline = sharp();
-    pipeline.metadata().then(function (metadata) {
+    pipeline.metadata().then((metadata) => {
       assert.strictEqual('jpeg', metadata.format);
       assert.strictEqual(829183, metadata.size);
       assert.strictEqual(2725, metadata.width);
@@ -554,9 +554,9 @@ describe('Image metadata', function () {
     }, 500);
   });
 
-  it('Stream', function (_t, done) {
+  it('Stream', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJpg);
-    const pipeline = sharp().metadata(function (err, metadata) {
+    const pipeline = sharp().metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
       assert.strictEqual(829183, metadata.size);
@@ -578,9 +578,9 @@ describe('Image metadata', function () {
     readable.pipe(pipeline);
   });
 
-  it('Resize to half width using metadata', function (_t, done) {
+  it('Resize to half width using metadata', (_t, done) => {
     const image = sharp(fixtures.inputJpg);
-    image.metadata(function (err, metadata) {
+    image.metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
       assert.strictEqual('undefined', typeof metadata.size);
@@ -597,7 +597,7 @@ describe('Image metadata', function () {
       assert.strictEqual('undefined', typeof metadata.orientation);
       assert.strictEqual('undefined', typeof metadata.exif);
       assert.strictEqual('undefined', typeof metadata.icc);
-      image.resize(Math.floor(metadata.width / 2)).toBuffer(function (err, data, info) {
+      image.resize(Math.floor(metadata.width / 2)).toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(1362, info.width);
@@ -607,13 +607,13 @@ describe('Image metadata', function () {
     });
   });
 
-  it('Keep EXIF metadata and add sRGB profile after a resize', function (_t, done) {
+  it('Keep EXIF metadata and add sRGB profile after a resize', (_t, done) => {
     sharp(fixtures.inputJpgWithExif)
       .resize(320, 240)
       .withMetadata()
-      .toBuffer(function (err, buffer) {
+      .toBuffer((err, buffer) => {
         if (err) throw err;
-        sharp(buffer).metadata(function (err, metadata) {
+        sharp(buffer).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(true, metadata.hasProfile);
           assert.strictEqual(8, metadata.orientation);
@@ -727,14 +727,14 @@ describe('Image metadata', function () {
     assert.strictEqual(undefined, metadata.icc);
   });
 
-  it('Apply CMYK output ICC profile', function (_t, done) {
+  it('Apply CMYK output ICC profile', (_t, done) => {
     const output = fixtures.path('output.icc-cmyk.jpg');
     sharp(fixtures.inputJpg)
       .resize(64)
       .withIccProfile('cmyk')
-      .toFile(output, function (err) {
+      .toFile(output, (err) => {
         if (err) throw err;
-        sharp(output).metadata(function (err, metadata) {
+        sharp(output).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(true, metadata.hasProfile);
           assert.strictEqual('cmyk', metadata.space);
@@ -752,12 +752,12 @@ describe('Image metadata', function () {
       });
   });
 
-  it('Apply custom output ICC profile', function (_t, done) {
+  it('Apply custom output ICC profile', (_t, done) => {
     const output = fixtures.path('output.hilutite.jpg');
     sharp(fixtures.inputJpg)
       .resize(64)
       .withIccProfile(fixtures.path('hilutite.icm'))
-      .toFile(output, function (err) {
+      .toFile(output, (err) => {
         if (err) throw err;
         fixtures.assertMaxColourDistance(output, fixtures.expected('hilutite.jpg'), 9);
         done();
@@ -792,12 +792,12 @@ describe('Image metadata', function () {
       )
   );
 
-  it('Remove EXIF metadata after a resize', function (_t, done) {
+  it('Remove EXIF metadata after a resize', (_t, done) => {
     sharp(fixtures.inputJpgWithExif)
       .resize(320, 240)
-      .toBuffer(function (err, buffer) {
+      .toBuffer((err, buffer) => {
         if (err) throw err;
-        sharp(buffer).metadata(function (err, metadata) {
+        sharp(buffer).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(false, metadata.hasProfile);
           assert.strictEqual('undefined', typeof metadata.orientation);
@@ -808,12 +808,12 @@ describe('Image metadata', function () {
       });
   });
 
-  it('Remove metadata from PNG output', function (_t, done) {
+  it('Remove metadata from PNG output', (_t, done) => {
     sharp(fixtures.inputJpgWithExif)
       .png()
-      .toBuffer(function (err, buffer) {
+      .toBuffer((err, buffer) => {
         if (err) throw err;
-        sharp(buffer).metadata(function (err, metadata) {
+        sharp(buffer).metadata((err, metadata) => {
           if (err) throw err;
           assert.strictEqual(false, metadata.hasProfile);
           assert.strictEqual('undefined', typeof metadata.orientation);
@@ -865,55 +865,41 @@ describe('Image metadata', function () {
     assert.strictEqual(density, 96);
   });
 
-  it('chromaSubsampling 4:4:4:4 CMYK JPEG', function () {
-    return sharp(fixtures.inputJpgWithCmykProfile)
+  it('chromaSubsampling 4:4:4:4 CMYK JPEG', () => sharp(fixtures.inputJpgWithCmykProfile)
       .metadata()
-      .then(function (metadata) {
+      .then((metadata) => {
         assert.strictEqual('4:4:4:4', metadata.chromaSubsampling);
-      });
-  });
+      }));
 
-  it('chromaSubsampling 4:4:4 RGB JPEG', function () {
-    return sharp(fixtures.inputJpg)
+  it('chromaSubsampling 4:4:4 RGB JPEG', () => sharp(fixtures.inputJpg)
       .resize(10, 10)
       .jpeg({ chromaSubsampling: '4:4:4' })
       .toBuffer()
-      .then(function (data) {
-        return sharp(data)
+      .then((data) => sharp(data)
           .metadata()
-          .then(function (metadata) {
+          .then((metadata) => {
             assert.strictEqual('4:4:4', metadata.chromaSubsampling);
-          });
-      });
-  });
+          })));
 
-  it('isProgressive JPEG', function () {
-    return sharp(fixtures.inputJpg)
+  it('isProgressive JPEG', () => sharp(fixtures.inputJpg)
       .resize(10, 10)
       .jpeg({ progressive: true })
       .toBuffer()
-      .then(function (data) {
-        return sharp(data)
+      .then((data) => sharp(data)
           .metadata()
-          .then(function (metadata) {
+          .then((metadata) => {
             assert.strictEqual(true, metadata.isProgressive);
-          });
-      });
-  });
+          })));
 
-  it('isProgressive PNG', function () {
-    return sharp(fixtures.inputJpg)
+  it('isProgressive PNG', () => sharp(fixtures.inputJpg)
       .resize(10, 10)
       .png({ progressive: true })
       .toBuffer()
-      .then(function (data) {
-        return sharp(data)
+      .then((data) => sharp(data)
           .metadata()
-          .then(function (metadata) {
+          .then((metadata) => {
             assert.strictEqual(true, metadata.isProgressive);
-          });
-      });
-  });
+          })));
 
   it('16-bit TIFF with TIFFTAG_PHOTOSHOP metadata', () =>
     sharp(fixtures.inputTifftagPhotoshop)
@@ -995,18 +981,18 @@ describe('Image metadata', function () {
     assert.strictEqual(description, 'sP3C');
   });
 
-  it('File input with corrupt header fails gracefully', function (_t, done) {
+  it('File input with corrupt header fails gracefully', (_t, done) => {
     sharp(fixtures.inputJpgWithCorruptHeader)
-      .metadata(function (err) {
+      .metadata((err) => {
         assert.strictEqual(true, !!err);
         assert.ok(err.message.includes('Input file has corrupt header: VipsJpeg: premature end of'), err);
         done();
       });
   });
 
-  it('Buffer input with corrupt header fails gracefully', function (_t, done) {
+  it('Buffer input with corrupt header fails gracefully', (_t, done) => {
     sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
-      .metadata(function (err) {
+      .metadata((err) => {
         assert.strictEqual(true, !!err);
         assert.ok(err.message.includes('Input buffer has corrupt header: VipsJpeg: premature end of'), err);
         done();
@@ -1114,7 +1100,7 @@ describe('Image metadata', function () {
     assert.strictEqual(exif2.Image.Software, 'sharp');
   });
 
-  describe('XMP metadata tests', function () {
+  describe('XMP metadata tests', () => {
     it('withMetadata preserves existing XMP metadata from input', async () => {
       const data = await sharp(fixtures.inputJpgWithIptcAndXmp)
         .resize(320, 240)
@@ -1256,21 +1242,21 @@ describe('Image metadata', function () {
       assert.strictEqual(true, xmpString.includes('image/webp'));
     });
 
-    it('withXmp XMP validation - non-string input', function () {
+    it('withXmp XMP validation - non-string input', () => {
       assert.throws(
         () => sharp().withXmp(123),
         /Expected non-empty string for xmp but received 123 of type number/
       );
     });
 
-    it('withXmp XMP validation - null input', function () {
+    it('withXmp XMP validation - null input', () => {
       assert.throws(
         () => sharp().withXmp(null),
         /Expected non-empty string for xmp but received null of type object/
       );
     });
 
-    it('withXmp XMP validation - empty string', function () {
+    it('withXmp XMP validation - empty string', () => {
       assert.throws(
         () => sharp().withXmp(''),
         /Expected non-empty string for xmp/
@@ -1278,54 +1264,54 @@ describe('Image metadata', function () {
     });
   });
 
-  describe('Invalid parameters', function () {
-    it('String orientation', function () {
-      assert.throws(function () {
+  describe('Invalid parameters', () => {
+    it('String orientation', () => {
+      assert.throws(() => {
         sharp().withMetadata({ orientation: 'zoinks' });
       });
     });
-    it('Negative orientation', function () {
-      assert.throws(function () {
+    it('Negative orientation', () => {
+      assert.throws(() => {
         sharp().withMetadata({ orientation: -1 });
       });
     });
-    it('Zero orientation', function () {
-      assert.throws(function () {
+    it('Zero orientation', () => {
+      assert.throws(() => {
         sharp().withMetadata({ orientation: 0 });
       });
     });
-    it('Too large orientation', function () {
-      assert.throws(function () {
+    it('Too large orientation', () => {
+      assert.throws(() => {
         sharp().withMetadata({ orientation: 9 });
       });
     });
-    it('Non-numeric density', function () {
-      assert.throws(function () {
+    it('Non-numeric density', () => {
+      assert.throws(() => {
         sharp().withMetadata({ density: '1' });
       });
     });
-    it('Negative density', function () {
-      assert.throws(function () {
+    it('Negative density', () => {
+      assert.throws(() => {
         sharp().withMetadata({ density: -1 });
       });
     });
-    it('Non string icc', function () {
-      assert.throws(function () {
+    it('Non string icc', () => {
+      assert.throws(() => {
         sharp().withMetadata({ icc: true });
       });
     });
-    it('Non object exif', function () {
-      assert.throws(function () {
+    it('Non object exif', () => {
+      assert.throws(() => {
         sharp().withMetadata({ exif: false });
       });
     });
-    it('Non string value in object exif', function () {
-      assert.throws(function () {
+    it('Non string value in object exif', () => {
+      assert.throws(() => {
         sharp().withMetadata({ exif: { ifd0: false } });
       });
     });
-    it('Non string value in nested object exif', function () {
-      assert.throws(function () {
+    it('Non string value in nested object exif', () => {
+      assert.throws(() => {
         sharp().withMetadata({ exif: { ifd0: { fail: false } } });
       });
     });

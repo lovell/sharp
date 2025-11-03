@@ -10,8 +10,8 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 const { inRange } = require('../../lib/is');
 
-describe('Text to image', function () {
-  it('text with default values', async function (t) {
+describe('Text to image', () => {
+  it('text with default values', async (t) => {
     const output = fixtures.path('output.text-default.png');
     const text = sharp({
       text: {
@@ -41,7 +41,7 @@ describe('Text to image', function () {
     assert.ok(info.textAutofitDpi > 0);
   });
 
-  it('text with width and height', async function (t) {
+  it('text with width and height', async (t) => {
     const output = fixtures.path('output.text-width-height.png');
     const text = sharp({
       text: {
@@ -61,7 +61,7 @@ describe('Text to image', function () {
     assert.ok(inRange(info.textAutofitDpi, 900, 1300), `Actual textAutofitDpi ${info.textAutofitDpi}`);
   });
 
-  it('text with dpi', async function (t) {
+  it('text with dpi', async (t) => {
     const output = fixtures.path('output.text-dpi.png');
     const dpi = 300;
     const text = sharp({
@@ -79,7 +79,7 @@ describe('Text to image', function () {
     assert.strictEqual(dpi, metadata.density);
   });
 
-  it('text with color and pango markup', async function (t) {
+  it('text with color and pango markup', async (t) => {
     const output = fixtures.path('output.text-color-pango.png');
     const dpi = 300;
     const text = sharp({
@@ -101,7 +101,7 @@ describe('Text to image', function () {
     assert.strictEqual(true, metadata.hasAlpha);
   });
 
-  it('text with font', async function (t) {
+  it('text with font', async (t) => {
     const output = fixtures.path('output.text-with-font.png');
     const text = sharp({
       text: {
@@ -119,7 +119,7 @@ describe('Text to image', function () {
     assert.ok(info.height > 10);
   });
 
-  it('text with justify and composite', async function (t) {
+  it('text with justify and composite', async (t) => {
     const output = fixtures.path('output.text-composite.png');
     const width = 500;
     const dpi = 300;
@@ -164,8 +164,8 @@ describe('Text to image', function () {
     assert.strictEqual(true, metadata.hasAlpha);
   });
 
-  it('bad text input', function () {
-    assert.throws(function () {
+  it('bad text input', () => {
+    assert.throws(() => {
       sharp({
         text: {
         }
@@ -173,8 +173,8 @@ describe('Text to image', function () {
     });
   });
 
-  it('fontfile input', function () {
-    assert.doesNotThrow(function () {
+  it('fontfile input', () => {
+    assert.doesNotThrow(() => {
       sharp({
         text: {
           text: 'text',
@@ -184,8 +184,8 @@ describe('Text to image', function () {
     });
   });
 
-  it('bad font input', function () {
-    assert.throws(function () {
+  it('bad font input', () => {
+    assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -195,8 +195,8 @@ describe('Text to image', function () {
     });
   });
 
-  it('bad fontfile input', function () {
-    assert.throws(function () {
+  it('bad fontfile input', () => {
+    assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -236,8 +236,8 @@ describe('Text to image', function () {
     );
   });
 
-  it('bad align input', function () {
-    assert.throws(function () {
+  it('bad align input', () => {
+    assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -247,8 +247,8 @@ describe('Text to image', function () {
     });
   });
 
-  it('bad justify input', function () {
-    assert.throws(function () {
+  it('bad justify input', () => {
+    assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -273,8 +273,8 @@ describe('Text to image', function () {
     );
   });
 
-  it('bad rgba input', function () {
-    assert.throws(function () {
+  it('bad rgba input', () => {
+    assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -299,8 +299,8 @@ describe('Text to image', function () {
     );
   });
 
-  it('only height or dpi not both', function () {
-    assert.throws(function () {
+  it('only height or dpi not both', () => {
+    assert.throws(() => {
       sharp({
         text: {
           text: 'text',

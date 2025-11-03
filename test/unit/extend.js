@@ -9,13 +9,13 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Extend', function () {
-  describe('extend all sides equally via a single value', function () {
-    it('JPEG', function (_t, done) {
+describe('Extend', () => {
+  describe('extend all sides equally via a single value', () => {
+    it('JPEG', (_t, done) => {
       sharp(fixtures.inputJpg)
         .resize(120)
         .extend(10)
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(140, info.width);
           assert.strictEqual(118, info.height);
@@ -23,11 +23,11 @@ describe('Extend', function () {
         });
     });
 
-    it('Animated WebP', function (_t, done) {
+    it('Animated WebP', (_t, done) => {
       sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(120)
         .extend(10)
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(140, info.width);
           assert.strictEqual(140 * 9, info.height);
@@ -37,7 +37,7 @@ describe('Extend', function () {
   });
 
   ['background', 'copy', 'mirror', 'repeat'].forEach(extendWith => {
-    it(`extends all sides with animated WebP (${extendWith})`, function (_t, done) {
+    it(`extends all sides with animated WebP (${extendWith})`, (_t, done) => {
       sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(120)
         .extend({
@@ -47,7 +47,7 @@ describe('Extend', function () {
           left: 40,
           right: 40
         })
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(200, info.width);
           assert.strictEqual(200 * 9, info.height);
@@ -55,7 +55,7 @@ describe('Extend', function () {
         });
     });
 
-    it(`extend all sides equally with RGB (${extendWith})`, function (_t, done) {
+    it(`extend all sides equally with RGB (${extendWith})`, (_t, done) => {
       sharp(fixtures.inputJpg)
         .resize(120)
         .extend({
@@ -66,7 +66,7 @@ describe('Extend', function () {
           right: 10,
           background: { r: 255, g: 0, b: 0 }
         })
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(140, info.width);
           assert.strictEqual(118, info.height);
@@ -74,7 +74,7 @@ describe('Extend', function () {
         });
     });
 
-    it(`extend sides unequally with RGBA (${extendWith})`, function (_t, done) {
+    it(`extend sides unequally with RGBA (${extendWith})`, (_t, done) => {
       sharp(fixtures.inputPngWithTransparency16bit)
         .resize(120)
         .extend({
@@ -84,7 +84,7 @@ describe('Extend', function () {
           right: 35,
           background: { r: 0, g: 0, b: 0, alpha: 0 }
         })
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(165, info.width);
           assert.strictEqual(170, info.height);
@@ -92,7 +92,7 @@ describe('Extend', function () {
         });
     });
 
-    it(`PNG with 2 channels (${extendWith})`, function (_t, done) {
+    it(`PNG with 2 channels (${extendWith})`, (_t, done) => {
       sharp(fixtures.inputPngWithGreyAlpha)
         .extend({
           extendWith,
@@ -102,7 +102,7 @@ describe('Extend', function () {
           right: 80,
           background: 'transparent'
         })
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(true, data.length > 0);
           assert.strictEqual('png', info.format);
@@ -147,13 +147,13 @@ describe('Extend', function () {
     assert.strictEqual(1470, height);
   });
 
-  it('missing parameter fails', function () {
-    assert.throws(function () {
+  it('missing parameter fails', () => {
+    assert.throws(() => {
       sharp().extend();
     });
   });
-  it('negative fails', function () {
-    assert.throws(function () {
+  it('negative fails', () => {
+    assert.throws(() => {
       sharp().extend(-1);
     });
   });
@@ -191,7 +191,7 @@ describe('Extend', function () {
     assert.doesNotThrow(() => sharp().extend({ top: 1, left: 2, bottom: 3 }));
   });
 
-  it('should add alpha channel before extending with a transparent Background', function (_t, done) {
+  it('should add alpha channel before extending with a transparent Background', (_t, done) => {
     sharp(fixtures.inputJpgWithLandscapeExif1)
       .extend({
         bottom: 10,
@@ -199,7 +199,7 @@ describe('Extend', function () {
         background: { r: 0, g: 0, b: 0, alpha: 0 }
       })
       .toFormat(sharp.format.png)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(610, info.width);
         assert.strictEqual(460, info.height);

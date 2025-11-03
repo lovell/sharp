@@ -8,8 +8,8 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fixtures = require('../fixtures');
 
-describe('Modulate', function () {
-  describe('Invalid options', function () {
+describe('Modulate', () => {
+  describe('Invalid options', () => {
     [
       null,
       undefined,
@@ -25,9 +25,9 @@ describe('Modulate', function () {
       { hue: null },
       { lightness: '+50' },
       { lightness: null }
-    ].forEach(function (options) {
-      it('should throw', function () {
-        assert.throws(function () {
+    ].forEach((options) => {
+      it('should throw', () => {
+        assert.throws(() => {
           sharp(fixtures.inputJpg).modulate(options);
         });
       });

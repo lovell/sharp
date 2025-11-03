@@ -4,11 +4,11 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Dilate', function () {
-  it('dilate 1 png', function (_t, done) {
+describe('Dilate', () => {
+  it('dilate 1 png', (_t, done) => {
     sharp(fixtures.inputPngDotAndLines)
       .dilate(1)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(100, info.width);
@@ -17,10 +17,10 @@ describe('Dilate', function () {
       });
   });
 
-  it('dilate 1 png - default width', function (_t, done) {
+  it('dilate 1 png - default width', (_t, done) => {
     sharp(fixtures.inputPngDotAndLines)
       .dilate()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(100, info.width);
@@ -29,8 +29,8 @@ describe('Dilate', function () {
       });
   });
 
-  it('invalid dilation width', function () {
-    assert.throws(function () {
+  it('invalid dilation width', () => {
+    assert.throws(() => {
       sharp(fixtures.inputJpg).dilate(-1);
     });
   });

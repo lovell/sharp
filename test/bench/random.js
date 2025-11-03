@@ -16,13 +16,11 @@ sharp.cache(false);
 const min = 320;
 const max = 960;
 
-const randomDimension = function () {
-  return Math.ceil((Math.random() * (max - min)) + min);
-};
+const randomDimension = () => Math.ceil((Math.random() * (max - min)) + min);
 
 new Benchmark.Suite('random').add('imagemagick', {
   defer: true,
-  fn: function (deferred) {
+  fn: (deferred) => {
     imagemagick.resize({
       srcPath: fixtures.inputJpg,
       dstPath: fixtures.path('output.jpg'),
@@ -31,7 +29,7 @@ new Benchmark.Suite('random').add('imagemagick', {
       height: randomDimension(),
       format: 'jpg',
       filter: 'Lanczos'
-    }, function (err) {
+    }, (err) => {
       if (err) {
         throw err;
       } else {
@@ -41,12 +39,12 @@ new Benchmark.Suite('random').add('imagemagick', {
   }
 }).add('gm', {
   defer: true,
-  fn: function (deferred) {
+  fn: (deferred) => {
     gm(fixtures.inputJpg)
       .resize(randomDimension(), randomDimension())
       .filter('Lanczos')
       .quality(80)
-      .toBuffer(function (err, buffer) {
+      .toBuffer((err, buffer) => {
         if (err) {
           throw err;
         } else {
@@ -57,10 +55,10 @@ new Benchmark.Suite('random').add('imagemagick', {
   }
 }).add('sharp', {
   defer: true,
-  fn: function (deferred) {
+  fn: (deferred) => {
     sharp(fixtures.inputJpg)
       .resize(randomDimension(), randomDimension())
-      .toBuffer(function (err, buffer) {
+      .toBuffer((err, buffer) => {
         if (err) {
           throw err;
         } else {
@@ -69,7 +67,7 @@ new Benchmark.Suite('random').add('imagemagick', {
         }
       });
   }
-}).on('cycle', function (event) {
+}).on('cycle', (event) => {
   console.log(String(event.target));
 }).on('complete', function () {
   const winner = this.filter('fastest').map('name');

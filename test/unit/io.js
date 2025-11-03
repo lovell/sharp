@@ -13,18 +13,18 @@ const fixtures = require('../fixtures');
 
 const outputJpg = fixtures.path('output.jpg');
 
-describe('Input/output', function () {
-  beforeEach(function () {
+describe('Input/output', () => {
+  beforeEach(() => {
     sharp.cache(false);
   });
-  afterEach(function () {
+  afterEach(() => {
     sharp.cache(true);
   });
 
-  it('Read from File and write to Stream', function (_t, done) {
+  it('Read from File and write to Stream', (_t, done) => {
     const writable = fs.createWriteStream(outputJpg);
-    writable.on('close', function () {
-      sharp(outputJpg).toBuffer(function (err, data, info) {
+    writable.on('close', () => {
+      sharp(outputJpg).toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -37,11 +37,11 @@ describe('Input/output', function () {
     sharp(fixtures.inputJpg).resize(320, 240).pipe(writable);
   });
 
-  it('Read from Buffer and write to Stream', function (_t, done) {
+  it('Read from Buffer and write to Stream', (_t, done) => {
     const inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
     const writable = fs.createWriteStream(outputJpg);
-    writable.on('close', function () {
-      sharp(outputJpg).toBuffer(function (err, data, info) {
+    writable.on('close', () => {
+      sharp(outputJpg).toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -54,9 +54,9 @@ describe('Input/output', function () {
     sharp(inputJpgBuffer).resize(320, 240).pipe(writable);
   });
 
-  it('Read from Stream and write to File', function (_t, done) {
+  it('Read from Stream and write to File', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJpg);
-    const pipeline = sharp().resize(320, 240).toFile(outputJpg, function (err, info) {
+    const pipeline = sharp().resize(320, 240).toFile(outputJpg, (err, info) => {
       if (err) throw err;
       assert.strictEqual(true, info.size > 0);
       assert.strictEqual('jpeg', info.format);
@@ -67,9 +67,9 @@ describe('Input/output', function () {
     readable.pipe(pipeline);
   });
 
-  it('Read from Stream and write to Buffer', function (_t, done) {
+  it('Read from Stream and write to Buffer', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJpg);
-    const pipeline = sharp().resize(320, 240).toBuffer(function (err, data, info) {
+    const pipeline = sharp().resize(320, 240).toBuffer((err, data, info) => {
       if (err) throw err;
       assert.strictEqual(true, data.length > 0);
       assert.strictEqual(data.length, info.size);
@@ -81,23 +81,23 @@ describe('Input/output', function () {
     readable.pipe(pipeline);
   });
 
-  it('Read from Stream and write to Buffer via Promise resolved with Buffer', function () {
+  it('Read from Stream and write to Buffer via Promise resolved with Buffer', () => {
     const pipeline = sharp().resize(1, 1);
     fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
     return pipeline
       .toBuffer({ resolveWithObject: false })
-      .then(function (data) {
+      .then((data) => {
         assert.strictEqual(true, data instanceof Buffer);
         assert.strictEqual(true, data.length > 0);
       });
   });
 
-  it('Read from Stream and write to Buffer via Promise resolved with Object', function () {
+  it('Read from Stream and write to Buffer via Promise resolved with Object', () => {
     const pipeline = sharp().resize(1, 1);
     fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
     return pipeline
       .toBuffer({ resolveWithObject: true })
-      .then(function (object) {
+      .then((object) => {
         assert.strictEqual('object', typeof object);
         assert.strictEqual('object', typeof object.info);
         assert.strictEqual('jpeg', object.info.format);
@@ -109,21 +109,18 @@ describe('Input/output', function () {
       });
   });
 
-  it('Read from File and write to Buffer via Promise resolved with Buffer', function () {
-    return sharp(fixtures.inputJpg)
+  it('Read from File and write to Buffer via Promise resolved with Buffer', () => sharp(fixtures.inputJpg)
       .resize(1, 1)
       .toBuffer({ resolveWithObject: false })
-      .then(function (data) {
+      .then((data) => {
         assert.strictEqual(true, data instanceof Buffer);
         assert.strictEqual(true, data.length > 0);
-      });
-  });
+      }));
 
-  it('Read from File and write to Buffer via Promise resolved with Object', function () {
-    return sharp(fixtures.inputJpg)
+  it('Read from File and write to Buffer via Promise resolved with Object', () => sharp(fixtures.inputJpg)
       .resize(1, 1)
       .toBuffer({ resolveWithObject: true })
-      .then(function (object) {
+      .then((object) => {
         assert.strictEqual('object', typeof object);
         assert.strictEqual('object', typeof object.info);
         assert.strictEqual('jpeg', object.info.format);
@@ -132,14 +129,13 @@ describe('Input/output', function () {
         assert.strictEqual(3, object.info.channels);
         assert.strictEqual(true, object.data instanceof Buffer);
         assert.strictEqual(true, object.data.length > 0);
-      });
-  });
+      }));
 
-  it('Read from Stream and write to Stream', function (_t, done) {
+  it('Read from Stream and write to Stream', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const writable = fs.createWriteStream(outputJpg);
-    writable.on('close', function () {
-      sharp(outputJpg).toBuffer(function (err, data, info) {
+    writable.on('close', () => {
+      sharp(outputJpg).toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -220,46 +216,46 @@ describe('Input/output', function () {
     assert.strictEqual(info.height, 1);
   });
 
-  it('Stream should emit info event', function (_t, done) {
+  it('Stream should emit info event', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const writable = fs.createWriteStream(outputJpg);
     const pipeline = sharp().resize(320, 240);
     let infoEventEmitted = false;
-    pipeline.on('info', function (info) {
+    pipeline.on('info', (info) => {
       assert.strictEqual('jpeg', info.format);
       assert.strictEqual(320, info.width);
       assert.strictEqual(240, info.height);
       assert.strictEqual(3, info.channels);
       infoEventEmitted = true;
     });
-    writable.on('close', function () {
+    writable.on('close', () => {
       assert.strictEqual(true, infoEventEmitted);
       fs.rm(outputJpg, done);
     });
     readable.pipe(pipeline).pipe(writable);
   });
 
-  it('Stream should emit close event', function (_t, done) {
+  it('Stream should emit close event', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const writable = fs.createWriteStream(outputJpg);
     const pipeline = sharp().resize(320, 240);
     let closeEventEmitted = false;
-    pipeline.on('close', function () {
+    pipeline.on('close', () => {
       closeEventEmitted = true;
     });
-    writable.on('close', function () {
+    writable.on('close', () => {
       assert.strictEqual(true, closeEventEmitted);
       fs.rm(outputJpg, done);
     });
     readable.pipe(pipeline).pipe(writable);
   });
 
-  it('Handle Stream to Stream error ', function (_t, done) {
+  it('Handle Stream to Stream error ', (_t, done) => {
     const pipeline = sharp().resize(320, 240);
     let anErrorWasEmitted = false;
-    pipeline.on('error', function (err) {
+    pipeline.on('error', (err) => {
       anErrorWasEmitted = !!err;
-    }).on('end', function () {
+    }).on('end', () => {
       assert(anErrorWasEmitted);
       fs.rm(outputJpg, done);
     });
@@ -268,12 +264,12 @@ describe('Input/output', function () {
     readableButNotAnImage.pipe(pipeline).pipe(writable);
   });
 
-  it('Handle File to Stream error', function (_t, done) {
+  it('Handle File to Stream error', (_t, done) => {
     const readableButNotAnImage = sharp(__filename).resize(320, 240);
     let anErrorWasEmitted = false;
-    readableButNotAnImage.on('error', function (err) {
+    readableButNotAnImage.on('error', (err) => {
       anErrorWasEmitted = !!err;
-    }).on('end', function () {
+    }).on('end', () => {
       assert(anErrorWasEmitted);
       fs.rm(outputJpg, done);
     });
@@ -281,11 +277,11 @@ describe('Input/output', function () {
     readableButNotAnImage.pipe(writable);
   });
 
-  it('Readable side of Stream can start flowing after Writable side has finished', function (_t, done) {
+  it('Readable side of Stream can start flowing after Writable side has finished', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJpg);
     const writable = fs.createWriteStream(outputJpg);
-    writable.on('close', function () {
-      sharp(outputJpg).toBuffer(function (err, data, info) {
+    writable.on('close', () => {
+      sharp(outputJpg).toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -297,7 +293,7 @@ describe('Input/output', function () {
     });
     const pipeline = sharp().resize(320, 240);
     readable.pipe(pipeline);
-    pipeline.on('finish', function () {
+    pipeline.on('finish', () => {
       pipeline.pipe(writable);
     });
   });
@@ -350,11 +346,11 @@ describe('Input/output', function () {
       })
   );
 
-  it('Support output to jpg format', function (_t, done) {
+  it('Support output to jpg format', (_t, done) => {
     sharp(fixtures.inputPng)
       .resize(320, 240)
       .toFormat('jpg')
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -365,11 +361,11 @@ describe('Input/output', function () {
       });
   });
 
-  it('Support output to tif format', function (_t, done) {
+  it('Support output to tif format', (_t, done) => {
     sharp(fixtures.inputTiff)
       .resize(320, 240)
       .toFormat('tif')
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual(data.length, info.size);
@@ -394,76 +390,76 @@ describe('Input/output', function () {
     assert.strictEqual(Buffer.isBuffer(data), true);
   });
 
-  it('Fail when output File is input File', function (_t, done) {
-    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, function (err) {
+  it('Fail when output File is input File', (_t, done) => {
+    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, (err) => {
       assert(err instanceof Error);
       assert.strictEqual('Cannot use same file for input and output', err.message);
       done();
     });
   });
 
-  it('Fail when output File is input File via Promise', function (_t, done) {
-    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg).then(function () {
+  it('Fail when output File is input File via Promise', (_t, done) => {
+    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg).then(() => {
       done(new Error('Unexpectedly resolved Promise'));
-    }).catch(function (err) {
+    }).catch((err) => {
       assert(err instanceof Error);
       assert.strictEqual('Cannot use same file for input and output', err.message);
       done();
     });
   });
 
-  it('Fail when output File is input File (relative output, absolute input)', function (_t, done) {
+  it('Fail when output File is input File (relative output, absolute input)', (_t, done) => {
     const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(fixtures.inputJpg).toFile(relativePath, function (err) {
+    sharp(fixtures.inputJpg).toFile(relativePath, (err) => {
       assert(err instanceof Error);
       assert.strictEqual('Cannot use same file for input and output', err.message);
       done();
     });
   });
 
-  it('Fail when output File is input File via Promise (relative output, absolute input)', function (_t, done) {
+  it('Fail when output File is input File via Promise (relative output, absolute input)', (_t, done) => {
     const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(fixtures.inputJpg).toFile(relativePath).then(function () {
+    sharp(fixtures.inputJpg).toFile(relativePath).then(() => {
       done(new Error('Unexpectedly resolved Promise'));
-    }).catch(function (err) {
+    }).catch((err) => {
       assert(err instanceof Error);
       assert.strictEqual('Cannot use same file for input and output', err.message);
       done();
     });
   });
 
-  it('Fail when output File is input File (relative input, absolute output)', function (_t, done) {
+  it('Fail when output File is input File (relative input, absolute output)', (_t, done) => {
     const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(relativePath).toFile(fixtures.inputJpg, function (err) {
+    sharp(relativePath).toFile(fixtures.inputJpg, (err) => {
       assert(err instanceof Error);
       assert.strictEqual('Cannot use same file for input and output', err.message);
       done();
     });
   });
 
-  it('Fail when output File is input File via Promise (relative input, absolute output)', function (_t, done) {
+  it('Fail when output File is input File via Promise (relative input, absolute output)', (_t, done) => {
     const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(relativePath).toFile(fixtures.inputJpg).then(function () {
+    sharp(relativePath).toFile(fixtures.inputJpg).then(() => {
       done(new Error('Unexpectedly resolved Promise'));
-    }).catch(function (err) {
+    }).catch((err) => {
       assert(err instanceof Error);
       assert.strictEqual('Cannot use same file for input and output', err.message);
       done();
     });
   });
 
-  it('Fail when output File is empty', function (_t, done) {
-    sharp(fixtures.inputJpg).toFile('', function (err) {
+  it('Fail when output File is empty', (_t, done) => {
+    sharp(fixtures.inputJpg).toFile('', (err) => {
       assert(err instanceof Error);
       assert.strictEqual('Missing output file path', err.message);
       done();
     });
   });
 
-  it('Fail when output File is empty via Promise', function (_t, done) {
-    sharp(fixtures.inputJpg).toFile('').then(function () {
+  it('Fail when output File is empty via Promise', (_t, done) => {
+    sharp(fixtures.inputJpg).toFile('').then(() => {
       done(new Error('Unexpectedly resolved Promise'));
-    }).catch(function (err) {
+    }).catch((err) => {
       assert(err instanceof Error);
       assert.strictEqual('Missing output file path', err.message);
       done();
@@ -494,41 +490,39 @@ describe('Input/output', function () {
     )
   );
 
-  describe('Fail for unsupported input', function () {
-    it('Undefined', function () {
-      assert.throws(function () {
+  describe('Fail for unsupported input', () => {
+    it('Undefined', () => {
+      assert.throws(() => {
         sharp(undefined);
       });
     });
-    it('Null', function () {
-      assert.throws(function () {
+    it('Null', () => {
+      assert.throws(() => {
         sharp(null);
       });
     });
-    it('Numeric', function () {
-      assert.throws(function () {
+    it('Numeric', () => {
+      assert.throws(() => {
         sharp(1);
       });
     });
-    it('Boolean', function () {
-      assert.throws(function () {
+    it('Boolean', () => {
+      assert.throws(() => {
         sharp(true);
       });
     });
-    it('Error Object', function () {
-      assert.throws(function () {
+    it('Error Object', () => {
+      assert.throws(() => {
         sharp(new Error());
       });
     });
   });
 
-  it('Promises/A+', function () {
-    return sharp(fixtures.inputJpg)
+  it('Promises/A+', () => sharp(fixtures.inputJpg)
       .resize(320, 240)
-      .toBuffer();
-  });
+      .toBuffer());
 
-  it('Invalid output format', function (_t, done) {
+  it('Invalid output format', (_t, done) => {
     let isValid = false;
     try {
       sharp().toFormat('zoinks');
@@ -538,30 +532,30 @@ describe('Input/output', function () {
     done();
   });
 
-  it('File input with corrupt header fails gracefully', function (_t, done) {
+  it('File input with corrupt header fails gracefully', (_t, done) => {
     sharp(fixtures.inputJpgWithCorruptHeader)
-      .toBuffer(function (err) {
+      .toBuffer((err) => {
         assert.strictEqual(true, !!err);
         done();
       });
   });
 
-  it('Buffer input with corrupt header fails gracefully', function (_t, done) {
+  it('Buffer input with corrupt header fails gracefully', (_t, done) => {
     sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
-      .toBuffer(function (err) {
+      .toBuffer((err) => {
         assert.strictEqual(true, !!err);
         done();
       });
   });
 
-  it('Stream input with corrupt header fails gracefully', function (_t, done) {
+  it('Stream input with corrupt header fails gracefully', (_t, done) => {
     const transformer = sharp();
     transformer
       .toBuffer()
-      .then(function () {
+      .then(() => {
         done(new Error('Unexpectedly resolved Promise'));
       })
-      .catch(function (err) {
+      .catch((err) => {
         assert.strictEqual(true, !!err);
         done();
       });
@@ -570,13 +564,13 @@ describe('Input/output', function () {
       .pipe(transformer);
   });
 
-  describe('Output filename with unknown extension', function () {
+  describe('Output filename with unknown extension', () => {
     const outputZoinks = fixtures.path('output.zoinks');
 
-    it('Match JPEG input', function (_t, done) {
+    it('Match JPEG input', (_t, done) => {
       sharp(fixtures.inputJpg)
         .resize(320, 80)
-        .toFile(outputZoinks, function (err, info) {
+        .toFile(outputZoinks, (err, info) => {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('jpeg', info.format);
@@ -586,10 +580,10 @@ describe('Input/output', function () {
         });
     });
 
-    it('Match PNG input', function (_t, done) {
+    it('Match PNG input', (_t, done) => {
       sharp(fixtures.inputPng)
         .resize(320, 80)
-        .toFile(outputZoinks, function (err, info) {
+        .toFile(outputZoinks, (err, info) => {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('png', info.format);
@@ -599,10 +593,10 @@ describe('Input/output', function () {
         });
     });
 
-    it('Match WebP input', function (_t, done) {
+    it('Match WebP input', (_t, done) => {
       sharp(fixtures.inputWebP)
         .resize(320, 80)
-        .toFile(outputZoinks, function (err, info) {
+        .toFile(outputZoinks, (err, info) => {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('webp', info.format);
@@ -612,10 +606,10 @@ describe('Input/output', function () {
         });
     });
 
-    it('Match TIFF input', function (_t, done) {
+    it('Match TIFF input', (_t, done) => {
       sharp(fixtures.inputTiff)
         .resize(320, 80)
-        .toFile(outputZoinks, function (err, info) {
+        .toFile(outputZoinks, (err, info) => {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('tiff', info.format);
@@ -625,11 +619,11 @@ describe('Input/output', function () {
         });
     });
 
-    it('Force JPEG format for PNG input', function (_t, done) {
+    it('Force JPEG format for PNG input', (_t, done) => {
       sharp(fixtures.inputPng)
         .resize(320, 80)
         .jpeg()
-        .toFile(outputZoinks, function (err, info) {
+        .toFile(outputZoinks, (err, info) => {
           if (err) throw err;
           assert.strictEqual(true, info.size > 0);
           assert.strictEqual('jpeg', info.format);
@@ -640,11 +634,11 @@ describe('Input/output', function () {
     });
   });
 
-  it('Input and output formats match when not forcing', function (_t, done) {
+  it('Input and output formats match when not forcing', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .png({ compressionLevel: 1, force: false })
-      .toBuffer(function (err, _data, info) {
+      .toBuffer((err, _data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(320, info.width);
@@ -653,44 +647,42 @@ describe('Input/output', function () {
       });
   });
 
-  it('Can force output format with output chaining', function () {
-    return sharp(fixtures.inputJpg)
+  it('Can force output format with output chaining', () => sharp(fixtures.inputJpg)
       .resize(320, 240)
       .png({ force: true })
       .jpeg({ force: false })
       .toBuffer({ resolveWithObject: true })
-      .then(function (out) {
+      .then((out) => {
         assert.strictEqual('png', out.info.format);
-      });
-  });
+      }));
 
-  it('toFormat=JPEG takes precedence over WebP extension', function (_t, done) {
+  it('toFormat=JPEG takes precedence over WebP extension', (_t, done) => {
     const outputWebP = fixtures.path('output.webp');
     sharp(fixtures.inputPng)
       .resize(8)
       .jpeg()
-      .toFile(outputWebP, function (err, info) {
+      .toFile(outputWebP, (err, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         fs.rm(outputWebP, done);
       });
   });
 
-  it('toFormat=WebP takes precedence over JPEG extension', function (_t, done) {
+  it('toFormat=WebP takes precedence over JPEG extension', (_t, done) => {
     sharp(fixtures.inputPng)
       .resize(8)
       .webp()
-      .toFile(outputJpg, function (err, info) {
+      .toFile(outputJpg, (err, info) => {
         if (err) throw err;
         assert.strictEqual('webp', info.format);
         done();
       });
   });
 
-  it('Load Vips V file', function (_t, done) {
+  it('Load Vips V file', (_t, done) => {
     sharp(fixtures.inputV)
       .jpeg()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('jpeg', info.format);
@@ -700,11 +692,11 @@ describe('Input/output', function () {
       });
   });
 
-  it('Save Vips V file', function (_t, done) {
+  it('Save Vips V file', (_t, done) => {
     const outputV = fixtures.path('output.v');
     sharp(fixtures.inputJpg)
       .extract({ left: 910, top: 1105, width: 70, height: 60 })
-      .toFile(outputV, function (err, info) {
+      .toFile(outputV, (err, info) => {
         if (err) throw err;
         assert.strictEqual(true, info.size > 0);
         assert.strictEqual('v', info.format);
@@ -827,62 +819,62 @@ describe('Input/output', function () {
     );
   });
 
-  describe('Input options', function () {
-    it('Option-less', function () {
+  describe('Input options', () => {
+    it('Option-less', () => {
       sharp();
     });
-    it('Ignore unknown attribute', function () {
+    it('Ignore unknown attribute', () => {
       sharp({ unknown: true });
     });
-    it('undefined with options fails', function () {
-      assert.throws(function () {
+    it('undefined with options fails', () => {
+      assert.throws(() => {
         sharp(undefined, {});
       }, /Unsupported input 'undefined' of type undefined when also providing options of type object/);
     });
-    it('null with options fails', function () {
-      assert.throws(function () {
+    it('null with options fails', () => {
+      assert.throws(() => {
         sharp(null, {});
       }, /Unsupported input 'null' of type object when also providing options of type object/);
     });
-    it('Non-Object options fails', function () {
-      assert.throws(function () {
+    it('Non-Object options fails', () => {
+      assert.throws(() => {
         sharp('test', 'zoinks');
       }, /Invalid input options zoinks/);
     });
-    it('Invalid density: string', function () {
-      assert.throws(function () {
+    it('Invalid density: string', () => {
+      assert.throws(() => {
         sharp({ density: 'zoinks' });
       }, /Expected number between 1 and 100000 for density but received zoinks of type string/);
     });
-    it('Invalid ignoreIcc: string', function () {
-      assert.throws(function () {
+    it('Invalid ignoreIcc: string', () => {
+      assert.throws(() => {
         sharp({ ignoreIcc: 'zoinks' });
       }, /Expected boolean for ignoreIcc but received zoinks of type string/);
     });
-    it('Setting animated property updates pages property', function () {
+    it('Setting animated property updates pages property', () => {
       assert.strictEqual(sharp({ animated: false }).options.input.pages, 1);
       assert.strictEqual(sharp({ animated: true }).options.input.pages, -1);
     });
-    it('Invalid animated property throws', function () {
-      assert.throws(function () {
+    it('Invalid animated property throws', () => {
+      assert.throws(() => {
         sharp({ animated: -1 });
       }, /Expected boolean for animated but received -1 of type number/);
     });
-    it('Invalid page property throws', function () {
-      assert.throws(function () {
+    it('Invalid page property throws', () => {
+      assert.throws(() => {
         sharp({ page: -1 });
       }, /Expected integer between 0 and 100000 for page but received -1 of type number/);
     });
-    it('Invalid pages property throws', function () {
-      assert.throws(function () {
+    it('Invalid pages property throws', () => {
+      assert.throws(() => {
         sharp({ pages: '1' });
       }, /Expected integer between -1 and 100000 for pages but received 1 of type string/);
     });
-    it('Valid openSlide.level property', function () {
+    it('Valid openSlide.level property', () => {
       sharp({ openSlide: { level: 1 } });
       sharp({ level: 1 });
     });
-    it('Invalid openSlide.level property (string) throws', function () {
+    it('Invalid openSlide.level property (string) throws', () => {
       assert.throws(
         () => sharp({ openSlide: { level: '1' } }),
         /Expected integer between 0 and 256 for openSlide.level but received 1 of type string/
@@ -892,7 +884,7 @@ describe('Input/output', function () {
         /Expected integer between 0 and 256 for level but received 1 of type string/
       );
     });
-    it('Invalid openSlide.level property (negative) throws', function () {
+    it('Invalid openSlide.level property (negative) throws', () => {
       assert.throws(
         () => sharp({ openSlide: { level: -1 } }),
         /Expected integer between 0 and 256 for openSlide\.level but received -1 of type number/
@@ -902,11 +894,11 @@ describe('Input/output', function () {
         /Expected integer between 0 and 256 for level but received -1 of type number/
       );
     });
-    it('Valid tiff.subifd property', function () {
+    it('Valid tiff.subifd property', () => {
       sharp({ tiff: { subifd: 1 } });
       sharp({ subifd: 1 });
     });
-    it('Invalid tiff.subifd property (string) throws', function () {
+    it('Invalid tiff.subifd property (string) throws', () => {
       assert.throws(
         () => sharp({ tiff: { subifd: '1' } }),
         /Expected integer between -1 and 100000 for tiff\.subifd but received 1 of type string/
@@ -916,7 +908,7 @@ describe('Input/output', function () {
         /Expected integer between -1 and 100000 for subifd but received 1 of type string/
       );
     });
-    it('Invalid tiff.subifd property (float) throws', function () {
+    it('Invalid tiff.subifd property (float) throws', () => {
       assert.throws(
         () => sharp({ tiff: { subifd: 1.2 } }),
         /Expected integer between -1 and 100000 for tiff\.subifd but received 1.2 of type number/
@@ -926,15 +918,15 @@ describe('Input/output', function () {
         /Expected integer between -1 and 100000 for subifd but received 1.2 of type number/
       );
     });
-    it('Valid pdf.background property (string)', function () {
+    it('Valid pdf.background property (string)', () => {
       sharp({ pdf: { background: '#00ff00' } });
       sharp({ pdfBackground: '#00ff00' });
     });
-    it('Valid pdf.background property (object)', function () {
+    it('Valid pdf.background property (object)', () => {
       sharp({ pdf: { background: { r: 0, g: 255, b: 0 } } });
       sharp({ pdfBackground: { r: 0, g: 255, b: 0 } });
     });
-    it('Invalid pdf.background property (string) throws', function () {
+    it('Invalid pdf.background property (string) throws', () => {
       assert.throws(
         () => sharp({ pdf: { background: '00ff00' } }),
         /Unable to parse color from string/
@@ -944,7 +936,7 @@ describe('Input/output', function () {
         /Unable to parse color from string/
       );
     });
-    it('Invalid pdf.background property (number) throws', function () {
+    it('Invalid pdf.background property (number) throws', () => {
       assert.throws(
         () => sharp({ pdf: { background: 255 } }),
         /Expected object or string for background/
@@ -954,7 +946,7 @@ describe('Input/output', function () {
         /Expected object or string for background/
       );
     });
-    it('Invalid pdf.background property (object)', function () {
+    it('Invalid pdf.background property (object)', () => {
       assert.throws(
         () => sharp({ pdf: { background: { red: 0, green: 255, blue: 0 } } }),
         /Unable to parse color from object/
@@ -979,8 +971,8 @@ describe('Input/output', function () {
     );
   });
 
-  describe('create new image', function () {
-    it('RGB', function (_t, done) {
+  describe('create new image', () => {
+    it('RGB', (_t, done) => {
       const create = {
         width: 10,
         height: 20,
@@ -989,7 +981,7 @@ describe('Input/output', function () {
       };
       sharp({ create })
         .jpeg()
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(create.width, info.width);
           assert.strictEqual(create.height, info.height);
@@ -998,7 +990,7 @@ describe('Input/output', function () {
           fixtures.assertSimilar(fixtures.expected('create-rgb.jpg'), data, done);
         });
     });
-    it('RGBA', function (_t, done) {
+    it('RGBA', (_t, done) => {
       const create = {
         width: 20,
         height: 10,
@@ -1007,7 +999,7 @@ describe('Input/output', function () {
       };
       sharp({ create })
         .png()
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(create.width, info.width);
           assert.strictEqual(create.height, info.height);
@@ -1016,40 +1008,40 @@ describe('Input/output', function () {
           fixtures.assertSimilar(fixtures.expected('create-rgba.png'), data, done);
         });
     });
-    it('Invalid channels', function () {
+    it('Invalid channels', () => {
       const create = {
         width: 10,
         height: 20,
         channels: 2,
         background: { r: 0, g: 0, b: 0 }
       };
-      assert.throws(function () {
+      assert.throws(() => {
         sharp({ create });
       });
     });
-    it('Missing background', function () {
+    it('Missing background', () => {
       const create = {
         width: 10,
         height: 20,
         channels: 3
       };
-      assert.throws(function () {
+      assert.throws(() => {
         sharp({ create });
       });
     });
   });
 
-  it('Queue length change events', function (_t, done) {
+  it('Queue length change events', (_t, done) => {
     let eventCounter = 0;
-    const queueListener = function (queueLength) {
+    const queueListener = (queueLength) => {
       assert.strictEqual(true, queueLength === 0 || queueLength === 1);
       eventCounter++;
     };
     sharp.queue.on('change', queueListener);
     sharp(fixtures.inputJpg)
       .resize(320, 240)
-      .toBuffer(function (err) {
-        process.nextTick(function () {
+      .toBuffer((err) => {
+        process.nextTick(() => {
           sharp.queue.removeListener('change', queueListener);
           if (err) throw err;
           assert.strictEqual(2, eventCounter);
@@ -1058,19 +1050,19 @@ describe('Input/output', function () {
       });
   });
 
-  it('Info event data', function (_t, done) {
+  it('Info event data', (_t, done) => {
     const readable = fs.createReadStream(fixtures.inputJPGBig);
     const inPipeline = sharp()
       .resize(840, 472)
       .raw()
-      .on('info', function (info) {
+      .on('info', (info) => {
         assert.strictEqual(840, info.width);
         assert.strictEqual(472, info.height);
         assert.strictEqual(3, info.channels);
       });
     const badPipeline = sharp({ raw: { width: 840, height: 500, channels: 3 } })
       .toFormat('jpeg')
-      .toBuffer(function (err) {
+      .toBuffer((err) => {
         assert.strictEqual(err.message.indexOf('memory area too small') > 0, true);
         const readable = fs.createReadStream(fixtures.inputJPGBig);
         const inPipeline = sharp()

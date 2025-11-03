@@ -10,25 +10,25 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('PNG', function () {
-  it('compression level is valid', function () {
-    assert.doesNotThrow(function () {
+describe('PNG', () => {
+  it('compression level is valid', () => {
+    assert.doesNotThrow(() => {
       sharp().png({ compressionLevel: 0 });
     });
   });
 
-  it('compression level is invalid', function () {
-    assert.throws(function () {
+  it('compression level is invalid', () => {
+    assert.throws(() => {
       sharp().png({ compressionLevel: -1 });
     });
   });
 
-  it('default compressionLevel generates smaller file than compressionLevel=0', function (_t, done) {
+  it('default compressionLevel generates smaller file than compressionLevel=0', (_t, done) => {
     // First generate with default compressionLevel
     sharp(fixtures.inputPng)
       .resize(320, 240)
       .png()
-      .toBuffer(function (err, defaultData, defaultInfo) {
+      .toBuffer((err, defaultData, defaultInfo) => {
         if (err) throw err;
         assert.strictEqual(true, defaultData.length > 0);
         assert.strictEqual('png', defaultInfo.format);
@@ -36,7 +36,7 @@ describe('PNG', function () {
         sharp(fixtures.inputPng)
           .resize(320, 240)
           .png({ compressionLevel: 0 })
-          .toBuffer(function (err, largerData, largerInfo) {
+          .toBuffer((err, largerData, largerInfo) => {
             if (err) throw err;
             assert.strictEqual(true, largerData.length > 0);
             assert.strictEqual('png', largerInfo.format);
@@ -46,12 +46,12 @@ describe('PNG', function () {
       });
   });
 
-  it('without adaptiveFiltering generates smaller file', function (_t, done) {
+  it('without adaptiveFiltering generates smaller file', (_t, done) => {
     // First generate with adaptive filtering
     sharp(fixtures.inputPng)
       .resize(320, 240)
       .png({ adaptiveFiltering: true })
-      .toBuffer(function (err, adaptiveData, adaptiveInfo) {
+      .toBuffer((err, adaptiveData, adaptiveInfo) => {
         if (err) throw err;
         assert.strictEqual(true, adaptiveData.length > 0);
         assert.strictEqual(adaptiveData.length, adaptiveInfo.size);
@@ -62,7 +62,7 @@ describe('PNG', function () {
         sharp(fixtures.inputPng)
           .resize(320, 240)
           .png({ adaptiveFiltering: false })
-          .toBuffer(function (err, withoutAdaptiveData, withoutAdaptiveInfo) {
+          .toBuffer((err, withoutAdaptiveData, withoutAdaptiveInfo) => {
             if (err) throw err;
             assert.strictEqual(true, withoutAdaptiveData.length > 0);
             assert.strictEqual(withoutAdaptiveData.length, withoutAdaptiveInfo.size);
@@ -75,17 +75,17 @@ describe('PNG', function () {
       });
   });
 
-  it('Invalid PNG adaptiveFiltering value throws error', function () {
-    assert.throws(function () {
+  it('Invalid PNG adaptiveFiltering value throws error', () => {
+    assert.throws(() => {
       sharp().png({ adaptiveFiltering: 1 });
     });
   });
 
-  it('Progressive PNG image', function (_t, done) {
+  it('Progressive PNG image', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .png({ progressive: false })
-      .toBuffer(function (err, nonProgressiveData, nonProgressiveInfo) {
+      .toBuffer((err, nonProgressiveData, nonProgressiveInfo) => {
         if (err) throw err;
         assert.strictEqual(true, nonProgressiveData.length > 0);
         assert.strictEqual(nonProgressiveData.length, nonProgressiveInfo.size);
@@ -94,7 +94,7 @@ describe('PNG', function () {
         assert.strictEqual(240, nonProgressiveInfo.height);
         sharp(nonProgressiveData)
           .png({ progressive: true })
-          .toBuffer(function (err, progressiveData, progressiveInfo) {
+          .toBuffer((err, progressiveData, progressiveInfo) => {
             if (err) throw err;
             assert.strictEqual(true, progressiveData.length > 0);
             assert.strictEqual(progressiveData.length, progressiveInfo.size);
@@ -107,11 +107,11 @@ describe('PNG', function () {
       });
   });
 
-  it('16-bit grey+alpha PNG identity transform', function () {
+  it('16-bit grey+alpha PNG identity transform', () => {
     const actual = fixtures.path('output.16-bit-grey-alpha-identity.png');
     return sharp(fixtures.inputPng16BitGreyAlpha)
       .toFile(actual)
-      .then(function () {
+      .then(() => {
         fixtures.assertMaxColourDistance(actual, fixtures.expected('16-bit-grey-alpha-identity.png'));
       });
   });
@@ -160,30 +160,30 @@ describe('PNG', function () {
     });
   });
 
-  it('Valid PNG libimagequant palette value does not throw error', function () {
-    assert.doesNotThrow(function () {
+  it('Valid PNG libimagequant palette value does not throw error', () => {
+    assert.doesNotThrow(() => {
       sharp().png({ palette: false });
     });
   });
 
-  it('Invalid PNG libimagequant palette value throws error', function () {
-    assert.throws(function () {
+  it('Invalid PNG libimagequant palette value throws error', () => {
+    assert.throws(() => {
       sharp().png({ palette: 'fail' });
     });
   });
 
-  it('Valid PNG libimagequant quality value produces image of same size or smaller', function () {
+  it('Valid PNG libimagequant quality value produces image of same size or smaller', () => {
     const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     return Promise.all([
       sharp(inputPngBuffer).resize(10).png({ effort: 1, quality: 80 }).toBuffer(),
       sharp(inputPngBuffer).resize(10).png({ effort: 1, quality: 100 }).toBuffer()
-    ]).then(function (data) {
+    ]).then((data) => {
       assert.strictEqual(true, data[0].length <= data[1].length);
     });
   });
 
-  it('Invalid PNG libimagequant quality value throws error', function () {
-    assert.throws(function () {
+  it('Invalid PNG libimagequant quality value throws error', () => {
+    assert.throws(() => {
       sharp().png({ quality: 101 });
     });
   });
@@ -194,24 +194,24 @@ describe('PNG', function () {
     });
   });
 
-  it('Valid PNG libimagequant colours value produces image of same size or smaller', function () {
+  it('Valid PNG libimagequant colours value produces image of same size or smaller', () => {
     const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     return Promise.all([
       sharp(inputPngBuffer).resize(10).png({ colours: 100 }).toBuffer(),
       sharp(inputPngBuffer).resize(10).png({ colours: 200 }).toBuffer()
-    ]).then(function (data) {
+    ]).then((data) => {
       assert.strictEqual(true, data[0].length <= data[1].length);
     });
   });
 
-  it('Invalid PNG libimagequant colours value throws error', function () {
-    assert.throws(function () {
+  it('Invalid PNG libimagequant colours value throws error', () => {
+    assert.throws(() => {
       sharp().png({ colours: -1 });
     });
   });
 
-  it('Invalid PNG libimagequant colors value throws error', function () {
-    assert.throws(function () {
+  it('Invalid PNG libimagequant colors value throws error', () => {
+    assert.throws(() => {
       sharp().png({ colors: 0.1 });
     });
   });
@@ -235,18 +235,18 @@ describe('PNG', function () {
     assert.strictEqual(space, 'b-w');
   });
 
-  it('Valid PNG libimagequant dither value produces image of same size or smaller', function () {
+  it('Valid PNG libimagequant dither value produces image of same size or smaller', () => {
     const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
     return Promise.all([
       sharp(inputPngBuffer).resize(10).png({ dither: 0.1 }).toBuffer(),
       sharp(inputPngBuffer).resize(10).png({ dither: 0.9 }).toBuffer()
-    ]).then(function (data) {
+    ]).then((data) => {
       assert.strictEqual(true, data[0].length <= data[1].length);
     });
   });
 
-  it('Invalid PNG libimagequant dither value throws error', function () {
-    assert.throws(function () {
+  it('Invalid PNG libimagequant dither value throws error', () => {
+    assert.throws(() => {
       sharp().png({ dither: 'fail' });
     });
   });

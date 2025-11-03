@@ -9,12 +9,12 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Image channel extraction', function () {
-  it('Red channel', function (_t, done) {
+describe('Image channel extraction', () => {
+  it('Red channel', (_t, done) => {
     sharp(fixtures.inputJpg)
       .extractChannel('red')
       .resize(320, 240)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -22,11 +22,11 @@ describe('Image channel extraction', function () {
       });
   });
 
-  it('Green channel', function (_t, done) {
+  it('Green channel', (_t, done) => {
     sharp(fixtures.inputJpg)
       .extractChannel('green')
       .resize(320, 240)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -34,11 +34,11 @@ describe('Image channel extraction', function () {
       });
   });
 
-  it('Blue channel', function (_t, done) {
+  it('Blue channel', (_t, done) => {
     sharp(fixtures.inputJpg)
       .extractChannel('blue')
       .resize(320, 240)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -46,11 +46,11 @@ describe('Image channel extraction', function () {
       });
   });
 
-  it('Blue channel by number', function (_t, done) {
+  it('Blue channel by number', (_t, done) => {
     sharp(fixtures.inputJpg)
       .extractChannel(2)
       .resize(320, 240)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(320, info.width);
         assert.strictEqual(240, info.height);
@@ -67,23 +67,23 @@ describe('Image channel extraction', function () {
     assert.strictEqual(chroma, 104);
   });
 
-  it('Alpha from 16-bit PNG', function (_t, done) {
+  it('Alpha from 16-bit PNG', (_t, done) => {
     const output = fixtures.path('output.extract-alpha-16bit.png');
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(16)
       .extractChannel(3)
-      .toFile(output, function (err) {
+      .toFile(output, (err) => {
         if (err) throw err;
         fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-16bit.png'));
         done();
       });
   });
 
-  it('Alpha from 2-channel input', function (_t, done) {
+  it('Alpha from 2-channel input', (_t, done) => {
     const output = fixtures.path('output.extract-alpha-2-channel.png');
     sharp(fixtures.inputPngWithGreyAlpha)
       .extractChannel('alpha')
-      .toFile(output, function (err, info) {
+      .toFile(output, (err, info) => {
         if (err) throw err;
         assert.strictEqual(1, info.channels);
         fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-2-channel.png'));
@@ -91,15 +91,15 @@ describe('Image channel extraction', function () {
       });
   });
 
-  it('Invalid channel number', function () {
-    assert.throws(function () {
+  it('Invalid channel number', () => {
+    assert.throws(() => {
       sharp(fixtures.inputJpg)
         .extractChannel(-1);
     });
   });
 
-  it('No arguments', function () {
-    assert.throws(function () {
+  it('No arguments', () => {
+    assert.throws(() => {
       sharp(fixtures.inputJpg)
         .extractChannel();
     });

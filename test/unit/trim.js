@@ -10,8 +10,8 @@ const sharp = require('../../');
 const inRange = require('../../lib/is').inRange;
 const fixtures = require('../fixtures');
 
-describe('Trim borders', function () {
-  it('Skip shrink-on-load', function (_t, done) {
+describe('Trim borders', () => {
+  it('Skip shrink-on-load', (_t, done) => {
     const expected = fixtures.expected('alpha-layer-2-trim-resize.jpg');
     sharp(fixtures.inputJpgOverlayLayer2)
       .trim()
@@ -19,7 +19,7 @@ describe('Trim borders', function () {
         width: 300,
         fastShrinkOnLoad: false
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('jpeg', info.format);
         assert.strictEqual(300, info.width);
@@ -44,13 +44,13 @@ describe('Trim borders', function () {
       })
   );
 
-  it('16-bit PNG with alpha channel', function (_t, done) {
+  it('16-bit PNG with alpha channel', (_t, done) => {
     sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 32)
       .trim({
         threshold: 20
       })
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('png', info.format);
@@ -63,7 +63,7 @@ describe('Trim borders', function () {
       });
   });
 
-  it('Attempt to trim 2x2 pixel image fails', function (_t, done) {
+  it('Attempt to trim 2x2 pixel image fails', (_t, done) => {
     sharp({
       create: {
         width: 2,
@@ -211,7 +211,7 @@ describe('Trim borders', function () {
     assert.strictEqual(info.trimOffsetTop, -552);
   });
 
-  describe('Invalid parameters', function () {
+  describe('Invalid parameters', () => {
     Object.entries({
       'Invalid string': 'fail',
       'Invalid background option': {
@@ -223,16 +223,16 @@ describe('Trim borders', function () {
       'Invalid lineArt': {
         lineArt: 'fail'
       }
-    }).forEach(function ([description, parameter]) {
-      it(description, function () {
-        assert.throws(function () {
+    }).forEach(([description, parameter]) => {
+      it(description, () => {
+        assert.throws(() => {
           sharp().trim(parameter);
         });
       });
     });
   });
 
-  describe('Specific background colour', function () {
+  describe('Specific background colour', () => {
     it('Doesn\'t trim at all', async () => {
       const { info } = await sharp(fixtures.inputPngTrimSpecificColour)
         .trim({

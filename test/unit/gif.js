@@ -199,11 +199,11 @@ describe('GIF input', () => {
     );
   });
 
-  it('should work with streams when only animated is set', function (_t, done) {
+  it('should work with streams when only animated is set', (_t, done) => {
     fs.createReadStream(fixtures.inputGifAnimated)
       .pipe(sharp({ animated: true }))
       .gif()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('gif', info.format);
@@ -211,11 +211,11 @@ describe('GIF input', () => {
       });
   });
 
-  it('should work with streams when only pages is set', function (_t, done) {
+  it('should work with streams when only pages is set', (_t, done) => {
     fs.createReadStream(fixtures.inputGifAnimated)
       .pipe(sharp({ pages: -1 }))
       .gif()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual(true, data.length > 0);
         assert.strictEqual('gif', info.format);

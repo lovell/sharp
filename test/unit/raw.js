@@ -9,49 +9,49 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Raw pixel data', function () {
-  describe('Raw pixel input', function () {
-    it('Empty data', function () {
-      assert.throws(function () {
+describe('Raw pixel data', () => {
+  describe('Raw pixel input', () => {
+    it('Empty data', () => {
+      assert.throws(() => {
         sharp(Buffer.from(''));
       }, /empty/);
-      assert.throws(function () {
+      assert.throws(() => {
         sharp(new ArrayBuffer(0));
       }, /empty/);
-      assert.throws(function () {
+      assert.throws(() => {
         sharp(new Uint8Array(0));
       }, /empty/);
-      assert.throws(function () {
+      assert.throws(() => {
         sharp(new Uint8ClampedArray(0));
       }, /empty/);
     });
 
-    it('Missing options', function () {
-      assert.throws(function () {
+    it('Missing options', () => {
+      assert.throws(() => {
         sharp({ raw: {} });
       });
     });
 
-    it('Incomplete options', function () {
-      assert.throws(function () {
+    it('Incomplete options', () => {
+      assert.throws(() => {
         sharp({ raw: { width: 1, height: 1 } });
       });
     });
 
-    it('Invalid channels', function () {
-      assert.throws(function () {
+    it('Invalid channels', () => {
+      assert.throws(() => {
         sharp({ raw: { width: 1, height: 1, channels: 5 } });
       });
     });
 
-    it('Invalid height', function () {
-      assert.throws(function () {
+    it('Invalid height', () => {
+      assert.throws(() => {
         sharp({ raw: { width: 1, height: 0, channels: 4 } });
       });
     });
 
-    it('Invalid width', function () {
-      assert.throws(function () {
+    it('Invalid width', () => {
+      assert.throws(() => {
         sharp({ raw: { width: 'zoinks', height: 1, channels: 4 } });
       });
     });
@@ -85,12 +85,12 @@ describe('Raw pixel data', function () {
       );
     });
 
-    it('RGB', function (_t, done) {
+    it('RGB', (_t, done) => {
       // Convert to raw pixel data
       sharp(fixtures.inputJpg)
         .resize(256)
         .raw()
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(256, info.width);
           assert.strictEqual(209, info.height);
@@ -104,7 +104,7 @@ describe('Raw pixel data', function () {
             }
           })
             .jpeg()
-            .toBuffer(function (err, data, info) {
+            .toBuffer((err, data, info) => {
               if (err) throw err;
               assert.strictEqual(256, info.width);
               assert.strictEqual(209, info.height);
@@ -114,12 +114,12 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('RGBA', function (_t, done) {
+    it('RGBA', (_t, done) => {
       // Convert to raw pixel data
       sharp(fixtures.inputPngOverlayLayer1)
         .resize(256)
         .raw()
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(256, info.width);
           assert.strictEqual(192, info.height);
@@ -133,7 +133,7 @@ describe('Raw pixel data', function () {
             }
           })
             .png()
-            .toBuffer(function (err, data, info) {
+            .toBuffer((err, data, info) => {
               if (err) throw err;
               assert.strictEqual(256, info.width);
               assert.strictEqual(192, info.height);
@@ -143,12 +143,12 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('RGBA premultiplied', function (_t, done) {
+    it('RGBA premultiplied', (_t, done) => {
       // Convert to raw pixel data
       sharp(fixtures.inputPngSolidAlpha)
         .resize(256)
         .raw()
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(256, info.width);
           assert.strictEqual(192, info.height);
@@ -178,7 +178,7 @@ describe('Raw pixel data', function () {
             }
           })
             .raw()
-            .toBuffer(function (err, data, info) {
+            .toBuffer((err, data, info) => {
               if (err) throw err;
               assert.strictEqual(256, info.width);
               assert.strictEqual(192, info.height);
@@ -189,7 +189,7 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('JPEG to raw Stream and back again', function (_t, done) {
+    it('JPEG to raw Stream and back again', (_t, done) => {
       const width = 32;
       const height = 24;
       const writable = sharp({
@@ -201,7 +201,7 @@ describe('Raw pixel data', function () {
       });
       writable
         .jpeg()
-        .toBuffer(function (err, _data, info) {
+        .toBuffer((err, _data, info) => {
           if (err) throw err;
           assert.strictEqual('jpeg', info.format);
           assert.strictEqual(32, info.width);
@@ -215,13 +215,13 @@ describe('Raw pixel data', function () {
     });
   });
 
-  describe('Output raw, uncompressed image data', function () {
-    it('1 channel greyscale image', function (_t, done) {
+  describe('Output raw, uncompressed image data', () => {
+    it('1 channel greyscale image', (_t, done) => {
       sharp(fixtures.inputJpg)
         .greyscale()
         .resize(32, 24)
         .raw()
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(32 * 24 * 1, info.size);
           assert.strictEqual(data.length, info.size);
@@ -233,11 +233,11 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('3 channel colour image without transparency', function (_t, done) {
+    it('3 channel colour image without transparency', (_t, done) => {
       sharp(fixtures.inputJpg)
         .resize(32, 24)
         .toFormat('raw')
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(32 * 24 * 3, info.size);
           assert.strictEqual(data.length, info.size);
@@ -248,11 +248,11 @@ describe('Raw pixel data', function () {
         });
     });
 
-    it('4 channel colour image with transparency', function (_t, done) {
+    it('4 channel colour image with transparency', (_t, done) => {
       sharp(fixtures.inputPngWithTransparency)
         .resize(32, 24)
         .toFormat(sharp.format.raw)
-        .toBuffer(function (err, data, info) {
+        .toBuffer((err, data, info) => {
           if (err) throw err;
           assert.strictEqual(32 * 24 * 4, info.size);
           assert.strictEqual(data.length, info.size);
@@ -278,9 +278,9 @@ describe('Raw pixel data', function () {
     );
   });
 
-  describe('Raw pixel depths', function () {
-    it('Invalid depth', function () {
-      assert.throws(function () {
+  describe('Raw pixel depths', () => {
+    it('Invalid depth', () => {
+      assert.throws(() => {
         sharp(Buffer.alloc(3), { raw: { width: 1, height: 1, channels: 3 } })
           .raw({ depth: 'zoinks' });
       });

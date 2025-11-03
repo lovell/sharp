@@ -9,7 +9,7 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Timeout', function () {
+describe('Timeout', () => {
   it('Will timeout after 1s when performing slow blur operation', () => assert.rejects(
     () => sharp(fixtures.inputJpg)
       .blur(200)

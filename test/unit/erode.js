@@ -4,11 +4,11 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Erode', function () {
-  it('erode 1 png', function (_t, done) {
+describe('Erode', () => {
+  it('erode 1 png', (_t, done) => {
     sharp(fixtures.inputPngDotAndLines)
       .erode(1)
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(100, info.width);
@@ -17,10 +17,10 @@ describe('Erode', function () {
       });
   });
 
-  it('erode 1 png - default width', function (_t, done) {
+  it('erode 1 png - default width', (_t, done) => {
     sharp(fixtures.inputPngDotAndLines)
       .erode()
-      .toBuffer(function (err, data, info) {
+      .toBuffer((err, data, info) => {
         if (err) throw err;
         assert.strictEqual('png', info.format);
         assert.strictEqual(100, info.width);
@@ -29,8 +29,8 @@ describe('Erode', function () {
       });
   });
 
-  it('invalid erosion width', function () {
-    assert.throws(function () {
+  it('invalid erosion width', () => {
+    assert.throws(() => {
       sharp(fixtures.inputJpg).erode(-1);
     });
   });

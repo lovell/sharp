@@ -9,21 +9,21 @@ const assert = require('node:assert');
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('JPEG', function () {
-  it('JPEG quality', function (_t, done) {
+describe('JPEG', () => {
+  it('JPEG quality', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .jpeg({ quality: 70 })
-      .toBuffer(function (err, buffer70) {
+      .toBuffer((err, buffer70) => {
         if (err) throw err;
         sharp(fixtures.inputJpg)
           .resize(320, 240)
-          .toBuffer(function (err, buffer80) {
+          .toBuffer((err, buffer80) => {
             if (err) throw err;
             sharp(fixtures.inputJpg)
               .resize(320, 240)
               .jpeg({ quality: 90 })
-              .toBuffer(function (err, buffer90) {
+              .toBuffer((err, buffer90) => {
                 if (err) throw err;
                 assert(buffer70.length < buffer80.length);
                 assert(buffer80.length < buffer90.length);
@@ -33,31 +33,31 @@ describe('JPEG', function () {
       });
   });
 
-  describe('Invalid JPEG quality', function () {
-    [-1, 88.2, 'test'].forEach(function (quality) {
-      it(quality.toString(), function () {
-        assert.throws(function () {
+  describe('Invalid JPEG quality', () => {
+    [-1, 88.2, 'test'].forEach((quality) => {
+      it(quality.toString(), () => {
+        assert.throws(() => {
           sharp().jpeg({ quality });
         });
       });
     });
   });
 
-  describe('Invalid JPEG quantisation table', function () {
-    [-1, 88.2, 'test'].forEach(function (table) {
-      it(table.toString(), function () {
-        assert.throws(function () {
+  describe('Invalid JPEG quantisation table', () => {
+    [-1, 88.2, 'test'].forEach((table) => {
+      it(table.toString(), () => {
+        assert.throws(() => {
           sharp().jpeg({ quantisationTable: table });
         });
       });
     });
   });
 
-  it('Progressive JPEG image', function (_t, done) {
+  it('Progressive JPEG image', (_t, done) => {
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .jpeg({ progressive: false })
-      .toBuffer(function (err, nonProgressiveData, nonProgressiveInfo) {
+      .toBuffer((err, nonProgressiveData, nonProgressiveInfo) => {
         if (err) throw err;
         assert.strictEqual(true, nonProgressiveData.length > 0);
         assert.strictEqual(nonProgressiveData.length, nonProgressiveInfo.size);
@@ -67,7 +67,7 @@ describe('JPEG', function () {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .jpeg({ progressive: true })
-          .toBuffer(function (err, progressiveData, progressiveInfo) {
+          .toBuffer((err, progressiveData, progressiveInfo) => {
             if (err) throw err;
             assert.strictEqual(true, progressiveData.length > 0);
             assert.strictEqual(progressiveData.length, progressiveInfo.size);
@@ -80,12 +80,12 @@ describe('JPEG', function () {
       });
   });
 
-  it('Without chroma subsampling generates larger file', function (_t, done) {
+  it('Without chroma subsampling generates larger file', (_t, done) => {
     // First generate with chroma subsampling (default)
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .jpeg({ chromaSubsampling: '4:2:0' })
-      .toBuffer(function (err, withChromaSubsamplingData, withChromaSubsamplingInfo) {
+      .toBuffer((err, withChromaSubsamplingData, withChromaSubsamplingInfo) => {
         if (err) throw err;
         assert.strictEqual(true, withChromaSubsamplingData.length > 0);
         assert.strictEqual(withChromaSubsamplingData.length, withChromaSubsamplingInfo.size);
@@ -96,7 +96,7 @@ describe('JPEG', function () {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .jpeg({ chromaSubsampling: '4:4:4' })
-          .toBuffer(function (err, withoutChromaSubsamplingData, withoutChromaSubsamplingInfo) {
+          .toBuffer((err, withoutChromaSubsamplingData, withoutChromaSubsamplingInfo) => {
             if (err) throw err;
             assert.strictEqual(true, withoutChromaSubsamplingData.length > 0);
             assert.strictEqual(withoutChromaSubsamplingData.length, withoutChromaSubsamplingInfo.size);
@@ -109,18 +109,18 @@ describe('JPEG', function () {
       });
   });
 
-  it('Invalid JPEG chromaSubsampling value throws error', function () {
-    assert.throws(function () {
+  it('Invalid JPEG chromaSubsampling value throws error', () => {
+    assert.throws(() => {
       sharp().jpeg({ chromaSubsampling: '4:2:2' });
     });
   });
 
-  it('Trellis quantisation', function (_t, done) {
+  it('Trellis quantisation', (_t, done) => {
     // First generate without
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .jpeg({ trellisQuantisation: false })
-      .toBuffer(function (err, withoutData, withoutInfo) {
+      .toBuffer((err, withoutData, withoutInfo) => {
         if (err) throw err;
         assert.strictEqual(true, withoutData.length > 0);
         assert.strictEqual(withoutData.length, withoutInfo.size);
@@ -131,7 +131,7 @@ describe('JPEG', function () {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .jpeg({ trellisQuantization: true })
-          .toBuffer(function (err, withData, withInfo) {
+          .toBuffer((err, withData, withInfo) => {
             if (err) throw err;
             assert.strictEqual(true, withData.length > 0);
             assert.strictEqual(withData.length, withInfo.size);
@@ -145,12 +145,12 @@ describe('JPEG', function () {
       });
   });
 
-  it('Overshoot deringing', function (_t, done) {
+  it('Overshoot deringing', (_t, done) => {
     // First generate without
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .jpeg({ overshootDeringing: false })
-      .toBuffer(function (err, withoutData, withoutInfo) {
+      .toBuffer((err, withoutData, withoutInfo) => {
         if (err) throw err;
         assert.strictEqual(true, withoutData.length > 0);
         assert.strictEqual(withoutData.length, withoutInfo.size);
@@ -161,7 +161,7 @@ describe('JPEG', function () {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .jpeg({ overshootDeringing: true })
-          .toBuffer(function (err, withData, withInfo) {
+          .toBuffer((err, withData, withInfo) => {
             if (err) throw err;
             assert.strictEqual(true, withData.length > 0);
             assert.strictEqual(withData.length, withInfo.size);
@@ -173,12 +173,12 @@ describe('JPEG', function () {
       });
   });
 
-  it('Optimise scans generates different output length', function (_t, done) {
+  it('Optimise scans generates different output length', (_t, done) => {
     // First generate without
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .jpeg({ optimiseScans: false })
-      .toBuffer(function (err, withoutData, withoutInfo) {
+      .toBuffer((err, withoutData, withoutInfo) => {
         if (err) throw err;
         assert.strictEqual(true, withoutData.length > 0);
         assert.strictEqual(withoutData.length, withoutInfo.size);
@@ -189,7 +189,7 @@ describe('JPEG', function () {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .jpeg({ optimizeScans: true })
-          .toBuffer(function (err, withData, withInfo) {
+          .toBuffer((err, withData, withInfo) => {
             if (err) throw err;
             assert.strictEqual(true, withData.length > 0);
             assert.strictEqual(withData.length, withInfo.size);
@@ -203,12 +203,12 @@ describe('JPEG', function () {
       });
   });
 
-  it('Optimise coding generates smaller output length', function (_t, done) {
+  it('Optimise coding generates smaller output length', (_t, done) => {
     // First generate with optimize coding enabled (default)
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .jpeg()
-      .toBuffer(function (err, withOptimiseCoding, withInfo) {
+      .toBuffer((err, withOptimiseCoding, withInfo) => {
         if (err) throw err;
         assert.strictEqual(true, withOptimiseCoding.length > 0);
         assert.strictEqual(withOptimiseCoding.length, withInfo.size);
@@ -219,7 +219,7 @@ describe('JPEG', function () {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .jpeg({ optimizeCoding: false })
-          .toBuffer(function (err, withoutOptimiseCoding, withoutInfo) {
+          .toBuffer((err, withoutOptimiseCoding, withoutInfo) => {
             if (err) throw err;
             assert.strictEqual(true, withoutOptimiseCoding.length > 0);
             assert.strictEqual(withoutOptimiseCoding.length, withoutInfo.size);
@@ -233,12 +233,12 @@ describe('JPEG', function () {
       });
   });
 
-  it('Specifying quantisation table provides different JPEG', function (_t, done) {
+  it('Specifying quantisation table provides different JPEG', (_t, done) => {
     // First generate with default quantisation table
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .jpeg({ optimiseCoding: false })
-      .toBuffer(function (err, withDefaultQuantisationTable, withInfo) {
+      .toBuffer((err, withDefaultQuantisationTable, withInfo) => {
         if (err) throw err;
         assert.strictEqual(true, withDefaultQuantisationTable.length > 0);
         assert.strictEqual(withDefaultQuantisationTable.length, withInfo.size);
@@ -249,7 +249,7 @@ describe('JPEG', function () {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .jpeg({ optimiseCoding: false, quantisationTable: 3 })
-          .toBuffer(function (err, withQuantTable3, withoutInfo) {
+          .toBuffer((err, withQuantTable3, withoutInfo) => {
             if (err) throw err;
             assert.strictEqual(true, withQuantTable3.length > 0);
             assert.strictEqual(withQuantTable3.length, withoutInfo.size);
@@ -264,12 +264,12 @@ describe('JPEG', function () {
       });
   });
 
-  it('Specifying quantization table provides different JPEG', function (_t, done) {
+  it('Specifying quantization table provides different JPEG', (_t, done) => {
     // First generate with default quantization table
     sharp(fixtures.inputJpg)
       .resize(320, 240)
       .jpeg({ optimiseCoding: false })
-      .toBuffer(function (err, withDefaultQuantizationTable, withInfo) {
+      .toBuffer((err, withDefaultQuantizationTable, withInfo) => {
         if (err) throw err;
         assert.strictEqual(true, withDefaultQuantizationTable.length > 0);
         assert.strictEqual(withDefaultQuantizationTable.length, withInfo.size);
@@ -280,7 +280,7 @@ describe('JPEG', function () {
         sharp(fixtures.inputJpg)
           .resize(320, 240)
           .jpeg({ optimiseCoding: false, quantizationTable: 3 })
-          .toBuffer(function (err, withQuantTable3, withoutInfo) {
+          .toBuffer((err, withQuantTable3, withoutInfo) => {
             if (err) throw err;
             assert.strictEqual(true, withQuantTable3.length > 0);
             assert.strictEqual(withQuantTable3.length, withoutInfo.size);

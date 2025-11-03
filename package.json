@@ -170,7 +170,7 @@
     "@img/sharp-win32-x64": "0.34.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.2",
+    "@biomejs/biome": "^2.3.3",
     "@cpplint/cli": "^0.1.0",
     "@emnapi/runtime": "^1.6.0",
     "@img/sharp-libvips-dev": "1.2.4",

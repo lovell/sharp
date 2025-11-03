@@ -9,82 +9,82 @@ const fixtures = require('../fixtures');
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
-describe('Linear adjustment', function () {
+describe('Linear adjustment', () => {
   const blackPoint = 70;
   const whitePoint = 203;
   const a = 255 / (whitePoint - blackPoint);
   const b = -blackPoint * a;
 
-  it('applies linear levels adjustment w/o alpha ch', function (_t, done) {
+  it('applies linear levels adjustment w/o alpha ch', (_t, done) => {
     sharp(fixtures.inputJpgWithLowContrast)
       .linear(a, b)
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('low-contrast-linear.jpg'), data, done);
       });
   });
 
-  it('applies slope level adjustment w/o alpha ch', function (_t, done) {
+  it('applies slope level adjustment w/o alpha ch', (_t, done) => {
     sharp(fixtures.inputJpgWithLowContrast)
       .linear(a)
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('low-contrast-slope.jpg'), data, done);
       });
   });
 
-  it('applies offset level adjustment w/o alpha ch', function (_t, done) {
+  it('applies offset level adjustment w/o alpha ch', (_t, done) => {
     sharp(fixtures.inputJpgWithLowContrast)
       .linear(null, b)
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('low-contrast-offset.jpg'), data, done);
       });
   });
 
-  it('applies linear levels adjustment w alpha ch', function (_t, done) {
+  it('applies linear levels adjustment w alpha ch', (_t, done) => {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(240)
       .linear(a, b)
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('alpha-layer-1-fill-linear.png'), data, done);
       });
   });
 
-  it('applies linear levels adjustment to 16-bit w alpha ch', function (_t, done) {
+  it('applies linear levels adjustment to 16-bit w alpha ch', (_t, done) => {
     sharp(fixtures.inputPngWithTransparency16bit)
       .linear(a, b)
       .png({ compressionLevel: 0 })
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('linear-16bit.png'), data, done);
       });
   });
 
-  it('applies slope level adjustment w alpha ch', function (_t, done) {
+  it('applies slope level adjustment w alpha ch', (_t, done) => {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(240)
       .linear(a)
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('alpha-layer-1-fill-slope.png'), data, done);
       });
   });
 
-  it('applies offset level adjustment w alpha ch', function (_t, done) {
+  it('applies offset level adjustment w alpha ch', (_t, done) => {
     sharp(fixtures.inputPngOverlayLayer1)
       .resize(240)
       .linear(null, b)
-      .toBuffer(function (err, data) {
+      .toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('alpha-layer-1-fill-offset.png'), data, done);
       });
   });
 
-  it('per channel level adjustment', function (_t, done) {
+  it('per channel level adjustment', (_t, done) => {
     sharp(fixtures.inputWebP)
-      .linear([0.25, 0.5, 0.75], [150, 100, 50]).toBuffer(function (err, data) {
+      .linear([0.25, 0.5, 0.75], [150, 100, 50]).toBuffer((err, data) => {
         if (err) throw err;
         fixtures.assertSimilar(fixtures.expected('linear-per-channel.jpg'), data, done);
       });
@@ -112,7 +112,7 @@ describe('Linear adjustment', function () {
     assert.strictEqual(depth, 'uchar');
   });
 
-  it('Invalid linear arguments', function () {
+  it('Invalid linear arguments', () => {
     assert.throws(
       () => sharp().linear('foo'),
       /Expected number or array of numbers for a but received foo of type string/

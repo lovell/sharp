@@ -8,9 +8,7 @@ const sharp = require('../../');
 const maxColourDistance = require('../../lib/sharp')._maxColourDistance;
 
 // Helpers
-const getPath = function (filename) {
-  return path.join(__dirname, filename);
-};
+const getPath = (filename) => path.join(__dirname, filename);
 
 // Generates a 64-bit-as-binary-string image fingerprint
 // Based on the dHash gradient method - see http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html
@@ -22,7 +20,7 @@ async function fingerprint (image) {
     .resize(9, 8, { fit: sharp.fit.fill })
     .raw()
     .toBuffer()
-    .then(function (data) {
+    .then((data) => {
       let fingerprint = '';
       for (let col = 0; col < 8; col++) {
         for (let row = 0; row < 8; row++) {
@@ -148,14 +146,12 @@ module.exports = {
   path: getPath,
 
   // Path for expected output images
-  expected: function (filename) {
-    return getPath(path.join('expected', filename));
-  },
+  expected: (filename) => getPath(path.join('expected', filename)),
 
   // Verify similarity of expected vs actual images via fingerprint
   // Specify distance threshold using `options={threshold: 42}`, default
   // `threshold` is 5;
-  assertSimilar: async function (expectedImage, actualImage, options, callback) {
+  assertSimilar: async (expectedImage, actualImage, options, callback) => {
     if (typeof options === 'function') {
       callback = options;
       options = {};
@@ -195,7 +191,7 @@ module.exports = {
     }
   },
 
-  assertMaxColourDistance: function (actualImagePath, expectedImagePath, acceptedDistance) {
+  assertMaxColourDistance: (actualImagePath, expectedImagePath, acceptedDistance) => {
     if (typeof actualImagePath !== 'string') {
       throw new TypeError(`\`actualImagePath\` must be a string; got ${actualImagePath}`);
     }
