@@ -797,20 +797,14 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::EnsureAlpha(image, baton->ensureAlpha);
       }
 
-      // Convert image to sRGB, if not already
+      // Ensure output colour space
       if (sharp::Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
       }
       if (image.interpretation() != baton->colourspace) {
-        // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
-        // Transform colours from embedded profile to output profile
-        if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->colourspacePipeline != VIPS_INTERPRETATION_CMYK &&
-          baton->withIccProfile.empty() && sharp::HasProfile(image)) {
-          image = image.icc_transform(processingProfile, VImage::option()
-            ->set("embedded", true)
-            ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
-            ->set("intent", VIPS_INTENT_PERCEPTUAL));
+        if (inputProfile.first && baton->withIccProfile.empty()) {
+          image = sharp::SetProfile(image, inputProfile);
         }
       }
 
@@ -845,8 +839,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         } catch(...) {
           sharp::VipsWarningCallback(nullptr, G_LOG_LEVEL_WARNING, "Invalid profile", nullptr);
         }
-      } else if (baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) {
-        image = sharp::SetProfile(image, inputProfile);
       }
 
       // Negate the colours in the image

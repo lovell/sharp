@@ -651,16 +651,27 @@ describe('Image metadata', () => {
     assert.strictEqual(description, 'Generic RGB Profile');
   });
 
-  it('keep existing ICC profile, ignore colourspace conversion', async () => {
+  it('keep existing CMYK input profile for CMYK output', async () => {
+    const data = await sharp(fixtures.inputJpgWithCmykProfile)
+      .keepIccProfile()
+      .toColourspace('cmyk')
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    assert.strictEqual(metadata.channels, 4);
+    const { description } = icc.parse(metadata.icc);
+    assert.strictEqual(description, 'U.S. Web Coated (SWOP) v2');
+  });
+
+  it('transform with but discard existing RGB input profile for CMYK output', async () => {
     const data = await sharp(fixtures.inputJpgWithExif)
       .keepIccProfile()
       .toColourspace('cmyk')
       .toBuffer();
 
     const metadata = await sharp(data).metadata();
-    assert.strictEqual(metadata.channels, 3);
-    const { description } = icc.parse(metadata.icc);
-    assert.strictEqual(description, 'Generic RGB Profile');
+    assert.strictEqual(metadata.channels, 4);
+    assert.strictEqual(metadata.icc, undefined);
   });
 
   it('keep existing ICC profile, avoid colour transform', async () => {

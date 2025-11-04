@@ -201,13 +201,21 @@ const dataWithMergedExif = await sharp(inputWithExif)
 
 Keep ICC profile from the input image in the output image.
 
-For non-RGB output use [toColourspace](/api-colour/#tocolourspace).
+When input and output colour spaces differ, use with [toColourspace](/api-colour/#tocolourspace) and optionally [pipelineColourspace](/api-colour/#pipelinecolourspace).
 
 
 **Since**: 0.33.0  
 **Example**  
 ```js
 const outputWithIccProfile = await sharp(inputWithIccProfile)
+  .keepIccProfile()
+  .toBuffer();
+```
+**Example**  
+```js
+const cmykOutputWithIccProfile = await sharp(cmykInputWithIccProfile)
+  .pipelineColourspace('cmyk')
+  .toColourspace('cmyk')
   .keepIccProfile()
   .toBuffer();
 ```
