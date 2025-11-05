@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-wasm32",
-  "version": "0.34.4",
+  "version": "0.34.5-rc.0",
   "description": "Prebuilt sharp for use with wasm32",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -31,7 +31,7 @@
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
   },
   "dependencies": {
-    "@emnapi/runtime": "^1.6.0"
+    "@emnapi/runtime": "^1.7.0"
   },
   "cpu": [
     "wasm32"
