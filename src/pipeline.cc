@@ -455,12 +455,10 @@ class PipelineWorker : public Napi::AsyncWorker {
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->resizeBackground, shouldPremultiplyAlpha);
 
           // Embed
-          int left;
-          int top;
-          std::tie(left, top) = sharp::CalculateEmbedPosition(
+          const auto& [left, top] = sharp::CalculateEmbedPosition(
             inputWidth, inputHeight, baton->width, baton->height, baton->position);
-          int width = std::max(inputWidth, baton->width);
-          int height = std::max(inputHeight, baton->height);
+          const int width = std::max(inputWidth, baton->width);
+          const int height = std::max(inputHeight, baton->height);
 
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
@@ -479,13 +477,10 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Crop
           if (baton->position < 9) {
             // Gravity-based crop
-            int left;
-            int top;
-
-            std::tie(left, top) = sharp::CalculateCrop(
+            const auto& [left, top] = sharp::CalculateCrop(
               inputWidth, inputHeight, baton->width, baton->height, baton->position);
-            int width = std::min(inputWidth, baton->width);
-            int height = std::min(inputHeight, baton->height);
+            const int width = std::min(inputWidth, baton->width);
+            const int height = std::min(inputHeight, baton->height);
 
             image = nPages > 1
               ? sharp::CropMultiPage(image,
@@ -803,7 +798,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
       if (image.interpretation() != baton->colourspace) {
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
-        if (inputProfile.first && baton->withIccProfile.empty()) {
+        if (inputProfile.first != nullptr && baton->withIccProfile.empty()) {
           image = sharp::SetProfile(image, inputProfile);
         }
       }
@@ -860,8 +855,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         if (!baton->withExifMerge) {
           image = sharp::RemoveExif(image);
         }
-        for (const auto& s : baton->withExif) {
-          image.set(s.first.data(), s.second.data());
+        for (const auto& [key, value] : baton->withExif) {
+          image.set(key.c_str(), value.c_str());
         }
       }
       // XMP buffer
@@ -1440,11 +1435,11 @@ class PipelineWorker : public Napi::AsyncWorker {
   std::string
   AssembleSuffixString(std::string extname, std::vector<std::pair<std::string, std::string>> options) {
     std::string argument;
-    for (auto const &option : options) {
+    for (const auto& [key, value] : options) {
       if (!argument.empty()) {
         argument += ",";
       }
-      argument += option.first + "=" + option.second;
+      argument += key + "=" + value;
     }
     return extname + "[" + argument + "]";
   }

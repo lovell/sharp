@@ -219,10 +219,10 @@ class MetadataWorker : public Napi::AsyncWorker {
       if (!baton->levels.empty()) {
         int i = 0;
         Napi::Array levels = Napi::Array::New(env, static_cast<size_t>(baton->levels.size()));
-        for (std::pair<int, int> const &l : baton->levels) {
+        for (const auto& [width, height] : baton->levels) {
           Napi::Object level = Napi::Object::New(env);
-          level.Set("width", l.first);
-          level.Set("height", l.second);
+          level.Set("width", width);
+          level.Set("height", height);
           levels.Set(i++, level);
         }
         info.Set("levels", levels);
@@ -279,10 +279,10 @@ class MetadataWorker : public Napi::AsyncWorker {
       if (baton->comments.size() > 0) {
         int i = 0;
         Napi::Array comments = Napi::Array::New(env, baton->comments.size());
-        for (auto &c : baton->comments) {
+        for (const auto& [keyword, text] : baton->comments) {
           Napi::Object comment = Napi::Object::New(env);
-          comment.Set("keyword", c.first);
-          comment.Set("text", c.second);
+          comment.Set("keyword", keyword);
+          comment.Set("text", text);
           comments.Set(i++, comment);
         }
         info.Set("comments", comments);
