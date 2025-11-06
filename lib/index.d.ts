@@ -860,6 +860,7 @@ declare namespace sharp {
                 | JxlOptions
                 | GifOptions
                 | Jp2Options
+                | RawOptions
                 | TiffOptions,
         ): Sharp;
 
@@ -1181,6 +1182,10 @@ declare namespace sharp {
         'IFD3'?: ExifDir;
     }
 
+    type HeifCompression = 'av1' | 'hevc';
+
+    type Unit = 'inch' | 'cm';
+
     interface WriteableMetadata {
         /** Number of pixels per inch (DPI) */
         density?: number | undefined;
@@ -1259,7 +1264,7 @@ declare namespace sharp {
         /** Buffer containing raw TIFFTAG_PHOTOSHOP data, if present */
         tifftagPhotoshop?: Buffer | undefined;
         /** The encoder used to compress an HEIF file, `av1` (AVIF) or `hevc` (HEIC) */
-        compression?: 'av1' | 'hevc';
+        compression?: HeifCompression | undefined;
         /** Default background colour, if present, for PNG (bKGD) and GIF images */
         background?: { r: number; g: number; b: number } | { gray: number };
         /** Details of each level in a multi-level image provided as an array of objects, requires libvips compiled with support for OpenSlide */
@@ -1267,7 +1272,7 @@ declare namespace sharp {
         /** Number of Sub Image File Directories in an OME-TIFF image */
         subifds?: number | undefined;
         /** The unit of resolution (density) */
-        resolutionUnit?: 'inch' | 'cm' | undefined;
+        resolutionUnit?: Unit | undefined;
         /** String containing format for images loaded via *magick */
         formatMagick?: string | undefined;
         /** Array of keyword/text pairs representing PNG text blocks, if present. */
@@ -1423,7 +1428,7 @@ declare namespace sharp {
         /** quality, integer 1-100 (optional, default 50) */
         quality?: number | undefined;
         /** compression format: av1, hevc (optional, default 'av1') */
-        compression?: 'av1' | 'hevc' | undefined;
+        compression?: HeifCompression | undefined;
         /** use lossless compression (optional, default false) */
         lossless?: boolean | undefined;
         /** Level of CPU effort to reduce file size, between 0 (fastest) and 9 (slowest) (optional, default 4) */
@@ -1481,7 +1486,7 @@ declare namespace sharp {
         /** Write 1-bit images as miniswhite (optional, default false) */
         miniswhite?: boolean | undefined;
         /** Resolution unit options: inch, cm (optional, default 'inch') */
-        resolutionUnit?: 'inch' | 'cm' | undefined;
+        resolutionUnit?: Unit | undefined;
     }
 
     interface PngOptions extends OutputOptions {
@@ -1606,7 +1611,7 @@ declare namespace sharp {
     }
 
     interface RawOptions {
-        depth?: 'char' | 'uchar' | 'short' | 'ushort' | 'int' | 'uint' | 'float' | 'complex' | 'double' | 'dpcomplex';
+        depth?: keyof DepthEnum;
     }
 
     /** 1 for grayscale, 2 for grayscale + alpha, 3 for sRGB, 4 for CMYK or RGBA */

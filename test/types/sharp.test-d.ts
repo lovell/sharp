@@ -321,7 +321,7 @@ sharp('input.gif')
 // From https://sharp.pixelplumbing.com/api-output#examples-9
 // Extract raw RGB pixel data from JPEG input
 sharp('input.jpg')
-  .raw()
+  .raw({ depth: 'ushort' })
   .toBuffer({ resolveWithObject: true })
   .then(({ data, info }) => {
     console.log(data);
