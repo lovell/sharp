@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-linux-riscv64",
-  "version": "0.34.5-rc.1",
+  "version": "0.34.5",
   "description": "Prebuilt sharp for use with Linux (glibc) RISC-V 64-bit",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
