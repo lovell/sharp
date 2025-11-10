@@ -1028,11 +1028,11 @@ declare namespace sharp {
         openSlide?: OpenSlideInputOptions | undefined;
         /** JPEG 2000 specific input options */
         jp2?: Jp2InputOptions | undefined;
-        /** Deprecated: use tiff.subifd instead */
+        /** @deprecated Use {@link SharpOptions.tiff} instead */
         subifd?: number | undefined;
-        /** Deprecated: use pdf.background instead */
+        /** @deprecated Use {@link SharpOptions.pdf} instead */
         pdfBackground?: Colour | Color | undefined;
-        /** Deprecated: use openSlide.level instead */
+        /** @deprecated Use {@link SharpOptions.openSlide} instead */
         level?: number | undefined;
         /** Set to `true` to read all frames/pages of an animated image (equivalent of setting `pages` to `-1`). (optional, default false) */
         animated?: boolean | undefined;
