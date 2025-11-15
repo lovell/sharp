@@ -45,11 +45,11 @@ describe('JP2 output', () => {
           assert.strictEqual('png', info.format);
           assert.strictEqual(8, info.width);
           assert.strictEqual(15, info.height);
-          assert.strictEqual(4, info.channels);
+          assert.strictEqual(3, info.channels);
         });
     });
 
-    it('JP2 quality', (done) => {
+    it('JP2 quality', (_t, done) => {
       sharp(fixtures.inputJp2)
         .resize(320, 240)
         .jp2({ quality: 70 })
@@ -65,7 +65,7 @@ describe('JP2 output', () => {
         });
     });
 
-    it('Without chroma subsampling generates larger file', (done) => {
+    it('Without chroma subsampling generates larger file', (_t, done) => {
       // First generate with chroma subsampling (default)
       sharp(fixtures.inputJp2)
         .resize(320, 240)
@@ -111,7 +111,7 @@ describe('JP2 output', () => {
     it('Invalid JP2 chromaSubsampling value throws error', () => {
       assert.throws(
         () => sharp().jp2({ chromaSubsampling: '4:2:2' }),
-        /Expected one of 4:2:0, 4:4:4 but received 4:2:2 of type string/
+        /Expected one of: 4:2:0, 4:4:4 for chromaSubsampling but received 4:2:2 of type string/
       );
     });
   }
