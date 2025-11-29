@@ -301,10 +301,41 @@ const data = await sharp(input)
 ```
 
 
+## keepGainmap
+> keepGainmap() ⇒ <code>Sharp</code>
+
+Keep Gainmap for uhdr image from the input image in the output image. This is the defualt behaviour for uhdr input.
+
+
+**Since**: 0.34.6
+**Example**  
+```js
+const outputWithGainmap = await sharp(uhdrInput)
+  .keepGainmap()
+  .toBuffer();
+```
+
+
+## noGainmap
+> noGainmap() ⇒ <code>Sharp</code>
+
+Remove gainmap from the input image in the output image.
+
+
+**Since**: 0.34.6
+**Example**  
+```js
+const outputWithoutGainmap = await sharp(uhdrInput)
+  .noGainmap()
+  .toBuffer();
+```
+
+
+
 ## keepMetadata
 > keepMetadata() ⇒ <code>Sharp</code>
 
-Keep all metadata (EXIF, ICC, XMP, IPTC) from the input image in the output image.
+Keep all metadata (EXIF, ICC, XMP, IPTC, GainMap) from the input image in the output image.
 
 The default behaviour, when `keepMetadata` is not used, is to convert to the device-independent
 sRGB colour space and strip all metadata, including the removal of any ICC profile.
@@ -376,6 +407,33 @@ Force output to a given format.
 // Convert any input to PNG output
 const data = await sharp(input)
   .toFormat('png')
+  .toBuffer();
+```
+
+## uhdr
+> uhdr([options]) ⇒ <code>Sharp</code>
+
+Use these UHDR options for output image.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid options
+- <code>Error</code> Image do not have gainmap
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>Object</code> |  | output options |
+| [options.quality] | <code>number</code> | <code>80</code> | quality, integer 1-100 |
+
+**Example**  
+```js
+// Convert any input to very high quality JPEG output
+const data = await sharp(input)
+  .uhdr({
+    quality: 100,
+  })
   .toBuffer();
 ```
 

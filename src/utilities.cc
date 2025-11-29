@@ -121,7 +121,7 @@ Napi::Value format(const Napi::CallbackInfo& info) {
   Napi::Object format = Napi::Object::New(env);
   for (std::string const f : {
     "jpeg", "png", "webp", "tiff", "magick", "openslide", "dz",
-    "ppm", "fits", "gif", "svg", "heif", "pdf", "vips", "jp2k", "jxl", "rad", "dcraw"
+    "ppm", "fits", "gif", "svg", "heif", "pdf", "vips", "jp2k", "jxl", "rad", "dcraw", "uhdr"
   }) {
     // Input
     const VipsObjectClass *oc = vips_class_find("VipsOperation", (f + "load").c_str());

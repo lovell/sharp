@@ -175,6 +175,7 @@ namespace sharp {
     DCRAW,
     VIPS,
     RAW,
+    UHDR,
     UNKNOWN,
     MISSING
   };
@@ -195,6 +196,7 @@ namespace sharp {
 
   // Filename extension checkers
   bool IsJpeg(std::string const &str);
+  bool IsUhdr(std::string const &str);
   bool IsPng(std::string const &str);
   bool IsWebp(std::string const &str);
   bool IsJp2(std::string const &str);

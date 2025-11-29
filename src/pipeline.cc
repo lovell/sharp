@@ -882,7 +882,10 @@ class PipelineWorker : public Napi::AsyncWorker {
       sharp::SetTimeout(image, baton->timeoutSeconds);
       if (baton->fileOut.empty()) {
         // Buffer output
-        if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == sharp::ImageType::JPEG)) {
+        if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == sharp::ImageType::JPEG)
+        || (baton->formatOut == "input" && inputImageType == sharp::ImageType::UHDR &&
+          !(baton->keepMetadata & VIPS_FOREIGN_KEEP_GAINMAP))
+        ) {
           // Write JPEG to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.jpegsave_buffer(VImage::option()
@@ -902,6 +905,23 @@ class PipelineWorker : public Napi::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "jpeg";
+          if (baton->colourspace == VIPS_INTERPRETATION_CMYK) {
+            baton->channels = std::min(baton->channels, 4);
+          } else {
+            baton->channels = std::min(baton->channels, 3);
+          }
+        } else if (baton->formatOut == "uhdr" ||
+            (baton->formatOut == "input" && inputImageType == sharp::ImageType::UHDR)) {
+          // Write UHDR to buffer
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::UHDR);
+          VipsArea *area = reinterpret_cast<VipsArea*>(image.uhdrsave_buffer(VImage::option()
+            ->set("keep", baton->keepMetadata)
+            ->set("Q", baton->jpegQuality)));
+          baton->bufferOut = static_cast<char*>(area->data);
+          baton->bufferOutLength = area->length;
+          area->free_fn = nullptr;
+          vips_area_unref(area);
+          baton->formatOut = "uhdr";
           if (baton->colourspace == VIPS_INTERPRETATION_CMYK) {
             baton->channels = std::min(baton->channels, 4);
           } else {
@@ -1094,6 +1114,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       } else {
         // File output
         bool const isJpeg = sharp::IsJpeg(baton->fileOut);
+        bool const isUhdr = sharp::IsUhdr(baton->fileOut);
         bool const isPng = sharp::IsPng(baton->fileOut);
         bool const isWebp = sharp::IsWebp(baton->fileOut);
         bool const isGif = sharp::IsGif(baton->fileOut);
@@ -1109,7 +1130,9 @@ class PipelineWorker : public Napi::AsyncWorker {
          !(isJpeg || isPng || isWebp || isGif || isTiff || isJp2 || isHeif || isDz || isDzZip || isV);
 
         if (baton->formatOut == "jpeg" || (mightMatchInput && isJpeg) ||
-          (willMatchInput && inputImageType == sharp::ImageType::JPEG)) {
+          (willMatchInput && inputImageType == sharp::ImageType::JPEG) ||
+          (willMatchInput && inputImageType == sharp::ImageType::UHDR &&
+            !(baton->keepMetadata & VIPS_FOREIGN_KEEP_GAINMAP))) {
           // Write JPEG to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
           image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
@@ -1125,6 +1148,15 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("optimize_scans", baton->jpegOptimiseScans)
             ->set("optimize_coding", baton->jpegOptimiseCoding));
           baton->formatOut = "jpeg";
+          baton->channels = std::min(baton->channels, 3);
+        } else if (baton->formatOut == "uhdr" || (mightMatchInput && isUhdr) ||
+          (willMatchInput && inputImageType == sharp::ImageType::UHDR)) {
+          // Write UHDR to file
+          sharp::AssertImageTypeDimensions(image, sharp::ImageType::UHDR);
+          image.uhdrsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("keep", baton->keepMetadata)
+            ->set("Q", baton->jpegQuality));
+          baton->formatOut = "uhdr";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "jp2" || (mightMatchInput && isJp2) ||
           (willMatchInput && (inputImageType == sharp::ImageType::JP2))) {

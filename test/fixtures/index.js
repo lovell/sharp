@@ -139,6 +139,8 @@ module.exports = {
 
   inputJpgClahe: getPath('concert.jpg'), // public domain - https://www.flickr.com/photos/mars_/14389236779/
 
+  inputUhdr: getPath('ultra-hdr.jpg'),
+
   testPattern: getPath('test-pattern.png'),
 
   inputPngWithTransparent: getPath('d.png'),

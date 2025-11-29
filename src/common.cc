@@ -221,6 +221,9 @@ namespace sharp {
   bool IsJpeg(std::string const &str) {
     return EndsWith(str, ".jpg") || EndsWith(str, ".jpeg") || EndsWith(str, ".JPG") || EndsWith(str, ".JPEG");
   }
+  bool IsUhdr(std::string const &str) {
+    return EndsWith(str, ".jpg") || EndsWith(str, ".jpeg") || EndsWith(str, ".JPG") || EndsWith(str, ".JPEG");
+  }
   bool IsPng(std::string const &str) {
     return EndsWith(str, ".png") || EndsWith(str, ".PNG");
   }
@@ -291,6 +294,7 @@ namespace sharp {
       case ImageType::DCRAW: id = "dcraw"; break;
       case ImageType::VIPS: id = "vips"; break;
       case ImageType::RAW: id = "raw"; break;
+      case ImageType::UHDR: id = "uhdr"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
       case ImageType::MISSING: id = "missing"; break;
     }
@@ -341,7 +345,9 @@ namespace sharp {
     { "VipsForeignLoadDcRawBuffer", ImageType::DCRAW },
     { "VipsForeignLoadVips", ImageType::VIPS },
     { "VipsForeignLoadVipsFile", ImageType::VIPS },
-    { "VipsForeignLoadRaw", ImageType::RAW }
+    { "VipsForeignLoadRaw", ImageType::RAW },
+    { "VipsForeignLoadUhdrFile", ImageType::UHDR },
+    { "VipsForeignLoadUhdrBuffer", ImageType::UHDR },
   };
 
   /*

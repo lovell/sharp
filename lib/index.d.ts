@@ -745,6 +745,18 @@ declare namespace sharp {
         withXmp(xmp: string): Sharp;
 
         /**
+         * Keep all Gainmap from the input image in the output image. This is the defualt behaviour for uhdr input.
+         * @returns A sharp instance that can be used to chain operations
+         */
+        keepGainmap(): Sharp;
+
+        /**
+         * Remove Gainmap from the input image in the output image.
+         * @returns A sharp instance that can be used to chain operations
+         */
+        noGainmap (): Sharp;
+
+        /**
          * Include all metadata (EXIF, XMP, IPTC) from the input image in the output image.
          * The default behaviour, when withMetadata is not used, is to strip all metadata and convert to the device-independent sRGB colour space.
          * This will also convert to and add a web-friendly sRGB ICC profile.
@@ -760,6 +772,14 @@ declare namespace sharp {
          * @returns A sharp instance that can be used to chain operations
          */
         jpeg(options?: JpegOptions): Sharp;
+
+        /**
+         * Use these UHDR options for output image.
+         * @param options Output options.
+         * @throws {Error} Invalid options
+         * @returns A sharp instance that can be used to chain operations
+         */
+        uhdr(options?: UhdrOptions): Sharp;
 
         /**
          * Use these JP2 (JPEG 2000) options for output image.
@@ -1362,6 +1382,11 @@ declare namespace sharp {
         mozjpeg?: boolean | undefined;
     }
 
+    interface UhdrOptions extends OutputOptions {
+        /** Quality, integer 1-100 (optional, default 80) */
+        quality?: number | undefined;
+    }
+
     interface Jp2Options extends OutputOptions {
         /** Quality, integer 1-100 (optional, default 80) */
         quality?: number;
@@ -1923,6 +1948,7 @@ declare namespace sharp {
         input: AvailableFormatInfo;
         jpeg: AvailableFormatInfo;
         jpg: AvailableFormatInfo;
+        uhdr: AvailableFormatInfo;
         jp2: AvailableFormatInfo;
         jxl: AvailableFormatInfo;
         magick: AvailableFormatInfo;
