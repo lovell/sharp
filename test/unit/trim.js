@@ -317,7 +317,6 @@ describe('Trim borders', () => {
     });
 
     it('Should not overflow image bounding box', async () => {
-
       const { info } = await sharp(fixtures.inputPngWithSlightGradientBorder)
         .trim({ threshold: 70, margin: 9999999 }).toBuffer({ resolveWithObject: true });
 
