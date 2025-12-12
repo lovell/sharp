@@ -1608,6 +1608,8 @@ declare namespace sharp {
         threshold?: number | undefined;
         /** Does the input more closely resemble line art (e.g. vector) rather than being photographic? (optional, default false) */
         lineArt?: boolean | undefined;
+        /** Applies margin in pixels to trim edges leaving extra space around trimmed content. (optional, default 0) */
+        margin?: number | undefined;
     }
 
     interface RawOptions {

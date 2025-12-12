@@ -17,3 +17,5 @@ package-lock.json
 .astro
 docs/dist
 release-notes.md
+.cache
+compile_commands.json

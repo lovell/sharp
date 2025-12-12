@@ -598,7 +598,7 @@ const vertexSplitQuadraticBasisSpline: string = sharp.interpolators.vertexSplitQ
 // Triming
 sharp(input).trim({ background: '#000' }).toBuffer();
 sharp(input).trim({ threshold: 10, lineArt: true }).toBuffer();
-sharp(input).trim({ background: '#bf1942', threshold: 30 }).toBuffer();
+sharp(input).trim({ background: '#bf1942', threshold: 30, margin: 20 }).toBuffer();
 
 // Text input
 sharp({
@@ -705,20 +705,20 @@ sharp(input)
 // https://github.com/lovell/sharp/pull/4048
 sharp(input).composite([
   {
-    input: 'image.gif', 
-    animated: true, 
-    limitInputPixels: 536805378, 
-    density: 144, 
+    input: 'image.gif',
+    animated: true,
+    limitInputPixels: 536805378,
+    density: 144,
     failOn: "warning",
     autoOrient: true
   }
 ])
 sharp(input).composite([
   {
-    input: 'image.png',  
+    input: 'image.png',
     animated: false,
-    limitInputPixels: 178935126, 
-    density: 72, 
+    limitInputPixels: 178935126,
+    density: 72,
     failOn: "truncated"
   }
 ])

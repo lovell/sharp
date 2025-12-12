@@ -285,7 +285,7 @@ namespace sharp {
   /*
     Trim an image
   */
-  VImage Trim(VImage image, std::vector<double> background, double threshold, bool const lineArt) {
+  VImage Trim(VImage image, std::vector<double> background, double threshold, bool const lineArt, int const margin) {
     if (image.width() < 3 && image.height() < 3) {
       throw VError("Image to trim must be at least 3x3 pixels");
     }
@@ -304,6 +304,13 @@ namespace sharp {
     } else {
       background.resize(image.bands());
     }
+    auto applyMargin = [&](int left, int top, int width, int height) {
+      int const marginLeft = std::max(0, left - margin);
+      int const marginTop = std::max(0, top - margin);
+      int const marginWidth = std::min(image.width(), left + width + margin) - marginLeft;
+      int const marginHeight = std::min(image.height(), top + height + margin) - marginTop;
+      return std::make_tuple(marginLeft, marginTop, marginWidth, marginHeight);
+    };
     int left, top, width, height;
     left = image.find_trim(&top, &width, &height, VImage::option()
       ->set("background", background)
@@ -324,15 +331,22 @@ namespace sharp {
           int const topB = std::min(top, topA);
           int const widthB = std::max(left + width, leftA + widthA) - leftB;
           int const heightB = std::max(top + height, topA + heightA) - topB;
-          return image.extract_area(leftB, topB, widthB, heightB);
+
+          // Combined bounding box + margin
+          auto [ml, mt, mw, mh] = applyMargin(leftB, topB, widthB, heightB);
+          return image.extract_area(ml, mt, mw, mh);
         } else {
           // Use alpha only
-          return image.extract_area(leftA, topA, widthA, heightA);
+          // Bounding box + margin
+          auto [ml, mt, mw, mh] = applyMargin(leftA, topA, widthA, heightA);
+          return image.extract_area(ml, mt, mw, mh);
         }
       }
     }
     if (width > 0 && height > 0) {
-      return image.extract_area(left, top, width, height);
+      // Bounding box + margin
+      auto [ml, mt, mw, mh] = applyMargin(left, top, width, height);
+      return image.extract_area(ml, mt, mw, mh);
     }
     return image;
   }

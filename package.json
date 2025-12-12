@@ -89,7 +89,8 @@
     "Lachlan Newman <lachnewman007@gmail.com>",
     "Dennis Beatty <dennis@dcbeatty.com>",
     "Ingvar Stepanyan <me@rreverser.com>",
-    "Don Denton <don@happycollision.com>"
+    "Don Denton <don@happycollision.com>",
+    "Dmytro Tiapukhin <cool.gegeg@gmail.com>"
   ],
   "scripts": {
     "build": "node install/build.js",

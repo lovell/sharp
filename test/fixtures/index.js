@@ -73,6 +73,7 @@ module.exports = {
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngGradients: getPath('gradients-rgb8.png'),
+  inputPngWithSlightGradientBorder: getPath('slight-gradient-border.png'), // https://pixabay.com/photos/cat-bury-cat-animal-sitting-cat-3038243/
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
   inputPngCompleteTransparency: getPath('full-transparent.png'),
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),

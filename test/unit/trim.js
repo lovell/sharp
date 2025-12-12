@@ -222,6 +222,9 @@ describe('Trim borders', () => {
       },
       'Invalid lineArt': {
         lineArt: 'fail'
+      },
+      'Invalid margin': {
+        margin: -1
       }
     }).forEach(([description, parameter]) => {
       it(description, () => {
@@ -285,6 +288,41 @@ describe('Trim borders', () => {
       const { width, height, trimOffsetTop, trimOffsetLeft } = info;
       assert.strictEqual(width, 900);
       assert.strictEqual(height, 401);
+      assert.strictEqual(trimOffsetTop, 0);
+      assert.strictEqual(trimOffsetLeft, 0);
+    });
+  });
+
+  describe('Margin around content', () => {
+    it('Should trim complex gradients', async () => {
+      const { info } = await sharp(fixtures.inputPngGradients)
+        .trim({ threshold: 50, margin: 100 }).toBuffer({ resolveWithObject: true });
+
+      const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+      assert.strictEqual(width, 1000);
+      assert.strictEqual(height, 443);
+      assert.strictEqual(trimOffsetTop, -557);
+      assert.strictEqual(trimOffsetLeft, 0);
+    });
+
+    it('Should trim simple gradients', async () => {
+      const { info } = await sharp(fixtures.inputPngWithSlightGradientBorder)
+        .trim({ threshold: 70, margin: 50 }).toBuffer({ resolveWithObject: true });
+
+      const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+      assert.strictEqual(width, 900);
+      assert.strictEqual(height, 900);
+      assert.strictEqual(trimOffsetTop, -50);
+      assert.strictEqual(trimOffsetLeft, -50);
+    });
+
+    it('Should not overflow image bounding box', async () => {
+      const { info } = await sharp(fixtures.inputPngWithSlightGradientBorder)
+        .trim({ threshold: 70, margin: 9999999 }).toBuffer({ resolveWithObject: true });
+
+      const { width, height, trimOffsetTop, trimOffsetLeft } = info;
+      assert.strictEqual(width, 1000);
+      assert.strictEqual(height, 1000);
       assert.strictEqual(trimOffsetTop, 0);
       assert.strictEqual(trimOffsetLeft, 0);
     });
