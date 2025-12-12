@@ -153,7 +153,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->trimThreshold >= 0.0) {
         MultiPageUnsupported(nPages, "Trim");
         image = sharp::StaySequential(image);
-        image = sharp::Trim(image, baton->trimBackground, baton->trimThreshold, baton->trimLineArt);
+        image = sharp::Trim(image, baton->trimBackground, baton->trimThreshold, baton->trimLineArt, baton->trimMargin);
         baton->trimOffsetLeft = image.xoffset();
         baton->trimOffsetTop = image.yoffset();
       }
@@ -1615,6 +1615,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->trimBackground = sharp::AttrAsVectorOfDouble(options, "trimBackground");
   baton->trimThreshold = sharp::AttrAsDouble(options, "trimThreshold");
   baton->trimLineArt = sharp::AttrAsBool(options, "trimLineArt");
+  baton->trimMargin = sharp::AttrAsUint32(options, "trimMargin");
   baton->gamma = sharp::AttrAsDouble(options, "gamma");
   baton->gammaOut = sharp::AttrAsDouble(options, "gammaOut");
   baton->linearA = sharp::AttrAsVectorOfDouble(options, "linearA");
