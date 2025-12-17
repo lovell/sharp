@@ -28,7 +28,7 @@
     "./versions": "./versions.json"
   },
   "engines": {
-    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
+    "node": ">=20.9.0"
   },
   "os": [
     "win32"
