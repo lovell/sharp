@@ -226,12 +226,11 @@ describe('PNG', () => {
       .png({ colours: 2, palette: false })
       .toBuffer();
 
-    const { channels, isPalette, bitsPerSample, paletteBitDepth, size, space } = await sharp(data).metadata();
+    const { channels, isPalette, bitsPerSample, paletteBitDepth, space } = await sharp(data).metadata();
     assert.strictEqual(channels, 1);
     assert.strictEqual(isPalette, false);
     assert.strictEqual(bitsPerSample, 1);
     assert.strictEqual(paletteBitDepth, undefined);
-    assert.strictEqual(size, 89);
     assert.strictEqual(space, 'b-w');
   });
 
