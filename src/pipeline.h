@@ -208,6 +208,7 @@ struct PipelineBaton {
   std::unordered_map<std::string, std::string> withExif;
   bool withExifMerge;
   std::string withXmp;
+  bool withGainMap;
   int timeoutSeconds;
   std::vector<double> convKernel;
   int convKernelWidth;
@@ -381,6 +382,7 @@ struct PipelineBaton {
     withMetadataOrientation(-1),
     withMetadataDensity(0.0),
     withExifMerge(true),
+    withGainMap(false),
     timeoutSeconds(0),
     convKernelWidth(0),
     convKernelHeight(0),

@@ -296,6 +296,14 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->input->autoOrient) {
         image = sharp::RemoveExifOrientation(image);
       }
+      if (sharp::HasGainMap(image)) {
+        if (baton->withGainMap) {
+          image = image.uhdr2scRGB();
+        }
+        image = sharp::RemoveGainMap(image);
+      } else {
+        baton->withGainMap = false;
+      }
 
       // Any pre-shrinking may already have been done
       inputWidth = image.width();
@@ -335,7 +343,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
         image.interpretation() != VIPS_INTERPRETATION_GREY16 &&
         baton->colourspacePipeline != VIPS_INTERPRETATION_CMYK &&
-        !baton->input->ignoreIcc
+        !baton->input->ignoreIcc && !baton->withGainMap
       ) {
         // Convert to sRGB/P3 using embedded profile
         try {
@@ -1706,6 +1714,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   }
   baton->withExifMerge = sharp::AttrAsBool(options, "withExifMerge");
   baton->withXmp = sharp::AttrAsStr(options, "withXmp");
+  baton->withGainMap = sharp::AttrAsBool(options, "withGainMap");
   baton->timeoutSeconds = sharp::AttrAsUint32(options, "timeoutSeconds");
   baton->loop = sharp::AttrAsUint32(options, "loop");
   baton->delay = sharp::AttrAsInt32Vector(options, "delay");

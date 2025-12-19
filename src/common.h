@@ -173,6 +173,7 @@ namespace sharp {
     JXL,
     RAD,
     DCRAW,
+    UHDR,
     VIPS,
     RAW,
     UNKNOWN,
@@ -396,6 +397,16 @@ namespace sharp {
     Ensure decoding remains sequential.
   */
   VImage StaySequential(VImage image, bool condition = true);
+
+  /*
+    Does this image have a gain map?
+  */
+  bool HasGainMap(VImage image);
+
+  /*
+    Removes gain map, if any.
+  */
+  VImage RemoveGainMap(VImage image);
 
 }  // namespace sharp
 

@@ -289,6 +289,7 @@ namespace sharp {
       case ImageType::JXL: id = "jxl"; break;
       case ImageType::RAD: id = "rad"; break;
       case ImageType::DCRAW: id = "dcraw"; break;
+      case ImageType::UHDR: id = "uhdr"; break;
       case ImageType::VIPS: id = "vips"; break;
       case ImageType::RAW: id = "raw"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
@@ -339,6 +340,9 @@ namespace sharp {
     { "VipsForeignLoadRadBuffer", ImageType::RAD },
     { "VipsForeignLoadDcRawFile", ImageType::DCRAW },
     { "VipsForeignLoadDcRawBuffer", ImageType::DCRAW },
+    { "VipsForeignLoadUhdr", ImageType::UHDR },
+    { "VipsForeignLoadUhdrFile", ImageType::UHDR },
+    { "VipsForeignLoadUhdrBuffer", ImageType::UHDR },
     { "VipsForeignLoadVips", ImageType::VIPS },
     { "VipsForeignLoadVipsFile", ImageType::VIPS },
     { "VipsForeignLoadRaw", ImageType::RAW }
@@ -355,6 +359,9 @@ namespace sharp {
       if (it != loaderToType.end()) {
         imageType = it->second;
       }
+    }
+    if (imageType == ImageType::UHDR) {
+      imageType = ImageType::JPEG;
     }
     return imageType;
   }
@@ -374,6 +381,9 @@ namespace sharp {
       if (EndsWith(vips::VError().what(), " does not exist\n")) {
         imageType = ImageType::MISSING;
       }
+    }
+    if (imageType == ImageType::UHDR) {
+      imageType = ImageType::JPEG;
     }
     return imageType;
   }
@@ -1126,5 +1136,21 @@ namespace sharp {
       image.remove(VIPS_META_SEQUENTIAL);
     }
     return image;
+  }
+
+  /*
+    Does this image have a gain map?
+  */
+  bool HasGainMap(VImage image) {
+    return image.get_typeof("gainmap-data") == VIPS_TYPE_BLOB;
+  }
+
+  /*
+    Removes gain map, if any.
+  */
+  VImage RemoveGainMap(VImage image) {
+    VImage copy = image.copy();
+    copy.remove("gainmap-data");
+    return copy;
   }
 }  // namespace sharp

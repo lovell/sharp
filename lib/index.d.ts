@@ -1277,6 +1277,8 @@ declare namespace sharp {
         formatMagick?: string | undefined;
         /** Array of keyword/text pairs representing PNG text blocks, if present. */
         comments?: CommentsMetadata[] | undefined;
+        /** HDR gain map, if present */
+        gainMap?: GainMapMetadata | undefined;
     }
 
     interface LevelMetadata {
@@ -1287,6 +1289,11 @@ declare namespace sharp {
     interface CommentsMetadata {
         keyword: string;
         text: string;
+    }
+
+    interface GainMapMetadata {
+        /** JPEG image */
+        image: Buffer;
     }
 
     interface Stats {

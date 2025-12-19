@@ -250,6 +250,27 @@ const outputWithP3 = await sharp(input)
 ```
 
 
+## withGainMap
+> withGainMap() ⇒ <code>Sharp</code>
+
+If the input contains gain map metadata, use it to convert the main image to HDR (High Dynamic Range) before further processing.
+The input gain map is discarded.
+
+If the output is JPEG, generate and attach a new ISO 21496-1 gain map.
+JPEG output options other than `quality` are ignored.
+
+This feature is experimental and the API may change.
+
+
+**Since**: 0.35.0  
+**Example**  
+```js
+const outputWithGainMap = await sharp(inputWithGainMap)
+  .withGainMap()
+  .toBuffer();
+```
+
+
 ## keepXmp
 > keepXmp() ⇒ <code>Sharp</code>
 

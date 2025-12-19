@@ -50,6 +50,7 @@ A `Promise` is returned when `callback` is not provided.
 - `tifftagPhotoshop`: Buffer containing raw TIFFTAG_PHOTOSHOP data, if present
 - `formatMagick`: String containing format for images loaded via *magick
 - `comments`: Array of keyword/text pairs representing PNG text blocks, if present.
+- `gainMap.image`: HDR gain map, if present, as compressed JPEG image.
 
 
 

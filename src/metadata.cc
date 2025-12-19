@@ -141,6 +141,14 @@ class MetadataWorker : public Napi::AsyncWorker {
         memcpy(baton->tifftagPhotoshop, tifftagPhotoshop, tifftagPhotoshopLength);
         baton->tifftagPhotoshopLength = tifftagPhotoshopLength;
       }
+      // Gain Map
+      if (image.get_typeof("gainmap-data") == VIPS_TYPE_BLOB) {
+        size_t gainMapLength;
+        void const *gainMap = image.get_blob("gainmap-data", &gainMapLength);
+        baton->gainMap = static_cast<char *>(g_malloc(gainMapLength));
+        memcpy(baton->gainMap, gainMap, gainMapLength);
+        baton->gainMapLength = gainMapLength;
+      }
       // PNG comments
       vips_image_map(image.get_image(), readPNGComment, &baton->comments);
     }
@@ -275,6 +283,12 @@ class MetadataWorker : public Napi::AsyncWorker {
         info.Set("tifftagPhotoshop",
           Napi::Buffer<char>::NewOrCopy(env, baton->tifftagPhotoshop,
             baton->tifftagPhotoshopLength, sharp::FreeCallback));
+      }
+      if (baton->gainMapLength > 0) {
+        Napi::Object gainMap = Napi::Object::New(env);
+        info.Set("gainMap", gainMap);
+        gainMap.Set("image",
+          Napi::Buffer<char>::NewOrCopy(env, baton->gainMap, baton->gainMapLength, sharp::FreeCallback));
       }
       if (baton->comments.size() > 0) {
         int i = 0;
