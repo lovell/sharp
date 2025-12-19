@@ -18,6 +18,7 @@
     "@img/sharp-libvips-darwin-arm64": "1.3.0-rc.1"
   },
   "files": [
+    "index.cjs",
     "lib"
   ],
   "publishConfig": {
@@ -25,7 +26,7 @@
   },
   "type": "commonjs",
   "exports": {
-    "./sharp.node": "./lib/sharp-darwin-arm64.node",
+    "./sharp.node": "./index.cjs",
     "./package": "./package.json"
   },
   "engines": {

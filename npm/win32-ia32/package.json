@@ -15,6 +15,7 @@
   },
   "preferUnplugged": true,
   "files": [
+    "index.cjs",
     "lib",
     "versions.json"
   ],
@@ -23,7 +24,7 @@
   },
   "type": "commonjs",
   "exports": {
-    "./sharp.node": "./lib/sharp-win32-ia32.node",
+    "./sharp.node": "./index.cjs",
     "./package": "./package.json",
     "./versions": "./versions.json"
   },

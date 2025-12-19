@@ -44,9 +44,10 @@ cpSync(releaseDir, libDir, {
   }
 });
 
-// Generate README
-const { name, description } = require(`./${platform}/package.json`);
+// Generate README and index.cjs
+const { version, name, description } = require(`./${platform}/package.json`);
 writeFileSync(join(destDir, 'README.md'), `# \`${name}\`\n\n${description}.\n${licensing}`);
+writeFileSync(join(destDir, 'index.cjs'), `module.exports = require('./lib/sharp-${platform}-${version}.node');`);
 
 // Copy Apache-2.0 LICENSE
 copyFileSync(join(__dirname, '..', 'LICENSE'), join(destDir, 'LICENSE'));

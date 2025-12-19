@@ -5,6 +5,7 @@
   'variables': {
     'vips_version': '<!(node -p "require(\'../lib/libvips\').minimumLibvipsVersion")',
     'platform_and_arch': '<!(node -p "require(\'../lib/libvips\').buildPlatformArch()")',
+    'sharp_version': '<!(node -p "require(\'../package.json\').version")',
     'sharp_libvips_version': '<!(node -p "require(\'../package.json\').optionalDependencies[\'@img/sharp-libvips-<(platform_and_arch)\']")',
     'sharp_libvips_yarn_locator': '<!(node -p "require(\'../lib/libvips\').yarnLocator()")',
     'sharp_libvips_include_dir': '<!(node -p "require(\'../lib/libvips\').buildSharpLibvipsIncludeDir()")',
@@ -81,7 +82,7 @@
       }]
     ]
   }, {
-    'target_name': 'sharp-<(platform_and_arch)',
+    'target_name': 'sharp-<(platform_and_arch)-<(sharp_version)',
     'defines': [
       'G_DISABLE_ASSERT',
       'G_DISABLE_CAST_CHECKS',
@@ -282,7 +283,7 @@
     'target_name': 'copy-dll',
     'type': 'none',
     'dependencies': [
-      'sharp-<(platform_and_arch)'
+      'sharp-<(platform_and_arch)-<(sharp_version)'
     ],
     'conditions': [
       ['OS == "win"', {

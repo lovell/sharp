@@ -23,7 +23,7 @@
   },
   "type": "commonjs",
   "exports": {
-    "./sharp.node": "./lib/sharp-wasm32.node.js",
+    "./sharp.node": "./index.cjs",
     "./package": "./package.json",
     "./versions": "./versions.json"
   },
