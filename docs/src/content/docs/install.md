@@ -20,10 +20,6 @@ npm install sharp
 pnpm add sharp
 ```
 
-When using `pnpm`, add `sharp` to
-[ignoredBuiltDependencies](https://pnpm.io/settings#ignoredbuiltdependencies)
-to silence warnings.
-
 ```sh frame="none"
 yarn add sharp
 ```
@@ -112,13 +108,13 @@ and on macOS when running Node.js under Rosetta.
 
 ## Building from source
 
-This module will be compiled from source when:
+```sh frame="none"
+npm install sharp
+npm explore sharp -- npm run build
+```
 
-* a globally-installed libvips is detected, or
-* using `npm explore sharp -- npm run build`, or
-* using the deprecated `npm run --build-from-source` at `npm install` time.
-
-The logic to detect a globally-installed libvips can be skipped by setting the
+The build process will search for a globally-installed libvips.
+This detection logic can be skipped by setting the
 `SHARP_IGNORE_GLOBAL_LIBVIPS` (never try to use it) or
 `SHARP_FORCE_GLOBAL_LIBVIPS` (always try to use it, even when missing or outdated)
 environment variables.
@@ -129,20 +125,11 @@ Building from source requires:
 * [node-addon-api](https://www.npmjs.com/package/node-addon-api) version 7+
 * [node-gyp](https://github.com/nodejs/node-gyp#installation) version 9+ and its dependencies
 
-There is an install-time check for these dependencies.
 If `node-addon-api` or `node-gyp` cannot be found, try adding them via:
 
 ```sh frame="none"
 npm install --save node-addon-api node-gyp
 ```
-
-When using `pnpm`, you may need to add `sharp` to
-[onlyBuiltDependencies](https://pnpm.io/settings#onlybuiltdependencies)
-to ensure the installation script can be run.
-
-For cross-compiling, the `--platform`, `--arch` and `--libc` npm flags
-(or the `npm_config_platform`, `npm_config_arch` and `npm_config_libc` environment variables)
-can be used to configure the target environment.
 
 ## WebAssembly
 
@@ -166,10 +153,8 @@ as well as the additional [building from source](#building-from-source) dependen
 
 ```sh frame="none"
 pkg install -y pkgconf vips
-```
-
-```sh frame="none"
-cd /usr/ports/graphics/vips/ && make install clean
+npm install sharp
+npm explore sharp -- npm run build
 ```
 
 ## Linux memory allocator
