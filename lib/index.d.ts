@@ -694,6 +694,13 @@ declare namespace sharp {
         toBuffer(options: { resolveWithObject: true }): Promise<{ data: Buffer; info: OutputInfo }>;
 
         /**
+         * Write output to a Uint8Array backed by a transferable ArrayBuffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+         * By default, the format will match the input image, except SVG input which becomes PNG output.
+         * @returns A promise that resolves with an object containing the Uint8Array data and an info object containing the output image format, size (bytes), width, height and channels
+         */
+        toUint8Array(): Promise<{ data: Uint8Array; info: OutputInfo }>;
+
+        /**
          * Keep all EXIF metadata from the input image in the output image.
          * EXIF metadata is unsupported for TIFF output.
          * @returns A sharp instance that can be used to chain operations

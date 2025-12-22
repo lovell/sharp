@@ -1345,12 +1345,21 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       if (baton->bufferOutLength > 0) {
-        // Add buffer size to info
         info.Set("size", static_cast<uint32_t>(baton->bufferOutLength));
-        // Pass ownership of output data to Buffer instance
-        Napi::Buffer<char> data = Napi::Buffer<char>::NewOrCopy(env, static_cast<char*>(baton->bufferOut),
-          baton->bufferOutLength, sharp::FreeCallback);
-        Callback().Call(Receiver().Value(), { env.Null(), data, info });
+        if (baton->typedArrayOut) {
+          // ECMAScript ArrayBuffer with Uint8Array view
+          Napi::ArrayBuffer ab = Napi::ArrayBuffer::New(env, baton->bufferOutLength);
+          memcpy(ab.Data(), baton->bufferOut, baton->bufferOutLength);
+          sharp::FreeCallback(static_cast<char*>(baton->bufferOut), nullptr);
+          Napi::TypedArrayOf<uint8_t> data = Napi::TypedArrayOf<uint8_t>::New(env,
+            baton->bufferOutLength, ab, 0, napi_uint8_array);
+          Callback().Call(Receiver().Value(), { env.Null(), data, info });
+        } else {
+          // Node.js Buffer
+          Napi::Buffer<char> data = Napi::Buffer<char>::NewOrCopy(env, static_cast<char*>(baton->bufferOut),
+            baton->bufferOutLength, sharp::FreeCallback);
+          Callback().Call(Receiver().Value(), { env.Null(), data, info });
+        }
       } else {
         // Add file size to info
         if (baton->formatOut != "dz" || sharp::IsDzZip(baton->fileOut)) {
@@ -1700,6 +1709,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   // Output
   baton->formatOut = sharp::AttrAsStr(options, "formatOut");
   baton->fileOut = sharp::AttrAsStr(options, "fileOut");
+  baton->typedArrayOut = sharp::AttrAsBool(options, "typedArrayOut");
   baton->keepMetadata = sharp::AttrAsUint32(options, "keepMetadata");
   baton->withMetadataOrientation = sharp::AttrAsUint32(options, "withMetadataOrientation");
   baton->withMetadataDensity = sharp::AttrAsDouble(options, "withMetadataDensity");

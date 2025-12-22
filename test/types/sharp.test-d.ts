@@ -86,6 +86,9 @@ let transformer = sharp()
   });
 readableStream.pipe(transformer).pipe(writableStream);
 
+sharp().toUint8Array();
+sharp().toUint8Array().then(({ data }) => data.byteLength);
+
 console.log(sharp.format);
 console.log(sharp.versions);
 

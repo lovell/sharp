@@ -228,6 +228,19 @@ async.series({
             }
           });
       }
+    }).add('sharp-buffer-uint8array', {
+      defer: true,
+      fn: (deferred) => {
+        sharp(inputJpgBuffer)
+          .resize(width, height)
+          .toUint8Array()
+          .then(() => {
+            deferred.resolve();
+          })
+          .catch((err) => {
+            throw err;
+          });
+      }
     }).add('sharp-file-file', {
       defer: true,
       fn: (deferred) => {
@@ -264,6 +277,19 @@ async.series({
             } else {
               deferred.resolve();
             }
+          });
+      }
+    }).add('sharp-file-uint8array', {
+      defer: true,
+      fn: (deferred) => {
+        sharp(fixtures.inputJpg)
+          .resize(width, height)
+          .toUint8Array()
+          .then(() => {
+            deferred.resolve();
+          })
+          .catch((err) => {
+            throw err;
           });
       }
     }).add('sharp-promise', {

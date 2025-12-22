@@ -48,6 +48,7 @@ struct PipelineBaton {
   size_t bufferOutLength;
   int pageHeightOut;
   int pagesOut;
+  bool typedArrayOut;
   std::vector<Composite *> composite;
   std::vector<sharp::InputDescriptor *> joinChannelIn;
   int topOffsetPre;
@@ -243,6 +244,7 @@ struct PipelineBaton {
     bufferOutLength(0),
     pageHeightOut(0),
     pagesOut(0),
+    typedArrayOut(false),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),

@@ -117,6 +117,38 @@ await sharp(pixelArray, { raw: { width, height, channels } })
 ```
 
 
+## toUint8Array
+> toUint8Array() ⇒ <code>Promise.&lt;{data: Uint8Array, info: Object}&gt;</code>
+
+Write output to a `Uint8Array` backed by a transferable `ArrayBuffer`.
+JPEG, PNG, WebP, AVIF, TIFF, GIF and raw pixel data output are supported.
+
+Use [toFormat](#toformat) or one of the format-specific functions such as [jpeg](#jpeg), [png](#png) etc. to set the output format.
+
+If no explicit format is set, the output format will match the input image, except SVG input which becomes PNG output.
+
+By default all metadata will be removed, which includes EXIF-based orientation.
+See [keepExif](#keepexif) and similar methods for control over this.
+
+Resolves with an `Object` containing:
+- `data` is the output image as a `Uint8Array` backed by a transferable `ArrayBuffer`.
+- `info` contains properties relating to the output image such as `width` and `height`.
+
+
+**Since**: v0.35.0  
+**Example**  
+```js
+const { data, info } = await sharp(input).toUint8Array();
+```
+**Example**  
+```js
+const { data } = await sharp(input)
+  .avif()
+  .toUint8Array();
+const base64String = data.toBase64();
+```
+
+
 ## keepExif
 > keepExif() ⇒ <code>Sharp</code>
 
