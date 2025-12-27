@@ -188,6 +188,12 @@ and how to configure it.
 Some package managers use symbolic links
 but AWS Lambda does not support these within deployment packages.
 
+An alternative approach is to use a well-maintained, third-party Lambda Layer:
+
+- [cbschuld/sharp-aws-lambda-layer](https://github.com/cbschuld/sharp-aws-lambda-layer)
+- [pH200/sharp-layer](https://github.com/pH200/sharp-layer)
+- [zoellner/sharp-heic-lambda-layer](https://github.com/zoellner/sharp-heic-lambda-layer)
+
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
 
