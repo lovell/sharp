@@ -190,10 +190,6 @@ class MetadataWorker : public Napi::AsyncWorker {
       info.Set("isPalette", baton->isPalette);
       if (baton->bitsPerSample > 0) {
         info.Set("bitsPerSample", baton->bitsPerSample);
-        if (baton->isPalette) {
-          // Deprecated, remove with libvips 8.17.0
-          info.Set("paletteBitDepth", baton->bitsPerSample);
-        }
       }
       if (baton->pages > 0) {
         info.Set("pages", baton->pages);

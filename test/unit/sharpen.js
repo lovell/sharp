@@ -94,24 +94,6 @@ describe('Sharpen', () => {
       });
   });
 
-  it('invalid sigma', () => {
-    assert.throws(() => {
-      sharp(fixtures.inputJpg).sharpen(-1.5);
-    });
-  });
-
-  it('invalid flat', () => {
-    assert.throws(() => {
-      sharp(fixtures.inputJpg).sharpen(1, -1);
-    });
-  });
-
-  it('invalid jagged', () => {
-    assert.throws(() => {
-      sharp(fixtures.inputJpg).sharpen(1, 1, -1);
-    });
-  });
-
   it('invalid options.sigma', () => assert.throws(
     () => sharp().sharpen({ sigma: -1 }),
     /Expected number between 0\.000001 and 10 for options\.sigma but received -1 of type number/
@@ -144,24 +126,23 @@ describe('Sharpen', () => {
 
   it('sharpened image is larger than non-sharpened', (_t, done) => {
     sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .sharpen(false)
+      .resize(32, 24)
       .toBuffer((err, notSharpened, info) => {
         if (err) throw err;
         assert.strictEqual(true, notSharpened.length > 0);
         assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
+        assert.strictEqual(32, info.width);
+        assert.strictEqual(24, info.height);
         sharp(fixtures.inputJpg)
-          .resize(320, 240)
-          .sharpen(true)
+          .resize(32, 24)
+          .sharpen()
           .toBuffer((err, sharpened, info) => {
             if (err) throw err;
             assert.strictEqual(true, sharpened.length > 0);
             assert.strictEqual(true, sharpened.length > notSharpened.length);
             assert.strictEqual('jpeg', info.format);
-            assert.strictEqual(320, info.width);
-            assert.strictEqual(240, info.height);
+            assert.strictEqual(32, info.width);
+            assert.strictEqual(24, info.height);
             done();
           });
       });

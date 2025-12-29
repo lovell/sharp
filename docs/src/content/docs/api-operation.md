@@ -170,7 +170,7 @@ inputStream
 
 
 ## sharpen
-> sharpen([options], [flat], [jagged]) ⇒ <code>Sharp</code>
+> sharpen([options]) ⇒ <code>Sharp</code>
 
 Sharpen the image.
 
@@ -189,15 +189,13 @@ See [libvips sharpen](https://www.libvips.org/API/current/method.Image.sharpen.h
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [options] | <code>Object</code> \| <code>number</code> |  | if present, is an Object with attributes |
+| [options] | <code>Object</code> |  | if present, is an Object with attributes |
 | [options.sigma] | <code>number</code> |  | the sigma of the Gaussian mask, where `sigma = 1 + radius / 2`, between 0.000001 and 10 |
 | [options.m1] | <code>number</code> | <code>1.0</code> | the level of sharpening to apply to "flat" areas, between 0 and 1000000 |
 | [options.m2] | <code>number</code> | <code>2.0</code> | the level of sharpening to apply to "jagged" areas, between 0 and 1000000 |
 | [options.x1] | <code>number</code> | <code>2.0</code> | threshold between "flat" and "jagged", between 0 and 1000000 |
 | [options.y2] | <code>number</code> | <code>10.0</code> | maximum amount of brightening, between 0 and 1000000 |
 | [options.y3] | <code>number</code> | <code>20.0</code> | maximum amount of darkening, between 0 and 1000000 |
-| [flat] | <code>number</code> |  | (deprecated) see `options.m1`. |
-| [jagged] | <code>number</code> |  | (deprecated) see `options.m2`. |
 
 **Example**  
 ```js
@@ -359,8 +357,6 @@ Ensure the image has an alpha channel
 with all white pixel values made fully transparent.
 
 Existing alpha channel values for non-white pixels remain unchanged.
-
-This feature is experimental and the API may change.
 
 
 **Since**: 0.32.1  

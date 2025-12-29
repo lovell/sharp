@@ -259,7 +259,6 @@ declare namespace sharp {
          * Set the pipeline colourspace.
          * The input image will be converted to the provided colourspace at the start of the pipeline.
          * All operations will use this colourspace before converting to the output colourspace, as defined by toColourspace.
-         * This feature is experimental and has not yet been fully-tested with all operations.
          *
          * @param colourspace pipeline colourspace e.g. rgb16, scrgb, lab, grey16 ...
          * @throws {Error} Invalid parameters
@@ -469,21 +468,6 @@ declare namespace sharp {
          * @returns A sharp instance that can be used to chain operations
          */
         sharpen(options?: SharpenOptions): Sharp;
-
-        /**
-         * Sharpen the image.
-         * When used without parameters, performs a fast, mild sharpen of the output image.
-         * When a sigma is provided, performs a slower, more accurate sharpen of the L channel in the LAB colour space.
-         * Fine-grained control over the level of sharpening in "flat" (m1) and "jagged" (m2) areas is available.
-         * @param sigma the sigma of the Gaussian mask, where sigma = 1 + radius / 2.
-         * @param flat the level of sharpening to apply to "flat" areas. (optional, default 1.0)
-         * @param jagged the level of sharpening to apply to "jagged" areas. (optional, default 2.0)
-         * @throws {Error} Invalid parameters
-         * @returns A sharp instance that can be used to chain operations
-         *
-         * @deprecated Use the object parameter `sharpen({sigma, m1, m2, x1, y2, y3})` instead
-         */
-        sharpen(sigma?: number, flat?: number, jagged?: number): Sharp;
 
         /**
          * Apply median filter. When used without parameters the default window is 3x3.
@@ -910,7 +894,7 @@ declare namespace sharp {
          *  - sharp.gravity: north, northeast, east, southeast, south, southwest, west, northwest, center or centre.
          *  - sharp.strategy: cover only, dynamically crop using either the entropy or attention strategy. Some of these values are based on the object-position CSS property.
          *
-         * The experimental strategy-based approach resizes so one dimension is at its target length then repeatedly ranks edge regions,
+         * The strategy-based approach resizes so one dimension is at its target length then repeatedly ranks edge regions,
          * discarding the edge with the lowest score based on the selected strategy.
          *  - entropy: focus on the region with the highest Shannon entropy.
          *  - attention: focus on the region with the highest luminance frequency, colour saturation and presence of skin tones.
@@ -999,14 +983,6 @@ declare namespace sharp {
          *  'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels, invalid metadata will always abort. (optional, default 'warning')
          */
         failOn?: FailOnOptions | undefined;
-        /**
-         * By default halt processing and raise an error when loading invalid images.
-         * Set this flag to false if you'd rather apply a "best effort" to decode images,
-         * even if the data is corrupt or invalid. (optional, default true)
-         *
-         * @deprecated Use `failOn` instead
-         */
-        failOnError?: boolean | undefined;
         /**
          * Do not process input images where the number of pixels (width x height) exceeds this limit.
          * Assumes image dimensions contained in the input metadata can be trusted.
@@ -1308,11 +1284,11 @@ declare namespace sharp {
         channels: ChannelStats[];
         /** Value to identify if the image is opaque or transparent, based on the presence and use of alpha channel */
         isOpaque: boolean;
-        /** Histogram-based estimation of greyscale entropy, discarding alpha channel if any (experimental) */
+        /** Histogram-based estimation of greyscale entropy, discarding alpha channel if any */
         entropy: number;
-        /** Estimation of greyscale sharpness based on the standard deviation of a Laplacian convolution, discarding alpha channel if any (experimental) */
+        /** Estimation of greyscale sharpness based on the standard deviation of a Laplacian convolution, discarding alpha channel if any */
         sharpness: number;
-        /** Object containing most dominant sRGB colour based on a 4096-bin 3D histogram (experimental) */
+        /** Object containing most dominant sRGB colour based on a 4096-bin 3D histogram */
         dominant: { r: number; g: number; b: number };
     }
 
