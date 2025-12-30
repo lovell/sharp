@@ -119,7 +119,7 @@ jobs:
             package: true
           - os: windows-2022
             nodejs_arch: x86
-            nodejs_version: "^22"
+            nodejs_version: "22.21.0"
             nodejs_version_major: 22
             platform: win32-ia32
           - os: windows-2022
