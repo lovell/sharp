@@ -1,7 +1,7 @@
 {
   "name": "@img/sharp-win32-ia32",
   "version": "0.34.5",
-  "description": "Prebuilt sharp for use with Windows x86 (32-bit)",
+  "description": "Prebuilt sharp for use with Windows x86 (deprecated)",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
   "repository": {
@@ -29,7 +29,7 @@
     "./versions": "./versions.json"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": "^20.9.0"
   },
   "os": [
     "win32"
