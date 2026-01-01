@@ -1394,11 +1394,13 @@ declare namespace sharp {
         /** Level of CPU effort to reduce file size, integer 0-6 (optional, default 4) */
         effort?: number | undefined;
         /** Prevent use of animation key frames to minimise file size (slow) (optional, default false) */
-        minSize?: boolean;
+        minSize?: boolean | undefined;
         /** Allow mixture of lossy and lossless animation frames (slow) (optional, default false) */
-        mixed?: boolean;
+        mixed?: boolean | undefined;
         /** Preset options: one of default, photo, picture, drawing, icon, text (optional, default 'default') */
         preset?: keyof PresetEnum | undefined;
+        /** Preserve the colour data in transparent pixels (optional, default false) */
+        exact?: boolean | undefined;
     }
 
     interface AvifOptions extends OutputOptions {

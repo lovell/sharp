@@ -548,8 +548,8 @@ sharp('input.tiff').jxl({ decodingTier: 4 }).toFile('out.jxl');
 sharp('input.tiff').jxl({ lossless: true }).toFile('out.jxl');
 sharp('input.tiff').jxl({ effort: 7 }).toFile('out.jxl');
 
-// Support `minSize` and `mixed` webp options
-sharp('input.tiff').webp({ minSize: true, mixed: true }).toFile('out.gif');
+// Support webp options
+sharp('input.tiff').webp({ minSize: true, mixed: true, exact: true }).toFile('out.webp');
 
 // 'failOn' input param
 sharp('input.tiff', { failOn: 'none' });

@@ -965,6 +965,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("effort", baton->webpEffort)
             ->set("min_size", baton->webpMinSize)
             ->set("mixed", baton->webpMixed)
+            ->set("exact", baton->webpExact)
             ->set("alpha_q", baton->webpAlphaQuality)));
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
@@ -1176,6 +1177,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("effort", baton->webpEffort)
             ->set("min_size", baton->webpMinSize)
             ->set("mixed", baton->webpMixed)
+            ->set("exact", baton->webpExact)
             ->set("alpha_q", baton->webpAlphaQuality));
           baton->formatOut = "webp";
         } else if (baton->formatOut == "gif" || (mightMatchInput && isGif) ||
@@ -1486,6 +1488,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         {"preset", vips_enum_nick(VIPS_TYPE_FOREIGN_WEBP_PRESET, baton->webpPreset)},
         {"min_size", baton->webpMinSize ? "true" : "false"},
         {"mixed", baton->webpMixed ? "true" : "false"},
+        {"exact", baton->webpExact ? "true" : "false"},
         {"effort", std::to_string(baton->webpEffort)}
       };
       suffix = AssembleSuffixString(".webp", options);
@@ -1760,6 +1763,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->webpEffort = sharp::AttrAsUint32(options, "webpEffort");
   baton->webpMinSize = sharp::AttrAsBool(options, "webpMinSize");
   baton->webpMixed = sharp::AttrAsBool(options, "webpMixed");
+  baton->webpExact = sharp::AttrAsBool(options, "webpExact");
   baton->gifBitdepth = sharp::AttrAsUint32(options, "gifBitdepth");
   baton->gifEffort = sharp::AttrAsUint32(options, "gifEffort");
   baton->gifDither = sharp::AttrAsDouble(options, "gifDither");

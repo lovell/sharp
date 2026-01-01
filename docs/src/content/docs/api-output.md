@@ -563,6 +563,7 @@ Use these WebP options for output image.
 | [options.delay] | <code>number</code> \| <code>Array.&lt;number&gt;</code> |  | delay(s) between animation frames (in milliseconds) |
 | [options.minSize] | <code>boolean</code> | <code>false</code> | prevent use of animation key frames to minimise file size (slow) |
 | [options.mixed] | <code>boolean</code> | <code>false</code> | allow mixture of lossy and lossless animation frames (slow) |
+| [options.exact] | <code>boolean</code> | <code>false</code> | preserve the colour data in transparent pixels |
 | [options.force] | <code>boolean</code> | <code>true</code> | force WebP output, otherwise attempt to use input format |
 
 **Example**  

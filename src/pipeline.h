@@ -168,6 +168,7 @@ struct PipelineBaton {
   int webpEffort;
   bool webpMinSize;
   bool webpMixed;
+  bool webpExact;
   int gifBitdepth;
   int gifEffort;
   double gifDither;
@@ -347,6 +348,7 @@ struct PipelineBaton {
     webpEffort(4),
     webpMinSize(false),
     webpMixed(false),
+    webpExact(false),
     gifBitdepth(8),
     gifEffort(7),
     gifDither(1.0),

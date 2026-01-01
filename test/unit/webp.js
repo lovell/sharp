@@ -213,6 +213,33 @@ describe('WebP', () => {
     );
   });
 
+  it('valid exact', () => {
+    assert.doesNotThrow(() => sharp().webp({ exact: true }));
+  });
+
+  it('invalid exact throws', () => {
+    assert.throws(
+      () => sharp().webp({ exact: 'fail' }),
+      /Expected boolean for webpExact but received fail of type string/
+    );
+  });
+
+  it('saving exact pixel colour values produces larger file size', async () => {
+    const withExact = await
+      sharp(fixtures.inputPngAlphaPremultiplicationSmall)
+        .resize(8, 8)
+        .webp({ exact: true, effort: 0 })
+        .toBuffer();
+
+    const withoutExact = await
+      sharp(fixtures.inputPngAlphaPremultiplicationSmall)
+        .resize(8, 8)
+        .webp({ exact: false, effort: 0 })
+        .toBuffer()
+
+    assert.strictEqual(true, withExact.length > withoutExact.length);
+  });
+
   it('invalid loop throws', () => {
     assert.throws(() => {
       sharp().webp({ loop: -1 });
