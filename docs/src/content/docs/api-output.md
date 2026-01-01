@@ -758,6 +758,7 @@ When using Windows ARM64, this feature requires a CPU with ARM64v8.4 or later.
 | [options.effort] | <code>number</code> | <code>4</code> | CPU effort, between 0 (fastest) and 9 (slowest) |
 | [options.chromaSubsampling] | <code>string</code> | <code>&quot;&#x27;4:4:4&#x27;&quot;</code> | set to '4:2:0' to use chroma subsampling |
 | [options.bitdepth] | <code>number</code> | <code>8</code> | set bitdepth to 8, 10 or 12 bit |
+| [options.tune] | <code>string</code> | <code>&quot;&#x27;iq&#x27;&quot;</code> | tune output for a quality metric, one of 'iq' (default), 'ssim' or 'psnr' |
 
 **Example**  
 ```js
@@ -797,6 +798,7 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
 | [options.effort] | <code>number</code> | <code>4</code> | CPU effort, between 0 (fastest) and 9 (slowest) |
 | [options.chromaSubsampling] | <code>string</code> | <code>&quot;&#x27;4:4:4&#x27;&quot;</code> | set to '4:2:0' to use chroma subsampling |
 | [options.bitdepth] | <code>number</code> | <code>8</code> | set bitdepth to 8, 10 or 12 bit |
+| [options.tune] | <code>string</code> | <code>&quot;&#x27;ssim&#x27;&quot;</code> | tune output for a quality metric, one of 'ssim' (default), 'psnr' or 'iq' |
 
 **Example**  
 ```js

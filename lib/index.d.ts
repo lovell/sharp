@@ -1167,6 +1167,8 @@ declare namespace sharp {
 
     type HeifCompression = 'av1' | 'hevc';
 
+    type HeifTune = 'iq' | 'ssim' | 'psnr';
+
     type Unit = 'inch' | 'cm';
 
     interface WriteableMetadata {
@@ -1414,6 +1416,8 @@ declare namespace sharp {
         chromaSubsampling?: string | undefined;
         /** Set bitdepth to 8, 10 or 12 bit (optional, default 8) */
         bitdepth?: 8 | 10 | 12 | undefined;
+        /** Tune output for a quality metric, one of 'iq', 'ssim' or 'psnr' (optional, default 'iq') */
+        tune?: HeifTune | undefined;
     }
 
     interface HeifOptions extends OutputOptions {
@@ -1429,6 +1433,8 @@ declare namespace sharp {
         chromaSubsampling?: string | undefined;
         /** Set bitdepth to 8, 10 or 12 bit (optional, default 8) */
         bitdepth?: 8 | 10 | 12 | undefined;
+        /** Tune output for a quality metric, one of 'ssim', 'psnr' or 'iq' (optional, default 'ssim') */
+        tune?: HeifTune | undefined;
     }
 
     interface GifOptions extends OutputOptions, AnimationOptions {

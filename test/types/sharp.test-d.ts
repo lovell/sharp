@@ -365,7 +365,7 @@ sharp(input)
   .avif({ quality: 50, lossless: false, effort: 5, chromaSubsampling: '4:2:0' })
   .heif()
   .heif({})
-  .heif({ quality: 50, compression: 'hevc', lossless: false, effort: 5, chromaSubsampling: '4:2:0' })
+  .heif({ quality: 50, compression: 'hevc', lossless: false, effort: 5, chromaSubsampling: '4:2:0', tune: 'psnr' })
   .toBuffer({ resolveWithObject: true })
   .then(({ data, info }) => {
     console.log(data);

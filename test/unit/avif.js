@@ -181,4 +181,16 @@ describe('AVIF', () => {
       /Expected 8, 10 or 12 for bitdepth but received 11 of type number/
     )
   );
+
+  it('Different tune options result in different file sizes', async () => {
+    const ssim = await sharp(inputJpg)
+      .resize(32)
+      .avif({ tune: 'ssim', effort: 0 })
+      .toBuffer();
+    const iq = await sharp(inputJpg)
+      .resize(32)
+      .avif({ tune: 'iq', effort: 0 })
+      .toBuffer();
+    assert(ssim.length < iq.length);
+  })
 });

@@ -196,6 +196,7 @@ struct PipelineBaton {
   std::string heifChromaSubsampling;
   bool heifLossless;
   int heifBitdepth;
+  std::string heifTune;
   double jxlDistance;
   int jxlDecodingTier;
   int jxlEffort;
@@ -376,6 +377,7 @@ struct PipelineBaton {
     heifChromaSubsampling("4:4:4"),
     heifLossless(false),
     heifBitdepth(8),
+    heifTune("ssim"),
     jxlDistance(1.0),
     jxlDecodingTier(0),
     jxlEffort(7),
