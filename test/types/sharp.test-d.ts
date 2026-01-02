@@ -599,7 +599,7 @@ const vertexSplitQuadraticBasisSpline: string = sharp.interpolators.vertexSplitQ
 // Triming
 sharp(input).trim({ background: '#000' }).toBuffer();
 sharp(input).trim({ threshold: 10, lineArt: true }).toBuffer();
-sharp(input).trim({ background: '#bf1942', threshold: 30 }).toBuffer();
+sharp(input).trim({ background: '#bf1942', threshold: 30, margin: 20 }).toBuffer();
 
 // Text input
 sharp({

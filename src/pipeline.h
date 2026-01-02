@@ -102,6 +102,7 @@ struct PipelineBaton {
   bool trimLineArt;
   int trimOffsetLeft;
   int trimOffsetTop;
+  int trimMargin;
   std::vector<double> linearA;
   std::vector<double> linearB;
   int dilateWidth;
@@ -286,6 +287,7 @@ struct PipelineBaton {
     trimLineArt(false),
     trimOffsetLeft(0),
     trimOffsetTop(0),
+    trimMargin(0),
     linearA{},
     linearB{},
     dilateWidth(0),
