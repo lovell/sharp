@@ -15,7 +15,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-linux-ppc64": "1.3.0-rc.1"
+    "@img/sharp-libvips-linux-ppc64": "1.3.0-rc.2"
   },
   "files": [
     "index.cjs",
