@@ -840,7 +840,7 @@ declare namespace sharp {
          * @returns A sharp instance that can be used to chain operations
          */
         toFormat(
-            format: keyof FormatEnum | AvailableFormatInfo,
+            format: keyof FormatEnum | AvailableFormatInfo | "avif",
             options?:
                 | OutputOptions
                 | JpegOptions
@@ -1911,16 +1911,13 @@ declare namespace sharp {
     }
 
     interface FormatEnum {
-        avif: AvailableFormatInfo;
         dcraw: AvailableFormatInfo;
         dz: AvailableFormatInfo;
         exr: AvailableFormatInfo;
         fits: AvailableFormatInfo;
         gif: AvailableFormatInfo;
         heif: AvailableFormatInfo;
-        input: AvailableFormatInfo;
         jpeg: AvailableFormatInfo;
-        jpg: AvailableFormatInfo;
         jp2: AvailableFormatInfo;
         jxl: AvailableFormatInfo;
         magick: AvailableFormatInfo;
@@ -1932,8 +1929,7 @@ declare namespace sharp {
         raw: AvailableFormatInfo;
         svg: AvailableFormatInfo;
         tiff: AvailableFormatInfo;
-        tif: AvailableFormatInfo;
-        v: AvailableFormatInfo;
+        vips: AvailableFormatInfo;
         webp: AvailableFormatInfo;
     }
 

@@ -234,7 +234,7 @@ sharp(input)
 
 sharp(input)
   .resize(100, 100)
-  .toFormat('jpg')
+  .toFormat('avif')
   .toBuffer({ resolveWithObject: false })
   .then((outputBuffer: Buffer) => {
     // Resolves with a Buffer object when resolveWithObject is false
@@ -267,9 +267,7 @@ sharp(input)
 // Output to tif
 sharp(input)
   .resize(100, 100)
-  .toFormat('tif')
   .toFormat('tiff')
-  .toFormat(sharp.format.tif)
   .toFormat(sharp.format.tiff)
   .toBuffer();
 
@@ -774,3 +772,35 @@ sharp().erode();
 sharp().erode(1);
 sharp().dilate();
 sharp().dilate(1);
+
+sharp.format.dcraw;
+sharp.format.dz;
+sharp.format.fits;
+sharp.format.gif;
+sharp.format.heif;
+sharp.format.jp2;
+sharp.format.jpeg;
+sharp.format.jxl;
+sharp.format.magick;
+sharp.format.openslide;
+sharp.format.pdf;
+sharp.format.png;
+sharp.format.ppm;
+sharp.format.rad;
+sharp.format.raw;
+sharp.format.svg;
+sharp.format.tiff;
+sharp.format.vips;
+sharp.format.webp;
+// @ts-expect-error
+sharp.format.avif;
+// @ts-expect-error
+sharp.format.input;
+// @ts-expect-error
+sharp.format.jp2k;
+// @ts-expect-error
+sharp.format.jpg;
+// @ts-expect-error
+sharp.format.tif;
+// @ts-expect-error
+sharp.format.v;
