@@ -7,7 +7,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
-const { inputAvif, inputJpg, inputGifAnimated } = require('../fixtures');
+const { inputAvif, inputJpg, inputGifAnimated, inputPng } = require('../fixtures');
 
 describe('AVIF', () => {
   it('called without options does not throw an error', () => {
@@ -64,6 +64,35 @@ describe('AVIF', () => {
       hasAlpha: false,
       hasProfile: false,
       height: 26,
+      isProgressive: false,
+      isPalette: false,
+      bitsPerSample: 8,
+      pagePrimary: 0,
+      pages: 1,
+      space: 'srgb',
+      width: 32
+    });
+  });
+
+  it('can convert PNG to lossless AVIF', async () => {
+    const data = await sharp(inputPng)
+      .resize(32)
+      .avif({ lossless: true, effort: 0 })
+      .toBuffer();
+    const { size, ...metadata } = await sharp(data).metadata();
+    void size;
+    assert.deepStrictEqual(metadata, {
+      autoOrient: {
+        height: 24,
+        width: 32
+      },
+      channels: 3,
+      compression: 'av1',
+      depth: 'uchar',
+      format: 'heif',
+      hasAlpha: false,
+      hasProfile: false,
+      height: 24,
       isProgressive: false,
       isPalette: false,
       bitsPerSample: 8,
