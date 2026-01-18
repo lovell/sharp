@@ -105,7 +105,7 @@ namespace sharp {
       rawPremultiplied(false),
       rawPageHeight(0),
       pages(1),
-      page(0),
+      page(-1),
       createChannels(0),
       createWidth(0),
       createHeight(0),

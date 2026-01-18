@@ -84,7 +84,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (nPages == -1) {
         // Resolve the number of pages if we need to render until the end of the document
         nPages = image.get_typeof(VIPS_META_N_PAGES) != 0
-          ? image.get_int(VIPS_META_N_PAGES) - baton->input->page
+          ? image.get_int(VIPS_META_N_PAGES) - std::max(0, baton->input->page)
           : 1;
       }
 
