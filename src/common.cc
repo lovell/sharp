@@ -459,7 +459,7 @@ namespace sharp {
   /*
     Should HEIF image be re-opened using the primary item?
   */
-  static bool HeifPrimaryPageReopen(VImage image, InputDescriptor *descriptor, vips::VOption *option) {
+  static bool HeifPrimaryPageReopen(VImage image, InputDescriptor *descriptor) {
     if (image.get_typeof(VIPS_META_N_PAGES) == G_TYPE_INT && image.get_typeof("heif-primary") == G_TYPE_INT) {
       if (image.get_int(VIPS_META_N_PAGES) > 1 && descriptor->pages == 1 && descriptor->page == -1) {
         int const pagePrimary = image.get_int("heif-primary");
@@ -506,7 +506,7 @@ namespace sharp {
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
-            } else if (imageType == ImageType::HEIF && HeifPrimaryPageReopen(image, descriptor, option)) {
+            } else if (imageType == ImageType::HEIF && HeifPrimaryPageReopen(image, descriptor)) {
               option = GetOptionsForImageType(imageType, descriptor);
               image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             }
@@ -596,7 +596,7 @@ namespace sharp {
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
-            } else if (imageType == ImageType::HEIF && HeifPrimaryPageReopen(image, descriptor, option)) {
+            } else if (imageType == ImageType::HEIF && HeifPrimaryPageReopen(image, descriptor)) {
               option = GetOptionsForImageType(imageType, descriptor);
               image = VImage::new_from_file(descriptor->file.data(), option);
             }
