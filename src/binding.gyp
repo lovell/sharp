@@ -21,6 +21,7 @@
         'defines': [
           '_VIPS_PUBLIC=__declspec(dllexport)',
           '_ALLOW_KEYWORD_MACROS',
+          '_HAS_EXCEPTIONS=1',
           'G_DISABLE_ASSERT',
           'G_DISABLE_CAST_CHECKS',
           'G_DISABLE_CHECKS'
@@ -148,7 +149,8 @@
           ['OS == "win"', {
             'defines': [
               '_ALLOW_KEYWORD_MACROS',
-              '_FILE_OFFSET_BITS=64'
+              '_FILE_OFFSET_BITS=64',
+              '_HAS_EXCEPTIONS=1'
             ],
             'link_settings': {
               'libraries': [
