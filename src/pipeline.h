@@ -365,7 +365,7 @@ struct PipelineBaton {
     tiffBigtiff(false),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
     tiffPyramid(false),
-    tiffBitdepth(8),
+    tiffBitdepth(0),
     tiffMiniswhite(false),
     tiffTile(false),
     tiffTileHeight(256),

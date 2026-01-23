@@ -1479,8 +1479,8 @@ declare namespace sharp {
         xres?: number | undefined;
         /** Vertical resolution in pixels/mm (optional, default 1.0) */
         yres?: number | undefined;
-        /** Reduce bitdepth to 1, 2 or 4 bit (optional, default 8) */
-        bitdepth?: 1 | 2 | 4 | 8 | undefined;
+        /** Reduce bitdepth to 1, 2 or 4 bit (optional) */
+        bitdepth?: 1 | 2 | 4 | undefined;
         /** Write 1-bit images as miniswhite (optional, default false) */
         miniswhite?: boolean | undefined;
         /** Resolution unit options: inch, cm (optional, default 'inch') */
