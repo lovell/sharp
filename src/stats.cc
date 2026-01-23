@@ -39,7 +39,7 @@ class StatsWorker : public Napi::AsyncWorker {
     sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
     try {
       std::tie(image, imageType) = OpenInput(baton->input);
-    } catch (vips::VError const &err) {
+    } catch (std::runtime_error const &err) {
       (baton->err).append(err.what());
     }
     if (imageType != sharp::ImageType::UNKNOWN) {
@@ -92,7 +92,7 @@ class StatsWorker : public Napi::AsyncWorker {
         baton->dominantRed = dx * 16 + 8;
         baton->dominantGreen = dy * 16 + 8;
         baton->dominantBlue = dz * 16 + 8;
-      } catch (vips::VError const &err) {
+      } catch (std::runtime_error const &err) {
         (baton->err).append(err.what());
       }
     }
@@ -112,7 +112,6 @@ class StatsWorker : public Napi::AsyncWorker {
       debuglog.Call(Receiver().Value(), { Napi::String::New(env, warning) });
       warning = sharp::VipsWarningPop();
     }
-
     if (baton->err.empty()) {
       // Stats Object
       Napi::Object info = Napi::Object::New(env);

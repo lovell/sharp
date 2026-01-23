@@ -31,7 +31,7 @@ class MetadataWorker : public Napi::AsyncWorker {
     sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
     try {
       std::tie(image, imageType) = OpenInput(baton->input);
-    } catch (vips::VError const &err) {
+    } catch (std::runtime_error const &err) {
       (baton->err).append(err.what());
     }
     if (imageType != sharp::ImageType::UNKNOWN) {

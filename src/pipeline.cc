@@ -274,7 +274,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           }
           sharp::SetDensity(image, baton->input->density);
           if (image.width() > 32767 || image.height() > 32767) {
-            throw vips::VError("Input SVG image will exceed 32767x32767 pixel limit when scaled");
+            throw std::runtime_error("Input SVG image will exceed 32767x32767 pixel limit when scaled");
           }
         } else if (inputImageType == sharp::ImageType::PDF) {
           if (baton->input->buffer != nullptr) {
@@ -290,7 +290,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       } else {
         if (inputImageType == sharp::ImageType::SVG && (image.width() > 32767 || image.height() > 32767)) {
-          throw vips::VError("Input SVG image exceeds 32767x32767 pixel limit");
+          throw std::runtime_error("Input SVG image exceeds 32767x32767 pixel limit");
         }
       }
       if (baton->input->autoOrient) {
@@ -675,7 +675,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
           // Verify within current dimensions
           if (compositeImage.width() > image.width() || compositeImage.height() > image.height()) {
-            throw vips::VError("Image to composite must have same dimensions or smaller");
+            throw std::runtime_error("Image to composite must have same dimensions or smaller");
           }
           // Check if overlay is tiled
           if (composite->tile) {
@@ -1086,20 +1086,19 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Get raw image data
           baton->bufferOut = static_cast<char*>(image.write_to_memory(&baton->bufferOutLength));
           if (baton->bufferOut == nullptr) {
-            (baton->err).append("Could not allocate enough memory for raw output");
-            return Error();
+            throw std::runtime_error("Could not allocate enough memory for raw output");
           }
           baton->formatOut = "raw";
         } else {
           // Unsupported output format
-          (baton->err).append("Unsupported output format ");
+          auto unsupported = std::string("Unsupported output format ");
           if (baton->formatOut == "input") {
-            (baton->err).append("when trying to match input format of ");
-            (baton->err).append(ImageTypeId(inputImageType));
+            unsupported.append("when trying to match input format of ");
+            unsupported.append(ImageTypeId(inputImageType));
           } else {
-            (baton->err).append(baton->formatOut);
+            unsupported.append(baton->formatOut);
           }
-          return Error();
+          throw std::runtime_error(unsupported);
         }
       } else {
         // File output
@@ -1274,7 +1273,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           return Error();
         }
       }
-    } catch (vips::VError const &err) {
+    } catch (std::runtime_error const &err) {
       char const *what = err.what();
       if (what && what[0]) {
         (baton->err).append(what);
@@ -1306,7 +1305,6 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
       warning = sharp::VipsWarningPop();
     }
-
     if (baton->err.empty()) {
       int width = baton->width;
       int height = baton->height;
@@ -1407,7 +1405,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
   void MultiPageUnsupported(int const pages, std::string op) {
     if (pages > 1) {
-      throw vips::VError(op + " is not supported for multi-page images");
+      throw std::runtime_error(op + " is not supported for multi-page images");
     }
   }
 

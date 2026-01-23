@@ -244,7 +244,7 @@ Napi::Value _maxColourDistance(const Napi::CallbackInfo& info) {
     }
     // Calculate colour distance
     maxColourDistance = image1.dE00(image2).max();
-  } catch (vips::VError const &err) {
+  } catch (std::runtime_error const &err) {
     throw Napi::Error::New(env, err.what());
   }
 

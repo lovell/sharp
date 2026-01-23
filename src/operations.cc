@@ -14,7 +14,6 @@
 #include "./operations.h"
 
 using vips::VImage;
-using vips::VError;
 
 namespace sharp {
   /*
@@ -287,7 +286,7 @@ namespace sharp {
   */
   VImage Trim(VImage image, std::vector<double> background, double threshold, bool const lineArt, int const margin) {
     if (image.width() < 3 && image.height() < 3) {
-      throw VError("Image to trim must be at least 3x3 pixels");
+      throw std::runtime_error("Image to trim must be at least 3x3 pixels");
     }
     if (background.size() == 0) {
       // Top-left pixel provides the default background colour if none is given
@@ -361,7 +360,7 @@ namespace sharp {
   VImage Linear(VImage image, std::vector<double> const a, std::vector<double> const b) {
     size_t const bands = static_cast<size_t>(image.bands());
     if (a.size() > bands) {
-      throw VError("Band expansion using linear is unsupported");
+      throw std::runtime_error("Band expansion using linear is unsupported");
     }
     bool const uchar = !Is16Bit(image.interpretation());
     if (image.has_alpha() && a.size() != bands && (a.size() == 1 || a.size() == bands - 1 || bands - 1 == 1)) {
