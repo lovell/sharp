@@ -19,6 +19,7 @@ struct MetadataBaton {
   sharp::InputDescriptor *input;
   // Output
   std::string format;
+  std::string mediaType;
   int width;
   int height;
   std::string space;

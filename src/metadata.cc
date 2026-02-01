@@ -151,6 +151,50 @@ class MetadataWorker : public Napi::AsyncWorker {
       }
       // PNG comments
       vips_image_map(image.get_image(), readPNGComment, &baton->comments);
+      // Media type
+      std::string mediaType;
+      switch (imageType) {
+        case sharp::ImageType::JPEG:
+        case sharp::ImageType::PNG:
+        case sharp::ImageType::WEBP:
+        case sharp::ImageType::JP2:
+        case sharp::ImageType::TIFF:
+        case sharp::ImageType::GIF:
+        case sharp::ImageType::FITS:
+        case sharp::ImageType::JXL:
+          baton->mediaType = "image/" + baton->format;
+          break;
+        case sharp::ImageType::SVG:
+          baton->mediaType = "image/svg+xml";
+          break;
+        case sharp::ImageType::HEIF:
+          if (baton->compression == "av1") {
+            baton->mediaType = "image/avif";
+          } else if (baton->compression == "hevc") {
+            baton->mediaType = "image/heic";
+          }
+          break;
+        case sharp::ImageType::PDF:
+          baton->mediaType = "application/pdf";
+          break;
+        case sharp::ImageType::OPENSLIDE:
+          baton->mediaType = "image/tiff";
+          break;
+        case sharp::ImageType::PPM:
+          baton->mediaType = "image/x-portable-pixmap";
+          break;
+        case sharp::ImageType::EXR:
+          baton->mediaType = "image/x-exr";
+          break;
+        case sharp::ImageType::RAD:
+          baton->mediaType = "image/vnd.radiance";
+          break;
+        case sharp::ImageType::UHDR:
+          baton->mediaType = "image/jpeg";
+          break;
+        default:
+          break;
+      }
     }
 
     // Clean up
@@ -172,6 +216,9 @@ class MetadataWorker : public Napi::AsyncWorker {
     if (baton->err.empty()) {
       Napi::Object info = Napi::Object::New(env);
       info.Set("format", baton->format);
+      if (!baton->mediaType.empty()) {
+        info.Set("mediaType", baton->mediaType);
+      }
       if (baton->input->bufferLength > 0) {
         info.Set("size", baton->input->bufferLength);
       }

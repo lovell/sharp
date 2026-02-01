@@ -145,6 +145,7 @@ describe('PNG', () => {
         width: 68
       },
       format: 'png',
+      mediaType: 'image/png',
       width: 68,
       height: 68,
       space: 'srgb',

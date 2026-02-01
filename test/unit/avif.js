@@ -36,6 +36,7 @@ describe('AVIF', () => {
       density: 72,
       depth: 'uchar',
       format: 'jpeg',
+      mediaType: 'image/jpeg',
       hasAlpha: false,
       hasProfile: false,
       // 32 / (2048 / 858) = 13.40625
@@ -64,6 +65,7 @@ describe('AVIF', () => {
       compression: 'av1',
       depth: 'uchar',
       format: 'heif',
+      mediaType: 'image/avif',
       hasAlpha: false,
       hasProfile: false,
       height: 26,
@@ -93,6 +95,7 @@ describe('AVIF', () => {
       compression: 'av1',
       depth: 'uchar',
       format: 'heif',
+      mediaType: 'image/avif',
       hasAlpha: false,
       hasProfile: false,
       height: 24,
@@ -119,6 +122,7 @@ describe('AVIF', () => {
       compression: 'av1',
       depth: 'uchar',
       format: 'heif',
+      mediaType: 'image/avif',
       hasAlpha: false,
       hasProfile: false,
       height: 13,
@@ -148,6 +152,7 @@ describe('AVIF', () => {
       compression: 'av1',
       depth: 'uchar',
       format: 'heif',
+      mediaType: 'image/avif',
       hasAlpha: true,
       hasProfile: false,
       height: 300,
@@ -178,6 +183,7 @@ describe('AVIF', () => {
       compression: 'av1',
       depth: 'uchar',
       format: 'heif',
+      mediaType: 'image/avif',
       hasAlpha: false,
       hasProfile: false,
       height: 26,
@@ -236,6 +242,7 @@ describe('AVIF', () => {
     void exif;
     assert.deepStrictEqual(metadata, {
       format: 'heif',
+      mediaType: 'image/avif',
       width: 4096,
       height: 800,
       space: 'srgb',
@@ -259,6 +266,7 @@ describe('AVIF', () => {
     const { size, ...pngMetadata } = await sharp(data).metadata();
     assert.deepStrictEqual(pngMetadata, {
       format: 'png',
+      mediaType: 'image/png',
       width: 4096,
       height: 800,
       space: 'srgb',
