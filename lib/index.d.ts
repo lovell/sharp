@@ -1923,7 +1923,7 @@ declare namespace sharp {
         input: AvailableFormatInfo;
         jpeg: AvailableFormatInfo;
         jpg: AvailableFormatInfo;
-        jp2: AvailableFormatInfo;
+        jp2k: AvailableFormatInfo;
         jxl: AvailableFormatInfo;
         magick: AvailableFormatInfo;
         openslide: AvailableFormatInfo;
@@ -1935,7 +1935,7 @@ declare namespace sharp {
         svg: AvailableFormatInfo;
         tiff: AvailableFormatInfo;
         tif: AvailableFormatInfo;
-        v: AvailableFormatInfo;
+        vips: AvailableFormatInfo;
         webp: AvailableFormatInfo;
     }
 

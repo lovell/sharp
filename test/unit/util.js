@@ -142,6 +142,16 @@ describe('Utilities', () => {
     it('output alias', () => {
       assert.deepStrictEqual(['jpe', 'jpg'], sharp.format.jpeg.output.alias);
     });
+    it('uses jp2k as format key, not jp2 (#4475)', () => {
+      assert.strictEqual('object', typeof sharp.format.jp2k);
+      assert.strictEqual('jp2k', sharp.format.jp2k.id);
+      assert.strictEqual(undefined, sharp.format.jp2);
+    });
+    it('uses vips as format key, not v (#4475)', () => {
+      assert.strictEqual('object', typeof sharp.format.vips);
+      assert.strictEqual('vips', sharp.format.vips.id);
+      assert.strictEqual(undefined, sharp.format.v);
+    });
   });
 
   describe('Versions', () => {
