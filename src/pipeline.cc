@@ -1301,7 +1301,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->errUseWarning) {
         (baton->err).append("\n").append(warning);
       } else {
-        debuglog.Call(Receiver().Value(), { Napi::String::New(env, warning) });
+        debuglog.MakeCallback(Receiver().Value(), { Napi::String::New(env, warning) });
       }
       warning = sharp::VipsWarningPop();
     }
@@ -1355,12 +1355,12 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::FreeCallback(static_cast<char*>(baton->bufferOut), nullptr);
           Napi::TypedArrayOf<uint8_t> data = Napi::TypedArrayOf<uint8_t>::New(env,
             baton->bufferOutLength, ab, 0, napi_uint8_array);
-          Callback().Call(Receiver().Value(), { env.Null(), data, info });
+          Callback().MakeCallback(Receiver().Value(), { env.Null(), data, info });
         } else {
           // Node.js Buffer
           Napi::Buffer<char> data = Napi::Buffer<char>::NewOrCopy(env, static_cast<char*>(baton->bufferOut),
             baton->bufferOutLength, sharp::FreeCallback);
-          Callback().Call(Receiver().Value(), { env.Null(), data, info });
+          Callback().MakeCallback(Receiver().Value(), { env.Null(), data, info });
         }
       } else {
         // Add file size to info
@@ -1371,10 +1371,10 @@ class PipelineWorker : public Napi::AsyncWorker {
             info.Set("size", size);
           } catch (...) {}
         }
-        Callback().Call(Receiver().Value(), { env.Null(), info });
+        Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
       }
     } else {
-      Callback().Call(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
+      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
     }
 
     // Delete baton
@@ -1395,7 +1395,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     // Decrement processing task counter
     sharp::counterProcess--;
     Napi::Number queueLength = Napi::Number::New(env, static_cast<int>(sharp::counterQueue));
-    queueListener.Call(Receiver().Value(), { queueLength });
+    queueListener.MakeCallback(Receiver().Value(), { queueLength });
   }
 
  private:
@@ -1833,7 +1833,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
 
   // Increment queued task counter
   Napi::Number queueLength = Napi::Number::New(info.Env(), static_cast<int>(++sharp::counterQueue));
-  queueListener.Call(info.This(), { queueLength });
+  queueListener.MakeCallback(info.This(), { queueLength });
 
   return info.Env().Undefined();
 }
