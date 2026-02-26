@@ -18,8 +18,7 @@
       '--js-library=<!(node -p "require(\'emnapi\').js_library")',
       '-sAUTO_JS_LIBRARIES=0',
       '-sAUTO_NATIVE_LIBRARIES=0',
-      '-sDEFAULT_TO_CXX=0',
-      '-sNODEJS_CATCH_REJECTION=0'
+      '-sDEFAULT_TO_CXX=0'
     ],
     'defines': [
       '__STDC_FORMAT_MACROS',
