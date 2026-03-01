@@ -288,26 +288,6 @@ jobs:
           path: npm/${{ matrix.platform }}
           retention-days: 1
           if-no-files-found: error
-  build-freebsd:
-    permissions:
-      contents: read
-    needs: lint
-    name: "build-freebsd"
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - uses: vmactions/freebsd-vm@v1
-        continue-on-error: true
-        with:
-          prepare: |
-            pkg update -f
-            pkg upgrade -y
-            pkg install -y devel/git devel/pkgconf graphics/vips www/node22 www/npm
-            pkg-config --modversion vips-cpp
-          run: |
-            npm install
-            npm run build
-            node --test test/unit/io.js
   build-emscripten:
     permissions:
       contents: read
@@ -360,6 +340,8 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
+      - name: Populate WebAssembly wrapper packages
+        run: npm run package-wasm-wrappers
       - name: Create release notes
         run: npm run package-release-notes
       - name: Create GitHub release for tag

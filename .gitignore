@@ -3,6 +3,7 @@ src/node_modules
 node_modules
 npm/*/*
 !npm/*/package.json
+!npm/*/export
 test/bench/node_modules
 test/fixtures/output*
 test/fixtures/vips-properties.xml

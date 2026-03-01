@@ -52,6 +52,7 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 * Windows x64
 * Windows x86 (deprecated, Node.js 20 only)
 * Windows ARM64 (CPU with ARMv8.4 required for all features)
+* FreeBSD (WebAssembly)
 
 This provides support for the
 JPEG, PNG, WebP, AVIF (limited to 8-bit depth), TIFF, GIF and SVG (input) image formats.
@@ -133,29 +134,17 @@ npm install --save node-addon-api node-gyp
 
 ## WebAssembly
 
-Experimental support is provided for runtime environments that provide
-multi-threaded Wasm via Workers.
-
-Use in web browsers is unsupported.
-
-Native text rendering is unsupported.
-
-[Tile-based output](/api-output#tile) is unsupported.
+Runtime environments that provide multi-threaded Wasm via Workers are supported
+by the optional `@img/sharp-wasm32` package.
 
 ```sh frame="none"
-npm install --cpu=wasm32 sharp
+npm install sharp @img/sharp-wasm32
 ```
 
-## FreeBSD
-
-The `vips` package must be installed before `npm install` is run,
-as well as the additional [building from source](#building-from-source) dependencies.
-
-```sh frame="none"
-pkg install -y pkgconf vips
-npm install sharp
-npm explore sharp -- npm run build
-```
+* Use in web browsers is unsupported.
+* Use in single-threaded environments is unsupported.
+* Native text rendering is unsupported.
+* [Tile-based output](/api-output#tile) is unsupported.
 
 ## Linux memory allocator
 
