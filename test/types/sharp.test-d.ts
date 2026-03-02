@@ -1,7 +1,7 @@
 // biome-ignore-all lint/correctness/noUnusedFunctionParameters: types only test file
 // biome-ignore-all lint/correctness/noUnusedVariables: types only test file
 
-import sharp = require('../../');
+import sharp from '../../';
 
 import { createReadStream, createWriteStream } from 'node:fs';
 
@@ -726,7 +726,7 @@ sharp(input).composite([
 
 // Support format-specific input options
 const colour: sharp.Colour = '#fff';
-const color: sharp.Color = '#fff';
+const color: sharp.Color = { l: 1, a: 2, b: 3 };
 sharp({ pdf: { background: colour } });
 sharp({ pdf: { background: color } });
 sharp({ pdfBackground: colour }); // Deprecated
