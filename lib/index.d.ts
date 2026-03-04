@@ -994,7 +994,7 @@ declare namespace sharp {
         unlimited?: boolean | undefined;
         /** Set this to false to use random access rather than sequential read. Some operations will do this automatically. */
         sequentialRead?: boolean | undefined;
-        /** Number representing the DPI for vector images in the range 1 to 100000. (optional, default 72) */
+        /** The DPI at which to render SVG and PDF images, in the range 1 to 100000. (optional, default 72) */
         density?: number | undefined;
         /** Should the embedded ICC profile, if any, be ignored. */
         ignoreIcc?: boolean | undefined;
