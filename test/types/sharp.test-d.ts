@@ -53,6 +53,8 @@ sharp('input.png')
     // output.png is an image containing input.png along with all metadata(EXIF, ICC, XMP, IPTC) from input.png
   })
 
+sharp(input).withDensity(300);
+
 sharp('input.jpg')
   .resize(300, 200)
   .toFile('output.jpg', (err: Error) => {

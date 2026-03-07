@@ -686,6 +686,14 @@ declare namespace sharp {
         toUint8Array(): Promise<{ data: Uint8Array; info: OutputInfo }>;
 
         /**
+         * Set output density (DPI) in EXIF metadata.
+         * @param density Density in dots per inch (DPI).
+         * @returns A sharp instance that can be used to chain operations
+         * @throws {Error} Invalid parameters
+         */
+        withDensity(density: number): Sharp;
+
+        /**
          * Keep all EXIF metadata from the input image in the output image.
          * EXIF metadata is unsupported for TIFF output.
          * @returns A sharp instance that can be used to chain operations

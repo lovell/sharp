@@ -875,7 +875,7 @@ describe('Image metadata', () => {
     assert.strictEqual(parsedExif.Photo.ExposureTime, 0.2);
   });
 
-  it('Set density of JPEG', async () => {
+  it('withMetadata - set density of JPEG', async () => {
     const data = await sharp({ create })
       .withMetadata({
         density: 300
@@ -887,11 +887,31 @@ describe('Image metadata', () => {
     assert.strictEqual(density, 300);
   });
 
-  it('Set density of PNG', async () => {
+  it('withMetadata - set density of PNG', async () => {
     const data = await sharp({ create })
       .withMetadata({
         density: 96
       })
+      .png()
+      .toBuffer();
+
+    const { density } = await sharp(data).metadata();
+    assert.strictEqual(density, 96);
+  });
+
+  it('withDensity - set density of JPEG', async () => {
+    const data = await sharp({ create })
+      .withDensity(300)
+      .jpeg()
+      .toBuffer();
+
+    const { density } = await sharp(data).metadata();
+    assert.strictEqual(density, 300);
+  });
+
+  it('withDensity - set density of PNG', async () => {
+    const data = await sharp({ create })
+      .withDensity(96)
       .png()
       .toBuffer();
 
@@ -1367,6 +1387,18 @@ describe('Image metadata', () => {
       assert.throws(
         () => sharp().withIccProfile('test', { attach: 1 }),
         /Expected boolean for attach but received 1 of type number/
+      );
+    });
+    it('withDensity missing density', () => {
+      assert.throws(
+        () => sharp().withDensity(),
+        /Expected positive number for density but received undefined of type undefined/
+      );
+    });
+    it('withDensity invalid density', () => {
+      assert.throws(
+        () => sharp().withDensity('invalid'),
+        /Expected positive number for density but received invalid of type string/
       );
     });
   });

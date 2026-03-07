@@ -149,6 +149,30 @@ const base64String = data.toBase64();
 ```
 
 
+## withDensity
+> withDensity(density) ⇒ <code>Sharp</code>
+
+Set output density (DPI) in EXIF metadata.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+**Since**: 0.35.0  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| density | <code>number</code> | Number of pixels per inch (DPI). |
+
+**Example**  
+```js
+const data = await sharp(input)
+  .withDensity(96)
+  .toBuffer();
+```
+
+
 ## keepExif
 > keepExif() ⇒ <code>Sharp</code>
 
