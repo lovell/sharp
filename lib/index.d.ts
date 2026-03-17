@@ -338,6 +338,13 @@ declare namespace sharp {
         keepMetadata(): Sharp;
 
         /**
+         * Keep CICP (Coding-Independent Code Points) colour metadata from the input image.
+         * When set, CICP-tagged images will pass through without linearization.
+         * @returns A sharp instance that can be used to chain operations
+         */
+        keepCicp(): Sharp;
+
+        /**
          * Access to pixel-derived image statistics for every channel in the image.
          * @returns A sharp instance that can be used to chain operations
          */
@@ -1070,6 +1077,14 @@ declare namespace sharp {
         premultiplied?: boolean | undefined;
         /** The height of each page/frame for animated images, must be an integral factor of the overall image height. */
         pageHeight?: number | undefined;
+        /** CICP colour primaries (ITU-T H.273). */
+        cicpColourPrimaries?: number | undefined;
+        /** CICP transfer characteristics (ITU-T H.273). */
+        cicpTransferCharacteristics?: number | undefined;
+        /** CICP matrix coefficients (ITU-T H.273). */
+        cicpMatrixCoefficients?: number | undefined;
+        /** CICP full range flag (ITU-T H.273). */
+        cicpFullRangeFlag?: number | undefined;
     }
 
     type CreateChannels = 3 | 4;
@@ -1273,6 +1288,14 @@ declare namespace sharp {
         comments?: CommentsMetadata[] | undefined;
         /** HDR gain map, if present */
         gainMap?: GainMapMetadata | undefined;
+        /** CICP colour primaries (ITU-T H.273), if present. */
+        cicpColourPrimaries?: number | undefined;
+        /** CICP transfer characteristics (ITU-T H.273), if present. */
+        cicpTransferCharacteristics?: number | undefined;
+        /** CICP matrix coefficients (ITU-T H.273), if present. */
+        cicpMatrixCoefficients?: number | undefined;
+        /** CICP full range flag (ITU-T H.273), if present. */
+        cicpFullRangeFlag?: number | undefined;
     }
 
     interface LevelMetadata {
@@ -1774,6 +1797,14 @@ declare namespace sharp {
         pages?: number | undefined;
         /** Number of pixels high each page in a multi-page image will be. */
         pageHeight?: number | undefined;
+        /** CICP colour primaries (ITU-T H.273), if present. */
+        cicpColourPrimaries?: number | undefined;
+        /** CICP transfer characteristics (ITU-T H.273), if present. */
+        cicpTransferCharacteristics?: number | undefined;
+        /** CICP matrix coefficients (ITU-T H.273), if present. */
+        cicpMatrixCoefficients?: number | undefined;
+        /** CICP full range flag (ITU-T H.273), if present. */
+        cicpFullRangeFlag?: number | undefined;
     }
 
     interface AvailableFormatInfo {

@@ -989,6 +989,10 @@ describe('Image metadata', () => {
       compression: 'av1',
       hasProfile: false,
       hasAlpha: false,
+      cicpColourPrimaries: 1,
+      cicpTransferCharacteristics: 13,
+      cicpMatrixCoefficients: 6,
+      cicpFullRangeFlag: 1,
       autoOrient: {
         width: 2048,
         height: 858

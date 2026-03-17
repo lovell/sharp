@@ -98,6 +98,12 @@ namespace sharp {
       descriptor->rawHeight = AttrAsUint32(input, "rawHeight");
       descriptor->rawPremultiplied = AttrAsBool(input, "rawPremultiplied");
       descriptor->rawPageHeight = AttrAsUint32(input, "rawPageHeight");
+      if (HasAttr(input, "rawCicpColourPrimaries")) {
+        descriptor->rawCicpColourPrimaries = AttrAsInt32(input, "rawCicpColourPrimaries");
+        descriptor->rawCicpTransferCharacteristics = AttrAsInt32(input, "rawCicpTransferCharacteristics");
+        descriptor->rawCicpMatrixCoefficients = AttrAsInt32(input, "rawCicpMatrixCoefficients");
+        descriptor->rawCicpFullRangeFlag = AttrAsInt32(input, "rawCicpFullRangeFlag");
+      }
     }
     // Multi-page input (GIF, TIFF, PDF)
     if (HasAttr(input, "pages")) {
@@ -495,6 +501,12 @@ namespace sharp {
         }
         if (descriptor->rawPremultiplied) {
           image = image.unpremultiply();
+        }
+        if (descriptor->rawCicpColourPrimaries >= 0) {
+          image.set("cicp-colour-primaries", descriptor->rawCicpColourPrimaries);
+          image.set("cicp-transfer-characteristics", descriptor->rawCicpTransferCharacteristics);
+          image.set("cicp-matrix-coefficients", descriptor->rawCicpMatrixCoefficients);
+          image.set("cicp-full-range-flag", descriptor->rawCicpFullRangeFlag);
         }
         imageType = ImageType::RAW;
       } else {

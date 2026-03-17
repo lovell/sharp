@@ -149,6 +149,13 @@ class MetadataWorker : public Napi::AsyncWorker {
         memcpy(baton->gainMap, gainMap, gainMapLength);
         baton->gainMapLength = gainMapLength;
       }
+      // CICP colour metadata
+      if (image.get_typeof("cicp-colour-primaries") == G_TYPE_INT) {
+        baton->cicpColourPrimaries = image.get_int("cicp-colour-primaries");
+        baton->cicpTransferCharacteristics = image.get_int("cicp-transfer-characteristics");
+        baton->cicpMatrixCoefficients = image.get_int("cicp-matrix-coefficients");
+        baton->cicpFullRangeFlag = image.get_int("cicp-full-range-flag");
+      }
       // PNG comments
       vips_image_map(image.get_image(), readPNGComment, &baton->comments);
       // Media type
@@ -332,6 +339,12 @@ class MetadataWorker : public Napi::AsyncWorker {
         info.Set("gainMap", gainMap);
         gainMap.Set("image",
           Napi::Buffer<char>::NewOrCopy(env, baton->gainMap, baton->gainMapLength, sharp::FreeCallback));
+      }
+      if (baton->cicpColourPrimaries >= 0) {
+        info.Set("cicpColourPrimaries", baton->cicpColourPrimaries);
+        info.Set("cicpTransferCharacteristics", baton->cicpTransferCharacteristics);
+        info.Set("cicpMatrixCoefficients", baton->cicpMatrixCoefficients);
+        info.Set("cicpFullRangeFlag", baton->cicpFullRangeFlag);
       }
       if (baton->comments.size() > 0) {
         int i = 0;

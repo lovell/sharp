@@ -203,6 +203,10 @@ struct PipelineBaton {
   int jxlEffort;
   bool jxlLossless;
   VipsBandFormat rawDepth;
+  int cicpColourPrimaries;
+  int cicpTransferCharacteristics;
+  int cicpMatrixCoefficients;
+  int cicpFullRangeFlag;
   std::string err;
   bool errUseWarning;
   int keepMetadata;
@@ -385,6 +389,10 @@ struct PipelineBaton {
     jxlEffort(7),
     jxlLossless(false),
     rawDepth(VIPS_FORMAT_UCHAR),
+    cicpColourPrimaries(-1),
+    cicpTransferCharacteristics(-1),
+    cicpMatrixCoefficients(-1),
+    cicpFullRangeFlag(-1),
     errUseWarning(false),
     keepMetadata(0),
     withMetadataOrientation(-1),

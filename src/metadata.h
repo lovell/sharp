@@ -57,6 +57,10 @@ struct MetadataBaton {
   char *gainMap;
   size_t gainMapLength;
   MetadataComments comments;
+  int cicpColourPrimaries;
+  int cicpTransferCharacteristics;
+  int cicpMatrixCoefficients;
+  int cicpFullRangeFlag;
   std::string err;
 
   MetadataBaton():
@@ -87,7 +91,11 @@ struct MetadataBaton {
     tifftagPhotoshop(nullptr),
     tifftagPhotoshopLength(0),
     gainMap(nullptr),
-    gainMapLength(0) {}
+    gainMapLength(0),
+    cicpColourPrimaries(-1),
+    cicpTransferCharacteristics(-1),
+    cicpMatrixCoefficients(-1),
+    cicpFullRangeFlag(-1) {}
 };
 
 Napi::Value metadata(const Napi::CallbackInfo& info);

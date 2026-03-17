@@ -52,6 +52,10 @@ namespace sharp {
     int rawHeight;
     bool rawPremultiplied;
     int rawPageHeight;
+    int rawCicpColourPrimaries;
+    int rawCicpTransferCharacteristics;
+    int rawCicpMatrixCoefficients;
+    int rawCicpFullRangeFlag;
     int pages;
     int page;
     int createChannels;
@@ -104,6 +108,10 @@ namespace sharp {
       rawHeight(0),
       rawPremultiplied(false),
       rawPageHeight(0),
+      rawCicpColourPrimaries(-1),
+      rawCicpTransferCharacteristics(-1),
+      rawCicpMatrixCoefficients(-1),
+      rawCicpFullRangeFlag(-1),
       pages(1),
       page(-1),
       createChannels(0),

@@ -363,6 +363,13 @@ class PipelineWorker : public Napi::AsyncWorker {
           ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
 
+      // CICP linearization for colour-accurate processing.
+      // Skip if keepCicp is set (passthrough mode).
+      if (image.get_typeof("cicp-transfer-characteristics") == G_TYPE_INT &&
+          !(baton->keepMetadata & VIPS_FOREIGN_KEEP_CICP)) {
+        image = image.CICP2scRGB();
+      }
+
       // Flatten image to remove alpha channel
       if (baton->flatten && image.has_alpha()) {
         image = sharp::Flatten(image, baton->flattenBackground);
@@ -1083,6 +1090,13 @@ class PipelineWorker : public Napi::AsyncWorker {
             // Cast pixels to requested format
             image = image.cast(baton->rawDepth);
           }
+          // Preserve CICP metadata through raw round-trip
+          if (image.get_typeof("cicp-colour-primaries") == G_TYPE_INT) {
+            baton->cicpColourPrimaries = image.get_int("cicp-colour-primaries");
+            baton->cicpTransferCharacteristics = image.get_int("cicp-transfer-characteristics");
+            baton->cicpMatrixCoefficients = image.get_int("cicp-matrix-coefficients");
+            baton->cicpFullRangeFlag = image.get_int("cicp-full-range-flag");
+          }
           // Get raw image data
           baton->bufferOut = static_cast<char*>(image.write_to_memory(&baton->bufferOutLength));
           if (baton->bufferOut == nullptr) {
@@ -1344,6 +1358,12 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->pageHeightOut) {
         info.Set("pageHeight", static_cast<int32_t>(baton->pageHeightOut));
         info.Set("pages", static_cast<int32_t>(baton->pagesOut));
+      }
+      if (baton->cicpColourPrimaries >= 0) {
+        info.Set("cicpColourPrimaries", baton->cicpColourPrimaries);
+        info.Set("cicpTransferCharacteristics", baton->cicpTransferCharacteristics);
+        info.Set("cicpMatrixCoefficients", baton->cicpMatrixCoefficients);
+        info.Set("cicpFullRangeFlag", baton->cicpFullRangeFlag);
       }
 
       if (baton->bufferOutLength > 0) {
