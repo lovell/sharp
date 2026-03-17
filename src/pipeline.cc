@@ -353,7 +353,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
         image.interpretation() != VIPS_INTERPRETATION_GREY16 &&
         baton->colourspacePipeline != VIPS_INTERPRETATION_CMYK &&
-        !baton->input->ignoreIcc && !baton->withGainMap
+        !baton->input->ignoreIcc && !baton->withGainMap &&
+        !hasCicp
       ) {
         // Convert to sRGB/P3 using embedded profile
         try {

@@ -118,11 +118,10 @@ describe('CICP handling', () => {
         .toBuffer();
       const { data } = await sharp(buf).raw({ depth: 'ushort' }).toBuffer({ resolveWithObject: true });
       const rbuf = Buffer.from(data);
-      // Default JXL passthrough — lossy noise but close to original PQ values
-      assertPixelNear(readUshortPixel(rbuf, 512, PQ.greyBg.x, PQ.greyBg.y), [33337, 33339, 33345], 500, 'grey bg');
-      assertPixelNear(readUshortPixel(rbuf, 512, PQ.red.x, PQ.red.y), [28517, 18293, 12665], 2000, 'red patch');
-      assertPixelNear(readUshortPixel(rbuf, 512, PQ.green.x, PQ.green.y), [27560, 32597, 20250], 2000, 'green patch');
-      assertPixelNear(readUshortPixel(rbuf, 512, PQ.blue.x, PQ.blue.y), [14676, 10494, 31570], 2000, 'blue patch');
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.greyBg.x, PQ.greyBg.y), PQ.greyBg.rgb, 500, 'grey bg');
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.red.x, PQ.red.y), PQ.red.rgb, 2000, 'red patch');
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.green.x, PQ.green.y), PQ.green.rgb, 2000, 'green patch');
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.blue.x, PQ.blue.y), PQ.blue.rgb, 2000, 'blue patch');
     });
   });
 
@@ -154,12 +153,11 @@ describe('CICP handling', () => {
         .toBuffer();
       const { data } = await sharp(buf).raw({ depth: 'ushort' }).toBuffer({ resolveWithObject: true });
       const rbuf = Buffer.from(data);
-      // JXL colour management shifts values from the original PQ encoding.
-      // These reference values are from keepCicp lossy JXL round-trip.
-      assertPixelNear(readUshortPixel(rbuf, 512, PQ.greyBg.x, PQ.greyBg.y), [40004, 40006, 40005], 500, 'grey bg');
-      assertPixelNear(readUshortPixel(rbuf, 512, PQ.red.x, PQ.red.y), [40609, 7937, 4010], 500, 'red patch');
-      assertPixelNear(readUshortPixel(rbuf, 512, PQ.green.x, PQ.green.y), [18954, 41217, 11503], 500, 'green patch');
-      assertPixelNear(readUshortPixel(rbuf, 512, PQ.blue.x, PQ.blue.y), [0, 0, 42025], 500, 'blue patch');
+      // With uses_original_profile (XYB bypass), values stay close to originals
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.greyBg.x, PQ.greyBg.y), PQ.greyBg.rgb, 500, 'grey bg');
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.red.x, PQ.red.y), PQ.red.rgb, 2000, 'red patch');
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.green.x, PQ.green.y), PQ.green.rgb, 2000, 'green patch');
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.blue.x, PQ.blue.y), PQ.blue.rgb, 2000, 'blue patch');
     });
 
     it('should produce UHDR JPEG with gainmap', async () => {
