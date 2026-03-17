@@ -78,7 +78,17 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       }
       VipsAccess access = baton->input->access;
-      image = sharp::EnsureColourspace(image, baton->colourspacePipeline);
+      bool const hasCicp = image.get_typeof("cicp-transfer-characteristics") == G_TYPE_INT;
+      bool const cicpLinearized = hasCicp && baton->colourspacePipeline != VIPS_INTERPRETATION_LAST &&
+          !(baton->keepMetadata & VIPS_FOREIGN_KEEP_CICP);
+      if (cicpLinearized) {
+        // User explicitly requested a pipeline colourspace — linearize
+        // via CICP2scRGB first, then convert to the requested space.
+        image = image.CICP2scRGB();
+        image = sharp::EnsureColourspace(image, baton->colourspacePipeline);
+      } else if (!hasCicp) {
+        image = sharp::EnsureColourspace(image, baton->colourspacePipeline);
+      }
 
       int nPages = baton->input->pages;
       if (nPages == -1) {
@@ -361,13 +371,6 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.icc_transform(processingProfile, VImage::option()
           ->set("input_profile", "cmyk")
           ->set("intent", VIPS_INTENT_PERCEPTUAL));
-      }
-
-      // CICP linearization for colour-accurate processing.
-      // Skip if keepCicp is set (passthrough mode).
-      if (image.get_typeof("cicp-transfer-characteristics") == G_TYPE_INT &&
-          !(baton->keepMetadata & VIPS_FOREIGN_KEEP_CICP)) {
-        image = image.CICP2scRGB();
       }
 
       // Flatten image to remove alpha channel
@@ -811,7 +814,8 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (sharp::Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
       }
-      if (image.interpretation() != baton->colourspace) {
+      // Skip for CICP images unless linearized via pipelineColorspace.
+      if ((!hasCicp || cicpLinearized) && image.interpretation() != baton->colourspace) {
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         if (inputProfile.first != nullptr && baton->withIccProfile.empty()) {
           image = sharp::SetProfile(image, inputProfile);
@@ -838,8 +842,8 @@ class PipelineWorker : public Napi::AsyncWorker {
           .copy(VImage::option()->set("interpretation", colourspace));
       }
 
-      // Apply output ICC profile
-      if (!baton->withIccProfile.empty()) {
+      // Apply output ICC profile (skip for CICP unless linearized)
+      if ((!hasCicp || cicpLinearized) && !baton->withIccProfile.empty()) {
         try {
           image = image.icc_transform(const_cast<char*>(baton->withIccProfile.data()), VImage::option()
             ->set("input_profile", processingProfile)
