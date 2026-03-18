@@ -116,9 +116,11 @@
     "lib/index.d.ts",
     "src/*.{cc,h,gyp}"
   ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./lib/index.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
