@@ -167,7 +167,6 @@ describe('CICP handling', () => {
         .toBuffer();
       const { data } = await sharp(buf).raw({ depth: 'ushort' }).toBuffer({ resolveWithObject: true });
       const rbuf = Buffer.from(data);
-      // With uses_original_profile (XYB bypass), values stay close to originals
       assertPixelNear(readUshortPixel(rbuf, 512, PQ.greyBg.x, PQ.greyBg.y), PQ.greyBg.rgb, 500, 'grey bg');
       assertPixelNear(readUshortPixel(rbuf, 512, PQ.red.x, PQ.red.y), PQ.red.rgb, 2000, 'red patch');
       assertPixelNear(readUshortPixel(rbuf, 512, PQ.green.x, PQ.green.y), PQ.green.rgb, 2000, 'green patch');
