@@ -14,7 +14,7 @@ labels: triage
 <!-- Please place an [x] in the box to confirm. -->
 
 - [ ] Running `npm install sharp` completes without error.
-- [ ] Running `node -e "require('sharp')"` completes without error.
+- [ ] Running `node -e "import 'sharp'"` completes without error.
 
 If you cannot confirm both of these, please open an [installation issue](https://github.com/lovell/sharp/issues/new?labels=installation&template=installation.md) instead.
 
