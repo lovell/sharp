@@ -92,7 +92,7 @@
     "Don Denton <don@happycollision.com>"
   ],
   "scripts": {
-    "build": "node install/build.js",
+    "build": "node scripts/build.js && node install/build.js",
     "build:test": "node build.mjs",
     "install": "node install/check.js || npm run build",
     "clean": "rm -rf src/build/ .nyc_output/ coverage/ test/fixtures/output.*",
