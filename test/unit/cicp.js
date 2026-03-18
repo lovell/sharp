@@ -136,14 +136,28 @@ describe('CICP handling', () => {
       assert.strictEqual(meta.cicpTransferCharacteristics, 16);
     });
 
-    it('should preserve CICP metadata in AVIF', async () => {
+    it('should preserve CICP metadata and bitdepth in AVIF', async () => {
       const buf = await sharp(fixtures.inputAvifHdr)
         .keepCicp()
-        .avif({ quality: 80 })
+        .avif({ quality: 80, bitdepth: 12 })
         .toBuffer();
       const meta = await sharp(buf).metadata();
       assert.strictEqual(meta.cicpColourPrimaries, 9);
       assert.strictEqual(meta.cicpTransferCharacteristics, 16);
+      assert.strictEqual(meta.bitsPerSample, 12);
+      assert.strictEqual(meta.depth, 'ushort');
+    });
+
+    it('should preserve PQ pixel values in lossless AVIF', async () => {
+      const buf = await sharp(fixtures.inputAvifHdr)
+        .keepCicp()
+        .avif({ lossless: true, bitdepth: 12 })
+        .toBuffer();
+      const { data } = await sharp(buf).raw({ depth: 'ushort' }).toBuffer({ resolveWithObject: true });
+      const rbuf = Buffer.from(data);
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.greyBg.x, PQ.greyBg.y), PQ.greyBg.rgb, 0, 'grey bg');
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.red.x, PQ.red.y), PQ.red.rgb, 0, 'red patch');
+      assertPixelNear(readUshortPixel(rbuf, 512, PQ.redP3text.x, PQ.redP3text.y), PQ.redP3text.rgb, 0, 'P3 text');
     });
 
     it('should preserve PQ colour values in lossy JXL', async () => {
