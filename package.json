@@ -93,6 +93,7 @@
   ],
   "scripts": {
     "build": "node install/build.js",
+    "build:test": "node build.mjs",
     "install": "node install/check.js || npm run build",
     "clean": "rm -rf src/build/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run lint && npm run test-unit",
@@ -108,14 +109,20 @@
     "docs-serve": "cd docs && npm start",
     "docs-publish": "cd docs && npm run build && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
   },
-  "type": "commonjs",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "type": "module",
   "files": [
+    "dist",
     "install",
-    "lib",
+    "lib/index.d.ts",
     "src/*.{cc,h,gyp}"
   ],
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/lovell/sharp.git"
@@ -180,6 +187,7 @@
     "@img/sharp-libvips-win32-x64": "1.2.4",
     "@types/node": "*",
     "emnapi": "^1.7.0",
+    "esbuild": "0.27.4",
     "exif-reader": "^2.0.2",
     "extract-zip": "^2.0.1",
     "icc": "^3.0.0",

@@ -17,3 +17,4 @@ package-lock.json
 .astro
 docs/dist
 release-notes.md
+dist
