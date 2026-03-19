@@ -203,9 +203,11 @@ class PipelineWorker : public Napi::AsyncWorker {
       //  - the width or height parameters are specified;
       //  - gamma correction doesn't need to be applied;
       //  - trimming or pre-resize extract isn't required;
+      //  - gain map processing is not required;
       //  - input colourspace is not specified;
       bool const shouldPreShrink = (targetResizeWidth > 0 || targetResizeHeight > 0) &&
         baton->gamma == 0 && baton->topOffsetPre == -1 && baton->trimThreshold < 0.0 &&
+        !baton->keepGainMap && !baton->withGainMap &&
         baton->colourspacePipeline == VIPS_INTERPRETATION_LAST && !(shouldOrientBefore || shouldRotateBefore);
 
       if (shouldPreShrink) {
@@ -296,12 +298,20 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->input->autoOrient) {
         image = sharp::RemoveExifOrientation(image);
       }
+      VImage gainMap;
+      int gainMapScaleFactor = 1;
       if (sharp::HasGainMap(image)) {
-        if (baton->withGainMap) {
+        if (baton->keepGainMap) {
+          gainMap = image.gainmap();
+          if (image.get_typeof("gainmap-scale-factor") == G_TYPE_INT) {
+            gainMapScaleFactor = image.get_int("gainmap-scale-factor");
+          }
+        } else if (baton->withGainMap) {
           image = image.uhdr2scRGB();
         }
         image = sharp::RemoveGainMap(image);
       } else {
+        baton->keepGainMap = false;
         baton->withGainMap = false;
       }
 
@@ -401,6 +411,11 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.resize(1.0 / hshrink, VImage::option()
           ->set("vscale", 1.0 / vshrink)
           ->set("kernel", baton->kernel));
+        if (baton->keepGainMap) {
+          gainMap = gainMap.resize(1.0 / hshrink, VImage::option()
+            ->set("vscale", 1.0 / vshrink)
+            ->set("kernel", baton->kernel));
+        }
       }
 
       image = sharp::StaySequential(image,
@@ -413,14 +428,23 @@ class PipelineWorker : public Napi::AsyncWorker {
           MultiPageUnsupported(nPages, "Rotate");
         }
         image = image.rot(autoRotation);
+        if (baton->keepGainMap) {
+          gainMap = gainMap.rot(autoRotation);
+        }
       }
       // Mirror vertically (up-down) about the x-axis
       if (baton->flip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
+        if (baton->keepGainMap) {
+          gainMap = gainMap.flip(VIPS_DIRECTION_VERTICAL);
+        }
       }
       // Mirror horizontally (left-right) about the y-axis
       if (baton->flop != autoFlop) {
         image = image.flip(VIPS_DIRECTION_HORIZONTAL);
+        if (baton->keepGainMap) {
+          gainMap = gainMap.flip(VIPS_DIRECTION_HORIZONTAL);
+        }
       }
       // Rotate post-extract 90-angle
       if (rotation != VIPS_ANGLE_D0) {
@@ -428,6 +452,9 @@ class PipelineWorker : public Napi::AsyncWorker {
           MultiPageUnsupported(nPages, "Rotate");
         }
         image = image.rot(rotation);
+        if (baton->keepGainMap) {
+          gainMap = gainMap.rot(rotation);
+        }
       }
 
       // Join additional color channels to the image
@@ -474,6 +501,12 @@ class PipelineWorker : public Napi::AsyncWorker {
             : image.embed(left, top, width, height, VImage::option()
               ->set("extend", VIPS_EXTEND_BACKGROUND)
               ->set("background", background));
+          if (baton->keepGainMap) {
+            gainMap = gainMap.embed(left / gainMapScaleFactor, top / gainMapScaleFactor,
+              width / gainMapScaleFactor, height / gainMapScaleFactor, VImage::option()
+                ->set("extend", VIPS_EXTEND_BACKGROUND)
+                ->set("background", 0));
+          }
         } else if (baton->canvas == sharp::Canvas::CROP) {
           if (baton->width > inputWidth) {
             baton->width = inputWidth;
@@ -494,12 +527,17 @@ class PipelineWorker : public Napi::AsyncWorker {
               ? sharp::CropMultiPage(image,
                   left, top, width, height, nPages, &targetPageHeight)
               : image.extract_area(left, top, width, height);
+            if (baton->keepGainMap) {
+              gainMap = gainMap.extract_area(left / gainMapScaleFactor, top / gainMapScaleFactor,
+                width / gainMapScaleFactor, height / gainMapScaleFactor);
+            }
           } else {
             int attention_x;
             int attention_y;
 
             // Attention-based or Entropy-based crop
             MultiPageUnsupported(nPages, "Resize strategy");
+            KeepGainMapUnsupported(baton->keepGainMap, "Resize strategy");
             image = sharp::StaySequential(image);
             image = image.smartcrop(baton->width, baton->height, VImage::option()
               ->set("interesting", baton->position == 16 ? VIPS_INTERESTING_ENTROPY : VIPS_INTERESTING_ATTENTION)
@@ -523,6 +561,9 @@ class PipelineWorker : public Napi::AsyncWorker {
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, shouldPremultiplyAlpha);
         image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background));
+        if (baton->keepGainMap) {
+          gainMap = gainMap.rotate(baton->rotationAngle, VImage::option()->set("background", 0));
+        }
       }
 
       // Post extraction
@@ -531,18 +572,23 @@ class PipelineWorker : public Napi::AsyncWorker {
           image = sharp::CropMultiPage(image,
             baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost,
             nPages, &targetPageHeight);
-
           // heightPost is used in the info object, so update to reflect the number of pages
           baton->heightPost *= nPages;
         } else {
           image = image.extract_area(
             baton->leftOffsetPost, baton->topOffsetPost, baton->widthPost, baton->heightPost);
+          if (baton->keepGainMap) {
+            gainMap = gainMap.extract_area(baton->leftOffsetPost / gainMapScaleFactor,
+              baton->topOffsetPost / gainMapScaleFactor, baton->widthPost / gainMapScaleFactor,
+              baton->heightPost / gainMapScaleFactor);
+          }
         }
       }
 
       // Affine transform
       if (!baton->affineMatrix.empty()) {
         MultiPageUnsupported(nPages, "Affine");
+        KeepGainMapUnsupported(baton->keepGainMap, "Affine");
         image = sharp::StaySequential(image);
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->affineBackground, shouldPremultiplyAlpha);
@@ -573,6 +619,12 @@ class PipelineWorker : public Napi::AsyncWorker {
                 baton->extendWith, background, nPages, &targetPageHeight)
             : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
                 VImage::option()->set("extend", baton->extendWith)->set("background", background));
+          if (baton->keepGainMap) {
+            gainMap = gainMap.embed(baton->extendLeft / gainMapScaleFactor, baton->extendTop / gainMapScaleFactor,
+              baton->width / gainMapScaleFactor, baton->height / gainMapScaleFactor, VImage::option()
+                ->set("extend", baton->extendWith)
+                ->set("background", 0));
+          }
         } else {
           std::vector<double> ignoredBackground(1);
           image = sharp::StaySequential(image);
@@ -582,6 +634,12 @@ class PipelineWorker : public Napi::AsyncWorker {
                 baton->extendWith, ignoredBackground, nPages, &targetPageHeight)
             : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
                 VImage::option()->set("extend", baton->extendWith));
+          if (baton->keepGainMap) {
+            gainMap = gainMap.embed(baton->extendLeft / gainMapScaleFactor, baton->extendTop / gainMapScaleFactor,
+              baton->width / gainMapScaleFactor, baton->height / gainMapScaleFactor, VImage::option()
+                ->set("extend", baton->extendWith)
+                ->set("background", 0));
+          }
         }
       }
       // Median - must happen before blurring, due to the utility of blurring after thresholding
@@ -608,6 +666,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Blur
       if (shouldBlur) {
         image = sharp::Blur(image, baton->blurSigma, baton->precision, baton->minAmpl);
+        if (baton->keepGainMap) {
+          gainMap = sharp::Blur(gainMap, baton->blurSigma, baton->precision, baton->minAmpl);
+        }
       }
 
       // Unflatten the image
@@ -617,6 +678,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Convolve
       if (shouldConv) {
+        KeepGainMapUnsupported(baton->keepGainMap, "Convolve");
         image = sharp::Convolve(image,
           baton->convKernelWidth, baton->convKernelHeight,
           baton->convKernelScale, baton->convKernelOffset,
@@ -625,11 +687,13 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Recomb
       if (!baton->recombMatrix.empty()) {
+        KeepGainMapUnsupported(baton->keepGainMap, "Recomb");
         image = sharp::Recomb(image, baton->recombMatrix);
       }
 
       // Modulate
       if (baton->brightness != 1.0 || baton->saturation != 1.0 || baton->hue != 0.0 || baton->lightness != 0.0) {
+        KeepGainMapUnsupported(baton->keepGainMap, "Modulate");
         image = sharp::Modulate(image, baton->brightness, baton->saturation, baton->hue, baton->lightness);
       }
 
@@ -647,6 +711,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Composite
       if (shouldComposite) {
+        KeepGainMapUnsupported(baton->keepGainMap, "Composite");
         std::vector<VImage> images = { image };
         std::vector<int> modes, xs, ys;
         for (Composite *composite : baton->composite) {
@@ -759,18 +824,21 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Apply normalisation - stretch luminance to cover full dynamic range
       if (baton->normalise) {
+        KeepGainMapUnsupported(baton->keepGainMap, "Normalise");
         image = sharp::StaySequential(image);
         image = sharp::Normalise(image, baton->normaliseLower, baton->normaliseUpper);
       }
 
       // Apply contrast limiting adaptive histogram equalization (CLAHE)
       if (baton->claheWidth != 0 && baton->claheHeight != 0) {
+        KeepGainMapUnsupported(baton->keepGainMap, "Clahe");
         image = sharp::StaySequential(image);
         image = sharp::Clahe(image, baton->claheWidth, baton->claheHeight, baton->claheMaxSlope);
       }
 
       // Apply bitwise boolean operation between images
       if (baton->boolean != nullptr) {
+        KeepGainMapUnsupported(baton->keepGainMap, "Boolean");
         VImage booleanImage;
         sharp::ImageType booleanImageType = sharp::ImageType::UNKNOWN;
         baton->boolean->access = access;
@@ -813,6 +881,7 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Extract channel
       if (baton->extractChannel > -1) {
+        KeepGainMapUnsupported(baton->keepGainMap, "Extract channel");
         if (baton->extractChannel >= image.bands()) {
           if (baton->extractChannel == 3 && image.has_alpha()) {
             baton->extractChannel = image.bands() - 1;
@@ -847,6 +916,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Negate the colours in the image
       if (baton->negate) {
         image = sharp::Negate(image, baton->negateAlpha);
+        if (baton->keepGainMap) {
+          gainMap = sharp::Negate(gainMap, false);
+        }
       }
 
       // Override EXIF Orientation tag
@@ -893,18 +965,28 @@ class PipelineWorker : public Napi::AsyncWorker {
         if (baton->formatOut == "jpeg" || (baton->formatOut == "input" && inputImageType == sharp::ImageType::JPEG)) {
           // Write JPEG to buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
-          VipsArea *area = reinterpret_cast<VipsArea*>(image.jpegsave_buffer(VImage::option()
-            ->set("keep", baton->keepMetadata)
-            ->set("Q", baton->jpegQuality)
-            ->set("interlace", baton->jpegProgressive)
-            ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
-              ? VIPS_FOREIGN_SUBSAMPLE_OFF
-              : VIPS_FOREIGN_SUBSAMPLE_ON)
-            ->set("trellis_quant", baton->jpegTrellisQuantisation)
-            ->set("quant_table", baton->jpegQuantisationTable)
-            ->set("overshoot_deringing", baton->jpegOvershootDeringing)
-            ->set("optimize_scans", baton->jpegOptimiseScans)
-            ->set("optimize_coding", baton->jpegOptimiseCoding)));
+          VipsArea *area;
+          if (baton->keepGainMap) {
+            image = image.copy();
+            image.set("gainmap", gainMap);
+            area = reinterpret_cast<VipsArea*>(image.uhdrsave_buffer(VImage::option()
+              ->set("keep", baton->keepMetadata)
+              ->set("Q", baton->jpegQuality)
+              ->set("gainmap_scale_factor", gainMapScaleFactor)));
+          } else {
+            area = reinterpret_cast<VipsArea*>(image.jpegsave_buffer(VImage::option()
+              ->set("keep", baton->keepMetadata)
+              ->set("Q", baton->jpegQuality)
+              ->set("interlace", baton->jpegProgressive)
+              ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
+                ? VIPS_FOREIGN_SUBSAMPLE_OFF
+                : VIPS_FOREIGN_SUBSAMPLE_ON)
+              ->set("trellis_quant", baton->jpegTrellisQuantisation)
+              ->set("quant_table", baton->jpegQuantisationTable)
+              ->set("overshoot_deringing", baton->jpegOvershootDeringing)
+              ->set("optimize_scans", baton->jpegOptimiseScans)
+              ->set("optimize_coding", baton->jpegOptimiseCoding)));
+          }
           baton->bufferOut = static_cast<char*>(area->data);
           baton->bufferOutLength = area->length;
           area->free_fn = nullptr;
@@ -1433,6 +1515,12 @@ class PipelineWorker : public Napi::AsyncWorker {
     }
   }
 
+  void KeepGainMapUnsupported(bool const keepGainMap, std::string op) {
+    if (keepGainMap) {
+      throw std::runtime_error(op + " is not supported when keeping gain maps");
+    }
+  }
+
   /*
     Calculate the angle of rotation and need-to-flip for the given Exif orientation
     By default, returns zero, i.e. no rotation.
@@ -1752,6 +1840,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   }
   baton->withExifMerge = sharp::AttrAsBool(options, "withExifMerge");
   baton->withXmp = sharp::AttrAsStr(options, "withXmp");
+  baton->keepGainMap = sharp::AttrAsBool(options, "keepGainMap");
   baton->withGainMap = sharp::AttrAsBool(options, "withGainMap");
   baton->timeoutSeconds = sharp::AttrAsUint32(options, "timeoutSeconds");
   baton->loop = sharp::AttrAsUint32(options, "loop");

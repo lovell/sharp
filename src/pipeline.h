@@ -213,6 +213,7 @@ struct PipelineBaton {
   bool withExifMerge;
   std::string withXmp;
   bool withGainMap;
+  bool keepGainMap;
   int timeoutSeconds;
   std::vector<double> convKernel;
   int convKernelWidth;
@@ -391,6 +392,7 @@ struct PipelineBaton {
     withMetadataDensity(0.0),
     withExifMerge(true),
     withGainMap(false),
+    keepGainMap(false),
     timeoutSeconds(0),
     convKernelWidth(0),
     convKernelHeight(0),

@@ -306,6 +306,31 @@ const outputWithP3 = await sharp(input)
 ```
 
 
+## keepGainMap
+> keepGainMap() ⇒ <code>Sharp</code>
+
+If the input contains gain map metadata, attempt to process the image and gain map separately,
+recombining them into a single output image.
+
+This approach is faster and should produce better results than [withGainMap](#withgainmap),
+however not all operations are supported.
+
+Only JPEG input and output are supported.
+JPEG output options other than `quality` are ignored.
+
+This feature is experimental and the API may change.
+
+
+**Since**: 0.35.0  
+**Example**  
+```js
+const outputWithResizedGainMap = await sharp(inputWithGainMap)
+  .keepGainMap()
+  .resize({ width: 64 })
+  .toBuffer();
+```
+
+
 ## withGainMap
 > withGainMap() ⇒ <code>Sharp</code>
 
@@ -321,7 +346,7 @@ This feature is experimental and the API may change.
 **Since**: 0.35.0  
 **Example**  
 ```js
-const outputWithGainMap = await sharp(inputWithGainMap)
+const outputWithRegeneratedGainMap = await sharp(inputWithGainMap)
   .withGainMap()
   .toBuffer();
 ```
