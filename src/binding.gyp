@@ -212,7 +212,6 @@
                 '-Oz',
                 '-sALLOW_MEMORY_GROWTH',
                 '-sENVIRONMENT=node',
-                '-sEXPORTED_FUNCTIONS=emnapiInit,_vips_shutdown,_uv_library_shutdown',
                 '-sNODERAWFS',
                 '-sWASM_ASYNC_COMPILATION=0'
               ],

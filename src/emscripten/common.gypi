@@ -16,6 +16,8 @@
     ],
     'ldflags': [
       '--js-library=<!(node -p "require(\'emnapi\').js_library")',
+      '-sEXPORTED_FUNCTIONS=_vips_shutdown,_uv_library_shutdown,<!(node -p "require(\'emnapi\').requiredConfig.emscripten.settings.EXPORTED_FUNCTIONS.join(\',\')")',
+      '-sEXPORTED_RUNTIME_METHODS=<!(node -p "require(\'emnapi\').requiredConfig.emscripten.settings.EXPORTED_RUNTIME_METHODS.join(\',\')")',
       '-sAUTO_JS_LIBRARIES=0',
       '-sAUTO_NATIVE_LIBRARIES=0',
       '-sDEFAULT_TO_CXX=0'
