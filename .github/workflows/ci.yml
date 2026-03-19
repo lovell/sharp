@@ -175,7 +175,7 @@ jobs:
       - run: npm run test-unit
       - if: matrix.package
         run: npm run package-from-local-build
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: matrix.package
         with:
           name: ${{ matrix.platform }}
@@ -220,7 +220,7 @@ jobs:
       - run: npm run test-unit
       - if: matrix.package
         run: npm run package-from-local-build
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: matrix.package
         with:
           name: linuxmusl-arm64
@@ -282,7 +282,7 @@ jobs:
             npm run build
             node --test test/unit/io.js
             npm run package-from-local-build
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.platform }}
           path: npm/${{ matrix.platform }}
@@ -294,13 +294,13 @@ jobs:
     needs: lint
     name: "build-wasm32 [package]"
     runs-on: ubuntu-24.04
-    container: "emscripten/emsdk:4.0.21"
+    container: "emscripten/emsdk:5.0.3"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Dependencies
         run: apt-get update && apt-get install -y pkg-config
       - name: Dependencies (Node.js)
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
       - run: npm install
@@ -314,7 +314,7 @@ jobs:
           test "$EMSCRIPTEN_VERSION_LIBVIPS" = "$EMSCRIPTEN_VERSION_SHARP"
       - run: emmake npm run test-unit
       - run: emmake npm run package-from-local-build
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: wasm32
           path: npm/wasm32
@@ -331,8 +331,8 @@ jobs:
       - build-qemu
       - build-emscripten
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v7
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
         with:
           path: npm
       - name: Create npm workspace tarball
