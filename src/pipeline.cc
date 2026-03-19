@@ -1383,11 +1383,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->errUseWarning) {
         (baton->err).append("\n").append(warning);
       } else {
-#ifdef __EMSCRIPTEN__
-        debuglog.Call(Receiver().Value(), { Napi::String::New(env, warning) });
-#else
-        debuglog.MakeCallback(Receiver().Value(), { Napi::String::New(env, warning) });
-#endif
+        debuglog.SHARP_CALLBACK_FN_NAME(Receiver().Value(), { Napi::String::New(env, warning) });
       }
       warning = sharp::VipsWarningPop();
     }
@@ -1441,20 +1437,12 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::FreeCallback(static_cast<char*>(baton->bufferOut), nullptr);
           Napi::TypedArrayOf<uint8_t> data = Napi::TypedArrayOf<uint8_t>::New(env,
             baton->bufferOutLength, ab, 0, napi_uint8_array);
-#ifdef __EMSCRIPTEN__
-          Callback().Call(Receiver().Value(), { env.Null(), data, info });
-#else
-          Callback().MakeCallback(Receiver().Value(), { env.Null(), data, info });
-#endif
+          Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(), { env.Null(), data, info });
         } else {
           // Node.js Buffer
           Napi::Buffer<char> data = Napi::Buffer<char>::NewOrCopy(env, static_cast<char*>(baton->bufferOut),
             baton->bufferOutLength, sharp::FreeCallback);
-#ifdef __EMSCRIPTEN__
-          Callback().Call(Receiver().Value(), { env.Null(), data, info });
-#else
-          Callback().MakeCallback(Receiver().Value(), { env.Null(), data, info });
-#endif
+          Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(), { env.Null(), data, info });
         }
       } else {
         // Add file size to info
@@ -1465,18 +1453,11 @@ class PipelineWorker : public Napi::AsyncWorker {
             info.Set("size", size);
           } catch (...) {}
         }
-#ifdef __EMSCRIPTEN__
-        Callback().Call(Receiver().Value(), { env.Null(), info });
-#else
-        Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
-#endif
+        Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(), { env.Null(), info });
       }
     } else {
-#ifdef __EMSCRIPTEN__
-      Callback().Call(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
-#else
-      Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
-#endif
+      Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(),
+        { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
     }
 
     // Delete baton
@@ -1497,11 +1478,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     // Decrement processing task counter
     sharp::counterProcess--;
     Napi::Number queueLength = Napi::Number::New(env, static_cast<int>(sharp::counterQueue));
-#ifdef __EMSCRIPTEN__
-    queueListener.Call(Receiver().Value(), { queueLength });
-#else
-    queueListener.MakeCallback(Receiver().Value(), { queueLength });
-#endif
+    queueListener.SHARP_CALLBACK_FN_NAME(Receiver().Value(), { queueLength });
   }
 
  private:
@@ -1946,11 +1923,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
 
   // Increment queued task counter
   Napi::Number queueLength = Napi::Number::New(info.Env(), static_cast<int>(++sharp::counterQueue));
-#ifdef __EMSCRIPTEN__
-  queueListener.Call(info.This(), { queueLength });
-#else
-  queueListener.MakeCallback(info.This(), { queueLength });
-#endif
+  queueListener.SHARP_CALLBACK_FN_NAME(info.This(), { queueLength });
 
   return info.Env().Undefined();
 }

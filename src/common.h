@@ -29,6 +29,12 @@
 #endif
 #endif
 
+#ifdef __EMSCRIPTEN__
+#define SHARP_CALLBACK_FN_NAME Call
+#else
+#define SHARP_CALLBACK_FN_NAME MakeCallback
+#endif
+
 using vips::VImage;
 
 namespace sharp {
