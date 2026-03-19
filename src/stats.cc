@@ -109,7 +109,11 @@ class StatsWorker : public Napi::AsyncWorker {
     // Handle warnings
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
+#ifdef __EMSCRIPTEN__
+      debuglog.Call(Receiver().Value(), { Napi::String::New(env, warning) });
+#else
       debuglog.MakeCallback(Receiver().Value(), { Napi::String::New(env, warning) });
+#endif
       warning = sharp::VipsWarningPop();
     }
     if (baton->err.empty()) {
@@ -143,9 +147,17 @@ class StatsWorker : public Napi::AsyncWorker {
       dominant.Set("g", baton->dominantGreen);
       dominant.Set("b", baton->dominantBlue);
       info.Set("dominant", dominant);
+#ifdef __EMSCRIPTEN__
+      Callback().Call(Receiver().Value(), { env.Null(), info });
+#else
       Callback().MakeCallback(Receiver().Value(), { env.Null(), info });
+#endif
     } else {
+#ifdef __EMSCRIPTEN__
+      Callback().Call(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
+#else
       Callback().MakeCallback(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
+#endif
     }
 
     delete baton->input;
