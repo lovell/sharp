@@ -11,6 +11,7 @@ const { isMarkedAsUntransferable } = require('node:worker_threads');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
+const { buildPlatformArch } = require('../../lib/libvips');
 
 const outputJpg = fixtures.path('output.jpg');
 
@@ -1099,7 +1100,7 @@ describe('Input/output', () => {
       .resize({ width: 8, height: 8 })
       .toBuffer();
 
-    if (isMarkedAsUntransferable) {
+    if (isMarkedAsUntransferable && buildPlatformArch() !== 'wasm32') {
       assert.strictEqual(isMarkedAsUntransferable(data.buffer), true);
     }
     assert.strictEqual(ArrayBuffer.isView(data), true);
