@@ -1432,11 +1432,9 @@ class PipelineWorker : public Napi::AsyncWorker {
         info.Set("size", static_cast<uint32_t>(baton->bufferOutLength));
         if (baton->typedArrayOut) {
           // ECMAScript ArrayBuffer with Uint8Array view
-          Napi::ArrayBuffer ab = Napi::ArrayBuffer::New(env, baton->bufferOutLength);
-          memcpy(ab.Data(), baton->bufferOut, baton->bufferOutLength);
+          Napi::TypedArrayOf<uint8_t> data = Napi::Buffer<char>::Copy(env,
+            static_cast<char*>(baton->bufferOut), baton->bufferOutLength);
           sharp::FreeCallback(static_cast<char*>(baton->bufferOut), nullptr);
-          Napi::TypedArrayOf<uint8_t> data = Napi::TypedArrayOf<uint8_t>::New(env,
-            baton->bufferOutLength, ab, 0, napi_uint8_array);
           Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(), { env.Null(), data, info });
         } else {
           // Node.js Buffer
