@@ -205,9 +205,12 @@
           }],
           ['OS == "emscripten"', {
             'product_extension': 'node.js',
+            'cflags_cc': [
+              '-fwasm-exceptions'
+            ],
             'link_settings': {
               'ldflags': [
-                '-fexceptions',
+                '-fwasm-exceptions',
                 '--pre-js=<!(node -p "require.resolve(\'./emscripten/pre.js\')")',
                 '-Oz',
                 '-sALLOW_MEMORY_GROWTH',
