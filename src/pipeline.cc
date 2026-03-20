@@ -1203,18 +1203,27 @@ class PipelineWorker : public Napi::AsyncWorker {
           (willMatchInput && inputImageType == sharp::ImageType::JPEG)) {
           // Write JPEG to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
-          image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-            ->set("keep", baton->keepMetadata)
-            ->set("Q", baton->jpegQuality)
-            ->set("interlace", baton->jpegProgressive)
-            ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
-              ? VIPS_FOREIGN_SUBSAMPLE_OFF
-              : VIPS_FOREIGN_SUBSAMPLE_ON)
-            ->set("trellis_quant", baton->jpegTrellisQuantisation)
-            ->set("quant_table", baton->jpegQuantisationTable)
-            ->set("overshoot_deringing", baton->jpegOvershootDeringing)
-            ->set("optimize_scans", baton->jpegOptimiseScans)
-            ->set("optimize_coding", baton->jpegOptimiseCoding));
+          if (baton->keepGainMap) {
+            image = image.copy();
+            image.set("gainmap", gainMap);
+            image.uhdrsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+              ->set("keep", baton->keepMetadata)
+              ->set("Q", baton->jpegQuality)
+              ->set("gainmap_scale_factor", gainMapScaleFactor));
+          } else {
+            image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+              ->set("keep", baton->keepMetadata)
+              ->set("Q", baton->jpegQuality)
+              ->set("interlace", baton->jpegProgressive)
+              ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
+                ? VIPS_FOREIGN_SUBSAMPLE_OFF
+                : VIPS_FOREIGN_SUBSAMPLE_ON)
+              ->set("trellis_quant", baton->jpegTrellisQuantisation)
+              ->set("quant_table", baton->jpegQuantisationTable)
+              ->set("overshoot_deringing", baton->jpegOvershootDeringing)
+              ->set("optimize_scans", baton->jpegOptimiseScans)
+              ->set("optimize_coding", baton->jpegOptimiseCoding));
+          }
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
         } else if (baton->formatOut == "jp2" || (mightMatchInput && isJp2) ||

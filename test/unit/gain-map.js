@@ -67,7 +67,7 @@ describe('Gain maps', () => {
     );
   });
 
-  it('Can be detached and reattached', async (t) => {
+  it('Buffer can be detached and reattached', async (t) => {
     t.plan(4);
 
     const data = await sharp(fixtures.inputJpgWithGainMap)
@@ -75,6 +75,54 @@ describe('Gain maps', () => {
       .toBuffer();
 
     const metadata = await sharp(data).metadata();
+    t.assert.strictEqual(metadata.format, 'jpeg');
+    t.assert.strictEqual(typeof metadata.gainMap, 'object');
+    t.assert.ok(Buffer.isBuffer(metadata.gainMap.image));
+
+    const {
+      format,
+      width,
+      height,
+      channels,
+      depth,
+      space,
+      hasProfile,
+      chromaSubsampling,
+    } = await sharp(metadata.gainMap.image).metadata();
+
+    t.assert.deepEqual(
+      {
+        format,
+        width,
+        height,
+        channels,
+        depth,
+        space,
+        hasProfile,
+        chromaSubsampling,
+      },
+      {
+        format: 'jpeg',
+        width: 960,
+        height: 540,
+        channels: 1,
+        depth: 'uchar',
+        space: 'b-w',
+        hasProfile: false,
+        chromaSubsampling: '4:4:4',
+      },
+    );
+  });
+
+  it('File can be detached and reattached', async (t) => {
+    t.plan(4);
+
+    const outputPath = fixtures.path('output-with-gain-map.jpg');
+    await sharp(fixtures.inputJpgWithGainMap)
+      .keepGainMap()
+      .toFile(outputPath);
+
+    const metadata = await sharp(outputPath).metadata();
     t.assert.strictEqual(metadata.format, 'jpeg');
     t.assert.strictEqual(typeof metadata.gainMap, 'object');
     t.assert.ok(Buffer.isBuffer(metadata.gainMap.image));
