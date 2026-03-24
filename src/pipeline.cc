@@ -967,8 +967,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
           VipsArea *area;
           if (baton->keepGainMap) {
-            image = image.copy();
-            image.set("gainmap", gainMap);
+            image = ReattachGainMap(image, gainMap, baton);
             area = reinterpret_cast<VipsArea*>(image.uhdrsave_buffer(VImage::option()
               ->set("keep", baton->keepMetadata)
               ->set("Q", baton->jpegQuality)
@@ -1204,8 +1203,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write JPEG to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
           if (baton->keepGainMap) {
-            image = image.copy();
-            image.set("gainmap", gainMap);
+            image = ReattachGainMap(image, gainMap, baton);
             image.uhdrsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
               ->set("keep", baton->keepMetadata)
               ->set("Q", baton->jpegQuality)
@@ -1621,6 +1619,21 @@ class PipelineWorker : public Napi::AsyncWorker {
       options->set("basename", const_cast<char*>(baton->tileBasename.data()));
     }
     return options;
+  }
+
+  VImage ReattachGainMap(VImage image, VImage gainMap, PipelineBaton *baton) {
+    VipsArea *gainMapJpeg = reinterpret_cast<VipsArea*>(gainMap.jpegsave_buffer(VImage::option()
+      ->set("keep", FALSE)
+      ->set("Q", baton->jpegQuality)
+      ->set("subsample_mode", VIPS_FOREIGN_SUBSAMPLE_OFF)
+      ->set("trellis_quant", baton->jpegTrellisQuantisation)
+      ->set("quant_table", baton->jpegQuantisationTable)
+      ->set("overshoot_deringing", baton->jpegOvershootDeringing)
+      ->set("optimize_coding", baton->jpegOptimiseCoding)));
+    image = image.copy();
+    image.set("gainmap-data", reinterpret_cast<VipsCallbackFn>(vips_area_free_cb),
+      gainMapJpeg->data, gainMapJpeg->length);
+    return image;
   }
 
   /*
