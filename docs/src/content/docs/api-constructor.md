@@ -229,8 +229,8 @@ readableStream.pipe(pipeline);
 ```js
 // Create a pipeline that will download an image, resize it and format it to different files
 // Using Promises to know when the pipeline is complete
-const fs = require("fs");
-const got = require("got");
+import fs from "node:fs";
+import got from "got";
 const sharpStream = sharp({ failOn: 'none' });
 
 const promises = [];

@@ -7,7 +7,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
 const sharp = require('../../');
-const inRange = require('../../lib/is').inRange;
+const inRange = require('../../dist/is.cjs').inRange;
 const fixtures = require('../fixtures');
 
 describe('Trim borders', () => {

@@ -4,7 +4,7 @@
 */
 
 try {
-  const { useGlobalLibvips } = require('../lib/libvips');
+  const { useGlobalLibvips } = require('../dist/libvips.cjs');
   if (useGlobalLibvips() || process.env.npm_config_build_from_source) {
     process.exit(1);
   }

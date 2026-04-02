@@ -92,7 +92,7 @@
     "Don Denton <don@happycollision.com>"
   ],
   "scripts": {
-    "build": "node scripts/build.js && node install/build.js",
+    "build": "node scripts/build.mjs && node install/build.js",
     "build:test": "node build.mjs",
     "install": "node install/check.js || npm run build",
     "clean": "rm -rf src/build/ .nyc_output/ coverage/ test/fixtures/output.*",
@@ -109,7 +109,7 @@
     "docs-serve": "cd docs && npm start",
     "docs-publish": "cd docs && npm run build && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
   },
-  "type": "module",
+  "type": "commonjs",
   "files": [
     "dist",
     "install",
@@ -117,11 +117,11 @@
     "src/*.{cc,h,gyp}"
   ],
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./lib/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     }
   },

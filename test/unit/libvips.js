@@ -7,7 +7,7 @@ const { after, before, describe, it } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 const semver = require('semver');
-const libvips = require('../../lib/libvips');
+const libvips = require('../../dist/libvips.cjs');
 
 const originalPlatform = process.platform;
 

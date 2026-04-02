@@ -8,7 +8,7 @@ const {
   globalLibvipsVersion,
   log,
   spawnRebuild,
-} = require('../lib/libvips');
+} = require('../dist/libvips.cjs');
 
 log('Attempting to build from source via node-gyp');
 log('See https://sharp.pixelplumbing.com/install#building-from-source');
