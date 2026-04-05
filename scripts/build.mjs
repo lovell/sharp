@@ -1,46 +1,35 @@
 // @ts-check
 import * as fs from "node:fs/promises";
-import * as esbuild from "esbuild";
+import { fileURLToPath } from "node:url";
 
-await fs.rm(new URL("../dist/", import.meta.url), { force: true, recursive: true });
+const distDir = new URL("../dist/", import.meta.url);
 
-/** @satisfies {esbuild.BuildOptions} */
-const sharedOptions = {
-  minify: false,
-  platform: "node",
-  target: "node18",
-  sourcemap: false,
-  sourcesContent: false,
-  bundle: false,
-  entryPoints: ["./lib/*.mjs"],
-  outdir: "dist",
-};
+await fs.rm(distDir, { force: true, recursive: true });
+await fs.mkdir(new URL("../dist/", import.meta.url), { recursive: true });
 
-await esbuild.build({
-  ...sharedOptions,
-  format: "esm",
-  outExtension: { ".js": ".mjs" },
-});
-await esbuild.build({
-  ...sharedOptions,
-  format: "cjs",
-  outExtension: { ".js": ".cjs" },
-  plugins: [
-    {
-      name: "cjs-compat",
-      setup(build) {
-        build.onLoad({ filter: /\.mjs$/ }, async (args) => {
-          const contents = await fs.readFile(args.path, "utf-8");
-          return {
-            contents: contents
-              // ESM TLA to CJS require() is not supported ootb
-              // https://github.com/evanw/esbuild/issues/253
-              .replaceAll("await import(", "require(")
-              .replaceAll("import.meta.url", "require('node:url').pathToFileURL(__filename)"),
-            loader: "js",
-          };
-        });
-      },
-    },
-  ],
-});
+const libDir = new URL("../lib/", import.meta.url);
+
+/**
+ * @param {string} input
+ * @returns {string}
+ */
+function cjsToEsm(input) {
+  return input
+    // Turn import into require() and .mjs into .cjs
+    .replace(
+      /import\s+(.+)\s+from\s+('[^']+'|"[^"]+");?/g,
+      (_, bindings, path) => `const ${bindings} = require(${path.replace(".mjs", ".cjs")});`,
+    )
+    .replace(/import\s+('[^']+'|"[^"]+");?/g, (_, path) => `require(${path.replace(".mjs", ".cjs")});`)
+    // Transforms TLA
+    .replaceAll("await import(", "require(")
+    .replaceAll("export default", "module.exports =")
+    // import.meta.url doesn't exist in cjs
+    .replaceAll("import.meta.url", "require('node:url').pathToFileURL(__filename)");
+}
+
+for await (const entry of fs.glob("**/*.mjs", { cwd: fileURLToPath(libDir) })) {
+  await fs.cp(new URL(entry, libDir), new URL(entry, distDir));
+  const contents = await fs.readFile(new URL(entry, libDir), "utf-8");
+  await fs.writeFile(new URL(entry.replace(".mjs", ".cjs"), distDir), cjsToEsm(contents));
+}

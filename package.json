@@ -189,7 +189,6 @@
     "@img/sharp-libvips-win32-x64": "1.2.4",
     "@types/node": "*",
     "emnapi": "^1.7.0",
-    "esbuild": "0.27.4",
     "exif-reader": "^2.0.2",
     "extract-zip": "^2.0.1",
     "icc": "^3.0.0",
