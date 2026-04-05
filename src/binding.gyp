@@ -3,13 +3,13 @@
 
 {
   'variables': {
-    'vips_version': '<!(node -p "require(\'../lib/libvips\').minimumLibvipsVersion")',
-    'platform_and_arch': '<!(node -p "require(\'../lib/libvips\').buildPlatformArch()")',
+    'vips_version': '<!(node -p "require(\'../dist/libvips.cjs\').minimumLibvipsVersion")',
+    'platform_and_arch': '<!(node -p "require(\'../dist/libvips.cjs\').buildPlatformArch()")',
     'sharp_libvips_version': '<!(node -p "require(\'../package.json\').optionalDependencies[\'@img/sharp-libvips-<(platform_and_arch)\']")',
-    'sharp_libvips_yarn_locator': '<!(node -p "require(\'../lib/libvips\').yarnLocator()")',
-    'sharp_libvips_include_dir': '<!(node -p "require(\'../lib/libvips\').buildSharpLibvipsIncludeDir()")',
-    'sharp_libvips_cplusplus_dir': '<!(node -p "require(\'../lib/libvips\').buildSharpLibvipsCPlusPlusDir()")',
-    'sharp_libvips_lib_dir': '<!(node -p "require(\'../lib/libvips\').buildSharpLibvipsLibDir()")'
+    'sharp_libvips_yarn_locator': '<!(node -p "require(\'../dist/libvips.cjs\').yarnLocator()")',
+    'sharp_libvips_include_dir': '<!(node -p "require(\'../dist/libvips.cjs\').buildSharpLibvipsIncludeDir()")',
+    'sharp_libvips_cplusplus_dir': '<!(node -p "require(\'../dist/libvips.cjs\').buildSharpLibvipsCPlusPlusDir()")',
+    'sharp_libvips_lib_dir': '<!(node -p "require(\'../dist/libvips.cjs\').buildSharpLibvipsLibDir()")'
   },
   'targets': [{
     'target_name': 'libvips-cpp-<(vips_version)',
@@ -97,8 +97,8 @@
     'variables': {
       'conditions': [
         ['OS != "win"', {
-          'pkg_config_path': '<!(node -p "require(\'../lib/libvips\').pkgConfigPath()")',
-          'use_global_libvips': '<!(node -p "Boolean(require(\'../lib/libvips\').useGlobalLibvips()).toString()")'
+          'pkg_config_path': '<!(node -p "require(\'../dist/libvips.cjs\').pkgConfigPath()")',
+          'use_global_libvips': '<!(node -p "Boolean(require(\'../dist/libvips.cjs\').useGlobalLibvips()).toString()")'
         }, {
           'pkg_config_path': '',
           'use_global_libvips': ''

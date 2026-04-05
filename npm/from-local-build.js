@@ -8,7 +8,7 @@
 const { copyFileSync, cpSync, readFileSync, writeFileSync, appendFileSync } = require('node:fs');
 const { basename, join } = require('node:path');
 
-const { buildPlatformArch } = require('../lib/libvips');
+const { buildPlatformArch } = require('../dist/libvips.cjs');
 
 const licensing = `
 ## Licensing
