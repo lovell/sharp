@@ -1,6 +1,5 @@
 // @ts-check
 import * as fs from "node:fs/promises";
-import { fileURLToPath } from "node:url";
 
 const distDir = new URL("../dist/", import.meta.url);
 
@@ -28,7 +27,9 @@ function cjsToEsm(input) {
     .replaceAll("import.meta.url", "require('node:url').pathToFileURL(__filename)");
 }
 
-for await (const entry of fs.glob("**/*.mjs", { cwd: fileURLToPath(libDir) })) {
+const entries = (await fs.readdir(libDir, { recursive: true })).filter(e => e.endsWith('.mjs'));
+
+for (const entry of entries) {
   await fs.cp(new URL(entry, libDir), new URL(entry, distDir));
   const contents = await fs.readFile(new URL(entry, libDir), "utf-8");
   await fs.writeFile(new URL(entry.replace(".mjs", ".cjs"), distDir), cjsToEsm(contents));
