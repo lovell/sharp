@@ -4,6 +4,7 @@
 */
 
 const { describe, it } = require('node:test');
+const exifReader = require('exif-reader');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -232,5 +233,21 @@ describe('Gain maps', () => {
         .toBuffer(),
       /Convolve is not supported when keeping gain maps/
     );
+  });
+
+  it('other metadata can be retained when keeping gain map', async (t) => {
+    t.plan(2);
+
+    const input = fixtures.inputJpgWithGainMap;
+    const data = await sharp(input)
+      .keepGainMap()
+      .keepMetadata()
+      .resize(32)
+      .toBuffer();
+
+    const { exif, gainMap } = await sharp(data).metadata();
+    const exifData = exifReader(exif);
+    t.assert.strictEqual(exifData.Photo.PixelXDimension, 32);
+    t.assert.ok(Buffer.isBuffer(gainMap.image));
   });
 });
