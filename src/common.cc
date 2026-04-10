@@ -455,6 +455,14 @@ namespace sharp {
     if (descriptor->isBuffer) {
       if (descriptor->rawChannels > 0) {
         // Raw, uncompressed pixel data
+        size_t const expectedLength = static_cast<size_t>(descriptor->rawWidth) *
+          static_cast<size_t>(descriptor->rawHeight) *
+          static_cast<size_t>(descriptor->rawChannels) *
+          static_cast<size_t>(vips_format_sizeof(descriptor->rawDepth));
+        if (descriptor->bufferLength < expectedLength) {
+          throw vips::VError("Raw buffer too small for declared dimensions "
+            "(expected at least %zu bytes, received %zu)", expectedLength, descriptor->bufferLength);
+        }
         bool const is8bit = vips_band_format_is8bit(descriptor->rawDepth);
         image = VImage::new_from_memory(descriptor->buffer, descriptor->bufferLength,
           descriptor->rawWidth, descriptor->rawHeight, descriptor->rawChannels, descriptor->rawDepth);
