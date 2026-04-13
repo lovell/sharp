@@ -54,23 +54,6 @@ describe('failOn', () => {
     );
   });
 
-  it('deprecated failOnError', () => {
-    assert.doesNotThrow(
-      () => sharp({ failOnError: true })
-    );
-    assert.doesNotThrow(
-      () => sharp({ failOnError: false })
-    );
-    assert.throws(
-      () => sharp({ failOnError: 'zoinks' }),
-      /Expected boolean for failOnError but received zoinks of type string/
-    );
-    assert.throws(
-      () => sharp({ failOnError: 1 }),
-      /Expected boolean for failOnError but received 1 of type number/
-    );
-  });
-
   it('returns errors to callback for truncated JPEG', (_t, done) => {
     sharp(fixtures.inputJpgTruncated, { failOn: 'truncated' }).toBuffer((err, data, info) => {
       assert.ok(err.message.includes('VipsJpeg: premature end of'), err);

@@ -7,9 +7,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { afterEach, beforeEach, describe, it } = require('node:test');
 const assert = require('node:assert');
+const { isMarkedAsUntransferable } = require('node:worker_threads');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
+const { buildPlatformArch } = require('../../lib/libvips');
 
 const outputJpg = fixtures.path('output.jpg');
 
@@ -1091,5 +1093,40 @@ describe('Input/output', () => {
     assert.strictEqual(height, 8);
     assert.strictEqual(channels, 3);
     assert.strictEqual(format, 'jpeg');
+  });
+
+  it('toBuffer resolves with an untransferable Buffer', async () => {
+    const data = await sharp(fixtures.inputJpg)
+      .resize({ width: 8, height: 8 })
+      .toBuffer();
+
+    if (isMarkedAsUntransferable && buildPlatformArch() !== 'wasm32') {
+      assert.strictEqual(isMarkedAsUntransferable(data.buffer), true);
+    }
+    assert.strictEqual(ArrayBuffer.isView(data), true);
+    assert.strictEqual(ArrayBuffer.isView(data.buffer), false);
+  });
+
+  it('toUint8Array resolves with a transferable Uint8Array', async () => {
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 8, height: 8 })
+      .toUint8Array();
+
+    assert.strictEqual(data instanceof Uint8Array, true);
+    if (isMarkedAsUntransferable) {
+      assert.strictEqual(isMarkedAsUntransferable(data.buffer), false);
+    }
+    assert.strictEqual(ArrayBuffer.isView(data), true);
+    assert.strictEqual(info.format, 'jpeg');
+    assert.strictEqual(info.width, 8);
+    assert.strictEqual(info.height, 8);
+    assert.strictEqual(data.byteLength, info.size);
+    assert.strictEqual(data[0], 0xFF);
+    assert.strictEqual(data[1], 0xD8);
+
+    const metadata = await sharp(data).metadata();
+    assert.strictEqual(metadata.format, 'jpeg');
+    assert.strictEqual(metadata.width, 8);
+    assert.strictEqual(metadata.height, 8);
   });
 });

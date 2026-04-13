@@ -18,6 +18,7 @@ Dimensions in the response will respect the `page` and `pages` properties of the
 A `Promise` is returned when `callback` is not provided.
 
 - `format`: Name of decoder used to parse image e.g. `jpeg`, `png`, `webp`, `gif`, `svg`, `heif`, `tiff`
+- `mediaType`: Media Type (MIME Type) e.g. `image/jpeg`, `image/png`, `image/svg+xml`, `image/avif`
 - `size`: Total size of image in bytes, for Stream and Buffer input only
 - `width`: Number of pixels wide (EXIF orientation is not taken into consideration, see example below)
 - `height`: Number of pixels high (EXIF orientation is not taken into consideration, see example below)
@@ -50,6 +51,7 @@ A `Promise` is returned when `callback` is not provided.
 - `tifftagPhotoshop`: Buffer containing raw TIFFTAG_PHOTOSHOP data, if present
 - `formatMagick`: String containing format for images loaded via *magick
 - `comments`: Array of keyword/text pairs representing PNG text blocks, if present.
+- `gainMap.image`: HDR gain map, if present, as compressed JPEG image.
 
 
 

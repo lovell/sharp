@@ -123,6 +123,7 @@ Napi::Value format(const Napi::CallbackInfo& info) {
     "jpeg", "png", "webp", "tiff", "magick", "openslide", "dz",
     "ppm", "fits", "gif", "svg", "heif", "pdf", "vips", "jp2k", "jxl", "rad", "dcraw"
   }) {
+    std::string id = f == "jp2k" ? "jp2" : f;
     // Input
     const VipsObjectClass *oc = vips_class_find("VipsOperation", (f + "load").c_str());
     Napi::Boolean hasInputFile = Napi::Boolean::New(env, oc);
@@ -154,11 +155,11 @@ Napi::Value format(const Napi::CallbackInfo& info) {
     output.Set("stream", hasOutputBuffer);
     // Other attributes
     Napi::Object container = Napi::Object::New(env);
-    container.Set("id", f);
+    container.Set("id", id);
     container.Set("input", input);
     container.Set("output", output);
     // Add to set of formats
-    format.Set(f, container);
+    format.Set(id, container);
   }
 
   // Raw, uncompressed data
@@ -243,7 +244,7 @@ Napi::Value _maxColourDistance(const Napi::CallbackInfo& info) {
     }
     // Calculate colour distance
     maxColourDistance = image1.dE00(image2).max();
-  } catch (vips::VError const &err) {
+  } catch (std::runtime_error const &err) {
     throw Napi::Error::New(env, err.what());
   }
 

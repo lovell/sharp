@@ -96,4 +96,14 @@ describe('HEIF', () => {
       sharp().heif({ compression: 'av1', bitdepth: 11 });
     }, /Error: Expected 8, 10 or 12 for bitdepth but received 11 of type number/);
   });
+  it('valid tune does not throw an error', () => {
+    assert.doesNotThrow(() => {
+      sharp().heif({ compression: 'hevc', tune: 'psnr' });
+    });
+  });
+  it('invalid tune should throw an error', () => {
+    assert.throws(() => {
+      sharp().heif({ compression: 'hevc', tune: 'fail' });
+    }, /Error: Expected one of: psnr, ssim, iq for tune but received fail of type string/);
+  });
 });

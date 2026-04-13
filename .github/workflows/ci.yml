@@ -9,8 +9,8 @@ jobs:
       contents: read
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: "24"
       - run: npm install --ignore-scripts
@@ -31,122 +31,123 @@ jobs:
           - os: ubuntu-24.04
             container: rockylinux:8
             nodejs_arch: x64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
+            nodejs_version: "^20.9.0"
+            nodejs_version_major: 20
             platform: linux-x64
             package: true
           - os: ubuntu-24.04
             container: rockylinux:8
             nodejs_arch: x64
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
-            platform: linux-x64
-          - os: ubuntu-24.04
-            container: rockylinux:8
-            nodejs_arch: x64
-            nodejs_version: "^22.9.0"
+            nodejs_version: "^22"
             nodejs_version_major: 22
             platform: linux-x64
           - os: ubuntu-24.04
-            container: node:18-alpine3.17
-            nodejs_version_major: 18
-            platform: linuxmusl-x64
-            package: true
+            container: rockylinux:8
+            nodejs_arch: x64
+            nodejs_version: "^24"
+            nodejs_version_major: 24
+            platform: linux-x64
           - os: ubuntu-24.04
             container: node:20-alpine3.18
             nodejs_version_major: 20
             platform: linuxmusl-x64
+            package: true
           - os: ubuntu-24.04
             container: node:22-alpine3.20
             nodejs_version_major: 22
             platform: linuxmusl-x64
+          - os: ubuntu-24.04
+            container: node:24-alpine3.22
+            nodejs_version_major: 24
+            platform: linuxmusl-x64
           - os: ubuntu-24.04-arm
             container: arm64v8/rockylinux:8
             nodejs_arch: arm64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
+            nodejs_version: "^20.9.0"
+            nodejs_version_major: 20
             platform: linux-arm64
             package: true
           - os: ubuntu-24.04-arm
             container: arm64v8/rockylinux:8
             nodejs_arch: arm64
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
+            nodejs_version: "^22"
+            nodejs_version_major: 22
+            platform: linux-arm64
+          - os: ubuntu-24.04-arm
+            container: arm64v8/rockylinux:8
+            nodejs_arch: arm64
+            nodejs_version: "^24"
+            nodejs_version_major: 24
             platform: linux-arm64
           - os: macos-15-intel
             nodejs_arch: x64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
+            nodejs_version: "^20.9.0"
+            nodejs_version_major: 20
             platform: darwin-x64
             package: true
           - os: macos-15-intel
             nodejs_arch: x64
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
+            nodejs_version: "^22"
+            nodejs_version_major: 22
             platform: darwin-x64
           - os: macos-15-intel
             nodejs_arch: x64
-            nodejs_version: "^22.9.0"
-            nodejs_version_major: 22
+            nodejs_version: "^24"
+            nodejs_version_major: 24
             platform: darwin-x64
           - os: macos-15
             nodejs_arch: arm64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
+            nodejs_version: "^20.9.0"
+            nodejs_version_major: 20
             platform: darwin-arm64
             package: true
           - os: macos-15
             nodejs_arch: arm64
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
+            nodejs_version: "^22"
+            nodejs_version_major: 22
             platform: darwin-arm64
           - os: macos-15
             nodejs_arch: arm64
-            nodejs_version: "^22.9.0"
-            nodejs_version_major: 22
+            nodejs_version: "^24"
+            nodejs_version_major: 24
             platform: darwin-arm64
           - os: windows-2022
             nodejs_arch: x86
-            nodejs_version: "18.18.2" # pinned to avoid 18.19.0 and npm 10
-            nodejs_version_major: 18
+            nodejs_version: "^20.9.0"
+            nodejs_version_major: 20
             platform: win32-ia32
             package: true
           - os: windows-2022
-            nodejs_arch: x86
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
-            platform: win32-ia32
-          - os: windows-2022
-            nodejs_arch: x86
-            nodejs_version: "^22.9.0"
-            nodejs_version_major: 22
-            platform: win32-ia32
-          - os: windows-2022
             nodejs_arch: x64
-            nodejs_version: "^18.17.0"
-            nodejs_version_major: 18
+            nodejs_version: "^20.9.0"
+            nodejs_version_major: 20
             platform: win32-x64
             package: true
           - os: windows-2022
             nodejs_arch: x64
-            nodejs_version: "^20.3.0"
-            nodejs_version_major: 20
+            nodejs_version: "^22"
+            nodejs_version_major: 22
             platform: win32-x64
           - os: windows-2022
             nodejs_arch: x64
-            nodejs_version: "^22.9.0"
-            nodejs_version_major: 22
+            nodejs_version: "^24"
+            nodejs_version_major: 24
             platform: win32-x64
           - os: windows-11-arm
             nodejs_arch: arm64
-            nodejs_version: "^20.3.0"
+            nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: win32-arm64
             package: true
           - os: windows-11-arm
             nodejs_arch: arm64
-            nodejs_version: "^22.9.0"
+            nodejs_version: "^22"
             nodejs_version_major: 22
+            platform: win32-arm64
+          - os: windows-11-arm
+            nodejs_arch: arm64
+            nodejs_version: "^24"
+            nodejs_version_major: 24
             platform: win32-arm64
     steps:
       - name: Dependencies (Rocky Linux glibc)
@@ -159,22 +160,22 @@ jobs:
         run: apk add build-base git python3 font-noto --update-cache
       - name: Dependencies (Python 3.11 - macOS, Windows)
         if: contains(matrix.os, 'macos') || contains(matrix.os, 'windows')
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Dependencies (Node.js)
         if: "!contains(matrix.platform, 'linuxmusl')"
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.nodejs_version }}
           architecture: ${{ matrix.nodejs_arch }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm install
       - run: npm run build:dist && npm run build
       - run: npm run test-unit
       - if: matrix.package
         run: npm run package-from-local-build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: matrix.package
         with:
           name: ${{ matrix.platform }}
@@ -191,16 +192,18 @@ jobs:
       image: ${{ matrix.container }}
       volumes:
         - /opt:/opt:rw,rshared
-        - /opt:/__e/node20:ro,rshared
+        - /opt:/__e/node24:ro,rshared
     strategy:
       fail-fast: false
       matrix:
         include:
-        - container: node:18-alpine3.17
-          nodejs_version_major: 18
-          package: true
-        - container: node:20-alpine3.18
+        - container: node:20-alpine3.20
           nodejs_version_major: 20
+          package: true
+        - container: node:22-alpine3.20
+          nodejs_version_major: 22
+        - container: node:24-alpine3.22
+          nodejs_version_major: 24
     steps:
       - name: Allow Linux musl containers on ARM64 runners # https://github.com/actions/runner/issues/801#issuecomment-2394425757
         shell: sh
@@ -211,13 +214,13 @@ jobs:
           ln -s /usr/bin/node /opt/bin/node
       - name: Dependencies
         run: apk add build-base git python3 font-noto --update-cache
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm install
       - run: npm run build:dist && npm run build
       - run: npm run test-unit
       - if: matrix.package
         run: npm run package-from-local-build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: matrix.package
         with:
           name: linuxmusl-arm64
@@ -238,20 +241,20 @@ jobs:
             base_image: "balenalib/rpi-raspbian:bullseye"
             nodejs_arch: armv6l
             nodejs_hostname: unofficial-builds.nodejs.org
-            nodejs_version: "18.17.0"
-            nodejs_version_major: 18
+            nodejs_version: "20.9.0"
+            nodejs_version_major: 20
           - platform: linux-s390x
             base_image: "--platform=linux/s390x s390x/debian:bookworm"
             nodejs_arch: s390x
             nodejs_hostname: nodejs.org
-            nodejs_version: "18.17.0"
-            nodejs_version_major: 18
+            nodejs_version: "20.9.0"
+            nodejs_version_major: 20
           - platform: linux-ppc64
             base_image: "--platform=linux/ppc64le ppc64le/debian:bookworm"
             nodejs_arch: ppc64le
             nodejs_hostname: nodejs.org
-            nodejs_version: "18.17.0"
-            nodejs_version_major: 18
+            nodejs_version: "20.9.0"
+            nodejs_version_major: 20
           - platform: linux-riscv64
             base_image: "--platform=linux/riscv64 riscv64/debian:trixie"
             compiler_flags: "-march=rv64gc"
@@ -260,7 +263,7 @@ jobs:
             nodejs_version: "20.19.5"
             nodejs_version_major: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: uraimo/run-on-arch-action@v3
         with:
           arch: none
@@ -280,7 +283,7 @@ jobs:
             npm run build
             node --test test/unit/io.js
             npm run package-from-local-build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.platform }}
           path: npm/${{ matrix.platform }}
@@ -292,15 +295,15 @@ jobs:
     needs: lint
     name: "build-wasm32 [package]"
     runs-on: ubuntu-24.04
-    container: "emscripten/emsdk:4.0.18"
+    container: "emscripten/emsdk:5.0.4"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Dependencies
         run: apt-get update && apt-get install -y pkg-config
       - name: Dependencies (Node.js)
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "22"
       - run: npm install
       - run: npm run build:dist && emmake npm run build
       - name: Verify emscripten versions match
@@ -312,7 +315,7 @@ jobs:
           test "$EMSCRIPTEN_VERSION_LIBVIPS" = "$EMSCRIPTEN_VERSION_SHARP"
       - run: emmake npm run test-unit
       - run: emmake npm run package-from-local-build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wasm32
           path: npm/wasm32
@@ -329,15 +332,17 @@ jobs:
       - build-qemu
       - build-emscripten
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
         with:
           path: npm
       - name: Create npm workspace tarball
         run: tar -vcaf npm-workspace.tar.xz --directory npm --exclude=from-local-build.js .
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
+      - name: Populate WebAssembly wrapper packages
+        run: npm run package-wasm-wrappers
       - name: Create release notes
         run: npm run package-release-notes
       - name: Create GitHub release for tag

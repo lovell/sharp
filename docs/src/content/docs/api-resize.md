@@ -284,6 +284,7 @@ The `info` response Object will contain `trimOffsetLeft` and `trimOffsetTop` pro
 | [options.background] | <code>string</code> \| <code>Object</code> | <code>&quot;&#x27;top-left pixel&#x27;&quot;</code> | Background colour, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to that of the top-left pixel. |
 | [options.threshold] | <code>number</code> | <code>10</code> | Allowed difference from the above colour, a positive number. |
 | [options.lineArt] | <code>boolean</code> | <code>false</code> | Does the input more closely resemble line art (e.g. vector) rather than being photographic? |
+| [options.margin] | <code>number</code> | <code>0</code> | Leave a margin around trimmed content, value is in pixels. |
 
 **Example**  
 ```js
@@ -318,6 +319,15 @@ const output = await sharp(input)
   .trim({
     background: "yellow",
     threshold: 42,
+  })
+  .toBuffer();
+```
+**Example**  
+```js
+// Trim image leaving (up to) a 10 pixel margin around the trimmed content.
+const output = await sharp(input)
+  .trim({
+    margin: 10
   })
   .toBuffer();
 ```

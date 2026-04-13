@@ -1,10 +1,11 @@
 {
   "name": "@img/sharp",
-  "version": "0.34.5",
+  "version": "0.35.0-rc.2",
   "private": "true",
   "workspaces": [
     "darwin-arm64",
     "darwin-x64",
+    "freebsd-wasm32",
     "linux-arm",
     "linux-arm64",
     "linux-ppc64",
@@ -14,6 +15,7 @@
     "linuxmusl-arm64",
     "linuxmusl-x64",
     "wasm32",
+    "webcontainers-wasm32",
     "win32-arm64",
     "win32-ia32",
     "win32-x64"

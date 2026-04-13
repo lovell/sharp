@@ -14,7 +14,6 @@
 #include "./operations.h"
 
 using vips::VImage;
-using vips::VError;
 
 namespace sharp {
   /*
@@ -285,9 +284,9 @@ namespace sharp {
   /*
     Trim an image
   */
-  VImage Trim(VImage image, std::vector<double> background, double threshold, bool const lineArt) {
+  VImage Trim(VImage image, std::vector<double> background, double threshold, bool const lineArt, int const margin) {
     if (image.width() < 3 && image.height() < 3) {
-      throw VError("Image to trim must be at least 3x3 pixels");
+      throw std::runtime_error("Image to trim must be at least 3x3 pixels");
     }
     if (background.size() == 0) {
       // Top-left pixel provides the default background colour if none is given
@@ -320,18 +319,36 @@ namespace sharp {
       if (widthA > 0 && heightA > 0) {
         if (width > 0 && height > 0) {
           // Combined bounding box (B)
-          int const leftB = std::min(left, leftA);
-          int const topB = std::min(top, topA);
-          int const widthB = std::max(left + width, leftA + widthA) - leftB;
-          int const heightB = std::max(top + height, topA + heightA) - topB;
+          int leftB = std::min(left, leftA);
+          int topB = std::min(top, topA);
+          int widthB = std::max(left + width, leftA + widthA) - leftB;
+          int heightB = std::max(top + height, topA + heightA) - topB;
+          if (margin > 0) {
+            leftB = std::max(0, leftB - margin);
+            topB = std::max(0, topB - margin);
+            widthB = std::min(image.width() - leftB, widthB + 2 * margin);
+            heightB = std::min(image.height() - topB, heightB + 2 * margin);
+          }
           return image.extract_area(leftB, topB, widthB, heightB);
         } else {
           // Use alpha only
+          if (margin > 0) {
+            leftA = std::max(0, leftA - margin);
+            topA = std::max(0, topA - margin);
+            widthA = std::min(image.width() - leftA, widthA + 2 * margin);
+            heightA = std::min(image.height() - topA, heightA + 2 * margin);
+          }
           return image.extract_area(leftA, topA, widthA, heightA);
         }
       }
     }
     if (width > 0 && height > 0) {
+      if (margin > 0) {
+        left = std::max(0, left - margin);
+        top = std::max(0, top - margin);
+        width = std::min(image.width() - left, width + 2 * margin);
+        height = std::min(image.height() - top, height + 2 * margin);
+      }
       return image.extract_area(left, top, width, height);
     }
     return image;
@@ -343,7 +360,7 @@ namespace sharp {
   VImage Linear(VImage image, std::vector<double> const a, std::vector<double> const b) {
     size_t const bands = static_cast<size_t>(image.bands());
     if (a.size() > bands) {
-      throw VError("Band expansion using linear is unsupported");
+      throw std::runtime_error("Band expansion using linear is unsupported");
     }
     bool const uchar = !Is16Bit(image.interpretation());
     if (image.has_alpha() && a.size() != bands && (a.size() == 1 || a.size() == bands - 1 || bands - 1 == 1)) {

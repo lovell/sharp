@@ -19,6 +19,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputJpg).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('image/jpeg', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
@@ -41,6 +42,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputJpgWithExif).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('image/jpeg', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(450, metadata.width);
       assert.strictEqual(600, metadata.height);
@@ -66,6 +68,7 @@ describe('Image metadata', () => {
       const profile = icc.parse(metadata.icc);
       assert.strictEqual('object', typeof profile);
       assert.strictEqual('Generic RGB Profile', profile.description);
+      assert.strictEqual('image/jpeg', metadata.mediaType);
       done();
     });
   });
@@ -92,6 +95,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputTiff).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('tiff', metadata.format);
+      assert.strictEqual('image/tiff', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2464, metadata.width);
       assert.strictEqual(3248, metadata.height);
@@ -111,6 +115,7 @@ describe('Image metadata', () => {
       assert.strictEqual('undefined', typeof metadata.xmp);
       assert.strictEqual('undefined', typeof metadata.xmpAsString);
       assert.strictEqual('inch', metadata.resolutionUnit);
+      assert.strictEqual('image/tiff', metadata.mediaType);
       done();
     });
   });
@@ -119,6 +124,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputTiffMultipage).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('tiff', metadata.format);
+      assert.strictEqual('image/tiff', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2464, metadata.width);
       assert.strictEqual(3248, metadata.height);
@@ -142,6 +148,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputPng).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
+      assert.strictEqual('image/png', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2809, metadata.width);
       assert.strictEqual(2074, metadata.height);
@@ -166,6 +173,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputPngTestJoinChannel).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
+      assert.strictEqual('image/png', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(320, metadata.width);
       assert.strictEqual(240, metadata.height);
@@ -191,6 +199,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputPngWithTransparency).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('png', metadata.format);
+      assert.strictEqual('image/png', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2048, metadata.width);
       assert.strictEqual(1536, metadata.height);
@@ -225,6 +234,7 @@ describe('Image metadata', () => {
       height: 32,
       isPalette: false,
       isProgressive: false,
+      mediaType: 'image/png',
       space: 'b-w',
       width: 32,
       autoOrient: {
@@ -250,6 +260,7 @@ describe('Image metadata', () => {
       height: 32,
       isPalette: false,
       isProgressive: false,
+      mediaType: 'image/png',
       space: 'grey16',
       width: 32,
       autoOrient: {
@@ -263,6 +274,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputWebP).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('webp', metadata.format);
+      assert.strictEqual('image/webp', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(1024, metadata.width);
       assert.strictEqual(772, metadata.height);
@@ -285,11 +297,12 @@ describe('Image metadata', () => {
     sharp(fixtures.inputWebPAnimated)
       .metadata()
       .then(({
-        format, width, height, space, channels, depth,
+        format, mediaType, width, height, space, channels, depth,
         isProgressive, pages, loop, delay, hasProfile,
         hasAlpha
       }) => {
         assert.strictEqual(format, 'webp');
+        assert.strictEqual(mediaType, 'image/webp');
         assert.strictEqual(width, 80);
         assert.strictEqual(height, 80);
         assert.strictEqual(space, 'srgb');
@@ -308,11 +321,12 @@ describe('Image metadata', () => {
     sharp(fixtures.inputWebPAnimated, { pages: -1 })
       .metadata()
       .then(({
-        format, width, height, space, channels, depth,
+        format, mediaType, width, height, space, channels, depth,
         isProgressive, pages, pageHeight, loop, delay,
         hasProfile, hasAlpha
       }) => {
         assert.strictEqual(format, 'webp');
+        assert.strictEqual(mediaType, 'image/webp');
         assert.strictEqual(width, 80);
         assert.strictEqual(height, 720);
         assert.strictEqual(space, 'srgb');
@@ -332,11 +346,12 @@ describe('Image metadata', () => {
     sharp(fixtures.inputWebPAnimatedLoop3)
       .metadata()
       .then(({
-        format, width, height, space, channels, depth,
+        format, mediaType, width, height, space, channels, depth,
         isProgressive, pages, loop, delay, hasProfile,
         hasAlpha
       }) => {
         assert.strictEqual(format, 'webp');
+        assert.strictEqual(mediaType, 'image/webp');
         assert.strictEqual(width, 370);
         assert.strictEqual(height, 285);
         assert.strictEqual(space, 'srgb');
@@ -355,6 +370,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputGif).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('gif', metadata.format);
+      assert.strictEqual('image/gif', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(800, metadata.width);
       assert.strictEqual(533, metadata.height);
@@ -375,6 +391,7 @@ describe('Image metadata', () => {
     sharp(fixtures.inputGifGreyPlusAlpha).metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('gif', metadata.format);
+      assert.strictEqual('image/gif', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2, metadata.width);
       assert.strictEqual(1, metadata.height);
@@ -395,11 +412,12 @@ describe('Image metadata', () => {
     sharp(fixtures.inputGifAnimated)
       .metadata()
       .then(({
-        format, width, height, space, channels, depth,
+        format, mediaType, width, height, space, channels, depth,
         isProgressive, pages, loop, delay, background,
         hasProfile, hasAlpha
       }) => {
         assert.strictEqual(format, 'gif');
+        assert.strictEqual(mediaType, 'image/gif');
         assert.strictEqual(width, 80);
         assert.strictEqual(height, 80);
         assert.strictEqual(space, 'srgb');
@@ -419,11 +437,12 @@ describe('Image metadata', () => {
     sharp(fixtures.inputGifAnimatedLoop3)
       .metadata()
       .then(({
-        format, width, height, space, channels, depth,
+        format, mediaType, width, height, space, channels, depth,
         isProgressive, pages, loop, delay, hasProfile,
         hasAlpha
       }) => {
         assert.strictEqual(format, 'gif');
+        assert.strictEqual(mediaType, 'image/gif');
         assert.strictEqual(width, 370);
         assert.strictEqual(height, 285);
         assert.strictEqual(space, 'srgb');
@@ -462,6 +481,7 @@ describe('Image metadata', () => {
   it('File in, Promise out', (_t, done) => {
     sharp(fixtures.inputJpg).metadata().then((metadata) => {
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('image/jpeg', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
@@ -508,6 +528,7 @@ describe('Image metadata', () => {
     const pipeline = sharp();
     pipeline.metadata().then((metadata) => {
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('image/jpeg', metadata.mediaType);
       assert.strictEqual(829183, metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
@@ -559,6 +580,7 @@ describe('Image metadata', () => {
     const pipeline = sharp().metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('image/jpeg', metadata.mediaType);
       assert.strictEqual(829183, metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
@@ -583,6 +605,7 @@ describe('Image metadata', () => {
     image.metadata((err, metadata) => {
       if (err) throw err;
       assert.strictEqual('jpeg', metadata.format);
+      assert.strictEqual('image/jpeg', metadata.mediaType);
       assert.strictEqual('undefined', typeof metadata.size);
       assert.strictEqual(2725, metadata.width);
       assert.strictEqual(2225, metadata.height);
@@ -852,7 +875,7 @@ describe('Image metadata', () => {
     assert.strictEqual(parsedExif.Photo.ExposureTime, 0.2);
   });
 
-  it('Set density of JPEG', async () => {
+  it('withMetadata - set density of JPEG', async () => {
     const data = await sharp({ create })
       .withMetadata({
         density: 300
@@ -864,11 +887,31 @@ describe('Image metadata', () => {
     assert.strictEqual(density, 300);
   });
 
-  it('Set density of PNG', async () => {
+  it('withMetadata - set density of PNG', async () => {
     const data = await sharp({ create })
       .withMetadata({
         density: 96
       })
+      .png()
+      .toBuffer();
+
+    const { density } = await sharp(data).metadata();
+    assert.strictEqual(density, 96);
+  });
+
+  it('withDensity - set density of JPEG', async () => {
+    const data = await sharp({ create })
+      .withDensity(300)
+      .jpeg()
+      .toBuffer();
+
+    const { density } = await sharp(data).metadata();
+    assert.strictEqual(density, 300);
+  });
+
+  it('withDensity - set density of PNG', async () => {
+    const data = await sharp({ create })
+      .withDensity(96)
       .png()
       .toBuffer();
 
@@ -917,6 +960,7 @@ describe('Image metadata', () => {
       .metadata()
       .then(metadata => {
         assert.strictEqual(metadata.format, 'tiff');
+        assert.strictEqual(metadata.mediaType, 'image/tiff');
         assert.strictEqual(metadata.width, 317);
         assert.strictEqual(metadata.height, 211);
         assert.strictEqual(metadata.space, 'rgb16');
@@ -931,6 +975,7 @@ describe('Image metadata', () => {
     const metadata = await sharp(fixtures.inputAvif).metadata();
     assert.deepStrictEqual(metadata, {
       format: 'heif',
+      mediaType: 'image/avif',
       width: 2048,
       height: 858,
       space: 'srgb',
@@ -1014,6 +1059,7 @@ describe('Image metadata', () => {
     const metadata = await sharp(fixtures.inputJpgLossless).metadata();
     assert.deepStrictEqual(metadata, {
       format: 'jpeg',
+      mediaType: 'image/jpeg',
       width: 227,
       height: 149,
       space: 'srgb',
@@ -1341,6 +1387,18 @@ describe('Image metadata', () => {
       assert.throws(
         () => sharp().withIccProfile('test', { attach: 1 }),
         /Expected boolean for attach but received 1 of type number/
+      );
+    });
+    it('withDensity missing density', () => {
+      assert.throws(
+        () => sharp().withDensity(),
+        /Expected positive number for density but received undefined of type undefined/
+      );
+    });
+    it('withDensity invalid density', () => {
+      assert.throws(
+        () => sharp().withDensity('invalid'),
+        /Expected positive number for density but received invalid of type string/
       );
     });
   });

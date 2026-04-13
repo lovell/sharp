@@ -1,7 +1,7 @@
 {
   "name": "@img/sharp-win32-ia32",
-  "version": "0.34.5",
-  "description": "Prebuilt sharp for use with Windows x86 (32-bit)",
+  "version": "0.35.0-rc.2",
+  "description": "Prebuilt sharp for use with Windows x86 (deprecated)",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
   "repository": {
@@ -15,6 +15,7 @@
   },
   "preferUnplugged": true,
   "files": [
+    "index.cjs",
     "lib",
     "versions.json"
   ],
@@ -23,12 +24,12 @@
   },
   "type": "commonjs",
   "exports": {
-    "./sharp.node": "./lib/sharp-win32-ia32.node",
+    "./sharp.node": "./index.cjs",
     "./package": "./package.json",
     "./versions": "./versions.json"
   },
   "engines": {
-    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
+    "node": "^20.9.0"
   },
   "os": [
     "win32"

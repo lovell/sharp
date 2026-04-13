@@ -122,7 +122,6 @@ describe('TIFF', () => {
     sharp(fixtures.inputTiff8BitDepth)
       .toColourspace('b-w') // can only squash 1 band uchar images
       .tiff({
-        bitdepth: 8,
         compression: 'none',
         predictor: 'none'
       })
@@ -154,7 +153,7 @@ describe('TIFF', () => {
   it('Invalid TIFF bitdepth value throws error', () => {
     assert.throws(() => {
       sharp().tiff({ bitdepth: 3 });
-    }, /Error: Expected 1, 2, 4 or 8 for bitdepth but received 3 of type number/);
+    }, /Error: Expected 1, 2 or 4 for bitdepth but received 3 of type number/);
   });
 
   it('TIFF setting xres and yres on file', () =>

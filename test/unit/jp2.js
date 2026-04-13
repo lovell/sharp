@@ -11,7 +11,7 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 describe('JP2 output', () => {
-  if (!sharp.format.jp2k.input.buffer) {
+  if (!sharp.format.jp2.input.buffer) {
     it('JP2 output should fail due to missing OpenJPEG', () =>
       assert.rejects(async () =>
         sharp(fixtures.inputJpg)

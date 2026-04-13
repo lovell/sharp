@@ -31,7 +31,7 @@ class MetadataWorker : public Napi::AsyncWorker {
     sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
     try {
       std::tie(image, imageType) = OpenInput(baton->input);
-    } catch (vips::VError const &err) {
+    } catch (std::runtime_error const &err) {
       (baton->err).append(err.what());
     }
     if (imageType != sharp::ImageType::UNKNOWN) {
@@ -141,8 +141,60 @@ class MetadataWorker : public Napi::AsyncWorker {
         memcpy(baton->tifftagPhotoshop, tifftagPhotoshop, tifftagPhotoshopLength);
         baton->tifftagPhotoshopLength = tifftagPhotoshopLength;
       }
+      // Gain Map
+      if (image.get_typeof("gainmap-data") == VIPS_TYPE_BLOB) {
+        size_t gainMapLength;
+        void const *gainMap = image.get_blob("gainmap-data", &gainMapLength);
+        baton->gainMap = static_cast<char *>(g_malloc(gainMapLength));
+        memcpy(baton->gainMap, gainMap, gainMapLength);
+        baton->gainMapLength = gainMapLength;
+      }
       // PNG comments
       vips_image_map(image.get_image(), readPNGComment, &baton->comments);
+      // Media type
+      std::string mediaType;
+      switch (imageType) {
+        case sharp::ImageType::JPEG:
+        case sharp::ImageType::PNG:
+        case sharp::ImageType::WEBP:
+        case sharp::ImageType::JP2:
+        case sharp::ImageType::TIFF:
+        case sharp::ImageType::GIF:
+        case sharp::ImageType::FITS:
+        case sharp::ImageType::JXL:
+          baton->mediaType = "image/" + baton->format;
+          break;
+        case sharp::ImageType::SVG:
+          baton->mediaType = "image/svg+xml";
+          break;
+        case sharp::ImageType::HEIF:
+          if (baton->compression == "av1") {
+            baton->mediaType = "image/avif";
+          } else if (baton->compression == "hevc") {
+            baton->mediaType = "image/heic";
+          }
+          break;
+        case sharp::ImageType::PDF:
+          baton->mediaType = "application/pdf";
+          break;
+        case sharp::ImageType::OPENSLIDE:
+          baton->mediaType = "image/tiff";
+          break;
+        case sharp::ImageType::PPM:
+          baton->mediaType = "image/x-portable-pixmap";
+          break;
+        case sharp::ImageType::EXR:
+          baton->mediaType = "image/x-exr";
+          break;
+        case sharp::ImageType::RAD:
+          baton->mediaType = "image/vnd.radiance";
+          break;
+        case sharp::ImageType::UHDR:
+          baton->mediaType = "image/jpeg";
+          break;
+        default:
+          break;
+      }
     }
 
     // Clean up
@@ -157,13 +209,16 @@ class MetadataWorker : public Napi::AsyncWorker {
     // Handle warnings
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
-      debuglog.Call(Receiver().Value(), { Napi::String::New(env, warning) });
+      debuglog.SHARP_CALLBACK_FN_NAME(Receiver().Value(), { Napi::String::New(env, warning) });
       warning = sharp::VipsWarningPop();
     }
 
     if (baton->err.empty()) {
       Napi::Object info = Napi::Object::New(env);
       info.Set("format", baton->format);
+      if (!baton->mediaType.empty()) {
+        info.Set("mediaType", baton->mediaType);
+      }
       if (baton->input->bufferLength > 0) {
         info.Set("size", baton->input->bufferLength);
       }
@@ -182,10 +237,6 @@ class MetadataWorker : public Napi::AsyncWorker {
       info.Set("isPalette", baton->isPalette);
       if (baton->bitsPerSample > 0) {
         info.Set("bitsPerSample", baton->bitsPerSample);
-        if (baton->isPalette) {
-          // Deprecated, remove with libvips 8.17.0
-          info.Set("paletteBitDepth", baton->bitsPerSample);
-        }
       }
       if (baton->pages > 0) {
         info.Set("pages", baton->pages);
@@ -276,6 +327,12 @@ class MetadataWorker : public Napi::AsyncWorker {
           Napi::Buffer<char>::NewOrCopy(env, baton->tifftagPhotoshop,
             baton->tifftagPhotoshopLength, sharp::FreeCallback));
       }
+      if (baton->gainMapLength > 0) {
+        Napi::Object gainMap = Napi::Object::New(env);
+        info.Set("gainMap", gainMap);
+        gainMap.Set("image",
+          Napi::Buffer<char>::NewOrCopy(env, baton->gainMap, baton->gainMapLength, sharp::FreeCallback));
+      }
       if (baton->comments.size() > 0) {
         int i = 0;
         Napi::Array comments = Napi::Array::New(env, baton->comments.size());
@@ -287,9 +344,10 @@ class MetadataWorker : public Napi::AsyncWorker {
         }
         info.Set("comments", comments);
       }
-      Callback().Call(Receiver().Value(), { env.Null(), info });
+      Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(), { env.Null(), info });
     } else {
-      Callback().Call(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
+      Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(),
+        { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
     }
 
     delete baton->input;

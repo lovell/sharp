@@ -1,0 +1,37 @@
+{
+  "name": "@img/sharp-webcontainers-wasm32",
+  "version": "0.35.0-rc.2",
+  "description": "Prebuilt sharp for use with WebContainers (WebAssembly)",
+  "author": "Lovell Fuller <npm@lovell.info>",
+  "homepage": "https://sharp.pixelplumbing.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lovell/sharp.git",
+    "directory": "npm/webcontainers-wasm32"
+  },
+  "license": "Apache-2.0",
+  "funding": {
+    "url": "https://opencollective.com/libvips"
+  },
+  "files": [
+    "export"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "exports": {
+    "./sharp.node": "./export/sharp.node.cjs",
+    "./package": "./export/package.cjs",
+    "./versions": "./export/versions.cjs"
+  },
+  "dependencies": {
+    "@img/sharp-wasm32": "0.35.0-rc.2"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "cpu": [
+    "wasm32"
+  ]
+}

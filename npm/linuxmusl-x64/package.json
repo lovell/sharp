@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-linuxmusl-x64",
-  "version": "0.34.5",
+  "version": "0.35.0-rc.2",
   "description": "Prebuilt sharp for use with Linux (musl) x64",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -15,9 +15,10 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-linuxmusl-x64": "1.2.4"
+    "@img/sharp-libvips-linuxmusl-x64": "1.3.0-rc.4"
   },
   "files": [
+    "index.cjs",
     "lib"
   ],
   "publishConfig": {
@@ -25,11 +26,11 @@
   },
   "type": "commonjs",
   "exports": {
-    "./sharp.node": "./lib/sharp-linuxmusl-x64.node",
+    "./sharp.node": "./index.cjs",
     "./package": "./package.json"
   },
   "engines": {
-    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
+    "node": ">=20.9.0"
   },
   "config": {
     "musl": ">=1.2.2"
