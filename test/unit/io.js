@@ -11,7 +11,7 @@ const { isMarkedAsUntransferable } = require('node:worker_threads');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
-const { buildPlatformArch } = require('../../lib/libvips');
+const { buildPlatformArch } = require('../../dist/libvips.cjs');
 
 const outputJpg = fixtures.path('output.jpg');
 

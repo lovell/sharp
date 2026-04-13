@@ -90,7 +90,8 @@
     "Dennis Beatty <dennis@dcbeatty.com>",
     "Ingvar Stepanyan <me@rreverser.com>",
     "Don Denton <don@happycollision.com>",
-    "Dmytro Tiapukhin <cool.gegeg@gmail.com>"
+    "Dmytro Tiapukhin <cool.gegeg@gmail.com>",
+    "Florian Lefebvre <contact@florian-lefebvre.dev>"
   ],
   "scripts": {
     "build": "node install/build.js",

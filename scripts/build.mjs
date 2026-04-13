@@ -16,15 +16,13 @@ function cjsToEsm(input) {
   return input
     // Turn import into require() and .mjs into .cjs
     .replace(
-      /import\s+(.+)\s+from\s+('[^']+'|"[^"]+");?/g,
+      /import\s+(.+)\s+from\s+('[^']+'|"[^"]+")(?:\s+with\s+\{[^}]*\})?;?/g,
       (_, bindings, path) => `const ${bindings} = require(${path.replace(".mjs", ".cjs")});`,
     )
-    .replace(/import\s+('[^']+'|"[^"]+");?/g, (_, path) => `require(${path.replace(".mjs", ".cjs")});`)
+    .replace(/import\s+('[^']+'|"[^"]+")(?:\s+with\s+\{[^}]*\})?;?/g, (_, path) => `require(${path.replace(".mjs", ".cjs")});`)
     // Transforms TLA
     .replaceAll("await import(", "require(")
     .replaceAll("export default", "module.exports =")
-    // import.meta.url doesn't exist in cjs
-    .replaceAll("import.meta.url", "require('node:url').pathToFileURL(__filename)");
 }
 
 const entries = (await fs.readdir(libDir, { recursive: true })).filter(e => e.endsWith('.mjs'));

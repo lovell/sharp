@@ -3,8 +3,8 @@
 
 {
   'variables': {
-    'vips_version': '<!(node -p "require(\'../lib/libvips\').minimumLibvipsVersion")',
-    'platform_and_arch': '<!(node -p "require(\'../lib/libvips\').buildPlatformArch()")',
+    'vips_version': '<!(node -p "require(\'../dist/libvips.cjs\').minimumLibvipsVersion")',
+    'platform_and_arch': '<!(node -p "require(\'../dist/libvips.cjs\').buildPlatformArch()")',
     'sharp_version': '<!(node -p "require(\'../package.json\').version")',
     'sharp_libvips_version': '<!(node -p "require(\'../package.json\').optionalDependencies[\'@img/sharp-libvips-<(platform_and_arch)\']")',
     'sharp_libvips_yarn_locator': '<!(node -p "require(\'../dist/libvips.cjs\').yarnLocator()")',
