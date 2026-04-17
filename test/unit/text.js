@@ -8,7 +8,7 @@ const assert = require('node:assert');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
-const { inRange } = require('../../lib/is');
+const { inRange } = require('../../dist/is.cjs');
 
 describe('Text to image', () => {
   it('text with default values', async (t) => {

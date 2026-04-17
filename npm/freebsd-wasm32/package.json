@@ -21,9 +21,18 @@
   },
   "type": "commonjs",
   "exports": {
-    "./sharp.node": "./export/sharp.node.cjs",
-    "./package": "./export/package.cjs",
-    "./versions": "./export/versions.cjs"
+    "./sharp.node": {
+      "import": "./export/sharp.node.mjs",
+      "require": "./export/sharp.node.cjs"
+    },
+    "./package": {
+      "import": "./export/package.mjs",
+      "require": "./export/package.cjs"
+    },
+    "./versions": {
+      "import": "./export/versions.mjs",
+      "require": "./export/versions.cjs"
+    }
   },
   "dependencies": {
     "@img/sharp-wasm32": "0.35.0-rc.2"

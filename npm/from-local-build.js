@@ -8,7 +8,7 @@
 const { copyFileSync, cpSync, readFileSync, writeFileSync, appendFileSync } = require('node:fs');
 const { basename, join } = require('node:path');
 
-const { buildPlatformArch } = require('../lib/libvips');
+const { buildPlatformArch } = require('../dist/libvips.cjs');
 
 const readme = readFileSync(join(__dirname, '..', 'README.md'), 'utf8');
 const licensing = readme.substring(readme.indexOf('## Licensing'));

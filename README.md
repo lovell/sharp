@@ -38,6 +38,10 @@ npm install sharp
 ```
 
 ```javascript
+// ESM
+import sharp from 'sharp';
+
+// CJS
 const sharp = require('sharp');
 ```
 

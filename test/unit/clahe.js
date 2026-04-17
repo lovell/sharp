@@ -6,7 +6,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
-const sharp = require('../../lib');
+const sharp = require('../../dist/index.cjs');
 const fixtures = require('../fixtures');
 
 describe('Clahe', () => {
