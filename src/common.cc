@@ -632,7 +632,7 @@ namespace sharp {
     if (HasProfile(image)) {
       size_t length;
       const void *data = image.get_blob(VIPS_META_ICC_NAME, &length);
-      icc.first = static_cast<char*>(g_malloc(length));
+      icc.first = static_cast<char*>(vips_malloc(reinterpret_cast<VipsObject*>(image.get_image()), length));
       icc.second = length;
       memcpy(icc.first, data, length);
     }
@@ -645,7 +645,7 @@ namespace sharp {
   VImage SetProfile(VImage image, std::pair<char*, size_t> icc) {
     if (icc.first != nullptr) {
       image = image.copy();
-      image.set(VIPS_META_ICC_NAME, reinterpret_cast<VipsCallbackFn>(vips_area_free_cb), icc.first, icc.second);
+      image.set(VIPS_META_ICC_NAME, nullptr, icc.first, icc.second);
     }
     return image;
   }
