@@ -20,10 +20,11 @@ const pages = {
 };
 
 Object.keys(pages).forEach(async (m) => {
-  const input = path.join('lib', `${m}.js`);
+  const input = path.join('lib', `${m}.mjs`);
   const output = path.join('docs', 'src', 'content', 'docs', `api-${m}.md`);
 
-  const ast = await jsdoc2md.getTemplateData({ files: input });
+  const source = await fs.readFile(input, 'utf8');
+  const ast = await jsdoc2md.getTemplateData({ source });
   const markdown = await jsdoc2md.render({
     data: ast,
     'global-index-format': 'none',
