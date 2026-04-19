@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-win32-arm64",
-  "version": "0.35.0-rc.2",
+  "version": "0.35.0-rc.3",
   "description": "Prebuilt sharp for use with Windows 64-bit ARM",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
