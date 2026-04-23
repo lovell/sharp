@@ -44,24 +44,24 @@ The I/O limits of the relevant (de)compression library will generally determine 
 
 ### Contenders
 
-- [jimp](https://www.npmjs.com/package/jimp) v1.6.0 - Image processing in pure JavaScript.
+- [jimp](https://www.npmjs.com/package/jimp) v1.6.1 - Image processing in pure JavaScript.
 - [imagemagick](https://www.npmjs.com/package/imagemagick) v0.1.3 - Supports filesystem only and "_has been unmaintained for a long time_".
 - [gm](https://www.npmjs.com/package/gm) v1.25.1 - Fully featured wrapper around GraphicsMagick's `gm` command line utility, but "_has been sunset_".
-- sharp v0.34.3 / libvips v8.17.0 - Caching within libvips disabled to ensure a fair comparison.
+- sharp v0.35.0 / libvips v8.18.2 - Caching within libvips disabled to ensure a fair comparison.
 
 ### Environment
 
 #### AMD64
 
-- AWS EC2 us-west-2 [c7a.xlarge](https://aws.amazon.com/ec2/instance-types/c7a/) (4x AMD EPYC 9R14)
-- Ubuntu 25.04
-- Node.js 24.3.0
+- AWS EC2 us-west-2 [c8a.xlarge](https://aws.amazon.com/ec2/instance-types/c8a/) (4x AMD EPYC 9R45)
+- Ubuntu 25.10
+- Node.js 24.15.0
 
 #### ARM64
 
 - AWS EC2 us-west-2 [c8g.xlarge](https://aws.amazon.com/ec2/instance-types/c8g/) (4x ARM Graviton4)
-- Ubuntu 25.04
-- Node.js 24.3.0
+- Ubuntu 25.10
+- Node.js 24.15.0
 
 ### Task: JPEG
 
@@ -75,27 +75,27 @@ Note: jimp does not support Lanczos 3, bicubic resampling used instead.
 
 | Package     | I/O    | Ops/sec | Speed-up |
 | :---------- | :----- | ------: | -------: |
-| jimp        | buffer |    2.40 |      1.0 |
-| jimp        | file   |    2.60 |      1.1 |
-| imagemagick | file   |    9.70 |      4.0 |
-| gm          | buffer |   11.60 |      4.8 |
-| gm          | file   |   11.72 |      4.9 |
-| sharp       | stream |   59.40 |     24.8 |
-| sharp       | file   |   62.67 |     26.1 |
-| sharp       | buffer |   64.42 |     26.8 |
+| jimp        | buffer |    3.44 |      1.0 |
+| jimp        | file   |    3.65 |      1.1 |
+| imagemagick | file   |   16.23 |      4.7 |
+| gm          | buffer |   20.92 |      6.1 |
+| gm          | file   |   21.04 |      6.1 |
+| sharp       | stream |   82.87 |     24.1 |
+| sharp       | file   |   88.21 |     25.6 |
+| sharp       | buffer |   89.63 |     26.1 |
 
 #### Results: JPEG (ARM64)
 
 | Package     | I/O    | Ops/sec | Speed-up |
 | :---------- | :----- | ------: | -------: |
-| jimp        | buffer |    2.24 |      1.0 |
-| jimp        | file   |    2.47 |      1.1 |
-| imagemagick | file   |   10.42 |      4.7 |
-| gm          | buffer |   12.80 |      5.7 |
-| gm          | file   |   12.88 |      5.7 |
-| sharp       | stream |   45.58 |     20.3 |
-| sharp       | file   |   47.99 |     21.4 |
-| sharp       | buffer |   49.20 |     22.0 |
+| jimp        | buffer |    2.20 |      1.0 |
+| jimp        | file   |    2.45 |      1.1 |
+| imagemagick | file   |    5.85 |      2.7 |
+| gm          | file   |   13.72 |      6.2 |
+| gm          | buffer |   13.82 |      6.3 |
+| sharp       | stream |   49.82 |     22.6 |
+| sharp       | file   |   52.42 |     23.8 |
+| sharp       | buffer |   53.83 |     24.5 |
 
 ### Task: PNG
 
@@ -111,21 +111,23 @@ Note: jimp does not support premultiply/unpremultiply.
 
 | Package     | I/O    | Ops/sec | Speed-up |
 | :---------- | :----- | ------: | -------: |
-| imagemagick | file   |    6.06 |      1.0 |
-| gm          | file   |    8.44 |      1.4 |
-| jimp        | buffer |   10.98 |      1.8 |
-| sharp       | file   |   28.26 |      4.7 |
-| sharp       | buffer |   28.70 |      4.7 |
+| imagemagick | file   |   10.37 |      1.0 |
+| gm          | file   |   13.35 |      1.3 |
+| jimp        | buffer |   17.04 |      1.6 |
+| jimp        | file   |   17.15 |      1.7 |
+| sharp       | file   |   47.17 |      4.5 |
+| sharp       | buffer |   47.74 |      4.6 |
 
 #### Results: PNG (ARM64)
 
 | Package     | I/O    | Ops/sec | Speed-up |
 | :---------- | :----- | ------: | -------: |
-| imagemagick | file   |    7.09 |      1.0 |
-| gm          | file   |    8.93 |      1.3 |
-| jimp        | buffer |   10.28 |      1.5 |
-| sharp       | file   |   23.81 |      3.4 |
-| sharp       | buffer |   24.19 |      3.4 |
+| imagemagick | file   |    4.39 |      1.0 |
+| gm          | file   |    9.45 |      2.2 |
+| jimp        | buffer |   10.36 |      2.4 |
+| jimp        | file   |   10.52 |      2.4 |
+| sharp       | file   |   28.04 |      6.4 |
+| sharp       | buffer |   28.57 |      6.5 |
 
 ## Running the benchmark test
 
