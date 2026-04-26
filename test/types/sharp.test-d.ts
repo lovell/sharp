@@ -806,3 +806,10 @@ sharp.format.jpg;
 sharp.format.tif;
 // @ts-expect-error
 sharp.format.v;
+
+sharp({ limitInputChannels: 6 });
+sharp({ limitInputChannels: 0 });
+sharp({ limitInputChannels: false });
+// @ts-expect-error
+sharp({ limitInputChannels: 'fail' });
+sharp(input).composite([{ limitInputChannels: 6 }]);

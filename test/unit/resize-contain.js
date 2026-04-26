@@ -820,7 +820,8 @@ describe('Resize fit=contain', () => {
       .tiff({ compression: 'deflate' })
       .toBuffer();
 
-    const data = await sharp(multipleAlphaChannels)
+    const options = { limitInputChannels: 8 };
+    const data = await sharp(multipleAlphaChannels, options)
       .resize({
         width: 8,
         height: 8,
@@ -829,7 +830,7 @@ describe('Resize fit=contain', () => {
       })
       .tiff({ compression: 'deflate' })
       .toBuffer();
-    const { format, width, height, space, channels } = await sharp(data).metadata();
+    const { format, width, height, space, channels } = await sharp(data, options).metadata();
     assert.deepStrictEqual(format, 'tiff');
     assert.deepStrictEqual(width, 8);
     assert.deepStrictEqual(height, 8);

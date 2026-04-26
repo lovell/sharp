@@ -998,6 +998,12 @@ declare namespace sharp {
          * An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). (optional, default 268402689)
          */
         limitInputPixels?: number | boolean | undefined;
+        /**
+         * Do not process input images where the number of channels exceeds this limit.
+         * Assumes image metadata can be trusted.
+         * An integral Number of channels, zero or false to remove limit, true to use default limit of 5. (optional, default 5)
+         */
+        limitInputChannels?: number | boolean | undefined;
         /** Set this to true to remove safety features that help prevent memory exhaustion (SVG, PNG). (optional, default false) */
         unlimited?: boolean | undefined;
         /** Set this to false to use random access rather than sequential read. Some operations will do this automatically. */

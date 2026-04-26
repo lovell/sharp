@@ -821,6 +821,83 @@ describe('Input/output', () => {
     );
   });
 
+  describe('Limit channel count of input image', () => {
+    const create = {
+      width: 1,
+      height: 1,
+      channels: 4,
+      background: 'black'
+    };
+
+    it('Invalid fails - negative', () => {
+      assert.throws(
+        () => sharp({ limitInputChannels: -1 }),
+        /Expected positive integer for limitInputChannels but received -1 of type number/
+      );
+    });
+
+    it('Invalid fails - float', () => {
+      assert.throws(
+        () => sharp({ limitInputChannels: 12.3 }),
+        /Expected positive integer for limitInputChannels but received 12\.3 of type number/
+      );
+    });
+
+    it('Invalid fails - integer overflow', () => {
+      assert.throws(
+        () => sharp({ limitInputChannels: Number.MAX_SAFE_INTEGER + 1 }),
+        /Expected positive integer for limitInputChannels but received 9007199254740992 of type number/
+      );
+    });
+
+    it('Invalid fails - string', () => {
+      assert.throws(
+        () => sharp({ limitInputChannels: 'fail' }),
+        /Expected positive integer for limitInputChannels but received fail of type string/
+      );
+    });
+
+    it('Same number of channels as input works', async () => {
+      const { channels } = await sharp(fixtures.inputJpg).metadata();
+      const data = await sharp(fixtures.inputJpg, { limitInputChannels: channels })
+        .resize(2)
+        .toBuffer();
+      assert.strictEqual(true, data.length > 0);
+    });
+
+    it('Disabling limit works', async () => {
+      const eightChannelTiff = await sharp({ create })
+        .joinChannel({ create })
+        .tiff({ compression: 'deflate' })
+        .toBuffer();
+
+      const data = await sharp(eightChannelTiff, { limitInputChannels: false })
+        .resize(2)
+        .toBuffer();
+      assert.strictEqual(true, data.length > 0);
+    });
+
+    it('Enabling default limit works and fails with a large image', async () => {
+      const eightChannelTiff = await sharp({ create })
+        .joinChannel({ create })
+        .tiff({ compression: 'deflate' })
+        .toBuffer();
+
+      await assert.rejects(
+        () => sharp(eightChannelTiff, { limitInputChannels: true }).toBuffer(),
+        /Input image exceeds channel limit/
+      );
+    });
+
+    it('Smaller than input fails', async () => {
+      const { channels } = await sharp(fixtures.inputJpg).metadata();
+      await assert.rejects(
+        () => sharp(fixtures.inputJpg, { limitInputChannels: channels - 1 }).toBuffer(),
+        /Input image exceeds channel limit/
+      );
+    });
+  });
+
   describe('Input options', () => {
     it('Option-less', () => {
       sharp();

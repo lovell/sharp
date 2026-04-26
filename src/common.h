@@ -46,6 +46,7 @@ namespace sharp {
     char *buffer;
     VipsFailOn failOn;
     uint64_t limitInputPixels;
+    uint64_t limitInputChannels;
     bool unlimited;
     VipsAccess access;
     size_t bufferLength;
@@ -98,6 +99,7 @@ namespace sharp {
       buffer(nullptr),
       failOn(VIPS_FAIL_ON_WARNING),
       limitInputPixels(0x3FFF * 0x3FFF),
+      limitInputChannels(5),
       unlimited(false),
       access(VIPS_ACCESS_SEQUENTIAL),
       bufferLength(0),

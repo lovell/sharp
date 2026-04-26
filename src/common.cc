@@ -196,8 +196,8 @@ namespace sharp {
     if (HasAttr(input, "joinValign")) {
       descriptor->joinValign = AttrAsEnum<VipsAlign>(input, "joinValign", VIPS_TYPE_ALIGN);
     }
-    // Limit input images to a given number of pixels, where pixels = width * height
     descriptor->limitInputPixels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputPixels"));
+    descriptor->limitInputChannels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputChannels"));
     if (HasAttr(input, "access")) {
       descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
     }
@@ -613,6 +613,9 @@ namespace sharp {
     if (descriptor->limitInputPixels > 0 &&
       static_cast<uint64_t>(image.width()) * image.height() > descriptor->limitInputPixels) {
       throw std::runtime_error("Input image exceeds pixel limit");
+    }
+    if (descriptor->limitInputChannels > 0 && static_cast<uint64_t>(image.bands()) > descriptor->limitInputChannels) {
+      throw std::runtime_error("Input image exceeds channel limit");
     }
     return std::make_tuple(image, imageType);
   }
