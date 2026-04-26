@@ -989,7 +989,8 @@ declare namespace sharp {
         autoOrient?: boolean | undefined;
         /**
          *  When to abort processing of invalid pixel data, one of (in order of sensitivity):
-         *  'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels, invalid metadata will always abort. (optional, default 'warning')
+         *  'none' (least), 'truncated', 'error' or 'warning' (most), highers level imply lower levels, invalid metadata will always abort.
+         *  Use the default 'warning' level with untrusted input. (optional, default 'warning')
          */
         failOn?: FailOnOptions | undefined;
         /**
