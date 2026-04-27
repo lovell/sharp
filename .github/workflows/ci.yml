@@ -239,18 +239,21 @@ jobs:
             nodejs_arch: armv6l
             nodejs_hostname: unofficial-builds.nodejs.org
             nodejs_version: "18.17.0"
+            nodejs_sha256: "1a8ef740b5b7a1bc39591f562363537d3fb5595a451dfc6cb29797aa1412aeea"
             nodejs_version_major: 18
           - platform: linux-s390x
             base_image: "--platform=linux/s390x s390x/debian:bookworm"
             nodejs_arch: s390x
             nodejs_hostname: nodejs.org
             nodejs_version: "18.17.0"
+            nodejs_sha256: "876ca54c246d24e346d0c740fbb72c9fb7353369127f20492bc923ee6d0121db"
             nodejs_version_major: 18
           - platform: linux-ppc64
             base_image: "--platform=linux/ppc64le ppc64le/debian:bookworm"
             nodejs_arch: ppc64le
             nodejs_hostname: nodejs.org
             nodejs_version: "18.17.0"
+            nodejs_sha256: "9fd9c215be8e54dcf8bbc42ba9e1342b05136be4bc12594ee40a29cedfaeaffd"
             nodejs_version_major: 18
           - platform: linux-riscv64
             base_image: "--platform=linux/riscv64 riscv64/debian:trixie"
@@ -258,6 +261,7 @@ jobs:
             nodejs_arch: riscv64
             nodejs_hostname: unofficial-builds.nodejs.org
             nodejs_version: "20.19.5"
+            nodejs_sha256: "9b0079da54be96377e47006e29a379ea8cc168b37b410d29803c8db4ab864ec5"
             nodejs_version_major: 20
     steps:
       - uses: actions/checkout@v4
@@ -272,8 +276,15 @@ jobs:
           run: |
             apt-get update
             apt-get install -y curl g++ git libatomic1 make python3 xz-utils
+            NODE_TARBALL="node-v${{ matrix.nodejs_version }}-linux-${{ matrix.nodejs_arch }}.tar.xz"
+            curl --silent --show-error --fail --location \
+              -o "/tmp/${NODE_TARBALL}" \
+              "https://${{ matrix.nodejs_hostname }}/download/release/v${{ matrix.nodejs_version }}/${NODE_TARBALL}"
+            echo "${{ matrix.nodejs_sha256 }}  /tmp/${NODE_TARBALL}" | sha256sum -c -
             mkdir /opt/nodejs
-            curl --silent https://${{ matrix.nodejs_hostname }}/download/release/v${{ matrix.nodejs_version}}/node-v${{ matrix.nodejs_version}}-linux-${{ matrix.nodejs_arch }}.tar.xz | tar xJC /opt/nodejs --strip-components=1
+            tar -xJf "/tmp/${NODE_TARBALL}" -C /opt/nodejs --strip-components=1
+            rm -f "/tmp/${NODE_TARBALL}"
+            
             export PATH=$PATH:/opt/nodejs/bin
             npm install
             npm run build
