@@ -34,13 +34,13 @@ jobs:
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: linux-x64
-            package: true
           - os: ubuntu-24.04
             container: rockylinux:8
             nodejs_arch: x64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: linux-x64
+            package: true
           - os: ubuntu-24.04
             container: rockylinux:8
             nodejs_arch: x64
@@ -51,11 +51,11 @@ jobs:
             container: node:20-alpine3.18
             nodejs_version_major: 20
             platform: linuxmusl-x64
-            package: true
           - os: ubuntu-24.04
             container: node:22-alpine3.20
             nodejs_version_major: 22
             platform: linuxmusl-x64
+            package: true
           - os: ubuntu-24.04
             container: node:24-alpine3.22
             nodejs_version_major: 24
@@ -66,13 +66,13 @@ jobs:
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: linux-arm64
-            package: true
           - os: ubuntu-24.04-arm
             container: arm64v8/rockylinux:8
             nodejs_arch: arm64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: linux-arm64
+            package: true
           - os: ubuntu-24.04-arm
             container: arm64v8/rockylinux:8
             nodejs_arch: arm64
@@ -84,12 +84,12 @@ jobs:
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: darwin-x64
-            package: true
           - os: macos-15-intel
             nodejs_arch: x64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: darwin-x64
+            package: true
           - os: macos-15-intel
             nodejs_arch: x64
             nodejs_version: "^24"
@@ -100,12 +100,12 @@ jobs:
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: darwin-arm64
-            package: true
           - os: macos-15
             nodejs_arch: arm64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: darwin-arm64
+            package: true
           - os: macos-15
             nodejs_arch: arm64
             nodejs_version: "^24"
@@ -122,12 +122,12 @@ jobs:
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: win32-x64
-            package: true
           - os: windows-2022
             nodejs_arch: x64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: win32-x64
+            package: true
           - os: windows-2022
             nodejs_arch: x64
             nodejs_version: "^24"
@@ -138,12 +138,12 @@ jobs:
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: win32-arm64
-            package: true
           - os: windows-11-arm
             nodejs_arch: arm64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: win32-arm64
+            package: true
           - os: windows-11-arm
             nodejs_arch: arm64
             nodejs_version: "^24"
@@ -199,9 +199,9 @@ jobs:
         include:
         - container: node:20-alpine3.20
           nodejs_version_major: 20
-          package: true
         - container: node:22-alpine3.20
           nodejs_version_major: 22
+          package: true
         - container: node:24-alpine3.22
           nodejs_version_major: 24
     steps:
@@ -241,27 +241,27 @@ jobs:
             base_image: "balenalib/rpi-raspbian:bullseye"
             nodejs_arch: armv6l
             nodejs_hostname: unofficial-builds.nodejs.org
-            nodejs_version: "20.9.0"
-            nodejs_version_major: 20
+            nodejs_version: "22.22.3"
+            nodejs_version_major: 22
           - platform: linux-s390x
             base_image: "--platform=linux/s390x s390x/debian:bookworm"
             nodejs_arch: s390x
             nodejs_hostname: nodejs.org
-            nodejs_version: "20.9.0"
-            nodejs_version_major: 20
+            nodejs_version: "22.22.3"
+            nodejs_version_major: 22
           - platform: linux-ppc64
             base_image: "--platform=linux/ppc64le ppc64le/debian:bookworm"
             nodejs_arch: ppc64le
             nodejs_hostname: nodejs.org
-            nodejs_version: "20.9.0"
-            nodejs_version_major: 20
+            nodejs_version: "22.22.3"
+            nodejs_version_major: 22
           - platform: linux-riscv64
             base_image: "--platform=linux/riscv64 riscv64/debian:trixie"
             compiler_flags: "-march=rv64gc"
             nodejs_arch: riscv64
             nodejs_hostname: unofficial-builds.nodejs.org
-            nodejs_version: "20.19.5"
-            nodejs_version_major: 20
+            nodejs_version: "22.22.3"
+            nodejs_version_major: 22
     steps:
       - uses: actions/checkout@v6
       - uses: uraimo/run-on-arch-action@v3
