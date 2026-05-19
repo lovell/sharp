@@ -3,189 +3,174 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Partial image extraction', () => {
-  it('JPEG', (_t, done) => {
-    sharp(fixtures.inputJpg)
+suite('Partial image extraction', () => {
+  test('JPEG', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .extract({ left: 2, top: 2, width: 20, height: 20 })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(20, info.width);
-        assert.strictEqual(20, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(20, info.width);
+    t.assert.strictEqual(20, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract.jpg'), data));
   });
 
-  it('PNG', (_t, done) => {
-    sharp(fixtures.inputPng)
+  test('PNG', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputPng)
       .extract({ left: 200, top: 300, width: 400, height: 200 })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(400, info.width);
-        assert.strictEqual(200, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(400, info.width);
+    t.assert.strictEqual(200, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract.png'), data));
   });
 
-  it('WebP', (_t, done) => {
-    sharp(fixtures.inputWebP)
+  test('WebP', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputWebP)
       .extract({ left: 100, top: 50, width: 125, height: 200 })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(125, info.width);
-        assert.strictEqual(200, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract.webp'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(125, info.width);
+    t.assert.strictEqual(200, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract.webp'), data));
   });
 
-  describe('Animated WebP', () => {
-    it('Before resize', (_t, done) => {
-      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+  suite('Animated WebP', () => {
+    test('Before resize', async (t) => {
+      t.plan(3);
+      const { data, info } = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .extract({ left: 0, top: 30, width: 80, height: 20 })
         .resize(320, 80)
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80 * 9, info.height);
-          fixtures.assertSimilar(fixtures.expected('gravity-center-height.webp'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80 * 9, info.height);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gravity-center-height.webp'), data));
     });
 
-    it('After resize', (_t, done) => {
-      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+    test('After resize', async (t) => {
+      t.plan(3);
+      const { data, info } = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(320, 320)
         .extract({ left: 0, top: 120, width: 320, height: 80 })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80 * 9, info.height);
-          fixtures.assertSimilar(fixtures.expected('gravity-center-height.webp'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80 * 9, info.height);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gravity-center-height.webp'), data));
     });
   });
 
-  it('TIFF', (_t, done) => {
-    sharp(fixtures.inputTiff)
+  test('TIFF', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputTiff)
       .extract({ left: 34, top: 63, width: 341, height: 529 })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(341, info.width);
-        assert.strictEqual(529, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract.tiff'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(341, info.width);
+    t.assert.strictEqual(529, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract.tiff'), data));
   });
 
-  it('Before resize', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Before resize', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .extract({ left: 10, top: 10, width: 10, height: 500 })
       .resize(100, 100)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(100, info.width);
-        assert.strictEqual(100, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-resize.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(100, info.width);
+    t.assert.strictEqual(100, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract-resize.jpg'), data));
   });
 
-  it('After resize and crop', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('After resize and crop', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(500, 500, {
         position: sharp.gravity.north
       })
       .extract({ left: 10, top: 10, width: 100, height: 100 })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(100, info.width);
-        assert.strictEqual(100, info.height);
-        fixtures.assertSimilar(fixtures.expected('resize-crop-extract.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(100, info.width);
+    t.assert.strictEqual(100, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('resize-crop-extract.jpg'), data));
   });
 
-  it('Before and after resize and crop', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Before and after resize and crop', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .extract({ left: 0, top: 0, width: 700, height: 700 })
       .resize(500, 500, {
         position: sharp.gravity.north
       })
       .extract({ left: 10, top: 10, width: 100, height: 100 })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(100, info.width);
-        assert.strictEqual(100, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-resize-crop-extract.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(100, info.width);
+    t.assert.strictEqual(100, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract-resize-crop-extract.jpg'), data));
   });
 
-  it('Extract then rotate', (_t, done) => {
-    sharp(fixtures.inputPngWithGreyAlpha)
+  test('Extract then rotate', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputPngWithGreyAlpha)
       .extract({ left: 20, top: 10, width: 380, height: 280 })
       .rotate(90)
       .jpeg()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(280, info.width);
-        assert.strictEqual(380, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-rotate.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(280, info.width);
+    t.assert.strictEqual(380, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract-rotate.jpg'), data));
   });
 
-  it('Rotate then extract', (_t, done) => {
-    sharp(fixtures.inputPngWithGreyAlpha)
+  test('Rotate then extract', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputPngWithGreyAlpha)
       .rotate(90)
       .extract({ left: 20, top: 10, width: 280, height: 380 })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(280, info.width);
-        assert.strictEqual(380, info.height);
-        fixtures.assertSimilar(fixtures.expected('rotate-extract.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(280, info.width);
+    t.assert.strictEqual(380, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('rotate-extract.jpg'), data));
   });
 
-  it('Extract then rotate then extract', (_t, done) => {
-    sharp(fixtures.inputPngWithGreyAlpha)
+  test('Extract then rotate then extract', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputPngWithGreyAlpha)
       .extract({ left: 20, top: 10, width: 180, height: 280 })
       .rotate(90)
       .extract({ left: 20, top: 10, width: 200, height: 100 })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(200, info.width);
-        assert.strictEqual(100, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-rotate-extract.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(200, info.width);
+    t.assert.strictEqual(100, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract-rotate-extract.jpg'), data));
   });
 
-  it('Extract then rotate non-90 anagle', (_t, done) => {
-    sharp(fixtures.inputPngWithGreyAlpha)
+  test('Extract then rotate non-90 anagle', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputPngWithGreyAlpha)
       .extract({ left: 20, top: 10, width: 380, height: 280 })
       .rotate(45)
       .jpeg()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(467, info.width);
-        assert.strictEqual(467, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-rotate-45.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(467, info.width);
+    t.assert.strictEqual(467, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract-rotate-45.jpg'), data));
   });
 
-  it('Rotate then extract non-90 angle', (_t, done) => {
-    sharp(fixtures.inputPngWithGreyAlpha)
+  test('Rotate then extract non-90 angle', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputPngWithGreyAlpha)
       .rotate(45)
       .extract({ left: 20, top: 10, width: 380, height: 280 })
       .jpeg()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(380, info.width);
-        assert.strictEqual(280, info.height);
-        fixtures.assertSimilar(fixtures.expected('rotate-extract-45.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(380, info.width);
+    t.assert.strictEqual(280, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('rotate-extract-45.jpg'), data));
   });
 
-  describe('Apply exif orientation and mirroring then extract', () => {
+  suite('Apply exif orientation and mirroring then extract', () => {
     [
       {
         name: 'EXIF-1',
@@ -220,116 +205,126 @@ describe('Partial image extraction', () => {
         image: fixtures.inputJpgWithLandscapeExif8
       }
     ].forEach(({ name, image }) => {
-      it(name, (_t, done) => {
-        sharp(image)
+      test(name, async (t) => {
+        t.plan(1);
+        const data = await sharp(image)
           .rotate()
           .extract({ left: 0, top: 208, width: 60, height: 40 })
-          .toBuffer((err, data) => {
-            if (err) throw err;
-            fixtures.assertSimilar(fixtures.expected('rotate-mirror-extract.jpg'), data, done);
-          });
+          .toBuffer();
+        await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('rotate-mirror-extract.jpg'), data));
       });
     });
   });
 
-  describe('Invalid parameters', () => {
-    describe('using the legacy extract(top,left,width,height) syntax', () => {
-      it('String top', () => {
-        assert.throws(() => {
+  suite('Invalid parameters', () => {
+    suite('using the legacy extract(top,left,width,height) syntax', () => {
+      test('String top', (t) => {
+        t.plan(1);
+        t.assert.throws(() => {
           sharp(fixtures.inputJpg).extract('spoons', 10, 10, 10);
         });
       });
 
-      it('Non-integral left', () => {
-        assert.throws(() => {
+      test('Non-integral left', (t) => {
+        t.plan(1);
+        t.assert.throws(() => {
           sharp(fixtures.inputJpg).extract(10, 10.2, 10, 10);
         });
       });
 
-      it('Negative width - negative', () => {
-        assert.throws(() => {
+      test('Negative width - negative', (t) => {
+        t.plan(1);
+        t.assert.throws(() => {
           sharp(fixtures.inputJpg).extract(10, 10, -10, 10);
         });
       });
 
-      it('Null height', () => {
-        assert.throws(() => {
+      test('Null height', (t) => {
+        t.plan(1);
+        t.assert.throws(() => {
           sharp(fixtures.inputJpg).extract(10, 10, 10, null);
         });
       });
     });
 
-    it('Undefined', () => {
-      assert.throws(() => {
+    test('Undefined', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).extract();
       });
     });
 
-    it('String top', () => {
-      assert.throws(() => {
+    test('String top', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).extract({ left: 10, top: 'spoons', width: 10, height: 10 });
       });
     });
 
-    it('Non-integral left', () => {
-      assert.throws(() => {
+    test('Non-integral left', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).extract({ left: 10.2, top: 10, width: 10, height: 10 });
       });
     });
 
-    it('Negative width - negative', () => {
-      assert.throws(() => {
+    test('Negative width - negative', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: -10, height: 10 });
       });
     });
 
-    it('Null height', () => {
-      assert.throws(() => {
+    test('Null height', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: 10, height: null });
       });
     });
 
-    it('Bad image area', (_t, done) => {
-      sharp(fixtures.inputJpg)
-        .extract({ left: 3000, top: 10, width: 10, height: 10 })
-        .toBuffer((err) => {
-          assert(err instanceof Error);
-          assert.strictEqual(err.message, 'extract_area: bad extract area');
-          done();
-        });
+    test('Bad image area', async (t) => {
+      t.plan(1);
+      t.assert.rejects(
+        () => sharp(fixtures.inputJpg)
+          .extract({ left: 3000, top: 10, width: 10, height: 10 })
+          .toBuffer(),
+        /bad extract area/);
     });
 
-    it('Multiple extract emits warning', () => {
+    test('Multiple extract emits warning', (t) => {
+      t.plan(2);
       let warningMessage = '';
       const s = sharp();
       s.on('warning', (msg) => { warningMessage = msg; });
       const options = { top: 0, left: 0, width: 1, height: 1 };
       s.extract(options).extract(options);
-      assert.strictEqual(warningMessage, '');
+      t.assert.strictEqual(warningMessage, '');
       s.extract(options);
-      assert.strictEqual(warningMessage, 'ignoring previous extract options');
+      t.assert.strictEqual(warningMessage, 'ignoring previous extract options');
     });
 
-    it('Multiple rotate+extract emits warning', () => {
+    test('Multiple rotate+extract emits warning', (t) => {
+      t.plan(2);
       let warningMessage = '';
       const s = sharp().rotate();
       s.on('warning', (msg) => { warningMessage = msg; });
       const options = { top: 0, left: 0, width: 1, height: 1 };
       s.extract(options).extract(options);
-      assert.strictEqual(warningMessage, '');
+      t.assert.strictEqual(warningMessage, '');
       s.extract(options);
-      assert.strictEqual(warningMessage, 'ignoring previous extract options');
+      t.assert.strictEqual(warningMessage, 'ignoring previous extract options');
     });
 
-    it('Multiple extract+resize emits warning', () => {
+    test('Multiple extract+resize emits warning', (t) => {
+      t.plan(2);
       let warningMessage = '';
       const s = sharp();
       s.on('warning', (msg) => { warningMessage = msg; });
       const options = { top: 0, left: 0, width: 1, height: 1 };
       s.extract(options).extract(options);
-      assert.strictEqual(warningMessage, '');
+      t.assert.strictEqual(warningMessage, '');
       s.resize(1);
-      assert.strictEqual(warningMessage, 'operation order will be: extract, resize, extract');
+      t.assert.strictEqual(warningMessage, 'operation order will be: extract, resize, extract');
     });
   });
 });

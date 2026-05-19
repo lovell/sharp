@@ -3,85 +3,81 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Gamma correction', () => {
-  it('value of 0.0 (disabled)', (_t, done) => {
-    sharp(fixtures.inputJpgWithGammaHoliness)
+suite('Gamma correction', () => {
+  test('value of 0.0 (disabled)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(129, info.width);
-        assert.strictEqual(111, info.height);
-        fixtures.assertSimilar(fixtures.expected('gamma-0.0.jpg'), data, { threshold: 9 }, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(129, info.width);
+    t.assert.strictEqual(111, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gamma-0.0.jpg'), data, { threshold: 9 }));
   });
 
-  it('value of 2.2 (default)', (_t, done) => {
-    sharp(fixtures.inputJpgWithGammaHoliness)
+  test('value of 2.2 (default)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .gamma()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(129, info.width);
-        assert.strictEqual(111, info.height);
-        fixtures.assertSimilar(fixtures.expected('gamma-2.2.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(129, info.width);
+    t.assert.strictEqual(111, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gamma-2.2.jpg'), data));
   });
 
-  it('value of 3.0', (_t, done) => {
-    sharp(fixtures.inputJpgWithGammaHoliness)
+  test('value of 3.0', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .gamma(3)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(129, info.width);
-        assert.strictEqual(111, info.height);
-        fixtures.assertSimilar(fixtures.expected('gamma-3.0.jpg'), data, { threshold: 6 }, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(129, info.width);
+    t.assert.strictEqual(111, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gamma-3.0.jpg'), data, { threshold: 6 }));
   });
 
-  it('input value of 2.2, output value of 3.0', (_t, done) => {
-    sharp(fixtures.inputJpgWithGammaHoliness)
+  test('input value of 2.2, output value of 3.0', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpgWithGammaHoliness)
       .resize(129, 111)
       .gamma(2.2, 3.0)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(129, info.width);
-        assert.strictEqual(111, info.height);
-        fixtures.assertSimilar(fixtures.expected('gamma-in-2.2-out-3.0.jpg'), data, { threshold: 6 }, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(129, info.width);
+    t.assert.strictEqual(111, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gamma-in-2.2-out-3.0.jpg'), data, { threshold: 6 }));
   });
 
-  it('alpha transparency', (_t, done) => {
-    sharp(fixtures.inputPngOverlayLayer1)
+  test('alpha transparency', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputPngOverlayLayer1)
       .resize(320)
       .gamma()
       .jpeg()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        fixtures.assertSimilar(fixtures.expected('gamma-alpha.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gamma-alpha.jpg'), data));
   });
 
-  it('invalid first parameter value', () => {
-    assert.throws(() => {
+  test('invalid first parameter value', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp(fixtures.inputJpgWithGammaHoliness).gamma(4);
     });
   });
 
-  it('invalid second parameter value', () => {
-    assert.throws(() => {
+  test('invalid second parameter value', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp(fixtures.inputJpgWithGammaHoliness).gamma(2.2, 4);
     });
   });

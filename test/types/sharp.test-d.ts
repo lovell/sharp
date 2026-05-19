@@ -1,9 +1,9 @@
 // biome-ignore-all lint/correctness/noUnusedFunctionParameters: types only test file
 // biome-ignore-all lint/correctness/noUnusedVariables: types only test file
 
-import sharp from '../../';
-
 import { createReadStream, createWriteStream } from 'node:fs';
+
+import sharp from '../../';
 
 const input: Buffer = Buffer.alloc(0);
 const readableStream: NodeJS.ReadableStream = createReadStream(input);

@@ -3,157 +3,147 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Threshold', () => {
-  it('threshold 1 jpeg', (_t, done) => {
-    sharp(fixtures.inputJpg)
+suite('Threshold', () => {
+  test('threshold 1 jpeg', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(1)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('threshold-1.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-1.jpg'), data));
   });
 
-  it('threshold 40 jpeg', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('threshold 40 jpeg', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(40)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('threshold-40.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-40.jpg'), data));
   });
 
-  it('threshold 128', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('threshold 128', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(128)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data));
   });
 
-  it('threshold true (=128)', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('threshold true (=128)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(true)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data));
   });
 
-  it('threshold false (=0)', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('threshold false (=0)', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg)
       .threshold(false)
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.inputJpg, data, done);
-      });
+      .toBuffer();
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.inputJpg, data));
   });
 
-  it('threshold grayscale: true (=128)', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('threshold grayscale: true (=128)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(128, { grayscale: true })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data));
   });
 
-  it('threshold default jpeg', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('threshold default jpeg', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-128.jpg'), data));
   });
 
-  it('threshold default png transparency', (_t, done) => {
-    sharp(fixtures.inputPngWithTransparency)
+  test('threshold default png transparency', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngWithTransparency)
       .resize(320, 240)
       .threshold()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('threshold-128-transparency.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'png');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-128-transparency.png'), data));
   });
 
-  it('threshold default png alpha', (_t, done) => {
-    sharp(fixtures.inputPngWithGreyAlpha)
+  test('threshold default png alpha', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngWithGreyAlpha)
       .resize(320, 240)
       .threshold()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('threshold-128-alpha.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'png');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-128-alpha.png'), data));
   });
 
-  it('threshold default webp transparency', (_t, done) => {
-    sharp(fixtures.inputWebPWithTransparency)
+  test('threshold default webp transparency', async (t) => {
+    t.plan(2);
+    const { data, info } = await sharp(fixtures.inputWebPWithTransparency)
       .threshold()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('webp', info.format);
-        fixtures.assertSimilar(fixtures.expected('threshold-128-transparency.webp'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'webp');
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-128-transparency.webp'), data));
   });
 
-  it('color threshold', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('color threshold', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .threshold(128, { grayscale: false })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('threshold-color-128.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('threshold-color-128.jpg'), data));
   });
 
-  it('invalid threshold -1', () => {
-    assert.throws(() => {
+  test('invalid threshold -1', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().threshold(-1);
     });
   });
 
-  it('invalid threshold 256', () => {
-    assert.throws(() => {
+  test('invalid threshold 256', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().threshold(256);
     });
   });

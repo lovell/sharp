@@ -3,114 +3,109 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Image channel extraction', () => {
-  it('Red channel', (_t, done) => {
-    sharp(fixtures.inputJpg)
+suite('Image channel extraction', () => {
+  test('Red channel', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .extractChannel('red')
       .resize(320, 240)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-red.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract-red.jpg'), data));
   });
 
-  it('Green channel', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Green channel', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .extractChannel('green')
       .resize(320, 240)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-green.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract-green.jpg'), data));
   });
 
-  it('Blue channel', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Blue channel', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .extractChannel('blue')
       .resize(320, 240)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-blue.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract-blue.jpg'), data));
   });
 
-  it('Blue channel by number', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Blue channel by number', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .extractChannel(2)
       .resize(320, 240)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('extract-blue.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('extract-blue.jpg'), data));
   });
 
-  it('With colorspace conversion', async () => {
+  test('With colorspace conversion', async (t) => {
+    t.plan(1);
     const [chroma] = await sharp({ create: { width: 1, height: 1, channels: 3, background: 'red' } })
       .toColourspace('lch')
       .extractChannel(1)
       .toBuffer();
 
-    assert.strictEqual(chroma, 104);
+    t.assert.strictEqual(chroma, 104);
   });
 
-  it('Alpha from 16-bit PNG', (_t, done) => {
+  test('Alpha from 16-bit PNG', async (t) => {
+    t.plan(1);
     const output = fixtures.path('output.extract-alpha-16bit.png');
-    sharp(fixtures.inputPngWithTransparency16bit)
+    await sharp(fixtures.inputPngWithTransparency16bit)
       .resize(16)
       .extractChannel(3)
-      .toFile(output, (err) => {
-        if (err) throw err;
-        fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-16bit.png'));
-        done();
-      });
+      .toFile(output);
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-16bit.png')));
   });
 
-  it('Alpha from 2-channel input', (_t, done) => {
+  test('Alpha from 2-channel input', async (t) => {
+    t.plan(2);
     const output = fixtures.path('output.extract-alpha-2-channel.png');
-    sharp(fixtures.inputPngWithGreyAlpha)
+    const info = await sharp(fixtures.inputPngWithGreyAlpha)
       .extractChannel('alpha')
-      .toFile(output, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual(1, info.channels);
-        fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-2-channel.png'));
-        done();
-      });
+      .toFile(output);
+    t.assert.strictEqual(1, info.channels);
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(output, fixtures.expected('extract-alpha-2-channel.png')));
   });
 
-  it('Invalid channel number', () => {
-    assert.throws(() => {
+  test('Invalid channel number', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp(fixtures.inputJpg)
         .extractChannel(-1);
     });
   });
 
-  it('No arguments', () => {
-    assert.throws(() => {
+  test('No arguments', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp(fixtures.inputJpg)
         .extractChannel();
     });
   });
 
-  it('Non-existent channel', async () =>
-    await assert.rejects(
+  test('Non-existent channel', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(
       () => sharp({ create: { width: 1, height: 1, channels: 3, background: 'red' } })
         .extractChannel(3)
         .toBuffer(),
       /Cannot extract channel 3 from image with channels 0-2/
-    )
-  );
+    );
+  });
 });

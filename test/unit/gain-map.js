@@ -3,14 +3,14 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
+const { suite, test } = require('node:test');
 const exifReader = require('exif-reader');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Gain maps', () => {
-  it('Metadata contains gainMap', async (t) => {
+suite('Gain maps', () => {
+  test('Metadata contains gainMap', async (t) => {
     t.plan(4);
 
     const { format, gainMap } = await sharp(
@@ -22,7 +22,7 @@ describe('Gain maps', () => {
     t.assert.strictEqual(gainMap.image.length, 31738);
   });
 
-  it('Can be regenerated', async (t) => {
+  test('Can be regenerated', async (t) => {
     t.plan(4);
 
     const data = await sharp(fixtures.inputJpgWithGainMap)
@@ -68,7 +68,7 @@ describe('Gain maps', () => {
     );
   });
 
-  it('Buffer can be detached and reattached', async (t) => {
+  test('Buffer can be detached and reattached', async (t) => {
     t.plan(4);
 
     const data = await sharp(fixtures.inputJpgWithGainMap)
@@ -115,7 +115,7 @@ describe('Gain maps', () => {
     );
   });
 
-  it('File can be detached and reattached', async (t) => {
+  test('File can be detached and reattached', async (t) => {
     t.plan(4);
 
     const outputPath = fixtures.path('output-with-gain-map.jpg');
@@ -163,7 +163,7 @@ describe('Gain maps', () => {
     );
   });
 
-  it('Can be detached, resized and reattached', async (t) => {
+  test('Can be detached, resized and reattached', async (t) => {
     t.plan(4);
 
     const data = await sharp(fixtures.inputJpgWithGainMap)
@@ -211,7 +211,7 @@ describe('Gain maps', () => {
     );
   });
 
-  it('Cannot keep existing gain map with certain operations', async (t) => {
+  test('Cannot keep existing gain map with certain operations', async (t) => {
     t.plan(2);
 
     await t.assert.rejects(
@@ -235,7 +235,7 @@ describe('Gain maps', () => {
     );
   });
 
-  it('other metadata can be retained when keeping gain map', async (t) => {
+  test('other metadata can be retained when keeping gain map', async (t) => {
     t.plan(2);
 
     const input = fixtures.inputJpgWithGainMap;

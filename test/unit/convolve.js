@@ -3,15 +3,15 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Convolve', () => {
-  it('specific convolution kernel 1', (_t, done) => {
-    sharp(fixtures.inputPngStripesV)
+suite('Convolve', () => {
+  test('specific convolution kernel 1', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngStripesV)
       .convolve({
         width: 3,
         height: 3,
@@ -23,17 +23,16 @@ describe('Convolve', () => {
           10, 20, 10
         ]
       })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('conv-1.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('conv-1.png'), data));
   });
 
-  it('specific convolution kernel 2', (_t, done) => {
-    sharp(fixtures.inputPngStripesH)
+  test('specific convolution kernel 2', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngStripesH)
       .convolve({
         width: 3,
         height: 3,
@@ -43,17 +42,16 @@ describe('Convolve', () => {
           1, 0, 1
         ]
       })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('conv-2.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('conv-2.png'), data));
   });
 
-  it('horizontal Sobel operator', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('horizontal Sobel operator', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .convolve({
         width: 3,
@@ -64,23 +62,23 @@ describe('Convolve', () => {
           -1, 0, 1
         ]
       })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('conv-sobel-horizontal.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('conv-sobel-horizontal.jpg'), data));
   });
 
-  describe('invalid kernel specification', () => {
-    it('missing', () => {
-      assert.throws(() => {
+  suite('invalid kernel specification', () => {
+    test('missing', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).convolve({});
       });
     });
-    it('incorrect data format', () => {
-      assert.throws(() => {
+    test('incorrect data format', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).convolve({
           width: 3,
           height: 3,
@@ -88,8 +86,9 @@ describe('Convolve', () => {
         });
       });
     });
-    it('incorrect dimensions', () => {
-      assert.throws(() => {
+    test('incorrect dimensions', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).convolve({
           width: 3,
           height: 4,

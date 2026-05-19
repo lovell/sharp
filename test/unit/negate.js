@@ -3,194 +3,179 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Negate', () => {
-  it('negate (jpeg)', (_t, done) => {
-    sharp(fixtures.inputJpg)
+suite('Negate', () => {
+  test('negate (jpeg)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .negate()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate.jpg'), data));
   });
 
-  it('negate (png)', (_t, done) => {
-    sharp(fixtures.inputPng)
+  test('negate (png)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPng)
       .resize(320, 240)
       .negate()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate.png'), data));
   });
 
-  it('negate (png, trans)', (_t, done) => {
-    sharp(fixtures.inputPngWithTransparency)
+  test('negate (png, trans)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngWithTransparency)
       .resize(320, 240)
       .negate()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate-trans.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate-trans.png'), data));
   });
 
-  it('negate (png, alpha)', (_t, done) => {
-    sharp(fixtures.inputPngWithGreyAlpha)
+  test('negate (png, alpha)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngWithGreyAlpha)
       .resize(320, 240)
       .negate()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate-alpha.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate-alpha.png'), data));
   });
 
-  it('negate (webp)', (_t, done) => {
-    sharp(fixtures.inputWebP)
+  test('negate (webp)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputWebP)
       .resize(320, 240)
       .negate()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('webp', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate.webp'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('webp', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate.webp'), data));
   });
 
-  it('negate (webp, trans)', (_t, done) => {
-    sharp(fixtures.inputWebPWithTransparency)
+  test('negate (webp, trans)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputWebPWithTransparency)
       .resize(320, 240)
       .negate()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('webp', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate-trans.webp'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('webp', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate-trans.webp'), data));
   });
 
-  it('negate (true)', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('negate (true)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .negate(true)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate.jpg'), data));
   });
 
-  it('negate (false)', (_t, done) => {
+  test('negate (false)', async (t) => {
+    t.plan(1);
     const output = fixtures.path('output.unmodified-by-negate.png');
-    sharp(fixtures.inputJpgWithLowContrast)
+    await sharp(fixtures.inputJpgWithLowContrast)
       .negate(false)
-      .toFile(output, (err) => {
-        if (err) throw err;
-        fixtures.assertMaxColourDistance(output, fixtures.inputJpgWithLowContrast, 0);
-        done();
-      });
+      .toFile(output);
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(output, fixtures.inputJpgWithLowContrast, 0));
   });
 
-  it('negate ({alpha: true})', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('negate ({alpha: true})', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .negate({ alpha: true })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate.jpg'), data));
   });
 
-  it('negate non-alpha channels (png)', (_t, done) => {
-    sharp(fixtures.inputPng)
+  test('negate non-alpha channels (png)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPng)
       .resize(320, 240)
       .negate({ alpha: false })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha.png'), data));
   });
 
-  it('negate non-alpha channels (png, trans)', (_t, done) => {
-    sharp(fixtures.inputPngWithTransparency)
+  test('negate non-alpha channels (png, trans)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngWithTransparency)
       .resize(320, 240)
       .negate({ alpha: false })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha-trans.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha-trans.png'), data));
   });
 
-  it('negate non-alpha channels (png, alpha)', (_t, done) => {
-    sharp(fixtures.inputPngWithGreyAlpha)
+  test('negate non-alpha channels (png, alpha)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngWithGreyAlpha)
       .resize(320, 240)
       .negate({ alpha: false })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha-grey.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha-grey.png'), data));
   });
 
-  it('negate non-alpha channels (webp)', (_t, done) => {
-    sharp(fixtures.inputWebP)
+  test('negate non-alpha channels (webp)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputWebP)
       .resize(320, 240)
       .negate({ alpha: false })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('webp', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha.webp'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('webp', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha.webp'), data));
   });
 
-  it('negate non-alpha channels (webp, trans)', (_t, done) => {
-    sharp(fixtures.inputWebPWithTransparency)
+  test('negate non-alpha channels (webp, trans)', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputWebPWithTransparency)
       .resize(320, 240)
       .negate({ alpha: false })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('webp', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha-trans.webp'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('webp', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('negate-preserve-alpha-trans.webp'), data));
   });
 
-  it('negate create', async () => {
+  test('negate create', async (t) => {
+    t.plan(1);
     const [r, g, b] = await sharp({
       create: {
         width: 1,
@@ -203,11 +188,12 @@ describe('Negate', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r, g, b }, { r: 245, g: 235, b: 225 });
+    t.assert.deepStrictEqual({ r, g, b }, { r: 245, g: 235, b: 225 });
   });
 
-  it('invalid alpha value', () => {
-    assert.throws(() => {
+  test('invalid alpha value', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp(fixtures.inputWebPWithTransparency).negate({ alpha: 'non-bool' });
     });
   });

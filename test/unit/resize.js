@@ -3,636 +3,507 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Resize dimensions', () => {
-  it('Exact crop', (_t, done) => {
-    sharp(fixtures.inputJpg).resize(320, 240).toBuffer((err, data, info) => {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(240, info.height);
-      done();
-    });
+suite('Resize dimensions', () => {
+  test('Exact crop', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg).resize(320, 240).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
   });
 
-  it('Fixed width', (_t, done) => {
-    sharp(fixtures.inputJpg).resize(320).toBuffer((err, data, info) => {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(261, info.height);
-      done();
-    });
+  test('Fixed width', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg).resize(320).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(261, info.height);
   });
 
-  it('Fixed height', (_t, done) => {
-    sharp(fixtures.inputJpg).resize(null, 320).toBuffer((err, data, info) => {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(392, info.width);
-      assert.strictEqual(320, info.height);
-      done();
-    });
+  test('Fixed height', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg).resize(null, 320).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(392, info.width);
+    t.assert.strictEqual(320, info.height);
   });
 
-  it('Identity transform', (_t, done) => {
-    sharp(fixtures.inputJpg).toBuffer((err, data, info) => {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(2725, info.width);
-      assert.strictEqual(2225, info.height);
-      done();
-    });
+  test('Identity transform', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2725, info.width);
+    t.assert.strictEqual(2225, info.height);
   });
 
-  it('Upscale', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize(3000)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(3000, info.width);
-        assert.strictEqual(2450, info.height);
-        done();
-      });
+  test('Upscale', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg).resize(3000).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(3000, info.width);
+    t.assert.strictEqual(2450, info.height);
   });
 
-  it('Invalid width - NaN', () => {
-    assert.throws(() => {
+  test('Invalid width - NaN', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().resize('spoons', 240);
     }, /Expected positive integer for width but received spoons of type string/);
   });
 
-  it('Invalid height - NaN', () => {
-    assert.throws(() => {
+  test('Invalid height - NaN', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().resize(320, 'spoons');
     }, /Expected positive integer for height but received spoons of type string/);
   });
 
-  it('Invalid width - float', () => {
-    assert.throws(() => {
+  test('Invalid width - float', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().resize(1.5, 240);
     }, /Expected positive integer for width but received 1.5 of type number/);
   });
 
-  it('Invalid height - float', () => {
-    assert.throws(() => {
+  test('Invalid height - float', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().resize(320, 1.5);
     }, /Expected positive integer for height but received 1.5 of type number/);
   });
 
-  it('Invalid width - via options', () => {
-    assert.throws(() => {
+  test('Invalid width - via options', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().resize({ width: 1.5, height: 240 });
     }, /Expected positive integer for width but received 1.5 of type number/);
   });
 
-  it('Invalid height - via options', () => {
-    assert.throws(() => {
+  test('Invalid height - via options', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().resize({ width: 320, height: 1.5 });
     }, /Expected positive integer for height but received 1.5 of type number/);
   });
 
-  it('Invalid width - too large', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize(0x4000, 1)
-      .webp()
-      .toBuffer((err) => {
-        assert.strictEqual(true, err instanceof Error);
-        assert.strictEqual('Processed image is too large for the WebP format', err.message);
-        done();
-      });
+  test('Invalid width - too large', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(() => sharp(fixtures.inputJpg).resize(0x4000, 1).webp().toBuffer(), /Processed image is too large for the WebP format/);
   });
 
-  it('Invalid height - too large', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize(1, 0x4000)
-      .webp()
-      .toBuffer((err) => {
-        assert.strictEqual(true, err instanceof Error);
-        assert.strictEqual('Processed image is too large for the WebP format', err.message);
-        done();
-      });
+  test('Invalid height - too large', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(() => sharp(fixtures.inputJpg).resize(1, 0x4000).webp().toBuffer(), /Processed image is too large for the WebP format/);
   });
 
-  it('Webp resize then extract large image', (_t, done) => {
-    sharp(fixtures.inputWebP)
+  test('Webp resize then extract large image', async (t) => {
+    t.plan(3);
+    const { info } = await sharp(fixtures.inputWebP)
       .resize(0x4000, 0x4000)
       .extract({ top: 0x2000, left: 0x2000, width: 256, height: 256 })
       .webp()
-      .toBuffer((err, _data, info) => {
-        if (err) throw err;
-        assert.strictEqual('webp', info.format);
-        assert.strictEqual(256, info.width);
-        assert.strictEqual(256, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('webp', info.format);
+    t.assert.strictEqual(256, info.width);
+    t.assert.strictEqual(256, info.height);
   });
 
-  it('WebP shrink-on-load rounds to zero, ensure recalculation is correct', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('WebP shrink-on-load rounds to zero, ensure recalculation is correct', async (t) => {
+    t.plan(6);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(1080, 607)
       .webp()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('webp', info.format);
-        assert.strictEqual(1080, info.width);
-        assert.strictEqual(607, info.height);
-        sharp(data)
-          .resize(233, 131)
-          .toBuffer((err, _data, info) => {
-            if (err) throw err;
-            assert.strictEqual('webp', info.format);
-            assert.strictEqual(233, info.width);
-            assert.strictEqual(131, info.height);
-            done();
-          });
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('webp', info.format);
+    t.assert.strictEqual(1080, info.width);
+    t.assert.strictEqual(607, info.height);
+
+    const second = await sharp(data)
+      .resize(233, 131)
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('webp', second.info.format);
+    t.assert.strictEqual(233, second.info.width);
+    t.assert.strictEqual(131, second.info.height);
   });
 
-  it('JPEG shrink-on-load with 90 degree rotation, ensure recalculation is correct', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('JPEG shrink-on-load with 90 degree rotation, ensure recalculation is correct', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(1920, 1280)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(1920, info.width);
-        assert.strictEqual(1280, info.height);
-        sharp(data)
-          .rotate(90)
-          .resize(533, 800)
-          .toBuffer((err, _data, info) => {
-            if (err) throw err;
-            assert.strictEqual(533, info.width);
-            assert.strictEqual(800, info.height);
-            done();
-          });
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(1920, info.width);
+    t.assert.strictEqual(1280, info.height);
+
+    const second = await sharp(data)
+      .rotate(90)
+      .resize(533, 800)
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(533, second.info.width);
+    t.assert.strictEqual(800, second.info.height);
   });
 
-  it('TIFF embed known to cause rounding errors', (_t, done) => {
-    sharp(fixtures.inputTiff)
+  test('TIFF embed known to cause rounding errors', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputTiff)
       .resize(240, 320, { fit: sharp.fit.contain })
       .jpeg()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(240, info.width);
-        assert.strictEqual(320, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(240, info.width);
+    t.assert.strictEqual(320, info.height);
   });
 
-  it('TIFF known to cause rounding errors', (_t, done) => {
-    sharp(fixtures.inputTiff)
+  test('TIFF known to cause rounding errors', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputTiff)
       .resize(240, 320)
       .jpeg()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(240, info.width);
-        assert.strictEqual(320, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(240, info.width);
+    t.assert.strictEqual(320, info.height);
   });
 
-  it('fit=inside, portrait', (_t, done) => {
-    sharp(fixtures.inputTiff)
+  test('fit=inside, portrait', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputTiff)
       .resize(320, 320, { fit: sharp.fit.inside })
       .jpeg()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(243, info.width);
-        assert.strictEqual(320, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(243, info.width);
+    t.assert.strictEqual(320, info.height);
   });
 
-  it('fit=outside, portrait', (_t, done) => {
-    sharp(fixtures.inputTiff)
+  test('fit=outside, portrait', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputTiff)
       .resize(320, 320, { fit: sharp.fit.outside })
       .jpeg()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(422, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(422, info.height);
   });
 
-  it('fit=inside, landscape', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('fit=inside, landscape', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: sharp.fit.inside })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(261, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(261, info.height);
   });
 
-  it('fit=outside, landscape', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('fit=outside, landscape', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: sharp.fit.outside })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(392, info.width);
-        assert.strictEqual(320, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(392, info.width);
+    t.assert.strictEqual(320, info.height);
   });
 
-  it('fit=inside, provide only one dimension', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 320,
-        fit: sharp.fit.inside
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(261, info.height);
-        done();
-      });
+  test('fit=inside, provide only one dimension', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 320, fit: sharp.fit.inside })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(261, info.height);
   });
 
-  it('fit=outside, provide only one dimension', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 320,
-        fit: sharp.fit.outside
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(261, info.height);
-        done();
-      });
+  test('fit=outside, provide only one dimension', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 320, fit: sharp.fit.outside })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(261, info.height);
   });
 
-  it('Do not enlarge when input width is already less than output width', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 2800,
-        withoutEnlargement: true
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
-        assert.strictEqual(2225, info.height);
-        done();
-      });
+  test('Do not enlarge when input width is already less than output width', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 2800, withoutEnlargement: true })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2725, info.width);
+    t.assert.strictEqual(2225, info.height);
   });
 
-  it('Do not enlarge when input height is already less than output height', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        height: 2300,
-        withoutEnlargement: true
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
-        assert.strictEqual(2225, info.height);
-        done();
-      });
+  test('Do not enlarge when input height is already less than output height', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ height: 2300, withoutEnlargement: true })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2725, info.width);
+    t.assert.strictEqual(2225, info.height);
   });
 
-  it('Do crop when fit = cover and withoutEnlargement = true and width >= outputWidth, and height < outputHeight', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 3000,
-        height: 1000,
-        withoutEnlargement: true
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
-        assert.strictEqual(1000, info.height);
-        done();
-      });
+  test('Do crop when fit = cover and withoutEnlargement = true and width >= outputWidth, and height < outputHeight', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 3000, height: 1000, withoutEnlargement: true })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2725, info.width);
+    t.assert.strictEqual(1000, info.height);
   });
 
-  it('Do crop when fit = cover and withoutEnlargement = true and width < outputWidth, and height >= outputHeight', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 1500,
-        height: 2226,
-        withoutEnlargement: true
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(1500, info.width);
-        assert.strictEqual(2225, info.height);
-        done();
-      });
+  test('Do crop when fit = cover and withoutEnlargement = true and width < outputWidth, and height >= outputHeight', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 1500, height: 2226, withoutEnlargement: true })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(1500, info.width);
+    t.assert.strictEqual(2225, info.height);
   });
 
-  it('Do enlarge when input width is less than output width', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 2800,
-        withoutEnlargement: false
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2800, info.width);
-        assert.strictEqual(2286, info.height);
-        done();
-      });
+  test('Do enlarge when input width is less than output width', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 2800, withoutEnlargement: false })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2800, info.width);
+    t.assert.strictEqual(2286, info.height);
   });
 
-  it('Do enlarge when input width is less than output width', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 2800,
-        withoutReduction: true
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2800, info.width);
-        assert.strictEqual(2286, info.height);
-        done();
-      });
+  test('Do enlarge when input width is less than output width', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 2800, withoutReduction: true })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2800, info.width);
+    t.assert.strictEqual(2286, info.height);
   });
 
-  it('Do enlarge when input height is less than output height', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        height: 2300,
-        withoutReduction: true
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2817, info.width);
-        assert.strictEqual(2300, info.height);
-        done();
-      });
+  test('Do enlarge when input height is less than output height', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ height: 2300, withoutReduction: true })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2817, info.width);
+    t.assert.strictEqual(2300, info.height);
   });
 
-  it('Do enlarge when input width is less than output width', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 2800,
-        withoutReduction: false
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2800, info.width);
-        assert.strictEqual(2286, info.height);
-        done();
-      });
+  test('Do enlarge when input width is less than output width', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 2800, withoutReduction: false })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2800, info.width);
+    t.assert.strictEqual(2286, info.height);
   });
 
-  it('Do not resize when both withoutEnlargement and withoutReduction are true', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Do not resize when both withoutEnlargement and withoutReduction are true', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: 'fill', withoutEnlargement: true, withoutReduction: true })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
-        assert.strictEqual(2225, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2725, info.width);
+    t.assert.strictEqual(2225, info.height);
   });
 
-  it('Do not reduce size when fit = outside and withoutReduction are true and height > outputHeight and width > outputWidth', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Do not reduce size when fit = outside and withoutReduction are true and height > outputHeight and width > outputWidth', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: 'outside', withoutReduction: true })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
-        assert.strictEqual(2225, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2725, info.width);
+    t.assert.strictEqual(2225, info.height);
   });
 
-  it('Do resize when fit = outside and withoutReduction are true and input height > height and input width > width ', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Do resize when fit = outside and withoutReduction are true and input height > height and input width > width ', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(3000, 3000, { fit: 'outside', withoutReduction: true })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(3674, info.width);
-        assert.strictEqual(3000, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(3674, info.width);
+    t.assert.strictEqual(3000, info.height);
   });
 
-  it('fit=fill, downscale width and height', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('fit=fill, downscale width and height', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 320, { fit: 'fill' })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(320, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(320, info.height);
   });
 
-  it('fit=fill, downscale width', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        width: 320,
-        fit: 'fill'
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(2225, info.height);
-        done();
-      });
+  test('fit=fill, downscale width', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 320, fit: 'fill' })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(2225, info.height);
   });
 
-  it('fit=fill, downscale height', (_t, done) => {
-    sharp(fixtures.inputJpg)
-      .resize({
-        height: 320,
-        fit: 'fill'
-      })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
-        assert.strictEqual(320, info.height);
-        done();
-      });
+  test('fit=fill, downscale height', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ height: 320, fit: 'fill' })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2725, info.width);
+    t.assert.strictEqual(320, info.height);
   });
 
-  it('fit=fill, upscale width and height', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('fit=fill, upscale width and height', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(3000, 3000, { fit: 'fill' })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(3000, info.width);
-        assert.strictEqual(3000, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(3000, info.width);
+    t.assert.strictEqual(3000, info.height);
   });
 
-  it('fit=fill, upscale width', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('fit=fill, upscale width', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(3000, null, { fit: 'fill' })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(3000, info.width);
-        assert.strictEqual(2225, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(3000, info.width);
+    t.assert.strictEqual(2225, info.height);
   });
 
-  it('fit=fill, upscale height', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('fit=fill, upscale height', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(null, 3000, { fit: 'fill' })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
-        assert.strictEqual(3000, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2725, info.width);
+    t.assert.strictEqual(3000, info.height);
   });
 
-  it('fit=fill, downscale width, upscale height', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('fit=fill, downscale width, upscale height', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(320, 3000, { fit: 'fill' })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(3000, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(3000, info.height);
   });
 
-  it('fit=fill, upscale width, downscale height', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('fit=fill, upscale width, downscale height', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(3000, 320, { fit: 'fill' })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(3000, info.width);
-        assert.strictEqual(320, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(3000, info.width);
+    t.assert.strictEqual(320, info.height);
   });
 
-  it('fit=fill, identity transform', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('fit=fill, identity transform', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(null, null, { fit: 'fill' })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(2725, info.width);
-        assert.strictEqual(2225, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(2725, info.width);
+    t.assert.strictEqual(2225, info.height);
   });
 
-  it('Dimensions that result in differing even shrinks on each axis', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Dimensions that result in differing even shrinks on each axis', async (t) => {
+    t.plan(5);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(645, 399)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(645, info.width);
-        assert.strictEqual(399, info.height);
-        sharp(data)
-          .resize(150, 100)
-          .toBuffer((err, data, info) => {
-            if (err) throw err;
-            assert.strictEqual(150, info.width);
-            assert.strictEqual(100, info.height);
-            fixtures.assertSimilar(fixtures.expected('resize-diff-shrink-even.jpg'), data, done);
-          });
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(645, info.width);
+    t.assert.strictEqual(399, info.height);
+    const second = await sharp(data)
+      .resize(150, 100)
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(150, second.info.width);
+    t.assert.strictEqual(100, second.info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('resize-diff-shrink-even.jpg'), second.data));
   });
 
-  it('Dimensions that result in differing odd shrinks on each axis', (_t, done) => sharp(fixtures.inputJpg)
+  test('Dimensions that result in differing odd shrinks on each axis', async (t) => {
+    t.plan(5);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(600, 399)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(600, info.width);
-        assert.strictEqual(399, info.height);
-        sharp(data)
-          .resize(200)
-          .toBuffer((err, data, info) => {
-            if (err) throw err;
-            assert.strictEqual(200, info.width);
-            assert.strictEqual(133, info.height);
-            fixtures.assertSimilar(fixtures.expected('resize-diff-shrink-odd.jpg'), data, done);
-          });
-      }));
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(600, info.width);
+    t.assert.strictEqual(399, info.height);
+    const second = await sharp(data)
+      .resize(200)
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(200, second.info.width);
+    t.assert.strictEqual(133, second.info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('resize-diff-shrink-odd.jpg'), second.data));
+  });
 
-  [
-    true,
-    false
-  ].forEach((value) => {
-    it(`fastShrinkOnLoad: ${value} does not causes image shifts`, (_t, done) => {
-      sharp(fixtures.inputJpgCenteredImage)
+  [true, false].forEach((value) => {
+    test(`fastShrinkOnLoad: ${value} does not causes image shifts`, async (t) => {
+      t.plan(3);
+      const { data, info } = await sharp(fixtures.inputJpgCenteredImage)
         .resize(9, 8, { fastShrinkOnLoad: value })
         .png()
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(9, info.width);
-          assert.strictEqual(8, info.height);
-          fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load.png'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(9, info.width);
+      t.assert.strictEqual(8, info.height);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('fast-shrink-on-load.png'), data));
     });
   });
 
@@ -643,31 +514,30 @@ describe('Resize dimensions', () => {
     sharp.kernel.lanczos2,
     sharp.kernel.lanczos3
   ].forEach((kernel) => {
-    it(`kernel ${kernel}`, (_t, done) => {
-      sharp(fixtures.inputJpg)
+    test(`kernel ${kernel}`, async (t) => {
+      t.plan(3);
+      const { data, info } = await sharp(fixtures.inputJpg)
         .resize(320, null, { kernel })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(320, info.width);
-          fixtures.assertSimilar(fixtures.inputJpg, data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual('jpeg', info.format);
+      t.assert.strictEqual(320, info.width);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.inputJpg, data));
     });
   });
 
-  it('nearest upsampling with integral factor', (_t, done) => {
-    sharp(fixtures.inputTiff8BitDepth)
+  test('nearest upsampling with integral factor', async (t) => {
+    t.plan(2);
+    const { info } = await sharp(fixtures.inputTiff8BitDepth)
       .resize(210, 210, { kernel: 'nearest' })
       .png()
-      .toBuffer((err, _data, info) => {
-        if (err) throw err;
-        assert.strictEqual(210, info.width);
-        assert.strictEqual(210, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(210, info.width);
+    t.assert.strictEqual(210, info.height);
   });
 
-  it('Ensure shortest edge (height) is at least 1 pixel', () => sharp({
+  test('Ensure shortest edge (height) is at least 1 pixel', async (t) => {
+    t.plan(2);
+    const output = await sharp({
       create: {
         width: 10,
         height: 2,
@@ -676,13 +546,14 @@ describe('Resize dimensions', () => {
       }
     })
       .resize(2)
-      .toBuffer({ resolveWithObject: true })
-      .then((output) => {
-        assert.strictEqual(2, output.info.width);
-        assert.strictEqual(1, output.info.height);
-      }));
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(2, output.info.width);
+    t.assert.strictEqual(1, output.info.height);
+  });
 
-  it('Ensure shortest edge (width) is at least 1 pixel', () => sharp({
+  test('Ensure shortest edge (width) is at least 1 pixel', async (t) => {
+    t.plan(2);
+    const output = await sharp({
       create: {
         width: 2,
         height: 10,
@@ -691,13 +562,14 @@ describe('Resize dimensions', () => {
       }
     })
       .resize(null, 2)
-      .toBuffer({ resolveWithObject: true })
-      .then((output) => {
-        assert.strictEqual(1, output.info.width);
-        assert.strictEqual(2, output.info.height);
-      }));
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(1, output.info.width);
+    t.assert.strictEqual(2, output.info.height);
+  });
 
-  it('Ensure embedded shortest edge (height) is at least 1 pixel', () => sharp({
+  test('Ensure embedded shortest edge (height) is at least 1 pixel', async (t) => {
+    t.plan(2);
+    const output = await sharp({
       create: {
         width: 200,
         height: 1,
@@ -706,13 +578,14 @@ describe('Resize dimensions', () => {
       }
     })
       .resize({ width: 50, height: 50, fit: sharp.fit.contain })
-      .toBuffer({ resolveWithObject: true })
-      .then((output) => {
-        assert.strictEqual(50, output.info.width);
-        assert.strictEqual(50, output.info.height);
-      }));
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(50, output.info.width);
+    t.assert.strictEqual(50, output.info.height);
+  });
 
-  it('Ensure embedded shortest edge (width) is at least 1 pixel', () => sharp({
+  test('Ensure embedded shortest edge (width) is at least 1 pixel', async (t) => {
+    t.plan(2);
+    const output = await sharp({
       create: {
         width: 1,
         height: 200,
@@ -721,13 +594,13 @@ describe('Resize dimensions', () => {
       }
     })
       .resize({ width: 50, height: 50, fit: sharp.fit.contain })
-      .toBuffer({ resolveWithObject: true })
-      .then((output) => {
-        assert.strictEqual(50, output.info.width);
-        assert.strictEqual(50, output.info.height);
-      }));
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(50, output.info.width);
+    t.assert.strictEqual(50, output.info.height);
+  });
 
-  it('Skip shrink-on-load where one dimension <4px', async () => {
+  test('Skip shrink-on-load where one dimension <4px', async (t) => {
+    t.plan(2);
     const jpeg = await sharp({
       create: {
         width: 100,
@@ -743,11 +616,12 @@ describe('Resize dimensions', () => {
       .resize(8)
       .toBuffer({ resolveWithObject: true });
 
-    assert.strictEqual(info.width, 8);
-    assert.strictEqual(info.height, 1);
+    t.assert.strictEqual(info.width, 8);
+    t.assert.strictEqual(info.height, 1);
   });
 
-  it('Skip JPEG shrink-on-load for known libjpeg rounding errors', async () => {
+  test('Skip JPEG shrink-on-load for known libjpeg rounding errors', async (t) => {
+    t.plan(2);
     const input = await sharp({
       create: {
         width: 1000,
@@ -764,35 +638,41 @@ describe('Resize dimensions', () => {
       .toBuffer();
 
     const { width, height } = await sharp(output).metadata();
-    assert.strictEqual(width, 500);
-    assert.strictEqual(height, 334);
+    t.assert.strictEqual(width, 500);
+    t.assert.strictEqual(height, 334);
   });
 
-  it('unknown kernel throws', () => {
-    assert.throws(() => {
+  test('unknown kernel throws', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().resize(null, null, { kernel: 'unknown' });
     });
   });
 
-  it('unknown fit throws', () => {
-    assert.throws(() => {
+  test('unknown fit throws', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().resize(null, null, { fit: 'unknown' });
     });
   });
 
-  it('unknown position throws', () => {
-    assert.throws(() => {
+  test('unknown position throws', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().resize(null, null, { position: 'unknown' });
     });
   });
 
-  it('Multiple resize emits warning', () => {
+  test('Multiple resize emits warning', (t) => {
+    t.plan(2);
     let warningMessage = '';
     const s = sharp();
-    s.on('warning', (msg) => { warningMessage = msg; });
+    s.on('warning', (msg) => {
+      warningMessage = msg;
+    });
     s.resize(1);
-    assert.strictEqual(warningMessage, '');
+    t.assert.strictEqual(warningMessage, '');
     s.resize(2);
-    assert.strictEqual(warningMessage, 'ignoring previous resize options');
+    t.assert.strictEqual(warningMessage, 'ignoring previous resize options');
   });
 });

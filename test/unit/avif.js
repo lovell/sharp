@@ -3,8 +3,7 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const {
@@ -15,18 +14,20 @@ const {
   inputPng,
 } = require('../fixtures');
 
-describe('AVIF', () => {
-  it('called without options does not throw an error', () => {
-    assert.doesNotThrow(() => {
+suite('AVIF', () => {
+  test('called without options does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().avif();
     });
   });
 
-  it('can convert AVIF to JPEG', async () => {
+  test('can convert AVIF to JPEG', async (t) => {
+    t.plan(1);
     const data = await sharp(inputAvif).resize(32).jpeg().toBuffer();
     const { size, ...metadata } = await sharp(data).metadata();
     void size;
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 13,
         width: 32,
@@ -49,14 +50,15 @@ describe('AVIF', () => {
     });
   });
 
-  it('can convert JPEG to AVIF', async () => {
+  test('can convert JPEG to AVIF', async (t) => {
+    t.plan(1);
     const data = await sharp(inputJpg)
       .resize(32)
       .avif({ effort: 0 })
       .toBuffer();
     const { size, ...metadata } = await sharp(data).metadata();
     void size;
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 26,
         width: 32,
@@ -79,14 +81,15 @@ describe('AVIF', () => {
     });
   });
 
-  it('can convert PNG to lossless AVIF', async () => {
+  test('can convert PNG to lossless AVIF', async (t) => {
+    t.plan(1);
     const data = await sharp(inputPng)
       .resize(32)
       .avif({ lossless: true, effort: 0 })
       .toBuffer();
     const { size, ...metadata } = await sharp(data).metadata();
     void size;
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 24,
         width: 32,
@@ -109,11 +112,12 @@ describe('AVIF', () => {
     });
   });
 
-  it('can passthrough AVIF', async () => {
+  test('can passthrough AVIF', async (t) => {
+    t.plan(1);
     const data = await sharp(inputAvif).resize(32).toBuffer();
     const { size, ...metadata } = await sharp(data).metadata();
     void size;
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 13,
         width: 32,
@@ -136,14 +140,15 @@ describe('AVIF', () => {
     });
   });
 
-  it('can convert animated GIF to non-animated AVIF', async () => {
+  test('can convert animated GIF to non-animated AVIF', async (t) => {
+    t.plan(1);
     const data = await sharp(inputGifAnimated, { animated: true })
       .resize(10)
       .avif({ effort: 0 })
       .toBuffer();
     const { size, ...metadata } = await sharp(data).metadata();
     void size;
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 300,
         width: 10,
@@ -166,7 +171,8 @@ describe('AVIF', () => {
     });
   });
 
-  it('should cast to uchar', async () => {
+  test('should cast to uchar', async (t) => {
+    t.plan(1);
     const data = await sharp(inputJpg)
       .resize(32)
       .sharpen()
@@ -174,7 +180,7 @@ describe('AVIF', () => {
       .toBuffer();
     const { size, ...metadata } = await sharp(data).metadata();
     void size;
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 26,
         width: 32,
@@ -197,8 +203,9 @@ describe('AVIF', () => {
     });
   });
 
-  it('Invalid width - too large', async () =>
-    assert.rejects(
+  test('Invalid width - too large', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(
       () =>
         sharp({
           create: { width: 16385, height: 16, channels: 3, background: 'red' },
@@ -206,10 +213,12 @@ describe('AVIF', () => {
           .avif()
           .toBuffer(),
       /Processed image is too large for the HEIF format/,
-    ));
+    );
+  });
 
-  it('Invalid height - too large', async () =>
-    assert.rejects(
+  test('Invalid height - too large', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(
       () =>
         sharp({
           create: { width: 16, height: 16385, channels: 3, background: 'red' },
@@ -217,15 +226,19 @@ describe('AVIF', () => {
           .avif()
           .toBuffer(),
       /Processed image is too large for the HEIF format/,
-    ));
+    );
+  });
 
-  it('Invalid bitdepth value throws error', () =>
-    assert.throws(
+  test('Invalid bitdepth value throws error', (t) => {
+    t.plan(1);
+    t.assert.throws(
       () => sharp().avif({ bitdepth: 11 }),
       /Expected 8, 10 or 12 for bitdepth but received 11 of type number/,
-    ));
+    );
+  });
 
-  it('Different tune options result in different file sizes', async () => {
+  test('Different tune options result in different file sizes', async (t) => {
+    t.plan(1);
     const ssim = await sharp(inputJpg)
       .resize(32)
       .avif({ tune: 'ssim', effort: 0 })
@@ -234,13 +247,14 @@ describe('AVIF', () => {
       .resize(32)
       .avif({ tune: 'iq', effort: 0 })
       .toBuffer();
-    assert(ssim.length < iq.length);
+    t.assert.ok(ssim.length < iq.length);
   });
 
-  it('AVIF with non-zero primary item uses it as default page', async () => {
+  test('AVIF with non-zero primary item uses it as default page', async (t) => {
+    t.plan(2);
     const { exif, ...metadata } = await sharp(inputAvifWithPitmBox).metadata();
     void exif;
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(metadata, {
       format: 'heif',
       mediaType: 'image/avif',
       width: 4096,
@@ -264,7 +278,7 @@ describe('AVIF', () => {
       .png({ compressionLevel: 0 })
       .toBuffer();
     const { size, ...pngMetadata } = await sharp(data).metadata();
-    assert.deepStrictEqual(pngMetadata, {
+    t.assert.deepStrictEqual(pngMetadata, {
       format: 'png',
       mediaType: 'image/png',
       width: 4096,
