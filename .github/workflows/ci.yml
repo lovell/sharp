@@ -238,7 +238,7 @@ jobs:
       matrix:
         include:
           - platform: linux-arm
-            base_image: "balenalib/rpi-raspbian:bullseye"
+            base_image: "balenalib/rpi-raspbian:bookworm"
             nodejs_arch: armv6l
             nodejs_hostname: unofficial-builds.nodejs.org
             nodejs_version: "22.22.3"
