@@ -238,7 +238,8 @@ jobs:
       matrix:
         include:
           - platform: linux-arm
-            base_image: "balenalib/rpi-raspbian:bookworm"
+            base_image: "--platform=linux/arm/v7 arm32v7/debian:bookworm"
+            compiler_flags: "-marm -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard"
             nodejs_arch: armv6l
             nodejs_hostname: unofficial-builds.nodejs.org
             nodejs_version: "22.22.3"
