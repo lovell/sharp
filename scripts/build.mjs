@@ -12,7 +12,7 @@ const libDir = new URL("../lib/", import.meta.url);
  * @param {string} input
  * @returns {string}
  */
-function cjsToEsm(input) {
+function esmToCjs(input) {
   return input
     // Turn import into require() and .mjs into .cjs
     .replace(
@@ -23,8 +23,8 @@ function cjsToEsm(input) {
     // Transforms TLA
     .replaceAll("export default", "module.exports =")
     // Remove createRequire
-    .replaceAll("const { createRequire } = require(\"node:module\");\n", "")
-    .replaceAll("const require = createRequire(import.meta.url);\n", "")
+    .replaceAll("const { createRequire } = require(\"node:module\");", "")
+    .replaceAll("const require = createRequire(import.meta.url);", "")
 }
 
 const entries = (await fs.readdir(libDir)).filter(e => e.endsWith('.mjs'));
@@ -32,5 +32,5 @@ const entries = (await fs.readdir(libDir)).filter(e => e.endsWith('.mjs'));
 for (const entry of entries) {
   await fs.cp(new URL(entry, libDir), new URL(entry, distDir));
   const contents = await fs.readFile(new URL(entry, libDir), "utf-8");
-  await fs.writeFile(new URL(entry.replace(".mjs", ".cjs"), distDir), cjsToEsm(contents));
+  await fs.writeFile(new URL(entry.replace(".mjs", ".cjs"), distDir), esmToCjs(contents));
 } 
