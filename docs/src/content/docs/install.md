@@ -44,11 +44,11 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 * macOS x64 (>= 10.15)
 * macOS ARM64
 * Linux ARM (glibc >= 2.36)
-* Linux ARM64 (glibc >= 2.26, musl >= 1.2.2)
+* Linux ARM64 (glibc >= 2.28, musl >= 1.2.5)
 * Linux RISC-V 64-bit (glibc >= 2.41)
 * Linux ppc64 (glibc >= 2.36)
 * Linux s390x (glibc >= 2.36)
-* Linux x64 (glibc >= 2.26, musl >= 1.2.2, CPU with SSE4.2)
+* Linux x64 (glibc >= 2.28, musl >= 1.2.5, CPU with SSE4.2)
 * Windows x64
 * Windows x86 (deprecated, Node.js 20 only)
 * Windows ARM64 (CPU with ARMv8.4 required for all features)
