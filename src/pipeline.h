@@ -380,7 +380,7 @@ struct PipelineBaton {
     heifChromaSubsampling("4:4:4"),
     heifLossless(false),
     heifBitdepth(8),
-    heifTune("ssim"),
+    heifTune("auto"),
     jxlDistance(1.0),
     jxlDecodingTier(0),
     jxlEffort(7),

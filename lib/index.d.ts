@@ -1183,7 +1183,7 @@ declare namespace sharp {
 
     type HeifCompression = 'av1' | 'hevc';
 
-    type HeifTune = 'iq' | 'ssim' | 'psnr';
+    type HeifTune = 'auto' | 'iq' | 'psnr' | 'ssim';
 
     type Unit = 'inch' | 'cm';
 
@@ -1432,7 +1432,7 @@ declare namespace sharp {
         chromaSubsampling?: string | undefined;
         /** Set bitdepth to 8, 10 or 12 bit (optional, default 8) */
         bitdepth?: 8 | 10 | 12 | undefined;
-        /** Tune output for a quality metric, one of 'iq', 'ssim' or 'psnr' (optional, default 'iq') */
+        /** Tune output for a quality metric, one of 'auto', 'iq', 'psnr' or 'ssim' (optional, default 'auto') */
         tune?: HeifTune | undefined;
     }
 
@@ -1449,7 +1449,7 @@ declare namespace sharp {
         chromaSubsampling?: string | undefined;
         /** Set bitdepth to 8, 10 or 12 bit (optional, default 8) */
         bitdepth?: 8 | 10 | 12 | undefined;
-        /** Tune output for a quality metric, one of 'ssim', 'psnr' or 'iq' (optional, default 'ssim') */
+        /** Tune output for a quality metric, one of 'auto', 'iq', 'psnr' or 'ssim' (optional, default 'auto') */
         tune?: HeifTune | undefined;
     }
 

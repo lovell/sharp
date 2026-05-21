@@ -121,6 +121,6 @@ suite('HEIF', () => {
     t.plan(1);
     t.assert.throws(() => {
       sharp().heif({ compression: 'hevc', tune: 'fail' });
-    }, /Error: Expected one of: psnr, ssim, iq for tune but received fail of type string/);
+    }, /Error: Expected one of: auto, iq, psnr, ssim for tune but received fail of type string/);
   });
 });

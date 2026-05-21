@@ -247,7 +247,33 @@ suite('AVIF', () => {
       .resize(32)
       .avif({ tune: 'iq', effort: 0 })
       .toBuffer();
-    t.assert.ok(ssim.length < iq.length);
+    t.assert.ok(ssim.length > iq.length);
+  });
+
+  test('Auto tune defaults to iq for lossy', async (t) => {
+    t.plan(1);
+    const iq = await sharp(inputJpg)
+      .resize(32)
+      .avif({ tune: 'iq', effort: 0 })
+      .toBuffer();
+    const auto = await sharp(inputJpg)
+      .resize(32)
+      .avif({ tune: 'auto', effort: 0 })
+      .toBuffer();
+    t.assert.ok(auto.length === iq.length);
+  });
+
+  test('Auto tune defaults to ssim for lossless', async (t) => {
+    t.plan(1);
+    const ssim = await sharp(inputJpg)
+      .resize(32)
+      .avif({ tune: 'ssim', lossless: true, effort: 0 })
+      .toBuffer();
+    const auto = await sharp(inputJpg)
+      .resize(32)
+      .avif({ tune: 'auto', lossless: true, effort: 0 })
+      .toBuffer();
+    t.assert.ok(auto.length === ssim.length);
   });
 
   test('AVIF with non-zero primary item uses it as default page', async (t) => {

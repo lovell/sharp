@@ -1140,7 +1140,7 @@ suite('Input/output', () => {
       });
     const badPipeline = sharp({ raw: { width: 840, height: 500, channels: 3 } }).toFormat('jpeg');
     readable.pipe(inPipeline).pipe(badPipeline);
-    const err = await t.assert.rejects(
+    await t.assert.rejects(
       () => badPipeline.toBuffer(),
       /memory area too small/
     );
