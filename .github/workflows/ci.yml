@@ -48,7 +48,7 @@ jobs:
             nodejs_version_major: 24
             platform: linux-x64
           - os: ubuntu-24.04
-            container: node:20-alpine3.18
+            container: node:20-alpine3.20
             nodejs_version_major: 20
             platform: linuxmusl-x64
           - os: ubuntu-24.04
