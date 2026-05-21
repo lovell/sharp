@@ -270,6 +270,8 @@ Images with an alpha channel will use the combined bounding box of alpha and non
 
 If the result of this operation would trim an image to nothing then no change is made.
 
+Use the `lineArt` and `threshold` options for control over sensitivity.
+
 The `info` response Object will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
 
