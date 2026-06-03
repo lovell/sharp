@@ -29,20 +29,20 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
-            container: rockylinux:8
+            container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: linux-x64
           - os: ubuntu-24.04
-            container: rockylinux:8
+            container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: linux-x64
             package: true
           - os: ubuntu-24.04
-            container: rockylinux:8
+            container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
             nodejs_version: "^24"
             nodejs_version_major: 24
@@ -61,20 +61,20 @@ jobs:
             nodejs_version_major: 24
             platform: linuxmusl-x64
           - os: ubuntu-24.04-arm
-            container: arm64v8/rockylinux:8
+            container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: linux-arm64
           - os: ubuntu-24.04-arm
-            container: arm64v8/rockylinux:8
+            container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: linux-arm64
             package: true
           - os: ubuntu-24.04-arm
-            container: arm64v8/rockylinux:8
+            container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
             nodejs_version: "^24"
             nodejs_version_major: 24
