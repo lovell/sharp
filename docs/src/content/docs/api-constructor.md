@@ -119,6 +119,18 @@ readableStream.pipe(transformer).pipe(writableStream);
 ```
 **Example**  
 ```js
+// Web Streams API, requires Node.js >= 24.15.0
+import { Duplex } from 'node:stream';
+
+const { body } = fetch('https://...');
+const transformer = Duplex.toWeb(
+  sharp().resize(300),
+  { readableType: 'bytes' }
+);
+body.pipeThrough(transformer).pipeTo(writable);
+```
+**Example**  
+```js
 // Create a blank 300x200 PNG image of semi-translucent red pixels
 sharp({
   create: {
