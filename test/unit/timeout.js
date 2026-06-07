@@ -13,7 +13,7 @@ suite('Timeout', () => {
     t.plan(1);
     await t.assert.rejects(
       () => sharp(fixtures.inputJpg)
-        .blur(200)
+        .blur(300)
         .timeout({ seconds: 1 })
         .toBuffer(),
       /timeout: [0-9]+% complete/
