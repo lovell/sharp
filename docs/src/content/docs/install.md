@@ -55,7 +55,7 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 * FreeBSD (WebAssembly)
 
 This provides support for the
-JPEG, PNG, WebP, AVIF (limited to 8-bit depth), TIFF, GIF and SVG (input) image formats.
+JPEG, PNG, Ultra HDR, WebP, AVIF, TIFF, GIF and SVG (input) image formats.
 
 ## Cross-platform
 
