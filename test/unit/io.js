@@ -901,6 +901,20 @@ suite('Input/output', () => {
         /Expected number between 1 and 100000 for density but received zoinks of type string/
       );
     });
+    test('Invalid density: numeric string', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ density: '50' }),
+        /Expected number between 1 and 100000 for density but received 50 of type string/
+      );
+    });
+    test('Invalid density: array', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ density: [50] }),
+        /Expected number between 1 and 100000 for density but received 50 of type object/
+      );
+    });
     test('Invalid ignoreIcc: string', (t) => {
       t.plan(1);
       t.assert.throws(
