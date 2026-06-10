@@ -27,8 +27,8 @@
 
 /// <reference types="node" />
 
-import type { Duplex } from 'node:stream';
-import { ColorLike } from '@img/colour';
+declare type Duplex = import('node:stream').Duplex;
+declare type ColorLike = import('@img/colour').ColorLike;
 
 //#region Constructor functions
 

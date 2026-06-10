@@ -14,9 +14,11 @@ jobs:
         with:
           node-version: "24"
       - run: npm install --ignore-scripts
+      - run: npm run build:dist
       - run: npm run lint-cpp
       - run: npm run lint-js
       - run: npm run lint-types
+      - run: npm run lint-publish
   build-native:
     permissions:
       contents: read
@@ -171,7 +173,8 @@ jobs:
           architecture: ${{ matrix.nodejs_arch }}
       - uses: actions/checkout@v6
       - run: npm install
-      - run: npm run build:dist && npm run build
+      - run: npm run build:dist
+      - run: npm run build
       - run: npm run test-unit
       - if: matrix.package
         run: npm run package-from-local-build

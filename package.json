@@ -98,9 +98,10 @@
     "build:dist": "node scripts/build.mjs",
     "clean": "rm -rf src/build/ test/fixtures/output.*",
     "test": "npm run lint && npm run test-unit",
-    "lint": "npm run lint-cpp && npm run lint-js && npm run lint-types",
+    "lint": "npm run lint-cpp && npm run lint-js && npm run lint-types && npm run lint-publish",
     "lint-cpp": "cpplint --quiet src/*.h src/*.cc",
     "lint-js": "biome lint",
+    "lint-publish": "publint --strict",
     "lint-types": "tsd --files ./test/types/sharp.test-d.ts",
     "test-leak": "./test/leak/leak.sh",
     "test-unit": "node --experimental-test-coverage test/unit.mjs",
@@ -120,16 +121,23 @@
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
+  "sideEffects": true,
   "repository": {
     "type": "git",
-    "url": "git://github.com/lovell/sharp.git"
+    "url": "git+https://github.com/lovell/sharp.git"
   },
   "keywords": [
     "jpeg",
@@ -197,6 +205,7 @@
     "icc": "^4.0.0",
     "node-addon-api": "^8.8.0",
     "node-gyp": "^12.4.0",
+    "publint": "^0.3.21",
     "tar-fs": "^3.1.2",
     "tsd": "^0.33.0"
   },

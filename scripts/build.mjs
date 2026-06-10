@@ -27,10 +27,13 @@ function esmToCjs(input) {
     .replaceAll("const require = createRequire(import.meta.url);", "")
 }
 
-const entries = (await fs.readdir(libDir)).filter(e => e.endsWith('.mjs') || e.endsWith('.d.ts'));
+const entries = (await fs.readdir(libDir)).filter(e => e.endsWith('.mjs'));
 
 for (const entry of entries) {
   await fs.cp(new URL(entry, libDir), new URL(entry, distDir));
   const contents = await fs.readFile(new URL(entry, libDir), "utf-8");
   await fs.writeFile(new URL(entry.replace(".mjs", ".cjs"), distDir), esmToCjs(contents));
 } 
+
+await fs.cp(new URL("index.d.ts", libDir), new URL("index.d.mts", distDir));
+await fs.cp(new URL("index.d.ts", libDir), new URL("index.d.cts", distDir));
