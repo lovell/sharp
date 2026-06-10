@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-win32-ia32",
-  "version": "0.35.0-rc.7",
+  "version": "0.35.0-rc.8",
   "description": "Prebuilt sharp for use with Windows x86 (deprecated)",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
