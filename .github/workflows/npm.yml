@@ -46,10 +46,6 @@ jobs:
             runs-on: macos-15-intel
             runtime: node
             package-manager: npm
-          - name: darwin-x64-node-pnpm
-            runs-on: macos-15-intel
-            runtime: node
-            package-manager: pnpm
           - name: darwin-x64-node-yarn
             runs-on: macos-15-intel
             runtime: node
