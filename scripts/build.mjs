@@ -27,7 +27,7 @@ function esmToCjs(input) {
     .replaceAll("const require = createRequire(import.meta.url);", "")
 }
 
-const entries = (await fs.readdir(libDir)).filter(e => e.endsWith('.mjs'));
+const entries = (await fs.readdir(libDir)).filter(e => e.endsWith('.mjs') || e.endsWith('.d.ts'));
 
 for (const entry of entries) {
   await fs.cp(new URL(entry, libDir), new URL(entry, distDir));
