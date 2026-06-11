@@ -35,5 +35,6 @@ for (const entry of entries) {
   await fs.writeFile(new URL(entry.replace(".mjs", ".cjs"), distDir), esmToCjs(contents));
 } 
 
-await fs.cp(new URL("index.d.ts", libDir), new URL("index.d.mts", distDir));
-await fs.cp(new URL("index.d.ts", libDir), new URL("index.d.cts", distDir));
+const indexDts = await fs.readFile(new URL("index.d.ts", libDir), "utf-8");
+await fs.writeFile(new URL("index.d.mts", distDir), indexDts);
+await fs.writeFile(new URL("index.d.cts", distDir), indexDts.replace(/export default /, "export = "));
