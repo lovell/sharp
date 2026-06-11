@@ -51,7 +51,7 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 * Linux x64 (glibc >= 2.28, musl >= 1.2.5, CPU with SSE4.2)
 * Windows x64
 * Windows x86 (deprecated, Node.js 20 only)
-* Windows ARM64 (CPU with ARMv8.4 required for all features)
+* Windows ARM64
 * FreeBSD (WebAssembly)
 
 This provides support for the
