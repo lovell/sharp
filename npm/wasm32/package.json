@@ -15,6 +15,7 @@
   },
   "preferUnplugged": true,
   "files": [
+    "index.cjs",
     "lib",
     "versions.json"
   ],
