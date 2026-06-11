@@ -3,14 +3,14 @@
 
 {
   'variables': {
-    'vips_version': '<!(node -p "require(\'../lib/libvips.js\').minimumLibvipsVersion")',
-    'platform_and_arch': '<!(node -p "require(\'../lib/libvips.js\').buildPlatformArch()")',
+    'vips_version': '<!(node -p "require(\'../lib/libvips.js\').default.minimumLibvipsVersion")',
+    'platform_and_arch': '<!(node -p "require(\'../lib/libvips.js\').default.buildPlatformArch()")',
     'sharp_version': '<!(node -p "require(\'../package.json\').version")',
     'sharp_libvips_version': '<!(node -p "require(\'../package.json\').optionalDependencies[\'@img/sharp-libvips-<(platform_and_arch)\']")',
-    'sharp_libvips_yarn_locator': '<!(node -p "require(\'../lib/libvips.js\').yarnLocator()")',
-    'sharp_libvips_include_dir': '<!(node -p "require(\'../lib/libvips.js\').buildSharpLibvipsIncludeDir()")',
-    'sharp_libvips_cplusplus_dir': '<!(node -p "require(\'../lib/libvips.js\').buildSharpLibvipsCPlusPlusDir()")',
-    'sharp_libvips_lib_dir': '<!(node -p "require(\'../lib/libvips.js\').buildSharpLibvipsLibDir()")'
+    'sharp_libvips_yarn_locator': '<!(node -p "require(\'../lib/libvips.js\').default.yarnLocator()")',
+    'sharp_libvips_include_dir': '<!(node -p "require(\'../lib/libvips.js\').default.buildSharpLibvipsIncludeDir()")',
+    'sharp_libvips_cplusplus_dir': '<!(node -p "require(\'../lib/libvips.js\').default.buildSharpLibvipsCPlusPlusDir()")',
+    'sharp_libvips_lib_dir': '<!(node -p "require(\'../lib/libvips.js\').default.buildSharpLibvipsLibDir()")'
   },
   'targets': [{
     'target_name': 'libvips-cpp-<(vips_version)',
@@ -99,8 +99,8 @@
     'variables': {
       'conditions': [
         ['OS != "win"', {
-          'pkg_config_path': '<!(node -p "require(\'../lib/libvips.js\').pkgConfigPath()")',
-          'use_global_libvips': '<!(node -p "Boolean(require(\'../lib/libvips.js\').useGlobalLibvips()).toString()")'
+          'pkg_config_path': '<!(node -p "require(\'../lib/libvips.js\').default.pkgConfigPath()")',
+          'use_global_libvips': '<!(node -p "Boolean(require(\'../lib/libvips.js\').default.useGlobalLibvips()).toString()")'
         }, {
           'pkg_config_path': '',
           'use_global_libvips': ''

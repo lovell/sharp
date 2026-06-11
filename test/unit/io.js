@@ -3,16 +3,17 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { createReadStream, createWriteStream } = require('node:fs');
-const fs = require('node:fs/promises');
-const path = require('node:path');
-const { afterEach, beforeEach, suite, test } = require('node:test');
+import { createReadStream, createWriteStream } from 'node:fs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { afterEach, beforeEach, suite, test } from 'node:test';
 
-const { isMarkedAsUntransferable } = require('node:worker_threads');
+import { isMarkedAsUntransferable } from 'node:worker_threads';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
-const { buildPlatformArch } = require('../../lib/libvips.js');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
+import libvips from '../../lib/libvips.js';
+const { buildPlatformArch } = libvips;
 
 const outputJpg = fixtures.path('output.jpg');
 
@@ -283,7 +284,7 @@ suite('Input/output', () => {
     const done = new Promise((resolve) => {
       pipeline.once('end', resolve);
     });
-    const readableButNotAnImage = createReadStream(__filename);
+    const readableButNotAnImage = createReadStream(import.meta.filename);
     const writable = createWriteStream(outputJpg);
     readableButNotAnImage.pipe(pipeline).pipe(writable);
     const anErrorWasEmitted = await errorSeen;
@@ -294,7 +295,7 @@ suite('Input/output', () => {
 
   test('Handle File to Stream error', async (t) => {
     t.plan(1);
-    const readableButNotAnImage = sharp(__filename).resize(320, 240);
+    const readableButNotAnImage = sharp(import.meta.filename).resize(320, 240);
     const errorSeen = new Promise((resolve) => {
       readableButNotAnImage.once('error', (err) => {
         resolve(!!err);
@@ -466,7 +467,7 @@ suite('Input/output', () => {
     } catch (err) {
       t.assert.strictEqual(err.message, 'Input buffer contains unsupported image format');
       t.assert.strictEqual(true, err.stack.includes('at Sharp.toBuffer'));
-      t.assert.strictEqual(true, err.stack.includes(__filename));
+      t.assert.strictEqual(true, err.stack.includes(import.meta.filename));
     }
   });
 
@@ -477,7 +478,7 @@ suite('Input/output', () => {
     } catch (err) {
       t.assert.strictEqual(err.message, 'Input file is missing: does-not-exist');
       t.assert.strictEqual(true, err.stack.includes('at Sharp.toFile'));
-      t.assert.strictEqual(true, err.stack.includes(__filename));
+      t.assert.strictEqual(true, err.stack.includes(import.meta.filename));
     }
   });
 

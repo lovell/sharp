@@ -3,10 +3,10 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
-const semver = require('semver');
+import { suite, test } from 'node:test';
+import semver from 'semver';
 
-const sharp = require('../../');
+import sharp from '../../lib/index.js';
 
 suite('Utilities', () => {
   suite('Cache', () => {

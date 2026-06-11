@@ -3,11 +3,11 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const fs = require('node:fs/promises');
-const { suite, test } = require('node:test');
+import fs from 'node:fs/promises';
+import { suite, test } from 'node:test';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 // Test Helpers
 const threshold = 0.001;
@@ -638,7 +638,7 @@ suite('Image Stats', () => {
       (err) => {
         t.assert.ok(err.message.includes('Input file has corrupt header'));
         t.assert.ok(err.stack.includes('at Sharp.stats'));
-        t.assert.ok(err.stack.includes(__filename));
+        t.assert.ok(err.stack.includes(import.meta.filename));
         return true;
       }
     );
@@ -655,7 +655,7 @@ suite('Image Stats', () => {
       (err) => {
         t.assert.ok(err.message.includes('Input buffer has corrupt header'));
         t.assert.ok(err.stack.includes('at Sharp.stats'));
-        t.assert.ok(err.stack.includes(__filename));
+        t.assert.ok(err.stack.includes(import.meta.filename));
         return true;
       }
     );

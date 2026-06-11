@@ -3,12 +3,13 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const path = require('node:path');
-const sharp = require('../../');
-const maxColourDistance = require('../../lib/sharp.js')._maxColourDistance;
+import path from 'node:path';
+import sharp from '../../lib/index.js';
+import sharpModule from '../../lib/sharp.js';
+const maxColourDistance = sharpModule._maxColourDistance;
 
 // Helpers
-const getPath = (filename) => path.join(__dirname, filename);
+const getPath = (filename) => path.join(import.meta.dirname, filename);
 
 // Generates a 64-bit-as-binary-string image fingerprint
 // Based on the dHash gradient method - see http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html
@@ -33,7 +34,7 @@ async function fingerprint (image) {
     });
 }
 
-module.exports = {
+export default {
 
   inputJpgWithLandscapeExif1: getPath('Landscape_1.jpg'), // https://github.com/recurser/exif-orientation-examples
   inputJpgWithLandscapeExif2: getPath('Landscape_2.jpg'), // https://github.com/recurser/exif-orientation-examples
