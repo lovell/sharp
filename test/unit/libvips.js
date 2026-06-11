@@ -7,7 +7,7 @@ const fs = require('node:fs/promises');
 const { after, before, suite, test } = require('node:test');
 
 const semver = require('semver');
-const libvips = require('../../dist/libvips.cjs');
+const libvips = require('../../lib/libvips.js');
 
 const originalPlatform = process.platform;
 

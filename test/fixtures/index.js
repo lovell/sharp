@@ -5,7 +5,7 @@
 
 const path = require('node:path');
 const sharp = require('../../');
-const maxColourDistance = require('../../dist/sharp.cjs')._maxColourDistance;
+const maxColourDistance = require('../../lib/sharp.js')._maxColourDistance;
 
 // Helpers
 const getPath = (filename) => path.join(__dirname, filename);

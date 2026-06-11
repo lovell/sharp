@@ -7,7 +7,7 @@ const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
-const { inRange } = require('../../dist/is.cjs');
+const { inRange } = require('../../lib/is.js');
 
 suite('Text to image', () => {
   test('text with default values', async (t) => {

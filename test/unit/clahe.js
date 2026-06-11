@@ -5,7 +5,7 @@
 
 const { suite, test } = require('node:test');
 
-const sharp = require('../../dist/index.cjs');
+const sharp = require('../../lib/index.js');
 const fixtures = require('../fixtures');
 
 suite('Clahe', () => {

@@ -6,7 +6,7 @@
 const fs = require('node:fs/promises');
 const { suite, test } = require('node:test');
 
-const sharp = require('../../dist/index.cjs');
+const sharp = require('../../lib/index.js');
 const fixtures = require('../fixtures');
 
 suite('failOn', () => {

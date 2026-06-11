@@ -6,7 +6,7 @@
 const { suite, test } = require('node:test');
 
 const sharp = require('../../');
-const inRange = require('../../dist/is.cjs').inRange;
+const inRange = require('../../lib/is.js').inRange;
 const fixtures = require('../fixtures');
 
 suite('Trim borders', () => {
