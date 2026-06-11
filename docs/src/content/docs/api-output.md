@@ -789,8 +789,6 @@ Use these AVIF options for output image.
 
 AVIF image sequences are not supported.
 
-When using Windows ARM64, this feature requires a CPU with ARM64v8.4 or later.
-
 
 **Throws**:
 
