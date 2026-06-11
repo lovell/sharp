@@ -30,7 +30,7 @@
     "./package": "./package.json"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": "^20.19.0 || >= 22.12.0"
   },
   "config": {
     "glibc": ">=2.36"

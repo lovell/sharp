@@ -32,13 +32,13 @@ jobs:
           - os: ubuntu-24.04
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: linux-x64
           - os: ubuntu-24.04
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: linux-x64
             package: true
@@ -64,13 +64,13 @@ jobs:
           - os: ubuntu-24.04-arm
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: linux-arm64
           - os: ubuntu-24.04-arm
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: linux-arm64
             package: true
@@ -82,12 +82,12 @@ jobs:
             platform: linux-arm64
           - os: macos-15-intel
             nodejs_arch: x64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: darwin-x64
           - os: macos-15-intel
             nodejs_arch: x64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: darwin-x64
             package: true
@@ -98,12 +98,12 @@ jobs:
             platform: darwin-x64
           - os: macos-15
             nodejs_arch: arm64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: darwin-arm64
           - os: macos-15
             nodejs_arch: arm64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: darwin-arm64
             package: true
@@ -114,18 +114,18 @@ jobs:
             platform: darwin-arm64
           - os: windows-2022
             nodejs_arch: x86
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: win32-ia32
             package: true
           - os: windows-2022
             nodejs_arch: x64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: win32-x64
           - os: windows-2022
             nodejs_arch: x64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: win32-x64
             package: true
@@ -136,12 +136,12 @@ jobs:
             platform: win32-x64
           - os: windows-11-arm
             nodejs_arch: arm64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: win32-arm64
           - os: windows-11-arm
             nodejs_arch: arm64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: win32-arm64
             package: true

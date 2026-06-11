@@ -8,7 +8,7 @@ smaller, web-friendly JPEG, PNG, WebP, GIF and AVIF images of varying dimensions
 
 It can be used with all JavaScript runtimes
 that provide support for Node-API v9, including
-Node.js (>= 20.9.0), Deno and Bun.
+Node.js (^20.19.0 || >= 22.12.0), Deno and Bun.
 
 Resizing an image is typically 4x-5x faster than using the
 quickest ImageMagick and GraphicsMagick settings
