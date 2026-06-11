@@ -177,7 +177,9 @@ jobs:
       - run: npm run build
       - run: npm run test-unit
       - if: matrix.package
-        run: npm run package-from-local-build
+        run: |
+          npm run package-from-local-build
+          npm run lint-publish -- npm/${{ matrix.platform }}
       - uses: actions/upload-artifact@v7
         if: matrix.package
         with:
@@ -222,7 +224,9 @@ jobs:
       - run: npm run build:dist && npm run build
       - run: npm run test-unit
       - if: matrix.package
-        run: npm run package-from-local-build
+        run: |
+          npm run package-from-local-build
+          npm run lint-publish -- npm/linuxmusl-arm64
       - uses: actions/upload-artifact@v7
         if: matrix.package
         with:
@@ -287,6 +291,7 @@ jobs:
             npm run build
             node --test test/unit/io.js
             npm run package-from-local-build
+            npm run lint-publish -- npm/${{ matrix.platform }}
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.platform }}
@@ -319,6 +324,7 @@ jobs:
           test "$EMSCRIPTEN_VERSION_LIBVIPS" = "$EMSCRIPTEN_VERSION_SHARP"
       - run: emmake npm run test-unit
       - run: emmake npm run package-from-local-build
+      - run: npm run lint-publish -- npm/wasm32
       - uses: actions/upload-artifact@v7
         with:
           name: wasm32
