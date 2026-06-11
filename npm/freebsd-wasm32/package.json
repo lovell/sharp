@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-freebsd-wasm32",
-  "version": "0.35.1-rc.1",
+  "version": "0.35.1",
   "description": "Prebuilt sharp for use with FreeBSD (WebAssembly)",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -35,7 +35,7 @@
     }
   },
   "dependencies": {
-    "@img/sharp-wasm32": "0.35.1-rc.1"
+    "@img/sharp-wasm32": "0.35.1"
   },
   "engines": {
     "node": ">=20.9.0"
