@@ -8,7 +8,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { afterEach, beforeEach, suite, test } from 'node:test';
 
-import { isMarkedAsUntransferable } from 'node:worker_threads';
+import workerThreads from 'node:worker_threads';
+const { isMarkedAsUntransferable } = workerThreads;
 
 import sharp from '../../lib/index.js';
 import fixtures from '../fixtures/index.js';
