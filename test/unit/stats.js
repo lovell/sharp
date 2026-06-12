@@ -500,6 +500,36 @@ suite('Image Stats', () => {
     });
   });
 
+  test('Stream input with corrupt header, Callback out, fails gracefully', (t, done) => {
+    t.plan(2);
+    const pipeline = sharp();
+    fs.open(fixtures.inputJpgWithCorruptHeader).then((fd) => {
+      fd.createReadStream().pipe(pipeline);
+    });
+    pipeline.stats((err) => {
+      t.assert.ok(err instanceof Error);
+      t.assert.ok(err.message.includes('Input buffer has corrupt header'));
+      done();
+    });
+  });
+
+  test('File in, Callback out', (t, done) => {
+    t.plan(2);
+    sharp(fixtures.inputJpg).stats((err, stats) => {
+      t.assert.ok(!err);
+      t.assert.strictEqual(true, stats.isOpaque);
+      done();
+    });
+  });
+
+  test('File input with corrupt header, Callback out, fails gracefully', (t, done) => {
+    t.plan(1);
+    sharp(fixtures.inputJpgWithCorruptHeader).stats((err) => {
+      t.assert.ok(err instanceof Error);
+      done();
+    });
+  });
+
   test('Stream in, Promise out', async (t) => {
     t.plan(48);
     const fd = await fs.open(fixtures.inputJpg);

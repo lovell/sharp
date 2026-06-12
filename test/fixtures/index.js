@@ -16,7 +16,7 @@ const getPath = (filename) => path.join(import.meta.dirname, filename);
 async function fingerprint (image) {
   return sharp(image)
     .flatten('gray')
-    .greyscale()
+    .grayscale()
     .normalise()
     .resize(9, 8, { fit: sharp.fit.fill })
     .raw()
