@@ -813,3 +813,9 @@ sharp({ limitInputChannels: false });
 // @ts-expect-error
 sharp({ limitInputChannels: 'fail' });
 sharp(input).composite([{ limitInputChannels: 6 }]);
+
+sharp().metadata().then((metadata: sharp.Metadata) => {
+  if (metadata.mediaType) {
+    const mediaType: sharp.MediaType = metadata.mediaType;
+  }
+});

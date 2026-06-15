@@ -151,10 +151,14 @@ suite('GIF input', () => {
   });
 
   test('invalid effort throws', (t) => {
-    t.plan(2);
+    t.plan(3);
     t.assert.throws(() => {
       sharp().gif({ effort: 0 });
     });
+    t.assert.throws(
+      () => sharp().gif({ effort: 7.5 }),
+      /Expected integer between 1 and 10 for effort but received 7.5 of type number/
+    );
     t.assert.throws(() => {
       sharp().gif({ effort: 'fail' });
     });

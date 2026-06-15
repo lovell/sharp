@@ -1187,6 +1187,23 @@ declare namespace sharp {
 
     type Unit = 'inch' | 'cm';
 
+    type MediaType =
+        'application/pdf' |
+        'image/avif' |
+        'image/fits' |
+        'image/gif' |
+        'image/heic' |
+        'image/jp2' |
+        'image/jpeg' |
+        'image/jxl' |
+        'image/png' |
+        'image/svg+xml' |
+        'image/tiff' |
+        'image/vnd.radiance' |
+        'image/webp' |
+        'image/x-exr' |
+        'image/x-portable-pixmap';
+
     interface WriteableMetadata {
         /** Number of pixels per inch (DPI) */
         density?: number | undefined;
@@ -1280,6 +1297,8 @@ declare namespace sharp {
         comments?: CommentsMetadata[] | undefined;
         /** HDR gain map, if present */
         gainMap?: GainMapMetadata | undefined;
+        /** Media Type (MIME Type) */
+        mediaType?: MediaType | undefined;
     }
 
     interface LevelMetadata {
