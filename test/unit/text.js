@@ -10,11 +10,6 @@ import fixtures from '../fixtures/index.js';
 import is from '../../lib/is.js';
 const { inRange } = is;
 
-// Windows CI runners resolve a different default font via fontconfig, so
-// text rendered at a given size has different metrics and the autofit DPI
-// search produces values outside the ranges these assertions expect.
-const win32 = process.platform === 'win32';
-
 suite('Text to image', () => {
   test('text with default values', async (t) => {
     const output = fixtures.path('output.text-default.png');
@@ -59,15 +54,13 @@ suite('Text to image', () => {
     if (!sharp.versions.pango) {
       return t.skip();
     }
-    t.plan(win32 ? 2 : 5);
+    t.plan(5);
     const info = await text.toFile(output);
     t.assert.strictEqual('png', info.format);
     t.assert.strictEqual(3, info.channels);
-    if (!win32) {
-      t.assert.ok(inRange(info.width, 400, 600), `Actual width ${info.width}`);
-      t.assert.ok(inRange(info.height, 290, 500), `Actual height ${info.height}`);
-      t.assert.ok(inRange(info.textAutofitDpi, 900, 1300), `Actual textAutofitDpi ${info.textAutofitDpi}`);
-    }
+    t.assert.ok(inRange(info.width, 400, 600), `Actual width ${info.width}`);
+    t.assert.ok(inRange(info.height, 290, 500), `Actual height ${info.height}`);
+    t.assert.ok(inRange(info.textAutofitDpi, 900, 1300), `Actual textAutofitDpi ${info.textAutofitDpi}`);
   });
 
   test('text with dpi', async (t) => {
@@ -99,8 +92,7 @@ suite('Text to image', () => {
         dpi
       }
     });
-    // The substituted Windows font at this size exceeds cairo's surface limits
-    if (!sharp.versions.pango || win32) {
+    if (!sharp.versions.pango) {
       return t.skip();
     }
     t.plan(5);
