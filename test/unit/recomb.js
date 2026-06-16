@@ -164,5 +164,11 @@ suite('Recomb', () => {
         sharp(fixtures.inputJpg).recomb([[1, 2, 3, 4], [5, 6, 7, 8]]);
       });
     });
+    test('non-numeric entries', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).recomb([['a', 'b', 'c'], [1, 2, 3], [4, 5, 6]]);
+      });
+    });
   });
 });

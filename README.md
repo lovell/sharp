@@ -1,6 +1,6 @@
 # sharp
 
-<img src="https://sharp.pixelplumbing.com/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right">
+<picture><img src="https://sharp.pixelplumbing.com/sharp-logo.svg" width="160" height="160" alt="sharp logo" align="right"></picture>
 
 The typical use case for this high speed Node-API module
 is to convert large images in common formats to
