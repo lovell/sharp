@@ -28,6 +28,7 @@ function esmToCjs(input) {
 }
 
 function typeDefsToEsm(input) {
+  input = input.replace(/\r\n/g, '\n');
   input = input.replace(/declare function sharp\(options\?:\s*sharp\.SharpOptions\):\s*sharp\.Sharp;\n?/g, '');
   input = input.replace(/declare function sharp\(\s*\n\s*input\?:\s*sharp\.SharpInput\s*\|\s*Array<sharp\.SharpInput>,\s*\n\s*options\?:\s*sharp\.SharpOptions,\s*\n\):\s*sharp\.Sharp;\n?/g, '');
 
