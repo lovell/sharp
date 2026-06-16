@@ -154,11 +154,11 @@ jobs:
       - name: Dependencies (Rocky Linux glibc)
         if: contains(matrix.container, 'rockylinux')
         run: |
-          dnf install -y gcc-toolset-14-gcc-c++ make git python3.12 fontconfig google-noto-sans-fonts
+          dnf install -y gcc-toolset-14-gcc-c++ make git python3.12 fontconfig
           echo "/opt/rh/gcc-toolset-14/root/usr/bin" >> $GITHUB_PATH
       - name: Dependencies (Linux musl)
         if: contains(matrix.container, 'alpine')
-        run: apk add build-base git python3 font-noto --update-cache
+        run: apk add build-base git python3 fontconfig --update-cache
       - name: Dependencies (Python 3.11 - macOS, Windows)
         if: contains(matrix.os, 'macos') || contains(matrix.os, 'windows')
         uses: actions/setup-python@v6
@@ -216,7 +216,7 @@ jobs:
           mkdir /opt/bin
           ln -s /usr/bin/node /opt/bin/node
       - name: Dependencies
-        run: apk add build-base git python3 font-noto --update-cache
+        run: apk add build-base git python3 fontconfig --update-cache
       - uses: actions/checkout@v6
       - run: npm install
       - run: npm run build
