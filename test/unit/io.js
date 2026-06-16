@@ -503,7 +503,7 @@ suite('Input/output', () => {
     } catch (err) {
       t.assert.strictEqual(err.message, 'Input buffer contains unsupported image format');
       t.assert.strictEqual(true, err.stack.includes('at Sharp.toBuffer'));
-      t.assert.strictEqual(true, err.stack.includes(import.meta.filename));
+      t.assert.strictEqual(true, err.stack.includes(import.meta.filename.replace(/\\/g, '/')));
     }
   });
 
@@ -514,7 +514,7 @@ suite('Input/output', () => {
     } catch (err) {
       t.assert.strictEqual(err.message, 'Input file is missing: does-not-exist');
       t.assert.strictEqual(true, err.stack.includes('at Sharp.toFile'));
-      t.assert.strictEqual(true, err.stack.includes(import.meta.filename));
+      t.assert.strictEqual(true, err.stack.includes(import.meta.filename.replace(/\\/g, '/')));
     }
   });
 

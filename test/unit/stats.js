@@ -668,7 +668,7 @@ suite('Image Stats', () => {
       (err) => {
         t.assert.ok(err.message.includes('Input file has corrupt header'));
         t.assert.ok(err.stack.includes('at Sharp.stats'));
-        t.assert.ok(err.stack.includes(import.meta.filename));
+        t.assert.ok(err.stack.includes(import.meta.filename.replace(/\\/g, '/')));
         return true;
       }
     );
@@ -685,7 +685,7 @@ suite('Image Stats', () => {
       (err) => {
         t.assert.ok(err.message.includes('Input buffer has corrupt header'));
         t.assert.ok(err.stack.includes('at Sharp.stats'));
-        t.assert.ok(err.stack.includes(import.meta.filename));
+        t.assert.ok(err.stack.includes(import.meta.filename.replace(/\\/g, '/')));
         return true;
       }
     );
