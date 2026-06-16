@@ -102,7 +102,7 @@
     "lint-cpp": "cpplint --quiet src/*.h src/*.cc",
     "lint-js": "biome lint",
     "lint-publish": "publint --strict",
-    "lint-types": "tsd --files ./test/types/sharp.test-d.ts",
+    "lint-types": "tsd --files ./test/types/sharp.test-d.{cts,mts}",
     "test-leak": "./test/leak/leak.sh",
     "test-unit": "node --experimental-test-coverage test/unit.mjs",
     "package-from-local-build": "node npm/from-local-build.js",
