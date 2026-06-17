@@ -32,4 +32,11 @@ suite('Erode', () => {
       sharp(fixtures.inputJpg).erode(-1);
     });
   });
+
+  test('oversized erosion width is rejected', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp(fixtures.inputJpg).erode(2147483648);
+    });
+  });
 });
