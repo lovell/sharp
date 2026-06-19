@@ -14,7 +14,9 @@ suite('Text to image', () => {
     const output = fixtures.path('output.text-default.png');
     const text = sharp({
       text: {
-        text: 'Hello, world !'
+        text: 'Hello, world !',
+        font: fixtures.fontFamily,
+        fontfile: fixtures.fontFile
       }
     });
     if (!sharp.versions.pango) {
@@ -46,6 +48,8 @@ suite('Text to image', () => {
     const text = sharp({
       text: {
         text: 'Hello, world!',
+        font: fixtures.fontFamily,
+        fontfile: fixtures.fontFile,
         width: 500,
         height: 400
       }
@@ -68,6 +72,8 @@ suite('Text to image', () => {
     const text = sharp({
       text: {
         text: 'Hello, world!',
+        font: fixtures.fontFamily,
+        fontfile: fixtures.fontFile,
         dpi
       }
     });
@@ -87,6 +93,8 @@ suite('Text to image', () => {
     const text = sharp({
       text: {
         text: '<span foreground="red" font="100">red</span><span font="50" background="cyan">blue</span>',
+        font: fixtures.fontFamily,
+        fontfile: fixtures.fontFile,
         rgba: true,
         dpi
       }
@@ -109,7 +117,8 @@ suite('Text to image', () => {
     const text = sharp({
       text: {
         text: 'Hello, world!',
-        font: 'sans 100'
+        font: `${fixtures.fontFamily} 100`,
+        fontfile: fixtures.fontFile
       }
     });
     if (!sharp.versions.pango) {
@@ -133,6 +142,8 @@ suite('Text to image', () => {
         input: {
           text: {
             text: '<span foreground="#ffff00">Watermark</span> <span foreground="white"><i>is cool</i></span>',
+            font: fixtures.fontFamily,
+            fontfile: fixtures.fontFile,
             width: 300,
             height: 300,
             justify: true,
@@ -146,7 +157,8 @@ suite('Text to image', () => {
         input: {
           text: {
             text: '<span background="cyan">cool</span>',
-            font: 'sans 30',
+            font: `${fixtures.fontFamily} 30`,
+            fontfile: fixtures.fontFile,
             dpi,
             rgba: true
           }

@@ -803,6 +803,34 @@ suite('Image metadata', () => {
     await t.assert.rejects(() => sharp('fail').metadata(), /Input file is missing: fail/);
   });
 
+  test('File in, callback out', async (t) => {
+    t.plan(2);
+    const metadata = await new Promise((resolve, reject) => {
+      sharp(fixtures.inputJpg).metadata((err, metadata) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(metadata);
+      });
+    });
+    t.assert.strictEqual(metadata.format, 'jpeg');
+    t.assert.strictEqual(metadata.width, 2725);
+  });
+
+  test('Non-existent file in, callback out', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(() => new Promise((resolve, reject) => {
+      sharp('fail').metadata((err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+    }), /Input file is missing: fail/);
+  });
+
   test('Invalid stream in, callback out', async (t) => {
     t.plan(1);
     const fd = await fs.open(__filename);
@@ -818,6 +846,26 @@ suite('Image metadata', () => {
         })
       );
     }), /Input buffer contains unsupported image format/);
+  });
+
+  test('Stream in, callback out', async (t) => {
+    t.plan(2);
+    const fd = await fs.open(fixtures.inputJpg);
+    const readable = fd.createReadStream();
+    const pipeline = sharp();
+    const metadata = await new Promise((resolve, reject) => {
+      readable.pipe(
+        pipeline.metadata((err, metadata) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve(metadata);
+        })
+      );
+    });
+    t.assert.strictEqual(metadata.format, 'jpeg');
+    t.assert.strictEqual(metadata.width, 2725);
   });
 
   test('Stream in, Promise out', async (t) => {
