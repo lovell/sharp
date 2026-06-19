@@ -3,7 +3,7 @@
 
 import { createReadStream, createWriteStream } from 'node:fs';
 
-import sharp from '../../';
+import sharp, { type Colour, type Color, type MediaType, type Metadata, type OutputInfo, type Raw, type Sharp } from '../../';
 
 const input: Buffer = Buffer.alloc(0);
 const readableStream: NodeJS.ReadableStream = createReadStream(input);
@@ -83,7 +83,7 @@ sharp({
 
 let transformer = sharp()
   .resize(300)
-  .on('info', (info: sharp.OutputInfo) => {
+  .on('info', (info: OutputInfo) => {
     console.log(`Image height is ${info.height}`);
   });
 readableStream.pipe(transformer).pipe(writableStream);
@@ -98,17 +98,17 @@ sharp.queue.on('change', (queueLength: number) => {
   console.log(`Queue contains ${queueLength} task(s)`);
 });
 
-let pipeline: sharp.Sharp = sharp().rotate();
+let pipeline: Sharp = sharp().rotate();
 pipeline.clone().resize(800, 600).pipe(writableStream);
 pipeline.clone().extract({ left: 20, top: 20, width: 100, height: 100 }).pipe(writableStream);
 readableStream.pipe(pipeline);
 // firstWritableStream receives auto-rotated, resized readableStream
 // secondWritableStream receives auto-rotated, extracted region of readableStream
 
-const image: sharp.Sharp = sharp(input);
+const image: Sharp = sharp(input);
 image
   .metadata()
-  .then<Buffer | undefined>((metadata: sharp.Metadata) => {
+  .then<Buffer | undefined>((metadata: Metadata) => {
     if (metadata.width) {
       return image
         .resize(Math.round(metadata.width / 2))
@@ -123,7 +123,7 @@ image
 pipeline = sharp()
   .rotate()
   .resize(undefined, 200)
-  .toBuffer((err: Error, outputBuffer: Buffer, info: sharp.OutputInfo) => {
+  .toBuffer((err: Error, outputBuffer: Buffer, info: OutputInfo) => {
     // outputBuffer contains 200px high JPEG image data,
     // auto-rotated using EXIF Orientation tag
     // info.width and info.height contain the dimensions of the resized image
@@ -157,7 +157,7 @@ sharp(input)
     kernel: [-1, 0, 1, -2, 0, 2, -1, 0, 1],
   })
   .raw()
-  .toBuffer((err: Error, data: Buffer, info: sharp.OutputInfo) => {
+  .toBuffer((err: Error, data: Buffer, info: OutputInfo) => {
     // data contains the raw pixel data representing the convolution
     // of the input image with the horizontal Sobel operator
   });
@@ -167,7 +167,7 @@ sharp('input.tiff')
   .tile({
     size: 512,
   })
-  .toFile('output.dz', (err: Error, info: sharp.OutputInfo) => {
+  .toFile('output.dz', (err: Error, info: OutputInfo) => {
     // output.dzi is the Deep Zoom XML definition
     // output_files contains 512x512 tiles grouped by zoom level
   });
@@ -245,7 +245,7 @@ sharp(input)
 sharp(input)
   .resize(100, 100)
   .toBuffer({ resolveWithObject: true })
-  .then((object: { data: Buffer; info: sharp.OutputInfo }) => {
+  .then((object: { data: Buffer; info: OutputInfo }) => {
     // Resolve with an object containing data Buffer and an OutputInfo object
     // when resolveWithObject is true
   });
@@ -727,8 +727,8 @@ sharp(input).composite([
 ])
 
 // Support format-specific input options
-const colour: sharp.Colour = '#fff';
-const color: sharp.Color = { l: 1, a: 2, b: 3 };
+const colour: Colour = '#fff';
+const color: Color = { l: 1, a: 2, b: 3 };
 sharp({ pdf: { background: colour } });
 sharp({ pdf: { background: color } });
 sharp({ pdfBackground: colour }); // Deprecated
@@ -744,7 +744,7 @@ sharp({ svg: { highBitdepth: true }});
 sharp({ svg: { highBitdepth: false }});
 
 // Raw input options
-const raw: sharp.Raw = { width: 1, height: 1, channels: 3 };
+const raw: Raw = { width: 1, height: 1, channels: 3 };
 sharp({ raw });
 sharp({ raw: { ...raw, premultiplied: true } });
 sharp({ raw: { ...raw, premultiplied: false } });
@@ -814,8 +814,8 @@ sharp({ limitInputChannels: false });
 sharp({ limitInputChannels: 'fail' });
 sharp(input).composite([{ limitInputChannels: 6 }]);
 
-sharp().metadata().then((metadata: sharp.Metadata) => {
+sharp().metadata().then((metadata: Metadata) => {
   if (metadata.mediaType) {
-    const mediaType: sharp.MediaType = metadata.mediaType;
+    const mediaType: MediaType = metadata.mediaType;
   }
 });

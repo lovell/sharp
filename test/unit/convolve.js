@@ -96,5 +96,25 @@ suite('Convolve', () => {
         });
       });
     });
+    test('non-numeric kernel value', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).convolve({
+          width: 3,
+          height: 3,
+          kernel: [1, 2, 3, 4, '5', 6, 7, 8, 9]
+        });
+      });
+    });
+    test('NaN kernel value', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).convolve({
+          width: 3,
+          height: 3,
+          kernel: [1, 2, 3, 4, NaN, 6, 7, 8, 9]
+        });
+      });
+    });
   });
 });

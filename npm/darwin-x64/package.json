@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-darwin-x64",
-  "version": "0.35.1",
+  "version": "0.35.2-rc.2",
   "description": "Prebuilt sharp for use with macOS x64",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -15,7 +15,7 @@
   },
   "preferUnplugged": true,
   "optionalDependencies": {
-    "@img/sharp-libvips-darwin-x64": "1.3.0"
+    "@img/sharp-libvips-darwin-x64": "1.3.1-rc.0"
   },
   "files": [
     "index.cjs",

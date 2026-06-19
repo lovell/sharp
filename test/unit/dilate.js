@@ -32,4 +32,11 @@ suite('Dilate', () => {
       sharp(fixtures.inputJpg).dilate(-1);
     });
   });
+
+  test('oversized dilation width is rejected', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp(fixtures.inputJpg).dilate(2147483648);
+    });
+  });
 });

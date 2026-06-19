@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-webcontainers-wasm32",
-  "version": "0.35.1",
+  "version": "0.35.2-rc.2",
   "description": "Prebuilt sharp for use with WebContainers (WebAssembly)",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -35,7 +35,7 @@
     }
   },
   "dependencies": {
-    "@img/sharp-wasm32": "0.35.1"
+    "@img/sharp-wasm32": "0.35.2-rc.2"
   },
   "engines": {
     "node": "^20.19.0 || >= 22.12.0"
