@@ -15,7 +15,7 @@ const getPath = (filename) => path.join(__dirname, filename);
 async function fingerprint (image) {
   return sharp(image)
     .flatten('gray')
-    .greyscale()
+    .grayscale()
     .normalise()
     .resize(9, 8, { fit: sharp.fit.fill })
     .raw()
@@ -144,6 +144,11 @@ module.exports = {
   testPattern: getPath('test-pattern.png'),
 
   inputPngWithTransparent: getPath('d.png'),
+
+  // Font bundled to keep text rendering deterministic across platforms
+  fontFile: getPath('NotoSans-Regular.ttf'), // SIL Open Font License 1.1 - https://fonts.google.com/noto/specimen/Noto+Sans
+  fontFamily: 'Noto Sans',
+
   // Path for tests requiring human inspection
   path: getPath,
 
