@@ -228,15 +228,15 @@ suite('Text to image', () => {
     t.plan(3);
     t.assert.throws(
       () => sharp({ text: { text: 'text', width: 'bad' } }),
-      /Expected positive integer for text\.width but received bad of type string/
+      /Expected integer between 1 and 1000000 for text\.width but received bad of type string/
     );
     t.assert.throws(
       () => sharp({ text: { text: 'text', width: 0.1 } }),
-      /Expected positive integer for text\.width but received 0.1 of type number/
+      /Expected integer between 1 and 1000000 for text\.width but received 0.1 of type number/
     );
     t.assert.throws(
       () => sharp({ text: { text: 'text', width: -1 } }),
-      /Expected positive integer for text\.width but received -1 of type number/
+      /Expected integer between 1 and 1000000 for text\.width but received -1 of type number/
     );
   });
 
@@ -244,15 +244,15 @@ suite('Text to image', () => {
     t.plan(3);
     t.assert.throws(
       () => sharp({ text: { text: 'text', height: 'bad' } }),
-      /Expected positive integer for text\.height but received bad of type string/
+      /Expected integer between 1 and 1000000 for text\.height but received bad of type string/
     );
     t.assert.throws(
       () => sharp({ text: { text: 'text', height: 0.1 } }),
-      /Expected positive integer for text\.height but received 0.1 of type number/
+      /Expected integer between 1 and 1000000 for text\.height but received 0.1 of type number/
     );
     t.assert.throws(
       () => sharp({ text: { text: 'text', height: -1 } }),
-      /Expected positive integer for text\.height but received -1 of type number/
+      /Expected integer between 1 and 1000000 for text\.height but received -1 of type number/
     );
   });
 

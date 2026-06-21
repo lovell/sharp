@@ -509,31 +509,35 @@ suite('TIFF', () => {
   });
 
   test('Invalid TIFF tileHeight value throws error', (t) => {
-    t.plan(1);
-    t.assert.throws(() => {
-      sharp().tiff({ tileHeight: '256' });
-    });
+    t.plan(3);
+    t.assert.throws(
+      () => sharp().tiff({ tileHeight: '256' }),
+      /Expected integer between 1 and 32768 for tileHeight but received 256 of type string/
+    );
+    t.assert.throws(
+      () => sharp().tiff({ tileHeight: 0 }),
+      /Expected integer between 1 and 32768 for tileHeight but received 0 of type number/
+    );
+    t.assert.throws(
+      () => sharp().tiff({ tileHeight: 32769 }),
+      /Expected integer between 1 and 32768 for tileHeight but received 32769 of type number/
+    );
   });
 
   test('Invalid TIFF tileWidth value throws error', (t) => {
-    t.plan(1);
-    t.assert.throws(() => {
-      sharp().tiff({ tileWidth: '256' });
-    });
-  });
-
-  test('Invalid TIFF tileHeight value throws error', (t) => {
-    t.plan(1);
-    t.assert.throws(() => {
-      sharp().tiff({ tileHeight: 0 });
-    });
-  });
-
-  test('Invalid TIFF tileWidth value throws error', (t) => {
-    t.plan(1);
-    t.assert.throws(() => {
-      sharp().tiff({ tileWidth: 0 });
-    });
+    t.plan(3);
+    t.assert.throws(
+      () => sharp().tiff({ tileWidth: '256' }),
+      /Expected integer between 1 and 32768 for tileWidth but received 256 of type string/
+    );
+    t.assert.throws(
+      () => sharp().tiff({ tileWidth: 0 }),
+      /Expected integer between 1 and 32768 for tileWidth but received 0 of type number/
+    );
+    t.assert.throws(
+      () => sharp().tiff({ tileWidth: 32769 }),
+      /Expected integer between 1 and 32768 for tileWidth but received 32769 of type number/
+    );
   });
 
   test('TIFF file input with invalid page fails gracefully', async (t) => {

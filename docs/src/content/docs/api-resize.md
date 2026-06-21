@@ -174,10 +174,10 @@ This operation will always occur after resizing and extraction, if any.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | extend | <code>number</code> \| <code>Object</code> |  | single pixel count to add to all edges or an Object with per-edge counts |
-| [extend.top] | <code>number</code> | <code>0</code> |  |
-| [extend.left] | <code>number</code> | <code>0</code> |  |
-| [extend.bottom] | <code>number</code> | <code>0</code> |  |
-| [extend.right] | <code>number</code> | <code>0</code> |  |
+| [extend.top] | <code>number</code> | <code>0</code> | number of pixels to add to the top edge, valid values are integers in the range 0-10000 |
+| [extend.left] | <code>number</code> | <code>0</code> | number of pixels to add to the left edge, valid values are integers in the range 0-10000 |
+| [extend.bottom] | <code>number</code> | <code>0</code> | number of pixels to add to the bottom edge, valid values are integers in the range 0-10000 |
+| [extend.right] | <code>number</code> | <code>0</code> | number of pixels to add to the right edge, valid values are integers in the range 0-10000 |
 | [extend.extendWith] | <code>String</code> | <code>&#x27;background&#x27;</code> | populate new pixels using this method, one of: background, copy, repeat, mirror. |
 | [extend.background] | <code>String</code> \| <code>Object</code> | <code>{r: 0, g: 0, b: 0, alpha: 1}</code> | background colour, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to black without transparency. |
 

@@ -496,8 +496,8 @@ This will, in general, enhance the clarity of the image by bringing out darker d
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  |  |
-| options.width | <code>number</code> |  | Integral width of the search window, in pixels. |
-| options.height | <code>number</code> |  | Integral height of the search window, in pixels. |
+| options.width | <code>number</code> |  | Integral width of the search window, in pixels, between 1 and 65536. |
+| options.height | <code>number</code> |  | Integral height of the search window, in pixels, between 1 and 65536. |
 | [options.maxSlope] | <code>number</code> | <code>3</code> | Integral level of brightening, between 0 and 100, where 0 disables contrast limiting. |
 
 **Example**  
