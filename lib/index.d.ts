@@ -1641,7 +1641,7 @@ declare namespace sharp {
         threshold?: number | undefined;
         /** Does the input more closely resemble line art (e.g. vector) rather than being photographic? (optional, default false) */
         lineArt?: boolean | undefined;
-        /** Leave a margin around trimmed content, value is in pixels. (optional, default 0) */
+        /** Leave a margin around trimmed content, integral number of pixels between 0 and 10000000. (optional, default 0) */
         margin?: number | undefined;
     }
 
