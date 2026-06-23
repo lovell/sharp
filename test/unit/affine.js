@@ -73,6 +73,20 @@ suite('Affine transform', () => {
           .affine([[4, 4], [4, 4]], { ody: 'invalid ody type' });
       });
     });
+    test('Non-finite idx offset', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[4, 4], [4, 4]], { idx: Infinity });
+      });
+    });
+    test('Non-finite idy offset', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[4, 4], [4, 4]], { idy: -Infinity });
+      });
+    });
     test('Invalid interpolator', (t) => {
       t.plan(1);
       t.assert.throws(() => {
