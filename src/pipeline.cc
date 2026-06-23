@@ -608,38 +608,25 @@ class PipelineWorker : public Napi::AsyncWorker {
         baton->width = image.width() + baton->extendLeft + baton->extendRight;
         baton->height = (nPages > 1 ? targetPageHeight : image.height()) + baton->extendTop + baton->extendBottom;
 
+        std::vector<double> background;
         if (baton->extendWith == VIPS_EXTEND_BACKGROUND) {
-          std::vector<double> background;
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
-
-          image = sharp::StaySequential(image, nPages > 1);
-          image = nPages > 1
-            ? sharp::EmbedMultiPage(image,
-                baton->extendLeft, baton->extendTop, baton->width, baton->height,
-                baton->extendWith, background, nPages, &targetPageHeight)
-            : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
-                VImage::option()->set("extend", baton->extendWith)->set("background", background));
-          if (baton->keepGainMap) {
-            gainMap = gainMap.embed(baton->extendLeft / gainMapScaleFactor, baton->extendTop / gainMapScaleFactor,
-              baton->width / gainMapScaleFactor, baton->height / gainMapScaleFactor, VImage::option()
-                ->set("extend", baton->extendWith)
-                ->set("background", 0));
-          }
-        } else {
-          std::vector<double> ignoredBackground(1);
-          image = sharp::StaySequential(image);
-          image = nPages > 1
-            ? sharp::EmbedMultiPage(image,
-                baton->extendLeft, baton->extendTop, baton->width, baton->height,
-                baton->extendWith, ignoredBackground, nPages, &targetPageHeight)
-            : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height,
-                VImage::option()->set("extend", baton->extendWith));
-          if (baton->keepGainMap) {
-            gainMap = gainMap.embed(baton->extendLeft / gainMapScaleFactor, baton->extendTop / gainMapScaleFactor,
-              baton->width / gainMapScaleFactor, baton->height / gainMapScaleFactor, VImage::option()
-                ->set("extend", baton->extendWith)
-                ->set("background", 0));
-          }
+        }
+        image = sharp::StaySequential(image, nPages > 1 || baton->extendWith != VIPS_EXTEND_BACKGROUND);
+        auto options = VImage::option()->set("extend", baton->extendWith);
+        if (baton->extendWith == VIPS_EXTEND_BACKGROUND) {
+          options->set("background", background);
+        }
+        image = nPages > 1
+          ? sharp::EmbedMultiPage(image,
+              baton->extendLeft, baton->extendTop, baton->width, baton->height,
+              baton->extendWith, background, nPages, &targetPageHeight)
+          : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height, options);
+        if (baton->keepGainMap) {
+          gainMap = gainMap.embed(baton->extendLeft / gainMapScaleFactor, baton->extendTop / gainMapScaleFactor,
+            baton->width / gainMapScaleFactor, baton->height / gainMapScaleFactor, VImage::option()
+              ->set("extend", baton->extendWith)
+              ->set("background", 0));
         }
       }
       // Median - must happen before blurring, due to the utility of blurring after thresholding
