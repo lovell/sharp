@@ -236,10 +236,10 @@ Extract/crop a region of the image.
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | describes the region to extract using integral pixel values |
-| options.left | <code>number</code> | zero-indexed offset from left edge |
-| options.top | <code>number</code> | zero-indexed offset from top edge |
-| options.width | <code>number</code> | width of region to extract |
-| options.height | <code>number</code> | height of region to extract |
+| options.left | <code>number</code> | zero-indexed offset from left edge, an integer between 0 and 100000000 |
+| options.top | <code>number</code> | zero-indexed offset from top edge, an integer between 0 and 100000000 |
+| options.width | <code>number</code> | width of region to extract, an integer between 0 and 100000000 |
+| options.height | <code>number</code> | height of region to extract, an integer between 0 and 100000000 |
 
 **Example**  
 ```js
