@@ -61,6 +61,20 @@ suite('Raw pixel data', () => {
       });
     });
 
+    test('Width beyond pixel limit', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp({ raw: { width: 100000001, height: 1, channels: 4 } });
+      });
+    });
+
+    test('Height beyond pixel limit', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp({ raw: { width: 1, height: 100000001, channels: 4 } });
+      });
+    });
+
     test('Invalid premultiplied', (t) => {
       t.plan(1);
       t.assert.throws(
