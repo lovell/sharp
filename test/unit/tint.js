@@ -105,4 +105,16 @@ suite('Tint', () => {
       () => fixtures.assertMaxColourDistance(output, fixtures.expected('tint-cmyk.jpg'), maxDistance)
     );
   });
+
+  test('non-numeric colour component fails', (t) => {
+    t.plan(2);
+    t.assert.throws(
+      () => sharp().tint({ r: 'fail', g: 0, b: 0 }),
+      /Expected valid colour for background but received \[object Object\] of type object/
+    );
+    t.assert.throws(
+      () => sharp().tint({ r: NaN, g: 0, b: 0 }),
+      /Expected valid colour for background but received \[object Object\] of type object/
+    );
+  });
 });
