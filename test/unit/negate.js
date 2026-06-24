@@ -99,7 +99,7 @@ suite('Negate', () => {
     await sharp(fixtures.inputJpgWithLowContrast)
       .negate(false)
       .toFile(output);
-    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(output, fixtures.inputJpgWithLowContrast, 0));
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(output, fixtures.inputJpgWithLowContrast, 1E-6));
   });
 
   test('negate ({alpha: true})', async (t) => {

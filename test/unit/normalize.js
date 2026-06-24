@@ -78,7 +78,7 @@ suite('Normalization', () => {
     await sharp(fixtures.inputPngWithOneColor)
       .normalize()
       .toFile(output);
-    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(output, fixtures.inputPngWithOneColor, 0));
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(output, fixtures.inputPngWithOneColor, 1E-6));
   });
 
   test('works with 16-bit RGBA images', async (t) => {

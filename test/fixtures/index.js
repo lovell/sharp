@@ -4,6 +4,8 @@
 */
 
 const path = require('node:path');
+const { endianness } = require('node:os');
+
 const sharp = require('../../');
 const maxColourDistance = require('../../dist/sharp.cjs')._maxColourDistance;
 
@@ -148,6 +150,8 @@ module.exports = {
   // Font bundled to keep text rendering deterministic across platforms
   fontFile: getPath('NotoSans-Regular.ttf'), // SIL Open Font License 1.1 - https://fonts.google.com/noto/specimen/Noto+Sans
   fontFamily: 'Noto Sans',
+
+  isLittleEndian: endianness() === 'LE',
 
   // Path for tests requiring human inspection
   path: getPath,

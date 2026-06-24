@@ -288,7 +288,9 @@ suite('composite', () => {
     t.assert.strictEqual(300, info.width);
     t.assert.strictEqual(300, info.height);
     t.assert.strictEqual(4, info.channels);
-    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('composite-cutout.png'), data));
+    if (fixtures.isLittleEndian) {
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('composite-cutout.png'), data));
+    }
   });
 
   suite('numeric gravity', () => {

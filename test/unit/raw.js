@@ -344,7 +344,11 @@ suite('Raw pixel data', () => {
         .raw({ depth: 'ushort' })
         .toBuffer();
 
-      t.assert.strictEqual(raw.readUint16LE(0), grey);
+      if (fixtures.isLittleEndian) {
+        t.assert.strictEqual(raw.readUint16LE(0), grey);
+      } else {
+        t.assert.strictEqual(raw.readUint16BE(0), grey);
+      }
     });
 
     test('RGB', async (t) => {
@@ -362,9 +366,15 @@ suite('Raw pixel data', () => {
         .raw({ depth: 'ushort' })
         .toBuffer();
 
-      t.assert.strictEqual(raw.readUint16LE(0), rgb[0]);
-      t.assert.strictEqual(raw.readUint16LE(2), rgb[1]);
-      t.assert.strictEqual(raw.readUint16LE(4), rgb[2]);
+      if (fixtures.isLittleEndian) {
+        t.assert.strictEqual(raw.readUint16LE(0), rgb[0]);
+        t.assert.strictEqual(raw.readUint16LE(2), rgb[1]);
+        t.assert.strictEqual(raw.readUint16LE(4), rgb[2]);
+      } else {
+        t.assert.strictEqual(raw.readUint16BE(0), rgb[0]);
+        t.assert.strictEqual(raw.readUint16BE(2), rgb[1]);
+        t.assert.strictEqual(raw.readUint16BE(4), rgb[2]);
+      }
     });
   });
 });

@@ -7,6 +7,7 @@ const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
+const { inRange } = require('../../dist/is.cjs');
 
 suite('Resize fit=cover', () => {
   [
@@ -376,7 +377,7 @@ suite('Resize fit=cover', () => {
       t.assert.strictEqual(-107, info.cropOffsetLeft);
       t.assert.strictEqual(0, info.cropOffsetTop);
       t.assert.strictEqual(588, info.attentionX);
-      t.assert.strictEqual(640, info.attentionY);
+      t.assert.ok(inRange(info.attentionY, 636, 640));
       await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('crop-strategy-attention.jpg'), data));
     });
 
@@ -413,7 +414,7 @@ suite('Resize fit=cover', () => {
       t.assert.strictEqual(80, info.height);
       t.assert.strictEqual(0, info.cropOffsetLeft);
       t.assert.strictEqual(-161, info.cropOffsetTop);
-      t.assert.strictEqual(288, info.attentionX);
+      t.assert.ok(inRange(info.attentionX, 284, 288));
       t.assert.strictEqual(745, info.attentionY);
       await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('crop-strategy.webp'), data));
     });

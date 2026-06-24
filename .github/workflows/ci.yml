@@ -297,7 +297,7 @@ jobs:
             npm install
             npm run build:dist
             npm run build
-            node --test test/unit/io.js
+            node --test test/unit/io.js test/unit/raw.js
             npm run package-from-local-build
             npm run lint-publish -- npm/${{ matrix.platform }}
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
