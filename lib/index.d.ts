@@ -1598,13 +1598,13 @@ declare namespace sharp {
     }
 
     interface Region {
-        /** zero-indexed offset from left edge */
+        /** zero-indexed offset from left edge, an integer between 0 and 100000000 */
         left: number;
-        /** zero-indexed offset from top edge */
+        /** zero-indexed offset from top edge, an integer between 0 and 100000000 */
         top: number;
-        /** dimension of extracted image */
+        /** dimension of extracted image, an integer between 0 and 100000000 */
         width: number;
-        /** dimension of extracted image */
+        /** dimension of extracted image, an integer between 0 and 100000000 */
         height: number;
     }
 
