@@ -23,15 +23,15 @@ Napi::Value cache(const Napi::CallbackInfo& info) {
 
   // Set memory limit
   if (info[size_t(0)].IsNumber()) {
-    vips_cache_set_max_mem(info[size_t(0)].As<Napi::Number>().Int32Value() * 1048576);
+    vips_cache_set_max_mem(static_cast<size_t>(info[size_t(0)].As<Napi::Number>().Uint32Value()) * 1048576);
   }
   // Set file limit
   if (info[size_t(1)].IsNumber()) {
-    vips_cache_set_max_files(info[size_t(1)].As<Napi::Number>().Int32Value());
+    vips_cache_set_max_files(info[size_t(1)].As<Napi::Number>().Uint32Value());
   }
   // Set items limit
   if (info[size_t(2)].IsNumber()) {
-    vips_cache_set_max(info[size_t(2)].As<Napi::Number>().Int32Value());
+    vips_cache_set_max(info[size_t(2)].As<Napi::Number>().Uint32Value());
   }
 
   // Get memory stats
