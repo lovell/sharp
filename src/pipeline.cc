@@ -944,6 +944,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         baton->pageHeightOut = image.get_int(VIPS_META_PAGE_HEIGHT);
         baton->pagesOut = image.get_int(VIPS_META_N_PAGES);
       }
+      baton->hasAlphaOut = image.has_alpha();
 
       // Output
       sharp::SetTimeout(image, baton->timeoutSeconds);
@@ -983,6 +984,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           } else {
             baton->channels = std::min(baton->channels, 3);
           }
+          baton->hasAlphaOut = false;
         } else if (baton->formatOut == "jp2" || (baton->formatOut == "input"
           && inputImageType == sharp::ImageType::JP2)) {
           // Write JP2 to Buffer
@@ -1065,6 +1067,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
             sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
             baton->channels = std::min(baton->channels, 3);
+            baton->hasAlphaOut = false;
           }
           // Cast pixel values to float, if required
           if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
@@ -1124,6 +1127,9 @@ class PipelineWorker : public Napi::AsyncWorker {
           area->free_fn = nullptr;
           vips_area_unref(area);
           baton->formatOut = "dz";
+          if (baton->tileFormat == "jpeg") {
+            baton->hasAlphaOut = false;
+          }
         } else if (baton->formatOut == "jxl" ||
           (baton->formatOut == "input" && inputImageType == sharp::ImageType::JXL)) {
           // Write JXL to buffer
@@ -1211,6 +1217,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           }
           baton->formatOut = "jpeg";
           baton->channels = std::min(baton->channels, 3);
+          baton->hasAlphaOut = false;
         } else if (baton->formatOut == "jp2" || (mightMatchInput && isJp2) ||
           (willMatchInput && (inputImageType == sharp::ImageType::JP2))) {
           // Write JP2 to file
@@ -1277,6 +1284,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (baton->tiffCompression == VIPS_FOREIGN_TIFF_COMPRESSION_JPEG) {
             sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
             baton->channels = std::min(baton->channels, 3);
+            baton->hasAlphaOut = false;
           }
           // Cast pixel values to float, if required
           if (baton->tiffPredictor == VIPS_FOREIGN_TIFF_PREDICTOR_FLOAT) {
@@ -1337,6 +1345,9 @@ class PipelineWorker : public Napi::AsyncWorker {
           vips::VOption *options = BuildOptionsDZ(baton);
           image.dzsave(const_cast<char*>(baton->fileOut.data()), options);
           baton->formatOut = "dz";
+          if (baton->tileFormat == "jpeg") {
+            baton->hasAlphaOut = false;
+          }
         } else if (baton->formatOut == "v" || (mightMatchInput && isV) ||
           (willMatchInput && inputImageType == sharp::ImageType::VIPS)) {
           // Write V to file
@@ -1421,6 +1432,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         info.Set("pageHeight", static_cast<int32_t>(baton->pageHeightOut));
         info.Set("pages", static_cast<int32_t>(baton->pagesOut));
       }
+      info.Set("hasAlpha", baton->hasAlphaOut);
 
       if (baton->bufferOutLength > 0) {
         info.Set("size", static_cast<uint32_t>(baton->bufferOutLength));

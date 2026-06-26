@@ -1783,6 +1783,8 @@ declare namespace sharp {
         channels: Channels;
         /** indicating if premultiplication was used */
         premultiplied: boolean;
+        /** Indicates if the output image has an alpha channel */
+        hasAlpha: boolean;
         /** Only defined when using a crop strategy */
         cropOffsetLeft?: number | undefined;
         /** Only defined when using a crop strategy */
