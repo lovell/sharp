@@ -1158,6 +1158,30 @@ suite('Input/output', () => {
         sharp({ create });
       });
     });
+    test('Width beyond pixel limit', (t) => {
+      t.plan(1);
+      const create = {
+        width: 100000001,
+        height: 10,
+        channels: 3,
+        background: { r: 0, g: 0, b: 0 }
+      };
+      t.assert.throws(() => {
+        sharp({ create });
+      });
+    });
+    test('Height beyond pixel limit', (t) => {
+      t.plan(1);
+      const create = {
+        width: 10,
+        height: 100000001,
+        channels: 3,
+        background: { r: 0, g: 0, b: 0 }
+      };
+      t.assert.throws(() => {
+        sharp({ create });
+      });
+    });
   });
 
   test('Queue length change events', async (t) => {
