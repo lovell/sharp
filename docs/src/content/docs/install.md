@@ -339,3 +339,15 @@ If both `canvas` and `sharp` modules are used in the same Windows process, the f
 ```
 The specified procedure could not be found.
 ```
+
+### Electron and Linux
+
+Binaries provided by Electron for use on Linux dynamically link against a globally-installed `glib`
+and leak its symbols into the process space, which may cause the following error to occur:
+```
+GLib-GObject: g_object_ref: assertion 'G_IS_OBJECT (object)' failed
+GLib-GObject: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
+```
+Please subscribe to
+[electron#46323](https://github.com/electron/electron/issues/46323)
+for updates.
