@@ -371,6 +371,8 @@ jobs:
         run: npm run package-release-notes
       - name: Create GitHub release for tag
         if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release create \
             --notes-file release-notes.md \
