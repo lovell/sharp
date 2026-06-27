@@ -3,193 +3,205 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Raw pixel data', () => {
-  describe('Raw pixel input', () => {
-    it('Empty data', () => {
-      assert.throws(() => {
+suite('Raw pixel data', () => {
+  suite('Raw pixel input', () => {
+    test('Empty data', (t) => {
+      t.plan(4);
+      t.assert.throws(() => {
         sharp(Buffer.from(''));
       }, /empty/);
-      assert.throws(() => {
+      t.assert.throws(() => {
         sharp(new ArrayBuffer(0));
       }, /empty/);
-      assert.throws(() => {
+      t.assert.throws(() => {
         sharp(new Uint8Array(0));
       }, /empty/);
-      assert.throws(() => {
+      t.assert.throws(() => {
         sharp(new Uint8ClampedArray(0));
       }, /empty/);
     });
 
-    it('Missing options', () => {
-      assert.throws(() => {
+    test('Missing options', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp({ raw: {} });
       });
     });
 
-    it('Incomplete options', () => {
-      assert.throws(() => {
+    test('Incomplete options', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp({ raw: { width: 1, height: 1 } });
       });
     });
 
-    it('Invalid channels', () => {
-      assert.throws(() => {
+    test('Invalid channels', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp({ raw: { width: 1, height: 1, channels: 5 } });
       });
     });
 
-    it('Invalid height', () => {
-      assert.throws(() => {
+    test('Invalid height', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp({ raw: { width: 1, height: 0, channels: 4 } });
       });
     });
 
-    it('Invalid width', () => {
-      assert.throws(() => {
+    test('Invalid width', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp({ raw: { width: 'zoinks', height: 1, channels: 4 } });
       });
     });
 
-    it('Invalid premultiplied', () => {
-      assert.throws(
+    test('Width beyond pixel limit', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp({ raw: { width: 100000001, height: 1, channels: 4 } });
+      });
+    });
+
+    test('Height beyond pixel limit', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp({ raw: { width: 1, height: 100000001, channels: 4 } });
+      });
+    });
+
+    test('Invalid premultiplied', (t) => {
+      t.plan(1);
+      t.assert.throws(
         () => sharp({ raw: { width: 1, height: 1, channels: 4, premultiplied: 'zoinks' } }),
         /Expected boolean for raw\.premultiplied but received zoinks of type string/
       );
     });
 
-    it('Invalid pageHeight', () => {
+    test('Invalid pageHeight', (t) => {
+      t.plan(4);
       const width = 8;
       const height = 8;
       const channels = 4;
-      assert.throws(
+      t.assert.throws(
         () => sharp({ raw: { width, height, channels, pageHeight: 'zoinks' } }),
         /Expected positive integer for raw\.pageHeight but received zoinks of type string/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ raw: { width, height, channels, pageHeight: -1 } }),
         /Expected positive integer for raw\.pageHeight but received -1 of type number/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ raw: { width, height, channels, pageHeight: 9 } }),
         /Expected positive integer for raw\.pageHeight but received 9 of type number/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ raw: { width, height, channels, pageHeight: 3 } }),
         /Expected raw\.height 8 to be a multiple of raw\.pageHeight 3/
       );
     });
 
-    it('RGB', (_t, done) => {
+    test('RGB', async (t) => {
+      t.plan(6);
       // Convert to raw pixel data
-      sharp(fixtures.inputJpg)
+      const raw = await sharp(fixtures.inputJpg)
         .resize(256)
         .raw()
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(256, info.width);
-          assert.strictEqual(209, info.height);
-          assert.strictEqual(3, info.channels);
-          // Convert back to JPEG
-          sharp(data, {
-            raw: {
-              width: info.width,
-              height: info.height,
-              channels: info.channels
-            }
-          })
-            .jpeg()
-            .toBuffer((err, data, info) => {
-              if (err) throw err;
-              assert.strictEqual(256, info.width);
-              assert.strictEqual(209, info.height);
-              assert.strictEqual(3, info.channels);
-              fixtures.assertSimilar(fixtures.inputJpg, data, done);
-            });
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(256, raw.info.width);
+      t.assert.strictEqual(209, raw.info.height);
+      t.assert.strictEqual(3, raw.info.channels);
+      // Convert back to JPEG
+      const jpeg = await sharp(raw.data, {
+        raw: {
+          width: raw.info.width,
+          height: raw.info.height,
+          channels: raw.info.channels
+        }
+      })
+        .jpeg()
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(256, jpeg.info.width);
+      t.assert.strictEqual(209, jpeg.info.height);
+      t.assert.strictEqual(3, jpeg.info.channels);
+      await fixtures.assertSimilar(fixtures.inputJpg, jpeg.data);
     });
 
-    it('RGBA', (_t, done) => {
+    test('RGBA', async (t) => {
+      t.plan(6);
       // Convert to raw pixel data
-      sharp(fixtures.inputPngOverlayLayer1)
+      const raw = await sharp(fixtures.inputPngOverlayLayer1)
         .resize(256)
         .raw()
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(256, info.width);
-          assert.strictEqual(192, info.height);
-          assert.strictEqual(4, info.channels);
-          // Convert back to PNG
-          sharp(data, {
-            raw: {
-              width: info.width,
-              height: info.height,
-              channels: info.channels
-            }
-          })
-            .png()
-            .toBuffer((err, data, info) => {
-              if (err) throw err;
-              assert.strictEqual(256, info.width);
-              assert.strictEqual(192, info.height);
-              assert.strictEqual(4, info.channels);
-              fixtures.assertSimilar(fixtures.inputPngOverlayLayer1, data, { threshold: 7 }, done);
-            });
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(256, raw.info.width);
+      t.assert.strictEqual(192, raw.info.height);
+      t.assert.strictEqual(4, raw.info.channels);
+      // Convert back to PNG
+      const png = await sharp(raw.data, {
+        raw: {
+          width: raw.info.width,
+          height: raw.info.height,
+          channels: raw.info.channels
+        }
+      })
+        .png()
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(256, png.info.width);
+      t.assert.strictEqual(192, png.info.height);
+      t.assert.strictEqual(4, png.info.channels);
+      await fixtures.assertSimilar(fixtures.inputPngOverlayLayer1, png.data, { threshold: 7 });
     });
 
-    it('RGBA premultiplied', (_t, done) => {
+    test('RGBA premultiplied', async (t) => {
+      t.plan(7);
       // Convert to raw pixel data
-      sharp(fixtures.inputPngSolidAlpha)
+      const raw = await sharp(fixtures.inputPngSolidAlpha)
         .resize(256)
         .raw()
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(256, info.width);
-          assert.strictEqual(192, info.height);
-          assert.strictEqual(4, info.channels);
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(256, raw.info.width);
+      t.assert.strictEqual(192, raw.info.height);
+      t.assert.strictEqual(4, raw.info.channels);
 
-          const originalData = Buffer.from(data);
+      const originalData = Buffer.from(raw.data);
 
-          // Premultiply image data
-          for (let i = 0; i < data.length; i += 4) {
-            const alpha = data[i + 3];
-            const norm = alpha / 255;
+      // Premultiply image data
+      for (let i = 0; i < raw.data.length; i += 4) {
+        const alpha = raw.data[i + 3];
+        const norm = alpha / 255;
 
-            if (alpha < 255) {
-              data[i] = Math.round(data[i] * norm);
-              data[i + 1] = Math.round(data[i + 1] * norm);
-              data[i + 2] = Math.round(data[i + 2] * norm);
-            }
-          }
+        if (alpha < 255) {
+          raw.data[i] = Math.round(raw.data[i] * norm);
+          raw.data[i + 1] = Math.round(raw.data[i + 1] * norm);
+          raw.data[i + 2] = Math.round(raw.data[i + 2] * norm);
+        }
+      }
 
-          // Convert back to PNG
-          sharp(data, {
-            raw: {
-              width: info.width,
-              height: info.height,
-              channels: info.channels,
-              premultiplied: true
-            }
-          })
-            .raw()
-            .toBuffer((err, data, info) => {
-              if (err) throw err;
-              assert.strictEqual(256, info.width);
-              assert.strictEqual(192, info.height);
-              assert.strictEqual(4, info.channels);
-              assert.equal(data.compare(originalData), 0, 'output buffer matches unpremultiplied input buffer');
-              done();
-            });
-        });
+      // Convert back to PNG
+      const unpremultiplied = await sharp(raw.data, {
+        raw: {
+          width: raw.info.width,
+          height: raw.info.height,
+          channels: raw.info.channels,
+          premultiplied: true
+        }
+      })
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(256, unpremultiplied.info.width);
+      t.assert.strictEqual(192, unpremultiplied.info.height);
+      t.assert.strictEqual(4, unpremultiplied.info.channels);
+      t.assert.equal(unpremultiplied.data.compare(originalData), 0, 'output buffer matches unpremultiplied input buffer');
     });
 
-    it('JPEG to raw Stream and back again', (_t, done) => {
+    test('JPEG to raw Stream and back again', async (t) => {
+      t.plan(3);
       const width = 32;
       const height = 24;
       const writable = sharp({
@@ -199,88 +211,88 @@ describe('Raw pixel data', () => {
           channels: 3
         }
       });
-      writable
-        .jpeg()
-        .toBuffer((err, _data, info) => {
-          if (err) throw err;
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(32, info.width);
-          assert.strictEqual(24, info.height);
-          done();
-        });
+      const finished = new Promise((resolve, reject) => {
+        writable
+          .jpeg()
+          .toBuffer((err, _data, info) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+            t.assert.strictEqual('jpeg', info.format);
+            t.assert.strictEqual(32, info.width);
+            t.assert.strictEqual(24, info.height);
+            resolve();
+          });
+      });
       sharp(fixtures.inputJpg)
         .resize(width, height)
         .raw()
         .pipe(writable);
+      await finished;
     });
   });
 
-  describe('Output raw, uncompressed image data', () => {
-    it('1 channel greyscale image', (_t, done) => {
-      sharp(fixtures.inputJpg)
+  suite('Output raw, uncompressed image data', () => {
+    test('1 channel greyscale image', async (t) => {
+      t.plan(6);
+      const { data, info } = await sharp(fixtures.inputJpg)
         .greyscale()
         .resize(32, 24)
         .raw()
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(32 * 24 * 1, info.size);
-          assert.strictEqual(data.length, info.size);
-          assert.strictEqual('raw', info.format);
-          assert.strictEqual(32, info.width);
-          assert.strictEqual(24, info.height);
-          assert.strictEqual(1, info.channels);
-          done();
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(32 * 24 * 1, info.size);
+      t.assert.strictEqual(data.length, info.size);
+      t.assert.strictEqual('raw', info.format);
+      t.assert.strictEqual(32, info.width);
+      t.assert.strictEqual(24, info.height);
+      t.assert.strictEqual(1, info.channels);
     });
 
-    it('3 channel colour image without transparency', (_t, done) => {
-      sharp(fixtures.inputJpg)
+    test('3 channel colour image without transparency', async (t) => {
+      t.plan(5);
+      const { data, info } = await sharp(fixtures.inputJpg)
         .resize(32, 24)
         .toFormat('raw')
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(32 * 24 * 3, info.size);
-          assert.strictEqual(data.length, info.size);
-          assert.strictEqual('raw', info.format);
-          assert.strictEqual(32, info.width);
-          assert.strictEqual(24, info.height);
-          done();
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(32 * 24 * 3, info.size);
+      t.assert.strictEqual(data.length, info.size);
+      t.assert.strictEqual('raw', info.format);
+      t.assert.strictEqual(32, info.width);
+      t.assert.strictEqual(24, info.height);
     });
 
-    it('4 channel colour image with transparency', (_t, done) => {
-      sharp(fixtures.inputPngWithTransparency)
+    test('4 channel colour image with transparency', async (t) => {
+      t.plan(5);
+      const { data, info } = await sharp(fixtures.inputPngWithTransparency)
         .resize(32, 24)
         .toFormat(sharp.format.raw)
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(32 * 24 * 4, info.size);
-          assert.strictEqual(data.length, info.size);
-          assert.strictEqual('raw', info.format);
-          assert.strictEqual(32, info.width);
-          assert.strictEqual(24, info.height);
-          done();
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(32 * 24 * 4, info.size);
+      t.assert.strictEqual(data.length, info.size);
+      t.assert.strictEqual('raw', info.format);
+      t.assert.strictEqual(32, info.width);
+      t.assert.strictEqual(24, info.height);
     });
 
-    it('Extract A from RGBA', () =>
-      sharp(fixtures.inputPngWithTransparency)
+    test('Extract A from RGBA', async (t) => {
+      t.plan(3);
+      const { info } = await sharp(fixtures.inputPngWithTransparency)
         .resize(32, 24)
         .extractChannel(3)
         .toColourspace('b-w')
         .raw()
-        .toBuffer({ resolveWithObject: true })
-        .then(({ info }) => {
-          assert.strictEqual('raw', info.format);
-          assert.strictEqual(1, info.channels);
-          assert.strictEqual(32 * 24, info.size);
-        })
-    );
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual('raw', info.format);
+      t.assert.strictEqual(1, info.channels);
+      t.assert.strictEqual(32 * 24, info.size);
+    });
   });
 
-  describe('Raw pixel depths', () => {
-    it('Invalid depth', () => {
-      assert.throws(() => {
+  suite('Raw pixel depths', () => {
+    test('Invalid depth', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(Buffer.alloc(3), { raw: { width: 1, height: 1, channels: 3 } })
           .raw({ depth: 'zoinks' });
       });
@@ -298,24 +310,24 @@ describe('Raw pixel data', () => {
       { type: Float32Array, depth: 'float', bits: 32 },
       { type: Float64Array, depth: 'double', bits: 64 }
     ]) {
-      it(type.name, () =>
-        sharp(new type(3), { raw: { width: 1, height: 1, channels: 3 } })
+      test(type.name, async (t) => {
+        t.plan(depth === undefined ? 4 : 5);
+        const { data, info } = await sharp(new type(3), { raw: { width: 1, height: 1, channels: 3 } })
           .raw({ depth })
-          .toBuffer({ resolveWithObject: true })
-          .then(({ data, info }) => {
-            assert.strictEqual(1, info.width);
-            assert.strictEqual(1, info.height);
-            assert.strictEqual(3, info.channels);
-            if (depth !== undefined) {
-              assert.strictEqual(depth, info.depth);
-            }
-            assert.strictEqual(data.length / 3, bits / 8);
-          })
-      );
+          .toBuffer({ resolveWithObject: true });
+        t.assert.strictEqual(1, info.width);
+        t.assert.strictEqual(1, info.height);
+        t.assert.strictEqual(3, info.channels);
+        if (depth !== undefined) {
+          t.assert.strictEqual(depth, info.depth);
+        }
+        t.assert.strictEqual(data.length / 3, bits / 8);
+      });
     }
   });
 
-  it('Animated', async () => {
+  test('Animated', async (t) => {
+    t.plan(4);
     const gif = await sharp(
       Buffer.alloc(8),
       { raw: { width: 1, height: 2, channels: 4, pageHeight: 1 }, animated: true }
@@ -324,14 +336,15 @@ describe('Raw pixel data', () => {
       .toBuffer();
 
     const { width, height, pages, delay } = await sharp(gif).metadata();
-    assert.strictEqual(width, 1);
-    assert.strictEqual(height, 1);
-    assert.strictEqual(pages, 2);
-    assert.strictEqual(delay.length, 2);
+    t.assert.strictEqual(width, 1);
+    t.assert.strictEqual(height, 1);
+    t.assert.strictEqual(pages, 2);
+    t.assert.strictEqual(delay.length, 2);
   });
 
-  describe('16-bit roundtrip', () => {
-    it('grey', async () => {
+  suite('16-bit roundtrip', () => {
+    test('grey', async (t) => {
+      t.plan(1);
       const grey = 42000;
       const png = await sharp(
         Uint16Array.from([grey]),
@@ -345,10 +358,15 @@ describe('Raw pixel data', () => {
         .raw({ depth: 'ushort' })
         .toBuffer();
 
-      assert.strictEqual(raw.readUint16LE(0), grey);
+      if (fixtures.isLittleEndian) {
+        t.assert.strictEqual(raw.readUint16LE(0), grey);
+      } else {
+        t.assert.strictEqual(raw.readUint16BE(0), grey);
+      }
     });
 
-    it('RGB', async () => {
+    test('RGB', async (t) => {
+      t.plan(3);
       const rgb = [10946, 28657, 46368];
       const png = await sharp(
         Uint16Array.from(rgb),
@@ -362,9 +380,15 @@ describe('Raw pixel data', () => {
         .raw({ depth: 'ushort' })
         .toBuffer();
 
-      assert.strictEqual(raw.readUint16LE(0), rgb[0]);
-      assert.strictEqual(raw.readUint16LE(2), rgb[1]);
-      assert.strictEqual(raw.readUint16LE(4), rgb[2]);
+      if (fixtures.isLittleEndian) {
+        t.assert.strictEqual(raw.readUint16LE(0), rgb[0]);
+        t.assert.strictEqual(raw.readUint16LE(2), rgb[1]);
+        t.assert.strictEqual(raw.readUint16LE(4), rgb[2]);
+      } else {
+        t.assert.strictEqual(raw.readUint16BE(0), rgb[0]);
+        t.assert.strictEqual(raw.readUint16BE(2), rgb[1]);
+        t.assert.strictEqual(raw.readUint16BE(4), rgb[2]);
+      }
     });
   });
 });

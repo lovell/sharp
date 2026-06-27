@@ -3,26 +3,27 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('toBuffer', () => {
-  it('reusing same sharp object does not reset previously passed parameters to toBuffer', async () => {
+suite('toBuffer', () => {
+  test('reusing same sharp object does not reset previously passed parameters to toBuffer', async (t) => {
+    t.plan(4);
     const image = sharp(fixtures.inputJpg);
     const obj = await image.toBuffer({ resolveWithObject: true });
-    assert.strictEqual(typeof obj, 'object');
-    assert.strictEqual(typeof obj.info, 'object');
-    assert.strictEqual(Buffer.isBuffer(obj.data), true);
+    t.assert.strictEqual(typeof obj, 'object');
+    t.assert.strictEqual(typeof obj.info, 'object');
+    t.assert.strictEqual(Buffer.isBuffer(obj.data), true);
     const data = await image.toBuffer();
-    assert.strictEqual(Buffer.isBuffer(data), true);
+    t.assert.strictEqual(Buffer.isBuffer(data), true);
   });
 
-  it('correctly process animated webp with height > 16383', async () => {
+  test('correctly process animated webp with height > 16383', async (t) => {
+    t.plan(1);
     const data = await sharp(fixtures.inputWebPAnimatedBigHeight, { animated: true })
       .toBuffer();
-    assert.strictEqual(Buffer.isBuffer(data), true);
+    t.assert.strictEqual(Buffer.isBuffer(data), true);
   });
 });

@@ -326,3 +326,9 @@ GitHub: https://github.com/tpatel
 
 Name: Maël Nison
 GitHub: https://github.com/arcanis
+
+Name: Dmytro Tiapukhin
+GitHub: https://github.com/eddienubes
+
+Name: Florian Lefebvre
+GitHub: https://github.com/florian-lefebvre

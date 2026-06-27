@@ -1,9 +1,9 @@
 // biome-ignore-all lint/correctness/noUnusedFunctionParameters: types only test file
 // biome-ignore-all lint/correctness/noUnusedVariables: types only test file
 
-import sharp = require('../../');
-
 import { createReadStream, createWriteStream } from 'node:fs';
+
+import sharp, { type Colour, type Color, type MediaType, type Metadata, type OutputInfo, type Raw, type Sharp } from '../../';
 
 const input: Buffer = Buffer.alloc(0);
 const readableStream: NodeJS.ReadableStream = createReadStream(input);
@@ -53,6 +53,8 @@ sharp('input.png')
     // output.png is an image containing input.png along with all metadata(EXIF, ICC, XMP, IPTC) from input.png
   })
 
+sharp(input).withDensity(300);
+
 sharp('input.jpg')
   .resize(300, 200)
   .toFile('output.jpg', (err: Error) => {
@@ -81,10 +83,13 @@ sharp({
 
 let transformer = sharp()
   .resize(300)
-  .on('info', (info: sharp.OutputInfo) => {
+  .on('info', (info: OutputInfo) => {
     console.log(`Image height is ${info.height}`);
   });
 readableStream.pipe(transformer).pipe(writableStream);
+
+sharp().toUint8Array();
+sharp().toUint8Array().then(({ data }) => data.byteLength);
 
 console.log(sharp.format);
 console.log(sharp.versions);
@@ -93,17 +98,17 @@ sharp.queue.on('change', (queueLength: number) => {
   console.log(`Queue contains ${queueLength} task(s)`);
 });
 
-let pipeline: sharp.Sharp = sharp().rotate();
+let pipeline: Sharp = sharp().rotate();
 pipeline.clone().resize(800, 600).pipe(writableStream);
 pipeline.clone().extract({ left: 20, top: 20, width: 100, height: 100 }).pipe(writableStream);
 readableStream.pipe(pipeline);
 // firstWritableStream receives auto-rotated, resized readableStream
 // secondWritableStream receives auto-rotated, extracted region of readableStream
 
-const image: sharp.Sharp = sharp(input);
+const image: Sharp = sharp(input);
 image
   .metadata()
-  .then<Buffer | undefined>((metadata: sharp.Metadata) => {
+  .then<Buffer | undefined>((metadata: Metadata) => {
     if (metadata.width) {
       return image
         .resize(Math.round(metadata.width / 2))
@@ -118,7 +123,7 @@ image
 pipeline = sharp()
   .rotate()
   .resize(undefined, 200)
-  .toBuffer((err: Error, outputBuffer: Buffer, info: sharp.OutputInfo) => {
+  .toBuffer((err: Error, outputBuffer: Buffer, info: OutputInfo) => {
     // outputBuffer contains 200px high JPEG image data,
     // auto-rotated using EXIF Orientation tag
     // info.width and info.height contain the dimensions of the resized image
@@ -152,7 +157,7 @@ sharp(input)
     kernel: [-1, 0, 1, -2, 0, 2, -1, 0, 1],
   })
   .raw()
-  .toBuffer((err: Error, data: Buffer, info: sharp.OutputInfo) => {
+  .toBuffer((err: Error, data: Buffer, info: OutputInfo) => {
     // data contains the raw pixel data representing the convolution
     // of the input image with the horizontal Sobel operator
   });
@@ -162,7 +167,7 @@ sharp('input.tiff')
   .tile({
     size: 512,
   })
-  .toFile('output.dz', (err: Error, info: sharp.OutputInfo) => {
+  .toFile('output.dz', (err: Error, info: OutputInfo) => {
     // output.dzi is the Deep Zoom XML definition
     // output_files contains 512x512 tiles grouped by zoom level
   });
@@ -231,7 +236,7 @@ sharp(input)
 
 sharp(input)
   .resize(100, 100)
-  .toFormat('jpg')
+  .toFormat('avif')
   .toBuffer({ resolveWithObject: false })
   .then((outputBuffer: Buffer) => {
     // Resolves with a Buffer object when resolveWithObject is false
@@ -240,7 +245,7 @@ sharp(input)
 sharp(input)
   .resize(100, 100)
   .toBuffer({ resolveWithObject: true })
-  .then((object: { data: Buffer; info: sharp.OutputInfo }) => {
+  .then((object: { data: Buffer; info: OutputInfo }) => {
     // Resolve with an object containing data Buffer and an OutputInfo object
     // when resolveWithObject is true
   });
@@ -264,9 +269,7 @@ sharp(input)
 // Output to tif
 sharp(input)
   .resize(100, 100)
-  .toFormat('tif')
   .toFormat('tiff')
-  .toFormat(sharp.format.tif)
   .toFormat(sharp.format.tiff)
   .toBuffer();
 
@@ -362,7 +365,7 @@ sharp(input)
   .avif({ quality: 50, lossless: false, effort: 5, chromaSubsampling: '4:2:0' })
   .heif()
   .heif({})
-  .heif({ quality: 50, compression: 'hevc', lossless: false, effort: 5, chromaSubsampling: '4:2:0' })
+  .heif({ quality: 50, compression: 'hevc', lossless: false, effort: 5, chromaSubsampling: '4:2:0', tune: 'psnr' })
   .toBuffer({ resolveWithObject: true })
   .then(({ data, info }) => {
     console.log(data);
@@ -545,8 +548,8 @@ sharp('input.tiff').jxl({ decodingTier: 4 }).toFile('out.jxl');
 sharp('input.tiff').jxl({ lossless: true }).toFile('out.jxl');
 sharp('input.tiff').jxl({ effort: 7 }).toFile('out.jxl');
 
-// Support `minSize` and `mixed` webp options
-sharp('input.tiff').webp({ minSize: true, mixed: true }).toFile('out.gif');
+// Support webp options
+sharp('input.tiff').webp({ minSize: true, mixed: true, exact: true }).toFile('out.webp');
 
 // 'failOn' input param
 sharp('input.tiff', { failOn: 'none' });
@@ -598,7 +601,7 @@ const vertexSplitQuadraticBasisSpline: string = sharp.interpolators.vertexSplitQ
 // Triming
 sharp(input).trim({ background: '#000' }).toBuffer();
 sharp(input).trim({ threshold: 10, lineArt: true }).toBuffer();
-sharp(input).trim({ background: '#bf1942', threshold: 30 }).toBuffer();
+sharp(input).trim({ background: '#bf1942', threshold: 30, margin: 20 }).toBuffer();
 
 // Text input
 sharp({
@@ -724,8 +727,8 @@ sharp(input).composite([
 ])
 
 // Support format-specific input options
-const colour: sharp.Colour = '#fff';
-const color: sharp.Color = '#fff';
+const colour: Colour = '#fff';
+const color: Color = { l: 1, a: 2, b: 3 };
 sharp({ pdf: { background: colour } });
 sharp({ pdf: { background: color } });
 sharp({ pdfBackground: colour }); // Deprecated
@@ -741,7 +744,7 @@ sharp({ svg: { highBitdepth: true }});
 sharp({ svg: { highBitdepth: false }});
 
 // Raw input options
-const raw: sharp.Raw = { width: 1, height: 1, channels: 3 };
+const raw: Raw = { width: 1, height: 1, channels: 3 };
 sharp({ raw });
 sharp({ raw: { ...raw, premultiplied: true } });
 sharp({ raw: { ...raw, premultiplied: false } });
@@ -771,3 +774,48 @@ sharp().erode();
 sharp().erode(1);
 sharp().dilate();
 sharp().dilate(1);
+
+sharp.format.dcraw;
+sharp.format.dz;
+sharp.format.fits;
+sharp.format.gif;
+sharp.format.heif;
+sharp.format.jp2;
+sharp.format.jpeg;
+sharp.format.jxl;
+sharp.format.magick;
+sharp.format.openslide;
+sharp.format.pdf;
+sharp.format.png;
+sharp.format.ppm;
+sharp.format.rad;
+sharp.format.raw;
+sharp.format.svg;
+sharp.format.tiff;
+sharp.format.vips;
+sharp.format.webp;
+// @ts-expect-error
+sharp.format.avif;
+// @ts-expect-error
+sharp.format.input;
+// @ts-expect-error
+sharp.format.jp2k;
+// @ts-expect-error
+sharp.format.jpg;
+// @ts-expect-error
+sharp.format.tif;
+// @ts-expect-error
+sharp.format.v;
+
+sharp({ limitInputChannels: 6 });
+sharp({ limitInputChannels: 0 });
+sharp({ limitInputChannels: false });
+// @ts-expect-error
+sharp({ limitInputChannels: 'fail' });
+sharp(input).composite([{ limitInputChannels: 6 }]);
+
+sharp().metadata().then((metadata: Metadata) => {
+  if (metadata.mediaType) {
+    const mediaType: MediaType = metadata.mediaType;
+  }
+});

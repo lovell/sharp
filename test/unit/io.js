@@ -3,17 +3,20 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const fs = require('node:fs');
+const { createReadStream, createWriteStream } = require('node:fs');
+const fs = require('node:fs/promises');
 const path = require('node:path');
-const { afterEach, beforeEach, describe, it } = require('node:test');
-const assert = require('node:assert');
+const { afterEach, beforeEach, suite, test } = require('node:test');
+
+const { isMarkedAsUntransferable } = require('node:worker_threads');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
+const { buildPlatformArch } = require('../../dist/libvips.cjs');
 
 const outputJpg = fixtures.path('output.jpg');
 
-describe('Input/output', () => {
+suite('Input/output', () => {
   beforeEach(() => {
     sharp.cache(false);
   });
@@ -21,135 +24,176 @@ describe('Input/output', () => {
     sharp.cache(true);
   });
 
-  it('Read from File and write to Stream', (_t, done) => {
-    const writable = fs.createWriteStream(outputJpg);
-    writable.on('close', () => {
-      sharp(outputJpg).toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fs.rm(outputJpg, done);
-      });
+  test('Read from File and write to Stream', async (t) => {
+    t.plan(6);
+    const writable = createWriteStream(outputJpg);
+    const closed = new Promise((resolve, reject) => {
+      writable.once('close', resolve);
+      writable.once('error', reject);
     });
     sharp(fixtures.inputJpg).resize(320, 240).pipe(writable);
+    await closed;
+    const { data, info } = await sharp(outputJpg).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
+    await fs.rm(outputJpg);
   });
 
-  it('Read from Buffer and write to Stream', (_t, done) => {
-    const inputJpgBuffer = fs.readFileSync(fixtures.inputJpg);
-    const writable = fs.createWriteStream(outputJpg);
-    writable.on('close', () => {
-      sharp(outputJpg).toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fs.rm(outputJpg, done);
-      });
+  test('Read from Buffer and write to Stream', async (t) => {
+    t.plan(6);
+    const inputJpgBuffer = await fs.readFile(fixtures.inputJpg);
+    const writable = createWriteStream(outputJpg);
+    const closed = new Promise((resolve, reject) => {
+      writable.once('close', resolve);
+      writable.once('error', reject);
     });
     sharp(inputJpgBuffer).resize(320, 240).pipe(writable);
+    await closed;
+    const { data, info } = await sharp(outputJpg).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
+    await fs.rm(outputJpg);
   });
 
-  it('Read from Stream and write to File', (_t, done) => {
-    const readable = fs.createReadStream(fixtures.inputJpg);
-    const pipeline = sharp().resize(320, 240).toFile(outputJpg, (err, info) => {
+  test('Read from Stream and write to File via callback', (t, done) => {
+    t.plan(5);
+    const readable = createReadStream(fixtures.inputJpg);
+    const pipeline = sharp().resize(320, 240).toFile(outputJpg, async (err, info) => {
       if (err) throw err;
-      assert.strictEqual(true, info.size > 0);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(240, info.height);
-      fs.rm(outputJpg, done);
-    });
-    readable.pipe(pipeline);
-  });
-
-  it('Read from Stream and write to Buffer', (_t, done) => {
-    const readable = fs.createReadStream(fixtures.inputJpg);
-    const pipeline = sharp().resize(320, 240).toBuffer((err, data, info) => {
-      if (err) throw err;
-      assert.strictEqual(true, data.length > 0);
-      assert.strictEqual(data.length, info.size);
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(240, info.height);
+      t.assert.strictEqual(true, info.size > 0);
+      t.assert.strictEqual('jpeg', info.format);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(240, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
+      await fs.rm(outputJpg);
       done();
     });
     readable.pipe(pipeline);
   });
 
-  it('Read from Stream and write to Buffer via Promise resolved with Buffer', () => {
-    const pipeline = sharp().resize(1, 1);
-    fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
-    return pipeline
-      .toBuffer({ resolveWithObject: false })
-      .then((data) => {
-        assert.strictEqual(true, data instanceof Buffer);
-        assert.strictEqual(true, data.length > 0);
-      });
+  test('Read from Stream and write to Buffer via callback', (t, done) => {
+    t.plan(6);
+    const readable = createReadStream(fixtures.inputJpg);
+    const pipeline = sharp().resize(320, 240).toBuffer((err, data, info) => {
+      if (err) throw err;
+      t.assert.strictEqual(true, data.length > 0);
+      t.assert.strictEqual(data.length, info.size);
+      t.assert.strictEqual('jpeg', info.format);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(240, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
+      done();
+    });
+    readable.pipe(pipeline);
   });
 
-  it('Read from Stream and write to Buffer via Promise resolved with Object', () => {
-    const pipeline = sharp().resize(1, 1);
-    fs.createReadStream(fixtures.inputJpg).pipe(pipeline);
-    return pipeline
-      .toBuffer({ resolveWithObject: true })
-      .then((object) => {
-        assert.strictEqual('object', typeof object);
-        assert.strictEqual('object', typeof object.info);
-        assert.strictEqual('jpeg', object.info.format);
-        assert.strictEqual(1, object.info.width);
-        assert.strictEqual(1, object.info.height);
-        assert.strictEqual(3, object.info.channels);
-        assert.strictEqual(true, object.data instanceof Buffer);
-        assert.strictEqual(true, object.data.length > 0);
-      });
+  test('Read from File and write to Buffer via callback', (t, done) => {
+    t.plan(7);
+    sharp(fixtures.inputJpg).resize(320, 240).toBuffer((err, data, info) => {
+      t.assert.strictEqual(err, null);
+      t.assert.strictEqual(true, data.length > 0);
+      t.assert.strictEqual(data.length, info.size);
+      t.assert.strictEqual('jpeg', info.format);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(240, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
+      done();
+    });
   });
 
-  it('Read from File and write to Buffer via Promise resolved with Buffer', () => sharp(fixtures.inputJpg)
-      .resize(1, 1)
-      .toBuffer({ resolveWithObject: false })
-      .then((data) => {
-        assert.strictEqual(true, data instanceof Buffer);
-        assert.strictEqual(true, data.length > 0);
-      }));
+  test('Read invalid Stream and write to Buffer via callback fails gracefully', (t, done) => {
+    t.plan(3);
+    const readableButNotAnImage = createReadStream(__filename);
+    const pipeline = sharp().resize(320, 240).toBuffer((err, data, info) => {
+      t.assert.ok(err instanceof Error);
+      t.assert.strictEqual(data, undefined);
+      t.assert.strictEqual(info, undefined);
+      done();
+    });
+    readableButNotAnImage.pipe(pipeline);
+  });
 
-  it('Read from File and write to Buffer via Promise resolved with Object', () => sharp(fixtures.inputJpg)
-      .resize(1, 1)
-      .toBuffer({ resolveWithObject: true })
-      .then((object) => {
-        assert.strictEqual('object', typeof object);
-        assert.strictEqual('object', typeof object.info);
-        assert.strictEqual('jpeg', object.info.format);
-        assert.strictEqual(1, object.info.width);
-        assert.strictEqual(1, object.info.height);
-        assert.strictEqual(3, object.info.channels);
-        assert.strictEqual(true, object.data instanceof Buffer);
-        assert.strictEqual(true, object.data.length > 0);
-      }));
+  test('Read from Stream and write to Buffer via Promise resolved with Buffer', async (t) => {
+    t.plan(2);
+    const pipeline = sharp().resize(1, 1);
+    createReadStream(fixtures.inputJpg).pipe(pipeline);
+    const data = await pipeline.toBuffer({ resolveWithObject: false });
+    t.assert.strictEqual(true, data instanceof Buffer);
+    t.assert.strictEqual(true, data.length > 0);
+  });
 
-  it('Read from Stream and write to Stream', (_t, done) => {
-    const readable = fs.createReadStream(fixtures.inputJpg);
-    const writable = fs.createWriteStream(outputJpg);
-    writable.on('close', () => {
-      sharp(outputJpg).toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fs.rm(outputJpg, done);
-      });
+  test('Read from Stream and write to Buffer via Promise resolved with Object', async (t) => {
+    t.plan(9);
+    const pipeline = sharp().resize(1, 1);
+    createReadStream(fixtures.inputJpg).pipe(pipeline);
+    const object = await pipeline.toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('object', typeof object);
+    t.assert.strictEqual('object', typeof object.info);
+    t.assert.strictEqual('jpeg', object.info.format);
+    t.assert.strictEqual(1, object.info.width);
+    t.assert.strictEqual(1, object.info.height);
+    t.assert.strictEqual(3, object.info.channels);
+    t.assert.strictEqual(false, object.info.hasAlpha);
+    t.assert.strictEqual(true, object.data instanceof Buffer);
+    t.assert.strictEqual(true, object.data.length > 0);
+  });
+
+  test('Read from File and write to Buffer via Promise resolved with Buffer', async (t) => {
+    t.plan(2);
+    const data = await sharp(fixtures.inputJpg)
+      .resize(1, 1)
+      .toBuffer({ resolveWithObject: false });
+    t.assert.strictEqual(true, data instanceof Buffer);
+    t.assert.strictEqual(true, data.length > 0);
+  });
+
+  test('Read from File and write to Buffer via Promise resolved with Object', async (t) => {
+    t.plan(9);
+    const object = await sharp(fixtures.inputJpg)
+      .resize(1, 1)
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('object', typeof object);
+    t.assert.strictEqual('object', typeof object.info);
+    t.assert.strictEqual('jpeg', object.info.format);
+    t.assert.strictEqual(1, object.info.width);
+    t.assert.strictEqual(1, object.info.height);
+    t.assert.strictEqual(3, object.info.channels);
+    t.assert.strictEqual(false, object.info.hasAlpha);
+    t.assert.strictEqual(true, object.data instanceof Buffer);
+    t.assert.strictEqual(true, object.data.length > 0);
+  });
+
+  test('Read from Stream and write to Stream', async (t) => {
+    t.plan(6);
+    const readable = createReadStream(fixtures.inputJpg);
+    const writable = createWriteStream(outputJpg);
+    const closed = new Promise((resolve, reject) => {
+      writable.once('close', resolve);
+      writable.once('error', reject);
     });
     const pipeline = sharp().resize(320, 240);
     readable.pipe(pipeline).pipe(writable);
+    await closed;
+    const { data, info } = await sharp(outputJpg).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
+    await fs.rm(outputJpg);
   });
 
-  it('Read from ArrayBuffer and write to Buffer', async () => {
+  test('Read from ArrayBuffer and write to Buffer', async (t) => {
+    t.plan(3);
     const uint8array = Uint8Array.from([255, 255, 255, 0, 0, 0]);
     const arrayBuffer = new ArrayBuffer(uint8array.byteLength);
     new Uint8Array(arrayBuffer).set(uint8array);
@@ -161,12 +205,13 @@ describe('Input/output', () => {
       }
     }).toBuffer({ resolveWithObject: true });
 
-    assert.deepStrictEqual(uint8array, new Uint8Array(data));
-    assert.strictEqual(info.width, 2);
-    assert.strictEqual(info.height, 1);
+    t.assert.deepStrictEqual(uint8array, new Uint8Array(data));
+    t.assert.strictEqual(info.width, 2);
+    t.assert.strictEqual(info.height, 1);
   });
 
-  it('Read from Uint8Array and write to Buffer', async () => {
+  test('Read from Uint8Array and write to Buffer', async (t) => {
+    t.plan(3);
     const uint8array = Uint8Array.from([255, 255, 255, 0, 0, 0]);
     const { data, info } = await sharp(uint8array, {
       raw: {
@@ -176,12 +221,13 @@ describe('Input/output', () => {
       }
     }).toBuffer({ resolveWithObject: true });
 
-    assert.deepStrictEqual(uint8array, new Uint8Array(data));
-    assert.strictEqual(info.width, 2);
-    assert.strictEqual(info.height, 1);
+    t.assert.deepStrictEqual(uint8array, new Uint8Array(data));
+    t.assert.strictEqual(info.width, 2);
+    t.assert.strictEqual(info.height, 1);
   });
 
-  it('Read from Uint8ClampedArray and output to Buffer', async () => {
+  test('Read from Uint8ClampedArray and output to Buffer', async (t) => {
+    t.plan(3);
     // since a Uint8ClampedArray is the same as Uint8Array but clamps the values
     // between 0-255 it seemed good to add this also
     const uint8array = Uint8ClampedArray.from([255, 255, 255, 0, 0, 0]);
@@ -193,12 +239,13 @@ describe('Input/output', () => {
       }
     }).toBuffer({ resolveWithObject: true });
 
-    assert.deepStrictEqual(uint8array, new Uint8ClampedArray(data));
-    assert.strictEqual(info.width, 2);
-    assert.strictEqual(info.height, 1);
+    t.assert.deepStrictEqual(uint8array, new Uint8ClampedArray(data));
+    t.assert.strictEqual(info.width, 2);
+    t.assert.strictEqual(info.height, 1);
   });
 
-  it('Read from Uint8ClampedArray with byteOffset and output to Buffer', async () => {
+  test('Read from Uint8ClampedArray with byteOffset and output to Buffer', async (t) => {
+    t.plan(3);
     // since a Uint8ClampedArray is the same as Uint8Array but clamps the values
     // between 0-255 it seemed good to add this also
     const uint8array = Uint8ClampedArray.from([0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255]);
@@ -211,172 +258,194 @@ describe('Input/output', () => {
       }
     }).toBuffer({ resolveWithObject: true });
 
-    assert.deepStrictEqual(Uint8ClampedArray.from([255, 255, 255, 0, 0, 0]), new Uint8ClampedArray(data));
-    assert.strictEqual(info.width, 2);
-    assert.strictEqual(info.height, 1);
+    t.assert.deepStrictEqual(Uint8ClampedArray.from([255, 255, 255, 0, 0, 0]), new Uint8ClampedArray(data));
+    t.assert.strictEqual(info.width, 2);
+    t.assert.strictEqual(info.height, 1);
   });
 
-  it('Stream should emit info event', (_t, done) => {
-    const readable = fs.createReadStream(fixtures.inputJpg);
-    const writable = fs.createWriteStream(outputJpg);
+  test('Stream should emit info event', async (t) => {
+    t.plan(5);
+    const readable = createReadStream(fixtures.inputJpg);
+    const writable = createWriteStream(outputJpg);
     const pipeline = sharp().resize(320, 240);
-    let infoEventEmitted = false;
-    pipeline.on('info', (info) => {
-      assert.strictEqual('jpeg', info.format);
-      assert.strictEqual(320, info.width);
-      assert.strictEqual(240, info.height);
-      assert.strictEqual(3, info.channels);
-      infoEventEmitted = true;
+    const infoEventEmitted = new Promise((resolve) => {
+      pipeline.once('info', (info) => {
+        t.assert.strictEqual('jpeg', info.format);
+        t.assert.strictEqual(320, info.width);
+        t.assert.strictEqual(240, info.height);
+        t.assert.strictEqual(3, info.channels);
+        t.assert.strictEqual(false, info.hasAlpha);
+        resolve();
+      });
     });
-    writable.on('close', () => {
-      assert.strictEqual(true, infoEventEmitted);
-      fs.rm(outputJpg, done);
+    const closed = new Promise((resolve, reject) => {
+      writable.once('close', resolve);
+      writable.once('error', reject);
     });
     readable.pipe(pipeline).pipe(writable);
+    await Promise.all([infoEventEmitted, closed]);
+    await fs.rm(outputJpg);
   });
 
-  it('Stream should emit close event', (_t, done) => {
-    const readable = fs.createReadStream(fixtures.inputJpg);
-    const writable = fs.createWriteStream(outputJpg);
+  test('Stream should emit close event', async (t) => {
+    t.plan(1);
+    const readable = createReadStream(fixtures.inputJpg);
+    const writable = createWriteStream(outputJpg);
     const pipeline = sharp().resize(320, 240);
     let closeEventEmitted = false;
-    pipeline.on('close', () => {
+    pipeline.once('close', () => {
       closeEventEmitted = true;
     });
-    writable.on('close', () => {
-      assert.strictEqual(true, closeEventEmitted);
-      fs.rm(outputJpg, done);
+    const closed = new Promise((resolve, reject) => {
+      writable.once('close', resolve);
+      writable.once('error', reject);
     });
     readable.pipe(pipeline).pipe(writable);
+    await closed;
+    t.assert.strictEqual(true, closeEventEmitted);
+    await fs.rm(outputJpg);
   });
 
-  it('Handle Stream to Stream error ', (_t, done) => {
+  test('Handle Stream to Stream error ', async (t) => {
+    t.plan(1);
     const pipeline = sharp().resize(320, 240);
-    let anErrorWasEmitted = false;
-    pipeline.on('error', (err) => {
-      anErrorWasEmitted = !!err;
-    }).on('end', () => {
-      assert(anErrorWasEmitted);
-      fs.rm(outputJpg, done);
-    });
-    const readableButNotAnImage = fs.createReadStream(__filename);
-    const writable = fs.createWriteStream(outputJpg);
-    readableButNotAnImage.pipe(pipeline).pipe(writable);
-  });
-
-  it('Handle File to Stream error', (_t, done) => {
-    const readableButNotAnImage = sharp(__filename).resize(320, 240);
-    let anErrorWasEmitted = false;
-    readableButNotAnImage.on('error', (err) => {
-      anErrorWasEmitted = !!err;
-    }).on('end', () => {
-      assert(anErrorWasEmitted);
-      fs.rm(outputJpg, done);
-    });
-    const writable = fs.createWriteStream(outputJpg);
-    readableButNotAnImage.pipe(writable);
-  });
-
-  it('Readable side of Stream can start flowing after Writable side has finished', (_t, done) => {
-    const readable = fs.createReadStream(fixtures.inputJpg);
-    const writable = fs.createWriteStream(outputJpg);
-    writable.on('close', () => {
-      sharp(outputJpg).toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        fs.rm(outputJpg, done);
+    const errorSeen = new Promise((resolve) => {
+      pipeline.once('error', (err) => {
+        resolve(!!err);
       });
+    });
+    const done = new Promise((resolve) => {
+      pipeline.once('end', resolve);
+    });
+    const readableButNotAnImage = createReadStream(__filename);
+    const writable = createWriteStream(outputJpg);
+    readableButNotAnImage.pipe(pipeline).pipe(writable);
+    const anErrorWasEmitted = await errorSeen;
+    await done;
+    t.assert.strictEqual(anErrorWasEmitted, true);
+    await fs.rm(outputJpg);
+  });
+
+  test('Handle File to Stream error', async (t) => {
+    t.plan(1);
+    const readableButNotAnImage = sharp(__filename).resize(320, 240);
+    const errorSeen = new Promise((resolve) => {
+      readableButNotAnImage.once('error', (err) => {
+        resolve(!!err);
+      });
+    });
+    const done = new Promise((resolve) => {
+      readableButNotAnImage.once('end', resolve);
+    });
+    const writable = createWriteStream(outputJpg);
+    readableButNotAnImage.pipe(writable);
+    const anErrorWasEmitted = await errorSeen;
+    await done;
+    t.assert.strictEqual(anErrorWasEmitted, true);
+    await fs.rm(outputJpg);
+  });
+
+  test('Readable side of Stream can start flowing after Writable side has finished', async (t) => {
+    t.plan(5);
+    const readable = createReadStream(fixtures.inputJpg);
+    const writable = createWriteStream(outputJpg);
+    const closed = new Promise((resolve, reject) => {
+      writable.once('close', resolve);
+      writable.once('error', reject);
     });
     const pipeline = sharp().resize(320, 240);
     readable.pipe(pipeline);
-    pipeline.on('finish', () => {
+    pipeline.once('finish', () => {
       pipeline.pipe(writable);
     });
+    await closed;
+    const { data, info } = await sharp(outputJpg).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    await fs.rm(outputJpg);
   });
 
-  it('Non-Stream input generates error when provided Stream-like data', (_t, done) => {
-    sharp('input')._write('fail', null, (err) => {
-      assert.strictEqual(err.message, 'Unexpected data on Writable Stream');
-      done();
-    });
+  test('Non-Stream input generates error when provided Stream-like data', async (t) => {
+    t.plan(2);
+    t.assert.throws(
+      () => sharp('input')._write('fail', null, t.assert.fail),
+      /Unexpected data on Writable Stream/
+    );
   });
 
-  it('Non-Buffer chunk on Stream input generates error', (_t, done) => {
-    sharp()._write('fail', null, (err) => {
-      assert.strictEqual(err.message, 'Non-Buffer data on Writable Stream');
-      done();
-    });
+  test('Non-Buffer chunk on Stream input generates error', async (t) => {
+    t.plan(2);
+    t.assert.throws(
+      () => sharp()._write('fail', null, t.assert.fail),
+      /Non-Buffer data on Writable Stream/
+    );
   });
 
-  it('Invalid sequential read option throws', () => {
-    assert.throws(() => {
-      sharp({ sequentialRead: 'fail' });
-    }, /Expected boolean for sequentialRead but received fail of type string/);
+  test('Invalid sequential read option throws', (t) => {
+    t.plan(1);
+    t.assert.throws(
+      () => sharp({ sequentialRead: 'fail' }),
+      /Expected boolean for sequentialRead but received fail of type string/
+    );
   });
 
-  it('Sequential read, force JPEG', () =>
-    sharp(fixtures.inputJpg, { sequentialRead: true })
+  test('Sequential read, force JPEG', async (t) => {
+    t.plan(5);
+    const { data, info } = await sharp(fixtures.inputJpg, { sequentialRead: true })
       .resize(320, 240)
       .toFormat(sharp.format.jpeg)
-      .toBuffer({ resolveWithObject: true })
-      .then(({ data, info }) => {
-        assert.strictEqual(data.length > 0, true);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual(info.format, 'jpeg');
-        assert.strictEqual(info.width, 320);
-        assert.strictEqual(info.height, 240);
-      })
-  );
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(data.length > 0, true);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+  });
 
-  it('Not sequential read, force JPEG', () =>
-    sharp(fixtures.inputJpg, { sequentialRead: false })
+  test('Not sequential read, force JPEG', async (t) => {
+    t.plan(5);
+    const { data, info } = await sharp(fixtures.inputJpg, { sequentialRead: false })
       .resize(320, 240)
       .toFormat('jpeg')
-      .toBuffer({ resolveWithObject: true })
-      .then(({ data, info }) => {
-        assert.strictEqual(data.length > 0, true);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual(info.format, 'jpeg');
-        assert.strictEqual(info.width, 320);
-        assert.strictEqual(info.height, 240);
-      })
-  );
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(data.length > 0, true);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 320);
+    t.assert.strictEqual(info.height, 240);
+  });
 
-  it('Support output to jpg format', (_t, done) => {
-    sharp(fixtures.inputPng)
+  test('Support output to jpg format', async (t) => {
+    t.plan(5);
+    const { data, info } = await sharp(fixtures.inputPng)
       .resize(320, 240)
       .toFormat('jpg')
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
   });
 
-  it('Support output to tif format', (_t, done) => {
-    sharp(fixtures.inputTiff)
+  test('Support output to tif format', async (t) => {
+    t.plan(5);
+    const { data, info } = await sharp(fixtures.inputTiff)
       .resize(320, 240)
       .toFormat('tif')
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(data.length, info.size);
-        assert.strictEqual('tiff', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual('tiff', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
   });
 
-  it('Allow use of toBuffer and toFile with same instance', async () => {
+  test('Allow use of toBuffer and toFile with same instance', async (t) => {
+    t.plan(1);
     const instance = sharp({
       create: {
         width: 8,
@@ -387,326 +456,277 @@ describe('Input/output', () => {
     });
     await instance.toFile(fixtures.path('output.jpg'));
     const data = await instance.toBuffer();
-    assert.strictEqual(Buffer.isBuffer(data), true);
+    t.assert.strictEqual(Buffer.isBuffer(data), true);
   });
 
-  it('Fail when output File is input File', (_t, done) => {
-    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg, (err) => {
-      assert(err instanceof Error);
-      assert.strictEqual('Cannot use same file for input and output', err.message);
-      done();
-    });
+  test('Fail when output File is input File', async (t) => {
+    t.plan(1);
+    t.assert.rejects(
+      () => sharp(fixtures.inputJpg).toFile(fixtures.inputJpg),
+      /Cannot use same file for input and output/
+    );
   });
 
-  it('Fail when output File is input File via Promise', (_t, done) => {
-    sharp(fixtures.inputJpg).toFile(fixtures.inputJpg).then(() => {
-      done(new Error('Unexpectedly resolved Promise'));
-    }).catch((err) => {
-      assert(err instanceof Error);
-      assert.strictEqual('Cannot use same file for input and output', err.message);
-      done();
-    });
-  });
-
-  it('Fail when output File is input File (relative output, absolute input)', (_t, done) => {
+  test('Fail when output File is input File (relative output, absolute input)', async (t) => {
+    t.plan(1);
     const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(fixtures.inputJpg).toFile(relativePath, (err) => {
-      assert(err instanceof Error);
-      assert.strictEqual('Cannot use same file for input and output', err.message);
-      done();
-    });
+    t.assert.rejects(
+      () => sharp(fixtures.inputJpg).toFile(relativePath),
+      /Cannot use same file for input and output/
+    );
   });
 
-  it('Fail when output File is input File via Promise (relative output, absolute input)', (_t, done) => {
+  test('Fail when output File is input File (relative input, absolute output)', async (t) => {
+    t.plan(1);
     const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(fixtures.inputJpg).toFile(relativePath).then(() => {
-      done(new Error('Unexpectedly resolved Promise'));
-    }).catch((err) => {
-      assert(err instanceof Error);
-      assert.strictEqual('Cannot use same file for input and output', err.message);
-      done();
-    });
+    t.assert.rejects(
+      () => sharp(relativePath).toFile(fixtures.inputJpg),
+      /Cannot use same file for input and output/
+    );
   });
 
-  it('Fail when output File is input File (relative input, absolute output)', (_t, done) => {
-    const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(relativePath).toFile(fixtures.inputJpg, (err) => {
-      assert(err instanceof Error);
-      assert.strictEqual('Cannot use same file for input and output', err.message);
-      done();
-    });
+  test('Fail when output File is empty', async (t) => {
+    t.plan(1);
+    t.assert.rejects(
+      () => sharp(fixtures.inputJpg).toFile(''),
+      /Missing output file path/
+    );
   });
 
-  it('Fail when output File is input File via Promise (relative input, absolute output)', (_t, done) => {
-    const relativePath = path.relative(process.cwd(), fixtures.inputJpg);
-    sharp(relativePath).toFile(fixtures.inputJpg).then(() => {
-      done(new Error('Unexpectedly resolved Promise'));
-    }).catch((err) => {
-      assert(err instanceof Error);
-      assert.strictEqual('Cannot use same file for input and output', err.message);
+  test('Fail when output File is empty, Callback out, returns instance', (t, done) => {
+    t.plan(2);
+    const instance = sharp(fixtures.inputJpg);
+    const returned = instance.toFile('', (err) => {
+      t.assert.strictEqual(err.message, 'Missing output file path');
       done();
     });
+    t.assert.strictEqual(returned, instance);
   });
 
-  it('Fail when output File is empty', (_t, done) => {
-    sharp(fixtures.inputJpg).toFile('', (err) => {
-      assert(err instanceof Error);
-      assert.strictEqual('Missing output file path', err.message);
-      done();
-    });
+  test('Fail when input is invalid Buffer', async (t) => {
+    t.plan(3);
+    try {
+      await sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer();
+    } catch (err) {
+      t.assert.strictEqual(err.message, 'Input buffer contains unsupported image format');
+      t.assert.strictEqual(true, err.stack.includes('at Sharp.toBuffer'));
+      t.assert.strictEqual(true, err.stack.includes(__filename));
+    }
   });
 
-  it('Fail when output File is empty via Promise', (_t, done) => {
-    sharp(fixtures.inputJpg).toFile('').then(() => {
-      done(new Error('Unexpectedly resolved Promise'));
-    }).catch((err) => {
-      assert(err instanceof Error);
-      assert.strictEqual('Missing output file path', err.message);
-      done();
-    });
+  test('Fail when input file path is missing', async (t) => {
+    t.plan(3);
+    try {
+      await sharp('does-not-exist').toFile('fail');
+    } catch (err) {
+      t.assert.strictEqual(err.message, 'Input file is missing: does-not-exist');
+      t.assert.strictEqual(true, err.stack.includes('at Sharp.toFile'));
+      t.assert.strictEqual(true, err.stack.includes(__filename));
+    }
   });
 
-  it('Fail when input is invalid Buffer', async () =>
-    assert.rejects(
-      () => sharp(Buffer.from([0x1, 0x2, 0x3, 0x4])).toBuffer(),
-      (err) => {
-        assert.strictEqual(err.message, 'Input buffer contains unsupported image format');
-        assert(err.stack.includes('at Sharp.toBuffer'));
-        assert(err.stack.includes(__filename));
-        return true;
-      }
-    )
-  );
-
-  it('Fail when input file path is missing', async () =>
-    assert.rejects(
-      () => sharp('does-not-exist').toFile('fail'),
-      (err) => {
-        assert.strictEqual(err.message, 'Input file is missing: does-not-exist');
-        assert(err.stack.includes('at Sharp.toFile'));
-        assert(err.stack.includes(__filename));
-        return true;
-      }
-    )
-  );
-
-  describe('Fail for unsupported input', () => {
-    it('Undefined', () => {
-      assert.throws(() => {
+  suite('Fail for unsupported input', () => {
+    test('Undefined', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(undefined);
       });
     });
-    it('Null', () => {
-      assert.throws(() => {
+    test('Null', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(null);
       });
     });
-    it('Numeric', () => {
-      assert.throws(() => {
+    test('Numeric', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(1);
       });
     });
-    it('Boolean', () => {
-      assert.throws(() => {
+    test('Boolean', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(true);
       });
     });
-    it('Error Object', () => {
-      assert.throws(() => {
+    test('Error Object', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(new Error());
       });
     });
   });
 
-  it('Promises/A+', () => sharp(fixtures.inputJpg)
-      .resize(320, 240)
-      .toBuffer());
-
-  it('Invalid output format', (_t, done) => {
+  test('Invalid output format', (t) => {
+    t.plan(1);
     let isValid = false;
     try {
       sharp().toFormat('zoinks');
       isValid = true;
     } catch (_err) {}
-    assert(!isValid);
-    done();
+    t.assert.strictEqual(false, isValid);
   });
 
-  it('File input with corrupt header fails gracefully', (_t, done) => {
-    sharp(fixtures.inputJpgWithCorruptHeader)
-      .toBuffer((err) => {
-        assert.strictEqual(true, !!err);
-        done();
-      });
+  test('File input with corrupt header fails gracefully', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(() => sharp(fixtures.inputJpgWithCorruptHeader).toBuffer());
   });
 
-  it('Buffer input with corrupt header fails gracefully', (_t, done) => {
-    sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
-      .toBuffer((err) => {
-        assert.strictEqual(true, !!err);
-        done();
-      });
+  test('Buffer input with corrupt header fails gracefully', async (t) => {
+    t.plan(1);
+    const inputBuffer = await fs.readFile(fixtures.inputJpgWithCorruptHeader);
+    await t.assert.rejects(() => sharp(inputBuffer).toBuffer());
   });
 
-  it('Stream input with corrupt header fails gracefully', (_t, done) => {
+  test('Stream input with corrupt header fails gracefully', async (t) => {
+    t.plan(1);
     const transformer = sharp();
-    transformer
-      .toBuffer()
-      .then(() => {
-        done(new Error('Unexpectedly resolved Promise'));
-      })
-      .catch((err) => {
-        assert.strictEqual(true, !!err);
-        done();
-      });
-    fs
-      .createReadStream(fixtures.inputJpgWithCorruptHeader)
-      .pipe(transformer);
+    createReadStream(fixtures.inputJpgWithCorruptHeader).pipe(transformer);
+    await t.assert.rejects(() => transformer.toBuffer());
   });
 
-  describe('Output filename with unknown extension', () => {
+  suite('Output filename with unknown extension', () => {
     const outputZoinks = fixtures.path('output.zoinks');
 
-    it('Match JPEG input', (_t, done) => {
-      sharp(fixtures.inputJpg)
+    test('Match JPEG input', async (t) => {
+      t.plan(4);
+      const info = await sharp(fixtures.inputJpg)
         .resize(320, 80)
-        .toFile(outputZoinks, (err, info) => {
-          if (err) throw err;
-          assert.strictEqual(true, info.size > 0);
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          fs.rm(outputZoinks, done);
-        });
+        .toFile(outputZoinks);
+      t.assert.strictEqual(true, info.size > 0);
+      t.assert.strictEqual('jpeg', info.format);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      await fs.rm(outputZoinks);
     });
 
-    it('Match PNG input', (_t, done) => {
-      sharp(fixtures.inputPng)
+    test('Match PNG input', async (t) => {
+      t.plan(5);
+      const info = await sharp(fixtures.inputPngRGBWithAlpha)
         .resize(320, 80)
-        .toFile(outputZoinks, (err, info) => {
-          if (err) throw err;
-          assert.strictEqual(true, info.size > 0);
-          assert.strictEqual('png', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          fs.rm(outputZoinks, done);
-        });
+        .toFile(outputZoinks);
+      t.assert.strictEqual(true, info.size > 0);
+      t.assert.strictEqual('png', info.format);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(true, info.hasAlpha);
+      await fs.rm(outputZoinks);
     });
 
-    it('Match WebP input', (_t, done) => {
-      sharp(fixtures.inputWebP)
+    test('Match WebP input', async (t) => {
+      t.plan(5);
+      const info = await sharp(fixtures.inputWebPWithTransparency)
         .resize(320, 80)
-        .toFile(outputZoinks, (err, info) => {
-          if (err) throw err;
-          assert.strictEqual(true, info.size > 0);
-          assert.strictEqual('webp', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          fs.rm(outputZoinks, done);
-        });
+        .toFile(outputZoinks);
+      t.assert.strictEqual(true, info.size > 0);
+      t.assert.strictEqual('webp', info.format);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(true, info.hasAlpha);
+      await fs.rm(outputZoinks);
     });
 
-    it('Match TIFF input', (_t, done) => {
-      sharp(fixtures.inputTiff)
+    test('Match TIFF input', async (t) => {
+      t.plan(5);
+      const info = await sharp(fixtures.inputTiff)
         .resize(320, 80)
-        .toFile(outputZoinks, (err, info) => {
-          if (err) throw err;
-          assert.strictEqual(true, info.size > 0);
-          assert.strictEqual('tiff', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          fs.rm(outputZoinks, done);
-        });
+        .toFile(outputZoinks);
+      t.assert.strictEqual(true, info.size > 0);
+      t.assert.strictEqual('tiff', info.format);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
+      await fs.rm(outputZoinks);
     });
 
-    it('Force JPEG format for PNG input', (_t, done) => {
-      sharp(fixtures.inputPng)
+    test('Force JPEG format for PNG input', async (t) => {
+      t.plan(5);
+      const info = await sharp(fixtures.inputPng)
         .resize(320, 80)
         .jpeg()
-        .toFile(outputZoinks, (err, info) => {
-          if (err) throw err;
-          assert.strictEqual(true, info.size > 0);
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          fs.rm(outputZoinks, done);
-        });
+        .toFile(outputZoinks);
+      t.assert.strictEqual(true, info.size > 0);
+      t.assert.strictEqual('jpeg', info.format);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
+      await fs.rm(outputZoinks);
     });
   });
 
-  it('Input and output formats match when not forcing', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Input and output formats match when not forcing', async (t) => {
+    t.plan(4);
+    const { info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .png({ compressionLevel: 1, force: false })
-      .toBuffer((err, _data, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(320, info.width);
-        assert.strictEqual(240, info.height);
-        done();
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(320, info.width);
+    t.assert.strictEqual(240, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
   });
 
-  it('Can force output format with output chaining', () => sharp(fixtures.inputJpg)
+  test('Can force output format with output chaining', async (t) => {
+    t.plan(1);
+    const { info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .png({ force: true })
       .jpeg({ force: false })
-      .toBuffer({ resolveWithObject: true })
-      .then((out) => {
-        assert.strictEqual('png', out.info.format);
-      }));
-
-  it('toFormat=JPEG takes precedence over WebP extension', (_t, done) => {
-    const outputWebP = fixtures.path('output.webp');
-    sharp(fixtures.inputPng)
-      .resize(8)
-      .jpeg()
-      .toFile(outputWebP, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        fs.rm(outputWebP, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
   });
 
-  it('toFormat=WebP takes precedence over JPEG extension', (_t, done) => {
-    sharp(fixtures.inputPng)
+  test('toFormat=JPEG takes precedence over WebP extension', async (t) => {
+    t.plan(1);
+    const outputWebP = fixtures.path('output.webp');
+    const info = await sharp(fixtures.inputPng)
+      .resize(8)
+      .jpeg()
+      .toFile(outputWebP);
+    t.assert.strictEqual('jpeg', info.format);
+    await fs.rm(outputWebP);
+  });
+
+  test('toFormat=WebP takes precedence over JPEG extension', async (t) => {
+    t.plan(1);
+    const outputJpg = fixtures.path('output.jpg');
+    const info = await sharp(fixtures.inputPng)
       .resize(8)
       .webp()
-      .toFile(outputJpg, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual('webp', info.format);
-        done();
-      });
+      .toFile(outputJpg);
+    t.assert.strictEqual('webp', info.format);
+    await fs.rm(outputJpg);
   });
 
-  it('Load Vips V file', (_t, done) => {
-    sharp(fixtures.inputV)
+  test('Load Vips V file', async (t) => {
+    t.plan(5);
+    const { data, info } = await sharp(fixtures.inputV)
       .jpeg()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(70, info.width);
-        assert.strictEqual(60, info.height);
-        fixtures.assertSimilar(fixtures.expected('vfile.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, data.length > 0);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(70, info.width);
+    t.assert.strictEqual(60, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
+    await fixtures.assertSimilar(fixtures.expected('vfile.jpg'), data);
   });
 
-  it('Save Vips V file', (_t, done) => {
+  test('Save Vips V file', async (t) => {
+    t.plan(4);
     const outputV = fixtures.path('output.v');
-    sharp(fixtures.inputJpg)
+    const info = await sharp(fixtures.inputJpg)
       .extract({ left: 910, top: 1105, width: 70, height: 60 })
-      .toFile(outputV, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, info.size > 0);
-        assert.strictEqual('v', info.format);
-        assert.strictEqual(70, info.width);
-        assert.strictEqual(60, info.height);
-        fs.rm(outputV, done);
-      });
+      .toFile(outputV);
+    t.assert.strictEqual(true, info.size > 0);
+    t.assert.strictEqual('v', info.format);
+    t.assert.strictEqual(70, info.width);
+    t.assert.strictEqual(60, info.height);
+    await fs.rm(outputV);
   });
 
-  it('can ignore ICC profile', async () => {
+  test('can ignore ICC profile', async (t) => {
+    t.plan(1);
     const [r1, g1, b1] = await sharp(fixtures.inputJpgWithPortraitExif5, { ignoreIcc: true })
       .extract({ width: 1, height: 1, top: 16, left: 16 })
       .raw()
@@ -717,7 +737,7 @@ describe('Input/output', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r1, g1, b1, r2, g2, b2 }, {
+    t.assert.deepStrictEqual({ r1, g1, b1, r2, g2, b2 }, {
       r1: 60,
       r2: 77,
       g1: 54,
@@ -727,356 +747,496 @@ describe('Input/output', () => {
     });
   });
 
-  describe('Switch off safety limits for certain formats', () => {
-    it('Valid', () => {
-      assert.doesNotThrow(() => {
+  suite('Switch off safety limits for certain formats', () => {
+    test('Valid', (t) => {
+      t.plan(1);
+      t.assert.doesNotThrow(() => {
         sharp({ unlimited: true });
       });
     });
-    it('Invalid', () => {
-      assert.throws(() => {
-        sharp({ unlimited: -1 });
-      }, /Expected boolean for unlimited but received -1 of type number/);
+    test('Invalid', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ unlimited: -1 }),
+        /Expected boolean for unlimited but received -1 of type number/
+      );
     });
   });
 
-  describe('Limit pixel count of input image', () => {
-    it('Invalid fails - negative', () => {
-      assert.throws(() => {
-        sharp({ limitInputPixels: -1 });
-      });
+  suite('Limit pixel count of input image', () => {
+    test('Invalid fails - negative', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp({ limitInputPixels: -1 }));
     });
 
-    it('Invalid fails - float', () => {
-      assert.throws(() => {
-        sharp({ limitInputPixels: 12.3 });
-      });
+    test('Invalid fails - float', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp({ limitInputPixels: 12.3 }));
     });
 
-    it('Invalid fails - integer overflow', () => {
-      assert.throws(() => {
-        sharp({ limitInputPixels: Number.MAX_SAFE_INTEGER + 1 });
-      });
+    test('Invalid fails - integer overflow', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp({ limitInputPixels: Number.MAX_SAFE_INTEGER + 1 }));
     });
 
-    it('Invalid fails - string', () => {
-      assert.throws(() => {
-        sharp({ limitInputPixels: 'fail' });
-      });
+    test('Invalid fails - string', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp({ limitInputPixels: 'fail' }));
     });
 
-    it('Same size as input works', () =>
-      sharp(fixtures.inputJpg)
-        .metadata()
-        .then(({ width, height }) =>
-          sharp(fixtures.inputJpg, { limitInputPixels: width * height })
-            .resize(2)
-            .toBuffer()
-        )
-    );
-
-    it('Disabling limit works', () =>
-      sharp(fixtures.inputJpgLarge, { limitInputPixels: false })
+    test('Same size as input works', async (t) => {
+      t.plan(1);
+      const { width, height } = await sharp(fixtures.inputJpg).metadata();
+      const data = await sharp(fixtures.inputJpg, { limitInputPixels: width * height })
         .resize(2)
-        .toBuffer()
-    );
+        .toBuffer();
+      t.assert.strictEqual(true, data.length > 0);
+    });
 
-    it('Enabling default limit works and fails with a large image', () =>
-      sharp(fixtures.inputJpgLarge, { limitInputPixels: true })
-        .toBuffer()
-        .then(() => {
-          assert.fail('Expected to fail');
-        })
-        .catch(err => {
-          assert.strictEqual(err.message, 'Input image exceeds pixel limit');
-        })
-    );
+    test('Disabling limit works', async (t) => {
+      t.plan(1);
+      const data = await sharp(fixtures.inputJpgLarge, { limitInputPixels: false })
+        .resize(2)
+        .toBuffer();
+      t.assert.strictEqual(true, data.length > 0);
+    });
 
-    it('Enabling default limit works and fails for an image with resolution higher than uint32 limit', () =>
-      sharp(fixtures.inputPngUint32Limit, { limitInputPixels: true })
-        .toBuffer()
-        .then(() => {
-          assert.fail('Expected to fail');
-        })
-        .catch(err => {
-          assert.strictEqual(err.message, 'Input image exceeds pixel limit');
-        })
-    );
+    test('Enabling default limit works and fails with a large image', async (t) => {
+      t.plan(1);
+      await t.assert.rejects(
+        () => sharp(fixtures.inputJpgLarge, { limitInputPixels: true }).toBuffer(),
+        /Input image exceeds pixel limit/
+      );
+    });
 
-    it('Smaller than input fails', () =>
-      sharp(fixtures.inputJpg)
-        .metadata()
-        .then(({ width, height }) =>
-          sharp(fixtures.inputJpg, { limitInputPixels: width * height - 1 })
-            .toBuffer()
-            .then(() => {
-              assert.fail('Expected to fail');
-            })
-            .catch(err => {
-              assert.strictEqual(err.message, 'Input image exceeds pixel limit');
-            })
-        )
-    );
+    test('Enabling default limit works and fails for an image with resolution higher than uint32 limit', async (t) => {
+      t.plan(1);
+      await t.assert.rejects(
+        () => sharp(fixtures.inputPngUint32Limit, { limitInputPixels: true }).toBuffer(),
+        /Input image exceeds pixel limit/
+      );
+    });
+
+    test('Smaller than input fails', async (t) => {
+      t.plan(1);
+      const { width, height } = await sharp(fixtures.inputJpg).metadata();
+      await t.assert.rejects(
+        () => sharp(fixtures.inputJpg, { limitInputPixels: width * height - 1 }).toBuffer(),
+        /Input image exceeds pixel limit/
+      );
+    });
   });
 
-  describe('Input options', () => {
-    it('Option-less', () => {
+  suite('Limit channel count of input image', () => {
+    const create = {
+      width: 1,
+      height: 1,
+      channels: 4,
+      background: 'black'
+    };
+
+    test('Invalid fails - negative', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ limitInputChannels: -1 }),
+        /Expected positive integer for limitInputChannels but received -1 of type number/
+      );
+    });
+
+    test('Invalid fails - float', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ limitInputChannels: 12.3 }),
+        /Expected positive integer for limitInputChannels but received 12\.3 of type number/
+      );
+    });
+
+    test('Invalid fails - integer overflow', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ limitInputChannels: Number.MAX_SAFE_INTEGER + 1 }),
+        /Expected positive integer for limitInputChannels but received 9007199254740992 of type number/
+      );
+    });
+
+    test('Invalid fails - string', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ limitInputChannels: 'fail' }),
+        /Expected positive integer for limitInputChannels but received fail of type string/
+      );
+    });
+
+    test('Same number of channels as input works', async (t) => {
+      t.plan(1);
+      const { channels } = await sharp(fixtures.inputJpg).metadata();
+      const data = await sharp(fixtures.inputJpg, { limitInputChannels: channels })
+        .resize(2)
+        .toBuffer();
+      t.assert.strictEqual(true, data.length > 0);
+    });
+
+    test('Disabling limit works', async (t) => {
+      t.plan(1);
+      const eightChannelTiff = await sharp({ create })
+        .joinChannel({ create })
+        .tiff({ compression: 'deflate' })
+        .toBuffer();
+
+      const data = await sharp(eightChannelTiff, { limitInputChannels: false })
+        .resize(2)
+        .toBuffer();
+      t.assert.strictEqual(true, data.length > 0);
+    });
+
+    test('Enabling default limit works and fails with a large image', async (t) => {
+      t.plan(1);
+      const eightChannelTiff = await sharp({ create })
+        .joinChannel({ create })
+        .tiff({ compression: 'deflate' })
+        .toBuffer();
+
+      await t.assert.rejects(
+        () => sharp(eightChannelTiff, { limitInputChannels: true }).toBuffer(),
+        /Input image exceeds channel limit/
+      );
+    });
+
+    test('Smaller than input fails', async (t) => {
+      t.plan(1);
+      const { channels } = await sharp(fixtures.inputJpg).metadata();
+      await t.assert.rejects(
+        () => sharp(fixtures.inputJpg, { limitInputChannels: channels - 1 }).toBuffer(),
+        /Input image exceeds channel limit/
+      );
+    });
+  });
+
+  suite('Input options', () => {
+    test('Option-less', (t) => {
+      t.plan(1);
       sharp();
+      t.assert.ok(true);
     });
-    it('Ignore unknown attribute', () => {
+    test('Ignore unknown attribute', (t) => {
+      t.plan(1);
       sharp({ unknown: true });
+      t.assert.ok(true);
     });
-    it('undefined with options fails', () => {
-      assert.throws(() => {
-        sharp(undefined, {});
-      }, /Unsupported input 'undefined' of type undefined when also providing options of type object/);
+    test('undefined with options fails', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp(undefined, {}),
+        /Unsupported input 'undefined' of type undefined when also providing options of type object/
+      );
     });
-    it('null with options fails', () => {
-      assert.throws(() => {
-        sharp(null, {});
-      }, /Unsupported input 'null' of type object when also providing options of type object/);
+    test('null with options fails', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp(null, {}),
+        /Unsupported input 'null' of type object when also providing options of type object/
+      );
     });
-    it('Non-Object options fails', () => {
-      assert.throws(() => {
-        sharp('test', 'zoinks');
-      }, /Invalid input options zoinks/);
+    test('Non-Object options fails', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp('test', 'zoinks'),
+        /Invalid input options zoinks/
+      );
     });
-    it('Invalid density: string', () => {
-      assert.throws(() => {
-        sharp({ density: 'zoinks' });
-      }, /Expected number between 1 and 100000 for density but received zoinks of type string/);
+    test('Invalid density: string', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ density: 'zoinks' }),
+        /Expected number between 1 and 100000 for density but received zoinks of type string/
+      );
     });
-    it('Invalid ignoreIcc: string', () => {
-      assert.throws(() => {
-        sharp({ ignoreIcc: 'zoinks' });
-      }, /Expected boolean for ignoreIcc but received zoinks of type string/);
+    test('Invalid density: numeric string', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ density: '50' }),
+        /Expected number between 1 and 100000 for density but received 50 of type string/
+      );
     });
-    it('Setting animated property updates pages property', () => {
-      assert.strictEqual(sharp({ animated: false }).options.input.pages, 1);
-      assert.strictEqual(sharp({ animated: true }).options.input.pages, -1);
+    test('Invalid density: array', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ density: [50] }),
+        /Expected number between 1 and 100000 for density but received 50 of type object/
+      );
     });
-    it('Invalid animated property throws', () => {
-      assert.throws(() => {
-        sharp({ animated: -1 });
-      }, /Expected boolean for animated but received -1 of type number/);
+    test('Invalid ignoreIcc: string', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ ignoreIcc: 'zoinks' }),
+        /Expected boolean for ignoreIcc but received zoinks of type string/
+      );
     });
-    it('Invalid page property throws', () => {
-      assert.throws(() => {
-        sharp({ page: -1 });
-      }, /Expected integer between 0 and 100000 for page but received -1 of type number/);
+    test('Setting animated property updates pages property', (t) => {
+      t.plan(2);
+      t.assert.strictEqual(sharp({ animated: false }).options.input.pages, 1);
+      t.assert.strictEqual(sharp({ animated: true }).options.input.pages, -1);
     });
-    it('Invalid pages property throws', () => {
-      assert.throws(() => {
-        sharp({ pages: '1' });
-      }, /Expected integer between -1 and 100000 for pages but received 1 of type string/);
+    test('Invalid animated property throws', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ animated: -1 }),
+        /Expected boolean for animated but received -1 of type number/
+      );
     });
-    it('Valid openSlide.level property', () => {
+    test('Invalid page property throws', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ page: -1 }),
+        /Expected integer between 0 and 100000 for page but received -1 of type number/
+      );
+    });
+    test('Invalid pages property throws', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp({ pages: '1' }),
+        /Expected integer between -1 and 100000 for pages but received 1 of type string/
+      );
+    });
+    test('Valid openSlide.level property', (t) => {
+      t.plan(1);
       sharp({ openSlide: { level: 1 } });
       sharp({ level: 1 });
+      t.assert.ok(true);
     });
-    it('Invalid openSlide.level property (string) throws', () => {
-      assert.throws(
+    test('Invalid openSlide.level property (string) throws', (t) => {
+      t.plan(2);
+      t.assert.throws(
         () => sharp({ openSlide: { level: '1' } }),
         /Expected integer between 0 and 256 for openSlide.level but received 1 of type string/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ level: '1' }),
         /Expected integer between 0 and 256 for level but received 1 of type string/
       );
     });
-    it('Invalid openSlide.level property (negative) throws', () => {
-      assert.throws(
+    test('Invalid openSlide.level property (negative) throws', (t) => {
+      t.plan(2);
+      t.assert.throws(
         () => sharp({ openSlide: { level: -1 } }),
         /Expected integer between 0 and 256 for openSlide\.level but received -1 of type number/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ level: -1 }),
         /Expected integer between 0 and 256 for level but received -1 of type number/
       );
     });
-    it('Valid tiff.subifd property', () => {
+    test('Valid tiff.subifd property', (t) => {
+      t.plan(1);
       sharp({ tiff: { subifd: 1 } });
       sharp({ subifd: 1 });
+      t.assert.ok(true);
     });
-    it('Invalid tiff.subifd property (string) throws', () => {
-      assert.throws(
+    test('Invalid tiff.subifd property (string) throws', (t) => {
+      t.plan(2);
+      t.assert.throws(
         () => sharp({ tiff: { subifd: '1' } }),
         /Expected integer between -1 and 100000 for tiff\.subifd but received 1 of type string/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ subifd: '1' }),
         /Expected integer between -1 and 100000 for subifd but received 1 of type string/
       );
     });
-    it('Invalid tiff.subifd property (float) throws', () => {
-      assert.throws(
+    test('Invalid tiff.subifd property (float) throws', (t) => {
+      t.plan(2);
+      t.assert.throws(
         () => sharp({ tiff: { subifd: 1.2 } }),
         /Expected integer between -1 and 100000 for tiff\.subifd but received 1.2 of type number/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ subifd: 1.2 }),
         /Expected integer between -1 and 100000 for subifd but received 1.2 of type number/
       );
     });
-    it('Valid pdf.background property (string)', () => {
+    test('Valid pdf.background property (string)', (t) => {
+      t.plan(1);
       sharp({ pdf: { background: '#00ff00' } });
       sharp({ pdfBackground: '#00ff00' });
+      t.assert.ok(true);
     });
-    it('Valid pdf.background property (object)', () => {
+    test('Valid pdf.background property (object)', (t) => {
+      t.plan(1);
       sharp({ pdf: { background: { r: 0, g: 255, b: 0 } } });
       sharp({ pdfBackground: { r: 0, g: 255, b: 0 } });
+      t.assert.ok(true);
     });
-    it('Invalid pdf.background property (string) throws', () => {
-      assert.throws(
+    test('Invalid pdf.background property (string) throws', (t) => {
+      t.plan(2);
+      t.assert.throws(
         () => sharp({ pdf: { background: '00ff00' } }),
         /Unable to parse color from string/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ pdfBackground: '00ff00' }),
         /Unable to parse color from string/
       );
     });
-    it('Invalid pdf.background property (number) throws', () => {
-      assert.throws(
+    test('Invalid pdf.background property (number) throws', (t) => {
+      t.plan(2);
+      t.assert.throws(
         () => sharp({ pdf: { background: 255 } }),
         /Expected object or string for background/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ pdf: { background: 255 } }),
         /Expected object or string for background/
       );
     });
-    it('Invalid pdf.background property (object)', () => {
-      assert.throws(
+    test('Invalid pdf.background property (object)', (t) => {
+      t.plan(2);
+      t.assert.throws(
         () => sharp({ pdf: { background: { red: 0, green: 255, blue: 0 } } }),
         /Unable to parse color from object/
       );
-      assert.throws(
+      t.assert.throws(
         () => sharp({ pdfBackground: { red: 0, green: 255, blue: 0 } }),
         /Unable to parse color from object/
       );
     });
   });
 
-  it('Fails when writing to missing directory', async () => {
+  test('Fails when writing to missing directory', async (t) => {
+    t.plan(1);
     const create = {
       width: 8,
       height: 8,
       channels: 3,
       background: { r: 0, g: 0, b: 0 }
     };
-    await assert.rejects(
+    await t.assert.rejects(
       () => sharp({ create }).toFile('does-not-exist/out.jpg'),
       /unable to open for write/
     );
   });
 
-  describe('create new image', () => {
-    it('RGB', (_t, done) => {
+  suite('create new image', () => {
+    test('RGB', async (t) => {
+      t.plan(4);
       const create = {
         width: 10,
         height: 20,
         channels: 3,
         background: { r: 0, g: 255, b: 0 }
       };
-      sharp({ create })
+      const { data, info } = await sharp({ create })
         .jpeg()
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(create.width, info.width);
-          assert.strictEqual(create.height, info.height);
-          assert.strictEqual(create.channels, info.channels);
-          assert.strictEqual('jpeg', info.format);
-          fixtures.assertSimilar(fixtures.expected('create-rgb.jpg'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(create.width, info.width);
+      t.assert.strictEqual(create.height, info.height);
+      t.assert.strictEqual(create.channels, info.channels);
+      t.assert.strictEqual('jpeg', info.format);
+      await fixtures.assertSimilar(fixtures.expected('create-rgb.jpg'), data);
     });
-    it('RGBA', (_t, done) => {
+    test('RGBA', async (t) => {
+      t.plan(4);
       const create = {
         width: 20,
         height: 10,
         channels: 4,
         background: { r: 255, g: 0, b: 0, alpha: 128 }
       };
-      sharp({ create })
+      const { data, info } = await sharp({ create })
         .png()
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(create.width, info.width);
-          assert.strictEqual(create.height, info.height);
-          assert.strictEqual(create.channels, info.channels);
-          assert.strictEqual('png', info.format);
-          fixtures.assertSimilar(fixtures.expected('create-rgba.png'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(create.width, info.width);
+      t.assert.strictEqual(create.height, info.height);
+      t.assert.strictEqual(create.channels, info.channels);
+      t.assert.strictEqual('png', info.format);
+      await fixtures.assertSimilar(fixtures.expected('create-rgba.png'), data);
     });
-    it('Invalid channels', () => {
+    test('Invalid channels', (t) => {
+      t.plan(1);
       const create = {
         width: 10,
         height: 20,
         channels: 2,
         background: { r: 0, g: 0, b: 0 }
       };
-      assert.throws(() => {
+      t.assert.throws(() => {
         sharp({ create });
       });
     });
-    it('Missing background', () => {
+    test('Missing background', (t) => {
+      t.plan(1);
       const create = {
         width: 10,
         height: 20,
         channels: 3
       };
-      assert.throws(() => {
+      t.assert.throws(() => {
+        sharp({ create });
+      });
+    });
+    test('Width beyond pixel limit', (t) => {
+      t.plan(1);
+      const create = {
+        width: 100000001,
+        height: 10,
+        channels: 3,
+        background: { r: 0, g: 0, b: 0 }
+      };
+      t.assert.throws(() => {
+        sharp({ create });
+      });
+    });
+    test('Height beyond pixel limit', (t) => {
+      t.plan(1);
+      const create = {
+        width: 10,
+        height: 100000001,
+        channels: 3,
+        background: { r: 0, g: 0, b: 0 }
+      };
+      t.assert.throws(() => {
         sharp({ create });
       });
     });
   });
 
-  it('Queue length change events', (_t, done) => {
+  test('Queue length change events', async (t) => {
+    t.plan(3);
     let eventCounter = 0;
     const queueListener = (queueLength) => {
-      assert.strictEqual(true, queueLength === 0 || queueLength === 1);
+      t.assert.strictEqual(true, queueLength === 0 || queueLength === 1);
       eventCounter++;
     };
     sharp.queue.on('change', queueListener);
-    sharp(fixtures.inputJpg)
+    await sharp(fixtures.inputJpg)
       .resize(320, 240)
-      .toBuffer((err) => {
-        process.nextTick(() => {
-          sharp.queue.removeListener('change', queueListener);
-          if (err) throw err;
-          assert.strictEqual(2, eventCounter);
-          done();
-        });
-      });
+      .toBuffer();
+    await new Promise((resolve) => process.nextTick(resolve));
+    sharp.queue.removeListener('change', queueListener);
+    t.assert.strictEqual(2, eventCounter);
   });
 
-  it('Info event data', (_t, done) => {
-    const readable = fs.createReadStream(fixtures.inputJPGBig);
+  test('Info event data', async (t) => {
+    t.plan(5);
+    const readable = createReadStream(fixtures.inputJPGBig);
     const inPipeline = sharp()
       .resize(840, 472)
       .raw()
       .on('info', (info) => {
-        assert.strictEqual(840, info.width);
-        assert.strictEqual(472, info.height);
-        assert.strictEqual(3, info.channels);
+        t.assert.strictEqual(840, info.width);
+        t.assert.strictEqual(472, info.height);
+        t.assert.strictEqual(3, info.channels);
+        t.assert.strictEqual(false, info.hasAlpha);
       });
-    const badPipeline = sharp({ raw: { width: 840, height: 500, channels: 3 } })
-      .toFormat('jpeg')
-      .toBuffer((err) => {
-        assert.strictEqual(err.message.indexOf('memory area too small') > 0, true);
-        const readable = fs.createReadStream(fixtures.inputJPGBig);
-        const inPipeline = sharp()
-          .resize(840, 472)
-          .raw();
-        const goodPipeline = sharp({ raw: { width: 840, height: 472, channels: 3 } })
-          .toFormat('jpeg')
-          .toBuffer(done);
-        readable.pipe(inPipeline).pipe(goodPipeline);
-      });
+    const badPipeline = sharp({ raw: { width: 840, height: 500, channels: 3 } }).toFormat('jpeg');
     readable.pipe(inPipeline).pipe(badPipeline);
+    await t.assert.rejects(
+      () => badPipeline.toBuffer(),
+      /memory area too small/
+    );
   });
 
-  it('supports wide-character filenames', async () => {
+  test('supports wide-character filenames', async (t) => {
+    t.plan(4);
     const filename = fixtures.path('output.图片.jpg');
     const create = {
       width: 8,
@@ -1087,9 +1247,47 @@ describe('Input/output', () => {
     await sharp({ create }).toFile(filename);
 
     const { width, height, channels, format } = await sharp(filename).metadata();
-    assert.strictEqual(width, 8);
-    assert.strictEqual(height, 8);
-    assert.strictEqual(channels, 3);
-    assert.strictEqual(format, 'jpeg');
+    t.assert.strictEqual(width, 8);
+    t.assert.strictEqual(height, 8);
+    t.assert.strictEqual(channels, 3);
+    t.assert.strictEqual(format, 'jpeg');
+  });
+
+  test('toBuffer resolves with an untransferable Buffer', async (t) => {
+    const data = await sharp(fixtures.inputJpg)
+      .resize({ width: 8, height: 8 })
+      .toBuffer();
+
+    t.plan(isMarkedAsUntransferable && buildPlatformArch() !== 'wasm32' ? 3 : 2);
+    if (isMarkedAsUntransferable && buildPlatformArch() !== 'wasm32') {
+      t.assert.strictEqual(isMarkedAsUntransferable(data.buffer), true);
+    }
+    t.assert.strictEqual(ArrayBuffer.isView(data), true);
+    t.assert.strictEqual(ArrayBuffer.isView(data.buffer), false);
+  });
+
+  test('toUint8Array resolves with a transferable Uint8Array', async (t) => {
+    const { data, info } = await sharp(fixtures.inputJpg)
+      .resize({ width: 8, height: 8 })
+      .toUint8Array();
+
+    t.plan(isMarkedAsUntransferable ? 13 : 12);
+    t.assert.strictEqual(data instanceof Uint8Array, true);
+    if (isMarkedAsUntransferable) {
+      t.assert.strictEqual(isMarkedAsUntransferable(data.buffer), false);
+    }
+    t.assert.strictEqual(ArrayBuffer.isView(data), true);
+    t.assert.strictEqual(info.format, 'jpeg');
+    t.assert.strictEqual(info.width, 8);
+    t.assert.strictEqual(info.height, 8);
+    t.assert.strictEqual(data.byteLength, info.size);
+    t.assert.strictEqual(data[0], 0xFF);
+    t.assert.strictEqual(data[1], 0xD8);
+    t.assert.strictEqual(info.hasAlpha, false);
+
+    const metadata = await sharp(data).metadata();
+    t.assert.strictEqual(metadata.format, 'jpeg');
+    t.assert.strictEqual(metadata.width, 8);
+    t.assert.strictEqual(metadata.height, 8);
   });
 });

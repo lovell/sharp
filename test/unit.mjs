@@ -12,5 +12,8 @@ run({
   coverageIncludeGlobs: ['lib/*.js'],
   branchCoverage: 100,
 })
+  .on('test:fail', () => {
+    process.exitCode = 1;
+  })
   .compose(new spec())
   .pipe(process.stdout);

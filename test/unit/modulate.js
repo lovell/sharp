@@ -4,12 +4,11 @@
 */
 
 const sharp = require('../../');
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 const fixtures = require('../fixtures');
 
-describe('Modulate', () => {
-  describe('Invalid options', () => {
+suite('Modulate', () => {
+  suite('Invalid options', () => {
     [
       null,
       undefined,
@@ -26,15 +25,17 @@ describe('Modulate', () => {
       { lightness: '+50' },
       { lightness: null }
     ].forEach((options) => {
-      it('should throw', () => {
-        assert.throws(() => {
+      test('should throw', (t) => {
+        t.plan(1);
+        t.assert.throws(() => {
           sharp(fixtures.inputJpg).modulate(options);
         });
       });
     });
   });
 
-  it('should be able to hue-rotate', async () => {
+  test('should be able to hue-rotate', async (t) => {
+    t.plan(1);
     const [r, g, b] = await sharp({
       create: {
         width: 1,
@@ -47,10 +48,11 @@ describe('Modulate', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 41, g: 107, b: 57 }, { r, g, b });
+    t.assert.deepStrictEqual({ r: 41, g: 107, b: 57 }, { r, g, b });
   });
 
-  it('should be able to brighten', async () => {
+  test('should be able to brighten', async (t) => {
+    t.plan(1);
     const [r, g, b] = await sharp({
       create: {
         width: 1,
@@ -63,10 +65,11 @@ describe('Modulate', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 255, g: 173, b: 168 }, { r, g, b });
+    t.assert.deepStrictEqual({ r: 255, g: 173, b: 168 }, { r, g, b });
   });
 
-  it('should be able to darken', async () => {
+  test('should be able to darken', async (t) => {
+    t.plan(1);
     const [r, g, b] = await sharp({
       create: {
         width: 1,
@@ -79,10 +82,11 @@ describe('Modulate', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 97, g: 17, b: 25 }, { r, g, b });
+    t.assert.deepStrictEqual({ r: 97, g: 17, b: 25 }, { r, g, b });
   });
 
-  it('should be able to saturate', async () => {
+  test('should be able to saturate', async (t) => {
+    t.plan(1);
     const [r, g, b] = await sharp({
       create: {
         width: 1,
@@ -95,10 +99,11 @@ describe('Modulate', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 198, g: 0, b: 43 }, { r, g, b });
+    t.assert.deepStrictEqual({ r: 198, g: 0, b: 43 }, { r, g, b });
   });
 
-  it('should be able to desaturate', async () => {
+  test('should be able to desaturate', async (t) => {
+    t.plan(1);
     const [r, g, b] = await sharp({
       create: {
         width: 1,
@@ -111,10 +116,11 @@ describe('Modulate', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 127, g: 83, b: 81 }, { r, g, b });
+    t.assert.deepStrictEqual({ r: 127, g: 83, b: 81 }, { r, g, b });
   });
 
-  it('should be able to lighten', async () => {
+  test('should be able to lighten', async (t) => {
+    t.plan(1);
     const [r, g, b] = await sharp({
       create: {
         width: 1,
@@ -127,10 +133,11 @@ describe('Modulate', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 182, g: 93, b: 92 }, { r, g, b });
+    t.assert.deepStrictEqual({ r: 182, g: 93, b: 92 }, { r, g, b });
   });
 
-  it('should be able to modulate all channels', async () => {
+  test('should be able to modulate all channels', async (t) => {
+    t.plan(1);
     const [r, g, b] = await sharp({
       create: {
         width: 1,
@@ -143,10 +150,11 @@ describe('Modulate', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 149, g: 209, b: 214 }, { r, g, b });
+    t.assert.deepStrictEqual({ r: 149, g: 209, b: 214 }, { r, g, b });
   });
 
-  it('should be able to use linear and modulate together', async () => {
+  test('should be able to use linear and modulate together', async (t) => {
+    t.plan(1);
     const contrast = 1.5;
     const brightness = 0.5;
 
@@ -163,12 +171,13 @@ describe('Modulate', () => {
       .raw()
       .toBuffer();
 
-    assert.deepStrictEqual({ r: 81, g: 0, b: 0 }, { r, g, b });
+    t.assert.deepStrictEqual({ r: 81, g: 0, b: 0 }, { r, g, b });
   });
 
-  describe('hue-rotate', () => {
+  suite('hue-rotate', () => {
     [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360].forEach(angle => {
-      it(`should hue rotate by ${angle} deg`, async () => {
+      test(`should hue rotate by ${angle} deg`, async (t) => {
+        t.plan(1);
         const base = `modulate-hue-angle-${angle}.png`;
         const actual = fixtures.path(`output.${base}`);
         const expected = fixtures.expected(base);
@@ -177,10 +186,8 @@ describe('Modulate', () => {
           .resize(320)
           .modulate({ hue: angle })
           .png({ compressionLevel: 0 })
-          .toFile(actual)
-          .then(() => {
-            fixtures.assertMaxColourDistance(actual, expected, 3);
-          });
+          .toFile(actual);
+        await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(actual, expected, 3));
       });
     });
   });

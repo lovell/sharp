@@ -196,8 +196,8 @@ namespace sharp {
     if (HasAttr(input, "joinValign")) {
       descriptor->joinValign = AttrAsEnum<VipsAlign>(input, "joinValign", VIPS_TYPE_ALIGN);
     }
-    // Limit input images to a given number of pixels, where pixels = width * height
     descriptor->limitInputPixels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputPixels"));
+    descriptor->limitInputChannels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputChannels"));
     if (HasAttr(input, "access")) {
       descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
     }
@@ -289,6 +289,7 @@ namespace sharp {
       case ImageType::JXL: id = "jxl"; break;
       case ImageType::RAD: id = "rad"; break;
       case ImageType::DCRAW: id = "dcraw"; break;
+      case ImageType::UHDR: id = "uhdr"; break;
       case ImageType::VIPS: id = "vips"; break;
       case ImageType::RAW: id = "raw"; break;
       case ImageType::UNKNOWN: id = "unknown"; break;
@@ -339,6 +340,9 @@ namespace sharp {
     { "VipsForeignLoadRadBuffer", ImageType::RAD },
     { "VipsForeignLoadDcRawFile", ImageType::DCRAW },
     { "VipsForeignLoadDcRawBuffer", ImageType::DCRAW },
+    { "VipsForeignLoadUhdr", ImageType::UHDR },
+    { "VipsForeignLoadUhdrFile", ImageType::UHDR },
+    { "VipsForeignLoadUhdrBuffer", ImageType::UHDR },
     { "VipsForeignLoadVips", ImageType::VIPS },
     { "VipsForeignLoadVipsFile", ImageType::VIPS },
     { "VipsForeignLoadRaw", ImageType::RAW }
@@ -355,6 +359,9 @@ namespace sharp {
       if (it != loaderToType.end()) {
         imageType = it->second;
       }
+    }
+    if (imageType == ImageType::UHDR) {
+      imageType = ImageType::JPEG;
     }
     return imageType;
   }
@@ -374,6 +381,9 @@ namespace sharp {
       if (EndsWith(vips::VError().what(), " does not exist\n")) {
         imageType = ImageType::MISSING;
       }
+    }
+    if (imageType == ImageType::UHDR) {
+      imageType = ImageType::JPEG;
     }
     return imageType;
   }
@@ -416,7 +426,7 @@ namespace sharp {
     }
     if (ImageTypeSupportsPage(imageType)) {
       option->set("n", descriptor->pages);
-      option->set("page", descriptor->page);
+      option->set("page", std::max(0, descriptor->page));
     }
     switch (imageType) {
       case ImageType::SVG:
@@ -444,6 +454,22 @@ namespace sharp {
         break;
     }
     return option;
+  }
+
+  /*
+    Should HEIF image be re-opened using the primary item?
+  */
+  static bool HeifPrimaryPageReopen(VImage image, InputDescriptor *descriptor) {
+    if (image.get_typeof(VIPS_META_N_PAGES) == G_TYPE_INT && image.get_typeof("heif-primary") == G_TYPE_INT) {
+      if (image.get_int(VIPS_META_N_PAGES) > 1 && descriptor->pages == 1 && descriptor->page == -1) {
+        int const pagePrimary = image.get_int("heif-primary");
+        if (pagePrimary != 0) {
+          descriptor->page = pagePrimary;
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /*
@@ -480,12 +506,15 @@ namespace sharp {
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
+            } else if (imageType == ImageType::HEIF && HeifPrimaryPageReopen(image, descriptor)) {
+              option = GetOptionsForImageType(imageType, descriptor);
+              image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
             }
-          } catch (vips::VError const &err) {
-            throw vips::VError(std::string("Input buffer has corrupt header: ") + err.what());
+          } catch (std::runtime_error const &err) {
+            throw std::runtime_error(std::string("Input buffer has corrupt header: ") + err.what());
           }
         } else {
-          throw vips::VError("Input buffer contains unsupported image format");
+          throw std::runtime_error("Input buffer contains unsupported image format");
         }
       }
     } else {
@@ -556,10 +585,10 @@ namespace sharp {
         imageType = DetermineImageType(descriptor->file.data());
         if (imageType == ImageType::MISSING) {
           if (descriptor->file.find("<svg") != std::string::npos) {
-            throw vips::VError("Input file is missing, did you mean "
+            throw std::runtime_error("Input file is missing, did you mean "
               "sharp(Buffer.from('" + descriptor->file.substr(0, 8) + "...')?");
           }
-          throw vips::VError("Input file is missing: " + descriptor->file);
+          throw std::runtime_error("Input file is missing: " + descriptor->file);
         }
         if (imageType != ImageType::UNKNOWN) {
           try {
@@ -567,12 +596,15 @@ namespace sharp {
             image = VImage::new_from_file(descriptor->file.data(), option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
+            } else if (imageType == ImageType::HEIF && HeifPrimaryPageReopen(image, descriptor)) {
+              option = GetOptionsForImageType(imageType, descriptor);
+              image = VImage::new_from_file(descriptor->file.data(), option);
             }
-          } catch (vips::VError const &err) {
-            throw vips::VError(std::string("Input file has corrupt header: ") + err.what());
+          } catch (std::runtime_error const &err) {
+            throw std::runtime_error(std::string("Input file has corrupt header: ") + err.what());
           }
         } else {
-          throw vips::VError("Input file contains unsupported image format");
+          throw std::runtime_error("Input file contains unsupported image format");
         }
       }
     }
@@ -580,7 +612,10 @@ namespace sharp {
     // Limit input images to a given number of pixels, where pixels = width * height
     if (descriptor->limitInputPixels > 0 &&
       static_cast<uint64_t>(image.width()) * image.height() > descriptor->limitInputPixels) {
-      throw vips::VError("Input image exceeds pixel limit");
+      throw std::runtime_error("Input image exceeds pixel limit");
+    }
+    if (descriptor->limitInputChannels > 0 && static_cast<uint64_t>(image.bands()) > descriptor->limitInputChannels) {
+      throw std::runtime_error("Input image exceeds channel limit");
     }
     return std::make_tuple(image, imageType);
   }
@@ -600,7 +635,7 @@ namespace sharp {
     if (HasProfile(image)) {
       size_t length;
       const void *data = image.get_blob(VIPS_META_ICC_NAME, &length);
-      icc.first = static_cast<char*>(g_malloc(length));
+      icc.first = static_cast<char*>(vips_malloc(reinterpret_cast<VipsObject*>(image.get_image()), length));
       icc.second = length;
       memcpy(icc.first, data, length);
     }
@@ -613,7 +648,7 @@ namespace sharp {
   VImage SetProfile(VImage image, std::pair<char*, size_t> icc) {
     if (icc.first != nullptr) {
       image = image.copy();
-      image.set(VIPS_META_ICC_NAME, reinterpret_cast<VipsCallbackFn>(vips_area_free_cb), icc.first, icc.second);
+      image.set(VIPS_META_ICC_NAME, nullptr, icc.first, icc.second);
     }
     return image;
   }
@@ -756,19 +791,19 @@ namespace sharp {
       : image.height();
     if (imageType == ImageType::JPEG) {
       if (image.width() > 65535 || height > 65535) {
-        throw vips::VError("Processed image is too large for the JPEG format");
+        throw std::runtime_error("Processed image is too large for the JPEG format");
       }
     } else if (imageType == ImageType::WEBP) {
       if (image.width() > 16383 || height > 16383) {
-        throw vips::VError("Processed image is too large for the WebP format");
+        throw std::runtime_error("Processed image is too large for the WebP format");
       }
     } else if (imageType == ImageType::GIF) {
       if (image.width() > 65535 || height > 65535) {
-        throw vips::VError("Processed image is too large for the GIF format");
+        throw std::runtime_error("Processed image is too large for the GIF format");
       }
     } else if (imageType == ImageType::HEIF) {
       if (image.width() > 16384 || height > 16384) {
-        throw vips::VError("Processed image is too large for the HEIF format");
+        throw std::runtime_error("Processed image is too large for the HEIF format");
       }
     }
   }
@@ -1126,5 +1161,23 @@ namespace sharp {
       image.remove(VIPS_META_SEQUENTIAL);
     }
     return image;
+  }
+
+  /*
+    Does this image have a gain map?
+  */
+  bool HasGainMap(VImage image) {
+    return image.get_typeof("gainmap") == VIPS_TYPE_BLOB ||
+      image.get_typeof("gainmap-data") == VIPS_TYPE_BLOB;
+  }
+
+  /*
+    Removes gain map, if any.
+  */
+  VImage RemoveGainMap(VImage image) {
+    VImage copy = image.copy();
+    copy.remove("gainmap");
+    copy.remove("gainmap-data");
+    return copy;
   }
 }  // namespace sharp

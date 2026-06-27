@@ -3,98 +3,114 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 
-describe('JXL', () => {
-  it('called without options does not throw an error', () => {
-    assert.doesNotThrow(() => {
+suite('JXL', () => {
+  test('called without options does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().jxl();
     });
   });
-  it('valid distance does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid distance does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().jxl({ distance: 2.3 });
     });
   });
-  it('invalid distance should throw an error', () => {
-    assert.throws(() => {
+  test('invalid distance should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().jxl({ distance: 15.1 });
     });
   });
-  it('non-numeric distance should throw an error', () => {
-    assert.throws(() => {
+  test('non-numeric distance should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().jxl({ distance: 'fail' });
     });
   });
-  it('valid quality > 30 does not throw an error', () => {
+  test('valid quality > 30 does not throw an error', (t) => {
+    t.plan(2);
     const s = sharp();
-    assert.doesNotThrow(() => {
+    t.assert.doesNotThrow(() => {
       s.jxl({ quality: 80 });
     });
-    assert.strictEqual(s.options.jxlDistance, 1.9);
+    t.assert.strictEqual(s.options.jxlDistance, 1.9);
   });
-  it('valid quality < 30 does not throw an error', () => {
+  test('valid quality < 30 does not throw an error', (t) => {
+    t.plan(2);
     const s = sharp();
-    assert.doesNotThrow(() => {
+    t.assert.doesNotThrow(() => {
       s.jxl({ quality: 20 });
     });
-    assert.strictEqual(s.options.jxlDistance, 9.066666666666666);
+    t.assert.strictEqual(s.options.jxlDistance, 9.066666666666666);
   });
-  it('valid quality does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid quality does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().jxl({ quality: 80 });
     });
   });
-  it('invalid quality should throw an error', () => {
-    assert.throws(() => {
+  test('invalid quality should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().jxl({ quality: 101 });
     });
   });
-  it('non-numeric quality should throw an error', () => {
-    assert.throws(() => {
+  test('non-numeric quality should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().jxl({ quality: 'fail' });
     });
   });
-  it('valid decodingTier does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid decodingTier does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().jxl({ decodingTier: 2 });
     });
   });
-  it('invalid decodingTier should throw an error', () => {
-    assert.throws(() => {
+  test('invalid decodingTier should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().jxl({ decodingTier: 5 });
     });
   });
-  it('non-numeric decodingTier should throw an error', () => {
-    assert.throws(() => {
+  test('non-numeric decodingTier should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().jxl({ decodingTier: 'fail' });
     });
   });
-  it('valid lossless does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid lossless does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().jxl({ lossless: true });
     });
   });
-  it('non-boolean lossless should throw an error', () => {
-    assert.throws(() => {
+  test('non-boolean lossless should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().jxl({ lossless: 'fail' });
     });
   });
-  it('valid effort does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid effort does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().jxl({ effort: 6 });
     });
   });
-  it('out of range effort should throw an error', () => {
-    assert.throws(() => {
+  test('out of range effort should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().jxl({ effort: 10 });
     });
   });
-  it('invalid effort should throw an error', () => {
-    assert.throws(() => {
+  test('invalid effort should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().jxl({ effort: 'fail' });
     });
   });

@@ -1,0 +1,46 @@
+{
+  "name": "@img/sharp-freebsd-wasm32",
+  "version": "0.35.3-rc.0",
+  "description": "Prebuilt sharp for use with FreeBSD (WebAssembly)",
+  "author": "Lovell Fuller <npm@lovell.info>",
+  "homepage": "https://sharp.pixelplumbing.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lovell/sharp.git",
+    "directory": "npm/freebsd-wasm32"
+  },
+  "license": "Apache-2.0",
+  "funding": {
+    "url": "https://opencollective.com/libvips"
+  },
+  "files": [
+    "export"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "exports": {
+    "./sharp.node": {
+      "import": "./export/sharp.node.mjs",
+      "require": "./export/sharp.node.cjs"
+    },
+    "./package": {
+      "import": "./export/package.mjs",
+      "require": "./export/package.cjs"
+    },
+    "./versions": {
+      "import": "./export/versions.mjs",
+      "require": "./export/versions.cjs"
+    }
+  },
+  "dependencies": {
+    "@img/sharp-wasm32": "0.35.3-rc.0"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "os": [
+    "freebsd"
+  ]
+}

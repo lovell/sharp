@@ -23,15 +23,15 @@ Napi::Value cache(const Napi::CallbackInfo& info) {
 
   // Set memory limit
   if (info[size_t(0)].IsNumber()) {
-    vips_cache_set_max_mem(info[size_t(0)].As<Napi::Number>().Int32Value() * 1048576);
+    vips_cache_set_max_mem(static_cast<size_t>(info[size_t(0)].As<Napi::Number>().Uint32Value()) * 1048576);
   }
   // Set file limit
   if (info[size_t(1)].IsNumber()) {
-    vips_cache_set_max_files(info[size_t(1)].As<Napi::Number>().Int32Value());
+    vips_cache_set_max_files(info[size_t(1)].As<Napi::Number>().Uint32Value());
   }
   // Set items limit
   if (info[size_t(2)].IsNumber()) {
-    vips_cache_set_max(info[size_t(2)].As<Napi::Number>().Int32Value());
+    vips_cache_set_max(info[size_t(2)].As<Napi::Number>().Uint32Value());
   }
 
   // Get memory stats
@@ -123,6 +123,7 @@ Napi::Value format(const Napi::CallbackInfo& info) {
     "jpeg", "png", "webp", "tiff", "magick", "openslide", "dz",
     "ppm", "fits", "gif", "svg", "heif", "pdf", "vips", "jp2k", "jxl", "rad", "dcraw"
   }) {
+    std::string id = f == "jp2k" ? "jp2" : f;
     // Input
     const VipsObjectClass *oc = vips_class_find("VipsOperation", (f + "load").c_str());
     Napi::Boolean hasInputFile = Napi::Boolean::New(env, oc);
@@ -154,11 +155,11 @@ Napi::Value format(const Napi::CallbackInfo& info) {
     output.Set("stream", hasOutputBuffer);
     // Other attributes
     Napi::Object container = Napi::Object::New(env);
-    container.Set("id", f);
+    container.Set("id", id);
     container.Set("input", input);
     container.Set("output", output);
     // Add to set of formats
-    format.Set(f, container);
+    format.Set(id, container);
   }
 
   // Raw, uncompressed data
@@ -243,7 +244,7 @@ Napi::Value _maxColourDistance(const Napi::CallbackInfo& info) {
     }
     // Calculate colour distance
     maxColourDistance = image1.dE00(image2).max();
-  } catch (vips::VError const &err) {
+  } catch (std::runtime_error const &err) {
     throw Napi::Error::New(env, err.what());
   }
 

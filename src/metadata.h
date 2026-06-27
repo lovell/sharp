@@ -19,6 +19,7 @@ struct MetadataBaton {
   sharp::InputDescriptor *input;
   // Output
   std::string format;
+  std::string mediaType;
   int width;
   int height;
   std::string space;
@@ -53,6 +54,8 @@ struct MetadataBaton {
   size_t xmpLength;
   char *tifftagPhotoshop;
   size_t tifftagPhotoshopLength;
+  char *gainMap;
+  size_t gainMapLength;
   MetadataComments comments;
   std::string err;
 
@@ -82,7 +85,9 @@ struct MetadataBaton {
     xmp(nullptr),
     xmpLength(0),
     tifftagPhotoshop(nullptr),
-    tifftagPhotoshopLength(0) {}
+    tifftagPhotoshopLength(0),
+    gainMap(nullptr),
+    gainMapLength(0) {}
 };
 
 Napi::Value metadata(const Napi::CallbackInfo& info);

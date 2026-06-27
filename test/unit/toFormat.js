@@ -3,29 +3,31 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
+
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('toFormat', () => {
-  it('accepts upper case characters as format parameter (string)', async () => {
+suite('toFormat', () => {
+  test('accepts upper case characters as format parameter (string)', async (t) => {
+    t.plan(1);
     const data = await sharp(fixtures.inputJpg)
       .resize(8, 8)
       .toFormat('PNG')
       .toBuffer();
 
     const { format } = await sharp(data).metadata();
-    assert.strictEqual(format, 'png');
+    t.assert.strictEqual(format, 'png');
   });
 
-  it('accepts upper case characters as format parameter (object)', async () => {
+  test('accepts upper case characters as format parameter (object)', async (t) => {
+    t.plan(1);
     const data = await sharp(fixtures.inputJpg)
       .resize(8, 8)
       .toFormat({ id: 'PNG' })
       .toBuffer();
 
     const { format } = await sharp(data).metadata();
-    assert.strictEqual(format, 'png');
+    t.assert.strictEqual(format, 'png');
   });
 });

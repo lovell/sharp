@@ -66,6 +66,7 @@ and https://www.cairographics.org/operators/
 | [images[].animated] | <code>boolean</code> | <code>false</code> | Set to `true` to read all frames/pages of an animated image. |
 | [images[].failOn] | <code>string</code> | <code>&quot;&#x27;warning&#x27;&quot;</code> | @see [constructor parameters](/api-constructor/) |
 | [images[].limitInputPixels] | <code>number</code> \| <code>boolean</code> | <code>268402689</code> | @see [constructor parameters](/api-constructor/) |
+| [images[].limitInputChannels] | <code>number</code> \| <code>boolean</code> | <code>5</code> | @see [constructor parameters](/api-constructor/) |
 
 **Example**  
 ```js

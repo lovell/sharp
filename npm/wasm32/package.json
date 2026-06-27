@@ -1,7 +1,7 @@
 {
   "name": "@img/sharp-wasm32",
-  "version": "0.34.5",
-  "description": "Prebuilt sharp for use with wasm32",
+  "version": "0.35.3-rc.0",
+  "description": "Prebuilt sharp for use with WebAssembly",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
   "repository": {
@@ -15,6 +15,7 @@
   },
   "preferUnplugged": true,
   "files": [
+    "index.cjs",
     "lib",
     "versions.json"
   ],
@@ -23,17 +24,14 @@
   },
   "type": "commonjs",
   "exports": {
-    "./sharp.node": "./lib/sharp-wasm32.node.js",
+    "./sharp.node": "./index.cjs",
     "./package": "./package.json",
     "./versions": "./versions.json"
   },
   "engines": {
-    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
+    "node": ">=20.9.0"
   },
   "dependencies": {
-    "@emnapi/runtime": "^1.7.0"
-  },
-  "cpu": [
-    "wasm32"
-  ]
+    "@emnapi/runtime": "^1.11.1"
+  }
 }

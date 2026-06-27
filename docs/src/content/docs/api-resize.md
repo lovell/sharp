@@ -174,10 +174,10 @@ This operation will always occur after resizing and extraction, if any.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | extend | <code>number</code> \| <code>Object</code> |  | single pixel count to add to all edges or an Object with per-edge counts |
-| [extend.top] | <code>number</code> | <code>0</code> |  |
-| [extend.left] | <code>number</code> | <code>0</code> |  |
-| [extend.bottom] | <code>number</code> | <code>0</code> |  |
-| [extend.right] | <code>number</code> | <code>0</code> |  |
+| [extend.top] | <code>number</code> | <code>0</code> | number of pixels to add to the top edge, valid values are integers in the range 0-10000 |
+| [extend.left] | <code>number</code> | <code>0</code> | number of pixels to add to the left edge, valid values are integers in the range 0-10000 |
+| [extend.bottom] | <code>number</code> | <code>0</code> | number of pixels to add to the bottom edge, valid values are integers in the range 0-10000 |
+| [extend.right] | <code>number</code> | <code>0</code> | number of pixels to add to the right edge, valid values are integers in the range 0-10000 |
 | [extend.extendWith] | <code>String</code> | <code>&#x27;background&#x27;</code> | populate new pixels using this method, one of: background, copy, repeat, mirror. |
 | [extend.background] | <code>String</code> \| <code>Object</code> | <code>{r: 0, g: 0, b: 0, alpha: 1}</code> | background colour, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to black without transparency. |
 
@@ -236,10 +236,10 @@ Extract/crop a region of the image.
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | describes the region to extract using integral pixel values |
-| options.left | <code>number</code> | zero-indexed offset from left edge |
-| options.top | <code>number</code> | zero-indexed offset from top edge |
-| options.width | <code>number</code> | width of region to extract |
-| options.height | <code>number</code> | height of region to extract |
+| options.left | <code>number</code> | zero-indexed offset from left edge, an integer between 0 and 100000000 |
+| options.top | <code>number</code> | zero-indexed offset from top edge, an integer between 0 and 100000000 |
+| options.width | <code>number</code> | width of region to extract, an integer between 0 and 100000000 |
+| options.height | <code>number</code> | height of region to extract, an integer between 0 and 100000000 |
 
 **Example**  
 ```js
@@ -270,6 +270,8 @@ Images with an alpha channel will use the combined bounding box of alpha and non
 
 If the result of this operation would trim an image to nothing then no change is made.
 
+Use the `lineArt` and `threshold` options for control over sensitivity.
+
 The `info` response Object will contain `trimOffsetLeft` and `trimOffsetTop` properties.
 
 
@@ -284,6 +286,7 @@ The `info` response Object will contain `trimOffsetLeft` and `trimOffsetTop` pro
 | [options.background] | <code>string</code> \| <code>Object</code> | <code>&quot;&#x27;top-left pixel&#x27;&quot;</code> | Background colour, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to that of the top-left pixel. |
 | [options.threshold] | <code>number</code> | <code>10</code> | Allowed difference from the above colour, a positive number. |
 | [options.lineArt] | <code>boolean</code> | <code>false</code> | Does the input more closely resemble line art (e.g. vector) rather than being photographic? |
+| [options.margin] | <code>number</code> | <code>0</code> | Leave a margin around trimmed content, integral number of pixels between 0 and 10000000. |
 
 **Example**  
 ```js
@@ -318,6 +321,15 @@ const output = await sharp(input)
   .trim({
     background: "yellow",
     threshold: 42,
+  })
+  .toBuffer();
+```
+**Example**  
+```js
+// Trim image leaving (up to) a 10 pixel margin around the trimmed content.
+const output = await sharp(input)
+  .trim({
+    margin: 10
   })
   .toBuffer();
 ```

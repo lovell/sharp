@@ -3,49 +3,53 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
-const { inRange } = require('../../lib/is');
+const { inRange } = require('../../dist/is.cjs');
 
-describe('Text to image', () => {
-  it('text with default values', async (t) => {
+suite('Text to image', () => {
+  test('text with default values', async (t) => {
     const output = fixtures.path('output.text-default.png');
     const text = sharp({
       text: {
-        text: 'Hello, world !'
+        text: 'Hello, world !',
+        font: fixtures.fontFamily,
+        fontfile: fixtures.fontFile
       }
     });
     if (!sharp.versions.pango) {
       return t.skip();
     }
+    t.plan(15);
     const info = await text.png().toFile(output);
-    assert.strictEqual('png', info.format);
-    assert.strictEqual(3, info.channels);
-    assert.strictEqual(false, info.premultiplied);
-    assert.ok(info.width > 10);
-    assert.ok(info.height > 8);
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(3, info.channels);
+    t.assert.strictEqual(false, info.premultiplied);
+    t.assert.ok(info.width > 10);
+    t.assert.ok(info.height > 8);
     const metadata = await sharp(output).metadata();
-    assert.strictEqual('uchar', metadata.depth);
-    assert.strictEqual('srgb', metadata.space);
-    assert.strictEqual(72, metadata.density);
+    t.assert.strictEqual('uchar', metadata.depth);
+    t.assert.strictEqual('srgb', metadata.space);
+    t.assert.strictEqual(72, metadata.density);
     const stats = await sharp(output).stats();
-    assert.strictEqual(0, stats.channels[0].min);
-    assert.strictEqual(255, stats.channels[0].max);
-    assert.strictEqual(0, stats.channels[1].min);
-    assert.strictEqual(255, stats.channels[1].max);
-    assert.strictEqual(0, stats.channels[2].min);
-    assert.strictEqual(255, stats.channels[2].max);
-    assert.ok(info.textAutofitDpi > 0);
+    t.assert.strictEqual(0, stats.channels[0].min);
+    t.assert.strictEqual(255, stats.channels[0].max);
+    t.assert.strictEqual(0, stats.channels[1].min);
+    t.assert.strictEqual(255, stats.channels[1].max);
+    t.assert.strictEqual(0, stats.channels[2].min);
+    t.assert.strictEqual(255, stats.channels[2].max);
+    t.assert.ok(info.textAutofitDpi > 0);
   });
 
-  it('text with width and height', async (t) => {
+  test('text with width and height', async (t) => {
     const output = fixtures.path('output.text-width-height.png');
     const text = sharp({
       text: {
         text: 'Hello, world!',
+        font: fixtures.fontFamily,
+        fontfile: fixtures.fontFile,
         width: 500,
         height: 400
       }
@@ -53,38 +57,44 @@ describe('Text to image', () => {
     if (!sharp.versions.pango) {
       return t.skip();
     }
+    t.plan(5);
     const info = await text.toFile(output);
-    assert.strictEqual('png', info.format);
-    assert.strictEqual(3, info.channels);
-    assert.ok(inRange(info.width, 400, 600), `Actual width ${info.width}`);
-    assert.ok(inRange(info.height, 290, 500), `Actual height ${info.height}`);
-    assert.ok(inRange(info.textAutofitDpi, 900, 1300), `Actual textAutofitDpi ${info.textAutofitDpi}`);
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(3, info.channels);
+    t.assert.ok(inRange(info.width, 400, 600), `Actual width ${info.width}`);
+    t.assert.ok(inRange(info.height, 290, 500), `Actual height ${info.height}`);
+    t.assert.ok(inRange(info.textAutofitDpi, 900, 1300), `Actual textAutofitDpi ${info.textAutofitDpi}`);
   });
 
-  it('text with dpi', async (t) => {
+  test('text with dpi', async (t) => {
     const output = fixtures.path('output.text-dpi.png');
     const dpi = 300;
     const text = sharp({
       text: {
         text: 'Hello, world!',
+        font: fixtures.fontFamily,
+        fontfile: fixtures.fontFile,
         dpi
       }
     });
     if (!sharp.versions.pango) {
       return t.skip();
     }
+    t.plan(2);
     const info = await text.toFile(output);
-    assert.strictEqual('png', info.format);
+    t.assert.strictEqual('png', info.format);
     const metadata = await sharp(output).metadata();
-    assert.strictEqual(dpi, metadata.density);
+    t.assert.strictEqual(dpi, metadata.density);
   });
 
-  it('text with color and pango markup', async (t) => {
+  test('text with color and pango markup', async (t) => {
     const output = fixtures.path('output.text-color-pango.png');
     const dpi = 300;
     const text = sharp({
       text: {
         text: '<span foreground="red" font="100">red</span><span font="50" background="cyan">blue</span>',
+        font: fixtures.fontFamily,
+        fontfile: fixtures.fontFile,
         rgba: true,
         dpi
       }
@@ -92,34 +102,37 @@ describe('Text to image', () => {
     if (!sharp.versions.pango) {
       return t.skip();
     }
+    t.plan(5);
     const info = await text.toFile(output);
-    assert.strictEqual('png', info.format);
-    assert.strictEqual(4, info.channels);
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(4, info.channels);
     const metadata = await sharp(output).metadata();
-    assert.strictEqual(dpi, metadata.density);
-    assert.strictEqual('uchar', metadata.depth);
-    assert.strictEqual(true, metadata.hasAlpha);
+    t.assert.strictEqual(dpi, metadata.density);
+    t.assert.strictEqual('uchar', metadata.depth);
+    t.assert.strictEqual(true, metadata.hasAlpha);
   });
 
-  it('text with font', async (t) => {
+  test('text with font', async (t) => {
     const output = fixtures.path('output.text-with-font.png');
     const text = sharp({
       text: {
         text: 'Hello, world!',
-        font: 'sans 100'
+        font: `${fixtures.fontFamily} 100`,
+        fontfile: fixtures.fontFile
       }
     });
     if (!sharp.versions.pango) {
       return t.skip();
     }
+    t.plan(4);
     const info = await text.toFile(output);
-    assert.strictEqual('png', info.format);
-    assert.strictEqual(3, info.channels);
-    assert.ok(info.width > 30);
-    assert.ok(info.height > 10);
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(3, info.channels);
+    t.assert.ok(info.width > 30);
+    t.assert.ok(info.height > 10);
   });
 
-  it('text with justify and composite', async (t) => {
+  test('text with justify and composite', async (t) => {
     const output = fixtures.path('output.text-composite.png');
     const width = 500;
     const dpi = 300;
@@ -129,6 +142,8 @@ describe('Text to image', () => {
         input: {
           text: {
             text: '<span foreground="#ffff00">Watermark</span> <span foreground="white"><i>is cool</i></span>',
+            font: fixtures.fontFamily,
+            fontfile: fixtures.fontFile,
             width: 300,
             height: 300,
             justify: true,
@@ -142,7 +157,8 @@ describe('Text to image', () => {
         input: {
           text: {
             text: '<span background="cyan">cool</span>',
-            font: 'sans 30',
+            font: `${fixtures.fontFamily} 30`,
+            fontfile: fixtures.fontFile,
             dpi,
             rgba: true
           }
@@ -153,28 +169,28 @@ describe('Text to image', () => {
     if (!sharp.versions.pango) {
       return t.skip();
     }
+    t.plan(7);
     const info = await text.toFile(output);
-    assert.strictEqual('png', info.format);
-    assert.strictEqual(4, info.channels);
-    assert.strictEqual(width, info.width);
-    assert.strictEqual(true, info.premultiplied);
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(4, info.channels);
+    t.assert.strictEqual(width, info.width);
+    t.assert.strictEqual(true, info.premultiplied);
     const metadata = await sharp(output).metadata();
-    assert.strictEqual('srgb', metadata.space);
-    assert.strictEqual('uchar', metadata.depth);
-    assert.strictEqual(true, metadata.hasAlpha);
+    t.assert.strictEqual('srgb', metadata.space);
+    t.assert.strictEqual('uchar', metadata.depth);
+    t.assert.strictEqual(true, metadata.hasAlpha);
   });
 
-  it('bad text input', () => {
-    assert.throws(() => {
-      sharp({
-        text: {
-        }
-      });
+  test('bad text input', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp({ text: {} });
     });
   });
 
-  it('fontfile input', () => {
-    assert.doesNotThrow(() => {
+  test('fontfile input', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp({
         text: {
           text: 'text',
@@ -184,8 +200,9 @@ describe('Text to image', () => {
     });
   });
 
-  it('bad font input', () => {
-    assert.throws(() => {
+  test('bad font input', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -195,8 +212,9 @@ describe('Text to image', () => {
     });
   });
 
-  it('bad fontfile input', () => {
-    assert.throws(() => {
+  test('bad fontfile input', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -206,38 +224,41 @@ describe('Text to image', () => {
     });
   });
 
-  it('invalid width', () => {
-    assert.throws(
+  test('invalid width', (t) => {
+    t.plan(3);
+    t.assert.throws(
       () => sharp({ text: { text: 'text', width: 'bad' } }),
-      /Expected positive integer for text\.width but received bad of type string/
+      /Expected integer between 1 and 1000000 for text\.width but received bad of type string/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', width: 0.1 } }),
-      /Expected positive integer for text\.width but received 0.1 of type number/
+      /Expected integer between 1 and 1000000 for text\.width but received 0.1 of type number/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', width: -1 } }),
-      /Expected positive integer for text\.width but received -1 of type number/
+      /Expected integer between 1 and 1000000 for text\.width but received -1 of type number/
     );
   });
 
-  it('invalid height', () => {
-    assert.throws(
+  test('invalid height', (t) => {
+    t.plan(3);
+    t.assert.throws(
       () => sharp({ text: { text: 'text', height: 'bad' } }),
-      /Expected positive integer for text\.height but received bad of type string/
+      /Expected integer between 1 and 1000000 for text\.height but received bad of type string/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', height: 0.1 } }),
-      /Expected positive integer for text\.height but received 0.1 of type number/
+      /Expected integer between 1 and 1000000 for text\.height but received 0.1 of type number/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', height: -1 } }),
-      /Expected positive integer for text\.height but received -1 of type number/
+      /Expected integer between 1 and 1000000 for text\.height but received -1 of type number/
     );
   });
 
-  it('bad align input', () => {
-    assert.throws(() => {
+  test('bad align input', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -247,8 +268,9 @@ describe('Text to image', () => {
     });
   });
 
-  it('bad justify input', () => {
-    assert.throws(() => {
+  test('bad justify input', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -258,23 +280,25 @@ describe('Text to image', () => {
     });
   });
 
-  it('invalid dpi', () => {
-    assert.throws(
+  test('invalid dpi', (t) => {
+    t.plan(3);
+    t.assert.throws(
       () => sharp({ text: { text: 'text', dpi: 'bad' } }),
       /Expected integer between 1 and 1000000 for text\.dpi but received bad of type string/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', dpi: 0.1 } }),
       /Expected integer between 1 and 1000000 for text\.dpi but received 0.1 of type number/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', dpi: -1 } }),
       /Expected integer between 1 and 1000000 for text\.dpi but received -1 of type number/
     );
   });
 
-  it('bad rgba input', () => {
-    assert.throws(() => {
+  test('bad rgba input', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -284,23 +308,25 @@ describe('Text to image', () => {
     });
   });
 
-  it('invalid spacing', () => {
-    assert.throws(
+  test('invalid spacing', (t) => {
+    t.plan(3);
+    t.assert.throws(
       () => sharp({ text: { text: 'text', spacing: 'bad' } }),
       /Expected integer between -1000000 and 1000000 for text\.spacing but received bad of type string/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', spacing: 0.1 } }),
       /Expected integer between -1000000 and 1000000 for text\.spacing but received 0.1 of type number/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', spacing: -1000001 } }),
       /Expected integer between -1000000 and 1000000 for text\.spacing but received -1000001 of type number/
     );
   });
 
-  it('only height or dpi not both', () => {
-    assert.throws(() => {
+  test('only height or dpi not both', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp({
         text: {
           text: 'text',
@@ -311,21 +337,23 @@ describe('Text to image', () => {
     });
   });
 
-  it('valid wrap throws', () => {
-    assert.doesNotThrow(() => sharp({ text: { text: 'text', wrap: 'none' } }));
-    assert.doesNotThrow(() => sharp({ text: { text: 'text', wrap: 'word-char' } }));
+  test('valid wrap throws', (t) => {
+    t.plan(2);
+    t.assert.doesNotThrow(() => sharp({ text: { text: 'text', wrap: 'none' } }));
+    t.assert.doesNotThrow(() => sharp({ text: { text: 'text', wrap: 'word-char' } }));
   });
 
-  it('invalid wrap throws', () => {
-    assert.throws(
+  test('invalid wrap throws', (t) => {
+    t.plan(3);
+    t.assert.throws(
       () => sharp({ text: { text: 'text', wrap: 1 } }),
       /Expected one of: word, char, word-char, none for text\.wrap but received 1 of type number/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', wrap: false } }),
       /Expected one of: word, char, word-char, none for text\.wrap but received false of type boolean/
     );
-    assert.throws(
+    t.assert.throws(
       () => sharp({ text: { text: 'text', wrap: 'invalid' } }),
       /Expected one of: word, char, word-char, none for text\.wrap but received invalid of type string/
     );

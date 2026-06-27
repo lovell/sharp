@@ -74,7 +74,7 @@ export default defineConfig({
         {
           label: 'Changelog',
           collapsed: true,
-          autogenerate: { directory: 'changelog' }
+          items: [{ autogenerate: { directory: 'changelog' } }]
         }
       ],
       social: [

@@ -35,12 +35,13 @@ where the overall height is the `pageHeight` multiplied by the number of `pages`
 | --- | --- | --- | --- |
 | [input] | <code>Buffer</code> \| <code>ArrayBuffer</code> \| <code>Uint8Array</code> \| <code>Uint8ClampedArray</code> \| <code>Int8Array</code> \| <code>Uint16Array</code> \| <code>Int16Array</code> \| <code>Uint32Array</code> \| <code>Int32Array</code> \| <code>Float32Array</code> \| <code>Float64Array</code> \| <code>string</code> \| <code>Array</code> |  | if present, can be  a Buffer / ArrayBuffer / Uint8Array / Uint8ClampedArray containing JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image data, or  a TypedArray containing raw pixel image data, or  a String containing the filesystem path to an JPEG, PNG, WebP, AVIF, GIF, SVG or TIFF image file.  An array of inputs can be provided, and these will be joined together.  JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present. |
 | [options] | <code>Object</code> |  | if present, is an Object with optional attributes. |
-| [options.failOn] | <code>string</code> | <code>&quot;&#x27;warning&#x27;&quot;</code> | When to abort processing of invalid pixel data, one of (in order of sensitivity, least to most): 'none', 'truncated', 'error', 'warning'. Higher levels imply lower levels. Invalid metadata will always abort. |
+| [options.failOn] | <code>string</code> | <code>&quot;&#x27;warning&#x27;&quot;</code> | When to abort processing of invalid pixel data, one of (in order of sensitivity, least to most): 'none', 'truncated', 'error', 'warning'. Higher levels imply lower levels. Invalid metadata will always abort. Use the default 'warning' level with untrusted input. |
 | [options.limitInputPixels] | <code>number</code> \| <code>boolean</code> | <code>268402689</code> | Do not process input images where the number of pixels  (width x height) exceeds this limit. Assumes image dimensions contained in the input metadata can be trusted.  An integral Number of pixels, zero or false to remove limit, true to use default limit of 268402689 (0x3FFF x 0x3FFF). |
+| [options.limitInputChannels] | <code>number</code> \| <code>boolean</code> | <code>5</code> | Do not process input images where the number of channels exceeds this limit. Assumes image metadata can be trusted.  An integral Number of channels, zero or false to remove limit, true to use default limit of 5. |
 | [options.unlimited] | <code>boolean</code> | <code>false</code> | Set this to `true` to remove safety features that help prevent memory exhaustion (JPEG, PNG, SVG, HEIF). |
 | [options.autoOrient] | <code>boolean</code> | <code>false</code> | Set this to `true` to rotate/flip the image to match EXIF `Orientation`, if any. |
 | [options.sequentialRead] | <code>boolean</code> | <code>true</code> | Set this to `false` to use random access rather than sequential read. Some operations will do this automatically. |
-| [options.density] | <code>number</code> | <code>72</code> | number representing the DPI for vector images in the range 1 to 100000. |
+| [options.density] | <code>number</code> | <code>72</code> | The DPI at which to render SVG and PDF images, in the range 1 to 100000. |
 | [options.ignoreIcc] | <code>number</code> | <code>false</code> | should the embedded ICC profile, if any, be ignored. |
 | [options.pages] | <code>number</code> | <code>1</code> | Number of pages to extract for multi-page input (GIF, WebP, TIFF), use -1 for all pages. |
 | [options.page] | <code>number</code> | <code>0</code> | Page number to start extracting from for multi-page input (GIF, WebP, TIFF), zero based. |
@@ -107,7 +108,7 @@ sharp('input.jpg')
 // resize to 300 pixels wide,
 // emit an 'info' event with calculated dimensions
 // and finally write image data to writableStream
-const { body } = fetch('https://...');
+const { body } = await fetch('https://...');
 const readableStream = Readable.fromWeb(body);
 const transformer = sharp()
   .resize(300)
@@ -115,6 +116,18 @@ const transformer = sharp()
     console.log(`Image height is ${height}`);
   });
 readableStream.pipe(transformer).pipe(writableStream);
+```
+**Example**  
+```js
+// Web Streams API, requires Node.js >= 24.15.0
+import { Duplex } from 'node:stream';
+
+const { body } = await fetch('https://...');
+const transformer = Duplex.toWeb(
+  sharp().resize(300),
+  { readableType: 'bytes' }
+);
+body.pipeThrough(transformer).pipeTo(writable);
 ```
 **Example**  
 ```js
@@ -218,30 +231,34 @@ This allows multiple output Streams and therefore multiple processing pipelines 
 
 **Example**  
 ```js
-const pipeline = sharp().rotate();
-pipeline.clone().resize(800, 600).pipe(firstWritableStream);
-pipeline.clone().extract({ left: 20, top: 20, width: 100, height: 100 }).pipe(secondWritableStream);
-readableStream.pipe(pipeline);
 // firstWritableStream receives auto-rotated, resized readableStream
 // secondWritableStream receives auto-rotated, extracted region of readableStream
+
+const pipeline = sharp().rotate();
+pipeline
+  .clone()
+  .resize(800, 600)
+  .pipe(firstWritableStream);
+pipeline
+  .clone()
+  .extract({ left: 20, top: 20, width: 100, height: 100 })
+  .pipe(secondWritableStream);
+readableStream.pipe(pipeline);
 ```
 **Example**  
 ```js
 // Create a pipeline that will download an image, resize it and format it to different files
 // Using Promises to know when the pipeline is complete
-const fs = require("fs");
-const got = require("got");
-const sharpStream = sharp({ failOn: 'none' });
+
+const sharpStream = sharp();
 
 const promises = [];
-
 promises.push(
   sharpStream
     .clone()
     .jpeg({ quality: 100 })
     .toFile("originalFile.jpg")
 );
-
 promises.push(
   sharpStream
     .clone()
@@ -249,7 +266,6 @@ promises.push(
     .jpeg({ quality: 80 })
     .toFile("optimized-500.jpg")
 );
-
 promises.push(
   sharpStream
     .clone()
@@ -258,17 +274,7 @@ promises.push(
     .toFile("optimized-500.webp")
 );
 
-// https://github.com/sindresorhus/got/blob/main/documentation/3-streams.md
-got.stream("https://www.example.com/some-file.jpg").pipe(sharpStream);
-
-Promise.all(promises)
-  .then(res => { console.log("Done!", res); })
-  .catch(err => {
-    console.error("Error processing files, let's clean it up", err);
-    try {
-      fs.unlinkSync("originalFile.jpg");
-      fs.unlinkSync("optimized-500.jpg");
-      fs.unlinkSync("optimized-500.webp");
-    } catch (e) {}
-  });
+const res = await fetch("https://www.example.com/some-file.jpg")
+Readable.fromWeb(res.body).pipe(sharpStream);
+await Promise.all(promises);
 ```

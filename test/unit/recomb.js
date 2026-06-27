@@ -3,8 +3,7 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
@@ -15,44 +14,41 @@ const sepia = [
   [0.2392, 0.4696, 0.0912]
 ];
 
-describe('Recomb', () => {
-  it('applies a sepia filter using recomb', (_t, done) => {
+suite('Recomb', () => {
+  test('applies a sepia filter using recomb', async (t) => {
+    t.plan(4);
     const output = fixtures.path('output.recomb-sepia.jpg');
-    sharp(fixtures.inputJpgWithLandscapeExif1)
+    const info = await sharp(fixtures.inputJpgWithLandscapeExif1)
       .recomb(sepia)
-      .toFile(output, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(600, info.width);
-        assert.strictEqual(450, info.height);
-        fixtures.assertMaxColourDistance(
-          output,
-          fixtures.expected('Landscape_1-recomb-sepia.jpg'),
-          17
-        );
-        done();
-      });
+      .toFile(output);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(600, info.width);
+    t.assert.strictEqual(450, info.height);
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(
+      output,
+      fixtures.expected('Landscape_1-recomb-sepia.jpg'),
+      17
+    ));
   });
 
-  it('applies a sepia filter using recomb to an PNG with Alpha', (_t, done) => {
+  test('applies a sepia filter using recomb to an PNG with Alpha', async (t) => {
+    t.plan(4);
     const output = fixtures.path('output.recomb-sepia.png');
-    sharp(fixtures.inputPngAlphaPremultiplicationSmall)
+    const info = await sharp(fixtures.inputPngAlphaPremultiplicationSmall)
       .recomb(sepia)
-      .toFile(output, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(1024, info.width);
-        assert.strictEqual(768, info.height);
-        fixtures.assertMaxColourDistance(
-          output,
-          fixtures.expected('alpha-recomb-sepia.png'),
-          17
-        );
-        done();
-      });
+      .toFile(output);
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(1024, info.width);
+    t.assert.strictEqual(768, info.height);
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(
+      output,
+      fixtures.expected('alpha-recomb-sepia.png'),
+      17
+    ));
   });
 
-  it('recomb with a single channel input', async () => {
+  test('recomb with a single channel input', async (t) => {
+    t.plan(1);
     const { info } = await sharp(Buffer.alloc(64), {
       raw: {
         width: 8,
@@ -63,34 +59,33 @@ describe('Recomb', () => {
       .recomb(sepia)
       .toBuffer({ resolveWithObject: true });
 
-    assert.strictEqual(3, info.channels);
+    t.assert.strictEqual(3, info.channels);
   });
 
-  it('applies a different sepia filter using recomb', (_t, done) => {
+  test('applies a different sepia filter using recomb', async (t) => {
+    t.plan(4);
     const output = fixtures.path('output.recomb-sepia2.jpg');
-    sharp(fixtures.inputJpgWithLandscapeExif1)
+    const info = await sharp(fixtures.inputJpgWithLandscapeExif1)
       .recomb([
         [0.393, 0.769, 0.189],
         [0.349, 0.686, 0.168],
         [0.272, 0.534, 0.131]
       ])
-      .toFile(output, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(600, info.width);
-        assert.strictEqual(450, info.height);
-        fixtures.assertMaxColourDistance(
-          output,
-          fixtures.expected('Landscape_1-recomb-sepia2.jpg'),
-          17
-        );
-        done();
-      });
+      .toFile(output);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(600, info.width);
+    t.assert.strictEqual(450, info.height);
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(
+      output,
+      fixtures.expected('Landscape_1-recomb-sepia2.jpg'),
+      17
+    ));
   });
-  it('increases the saturation of the image', (_t, done) => {
+  test('increases the saturation of the image', async (t) => {
+    t.plan(4);
     const saturationLevel = 1;
     const output = fixtures.path('output.recomb-saturation.jpg');
-    sharp(fixtures.inputJpgWithLandscapeExif1)
+    const info = await sharp(fixtures.inputJpgWithLandscapeExif1)
       .recomb([
         [
           saturationLevel + 1 - 0.2989,
@@ -108,56 +103,54 @@ describe('Recomb', () => {
           saturationLevel + 1 - 0.114
         ]
       ])
-      .toFile(output, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual('jpeg', info.format);
-        assert.strictEqual(600, info.width);
-        assert.strictEqual(450, info.height);
-        fixtures.assertMaxColourDistance(
-          output,
-          fixtures.expected('Landscape_1-recomb-saturation.jpg'),
-          37
-        );
-        done();
-      });
+      .toFile(output);
+    t.assert.strictEqual('jpeg', info.format);
+    t.assert.strictEqual(600, info.width);
+    t.assert.strictEqual(450, info.height);
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(
+      output,
+      fixtures.expected('Landscape_1-recomb-saturation.jpg'),
+      37
+    ));
   });
 
-  it('applies opacity 30% to the image', (_t, done) => {
+  test('applies opacity 30% to the image', async (t) => {
+    t.plan(4);
     const output = fixtures.path('output.recomb-opacity.png');
-    sharp(fixtures.inputPngWithTransparent)
+    const info = await sharp(fixtures.inputPngWithTransparent)
       .recomb([
         [1, 0, 0, 0],
         [0, 1, 0, 0],
         [0, 0, 1, 0],
         [0, 0, 0, 0.3]
       ])
-      .toFile(output, (err, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(48, info.width);
-        assert.strictEqual(48, info.height);
-        fixtures.assertMaxColourDistance(
-          output,
-          fixtures.expected('d-opacity-30.png'),
-          17
-        );
-        done();
-      });
+      .toFile(output);
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(48, info.width);
+    t.assert.strictEqual(48, info.height);
+    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(
+      output,
+      fixtures.expected('d-opacity-30.png'),
+      17
+    ));
   });
 
-  describe('invalid matrix specification', () => {
-    it('missing', () => {
-      assert.throws(() => {
+  suite('invalid matrix specification', () => {
+    test('missing', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).recomb();
       });
     });
-    it('incorrect flat data', () => {
-      assert.throws(() => {
+    test('incorrect flat data', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).recomb([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
     });
-    it('incorrect sub size', () => {
-      assert.throws(() => {
+    test('incorrect sub size', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).recomb([
           [1, 2, 3, 4],
           [5, 6, 7, 8],
@@ -165,9 +158,25 @@ describe('Recomb', () => {
         ]);
       });
     });
-    it('incorrect top size', () => {
-      assert.throws(() => {
+    test('incorrect top size', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg).recomb([[1, 2, 3, 4], [5, 6, 7, 8]]);
+      });
+    });
+    test('ragged rows summing to a valid cardinality', (t) => {
+      t.plan(2);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).recomb([[1, 2, 3, 4, 5], [6, 7], [8, 9]]);
+      }, /Expected array of 3 arrays of length 3 for inputMatrix/);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).recomb([[1, 2, 3, 4, 5], [6, 7, 8, 9], [10, 11, 12], [13, 14, 15, 16]]);
+      }, /Expected array of 4 arrays of length 4 for inputMatrix/);
+    });
+    test('non-numeric entries', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).recomb([['a', 'b', 'c'], [1, 2, 3], [4, 5, 6]]);
       });
     });
   });

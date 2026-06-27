@@ -48,6 +48,8 @@ struct PipelineBaton {
   size_t bufferOutLength;
   int pageHeightOut;
   int pagesOut;
+  bool typedArrayOut;
+  bool hasAlphaOut;
   std::vector<Composite *> composite;
   std::vector<sharp::InputDescriptor *> joinChannelIn;
   int topOffsetPre;
@@ -101,6 +103,7 @@ struct PipelineBaton {
   bool trimLineArt;
   int trimOffsetLeft;
   int trimOffsetTop;
+  int trimMargin;
   std::vector<double> linearA;
   std::vector<double> linearB;
   int dilateWidth;
@@ -167,6 +170,7 @@ struct PipelineBaton {
   int webpEffort;
   bool webpMinSize;
   bool webpMixed;
+  bool webpExact;
   int gifBitdepth;
   int gifEffort;
   double gifDither;
@@ -194,6 +198,7 @@ struct PipelineBaton {
   std::string heifChromaSubsampling;
   bool heifLossless;
   int heifBitdepth;
+  std::string heifTune;
   double jxlDistance;
   int jxlDecodingTier;
   int jxlEffort;
@@ -208,6 +213,8 @@ struct PipelineBaton {
   std::unordered_map<std::string, std::string> withExif;
   bool withExifMerge;
   std::string withXmp;
+  bool withGainMap;
+  bool keepGainMap;
   int timeoutSeconds;
   std::vector<double> convKernel;
   int convKernelWidth;
@@ -242,6 +249,8 @@ struct PipelineBaton {
     bufferOutLength(0),
     pageHeightOut(0),
     pagesOut(0),
+    typedArrayOut(false),
+    hasAlphaOut(false),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),
@@ -281,6 +290,7 @@ struct PipelineBaton {
     trimLineArt(false),
     trimOffsetLeft(0),
     trimOffsetTop(0),
+    trimMargin(0),
     linearA{},
     linearB{},
     dilateWidth(0),
@@ -344,6 +354,7 @@ struct PipelineBaton {
     webpEffort(4),
     webpMinSize(false),
     webpMixed(false),
+    webpExact(false),
     gifBitdepth(8),
     gifEffort(7),
     gifDither(1.0),
@@ -357,7 +368,7 @@ struct PipelineBaton {
     tiffBigtiff(false),
     tiffPredictor(VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL),
     tiffPyramid(false),
-    tiffBitdepth(8),
+    tiffBitdepth(0),
     tiffMiniswhite(false),
     tiffTile(false),
     tiffTileHeight(256),
@@ -371,6 +382,7 @@ struct PipelineBaton {
     heifChromaSubsampling("4:4:4"),
     heifLossless(false),
     heifBitdepth(8),
+    heifTune("auto"),
     jxlDistance(1.0),
     jxlDecodingTier(0),
     jxlEffort(7),
@@ -381,6 +393,8 @@ struct PipelineBaton {
     withMetadataOrientation(-1),
     withMetadataDensity(0.0),
     withExifMerge(true),
+    withGainMap(false),
+    keepGainMap(false),
     timeoutSeconds(0),
     convKernelWidth(0),
     convKernelHeight(0),

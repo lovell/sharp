@@ -117,6 +117,62 @@ await sharp(pixelArray, { raw: { width, height, channels } })
 ```
 
 
+## toUint8Array
+> toUint8Array() ⇒ <code>Promise.&lt;{data: Uint8Array, info: Object}&gt;</code>
+
+Write output to a `Uint8Array` backed by a transferable `ArrayBuffer`.
+JPEG, PNG, WebP, AVIF, TIFF, GIF and raw pixel data output are supported.
+
+Use [toFormat](#toformat) or one of the format-specific functions such as [jpeg](#jpeg), [png](#png) etc. to set the output format.
+
+If no explicit format is set, the output format will match the input image, except SVG input which becomes PNG output.
+
+By default all metadata will be removed, which includes EXIF-based orientation.
+See [keepExif](#keepexif) and similar methods for control over this.
+
+Resolves with an `Object` containing:
+- `data` is the output image as a `Uint8Array` backed by a transferable `ArrayBuffer`.
+- `info` contains properties relating to the output image such as `width` and `height`.
+
+
+**Since**: v0.35.0  
+**Example**  
+```js
+const { data, info } = await sharp(input).toUint8Array();
+```
+**Example**  
+```js
+const { data } = await sharp(input)
+  .avif()
+  .toUint8Array();
+const base64String = data.toBase64();
+```
+
+
+## withDensity
+> withDensity(density) ⇒ <code>Sharp</code>
+
+Set output density (DPI) in EXIF metadata.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+**Since**: 0.35.0  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| density | <code>number</code> | Number of pixels per inch (DPI). |
+
+**Example**  
+```js
+const data = await sharp(input)
+  .withDensity(96)
+  .toBuffer();
+```
+
+
 ## keepExif
 > keepExif() ⇒ <code>Sharp</code>
 
@@ -246,6 +302,52 @@ built-in profile name (`srgb`, `p3`, `cmyk`).
 ```js
 const outputWithP3 = await sharp(input)
   .withIccProfile('p3')
+  .toBuffer();
+```
+
+
+## keepGainMap
+> keepGainMap() ⇒ <code>Sharp</code>
+
+If the input contains gain map metadata, attempt to process the image and gain map separately,
+recombining them into a single output image.
+
+This approach is faster and should produce better results than [withGainMap](#withgainmap),
+however not all operations are supported.
+
+Only JPEG input and output are supported.
+JPEG output options other than `quality` are ignored.
+
+This feature is experimental and the API may change.
+
+
+**Since**: 0.35.0  
+**Example**  
+```js
+const outputWithResizedGainMap = await sharp(inputWithGainMap)
+  .keepGainMap()
+  .resize({ width: 64 })
+  .toBuffer();
+```
+
+
+## withGainMap
+> withGainMap() ⇒ <code>Sharp</code>
+
+If the input contains gain map metadata, use it to convert the main image to HDR (High Dynamic Range) before further processing.
+The input gain map is discarded.
+
+If the output is JPEG, generate and attach a new ISO 21496-1 gain map.
+JPEG output options other than `quality` are ignored.
+
+This feature is experimental and the API may change.
+
+
+**Since**: 0.35.0  
+**Example**  
+```js
+const outputWithRegeneratedGainMap = await sharp(inputWithGainMap)
+  .withGainMap()
   .toBuffer();
 ```
 
@@ -510,6 +612,7 @@ Use these WebP options for output image.
 | [options.delay] | <code>number</code> \| <code>Array.&lt;number&gt;</code> |  | delay(s) between animation frames (in milliseconds) |
 | [options.minSize] | <code>boolean</code> | <code>false</code> | prevent use of animation key frames to minimise file size (slow) |
 | [options.mixed] | <code>boolean</code> | <code>false</code> | allow mixture of lossy and lossless animation frames (slow) |
+| [options.exact] | <code>boolean</code> | <code>false</code> | preserve the colour data in transparent pixels |
 | [options.force] | <code>boolean</code> | <code>true</code> | force WebP output, otherwise attempt to use input format |
 
 **Example**  
@@ -658,12 +761,12 @@ instead of providing `xres` and `yres` in pixels/mm.
 | [options.predictor] | <code>string</code> | <code>&quot;&#x27;horizontal&#x27;&quot;</code> | compression predictor options: none, horizontal, float |
 | [options.pyramid] | <code>boolean</code> | <code>false</code> | write an image pyramid |
 | [options.tile] | <code>boolean</code> | <code>false</code> | write a tiled tiff |
-| [options.tileWidth] | <code>number</code> | <code>256</code> | horizontal tile size |
-| [options.tileHeight] | <code>number</code> | <code>256</code> | vertical tile size |
-| [options.xres] | <code>number</code> | <code>1.0</code> | horizontal resolution in pixels/mm |
-| [options.yres] | <code>number</code> | <code>1.0</code> | vertical resolution in pixels/mm |
+| [options.tileWidth] | <code>number</code> | <code>256</code> | horizontal tile size, valid values are integers in the range 1-32768 |
+| [options.tileHeight] | <code>number</code> | <code>256</code> | vertical tile size, valid values are integers in the range 1-32768 |
+| [options.xres] | <code>number</code> | <code>1.0</code> | horizontal resolution in pixels/mm, valid values are numbers in the range 0.001-1000000 |
+| [options.yres] | <code>number</code> | <code>1.0</code> | vertical resolution in pixels/mm, valid values are numbers in the range 0.001-1000000 |
 | [options.resolutionUnit] | <code>string</code> | <code>&quot;&#x27;inch&#x27;&quot;</code> | resolution unit options: inch, cm |
-| [options.bitdepth] | <code>number</code> | <code>8</code> | reduce bitdepth to 1, 2 or 4 bit |
+| [options.bitdepth] | <code>number</code> | <code>0</code> | reduce bitdepth to 1, 2 or 4 bit |
 | [options.miniswhite] | <code>boolean</code> | <code>false</code> | write 1-bit images as miniswhite |
 
 **Example**  
@@ -685,10 +788,6 @@ sharp('input.svg')
 Use these AVIF options for output image.
 
 AVIF image sequences are not supported.
-Prebuilt binaries support a bitdepth of 8 only.
-
-This feature is experimental on the Windows ARM64 platform
-and requires a CPU with ARM64v8.4 or later.
 
 
 **Throws**:
@@ -705,6 +804,7 @@ and requires a CPU with ARM64v8.4 or later.
 | [options.effort] | <code>number</code> | <code>4</code> | CPU effort, between 0 (fastest) and 9 (slowest) |
 | [options.chromaSubsampling] | <code>string</code> | <code>&quot;&#x27;4:4:4&#x27;&quot;</code> | set to '4:2:0' to use chroma subsampling |
 | [options.bitdepth] | <code>number</code> | <code>8</code> | set bitdepth to 8, 10 or 12 bit |
+| [options.tune] | <code>string</code> | <code>&quot;&#x27;auto&#x27;&quot;</code> | tune output for a quality metric, one of 'auto' (default), 'iq', 'psnr' or 'ssim' |
 
 **Example**  
 ```js
@@ -744,6 +844,7 @@ globally-installed libvips compiled with support for libheif, libde265 and x265.
 | [options.effort] | <code>number</code> | <code>4</code> | CPU effort, between 0 (fastest) and 9 (slowest) |
 | [options.chromaSubsampling] | <code>string</code> | <code>&quot;&#x27;4:4:4&#x27;&quot;</code> | set to '4:2:0' to use chroma subsampling |
 | [options.bitdepth] | <code>number</code> | <code>8</code> | set bitdepth to 8, 10 or 12 bit |
+| [options.tune] | <code>string</code> | <code>&quot;&#x27;auto&#x27;&quot;</code> | tune output for a quality metric, one of 'auto' (default), 'iq', 'psnr' or 'ssim' |
 
 **Example**  
 ```js

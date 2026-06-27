@@ -8,9 +8,9 @@ const {
   globalLibvipsVersion,
   log,
   spawnRebuild,
-} = require('../lib/libvips');
+} = require('../dist/libvips.cjs');
 
-log('Attempting to build from source via node-gyp');
+log('Building from source');
 log('See https://sharp.pixelplumbing.com/install#building-from-source');
 
 try {
@@ -29,7 +29,7 @@ try {
 }
 
 if (useGlobalLibvips(log)) {
-  log(`Detected globally-installed libvips v${globalLibvipsVersion()}`);
+  log(`Found globally-installed libvips v${globalLibvipsVersion()}`);
 }
 
 const status = spawnRebuild();

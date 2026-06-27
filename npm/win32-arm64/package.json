@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-win32-arm64",
-  "version": "0.34.5",
+  "version": "0.35.3-rc.0",
   "description": "Prebuilt sharp for use with Windows 64-bit ARM",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -15,6 +15,7 @@
   },
   "preferUnplugged": true,
   "files": [
+    "index.cjs",
     "lib",
     "versions.json"
   ],
@@ -23,12 +24,12 @@
   },
   "type": "commonjs",
   "exports": {
-    "./sharp.node": "./lib/sharp-win32-arm64.node",
+    "./sharp.node": "./index.cjs",
     "./package": "./package.json",
     "./versions": "./versions.json"
   },
   "engines": {
-    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
+    "node": ">=20.9.0"
   },
   "os": [
     "win32"

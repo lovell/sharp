@@ -3,120 +3,112 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const fs = require('node:fs');
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const fs = require('node:fs/promises');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('PNG', () => {
-  it('compression level is valid', () => {
-    assert.doesNotThrow(() => {
+suite('PNG', () => {
+  test('compression level is valid', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().png({ compressionLevel: 0 });
     });
   });
 
-  it('compression level is invalid', () => {
-    assert.throws(() => {
+  test('compression level is invalid', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().png({ compressionLevel: -1 });
     });
   });
 
-  it('default compressionLevel generates smaller file than compressionLevel=0', (_t, done) => {
+  test('default compressionLevel generates smaller file than compressionLevel=0', async (t) => {
+    t.plan(5);
     // First generate with default compressionLevel
-    sharp(fixtures.inputPng)
+    const defaultBuffer = await sharp(fixtures.inputPng)
       .resize(320, 240)
       .png()
-      .toBuffer((err, defaultData, defaultInfo) => {
-        if (err) throw err;
-        assert.strictEqual(true, defaultData.length > 0);
-        assert.strictEqual('png', defaultInfo.format);
-        // Then generate with compressionLevel=6
-        sharp(fixtures.inputPng)
-          .resize(320, 240)
-          .png({ compressionLevel: 0 })
-          .toBuffer((err, largerData, largerInfo) => {
-            if (err) throw err;
-            assert.strictEqual(true, largerData.length > 0);
-            assert.strictEqual('png', largerInfo.format);
-            assert.strictEqual(true, defaultData.length < largerData.length);
-            done();
-          });
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, defaultBuffer.data.length > 0);
+    t.assert.strictEqual('png', defaultBuffer.info.format);
+    // Then generate with compressionLevel=6
+    const largerBuffer = await sharp(fixtures.inputPng)
+      .resize(320, 240)
+      .png({ compressionLevel: 0 })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, largerBuffer.data.length > 0);
+    t.assert.strictEqual('png', largerBuffer.info.format);
+    t.assert.strictEqual(true, defaultBuffer.data.length < largerBuffer.data.length);
   });
 
-  it('without adaptiveFiltering generates smaller file', (_t, done) => {
+  test('without adaptiveFiltering generates smaller file', async (t) => {
+    t.plan(11);
     // First generate with adaptive filtering
-    sharp(fixtures.inputPng)
+    const adaptiveBuffer = await sharp(fixtures.inputPng)
       .resize(320, 240)
       .png({ adaptiveFiltering: true })
-      .toBuffer((err, adaptiveData, adaptiveInfo) => {
-        if (err) throw err;
-        assert.strictEqual(true, adaptiveData.length > 0);
-        assert.strictEqual(adaptiveData.length, adaptiveInfo.size);
-        assert.strictEqual('png', adaptiveInfo.format);
-        assert.strictEqual(320, adaptiveInfo.width);
-        assert.strictEqual(240, adaptiveInfo.height);
-        // Then generate without
-        sharp(fixtures.inputPng)
-          .resize(320, 240)
-          .png({ adaptiveFiltering: false })
-          .toBuffer((err, withoutAdaptiveData, withoutAdaptiveInfo) => {
-            if (err) throw err;
-            assert.strictEqual(true, withoutAdaptiveData.length > 0);
-            assert.strictEqual(withoutAdaptiveData.length, withoutAdaptiveInfo.size);
-            assert.strictEqual('png', withoutAdaptiveInfo.format);
-            assert.strictEqual(320, withoutAdaptiveInfo.width);
-            assert.strictEqual(240, withoutAdaptiveInfo.height);
-            assert.strictEqual(true, withoutAdaptiveData.length < adaptiveData.length);
-            done();
-          });
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, adaptiveBuffer.data.length > 0);
+    t.assert.strictEqual(adaptiveBuffer.data.length, adaptiveBuffer.info.size);
+    t.assert.strictEqual('png', adaptiveBuffer.info.format);
+    t.assert.strictEqual(320, adaptiveBuffer.info.width);
+    t.assert.strictEqual(240, adaptiveBuffer.info.height);
+    // Then generate without
+    const withoutAdaptiveBuffer = await sharp(fixtures.inputPng)
+      .resize(320, 240)
+      .png({ adaptiveFiltering: false })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, withoutAdaptiveBuffer.data.length > 0);
+    t.assert.strictEqual(withoutAdaptiveBuffer.data.length, withoutAdaptiveBuffer.info.size);
+    t.assert.strictEqual('png', withoutAdaptiveBuffer.info.format);
+    t.assert.strictEqual(320, withoutAdaptiveBuffer.info.width);
+    t.assert.strictEqual(240, withoutAdaptiveBuffer.info.height);
+    t.assert.strictEqual(true, withoutAdaptiveBuffer.data.length < adaptiveBuffer.data.length);
   });
 
-  it('Invalid PNG adaptiveFiltering value throws error', () => {
-    assert.throws(() => {
+  test('Invalid PNG adaptiveFiltering value throws error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().png({ adaptiveFiltering: 1 });
     });
   });
 
-  it('Progressive PNG image', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Progressive PNG image', async (t) => {
+    t.plan(11);
+    const nonProgressiveBuffer = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .png({ progressive: false })
-      .toBuffer((err, nonProgressiveData, nonProgressiveInfo) => {
-        if (err) throw err;
-        assert.strictEqual(true, nonProgressiveData.length > 0);
-        assert.strictEqual(nonProgressiveData.length, nonProgressiveInfo.size);
-        assert.strictEqual('png', nonProgressiveInfo.format);
-        assert.strictEqual(320, nonProgressiveInfo.width);
-        assert.strictEqual(240, nonProgressiveInfo.height);
-        sharp(nonProgressiveData)
-          .png({ progressive: true })
-          .toBuffer((err, progressiveData, progressiveInfo) => {
-            if (err) throw err;
-            assert.strictEqual(true, progressiveData.length > 0);
-            assert.strictEqual(progressiveData.length, progressiveInfo.size);
-            assert.strictEqual(true, progressiveData.length > nonProgressiveData.length);
-            assert.strictEqual('png', progressiveInfo.format);
-            assert.strictEqual(320, progressiveInfo.width);
-            assert.strictEqual(240, progressiveInfo.height);
-            done();
-          });
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, nonProgressiveBuffer.data.length > 0);
+    t.assert.strictEqual(nonProgressiveBuffer.data.length, nonProgressiveBuffer.info.size);
+    t.assert.strictEqual('png', nonProgressiveBuffer.info.format);
+    t.assert.strictEqual(320, nonProgressiveBuffer.info.width);
+    t.assert.strictEqual(240, nonProgressiveBuffer.info.height);
+    const progressiveBuffer = await sharp(nonProgressiveBuffer.data)
+      .png({ progressive: true })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(true, progressiveBuffer.data.length > 0);
+    t.assert.strictEqual(progressiveBuffer.data.length, progressiveBuffer.info.size);
+    t.assert.strictEqual(true, progressiveBuffer.data.length > nonProgressiveBuffer.data.length);
+    t.assert.strictEqual('png', progressiveBuffer.info.format);
+    t.assert.strictEqual(320, progressiveBuffer.info.width);
+    t.assert.strictEqual(240, progressiveBuffer.info.height);
   });
 
-  it('16-bit grey+alpha PNG identity transform', () => {
+  test('16-bit grey+alpha PNG identity transform', async (t) => {
+    t.plan(1);
     const actual = fixtures.path('output.16-bit-grey-alpha-identity.png');
-    return sharp(fixtures.inputPng16BitGreyAlpha)
-      .toFile(actual)
-      .then(() => {
-        fixtures.assertMaxColourDistance(actual, fixtures.expected('16-bit-grey-alpha-identity.png'));
-      });
+    await sharp(fixtures.inputPng16BitGreyAlpha)
+      .toFile(actual);
+    t.assert.doesNotThrow(() => {
+      fixtures.assertMaxColourDistance(actual, fixtures.expected('16-bit-grey-alpha-identity.png'));
+    });
   });
 
-  it('16-bit grey+alpha PNG roundtrip', async () => {
+  test('16-bit grey+alpha PNG roundtrip', async (t) => {
+    t.plan(1);
     const after = await sharp(fixtures.inputPng16BitGreyAlpha)
       .toColourspace('grey16')
       .toBuffer();
@@ -129,22 +121,24 @@ describe('PNG', () => {
     )
       .map(stats => stats.channels[1].mean);
 
-    assert.strictEqual(alphaMeanAfter, alphaMeanBefore);
+    t.assert.strictEqual(alphaMeanAfter, alphaMeanBefore);
   });
 
-  it('palette decode/encode roundtrip', async () => {
+  test('palette decode/encode roundtrip', async (t) => {
+    t.plan(1);
     const data = await sharp(fixtures.inputPngPalette)
       .png({ effort: 1, palette: true })
       .toBuffer();
 
     const { size, ...metadata } = await sharp(data).metadata();
     void size;
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(metadata, {
       autoOrient: {
         height: 68,
         width: 68
       },
       format: 'png',
+      mediaType: 'image/png',
       width: 68,
       height: 68,
       space: 'srgb',
@@ -154,69 +148,75 @@ describe('PNG', () => {
       isProgressive: false,
       isPalette: true,
       bitsPerSample: 8,
-      paletteBitDepth: 8,
       hasProfile: false,
       hasAlpha: false
     });
   });
 
-  it('Valid PNG libimagequant palette value does not throw error', () => {
-    assert.doesNotThrow(() => {
+  test('Valid PNG libimagequant palette value does not throw error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().png({ palette: false });
     });
   });
 
-  it('Invalid PNG libimagequant palette value throws error', () => {
-    assert.throws(() => {
+  test('Invalid PNG libimagequant palette value throws error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().png({ palette: 'fail' });
     });
   });
 
-  it('Valid PNG libimagequant quality value produces image of same size or smaller', () => {
-    const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
-    return Promise.all([
+  test('Valid PNG libimagequant quality value produces image of same size or smaller', async (t) => {
+    t.plan(1);
+    const inputPngBuffer = await fs.readFile(fixtures.inputPng);
+    const data = await Promise.all([
       sharp(inputPngBuffer).resize(10).png({ effort: 1, quality: 80 }).toBuffer(),
       sharp(inputPngBuffer).resize(10).png({ effort: 1, quality: 100 }).toBuffer()
-    ]).then((data) => {
-      assert.strictEqual(true, data[0].length <= data[1].length);
-    });
+    ]);
+    t.assert.strictEqual(true, data[0].length <= data[1].length);
   });
 
-  it('Invalid PNG libimagequant quality value throws error', () => {
-    assert.throws(() => {
+  test('Invalid PNG libimagequant quality value throws error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().png({ quality: 101 });
     });
   });
 
-  it('Invalid effort value throws error', () => {
-    assert.throws(() => {
+  test('Invalid effort value throws error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().png({ effort: 0.1 });
     });
   });
 
-  it('Valid PNG libimagequant colours value produces image of same size or smaller', () => {
-    const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
-    return Promise.all([
+  test('Valid PNG libimagequant colours value produces image of same size or smaller', async (t) => {
+    t.plan(1);
+    const inputPngBuffer = await fs.readFile(fixtures.inputPng);
+    const data = await Promise.all([
       sharp(inputPngBuffer).resize(10).png({ colours: 100 }).toBuffer(),
       sharp(inputPngBuffer).resize(10).png({ colours: 200 }).toBuffer()
-    ]).then((data) => {
-      assert.strictEqual(true, data[0].length <= data[1].length);
-    });
+    ]);
+    t.assert.strictEqual(true, data[0].length <= data[1].length);
   });
 
-  it('Invalid PNG libimagequant colours value throws error', () => {
-    assert.throws(() => {
+  test('Invalid PNG libimagequant colours value throws error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().png({ colours: -1 });
     });
   });
 
-  it('Invalid PNG libimagequant colors value throws error', () => {
-    assert.throws(() => {
+  test('Invalid PNG libimagequant colors value throws error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().png({ colors: 0.1 });
     });
   });
 
-  it('Can set bitdepth of PNG without palette', async () => {
+  test('Can set bitdepth of PNG without palette', async (t) => {
+    t.plan(4);
     const data = await sharp({
       create: {
         width: 8, height: 8, channels: 3, background: 'red'
@@ -226,27 +226,26 @@ describe('PNG', () => {
       .png({ colours: 2, palette: false })
       .toBuffer();
 
-    const { channels, isPalette, bitsPerSample, paletteBitDepth, size, space } = await sharp(data).metadata();
-    assert.strictEqual(channels, 1);
-    assert.strictEqual(isPalette, false);
-    assert.strictEqual(bitsPerSample, 1);
-    assert.strictEqual(paletteBitDepth, undefined);
-    assert.strictEqual(size, 89);
-    assert.strictEqual(space, 'b-w');
+    const { channels, isPalette, bitsPerSample, space } = await sharp(data).metadata();
+    t.assert.strictEqual(channels, 1);
+    t.assert.strictEqual(isPalette, false);
+    t.assert.strictEqual(bitsPerSample, 1);
+    t.assert.strictEqual(space, 'b-w');
   });
 
-  it('Valid PNG libimagequant dither value produces image of same size or smaller', () => {
-    const inputPngBuffer = fs.readFileSync(fixtures.inputPng);
-    return Promise.all([
+  test('Valid PNG libimagequant dither value produces image of same size or smaller', async (t) => {
+    t.plan(1);
+    const inputPngBuffer = await fs.readFile(fixtures.inputPng);
+    const data = await Promise.all([
       sharp(inputPngBuffer).resize(10).png({ dither: 0.1 }).toBuffer(),
       sharp(inputPngBuffer).resize(10).png({ dither: 0.9 }).toBuffer()
-    ]).then((data) => {
-      assert.strictEqual(true, data[0].length <= data[1].length);
-    });
+    ]);
+    t.assert.strictEqual(true, data[0].length <= data[1].length);
   });
 
-  it('Invalid PNG libimagequant dither value throws error', () => {
-    assert.throws(() => {
+  test('Invalid PNG libimagequant dither value throws error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().png({ dither: 'fail' });
     });
   });

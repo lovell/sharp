@@ -39,7 +39,7 @@ class StatsWorker : public Napi::AsyncWorker {
     sharp::ImageType imageType = sharp::ImageType::UNKNOWN;
     try {
       std::tie(image, imageType) = OpenInput(baton->input);
-    } catch (vips::VError const &err) {
+    } catch (std::runtime_error const &err) {
       (baton->err).append(err.what());
     }
     if (imageType != sharp::ImageType::UNKNOWN) {
@@ -92,7 +92,7 @@ class StatsWorker : public Napi::AsyncWorker {
         baton->dominantRed = dx * 16 + 8;
         baton->dominantGreen = dy * 16 + 8;
         baton->dominantBlue = dz * 16 + 8;
-      } catch (vips::VError const &err) {
+      } catch (std::runtime_error const &err) {
         (baton->err).append(err.what());
       }
     }
@@ -109,10 +109,9 @@ class StatsWorker : public Napi::AsyncWorker {
     // Handle warnings
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
-      debuglog.Call(Receiver().Value(), { Napi::String::New(env, warning) });
+      debuglog.SHARP_CALLBACK_FN_NAME(Receiver().Value(), { Napi::String::New(env, warning) });
       warning = sharp::VipsWarningPop();
     }
-
     if (baton->err.empty()) {
       // Stats Object
       Napi::Object info = Napi::Object::New(env);
@@ -144,9 +143,10 @@ class StatsWorker : public Napi::AsyncWorker {
       dominant.Set("g", baton->dominantGreen);
       dominant.Set("b", baton->dominantBlue);
       info.Set("dominant", dominant);
-      Callback().Call(Receiver().Value(), { env.Null(), info });
+      Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(), { env.Null(), info });
     } else {
-      Callback().Call(Receiver().Value(), { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
+      Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(),
+        { Napi::Error::New(env, sharp::TrimEnd(baton->err)).Value() });
     }
 
     delete baton->input;

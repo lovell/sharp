@@ -3,9 +3,9 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const fs = require('node:fs');
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const fs = require('node:fs/promises');
+const { suite, test } = require('node:test');
+
 const exifReader = require('exif-reader');
 const icc = require('icc');
 
@@ -14,207 +14,371 @@ const fixtures = require('../fixtures');
 
 const create = { width: 1, height: 1, channels: 3, background: 'red' };
 
-describe('Image metadata', () => {
-  it('JPEG', (_t, done) => {
-    sharp(fixtures.inputJpg).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('jpeg', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(2725, metadata.width);
-      assert.strictEqual(2225, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
-      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+const collect = (metadata, spec) => Object.fromEntries(Object.entries(spec).map(([key, selector]) => [
+  key,
+  typeof selector === 'function' ? selector(metadata) : metadata[selector]
+]));
+
+suite('Image metadata', () => {
+  test('JPEG', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputJpg).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      densityType: (value) => typeof value.density,
+      chromaSubsampling: 'chromaSubsampling',
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'jpeg',
+      mediaType: 'image/jpeg',
+      sizeType: 'undefined',
+      width: 2725,
+      height: 2225,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      densityType: 'number',
+      chromaSubsampling: '4:2:0',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
     });
   });
 
-  it('JPEG with EXIF/ICC', (_t, done) => {
-    sharp(fixtures.inputJpgWithExif).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('jpeg', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(450, metadata.width);
-      assert.strictEqual(600, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(72, metadata.density);
-      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(true, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual(8, metadata.orientation);
-      // EXIF
-      assert.strictEqual('object', typeof metadata.exif);
-      assert.strictEqual(true, metadata.exif instanceof Buffer);
-      const exif = exifReader(metadata.exif);
-      assert.strictEqual('object', typeof exif);
-      assert.strictEqual('object', typeof exif.Image);
-      assert.strictEqual('number', typeof exif.Image.XResolution);
-      // ICC
-      assert.strictEqual('object', typeof metadata.icc);
-      assert.strictEqual(true, metadata.icc instanceof Buffer);
-      const profile = icc.parse(metadata.icc);
-      assert.strictEqual('object', typeof profile);
-      assert.strictEqual('Generic RGB Profile', profile.description);
-      done();
+  test('JPEG with EXIF/ICC', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputJpgWithExif).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      density: 'density',
+      chromaSubsampling: 'chromaSubsampling',
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientation: 'orientation',
+      exifType: (value) => typeof value.exif,
+      exifBuffer: (value) => Buffer.isBuffer(value.exif),
+      exifImageType: (value) => typeof exifReader(value.exif).Image,
+      exifResolutionType: (value) => typeof exifReader(value.exif).Image.XResolution,
+      iccType: (value) => typeof value.icc,
+      iccBuffer: (value) => Buffer.isBuffer(value.icc),
+      iccDescription: (value) => icc.parse(value.icc).description
+    }), {
+      format: 'jpeg',
+      mediaType: 'image/jpeg',
+      sizeType: 'undefined',
+      width: 450,
+      height: 600,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      density: 72,
+      chromaSubsampling: '4:2:0',
+      isProgressive: false,
+      hasProfile: true,
+      hasAlpha: false,
+      orientation: 8,
+      exifType: 'object',
+      exifBuffer: true,
+      exifImageType: 'object',
+      exifResolutionType: 'number',
+      iccType: 'object',
+      iccBuffer: true,
+      iccDescription: 'Generic RGB Profile'
     });
   });
 
-  it('JPEG with IPTC/XMP', (_t, done) => {
-    sharp(fixtures.inputJpgWithIptcAndXmp).metadata((err, metadata) => {
-      if (err) throw err;
-      // IPTC
-      assert.strictEqual('object', typeof metadata.iptc);
-      assert.strictEqual(true, metadata.iptc instanceof Buffer);
-      assert.strictEqual(18250, metadata.iptc.byteLength);
-      assert.strictEqual(metadata.iptc.indexOf(Buffer.from('Photoshop')), 0);
-      // XMP
-      assert.strictEqual('object', typeof metadata.xmp);
-      assert.strictEqual(true, metadata.xmp instanceof Buffer);
-      assert.strictEqual(12466, metadata.xmp.byteLength);
-      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('<?xpacket begin="')), 0);
-      assert(metadata.xmpAsString.startsWith('<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>'));
-      done();
+  test('JPEG with IPTC/XMP', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputJpgWithIptcAndXmp).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      iptcType: (value) => typeof value.iptc,
+      iptcBuffer: (value) => Buffer.isBuffer(value.iptc),
+      iptcLength: (value) => value.iptc.byteLength,
+      iptcStart: (value) => value.iptc.indexOf(Buffer.from('Photoshop')),
+      xmpType: (value) => typeof value.xmp,
+      xmpBuffer: (value) => Buffer.isBuffer(value.xmp),
+      xmpLength: (value) => value.xmp.byteLength,
+      xmpStart: (value) => value.xmp.indexOf(Buffer.from('<?xpacket begin="')),
+      xmpStringStarts: (value) => value.xmpAsString.startsWith('<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>')
+    }), {
+      iptcType: 'object',
+      iptcBuffer: true,
+      iptcLength: 18250,
+      iptcStart: 0,
+      xmpType: 'object',
+      xmpBuffer: true,
+      xmpLength: 12466,
+      xmpStart: 0,
+      xmpStringStarts: true
     });
   });
 
-  it('TIFF', (_t, done) => {
-    sharp(fixtures.inputTiff).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('tiff', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(2464, metadata.width);
-      assert.strictEqual(3248, metadata.height);
-      assert.strictEqual('b-w', metadata.space);
-      assert.strictEqual(1, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(300, metadata.density);
-      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual(1, metadata.orientation);
-      assert.strictEqual(2464, metadata.autoOrient.width);
-      assert.strictEqual(3248, metadata.autoOrient.height);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      assert.strictEqual('undefined', typeof metadata.xmp);
-      assert.strictEqual('undefined', typeof metadata.xmpAsString);
-      assert.strictEqual('inch', metadata.resolutionUnit);
-      done();
+  test('TIFF', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputTiff).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      density: 'density',
+      chromaSubsamplingType: (value) => typeof value.chromaSubsampling,
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientation: 'orientation',
+      autoOrientWidth: (value) => value.autoOrient.width,
+      autoOrientHeight: (value) => value.autoOrient.height,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc,
+      xmpType: (value) => typeof value.xmp,
+      xmpAsStringType: (value) => typeof value.xmpAsString,
+      resolutionUnit: 'resolutionUnit'
+    }), {
+      format: 'tiff',
+      mediaType: 'image/tiff',
+      sizeType: 'undefined',
+      width: 2464,
+      height: 3248,
+      space: 'b-w',
+      channels: 1,
+      depth: 'uchar',
+      density: 300,
+      chromaSubsamplingType: 'undefined',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false,
+      orientation: 1,
+      autoOrientWidth: 2464,
+      autoOrientHeight: 3248,
+      exifType: 'undefined',
+      iccType: 'undefined',
+      xmpType: 'undefined',
+      xmpAsStringType: 'undefined',
+      resolutionUnit: 'inch'
     });
   });
 
-  it('Multipage TIFF', (_t, done) => {
-    sharp(fixtures.inputTiffMultipage).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('tiff', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(2464, metadata.width);
-      assert.strictEqual(3248, metadata.height);
-      assert.strictEqual('b-w', metadata.space);
-      assert.strictEqual(1, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(300, metadata.density);
-      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(2, metadata.pages);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual(1, metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+  test('Multipage TIFF', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputTiffMultipage).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      density: 'density',
+      chromaSubsamplingType: (value) => typeof value.chromaSubsampling,
+      isProgressive: 'isProgressive',
+      pages: 'pages',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientation: 'orientation',
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'tiff',
+      mediaType: 'image/tiff',
+      sizeType: 'undefined',
+      width: 2464,
+      height: 3248,
+      space: 'b-w',
+      channels: 1,
+      depth: 'uchar',
+      density: 300,
+      chromaSubsamplingType: 'undefined',
+      isProgressive: false,
+      pages: 2,
+      hasProfile: false,
+      hasAlpha: false,
+      orientation: 1,
+      exifType: 'undefined',
+      iccType: 'undefined'
     });
   });
 
-  it('PNG', (_t, done) => {
-    sharp(fixtures.inputPng).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('png', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(2809, metadata.width);
-      assert.strictEqual(2074, metadata.height);
-      assert.strictEqual('b-w', metadata.space);
-      assert.strictEqual(1, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(300, metadata.density);
-      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual(2809, metadata.autoOrient.width);
-      assert.strictEqual(2074, metadata.autoOrient.height);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+  test('PNG', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputPng).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      density: 'density',
+      chromaSubsamplingType: (value) => typeof value.chromaSubsampling,
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientationType: (value) => typeof value.orientation,
+      autoOrientWidth: (value) => value.autoOrient.width,
+      autoOrientHeight: (value) => value.autoOrient.height,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'png',
+      mediaType: 'image/png',
+      sizeType: 'undefined',
+      width: 2809,
+      height: 2074,
+      space: 'b-w',
+      channels: 1,
+      depth: 'uchar',
+      density: 300,
+      chromaSubsamplingType: 'undefined',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false,
+      orientationType: 'undefined',
+      autoOrientWidth: 2809,
+      autoOrientHeight: 2074,
+      exifType: 'undefined',
+      iccType: 'undefined'
     });
   });
 
-  it('PNG with comment', (_t, done) => {
-    sharp(fixtures.inputPngTestJoinChannel).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('png', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(320, metadata.width);
-      assert.strictEqual(240, metadata.height);
-      assert.strictEqual('b-w', metadata.space);
-      assert.strictEqual(1, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(72, metadata.density);
-      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      assert.strictEqual(1, metadata.comments.length);
-      assert.strictEqual('Comment', metadata.comments[0].keyword);
-      assert.strictEqual('Created with GIMP', metadata.comments[0].text);
-      done();
+  test('PNG with comment', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputPngTestJoinChannel).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      density: 'density',
+      chromaSubsamplingType: (value) => typeof value.chromaSubsampling,
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc,
+      commentsLength: (value) => value.comments.length,
+      commentsKeyword: (value) => value.comments[0].keyword,
+      commentsText: (value) => value.comments[0].text
+    }), {
+      format: 'png',
+      mediaType: 'image/png',
+      sizeType: 'undefined',
+      width: 320,
+      height: 240,
+      space: 'b-w',
+      channels: 1,
+      depth: 'uchar',
+      density: 72,
+      chromaSubsamplingType: 'undefined',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined',
+      commentsLength: 1,
+      commentsKeyword: 'Comment',
+      commentsText: 'Created with GIMP'
     });
   });
 
-  it('Transparent PNG', (_t, done) => {
-    sharp(fixtures.inputPngWithTransparency).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('png', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(2048, metadata.width);
-      assert.strictEqual(1536, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(4, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(72, metadata.density);
-      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(true, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+  test('Transparent PNG', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputPngWithTransparency).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      density: 'density',
+      chromaSubsamplingType: (value) => typeof value.chromaSubsampling,
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'png',
+      mediaType: 'image/png',
+      sizeType: 'undefined',
+      width: 2048,
+      height: 1536,
+      space: 'srgb',
+      channels: 4,
+      depth: 'uchar',
+      density: 72,
+      chromaSubsamplingType: 'undefined',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: true,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
     });
   });
 
-  it('PNG with greyscale bKGD chunk - 8 bit', async () => {
-    const data = await sharp(fixtures.inputPng8BitGreyBackground).metadata();
-    assert.deepStrictEqual(data, {
-      background: {
-        gray: 0
-      },
+  test('PNG with greyscale bKGD chunk - 8 bit', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputPng8BitGreyBackground).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      background: 'background',
+      bitsPerSample: 'bitsPerSample',
+      channels: 'channels',
+      density: 'density',
+      depth: 'depth',
+      format: 'format',
+      hasAlpha: 'hasAlpha',
+      hasProfile: 'hasProfile',
+      height: 'height',
+      isPalette: 'isPalette',
+      isProgressive: 'isProgressive',
+      mediaType: 'mediaType',
+      space: 'space',
+      width: 'width',
+      autoOrient: 'autoOrient'
+    }), {
+      background: { gray: 0 },
       bitsPerSample: 8,
       channels: 2,
       density: 72,
@@ -225,21 +389,34 @@ describe('Image metadata', () => {
       height: 32,
       isPalette: false,
       isProgressive: false,
+      mediaType: 'image/png',
       space: 'b-w',
       width: 32,
-      autoOrient: {
-        width: 32,
-        height: 32
-      }
+      autoOrient: { width: 32, height: 32 }
     });
   });
 
-  it('PNG with greyscale bKGD chunk - 16 bit', async () => {
-    const data = await sharp(fixtures.inputPng16BitGreyBackground).metadata();
-    assert.deepStrictEqual(data, {
-      background: {
-        gray: 67
-      },
+  test('PNG with greyscale bKGD chunk - 16 bit', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputPng16BitGreyBackground).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      background: 'background',
+      bitsPerSample: 'bitsPerSample',
+      channels: 'channels',
+      density: 'density',
+      depth: 'depth',
+      format: 'format',
+      hasAlpha: 'hasAlpha',
+      hasProfile: 'hasProfile',
+      height: 'height',
+      isPalette: 'isPalette',
+      isProgressive: 'isProgressive',
+      mediaType: 'mediaType',
+      space: 'space',
+      width: 'width',
+      autoOrient: 'autoOrient'
+    }), {
+      background: { gray: 67 },
       bitsPerSample: 16,
       channels: 2,
       density: 72,
@@ -250,592 +427,806 @@ describe('Image metadata', () => {
       height: 32,
       isPalette: false,
       isProgressive: false,
+      mediaType: 'image/png',
       space: 'grey16',
       width: 32,
-      autoOrient: {
-        width: 32,
-        height: 32
-      }
+      autoOrient: { width: 32, height: 32 }
     });
   });
 
-  it('WebP', (_t, done) => {
-    sharp(fixtures.inputWebP).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('webp', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(1024, metadata.width);
-      assert.strictEqual(772, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual('undefined', typeof metadata.density);
-      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+  test('WebP', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputWebP).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      densityType: (value) => typeof value.density,
+      chromaSubsamplingType: (value) => typeof value.chromaSubsampling,
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'webp',
+      mediaType: 'image/webp',
+      sizeType: 'undefined',
+      width: 1024,
+      height: 772,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      densityType: 'undefined',
+      chromaSubsamplingType: 'undefined',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
     });
   });
 
-  it('Animated WebP', () =>
-    sharp(fixtures.inputWebPAnimated)
-      .metadata()
-      .then(({
-        format, width, height, space, channels, depth,
-        isProgressive, pages, loop, delay, hasProfile,
-        hasAlpha
-      }) => {
-        assert.strictEqual(format, 'webp');
-        assert.strictEqual(width, 80);
-        assert.strictEqual(height, 80);
-        assert.strictEqual(space, 'srgb');
-        assert.strictEqual(channels, 4);
-        assert.strictEqual(depth, 'uchar');
-        assert.strictEqual(isProgressive, false);
-        assert.strictEqual(pages, 9);
-        assert.strictEqual(loop, 0);
-        assert.deepStrictEqual(delay, [120, 120, 90, 120, 120, 90, 120, 90, 30]);
-        assert.strictEqual(hasProfile, false);
-        assert.strictEqual(hasAlpha, true);
-      })
-  );
-
-  it('Animated WebP with all pages', () =>
-    sharp(fixtures.inputWebPAnimated, { pages: -1 })
-      .metadata()
-      .then(({
-        format, width, height, space, channels, depth,
-        isProgressive, pages, pageHeight, loop, delay,
-        hasProfile, hasAlpha
-      }) => {
-        assert.strictEqual(format, 'webp');
-        assert.strictEqual(width, 80);
-        assert.strictEqual(height, 720);
-        assert.strictEqual(space, 'srgb');
-        assert.strictEqual(channels, 4);
-        assert.strictEqual(depth, 'uchar');
-        assert.strictEqual(isProgressive, false);
-        assert.strictEqual(pages, 9);
-        assert.strictEqual(pageHeight, 80);
-        assert.strictEqual(loop, 0);
-        assert.deepStrictEqual(delay, [120, 120, 90, 120, 120, 90, 120, 90, 30]);
-        assert.strictEqual(hasProfile, false);
-        assert.strictEqual(hasAlpha, true);
-      })
-  );
-
-  it('Animated WebP with limited looping', () =>
-    sharp(fixtures.inputWebPAnimatedLoop3)
-      .metadata()
-      .then(({
-        format, width, height, space, channels, depth,
-        isProgressive, pages, loop, delay, hasProfile,
-        hasAlpha
-      }) => {
-        assert.strictEqual(format, 'webp');
-        assert.strictEqual(width, 370);
-        assert.strictEqual(height, 285);
-        assert.strictEqual(space, 'srgb');
-        assert.strictEqual(channels, 4);
-        assert.strictEqual(depth, 'uchar');
-        assert.strictEqual(isProgressive, false);
-        assert.strictEqual(pages, 10);
-        assert.strictEqual(loop, 3);
-        assert.deepStrictEqual(delay, [...Array(9).fill(3000), 15000]);
-        assert.strictEqual(hasProfile, false);
-        assert.strictEqual(hasAlpha, true);
-      })
-  );
-
-  it('GIF', (_t, done) => {
-    sharp(fixtures.inputGif).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('gif', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(800, metadata.width);
-      assert.strictEqual(533, metadata.height);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual('undefined', typeof metadata.density);
-      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      assert.deepStrictEqual(metadata.background, { r: 138, g: 148, b: 102 });
-      done();
-    });
-  });
-  it('GIF grey+alpha', (_t, done) => {
-    sharp(fixtures.inputGifGreyPlusAlpha).metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('gif', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(2, metadata.width);
-      assert.strictEqual(1, metadata.height);
-      assert.strictEqual(4, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual('undefined', typeof metadata.density);
-      assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+  test('Animated WebP', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputWebPAnimated).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      isProgressive: 'isProgressive',
+      pages: 'pages',
+      loop: 'loop',
+      delay: 'delay',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha'
+    }), {
+      format: 'webp',
+      mediaType: 'image/webp',
+      width: 80,
+      height: 80,
+      space: 'srgb',
+      channels: 4,
+      depth: 'uchar',
+      isProgressive: false,
+      pages: 9,
+      loop: 0,
+      delay: [120, 120, 90, 120, 120, 90, 120, 90, 30],
+      hasProfile: false,
+      hasAlpha: true
     });
   });
 
-  it('Animated GIF', () =>
-    sharp(fixtures.inputGifAnimated)
-      .metadata()
-      .then(({
-        format, width, height, space, channels, depth,
-        isProgressive, pages, loop, delay, background,
-        hasProfile, hasAlpha
-      }) => {
-        assert.strictEqual(format, 'gif');
-        assert.strictEqual(width, 80);
-        assert.strictEqual(height, 80);
-        assert.strictEqual(space, 'srgb');
-        assert.strictEqual(channels, 4);
-        assert.strictEqual(depth, 'uchar');
-        assert.strictEqual(isProgressive, false);
-        assert.strictEqual(pages, 30);
-        assert.strictEqual(loop, 0);
-        assert.deepStrictEqual(delay, Array(30).fill(30));
-        assert.deepStrictEqual(background, { r: 0, g: 0, b: 0 });
-        assert.strictEqual(hasProfile, false);
-        assert.strictEqual(hasAlpha, true);
-      })
-  );
-
-  it('Animated GIF with limited looping', () =>
-    sharp(fixtures.inputGifAnimatedLoop3)
-      .metadata()
-      .then(({
-        format, width, height, space, channels, depth,
-        isProgressive, pages, loop, delay, hasProfile,
-        hasAlpha
-      }) => {
-        assert.strictEqual(format, 'gif');
-        assert.strictEqual(width, 370);
-        assert.strictEqual(height, 285);
-        assert.strictEqual(space, 'srgb');
-        assert.strictEqual(channels, 4);
-        assert.strictEqual(depth, 'uchar');
-        assert.strictEqual(isProgressive, false);
-        assert.strictEqual(pages, 10);
-        assert.strictEqual(loop, 3);
-        assert.deepStrictEqual(delay, [...Array(9).fill(3000), 15000]);
-        assert.strictEqual(hasProfile, false);
-        assert.strictEqual(hasAlpha, true);
-      })
-  );
-
-  it('vips', () =>
-    sharp(fixtures.inputV)
-      .metadata()
-      .then(metadata => {
-        assert.strictEqual('vips', metadata.format);
-        assert.strictEqual('undefined', typeof metadata.size);
-        assert.strictEqual(70, metadata.width);
-        assert.strictEqual(60, metadata.height);
-        assert.strictEqual(3, metadata.channels);
-        assert.strictEqual('uchar', metadata.depth);
-        assert.strictEqual(72, metadata.density);
-        assert.strictEqual('undefined', typeof metadata.chromaSubsampling);
-        assert.strictEqual(false, metadata.isProgressive);
-        assert.strictEqual(false, metadata.hasProfile);
-        assert.strictEqual(false, metadata.hasAlpha);
-        assert.strictEqual('undefined', typeof metadata.orientation);
-        assert.strictEqual('undefined', typeof metadata.exif);
-        assert.strictEqual('undefined', typeof metadata.icc);
-      })
-  );
-
-  it('File in, Promise out', (_t, done) => {
-    sharp(fixtures.inputJpg).metadata().then((metadata) => {
-      assert.strictEqual('jpeg', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(2725, metadata.width);
-      assert.strictEqual(2225, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
-      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+  test('Animated WebP with all pages', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputWebPAnimated, { pages: -1 }).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      isProgressive: 'isProgressive',
+      pages: 'pages',
+      pageHeight: 'pageHeight',
+      loop: 'loop',
+      delay: 'delay',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha'
+    }), {
+      format: 'webp',
+      mediaType: 'image/webp',
+      width: 80,
+      height: 720,
+      space: 'srgb',
+      channels: 4,
+      depth: 'uchar',
+      isProgressive: false,
+      pages: 9,
+      pageHeight: 80,
+      loop: 0,
+      delay: [120, 120, 90, 120, 120, 90, 120, 90, 30],
+      hasProfile: false,
+      hasAlpha: true
     });
   });
 
-  it('Non-existent file in, Promise out', async () =>
-    assert.rejects(
-      () => sharp('fail').metadata(),
-      (err) => {
-        assert.strictEqual(err.message, 'Input file is missing: fail');
-        assert(err.stack.includes('at Sharp.metadata'));
-        assert(err.stack.includes(__filename));
-        return true;
-      }
-    )
-  );
-
-  it('Invalid stream in, callback out', (_t, done) => {
-    fs.createReadStream(__filename).pipe(
-      sharp().metadata((err) => {
-        assert.strictEqual(err.message, 'Input buffer contains unsupported image format');
-        assert(err.stack.includes('at Sharp.metadata'));
-        assert(err.stack.includes(__filename));
-        done();
-      })
-    );
-  });
-
-  it('Stream in, Promise out', (_t, done) => {
-    const readable = fs.createReadStream(fixtures.inputJpg);
-    const pipeline = sharp();
-    pipeline.metadata().then((metadata) => {
-      assert.strictEqual('jpeg', metadata.format);
-      assert.strictEqual(829183, metadata.size);
-      assert.strictEqual(2725, metadata.width);
-      assert.strictEqual(2225, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
-      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
-    }).catch(_t, done);
-    readable.pipe(pipeline);
-  });
-
-  it('Stream in, rejected Promise out', () => {
-    const pipeline = sharp();
-    fs
-      .createReadStream(__filename)
-      .pipe(pipeline);
-
-    return pipeline
-      .metadata()
-      .then(
-        () => Promise.reject(new Error('Expected metadata to reject')),
-        err => assert.strictEqual(err.message, 'Input buffer contains unsupported image format')
-      );
-  });
-
-  it('Stream in, finish event fires before metadata is requested', (_t, done) => {
-    const create = { width: 1, height: 1, channels: 3, background: 'red' };
-    const image1 = sharp({ create }).png().pipe(sharp());
-    const image2 = sharp({ create }).png().pipe(sharp());
-    setTimeout(async () => {
-      const data1 = await image1.metadata();
-      assert.strictEqual('png', data1.format);
-      const data2 = await image2.metadata();
-      assert.strictEqual('png', data2.format);
-      done();
-    }, 500);
-  });
-
-  it('Stream', (_t, done) => {
-    const readable = fs.createReadStream(fixtures.inputJpg);
-    const pipeline = sharp().metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('jpeg', metadata.format);
-      assert.strictEqual(829183, metadata.size);
-      assert.strictEqual(2725, metadata.width);
-      assert.strictEqual(2225, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
-      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      done();
+  test('Animated WebP with limited looping', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputWebPAnimatedLoop3).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      isProgressive: 'isProgressive',
+      pages: 'pages',
+      loop: 'loop',
+      delay: 'delay',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha'
+    }), {
+      format: 'webp',
+      mediaType: 'image/webp',
+      width: 370,
+      height: 285,
+      space: 'srgb',
+      channels: 4,
+      depth: 'uchar',
+      isProgressive: false,
+      pages: 10,
+      loop: 3,
+      delay: [...Array(9).fill(3000), 15000],
+      hasProfile: false,
+      hasAlpha: true
     });
-    readable.pipe(pipeline);
   });
 
-  it('Resize to half width using metadata', (_t, done) => {
-    const image = sharp(fixtures.inputJpg);
-    image.metadata((err, metadata) => {
-      if (err) throw err;
-      assert.strictEqual('jpeg', metadata.format);
-      assert.strictEqual('undefined', typeof metadata.size);
-      assert.strictEqual(2725, metadata.width);
-      assert.strictEqual(2225, metadata.height);
-      assert.strictEqual('srgb', metadata.space);
-      assert.strictEqual(3, metadata.channels);
-      assert.strictEqual('uchar', metadata.depth);
-      assert.strictEqual(true, ['undefined', 'number'].includes(typeof metadata.density));
-      assert.strictEqual('4:2:0', metadata.chromaSubsampling);
-      assert.strictEqual(false, metadata.isProgressive);
-      assert.strictEqual(false, metadata.hasProfile);
-      assert.strictEqual(false, metadata.hasAlpha);
-      assert.strictEqual('undefined', typeof metadata.orientation);
-      assert.strictEqual('undefined', typeof metadata.exif);
-      assert.strictEqual('undefined', typeof metadata.icc);
-      image.resize(Math.floor(metadata.width / 2)).toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(true, data.length > 0);
-        assert.strictEqual(1362, info.width);
-        assert.strictEqual(1112, info.height);
-        done();
+  test('GIF', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputGif).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      channels: 'channels',
+      depth: 'depth',
+      densityType: (value) => typeof value.density,
+      chromaSubsamplingType: (value) => typeof value.chromaSubsampling,
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc,
+      background: 'background'
+    }), {
+      format: 'gif',
+      mediaType: 'image/gif',
+      sizeType: 'undefined',
+      width: 800,
+      height: 533,
+      channels: 3,
+      depth: 'uchar',
+      densityType: 'undefined',
+      chromaSubsamplingType: 'undefined',
+      isProgressive: false,
+      hasProfile: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined',
+      background: { r: 138, g: 148, b: 102 }
+    });
+  });
+
+  test('GIF grey+alpha', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputGifGreyPlusAlpha).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      channels: 'channels',
+      depth: 'depth',
+      densityType: (value) => typeof value.density,
+      chromaSubsamplingType: (value) => typeof value.chromaSubsampling,
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'gif',
+      mediaType: 'image/gif',
+      sizeType: 'undefined',
+      width: 2,
+      height: 1,
+      channels: 4,
+      depth: 'uchar',
+      densityType: 'undefined',
+      chromaSubsamplingType: 'undefined',
+      isProgressive: false,
+      hasProfile: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
+    });
+  });
+
+  test('Animated GIF', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputGifAnimated).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      isProgressive: 'isProgressive',
+      pages: 'pages',
+      loop: 'loop',
+      delay: 'delay',
+      background: 'background',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha'
+    }), {
+      format: 'gif',
+      mediaType: 'image/gif',
+      width: 80,
+      height: 80,
+      space: 'srgb',
+      channels: 4,
+      depth: 'uchar',
+      isProgressive: false,
+      pages: 30,
+      loop: 0,
+      delay: Array(30).fill(30),
+      background: { r: 0, g: 0, b: 0 },
+      hasProfile: false,
+      hasAlpha: true
+    });
+  });
+
+  test('Animated GIF with limited looping', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputGifAnimatedLoop3).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      isProgressive: 'isProgressive',
+      pages: 'pages',
+      loop: 'loop',
+      delay: 'delay',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha'
+    }), {
+      format: 'gif',
+      mediaType: 'image/gif',
+      width: 370,
+      height: 285,
+      space: 'srgb',
+      channels: 4,
+      depth: 'uchar',
+      isProgressive: false,
+      pages: 10,
+      loop: 3,
+      delay: [...Array(9).fill(3000), 15000],
+      hasProfile: false,
+      hasAlpha: true
+    });
+  });
+
+  test('vips', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputV).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      channels: 'channels',
+      depth: 'depth',
+      density: 'density',
+      chromaSubsamplingType: (value) => typeof value.chromaSubsampling,
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'vips',
+      sizeType: 'undefined',
+      width: 70,
+      height: 60,
+      channels: 3,
+      depth: 'uchar',
+      density: 72,
+      chromaSubsamplingType: 'undefined',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
+    });
+  });
+
+  test('File in, Promise out', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputJpg).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      sizeType: (value) => typeof value.size,
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      densityType: (value) => typeof value.density,
+      chromaSubsampling: 'chromaSubsampling',
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'jpeg',
+      mediaType: 'image/jpeg',
+      sizeType: 'undefined',
+      width: 2725,
+      height: 2225,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      densityType: 'number',
+      chromaSubsampling: '4:2:0',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
+    });
+  });
+
+  test('Non-existent file in, Promise out', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(() => sharp('fail').metadata(), /Input file is missing: fail/);
+  });
+
+  test('File in, callback out', async (t) => {
+    t.plan(2);
+    const metadata = await new Promise((resolve, reject) => {
+      sharp(fixtures.inputJpg).metadata((err, metadata) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(metadata);
       });
     });
+    t.assert.strictEqual(metadata.format, 'jpeg');
+    t.assert.strictEqual(metadata.width, 2725);
   });
 
-  it('Keep EXIF metadata and add sRGB profile after a resize', (_t, done) => {
-    sharp(fixtures.inputJpgWithExif)
+  test('Non-existent file in, callback out', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(() => new Promise((resolve, reject) => {
+      sharp('fail').metadata((err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+    }), /Input file is missing: fail/);
+  });
+
+  test('Invalid stream in, callback out', async (t) => {
+    t.plan(1);
+    const fd = await fs.open(__filename);
+    const readable = fd.createReadStream();
+    await t.assert.rejects(() => new Promise((resolve, reject) => {
+      readable.pipe(
+        sharp().metadata((err) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve();
+        })
+      );
+    }), /Input buffer contains unsupported image format/);
+  });
+
+  test('Stream in, callback out', async (t) => {
+    t.plan(2);
+    const fd = await fs.open(fixtures.inputJpg);
+    const readable = fd.createReadStream();
+    const pipeline = sharp();
+    const metadata = await new Promise((resolve, reject) => {
+      readable.pipe(
+        pipeline.metadata((err, metadata) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve(metadata);
+        })
+      );
+    });
+    t.assert.strictEqual(metadata.format, 'jpeg');
+    t.assert.strictEqual(metadata.width, 2725);
+  });
+
+  test('Stream in, Promise out', async (t) => {
+    t.plan(1);
+    const fd = await fs.open(fixtures.inputJpg);
+    const readable = fd.createReadStream();
+    const pipeline = sharp();
+    readable.pipe(pipeline);
+    const metadata = await pipeline.metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      size: 'size',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      densityType: (value) => typeof value.density,
+      chromaSubsampling: 'chromaSubsampling',
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'jpeg',
+      mediaType: 'image/jpeg',
+      size: 829183,
+      width: 2725,
+      height: 2225,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      densityType: 'number',
+      chromaSubsampling: '4:2:0',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
+    });
+  });
+
+  test('Stream in, rejected Promise out', async (t) => {
+    t.plan(1);
+    const fd = await fs.open(__filename);
+    const readable = fd.createReadStream();
+    const pipeline = sharp();
+    readable.pipe(pipeline);
+    await t.assert.rejects(() => pipeline.metadata(), /Input buffer contains unsupported image format/);
+  });
+
+  test('Stream in, finish event fires before metadata is requested', async (t) => {
+    t.plan(1);
+    const createImage = { width: 1, height: 1, channels: 3, background: 'red' };
+    const image1 = sharp({ create: createImage }).png().pipe(sharp());
+    const image2 = sharp({ create: createImage }).png().pipe(sharp());
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const data1 = await image1.metadata();
+    const data2 = await image2.metadata();
+    t.assert.deepStrictEqual([data1.format, data2.format], ['png', 'png']);
+  });
+
+  test('Stream', async (t) => {
+    t.plan(1);
+    const fd = await fs.open(fixtures.inputJpg);
+    const readable = fd.createReadStream();
+    const pipeline = sharp();
+    const promise = pipeline.metadata();
+    readable.pipe(pipeline);
+    const metadata = await promise;
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      size: 'size',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      densityType: (value) => typeof value.density,
+      chromaSubsampling: 'chromaSubsampling',
+      isProgressive: 'isProgressive',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      format: 'jpeg',
+      mediaType: 'image/jpeg',
+      size: 829183,
+      width: 2725,
+      height: 2225,
+      space: 'srgb',
+      channels: 3,
+      depth: 'uchar',
+      densityType: 'number',
+      chromaSubsampling: '4:2:0',
+      isProgressive: false,
+      hasProfile: false,
+      hasAlpha: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
+    });
+  });
+
+  test('Resize to half width using metadata', async (t) => {
+    t.plan(1);
+    const image = sharp(fixtures.inputJpg);
+    const metadata = await image.metadata();
+    const resized = await image.resize(Math.floor(metadata.width / 2)).toBuffer({ resolveWithObject: true });
+    t.assert.deepStrictEqual({
+      metadataWidth: metadata.width,
+      metadataHeight: metadata.height,
+      resizedWidth: resized.info.width,
+      resizedHeight: resized.info.height,
+      resizedHasData: resized.data.length > 0
+    }, {
+      metadataWidth: 2725,
+      metadataHeight: 2225,
+      resizedWidth: 1362,
+      resizedHeight: 1112,
+      resizedHasData: true
+    });
+  });
+
+  test('Keep EXIF metadata and add sRGB profile after a resize', async (t) => {
+    t.plan(1);
+    const buffer = await sharp(fixtures.inputJpgWithExif)
       .resize(320, 240)
       .withMetadata()
-      .toBuffer((err, buffer) => {
-        if (err) throw err;
-        sharp(buffer).metadata((err, metadata) => {
-          if (err) throw err;
-          assert.strictEqual(true, metadata.hasProfile);
-          assert.strictEqual(8, metadata.orientation);
-          assert.strictEqual(320, metadata.width);
-          assert.strictEqual(240, metadata.height);
-          assert.strictEqual(240, metadata.autoOrient.width);
-          assert.strictEqual(320, metadata.autoOrient.height);
-          assert.strictEqual('object', typeof metadata.exif);
-          assert.strictEqual(true, metadata.exif instanceof Buffer);
-          // EXIF
-          const exif = exifReader(metadata.exif);
-          assert.strictEqual('object', typeof exif);
-          assert.strictEqual('object', typeof exif.Image);
-          assert.strictEqual('number', typeof exif.Image.XResolution);
-          // ICC
-          assert.strictEqual('object', typeof metadata.icc);
-          assert.strictEqual(true, metadata.icc instanceof Buffer);
-          const profile = icc.parse(metadata.icc);
-          assert.strictEqual('object', typeof profile);
-          assert.strictEqual('RGB', profile.colorSpace);
-          assert.strictEqual('Perceptual', profile.intent);
-          assert.strictEqual('Monitor', profile.deviceClass);
-          done();
-        });
-      });
-  });
-
-  it('keep existing ICC profile', async () => {
-    const data = await sharp(fixtures.inputJpgWithExif)
-      .keepIccProfile()
       .toBuffer();
-
-    const metadata = await sharp(data).metadata();
-    const { description } = icc.parse(metadata.icc);
-    assert.strictEqual(description, 'Generic RGB Profile');
+    const metadata = await sharp(buffer).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      hasProfile: 'hasProfile',
+      orientation: 'orientation',
+      width: 'width',
+      height: 'height',
+      autoOrientWidth: (value) => value.autoOrient.width,
+      autoOrientHeight: (value) => value.autoOrient.height,
+      exifType: (value) => typeof value.exif,
+      exifBuffer: (value) => Buffer.isBuffer(value.exif),
+      exifResolutionType: (value) => typeof exifReader(value.exif).Image.XResolution,
+      iccType: (value) => typeof value.icc,
+      iccBuffer: (value) => Buffer.isBuffer(value.icc),
+      iccColorSpace: (value) => icc.parse(value.icc).colorSpace,
+      iccIntent: (value) => icc.parse(value.icc).intent,
+      iccDeviceClass: (value) => icc.parse(value.icc).deviceClass
+    }), {
+      hasProfile: true,
+      orientation: 8,
+      width: 320,
+      height: 240,
+      autoOrientWidth: 240,
+      autoOrientHeight: 320,
+      exifType: 'object',
+      exifBuffer: true,
+      exifResolutionType: 'number',
+      iccType: 'object',
+      iccBuffer: true,
+      iccColorSpace: 'RGB',
+      iccIntent: 'Perceptual',
+      iccDeviceClass: 'Monitor'
+    });
   });
 
-  it('keep existing CMYK input profile for CMYK output', async () => {
+  test('keep existing ICC profile', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpgWithExif).keepIccProfile().toBuffer();
+    const metadata = await sharp(data).metadata();
+    t.assert.strictEqual(icc.parse(metadata.icc).description, 'Generic RGB Profile');
+  });
+
+  test('keep existing CMYK input profile for CMYK output', async (t) => {
+    t.plan(1);
     const data = await sharp(fixtures.inputJpgWithCmykProfile)
       .keepIccProfile()
       .toColourspace('cmyk')
       .toBuffer();
-
     const metadata = await sharp(data).metadata();
-    assert.strictEqual(metadata.channels, 4);
-    const { description } = icc.parse(metadata.icc);
-    assert.strictEqual(description, 'U.S. Web Coated (SWOP) v2');
+    t.assert.deepStrictEqual({ channels: metadata.channels, description: icc.parse(metadata.icc).description }, {
+      channels: 4,
+      description: 'U.S. Web Coated (SWOP) v2'
+    });
   });
 
-  it('transform with but discard existing RGB input profile for CMYK output', async () => {
+  test('transform with but discard existing RGB input profile for CMYK output', async (t) => {
+    t.plan(1);
     const data = await sharp(fixtures.inputJpgWithExif)
       .keepIccProfile()
       .toColourspace('cmyk')
       .toBuffer();
-
     const metadata = await sharp(data).metadata();
-    assert.strictEqual(metadata.channels, 4);
-    assert.strictEqual(metadata.icc, undefined);
+    t.assert.deepStrictEqual({ channels: metadata.channels, icc: metadata.icc }, { channels: 4, icc: undefined });
   });
 
-  it('keep existing ICC profile, avoid colour transform', async () => {
+  test('keep existing ICC profile, avoid colour transform', async (t) => {
+    t.plan(1);
     const [r, g, b] = await sharp(fixtures.inputPngWithProPhotoProfile)
       .keepIccProfile()
       .raw()
       .toBuffer();
-
-    assert.strictEqual(r, 131);
-    assert.strictEqual(g, 141);
-    assert.strictEqual(b, 192);
+    t.assert.deepStrictEqual([r, g, b], [131, 141, 192]);
   });
 
-  it('keep existing CMYK ICC profile', async () => {
+  test('keep existing CMYK ICC profile', async (t) => {
+    t.plan(1);
     const data = await sharp(fixtures.inputJpgWithCmykProfile)
       .pipelineColourspace('cmyk')
       .toColourspace('cmyk')
       .keepIccProfile()
       .toBuffer();
-
     const metadata = await sharp(data).metadata();
-    assert.strictEqual(metadata.channels, 4);
-    const { description } = icc.parse(metadata.icc);
-    assert.strictEqual(description, 'U.S. Web Coated (SWOP) v2');
+    t.assert.deepStrictEqual({ channels: metadata.channels, description: icc.parse(metadata.icc).description }, {
+      channels: 4,
+      description: 'U.S. Web Coated (SWOP) v2'
+    });
   });
 
-  it('transform to ICC profile and attach', async () => {
-    const data = await sharp({ create })
-      .png()
-      .withIccProfile('p3', { attach: true })
-      .toBuffer();
-
+  test('transform to ICC profile and attach', async (t) => {
+    t.plan(1);
+    const data = await sharp({ create }).png().withIccProfile('p3', { attach: true }).toBuffer();
     const metadata = await sharp(data).metadata();
-    const { description } = icc.parse(metadata.icc);
-    assert.strictEqual(description, 'sP3C');
+    t.assert.strictEqual(icc.parse(metadata.icc).description, 'sP3C');
   });
 
-  it('transform to ICC profile but do not attach', async () => {
-    const data = await sharp({ create })
-      .png()
-      .withIccProfile('p3', { attach: false })
-      .toBuffer();
-
+  test('transform to ICC profile but do not attach', async (t) => {
+    t.plan(1);
+    const data = await sharp({ create }).png().withIccProfile('p3', { attach: false }).toBuffer();
     const metadata = await sharp(data).metadata();
-    assert.strictEqual(3, metadata.channels);
-    assert.strictEqual(undefined, metadata.icc);
+    t.assert.deepStrictEqual({ channels: metadata.channels, icc: metadata.icc }, { channels: 3, icc: undefined });
   });
 
-  it('transform to invalid ICC profile emits warning', async () => {
+  test('transform to invalid ICC profile emits warning', async (t) => {
+    t.plan(1);
     const img = sharp({ create })
       .png()
       .withIccProfile(fixtures.path('invalid-illuminant.icc'));
-
     const warningsEmitted = [];
     img.on('warning', (warning) => {
       warningsEmitted.push(warning);
     });
-
     const data = await img.toBuffer();
-    assert.strict(warningsEmitted.includes('Invalid profile'));
-
     const metadata = await sharp(data).metadata();
-    assert.strictEqual(3, metadata.channels);
-    assert.strictEqual(undefined, metadata.icc);
+    t.assert.deepStrictEqual({ warningsEmitted, channels: metadata.channels, icc: metadata.icc }, {
+      warningsEmitted: ['Invalid profile'],
+      channels: 3,
+      icc: undefined
+    });
   });
 
-  it('Apply CMYK output ICC profile', (_t, done) => {
+  test('Apply CMYK output ICC profile', async (t) => {
+    t.plan(2);
     const output = fixtures.path('output.icc-cmyk.jpg');
-    sharp(fixtures.inputJpg)
+    await sharp(fixtures.inputJpg)
       .resize(64)
       .withIccProfile('cmyk')
-      .toFile(output, (err) => {
-        if (err) throw err;
-        sharp(output).metadata((err, metadata) => {
-          if (err) throw err;
-          assert.strictEqual(true, metadata.hasProfile);
-          assert.strictEqual('cmyk', metadata.space);
-          assert.strictEqual(4, metadata.channels);
-          // ICC
-          assert.strictEqual('object', typeof metadata.icc);
-          assert.strictEqual(true, metadata.icc instanceof Buffer);
-          const profile = icc.parse(metadata.icc);
-          assert.strictEqual('object', typeof profile);
-          assert.strictEqual('CMYK', profile.colorSpace);
-          assert.strictEqual('Relative', profile.intent);
-          assert.strictEqual('Printer', profile.deviceClass);
-        });
-        fixtures.assertSimilar(output, fixtures.expected('icc-cmyk.jpg'), { threshold: 1 }, done);
-      });
+      .toFile(output);
+    const metadata = await sharp(output).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      hasProfile: 'hasProfile',
+      space: 'space',
+      channels: 'channels',
+      iccColorSpace: (value) => icc.parse(value.icc).colorSpace,
+      iccIntent: (value) => icc.parse(value.icc).intent,
+      iccDeviceClass: (value) => icc.parse(value.icc).deviceClass
+    }), {
+      hasProfile: true,
+      space: 'cmyk',
+      channels: 4,
+      iccColorSpace: 'CMYK',
+      iccIntent: 'Relative',
+      iccDeviceClass: 'Printer'
+    });
+    t.assert.doesNotThrow(() => fixtures.assertSimilar(output, fixtures.expected('icc-cmyk.jpg'), { threshold: 1 }));
   });
 
-  it('Apply custom output ICC profile', (_t, done) => {
+  test('Apply custom output ICC profile', async (t) => {
+    t.plan(1);
     const output = fixtures.path('output.hilutite.jpg');
-    sharp(fixtures.inputJpg)
+    await sharp(fixtures.inputJpg)
       .resize(64)
       .withIccProfile(fixtures.path('hilutite.icm'))
-      .toFile(output, (err) => {
-        if (err) throw err;
-        fixtures.assertMaxColourDistance(output, fixtures.expected('hilutite.jpg'), 9);
-        done();
-      });
+      .toFile(output);
+    t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(output, fixtures.expected('hilutite.jpg'), 9));
   });
 
-  it('Include metadata in output, enabled via empty object', () =>
-    sharp(fixtures.inputJpgWithExif)
+  test('Include metadata in output, enabled via empty object', async (t) => {
+    t.plan(1);
+    const buffer = await sharp(fixtures.inputJpgWithExif)
       .withMetadata({})
-      .toBuffer()
-      .then((buffer) => sharp(buffer)
-        .metadata()
-        .then(metadata => {
-          assert.strictEqual(true, metadata.hasProfile);
-          assert.strictEqual(8, metadata.orientation);
-          assert.strictEqual('object', typeof metadata.exif);
-          assert.strictEqual(true, metadata.exif instanceof Buffer);
-          // EXIF
-          const exif = exifReader(metadata.exif);
-          assert.strictEqual('object', typeof exif);
-          assert.strictEqual('object', typeof exif.Image);
-          assert.strictEqual('number', typeof exif.Image.XResolution);
-          // ICC
-          assert.strictEqual('object', typeof metadata.icc);
-          assert.strictEqual(true, metadata.icc instanceof Buffer);
-          const profile = icc.parse(metadata.icc);
-          assert.strictEqual('object', typeof profile);
-          assert.strictEqual('RGB', profile.colorSpace);
-          assert.strictEqual('Perceptual', profile.intent);
-          assert.strictEqual('Monitor', profile.deviceClass);
-        })
-      )
-  );
+      .toBuffer();
+    const metadata = await sharp(buffer).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      hasProfile: 'hasProfile',
+      orientation: 'orientation',
+      exifType: (value) => typeof value.exif,
+      exifBuffer: (value) => Buffer.isBuffer(value.exif),
+      exifResolutionType: (value) => typeof exifReader(value.exif).Image.XResolution,
+      iccType: (value) => typeof value.icc,
+      iccBuffer: (value) => Buffer.isBuffer(value.icc),
+      iccColorSpace: (value) => icc.parse(value.icc).colorSpace,
+      iccIntent: (value) => icc.parse(value.icc).intent,
+      iccDeviceClass: (value) => icc.parse(value.icc).deviceClass
+    }), {
+      hasProfile: true,
+      orientation: 8,
+      exifType: 'object',
+      exifBuffer: true,
+      exifResolutionType: 'number',
+      iccType: 'object',
+      iccBuffer: true,
+      iccColorSpace: 'RGB',
+      iccIntent: 'Perceptual',
+      iccDeviceClass: 'Monitor'
+    });
+  });
 
-  it('Remove EXIF metadata after a resize', (_t, done) => {
-    sharp(fixtures.inputJpgWithExif)
+  test('Remove EXIF metadata after a resize', async (t) => {
+    t.plan(1);
+    const buffer = await sharp(fixtures.inputJpgWithExif)
       .resize(320, 240)
-      .toBuffer((err, buffer) => {
-        if (err) throw err;
-        sharp(buffer).metadata((err, metadata) => {
-          if (err) throw err;
-          assert.strictEqual(false, metadata.hasProfile);
-          assert.strictEqual('undefined', typeof metadata.orientation);
-          assert.strictEqual('undefined', typeof metadata.exif);
-          assert.strictEqual('undefined', typeof metadata.icc);
-          done();
-        });
-      });
+      .toBuffer();
+    const metadata = await sharp(buffer).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      hasProfile: 'hasProfile',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      hasProfile: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
+    });
   });
 
-  it('Remove metadata from PNG output', (_t, done) => {
-    sharp(fixtures.inputJpgWithExif)
-      .png()
-      .toBuffer((err, buffer) => {
-        if (err) throw err;
-        sharp(buffer).metadata((err, metadata) => {
-          if (err) throw err;
-          assert.strictEqual(false, metadata.hasProfile);
-          assert.strictEqual('undefined', typeof metadata.orientation);
-          assert.strictEqual('undefined', typeof metadata.exif);
-          assert.strictEqual('undefined', typeof metadata.icc);
-          done();
-        });
-      });
+  test('Remove metadata from PNG output', async (t) => {
+    t.plan(1);
+    const buffer = await sharp(fixtures.inputJpgWithExif).png().toBuffer();
+    const metadata = await sharp(buffer).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      hasProfile: 'hasProfile',
+      orientationType: (value) => typeof value.orientation,
+      exifType: (value) => typeof value.exif,
+      iccType: (value) => typeof value.icc
+    }), {
+      hasProfile: false,
+      orientationType: 'undefined',
+      exifType: 'undefined',
+      iccType: 'undefined'
+    });
   });
 
-  it('Add EXIF metadata to JPEG', async () => {
+  test('Add EXIF metadata to JPEG', async (t) => {
+    t.plan(1);
     const data = await sharp({ create })
       .jpeg()
       .withMetadata({
@@ -845,92 +1236,133 @@ describe('Image metadata', () => {
         }
       })
       .toBuffer();
-
     const { exif } = await sharp(data).metadata();
     const parsedExif = exifReader(exif);
-    assert.strictEqual(parsedExif.Image.Software, 'sharp');
-    assert.strictEqual(parsedExif.Photo.ExposureTime, 0.2);
+    t.assert.deepStrictEqual({ software: parsedExif.Image.Software, exposureTime: parsedExif.Photo.ExposureTime }, {
+      software: 'sharp',
+      exposureTime: 0.2
+    });
   });
 
-  it('Set density of JPEG', async () => {
+  test('withMetadata - set density of JPEG', async (t) => {
+    t.plan(1);
     const data = await sharp({ create })
-      .withMetadata({
-        density: 300
-      })
+      .withMetadata({ density: 300 })
       .jpeg()
       .toBuffer();
-
     const { density } = await sharp(data).metadata();
-    assert.strictEqual(density, 300);
+    t.assert.strictEqual(density, 300);
   });
 
-  it('Set density of PNG', async () => {
+  test('withMetadata - set density of PNG', async (t) => {
+    t.plan(1);
     const data = await sharp({ create })
-      .withMetadata({
-        density: 96
-      })
+      .withMetadata({ density: 96 })
       .png()
       .toBuffer();
-
     const { density } = await sharp(data).metadata();
-    assert.strictEqual(density, 96);
+    t.assert.strictEqual(density, 96);
   });
 
-  it('chromaSubsampling 4:4:4:4 CMYK JPEG', () => sharp(fixtures.inputJpgWithCmykProfile)
-      .metadata()
-      .then((metadata) => {
-        assert.strictEqual('4:4:4:4', metadata.chromaSubsampling);
-      }));
+  test('withDensity - set density of JPEG', async (t) => {
+    t.plan(1);
+    const data = await sharp({ create }).withDensity(300).jpeg().toBuffer();
+    const { density } = await sharp(data).metadata();
+    t.assert.strictEqual(density, 300);
+  });
 
-  it('chromaSubsampling 4:4:4 RGB JPEG', () => sharp(fixtures.inputJpg)
+  test('withDensity - set density of PNG', async (t) => {
+    t.plan(1);
+    const data = await sharp({ create }).withDensity(96).png().toBuffer();
+    const { density } = await sharp(data).metadata();
+    t.assert.strictEqual(density, 96);
+  });
+
+  test('chromaSubsampling 4:4:4:4 CMYK JPEG', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputJpgWithCmykProfile).metadata();
+    t.assert.strictEqual(metadata.chromaSubsampling, '4:4:4:4');
+  });
+
+  test('chromaSubsampling 4:4:4 RGB JPEG', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg)
       .resize(10, 10)
       .jpeg({ chromaSubsampling: '4:4:4' })
-      .toBuffer()
-      .then((data) => sharp(data)
-          .metadata()
-          .then((metadata) => {
-            assert.strictEqual('4:4:4', metadata.chromaSubsampling);
-          })));
+      .toBuffer();
+    const metadata = await sharp(data).metadata();
+    t.assert.strictEqual(metadata.chromaSubsampling, '4:4:4');
+  });
 
-  it('isProgressive JPEG', () => sharp(fixtures.inputJpg)
+  test('isProgressive JPEG', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg)
       .resize(10, 10)
       .jpeg({ progressive: true })
-      .toBuffer()
-      .then((data) => sharp(data)
-          .metadata()
-          .then((metadata) => {
-            assert.strictEqual(true, metadata.isProgressive);
-          })));
+      .toBuffer();
+    const metadata = await sharp(data).metadata();
+    t.assert.strictEqual(metadata.isProgressive, true);
+  });
 
-  it('isProgressive PNG', () => sharp(fixtures.inputJpg)
+  test('isProgressive PNG', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg)
       .resize(10, 10)
       .png({ progressive: true })
-      .toBuffer()
-      .then((data) => sharp(data)
-          .metadata()
-          .then((metadata) => {
-            assert.strictEqual(true, metadata.isProgressive);
-          })));
+      .toBuffer();
+    const metadata = await sharp(data).metadata();
+    t.assert.strictEqual(metadata.isProgressive, true);
+  });
 
-  it('16-bit TIFF with TIFFTAG_PHOTOSHOP metadata', () =>
-    sharp(fixtures.inputTifftagPhotoshop)
-      .metadata()
-      .then(metadata => {
-        assert.strictEqual(metadata.format, 'tiff');
-        assert.strictEqual(metadata.width, 317);
-        assert.strictEqual(metadata.height, 211);
-        assert.strictEqual(metadata.space, 'rgb16');
-        assert.strictEqual(metadata.channels, 3);
-        assert.strictEqual(typeof metadata.tifftagPhotoshop, 'object');
-        assert.strictEqual(metadata.tifftagPhotoshop instanceof Buffer, true);
-        assert.strictEqual(metadata.tifftagPhotoshop.length, 6634);
-      })
-  );
+  test('16-bit TIFF with TIFFTAG_PHOTOSHOP metadata', async (t) => {
+    t.plan(1);
+    const metadata = await sharp(fixtures.inputTifftagPhotoshop).metadata();
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      tifftagPhotoshopType: (value) => typeof value.tifftagPhotoshop,
+      tifftagPhotoshopBuffer: (value) => Buffer.isBuffer(value.tifftagPhotoshop),
+      tifftagPhotoshopLength: (value) => value.tifftagPhotoshop.length
+    }), {
+      format: 'tiff',
+      mediaType: 'image/tiff',
+      width: 317,
+      height: 211,
+      space: 'rgb16',
+      channels: 3,
+      tifftagPhotoshopType: 'object',
+      tifftagPhotoshopBuffer: true,
+      tifftagPhotoshopLength: 6634
+    });
+  });
 
-  it('AVIF', async () => {
+  test('AVIF', async (t) => {
+    t.plan(1);
     const metadata = await sharp(fixtures.inputAvif).metadata();
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      isProgressive: 'isProgressive',
+      isPalette: 'isPalette',
+      bitsPerSample: 'bitsPerSample',
+      pages: 'pages',
+      pagePrimary: 'pagePrimary',
+      compression: 'compression',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      autoOrient: 'autoOrient'
+    }), {
       format: 'heif',
+      mediaType: 'image/avif',
       width: 2048,
       height: 858,
       space: 'srgb',
@@ -944,76 +1376,94 @@ describe('Image metadata', () => {
       compression: 'av1',
       hasProfile: false,
       hasAlpha: false,
-      autoOrient: {
-        width: 2048,
-        height: 858
-      }
+      autoOrient: { width: 2048, height: 858 }
     });
   });
 
-  it('withMetadata adds default sRGB profile', async () => {
+  test('withMetadata adds default sRGB profile', async (t) => {
+    t.plan(1);
     const data = await sharp(fixtures.inputJpg)
       .resize(32, 24)
       .withMetadata()
       .toBuffer();
-
     const metadata = await sharp(data).metadata();
-    const { colorSpace, deviceClass, intent } = icc.parse(metadata.icc);
-    assert.strictEqual(colorSpace, 'RGB');
-    assert.strictEqual(deviceClass, 'Monitor');
-    assert.strictEqual(intent, 'Perceptual');
+    t.assert.deepStrictEqual({
+      colorSpace: icc.parse(metadata.icc).colorSpace,
+      deviceClass: icc.parse(metadata.icc).deviceClass,
+      intent: icc.parse(metadata.icc).intent
+    }, {
+      colorSpace: 'RGB',
+      deviceClass: 'Monitor',
+      intent: 'Perceptual'
+    });
   });
 
-  it('withMetadata adds default sRGB profile to RGB16', async () => {
+  test('withMetadata adds default sRGB profile to RGB16', async (t) => {
+    t.plan(1);
     const data = await sharp({ create })
       .toColorspace('rgb16')
       .png()
       .withMetadata()
       .toBuffer();
-
     const metadata = await sharp(data).metadata();
-    assert.strictEqual(metadata.depth, 'ushort');
-
-    const { description } = icc.parse(metadata.icc);
-    assert.strictEqual(description, 'sRGB');
+    t.assert.deepStrictEqual({
+      depth: metadata.depth,
+      description: icc.parse(metadata.icc).description
+    }, {
+      depth: 'ushort',
+      description: 'sRGB'
+    });
   });
 
-  it('withMetadata adds P3 profile to 16-bit PNG', async () => {
+  test('withMetadata adds P3 profile to 16-bit PNG', async (t) => {
+    t.plan(1);
     const data = await sharp({ create })
       .toColorspace('rgb16')
       .png()
       .withMetadata({ icc: 'p3' })
       .toBuffer();
-
     const metadata = await sharp(data).metadata();
-    assert.strictEqual(metadata.depth, 'ushort');
-
-    const { description } = icc.parse(metadata.icc);
-    assert.strictEqual(description, 'sP3C');
+    t.assert.deepStrictEqual({
+      depth: metadata.depth,
+      description: icc.parse(metadata.icc).description
+    }, {
+      depth: 'ushort',
+      description: 'sP3C'
+    });
   });
 
-  it('File input with corrupt header fails gracefully', (_t, done) => {
-    sharp(fixtures.inputJpgWithCorruptHeader)
-      .metadata((err) => {
-        assert.strictEqual(true, !!err);
-        assert.ok(err.message.includes('Input file has corrupt header: VipsJpeg: premature end of'), err);
-        done();
-      });
+  test('File input with corrupt header fails gracefully', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(() => sharp(fixtures.inputJpgWithCorruptHeader).metadata(), /Input file has corrupt header: VipsJpeg: premature end of/);
   });
 
-  it('Buffer input with corrupt header fails gracefully', (_t, done) => {
-    sharp(fs.readFileSync(fixtures.inputJpgWithCorruptHeader))
-      .metadata((err) => {
-        assert.strictEqual(true, !!err);
-        assert.ok(err.message.includes('Input buffer has corrupt header: VipsJpeg: premature end of'), err);
-        done();
-      });
+  test('Buffer input with corrupt header fails gracefully', async (t) => {
+    t.plan(1);
+    const input = await fs.readFile(fixtures.inputJpgWithCorruptHeader);
+    await t.assert.rejects(() => sharp(input).metadata(), /Input buffer has corrupt header: VipsJpeg: premature end of/);
   });
 
-  it('Lossless JPEG', async () => {
+  test('Lossless JPEG', async (t) => {
+    t.plan(1);
     const metadata = await sharp(fixtures.inputJpgLossless).metadata();
-    assert.deepStrictEqual(metadata, {
+    t.assert.deepStrictEqual(collect(metadata, {
+      format: 'format',
+      mediaType: 'mediaType',
+      width: 'width',
+      height: 'height',
+      space: 'space',
+      channels: 'channels',
+      depth: 'depth',
+      density: 'density',
+      chromaSubsampling: 'chromaSubsampling',
+      isProgressive: 'isProgressive',
+      isPalette: 'isPalette',
+      hasProfile: 'hasProfile',
+      hasAlpha: 'hasAlpha',
+      autoOrient: 'autoOrient'
+    }), {
       format: 'jpeg',
+      mediaType: 'image/jpeg',
       width: 227,
       height: 149,
       space: 'srgb',
@@ -1029,7 +1479,8 @@ describe('Image metadata', () => {
     });
   });
 
-  it('keepExif maintains all EXIF metadata', async () => {
+  test('keepExif maintains all EXIF metadata', async (t) => {
+    t.plan(1);
     const data1 = await sharp({ create })
       .withExif({
         IFD0: {
@@ -1039,18 +1490,17 @@ describe('Image metadata', () => {
       })
       .jpeg()
       .toBuffer();
-
-    const data2 = await sharp(data1)
-      .keepExif()
-      .toBuffer();
-
+    const data2 = await sharp(data1).keepExif().toBuffer();
     const md2 = await sharp(data2).metadata();
     const exif2 = exifReader(md2.exif);
-    assert.strictEqual(exif2.Image.Copyright, 'Test 1');
-    assert.strictEqual(exif2.Image.Software, 'sharp');
+    t.assert.deepStrictEqual({ copyright: exif2.Image.Copyright, software: exif2.Image.Software }, {
+      copyright: 'Test 1',
+      software: 'sharp'
+    });
   });
 
-  it('withExif replaces all EXIF metadata', async () => {
+  test('withExif replaces all EXIF metadata', async (t) => {
+    t.plan(1);
     const data1 = await sharp({ create })
       .withExif({
         IFD0: {
@@ -1060,12 +1510,8 @@ describe('Image metadata', () => {
       })
       .jpeg()
       .toBuffer();
-
     const md1 = await sharp(data1).metadata();
     const exif1 = exifReader(md1.exif);
-    assert.strictEqual(exif1.Image.Copyright, 'Test 1');
-    assert.strictEqual(exif1.Image.Software, 'sharp');
-
     const data2 = await sharp(data1)
       .withExif({
         IFD0: {
@@ -1073,14 +1519,18 @@ describe('Image metadata', () => {
         }
       })
       .toBuffer();
-
     const md2 = await sharp(data2).metadata();
     const exif2 = exifReader(md2.exif);
-    assert.strictEqual(exif2.Image.Copyright, 'Test 2');
-    assert.strictEqual(exif2.Image.Software, undefined);
+    t.assert.deepStrictEqual({ firstCopyright: exif1.Image.Copyright, firstSoftware: exif1.Image.Software, secondCopyright: exif2.Image.Copyright, secondSoftware: exif2.Image.Software }, {
+      firstCopyright: 'Test 1',
+      firstSoftware: 'sharp',
+      secondCopyright: 'Test 2',
+      secondSoftware: undefined
+    });
   });
 
-  it('withExifMerge merges all EXIF metadata', async () => {
+  test('withExifMerge merges all EXIF metadata', async (t) => {
+    t.plan(1);
     const data1 = await sharp({ create })
       .withExif({
         IFD0: {
@@ -1089,137 +1539,132 @@ describe('Image metadata', () => {
       })
       .jpeg()
       .toBuffer();
-
     const md1 = await sharp(data1).metadata();
     const exif1 = exifReader(md1.exif);
-    assert.strictEqual(exif1.Image.Copyright, 'Test 1');
-    assert.strictEqual(exif1.Image.Software, undefined);
-
     const data2 = await sharp(data1)
       .withExifMerge({
         IFD0: {
           Copyright: 'Test 2',
           Software: 'sharp'
-
         }
       })
       .toBuffer();
-
     const md2 = await sharp(data2).metadata();
     const exif2 = exifReader(md2.exif);
-    assert.strictEqual(exif2.Image.Copyright, 'Test 2');
-    assert.strictEqual(exif2.Image.Software, 'sharp');
+    t.assert.deepStrictEqual({ firstCopyright: exif1.Image.Copyright, firstSoftware: exif1.Image.Software, secondCopyright: exif2.Image.Copyright, secondSoftware: exif2.Image.Software }, {
+      firstCopyright: 'Test 1',
+      firstSoftware: undefined,
+      secondCopyright: 'Test 2',
+      secondSoftware: 'sharp'
+    });
   });
 
-  describe('XMP metadata tests', () => {
-    it('withMetadata preserves existing XMP metadata from input', async () => {
+  suite('XMP metadata tests', () => {
+    test('withMetadata preserves existing XMP metadata from input', async (t) => {
+      t.plan(1);
       const data = await sharp(fixtures.inputJpgWithIptcAndXmp)
         .resize(320, 240)
         .withMetadata()
         .toBuffer();
-
       const metadata = await sharp(data).metadata();
-      assert.strictEqual('object', typeof metadata.xmp);
-      assert.strictEqual(true, metadata.xmp instanceof Buffer);
-      assert.strictEqual(true, metadata.xmp.length > 0);
-      // Check that XMP starts with the expected XML declaration
-      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('<?xpacket begin="')), 0);
+      t.assert.deepStrictEqual(collect(metadata, {
+        xmpType: (value) => typeof value.xmp,
+        xmpBuffer: (value) => Buffer.isBuffer(value.xmp),
+        xmpStart: (value) => value.xmp.indexOf(Buffer.from('<?xpacket begin="'))
+      }), {
+        xmpType: 'object',
+        xmpBuffer: true,
+        xmpStart: 0
+      });
     });
 
-    it('keepXmp preserves existing XMP metadata from input', async () => {
+    test('keepXmp preserves existing XMP metadata from input', async (t) => {
+      t.plan(1);
       const data = await sharp(fixtures.inputJpgWithIptcAndXmp)
         .resize(320, 240)
         .keepXmp()
         .toBuffer();
-
       const metadata = await sharp(data).metadata();
-      assert.strictEqual('object', typeof metadata.xmp);
-      assert.strictEqual(true, metadata.xmp instanceof Buffer);
-      assert.strictEqual(true, metadata.xmp.length > 0);
-      // Check that XMP starts with the expected XML declaration
-      assert.strictEqual(metadata.xmp.indexOf(Buffer.from('<?xpacket begin="')), 0);
+      t.assert.deepStrictEqual(collect(metadata, {
+        xmpType: (value) => typeof value.xmp,
+        xmpBuffer: (value) => Buffer.isBuffer(value.xmp),
+        xmpStart: (value) => value.xmp.indexOf(Buffer.from('<?xpacket begin="'))
+      }), {
+        xmpType: 'object',
+        xmpBuffer: true,
+        xmpStart: 0
+      });
     });
 
-    it('withXmp with custom XMP replaces existing XMP', async () => {
+    test('withXmp with custom XMP replaces existing XMP', async (t) => {
+      t.plan(1);
       const customXmp = '<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:creator><rdf:Seq><rdf:li>Test Creator</rdf:li></rdf:Seq></dc:creator><dc:title><rdf:Alt><rdf:li xml:lang="x-default">Test Title</rdf:li></rdf:Alt></dc:title></rdf:Description></rdf:RDF></x:xmpmeta>';
-
       const data = await sharp(fixtures.inputJpgWithIptcAndXmp)
         .resize(320, 240)
         .withXmp(customXmp)
         .toBuffer();
-
       const metadata = await sharp(data).metadata();
-      assert.strictEqual('object', typeof metadata.xmp);
-      assert.strictEqual(true, metadata.xmp instanceof Buffer);
-
-      // Check that the XMP contains our custom content
-      const xmpString = metadata.xmp.toString();
-      assert.strictEqual(true, xmpString.includes('Test Creator'));
-      assert.strictEqual(true, xmpString.includes('Test Title'));
+      t.assert.deepStrictEqual(collect(metadata, {
+        xmpType: (value) => typeof value.xmp,
+        xmpBuffer: (value) => Buffer.isBuffer(value.xmp),
+        includesCreator: (value) => value.xmp.toString().includes('Test Creator'),
+        includesTitle: (value) => value.xmp.toString().includes('Test Title')
+      }), {
+        xmpType: 'object',
+        xmpBuffer: true,
+        includesCreator: true,
+        includesTitle: true
+      });
     });
 
-    it('withXmp with custom XMP buffer on image without existing XMP', async () => {
+    test('withXmp with custom XMP buffer on image without existing XMP', async (t) => {
+      t.plan(1);
       const customXmp = '<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:description><rdf:Alt><rdf:li xml:lang="x-default">Added via Sharp</rdf:li></rdf:Alt></dc:description></rdf:Description></rdf:RDF></x:xmpmeta>';
-
       const data = await sharp(fixtures.inputJpg)
         .resize(320, 240)
         .withXmp(customXmp)
         .toBuffer();
-
       const metadata = await sharp(data).metadata();
-      assert.strictEqual('object', typeof metadata.xmp);
-      assert.strictEqual(true, metadata.xmp instanceof Buffer);
-
-      // Check that the XMP contains our custom content
-      const xmpString = metadata.xmp.toString();
-      assert.strictEqual(true, xmpString.includes('Added via Sharp'));
+      t.assert.deepStrictEqual(collect(metadata, {
+        xmpType: (value) => typeof value.xmp,
+        xmpBuffer: (value) => Buffer.isBuffer(value.xmp),
+        includesText: (value) => value.xmp.toString().includes('Added via Sharp')
+      }), {
+        xmpType: 'object',
+        xmpBuffer: true,
+        includesText: true
+      });
     });
 
-    it('withXmp with valid XMP metadata for different image formats', async () => {
+    test('withXmp with valid XMP metadata for different image formats', async (t) => {
+      t.plan(1);
       const customXmp = '<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:subject><rdf:Bag><rdf:li>test</rdf:li><rdf:li>metadata</rdf:li></rdf:Bag></dc:subject></rdf:Description></rdf:RDF></x:xmpmeta>';
-
-      // Test with JPEG output
-      const jpegData = await sharp(fixtures.inputJpg)
-        .resize(100, 100)
-        .jpeg()
-        .withXmp(customXmp)
-        .toBuffer();
-
+      const jpegData = await sharp(fixtures.inputJpg).resize(100, 100).jpeg().withXmp(customXmp).toBuffer();
+      const pngData = await sharp(fixtures.inputJpg).resize(100, 100).png().withXmp(customXmp).toBuffer();
+      const webpData = await sharp(fixtures.inputJpg).resize(100, 100).webp().withXmp(customXmp).toBuffer();
       const jpegMetadata = await sharp(jpegData).metadata();
-      assert.strictEqual('object', typeof jpegMetadata.xmp);
-      assert.strictEqual(true, jpegMetadata.xmp instanceof Buffer);
-      assert.strictEqual(true, jpegMetadata.xmp.toString().includes('test'));
-
-      // Test with PNG output (PNG should also support XMP metadata)
-      const pngData = await sharp(fixtures.inputJpg)
-        .resize(100, 100)
-        .png()
-        .withXmp(customXmp)
-        .toBuffer();
-
       const pngMetadata = await sharp(pngData).metadata();
-      // PNG format should preserve XMP metadata when using withXmp
-      assert.strictEqual('object', typeof pngMetadata.xmp);
-      assert.strictEqual(true, pngMetadata.xmp instanceof Buffer);
-      assert.strictEqual(true, pngMetadata.xmp.toString().includes('test'));
-
-      // Test with WebP output (WebP should also support XMP metadata)
-      const webpData = await sharp(fixtures.inputJpg)
-        .resize(100, 100)
-        .webp()
-        .withXmp(customXmp)
-        .toBuffer();
-
       const webpMetadata = await sharp(webpData).metadata();
-      // WebP format should preserve XMP metadata when using withXmp
-      assert.strictEqual('object', typeof webpMetadata.xmp);
-      assert.strictEqual(true, webpMetadata.xmp instanceof Buffer);
-      assert.strictEqual(true, webpMetadata.xmp.toString().includes('test'));
+      t.assert.deepStrictEqual({
+        jpegFormat: jpegMetadata.format,
+        jpegXmp: Buffer.isBuffer(jpegMetadata.xmp),
+        pngFormat: pngMetadata.format,
+        pngXmp: Buffer.isBuffer(pngMetadata.xmp),
+        webpFormat: webpMetadata.format,
+        webpXmp: Buffer.isBuffer(webpMetadata.xmp)
+      }, {
+        jpegFormat: 'jpeg',
+        jpegXmp: true,
+        pngFormat: 'png',
+        pngXmp: true,
+        webpFormat: 'webp',
+        webpXmp: true
+      });
     });
 
-    it('XMP metadata persists through multiple operations', async () => {
+    test('XMP metadata persists through multiple operations', async (t) => {
+      t.plan(1);
       const customXmp = '<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier>persistent-test</dc:identifier></rdf:Description></rdf:RDF></x:xmpmeta>';
-
       const data = await sharp(fixtures.inputJpg)
         .resize(320, 240)
         .withXmp(customXmp)
@@ -1227,121 +1672,118 @@ describe('Image metadata', () => {
         .blur(1)
         .sharpen()
         .toBuffer();
-
       const metadata = await sharp(data).metadata();
-      assert.strictEqual('object', typeof metadata.xmp);
-      assert.strictEqual(true, metadata.xmp instanceof Buffer);
-      assert.strictEqual(true, metadata.xmp.toString().includes('persistent-test'));
+      t.assert.deepStrictEqual(collect(metadata, {
+        xmpType: (value) => typeof value.xmp,
+        xmpBuffer: (value) => Buffer.isBuffer(value.xmp),
+        includesText: (value) => value.xmp.toString().includes('persistent-test')
+      }), {
+        xmpType: 'object',
+        xmpBuffer: true,
+        includesText: true
+      });
     });
 
-    it('withXmp XMP works with WebP format specifically', async () => {
+    test('withXmp XMP works with WebP format specifically', async (t) => {
+      t.plan(1);
       const webpXmp = '<?xml version="1.0"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:creator><rdf:Seq><rdf:li>WebP Creator</rdf:li></rdf:Seq></dc:creator><dc:format>image/webp</dc:format></rdf:Description></rdf:RDF></x:xmpmeta>';
-
       const data = await sharp(fixtures.inputJpg)
         .resize(120, 80)
         .webp({ quality: 80 })
         .withXmp(webpXmp)
         .toBuffer();
-
       const metadata = await sharp(data).metadata();
-      assert.strictEqual('webp', metadata.format);
-      assert.strictEqual('object', typeof metadata.xmp);
-      assert.strictEqual(true, metadata.xmp instanceof Buffer);
-
-      const xmpString = metadata.xmp.toString();
-      assert.strictEqual(true, xmpString.includes('WebP Creator'));
-      assert.strictEqual(true, xmpString.includes('image/webp'));
+      t.assert.deepStrictEqual(collect(metadata, {
+        format: 'format',
+        xmpType: (value) => typeof value.xmp,
+        xmpBuffer: (value) => Buffer.isBuffer(value.xmp),
+        includesCreator: (value) => value.xmp.toString().includes('WebP Creator'),
+        includesWebp: (value) => value.xmp.toString().includes('image/webp')
+      }), {
+        format: 'webp',
+        xmpType: 'object',
+        xmpBuffer: true,
+        includesCreator: true,
+        includesWebp: true
+      });
     });
 
-    it('withXmp XMP validation - non-string input', () => {
-      assert.throws(
-        () => sharp().withXmp(123),
-        /Expected non-empty string for xmp but received 123 of type number/
-      );
+    test('withXmp XMP validation - non-string input', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withXmp(123), /Expected non-empty string for xmp but received 123 of type number/);
     });
 
-    it('withXmp XMP validation - null input', () => {
-      assert.throws(
-        () => sharp().withXmp(null),
-        /Expected non-empty string for xmp but received null of type object/
-      );
+    test('withXmp XMP validation - null input', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withXmp(null), /Expected non-empty string for xmp but received null of type object/);
     });
 
-    it('withXmp XMP validation - empty string', () => {
-      assert.throws(
-        () => sharp().withXmp(''),
-        /Expected non-empty string for xmp/
-      );
+    test('withXmp XMP validation - empty string', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withXmp(''), /Expected non-empty string for xmp/);
     });
   });
 
-  describe('Invalid parameters', () => {
-    it('String orientation', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ orientation: 'zoinks' });
-      });
+  suite('Invalid parameters', () => {
+    test('String orientation', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ orientation: 'zoinks' }));
     });
-    it('Negative orientation', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ orientation: -1 });
-      });
+    test('Negative orientation', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ orientation: -1 }));
     });
-    it('Zero orientation', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ orientation: 0 });
-      });
+    test('Zero orientation', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ orientation: 0 }));
     });
-    it('Too large orientation', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ orientation: 9 });
-      });
+    test('Too large orientation', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ orientation: 9 }));
     });
-    it('Non-numeric density', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ density: '1' });
-      });
+    test('Non-numeric density', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ density: '1' }));
     });
-    it('Negative density', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ density: -1 });
-      });
+    test('Negative density', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ density: -1 }));
     });
-    it('Non string icc', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ icc: true });
-      });
+    test('Non string icc', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ icc: true }));
     });
-    it('Non object exif', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ exif: false });
-      });
+    test('Non object exif', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ exif: false }));
     });
-    it('Non string value in object exif', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ exif: { ifd0: false } });
-      });
+    test('Non string value in object exif', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ exif: { ifd0: false } }));
     });
-    it('Non string value in nested object exif', () => {
-      assert.throws(() => {
-        sharp().withMetadata({ exif: { ifd0: { fail: false } } });
-      });
+    test('Non string value in nested object exif', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ exif: { ifd0: { fail: false } } }));
     });
-    it('withIccProfile invalid profile', () => {
-      assert.throws(
-        () => sharp().withIccProfile(false),
-        /Expected string for icc but received false of type boolean/
-      );
+    test('withIccProfile invalid profile', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withIccProfile(false), /Expected string for icc but received false of type boolean/);
     });
-    it('withIccProfile missing attach', () => {
-      assert.doesNotThrow(
-        () => sharp().withIccProfile('test', {})
-      );
+    test('withIccProfile missing attach', (t) => {
+      t.plan(1);
+      t.assert.doesNotThrow(() => sharp().withIccProfile('test', {}));
     });
-    it('withIccProfile invalid attach', () => {
-      assert.throws(
-        () => sharp().withIccProfile('test', { attach: 1 }),
-        /Expected boolean for attach but received 1 of type number/
-      );
+    test('withIccProfile invalid attach', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withIccProfile('test', { attach: 1 }), /Expected boolean for attach but received 1 of type number/);
+    });
+    test('withDensity missing density', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withDensity(), /Expected positive number for density but received undefined of type undefined/);
+    });
+    test('withDensity invalid density', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withDensity('invalid'), /Expected positive number for density but received invalid of type string/);
     });
   });
 });

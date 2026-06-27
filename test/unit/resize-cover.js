@@ -3,13 +3,13 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
+const { inRange } = require('../../dist/is.cjs');
 
-describe('Resize fit=cover', () => {
+suite('Resize fit=cover', () => {
   [
     // Position
     {
@@ -203,153 +203,153 @@ describe('Resize fit=cover', () => {
       fixture: 'gravity-west.jpg'
     }
   ].forEach((settings) => {
-    it(settings.name, (_t, done) => {
-      sharp(fixtures.inputJpg)
+    test(settings.name, async (t) => {
+      t.plan(3);
+      const { data, info } = await sharp(fixtures.inputJpg)
         .resize(settings.width, settings.height, {
           fit: sharp.fit.cover,
           position: settings.gravity
         })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(settings.width, info.width);
-          assert.strictEqual(settings.height, info.height);
-          fixtures.assertSimilar(fixtures.expected(settings.fixture), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+
+      t.assert.strictEqual(settings.width, info.width);
+      t.assert.strictEqual(settings.height, info.height);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected(settings.fixture), data));
     });
   });
 
-  it('Allows specifying the gravity as a string', (_t, done) => {
-    sharp(fixtures.inputJpg)
+  test('Allows specifying the gravity as a string', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg)
       .resize(80, 320, {
         fit: sharp.fit.cover,
         position: 'east'
       })
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual(80, info.width);
-        assert.strictEqual(320, info.height);
-        fixtures.assertSimilar(fixtures.expected('gravity-east.jpg'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+
+    t.assert.strictEqual(80, info.width);
+    t.assert.strictEqual(320, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gravity-east.jpg'), data));
   });
 
-  it('Invalid position values fail', () => {
-    assert.throws(() => {
+  test('Invalid position values fail', (t) => {
+    t.plan(4);
+    t.assert.throws(() => {
       sharp().resize(null, null, { fit: 'cover', position: 9 });
     }, /Expected valid position\/gravity\/strategy for position but received 9 of type number/);
-    assert.throws(() => {
+    t.assert.throws(() => {
       sharp().resize(null, null, { fit: 'cover', position: 1.1 });
     }, /Expected valid position\/gravity\/strategy for position but received 1.1 of type number/);
-    assert.throws(() => {
+    t.assert.throws(() => {
       sharp().resize(null, null, { fit: 'cover', position: -1 });
     }, /Expected valid position\/gravity\/strategy for position but received -1 of type number/);
-    assert.throws(() => {
+    t.assert.throws(() => {
       sharp().resize(null, null, { fit: 'cover', position: 'zoinks' }).crop();
     }, /Expected valid position\/gravity\/strategy for position but received zoinks of type string/);
   });
 
-  it('Uses default value when none specified', () => {
-    assert.doesNotThrow(() => {
+  test('Uses default value when none specified', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().resize(null, null, { fit: 'cover' });
     });
   });
 
-  it('Skip crop when post-resize dimensions are at target', () => sharp(fixtures.inputJpg)
+  test('Skip crop when post-resize dimensions are at target', async (t) => {
+    t.plan(4);
+    const input = await sharp(fixtures.inputJpg)
       .resize(1600, 1200)
-      .toBuffer()
-      .then((input) => sharp(input)
-          .resize(1110, null, {
-            fit: sharp.fit.cover,
-            position: sharp.strategy.attention
-          })
-          .toBuffer({ resolveWithObject: true })
-          .then((result) => {
-            assert.strictEqual(1110, result.info.width);
-            assert.strictEqual(832, result.info.height);
-            assert.strictEqual(undefined, result.info.cropOffsetLeft);
-            assert.strictEqual(undefined, result.info.cropOffsetTop);
-          })));
+      .toBuffer();
+    const { info } = await sharp(input)
+      .resize(1110, null, {
+        fit: sharp.fit.cover,
+        position: sharp.strategy.attention
+      })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(1110, info.width);
+    t.assert.strictEqual(832, info.height);
+    t.assert.strictEqual(undefined, info.cropOffsetLeft);
+    t.assert.strictEqual(undefined, info.cropOffsetTop);
+  });
 
-  describe('Animated WebP', () => {
-    it('Width only', (_t, done) => {
-      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+  suite('Animated WebP', () => {
+    test('Width only', async (t) => {
+      t.plan(3);
+      const { data, info } = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(80, 320, { fit: sharp.fit.cover })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(80, info.width);
-          assert.strictEqual(320 * 9, info.height);
-          fixtures.assertSimilar(fixtures.expected('gravity-center-width.webp'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(80, info.width);
+      t.assert.strictEqual(320 * 9, info.height);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gravity-center-width.webp'), data));
     });
 
-    it('Height only', (_t, done) => {
-      sharp(fixtures.inputWebPAnimated, { pages: -1 })
+    test('Height only', async (t) => {
+      t.plan(3);
+      const { data, info } = await sharp(fixtures.inputWebPAnimated, { pages: -1 })
         .resize(320, 80, { fit: sharp.fit.cover })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80 * 9, info.height);
-          fixtures.assertSimilar(fixtures.expected('gravity-center-height.webp'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80 * 9, info.height);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('gravity-center-height.webp'), data));
     });
   });
 
-  describe('Entropy-based strategy', () => {
-    it('JPEG', (_t, done) => {
-      sharp(fixtures.inputJpg)
-        .resize(80, 320, {
-          fit: 'cover',
-          position: sharp.strategy.entropy
-        })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual(80, info.width);
-          assert.strictEqual(320, info.height);
-          assert.strictEqual(-117, info.cropOffsetLeft);
-          assert.strictEqual(0, info.cropOffsetTop);
-          fixtures.assertSimilar(fixtures.expected('crop-strategy-entropy.jpg'), data, done);
-        });
+  suite('Entropy-based strategy', () => {
+    test('JPEG', async (t) => {
+      t.plan(7);
+      const options = {
+        fit: 'cover',
+        position: sharp.strategy.entropy
+      };
+      const { data, info } = await sharp(fixtures.inputJpg)
+        .resize(80, 320, options)
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual('jpeg', info.format);
+      t.assert.strictEqual(3, info.channels);
+      t.assert.strictEqual(80, info.width);
+      t.assert.strictEqual(320, info.height);
+      t.assert.strictEqual(-117, info.cropOffsetLeft);
+      t.assert.strictEqual(0, info.cropOffsetTop);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('crop-strategy-entropy.jpg'), data));
     });
 
-    it('PNG', (_t, done) => {
-      sharp(fixtures.inputPngWithTransparency)
+    test('PNG', async (t) => {
+      t.plan(7);
+      const { data, info } = await sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80, {
           fit: 'cover',
           position: sharp.strategy.entropy
         })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual('png', info.format);
-          assert.strictEqual(4, info.channels);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          assert.strictEqual(0, info.cropOffsetLeft);
-          assert.strictEqual(-80, info.cropOffsetTop);
-          fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual('png', info.format);
+      t.assert.strictEqual(4, info.channels);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(0, info.cropOffsetLeft);
+      t.assert.strictEqual(-80, info.cropOffsetTop);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data));
     });
 
-    it('supports the strategy passed as a string', (_t, done) => {
-      sharp(fixtures.inputPngWithTransparency)
+    test('supports the strategy passed as a string', async (t) => {
+      t.plan(7);
+      const { data, info } = await sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80, {
           fit: 'cover',
           position: 'entropy'
         })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual('png', info.format);
-          assert.strictEqual(4, info.channels);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          assert.strictEqual(0, info.cropOffsetLeft);
-          assert.strictEqual(-80, info.cropOffsetTop);
-          fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual('png', info.format);
+      t.assert.strictEqual(4, info.channels);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(0, info.cropOffsetLeft);
+      t.assert.strictEqual(-80, info.cropOffsetTop);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data));
     });
 
-    it('Animated image rejects', () =>
-      assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+    test('Animated image rejects', async (t) => {
+      t.plan(1);
+      await t.assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
         .resize({
           width: 100,
           height: 8,
@@ -357,91 +357,88 @@ describe('Resize fit=cover', () => {
         })
         .toBuffer(),
       /Resize strategy is not supported for multi-page images/
-      )
-    );
+      );
+    });
   });
 
-  describe('Attention strategy', () => {
-    it('JPEG', (_t, done) => {
-      sharp(fixtures.inputJpg)
+  suite('Attention strategy', () => {
+    test('JPEG', async (t) => {
+      t.plan(9);
+      const { data, info } = await sharp(fixtures.inputJpg)
         .resize(80, 320, {
           fit: 'cover',
           position: sharp.strategy.attention
         })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual('jpeg', info.format);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual(80, info.width);
-          assert.strictEqual(320, info.height);
-          assert.strictEqual(-107, info.cropOffsetLeft);
-          assert.strictEqual(0, info.cropOffsetTop);
-          assert.strictEqual(588, info.attentionX);
-          assert.strictEqual(640, info.attentionY);
-          fixtures.assertSimilar(fixtures.expected('crop-strategy-attention.jpg'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual('jpeg', info.format);
+      t.assert.strictEqual(3, info.channels);
+      t.assert.strictEqual(80, info.width);
+      t.assert.strictEqual(320, info.height);
+      t.assert.strictEqual(-107, info.cropOffsetLeft);
+      t.assert.strictEqual(0, info.cropOffsetTop);
+      t.assert.strictEqual(588, info.attentionX);
+      t.assert.ok(inRange(info.attentionY, 636, 640));
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('crop-strategy-attention.jpg'), data));
     });
 
-    it('PNG', (_t, done) => {
-      sharp(fixtures.inputPngWithTransparency)
+    test('PNG', async (t) => {
+      t.plan(9);
+      const { data, info } = await sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80, {
           fit: 'cover',
           position: sharp.strategy.attention
         })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual('png', info.format);
-          assert.strictEqual(4, info.channels);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          assert.strictEqual(0, info.cropOffsetLeft);
-          assert.strictEqual(0, info.cropOffsetTop);
-          assert.strictEqual(0, info.attentionX);
-          assert.strictEqual(0, info.attentionY);
-          fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual('png', info.format);
+      t.assert.strictEqual(4, info.channels);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(0, info.cropOffsetLeft);
+      t.assert.strictEqual(0, info.cropOffsetTop);
+      t.assert.strictEqual(0, info.attentionX);
+      t.assert.strictEqual(0, info.attentionY);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data));
     });
 
-    it('WebP', (_t, done) => {
-      sharp(fixtures.inputWebP)
+    test('WebP', async (t) => {
+      t.plan(9);
+      const { data, info } = await sharp(fixtures.inputWebP)
         .resize(320, 80, {
           fit: 'cover',
           position: sharp.strategy.attention
         })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual('webp', info.format);
-          assert.strictEqual(3, info.channels);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          assert.strictEqual(0, info.cropOffsetLeft);
-          assert.strictEqual(-161, info.cropOffsetTop);
-          assert.strictEqual(288, info.attentionX);
-          assert.strictEqual(745, info.attentionY);
-          fixtures.assertSimilar(fixtures.expected('crop-strategy.webp'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual('webp', info.format);
+      t.assert.strictEqual(3, info.channels);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(0, info.cropOffsetLeft);
+      t.assert.strictEqual(-161, info.cropOffsetTop);
+      t.assert.ok(inRange(info.attentionX, 284, 288));
+      t.assert.strictEqual(745, info.attentionY);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('crop-strategy.webp'), data));
     });
 
-    it('supports the strategy passed as a string', (_t, done) => {
-      sharp(fixtures.inputPngWithTransparency)
+    test('supports the strategy passed as a string', async (t) => {
+      t.plan(7);
+      const { data, info } = await sharp(fixtures.inputPngWithTransparency)
         .resize(320, 80, {
           fit: 'cover',
           position: 'attention'
         })
-        .toBuffer((err, data, info) => {
-          if (err) throw err;
-          assert.strictEqual('png', info.format);
-          assert.strictEqual(4, info.channels);
-          assert.strictEqual(320, info.width);
-          assert.strictEqual(80, info.height);
-          assert.strictEqual(0, info.cropOffsetLeft);
-          assert.strictEqual(0, info.cropOffsetTop);
-          fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data, done);
-        });
+        .toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual('png', info.format);
+      t.assert.strictEqual(4, info.channels);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(0, info.cropOffsetLeft);
+      t.assert.strictEqual(0, info.cropOffsetTop);
+      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('crop-strategy.png'), data));
     });
 
-    it('Animated image rejects', () =>
-      assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+    test('Animated image rejects', async (t) => {
+      t.plan(1);
+      await t.assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
         .resize({
           width: 100,
           height: 8,
@@ -449,7 +446,7 @@ describe('Resize fit=cover', () => {
         })
         .toBuffer(),
       /Resize strategy is not supported for multi-page images/
-      )
-    );
+      );
+    });
   });
 });

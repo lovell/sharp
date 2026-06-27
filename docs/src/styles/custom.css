@@ -37,9 +37,11 @@ blockquote {
   padding: 1rem;
 }
 
-.site-title::after {
-  content: "High performance Node.js image processing";
-  color: var(--sl-color-text);
-  font-size: var(--sl-text-sm);
-  padding-top: 0.3rem;
+@media (min-width: 50rem) {
+  .site-title::after {
+    content: "High performance Node.js image processing";
+    color: var(--sl-color-text);
+    font-size: var(--sl-text-sm);
+    padding-top: 0.3rem;
+  }
 }

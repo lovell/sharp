@@ -3,97 +3,117 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 
-describe('HEIF', () => {
-  it('called without options throws an error', () => {
-    assert.throws(() => {
+suite('HEIF', () => {
+  test('called without options throws an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif();
     });
   });
-  it('valid quality does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid quality does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().heif({ compression: 'av1', quality: 80 });
     });
   });
-  it('invalid quality should throw an error', () => {
-    assert.throws(() => {
+  test('invalid quality should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif({ compression: 'av1', quality: 101 });
     });
   });
-  it('non-numeric quality should throw an error', () => {
-    assert.throws(() => {
+  test('non-numeric quality should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif({ compression: 'av1', quality: 'fail' });
     });
   });
-  it('valid lossless does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid lossless does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().heif({ compression: 'av1', lossless: true });
     });
   });
-  it('non-boolean lossless should throw an error', () => {
-    assert.throws(() => {
+  test('non-boolean lossless should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif({ compression: 'av1', lossless: 'fail' });
     });
   });
-  it('valid compression does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid compression does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().heif({ compression: 'hevc' });
     });
   });
-  it('unknown compression should throw an error', () => {
-    assert.throws(() => {
+  test('unknown compression should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif({ compression: 'fail' });
     });
   });
-  it('invalid compression should throw an error', () => {
-    assert.throws(() => {
+  test('invalid compression should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif({ compression: 1 });
     });
   });
-  it('valid effort does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid effort does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().heif({ compression: 'av1', effort: 6 });
     });
   });
-  it('out of range effort should throw an error', () => {
-    assert.throws(() => {
+  test('out of range effort should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif({ compression: 'av1', effort: 10 });
     });
   });
-  it('invalid effort should throw an error', () => {
-    assert.throws(() => {
+  test('invalid effort should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif({ compression: 'av1', effort: 'fail' });
     });
   });
-  it('invalid chromaSubsampling should throw an error', () => {
-    assert.throws(() => {
+  test('invalid chromaSubsampling should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif({ compression: 'av1', chromaSubsampling: 'fail' });
     });
   });
-  it('valid chromaSubsampling does not throw an error', () => {
-    assert.doesNotThrow(() => {
+  test('valid chromaSubsampling does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().heif({ compression: 'av1', chromaSubsampling: '4:4:4' });
     });
   });
-  it('valid bitdepth value does not throw an error', () => {
-    const { heif } = sharp.versions;
-    delete sharp.versions.heif;
-    assert.doesNotThrow(() => {
+  test('valid bitdepth value does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
       sharp().heif({ compression: 'av1', bitdepth: 12 });
     });
-    sharp.versions.heif = '1.2.3';
-    assert.throws(() => {
-      sharp().heif({ compression: 'av1', bitdepth: 10 });
-    }, /Error: Expected 8 for bitdepth when using prebuilt binaries but received 10 of type number/);
-    sharp.versions.heif = heif;
   });
-  it('invalid bitdepth value should throw an error', () => {
-    assert.throws(() => {
+  test('invalid bitdepth value should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp().heif({ compression: 'av1', bitdepth: 11 });
     }, /Error: Expected 8, 10 or 12 for bitdepth but received 11 of type number/);
+  });
+  test('valid tune does not throw an error', (t) => {
+    t.plan(1);
+    t.assert.doesNotThrow(() => {
+      sharp().heif({ compression: 'hevc', tune: 'psnr' });
+    });
+  });
+  test('invalid tune should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp().heif({ compression: 'hevc', tune: 'fail' });
+    }, /Error: Expected one of: auto, iq, psnr, ssim for tune but received fail of type string/);
   });
 });

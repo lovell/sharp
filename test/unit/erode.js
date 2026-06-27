@@ -1,37 +1,42 @@
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Erode', () => {
-  it('erode 1 png', (_t, done) => {
-    sharp(fixtures.inputPngDotAndLines)
+suite('Erode', () => {
+  test('erode 1 png', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngDotAndLines)
       .erode(1)
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(100, info.width);
-        assert.strictEqual(100, info.height);
-        fixtures.assertSimilar(fixtures.expected('erode-1.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(100, info.width);
+    t.assert.strictEqual(100, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('erode-1.png'), data));
   });
 
-  it('erode 1 png - default width', (_t, done) => {
-    sharp(fixtures.inputPngDotAndLines)
+  test('erode 1 png - default width', async (t) => {
+    t.plan(4);
+    const { data, info } = await sharp(fixtures.inputPngDotAndLines)
       .erode()
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        assert.strictEqual('png', info.format);
-        assert.strictEqual(100, info.width);
-        assert.strictEqual(100, info.height);
-        fixtures.assertSimilar(fixtures.expected('erode-1.png'), data, done);
-      });
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('png', info.format);
+    t.assert.strictEqual(100, info.width);
+    t.assert.strictEqual(100, info.height);
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('erode-1.png'), data));
   });
 
-  it('invalid erosion width', () => {
-    assert.throws(() => {
+  test('invalid erosion width', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
       sharp(fixtures.inputJpg).erode(-1);
+    });
+  });
+
+  test('oversized erosion width is rejected', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp(fixtures.inputJpg).erode(2147483648);
     });
   });
 });

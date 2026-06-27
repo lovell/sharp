@@ -20,10 +20,6 @@ npm install sharp
 pnpm add sharp
 ```
 
-When using `pnpm`, add `sharp` to
-[ignoredBuiltDependencies](https://pnpm.io/settings#ignoredbuiltdependencies)
-to silence warnings.
-
 ```sh frame="none"
 yarn add sharp
 ```
@@ -39,7 +35,7 @@ deno run --allow-env --allow-ffi --allow-read --allow-sys ...
 
 ## Prerequisites
 
-* Node-API v9 compatible runtime e.g. Node.js ^18.17.0 or >=20.3.0.
+* Node-API v9 compatible runtime e.g. Node.js >= 20.9.0.
 
 ## Prebuilt binaries
 
@@ -47,18 +43,19 @@ Ready-compiled sharp and libvips binaries are provided for use on the most commo
 
 * macOS x64 (>= 10.15)
 * macOS ARM64
-* Linux ARM (glibc >= 2.31)
-* Linux ARM64 (glibc >= 2.26, musl >= 1.2.2)
+* Linux ARM (glibc >= 2.36)
+* Linux ARM64 (glibc >= 2.28, musl >= 1.2.5)
 * Linux RISC-V 64-bit (glibc >= 2.41)
 * Linux ppc64 (glibc >= 2.36)
 * Linux s390x (glibc >= 2.36)
-* Linux x64 (glibc >= 2.26, musl >= 1.2.2, CPU with SSE4.2)
+* Linux x64 (glibc >= 2.28, musl >= 1.2.5, CPU with SSE4.2)
 * Windows x64
-* Windows x86
-* Windows ARM64 (experimental, CPU with ARMv8.4 required for all features)
+* Windows x86 (deprecated, Node.js 20 only)
+* Windows ARM64
+* FreeBSD (WebAssembly)
 
 This provides support for the
-JPEG, PNG, WebP, AVIF (limited to 8-bit depth), TIFF, GIF and SVG (input) image formats.
+JPEG, PNG, Ultra HDR, WebP, AVIF, TIFF, GIF and SVG (input) image formats.
 
 ## Cross-platform
 
@@ -112,13 +109,13 @@ and on macOS when running Node.js under Rosetta.
 
 ## Building from source
 
-This module will be compiled from source when:
+```sh frame="none"
+npm install sharp
+npm explore sharp -- npm run build
+```
 
-* a globally-installed libvips is detected, or
-* using `npm explore sharp -- npm run build`, or
-* using the deprecated `npm run --build-from-source` at `npm install` time.
-
-The logic to detect a globally-installed libvips can be skipped by setting the
+The build process will search for a globally-installed libvips.
+This detection logic can be skipped by setting the
 `SHARP_IGNORE_GLOBAL_LIBVIPS` (never try to use it) or
 `SHARP_FORCE_GLOBAL_LIBVIPS` (always try to use it, even when missing or outdated)
 environment variables.
@@ -129,48 +126,25 @@ Building from source requires:
 * [node-addon-api](https://www.npmjs.com/package/node-addon-api) version 7+
 * [node-gyp](https://github.com/nodejs/node-gyp#installation) version 9+ and its dependencies
 
-There is an install-time check for these dependencies.
 If `node-addon-api` or `node-gyp` cannot be found, try adding them via:
 
 ```sh frame="none"
 npm install --save node-addon-api node-gyp
 ```
 
-When using `pnpm`, you may need to add `sharp` to
-[onlyBuiltDependencies](https://pnpm.io/settings#onlybuiltdependencies)
-to ensure the installation script can be run.
-
-For cross-compiling, the `--platform`, `--arch` and `--libc` npm flags
-(or the `npm_config_platform`, `npm_config_arch` and `npm_config_libc` environment variables)
-can be used to configure the target environment.
-
 ## WebAssembly
 
-Experimental support is provided for runtime environments that provide
-multi-threaded Wasm via Workers.
-
-Use in web browsers is unsupported.
-
-Native text rendering is unsupported.
-
-[Tile-based output](/api-output#tile) is unsupported.
+Runtime environments that provide multi-threaded Wasm via Workers are supported
+by the optional `@img/sharp-wasm32` package.
 
 ```sh frame="none"
-npm install --cpu=wasm32 sharp
+npm install sharp @img/sharp-wasm32
 ```
 
-## FreeBSD
-
-The `vips` package must be installed before `npm install` is run,
-as well as the additional [building from source](#building-from-source) dependencies.
-
-```sh frame="none"
-pkg install -y pkgconf vips
-```
-
-```sh frame="none"
-cd /usr/ports/graphics/vips/ && make install clean
-```
+* Use in web browsers is unsupported.
+* Use in single-threaded environments is unsupported.
+* Native text rendering is unsupported.
+* [Tile-based output](/api-output#tile) is unsupported.
 
 ## Linux memory allocator
 
@@ -202,6 +176,12 @@ and how to configure it.
 
 Some package managers use symbolic links
 but AWS Lambda does not support these within deployment packages.
+
+An alternative approach is to use a well-maintained, third-party Lambda Layer:
+
+- [cbschuld/sharp-aws-lambda-layer](https://github.com/cbschuld/sharp-aws-lambda-layer)
+- [pH200/sharp-layer](https://github.com/pH200/sharp-layer)
+- [zoellner/sharp-heic-lambda-layer](https://github.com/zoellner/sharp-heic-lambda-layer)
 
 To get the best performance select the largest memory available.
 A 1536 MB function provides ~12x more CPU time than a 128 MB function.
@@ -359,3 +339,15 @@ If both `canvas` and `sharp` modules are used in the same Windows process, the f
 ```
 The specified procedure could not be found.
 ```
+
+### Electron and Linux
+
+Binaries provided by Electron for use on Linux dynamically link against a globally-installed `glib`
+and leak its symbols into the process space, which may cause the following error to occur:
+```
+GLib-GObject: g_object_ref: assertion 'G_IS_OBJECT (object)' failed
+GLib-GObject: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
+```
+Please subscribe to
+[electron#46323](https://github.com/electron/electron/issues/46323)
+for updates.

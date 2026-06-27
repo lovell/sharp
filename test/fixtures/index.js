@@ -4,8 +4,10 @@
 */
 
 const path = require('node:path');
+const { endianness } = require('node:os');
+
 const sharp = require('../../');
-const maxColourDistance = require('../../lib/sharp')._maxColourDistance;
+const maxColourDistance = require('../../dist/sharp.cjs')._maxColourDistance;
 
 // Helpers
 const getPath = (filename) => path.join(__dirname, filename);
@@ -15,7 +17,7 @@ const getPath = (filename) => path.join(__dirname, filename);
 async function fingerprint (image) {
   return sharp(image)
     .flatten('gray')
-    .greyscale()
+    .grayscale()
     .normalise()
     .resize(9, 8, { fit: sharp.fit.fill })
     .raw()
@@ -70,9 +72,11 @@ module.exports = {
   inputJpgRandom: getPath('random.jpg'), // convert -size 200x200 xc:   +noise Random   random.jpg
   inputJpgThRandom: getPath('thRandom.jpg'), // convert random.jpg  -channel G -threshold 5% -separate +channel -negate thRandom.jpg
   inputJpgLossless: getPath('testimgl.jpg'), // Lossless JPEG from ftp://ftp.fu-berlin.de/unix/X11/graphics/ImageMagick/delegates/ljpeg-6b.tar.gz
+  inputJpgWithGainMap: getPath('gain-map.jpg'), // https://github.com/libvips/libvips/issues/3799
 
   inputPng: getPath('50020484-00001.png'), // http://c.searspartsdirect.com/lis_png/PLDM/50020484-00001.png
   inputPngGradients: getPath('gradients-rgb8.png'),
+  inputPngWithSlightGradientBorder: getPath('slight-gradient-border.png'),
   inputPngWithTransparency: getPath('blackbug.png'), // public domain
   inputPngCompleteTransparency: getPath('full-transparent.png'),
   inputPngWithGreyAlpha: getPath('grey-8bit-alpha.png'),
@@ -125,7 +129,7 @@ module.exports = {
   inputSvgSmallViewBox: getPath('circle.svg'),
   inputSvgWithEmbeddedImages: getPath('struct-image-04-t.svg'), // https://dev.w3.org/SVG/profiles/1.2T/test/svg/struct-image-04-t.svg
   inputAvif: getPath('sdr_cosmos12920_cicp1-13-6_yuv444_full_qp10.avif'), // CC by-nc-nd https://github.com/AOMediaCodec/av1-avif/tree/master/testFiles/Netflix
-
+  inputAvifWithPitmBox: getPath('pitm.avif'), // https://github.com/lovell/sharp/issues/4487
   inputJPGBig: getPath('flowers.jpeg'),
 
   inputPngDotAndLines: getPath('dot-and-lines.png'),
@@ -142,6 +146,13 @@ module.exports = {
   testPattern: getPath('test-pattern.png'),
 
   inputPngWithTransparent: getPath('d.png'),
+
+  // Font bundled to keep text rendering deterministic across platforms
+  fontFile: getPath('NotoSans-Regular.ttf'), // SIL Open Font License 1.1 - https://fonts.google.com/noto/specimen/Noto+Sans
+  fontFamily: 'Noto Sans',
+
+  isLittleEndian: endianness() === 'LE',
+
   // Path for tests requiring human inspection
   path: getPath,
 

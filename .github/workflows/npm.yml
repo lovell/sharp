@@ -46,10 +46,6 @@ jobs:
             runs-on: macos-15-intel
             runtime: node
             package-manager: npm
-          - name: darwin-x64-node-pnpm
-            runs-on: macos-15-intel
-            runtime: node
-            package-manager: pnpm
           - name: darwin-x64-node-yarn
             runs-on: macos-15-intel
             runtime: node
@@ -96,61 +92,65 @@ jobs:
     steps:
       - name: Install Node.js
         if: ${{ matrix.runtime == 'node' }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 20
+          cache: ""
+          package-manager-cache: false
       - name: Install pnpm
         if: ${{ matrix.package-manager == 'pnpm' }}
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         with:
-          version: 8
+          version: 11
       - name: Install Deno
         if: ${{ matrix.runtime == 'deno' }}
-        uses: denoland/setup-deno@v2
+        uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282 # v2.0.4
         with:
           deno-version: v2.x
       - name: Install Bun
         if: ${{ matrix.runtime == 'bun' }}
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: latest
+          no-cache: true
 
       - name: Version
         id: version
-        uses: actions/github-script@v8
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             core.setOutput('semver', context.ref.replace('refs/tags/v',''))
       - name: Create package.json
-        uses: DamianReeves/write-file-action@v1.3
-        with:
-          path: package.json
-          contents: |
-            {
-              "dependencies": {
-                "sharp": "${{ steps.version.outputs.semver }}"
-              },
-              "type": "module"
-            }
+        env:
+          SEMVER: ${{ steps.version.outputs.semver }}
+        run: |
+          cat <<EOF >package.json
+          {
+            "dependencies": {
+              "sharp": "${SEMVER}"
+            },
+            "type": "module"
+          }
+          EOF
       - name: Create release.mjs
-        uses: DamianReeves/write-file-action@v1.3
-        with:
-          path: release.mjs
-          contents: |
-            import { deepStrictEqual } from 'node:assert';
-            import sharp from 'sharp';
-            deepStrictEqual(['.jpg', '.jpeg', '.jpe', '.jfif'], sharp.format.jpeg.input.fileSuffix);
+        run: |
+          cat <<EOF >release.mjs
+          import { deepStrictEqual } from 'node:assert';
+          import sharp from 'sharp';
+          deepStrictEqual(['.jpg', '.jpeg', '.jpe', '.jfif'], sharp.format.jpeg.input.fileSuffix);
+          EOF
 
       - name: Run with Node.js + npm
         if: ${{ matrix.package-manager == 'npm' }}
         run: |
-          npm install --ignore-scripts
+          npm install
           node release.mjs
 
       - name: Run with Node.js + pnpm
         if: ${{ matrix.package-manager == 'pnpm' }}
         run: |
-          pnpm install --ignore-scripts
+          pnpm config set minimumReleaseAge 0 --location=user
+          pnpm install
           node release.mjs
 
       - name: Run with Node.js + yarn
@@ -161,6 +161,7 @@ jobs:
           yarn config set enableImmutableInstalls false
           yarn config set enableScripts false
           yarn config set nodeLinker node-modules
+          yarn config set npmMinimalAgeGate 0
           yarn install
           node release.mjs
 
@@ -172,6 +173,7 @@ jobs:
           yarn config set enableImmutableInstalls false
           yarn config set enableScripts false
           yarn config set nodeLinker pnp
+          yarn config set npmMinimalAgeGate 0
           yarn install
           yarn node release.mjs
 

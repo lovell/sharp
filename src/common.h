@@ -18,15 +18,21 @@
 // Verify platform and compiler compatibility
 
 #if (VIPS_MAJOR_VERSION < 8) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 17) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 17 && VIPS_MICRO_VERSION < 3)
-#error "libvips version 8.17.3+ is required - please see https://sharp.pixelplumbing.com/install"
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 18) || \
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 18 && VIPS_MICRO_VERSION < 3)
+#error "libvips version 8.18.3+ is required - please see https://sharp.pixelplumbing.com/install"
 #endif
 
 #if defined(__has_include)
 #if !__has_include(<filesystem>)
 #error "C++17 compiler required - please see https://sharp.pixelplumbing.com/install"
 #endif
+#endif
+
+#ifdef __EMSCRIPTEN__
+#define SHARP_CALLBACK_FN_NAME Call
+#else
+#define SHARP_CALLBACK_FN_NAME MakeCallback
 #endif
 
 using vips::VImage;
@@ -40,6 +46,7 @@ namespace sharp {
     char *buffer;
     VipsFailOn failOn;
     uint64_t limitInputPixels;
+    uint64_t limitInputChannels;
     bool unlimited;
     VipsAccess access;
     size_t bufferLength;
@@ -92,6 +99,7 @@ namespace sharp {
       buffer(nullptr),
       failOn(VIPS_FAIL_ON_WARNING),
       limitInputPixels(0x3FFF * 0x3FFF),
+      limitInputChannels(5),
       unlimited(false),
       access(VIPS_ACCESS_SEQUENTIAL),
       bufferLength(0),
@@ -105,7 +113,7 @@ namespace sharp {
       rawPremultiplied(false),
       rawPageHeight(0),
       pages(1),
-      page(0),
+      page(-1),
       createChannels(0),
       createWidth(0),
       createHeight(0),
@@ -173,6 +181,7 @@ namespace sharp {
     JXL,
     RAD,
     DCRAW,
+    UHDR,
     VIPS,
     RAW,
     UNKNOWN,
@@ -396,6 +405,16 @@ namespace sharp {
     Ensure decoding remains sequential.
   */
   VImage StaySequential(VImage image, bool condition = true);
+
+  /*
+    Does this image have a gain map?
+  */
+  bool HasGainMap(VImage image);
+
+  /*
+    Removes gain map, if any.
+  */
+  VImage RemoveGainMap(VImage image);
 
 }  // namespace sharp
 

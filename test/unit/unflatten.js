@@ -3,30 +3,31 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
+const { suite, test } = require('node:test');
+
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Unflatten', () => {
-  it('unflatten white background', (_t, done) => {
-    sharp(fixtures.inputPng).unflatten()
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('unflatten-white-transparent.png'), data, { threshold: 0 }, done);
-      });
+suite('Unflatten', () => {
+  test('unflatten white background', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputPng).unflatten().toBuffer();
+    await t.assert.doesNotReject(
+      () => fixtures.assertSimilar(fixtures.expected('unflatten-white-transparent.png'), data, { threshold: 0 })
+    );
   });
-  it('unflatten transparent image', (_t, done) => {
-    sharp(fixtures.inputPngTrimSpecificColourIncludeAlpha).unflatten()
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('unflatten-flag-white-transparent.png'), data, { threshold: 0 }, done);
-      });
+  test('unflatten transparent image', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputPngTrimSpecificColourIncludeAlpha).unflatten().toBuffer();
+    await t.assert.doesNotReject(
+      () => fixtures.assertSimilar(fixtures.expected('unflatten-flag-white-transparent.png'), data, { threshold: 0 })
+    );
   });
-  it('unflatten using threshold', (_t, done) => {
-    sharp(fixtures.inputPngPalette).unflatten().threshold(128, { grayscale: false })
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('unflatten-swiss.png'), data, { threshold: 1 }, done);
-      });
+  test('unflatten using threshold', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputPngPalette).unflatten().threshold(128, { grayscale: false }).toBuffer();
+    await t.assert.doesNotReject(
+      () => fixtures.assertSimilar(fixtures.expected('unflatten-swiss.png'), data, { threshold: 1 })
+    );
   });
 });

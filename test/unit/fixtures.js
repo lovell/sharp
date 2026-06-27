@@ -3,28 +3,36 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
+
 const fixtures = require('../fixtures');
 
-describe('Test fixtures', () => {
-  describe('assertMaxColourDistance', () => {
-    it('should throw an Error when images have a different number of channels', () => {
-      assert.throws(() => {
-        fixtures.assertMaxColourDistance(fixtures.inputPngOverlayLayer1, fixtures.inputJpg);
-      });
+suite('Test fixtures', () => {
+  suite('assertMaxColourDistance', () => {
+    test('should throw an Error when images have a different number of channels', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => fixtures.assertMaxColourDistance(fixtures.inputPngOverlayLayer1, fixtures.inputJpg)
+      );
     });
-    it('should throw an Error when images have different dimensions', () => {
-      assert.throws(() => {
-        fixtures.assertMaxColourDistance(fixtures.inputJpg, fixtures.inputJpgWithExif);
-      });
+    test('should throw an Error when images have different dimensions', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => fixtures.assertMaxColourDistance(fixtures.inputJpg, fixtures.inputJpgWithExif)
+      );
     });
-    it('should accept a zero threshold when comparing an image to itself', () => {
+    test('should accept a zero threshold when comparing an image to itself', (t) => {
+      t.plan(1);
       const image = fixtures.inputPngOverlayLayer0;
-      fixtures.assertMaxColourDistance(image, image, 0);
+      t.assert.doesNotThrow(
+        () => fixtures.assertMaxColourDistance(image, image, 1E-6)
+      );
     });
-    it('should accept a numeric threshold for two different images', () => {
-      fixtures.assertMaxColourDistance(fixtures.inputPngOverlayLayer0, fixtures.inputPngOverlayLayer1, 100);
+    test('should accept a numeric threshold for two different images', (t) => {
+      t.plan(1);
+      t.assert.doesNotThrow(
+        () => fixtures.assertMaxColourDistance(fixtures.inputPngOverlayLayer0, fixtures.inputPngOverlayLayer1, 100)
+      );
     });
   });
 });

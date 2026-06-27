@@ -3,185 +3,210 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert');
+const { suite, test } = require('node:test');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
-describe('Affine transform', () => {
-  describe('Invalid input', () => {
-    it('Missing matrix', () => {
-      assert.throws(() => {
+suite('Affine transform', () => {
+  suite('Invalid input', () => {
+    test('Missing matrix', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine();
       });
     });
-    it('Invalid 1d matrix', () => {
-      assert.throws(() => {
+    test('Invalid 1d matrix', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine(['123', 123, 123, 123]);
       });
     });
-    it('Invalid 2d matrix', () => {
-      assert.throws(() => {
+    test('Invalid 2d matrix', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine([[123, 123], [null, 123]]);
       });
     });
-    it('Invalid options parameter type', () => {
-      assert.throws(() => {
+    test('Ragged matrix flattening to a length of four', (t) => {
+      t.plan(2);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[1, 2, 3], [4]]);
+      }, /Expected 1x4 or 2x2 array for matrix/);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[1], [2], [3], [4]]);
+      }, /Expected 1x4 or 2x2 array for matrix/);
+    });
+    test('Invalid options parameter type', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine([[1, 0], [0, 1]], 'invalid options type');
       });
     });
-    it('Invalid background color', () => {
-      assert.throws(() => {
+    test('Invalid background color', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine([4, 4, 4, 4], { background: 'not a color' });
       });
     });
-    it('Invalid idx offset type', () => {
-      assert.throws(() => {
+    test('Invalid idx offset type', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine([[4, 4], [4, 4]], { idx: 'invalid idx type' });
       });
     });
-    it('Invalid idy offset type', () => {
-      assert.throws(() => {
+    test('Invalid idy offset type', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine([4, 4, 4, 4], { idy: 'invalid idy type' });
       });
     });
-    it('Invalid odx offset type', () => {
-      assert.throws(() => {
+    test('Invalid odx offset type', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine([[4, 4], [4, 4]], { odx: 'invalid odx type' });
       });
     });
-    it('Invalid ody offset type', () => {
-      assert.throws(() => {
+    test('Invalid ody offset type', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine([[4, 4], [4, 4]], { ody: 'invalid ody type' });
       });
     });
-    it('Invalid interpolator', () => {
-      assert.throws(() => {
+    test('Non-finite idx offset', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[4, 4], [4, 4]], { idx: Infinity });
+      });
+    });
+    test('Non-finite idy offset', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[4, 4], [4, 4]], { idy: -Infinity });
+      });
+    });
+    test('Invalid interpolator', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine([[4, 4], [4, 4]], { interpolator: 'cubic' });
       });
     });
   });
-  it('Applies identity matrix', done => {
+  test('Applies identity matrix', async (t) => {
+    t.plan(1);
     const input = fixtures.inputJpg;
-    sharp(input)
+    const data = await sharp(input)
       .affine([[1, 0], [0, 1]])
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(input, data, done);
-      });
+      .toBuffer();
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(input, data));
   });
-  it('Applies resize affine matrix', done => {
+  test('Applies resize affine matrix', async (t) => {
+    t.plan(3);
     const input = fixtures.inputJpg;
     const inputWidth = 2725;
     const inputHeight = 2225;
-    sharp(input)
+    const { data, info } = await sharp(input)
       .affine([[0.2, 0], [0, 1.5]])
-      .toBuffer((err, data, info) => {
-        if (err) throw err;
-        fixtures.assertSimilar(input, data, done);
-        assert.strictEqual(info.width, Math.ceil(inputWidth * 0.2));
-        assert.strictEqual(info.height, Math.ceil(inputHeight * 1.5));
-      });
+      .toBuffer({ resolveWithObject: true });
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(input, data));
+    t.assert.strictEqual(info.width, Math.ceil(inputWidth * 0.2));
+    t.assert.strictEqual(info.height, Math.ceil(inputHeight * 1.5));
   });
-  it('Resizes and applies affine transform', done => {
+  test('Resizes and applies affine transform', async (t) => {
+    t.plan(1);
     const input = fixtures.inputJpg;
-    sharp(input)
+    const data = await sharp(input)
       .resize(500, 500)
       .affine([[0.5, 1], [1, 0.5]])
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(data, fixtures.expected('affine-resize-expected.jpg'), done);
-      });
+      .toBuffer();
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(data, fixtures.expected('affine-resize-expected.jpg')));
   });
-  it('Extracts and applies affine transform', done => {
-    sharp(fixtures.inputJpg)
+  test('Extracts and applies affine transform', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg)
       .extract({ left: 300, top: 300, width: 600, height: 600 })
       .affine([0.3, 0, -0.5, 0.3])
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(data, fixtures.expected('affine-extract-expected.jpg'), done);
-      });
+      .toBuffer();
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(data, fixtures.expected('affine-extract-expected.jpg')));
   });
-  it('Rotates and applies affine transform', done => {
-    sharp(fixtures.inputJpg320x240)
+  test('Rotates and applies affine transform', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg320x240)
       .rotate(90)
       .affine([[-1.2, 0], [0, -1.2]])
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(data, fixtures.expected('affine-rotate-expected.jpg'), done);
-      });
+      .toBuffer();
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(data, fixtures.expected('affine-rotate-expected.jpg')));
   });
-  it('Extracts, rotates and applies affine transform', done => {
-    sharp(fixtures.inputJpg)
+  test('Extracts, rotates and applies affine transform', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg)
       .extract({ left: 1000, top: 1000, width: 200, height: 200 })
       .rotate(45, { background: 'blue' })
       .affine([[2, 1], [2, -0.5]], { background: 'red' })
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('affine-extract-rotate-expected.jpg'), data, done);
-      });
+      .toBuffer();
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(data, fixtures.expected('affine-extract-rotate-expected.jpg')));
   });
-  it('Applies affine transform with background color', done => {
-    sharp(fixtures.inputJpg320x240)
+  test('Applies affine transform with background color', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg320x240)
       .rotate(180)
       .affine([[-1.5, 1.2], [-1, 1]], { background: 'red' })
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('affine-background-expected.jpg'), data, done);
-      });
+      .toBuffer();
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(data, fixtures.expected('affine-background-expected.jpg')));
   });
-  it('Applies affine transform with background color and output offsets', done => {
-    sharp(fixtures.inputJpg320x240)
+  test('Applies affine transform with background color and output offsets', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg320x240)
       .rotate(180)
       .affine([[-2, 1.5], [-1, 2]], { background: 'blue', odx: 40, ody: -100 })
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('affine-background-output-offsets-expected.jpg'), data, done);
-      });
+      .toBuffer();
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(data, fixtures.expected('affine-background-output-offsets-expected.jpg')));
   });
-  it('Applies affine transform with background color and all offsets', done => {
-    sharp(fixtures.inputJpg320x240)
+  test('Applies affine transform with background color and all offsets', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg320x240)
       .rotate(180)
       .affine([[-1.2, 1.8], [-1, 2]], { background: 'yellow', idx: 10, idy: -40, odx: 10, ody: -50 })
-      .toBuffer((err, data) => {
-        if (err) throw err;
-        fixtures.assertSimilar(fixtures.expected('affine-background-all-offsets-expected.jpg'), data, done);
-      });
+      .toBuffer();
+    await t.assert.doesNotReject(() => fixtures.assertSimilar(data, fixtures.expected('affine-background-all-offsets-expected.jpg')));
   });
 
-  it('Animated image rejects', () =>
-    assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
+  test('Animated image rejects', async (t) => {
+    t.plan(1);
+    await t.assert.rejects(() => sharp(fixtures.inputGifAnimated, { animated: true })
       .affine([1, 1, 1, 1])
       .toBuffer(),
     /Affine is not supported for multi-page images/
     )
-  );
+  });
 
-  describe('Interpolations', () => {
+  suite('Interpolations', () => {
     const input = fixtures.inputJpg320x240;
     const inputWidth = 320;
     const inputHeight = 240;
     for (const interp in sharp.interpolators) {
-      it(`Performs 2x upscale with ${interp} interpolation`, done => {
-        sharp(input)
+      test(`Performs 2x upscale with ${interp} interpolation`, async (t) => {
+        t.plan(3);
+        const { data, info } = await sharp(input)
           .affine([[2, 0], [0, 2]], { interpolator: sharp.interpolators[interp] })
-          .toBuffer((err, data, info) => {
-            if (err) throw err;
-            assert.strictEqual(info.width, Math.ceil(inputWidth * 2));
-            assert.strictEqual(info.height, Math.ceil(inputHeight * 2));
-            fixtures.assertSimilar(fixtures.expected(`affine-${sharp.interpolators[interp]}-2x-upscale-expected.jpg`), data, done);
-          });
+          .toBuffer({ resolveWithObject: true });
+        t.assert.strictEqual(info.width, Math.ceil(inputWidth * 2));
+        t.assert.strictEqual(info.height, Math.ceil(inputHeight * 2));
+        await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected(`affine-${sharp.interpolators[interp]}-2x-upscale-expected.jpg`), data));
       });
     }
   });
