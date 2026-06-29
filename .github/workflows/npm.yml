@@ -123,6 +123,7 @@ jobs:
       - name: Create package.json
         env:
           SEMVER: ${{ steps.version.outputs.semver }}
+        shell: bash
         run: |
           cat <<EOF >package.json
           {
@@ -133,6 +134,7 @@ jobs:
           }
           EOF
       - name: Create release.mjs
+        shell: bash
         run: |
           cat <<EOF >release.mjs
           import { deepStrictEqual } from 'node:assert';
@@ -188,7 +190,7 @@ jobs:
       - name: Run with Deno
         if: ${{ matrix.runtime == 'deno' }}
         run: |
-          deno install
+          deno install --minimum-dependency-age=0
           deno run --allow-env --allow-ffi --allow-read --allow-sys release.mjs
 
       - name: Run with Bun
