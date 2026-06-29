@@ -67,6 +67,9 @@ When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
 Animated output will also contain `pageHeight` and `pages`.
 May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text.
 
+The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
+Use [toUint8Array](#touint8array) for a guaranteed transferable `ArrayBuffer`.
+
 A `Promise` is returned when `callback` is not provided.
 
 
@@ -80,23 +83,15 @@ A `Promise` is returned when `callback` is not provided.
 
 **Example**  
 ```js
-sharp(input)
-  .toBuffer((err, data, info) => { ... });
-```
-**Example**  
-```js
-sharp(input)
-  .toBuffer()
-  .then(data => { ... })
-  .catch(err => { ... });
-```
-**Example**  
-```js
-sharp(input)
+const data = await sharp(input)
   .png()
-  .toBuffer({ resolveWithObject: true })
-  .then(({ data, info }) => { ... })
-  .catch(err => { ... });
+  .toBuffer();
+```
+**Example**  
+```js
+const { data, info } = await sharp(input)
+  .png()
+  .toBuffer({ resolveWithObject: true });
 ```
 **Example**  
 ```js
