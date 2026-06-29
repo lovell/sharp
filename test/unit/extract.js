@@ -282,6 +282,20 @@ suite('Partial image extraction', () => {
       });
     });
 
+    test('Oversized width', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: 100000001, height: 10 });
+      }, /Expected integer between 0 and 100000000 for width but received 100000001 of type number/);
+    });
+
+    test('Oversized left', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).extract({ left: 2 ** 31, top: 10, width: 10, height: 10 });
+      }, /Expected integer between 0 and 100000000 for left but received 2147483648 of type number/);
+    });
+
     test('Bad image area', async (t) => {
       t.plan(1);
       t.assert.rejects(

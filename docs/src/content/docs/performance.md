@@ -21,13 +21,14 @@ libvips uses a shared thread pool to avoid the overhead of spawning new threads.
 The size of this thread pool will grow on demand and shrink when idle.
 
 The default number of threads used to concurrently process each image is the same as the number of CPU cores,
-except when using glibc-based Linux without jemalloc, where the default is `1` to help reduce memory fragmentation.
+except when using glibc-based Linux without jemalloc or without `MALLOC_ARENA_MAX`,
+where the default is `1` to help reduce memory fragmentation.
 
 Use [`sharp.concurrency()`](/api-utility/#concurrency) to manage the number of threads per image.
 
 To reduce memory fragmentation when using the default Linux glibc memory allocator, set the
 [`MALLOC_ARENA_MAX`](https://sourceware.org/glibc/manual/latest/html_node/Memory-Allocation-Tunables.html)
-environment variable before the Node.js process starts to reduce the number of memory pools.
+environment variable to either 2 or 4 before the Node.js process starts to reduce the number of memory pools.
 
 ```sh frame="none"
 export MALLOC_ARENA_MAX="2"

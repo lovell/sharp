@@ -1,6 +1,6 @@
 {
   "name": "@img/sharp-wasm32",
-  "version": "0.35.2-rc.2",
+  "version": "0.35.3-rc.1",
   "description": "Prebuilt sharp for use with WebAssembly",
   "author": "Lovell Fuller <npm@lovell.info>",
   "homepage": "https://sharp.pixelplumbing.com",
@@ -32,6 +32,6 @@
     "node": "^20.19.0 || >= 22.12.0"
   },
   "dependencies": {
-    "@emnapi/runtime": "^1.11.0"
+    "@emnapi/runtime": "^1.11.1"
   }
 }

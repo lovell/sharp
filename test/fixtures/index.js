@@ -3,6 +3,7 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
+import { endianness } from 'node:os';
 import path from 'node:path';
 import sharp from '../../lib/index.js';
 import sharpModule from '../../lib/sharp.js';
@@ -149,6 +150,8 @@ export default {
   // Font bundled to keep text rendering deterministic across platforms
   fontFile: getPath('NotoSans-Regular.ttf'), // SIL Open Font License 1.1 - https://fonts.google.com/noto/specimen/Noto+Sans
   fontFamily: 'Noto Sans',
+
+  isLittleEndian: endianness() === 'LE',
 
   // Path for tests requiring human inspection
   path: getPath,

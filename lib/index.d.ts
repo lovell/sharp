@@ -658,25 +658,27 @@ declare namespace sharp {
          * @param callback Callback function called on completion with three arguments (err, buffer, info).
          * @returns A sharp instance that can be used to chain operations
          */
-        toBuffer(callback: (err: Error, buffer: Buffer, info: OutputInfo) => void): Sharp;
+        toBuffer(callback: (err: Error, buffer: Buffer<ArrayBuffer>, info: OutputInfo) => void): Sharp;
 
         /**
          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
          * By default, the format will match the input image, except SVG input which becomes PNG output.
+         * The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
          * @param options resolve options
          * @param options.resolveWithObject Resolve the Promise with an Object containing data and info properties instead of resolving only with data.
          * @returns A promise that resolves with the Buffer data.
          */
-        toBuffer(options?: { resolveWithObject: false }): Promise<Buffer>;
+        toBuffer(options?: { resolveWithObject: false }): Promise<Buffer<ArrayBuffer>>;
 
         /**
          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
          * By default, the format will match the input image, except SVG input which becomes PNG output.
+         * The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
          * @param options resolve options
          * @param options.resolveWithObject Resolve the Promise with an Object containing data and info properties instead of resolving only with data.
          * @returns A promise that resolves with an object containing the Buffer data and an info object containing the output image format, size (bytes), width, height and channels
          */
-        toBuffer(options: { resolveWithObject: true }): Promise<{ data: Buffer; info: OutputInfo }>;
+        toBuffer(options: { resolveWithObject: true }): Promise<{ data: Buffer<ArrayBuffer>; info: OutputInfo }>;
 
         /**
          * Write output to a Uint8Array backed by a transferable ArrayBuffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
@@ -1508,11 +1510,11 @@ declare namespace sharp {
         tile?: boolean | undefined;
         /** Horizontal tile size (optional, default 256) */
         tileWidth?: number | undefined;
-        /** Vertical tile size (optional, default 256) */
+        /** Vertical tile size, valid values are integers in the range 1-32768 (optional, default 256) */
         tileHeight?: number | undefined;
-        /** Horizontal resolution in pixels/mm (optional, default 1.0) */
+        /** Horizontal resolution in pixels/mm, valid values are numbers in the range 0.001-1000000 (optional, default 1.0) */
         xres?: number | undefined;
-        /** Vertical resolution in pixels/mm (optional, default 1.0) */
+        /** Vertical resolution in pixels/mm, valid values are numbers in the range 0.001-1000000 (optional, default 1.0) */
         yres?: number | undefined;
         /** Reduce bitdepth to 1, 2 or 4 bit (optional) */
         bitdepth?: 1 | 2 | 4 | undefined;
@@ -1598,13 +1600,13 @@ declare namespace sharp {
     }
 
     interface Region {
-        /** zero-indexed offset from left edge */
+        /** zero-indexed offset from left edge, an integer between 0 and 100000000 */
         left: number;
-        /** zero-indexed offset from top edge */
+        /** zero-indexed offset from top edge, an integer between 0 and 100000000 */
         top: number;
-        /** dimension of extracted image */
+        /** dimension of extracted image, an integer between 0 and 100000000 */
         width: number;
-        /** dimension of extracted image */
+        /** dimension of extracted image, an integer between 0 and 100000000 */
         height: number;
     }
 
@@ -1620,13 +1622,13 @@ declare namespace sharp {
     type ExtendWith = 'background' | 'copy' | 'repeat' | 'mirror';
 
     interface ExtendOptions {
-        /** single pixel count to top edge (optional, default 0) */
+        /** single pixel count to top edge, valid values are integers in the range 0-10000 (optional, default 0) */
         top?: number | undefined;
-        /** single pixel count to left edge (optional, default 0) */
+        /** single pixel count to left edge, valid values are integers in the range 0-10000 (optional, default 0) */
         left?: number | undefined;
-        /** single pixel count to bottom edge (optional, default 0) */
+        /** single pixel count to bottom edge, valid values are integers in the range 0-10000 (optional, default 0) */
         bottom?: number | undefined;
-        /** single pixel count to right edge (optional, default 0) */
+        /** single pixel count to right edge, valid values are integers in the range 0-10000 (optional, default 0) */
         right?: number | undefined;
         /** background colour, parsed by the color module, defaults to black without transparency. (optional, default {r:0,g:0,b:0,alpha:1}) */
         background?: ColorLike | undefined;
@@ -1641,7 +1643,7 @@ declare namespace sharp {
         threshold?: number | undefined;
         /** Does the input more closely resemble line art (e.g. vector) rather than being photographic? (optional, default false) */
         lineArt?: boolean | undefined;
-        /** Leave a margin around trimmed content, value is in pixels. (optional, default 0) */
+        /** Leave a margin around trimmed content, integral number of pixels between 0 and 10000000. (optional, default 0) */
         margin?: number | undefined;
     }
 
@@ -1669,11 +1671,11 @@ declare namespace sharp {
     }
 
     interface ClaheOptions {
-        /** width of the region */
+        /** width of the region. Valid values are integers in the range 1-65536. */
         width: number;
-        /** height of the region */
+        /** height of the region. Valid values are integers in the range 1-65536. */
         height: number;
-        /** max slope of the cumulative contrast. A value of 0 disables contrast limiting. Valid values are integers in the range 0-100 (inclusive) (optional, default 3) */
+        /** max slope of the cumulative contrast. A value of 0 disables contrast limiting. Valid values are integers in the range 0-100. (optional, default 3) */
         maxSlope?: number | undefined;
     }
 
@@ -1783,6 +1785,8 @@ declare namespace sharp {
         channels: Channels;
         /** indicating if premultiplication was used */
         premultiplied: boolean;
+        /** Indicates if the output image has an alpha channel */
+        hasAlpha: boolean;
         /** Only defined when using a crop strategy */
         cropOffsetLeft?: number | undefined;
         /** Only defined when using a crop strategy */

@@ -105,4 +105,20 @@ suite('Tint', () => {
       () => fixtures.assertMaxColourDistance(output, fixtures.expected('tint-cmyk.jpg'), maxDistance)
     );
   });
+
+  test('non-numeric colour component fails, identifying the channel', (t) => {
+    t.plan(3);
+    t.assert.throws(
+      () => sharp().tint({ r: 'fail', g: 0, b: 0 }),
+      /Expected number for background\.red but received NaN of type number/
+    );
+    t.assert.throws(
+      () => sharp().tint({ r: NaN, g: 0, b: 0 }),
+      /Expected number for background\.red but received NaN of type number/
+    );
+    t.assert.throws(
+      () => sharp().tint({ r: 0, g: 0, b: 'fail' }),
+      /Expected number for background\.blue but received NaN of type number/
+    );
+  });
 });

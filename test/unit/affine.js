@@ -31,6 +31,17 @@ suite('Affine transform', () => {
           .affine([[123, 123], [null, 123]]);
       });
     });
+    test('Ragged matrix flattening to a length of four', (t) => {
+      t.plan(2);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[1, 2, 3], [4]]);
+      }, /Expected 1x4 or 2x2 array for matrix/);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[1], [2], [3], [4]]);
+      }, /Expected 1x4 or 2x2 array for matrix/);
+    });
     test('Invalid options parameter type', (t) => {
       t.plan(1);
       t.assert.throws(() => {
@@ -71,6 +82,20 @@ suite('Affine transform', () => {
       t.assert.throws(() => {
         sharp(fixtures.inputJpg)
           .affine([[4, 4], [4, 4]], { ody: 'invalid ody type' });
+      });
+    });
+    test('Non-finite idx offset', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[4, 4], [4, 4]], { idx: Infinity });
+      });
+    });
+    test('Non-finite idy offset', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg)
+          .affine([[4, 4], [4, 4]], { idy: -Infinity });
       });
     });
     test('Invalid interpolator', (t) => {

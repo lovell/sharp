@@ -27,7 +27,7 @@ suite('Input/output', () => {
   });
 
   test('Read from File and write to Stream', async (t) => {
-    t.plan(5);
+    t.plan(6);
     const writable = createWriteStream(outputJpg);
     const closed = new Promise((resolve, reject) => {
       writable.once('close', resolve);
@@ -41,11 +41,12 @@ suite('Input/output', () => {
     t.assert.strictEqual('jpeg', info.format);
     t.assert.strictEqual(320, info.width);
     t.assert.strictEqual(240, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
     await fs.rm(outputJpg);
   });
 
   test('Read from Buffer and write to Stream', async (t) => {
-    t.plan(5);
+    t.plan(6);
     const inputJpgBuffer = await fs.readFile(fixtures.inputJpg);
     const writable = createWriteStream(outputJpg);
     const closed = new Promise((resolve, reject) => {
@@ -60,11 +61,12 @@ suite('Input/output', () => {
     t.assert.strictEqual('jpeg', info.format);
     t.assert.strictEqual(320, info.width);
     t.assert.strictEqual(240, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
     await fs.rm(outputJpg);
   });
 
   test('Read from Stream and write to File via callback', (t, done) => {
-    t.plan(4);
+    t.plan(5);
     const readable = createReadStream(fixtures.inputJpg);
     const pipeline = sharp().resize(320, 240).toFile(outputJpg, async (err, info) => {
       if (err) throw err;
@@ -72,6 +74,7 @@ suite('Input/output', () => {
       t.assert.strictEqual('jpeg', info.format);
       t.assert.strictEqual(320, info.width);
       t.assert.strictEqual(240, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
       await fs.rm(outputJpg);
       done();
     });
@@ -79,7 +82,7 @@ suite('Input/output', () => {
   });
 
   test('Read from Stream and write to Buffer via callback', (t, done) => {
-    t.plan(5);
+    t.plan(6);
     const readable = createReadStream(fixtures.inputJpg);
     const pipeline = sharp().resize(320, 240).toBuffer((err, data, info) => {
       if (err) throw err;
@@ -88,13 +91,14 @@ suite('Input/output', () => {
       t.assert.strictEqual('jpeg', info.format);
       t.assert.strictEqual(320, info.width);
       t.assert.strictEqual(240, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
       done();
     });
     readable.pipe(pipeline);
   });
 
   test('Read from File and write to Buffer via callback', (t, done) => {
-    t.plan(6);
+    t.plan(7);
     sharp(fixtures.inputJpg).resize(320, 240).toBuffer((err, data, info) => {
       t.assert.strictEqual(err, null);
       t.assert.strictEqual(true, data.length > 0);
@@ -102,6 +106,7 @@ suite('Input/output', () => {
       t.assert.strictEqual('jpeg', info.format);
       t.assert.strictEqual(320, info.width);
       t.assert.strictEqual(240, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
       done();
     });
   });
@@ -128,7 +133,7 @@ suite('Input/output', () => {
   });
 
   test('Read from Stream and write to Buffer via Promise resolved with Object', async (t) => {
-    t.plan(8);
+    t.plan(9);
     const pipeline = sharp().resize(1, 1);
     createReadStream(fixtures.inputJpg).pipe(pipeline);
     const object = await pipeline.toBuffer({ resolveWithObject: true });
@@ -138,6 +143,7 @@ suite('Input/output', () => {
     t.assert.strictEqual(1, object.info.width);
     t.assert.strictEqual(1, object.info.height);
     t.assert.strictEqual(3, object.info.channels);
+    t.assert.strictEqual(false, object.info.hasAlpha);
     t.assert.strictEqual(true, object.data instanceof Buffer);
     t.assert.strictEqual(true, object.data.length > 0);
   });
@@ -152,7 +158,7 @@ suite('Input/output', () => {
   });
 
   test('Read from File and write to Buffer via Promise resolved with Object', async (t) => {
-    t.plan(8);
+    t.plan(9);
     const object = await sharp(fixtures.inputJpg)
       .resize(1, 1)
       .toBuffer({ resolveWithObject: true });
@@ -162,12 +168,13 @@ suite('Input/output', () => {
     t.assert.strictEqual(1, object.info.width);
     t.assert.strictEqual(1, object.info.height);
     t.assert.strictEqual(3, object.info.channels);
+    t.assert.strictEqual(false, object.info.hasAlpha);
     t.assert.strictEqual(true, object.data instanceof Buffer);
     t.assert.strictEqual(true, object.data.length > 0);
   });
 
   test('Read from Stream and write to Stream', async (t) => {
-    t.plan(5);
+    t.plan(6);
     const readable = createReadStream(fixtures.inputJpg);
     const writable = createWriteStream(outputJpg);
     const closed = new Promise((resolve, reject) => {
@@ -183,6 +190,7 @@ suite('Input/output', () => {
     t.assert.strictEqual('jpeg', info.format);
     t.assert.strictEqual(320, info.width);
     t.assert.strictEqual(240, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
     await fs.rm(outputJpg);
   });
 
@@ -258,7 +266,7 @@ suite('Input/output', () => {
   });
 
   test('Stream should emit info event', async (t) => {
-    t.plan(4);
+    t.plan(5);
     const readable = createReadStream(fixtures.inputJpg);
     const writable = createWriteStream(outputJpg);
     const pipeline = sharp().resize(320, 240);
@@ -268,6 +276,7 @@ suite('Input/output', () => {
         t.assert.strictEqual(320, info.width);
         t.assert.strictEqual(240, info.height);
         t.assert.strictEqual(3, info.channels);
+        t.assert.strictEqual(false, info.hasAlpha);
         resolve();
       });
     });
@@ -595,31 +604,33 @@ suite('Input/output', () => {
     });
 
     test('Match PNG input', async (t) => {
-      t.plan(4);
-      const info = await sharp(fixtures.inputPng)
+      t.plan(5);
+      const info = await sharp(fixtures.inputPngRGBWithAlpha)
         .resize(320, 80)
         .toFile(outputZoinks);
       t.assert.strictEqual(true, info.size > 0);
       t.assert.strictEqual('png', info.format);
       t.assert.strictEqual(320, info.width);
       t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(true, info.hasAlpha);
       await fs.rm(outputZoinks);
     });
 
     test('Match WebP input', async (t) => {
-      t.plan(4);
-      const info = await sharp(fixtures.inputWebP)
+      t.plan(5);
+      const info = await sharp(fixtures.inputWebPWithTransparency)
         .resize(320, 80)
         .toFile(outputZoinks);
       t.assert.strictEqual(true, info.size > 0);
       t.assert.strictEqual('webp', info.format);
       t.assert.strictEqual(320, info.width);
       t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(true, info.hasAlpha);
       await fs.rm(outputZoinks);
     });
 
     test('Match TIFF input', async (t) => {
-      t.plan(4);
+      t.plan(5);
       const info = await sharp(fixtures.inputTiff)
         .resize(320, 80)
         .toFile(outputZoinks);
@@ -627,11 +638,12 @@ suite('Input/output', () => {
       t.assert.strictEqual('tiff', info.format);
       t.assert.strictEqual(320, info.width);
       t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
       await fs.rm(outputZoinks);
     });
 
     test('Force JPEG format for PNG input', async (t) => {
-      t.plan(4);
+      t.plan(5);
       const info = await sharp(fixtures.inputPng)
         .resize(320, 80)
         .jpeg()
@@ -640,12 +652,13 @@ suite('Input/output', () => {
       t.assert.strictEqual('jpeg', info.format);
       t.assert.strictEqual(320, info.width);
       t.assert.strictEqual(80, info.height);
+      t.assert.strictEqual(false, info.hasAlpha);
       await fs.rm(outputZoinks);
     });
   });
 
   test('Input and output formats match when not forcing', async (t) => {
-    t.plan(3);
+    t.plan(4);
     const { info } = await sharp(fixtures.inputJpg)
       .resize(320, 240)
       .png({ compressionLevel: 1, force: false })
@@ -653,6 +666,7 @@ suite('Input/output', () => {
     t.assert.strictEqual('jpeg', info.format);
     t.assert.strictEqual(320, info.width);
     t.assert.strictEqual(240, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
   });
 
   test('Can force output format with output chaining', async (t) => {
@@ -688,7 +702,7 @@ suite('Input/output', () => {
   });
 
   test('Load Vips V file', async (t) => {
-    t.plan(4);
+    t.plan(5);
     const { data, info } = await sharp(fixtures.inputV)
       .jpeg()
       .toBuffer({ resolveWithObject: true });
@@ -696,6 +710,7 @@ suite('Input/output', () => {
     t.assert.strictEqual('jpeg', info.format);
     t.assert.strictEqual(70, info.width);
     t.assert.strictEqual(60, info.height);
+    t.assert.strictEqual(false, info.hasAlpha);
     await fixtures.assertSimilar(fixtures.expected('vfile.jpg'), data);
   });
 
@@ -1160,6 +1175,30 @@ suite('Input/output', () => {
         sharp({ create });
       });
     });
+    test('Width beyond pixel limit', (t) => {
+      t.plan(1);
+      const create = {
+        width: 100000001,
+        height: 10,
+        channels: 3,
+        background: { r: 0, g: 0, b: 0 }
+      };
+      t.assert.throws(() => {
+        sharp({ create });
+      });
+    });
+    test('Height beyond pixel limit', (t) => {
+      t.plan(1);
+      const create = {
+        width: 10,
+        height: 100000001,
+        channels: 3,
+        background: { r: 0, g: 0, b: 0 }
+      };
+      t.assert.throws(() => {
+        sharp({ create });
+      });
+    });
   });
 
   test('Queue length change events', async (t) => {
@@ -1179,7 +1218,7 @@ suite('Input/output', () => {
   });
 
   test('Info event data', async (t) => {
-    t.plan(4);
+    t.plan(5);
     const readable = createReadStream(fixtures.inputJPGBig);
     const inPipeline = sharp()
       .resize(840, 472)
@@ -1188,6 +1227,7 @@ suite('Input/output', () => {
         t.assert.strictEqual(840, info.width);
         t.assert.strictEqual(472, info.height);
         t.assert.strictEqual(3, info.channels);
+        t.assert.strictEqual(false, info.hasAlpha);
       });
     const badPipeline = sharp({ raw: { width: 840, height: 500, channels: 3 } }).toFormat('jpeg');
     readable.pipe(inPipeline).pipe(badPipeline);
@@ -1233,7 +1273,7 @@ suite('Input/output', () => {
       .resize({ width: 8, height: 8 })
       .toUint8Array();
 
-    t.plan(isMarkedAsUntransferable ? 12 : 11);
+    t.plan(isMarkedAsUntransferable ? 13 : 12);
     t.assert.strictEqual(data instanceof Uint8Array, true);
     if (isMarkedAsUntransferable) {
       t.assert.strictEqual(isMarkedAsUntransferable(data.buffer), false);
@@ -1245,6 +1285,7 @@ suite('Input/output', () => {
     t.assert.strictEqual(data.byteLength, info.size);
     t.assert.strictEqual(data[0], 0xFF);
     t.assert.strictEqual(data[1], 0xD8);
+    t.assert.strictEqual(info.hasAlpha, false);
 
     const metadata = await sharp(data).metadata();
     t.assert.strictEqual(metadata.format, 'jpeg');

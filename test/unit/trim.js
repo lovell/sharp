@@ -220,6 +220,9 @@ suite('Trim borders', () => {
       },
       'Invalid margin': {
         margin: -1
+      },
+      'Oversized margin': {
+        margin: 2 ** 30
       }
     }).forEach(([description, parameter]) => {
       test(description, (t) => {

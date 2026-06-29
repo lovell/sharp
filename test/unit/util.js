@@ -7,6 +7,10 @@ import { suite, test } from 'node:test';
 import semver from 'semver';
 
 import sharp from '../../lib/index.js';
+import libvips from '../../lib/libvips.js'
+
+// vips_cache_set_max_mem takes a size_t, so the 4096MB byte count overflows on 32-bit
+const is64bit = !['arm', 'ia32', 'wasm32'].includes(libvips.buildPlatformArch().split('-').pop());
 
 suite('Utilities', () => {
   suite('Cache', () => {
@@ -57,6 +61,14 @@ suite('Utilities', () => {
       t.assert.strictEqual(cache.files.max, 100);
       t.assert.strictEqual(cache.items.max, 1000);
     });
+    test('Can be set to a memory maximum of 4096MB', (t) => {
+      if (!is64bit) {
+        return t.skip();
+      }
+      t.plan(1);
+      const cache = sharp.cache({ memory: 4096, files: 0, items: 0 });
+      t.assert.strictEqual(cache.memory.max, 4096);
+    });
     test('Ignores invalid values', (t) => {
       t.plan(3);
       sharp.cache(true);
@@ -64,6 +76,12 @@ suite('Utilities', () => {
       t.assert.strictEqual(cache.memory.max, 50);
       t.assert.strictEqual(cache.files.max, 20);
       t.assert.strictEqual(cache.items.max, 100);
+    });
+    test('Rejects negative values', (t) => {
+      t.plan(3);
+      t.assert.throws(() => sharp.cache({ memory: -1 }), /Expected a positive integer for memory but received -1 of type number/);
+      t.assert.throws(() => sharp.cache({ files: -1 }), /Expected a positive integer for files but received -1 of type number/);
+      t.assert.throws(() => sharp.cache({ items: 1.5 }), /Expected a positive integer for items but received 1.5 of type number/);
     });
   });
 

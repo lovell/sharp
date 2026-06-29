@@ -164,6 +164,15 @@ suite('Recomb', () => {
         sharp(fixtures.inputJpg).recomb([[1, 2, 3, 4], [5, 6, 7, 8]]);
       });
     });
+    test('ragged rows summing to a valid cardinality', (t) => {
+      t.plan(2);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).recomb([[1, 2, 3, 4, 5], [6, 7], [8, 9]]);
+      }, /Expected array of 3 arrays of length 3 for inputMatrix/);
+      t.assert.throws(() => {
+        sharp(fixtures.inputJpg).recomb([[1, 2, 3, 4, 5], [6, 7, 8, 9], [10, 11, 12], [13, 14, 15, 16]]);
+      }, /Expected array of 4 arrays of length 4 for inputMatrix/);
+    });
     test('non-numeric entries', (t) => {
       t.plan(1);
       t.assert.throws(() => {

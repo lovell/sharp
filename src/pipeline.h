@@ -49,6 +49,7 @@ struct PipelineBaton {
   int pageHeightOut;
   int pagesOut;
   bool typedArrayOut;
+  bool hasAlphaOut;
   std::vector<Composite *> composite;
   std::vector<sharp::InputDescriptor *> joinChannelIn;
   int topOffsetPre;
@@ -249,6 +250,7 @@ struct PipelineBaton {
     pageHeightOut(0),
     pagesOut(0),
     typedArrayOut(false),
+    hasAlphaOut(false),
     topOffsetPre(-1),
     topOffsetPost(-1),
     channels(0),

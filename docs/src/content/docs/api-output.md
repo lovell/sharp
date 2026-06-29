@@ -67,6 +67,9 @@ When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`.
 Animated output will also contain `pageHeight` and `pages`.
 May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text.
 
+The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
+Use [toUint8Array](#touint8array) for a guaranteed transferable `ArrayBuffer`.
+
 A `Promise` is returned when `callback` is not provided.
 
 
@@ -80,23 +83,15 @@ A `Promise` is returned when `callback` is not provided.
 
 **Example**  
 ```js
-sharp(input)
-  .toBuffer((err, data, info) => { ... });
-```
-**Example**  
-```js
-sharp(input)
-  .toBuffer()
-  .then(data => { ... })
-  .catch(err => { ... });
-```
-**Example**  
-```js
-sharp(input)
+const data = await sharp(input)
   .png()
-  .toBuffer({ resolveWithObject: true })
-  .then(({ data, info }) => { ... })
-  .catch(err => { ... });
+  .toBuffer();
+```
+**Example**  
+```js
+const { data, info } = await sharp(input)
+  .png()
+  .toBuffer({ resolveWithObject: true });
 ```
 **Example**  
 ```js
@@ -761,10 +756,10 @@ instead of providing `xres` and `yres` in pixels/mm.
 | [options.predictor] | <code>string</code> | <code>&quot;&#x27;horizontal&#x27;&quot;</code> | compression predictor options: none, horizontal, float |
 | [options.pyramid] | <code>boolean</code> | <code>false</code> | write an image pyramid |
 | [options.tile] | <code>boolean</code> | <code>false</code> | write a tiled tiff |
-| [options.tileWidth] | <code>number</code> | <code>256</code> | horizontal tile size |
-| [options.tileHeight] | <code>number</code> | <code>256</code> | vertical tile size |
-| [options.xres] | <code>number</code> | <code>1.0</code> | horizontal resolution in pixels/mm |
-| [options.yres] | <code>number</code> | <code>1.0</code> | vertical resolution in pixels/mm |
+| [options.tileWidth] | <code>number</code> | <code>256</code> | horizontal tile size, valid values are integers in the range 1-32768 |
+| [options.tileHeight] | <code>number</code> | <code>256</code> | vertical tile size, valid values are integers in the range 1-32768 |
+| [options.xres] | <code>number</code> | <code>1.0</code> | horizontal resolution in pixels/mm, valid values are numbers in the range 0.001-1000000 |
+| [options.yres] | <code>number</code> | <code>1.0</code> | vertical resolution in pixels/mm, valid values are numbers in the range 0.001-1000000 |
 | [options.resolutionUnit] | <code>string</code> | <code>&quot;&#x27;inch&#x27;&quot;</code> | resolution unit options: inch, cm |
 | [options.bitdepth] | <code>number</code> | <code>0</code> | reduce bitdepth to 1, 2 or 4 bit |
 | [options.miniswhite] | <code>boolean</code> | <code>false</code> | write 1-bit images as miniswhite |

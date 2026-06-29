@@ -33,10 +33,10 @@ cpSync(releaseDir, libDir, {
 // Generate README and index.cjs
 const { version, name, description } = require(`./${platform}/package.json`);
 writeFileSync(join(destDir, 'README.md'), `# \`${name}\`\n\n${description}.\n\n${licensing}`);
-const requireStub = (platform.startsWith('darwin') || platform.startsWith('linux'))
-  ? `try { require.resolve('@img/sharp-libvips-${platform}/stub'); } catch {}\n`
+const resolveLibvipsBinary = (platform.startsWith('darwin') || platform.startsWith('linux'))
+  ? `try { require.resolve('@img/sharp-libvips-${platform}/binary'); } catch {}\n`
   : '';
-writeFileSync(join(destDir, 'index.cjs'), `${requireStub}module.exports = require('./lib/sharp-${platform}-${version}.node');`);
+writeFileSync(join(destDir, 'index.cjs'), `${resolveLibvipsBinary}module.exports = require('./lib/sharp-${platform}-${version}.node');`);
 
 // Copy Apache-2.0 LICENSE
 copyFileSync(join(__dirname, '..', 'LICENSE'), join(destDir, 'LICENSE'));

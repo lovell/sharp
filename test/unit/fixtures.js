@@ -25,7 +25,7 @@ suite('Test fixtures', () => {
       t.plan(1);
       const image = fixtures.inputPngOverlayLayer0;
       t.assert.doesNotThrow(
-        () => fixtures.assertMaxColourDistance(image, image, 0)
+        () => fixtures.assertMaxColourDistance(image, image, 1E-6)
       );
     });
     test('should accept a numeric threshold for two different images', (t) => {

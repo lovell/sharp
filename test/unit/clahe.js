@@ -89,12 +89,15 @@ suite('Clahe', () => {
   });
 
   test('invalid width', (t) => {
-    t.plan(4);
+    t.plan(5);
     t.assert.throws(() => {
       sharp(fixtures.inputJpgClahe).clahe({ width: 100.5, height: 100 });
     });
     t.assert.throws(() => {
       sharp(fixtures.inputJpgClahe).clahe({ width: -5, height: 100 });
+    });
+    t.assert.throws(() => {
+      sharp(fixtures.inputJpgClahe).clahe({ width: 2 ** 32, height: 100 });
     });
     t.assert.throws(() => {
       sharp(fixtures.inputJpgClahe).clahe({ width: true, height: 100 });
@@ -105,12 +108,15 @@ suite('Clahe', () => {
   });
 
   test('invalid height', (t) => {
-    t.plan(4);
+    t.plan(5);
     t.assert.throws(() => {
       sharp(fixtures.inputJpgClahe).clahe({ width: 100, height: 100.5 });
     });
     t.assert.throws(() => {
       sharp(fixtures.inputJpgClahe).clahe({ width: 100, height: -5 });
+    });
+    t.assert.throws(() => {
+      sharp(fixtures.inputJpgClahe).clahe({ width: 100, height: 2 ** 32 });
     });
     t.assert.throws(() => {
       sharp(fixtures.inputJpgClahe).clahe({ width: 100, height: true });
