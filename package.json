@@ -189,6 +189,11 @@
     "@img/sharp-win32-ia32": "0.35.3-rc.1",
     "@img/sharp-win32-x64": "0.35.3-rc.1"
   },
+  "peerDependenciesMeta": {
+    "@types/node": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
     "@cpplint/cli": "^0.1.0",
