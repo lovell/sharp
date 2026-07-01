@@ -3,12 +3,11 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const {
-  useGlobalLibvips,
-  globalLibvipsVersion,
-  log,
-  spawnRebuild,
-} = require('../dist/libvips.cjs');
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+
+const { useGlobalLibvips, globalLibvipsVersion, log, spawnRebuild } = require('../lib/libvips.js').default;
 
 log('Building from source');
 log('See https://sharp.pixelplumbing.com/install#building-from-source');

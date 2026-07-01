@@ -31,7 +31,7 @@ please open an issue against that package instead.
 
 <!-- Please place an [x] in the relevant box to confirm. -->
 
-- [ ] I am using Node.js with a version that satisfies `>=20.9.0`
+- [ ] I am using Node.js with a version that satisfies `^20.19.0 || >= 22.12.0`
 - [ ] I am using Deno
 - [ ] I am using Bun
 

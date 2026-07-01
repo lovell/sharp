@@ -20,7 +20,7 @@ const pages = {
 };
 
 Object.keys(pages).forEach(async (m) => {
-  const input = path.join('lib', `${m}.mjs`);
+  const input = path.join('lib', `${m}.js`);
   const output = path.join('docs', 'src', 'content', 'docs', `api-${m}.md`);
 
   const source = await fs.readFile(input, 'utf8');

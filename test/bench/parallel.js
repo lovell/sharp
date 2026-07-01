@@ -5,11 +5,11 @@
 
 process.env.UV_THREADPOOL_SIZE = 64;
 
-const assert = require('node:assert');
-const async = require('async');
+import assert from 'node:assert';
+import async from 'async';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 const width = 720;
 const height = 480;

@@ -3,10 +3,10 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
+import { suite, test } from 'node:test';
 
-const sharp = require('../../dist/index.cjs');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 suite('Clahe', () => {
   test('width 5 width 5 maxSlope 0', async (t) => {

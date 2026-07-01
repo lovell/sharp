@@ -16,7 +16,6 @@ jobs:
         with:
           node-version: "24"
       - run: npm install --ignore-scripts
-      - run: npm run build:dist
       - run: npm run lint-cpp
       - run: npm run lint-js
       - run: npm run lint-types
@@ -35,13 +34,13 @@ jobs:
           - os: ubuntu-24.04
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: linux-x64
           - os: ubuntu-24.04
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: linux-x64
             package: true
@@ -67,13 +66,13 @@ jobs:
           - os: ubuntu-24.04-arm
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: linux-arm64
           - os: ubuntu-24.04-arm
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: linux-arm64
             package: true
@@ -85,12 +84,12 @@ jobs:
             platform: linux-arm64
           - os: macos-15-intel
             nodejs_arch: x64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: darwin-x64
           - os: macos-15-intel
             nodejs_arch: x64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: darwin-x64
             package: true
@@ -101,12 +100,12 @@ jobs:
             platform: darwin-x64
           - os: macos-15
             nodejs_arch: arm64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: darwin-arm64
           - os: macos-15
             nodejs_arch: arm64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: darwin-arm64
             package: true
@@ -117,18 +116,18 @@ jobs:
             platform: darwin-arm64
           - os: windows-2022
             nodejs_arch: x86
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: win32-ia32
             package: true
           - os: windows-2022
             nodejs_arch: x64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: win32-x64
           - os: windows-2022
             nodejs_arch: x64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: win32-x64
             package: true
@@ -139,12 +138,12 @@ jobs:
             platform: win32-x64
           - os: windows-11-arm
             nodejs_arch: arm64
-            nodejs_version: "^20.9.0"
+            nodejs_version: "^20.19.0"
             nodejs_version_major: 20
             platform: win32-arm64
           - os: windows-11-arm
             nodejs_arch: arm64
-            nodejs_version: "^22"
+            nodejs_version: "^22.12.0"
             nodejs_version_major: 22
             platform: win32-arm64
             package: true
@@ -177,7 +176,6 @@ jobs:
         with:
           persist-credentials: false
       - run: npm install
-      - run: npm run build:dist
       - run: npm run build
       - run: npm run test-unit
       - if: matrix.package
@@ -227,7 +225,7 @@ jobs:
         with:
           persist-credentials: false
       - run: npm install
-      - run: npm run build:dist && npm run build
+      - run: npm run build
       - run: npm run test-unit
       - if: matrix.package
         run: |
@@ -295,7 +293,6 @@ jobs:
             curl --silent https://${{ matrix.nodejs_hostname }}/download/release/v${{ matrix.nodejs_version}}/node-v${{ matrix.nodejs_version}}-linux-${{ matrix.nodejs_arch }}.tar.xz | tar xJC /opt/nodejs --strip-components=1
             export PATH=$PATH:/opt/nodejs/bin
             npm install
-            npm run build:dist
             npm run build
             node --test test/unit/io.js test/unit/raw.js
             npm run package-from-local-build
@@ -324,7 +321,7 @@ jobs:
         with:
           node-version: "22"
       - run: npm install
-      - run: npm run build:dist && emmake npm run build
+      - run: emmake npm run build
       - name: Verify emscripten versions match
         run: |
           EMSCRIPTEN_VERSION_LIBVIPS=$(node -p "require('@img/sharp-libvips-dev-wasm32/versions').emscripten")
@@ -363,8 +360,6 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: '24'
-      - name: Populate distribution directory
-        run: npm run build:dist
       - name: Populate WebAssembly wrapper packages
         run: npm run package-wasm-wrappers
       - name: Create release notes
