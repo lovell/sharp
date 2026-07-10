@@ -74,7 +74,7 @@ suite('GIF input', () => {
     const reduced = await sharp(fixtures.inputJpg)
       .resize(120, 80)
       .gif({
-        colours: 128,
+        colours: 16,
         dither: 0,
         effort: 1
       })

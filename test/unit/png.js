@@ -201,6 +201,31 @@ suite('PNG', () => {
     t.assert.strictEqual(true, data[0].length <= data[1].length);
   });
 
+  test('PNG palette bit depth is large enough to hold the requested number of colours', async (t) => {
+    const colourCounts = [8, 17, 100, 128];
+    t.plan(colourCounts.length);
+    // 256-colour gradient so quantisation genuinely fills the palette
+    const width = 256;
+    const height = 16;
+    const channels = 3;
+    const gradient = Buffer.alloc(width * height * channels);
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        const i = (y * width + x) * channels;
+        gradient[i] = x;
+        gradient[i + 1] = (x * 2) % 256;
+        gradient[i + 2] = 255 - x;
+      }
+    }
+    for (const colours of colourCounts) {
+      const data = await sharp(gradient, { raw: { width, height, channels } })
+        .png({ colours, palette: true })
+        .toBuffer();
+      const { bitsPerSample } = await sharp(data).metadata();
+      t.assert.ok(2 ** bitsPerSample >= colours, `colours ${colours} needs a palette of at least that size, got bit depth ${bitsPerSample}`);
+    }
+  });
+
   test('Invalid PNG libimagequant colours value throws error', (t) => {
     t.plan(1);
     t.assert.throws(() => {
