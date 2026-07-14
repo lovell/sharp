@@ -1054,6 +1054,18 @@ suite('Input/output', () => {
         /Expected integer between -1 and 100000 for subifd but received 1.2 of type number/
       );
     });
+    test('tiff.subifd is applied when decoding', async (t) => {
+      t.plan(2);
+      // The default main IFD (-1) decodes as usual
+      const { width } = await sharp(fixtures.inputTiffUncompressed, { tiff: { subifd: -1 } }).metadata();
+      t.assert.strictEqual(width, 246);
+      // Requesting a sub-IFD reaches the loader, so a file without sub-IFDs
+      // now fails rather than silently decoding the main image
+      await t.assert.rejects(
+        () => sharp(fixtures.inputTiffUncompressed, { tiff: { subifd: 0 } }).toBuffer(),
+        /SUBIFD/
+      );
+    });
     test('Valid pdf.background property (string)', (t) => {
       t.plan(1);
       sharp({ pdf: { background: '#00ff00' } });

@@ -118,7 +118,7 @@ namespace sharp {
       descriptor->openSlideLevel = AttrAsUint32(input, "openSlideLevel");
     }
     // subIFD (OME-TIFF)
-    if (HasAttr(input, "subifd")) {
+    if (HasAttr(input, "tiffSubifd")) {
       descriptor->tiffSubifd = AttrAsInt32(input, "tiffSubifd");
     }
     // // PDF background color
