@@ -64,6 +64,14 @@ suite('GIF input', () => {
     t.assert.strictEqual(80, info.pageHeight);
   });
 
+  test('Animated GIF limited to fewer pages than the input', async (t) => {
+    t.plan(3);
+    const { info } = await sharp(fixtures.inputGifAnimated, { pages: 2 }).toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual(160, info.height);
+    t.assert.strictEqual(80, info.pageHeight);
+    t.assert.strictEqual(2, info.pages);
+  });
+
   test('GIF with reduced colours, no dither, low effort reduces file size', async (t) => {
     t.plan(1);
     const original = await sharp(fixtures.inputJpg)

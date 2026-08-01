@@ -711,9 +711,12 @@ namespace sharp {
     bool hasDelay = !delay.empty();
     VImage copy = image.copy();
 
-    // Only set page-height if we have more than one page, or this could
-    // accidentally turn into an animated image later.
-    if (nPages > 1) copy.set(VIPS_META_PAGE_HEIGHT, pageHeight);
+    // Only set page-height and n-pages if we have more than one page, or this
+    // could accidentally turn into an animated image later.
+    if (nPages > 1) {
+      copy.set(VIPS_META_PAGE_HEIGHT, pageHeight);
+      copy.set(VIPS_META_N_PAGES, nPages);
+    }
     if (hasDelay) {
       if (delay.size() == 1) {
         // We have just one delay, repeat that value for all frames.
