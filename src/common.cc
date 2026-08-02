@@ -869,6 +869,29 @@ namespace sharp {
   }
 
   /*
+    Attach an event listener for progress updates, used to detect abort via SharedArrayBuffer flag
+  */
+  void SetAbortFlag(VImage image, std::atomic<int8_t> *abortFlag) {
+    if (abortFlag != nullptr) {
+      VipsImage *im = image.get_image();
+      if (im->progress_signal == NULL) {
+        g_signal_connect(im, "eval", G_CALLBACK(VipsAbortCallBack), abortFlag);
+        vips_image_set_progress(im, true);
+      }
+    }
+  }
+
+  /*
+    Event listener for progress updates, used to detect abort via SharedArrayBuffer flag
+  */
+  void VipsAbortCallBack(VipsImage *im, VipsProgress *progress, std::atomic<int8_t> *abortFlag) {
+    if (abortFlag->load(std::memory_order_relaxed) != 0) {
+      vips_image_set_kill(im, true);
+      vips_error("abort", "%d%% complete", progress->percent);
+    }
+  }
+
+  /*
     Calculate the (left, top) coordinates of the output image
     within the input image, applying the given gravity during an embed.
 
