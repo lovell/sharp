@@ -101,4 +101,41 @@ suite('AbortSignal', () => {
       /abort/
     );
   });
+
+  test('toBuffer with signal rejects resolveWithObject: true', async (t) => {
+    t.plan(1);
+    const controller = new AbortController();
+    await t.assert.throws(
+      () => sharp(fixtures.inputJpg).toBuffer({ signal: controller.signal, resolveWithObject: true }),
+      /resolveWithObject/
+    );
+  });
+
+  test('toBuffer with signal rejects resolveWithObject: false', async (t) => {
+    t.plan(1);
+    const controller = new AbortController();
+    await t.assert.throws(
+      () => sharp(fixtures.inputJpg).toBuffer({ signal: controller.signal, resolveWithObject: false }),
+      /resolveWithObject/
+    );
+  });
+
+  test('toBuffer without signal allows resolveWithObject: true', async (t) => {
+    t.plan(2);
+    const result = await sharp(fixtures.inputJpg)
+      .resize(100)
+      .toBuffer({ resolveWithObject: true });
+
+    t.assert.ok(result.data.length > 0);
+    t.assert.ok(result.info.width === 100);
+  });
+
+  test('toBuffer without signal allows resolveWithObject: false', async (t) => {
+    t.plan(1);
+    const data = await sharp(fixtures.inputJpg)
+      .resize(100)
+      .toBuffer({ resolveWithObject: false });
+
+    t.assert.ok(data.length > 0);
+  });
 });
