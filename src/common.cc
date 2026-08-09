@@ -686,11 +686,138 @@ namespace sharp {
   }
 
   /*
+    Callback collecting PNG text-chunk fields whose keyword carries image
+    orientation (e.g. "EXIF:Orientation", "xmp:tiff:Orientation").
+  */
+  static void* CollectOrientationPngCommentFields(VipsImage *image, char const *field, GValue *value, void *data) {
+    std::vector<std::string> *fieldNames = static_cast<std::vector<std::string> *>(data);
+    std::string fieldName(field);
+    const std::string prefix = "png-comment-";
+    if (fieldName.compare(0, prefix.size(), prefix) != 0) {
+      return nullptr;
+    }
+    // Keyword follows the first hyphen after the prefix, e.g. png-comment-3-EXIF:Orientation
+    const size_t hyphen = fieldName.find('-', prefix.size());
+    if (hyphen == std::string::npos) {
+      return nullptr;
+    }
+    const std::string keyword = fieldName.substr(hyphen + 1);
+    if (keyword == "EXIF:Orientation" || keyword == "xmp:tiff:Orientation") {
+      fieldNames->push_back(fieldName);
+    }
+    return nullptr;
+  }
+
+  /*
+    Update PNG text-chunk fields carrying image orientation to the given value.
+  */
+  VImage UpdateOrientationPngComments(VImage image, int const orientation) {
+    std::vector<std::string> fieldNames;
+    vips_image_map(image.get_image(),
+      static_cast<VipsImageMapFn>(CollectOrientationPngCommentFields), &fieldNames);
+    if (fieldNames.empty()) {
+      return image;
+    }
+    VImage copy = image.copy();
+    const std::string value = std::to_string(orientation);
+    for (const auto& field : fieldNames) {
+      copy.set(field.c_str(), value.c_str());
+    }
+    return copy;
+  }
+
+  /*
+    Replace every tiff:Orientation element in an XMP packet with the given value.
+    Handles plain, attribute-bearing and self-closing forms, and skips XML
+    comments, e.g. <tiff:Orientation>6</tiff:Orientation>,
+    <tiff:Orientation stDim:val="...">6</tiff:Orientation> and
+    <tiff:Orientation/>.
+  */
+  static std::string UpdateXmpOrientation(const std::string &xmp, int const orientation) {
+    const std::string element = "<tiff:Orientation";
+    const std::string commentOpen = "<!--";
+    const std::string commentClose = "-->";
+    const std::string closeTag = "</tiff:Orientation>";
+    const std::string valueStr = std::to_string(orientation);
+    std::string result;
+    size_t pos = 0;
+    bool changed = false;
+    while (true) {
+      const size_t next = xmp.find(element, pos);
+      if (next == std::string::npos) {
+        result.append(xmp, pos, std::string::npos);
+        break;
+      }
+      // Skip occurrences inside XML comments.
+      const size_t commentStart = xmp.find(commentOpen, pos);
+      if (commentStart != std::string::npos && commentStart < next) {
+        const size_t commentEnd = xmp.find(commentClose, commentStart);
+        if (commentEnd != std::string::npos) {
+          result.append(xmp, pos, commentEnd - pos);
+          pos = commentEnd;
+          continue;
+        }
+      }
+      const size_t tagEnd = xmp.find('>', next);
+      if (tagEnd == std::string::npos) {
+        result.append(xmp, pos, std::string::npos);
+        break;
+      }
+      result.append(xmp, pos, next - pos);
+      if (xmp[tagEnd - 1] == '/') {
+        // Self-closing form, e.g. <tiff:Orientation/>.
+        result.append("<tiff:Orientation>");
+        result.append(valueStr);
+        result.append(closeTag);
+      } else {
+        const size_t close = xmp.find(closeTag, tagEnd);
+        if (close == std::string::npos) {
+          result.append(xmp, next, std::string::npos);
+          break;
+        }
+        result.append("<tiff:Orientation>");
+        result.append(valueStr);
+        result.append(closeTag);
+        pos = close + closeTag.size();
+        changed = true;
+        continue;
+      }
+      pos = tagEnd + 1;
+      changed = true;
+    }
+    return changed ? result : xmp;
+  }
+
+  /*
+    Update non-EXIF sources of image orientation (PNG text-chunk comments and XMP packets).
+  */
+  VImage UpdateOrientationMetadata(VImage image, int const orientation) {
+    image = UpdateOrientationPngComments(image, orientation);
+    if (image.get_typeof(VIPS_META_XMP_NAME) == VIPS_TYPE_BLOB) {
+      size_t length = 0;
+      const void *data = image.get_blob(VIPS_META_XMP_NAME, &length);
+      const std::string xmp(static_cast<char const *>(data), length);
+      const std::string updated = UpdateXmpOrientation(xmp, orientation);
+      if (updated != xmp) {
+        // Copy into glib-owned memory so libvips can free the blob when done.
+        void *buffer = g_malloc(updated.size());
+        memcpy(buffer, updated.data(), updated.size());
+        VImage copy = image.copy();
+        copy.set(VIPS_META_XMP_NAME, reinterpret_cast<VipsCallbackFn>(vips_area_free_cb),
+          buffer, updated.size());
+        return copy;
+      }
+    }
+    return image;
+  }
+
+  /*
     Set EXIF Orientation of image.
   */
   VImage SetExifOrientation(VImage image, int const orientation) {
     VImage copy = image.copy();
     copy.set(VIPS_META_ORIENTATION, orientation);
+    copy = UpdateOrientationMetadata(copy, orientation);
     return copy;
   }
 
@@ -701,6 +828,7 @@ namespace sharp {
     VImage copy = image.copy();
     copy.remove(VIPS_META_ORIENTATION);
     copy.remove("exif-ifd0-Orientation");
+    copy = UpdateOrientationMetadata(copy, 1);
     return copy;
   }
 

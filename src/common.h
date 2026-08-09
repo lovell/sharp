@@ -273,6 +273,11 @@ namespace sharp {
   int ExifOrientation(VImage image);
 
   /*
+    Update non-EXIF orientation metadata (PNG text-chunk comments and XMP packets).
+  */
+  VImage UpdateOrientationMetadata(VImage image, int const orientation);
+
+  /*
     Set EXIF Orientation of image.
   */
   VImage SetExifOrientation(VImage image, int const orientation);

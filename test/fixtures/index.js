@@ -104,6 +104,8 @@ module.exports = {
   inputPngTrimSpecificColourIncludeAlpha: getPath('Flag_of_the_Netherlands-alpha.png'), // convert Flag_of_the_Netherlands.png -alpha set -background none -channel A -evaluate multiply 0.5 +channel Flag_of_the_Netherlands-alpha.png
   inputPngUint32Limit: getPath('65536-uint32-limit.png'), // https://alexandre.alapetite.fr/doc-alex/large-image/
   inputPngWithProPhotoProfile: getPath('prophoto.png'),
+  inputPngWithExifXmpOrientation: getPath('inputPngWithExifXmpOrientation.png'), // https://github.com/lovell/sharp/issues/4585
+  inputPngWithXmpOrientation: getPath('inputPngWithXmpOrientation.png'), // https://github.com/lovell/sharp/issues/4585
 
   inputWebP: getPath('4.webp'), // http://www.gstatic.com/webp/gallery/4.webp
   inputWebPWithTransparency: getPath('5_webp_a.webp'), // http://www.gstatic.com/webp/gallery3/5_webp_a.webp

@@ -121,6 +121,33 @@ suite('Rotation', () => {
     });
   });
 
+  test('Auto-orient normalises orientation duplicated in non-EXIF metadata', async (t) => {
+    // https://github.com/lovell/sharp/issues/4585
+    t.plan(2);
+    const { data } = await bufferWithInfo(
+      sharp(fixtures.inputPngWithExifXmpOrientation).autoOrient().withMetadata()
+    );
+    const { orientation, comments } = await sharp(data).metadata();
+    t.assert.strictEqual(orientation, 1);
+    const stale = (comments || [])
+      .filter(({ keyword }) => /orientation$/i.test(keyword))
+      .filter(({ text }) => text !== '1');
+    t.assert.deepEqual(stale, []);
+  });
+
+  test('Auto-orient normalises XMP packet orientation and preserves packet integrity', async (t) => {
+    // https://github.com/lovell/sharp/issues/4585
+    t.plan(3);
+    const { data } = await bufferWithInfo(
+      sharp(fixtures.inputPngWithXmpOrientation).autoOrient().withMetadata()
+    );
+    const { orientation, xmpAsString } = await sharp(data).metadata();
+    t.assert.strictEqual(orientation, 1);
+    // The XMP packet must survive intact (regression guard for buffer lifetime).
+    t.assert.ok(typeof xmpAsString === 'string' && xmpAsString.length > 0);
+    t.assert.ok(/<tiff:Orientation>1<\/tiff:Orientation>/.test(xmpAsString));
+  });
+
   test('Rotate by 30 degrees with semi-transparent background', async (t) => {
     t.plan(4);
     const { data, info } = await bufferWithInfo(
