@@ -3,11 +3,11 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
-const exifReader = require('exif-reader');
+import { suite, test } from 'node:test';
+import exifReader from 'exif-reader';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 suite('Gain maps', () => {
   test('Metadata contains gainMap', async (t) => {

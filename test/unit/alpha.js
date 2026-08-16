@@ -3,10 +3,10 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
+import { suite, test } from 'node:test';
 
-const fixtures = require('../fixtures');
-const sharp = require('../../');
+import fixtures from '../fixtures/index.js';
+import sharp from '../../lib/index.js';
 
 suite('Alpha transparency', () => {
   test('Flatten to black', async (t) => {
