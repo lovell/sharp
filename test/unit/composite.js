@@ -400,29 +400,35 @@ suite('composite', () => {
     });
 
     test('invalid left', (t) => {
-      t.plan(3);
+      t.plan(4);
       t.assert.throws(() => {
         sharp().composite([{ input: 'test', left: 0.5 }]);
-      }, /Expected integer for left but received 0.5 of type number/);
+      }, /Expected integer between -100000000 and 100000000 for left but received 0.5 of type number/);
       t.assert.throws(() => {
         sharp().composite([{ input: 'test', left: 'invalid' }]);
-      }, /Expected integer for left but received invalid of type string/);
+      }, /Expected integer between -100000000 and 100000000 for left but received invalid of type string/);
       t.assert.throws(() => {
         sharp().composite([{ input: 'test', left: 'invalid', top: 10 }]);
-      }, /Expected integer for left but received invalid of type string/);
+      }, /Expected integer between -100000000 and 100000000 for left but received invalid of type string/);
+      t.assert.throws(() => {
+        sharp().composite([{ input: 'test', left: 4294967301, top: 10 }]);
+      }, /Expected integer between -100000000 and 100000000 for left but received 4294967301 of type number/);
     });
 
     test('invalid top', (t) => {
-      t.plan(3);
+      t.plan(4);
       t.assert.throws(() => {
         sharp().composite([{ input: 'test', top: 0.5 }]);
-      }, /Expected integer for top but received 0.5 of type number/);
+      }, /Expected integer between -100000000 and 100000000 for top but received 0.5 of type number/);
       t.assert.throws(() => {
         sharp().composite([{ input: 'test', top: 'invalid' }]);
-      }, /Expected integer for top but received invalid of type string/);
+      }, /Expected integer between -100000000 and 100000000 for top but received invalid of type string/);
       t.assert.throws(() => {
         sharp().composite([{ input: 'test', top: 'invalid', left: 10 }]);
-      }, /Expected integer for top but received invalid of type string/);
+      }, /Expected integer between -100000000 and 100000000 for top but received invalid of type string/);
+      t.assert.throws(() => {
+        sharp().composite([{ input: 'test', top: 4294967301, left: 10 }]);
+      }, /Expected integer between -100000000 and 100000000 for top but received 4294967301 of type number/);
     });
 
     test('left but no top', (t) => {

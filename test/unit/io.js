@@ -3,6 +3,7 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
+import { once } from'node:events';
 import { createReadStream, createWriteStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -368,6 +369,81 @@ suite('Input/output', () => {
     t.assert.strictEqual(320, info.width);
     t.assert.strictEqual(240, info.height);
     await fs.rm(outputJpg);
+  });
+
+  suite('Output requested after Writable side of Stream-based input has finished', () => {
+    const finishedPipeline = async (pipeline) => {
+      createReadStream(fixtures.inputJpg).pipe(pipeline);
+      await once(pipeline, 'finish');
+      return pipeline;
+    };
+
+    test('Write to Buffer via Promise', async (t) => {
+      t.plan(2);
+      const pipeline = await finishedPipeline(sharp().resize(320, 240));
+      const { info } = await pipeline.toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(240, info.height);
+    });
+
+    test('Write to Buffer via callback', async (t) => {
+      t.plan(2);
+      const pipeline = await finishedPipeline(sharp().resize(320, 240));
+      const info = await new Promise((resolve, reject) => {
+        pipeline.toBuffer((err, _data, info) => err ? reject(err) : resolve(info));
+      });
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(240, info.height);
+    });
+
+    test('Write to File via Promise', async (t) => {
+      t.plan(2);
+      const pipeline = await finishedPipeline(sharp().resize(320, 240));
+      const info = await pipeline.toFile(outputJpg);
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(240, info.height);
+      await fs.rm(outputJpg);
+    });
+
+    test('Read metadata via Promise', async (t) => {
+      t.plan(1);
+      const pipeline = await finishedPipeline(sharp());
+      const { width } = await pipeline.metadata();
+      t.assert.strictEqual(2725, width);
+    });
+
+    test('Read metadata via callback', async (t) => {
+      t.plan(1);
+      const pipeline = await finishedPipeline(sharp());
+      const { width } = await new Promise((resolve, reject) => {
+        pipeline.metadata((err, metadata) => err ? reject(err) : resolve(metadata));
+      });
+      t.assert.strictEqual(2725, width);
+    });
+
+    test('Read stats via Promise', async (t) => {
+      t.plan(1);
+      const pipeline = await finishedPipeline(sharp());
+      const { isOpaque } = await pipeline.stats();
+      t.assert.strictEqual(true, isOpaque);
+    });
+
+    test('Read stats via callback', async (t) => {
+      t.plan(1);
+      const pipeline = await finishedPipeline(sharp());
+      const { isOpaque } = await new Promise((resolve, reject) => {
+        pipeline.stats((err, stats) => err ? reject(err) : resolve(stats));
+      });
+      t.assert.strictEqual(true, isOpaque);
+    });
+
+    test('Clone inherits input', async (t) => {
+      t.plan(2);
+      const pipeline = await finishedPipeline(sharp());
+      const { info } = await pipeline.clone().resize(320, 240).toBuffer({ resolveWithObject: true });
+      t.assert.strictEqual(320, info.width);
+      t.assert.strictEqual(240, info.height);
+    });
   });
 
   test('Non-Stream input generates error when provided Stream-like data', async (t) => {
@@ -1054,6 +1130,18 @@ suite('Input/output', () => {
       t.assert.throws(
         () => sharp({ subifd: 1.2 }),
         /Expected integer between -1 and 100000 for subifd but received 1.2 of type number/
+      );
+    });
+    test('tiff.subifd is applied when decoding', async (t) => {
+      t.plan(2);
+      // The default main IFD (-1) decodes as usual
+      const { width } = await sharp(fixtures.inputTiffUncompressed, { tiff: { subifd: -1 } }).metadata();
+      t.assert.strictEqual(width, 246);
+      // Requesting a sub-IFD reaches the loader, so a file without sub-IFDs
+      // now fails rather than silently decoding the main image
+      await t.assert.rejects(
+        () => sharp(fixtures.inputTiffUncompressed, { tiff: { subifd: 0 } }).toBuffer(),
+        /SUBIFD/
       );
     });
     test('Valid pdf.background property (string)', (t) => {

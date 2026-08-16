@@ -1693,9 +1693,9 @@ declare namespace sharp {
         blend?: Blend | undefined;
         /** gravity at which to place the overlay. (optional, default 'centre') */
         gravity?: Gravity | undefined;
-        /** the pixel offset from the top edge. */
+        /** the pixel offset from the top edge, an integer between -100000000 and 100000000. */
         top?: number | undefined;
-        /** the pixel offset from the left edge. */
+        /** the pixel offset from the left edge, an integer between -100000000 and 100000000. */
         left?: number | undefined;
         /** set to true to repeat the overlay image across the entire image with the given  gravity. (optional, default false) */
         tile?: boolean | undefined;

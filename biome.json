@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**/*", "!**/*.svg"]
+    "includes": ["**/*", "!test/**/*.svg"]
   },
   "linter": {
     "enabled": true,

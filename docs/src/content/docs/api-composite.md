@@ -54,8 +54,8 @@ and https://www.cairographics.org/operators/
 | [images[].autoOrient] | <code>Boolean</code> | <code>false</code> | set to true to use EXIF orientation data, if present, to orient the image. |
 | [images[].blend] | <code>String</code> | <code>&#x27;over&#x27;</code> | how to blend this image with the image below. |
 | [images[].gravity] | <code>String</code> | <code>&#x27;centre&#x27;</code> | gravity at which to place the overlay. |
-| [images[].top] | <code>Number</code> |  | the pixel offset from the top edge. |
-| [images[].left] | <code>Number</code> |  | the pixel offset from the left edge. |
+| [images[].top] | <code>Number</code> |  | the pixel offset from the top edge, an integer between -100000000 and 100000000. |
+| [images[].left] | <code>Number</code> |  | the pixel offset from the left edge, an integer between -100000000 and 100000000. |
 | [images[].tile] | <code>Boolean</code> | <code>false</code> | set to true to repeat the overlay image across the entire image with the given `gravity`. |
 | [images[].premultiplied] | <code>Boolean</code> | <code>false</code> | set to true to avoid premultiplying the image below. Equivalent to the `--premultiplied` vips option. |
 | [images[].density] | <code>Number</code> | <code>72</code> | number representing the DPI for vector overlay image. |

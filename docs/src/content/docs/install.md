@@ -232,7 +232,7 @@ custom:
       - sharp
     packagerOptions:
       scripts:
-        - npm install --os=linux --cpu=x64 sharp
+        - npm install --os=linux --libc=glibc --cpu=x64 sharp
 ```
 
 ### electron
