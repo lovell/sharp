@@ -3,9 +3,9 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
+import { suite, test } from 'node:test';
 
-const sharp = require('../../');
+import sharp from '../../lib/index.js';
 
 const row = [0, 3, 15, 63, 127, 255];
 const input = Buffer.from(Array.from(row, () => row).flat());

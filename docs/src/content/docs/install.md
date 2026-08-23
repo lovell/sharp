@@ -35,7 +35,7 @@ deno run --allow-env --allow-ffi --allow-read --allow-sys ...
 
 ## Prerequisites
 
-* Node-API v9 compatible runtime e.g. Node.js >= 20.9.0.
+* Node-API v9 compatible runtime e.g. Node.js ^20.19.0 || >= 22.12.0.
 
 ## Prebuilt binaries
 

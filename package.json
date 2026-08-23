@@ -95,7 +95,6 @@
   ],
   "scripts": {
     "build": "node install/build.js",
-    "build:dist": "node scripts/build.mjs",
     "clean": "rm -rf src/build/ test/fixtures/output.*",
     "test": "npm run lint && npm run test-unit",
     "lint": "npm run lint-cpp && npm run lint-js && npm run lint-types && npm run lint-publish",
@@ -104,35 +103,24 @@
     "lint-publish": "publint --strict",
     "lint-types": "tsd --files ./test/types/sharp.test-d.{cts,mts}",
     "test-leak": "./test/leak/leak.sh",
-    "test-unit": "node --experimental-test-coverage test/unit.mjs",
+    "test-unit": "node --experimental-test-coverage test/unit.js",
     "package-from-local-build": "node npm/from-local-build.js",
     "package-wasm-wrappers": "node npm/wasm-wrappers.js",
     "package-release-notes": "node npm/release-notes.js",
-    "docs-build": "node docs/build.mjs",
+    "docs-build": "node docs/build.js",
     "docs-serve": "cd docs && npm start",
     "docs-publish": "cd docs && npm run build && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"
   },
-  "type": "commonjs",
+  "type": "module",
   "files": [
-    "dist",
     "install",
-    "lib/index.d.ts",
+    "lib",
     "src/*.{cc,h,gyp}"
   ],
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
-    }
+    ".": "./lib/index.js"
   },
   "sideEffects": true,
   "repository": {
@@ -216,7 +204,7 @@
   },
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=20.9.0"
+    "node": "^20.19.0 || >= 22.12.0"
   },
   "config": {
     "libvips": ">=8.18.3"

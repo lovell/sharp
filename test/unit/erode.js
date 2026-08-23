@@ -1,7 +1,7 @@
-const { suite, test } = require('node:test');
+import { suite, test } from 'node:test';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 suite('Erode', () => {
   test('erode 1 png', async (t) => {

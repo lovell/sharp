@@ -3,11 +3,12 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
+import { suite, test } from 'node:test';
 
-const sharp = require('../../');
-const inRange = require('../../dist/is.cjs').inRange;
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import is from '../../lib/is.js';
+const { inRange } = is;
+import fixtures from '../fixtures/index.js';
 
 suite('Trim borders', () => {
   test('Skip shrink-on-load', async (t) => {

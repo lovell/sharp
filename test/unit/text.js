@@ -3,11 +3,12 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
+import { suite, test } from 'node:test';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
-const { inRange } = require('../../dist/is.cjs');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
+import is from '../../lib/is.js';
+const { inRange } = is;
 
 suite('Text to image', () => {
   test('text with default values', async (t) => {

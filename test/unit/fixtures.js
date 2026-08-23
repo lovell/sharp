@@ -3,9 +3,9 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
+import { suite, test } from 'node:test';
 
-const fixtures = require('../fixtures');
+import fixtures from '../fixtures/index.js';
 
 suite('Test fixtures', () => {
   suite('assertMaxColourDistance', () => {

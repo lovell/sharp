@@ -3,13 +3,13 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const imagemagick = require('imagemagick');
-const gm = require('gm');
-const assert = require('node:assert');
-const Benchmark = require('benchmark');
+import imagemagick from 'imagemagick';
+import gm from 'gm';
+import assert from 'node:assert';
+import Benchmark from 'benchmark';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 sharp.cache(false);
 
