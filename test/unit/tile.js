@@ -3,14 +3,30 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
+const { createWriteStream } = require('node:fs');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { pipeline } = require('node:stream/promises');
 const { suite, test } = require('node:test');
 
-const extractZip = require('extract-zip');
+const yauzl = require('yauzl');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
+
+async function extractZip(zipPath, { dir }) {
+  const zipFile = await yauzl.openPromise(zipPath, { autoClose: true, lazyEntries: true });
+  for await (const entry of zipFile.eachEntry()) {
+    const entryPath = path.join(dir, entry.fileName);
+    if (entry.fileName.endsWith('/')) {
+      await fs.mkdir(entryPath, { recursive: true });
+      continue;
+    }
+    await fs.mkdir(path.dirname(entryPath), { recursive: true });
+    const readStream = await zipFile.openReadStreamPromise(entry);
+    await pipeline(readStream, createWriteStream(entryPath));
+  }
+}
 
 async function countDeepZoomAssertions(directory) {
   const dirents = await fs.readdir(directory, { withFileTypes: true });

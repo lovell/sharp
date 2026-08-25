@@ -32,6 +32,6 @@
     "node": ">=20.9.0"
   },
   "dependencies": {
-    "@emnapi/runtime": "^1.11.2"
+    "@emnapi/runtime": "^1.11.3"
   }
 }
