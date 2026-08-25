@@ -58,42 +58,70 @@ suite('Resize dimensions', () => {
     t.plan(1);
     t.assert.throws(() => {
       sharp().resize('spoons', 240);
-    }, /Expected positive integer for width but received spoons of type string/);
+    }, /Expected positive integer between 1 and 100000000 for width but received spoons of type string/);
   });
 
   test('Invalid height - NaN', (t) => {
     t.plan(1);
     t.assert.throws(() => {
       sharp().resize(320, 'spoons');
-    }, /Expected positive integer for height but received spoons of type string/);
+    }, /Expected positive integer between 1 and 100000000 for height but received spoons of type string/);
   });
 
   test('Invalid width - float', (t) => {
     t.plan(1);
     t.assert.throws(() => {
       sharp().resize(1.5, 240);
-    }, /Expected positive integer for width but received 1.5 of type number/);
+    }, /Expected positive integer between 1 and 100000000 for width but received 1.5 of type number/);
   });
 
   test('Invalid height - float', (t) => {
     t.plan(1);
     t.assert.throws(() => {
       sharp().resize(320, 1.5);
-    }, /Expected positive integer for height but received 1.5 of type number/);
+    }, /Expected positive integer between 1 and 100000000 for height but received 1.5 of type number/);
   });
 
   test('Invalid width - via options', (t) => {
     t.plan(1);
     t.assert.throws(() => {
       sharp().resize({ width: 1.5, height: 240 });
-    }, /Expected positive integer for width but received 1.5 of type number/);
+    }, /Expected positive integer between 1 and 100000000 for width but received 1.5 of type number/);
   });
 
   test('Invalid height - via options', (t) => {
     t.plan(1);
     t.assert.throws(() => {
       sharp().resize({ width: 320, height: 1.5 });
-    }, /Expected positive integer for height but received 1.5 of type number/);
+    }, /Expected positive integer between 1 and 100000000 for height but received 1.5 of type number/);
+  });
+
+  test('Invalid width - greater than max coords', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp().resize(100000001, 240);
+    }, /Expected positive integer between 1 and 100000000 for width but received 100000001 of type number/);
+  });
+
+  test('Invalid height - greater than max coords', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp().resize(320, 100000001);
+    }, /Expected positive integer between 1 and 100000000 for height but received 100000001 of type number/);
+  });
+
+  test('Invalid width - greater than max coords - via options', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp().resize({ width: 100000001, height: 240 });
+    }, /Expected positive integer between 1 and 100000000 for width but received 100000001 of type number/);
+  });
+
+  test('Invalid height - greater than max coords - via options', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp().resize({ width: 320, height: 100000001 });
+    }, /Expected positive integer between 1 and 100000000 for height but received 100000001 of type number/);
   });
 
   test('Invalid width - too large', async (t) => {
