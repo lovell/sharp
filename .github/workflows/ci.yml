@@ -324,6 +324,7 @@ jobs:
         with:
           node-version: "22"
       - run: npm install
+      - run: npx patch-package
       - run: npm run build:dist && emmake npm run build
       - name: Verify emscripten versions match
         run: |

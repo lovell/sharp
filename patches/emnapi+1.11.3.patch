@@ -1,0 +1,35 @@
+diff --git a/node_modules/emnapi/dist/library_napi.js b/node_modules/emnapi/dist/library_napi.js
+index c2ef5b0..210c4c3 100644
+--- a/node_modules/emnapi/dist/library_napi.js
++++ b/node_modules/emnapi/dist/library_napi.js
+@@ -602,6 +602,12 @@ function _napi_cancel_async_work(env, work) {
+ var emnapiString = {
+     utf8Decoder: undefined,
+     utf16Decoder: undefined,
++    getHeapViewOrCopy: function (heap, start, end) {
++        var buffer = heap.buffer;
++        var isShared = Object.prototype.toString.call(buffer) === '[object SharedArrayBuffer]';
++        var isResizable = buffer.resizable === true;
++        return isShared || isResizable ? heap.slice(start, end) : heap.subarray(start, end);
++    },
+     init: function () {
+ #if !TEXTDECODER || TEXTDECODER == 1
+         var fallbackDecoder = {
+@@ -761,7 +767,7 @@ var emnapiString = {
+             return str;
+         }
+ #endif
+-        return emnapiString.utf8Decoder.decode({{{ getUnsharedTextDecoderView('HEAPU8', 'ptr', 'end') }}});
++        return emnapiString.utf8Decoder.decode(emnapiString.getHeapViewOrCopy(HEAPU8, ptr, end));
+     },
+     stringToUTF8: function (str, outPtr, maxBytesToWrite) {
+         var HEAPU8 = new Uint8Array(wasmMemory.buffer);
+@@ -831,7 +837,7 @@ var emnapiString = {
+ #endif
+         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+         var HEAPU8 = new Uint8Array(wasmMemory.buffer);
+-        return emnapiString.utf16Decoder.decode({{{ getUnsharedTextDecoderView('HEAPU8', 'ptr', 'end') }}});
++        return emnapiString.utf16Decoder.decode(emnapiString.getHeapViewOrCopy(HEAPU8, ptr, end));
+     },
+     stringToUTF16: function (str, outPtr, maxBytesToWrite) {
+         if (maxBytesToWrite === undefined) {
