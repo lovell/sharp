@@ -1,3 +1,8 @@
+/* TEAM */
+
+Name: Lovell Fuller
+GitHub: https://github.com/lovell
+
 /* THANKS */
 
 Name: John Cupitt
