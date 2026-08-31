@@ -172,6 +172,89 @@ suite('Colour space conversion', () => {
     t.assert.strictEqual(b, 34);
   });
 
+  suite('Device-independent pipeline colourspace', async () => {
+    const size = 64;
+    const data = Buffer.alloc(size * size * 3);
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const i = (y * size + x) * 3;
+        data.fill((x + y) % 2 ? 255 : 0, i, i + 3);
+      }
+    }
+    const chequerboard = await sharp(data, { raw: { width: size, height: size, channels: 3 } })
+      .png()
+      .withIccProfile('p3')
+      .toBuffer();
+
+    for (const [space, expected] of [['srgb', 128], ['rgb16', 128], ['scrgb', 188], ['xyz', 188]]) {
+      test(`Reduces a profiled image in ${space}`, async (t) => {
+        t.plan(1);
+        const data = await sharp(chequerboard)
+          .pipelineColourspace(space)
+          .resize(8)
+          .raw()
+          .toBuffer();
+        const mean = data.reduce((sum, value) => sum + value, 0) / data.length;
+        t.assert.ok(Math.abs(mean - expected) <= 1, `expected ~${expected}, saw ${mean.toFixed(2)}`);
+      });
+    }
+
+    const swatch = sharp(Buffer.from([200, 60, 30]), { raw: { width: 1, height: 1, channels: 3 } }).png()
+    const swatchNarrowGamut = await swatch.toBuffer();
+    const swatchWideGamut = await swatch.withIccProfile('p3').toBuffer();
+
+    for (const space of ['scrgb', 'xyz', 'yxy', 'lab', 'labs', 'lch']) {
+      test(`Applies the embedded profile in ${space}`, async (t) => {
+        t.plan(3);
+        const render = (swatch) => sharp(swatch)
+          .pipelineColourspace(space)
+          .raw()
+          .toBuffer();
+        const [r1, g1, b1] = await render(swatchNarrowGamut);
+        const [r2, g2, b2] = await render(swatchWideGamut);
+        t.assert.ok(Math.abs(r2 - r1) < 5);
+        t.assert.ok(Math.abs(g2 - g1) < 1);
+        t.assert.ok(Math.abs(b2 - b1) < 3);
+      });
+    }
+
+    test('Keeps the P3 working profile in rgb16', async (t) => {
+      t.plan(3);
+      const [r, g, b] = await sharp(fixtures.inputPngP3)
+        .pipelineColourspace('rgb16')
+        .withIccProfile('p3')
+        .raw()
+        .toBuffer();
+      t.assert.strictEqual(r, 242);
+      t.assert.strictEqual(g, 0);
+      t.assert.strictEqual(b, 0);
+    });
+
+    test('Ignores the input profile regardless of pipeline colourspace', async (t) => {
+      t.plan(1);
+      const render = (space) => sharp(fixtures.inputPngP3, { ignoreIcc: true })
+        .pipelineColourspace(space)
+        .withIccProfile('srgb')
+        .raw()
+        .toBuffer();
+      const [r1, g1, b1] = await render('srgb');
+      const [r2, g2, b2] = await render('scrgb');
+      t.assert.deepStrictEqual([r1, g1, b1], [r2, g2, b2]);
+    });
+
+    test('Passthrough P3 without gamut loss', async (t) => {
+      t.plan(3);
+      const [r, g, b] = await sharp(fixtures.inputPngP3)
+        .pipelineColourspace('scrgb')
+        .withIccProfile('p3')
+        .raw()
+        .toBuffer();
+      t.assert.strictEqual(r, 241);
+      t.assert.strictEqual(g, 0);
+      t.assert.strictEqual(b, 0);
+    });
+  });
+
   test('Invalid pipelineColourspace input', (t) => {
     t.plan(1);
     t.assert.throws(() => {
