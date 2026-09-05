@@ -216,6 +216,7 @@ struct PipelineBaton {
   bool withGainMap;
   bool keepGainMap;
   int timeoutSeconds;
+  std::atomic<int8_t> *abortFlag;
   std::vector<double> convKernel;
   int convKernelWidth;
   int convKernelHeight;
@@ -396,6 +397,7 @@ struct PipelineBaton {
     withGainMap(false),
     keepGainMap(false),
     timeoutSeconds(0),
+    abortFlag(nullptr),
     convKernelWidth(0),
     convKernelHeight(0),
     convKernelScale(0.0),

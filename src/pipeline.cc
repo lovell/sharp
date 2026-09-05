@@ -947,6 +947,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       baton->hasAlphaOut = image.has_alpha();
 
       // Output
+      if (baton->abortFlag) {
+        sharp::SetAbortFlag(image, baton->abortFlag);
+      }
       sharp::SetTimeout(image, baton->timeoutSeconds);
       if (baton->fileOut.empty()) {
         // Buffer output
@@ -1839,6 +1842,10 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->keepGainMap = sharp::AttrAsBool(options, "keepGainMap");
   baton->withGainMap = sharp::AttrAsBool(options, "withGainMap");
   baton->timeoutSeconds = sharp::AttrAsUint32(options, "timeoutSeconds");
+  if (sharp::HasAttr(options, "abortFlag")) {
+    Napi::ArrayBuffer ab = options.Get("abortFlag").As<Napi::ArrayBuffer>();
+    baton->abortFlag = reinterpret_cast<std::atomic<int8_t>*>(ab.Data());
+  }
   baton->loop = sharp::AttrAsUint32(options, "loop");
   baton->delay = sharp::AttrAsInt32Vector(options, "delay");
   // Format-specific
