@@ -901,6 +901,14 @@ suite('Input/output', () => {
         /Input image exceeds pixel limit/
       );
     });
+
+    test('Limit applies when creating an image', async (t) => {
+      t.plan(1);
+      await t.assert.rejects(
+        () => sharp({ create: { width: 100000, height: 100000, channels: 3, background: 'red' }}).toBuffer(),
+        /Input image exceeds pixel limit/
+      );
+    });
   });
 
   suite('Limit channel count of input image', () => {

@@ -540,10 +540,10 @@ namespace sharp {
           if (channels == 4) {
             background.push_back(descriptor->createBackground[3]);
           }
-          image = VImage::new_matrix(descriptor->createWidth, descriptor->createHeight)
-            .copy(VImage::option()->set("interpretation",
-              channels < 3 ? VIPS_INTERPRETATION_B_W : VIPS_INTERPRETATION_sRGB))
-            .new_from_image(background);
+          image = VImage::black(descriptor->createWidth, descriptor->createHeight,
+            VImage::option()->set("bands", channels))
+            .copy(VImage::option()->set("interpretation", VIPS_INTERPRETATION_sRGB))
+            .linear(std::vector<double>(channels, 0.0), background, VImage::option()->set("uchar", true));
         }
         if (descriptor->createPageHeight > 0) {
           image.set(VIPS_META_PAGE_HEIGHT, descriptor->createPageHeight);
