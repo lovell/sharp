@@ -959,10 +959,8 @@ class PipelineWorker : public Napi::AsyncWorker {
           VipsArea *area;
           if (baton->keepGainMap) {
             image = ReattachGainMap(image, gainMap, baton);
-            area = reinterpret_cast<VipsArea*>(image.uhdrsave_buffer(VImage::option()
-              ->set("keep", baton->keepMetadata)
-              ->set("Q", baton->jpegQuality)
-              ->set("gainmap_scale_factor", gainMapScaleFactor)));
+            area = reinterpret_cast<VipsArea*>(image.uhdrsave_buffer(
+              BuildOptionsUhdr(image, baton, gainMapScaleFactor)));
           } else {
             area = reinterpret_cast<VipsArea*>(image.jpegsave_buffer(VImage::option()
               ->set("keep", baton->keepMetadata)
@@ -1200,10 +1198,8 @@ class PipelineWorker : public Napi::AsyncWorker {
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JPEG);
           if (baton->keepGainMap) {
             image = ReattachGainMap(image, gainMap, baton);
-            image.uhdrsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
-              ->set("keep", baton->keepMetadata)
-              ->set("Q", baton->jpegQuality)
-              ->set("gainmap_scale_factor", gainMapScaleFactor));
+            image.uhdrsave(const_cast<char*>(baton->fileOut.data()),
+              BuildOptionsUhdr(image, baton, gainMapScaleFactor));
           } else {
             image.jpegsave(const_cast<char*>(baton->fileOut.data()), VImage::option()
               ->set("keep", baton->keepMetadata)
@@ -1636,6 +1632,23 @@ class PipelineWorker : public Napi::AsyncWorker {
     image.set("gainmap-data", reinterpret_cast<VipsCallbackFn>(vips_area_free_cb),
       gainMapJpeg->data, gainMapJpeg->length);
     return image;
+  }
+
+  vips::VOption *BuildOptionsUhdr(VImage image, PipelineBaton *baton,
+    int gainMapScaleFactor) {
+    vips::VOption *options = VImage::option()
+      ->set("keep", baton->keepMetadata)
+      ->set("Q", baton->jpegQuality)
+      ->set("gainmap_scale_factor", gainMapScaleFactor);
+    if (image.interpretation() != VIPS_INTERPRETATION_scRGB) {
+      options
+        ->set("interlace", baton->jpegProgressive)
+        ->set("subsample_mode", baton->jpegChromaSubsampling == "4:4:4"
+          ? VIPS_FOREIGN_SUBSAMPLE_OFF
+          : VIPS_FOREIGN_SUBSAMPLE_ON)
+        ->set("optimize_coding", baton->jpegOptimiseCoding);
+    }
+    return options;
   }
 
   /*
