@@ -152,74 +152,74 @@ suite('Extend', () => {
     t.plan(1);
     t.assert.throws(
       () => sharp().extend(-1),
-      /Expected integer between 1 and 10000 for extend but received -1 of type number/
+      /Expected integer between 1 and 100000000 for extend but received -1 of type number/
     );
   });
   test('too large fails', (t) => {
     t.plan(1);
     t.assert.throws(
-      () => sharp().extend(10001),
-      /Expected integer between 1 and 10000 for extend but received 10001 of type number/ 
+      () => sharp().extend(100000001),
+      /Expected integer between 1 and 100000000 for extend but received 100000001 of type number/
     );
   });
   test('invalid top fails', (t) => {
     t.plan(3);
     t.assert.throws(
       () => sharp().extend({ top: 'fail' }),
-      /Expected integer between 0 and 10000 for top but received fail of type string/
+      /Expected integer between 0 and 100000000 for top but received fail of type string/
     );
     t.assert.throws(
       () => sharp().extend({ top: -1 }),
-      /Expected integer between 0 and 10000 for top but received -1 of type number/
+      /Expected integer between 0 and 100000000 for top but received -1 of type number/
     );
     t.assert.throws(
-      () => sharp().extend({ top: 10001 }),
-      /Expected integer between 0 and 10000 for top but received 10001 of type number/
+      () => sharp().extend({ top: 100000001 }),
+      /Expected integer between 0 and 100000000 for top but received 100000001 of type number/
     );
   });
   test('invalid bottom fails', (t) => {
     t.plan(3);
     t.assert.throws(
       () => sharp().extend({ bottom: 'fail' }),
-      /Expected integer between 0 and 10000 for bottom but received fail of type string/
+      /Expected integer between 0 and 100000000 for bottom but received fail of type string/
     );
     t.assert.throws(
       () => sharp().extend({ bottom: -1 }),
-      /Expected integer between 0 and 10000 for bottom but received -1 of type number/
+      /Expected integer between 0 and 100000000 for bottom but received -1 of type number/
     );
     t.assert.throws(
-      () => sharp().extend({ bottom: 10001 }),
-      /Expected integer between 0 and 10000 for bottom but received 10001 of type number/
+      () => sharp().extend({ bottom: 100000001 }),
+      /Expected integer between 0 and 100000000 for bottom but received 100000001 of type number/
     );
   });
   test('invalid left fails', (t) => {
     t.plan(3);
     t.assert.throws(
       () => sharp().extend({ left: 'fail' }),
-      /Expected integer between 0 and 10000 for left but received fail of type string/
+      /Expected integer between 0 and 100000000 for left but received fail of type string/
     );
     t.assert.throws(
       () => sharp().extend({ left: -1 }),
-      /Expected integer between 0 and 10000 for left but received -1 of type number/
+      /Expected integer between 0 and 100000000 for left but received -1 of type number/
     );
     t.assert.throws(
-      () => sharp().extend({ left: 10001 }),
-      /Expected integer between 0 and 10000 for left but received 10001 of type number/
+      () => sharp().extend({ left: 100000001 }),
+      /Expected integer between 0 and 100000000 for left but received 100000001 of type number/
     );
   });
   test('invalid right fails', (t) => {
     t.plan(3);
     t.assert.throws(
       () => sharp().extend({ right: 'fail' }),
-      /Expected integer between 0 and 10000 for right but received fail of type string/
+      /Expected integer between 0 and 100000000 for right but received fail of type string/
     );
     t.assert.throws(
       () => sharp().extend({ right: -1 }),
-      /Expected integer between 0 and 10000 for right but received -1 of type number/
+      /Expected integer between 0 and 100000000 for right but received -1 of type number/
     );
     t.assert.throws(
-      () => sharp().extend({ right: 10001 }),
-      /Expected integer between 0 and 10000 for right but received 10001 of type number/
+      () => sharp().extend({ right: 100000001 }),
+      /Expected integer between 0 and 100000000 for right but received 100000001 of type number/
     );
   });
   test('invalid extendWith fails', (t) => {
