@@ -108,7 +108,7 @@ function typeDefsToEsm(input) {
     '  bool: BoolEnum;',
     '}',
     '',
-    'export const sharp: SharpConstructor;',
+    'declare const sharp: SharpConstructor;',
     'export default sharp;',
     '',
   ].join('\n');

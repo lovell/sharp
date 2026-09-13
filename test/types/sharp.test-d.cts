@@ -819,3 +819,7 @@ sharp().metadata().then((metadata: sharp.Metadata) => {
     const mediaType: sharp.MediaType = metadata.mediaType;
   }
 });
+
+// @ts-expect-error
+import { sharp as fail } from '../../dist/index.cjs';
+fail();
