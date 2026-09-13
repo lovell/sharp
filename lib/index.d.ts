@@ -1404,7 +1404,7 @@ declare namespace sharp {
         chromaSubsampling?: '4:4:4' | '4:2:0';
     }
 
-    interface JxlOptions extends OutputOptions {
+    interface JxlOptions extends OutputOptions, AnimationOptions {
         /** Maximum encoding error, between 0 (highest quality) and 15 (lowest quality) (optional, default 1.0) */
         distance?: number;
         /** Calculate distance based on JPEG-like quality, between 1 and 100, overrides distance if specified */
@@ -1413,7 +1413,7 @@ declare namespace sharp {
         decodingTier?: number;
         /** Use lossless compression (optional, default false) */
         lossless?: boolean;
-        /** CPU effort, between 3 (fastest) and 9 (slowest) (optional, default 7) */
+        /** CPU effort, between 1 (fastest) and 9 (slowest) (optional, default 7) */
         effort?: number | undefined;
     }
 
