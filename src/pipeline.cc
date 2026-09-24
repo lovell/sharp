@@ -152,6 +152,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Trim
       if (baton->trimThreshold >= 0.0) {
         MultiPageUnsupported(nPages, "Trim");
+        KeepGainMapUnsupported(baton->keepGainMap, "Trim");
         image = sharp::StaySequential(image);
         image = sharp::Trim(image, baton->trimBackground, baton->trimThreshold, baton->trimLineArt, baton->trimMargin);
         baton->trimOffsetLeft = image.xoffset();
@@ -305,6 +306,11 @@ class PipelineWorker : public Napi::AsyncWorker {
           gainMap = image.gainmap();
           if (image.get_typeof("gainmap-scale-factor") == G_TYPE_INT) {
             gainMapScaleFactor = image.get_int("gainmap-scale-factor");
+          }
+          if (baton->topOffsetPre != -1) {
+            gainMap = gainMap.extract_area(
+              baton->leftOffsetPre / gainMapScaleFactor, baton->topOffsetPre / gainMapScaleFactor,
+              baton->widthPre / gainMapScaleFactor, baton->heightPre / gainMapScaleFactor);
           }
         } else if (baton->withGainMap) {
           image = image.uhdr2scRGB();
