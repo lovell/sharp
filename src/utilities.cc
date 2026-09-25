@@ -133,7 +133,7 @@ Napi::Value format(const Napi::CallbackInfo& info) {
     input.Set("file", hasInputFile);
     input.Set("buffer", hasInputBuffer);
     input.Set("stream", hasInputBuffer);
-    if (hasInputFile) {
+    if (oc) {
       const VipsForeignClass *fc = VIPS_FOREIGN_CLASS(oc);
       if (fc->suffs) {
         Napi::Array fileSuffix = Napi::Array::New(env);

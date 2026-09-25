@@ -56,9 +56,9 @@ class PipelineWorker : public Napi::AsyncWorker {
           hasAlpha |= image.has_alpha();
         }
         if (hasAlpha) {
-          for (auto &image : images) {
-            if (!image.has_alpha()) {
-              image = sharp::EnsureAlpha(image, 1);
+          for (size_t i = 0; i < images.size(); i++) {
+            if (!images[i].has_alpha()) {
+              images[i] = sharp::EnsureAlpha(images[i], 1);
             }
           }
         } else {
