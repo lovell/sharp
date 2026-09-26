@@ -94,7 +94,10 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Calculate angle of rotation
       VipsAngle rotation = VIPS_ANGLE_D0;
       VipsAngle autoRotation = VIPS_ANGLE_D0;
+      VipsAngle gainMapRotation = VIPS_ANGLE_D0;
       bool autoFlop = false;
+      bool gainMapFlip = false;
+      bool gainMapFlop = false;
 
       if (baton->input->autoOrient) {
         // Rotate and flip image according to Exif orientation
@@ -115,11 +118,13 @@ class PipelineWorker : public Napi::AsyncWorker {
             MultiPageUnsupported(nPages, "Rotate");
           }
           image = image.rot(autoRotation);
+          gainMapRotation = autoRotation;
           autoRotation = VIPS_ANGLE_D0;
         }
         if (autoFlop) {
           image = image.flip(VIPS_DIRECTION_HORIZONTAL);
           autoFlop = false;
+          gainMapFlop = true;
         }
       }
 
@@ -128,20 +133,24 @@ class PipelineWorker : public Napi::AsyncWorker {
         if (baton->flip) {
           image = image.flip(VIPS_DIRECTION_VERTICAL);
           baton->flip = false;
+          gainMapFlip = true;
         }
         if (baton->flop) {
           image = image.flip(VIPS_DIRECTION_HORIZONTAL);
           baton->flop = false;
+          gainMapFlop = true;
         }
         if (rotation != VIPS_ANGLE_D0) {
           if (rotation != VIPS_ANGLE_D180) {
             MultiPageUnsupported(nPages, "Rotate");
           }
           image = image.rot(rotation);
+          gainMapRotation = rotation;
           rotation = VIPS_ANGLE_D0;
         }
         if (baton->rotationAngle != 0.0) {
           MultiPageUnsupported(nPages, "Rotate");
+          KeepGainMapUnsupported(baton->keepGainMap, "Rotate");
           std::vector<double> background;
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, false);
           image = image.rotate(baton->rotationAngle, VImage::option()->set("background", background)).copy_memory();
@@ -306,6 +315,15 @@ class PipelineWorker : public Napi::AsyncWorker {
           gainMap = image.gainmap();
           if (image.get_typeof("gainmap-scale-factor") == G_TYPE_INT) {
             gainMapScaleFactor = image.get_int("gainmap-scale-factor");
+          }
+          if (gainMapFlip) {
+            gainMap = gainMap.flip(VIPS_DIRECTION_VERTICAL);
+          }
+          if (gainMapFlop) {
+            gainMap = gainMap.flip(VIPS_DIRECTION_HORIZONTAL);
+          }
+          if (gainMapRotation != VIPS_ANGLE_D0) {
+            gainMap = gainMap.rot(gainMapRotation);
           }
           if (baton->topOffsetPre != -1) {
             gainMap = gainMap.extract_area(
@@ -563,6 +581,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Rotate post-extract non-90 angle
       if (!baton->rotateBefore && baton->rotationAngle != 0.0) {
         MultiPageUnsupported(nPages, "Rotate");
+        KeepGainMapUnsupported(baton->keepGainMap, "Rotate");
         image = sharp::StaySequential(image);
         std::vector<double> background;
         std::tie(image, background) = sharp::ApplyAlpha(image, baton->rotationBackground, shouldPremultiplyAlpha);

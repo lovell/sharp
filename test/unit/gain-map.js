@@ -259,8 +259,57 @@ suite('Gain maps', () => {
     );
   });
 
+  test('Can be detached, rotated and reattached', async (t) => {
+    t.plan(4);
+
+    const data = await sharp(fixtures.inputJpgWithGainMap)
+      .keepGainMap()
+      .rotate(90)
+      .extract({ left: 2000, top: 3000, width: 48, height: 32 })
+      .toBuffer();
+
+    const metadata = await sharp(data).metadata();
+    t.assert.strictEqual(metadata.format, 'jpeg');
+    t.assert.strictEqual(typeof metadata.gainMap, 'object');
+    t.assert.ok(Buffer.isBuffer(metadata.gainMap.image));
+
+    const {
+      format,
+      width,
+      height,
+      channels,
+      depth,
+      space,
+      hasProfile,
+      chromaSubsampling,
+    } = await sharp(metadata.gainMap.image).metadata();
+
+    t.assert.deepEqual(
+      {
+        format,
+        width,
+        height,
+        channels,
+        depth,
+        space,
+        hasProfile,
+        chromaSubsampling,
+      },
+      {
+        format: 'jpeg',
+        width: 12,
+        height: 8,
+        channels: 1,
+        depth: 'uchar',
+        space: 'b-w',
+        hasProfile: false,
+        chromaSubsampling: '4:4:4',
+      },
+    );
+  });
+
   test('Cannot keep existing gain map with certain operations', async (t) => {
-    t.plan(3);
+    t.plan(4);
 
     await t.assert.rejects(
       sharp(fixtures.inputJpgWithGainMap)
@@ -288,6 +337,14 @@ suite('Gain maps', () => {
         .trim()
         .toBuffer(),
       /Trim is not supported when keeping gain maps/
+    );
+
+    await t.assert.rejects(
+      sharp(fixtures.inputJpgWithGainMap)
+        .keepGainMap()
+        .rotate(1)
+        .toBuffer(),
+      /Rotate is not supported when keeping gain maps/
     );
   });
 
