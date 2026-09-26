@@ -308,10 +308,13 @@ class PipelineWorker : public Napi::AsyncWorker {
       if (baton->input->autoOrient) {
         image = sharp::RemoveExifOrientation(image);
       }
+      VImage gainMapSource;
       VImage gainMap;
       int gainMapScaleFactor = 1;
       if (sharp::HasGainMap(image)) {
         if (baton->keepGainMap) {
+          // Keep source-owned gain-map bytes alive for lazy decoding.
+          gainMapSource = image;
           gainMap = image.gainmap();
           if (image.get_typeof("gainmap-scale-factor") == G_TYPE_INT) {
             gainMapScaleFactor = image.get_int("gainmap-scale-factor");

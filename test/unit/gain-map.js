@@ -10,6 +10,31 @@ const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 suite('Gain maps', () => {
+  test('Can rotate while keeping gain map with cache disabled', async (t) => {
+    const previousCache = sharp.cache();
+    sharp.cache(false);
+    try {
+      const data = await sharp(fixtures.inputJpgWithGainMap)
+        .keepGainMap()
+        .rotate(90)
+        .toBuffer();
+      const metadata = await sharp(data).metadata();
+      t.assert.deepStrictEqual([metadata.width, metadata.height], [2160, 3840]);
+      t.assert.ok(metadata.gainMap);
+      const { data: gainMapPixels, info: gainMapInfo } = await sharp(metadata.gainMap.image)
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      t.assert.ok(gainMapPixels.length > 0);
+      t.assert.deepStrictEqual([gainMapInfo.width, gainMapInfo.height], [540, 960]);
+    } finally {
+      sharp.cache({
+        memory: previousCache.memory.max,
+        files: previousCache.files.max,
+        items: previousCache.items.max
+      });
+    }
+  });
+
   test('Metadata contains gainMap', async (t) => {
     t.plan(4);
 
