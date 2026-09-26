@@ -78,7 +78,20 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       }
       VipsAccess access = baton->input->access;
-      image = sharp::EnsureColourspace(image, baton->colourspacePipeline);
+      // A device-independent colourspace is reached through the ICC profile connection space, either Lab or XYZ
+      bool const labPcs =
+        baton->colourspacePipeline == VIPS_INTERPRETATION_LAB ||
+        baton->colourspacePipeline == VIPS_INTERPRETATION_LABS ||
+        baton->colourspacePipeline == VIPS_INTERPRETATION_LCH;
+      bool const xyzPcs =
+        baton->colourspacePipeline == VIPS_INTERPRETATION_scRGB ||
+        baton->colourspacePipeline == VIPS_INTERPRETATION_XYZ ||
+        baton->colourspacePipeline == VIPS_INTERPRETATION_YXY;
+      // lcms needs 8/16-bit device values, so the conversion must wait for the import
+      bool const deferColourspace = sharp::HasProfile(image) && (labPcs || xyzPcs);
+      if (!deferColourspace) {
+        image = sharp::EnsureColourspace(image, baton->colourspacePipeline);
+      }
 
       int nPages = baton->input->pages;
       if (nPages == -1) {
@@ -372,6 +385,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         baton->input->ignoreIcc = true;
       }
       char const *processingProfile = image.interpretation() == VIPS_INTERPRETATION_RGB16 ? "p3" : "srgb";
+      bool importedToPcs = false;
       if (
         sharp::HasProfile(image) &&
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
@@ -381,10 +395,20 @@ class PipelineWorker : public Napi::AsyncWorker {
       ) {
         // Convert to sRGB/P3 using embedded profile
         try {
-          image = image.icc_transform(processingProfile, VImage::option()
-            ->set("embedded", true)
-            ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
-            ->set("intent", VIPS_INTENT_PERCEPTUAL));
+          if (deferColourspace &&
+            (image.format() == VIPS_FORMAT_UCHAR || image.format() == VIPS_FORMAT_USHORT)) {
+            // XYZ PCS is linear and device-independent, so colour management and linearisation are a single operation
+            image = image.icc_import(VImage::option()
+              ->set("embedded", true)
+              ->set("pcs", labPcs ? VIPS_PCS_LAB : VIPS_PCS_XYZ)
+              ->set("intent", VIPS_INTENT_PERCEPTUAL));
+            importedToPcs = true;
+          } else {
+            image = image.icc_transform(processingProfile, VImage::option()
+              ->set("embedded", true)
+              ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
+              ->set("intent", VIPS_INTENT_PERCEPTUAL));
+          }
         } catch(...) {
           sharp::VipsWarningCallback(nullptr, G_LOG_LEVEL_WARNING, "Invalid embedded profile", nullptr);
         }
@@ -395,6 +419,10 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.icc_transform(processingProfile, VImage::option()
           ->set("input_profile", "cmyk")
           ->set("intent", VIPS_INTENT_PERCEPTUAL));
+      }
+
+      if (deferColourspace) {
+        image = sharp::EnsureColourspace(image, baton->colourspacePipeline);
       }
 
       // Flatten image to remove alpha channel
@@ -880,6 +908,19 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::EnsureAlpha(image, baton->ensureAlpha);
       }
 
+      // Leave PCS before the output colourspace is applied, which would gamut-clip
+      if (importedToPcs) {
+        try {
+          image = image.colourspace(VIPS_INTERPRETATION_XYZ).icc_export(VImage::option()
+            ->set("output_profile", baton->withIccProfile.empty()
+              ? processingProfile
+              : const_cast<char*>(baton->withIccProfile.data()))
+            ->set("intent", VIPS_INTENT_PERCEPTUAL));
+        } catch(...) {
+          sharp::VipsWarningCallback(nullptr, G_LOG_LEVEL_WARNING, "Invalid profile", nullptr);
+        }
+      }
+
       // Ensure output colour space
       if (sharp::Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
@@ -913,7 +954,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Apply output ICC profile
-      if (!baton->withIccProfile.empty()) {
+      if (!importedToPcs && !baton->withIccProfile.empty()) {
         try {
           image = image.icc_transform(const_cast<char*>(baton->withIccProfile.data()), VImage::option()
             ->set("input_profile", processingProfile)
