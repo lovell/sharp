@@ -7,7 +7,7 @@ jobs:
   lint:
     permissions:
       contents: read
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -32,52 +32,52 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: linux-x64
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: linux-x64
             package: true
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: x64
             nodejs_version: "^24"
             nodejs_version_major: 24
             platform: linux-x64
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             container: node:20-alpine3.20
             nodejs_version_major: 20
             platform: linuxmusl-x64
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             container: node:22-alpine3.20
             nodejs_version_major: 22
             platform: linuxmusl-x64
             package: true
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             container: node:24-alpine3.22
             nodejs_version_major: 24
             platform: linuxmusl-x64
-          - os: ubuntu-24.04-arm
+          - os: ubuntu-26.04-arm
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
             nodejs_version: "^20.9.0"
             nodejs_version_major: 20
             platform: linux-arm64
-          - os: ubuntu-24.04-arm
+          - os: ubuntu-26.04-arm
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
             nodejs_version: "^22"
             nodejs_version_major: 22
             platform: linux-arm64
             package: true
-          - os: ubuntu-24.04-arm
+          - os: ubuntu-26.04-arm
             container: rockylinux/rockylinux:8-ubi-init
             nodejs_arch: arm64
             nodejs_version: "^24"
@@ -196,7 +196,7 @@ jobs:
       contents: read
     needs: lint
     name: "build-linuxmusl-arm64 [Node.js ${{ matrix.nodejs_version_major }}] ${{ matrix.package && '[package]' }}"
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     container:
       image: ${{ matrix.container }}
       volumes:
@@ -245,7 +245,7 @@ jobs:
       contents: read
     needs: lint
     name: "build-${{ matrix.platform }} [Node.js ${{ matrix.nodejs_version_major }}] [package]"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -311,8 +311,8 @@ jobs:
       contents: read
     needs: lint
     name: "build-wasm32 [package]"
-    runs-on: ubuntu-24.04
-    container: "emscripten/emsdk:6.0.9"
+    runs-on: ubuntu-26.04
+    container: "emscripten/emsdk:6.0.10"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -346,7 +346,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       - build-native
       - build-linuxmusl-arm64
