@@ -650,35 +650,83 @@ declare namespace sharp {
          * @throws {Error} Invalid parameters
          * @returns A promise that fulfills with an object containing information on the resulting file
          */
-        toFile(fileOut: string): Promise<OutputInfo>;
+         toFile(fileOut: string): Promise<OutputInfo>;
 
-        /**
-         * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+         /**
+          * Write output image data to a file.
+          * @param fileOut The path to write the image data to.
+          * @param options Options object with signal for cancellation.
+          * @throws {Error} Invalid parameters
+          * @returns A promise that fulfills with an object containing information on the resulting file
+          */
+         toFile(fileOut: string, options: { signal?: AbortSignal }): Promise<OutputInfo>;
+
+         /**
+          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
          * By default, the format will match the input image, except SVG input which becomes PNG output.
          * @param callback Callback function called on completion with three arguments (err, buffer, info).
          * @returns A sharp instance that can be used to chain operations
          */
         toBuffer(callback: (err: Error, buffer: Buffer<ArrayBuffer>, info: OutputInfo) => void): Sharp;
 
-        /**
-         * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
-         * By default, the format will match the input image, except SVG input which becomes PNG output.
-         * The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
-         * @param options resolve options
-         * @param options.resolveWithObject Resolve the Promise with an Object containing data and info properties instead of resolving only with data.
-         * @returns A promise that resolves with the Buffer data.
-         */
-        toBuffer(options?: { resolveWithObject: false }): Promise<Buffer<ArrayBuffer>>;
+         /**
+          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+          * By default, the format will match the input image, except SVG input which becomes PNG output.
+          * @param options Options object with signal for cancellation.
+          * @param callback Callback function called on completion with three arguments (err, buffer, info).
+          * @returns A sharp instance that can be used to chain operations
+          */
+         toBuffer(options: { signal: AbortSignal }, callback: (err: Error, buffer: Buffer<ArrayBuffer>, info: OutputInfo) => void): Sharp;
 
-        /**
-         * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
-         * By default, the format will match the input image, except SVG input which becomes PNG output.
-         * The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
-         * @param options resolve options
-         * @param options.resolveWithObject Resolve the Promise with an Object containing data and info properties instead of resolving only with data.
-         * @returns A promise that resolves with an object containing the Buffer data and an info object containing the output image format, size (bytes), width, height and channels
-         */
-        toBuffer(options: { resolveWithObject: true }): Promise<{ data: Buffer<ArrayBuffer>; info: OutputInfo }>;
+         /**
+          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+          * By default, the format will match the input image, except SVG input which becomes PNG output.
+          * The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
+          * @param options Options object with signal for cancellation.
+          * @param options.signal AbortSignal to cancel the operation.
+          * @returns A promise that resolves with the Buffer data.
+          */
+         toBuffer(options?: { signal?: AbortSignal }): Promise<Buffer<ArrayBuffer>>;
+
+         /**
+          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+          * By default, the format will match the input image, except SVG input which becomes PNG output.
+          * The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
+          * @param options resolve options
+          * @param options.resolveWithObject Resolve the Promise with an Object containing data and info properties instead of resolving only with data.
+          * @returns A promise that resolves with the Buffer data.
+          */
+         toBuffer(options?: { resolveWithObject?: false }): Promise<Buffer<ArrayBuffer>>;
+
+         /**
+          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+          * By default, the format will match the input image, except SVG input which becomes PNG output.
+          * The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
+          * @param options resolve options
+          * @param options.resolveWithObject Resolve the Promise with an Object containing data and info properties instead of resolving only with data.
+          * @returns A promise that resolves with an object containing the Buffer data and an info object containing the output image format, size (bytes), width, height and channels
+          */
+         toBuffer(options: { resolveWithObject: true }): Promise<{ data: Buffer<ArrayBuffer>; info: OutputInfo }>;
+
+         /**
+          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+          * By default, the format will match the input image, except SVG input which becomes PNG output.
+          * @param options resolve options
+          * @param options.resolveWithObject Resolve the Promise with an Object containing data and info properties instead of resolving only with data.
+          * @param callback Callback function called on completion with three arguments (err, buffer, info).
+          * @returns A sharp instance that can be used to chain operations
+          */
+         toBuffer(options: { resolveWithObject?: false }, callback: (err: Error, buffer: Buffer<ArrayBuffer>, info: OutputInfo) => void): Sharp;
+
+         /**
+          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+          * By default, the format will match the input image, except SVG input which becomes PNG output.
+          * @param options resolve options
+          * @param options.resolveWithObject Resolve the Promise with an Object containing data and info properties instead of resolving only with data.
+          * @param callback Callback function called on completion with two arguments (err, result).
+          * @returns A sharp instance that can be used to chain operations
+          */
+         toBuffer(options: { resolveWithObject: true }, callback: (err: Error, result: { data: Buffer<ArrayBuffer>; info: OutputInfo }) => void): Sharp;
 
         /**
          * Write output to a Uint8Array backed by a transferable ArrayBuffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
@@ -1045,6 +1093,8 @@ declare namespace sharp {
         text?: CreateText | undefined;
         /** Describes how array of input images should be joined. */
         join?: Join | undefined;
+        /** AbortSignal to cancel processing. */
+        signal?: AbortSignal | undefined;
     }
 
     interface CacheOptions {
