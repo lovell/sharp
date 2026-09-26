@@ -311,7 +311,8 @@ This approach is faster and should produce better results than [withGainMap](#wi
 however not all operations are supported.
 
 Only JPEG input and output are supported.
-JPEG output options other than `quality` are ignored.
+JPEG `quality`, `progressive`, `chromaSubsampling` and `optimiseCoding` settings are forwarded
+to the compressed SDR base encoder. Other JPEG encoder settings are not forwarded to that encoder.
 
 This feature is experimental and the API may change.
 
