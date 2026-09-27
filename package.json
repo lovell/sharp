@@ -208,7 +208,7 @@
     "exif-reader": "^2.0.3",
     "icc": "^4.0.0",
     "node-addon-api": "^8.9.2",
-    "node-gyp": "^12.4.0",
+    "node-gyp": "^13.0.2",
     "publint": "^0.3.24",
     "tar-fs": "^3.1.3",
     "tsd": "^0.33.0",
