@@ -453,14 +453,14 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
         image = image.rot(autoRotation);
         if (baton->keepGainMap) {
-          gainMap = gainMap.rot(autoRotation);
+          gainMap = sharp::StaySequential(gainMap).rot(autoRotation);
         }
       }
       // Mirror vertically (up-down) about the x-axis
       if (baton->flip) {
         image = image.flip(VIPS_DIRECTION_VERTICAL);
         if (baton->keepGainMap) {
-          gainMap = gainMap.flip(VIPS_DIRECTION_VERTICAL);
+          gainMap = sharp::StaySequential(gainMap).flip(VIPS_DIRECTION_VERTICAL);
         }
       }
       // Mirror horizontally (left-right) about the y-axis
@@ -477,7 +477,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
         image = image.rot(rotation);
         if (baton->keepGainMap) {
-          gainMap = gainMap.rot(rotation);
+          gainMap = sharp::StaySequential(gainMap).rot(rotation);
         }
       }
 
