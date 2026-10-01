@@ -888,7 +888,11 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         if (inputProfile.first != nullptr && baton->withIccProfile.empty()) {
           image = sharp::SetProfile(image, inputProfile);
+        } else {
+          g_free(inputProfile.first);
         }
+      } else {
+        g_free(inputProfile.first);
       }
 
       // Extract channel
@@ -1381,8 +1385,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           baton->formatOut = "v";
         } else {
           // Unsupported output format
-          (baton->err).append("Unsupported output format " + baton->fileOut);
-          return Error();
+          throw std::runtime_error("Unsupported output format " + baton->fileOut);
         }
       }
     } catch (std::runtime_error const &err) {
