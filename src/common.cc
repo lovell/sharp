@@ -630,25 +630,25 @@ namespace sharp {
   /*
     Get copy of embedded profile.
   */
-  std::pair<char*, size_t> GetProfile(VImage image) {
-    std::pair<char*, size_t> icc(nullptr, 0);
+  std::string GetProfile(VImage image) {
     if (HasProfile(image)) {
       size_t length;
       const void *data = image.get_blob(VIPS_META_ICC_NAME, &length);
-      icc.first = static_cast<char*>(vips_malloc(reinterpret_cast<VipsObject*>(image.get_image()), length));
-      icc.second = length;
-      memcpy(icc.first, data, length);
+      return std::string(static_cast<const char*>(data), length);
     }
-    return icc;
+    return std::string();
   }
 
   /*
     Set embedded profile.
   */
-  VImage SetProfile(VImage image, std::pair<char*, size_t> icc) {
-    if (icc.first != nullptr) {
+  VImage SetProfile(VImage image, std::string const &icc) {
+    if (!icc.empty()) {
+      char *data = static_cast<char*>(g_malloc(icc.size()));
+      memcpy(data, icc.data(), icc.size());
       image = image.copy();
-      image.set(VIPS_META_ICC_NAME, nullptr, icc.first, icc.second);
+      image.set(VIPS_META_ICC_NAME,
+        reinterpret_cast<VipsCallbackFn>(vips_area_free_cb), data, icc.size());
     }
     return image;
   }

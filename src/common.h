@@ -255,12 +255,12 @@ namespace sharp {
   /*
     Get copy of embedded profile.
   */
-  std::pair<char*, size_t> GetProfile(VImage image);
+  std::string GetProfile(VImage image);
 
   /*
     Set embedded profile.
   */
-  VImage SetProfile(VImage image, std::pair<char*, size_t> icc);
+  VImage SetProfile(VImage image, std::string const &icc);
 
   /*
     Remove all EXIF-related image fields.

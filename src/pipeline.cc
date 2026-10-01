@@ -365,7 +365,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Ensure we're using a device-independent colour space
-      std::pair<char*, size_t> inputProfile(nullptr, 0);
+      std::string inputProfile;
       if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->withIccProfile.empty()) {
         // Cache input profile for use with output
         inputProfile = sharp::GetProfile(image);
@@ -886,7 +886,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
       if (image.interpretation() != baton->colourspace) {
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
-        if (inputProfile.first != nullptr && baton->withIccProfile.empty()) {
+        if (!inputProfile.empty() && baton->withIccProfile.empty()) {
           image = sharp::SetProfile(image, inputProfile);
         }
       }

@@ -1044,6 +1044,22 @@ suite('Image metadata', () => {
     t.assert.strictEqual(icc.parse(metadata.icc).description, 'Generic RGB Profile');
   });
 
+  test('keep existing ICC profile when intermediate images are not cached', async (t) => {
+    t.plan(1);
+    sharp.cache(false);
+    try {
+      const data = await sharp(fixtures.inputJpgWithExif)
+        .greyscale()
+        .rotate(90)
+        .keepIccProfile()
+        .toBuffer();
+      const metadata = await sharp(data).metadata();
+      t.assert.strictEqual(icc.parse(metadata.icc).description, 'Generic RGB Profile');
+    } finally {
+      sharp.cache(true);
+    }
+  });
+
   test('keep existing CMYK input profile for CMYK output', async (t) => {
     t.plan(1);
     const data = await sharp(fixtures.inputJpgWithCmykProfile)
