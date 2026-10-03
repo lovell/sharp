@@ -4,7 +4,7 @@
 */
 
 // Rebuild docs/public/api-resize-kernels.png from a high-contrast diagonal.
-// All samples downsize the same 1280x960 SVG to 160x120 without shrink-on-load.
+// Rasterise the SVG at 1280x960 first, then downsize the same PNG to 160x120.
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import sharp from '../../lib/index.mjs';
@@ -16,6 +16,8 @@ const input = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1280" 
   <path d="M0 250 L1280 900" fill="none" stroke="#111" stroke-width="24"/>
   <path d="M150 0 L1280 570" fill="none" stroke="#e84428" stroke-width="8"/>
 </svg>`);
+// Resizing SVG input directly rasterises at the output size and ignores the kernel.
+const raster = await sharp(input).png().toBuffer();
 const output = path.join(root, 'docs/public/api-resize-kernels.png');
 const kernels = [
   'nearest', 'linear', 'cubic', 'mitchell',
@@ -26,7 +28,7 @@ const height = 154;
 const imageWidth = 160;
 const imageHeight = 120;
 const panels = await Promise.all(kernels.map(async (kernel, index) => {
-  const image = await sharp(input)
+  const image = await sharp(raster)
     .resize(imageWidth, imageHeight, { kernel, fastShrinkOnLoad: false })
     .png()
     .toBuffer();
