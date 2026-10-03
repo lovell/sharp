@@ -720,7 +720,7 @@ namespace sharp {
     if (hasDelay) {
       if (delay.size() == 1) {
         // We have just one delay, repeat that value for all frames.
-        delay.insert(delay.end(), nPages - 1, delay[0]);
+        delay.insert(delay.end(), std::max(0, nPages - 1), delay[0]);
       }
       copy.set("delay", delay);
     }

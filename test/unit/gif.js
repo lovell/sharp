@@ -72,6 +72,17 @@ suite('GIF input', () => {
     t.assert.strictEqual(2, info.pages);
   });
 
+  test('Single delay with a page count of zero', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg, { pages: 0 })
+      .resize(8)
+      .gif({ delay: 100 })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('gif', info.format);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual(undefined, info.pages);
+  });
+
   test('GIF with reduced colours, no dither, low effort reduces file size', async (t) => {
     t.plan(1);
     const original = await sharp(fixtures.inputJpg)
