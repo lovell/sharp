@@ -5,11 +5,37 @@
 
 const { suite, test } = require('node:test');
 const exifReader = require('exif-reader');
+const fs = require('node:fs/promises');
 
 const sharp = require('../../');
 const fixtures = require('../fixtures');
 
 suite('Gain maps', () => {
+  test('Can rotate while keeping gain map with cache disabled', async (t) => {
+    const previousCache = sharp.cache();
+    sharp.cache(false);
+    try {
+      const data = await sharp(fixtures.inputJpgWithGainMap)
+        .keepGainMap()
+        .rotate(90)
+        .toBuffer();
+      const metadata = await sharp(data).metadata();
+      t.assert.deepStrictEqual([metadata.width, metadata.height], [2160, 3840]);
+      t.assert.ok(metadata.gainMap);
+      const { data: gainMapPixels, info: gainMapInfo } = await sharp(metadata.gainMap.image)
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      t.assert.ok(gainMapPixels.length > 0);
+      t.assert.deepStrictEqual([gainMapInfo.width, gainMapInfo.height], [540, 960]);
+    } finally {
+      sharp.cache({
+        memory: previousCache.memory.max,
+        files: previousCache.files.max,
+        items: previousCache.items.max
+      });
+    }
+  });
+
   test('Metadata contains gainMap', async (t) => {
     t.plan(4);
 
@@ -362,5 +388,56 @@ suite('Gain maps', () => {
     const exifData = exifReader(exif);
     t.assert.strictEqual(exifData.Photo.PixelXDimension, 32);
     t.assert.ok(Buffer.isBuffer(gainMap.image));
+  });
+
+  for (const outputType of ['buffer', 'file']) {
+    test(`JPEG options are forwarded when keeping gain map (${outputType})`, async (t) => {
+      const options = { quality: 95, progressive: true, chromaSubsampling: '4:2:0' };
+      const outputPath = fixtures.path('output-gain-map-jpeg-options.jpg');
+      const pipeline = sharp(fixtures.inputJpgWithGainMap)
+        .keepGainMap().resize(320).jpeg(options);
+      let output;
+      if (outputType === 'buffer') {
+        output = await pipeline.toBuffer();
+      } else {
+        await pipeline.toFile(outputPath);
+        output = await fs.readFile(outputPath);
+      }
+      const { gainMap } = await sharp(output).metadata();
+      t.assert.ok(gainMap);
+      // Inspect the primary JPEG separately; the UHDR loader omits JPEG encoding metadata.
+      const baseLength = output.length - gainMap.image.length;
+      t.assert.deepStrictEqual(output.subarray(baseLength), gainMap.image);
+      const metadata = await sharp(output.subarray(0, baseLength)).metadata();
+      t.assert.strictEqual(metadata.isProgressive, true);
+      t.assert.strictEqual(metadata.chromaSubsampling, '4:2:0');
+      const { data: mapPixels } = await sharp(gainMap.image)
+        .raw().toBuffer({ resolveWithObject: true });
+      t.assert.ok(mapPixels.length > 0);
+    });
+  }
+
+  test('JPEG optimise coding preserves base and gain-map pixels', async (t) => {
+    const input = fixtures.inputJpgWithGainMap;
+    const [optimised, unoptimised] = await Promise.all([true, false].map((optimizeCoding) =>
+      sharp(input).keepGainMap().resize(320)
+        .jpeg({ quality: 80, progressive: false, optimizeCoding }).toBuffer()
+    ));
+
+    const [optimisedMetadata, unoptimisedMetadata] = await Promise.all([
+      sharp(optimised).metadata(), sharp(unoptimised).metadata()
+    ]);
+    const optimisedBaseLength = optimised.length - optimisedMetadata.gainMap.image.length;
+    const unoptimisedBaseLength = unoptimised.length - unoptimisedMetadata.gainMap.image.length;
+    t.assert.ok(optimisedBaseLength < unoptimisedBaseLength);
+    const [optimisedBase, unoptimisedBase] = await Promise.all([
+      sharp(optimised).raw().toBuffer(), sharp(unoptimised).raw().toBuffer()
+    ]);
+    t.assert.deepStrictEqual(optimisedBase, unoptimisedBase);
+    const [optimisedMap, unoptimisedMap] = await Promise.all([
+      sharp(optimisedMetadata.gainMap.image).raw().toBuffer(),
+      sharp(unoptimisedMetadata.gainMap.image).raw().toBuffer()
+    ]);
+    t.assert.deepStrictEqual(optimisedMap, unoptimisedMap);
   });
 });
