@@ -1660,6 +1660,8 @@ class PipelineWorker : public Napi::AsyncWorker {
     image = image.copy();
     image.set("gainmap-data", reinterpret_cast<VipsCallbackFn>(vips_area_free_cb),
       gainMapJpeg->data, gainMapJpeg->length);
+    gainMapJpeg->free_fn = nullptr;
+    vips_area_unref(gainMapJpeg);
     return image;
   }
 
