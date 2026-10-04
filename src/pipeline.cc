@@ -638,15 +638,17 @@ class PipelineWorker : public Napi::AsyncWorker {
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->extendBackground, shouldPremultiplyAlpha);
         }
         image = sharp::StaySequential(image, nPages > 1 || baton->extendWith != VIPS_EXTEND_BACKGROUND);
-        auto options = VImage::option()->set("extend", baton->extendWith);
-        if (baton->extendWith == VIPS_EXTEND_BACKGROUND) {
-          options->set("background", background);
+        if (nPages > 1) {
+          image = sharp::EmbedMultiPage(image,
+            baton->extendLeft, baton->extendTop, baton->width, baton->height,
+            baton->extendWith, background, nPages, &targetPageHeight);
+        } else {
+          auto options = VImage::option()->set("extend", baton->extendWith);
+          if (baton->extendWith == VIPS_EXTEND_BACKGROUND) {
+            options->set("background", background);
+          }
+          image = image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height, options);
         }
-        image = nPages > 1
-          ? sharp::EmbedMultiPage(image,
-              baton->extendLeft, baton->extendTop, baton->width, baton->height,
-              baton->extendWith, background, nPages, &targetPageHeight)
-          : image.embed(baton->extendLeft, baton->extendTop, baton->width, baton->height, options);
         if (baton->keepGainMap) {
           gainMap = gainMap.embed(baton->extendLeft / gainMapScaleFactor, baton->extendTop / gainMapScaleFactor,
             baton->width / gainMapScaleFactor, baton->height / gainMapScaleFactor, VImage::option()
@@ -1468,7 +1470,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // ECMAScript ArrayBuffer with Uint8Array view
           Napi::TypedArrayOf<uint8_t> data = Napi::Buffer<char>::Copy(env,
             static_cast<char*>(baton->bufferOut), baton->bufferOutLength);
-          sharp::FreeCallback(static_cast<char*>(baton->bufferOut), nullptr);
+          sharp::FreeCallback(nullptr, static_cast<char*>(baton->bufferOut));
           Callback().SHARP_CALLBACK_FN_NAME(Receiver().Value(), { env.Null(), data, info });
         } else {
           // Node.js Buffer
