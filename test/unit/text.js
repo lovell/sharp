@@ -11,6 +11,7 @@ const { inRange } = require('../../dist/is.cjs');
 
 suite('Text to image', () => {
   test('text with default values', async (t) => {
+    if (fixtures.isLsan) return t.skip('LSAN');
     const output = fixtures.path('output.text-default.png');
     const text = sharp({
       text: {
@@ -44,6 +45,7 @@ suite('Text to image', () => {
   });
 
   test('text with width and height', async (t) => {
+    if (fixtures.isLsan) return t.skip('LSAN');
     const output = fixtures.path('output.text-width-height.png');
     const text = sharp({
       text: {
@@ -67,6 +69,7 @@ suite('Text to image', () => {
   });
 
   test('text with dpi', async (t) => {
+    if (fixtures.isLsan) return t.skip('LSAN');
     const output = fixtures.path('output.text-dpi.png');
     const dpi = 300;
     const text = sharp({
@@ -88,6 +91,7 @@ suite('Text to image', () => {
   });
 
   test('text with color and pango markup', async (t) => {
+    if (fixtures.isLsan) return t.skip('LSAN');
     const output = fixtures.path('output.text-color-pango.png');
     const dpi = 300;
     const text = sharp({
@@ -113,6 +117,7 @@ suite('Text to image', () => {
   });
 
   test('text with font', async (t) => {
+    if (fixtures.isLsan) return t.skip('LSAN');
     const output = fixtures.path('output.text-with-font.png');
     const text = sharp({
       text: {
@@ -133,6 +138,7 @@ suite('Text to image', () => {
   });
 
   test('text with justify and composite', async (t) => {
+    if (fixtures.isLsan) return t.skip('LSAN');
     const output = fixtures.path('output.text-composite.png');
     const width = 500;
     const dpi = 300;

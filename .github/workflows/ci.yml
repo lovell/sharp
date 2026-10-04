@@ -342,6 +342,28 @@ jobs:
           path: npm/wasm32
           retention-days: 1
           if-no-files-found: error
+  build-asan:
+    permissions:
+      contents: read
+    needs: lint
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "26"
+      - run: npm install --ignore-scripts
+      - run: npm run build:dist
+      - run: npm run build
+        env:
+          CFLAGS: "-fsanitize=address"
+          LDFLAGS: "-fsanitize=address"
+      - run: npm run test-unit
+        env:
+          LSAN_OPTIONS: "detect_leaks=1:suppressions=test/leak/asan.supp"
+          LD_PRELOAD: "/usr/lib/x86_64-linux-gnu/libasan.so.8"
   release:
     permissions:
       contents: write
@@ -352,6 +374,7 @@ jobs:
       - build-linuxmusl-arm64
       - build-qemu
       - build-emscripten
+      - build-asan
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

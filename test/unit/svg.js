@@ -86,6 +86,7 @@ suite('SVG input', () => {
   });
 
   test('Convert SVG with embedded images to PNG, respecting dimensions, autoconvert to PNG', async (t) => {
+    if (fixtures.isLsan) return t.skip('LSAN');
     t.plan(4);
     const { data, info } = await sharp(fixtures.inputSvgWithEmbeddedImages)
       .toBuffer({ resolveWithObject: true });

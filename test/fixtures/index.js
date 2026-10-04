@@ -153,6 +153,8 @@ module.exports = {
 
   isLittleEndian: endianness() === 'LE',
 
+  isLsan: process.env.LSAN_OPTIONS?.includes('detect_leaks=1'),
+
   // Path for tests requiring human inspection
   path: getPath,
 
