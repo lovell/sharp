@@ -1,12 +1,12 @@
-name: "CI: npm smoke test"
+# SPDX-FileCopyrightText: 2013 Lovell Fuller and others
+# SPDX-License-Identifier: Apache-2.0
 
+name: "CI: npm smoke test"
 on:
   push:
     tags:
       - "v**"
-
 permissions: {}
-
 jobs:
   release-smoke-test:
     name: "${{ github.ref_name }} ${{ matrix.name }}"

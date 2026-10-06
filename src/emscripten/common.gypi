@@ -1,4 +1,4 @@
-# Copyright 2013 Lovell Fuller and others.
+# SPDX-FileCopyrightText: 2013 Lovell Fuller and others
 # SPDX-License-Identifier: Apache-2.0
 
 {
