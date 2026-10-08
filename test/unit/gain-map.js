@@ -308,6 +308,23 @@ suite('Gain maps', () => {
     );
   });
 
+  test('keep existing gain map and rotate when not cached', async (t) => {
+    t.plan(3);
+    sharp.cache(false);
+    try {
+      const data = await sharp(fixtures.inputJpgWithGainMap)
+        .keepGainMap()
+        .rotate(90)
+        .toBuffer();
+      const { gainMap, format } = await sharp(data).metadata();
+      t.assert.strictEqual(format, 'jpeg');
+      t.assert.strictEqual(typeof gainMap, 'object');
+      t.assert.ok(Buffer.isBuffer(gainMap.image));
+    } finally {
+      sharp.cache(true);
+    }
+  });
+
   test('Cannot keep existing gain map with certain operations', async (t) => {
     t.plan(4);
 
