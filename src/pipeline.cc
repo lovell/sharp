@@ -40,6 +40,7 @@ class PipelineWorker : public Napi::AsyncWorker {
     // Increment processing task counter
     sharp::counterProcess++;
 
+    std::pair<char*, size_t> inputProfile(nullptr, 0);
     try {
       // Open input
       vips::VImage image;
@@ -378,7 +379,6 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
 
       // Ensure we're using a device-independent colour space
-      std::pair<char*, size_t> inputProfile(nullptr, 0);
       if ((baton->keepMetadata & VIPS_FOREIGN_KEEP_ICC) && baton->withIccProfile.empty()) {
         // Cache input profile for use with output
         inputProfile = sharp::GetProfile(image);
@@ -931,11 +931,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
         if (inputProfile.first != nullptr && baton->withIccProfile.empty()) {
           image = sharp::SetProfile(image, inputProfile);
-        } else {
-          g_free(inputProfile.first);
+          inputProfile.first = nullptr;
         }
-      } else {
-        g_free(inputProfile.first);
       }
 
       // Extract channel
@@ -1444,6 +1441,8 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       }
     }
+    g_free(inputProfile.first);
+
     // Clean up libvips' per-request data and threads
     vips_error_clear();
     vips_thread_shutdown();

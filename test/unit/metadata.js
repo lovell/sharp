@@ -1106,6 +1106,15 @@ suite('Image metadata', () => {
     });
   });
 
+  test('attempt to keep existing profile ensuring memory is freed correctly on error', async (t) => {
+    t.plan(1);
+    const overlay = [{ input: { create: { width: 17, height: 17, channels: 3, background: 'red' } } }];
+    await t.assert.rejects(
+      sharp(fixtures.inputJpgWithExif).keepIccProfile().resize(16, 16, { fit: 'fill' }).composite(overlay).toBuffer(),
+      /Image to composite must have same dimensions or smaller/
+    );
+  });
+
   test('transform to ICC profile and attach', async (t) => {
     t.plan(1);
     const data = await sharp({ create }).png().withIccProfile('p3', { attach: true }).toBuffer();
