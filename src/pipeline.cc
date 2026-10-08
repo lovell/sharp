@@ -942,10 +942,9 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (baton->extractChannel == 3 && image.has_alpha()) {
             baton->extractChannel = image.bands() - 1;
           } else {
-            (baton->err)
-              .append("Cannot extract channel ").append(std::to_string(baton->extractChannel))
-              .append(" from image with channels 0-").append(std::to_string(image.bands() - 1));
-            return Error();
+            throw std::runtime_error(
+              std::string("Cannot extract channel ").append(std::to_string(baton->extractChannel))
+              .append(" from image with channels 0-").append(std::to_string(image.bands() - 1)));
           }
         }
         VipsInterpretation colourspace = sharp::Is16Bit(image.interpretation())
