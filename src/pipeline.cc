@@ -1172,7 +1172,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("compression", baton->heifCompression)
             ->set("effort", baton->heifEffort)
             ->set("bitdepth", baton->heifBitdepth)
-            ->set("tune", baton->heifTune.c_str())
+            ->set("tune", baton->heifTune == "auto" ? nullptr : baton->heifTune.c_str())
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("lossless", baton->heifLossless)));
@@ -1385,7 +1385,7 @@ class PipelineWorker : public Napi::AsyncWorker {
             ->set("compression", baton->heifCompression)
             ->set("effort", baton->heifEffort)
             ->set("bitdepth", baton->heifBitdepth)
-            ->set("tune", baton->heifTune.c_str())
+            ->set("tune", baton->heifTune == "auto" ? nullptr : baton->heifTune.c_str())
             ->set("subsample_mode", baton->heifChromaSubsampling == "4:4:4"
               ? VIPS_FOREIGN_SUBSAMPLE_OFF : VIPS_FOREIGN_SUBSAMPLE_ON)
             ->set("lossless", baton->heifLossless));
