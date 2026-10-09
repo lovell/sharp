@@ -3,30 +3,24 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const fs = require('node:fs');
-const { execSync } = require('node:child_process');
+import fs from 'node:fs';
+import { execSync } from 'node:child_process';
 
-const async = require('async');
-const Benchmark = require('benchmark');
-
-const safeRequire = (name) => {
-  try {
-    return require(name);
-  } catch (_err) {}
-  return null;
-};
+import async from 'async';
+import Benchmark from 'benchmark';
 
 // Contenders
-const sharp = require('../../');
-const gm = require('gm');
-const imagemagick = require('imagemagick');
-const mapnik = safeRequire('mapnik');
-const { Jimp, JimpMime } = require('jimp');
+import sharp from '../../lib/index.js';
+import gm from 'gm';
+import imagemagick from 'imagemagick';
+import { Jimp, JimpMime } from 'jimp';
+
+import fixtures from '../fixtures/index.js';
+
+const mapnik = await import('mapnik').catch(() => null);
 
 process.env.TF_CPP_MIN_LOG_LEVEL = 1;
-const tfjs = safeRequire('@tensorflow/tfjs-node');
-
-const fixtures = require('../fixtures');
+const tfjs = await import('@tensorflow/tfjs-node').catch(() => null);
 
 const outputJpg = fixtures.path('output.jpg');
 const outputPng = fixtures.path('output.png');

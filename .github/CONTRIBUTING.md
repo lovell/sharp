@@ -20,11 +20,6 @@ Thank you! To prevent the problem occurring again, please add unit tests that wo
 Please select the `main` branch as the destination for your Pull Request so your fix can be included in the next minor release.
 Please squash your changes into a single commit using a command like `git rebase -i upstream/main`.
 
-To build CJS from ESM:
-```sh frame="none"
-npm run build:dist
-```
-
 To build C++:
 ```sh frame="none"
 npm run build

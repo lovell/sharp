@@ -3,12 +3,12 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { createReadStream, createWriteStream } = require('node:fs');
-const fs = require('node:fs/promises');
-const { afterEach, beforeEach, suite, test } = require('node:test');
+import { createReadStream, createWriteStream } from 'node:fs';
+import fs from 'node:fs/promises';
+import { afterEach, beforeEach, suite, test } from 'node:test';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 suite('Clone', () => {
   beforeEach(() => {

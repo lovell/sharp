@@ -3,11 +3,11 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
-const fs = require('node:fs');
+import { suite, test } from 'node:test';
+import fs from 'node:fs';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 suite('Image channel insertion', () => {
   test('Grayscale to RGB, buffer', async (t) => {

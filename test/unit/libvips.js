@@ -3,11 +3,11 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const fs = require('node:fs/promises');
-const { after, before, suite, test } = require('node:test');
+import fs from 'node:fs/promises';
+import { after, before, suite, test } from 'node:test';
 
-const semver = require('semver');
-const libvips = require('../../dist/libvips.cjs');
+import semver from 'semver';
+import libvips from '../../lib/libvips.js';
 
 const originalPlatform = process.platform;
 

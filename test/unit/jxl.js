@@ -3,9 +3,9 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
+import { suite, test } from 'node:test';
 
-const sharp = require('../../');
+import sharp from '../../lib/index.js';
 
 suite('JXL', () => {
   test('called without options does not throw an error', (t) => {

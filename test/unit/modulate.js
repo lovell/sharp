@@ -3,9 +3,9 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const sharp = require('../../');
-const { suite, test } = require('node:test');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import { suite, test } from 'node:test';
+import fixtures from '../fixtures/index.js';
 
 suite('Modulate', () => {
   suite('Invalid options', () => {

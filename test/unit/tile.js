@@ -3,16 +3,16 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { createWriteStream } = require('node:fs');
-const fs = require('node:fs/promises');
-const path = require('node:path');
-const { pipeline } = require('node:stream/promises');
-const { suite, test } = require('node:test');
+import { createWriteStream } from 'node:fs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { pipeline } from 'node:stream/promises';
+import { suite, test } from 'node:test';
 
-const yauzl = require('yauzl');
+import yauzl from 'yauzl';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 async function extractZip(zipPath, { dir }) {
   const zipFile = await yauzl.openPromise(zipPath, { autoClose: true, lazyEntries: true });
@@ -788,7 +788,7 @@ suite('Tile', () => {
       t.assert.strictEqual(2225, info.height);
       t.assert.strictEqual(3, info.channels);
       t.assert.strictEqual(undefined, info.size);
-      const infoJson = require(path.join(directory, 'info.json'));
+      const infoJson = JSON.parse(await fs.readFile(path.join(directory, 'info.json')));
       t.assert.strictEqual('http://iiif.io/api/image/2/context.json', infoJson['@context']);
       t.assert.strictEqual(`${id}/${name}`, infoJson['@id']);
       const stat = await fs.stat(path.join(directory, '0,0,256,256', '256,', '0', 'default.jpg'));
@@ -813,7 +813,7 @@ suite('Tile', () => {
       t.assert.strictEqual(2225, info.height);
       t.assert.strictEqual(3, info.channels);
       t.assert.strictEqual(undefined, info.size);
-      const infoJson = require(path.join(directory, 'info.json'));
+      const infoJson = JSON.parse(await fs.readFile(path.join(directory, 'info.json')));
       t.assert.strictEqual('http://iiif.io/api/image/3/context.json', infoJson['@context']);
       t.assert.strictEqual('ImageService3', infoJson.type);
       t.assert.strictEqual(`${id}/${name}`, infoJson.id);

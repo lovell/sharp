@@ -3,14 +3,14 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const fs = require('node:fs/promises');
-const { suite, test } = require('node:test');
+import fs from 'node:fs/promises';
+import { suite, test } from 'node:test';
 
-const exifReader = require('exif-reader');
-const icc = require('icc');
+import exifReader from 'exif-reader';
+import icc from 'icc';
 
-const sharp = require('../../');
-const fixtures = require('../fixtures');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 
 const create = { width: 1, height: 1, channels: 3, background: 'red' };
 
@@ -833,7 +833,7 @@ suite('Image metadata', () => {
 
   test('Invalid stream in, callback out', async (t) => {
     t.plan(1);
-    const fd = await fs.open(__filename);
+    const fd = await fs.open(import.meta.filename);
     const readable = fd.createReadStream();
     await t.assert.rejects(() => new Promise((resolve, reject) => {
       readable.pipe(
@@ -914,7 +914,7 @@ suite('Image metadata', () => {
 
   test('Stream in, rejected Promise out', async (t) => {
     t.plan(1);
-    const fd = await fs.open(__filename);
+    const fd = await fs.open(import.meta.filename);
     const readable = fd.createReadStream();
     const pipeline = sharp();
     readable.pipe(pipeline);

@@ -3,16 +3,17 @@
   SPDX-License-Identifier: Apache-2.0
 */
 
-const { suite, test } = require('node:test');
+import { suite, test } from 'node:test';
 
-const sharp = require('../../');
+import sharp from '../../lib/index.js';
+import fixtures from '../fixtures/index.js';
 const {
   inputAvif,
   inputAvifWithPitmBox,
   inputJpg,
   inputGifAnimated,
   inputPng,
-} = require('../fixtures');
+} = fixtures;
 
 suite('AVIF', () => {
   test('called without options does not throw an error', (t) => {
