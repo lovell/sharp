@@ -1,5 +1,5 @@
 /*!
-  Copyright 2013 Lovell Fuller and others.
+  SPDX-FileCopyrightText: 2013 Lovell Fuller and others
   SPDX-License-Identifier: Apache-2.0
 */
 
@@ -72,6 +72,17 @@ suite('GIF input', () => {
     t.assert.strictEqual(2, info.pages);
   });
 
+  test('Single delay with a page count of zero', async (t) => {
+    t.plan(3);
+    const { data, info } = await sharp(fixtures.inputJpg, { pages: 0 })
+      .resize(8)
+      .gif({ delay: 100 })
+      .toBuffer({ resolveWithObject: true });
+    t.assert.strictEqual('gif', info.format);
+    t.assert.strictEqual(data.length, info.size);
+    t.assert.strictEqual(undefined, info.pages);
+  });
+
   test('GIF with reduced colours, no dither, low effort reduces file size', async (t) => {
     t.plan(1);
     const original = await sharp(fixtures.inputJpg)
@@ -139,13 +150,21 @@ suite('GIF input', () => {
   });
 
   test('invalid delay throws', (t) => {
-    t.plan(2);
+    t.plan(4);
     t.assert.throws(() => {
       sharp().gif({ delay: -1 });
     });
     t.assert.throws(() => {
       sharp().gif({ delay: [65536] });
     });
+    t.assert.throws(
+      () => sharp().gif({ delay: new Array(1000001) }),
+      /Expected integer or an array of integers between 0 and 65535 for delay but received [,]{100} of type object/
+    );
+    t.assert.throws(
+      () => sharp().gif({ delay: new Array(2000000000) }),
+      /Expected integer or an array of integers between 0 and 65535 for delay but received undefined of type object/
+    );
   });
 
   test('invalid colour throws', (t) => {

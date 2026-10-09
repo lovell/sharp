@@ -1,12 +1,12 @@
-name: "CI: npm smoke test"
+# SPDX-FileCopyrightText: 2013 Lovell Fuller and others
+# SPDX-License-Identifier: Apache-2.0
 
+name: "CI: npm smoke test"
 on:
   push:
     tags:
       - "v**"
-
 permissions: {}
-
 jobs:
   release-smoke-test:
     name: "${{ github.ref_name }} ${{ matrix.name }}"
@@ -16,30 +16,30 @@ jobs:
       matrix:
         include:
           - name: linux-x64-node-npm
-            runs-on: ubuntu-24.04
+            runs-on: ubuntu-26.04
             runtime: node
             package-manager: npm
           - name: linux-x64-node-pnpm
-            runs-on: ubuntu-24.04
+            runs-on: ubuntu-26.04
             runtime: node
             package-manager: pnpm
           - name: linux-x64-node-yarn
-            runs-on: ubuntu-24.04
+            runs-on: ubuntu-26.04
             runtime: node
             package-manager: yarn
           - name: linux-x64-node-yarn-pnp
-            runs-on: ubuntu-24.04
+            runs-on: ubuntu-26.04
             runtime: node
             package-manager: yarn-pnp
           - name: linux-x64-node-yarn-v1
-            runs-on: ubuntu-24.04
+            runs-on: ubuntu-26.04
             runtime: node
             package-manager: yarn-v1
           - name: linux-x64-deno
-            runs-on: ubuntu-24.04
+            runs-on: ubuntu-26.04
             runtime: deno
           - name: linux-x64-bun
-            runs-on: ubuntu-24.04
+            runs-on: ubuntu-26.04
             runtime: bun
 
           - name: darwin-x64-node-npm
@@ -92,14 +92,14 @@ jobs:
     steps:
       - name: Install Node.js
         if: ${{ matrix.runtime == 'node' }}
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 20
           cache: ""
           package-manager-cache: false
       - name: Install pnpm
         if: ${{ matrix.package-manager == 'pnpm' }}
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           version: 11
       - name: Install Deno

@@ -1,7 +1,7 @@
-# Copyright 2013 Lovell Fuller and others.
+# SPDX-FileCopyrightText: 2013 Lovell Fuller and others
 # SPDX-License-Identifier: Apache-2.0
 
-{
+{ # noqa: B018
   'variables': {
     'vips_version': '<!(node -p "require(\'../lib/libvips.js\').default.minimumLibvipsVersion")',
     'platform_and_arch': '<!(node -p "require(\'../lib/libvips.js\').default.buildPlatformArch()")',

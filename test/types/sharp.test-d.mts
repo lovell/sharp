@@ -363,8 +363,6 @@ sharp(input)
   .avif()
   .avif({})
   .avif({ quality: 50, lossless: false, effort: 5, chromaSubsampling: '4:2:0' })
-  .heif()
-  .heif({})
   .heif({ quality: 50, compression: 'hevc', lossless: false, effort: 5, chromaSubsampling: '4:2:0', tune: 'psnr' })
   .toBuffer({ resolveWithObject: true })
   .then(({ data, info }) => {
@@ -513,7 +511,7 @@ sharp('someImage.png').timeout({ seconds: 30 }).resize(300, 300).toBuffer();
 sharp('input.tiff').png({ effort: 9 }).toFile('out.png');
 sharp('input.tiff').webp({ effort: 9 }).toFile('out.webp');
 sharp('input.tiff').avif({ effort: 9 }).toFile('out.avif');
-sharp('input.tiff').heif({ effort: 9 }).toFile('out.heif');
+sharp('input.tiff').heif({ compression: 'hevc', effort: 9 }).toFile('out.heif');
 sharp('input.tiff').gif({ effort: 9 }).toFile('out.gif');
 
 // Support for `colors`/`colours` for gif output
@@ -547,6 +545,8 @@ sharp('input.tiff').jxl({ quality: 50 }).toFile('out.jxl');
 sharp('input.tiff').jxl({ decodingTier: 4 }).toFile('out.jxl');
 sharp('input.tiff').jxl({ lossless: true }).toFile('out.jxl');
 sharp('input.tiff').jxl({ effort: 7 }).toFile('out.jxl');
+sharp('input.tiff').jxl({ loop: 3 }).toFile('out.jxl');
+sharp('input.tiff').jxl({ delay: [100, 200] }).toFile('out.jxl');
 
 // Support webp options
 sharp('input.tiff').webp({ minSize: true, mixed: true, exact: true }).toFile('out.webp');
@@ -819,3 +819,7 @@ sharp().metadata().then((metadata: Metadata) => {
     const mediaType: MediaType = metadata.mediaType;
   }
 });
+
+// @ts-expect-error
+import { sharp as fail } from '../../';
+fail();

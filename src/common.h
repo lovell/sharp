@@ -1,5 +1,5 @@
 /*!
-  Copyright 2013 Lovell Fuller and others.
+  SPDX-FileCopyrightText: 2013 Lovell Fuller and others
   SPDX-License-Identifier: Apache-2.0
 */
 
@@ -19,8 +19,8 @@
 
 #if (VIPS_MAJOR_VERSION < 8) || \
   (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 18) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 18 && VIPS_MICRO_VERSION < 3)
-#error "libvips version 8.18.3+ is required - please see https://sharp.pixelplumbing.com/install"
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 18 && VIPS_MICRO_VERSION < 7)
+#error "libvips version 8.18.7+ is required - please see https://sharp.pixelplumbing.com/install"
 #endif
 
 #if defined(__has_include)

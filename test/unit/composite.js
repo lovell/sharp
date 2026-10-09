@@ -1,5 +1,5 @@
 /*!
-  Copyright 2013 Lovell Fuller and others.
+  SPDX-FileCopyrightText: 2013 Lovell Fuller and others
   SPDX-License-Identifier: Apache-2.0
 */
 
@@ -273,7 +273,7 @@ suite('composite', () => {
   });
 
   test('cutout via dest-in', async (t) => {
-    t.plan(5);
+    t.plan(4);
     const { data, info } = await sharp(fixtures.inputJpg)
       .resize(300, 300)
       .composite([{
@@ -289,7 +289,7 @@ suite('composite', () => {
     t.assert.strictEqual(300, info.height);
     t.assert.strictEqual(4, info.channels);
     if (fixtures.isLittleEndian) {
-      await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('composite-cutout.png'), data));
+      await fixtures.assertSimilar(fixtures.expected('composite-cutout.png'), data);
     }
   });
 

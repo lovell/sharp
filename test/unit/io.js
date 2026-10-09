@@ -1,5 +1,5 @@
 /*!
-  Copyright 2013 Lovell Fuller and others.
+  SPDX-FileCopyrightText: 2013 Lovell Fuller and others
   SPDX-License-Identifier: Apache-2.0
 */
 
@@ -900,6 +900,14 @@ suite('Input/output', () => {
       const { width, height } = await sharp(fixtures.inputJpg).metadata();
       await t.assert.rejects(
         () => sharp(fixtures.inputJpg, { limitInputPixels: width * height - 1 }).toBuffer(),
+        /Input image exceeds pixel limit/
+      );
+    });
+
+    test('Limit applies when creating an image', async (t) => {
+      t.plan(1);
+      await t.assert.rejects(
+        () => sharp({ create: { width: 100000, height: 100000, channels: 3, background: 'red' }}).toBuffer(),
         /Input image exceeds pixel limit/
       );
     });

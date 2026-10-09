@@ -1,5 +1,5 @@
 /*!
-  Copyright 2013 Lovell Fuller and others.
+  SPDX-FileCopyrightText: 2013 Lovell Fuller and others
   SPDX-License-Identifier: Apache-2.0
 */
 
@@ -107,7 +107,7 @@ suite('Linear adjustment', () => {
   });
 
   test('Invalid linear arguments', (t) => {
-    t.plan(5);
+    t.plan(6);
     t.assert.throws(
       () => sharp().linear('foo'),
       /Expected number or array of numbers for a but received foo of type string/
@@ -127,6 +127,10 @@ suite('Linear adjustment', () => {
     t.assert.throws(
       () => sharp().linear([1]),
       /Expected a and b to be arrays of the same length/
+    );
+    t.assert.throws(
+      () => sharp().linear(new Array(1000001), new Array(1000001)),
+      /Expected number or array of numbers for a but received [,]{100} of type object/
     );
   });
 });

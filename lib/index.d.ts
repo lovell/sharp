@@ -1404,7 +1404,7 @@ declare namespace sharp {
         chromaSubsampling?: '4:4:4' | '4:2:0';
     }
 
-    interface JxlOptions extends OutputOptions {
+    interface JxlOptions extends OutputOptions, AnimationOptions {
         /** Maximum encoding error, between 0 (highest quality) and 15 (lowest quality) (optional, default 1.0) */
         distance?: number;
         /** Calculate distance based on JPEG-like quality, between 1 and 100, overrides distance if specified */
@@ -1413,7 +1413,7 @@ declare namespace sharp {
         decodingTier?: number;
         /** Use lossless compression (optional, default false) */
         lossless?: boolean;
-        /** CPU effort, between 3 (fastest) and 9 (slowest) (optional, default 7) */
+        /** CPU effort, between 1 (fastest) and 9 (slowest) (optional, default 7) */
         effort?: number | undefined;
     }
 
@@ -1460,8 +1460,8 @@ declare namespace sharp {
     interface HeifOptions extends OutputOptions {
         /** quality, integer 1-100 (optional, default 50) */
         quality?: number | undefined;
-        /** compression format: av1, hevc (optional, default 'av1') */
-        compression?: HeifCompression | undefined;
+        /** compression format: av1, hevc */
+        compression: HeifCompression;
         /** use lossless compression (optional, default false) */
         lossless?: boolean | undefined;
         /** Level of CPU effort to reduce file size, between 0 (fastest) and 9 (slowest) (optional, default 4) */
@@ -1470,7 +1470,7 @@ declare namespace sharp {
         chromaSubsampling?: string | undefined;
         /** Set bitdepth to 8, 10 or 12 bit (optional, default 8) */
         bitdepth?: 8 | 10 | 12 | undefined;
-        /** Tune output for a quality metric, one of 'auto', 'iq', 'psnr' or 'ssim' (optional, default 'auto') */
+        /** Tune output for a quality metric, one of 'auto' (av1 default), 'iq' (av1 only), 'psnr' or 'ssim' (hevc default) */
         tune?: HeifTune | undefined;
     }
 

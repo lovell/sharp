@@ -15,6 +15,18 @@
       "preset": "recommended"
     }
   },
+  "overrides": [
+    {
+      "includes": ["**/*.astro"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ],
   "formatter": {
     "enabled": false,
     "useEditorconfig": true

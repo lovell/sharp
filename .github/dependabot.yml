@@ -7,7 +7,11 @@ updates:
     cooldown:
       default-days: 2
   - package-ecosystem: "npm"
-    directory: "/"
+    directories:
+      - "/"
+      - "/docs"
+      - "/test/bench"
+      - "/npm/wasm32"
     schedule:
       interval: "daily"
     cooldown:

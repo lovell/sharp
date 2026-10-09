@@ -71,6 +71,8 @@ export default defineConfig({
           ]
         },
         { label: 'Performance', slug: 'performance' },
+        { label: 'Security', link: '/security' },
+        { label: 'Contributing', link: '/contributing' },
         {
           label: 'Changelog',
           collapsed: true,

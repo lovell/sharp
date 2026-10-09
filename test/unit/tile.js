@@ -1,16 +1,32 @@
 /*!
-  Copyright 2013 Lovell Fuller and others.
+  SPDX-FileCopyrightText: 2013 Lovell Fuller and others
   SPDX-License-Identifier: Apache-2.0
 */
 
+import { createWriteStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { pipeline } from 'node:stream/promises';
 import { suite, test } from 'node:test';
 
-import extractZip from 'extract-zip';
+import yauzl from 'yauzl';
 
 import sharp from '../../lib/index.js';
 import fixtures from '../fixtures/index.js';
+
+async function extractZip(zipPath, { dir }) {
+  const zipFile = await yauzl.openPromise(zipPath, { autoClose: true, lazyEntries: true });
+  for await (const entry of zipFile.eachEntry()) {
+    const entryPath = path.join(dir, entry.fileName);
+    if (entry.fileName.endsWith('/')) {
+      await fs.mkdir(entryPath, { recursive: true });
+      continue;
+    }
+    await fs.mkdir(path.dirname(entryPath), { recursive: true });
+    const readStream = await zipFile.openReadStreamPromise(entry);
+    await pipeline(readStream, createWriteStream(entryPath));
+  }
+}
 
 async function countDeepZoomAssertions(directory) {
   const dirents = await fs.readdir(directory, { withFileTypes: true });

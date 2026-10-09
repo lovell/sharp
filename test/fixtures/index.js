@@ -1,5 +1,5 @@
 /*!
-  Copyright 2013 Lovell Fuller and others.
+  SPDX-FileCopyrightText: 2013 Lovell Fuller and others
   SPDX-License-Identifier: Apache-2.0
 */
 
@@ -152,6 +152,8 @@ export default {
   fontFamily: 'Noto Sans',
 
   isLittleEndian: endianness() === 'LE',
+
+  isLsan: process.env.LSAN_OPTIONS?.includes('detect_leaks=1'),
 
   // Path for tests requiring human inspection
   path: getPath,
