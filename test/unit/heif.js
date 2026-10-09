@@ -112,8 +112,33 @@ suite('HEIF', () => {
   });
   test('invalid tune should throw an error', (t) => {
     t.plan(1);
-    t.assert.throws(() => {
-      sharp().heif({ compression: 'hevc', tune: 'fail' });
-    }, /Error: Expected one of: auto, iq, psnr, ssim for tune but received fail of type string/);
+    t.assert.throws(
+      () => sharp().heif({ compression: 'hevc', tune: true }),
+      /Error: Expected string for tune but received true of type boolean/
+    );
+  });
+  test('av1 auto tune is auto', (t) => {
+    t.plan(1);
+    const pipeline = sharp().heif({ compression: 'av1' });
+    t.assert.equal(pipeline.options.heifTune, 'auto');
+  });
+  test('hevc default tune is ssim', (t) => {
+    t.plan(1);
+    const pipeline = sharp().heif({ compression: 'hevc' });
+    t.assert.equal(pipeline.options.heifTune, 'ssim');
+  });
+  test('invalid av1 tune should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(
+      () => sharp().heif({ compression: 'av1', tune: 'fail' }),
+      /Error: Expected one of: auto, iq, psnr, ssim for tune but received fail of type string/
+    );
+  });
+  test('invalid hevc tune should throw an error', (t) => {
+    t.plan(1);
+    t.assert.throws(
+      () => sharp().heif({ compression: 'hevc', tune: 'fail' }),
+      /Error: Expected one of: psnr, ssim for tune but received fail of type string/
+    );
   });
 });

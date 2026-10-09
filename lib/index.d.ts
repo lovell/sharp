@@ -1460,8 +1460,8 @@ declare namespace sharp {
     interface HeifOptions extends OutputOptions {
         /** quality, integer 1-100 (optional, default 50) */
         quality?: number | undefined;
-        /** compression format: av1, hevc (optional, default 'av1') */
-        compression?: HeifCompression | undefined;
+        /** compression format: av1, hevc */
+        compression: HeifCompression;
         /** use lossless compression (optional, default false) */
         lossless?: boolean | undefined;
         /** Level of CPU effort to reduce file size, between 0 (fastest) and 9 (slowest) (optional, default 4) */
@@ -1470,7 +1470,7 @@ declare namespace sharp {
         chromaSubsampling?: string | undefined;
         /** Set bitdepth to 8, 10 or 12 bit (optional, default 8) */
         bitdepth?: 8 | 10 | 12 | undefined;
-        /** Tune output for a quality metric, one of 'auto', 'iq', 'psnr' or 'ssim' (optional, default 'auto') */
+        /** Tune output for a quality metric, one of 'auto' (av1 default), 'iq' (av1 only), 'psnr' or 'ssim' (hevc default) */
         tune?: HeifTune | undefined;
     }
 
