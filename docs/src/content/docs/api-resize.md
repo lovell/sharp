@@ -41,6 +41,16 @@ Possible downsizing kernels are:
 - `mks2013`: Use a [Magic Kernel Sharp](https://johncostella.com/magic/mks.pdf) 2013 kernel, as adopted by Facebook.
 - `mks2021`: Use a Magic Kernel Sharp 2021 kernel, with more accurate (reduced) sharpening than the 2013 version.
 
+The comparison below downsizes the same 1280x960 high-contrast diagonal graphic to 160x120 with each kernel.
+Use `nearest` to keep hard pixel edges; `linear` softens them. For photographs,
+start with the default `lanczos3`, then compare other kernels if fine edges
+look too soft or show halos. The best choice depends on the image and output size.
+
+<img alt="Side-by-side 160x120 downsizes of one diagonal graphic using nearest, linear, cubic, mitchell, lanczos2, lanczos3, mks2013 and mks2021 kernels" width="704" height="308" src="/api-resize-kernels.png">
+
+Rebuild this image with `node docs/scripts/generate-kernel-comparison.mjs`.
+The comparison disables shrink-on-load so the kernel's effect is easier to see.
+
 When upsampling, these kernels map to `nearest`, `linear` and `cubic` interpolators.
 Downsampling kernels without a matching upsampling interpolator map to `cubic`.
 
