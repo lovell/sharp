@@ -371,6 +371,13 @@ suite('composite', () => {
       }, /Expected object for image to composite but received invalid of type string/);
     });
 
+    test('null image', (t) => {
+      t.plan(1);
+      t.assert.throws(() => {
+        sharp().composite([null]);
+      }, /Expected object for image to composite but received null of type object/);
+    });
+
     test('missing input', (t) => {
       t.plan(1);
       t.assert.throws(() => {
