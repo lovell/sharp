@@ -155,6 +155,13 @@ suite('Extend', () => {
       /Expected integer between 1 and 100000000 for extend but received -1 of type number/
     );
   });
+  test('null fails', (t) => {
+    t.plan(1);
+    t.assert.throws(
+      () => sharp().extend(null),
+      /Expected integer or object for extend but received null of type object/
+    );
+  });
   test('too large fails', (t) => {
     t.plan(1);
     t.assert.throws(
