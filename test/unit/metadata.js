@@ -1774,6 +1774,10 @@ suite('Image metadata', () => {
       t.plan(1);
       t.assert.throws(() => sharp().withMetadata({ density: -1 }));
     });
+    test('Out of range density', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withMetadata({ density: 100001 }), /Expected number between 1 and 100000 for density but received 100001 of type number/);
+    });
     test('Non string icc', (t) => {
       t.plan(1);
       t.assert.throws(() => sharp().withMetadata({ icc: true }));
@@ -1804,11 +1808,15 @@ suite('Image metadata', () => {
     });
     test('withDensity missing density', (t) => {
       t.plan(1);
-      t.assert.throws(() => sharp().withDensity(), /Expected positive number for density but received undefined of type undefined/);
+      t.assert.throws(() => sharp().withDensity(), /Expected number between 1 and 100000 for density but received undefined of type undefined/);
     });
     test('withDensity invalid density', (t) => {
       t.plan(1);
-      t.assert.throws(() => sharp().withDensity('invalid'), /Expected positive number for density but received invalid of type string/);
+      t.assert.throws(() => sharp().withDensity('invalid'), /Expected number between 1 and 100000 for density but received invalid of type string/);
+    });
+    test('withDensity out of range density', (t) => {
+      t.plan(1);
+      t.assert.throws(() => sharp().withDensity(100001), /Expected number between 1 and 100000 for density but received 100001 of type number/);
     });
   });
 });

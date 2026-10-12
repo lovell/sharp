@@ -158,7 +158,7 @@ Set output density (DPI) in EXIF metadata.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| density | <code>number</code> | Number of pixels per inch (DPI). |
+| density | <code>number</code> | Number of pixels per inch (DPI), between 1 and 100000. |
 
 **Example**  
 ```js
@@ -435,7 +435,7 @@ Allows orientation and density to be set or updated.
 | --- | --- | --- |
 | [options] | <code>Object</code> |  |
 | [options.orientation] | <code>number</code> | Used to update the EXIF `Orientation` tag, integer between 1 and 8. |
-| [options.density] | <code>number</code> | Number of pixels per inch (DPI). |
+| [options.density] | <code>number</code> | Number of pixels per inch (DPI), between 1 and 100000. |
 
 **Example**  
 ```js
