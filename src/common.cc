@@ -399,6 +399,7 @@ namespace sharp {
       imageType == ImageType::JP2 ||
       imageType == ImageType::TIFF ||
       imageType == ImageType::HEIF ||
+      imageType == ImageType::JXL ||
       imageType == ImageType::PDF;
   }
 
