@@ -9,7 +9,7 @@ run({
   concurrency: true,
   timeout: 60000,
   coverage: true,
-  coverageIncludeGlobs: ['lib/*.js'],
+  coverageIncludeGlobs: ['dist/*.cjs'],
   branchCoverage: 100,
 })
   .on('test:fail', () => {
