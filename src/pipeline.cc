@@ -1865,9 +1865,9 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     baton->convKernelOffset = sharp::AttrAsDouble(kernel, "offset");
     size_t const kernelSize = static_cast<size_t>(baton->convKernelWidth * baton->convKernelHeight);
     baton->convKernel.resize(kernelSize);
-    Napi::Array kdata = kernel.Get("kernel").As<Napi::Array>();
+    Napi::Array kernelData = kernel.Get("kernel").As<Napi::Array>();
     for (unsigned int i = 0; i < kernelSize; i++) {
-      baton->convKernel[i] = sharp::AttrAsDouble(kdata, i);
+      baton->convKernel[i] = sharp::AttrAsDouble(kernelData, i);
     }
   }
   if (options.Has("recombMatrix")) {

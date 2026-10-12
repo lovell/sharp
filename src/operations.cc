@@ -97,7 +97,7 @@ namespace sharp {
   }
 
   /*
-   * Contrast limiting adapative histogram equalization (CLAHE)
+   * Contrast limiting adaptive histogram equalization (CLAHE)
    */
   VImage Clahe(VImage image, int const width, int const height, int const maxSlope) {
     return image.hist_local(width, height, VImage::option()->set("max_slope", maxSlope));

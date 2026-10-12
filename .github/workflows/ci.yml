@@ -23,6 +23,7 @@ jobs:
       - run: npm run lint-cpp
       - run: npm run lint-js
       - run: npm run lint-types
+      - run: npm run lint-spell
       - run: npm run lint-publish
   build-native:
     permissions:

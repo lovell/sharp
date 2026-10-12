@@ -1,0 +1,30 @@
+{
+  "caseSensitive": false,
+  "dictionaries": ["ignore"],
+  "dictionaryDefinitions": [
+    {
+      "name": "ignore",
+      "path": "ignore.txt"
+    }
+  ],
+  "globRoot": "../../",
+  "ignorePaths": [
+    "docs/dist/",
+    "docs/firebase.json",
+    "docs/public/api-resize-fit.svg",
+    "humans.txt",
+    "node_modules/",
+    "package.json",
+    "patches/",
+    "src/binding.gyp",
+    "src/build/",
+    "src/CPPLINT.cfg",
+    "src/emscripten/",
+    "test/"
+  ],
+  "ignoreRegExpList": [
+    "/@[A-Za-z0-9-]+/g", // Usernames in changelog
+    "/[A-Za-z0-9]+/sharp-[a-z-]+/g" // Repo names in installation docs
+  ],
+  "language": "en-GB,en-US"
+}

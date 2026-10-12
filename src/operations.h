@@ -28,7 +28,7 @@ namespace sharp {
   VImage Normalise(VImage image, int const lower, int const upper);
 
   /*
-   * Contrast limiting adapative histogram equalization (CLAHE)
+   * Contrast limiting adaptive histogram equalization (CLAHE)
    */
   VImage Clahe(VImage image, int const width, int const height, int const maxSlope);
 
