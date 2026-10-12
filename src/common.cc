@@ -198,7 +198,7 @@ namespace sharp {
     }
     descriptor->limitInputPixels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputPixels"));
     descriptor->limitInputChannels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputChannels"));
-    if (HasAttr(input, "access")) {
+    if (HasAttr(input, "sequentialRead")) {
       descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
     }
     // Remove safety features and allow unlimited input
