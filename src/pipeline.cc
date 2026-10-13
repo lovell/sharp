@@ -270,7 +270,12 @@ class PipelineWorker : public Napi::AsyncWorker {
         if (baton->input->buffer != nullptr) {
           // Reload JPEG buffer
           VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
-          image = VImage::jpegload_buffer(blob, option);
+          try {
+            image = VImage::jpegload_buffer(blob, option);
+          } catch (...) {
+            vips_area_unref(reinterpret_cast<VipsArea*>(blob));
+            throw;
+          }
           vips_area_unref(reinterpret_cast<VipsArea*>(blob));
         } else {
           // Reload JPEG file
@@ -282,7 +287,12 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (baton->input->buffer != nullptr) {
             // Reload WebP buffer
             VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
-            image = VImage::webpload_buffer(blob, option);
+            try {
+              image = VImage::webpload_buffer(blob, option);
+            } catch (...) {
+              vips_area_unref(reinterpret_cast<VipsArea*>(blob));
+              throw;
+            }
             vips_area_unref(reinterpret_cast<VipsArea*>(blob));
           } else {
             // Reload WebP file
@@ -292,7 +302,12 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (baton->input->buffer != nullptr) {
             // Reload SVG buffer
             VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
-            image = VImage::svgload_buffer(blob, option);
+            try {
+              image = VImage::svgload_buffer(blob, option);
+            } catch (...) {
+              vips_area_unref(reinterpret_cast<VipsArea*>(blob));
+              throw;
+            }
             vips_area_unref(reinterpret_cast<VipsArea*>(blob));
           } else {
             // Reload SVG file
@@ -306,7 +321,12 @@ class PipelineWorker : public Napi::AsyncWorker {
           if (baton->input->buffer != nullptr) {
             // Reload PDF buffer
             VipsBlob *blob = vips_blob_new(nullptr, baton->input->buffer, baton->input->bufferLength);
-            image = VImage::pdfload_buffer(blob, option);
+            try {
+              image = VImage::pdfload_buffer(blob, option);
+            } catch (...) {
+              vips_area_unref(reinterpret_cast<VipsArea*>(blob));
+              throw;
+            }
             vips_area_unref(reinterpret_cast<VipsArea*>(blob));
           } else {
             // Reload PDF file
