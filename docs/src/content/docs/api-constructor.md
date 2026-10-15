@@ -76,7 +76,7 @@ where the overall height is the `pageHeight` multiplied by the number of `pages`
 | [options.text.wrap] | <code>string</code> | <code>&quot;&#x27;word&#x27;&quot;</code> | word wrapping style when width is provided, one of: 'word', 'char', 'word-char' (prefer word, fallback to char) or 'none'. |
 | [options.join] | <code>Object</code> |  | describes how an array of input images should be joined. |
 | [options.join.across] | <code>number</code> | <code>1</code> | number of images to join horizontally. |
-| [options.join.animated] | <code>boolean</code> | <code>false</code> | set this to `true` to join the images as an animated image. |
+| [options.join.animated] | <code>boolean</code> | <code>false</code> | set this to `true` to join the images as an animated image, cannot be used with `across` or `shim`. |
 | [options.join.shim] | <code>number</code> | <code>0</code> | number of pixels to insert between joined images. |
 | [options.join.background] | <code>string</code> \| <code>Object</code> |  | parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha. |
 | [options.join.halign] | <code>string</code> | <code>&quot;&#x27;left&#x27;&quot;</code> | horizontal alignment style for images joined horizontally (`'left'`, `'centre'`, `'center'`, `'right'`). |
