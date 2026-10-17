@@ -151,4 +151,18 @@ suite('Blur', () => {
       sharp(fixtures.inputJpg).blur({ precision: 'invalid' });
     }, /Expected number between 0.3 and 1000 for options.sigma but received undefined of type undefined/);
   });
+
+  test('invalid options.sigma', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp(fixtures.inputJpg).blur({ sigma: 'x' });
+    }, /Expected number between 0.3 and 1000 for options.sigma but received x of type string/);
+  });
+
+  test('invalid sigma', (t) => {
+    t.plan(1);
+    t.assert.throws(() => {
+      sharp(fixtures.inputJpg).blur('5');
+    }, /Expected number between 0.3 and 1000 for sigma but received 5 of type string/);
+  });
 });
