@@ -411,6 +411,25 @@ suite('Tile', () => {
       t.assert.strictEqual(true, metadata.height === 170);
     });
 
+    test('Deep Zoom layout with angle beyond 32-bit integer range', async (t) => {
+      const directory = fixtures.path('output.512_largeangle.dzi_files');
+      await fs.rm(directory, { recursive: true, force: true });
+      // 2147483970 is a multiple of 90 equal to 90 modulo 360 but larger than
+      // the signed 32-bit range, so it must rotate as 90 rather than truncate
+      const info = await sharp(fixtures.inputJpg)
+        .tile({
+          size: 512,
+          angle: 2147483970
+        })
+        .toFile(fixtures.path('output.512_largeangle.dzi'));
+      t.plan(3);
+      t.assert.strictEqual('dz', info.format);
+      const tile = path.join(directory, '10', '0_1.jpeg');
+      const metadata = await sharp(tile).metadata();
+      t.assert.strictEqual(true, metadata.width === 512);
+      t.assert.strictEqual(true, metadata.height === 170);
+    });
+
     test('Deep Zoom layout with depth of one', async (t) => {
       const directory = fixtures.path('output.512_depth_one.dzi_files');
       await fs.rm(directory, { recursive: true, force: true });
