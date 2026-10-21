@@ -847,28 +847,26 @@ namespace sharp {
   }
 
   /*
-    Attach an event listener for progress updates, used to detect timeout
+    Attach an event listener for progress updates, used to detect abort
   */
-  void SetTimeout(VImage image, int const seconds) {
-    if (seconds > 0) {
+  void SetAbortFlag(VImage image, std::atomic<int8_t> *abortFlag) {
+    if (abortFlag != nullptr) {
       VipsImage *im = image.get_image();
       if (im->progress_signal == NULL) {
-        int *timeout = VIPS_NEW(im, int);
-        *timeout = seconds;
-        g_signal_connect(im, "eval", G_CALLBACK(VipsProgressCallBack), timeout);
+        g_signal_connect(im, "eval", G_CALLBACK(VipsAbortCallBack), abortFlag);
         vips_image_set_progress(im, true);
       }
     }
   }
 
   /*
-    Event listener for progress updates, used to detect timeout
+    Event listener for progress updates, used to detect abort
   */
-  void VipsProgressCallBack(VipsImage *im, VipsProgress *progress, int *timeout) {
-    if (*timeout > 0 && progress->run >= *timeout) {
+  void VipsAbortCallBack(VipsImage *im, VipsProgress *progress, std::atomic<int8_t> *abortFlag) {
+    if (abortFlag->load(std::memory_order_relaxed) != 0) {
       vips_image_set_kill(im, true);
-      vips_error("timeout", "%d%% complete", progress->percent);
-      *timeout = 0;
+      vips_error("abort", "ran for %d second%s, %d%% complete",
+        progress->run, progress->run == 1 ? "" : "s", progress->percent);
     }
   }
 

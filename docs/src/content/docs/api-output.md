@@ -4,7 +4,7 @@ title: Output options
 ---
 
 ## toFile
-> toFile(fileOut, [callback]) ⇒ <code>Promise.&lt;Object&gt;</code>
+> toFile(fileOut, [options], [callback]) ⇒ <code>Promise.&lt;Object&gt;</code>
 
 Write output image data to a file.
 
@@ -29,19 +29,22 @@ A `Promise` is returned when `callback` is not provided.
 | Param | Type | Description |
 | --- | --- | --- |
 | fileOut | <code>string</code> | the path to write the image data to. |
+| [options] | <code>Object</code> |  |
+| [options.signal] | <code>AbortSignal</code> | A signal that can be used to abort this asynchronous operation on a best-effort basis. |
 | [callback] | <code>function</code> | called on completion with two arguments `(err, info)`. `info` contains the output image `format`, `size` (bytes), `width`, `height`, `channels` and `premultiplied` (indicating if premultiplication was used). When using a crop strategy also contains `cropOffsetLeft` and `cropOffsetTop`. When using the attention crop strategy also contains `attentionX` and `attentionY`, the focal point of the cropped region. Animated output will also contain `pageHeight` and `pages`. May also contain `textAutofitDpi` (dpi the font was rendered at) if image was created from text. |
 
 **Example**  
 ```js
-sharp(input)
-  .toFile('output.png', (err, info) => { ... });
+await sharp(input).toFile('output.png');
+```
+**Example**  
+```js
+await sharp(input).toFile('output.webp', { signal: AbortSignal.timeout(5000) });
 ```
 **Example**  
 ```js
 sharp(input)
-  .toFile('output.png')
-  .then(info => { ... })
-  .catch(err => { ... });
+  .toFile('output.png', (err, info) => { ... });
 ```
 
 
@@ -78,6 +81,7 @@ A `Promise` is returned when `callback` is not provided.
 | Param | Type | Description |
 | --- | --- | --- |
 | [options] | <code>Object</code> |  |
+| [options.signal] | <code>AbortSignal</code> | A signal that can be used to abort this asynchronous operation on a best-effort basis. Mutually exclusive with `resolveWithObject`, which is always set to `true` when a signal is present. |
 | [options.resolveWithObject] | <code>boolean</code> | Resolve the Promise with an Object containing `data` and `info` properties instead of resolving only with `data`. |
 | [callback] | <code>function</code> |  |
 
@@ -86,6 +90,12 @@ A `Promise` is returned when `callback` is not provided.
 const data = await sharp(input)
   .png()
   .toBuffer();
+```
+**Example**  
+```js
+const { data, info } = await sharp(input)
+  .blur(100)
+  .toBuffer({ signal: AbortSignal.timeout(5000) });
 ```
 **Example**  
 ```js
@@ -113,7 +123,7 @@ await sharp(pixelArray, { raw: { width, height, channels } })
 
 
 ## toUint8Array
-> toUint8Array() ⇒ <code>Promise.&lt;{data: Uint8Array, info: Object}&gt;</code>
+> toUint8Array([options]) ⇒ <code>Promise.&lt;{data: Uint8Array, info: Object}&gt;</code>
 
 Write output to a `Uint8Array` backed by a transferable `ArrayBuffer`.
 JPEG, PNG, WebP, AVIF, TIFF, GIF and raw pixel data output are supported.
@@ -131,6 +141,12 @@ Resolves with an `Object` containing:
 
 
 **Since**: v0.35.0  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [options] | <code>Object</code> |  |
+| [options.signal] | <code>AbortSignal</code> | A signal that can be used to abort this asynchronous operation on a best-effort basis. |
+
 **Example**  
 ```js
 const { data, info } = await sharp(input).toUint8Array();
@@ -141,6 +157,12 @@ const { data } = await sharp(input)
   .avif()
   .toUint8Array();
 const base64String = data.toBase64();
+```
+**Example**  
+```js
+const { data, info } = await sharp(input)
+  .blur(100)
+  .toUint8Array({ signal: AbortSignal.timeout(5000) });
 ```
 
 
@@ -979,14 +1001,10 @@ readableStream
 ## timeout
 > timeout(options) ⇒ <code>Sharp</code>
 
-Set a timeout for processing, in seconds.
-Use a value of zero to continue processing indefinitely, the default behaviour.
-
-The clock starts when libvips opens an input image for processing.
-Time spent waiting for a libuv thread to become available is not included.
+Deprecated. Please provide a timeout-based signal to the output methods instead.
 
 
-**Since**: 0.29.2  
+**Version**: 0.35.6 Deprecated  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -996,12 +1014,17 @@ Time spent waiting for a libuv thread to become available is not included.
 **Example**  
 ```js
 // Ensure processing takes no longer than 3 seconds
-try {
-  const data = await sharp(input)
-    .blur(1000)
-    .timeout({ seconds: 3 })
-    .toBuffer();
-} catch (err) {
-  if (err.message.includes('timeout')) { ... }
-}
+const data = await sharp(input)
+  .blur(1000)
+  .toBuffer({ signal: AbortSignal.timeout(3000) });
+```
+**Example**  
+```js
+// Ensure processing takes no longer than 3 seconds
+await stream.pipeline(
+  readableStream,
+  sharp().blur(1000),
+  writableStream,
+  { signal: AbortSignal.timeout(1000) }
+);
 ```

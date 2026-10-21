@@ -655,12 +655,31 @@ declare namespace sharp {
         toFile(fileOut: string): Promise<OutputInfo>;
 
         /**
+         * Write output image data to a file.
+         * @param fileOut The path to write the image data to.
+         * @param options Options object with signal for cancellation.
+         * @throws {Error} Invalid parameters
+         * @returns A promise that fulfills with an object containing information on the resulting file
+         */
+        toFile(fileOut: string, options: { signal: AbortSignal }): Promise<OutputInfo>;
+
+        /**
          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
          * By default, the format will match the input image, except SVG input which becomes PNG output.
          * @param callback Callback function called on completion with three arguments (err, buffer, info).
          * @returns A sharp instance that can be used to chain operations
          */
         toBuffer(callback: (err: Error, buffer: Buffer<ArrayBuffer>, info: OutputInfo) => void): Sharp;
+
+        /**
+         * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+         * By default, the format will match the input image, except SVG input which becomes PNG output.
+         * The underlying `ArrayBuffer` may be marked as non-transferable by some JavaScript runtimes.
+         * @param options Options object with signal for cancellation.
+         * @param options.signal AbortSignal to cancel the operation.
+         * @returns A promise that resolves with the Buffer data.
+         */
+        toBuffer(options: { signal: AbortSignal }): Promise<{ data: Buffer<ArrayBuffer>; info: OutputInfo }>;
 
         /**
          * Write output to a Buffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
@@ -688,6 +707,15 @@ declare namespace sharp {
          * @returns A promise that resolves with an object containing the Uint8Array data and an info object containing the output image format, size (bytes), width, height and channels
          */
         toUint8Array(): Promise<{ data: Uint8Array; info: OutputInfo }>;
+
+        /**
+         * Write output to a Uint8Array backed by a transferable ArrayBuffer. JPEG, PNG, WebP, AVIF, TIFF, GIF and RAW output are supported.
+         * By default, the format will match the input image, except SVG input which becomes PNG output.
+         * @param options Options object with signal for cancellation.
+         * @param options.signal AbortSignal to cancel the operation.
+         * @returns A promise that resolves with an object containing the Uint8Array data and an info object containing the output image format, size (bytes), width, height and channels
+         */
+        toUint8Array(options: { signal: AbortSignal }): Promise<{ data: Uint8Array; info: OutputInfo }>;
 
         /**
          * Set output density (DPI) in EXIF metadata.

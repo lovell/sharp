@@ -823,3 +823,8 @@ sharp().metadata().then((metadata: Metadata) => {
 // @ts-expect-error
 import { sharp as fail } from '../../';
 fail();
+
+const { signal } = new AbortController();
+sharp().toFile('output.jpg', { signal });
+sharp().toBuffer({ signal });
+sharp().toUint8Array({ signal });

@@ -145,6 +145,7 @@ thresholding
 tiffsave
 tifftag
 tilecache
+tobuffer
 tocolourspace
 toformat
 touint

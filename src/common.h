@@ -339,14 +339,14 @@ namespace sharp {
   std::string VipsWarningPop();
 
   /*
-    Attach an event listener for progress updates, used to detect timeout
+    Attach an event listener for progress updates, used to detect abort
   */
-  void SetTimeout(VImage image, int const timeoutSeconds);
+  void SetAbortFlag(VImage image, std::atomic<int8_t> *abortFlag);
 
   /*
-    Event listener for progress updates, used to detect timeout
+    Event listener for progress updates, used to detect abort
   */
-  void VipsProgressCallBack(VipsImage *image, VipsProgress *progress, int *timeoutSeconds);
+  void VipsAbortCallBack(VipsImage *image, VipsProgress *progress, std::atomic<int8_t> *abortFlag);
 
   /*
     Calculate the (left, top) coordinates of the output image

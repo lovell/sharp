@@ -821,3 +821,19 @@ sharp().metadata().then((metadata: sharp.Metadata) => {
 // @ts-expect-error
 import { sharp as fail } from '../../dist/index.cjs';
 fail();
+
+const { signal } = new AbortController();
+sharp().toFile('output.jpg', { signal });
+sharp().toBuffer({ signal });
+sharp().toUint8Array({ signal });
+
+// @ts-expect-error
+sharp().toFile('output.jpg', { signal, resolveWithObject: true });
+// @ts-expect-error
+sharp().toBuffer({ signal, resolveWithObject: false });
+// @ts-expect-error
+sharp().toUint8Array({ signal, resolveWithObject: true });
+// @ts-expect-error
+sharp().toFile('output.jpg', { signal }, () => {});
+// @ts-expect-error
+sharp().toBuffer({ signal }, () => {});
