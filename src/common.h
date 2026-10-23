@@ -344,9 +344,19 @@ namespace sharp {
   void SetTimeout(VImage image, int const timeoutSeconds);
 
   /*
+    Attach an event listener for progress updates, used to detect abort via SharedArrayBuffer flag
+  */
+  void SetAbortFlag(VImage image, std::atomic<int8_t> *abortFlag);
+
+  /*
     Event listener for progress updates, used to detect timeout
   */
   void VipsProgressCallBack(VipsImage *image, VipsProgress *progress, int *timeoutSeconds);
+
+  /*
+    Event listener for progress updates, used to detect abort via SharedArrayBuffer flag
+  */
+  void VipsAbortCallBack(VipsImage *image, VipsProgress *progress, std::atomic<int8_t> *abortFlag);
 
   /*
     Calculate the (left, top) coordinates of the output image
