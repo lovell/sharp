@@ -367,19 +367,66 @@ namespace sharp {
   }
 
   /*
+    Find the loader for a file, treating the path literally rather than as a
+    libvips "filename[options]" string, so a trailing bracketed suffix in the
+    path is never parsed as loader options. Mirrors vips_foreign_find_load.
+  */
+  static void* FindLoadSub(void *item, void *a, void *b) {
+    VipsForeignLoadClass *loadClass = static_cast<VipsForeignLoadClass*>(item);
+    char const *nickname = VIPS_OBJECT_CLASS(loadClass)->nickname;
+    char const *file = static_cast<char const*>(a);
+    // Ignore the buffer and source loaders
+    if (g_str_has_suffix(nickname, "_buffer") || g_str_has_suffix(nickname, "_source")) {
+      return nullptr;
+    }
+    // Sniff the first few bytes if we can, otherwise fall back to the filename suffix
+    if (loadClass->is_a != nullptr) {
+      return loadClass->is_a(file) ? item : nullptr;
+    }
+    char const **suffs = VIPS_FOREIGN_CLASS(loadClass)->suffs;
+    return suffs != nullptr && vips_filename_suffix_match(file, suffs) ? item : nullptr;
+  }
+  static char const* FindLoad(char const *file) {
+    if (vips_isdirf("%s", file)) {
+      vips_error("VipsForeignLoad", "\"%s\" is a directory", file);
+      return nullptr;
+    }
+    void *loadClass = vips_foreign_map("VipsForeignLoad", FindLoadSub, const_cast<char*>(file), nullptr);
+    if (loadClass == nullptr) {
+      vips_error("VipsForeignLoad", "\"%s\" is not a known file format", file);
+      return nullptr;
+    }
+    return G_OBJECT_CLASS_NAME(loadClass);
+  }
+
+  /*
+    Open an image file with the given loader options, treating the path literally.
+  */
+  static VImage NewFromFile(std::string const &file, vips::VOption *option) {
+    char const *load = FindLoad(file.data());
+    if (load == nullptr) {
+      delete option;
+      throw vips::VError();
+    }
+    VImage image;
+    VImage::call(load, option->set("filename", file.data())->set("out", &image));
+    return image;
+  }
+
+  /*
     Determine image format, reads the first few bytes of the file
   */
   ImageType DetermineImageType(char const *file) {
     ImageType imageType = ImageType::UNKNOWN;
-    char const *load = vips_foreign_find_load(file);
-    if (load != nullptr) {
-      auto it = loaderToType.find(load);
-      if (it != loaderToType.end()) {
-        imageType = it->second;
-      }
+    if (!vips_existsf("%s", file)) {
+      imageType = ImageType::MISSING;
     } else {
-      if (EndsWith(vips::VError().what(), " does not exist\n")) {
-        imageType = ImageType::MISSING;
+      char const *load = FindLoad(file);
+      if (load != nullptr) {
+        auto it = loaderToType.find(load);
+        if (it != loaderToType.end()) {
+          imageType = it->second;
+        }
       }
     }
     if (imageType == ImageType::UHDR) {
@@ -594,12 +641,12 @@ namespace sharp {
         if (imageType != ImageType::UNKNOWN) {
           try {
             vips::VOption *option = GetOptionsForImageType(imageType, descriptor);
-            image = VImage::new_from_file(descriptor->file.data(), option);
+            image = NewFromFile(descriptor->file, option);
             if (imageType == ImageType::SVG || imageType == ImageType::PDF || imageType == ImageType::MAGICK) {
               image = SetDensity(image, descriptor->density);
             } else if (imageType == ImageType::HEIF && HeifPrimaryPageReopen(image, descriptor)) {
               option = GetOptionsForImageType(imageType, descriptor);
-              image = VImage::new_from_file(descriptor->file.data(), option);
+              image = NewFromFile(descriptor->file, option);
             }
           } catch (std::runtime_error const &err) {
             throw std::runtime_error(std::string("Input file has corrupt header: ") + err.what());
