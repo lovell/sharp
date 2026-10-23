@@ -196,6 +196,18 @@ sharp(input)
     // of the image data in inputBuffer
   });
 
+// Coordinate-based resize position accepts mutable and readonly pairs.
+sharp(input).resize(200, 300, { position: [0.25, 0.75] });
+sharp(input).resize({ width: 200, height: 300, fit: 'contain', position: [0.25, 0.75] as const });
+const resizePosition: [number, number] = [0.25, 0.75];
+sharp(input).resize(200, 300, { position: resizePosition });
+// @ts-expect-error
+sharp(input).resize(200, 300, { position: [0.5] });
+// @ts-expect-error
+sharp(input).resize(200, 300, { position: [0.5, 0.5, 0.5] });
+// @ts-expect-error
+sharp(input).resize(200, 300, { position: ['0.5', 0.5] });
+
 sharp(input).resize({ kernel: 'mks2013' });
 
 transformer = sharp()
