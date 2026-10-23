@@ -27,6 +27,7 @@ embeddded
 emcc
 emscripten
 exif
+existsf
 fontconfig
 fontfile
 freetype
@@ -49,6 +50,7 @@ iiififier
 imagequant
 imgsharp
 iptc
+isdirf
 jemalloc
 jpegoptim
 jpegtran
