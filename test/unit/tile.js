@@ -350,8 +350,18 @@ suite('Tile', () => {
     t.plan(1);
     t.assert.throws(
       () => sharp().tile({ basename: true }),
-      /Expected string for basename but received/
+      /Expected string without path separators for basename but received/
     );
+  });
+
+  test('Basename containing path separators fails', (t) => {
+    t.plan(3);
+    for (const basename of ['../escaped', 'dir\\escaped', '..']) {
+      t.assert.throws(
+        () => sharp().tile({ basename }),
+        /Expected string without path separators for basename but received/
+      );
+    }
   });
 
   if (sharp.format.dz.output.file) {

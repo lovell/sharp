@@ -947,7 +947,7 @@ The container will be set to `zip` when the output is a Buffer or Stream, otherw
 | [options.centre] | <code>boolean</code> | <code>false</code> | centre image in tile. |
 | [options.center] | <code>boolean</code> | <code>false</code> | alternative spelling of centre. |
 | [options.id] | <code>string</code> | <code>&quot;&#x27;https://example.com/iiif&#x27;&quot;</code> | when `layout` is `iiif`/`iiif3`, sets the `@id`/`id` attribute of `info.json` |
-| [options.basename] | <code>string</code> |  | the name of the directory within the zip file when container is `zip`. |
+| [options.basename] | <code>string</code> |  | the name of the directory within the zip file when container is `zip`, must not contain path separators. |
 
 **Example**  
 ```js

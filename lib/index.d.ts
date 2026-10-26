@@ -1738,7 +1738,7 @@ declare namespace sharp {
         center?: boolean | undefined;
         /** When layout is iiif/iiif3, sets the @id/id attribute of info.json (optional, default 'https://example.com/iiif') */
         id?: string | undefined;
-        /** The name of the directory within the zip file when container is `zip`. */
+        /** The name of the directory within the zip file when container is `zip`, must not contain path separators. */
         basename?: string | undefined;
     }
 
