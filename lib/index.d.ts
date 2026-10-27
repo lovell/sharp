@@ -179,6 +179,7 @@ declare namespace sharp {
     const kernel: KernelEnum;
     const fit: FitEnum;
     const bool: BoolEnum;
+    const trustedFormats: Array<keyof FormatEnum>;
 
     interface Sharp extends Duplex {
         //#region Channel functions
@@ -1047,6 +1048,8 @@ declare namespace sharp {
         text?: CreateText | undefined;
         /** Describes how array of input images should be joined. */
         join?: Join | undefined;
+        /** List of trusted formats for input images */
+        trustedFormats?: Array<keyof FormatEnum> | undefined;
     }
 
     interface CacheOptions {

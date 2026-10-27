@@ -14,7 +14,14 @@ Thank you in advance.
 
 All input is assumed to be untrusted and will be rejected if there are any warnings whilst decoding is attempted.
 
-Support for various input formats can be controlled at runtime using
+Support for various input formats can be controlled at runtime by passing
+[trustedFormats](/api-constructor/#:~:text=options.trustedFormats) to the constructor.
+For example to only allow JPEG and PNG input:
+```js frame="none"
+sharp(input, { trustedFormats: ['jpeg', 'png']})...
+```
+
+Alternatively, at a process level, low-level libvips operations can be controlled using
 [block](/api-utility/#block) and [unblock](/api-utility/#unblock).
 For example, to allow only JPEG input:
 ```sh frame="none"

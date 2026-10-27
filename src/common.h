@@ -39,6 +39,31 @@ using vips::VImage;
 
 namespace sharp {
 
+  enum class ImageType {
+    JPEG,
+    PNG,
+    WEBP,
+    JP2,
+    TIFF,
+    GIF,
+    SVG,
+    HEIF,
+    PDF,
+    MAGICK,
+    OPENSLIDE,
+    PPM,
+    FITS,
+    EXR,
+    JXL,
+    RAD,
+    DCRAW,
+    UHDR,
+    VIPS,
+    RAW,
+    UNKNOWN,
+    MISSING
+  };
+
   struct InputDescriptor {
     std::string name;
     std::string file;
@@ -47,6 +72,7 @@ namespace sharp {
     VipsFailOn failOn;
     uint64_t limitInputPixels;
     uint64_t limitInputChannels;
+    std::vector<ImageType> trustedImageTypes;
     bool unlimited;
     VipsAccess access;
     size_t bufferLength;
@@ -162,31 +188,6 @@ namespace sharp {
 
   // Create an InputDescriptor instance from a Napi::Object describing an input image
   InputDescriptor* CreateInputDescriptor(Napi::Object input);
-
-  enum class ImageType {
-    JPEG,
-    PNG,
-    WEBP,
-    JP2,
-    TIFF,
-    GIF,
-    SVG,
-    HEIF,
-    PDF,
-    MAGICK,
-    OPENSLIDE,
-    PPM,
-    FITS,
-    EXR,
-    JXL,
-    RAD,
-    DCRAW,
-    UHDR,
-    VIPS,
-    RAW,
-    UNKNOWN,
-    MISSING
-  };
 
   enum class Canvas {
       CROP,

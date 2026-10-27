@@ -70,6 +70,30 @@ namespace sharp {
     return vector;
   }
 
+  // Map format string identifiers to ImageType enum values
+  std::map<std::string, ImageType> formatToType = {
+    { "jpeg", ImageType::JPEG },
+    { "png", ImageType::PNG },
+    { "webp", ImageType::WEBP },
+    { "tiff", ImageType::TIFF },
+    { "gif", ImageType::GIF },
+    { "jp2", ImageType::JP2 },
+    { "svg", ImageType::SVG },
+    { "heif", ImageType::HEIF },
+    { "pdf", ImageType::PDF },
+    { "magick", ImageType::MAGICK },
+    { "openslide", ImageType::OPENSLIDE },
+    { "ppm", ImageType::PPM },
+    { "fits", ImageType::FITS },
+    { "exr", ImageType::EXR },
+    { "jxl", ImageType::JXL },
+    { "rad", ImageType::RAD },
+    { "dcraw", ImageType::DCRAW },
+    { "uhdr", ImageType::UHDR },
+    { "vips", ImageType::VIPS },
+    { "raw", ImageType::RAW }
+  };
+
   // Create an InputDescriptor instance from a Napi::Object describing an input image
   InputDescriptor* CreateInputDescriptor(Napi::Object input) {
     InputDescriptor *descriptor = new InputDescriptor;
@@ -200,6 +224,13 @@ namespace sharp {
     descriptor->limitInputChannels = static_cast<uint64_t>(AttrAsInt64(input, "limitInputChannels"));
     if (HasAttr(input, "sequentialRead")) {
       descriptor->access = AttrAsBool(input, "sequentialRead") ? VIPS_ACCESS_SEQUENTIAL : VIPS_ACCESS_RANDOM;
+    }
+    Napi::Array trustedFormats = input.Get("trustedFormats").As<Napi::Array>();
+    for (unsigned int i = 0; i < trustedFormats.Length(); i++) {
+      auto type = formatToType.find(trustedFormats.Get(i).As<Napi::String>().Utf8Value());
+      if (type != formatToType.end()) {
+        descriptor->trustedImageTypes.push_back(type->second);
+      }
     }
     // Remove safety features and allow unlimited input
     descriptor->unlimited = AttrAsBool(input, "unlimited");
@@ -416,6 +447,16 @@ namespace sharp {
   }
 
   /*
+    Verify image type is trusted, throw otherwise
+  */
+  void EnsureImageTypeIsTrusted(ImageType imageType, std::vector<ImageType> const &trustedImageTypes) {
+    if (std::find(trustedImageTypes.begin(), trustedImageTypes.end(), imageType) != trustedImageTypes.end()) {
+      return;
+    }
+    throw std::runtime_error("Input format " + ImageTypeId(imageType) + " is not in list of trustedFormats");
+  }
+
+  /*
     Format-specific options builder
   */
   vips::VOption* GetOptionsForImageType(ImageType imageType, InputDescriptor *descriptor) {
@@ -502,6 +543,7 @@ namespace sharp {
         // Compressed data
         imageType = DetermineImageType(descriptor->buffer, descriptor->bufferLength);
         if (imageType != ImageType::UNKNOWN) {
+          EnsureImageTypeIsTrusted(imageType, descriptor->trustedImageTypes);
           try {
             vips::VOption *option = GetOptionsForImageType(imageType, descriptor);
             image = VImage::new_from_buffer(descriptor->buffer, descriptor->bufferLength, nullptr, option);
@@ -592,6 +634,7 @@ namespace sharp {
           throw std::runtime_error("Input file is missing: " + descriptor->file);
         }
         if (imageType != ImageType::UNKNOWN) {
+          EnsureImageTypeIsTrusted(imageType, descriptor->trustedImageTypes);
           try {
             vips::VOption *option = GetOptionsForImageType(imageType, descriptor);
             image = VImage::new_from_file(descriptor->file.data(), option);

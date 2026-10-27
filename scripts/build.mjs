@@ -106,6 +106,7 @@ function typeDefsToEsm(input) {
     '  kernel: KernelEnum;',
     '  fit: FitEnum;',
     '  bool: BoolEnum;',
+    '  trustedFormats: Array<keyof FormatEnum>;',
     '}',
     '',
     'declare const sharp: SharpConstructor;',

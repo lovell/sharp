@@ -821,3 +821,11 @@ sharp().metadata().then((metadata: sharp.Metadata) => {
 // @ts-expect-error
 import { sharp as fail } from '../../dist/index.cjs';
 fail();
+
+sharp.trustedFormats.includes('jpeg');
+// @ts-expect-error
+sharp.trustedFormats.includes('fail');
+sharp({ trustedFormats: ['jpeg'] });
+sharp({ trustedFormats: [...sharp.trustedFormats, 'jxl'] });
+// @ts-expect-error
+sharp({ trustedFormats: ['fail'] });

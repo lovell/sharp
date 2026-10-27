@@ -181,6 +181,10 @@ Block libvips operations at runtime.
 This is in addition to the `VIPS_BLOCK_UNTRUSTED` environment variable,
 which when set will block all "untrusted" operations.
 
+An alternative, per-pipeline approach is to pass a list of
+[trustedFormats](/api-constructor/#:~:text=options.trustedFormats)
+to the constructor.
+
 
 **Since**: 0.32.4  
 
