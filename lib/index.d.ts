@@ -227,6 +227,19 @@ declare namespace sharp {
          */
         bandbool(boolOp: keyof BoolEnum): Sharp;
 
+        /**
+         * Map pixel values through a 1D look-up table (LUT).
+         *
+         * Accepts either an array of 256 integers (applied after converting to greyscale),
+         * or an array of 3 or 4 arrays of 256 integers (one LUT per colour channel;
+         * a 3-band LUT leaves any alpha channel unchanged).
+         *
+         * @param lookupTable 256 values, or 3/4 arrays of 256 values.
+         * @throws {Error} Invalid parameters
+         * @returns A sharp instance that can be used to chain operations
+         */
+        maplut(lookupTable: ReadonlyArray<number> | ReadonlyArray<ReadonlyArray<number>>): Sharp;
+
         //#endregion
 
         //#region Color functions

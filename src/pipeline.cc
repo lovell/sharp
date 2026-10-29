@@ -753,6 +753,12 @@ class PipelineWorker : public Napi::AsyncWorker {
         image = sharp::Recomb(image, baton->recombMatrix);
       }
 
+      // Maplut
+      if (!baton->maplut.empty()) {
+        KeepGainMapUnsupported(baton->keepGainMap, "Maplut");
+        image = sharp::Maplut(image, baton->maplut, baton->maplutBands);
+      }
+
       // Modulate
       if (baton->brightness != 1.0 || baton->saturation != 1.0 || baton->hue != 0.0 || baton->lightness != 0.0) {
         KeepGainMapUnsupported(baton->keepGainMap, "Modulate");
@@ -1897,6 +1903,10 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
     for (unsigned int i = 0; i < matrixElements; i++) {
       baton->recombMatrix[i] = sharp::AttrAsDouble(recombMatrix, i);
     }
+  }
+  if (options.Has("maplut")) {
+    baton->maplut = sharp::AttrAsVectorOfDouble(options, "maplut");
+    baton->maplutBands = sharp::AttrAsInt32(options, "maplutBands");
   }
   baton->colourspacePipeline = sharp::AttrAsEnum<VipsInterpretation>(
     options, "colourspacePipeline", VIPS_TYPE_INTERPRETATION);
