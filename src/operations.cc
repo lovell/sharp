@@ -4,6 +4,8 @@
 */
 
 #include <algorithm>
+#include <cmath>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <tuple>
@@ -511,6 +513,54 @@ namespace sharp {
     return image.morph(
       mask,
       VIPS_OPERATION_MORPHOLOGY_ERODE).invert();
+  }
+
+  /*
+   * Map pixel values through a 1D LUT (256 entries per band).
+   */
+  VImage Maplut(VImage image, std::vector<double> const &lutData, int const lutBands) {
+    size_t const expected = static_cast<size_t>(256 * lutBands);
+    if (lutData.size() != expected) {
+      throw std::runtime_error("Expected maplut with 256 values per band");
+    }
+    if (lutBands != 1 && lutBands != 3 && lutBands != 4) {
+      throw std::runtime_error("Expected maplut with 1, 3 or 4 bands");
+    }
+
+    std::vector<uint8_t> lutBytes(expected);
+    for (size_t i = 0; i < expected; i++) {
+      double v = lutData[i];
+      if (v < 0.0) v = 0.0;
+      if (v > 255.0) v = 255.0;
+      lutBytes[i] = static_cast<uint8_t>(std::lround(v));
+    }
+
+    VImage lut = VImage::new_from_memory(
+      lutBytes.data(),
+      expected * sizeof(uint8_t),
+      256,
+      1,
+      lutBands,
+      VIPS_FORMAT_UCHAR).copy_memory();
+
+    if (lutBands == 1) {
+      // Single-band LUT: force greyscale first (see lovell/sharp#1441 / #4287)
+      if (image.has_alpha()) {
+        VImage alpha = image[image.bands() - 1];
+        return RemoveAlpha(image)
+          .colourspace(VIPS_INTERPRETATION_B_W)
+          .maplut(lut)
+          .bandjoin(alpha);
+      }
+      return image.colourspace(VIPS_INTERPRETATION_B_W).maplut(lut);
+    }
+
+    // Multi-band LUT: preserve alpha when the LUT covers colour channels only
+    if (image.has_alpha() && lutBands == image.bands() - 1) {
+      VImage alpha = image[image.bands() - 1];
+      return RemoveAlpha(image).maplut(lut).bandjoin(alpha);
+    }
+    return image.maplut(lut);
   }
 
 }  // namespace sharp
