@@ -104,6 +104,16 @@ and that it can be located using `pkg-config --modversion vips-cpp`.
 For help compiling libvips and its dependencies, please see
 [building libvips from source](https://www.libvips.org/install.html#building-libvips-from-source).
 
+### Radiance (RGBE / `.hdr`)
+
+Prebuilt binaries do not include Radiance support.
+If your custom libvips is compiled with Radiance enabled, sharp can **read**
+RGBE / Radiance HDR (`.hdr`) input from v0.34.0 onwards (`radload`).
+Confirm availability at runtime with `sharp.format.rad.input`.
+
+Writing Radiance files (`radsave`) is not supported yet —
+see [#3544](https://github.com/lovell/sharp/issues/3544).
+
 The use of a globally-installed libvips is unsupported on Windows
 and on macOS when running Node.js under Rosetta.
 
