@@ -35,6 +35,12 @@ This module supports reading JPEG, PNG, WebP, GIF, AVIF, TIFF and SVG images.
 
 Output images can be in JPEG, PNG, WebP, GIF, AVIF and TIFF formats as well as uncompressed raw pixel data.
 
+When using a custom libvips build that enables Radiance support, sharp can also
+**read** RGBE / Radiance HDR (`.hdr`) input as of v0.34.0 (`radload`).
+Writing Radiance files (`radsave`) is not supported yet; track that work in
+[#3544](https://github.com/lovell/sharp/issues/3544).
+Prebuilt binaries do not include Radiance — see [custom libvips](/install#custom-libvips).
+
 Streams, Buffer objects and the filesystem can be used for input and output.
 
 A single input Stream can be split into multiple processing pipelines and output Streams.
