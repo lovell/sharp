@@ -612,21 +612,12 @@ suite('Input/output', () => {
     }
   });
 
-  test('Input file path ending with square brackets is used as-is', async (t) => {
-    const inputJpgWithSuffix = fixtures.path('output.jpg[shrink=8]');
-    await fs.copyFile(fixtures.inputJpg, inputJpgWithSuffix);
-    const { width, height } = await sharp(inputJpgWithSuffix).metadata();
-    t.assert.strictEqual(width, 2725);
-    t.assert.strictEqual(height, 2225);
-    await fs.rm(inputJpgWithSuffix);
-  });
-
-  test('Fail when input file path ending with square brackets is missing', async (t) => {
-    const inputJpgWithSuffix = `${fixtures.inputJpg}[shrink=8]`;
-    await t.assert.rejects(
-      () => sharp(inputJpgWithSuffix).metadata(),
-      { message: `Input file is missing: ${inputJpgWithSuffix}` }
-    );
+  test('Input file path square bracket options are ignored', async (t) => {
+    for (const suffix of ['[shrink=8]', '[shrink=8][shrink=4]']) {
+      const { width, height } = await sharp(`${fixtures.inputJpg}${suffix}`).metadata();
+      t.assert.strictEqual(width, 2725);
+      t.assert.strictEqual(height, 2225);
+    }
   });
 
   suite('Fail for unsupported input', () => {
