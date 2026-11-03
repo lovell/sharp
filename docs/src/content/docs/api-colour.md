@@ -127,7 +127,7 @@ By default output image will be web-friendly sRGB, with additional channels inte
 
 **Example**  
 ```js
-// Output 16 bits per pixel RGB
+// Output 16 bits per channel RGB
 await sharp(input)
  .toColourspace('rgb16')
  .toFile('16-bpp.png')
