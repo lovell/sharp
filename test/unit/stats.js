@@ -715,6 +715,22 @@ suite('Image Stats', () => {
     await t.assert.rejects(() => sharp('fail').stats());
   });
 
+  test('Float input keeps min/max beyond int range', async (t) => {
+    t.plan(2);
+    const input = new Float32Array([0.25, 0.5, 1e10, -1e10]);
+    const { channels } = await sharp(input, { raw: { width: 4, height: 1, channels: 1 } }).stats();
+    t.assert.strictEqual(channels[0].min, -1e10);
+    t.assert.strictEqual(channels[0].max, 1e10);
+  });
+
+  test('Float input with fractional values keeps min/max', async (t) => {
+    t.plan(2);
+    const input = new Float32Array([0.25, 0.5, 0.75, 0.875]);
+    const { channels } = await sharp(input, { raw: { width: 4, height: 1, channels: 1 } }).stats();
+    t.assert.strictEqual(channels[0].min, 0.25);
+    t.assert.strictEqual(channels[0].max, 0.875);
+  });
+
   test('Sequential read option is ignored', async (t) => {
     t.plan(1);
     const { isOpaque } = await sharp(fixtures.inputJpg, { sequentialRead: true }).stats();
