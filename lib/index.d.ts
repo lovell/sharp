@@ -787,8 +787,8 @@ declare namespace sharp {
 
         /**
          * Use these PNG options for output image.
-         * PNG output is always full colour at 8 or 16 bits per pixel.
-         * Indexed PNG input at 1, 2 or 4 bits per pixel is converted to 8 bits per pixel.
+         * PNG output is always full colour at 8 or 16 bits per channel.
+         * Indexed PNG input is converted to 8 bits per channel.
          * @param options Output options.
          * @throws {Error} Invalid options
          * @returns A sharp instance that can be used to chain operations
