@@ -151,6 +151,17 @@ suite('Join input images together', () => {
       /Expected valid alignment for join.halign but received fail of type string/
     );
   });
+  test('Limits apply to each image being joined', async (t) => {
+    t.plan(2);
+    await t.assert.rejects(
+      () => sharp([fixtures.inputJpg, fixtures.inputJpg], { limitInputPixels: 1 }).toBuffer(),
+      /Input image exceeds pixel limit/
+    );
+    await t.assert.rejects(
+      () => sharp([fixtures.inputJpg, fixtures.inputJpg], { limitInputChannels: 1 }).toBuffer(),
+      /Input image exceeds channel limit/
+    );
+  });
   test('Invalid valign', (t) => {
     t.plan(1);
     t.assert.throws(
