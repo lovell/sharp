@@ -161,6 +161,21 @@ suite('Colour space conversion', () => {
     t.assert.strictEqual(b, 0);
   });
 
+  test('Convert 16-bit P3 to 8-bit sRGB', async (t) => {
+    t.plan(3);
+    const input = await sharp(fixtures.inputPngP3)
+      .toColourspace('rgb16')
+      .withIccProfile('p3')
+      .png()
+      .toBuffer();
+    const [r, g, b] = await sharp(input)
+      .raw()
+      .toBuffer();
+    t.assert.strictEqual(r, 254);
+    t.assert.strictEqual(g, 6);
+    t.assert.strictEqual(b, 3);
+  });
+
   test('Passthrough P3', async (t) => {
     t.plan(3);
     const [r, g, b] = await sharp(fixtures.inputPngP3)
