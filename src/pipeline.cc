@@ -937,7 +937,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         try {
           image = image.colourspace(VIPS_INTERPRETATION_XYZ).icc_export(VImage::option()
             ->set("output_profile", baton->withIccProfile.empty()
-              ? processingProfile
+              ? (sharp::Is16Bit(baton->colourspace) ? processingProfile : "srgb")
               : const_cast<char*>(baton->withIccProfile.data()))
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
@@ -945,16 +945,14 @@ class PipelineWorker : public Napi::AsyncWorker {
         }
       }
 
-      // Leave the P3 working profile before reducing to 8-bit
+      // Ensure output colour space
+      if (sharp::Is16Bit(image.interpretation())) {
+        image = image.cast(VIPS_FORMAT_USHORT);
+      }
       if (importedToP3 && !sharp::Is16Bit(baton->colourspace) && baton->withIccProfile.empty()) {
         image = image.icc_transform("srgb", VImage::option()
           ->set("input_profile", "p3")
           ->set("intent", VIPS_INTENT_PERCEPTUAL));
-      }
-
-      // Ensure output colour space
-      if (sharp::Is16Bit(image.interpretation())) {
-        image = image.cast(VIPS_FORMAT_USHORT);
       }
       if (image.interpretation() != baton->colourspace) {
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
