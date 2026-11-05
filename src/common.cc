@@ -75,6 +75,14 @@ namespace sharp {
     InputDescriptor *descriptor = new InputDescriptor;
     if (HasAttr(input, "file")) {
       descriptor->file = AttrAsStr(input, "file");
+      // Remove all libvips [options] suffixes so none are applied as loader options
+      std::string file;
+      do {
+        file = descriptor->file;
+        char *filename = vips_filename_get_filename(file.data());
+        descriptor->file = filename;
+        g_free(filename);
+      } while (descriptor->file != file);
     } else if (HasAttr(input, "buffer")) {
       Napi::Buffer<char> buffer = input.Get("buffer").As<Napi::Buffer<char>>();
       descriptor->bufferLength = buffer.Length();
