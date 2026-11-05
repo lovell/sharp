@@ -562,10 +562,14 @@ class PipelineWorker : public Napi::AsyncWorker {
           std::tie(image, background) = sharp::ApplyAlpha(image, baton->resizeBackground, shouldPremultiplyAlpha);
 
           // Embed
-          const auto& [left, top] = sharp::CalculateEmbedPosition(
+          auto [left, top] = sharp::CalculateEmbedPosition(
             inputWidth, inputHeight, baton->width, baton->height, baton->position);
           const int width = std::max(inputWidth, baton->width);
           const int height = std::max(inputHeight, baton->height);
+          if (baton->positionCoordinates.size() == 2) {
+            left = static_cast<int>(std::floor((width - inputWidth) * baton->positionCoordinates[0]));
+            top = static_cast<int>(std::floor((height - inputHeight) * baton->positionCoordinates[1]));
+          }
 
           image = nPages > 1
             ? sharp::EmbedMultiPage(image,
@@ -589,11 +593,15 @@ class PipelineWorker : public Napi::AsyncWorker {
 
           // Crop
           if (baton->position < 9) {
-            // Gravity-based crop
-            const auto& [left, top] = sharp::CalculateCrop(
+            // Gravity- or coordinate-based crop
+            auto [left, top] = sharp::CalculateCrop(
               inputWidth, inputHeight, baton->width, baton->height, baton->position);
             const int width = std::min(inputWidth, baton->width);
             const int height = std::min(inputHeight, baton->height);
+            if (baton->positionCoordinates.size() == 2) {
+              left = static_cast<int>(std::round((inputWidth - width) * baton->positionCoordinates[0]));
+              top = static_cast<int>(std::round((inputHeight - height) * baton->positionCoordinates[1]));
+            }
 
             image = nPages > 1
               ? sharp::CropMultiPage(image,
@@ -1796,6 +1804,7 @@ Napi::Value pipeline(const Napi::CallbackInfo& info) {
   baton->withoutEnlargement = sharp::AttrAsBool(options, "withoutEnlargement");
   baton->withoutReduction = sharp::AttrAsBool(options, "withoutReduction");
   baton->position = sharp::AttrAsInt32(options, "position");
+  baton->positionCoordinates = sharp::AttrAsVectorOfDouble(options, "positionCoordinates");
   baton->resizeBackground = sharp::AttrAsVectorOfDouble(options, "resizeBackground");
   baton->kernel = sharp::AttrAsEnum<VipsKernel>(options, "kernel", VIPS_TYPE_KERNEL);
   baton->fastShrinkOnLoad = sharp::AttrAsBool(options, "fastShrinkOnLoad");
