@@ -159,8 +159,8 @@
     "vips"
   ],
   "dependencies": {
-    "@img/colour": "^1.1.0",
     "detect-libc": "^2.1.2",
+    "hueful": "^0.9.0",
     "semver": "^7.8.6"
   },
   "optionalDependencies": {
