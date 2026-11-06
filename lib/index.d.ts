@@ -30,7 +30,15 @@
 /// <reference types="node" />
 
 declare type Duplex = import('node:stream').Duplex;
-declare type ColorLike = import('@img/colour').ColorLike;
+declare type ColorLike =
+    | string
+    | readonly number[]
+    | { r: number; g: number; b: number; alpha?: number }
+    | { h: number; s: number; l: number; alpha?: number }
+    | { h: number; w: number; b: number; alpha?: number }
+    | { l: number; a: number; b: number; alpha?: number }
+    | { l: number; c: number; h: number; alpha?: number }
+    | { c: number; m: number; y: number; k: number; alpha?: number };
 
 //#region Constructor functions
 
@@ -402,7 +410,7 @@ declare namespace sharp {
          *
          * @param {number} [angle=auto] angle of rotation.
          * @param {Object} [options] - if present, is an Object with optional attributes.
-         * @param {string|Object} [options.background="#000000"] parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha.
+         * @param {string|Object} [options.background="#000000"] parsed by the [hueful](https://www.npmjs.org/package/hueful) module to extract values for red, green, blue and alpha.
          * @returns {Sharp}
          * @throws {Error} Invalid parameters
          */
@@ -1092,7 +1100,7 @@ declare namespace sharp {
         height: number;
         /** Number of bands, 3 for RGB, 4 for RGBA */
         channels: CreateChannels;
-        /** Parsed by the [color](https://www.npmjs.org/package/color) module to extract values for red, green, blue and alpha. */
+        /** Parsed by the [hueful](https://www.npmjs.org/package/hueful) module to extract values for red, green, blue and alpha. */
         background: ColorLike;
         /** Describes a noise to be created. */
         noise?: Noise | undefined;
