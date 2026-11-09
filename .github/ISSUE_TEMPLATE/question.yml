@@ -1,0 +1,33 @@
+name: Question
+description: For help understanding an existing feature
+labels:
+  - question
+body:
+  - type: checkboxes
+    attributes:
+      label: Humans asking relevant questions in their own voice
+      options:
+        - label: I am a human writing in my own words
+          required: true
+        - label: My question does not relate to problems during installation
+          required: true
+  - type: textarea
+    attributes:
+      label: What are you trying to achieve?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: When you searched for similar issues, what did you find that might be related?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Please provide a minimal, standalone code sample, without other dependencies, that demonstrates this question
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Please provide sample image(s) that help explain this question
+    validations:
+      required: true

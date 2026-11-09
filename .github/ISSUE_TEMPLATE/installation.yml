@@ -1,0 +1,32 @@
+name: Installation
+description: Something went wrong during either 'npm install sharp' or 'import "sharp"'
+labels:
+  - installation
+body:
+  - type: checkboxes
+    attributes:
+      label: Humans asking relevant questions in their own voice
+      options:
+        - label: I am a human writing in my own words
+          required: true
+        - label: I am using the latest version of `sharp` as reported by `npm view sharp dist-tags.latest`
+          required: true
+        - label: I am using the latest version of my choice of package manager
+          required: true
+        - label: I have read and understood all of the [documentation relating to installation](https://sharp.pixelplumbing.com/install)
+          required: true
+  - type: textarea
+    attributes:
+      label: What is the complete error message, including the full stack trace?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What is the complete output of running `npm install --verbose --foreground-scripts sharp` in an empty directory?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What is the output of running `npx envinfo --binaries --system --npmPackages=sharp --npmGlobalPackages=sharp`?
+    validations:
+      required: true

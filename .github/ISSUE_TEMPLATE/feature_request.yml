@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest an idea
+labels:
+  - enhancement
+body:
+  - type: checkboxes
+    attributes:
+      label: Humans making relevant suggestions in their own voice
+      options:
+        - label: I am a human writing in my own words
+          required: true
+  - type: textarea
+    attributes:
+      label: What are you trying to achieve?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: When you searched for similar feature requests, what did you find that might be related?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What might you expect the API to look like?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What alternatives have you considered?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Please provide sample image(s) that help explain this feature
+    validations:
+      required: true

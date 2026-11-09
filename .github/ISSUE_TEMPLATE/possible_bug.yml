@@ -1,0 +1,46 @@
+name: Possible bug
+description: Installation of sharp was successful but then something unexpected occurred using one of its features
+labels:
+  - triage
+body:
+  - type: checkboxes
+    attributes:
+      label: Humans asking relevant questions in their own voice
+      options:
+        - label: I am a human writing in my own words
+          required: true
+        - label: I am using the latest version of `sharp` as reported by `npm view sharp dist-tags.latest`
+          required: true
+        - label: Running `npm install sharp` completes without error
+          required: true
+        - label: Running `node -e "import 'sharp'"` completes without error
+          required: true
+        - label: Adding [`sharp.cache(false)`](https://sharp.pixelplumbing.com/api-utility/#cache) does not fix this problem
+          required: true
+        - label: Adding [`autoOrient()`](https://sharp.pixelplumbing.com/api-operation/#autoorient) does not fix this problem
+          required: true
+  - type: textarea
+    attributes:
+      label: What are the steps to reproduce?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What is the expected behaviour?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Please provide a minimal, standalone code sample, without other dependencies, that demonstrates this problem
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Please provide sample image(s) that help explain this problem
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What is the output of running `npx envinfo --binaries --system --npmPackages=sharp --npmGlobalPackages=sharp`?
+    validations:
+      required: true
