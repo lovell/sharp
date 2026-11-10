@@ -1784,15 +1784,38 @@ suite('Image metadata', () => {
     });
     test('Non object exif', (t) => {
       t.plan(1);
-      t.assert.throws(() => sharp().withMetadata({ exif: false }));
+      t.assert.throws(
+        () => sharp().withExif(false),
+        /Expected object for exif but received false of type boolean/
+      );
+    });
+    test('Non IFD-prefixed key in object exif', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp().withExif({ fail: false }),
+        /Expected object with IFD-prefixed string keys for exif/
+      );
     });
     test('Non string value in object exif', (t) => {
       t.plan(1);
-      t.assert.throws(() => sharp().withMetadata({ exif: { ifd0: false } }));
+      t.assert.throws(
+        () => sharp().withExif({ ifd0: false }),
+        /Expected object for ifd0 but received false of type boolean/
+      );
+    });
+    test('Non string key in nested object exif', (t) => {
+      t.plan(1);
+      t.assert.throws(
+        () => sharp().withExif({ ifd0: { 1: false } }),
+        /Expected string for ifd0.1 but received false of type boolean/
+      );
     });
     test('Non string value in nested object exif', (t) => {
       t.plan(1);
-      t.assert.throws(() => sharp().withMetadata({ exif: { ifd0: { fail: false } } }));
+      t.assert.throws(
+        () => sharp().withExif({ ifd0: { fail: false } }),
+        /Expected string for ifd0.fail but received false of type boolean/
+      );
     });
     test('withIccProfile invalid profile', (t) => {
       t.plan(1);
