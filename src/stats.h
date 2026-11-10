@@ -14,8 +14,8 @@
 
 struct ChannelStats {
   // stats per channel
-  int min;
-  int max;
+  double min;
+  double max;
   double sum;
   double squaresSum;
   double mean;
@@ -25,7 +25,7 @@ struct ChannelStats {
   int maxX;
   int maxY;
 
-  ChannelStats(int minVal, int maxVal, double sumVal, double squaresSumVal,
+  ChannelStats(double minVal, double maxVal, double sumVal, double squaresSumVal,
     double meanVal, double stdevVal, int minXVal, int minYVal, int maxXVal, int maxYVal):
     min(minVal), max(maxVal), sum(sumVal), squaresSum(squaresSumVal),  // NOLINT(build/include_what_you_use)
     mean(meanVal), stdev(stdevVal), minX(minXVal), minY(minYVal), maxX(maxXVal), maxY(maxYVal) {}

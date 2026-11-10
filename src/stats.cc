@@ -48,8 +48,8 @@ class StatsWorker : public Napi::AsyncWorker {
         int const bands = image.bands();
         for (int b = 1; b <= bands; b++) {
           ChannelStats cStats(
-            static_cast<int>(stats.getpoint(STAT_MIN_INDEX, b).front()),
-            static_cast<int>(stats.getpoint(STAT_MAX_INDEX, b).front()),
+            stats.getpoint(STAT_MIN_INDEX, b).front(),
+            stats.getpoint(STAT_MAX_INDEX, b).front(),
             stats.getpoint(STAT_SUM_INDEX, b).front(),
             stats.getpoint(STAT_SQ_SUM_INDEX, b).front(),
             stats.getpoint(STAT_MEAN_INDEX, b).front(),
