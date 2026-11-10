@@ -1276,7 +1276,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         bool const isV = sharp::IsV(baton->fileOut);
         bool const mightMatchInput = baton->formatOut == "input";
         bool const willMatchInput = mightMatchInput &&
-         !(isJpeg || isPng || isWebp || isGif || isTiff || isJp2 || isHeif || isDz || isDzZip || isV);
+         !(isJpeg || isPng || isWebp || isGif || isTiff || isJp2 || isJxl || isHeif || isDz || isDzZip || isV);
 
         if (baton->formatOut == "jpeg" || (mightMatchInput && isJpeg) ||
           (willMatchInput && inputImageType == sharp::ImageType::JPEG)) {
