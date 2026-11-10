@@ -69,11 +69,20 @@ suite('Blur', () => {
     await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('blur-mild.jpg'), data));
   });
 
-  test('invalid radius', (t) => {
-    t.plan(1);
-    t.assert.throws(() => {
-      sharp(fixtures.inputJpg).blur(0.1);
-    });
+  test('invalid sigma', (t) => {
+    t.plan(3);
+    t.assert.throws(
+      () => sharp(fixtures.inputJpg).blur(0.1),
+      /Expected number between 0\.3 and 1000 for sigma but received 0.1 of type number/
+    );
+    t.assert.throws(
+      () => sharp(fixtures.inputJpg).blur('fail'),
+      /Expected number between 0\.3 and 1000 for sigma but received fail of type string/
+    );
+    t.assert.throws(
+      () => sharp(fixtures.inputJpg).blur({ sigma: 'fail' }),
+      /Expected number between 0\.3 and 1000 for options\.sigma but received fail of type string/
+    );
   });
 
   test('blurred image is smaller than non-blurred', async (t) => {
