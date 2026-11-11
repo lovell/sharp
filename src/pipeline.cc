@@ -342,7 +342,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
       VImage gainMap;
       int gainMapScaleFactor = 1;
-      if (sharp::HasGainMap(image)) {
+      if (!image.gainmap().is_null()) {
         if (baton->keepGainMap) {
           gainMap = image.gainmap().copy_memory();
           if (image.get_typeof("gainmap-scale-factor") == G_TYPE_INT) {
@@ -365,7 +365,9 @@ class PipelineWorker : public Napi::AsyncWorker {
         } else if (baton->withGainMap) {
           image = image.uhdr2scRGB();
         }
-        image = sharp::RemoveGainMap(image);
+        image = image.copy();
+        image.remove("gainmap");
+        image.remove("gainmap-data");
       } else {
         baton->keepGainMap = false;
         baton->withGainMap = false;

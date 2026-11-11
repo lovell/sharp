@@ -1167,21 +1167,4 @@ namespace sharp {
     return image;
   }
 
-  /*
-    Does this image have a gain map?
-  */
-  bool HasGainMap(VImage image) {
-    return image.get_typeof("gainmap") == VIPS_TYPE_BLOB ||
-      image.get_typeof("gainmap-data") == VIPS_TYPE_BLOB;
-  }
-
-  /*
-    Removes gain map, if any.
-  */
-  VImage RemoveGainMap(VImage image) {
-    VImage copy = image.copy();
-    copy.remove("gainmap");
-    copy.remove("gainmap-data");
-    return copy;
-  }
 }  // namespace sharp
