@@ -394,6 +394,9 @@ class PipelineWorker : public Napi::AsyncWorker {
       // In toilet-roll mode, we must adjust vshrink so that we exactly hit
       // pageHeight or we'll have pixels straddling pixel boundaries
       if (inputHeight > pageHeight) {
+        if (nPages == 0 || targetHeight > INT_MAX / nPages) {
+          throw std::runtime_error("Invalid dimensions");
+        }
         targetHeight *= nPages;
         vshrink = static_cast<double>(inputHeight) / targetHeight;
       }
