@@ -45,6 +45,7 @@ struct StatsBaton {
   int dominantBlue;
 
   std::string err;
+  bool errUseWarning;
 
   StatsBaton():
     input(nullptr),
@@ -53,7 +54,8 @@ struct StatsBaton {
     sharpness(0.0),
     dominantRed(0),
     dominantGreen(0),
-    dominantBlue(0)
+    dominantBlue(0),
+    errUseWarning(false)
     {}
 };
 

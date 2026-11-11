@@ -58,6 +58,7 @@ struct MetadataBaton {
   size_t gainMapLength;
   MetadataComments comments;
   std::string err;
+  bool errUseWarning;
 
   MetadataBaton():
     input(nullptr),
@@ -87,7 +88,9 @@ struct MetadataBaton {
     tifftagPhotoshop(nullptr),
     tifftagPhotoshopLength(0),
     gainMap(nullptr),
-    gainMapLength(0) {}
+    gainMapLength(0),
+    errUseWarning(false)
+    {}
 };
 
 Napi::Value metadata(const Napi::CallbackInfo& info);

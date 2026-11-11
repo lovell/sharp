@@ -93,7 +93,17 @@ class StatsWorker : public Napi::AsyncWorker {
         baton->dominantGreen = dy * 16 + 8;
         baton->dominantBlue = dz * 16 + 8;
       } catch (std::runtime_error const &err) {
-        (baton->err).append(err.what());
+        char const *what = err.what();
+        if (what && what[0]) {
+          (baton->err).append(what);
+        } else {
+          if (baton->input->failOn == VIPS_FAIL_ON_WARNING) {
+            (baton->err).append("Warning treated as error due to failOn setting");
+            baton->errUseWarning = true;
+          } else {
+            (baton->err).append("Unknown error");
+          }
+        }
       }
     }
 
@@ -109,7 +119,11 @@ class StatsWorker : public Napi::AsyncWorker {
     // Handle warnings
     std::string warning = sharp::VipsWarningPop();
     while (!warning.empty()) {
-      debuglog.SHARP_CALLBACK_FN_NAME(Receiver().Value(), { Napi::String::New(env, warning) });
+      if (baton->errUseWarning) {
+        (baton->err).append("\n").append(warning);
+      } else {
+        debuglog.SHARP_CALLBACK_FN_NAME(Receiver().Value(), { Napi::String::New(env, warning) });
+      }
       warning = sharp::VipsWarningPop();
     }
     if (baton->err.empty()) {
