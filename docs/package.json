@@ -11,8 +11,8 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.42.9",
-    "astro": "^7.4.7",
+    "@astrojs/starlight": "^0.42.10",
+    "astro": "^7.4.10",
     "jsdoc-to-markdown": "^9.1.3",
     "starlight-auto-sidebar": "^0.4.1"
   }

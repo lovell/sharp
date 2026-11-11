@@ -210,13 +210,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - container: node:20-alpine3.20
-          nodejs_version_major: 20
-        - container: node:22-alpine3.20
-          nodejs_version_major: 22
-          package: true
-        - container: node:24-alpine3.22
-          nodejs_version_major: 24
+          - container: node:20-alpine3.20
+            nodejs_version_major: 20
+          - container: node:22-alpine3.20
+            nodejs_version_major: 22
+            package: true
+          - container: node:24-alpine3.22
+            nodejs_version_major: 24
     steps:
       - name: Allow Linux musl containers on ARM64 runners # https://github.com/actions/runner/issues/801#issuecomment-2394425757
         shell: sh
@@ -284,7 +284,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: uraimo/run-on-arch-action@fa1f3e7de95534497266c7265950b5188355fbfb # v3.2.1
+      - uses: uraimo/run-on-arch-action@9893a0f995e5148dcc313ba661820f3992cffcc1 # v3.3
         with:
           arch: none
           distro: none
