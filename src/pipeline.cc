@@ -1303,7 +1303,11 @@ class PipelineWorker : public Napi::AsyncWorker {
               ->set("optimize_coding", baton->jpegOptimiseCoding));
           }
           baton->formatOut = "jpeg";
-          baton->channels = std::min(baton->channels, 3);
+          if (baton->colourspace == VIPS_INTERPRETATION_CMYK) {
+            baton->channels = std::min(baton->channels, 4);
+          } else {
+            baton->channels = std::min(baton->channels, 3);
+          }
           baton->hasAlphaOut = false;
         } else if (baton->formatOut == "jp2" || (mightMatchInput && isJp2) ||
           (willMatchInput && (inputImageType == sharp::ImageType::JP2))) {
