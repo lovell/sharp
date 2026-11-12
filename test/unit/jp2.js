@@ -110,6 +110,25 @@ suite('JP2 output', () => {
         /Expected one of: 4:2:0, 4:4:4 for chromaSubsampling but received 4:2:2 of type string/
       );
     });
+
+    test('JP2 output strips EXIF metadata by default', async (t) => {
+      t.plan(1);
+      const data = await sharp(fixtures.inputJpgWithExif)
+        .jp2()
+        .toBuffer();
+      const { exif } = await sharp(data).metadata();
+      t.assert.ok(exif === undefined || exif.length === 0);
+    });
+
+    test('JP2 output retains EXIF metadata with withMetadata', async (t) => {
+      t.plan(1);
+      const data = await sharp(fixtures.inputJpgWithExif)
+        .withMetadata()
+        .jp2()
+        .toBuffer();
+      const { exif } = await sharp(data).metadata();
+      t.assert.ok(Buffer.isBuffer(exif) && exif.length > 0);
+    });
   }
 
   test('valid JP2 oneshot value does not throw error', (t) => {

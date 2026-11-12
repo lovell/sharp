@@ -1081,6 +1081,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write JP2 to Buffer
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JP2);
           VipsArea *area = reinterpret_cast<VipsArea*>(image.jp2ksave_buffer(VImage::option()
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->jp2Quality)
             ->set("lossless", baton->jp2Lossless)
             ->set("subsample_mode", baton->jp2ChromaSubsampling == "4:4:4"
@@ -1317,6 +1318,7 @@ class PipelineWorker : public Napi::AsyncWorker {
           // Write JP2 to file
           sharp::AssertImageTypeDimensions(image, sharp::ImageType::JP2);
           image.jp2ksave(const_cast<char*>(baton->fileOut.data()), VImage::option()
+            ->set("keep", baton->keepMetadata)
             ->set("Q", baton->jp2Quality)
             ->set("lossless", baton->jp2Lossless)
             ->set("subsample_mode", baton->jp2ChromaSubsampling == "4:4:4"
