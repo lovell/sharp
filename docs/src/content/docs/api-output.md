@@ -496,10 +496,10 @@ Use these JPEG options for output image.
 | [options.chromaSubsampling] | <code>string</code> | <code>&quot;&#x27;4:2:0&#x27;&quot;</code> | set to '4:4:4' to prevent chroma subsampling otherwise defaults to '4:2:0' chroma subsampling |
 | [options.optimiseCoding] | <code>boolean</code> | <code>true</code> | optimise Huffman coding tables |
 | [options.optimizeCoding] | <code>boolean</code> | <code>true</code> | alternative spelling of optimiseCoding |
-| [options.mozjpeg] | <code>boolean</code> | <code>false</code> | use mozjpeg defaults, equivalent to `{ trellisQuantisation: true, overshootDeringing: true, optimiseScans: true, progressive: true, quantisationTable: 3 }` (may increase processing time by about 250%) |
-| [options.trellisQuantisation] | <code>boolean</code> | <code>false</code> | apply trellis quantisation |
+| [options.mozjpeg] | <code>boolean</code> | <code>false</code> | use mozjpeg defaults, equivalent to `{ trellisQuantisation: true, overshootDeringing: true, optimiseScans: true, progressive: true, quantisationTable: 3 }` (may increase processing time by about 75%) |
+| [options.trellisQuantisation] | <code>boolean</code> | <code>false</code> | apply trellis quantisation (may increase processing time by about 45%) |
 | [options.overshootDeringing] | <code>boolean</code> | <code>false</code> | apply overshoot deringing |
-| [options.optimiseScans] | <code>boolean</code> | <code>false</code> | optimise progressive scans, forces progressive (may increase processing time by about 30%) |
+| [options.optimiseScans] | <code>boolean</code> | <code>false</code> | optimise progressive scans, forces progressive (may increase processing time by about 40%) |
 | [options.optimizeScans] | <code>boolean</code> | <code>false</code> | alternative spelling of optimiseScans |
 | [options.quantisationTable] | <code>number</code> | <code>0</code> | quantization table to use, integer 0-8 |
 | [options.quantizationTable] | <code>number</code> | <code>0</code> | alternative spelling of quantisationTable |
