@@ -409,6 +409,7 @@ class PipelineWorker : public Napi::AsyncWorker {
       }
       char const *processingProfile = image.interpretation() == VIPS_INTERPRETATION_RGB16 ? "p3" : "srgb";
       bool importedToPcs = false;
+      bool importedToP3 = false;
       if (
         sharp::HasProfile(image) &&
         image.interpretation() != VIPS_INTERPRETATION_LABS &&
@@ -431,6 +432,7 @@ class PipelineWorker : public Napi::AsyncWorker {
               ->set("embedded", true)
               ->set("depth", sharp::Is16Bit(image.interpretation()) ? 16 : 8)
               ->set("intent", VIPS_INTENT_PERCEPTUAL));
+            importedToP3 = image.interpretation() == VIPS_INTERPRETATION_RGB16;
           }
         } catch(...) {
           sharp::VipsWarningCallback(nullptr, G_LOG_LEVEL_WARNING, "Invalid embedded profile", nullptr);
@@ -938,7 +940,7 @@ class PipelineWorker : public Napi::AsyncWorker {
         try {
           image = image.colourspace(VIPS_INTERPRETATION_XYZ).icc_export(VImage::option()
             ->set("output_profile", baton->withIccProfile.empty()
-              ? processingProfile
+              ? (sharp::Is16Bit(baton->colourspace) ? processingProfile : "srgb")
               : const_cast<char*>(baton->withIccProfile.data()))
             ->set("intent", VIPS_INTENT_PERCEPTUAL));
         } catch(...) {
@@ -949,6 +951,11 @@ class PipelineWorker : public Napi::AsyncWorker {
       // Ensure output colour space
       if (sharp::Is16Bit(image.interpretation())) {
         image = image.cast(VIPS_FORMAT_USHORT);
+      }
+      if (importedToP3 && !sharp::Is16Bit(baton->colourspace) && baton->withIccProfile.empty()) {
+        image = image.icc_transform("srgb", VImage::option()
+          ->set("input_profile", "p3")
+          ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
       if (image.interpretation() != baton->colourspace) {
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
