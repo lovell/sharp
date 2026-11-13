@@ -612,6 +612,14 @@ suite('Input/output', () => {
     }
   });
 
+  test('Input file path square bracket options are ignored', async (t) => {
+    for (const suffix of ['[shrink=8]', '[shrink=8][shrink=4]']) {
+      const { width, height } = await sharp(`${fixtures.inputJpg}${suffix}`).metadata();
+      t.assert.strictEqual(width, 2725);
+      t.assert.strictEqual(height, 2225);
+    }
+  });
+
   suite('Fail for unsupported input', () => {
     test('Undefined', (t) => {
       t.plan(1);
