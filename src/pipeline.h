@@ -66,6 +66,7 @@ struct PipelineBaton {
   VipsKernel kernel;
   sharp::Canvas canvas;
   int position;
+  std::vector<double> positionCoordinates;
   std::vector<double> resizeBackground;
   bool hasCropOffset;
   int cropOffsetLeft;
@@ -257,6 +258,7 @@ struct PipelineBaton {
     kernel(VIPS_KERNEL_LANCZOS3),
     canvas(sharp::Canvas::CROP),
     position(0),
+    positionCoordinates{},
     resizeBackground{ 0.0, 0.0, 0.0, 255.0 },
     hasCropOffset(false),
     cropOffsetLeft(0),
