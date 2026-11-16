@@ -132,6 +132,12 @@ namespace sharp {
    * Erode an image
    */
   VImage Erode(VImage image, int const maskWidth);
+
+  /*
+   * Map pixel values through a 1D LUT (256 entries per band).
+   * lutData is length 256 * lutBands; lutBands is 1, 3 or 4.
+   */
+  VImage Maplut(VImage image, std::vector<double> const &lutData, int const lutBands);
 }  // namespace sharp
 
 #endif  // SRC_OPERATIONS_H_

@@ -140,4 +140,42 @@ sharp('3-channel-rgb-input.png')
     // If `I(1,1) = [247, 170, 14] = [0b11110111, 0b10101010, 0b00001111]`
     // then `O(1,1) = 0b11110111 & 0b10101010 & 0b00001111 = 0b00000010 = 2`.
   });
+```## maplut
+> maplut(lookupTable) ⇒ <code>Sharp</code>
+
+Map pixel values through a 1D look-up table (LUT).
+
+Accepts either:
+- an array of 256 integers (applied after converting the image to greyscale), or
+- an array of 3 or 4 arrays, each of 256 integers (one LUT per colour channel;
+  a 3-band LUT leaves any alpha channel unchanged).
+
+Values outside 0–255 are clamped.
+
+
+**Throws**:
+
+- <code>Error</code> Invalid parameters
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| lookupTable | <code>Array.&lt;number&gt;</code> \| <code>Array.&lt;Array.&lt;number&gt;&gt;</code> | 256 values, or 3/4 arrays of 256 values. |
+
+**Example**  
+```js
+// Invert a greyscale image via LUT
+const inverted = await sharp(input)
+  .maplut([...Array(256).keys()].reverse())
+  .toBuffer();
+```
+
+**Example**  
+```js
+// Per-channel LUTs (identity R/G, invert B)
+const identity = [...Array(256).keys()];
+const invertedBlue = identity.slice().reverse();
+await sharp(input)
+  .maplut([identity, identity, invertedBlue])
+  .toFile('out.png');
 ```
