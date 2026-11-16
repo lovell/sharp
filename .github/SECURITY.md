@@ -38,6 +38,12 @@ Potential security issues are co-ordinated, fixed and published ahead of details
 
 ### Security considerations
 
+#### Sanity-check metadata before decoding pixel data
+
+Use [metadata](/api-input/#metadata) for fast and safe access to the header of an image,
+which can be used to verify dimensions and similar properties before an output image is requested
+and therefore before pixel data is decompressed.
+
 #### Reduce effects of memory-related vulnerabilities
 
 High severity issues often relate to heap-buffer overflow,
