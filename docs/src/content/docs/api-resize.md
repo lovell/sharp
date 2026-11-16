@@ -23,8 +23,14 @@ When using a **fit** of `cover` or `contain`, the default **position** is `centr
 - `sharp.position`: `top`, `right top`, `right`, `right bottom`, `bottom`, `left bottom`, `left`, `left top`.
 - `sharp.gravity`: `north`, `northeast`, `east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` or `centre`.
 - `sharp.strategy`: `cover` only, dynamically crop using either the `entropy` or `attention` strategy.
+- `[x, y]`: horizontal and vertical alignment, each a number between `0` and `1` inclusive.
+  `[0, 0]` aligns to the top left, `[0.5, 0.5]` to the centre and `[1, 1]` to the bottom right.
 
 Some of these values are based on the [object-position](https://developer.mozilla.org/en-US/docs/Web/CSS/object-position) CSS property.
+Coordinates align the resized image within the output: for `cover`, `[0.25, 0.75]` removes
+25% of the excess width from the left and 75% of the excess height from the top.
+For `contain`, these fractions instead determine the padding on the left and top.
+Offsets are rounded to the nearest pixel for `cover` and down for `contain`, matching named positions.
 
 The strategy-based approach initially resizes so one dimension is at its target length
 then repeatedly ranks edge regions, discarding the edge with the lowest score based on the selected strategy.
@@ -61,7 +67,7 @@ Previous calls to `resize` in the same pipeline will be ignored.
 | [options.width] | <code>number</code> |  | An alternative means of specifying `width`. If both are present this takes priority. |
 | [options.height] | <code>number</code> |  | An alternative means of specifying `height`. If both are present this takes priority. |
 | [options.fit] | <code>String</code> | <code>&#x27;cover&#x27;</code> | How the image should be resized/cropped to fit the target dimension(s), one of `cover`, `contain`, `fill`, `inside` or `outside`. |
-| [options.position] | <code>String</code> | <code>&#x27;centre&#x27;</code> | A position, gravity or strategy to use when `fit` is `cover` or `contain`. |
+| [options.position] | <code>String</code> \| <code>number</code> \| <code>Array.&lt;number&gt;</code> | <code>&#x27;centre&#x27;</code> | A position, gravity, strategy or `[x, y]` alignment to use when `fit` is `cover` or `contain`. Coordinates must each be between `0` and `1` inclusive. |
 | [options.background] | <code>String</code> \| <code>Object</code> | <code>{r: 0, g: 0, b: 0, alpha: 1}</code> | background colour when `fit` is `contain`, parsed by the [color](https://www.npmjs.org/package/color) module, defaults to black without transparency. |
 | [options.kernel] | <code>String</code> | <code>&#x27;lanczos3&#x27;</code> | The kernel to use for image reduction and the inferred interpolator to use for upsampling. Use the `fastShrinkOnLoad` option to control kernel vs shrink-on-load. |
 | [options.withoutEnlargement] | <code>Boolean</code> | <code>false</code> | Do not scale up if the width *or* height are already less than the target dimensions, equivalent to GraphicsMagick's `>` geometry option. This may result in output dimensions smaller than the target dimensions. |
