@@ -220,80 +220,91 @@ suite('Partial image extraction', () => {
     suite('using the legacy extract(top,left,width,height) syntax', () => {
       test('String top', (t) => {
         t.plan(1);
-        t.assert.throws(() => {
-          sharp(fixtures.inputJpg).extract('spoons', 10, 10, 10);
-        });
+        t.assert.throws(
+          () => sharp(fixtures.inputJpg).extract({ top: 'spoons', left: 10, width: 10, height: 10 }),
+          /Expected integer between 0 and 100000000 for top but received spoons of type string/
+        );
       });
 
       test('Non-integral left', (t) => {
         t.plan(1);
-        t.assert.throws(() => {
-          sharp(fixtures.inputJpg).extract(10, 10.2, 10, 10);
-        });
+        t.assert.throws(
+          () => sharp(fixtures.inputJpg).extract({ top: 10, left: 10.2, width: 10, height: 10 }),
+          /Expected integer between 0 and 100000000 for left but received 10.2 of type number/
+        );
       });
 
       test('Negative width - negative', (t) => {
         t.plan(1);
-        t.assert.throws(() => {
-          sharp(fixtures.inputJpg).extract(10, 10, -10, 10);
-        });
+        t.assert.throws(
+          () => sharp(fixtures.inputJpg).extract({ top: 10, left: 10, width: -10, height: 10 }),
+          /Expected integer between 0 and 100000000 for width but received -10 of type number/
+        );
       });
 
       test('Null height', (t) => {
         t.plan(1);
-        t.assert.throws(() => {
-          sharp(fixtures.inputJpg).extract(10, 10, 10, null);
-        });
+        t.assert.throws(
+          () => sharp(fixtures.inputJpg).extract({ top: 10, left: 10, width: 10, height: null }),
+          /Expected integer between 0 and 100000000 for height but received null of type object/
+        );
       });
     });
 
     test('Undefined', (t) => {
       t.plan(1);
-      t.assert.throws(() => {
-        sharp(fixtures.inputJpg).extract();
-      });
+      t.assert.throws(
+        () => sharp(fixtures.inputJpg).extract(),
+        /Expected plain object for options but received undefined of type undefined/
+      );
     });
 
     test('String top', (t) => {
       t.plan(1);
-      t.assert.throws(() => {
-        sharp(fixtures.inputJpg).extract({ left: 10, top: 'spoons', width: 10, height: 10 });
-      });
+      t.assert.throws(
+        () => sharp(fixtures.inputJpg).extract({ left: 10, top: 'spoons', width: 10, height: 10 }),
+        /Expected integer between 0 and 100000000 for top but received spoons of type string/
+      );
     });
 
     test('Non-integral left', (t) => {
       t.plan(1);
-      t.assert.throws(() => {
-        sharp(fixtures.inputJpg).extract({ left: 10.2, top: 10, width: 10, height: 10 });
-      });
+      t.assert.throws(
+        () => sharp(fixtures.inputJpg).extract({ left: 10.2, top: 10, width: 10, height: 10 }),
+        /Expected integer between 0 and 100000000 for left but received 10.2 of type number/
+      );
     });
 
     test('Negative width - negative', (t) => {
       t.plan(1);
-      t.assert.throws(() => {
-        sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: -10, height: 10 });
-      });
+      t.assert.throws(
+        () => sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: -10, height: 10 }),
+        /Expected integer between 0 and 100000000 for width but received -10 of type number/
+      );
     });
 
     test('Null height', (t) => {
       t.plan(1);
-      t.assert.throws(() => {
-        sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: 10, height: null });
-      });
+      t.assert.throws(
+        () => sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: 10, height: null }),
+        /Expected integer between 0 and 100000000 for height but received null of type object/
+      );
     });
 
     test('Oversized width', (t) => {
       t.plan(1);
-      t.assert.throws(() => {
-        sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: 100000001, height: 10 });
-      }, /Expected integer between 0 and 100000000 for width but received 100000001 of type number/);
+      t.assert.throws(
+        () => sharp(fixtures.inputJpg).extract({ left: 10, top: 10, width: 100000001, height: 10 }),
+        /Expected integer between 0 and 100000000 for width but received 100000001 of type number/
+      );
     });
 
     test('Oversized left', (t) => {
       t.plan(1);
-      t.assert.throws(() => {
-        sharp(fixtures.inputJpg).extract({ left: 2 ** 31, top: 10, width: 10, height: 10 });
-      }, /Expected integer between 0 and 100000000 for left but received 2147483648 of type number/);
+      t.assert.throws(
+        () => sharp(fixtures.inputJpg).extract({ left: 2 ** 31, top: 10, width: 10, height: 10 }),
+        /Expected integer between 0 and 100000000 for left but received 2147483648 of type number/
+      );
     });
 
     test('Bad image area', async (t) => {

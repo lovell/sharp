@@ -141,22 +141,26 @@ suite('GIF input', () => {
 
   test('invalid loop throws', (t) => {
     t.plan(2);
-    t.assert.throws(() => {
-      sharp().gif({ loop: -1 });
-    });
-    t.assert.throws(() => {
-      sharp().gif({ loop: 65536 });
-    });
+    t.assert.throws(
+      () => sharp().gif({ loop: -1 }),
+      /Expected integer between 0 and 65535 for loop but received -1 of type number/
+    );
+    t.assert.throws(
+      () => sharp().gif({ loop: 65536 }),
+      /Expected integer between 0 and 65535 for loop but received 65536 of type number/
+    );
   });
 
   test('invalid delay throws', (t) => {
     t.plan(4);
-    t.assert.throws(() => {
-      sharp().gif({ delay: -1 });
-    });
-    t.assert.throws(() => {
-      sharp().gif({ delay: [65536] });
-    });
+    t.assert.throws(
+      () => sharp().gif({ delay: -1 }),
+      /Expected integer or an array of integers between 0 and 65535 for delay but received -1 of type number/
+    );
+    t.assert.throws(
+      () => sharp().gif({ delay: [65536] }),
+      /Expected integer or an array of integers between 0 and 65535 for delay but received 65536 of type object/
+    );
     t.assert.throws(
       () => sharp().gif({ delay: new Array(1000001) }),
       /Expected integer or an array of integers between 0 and 65535 for delay but received [,]{100} of type object/
@@ -169,36 +173,42 @@ suite('GIF input', () => {
 
   test('invalid colour throws', (t) => {
     t.plan(2);
-    t.assert.throws(() => {
-      sharp().gif({ colours: 1 });
-    });
-    t.assert.throws(() => {
-      sharp().gif({ colours: 'fail' });
-    });
+    t.assert.throws(
+      () => sharp().gif({ colours: 1 }),
+      /Expected integer between 2 and 256 for colours but received 1 of type number/
+    );
+    t.assert.throws(
+      () => sharp().gif({ colours: 'fail' }),
+      /Expected integer between 2 and 256 for colours but received fail of type string/
+    );
   });
 
   test('invalid effort throws', (t) => {
     t.plan(3);
-    t.assert.throws(() => {
-      sharp().gif({ effort: 0 });
-    });
+    t.assert.throws(
+      () => sharp().gif({ effort: 0 }),
+      /Expected integer between 1 and 10 for effort but received 0 of type number/
+    );
     t.assert.throws(
       () => sharp().gif({ effort: 7.5 }),
       /Expected integer between 1 and 10 for effort but received 7.5 of type number/
     );
-    t.assert.throws(() => {
-      sharp().gif({ effort: 'fail' });
-    });
+    t.assert.throws(
+      () => sharp().gif({ effort: 'fail' }),
+      /Expected integer between 1 and 10 for effort but received fail of type string/
+    );
   });
 
   test('invalid dither throws', (t) => {
     t.plan(2);
-    t.assert.throws(() => {
-      sharp().gif({ dither: 1.1 });
-    });
-    t.assert.throws(() => {
-      sharp().gif({ effort: 'fail' });
-    });
+    t.assert.throws(
+      () => sharp().gif({ dither: 1.1 }),
+      /Expected number between 0.0 and 1.0 for dither but received 1.1 of type number/
+    );
+    t.assert.throws(
+      () => sharp().gif({ dither: 'fail' }),
+      /Expected number between 0.0 and 1.0 for dither but received fail of type string/
+    );
   });
 
   test('invalid interFrameMaxError throws', (t) => {
