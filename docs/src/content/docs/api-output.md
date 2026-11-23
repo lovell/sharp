@@ -291,7 +291,7 @@ built-in profile name (`srgb`, `p3`, `cmyk`).
 | --- | --- | --- | --- |
 | icc | <code>string</code> |  | Absolute filesystem path to output ICC profile or built-in profile name (srgb, p3, cmyk). |
 | [options] | <code>Object</code> |  |  |
-| [options.attach] | <code>number</code> | <code>true</code> | Should the ICC profile be included in the output image metadata? |
+| [options.attach] | <code>boolean</code> | <code>true</code> | Should the ICC profile be included in the output image metadata? |
 
 **Example**  
 ```js

@@ -42,7 +42,7 @@ where the overall height is the `pageHeight` multiplied by the number of `pages`
 | [options.autoOrient] | <code>boolean</code> | <code>false</code> | Set this to `true` to rotate/flip the image to match EXIF `Orientation`, if any. |
 | [options.sequentialRead] | <code>boolean</code> | <code>true</code> | Set this to `false` to use random access rather than sequential read. Some operations will do this automatically. |
 | [options.density] | <code>number</code> | <code>72</code> | The DPI at which to render SVG and PDF images, in the range 1 to 100000. |
-| [options.ignoreIcc] | <code>number</code> | <code>false</code> | should the embedded ICC profile, if any, be ignored. |
+| [options.ignoreIcc] | <code>boolean</code> | <code>false</code> | should the embedded ICC profile, if any, be ignored. |
 | [options.pages] | <code>number</code> | <code>1</code> | Number of pages to extract for multi-page input (GIF, WebP, TIFF), use -1 for all pages. |
 | [options.page] | <code>number</code> | <code>0</code> | Page number to start extracting from for multi-page input (GIF, WebP, TIFF), zero based. |
 | [options.animated] | <code>boolean</code> | <code>false</code> | Set to `true` to read all frames/pages of an animated image (GIF, WebP, TIFF), equivalent of setting `pages` to `-1`. |
