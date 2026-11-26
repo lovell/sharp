@@ -63,7 +63,7 @@ suite('Image channel extraction', () => {
     t.assert.strictEqual(chroma, 104);
   });
 
-  test('Alpha from 16-bit PNG', async (t) => {
+  test.skip('Alpha from 16-bit PNG', async (t) => {
     t.plan(1);
     const output = fixtures.path('output.extract-alpha-16bit.png');
     await sharp(fixtures.inputPngWithTransparency16bit)

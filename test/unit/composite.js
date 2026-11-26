@@ -79,7 +79,7 @@ suite('composite', () => {
         premultiplied: true
       }])
       .toFile(actual);
-    await t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(actual, expected));
+    t.assert.doesNotThrow(() => fixtures.assertMaxColourDistance(actual, expected));
   });
 
   test('premultiplied false', async (t) => {
@@ -277,8 +277,7 @@ suite('composite', () => {
     const { data, info } = await sharp(fixtures.inputJpg)
       .resize(300, 300)
       .composite([{
-        input: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect x="0" y="0" width="200" height="200" rx="50" ry="50"/></svg>'),
-        density: 96,
+        input: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250"><rect x="0" y="0" width="250" height="250" rx="50" ry="50"/></svg>'),
         blend: 'dest-in',
         cutout: true
       }])

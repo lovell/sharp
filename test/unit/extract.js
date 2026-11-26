@@ -76,7 +76,7 @@ suite('Partial image extraction', () => {
   test('Before resize', async (t) => {
     t.plan(3);
     const { data, info } = await sharp(fixtures.inputJpg)
-      .extract({ left: 10, top: 10, width: 10, height: 500 })
+      .extract({ left: 300, top: 300, width: 80, height: 200 })
       .resize(100, 100)
       .toBuffer({ resolveWithObject: true });
     t.assert.strictEqual(100, info.width);

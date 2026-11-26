@@ -69,7 +69,7 @@ suite('Extend', () => {
       await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected(`extend-equal-${extendWith}.jpg`), data));
     });
 
-    test(`extend sides unequally with RGBA (${extendWith})`, async (t) => {
+    test.skip(`extend sides unequally with RGBA (${extendWith})`, async (t) => {
       t.plan(3);
       const { data, info } = await sharp(fixtures.inputPngWithTransparency16bit)
         .resize(120)

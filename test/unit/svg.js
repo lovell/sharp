@@ -74,12 +74,12 @@ suite('SVG input', () => {
 
   test('Convert SVG to PNG at 14.4DPI', async (t) => {
     t.plan(3);
-    const { data, info } = await sharp(fixtures.inputSvg, { density: 14.4 })
+    const { data, info } = await sharp(fixtures.inputSvgUnits, { density: 14.4 })
       .toFormat('png')
       .toBuffer({ resolveWithObject: true });
     t.assert.strictEqual('png', info.format);
-    t.assert.strictEqual(20, info.width);
-    t.assert.strictEqual(20, info.height);
+    t.assert.strictEqual(57, info.width);
+    t.assert.strictEqual(57, info.height);
     if (fixtures.isLittleEndian) {
       await fixtures.assertSimilar(fixtures.expected('svg14.4.png'), data);
     }

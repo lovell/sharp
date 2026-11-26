@@ -495,7 +495,7 @@ namespace sharp {
           image.set(VIPS_META_N_PAGES, static_cast<int>(descriptor->rawHeight / descriptor->rawPageHeight));
         }
         if (descriptor->rawPremultiplied) {
-          image = image.unpremultiply();
+          image = image.unpremultiply(VImage::option()->set("uchar", true));
         }
         imageType = ImageType::RAW;
       } else {
@@ -1028,7 +1028,7 @@ namespace sharp {
       .new_from_image(rgba)
       .colourspace(interpretation, VImage::option()->set("source_space", VIPS_INTERPRETATION_sRGB));
     if (premultiply) {
-      pixel = pixel.premultiply();
+      pixel = pixel.premultiply(VImage::option()->set("uchar", true));
     }
     return pixel(0, 0);
   }

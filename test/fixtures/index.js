@@ -128,6 +128,7 @@ module.exports = {
   inputJxlAnimated: getPath('rotating-squares.jxl'), // CC0 https://loading.io/spinner/blocks/-rotating-squares-preloader-gif
   inputSvg: getPath('check.svg'), // http://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg
   inputSvgSmallViewBox: getPath('circle.svg'),
+  inputSvgUnits: getPath('circle-units.svg'),
   inputSvgWithEmbeddedImages: getPath('struct-image-04-t.svg'), // https://dev.w3.org/SVG/profiles/1.2T/test/svg/struct-image-04-t.svg
   inputAvif: getPath('sdr_cosmos12920_cicp1-13-6_yuv444_full_qp10.avif'), // CC by-nc-nd https://github.com/AOMediaCodec/av1-avif/tree/master/testFiles/Netflix
   inputAvifWithPitmBox: getPath('pitm.avif'), // https://github.com/lovell/sharp/issues/4487

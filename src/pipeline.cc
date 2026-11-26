@@ -363,7 +363,7 @@ class PipelineWorker : public Napi::AsyncWorker {
               baton->widthPre / gainMapScaleFactor, baton->heightPre / gainMapScaleFactor);
           }
         } else if (baton->withGainMap) {
-          image = image.uhdr2scRGB();
+          image = image.UHDR2scRGB();
         }
         image = image.copy();
         image.remove("gainmap");
@@ -480,7 +480,10 @@ class PipelineWorker : public Napi::AsyncWorker {
         (shouldResize || shouldBlur || shouldConv || shouldSharpen);
 
       if (shouldPremultiplyAlpha) {
-        image = image.premultiply().cast(premultiplyFormat);
+        image = image.premultiply(VImage::option()->set("uchar", true));
+        if (premultiplyFormat != VIPS_FORMAT_UCHAR) {
+          image = image.cast(premultiplyFormat);
+        }
       }
 
       // Resize
@@ -772,7 +775,10 @@ class PipelineWorker : public Napi::AsyncWorker {
 
       // Reverse premultiplication after all transformations
       if (shouldPremultiplyAlpha) {
-        image = image.unpremultiply().cast(premultiplyFormat);
+        image = image.unpremultiply(VImage::option()->set("uchar", true));
+        if (premultiplyFormat != VIPS_FORMAT_UCHAR) {
+          image = image.cast(premultiplyFormat);
+        }
       }
       baton->premultiplied = shouldPremultiplyAlpha;
 
@@ -847,7 +853,9 @@ class PipelineWorker : public Napi::AsyncWorker {
           }
           // Ensure image to composite is with unpremultiplied alpha
           compositeImage = sharp::EnsureAlpha(compositeImage, 1);
-          if (composite->premultiplied) compositeImage = compositeImage.unpremultiply();
+          if (composite->premultiplied) {
+            compositeImage = compositeImage.unpremultiply(VImage::option()->set("uchar", true));
+          }
           // Calculate position
           int left;
           int top;

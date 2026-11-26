@@ -237,10 +237,14 @@ Napi::Value _maxColourDistance(const Napi::CallbackInfo& info) {
   try {
     // Premultiply and remove alpha
     if (image1.has_alpha()) {
-      image1 = image1.premultiply().extract_band(1, VImage::option()->set("n", image1.bands() - 1));
+      image1 = image1
+        .premultiply(VImage::option()->set("uchar", true))
+        .extract_band(1, VImage::option()->set("n", image1.bands() - 1));
     }
     if (image2.has_alpha()) {
-      image2 = image2.premultiply().extract_band(1, VImage::option()->set("n", image2.bands() - 1));
+      image2 = image2
+        .premultiply(VImage::option()->set("uchar", true))
+        .extract_band(1, VImage::option()->set("n", image2.bands() - 1));
     }
     // Calculate colour distance
     maxColourDistance = image1.dE00(image2).max();

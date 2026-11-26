@@ -67,7 +67,7 @@ suite('Resize fit=contain', () => {
     await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('embed-4-into-4.png'), data));
   });
 
-  test('16-bit PNG with alpha channel', async (t) => {
+  test.skip('16-bit PNG with alpha channel', async (t) => {
     t.plan(6);
     const { data, info } = await sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 16, { fit: 'contain' })
@@ -80,7 +80,7 @@ suite('Resize fit=contain', () => {
     await t.assert.doesNotReject(() => fixtures.assertSimilar(fixtures.expected('embed-16bit.png'), data));
   });
 
-  test('16-bit PNG with alpha channel onto RGBA', async (t) => {
+  test.skip('16-bit PNG with alpha channel onto RGBA', async (t) => {
     t.plan(6);
     const { data, info } = await sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 16, {

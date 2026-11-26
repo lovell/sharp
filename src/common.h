@@ -18,9 +18,9 @@
 // Verify platform and compiler compatibility
 
 #if (VIPS_MAJOR_VERSION < 8) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 18) || \
-  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 18 && VIPS_MICRO_VERSION < 7)
-#error "libvips version 8.18.7+ is required - please see https://sharp.pixelplumbing.com/install"
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION < 19) || \
+  (VIPS_MAJOR_VERSION == 8 && VIPS_MINOR_VERSION == 19 && VIPS_MICRO_VERSION < 0)
+#error "libvips version 8.19.0+ is required - please see https://sharp.pixelplumbing.com/install"
 #endif
 
 #if defined(__has_include)

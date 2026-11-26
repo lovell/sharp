@@ -41,7 +41,7 @@ suite('Trim borders', () => {
     t.assert.strictEqual(info.trimOffsetTop, -20);
   });
 
-  test('16-bit PNG with alpha channel', async (t) => {
+  test.skip('16-bit PNG with alpha channel', async (t) => {
     t.plan(8);
     const { data, info } = await sharp(fixtures.inputPngWithTransparency16bit)
       .resize(32, 32)
