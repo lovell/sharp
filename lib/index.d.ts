@@ -906,6 +906,7 @@ declare namespace sharp {
          *  - sharp.position: top, right top, right, right bottom, bottom, left bottom, left, left top.
          *  - sharp.gravity: north, northeast, east, southeast, south, southwest, west, northwest, center or centre.
          *  - sharp.strategy: cover only, dynamically crop using either the entropy or attention strategy. Some of these values are based on the object-position CSS property.
+         *  - [x, y]: horizontal and vertical alignment between 0 and 1 inclusive, from top left to bottom right.
          *
          * The strategy-based approach resizes so one dimension is at its target length then repeatedly ranks edge regions,
          * discarding the edge with the lowest score based on the selected strategy.
@@ -1587,8 +1588,8 @@ declare namespace sharp {
         height?: number | undefined;
         /** How the image should be resized to fit both provided dimensions, one of cover, contain, fill, inside or outside. (optional, default 'cover') */
         fit?: keyof FitEnum | undefined;
-        /** Position, gravity or strategy to use when fit is cover or contain. (optional, default 'centre') */
-        position?: number | string | undefined;
+        /** Position, gravity, strategy or [x, y] alignment (each between 0 and 1) to use when fit is cover or contain. (optional, default 'centre') */
+        position?: number | string | readonly [number, number] | undefined;
         /** Background colour when using a fit of contain, parsed by the color module, defaults to black without transparency. (optional, default {r:0,g:0,b:0,alpha:1}) */
         background?: ColorLike | undefined;
         /** The kernel to use for image reduction. (optional, default 'lanczos3') */
