@@ -243,6 +243,8 @@ struct PipelineBaton {
   std::string tileId;
   std::string tileBasename;
   std::vector<double> recombMatrix;
+  std::vector<double> maplut;
+  int maplutBands;
 
   PipelineBaton():
     input(nullptr),
@@ -416,7 +418,8 @@ struct PipelineBaton {
     tileAngle(0),
     tileBackground{ 255.0, 255.0, 255.0, 255.0 },
     tileSkipBlanks(-1),
-    tileDepth(VIPS_FOREIGN_DZ_DEPTH_LAST) {}
+    tileDepth(VIPS_FOREIGN_DZ_DEPTH_LAST),
+    maplutBands(0) {}
 };
 
 #endif  // SRC_PIPELINE_H_
